@@ -1,0 +1,36 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "label"
+    },
+    {
+      "name": "Home",
+      "value": "主页"
+    },
+    {
+      "name": "Proxy",
+      "value": "代理"
+    },
+    {
+      "name": "Configuration",
+      "value": "配置"
+    },
+    {
+      "name": "More",
+      "value": "更多"
+    },
+    {
+      "name": "Settings",
+      "value": "设置"
+    }
+  ]
+}

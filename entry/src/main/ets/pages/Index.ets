@@ -1,0 +1,157 @@
+//Index 媒体查询
+import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
+import { mediaquery, window } from '@kit.ArkUI'
+import { common } from '@kit.AbilityKit'
+import Home from './HomePage'
+import ProxyPage  from './ProxyPage'
+import ConfigurationPage from './ConfigurationPage'
+import MorePage from './MorePage'
+
+interface marginGenerate {
+  top: number,
+  left?:number
+}
+
+@Entry
+@Component
+struct Index {
+  @State currentIndex: number = 0
+  @State isLandscape:boolean = false
+  @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
+  @State compDirection: BreakpointState<FlexDirection> = BreakpointState.of({
+    sm: FlexDirection.Column,
+    md: FlexDirection.Column,
+    lg: FlexDirection.Column,
+    xl: FlexDirection.Column
+  });
+  @State compBarPose: BreakpointState<BarPosition> = BreakpointState.of({
+    sm: BarPosition.End,
+    md: BarPosition.End,
+    lg: BarPosition.End,
+    xl: BarPosition.Start
+  });
+  @State compVertical: BreakpointState<boolean> = BreakpointState.of({
+    sm: false,
+    md: false,
+    lg: false,
+    xl: true
+  });
+  @State compBarWidth: BreakpointState<string> = BreakpointState.of({
+    sm: '100%', md: '100%', lg: '100%', xl: '60vp'
+  });
+  @State compBarHeight: BreakpointState<string> = BreakpointState.of({
+    sm: '55vp', md: '55vp', lg: '55vp', xl: '100%'
+  });
+  @State compMargin: BreakpointState<marginGenerate> = BreakpointState.of({
+    sm: ({ top: 4 } as marginGenerate),
+    md: ({ top: 4 } as marginGenerate),
+    lg: ({ left: 8 } as marginGenerate),
+    xl: ({ top: 4 } as marginGenerate)
+  });
+
+  @Builder TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
+    Flex({
+      direction: this.compDirection.value,
+      justifyContent: FlexAlign.Center,
+      alignItems: ItemAlign.Center
+    }) {
+      Image(TabIcon)
+        .size({ width: 36, height: 36 })
+        .fillColor(this.currentIndex === index ? '#ff2649f6' : '#999')
+      Text(title)
+        .fontColor(this.currentIndex === index ? '#ff2649f6' : '#999')
+        .margin(this.compMargin.value)
+        .fontSize(16)
+    }
+    .width('100%')
+    .height('100%')
+  }
+
+  // 当设备横屏时条件成立
+  listener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(orientation: landscape)');
+
+  // 当满足媒体查询条件时，触发回调
+  onPortrait(mediaQueryResult:mediaquery.MediaQueryResult) {
+    if (mediaQueryResult.matches as boolean) { // 若设备为横屏状态，更改相应的页面布局
+      this.isLandscape = true
+      console.log('横屏' + this.isLandscape)
+    } else {
+      this.isLandscape = false
+      console.log('竖屏' + this.isLandscape)
+    }
+  }
+
+  aboutToAppear() {
+
+    // 绑定当前应用实例
+    // 绑定回调函数
+    this.listener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
+      this.onPortrait(mediaQueryResult)
+    });
+
+    BreakpointSystem.getInstance().attach(this.compStr)
+    BreakpointSystem.getInstance().attach(this.compDirection)
+    BreakpointSystem.getInstance().attach(this.compBarPose)
+    BreakpointSystem.getInstance().attach(this.compVertical)
+    BreakpointSystem.getInstance().attach(this.compBarWidth)
+    BreakpointSystem.getInstance().attach(this.compBarHeight)
+    BreakpointSystem.getInstance().attach(this.compMargin)
+    BreakpointSystem.getInstance().start()
+  }
+
+  aboutToDisappear() {
+
+    BreakpointSystem.getInstance().detach(this.compStr)
+    BreakpointSystem.getInstance().detach(this.compDirection)
+    BreakpointSystem.getInstance().detach(this.compBarPose)
+    BreakpointSystem.getInstance().detach(this.compVertical)
+    BreakpointSystem.getInstance().detach(this.compBarWidth)
+    BreakpointSystem.getInstance().detach(this.compBarHeight)
+    BreakpointSystem.getInstance().detach(this.compMargin)
+    BreakpointSystem.getInstance().stop()
+
+    // 解绑listener中注册的回调函数
+    this.listener.off('change');
+  }
+
+  // 改变设备横竖屏状态函数
+  private changeOrientation(isLandscape: boolean) {
+    // 获取UIAbility实例的上下文信息
+    let context:common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    // 调用该接口手动改变设备横竖屏状态
+    window.getLastWindow(context).then((lastWindow) => {
+      lastWindow.setPreferredOrientation(isLandscape ? window.Orientation.LANDSCAPE : window.Orientation.PORTRAIT)
+    });
+  }
+  /**/
+  build() {
+    Tabs({
+      barPosition:this.isLandscape ? BarPosition.Start : this.compBarPose.value
+    }) {
+      TabContent() {
+        Home()
+      }
+      .tabBar(this.TabBarBuilder($r('app.string.Home'), 0, $rawfile('house_fill.svg')))
+
+      TabContent() {
+        ProxyPage()
+      }
+      .tabBar(this.TabBarBuilder( $r('app.string.Proxy'), 1, $rawfile('list_bullet_square_fill.svg')))
+      TabContent() {
+        ConfigurationPage()
+      }
+      .tabBar(this.TabBarBuilder( $r('app.string.Configuration'), 2, $rawfile('folder_fill.svg')))
+      TabContent() {
+        MorePage()
+      }
+      .tabBar(this.TabBarBuilder( $r('app.string.More'), 3, $rawfile('square_fill_grid_2x2.svg')))
+    }
+    .vertical(this.isLandscape ? true : this.compVertical.value)/**/
+    .barWidth(this.isLandscape ? '60vp' : this.compBarWidth.value)/**/
+    .barHeight(this.isLandscape ? '100%' : this.compBarHeight.value)/**/
+    .animationDuration(0)
+    .onChange((index: number) => {
+      this.currentIndex = index
+    })
+  }
+}

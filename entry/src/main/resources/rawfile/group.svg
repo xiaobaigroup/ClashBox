@@ -1,0 +1,29 @@
+<svg width="24.000000" height="24.000000" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<desc>
+			Created with Pixso.
+	</desc>
+	<defs>
+		<clipPath id="clip610_8863">
+			<rect id="xmark_circle_fill" width="24.000000" height="24.000000" fill="white" fill-opacity="0"/>
+		</clipPath>
+	</defs>
+	<g clip-path="url(#clip610_8863)">
+		<g opacity="0.000000">
+			<rect id="rect" width="24.000000" height="24.000000" fill="#000000" fill-opacity="1.000000"/>
+		</g>
+		<path id="矩形 16" d="M5 1L19 1C21.2 1 23 2.79 23 5L23 19C23 21.2 21.2 23 19 23L5 23C2.79 23 1 21.2 1 19L1 5C1 2.79 2.79 1 5 1Z" fill="#FFFFFF" fill-opacity="1.000000" fill-rule="evenodd"/>
+		<path id="矩形 16" d="M5 1L19 1C21.2 1 23 2.79 23 5L23 19C23 21.2 21.2 23 19 23L5 23C2.79 23 1 21.2 1 19L1 5C1 2.79 2.79 1 5 1ZM5 2.7L19 2.7Q19.47 2.7 19.88 2.86Q20.28 3.03 20.62 3.37Q20.96 3.71 21.13 4.11Q21.3 4.52 21.3 5L21.3 19Q21.3 20.15 20.72 20.72Q20.15 21.3 19 21.3L5 21.3Q3.84 21.3 3.27 20.72Q2.7 20.15 2.7 19L2.7 5Q2.7 4.52 2.86 4.11Q3.03 3.71 3.37 3.37Q3.71 3.03 4.11 2.86Q4.52 2.7 5 2.7Z" fill="#000000" fill-opacity="1.000000" fill-rule="evenodd"/>
+		<rect id="矩形 17" x="8.000000" y="24.000000" width="24.000000" height="8.000000" transform="rotate(-90 8.000000 24.000000)" fill="#FFFFFF" fill-opacity="1.000000"/>
+		<g style="mix-blend-mode:normal">
+			<rect id="矩形 17" y="8.000000" width="24.000000" height="8.000000" fill="#FFFFFF" fill-opacity="1.000000"/>
+		</g>
+		<g style="mix-blend-mode:normal">
+			<rect id="矩形 18" x="5.000000" y="6.000000" rx="1.000000" width="9.000000" height="7.000000" fill="#FFFFFF" fill-opacity="1.000000"/>
+			<rect id="矩形 18" x="5.599976" y="6.600006" rx="1.000000" width="7.800000" height="5.800000" stroke="#000000" stroke-opacity="1.000000" stroke-width="1.200000"/>
+		</g>
+		<g style="mix-blend-mode:normal">
+			<rect id="矩形 18" x="10.000000" y="11.000000" rx="1.000000" width="9.000000" height="7.000000" fill="#FFFFFF" fill-opacity="1.000000"/>
+			<rect id="矩形 18" x="10.599976" y="11.600006" rx="1.000000" width="7.800000" height="5.800000" stroke="#000000" stroke-opacity="1.000000" stroke-width="1.200000"/>
+		</g>
+	</g>
+</svg>
