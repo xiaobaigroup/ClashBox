@@ -50,14 +50,16 @@ struct Index {
   });
 
   @Builder TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
+
     Flex({
       direction: this.compDirection.value,
       justifyContent: FlexAlign.Center,
       alignItems: ItemAlign.Center
     }) {
-      Image(TabIcon)
-        .size({ width: 36, height: 36 })
-        .fillColor(this.currentIndex === index ? '#ff2649f6' : '#999')
+      SymbolGlyph(TabIcon)
+        .fontColor([this.currentIndex === index ? '#ff2649f6' : '#999'])
+        .fontSize(36)
+
       Text(title)
         .fontColor(this.currentIndex === index ? '#ff2649f6' : '#999')
         .margin(this.compMargin.value)
@@ -66,6 +68,7 @@ struct Index {
     .width('100%')
     .height('100%')
   }
+
 
   // 当设备横屏时条件成立
   listener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(orientation: landscape)');
@@ -131,20 +134,20 @@ struct Index {
       TabContent() {
         Home()
       }
-      .tabBar(this.TabBarBuilder($r('app.string.Home'), 0, $rawfile('house_fill.svg')))
+      .tabBar(this.TabBarBuilder($r('app.string.Home'), 0, $r('sys.symbol.house_fill')))
 
       TabContent() {
         ProxyPage()
       }
-      .tabBar(this.TabBarBuilder( $r('app.string.Proxy'), 1, $rawfile('list_bullet_square_fill.svg')))
+      .tabBar(this.TabBarBuilder( $r('app.string.Proxy'), 1, $r('sys.symbol.list_bullet_square_fill')))
       TabContent() {
         ConfigurationPage()
       }
-      .tabBar(this.TabBarBuilder( $r('app.string.Configuration'), 2, $rawfile('folder_fill.svg')))
+      .tabBar(this.TabBarBuilder( $r('app.string.Configuration'), 2, $r('sys.symbol.folder_fill')))
       TabContent() {
         MorePage()
       }
-      .tabBar(this.TabBarBuilder( $r('app.string.More'), 3, $rawfile('square_fill_grid_2x2.svg')))
+      .tabBar(this.TabBarBuilder( $r('app.string.More'), 3, $r('sys.symbol.square_fill_grid_2x2')))
     }
     .vertical(this.isLandscape ? true : this.compVertical.value)/**/
     .barWidth(this.isLandscape ? '60vp' : this.compBarWidth.value)/**/
@@ -152,6 +155,7 @@ struct Index {
     .animationDuration(0)
     .onChange((index: number) => {
       this.currentIndex = index
+
     })
   }
 }
