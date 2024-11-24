@@ -11,6 +11,30 @@
     {
       "name": "EntryAbility_label",
       "value": "label"
+    },
+    {
+      "name": "Home",
+      "value": "主页"
+    },
+    {
+      "name": "Proxy",
+      "value": "代理"
+    },
+    {
+      "name": "Configuration",
+      "value": "配置"
+    },
+    {
+      "name": "More",
+      "value": "更多"
+    },
+    {
+      "name": "Settings",
+      "value": "设置"
+    },
+    {
+      "name": "Start",
+      "value": "立即启动"
     }
   ]
 }

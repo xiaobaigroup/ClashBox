@@ -31,6 +31,10 @@
     {
       "name": "Settings",
       "value": "设置"
+    },
+    {
+      "name": "Start",
+      "value": "立即启动"
     }
   ]
 }

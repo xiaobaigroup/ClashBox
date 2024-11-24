@@ -11,6 +11,30 @@
     {
       "name": "EntryAbility_label",
       "value": "label"
+    },
+    {
+      "name": "Start",
+      "value": "Start Now"
+    },
+    {
+      "name": "Settings",
+      "value": "Settings"
+    },
+    {
+      "name": "More",
+      "value": "More"
+    },
+    {
+      "name": "Configuration",
+      "value": "Configuration"
+    },
+    {
+      "name": "Proxy",
+      "value": "Proxy"
+    },
+    {
+      "name": "Home",
+      "value": "Home"
     }
   ]
 }
