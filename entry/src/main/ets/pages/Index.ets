@@ -152,6 +152,7 @@ struct Index {
     .vertical(this.isLandscape ? true : this.compVertical.value)/**/
     .barWidth(this.isLandscape ? '60vp' : this.compBarWidth.value)/**/
     .barHeight(this.isLandscape ? '100%' : this.compBarHeight.value)/**/
+    .margin(this.compMargin.value)
     .animationDuration(0)
     .onChange((index: number) => {
       this.currentIndex = index
