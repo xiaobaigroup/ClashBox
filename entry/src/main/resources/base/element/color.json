@@ -5,8 +5,16 @@
       "value": "#FFFFFF"
     },
     {
-      "name": "container_background",
+      "name": "settings_container_background",
       "value": "#999"
+    },
+    {
+      "name": "background",
+      "value": "#FFE5E4E4"
+    },
+    {
+      "name": "container_background",
+      "value": "#FFFFFFFF"
     }
   ]
 }

@@ -35,6 +35,38 @@
     {
       "name": "Start",
       "value": "立即启动"
+    },
+    {
+      "name": "Mode",
+      "value": "模式"
+    },
+    {
+      "name": "Rule",
+      "value": "规则"
+    },
+    {
+      "name": "Overall",
+      "value": "全局"
+    },
+    {
+      "name": "Direct",
+      "value": "直连"
+    },
+    {
+      "name": "TrafficStatistics",
+      "value": "流量统计"
+    },
+    {
+      "name": "CurrentNode",
+      "value": "当前节点"
+    },
+    {
+      "name": "PublicNetwork",
+      "value": "公网IP"
+    },
+    {
+      "name": "Switch",
+      "value": "切换"
     }
   ]
 }

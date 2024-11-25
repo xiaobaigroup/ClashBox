@@ -1,7 +1,6 @@
 //Index 媒体查询
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
 import { mediaquery, window } from '@kit.ArkUI'
-import { common } from '@kit.AbilityKit'
 import Home from './HomePage'
 import ProxyPage  from './ProxyPage'
 import ConfigurationPage from './ConfigurationPage'
@@ -17,6 +16,8 @@ interface marginGenerate {
 struct Index {
   @State currentIndex: number = 0
   @State isLandscape:boolean = false
+  @StorageProp('bottomRectHeight') bottomRectHeight: number = 0;// 读取导航条区域的高度
+  @StorageProp('topRectHeight') topRectHeight: number = 0;
   @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
   @State compDirection: BreakpointState<FlexDirection> = BreakpointState.of({
     sm: FlexDirection.Column,
@@ -118,45 +119,51 @@ struct Index {
   }
 
   // 改变设备横竖屏状态函数
-  private changeOrientation(isLandscape: boolean) {
+  /*private changeOrientation(isLandscape: boolean) {
     // 获取UIAbility实例的上下文信息
     let context:common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
     // 调用该接口手动改变设备横竖屏状态
     window.getLastWindow(context).then((lastWindow) => {
       lastWindow.setPreferredOrientation(isLandscape ? window.Orientation.LANDSCAPE : window.Orientation.PORTRAIT)
     });
-  }
+  }*/
   /**/
   build() {
-    Tabs({
-      barPosition:this.isLandscape ? BarPosition.Start : this.compBarPose.value
-    }) {
-      TabContent() {
-        Home()
-      }
-      .tabBar(this.TabBarBuilder($r('app.string.Home'), 0, $r('sys.symbol.house_fill')))
+    Column() {
+      Tabs({
+        barPosition:this.isLandscape ? BarPosition.Start : this.compBarPose.value
+      }) {
+        TabContent() {
+          Home()
+        }
+        .tabBar(this.TabBarBuilder($r('app.string.Home'), 0, $r('sys.symbol.house_fill')))
 
-      TabContent() {
-        ProxyPage()
+        TabContent() {
+          ProxyPage()
+        }
+        .tabBar(this.TabBarBuilder( $r('app.string.Proxy'), 1, $r('sys.symbol.list_bullet_square_fill')))
+        TabContent() {
+          ConfigurationPage()
+        }
+        .tabBar(this.TabBarBuilder( $r('app.string.Configuration'), 2, $r('sys.symbol.folder_fill')))
+        TabContent() {
+          MorePage()
+        }
+        .tabBar(this.TabBarBuilder( $r('app.string.More'), 3, $r('sys.symbol.square_fill_grid_2x2')))
       }
-      .tabBar(this.TabBarBuilder( $r('app.string.Proxy'), 1, $r('sys.symbol.list_bullet_square_fill')))
-      TabContent() {
-        ConfigurationPage()
-      }
-      .tabBar(this.TabBarBuilder( $r('app.string.Configuration'), 2, $r('sys.symbol.folder_fill')))
-      TabContent() {
-        MorePage()
-      }
-      .tabBar(this.TabBarBuilder( $r('app.string.More'), 3, $r('sys.symbol.square_fill_grid_2x2')))
+      .vertical(this.isLandscape ? true : this.compVertical.value)/**/
+      .barWidth(this.isLandscape ? '60vp' : this.compBarWidth.value)/**/
+      .barHeight(this.isLandscape ? '100%' : this.compBarHeight.value)/**/
+      .margin(this.compMargin.value)
+      .animationDuration(0)
+      .onChange((index: number) => {
+        this.currentIndex = index
+
+      })
     }
-    .vertical(this.isLandscape ? true : this.compVertical.value)/**/
-    .barWidth(this.isLandscape ? '60vp' : this.compBarWidth.value)/**/
-    .barHeight(this.isLandscape ? '100%' : this.compBarHeight.value)/**/
-    .margin(this.compMargin.value)
-    .animationDuration(0)
-    .onChange((index: number) => {
-      this.currentIndex = index
-
-    })
+    .width('100%')
+    .height('100%')
+    .backgroundColor($r('app.color.background'))
+    .padding({ top: px2vp(this.topRectHeight)-5, bottom: px2vp(this.bottomRectHeight) })
   }
 }

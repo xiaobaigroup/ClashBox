@@ -35,6 +35,38 @@
     {
       "name": "Home",
       "value": "Home"
+    },
+    {
+      "name": "Mode",
+      "value": "Mode"
+    },
+    {
+      "name": "Rule",
+      "value": "Rule"
+    },
+    {
+      "name": "Overall",
+      "value": "Overall"
+    },
+    {
+      "name": "Direct",
+      "value": "Direct"
+    },
+    {
+      "name": "TrafficStatistics",
+      "value": "TrafficStatistics"
+    },
+    {
+      "name": "CurrentNode",
+      "value": "CurrentNode"
+    },
+    {
+      "name": "PublicNetwork",
+      "value": "PublicNetwork"
+    },
+    {
+      "name": "Switch",
+      "value": "Switch"
     }
   ]
 }

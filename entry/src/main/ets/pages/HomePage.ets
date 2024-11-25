@@ -1,5 +1,11 @@
 //主页 栅格布局、媒体查询
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
+import { mediaquery, window } from '@kit.ArkUI'
+import SwitchMode from '../components/SwitchMode'
+import TrafficStatistics from '../components/TrafficStatistics'
+import CurrrentNode from '../components/CurrentNode'
+import PublicNetwork from '../components/PublicNetwork'
+import Start from '../components/Start'
 
 interface MarginGenerate {
   top: number,
@@ -9,12 +15,12 @@ interface MarginGenerate {
 @Entry
 @Component
 struct Home {
+  //@Prop isLandscape: boolean
   @State currentBp: string = ''
   @State greetings: string = '早上好'
   @State ContainerHeight: string = ''
   @State TopHeight: string = ''
-  @State DownloadSpeed: number = 0
-  @State UploadSpeed: number = 0
+  @State isLandscapePhone: boolean = false
   @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
   @State containerMargin1: BreakpointState<MarginGenerate> = BreakpointState.of({
     sm: ({ top: 10 } as MarginGenerate),
@@ -38,10 +44,26 @@ struct Home {
     sm: '26%', md: '36%', lg: '26%', xl: '46%'
   });
   @State ContainerHeight1: BreakpointState<string> = BreakpointState.of({
-    sm: '30%', md: '25%', lg: '26%', xl: '40%'
+    sm: '26%', md: '25%', lg: '26%', xl: '40%'
   });
 
+  onPhoneLandscape(mediaQueryResult:mediaquery.MediaQueryResult) {
+    if (mediaQueryResult.matches as boolean ) {
+      this.isLandscapePhone = true
+       console.log('手机横屏' + this.isLandscapePhone)
+    } else {
+      this.isLandscapePhone = false
+       console.log('手机竖屏' + this.isLandscapePhone)
+    }
+  }
+
+  // 手机横屏高度条件
+  phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
+
   aboutToAppear() {
+    this.phonelistener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
+      this.onPhoneLandscape(mediaQueryResult)
+    });
 
     BreakpointSystem.getInstance().attach(this.compStr)
     BreakpointSystem.getInstance().attach(this.containerMargin1)
@@ -60,6 +82,7 @@ struct Home {
     BreakpointSystem.getInstance().attach(this.containerHeight)
     BreakpointSystem.getInstance().attach(this.ContainerHeight1)
     BreakpointSystem.getInstance().stop()
+    this.phonelistener.off('change');
   }
 
 
@@ -67,7 +90,7 @@ struct Home {
     Column() {
       GridRow({
         columns: 12,
-        gutter: { x: 10, y: 10 },
+        gutter: { x: this.isLandscapePhone ? 5 : 10, y: 10 },
         breakpoints: {
           value: ["320vp", "600vp", "840vp", "1000vp"],
           reference: BreakpointsReference.WindowSize
@@ -97,7 +120,7 @@ struct Home {
               }
               .width(40)
               .height(40)
-              .backgroundColor($r('app.color.container_background'))
+              .backgroundColor($r('app.color.settings_container_background'))
             }
             //.backgroundColor('red')
           }
@@ -105,126 +128,102 @@ struct Home {
         .height('45vp')
 
         GridCol({
-          span: { xs: 12, sm: 12, md: 12, lg: 6, xl:6 }
+          span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 12 , lg: 6, xl:6 }
         }) {
           GridRow() {
             GridCol({
               span: 10, offset: 1, order: 0
             }) {
-              Column() {
-                GridRow() {
-                  GridCol({ span: 7 }) {
-                    Text($r('app.string.Start'))
-                      .fontSize(36)
-                  }
-                }.margin(5).height('25%')
-                GridRow() {
-
-                }//.flexGrow(1)
-                .height('50%')
-                GridRow() {
-                  GridCol({span: 6, offset:6}) {
-                    Row() {
-                      Text() {SymbolSpan($r('sys.symbol.chevron_up'))}
-                      Text(this.DownloadSpeed.toString() + 'Kbps')
-                        .margin({right: 3})
-                      Text() {SymbolSpan($r('sys.symbol.chevron_down'))}
-                      Text(this.UploadSpeed.toString() + 'Kbps')
-                        .margin({right: 3})
-                    }
-                  }
-                }.height('12%')
-              }
-
+              Start()
             }
             .width('100%')
             .height('100%')
             .borderRadius(20)
-            .backgroundColor('red')
+            .backgroundColor($r('app.color.container_background'))
           }
           .height('100%')
         }
-        .height(this.containerHeight.value)
-        .margin(this.containerMargin1.value)
+        .height(this.isLandscapePhone ? '45%' : this.containerHeight.value)
+        .margin(this.isLandscapePhone ? '2vp' : this.containerMargin1.value)
 
         GridCol({
-          span: { xs: 12, sm: 12, md: 12, lg: 6, xl:6 }
+          span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 12, lg: 6, xl:6 }
         }) {
           GridRow() {
             GridCol({
               span: 10,
-              offset: {sm: 1, md: 1} }) {
+              offset: {sm: 1, md: this.isLandscapePhone ? 0 : 1} }) {
               GridRow({columns:16}) {
                 GridCol({
                   span:{ sm: 7, md: 7, lg: 7, xl:7 }
                 }) {
-
+                  SwitchMode()
                 }
                 .height('100%')
-                .backgroundColor('blue')
+                .backgroundColor($r('app.color.container_background'))
                 .borderRadius(20)
                 GridCol({
                   span:{ sm: 7, md: 7, lg: 7, xl:7 },
                   offset:{sm: 2}
                 }) {
-
+                  TrafficStatistics()
                 }
                 .height('100%')
                 .borderRadius(20)
                 //.margin(this.containerMargin3.value)
-                .backgroundColor('blue')
+                .backgroundColor($r('app.color.container_background'))
               }
             }
             .height('100%')
           }
           .height('100%')
         }
-        .height(this.ContainerHeight1.value)
-        .margin(this.containerMargin2.value)
+        .height(this.isLandscapePhone ? '45%' : this.ContainerHeight1.value)
+        .margin(this.isLandscapePhone ? '2vp' : this.containerMargin2.value)
 
         GridCol({
-          span: { xs: 12, sm: 12, md: 12, lg: 6, xl:6 }
+          span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 12, lg: 6, xl:6 }
         }) {
           GridRow() {
             GridCol({
               span: 10,
-              offset: {sm: 1, md: 1} }) {
+              offset: 1 }) {
               GridRow({columns:16}) {
                 GridCol({
                   span:{ sm: 7, md: 7, lg: 7, xl:7 }
                 }) {
-
+                  CurrrentNode()
                 }
                 .height('100%')
-                .backgroundColor('gray')
+                .backgroundColor($r('app.color.container_background'))
                 .borderRadius(20)
                 GridCol({
                   span:{ sm: 7, md: 7, lg: 7, xl:7 },
-                  offset:{sm: 2}
+                  offset: 2
                 }) {
-
+                  PublicNetwork()
                 }
                 .height('100%')
                 .borderRadius(20)
                 //.margin(this.containerMargin3.value)
-                .backgroundColor('gray')
+                .backgroundColor($r('app.color.container_background'))
               }
             }
             .height('100%')
           }
           .height('100%')
         }
-        .height(this.ContainerHeight1.value)
-        .margin(this.containerMargin3.value)
+        .height(this.isLandscapePhone ? '45%' : this.ContainerHeight1.value)
+        .margin(this.isLandscapePhone ? '2vp' : this.containerMargin3.value)
 
-        if(this.currentBp === 'lg' || this.currentBp === 'xl') {
+        if(this.currentBp === 'lg' || this.currentBp === 'xl' || this.isLandscapePhone) {
           GridCol({
-            span: { xs: 12, sm: 12, md: 12, lg: 6, xl:6 }
+            span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 12, lg: 6, xl:6 }
           }) {
             GridRow() {
               GridCol({
                 span: 10,
-                offset: {sm: 1, md: 1} }) {
+                offset: {sm: 1, md: this.isLandscapePhone ? 0 : 1} }) {
                 GridRow({columns:16}) {
                   GridCol({
                     span:{ sm: 7, md: 7, lg: 7, xl:7 }
@@ -250,15 +249,15 @@ struct Home {
             }
             .height('100%')
           }
-          .height(this.ContainerHeight1.value)
-          .margin(this.containerMargin3.value)
+          .height(this.isLandscapePhone ? '45%' : this.ContainerHeight1.value)
+          .margin(this.isLandscapePhone ? '2vp' : this.containerMargin3.value)
         }
       }
       .width('100%')
       .height("100%")
       .onBreakpointChange((breakpoint) => {
         this.currentBp = breakpoint
-        switch (this.currentBp) {
+        /*switch (this.currentBp) {
           case 'xs':
           case 'sm':
             this.ContainerHeight = '26%'
@@ -270,10 +269,11 @@ struct Home {
             this.ContainerHeight = '46%'
             this.TopHeight = '11%'
             break
-        }
+        }*/
         console.log('断点为：' + this.currentBp + '容器高：' + this.ContainerHeight + '顶部高：' + this.TopHeight)
       })
     }
+    .backgroundColor($r('app.color.background'))
     .padding({bottom: '45vp'})
     .height("100%")
   }
