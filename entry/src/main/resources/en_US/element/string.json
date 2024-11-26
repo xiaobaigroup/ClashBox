@@ -53,10 +53,6 @@
       "value": "Direct"
     },
     {
-      "name": "TrafficStatistics",
-      "value": "TrafficStatistics"
-    },
-    {
       "name": "CurrentNode",
       "value": "CurrentNode"
     },
@@ -67,6 +63,14 @@
     {
       "name": "Switch",
       "value": "Switch"
+    },
+    {
+      "name": "CellularData",
+      "value": "CellularDataStatistics"
+    },
+    {
+      "name": "CellularData_Statistics_explanation",
+      "value": "Set monthly traffic to enable"
     }
   ]
 }

@@ -2,7 +2,7 @@
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
 import { mediaquery, window } from '@kit.ArkUI'
 import SwitchMode from '../components/SwitchMode'
-import TrafficStatistics from '../components/TrafficStatistics'
+import CellularData from '../components/CellularData'
 import CurrrentNode from '../components/CurrentNode'
 import PublicNetwork from '../components/PublicNetwork'
 import Start from '../components/Start'
@@ -51,10 +51,10 @@ struct Home {
     xs: '0vp', sm: '0vp', md: '0vp', lg: '15vp', xl: '15vp'
   });
   @State containerHeight: BreakpointState<string> = BreakpointState.of({
-    xs: '156vp', sm: '160vp', md: '261.41vp', lg: '26%', xl: '240vp'
+    xs: '156vp', sm: '160vp', md: '261.41vp', lg: '240vp', xl: '240vp'
   });
   @State GridRowHeight: BreakpointState<string> = BreakpointState.of({
-    xs: '715vp', sm: '715vp', md: '1158vp', lg: '26%', xl: '550vp'
+    xs: '715vp', sm: '715vp', md: '1158vp', lg: '550vp', xl: '550vp'
   });
 
   onPhoneLandscape(mediaQueryResult:mediaquery.MediaQueryResult) {
@@ -157,7 +157,7 @@ struct Home {
                 GridCol({
                   span:{ xs: 6, sm: 6, md: 6, lg: 6, xl:6 },
                 }) {
-                  TrafficStatistics()
+                  CellularData()
                 }
                 .height('100%')
                 .borderRadius(20)

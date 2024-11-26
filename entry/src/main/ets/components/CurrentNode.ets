@@ -7,10 +7,10 @@ interface MarginGenerate {
 
 @Component
 struct CurrrentNode {
-  @State currentNode: string = '123'
+  @State currentNode: string = '暂无节点'
   @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
   @State fontSize: BreakpointState<number> = BreakpointState.of({
-    sm: 21, md: 22, lg: 26, xl: 27
+    sm: 18, md: 22, lg: 26, xl: 27
   });
   @State RowPadding: BreakpointState<number> = BreakpointState.of({
     sm: 10, md: 10, lg: 10, xl: 20
@@ -48,16 +48,17 @@ struct CurrrentNode {
     Column() {
       Text($r('app.string.CurrentNode'))
         .fontSize(this.fontSize.value)
-        .margin({left:this.RowPadding.value})
+        //.margin({left:this.RowPadding.value})
         .fontWeight(FontWeight.Bold)
       Row() {
         Text(this.currentNode)
-          .fontSize(this.fontSize.value)
+          .fontSize(23)
+          .fontColor('grey')
       }
       .flexGrow(1)
       .width('100%')
       .justifyContent(FlexAlign.Center)
-      Row() {
+      /*Row() {
         Text($r('app.string.Switch'))
           .fontSize(this.fontSize.value)
           .fontWeight(FontWeight.Bold)
@@ -66,9 +67,9 @@ struct CurrrentNode {
         .margin({left:5})
       }
       .width('100%')
-      .justifyContent(FlexAlign.End)
+      .justifyContent(FlexAlign.End)*/
     }
-    .padding(5)
+    .padding({top: 12, bottom: 12, left: 10, right: 10})
     .width('100%')
     .height('100%')
     .alignItems(HorizontalAlign.Start)

@@ -12,13 +12,16 @@ struct SwitchMode {
   @State isToggle3: boolean = false;
   @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
   @State fontSize: BreakpointState<number> = BreakpointState.of({
-    sm: 21, md: 21, lg: 26, xl: 27
+    sm: 16, md: 21, lg: 26, xl: 27
+  });
+  @State titleFontSize: BreakpointState<number> = BreakpointState.of({
+    sm: 18, md: 22, lg: 26, xl: 27
   });
   @State RowPadding: BreakpointState<number> = BreakpointState.of({
     sm: 10, md: 9, lg: 10, xl: 20
   });
   @State fontMargin: BreakpointState<MarginGenerate> = BreakpointState.of({
-    sm: ({ left: 20 } as MarginGenerate),
+    sm: ({ left: 15 } as MarginGenerate),
     md: ({ left: 25 } as MarginGenerate),
     lg: ({ left: 8 } as MarginGenerate),
     xl: ({ left: 15 } as MarginGenerate)
@@ -31,6 +34,7 @@ struct SwitchMode {
 
     BreakpointSystem.getInstance().attach(this.compStr)
     BreakpointSystem.getInstance().attach(this.fontSize)
+    BreakpointSystem.getInstance().attach(this.titleFontSize)
     BreakpointSystem.getInstance().attach(this.RowPadding)
     BreakpointSystem.getInstance().attach(this.fontMargin)
     BreakpointSystem.getInstance().start()
@@ -39,6 +43,7 @@ struct SwitchMode {
 
     BreakpointSystem.getInstance().attach(this.compStr)
     BreakpointSystem.getInstance().attach(this.fontSize)
+    BreakpointSystem.getInstance().attach(this.titleFontSize)
     BreakpointSystem.getInstance().attach(this.fontMargin)
     BreakpointSystem.getInstance().attach(this.RowPadding)
     BreakpointSystem.getInstance().stop()
@@ -48,9 +53,9 @@ struct SwitchMode {
   build() {
     Column() {
       Text($r('app.string.Mode'))
-        .fontSize(this.fontSize.value)
+        .fontSize(this.titleFontSize.value)
         .fontWeight(FontWeight.Bold)
-        .margin({left:this.RowPadding.value, bottom:7})
+        //.margin({left:this.RowPadding.value, bottom:7})
       Column() {
         Row() {
           Checkbox({ name: 'checkbox', group: 'checkboxGroup' })
@@ -66,6 +71,7 @@ struct SwitchMode {
               }
             })
           Text($r('app.string.Rule'))
+            .fontWeight(FontWeight.Bold)
             .fontSize(this.fontSize.value)
             .margin(this.fontMargin.value)
         }
@@ -83,6 +89,7 @@ struct SwitchMode {
               }
             })
           Text($r('app.string.Overall'))
+            .fontWeight(FontWeight.Bold)
             .fontSize(this.fontSize.value)
             .margin(this.fontMargin.value)
         }
@@ -101,6 +108,7 @@ struct SwitchMode {
               }
             })
           Text($r('app.string.Direct'))
+            .fontWeight(FontWeight.Bold)
             .fontSize(this.fontSize.value)
             .margin(this.fontMargin.value)
         }
@@ -108,7 +116,7 @@ struct SwitchMode {
       }
       //.padding(this.RowPadding.value)
     }
-    .padding(5)
+    .padding({top: 12, bottom: 12, left: 10, right: 10})
     .width('100%')
     .height('100%')
     //.justifyContent(FlexAlign.Center)

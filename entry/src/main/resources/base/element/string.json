@@ -53,7 +53,7 @@
       "value": "直连"
     },
     {
-      "name": "TrafficStatistics",
+      "name": "CellularData",
       "value": "流量统计"
     },
     {
@@ -62,11 +62,15 @@
     },
     {
       "name": "PublicNetwork",
-      "value": "公网IP"
+      "value": "IP地址"
     },
     {
       "name": "Switch",
       "value": "切换"
+    },
+    {
+      "name": "CellularData_Statistics_explanation",
+      "value": "设置每月流量以启用"
     }
   ]
 }
