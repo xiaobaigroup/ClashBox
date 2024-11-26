@@ -7,8 +7,8 @@ import ConfigurationPage from './ConfigurationPage'
 import MorePage from './MorePage'
 
 interface marginGenerate {
-  top: number,
-  left?:number
+  top: number, bottom: number,
+  left:number, right: number
 }
 
 @Entry
@@ -43,11 +43,17 @@ struct Index {
   @State compBarHeight: BreakpointState<string> = BreakpointState.of({
     sm: '55vp', md: '55vp', lg: '55vp', xl: '100%'
   });
+  @State TabIconfontSize: BreakpointState<number> = BreakpointState.of({
+    sm: 24, md: 29, lg: 29, xl: 29
+  });
+  @State TabTitlefontSize: BreakpointState<number> = BreakpointState.of({
+    sm: 12, md: 16, lg: 16, xl: 16
+  });
   @State compMargin: BreakpointState<marginGenerate> = BreakpointState.of({
-    sm: ({ top: 4 } as marginGenerate),
-    md: ({ top: 4 } as marginGenerate),
-    lg: ({ left: 8 } as marginGenerate),
-    xl: ({ top: 4 } as marginGenerate)
+    sm: ({ top: 4, bottom: 5 } as marginGenerate),
+    md: ({ top: 4, bottom: 5  } as marginGenerate),
+    lg: ({ top: 5 } as marginGenerate),
+    xl: ({ top: 5 } as marginGenerate)
   });
 
   @Builder TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
@@ -59,12 +65,14 @@ struct Index {
     }) {
       SymbolGlyph(TabIcon)
         .fontColor([this.currentIndex === index ? '#ff2649f6' : '#999'])
-        .fontSize(36)
+        .fontSize(this.isLandscape ? 24 : this.TabIconfontSize.value)
+        .margin({top: 5})
 
       Text(title)
         .fontColor(this.currentIndex === index ? '#ff2649f6' : '#999')
+        .fontWeight(FontWeight.Medium)
         .margin(this.compMargin.value)
-        .fontSize(16)
+        .fontSize(this.isLandscape ? 12 : this.TabTitlefontSize.value)
     }
     .width('100%')
     .height('100%')
@@ -72,7 +80,7 @@ struct Index {
 
 
   // 当设备横屏时条件成立
-  listener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(orientation: landscape)');
+  listener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
 
   // 当满足媒体查询条件时，触发回调
   onPortrait(mediaQueryResult:mediaquery.MediaQueryResult) {
@@ -100,6 +108,8 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.compBarWidth)
     BreakpointSystem.getInstance().attach(this.compBarHeight)
     BreakpointSystem.getInstance().attach(this.compMargin)
+    BreakpointSystem.getInstance().attach(this.TabIconfontSize)
+    BreakpointSystem.getInstance().attach(this.TabTitlefontSize)
     BreakpointSystem.getInstance().start()
   }
 
@@ -112,6 +122,8 @@ struct Index {
     BreakpointSystem.getInstance().detach(this.compBarWidth)
     BreakpointSystem.getInstance().detach(this.compBarHeight)
     BreakpointSystem.getInstance().detach(this.compMargin)
+    BreakpointSystem.getInstance().attach(this.TabIconfontSize)
+    BreakpointSystem.getInstance().attach(this.TabTitlefontSize)
     BreakpointSystem.getInstance().stop()
 
     // 解绑listener中注册的回调函数
@@ -127,7 +139,7 @@ struct Index {
       lastWindow.setPreferredOrientation(isLandscape ? window.Orientation.LANDSCAPE : window.Orientation.PORTRAIT)
     });
   }*/
-  /**/
+
   build() {
     Column() {
       Tabs({
