@@ -151,6 +151,13 @@ struct Index {
         }
         .tabBar(this.TabBarBuilder( $r('app.string.More'), 3, $r('sys.symbol.square_fill_grid_2x2')))
       }
+      //.barOverlap(true)
+      /*.backgroundBrightness({
+        rate: 0.5,
+        lightUpDegree: 0.5 })*/
+      //.blur(50)
+      .backgroundColor('#F1F3F5')
+      .backdropBlur(60)
       .vertical(this.isLandscape ? true : this.compVertical.value)/**/
       .barWidth(this.isLandscape ? '60vp' : this.compBarWidth.value)/**/
       .barHeight(this.isLandscape ? '100%' : this.compBarHeight.value)/**/
