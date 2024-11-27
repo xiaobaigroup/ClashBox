@@ -63,16 +63,19 @@ struct Index {
       justifyContent: FlexAlign.Center,
       alignItems: ItemAlign.Center
     }) {
-      SymbolGlyph(TabIcon)
-        .fontColor([this.currentIndex === index ? '#ff2649f6' : '#999'])
-        .fontSize(this.isLandscape ? 24 : this.TabIconfontSize.value)
-        .margin({top: 5})
+      Column() {
+        SymbolGlyph(TabIcon)
+          .fontColor([this.currentIndex === index ? '#ff2649f6' : '#999'])
+          .fontSize(this.isLandscape ? 24 : this.TabIconfontSize.value)
+          .margin({top: 5})
 
-      Text(title)
-        .fontColor(this.currentIndex === index ? '#ff2649f6' : '#999')
-        .fontWeight(FontWeight.Medium)
-        .margin(this.compMargin.value)
-        .fontSize(this.isLandscape ? 12 : this.TabTitlefontSize.value)
+        Text(title)
+          .fontColor(this.currentIndex === index ? '#ff2649f6' : '#999')
+          .fontWeight(FontWeight.Medium)
+          .margin(this.compMargin.value)
+          .fontSize(this.isLandscape ? 12 : this.TabTitlefontSize.value)
+      }
+      .margin(this.isLandscape ? {left: 39 } : '0vp')
     }
     .width('100%')
     .height('100%')
@@ -171,7 +174,7 @@ struct Index {
       .backgroundColor('#F1F3F5')
       .backdropBlur(60)
       .vertical(this.isLandscape ? true : this.compVertical.value)/**/
-      .barWidth(this.isLandscape ? '60vp' : this.compBarWidth.value)/**/
+      .barWidth(this.isLandscape ? '63vp' : this.compBarWidth.value)/**/
       .barHeight(this.isLandscape ? '100%' : this.compBarHeight.value)/**/
       .margin(this.compMargin.value)
       .animationDuration(0)

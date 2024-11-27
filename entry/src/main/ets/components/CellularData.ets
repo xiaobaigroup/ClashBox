@@ -13,7 +13,7 @@ struct TrafficStatistics {
   @State isLandscapePhone: boolean = false
   @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
   @State fontSize: BreakpointState<number> = BreakpointState.of({
-    sm: 14, md: 27, lg: 26, xl: 21
+    sm: 14, md: 23, lg: 26, xl: 21
   });
   @State titleFontSize: BreakpointState<number> = BreakpointState.of({
     sm: 18, md: 29, lg: 26, xl: 27
@@ -86,7 +86,7 @@ struct TrafficStatistics {
   build() {
     Column() {
       Text($r('app.string.CellularData'))
-        .fontSize(this.titleFontSize.value)
+        .fontSize(this.isLandscapePhone ? 18 : this.titleFontSize.value)
           //.margin({left:this.RowPadding.value})
         .fontWeight(FontWeight.Bold)
       Column() {
@@ -96,7 +96,7 @@ struct TrafficStatistics {
             .fontSize(this.chevronSize.value)
             Text(this.TotalDownloads.toString() + ' GB')
               //.margin(this.fontMargin.value)
-              .fontSize(this.fontSize.value)
+              .fontSize(this.isLandscapePhone ? 14 : this.fontSize.value)
           }
           .margin({top:this.RowMargin.value, right: this.RowMargin.value})
           .justifyContent(FlexAlign.Center)
@@ -105,7 +105,7 @@ struct TrafficStatistics {
             .fontSize(this.chevronSize.value)
             Text(this.TotalUpload.toString() + ' GB')
               //.margin(this.fontMargin.value)
-              .fontSize(this.fontSize.value)
+              .fontSize(this.isLandscapePhone ? 14 : this.fontSize.value)
           }
           .margin({top:this.RowMargin.value})
           .justifyContent(FlexAlign.Center)

@@ -53,19 +53,22 @@ struct Home {
     xs: '0vp', sm: '0vp', md: '0vp', lg: '15vp', xl: '15vp'
   });
   @State containerHeight: BreakpointState<string> = BreakpointState.of({
-    xs: '156vp', sm: '160vp', md: '261.41vp', lg: '240vp', xl: '240vp'
+    xs: '156vp', sm: '160vp', md: '232.7vp', lg: '240vp', xl: '240vp'
   });
   @State GridRowHeight: BreakpointState<string> = BreakpointState.of({
-    xs: '715vp', sm: '715vp', md: '1158vp', lg: '550vp', xl: '550vp'
+    xs: '715vp', sm: '715vp', md: '1050vp', lg: '550vp', xl: '550vp'
   });
+  windowClass = AppStorage.get<window.Window>('windowClass') as window.Window;
 
   onPhoneLandscape(mediaQueryResult:mediaquery.MediaQueryResult) {
     if (mediaQueryResult.matches as boolean ) {
       this.isLandscapePhone = true
        console.log('手机横屏' + this.isLandscapePhone)
+      this.windowClass.setSpecificSystemBarEnabled('navigationIndicator', false)
     } else {
       this.isLandscapePhone = false
        console.log('手机竖屏' + this.isLandscapePhone)
+      this.windowClass.setSpecificSystemBarEnabled('navigationIndicator', true)
     }
   }
 
@@ -107,23 +110,25 @@ struct Home {
 
   build() {
       Column() {
-        Row() {
-          Text(this.greetings)
-            .fontSize(36)
-            .fontWeight(FontWeight.Bold)
-            .margin({left: this.gridMargin })
-          Blank()
-          Button({ type: ButtonType.Circle, stateEffect: true }) {
-            SymbolGlyph($r('sys.symbol.gearshape'))
-              .fontSize(30)
+        if(!this.isLandscapePhone) {
+          Row() {
+            Text(this.greetings)
+              .fontSize(28)
+              .fontWeight(FontWeight.Bold)
+              .margin({left: this.gridMargin })
+            Blank()
+            Button({ type: ButtonType.Circle, stateEffect: true }) {
+              SymbolGlyph($r('sys.symbol.gearshape'))
+                .fontSize(30)
+            }
+            .margin({right: this.gridMargin })
+            .width(40)
+            .height(40)
+            .backgroundColor($r('app.color.settings_container_background'))
           }
-          .margin({right: this.gridMargin })
-          .width(40)
-          .height(40)
-          .backgroundColor($r('app.color.settings_container_background'))
+          .width('100%')
+          .margin({bottom: 15 })
         }
-        .width('100%')
-        .margin({bottom: 15 })
 
         Scroll() {
           GridRow({
@@ -135,7 +140,8 @@ struct Home {
           })
           {
             GridCol({
-              span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 12 , lg: 6, xl:6 }
+              span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 10 , lg: 6, xl:6 },
+              offset: {xs: 0, sm: 0, md: this.isLandscapePhone ? 0 : 1, lg: 0, xl:0}
             })
             {
               Start()
@@ -147,7 +153,8 @@ struct Home {
 
 
             GridCol({
-              span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 12, lg: 6, xl:6 }
+              span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 10, lg: 6, xl:6 },
+              offset: {xs: 0, sm: 0, md: this.isLandscapePhone ? 0 : 2, lg: 0, xl:0}
             }) {
               GridRow() {
                 GridCol({
@@ -174,7 +181,8 @@ struct Home {
             .margin(this.isLandscapePhone ? {left: 12 } : this.containerMargin1.value)
 
             GridCol({
-              span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 12, lg: 6, xl:6 }
+              span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 10, lg: 6, xl:6 },
+              offset: {xs: 0, sm: 0, md: this.isLandscapePhone ? 0 : 2, lg: 0, xl:0}
             }) {
               GridRow() {
                 GridCol({
@@ -201,7 +209,8 @@ struct Home {
             .margin(this.isLandscapePhone ? {top: 20,right: 12 } : this.containerMargin2.value)
 
             GridCol({
-              span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 12, lg: 6, xl:6 }
+              span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 10, lg: 6, xl:6 },
+              offset: {xs: 0, sm: 0, md: this.isLandscapePhone ? 0 : 2, lg: 0, xl:0}
             }) {
               GridRow() {
                 GridCol({
@@ -256,9 +265,10 @@ struct Home {
         .padding({left: this.gridMargin, right: this.gridMargin})
         .scrollBar(BarState.Off)
         .scrollable(ScrollDirection.Vertical)
+        .margin(this.isLandscapePhone ? {top: 19} : '0vp')
       }
       .backgroundColor($r('app.color.background'))
-      .padding({bottom: '45vp'})
+      .padding(this.isLandscapePhone ? '0vp' : {bottom: '45vp'})
       .width("100%")
     //}
     //.height('100%')

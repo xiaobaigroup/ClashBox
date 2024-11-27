@@ -44,7 +44,7 @@ export function getGreeting(): string {
   } else if (currentHour >= 18 && currentHour < 22) {
     return "晚上好！";
   } else {
-    return "夜深了，请注意休息。";
+    return "夜已深, 请注意休息";
   }
 }
 

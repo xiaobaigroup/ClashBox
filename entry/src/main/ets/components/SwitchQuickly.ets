@@ -1,4 +1,5 @@
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
+import { mediaquery } from '@kit.ArkUI'
 
 interface MarginGenerate {
   left: number, right: number, top: number,
@@ -8,6 +9,7 @@ interface MarginGenerate {
 @Component
 struct SwitchQuickly {
   @State switchQuickly: string = '123'
+  @State isLandscapePhone: boolean = false
   @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
   @State fontSize: BreakpointState<number> = BreakpointState.of({
     sm: 18, md: 29, lg: 26, xl: 27
@@ -28,10 +30,22 @@ struct SwitchQuickly {
     xl: ({top: 14, bottom: 14, left: 12, right: 12} as MarginGenerate)
   });
 
+  onPhoneLandscape(mediaQueryResult:mediaquery.MediaQueryResult) {
+    if (mediaQueryResult.matches as boolean ) {
+      this.isLandscapePhone = true
+      console.log('手机横屏' + this.isLandscapePhone)
+    } else {
+      this.isLandscapePhone = false
+      console.log('手机竖屏' + this.isLandscapePhone)
+    }
+  }
+
+  phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
+
   aboutToAppear() {
-    /*this.phonelistener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
+    this.phonelistener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
       this.onPhoneLandscape(mediaQueryResult)
-    });*/
+    });
 
     BreakpointSystem.getInstance().attach(this.compStr)
     BreakpointSystem.getInstance().attach(this.fontSize)
@@ -48,14 +62,14 @@ struct SwitchQuickly {
     BreakpointSystem.getInstance().attach(this.RowPadding)
     BreakpointSystem.getInstance().attach(this.cardPadding)
     BreakpointSystem.getInstance().stop()
-    //this.phonelistener.off('change');
+    this.phonelistener.off('change');
   }
 
 
   build() {
     Column() {
       Text($r('app.string.SwitchQuickly'))
-        .fontSize(this.fontSize.value)
+        .fontSize(this.isLandscapePhone ? 18 : this.fontSize.value)
           //.margin({left:this.RowPadding.value})
         .fontWeight(FontWeight.Bold)
       Row() {

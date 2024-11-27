@@ -80,7 +80,7 @@ struct PublicNetwork {
   build() {
     Column() {
       Text($r('app.string.PublicNetwork'))
-        .fontSize(this.TitleFontSize.value)
+        .fontSize(this.isLandscapePhone ? 18 : this.TitleFontSize.value)
         //.margin({left:this.RowPadding.value})
         .fontWeight(FontWeight.Bold)
       Column() {
@@ -90,7 +90,7 @@ struct PublicNetwork {
         }
         .justifyContent(FlexAlign.Start)
         Text(this.IP)
-          .fontSize(this.IPfontSize.value)
+          .fontSize(this.isLandscapePhone ? 20 : this.IPfontSize.value)
           .textAlign(TextAlign.Center)
           .margin(this.RowPadding.value)
 

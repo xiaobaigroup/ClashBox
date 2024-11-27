@@ -1,4 +1,5 @@
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
+import { mediaquery } from '@kit.ArkUI';
 
 interface MarginGenerate {
   left: number, right: number, top: number,
@@ -10,6 +11,7 @@ struct SwitchMode {
   @State isToggle1: boolean = false;
   @State isToggle2: boolean = false;
   @State isToggle3: boolean = false;
+  @State isLandscapePhone: boolean = false
   @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
   @State fontSize: BreakpointState<number> = BreakpointState.of({
     sm: 16, md: 27, lg: 26, xl: 27
@@ -27,16 +29,29 @@ struct SwitchMode {
     xl: ({ left: 15 } as MarginGenerate)
   });
   @State cardPadding: BreakpointState<MarginGenerate> = BreakpointState.of({
-    sm: ({top: 12, bottom: 12, left: 10, right: 10} as MarginGenerate),
-    md: ({top: 12, bottom: 12, left: 10, right: 10} as MarginGenerate),
-    lg: ({top: 14, bottom: 14, left: 12, right: 12} as MarginGenerate),
-    xl: ({top: 14, bottom: 14, left: 12, right: 12} as MarginGenerate)
+    sm: ({top: 12, bottom: 12, left: 12, right: 12} as MarginGenerate),
+    md: ({top: 12, bottom: 12, left: 12, right: 12} as MarginGenerate),
+    lg: ({top: 14, bottom: 14, left: 14, right: 14} as MarginGenerate),
+    xl: ({top: 14, bottom: 14, left: 14, right: 14} as MarginGenerate)
   });
 
+  onPhoneLandscape(mediaQueryResult:mediaquery.MediaQueryResult) {
+    if (mediaQueryResult.matches as boolean ) {
+      this.isLandscapePhone = true
+      console.log('手机横屏' + this.isLandscapePhone)
+    } else {
+      this.isLandscapePhone = false
+      console.log('手机竖屏' + this.isLandscapePhone)
+    }
+  }
+
+  // 手机横屏高度条件
+  phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
+
   aboutToAppear() {
-    /*this.phonelistener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
+    this.phonelistener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
       this.onPhoneLandscape(mediaQueryResult)
-    });*/
+    });
 
     BreakpointSystem.getInstance().attach(this.compStr)
     BreakpointSystem.getInstance().attach(this.fontSize)
@@ -55,13 +70,13 @@ struct SwitchMode {
     BreakpointSystem.getInstance().attach(this.RowPadding)
     BreakpointSystem.getInstance().attach(this.cardPadding)
     BreakpointSystem.getInstance().stop()
-    //this.phonelistener.off('change');
+    this.phonelistener.off('change');
   }
 
   build() {
     Column() {
       Text($r('app.string.Mode'))
-        .fontSize(this.titleFontSize.value)
+        .fontSize(this.isLandscapePhone ? 18 : this.titleFontSize.value)
         .fontWeight(FontWeight.Bold)
         //.margin({left:this.RowPadding.value, bottom:7})
       Column() {
@@ -80,8 +95,8 @@ struct SwitchMode {
             })
           Text($r('app.string.Rule'))
             .fontWeight(FontWeight.Bold)
-            .fontSize(this.fontSize.value)
-            .margin(this.fontMargin.value)
+            .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+            .margin(this.isLandscapePhone ? { left: 15 }: this.fontMargin.value)
         }
         Row() {
           Checkbox({ name: 'checkbox', group: 'checkboxGroup' })
@@ -98,8 +113,8 @@ struct SwitchMode {
             })
           Text($r('app.string.Overall'))
             .fontWeight(FontWeight.Bold)
-            .fontSize(this.fontSize.value)
-            .margin(this.fontMargin.value)
+            .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+            .margin(this.isLandscapePhone ? { left: 15 }: this.fontMargin.value)
         }
         .margin({top: this.RowPadding.value})
         Row() {
@@ -117,8 +132,8 @@ struct SwitchMode {
             })
           Text($r('app.string.Direct'))
             .fontWeight(FontWeight.Bold)
-            .fontSize(this.fontSize.value)
-            .margin(this.fontMargin.value)
+            .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+            .margin(this.isLandscapePhone ? { left: 15 }: this.fontMargin.value)
         }
         .margin({top: this.RowPadding.value})
       }

@@ -32,6 +32,8 @@ export default class EntryAbility extends UIAbility {
     }).catch((err: BusinessError) => {
       console.error('Failed to set the window layout to full-screen mode. Cause:' + JSON.stringify(err));
     });
+    // 缓存window窗口对象
+    AppStorage.setOrCreate('windowClass', windowClass);
 
     // 2. 获取布局避让遮挡的区域
     let type = window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR; // 以导航条避让为例
