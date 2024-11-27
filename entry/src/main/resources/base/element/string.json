@@ -71,6 +71,10 @@
     {
       "name": "CellularData_Statistics_explanation",
       "value": "设置每月流量以启用"
+    },
+    {
+      "name": "SwitchQuickly",
+      "value": "快捷切换"
     }
   ]
 }

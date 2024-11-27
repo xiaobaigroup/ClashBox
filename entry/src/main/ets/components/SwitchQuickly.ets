@@ -1,5 +1,4 @@
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
-import { mediaquery } from '@kit.ArkUI'
 
 interface MarginGenerate {
   left: number, right: number, top: number,
@@ -7,19 +6,11 @@ interface MarginGenerate {
 }
 
 @Component
-struct PublicNetwork {
-  @State address: string = '中国大陆'
-  @State IP: string = '255.255.255.255'
-  @State isLandscapePhone: boolean = false
+struct SwitchQuickly {
+  @State switchQuickly: string = '123'
   @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
-  @State TitleFontSize: BreakpointState<number> = BreakpointState.of({
-    sm: 18, md: 29, lg: 26, xl: 27
-  });
   @State fontSize: BreakpointState<number> = BreakpointState.of({
-    sm: 16, md: 27, lg: 26, xl: 27
-  });
-  @State IPfontSize: BreakpointState<number> = BreakpointState.of({
-    sm: 20, md: 30, lg: 26, xl: 27
+    sm: 18, md: 29, lg: 26, xl: 27
   });
   @State RowPadding: BreakpointState<number> = BreakpointState.of({
     sm: 10, md: 10, lg: 10, xl: 20
@@ -37,27 +28,13 @@ struct PublicNetwork {
     xl: ({top: 14, bottom: 14, left: 12, right: 12} as MarginGenerate)
   });
 
-  onPhoneLandscape(mediaQueryResult:mediaquery.MediaQueryResult) {
-    if (mediaQueryResult.matches as boolean ) {
-      this.isLandscapePhone = true
-      console.log('手机横屏' + this.isLandscapePhone)
-    } else {
-      this.isLandscapePhone = false
-      console.log('手机竖屏' + this.isLandscapePhone)
-    }
-  }
-
-  phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
-
   aboutToAppear() {
-    this.phonelistener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
+    /*this.phonelistener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
       this.onPhoneLandscape(mediaQueryResult)
-    });
+    });*/
 
     BreakpointSystem.getInstance().attach(this.compStr)
     BreakpointSystem.getInstance().attach(this.fontSize)
-    BreakpointSystem.getInstance().attach(this.TitleFontSize)
-    BreakpointSystem.getInstance().attach(this.IPfontSize)
     BreakpointSystem.getInstance().attach(this.RowPadding)
     BreakpointSystem.getInstance().attach(this.fontMargin)
     BreakpointSystem.getInstance().attach(this.cardPadding)
@@ -67,44 +44,43 @@ struct PublicNetwork {
 
     BreakpointSystem.getInstance().attach(this.compStr)
     BreakpointSystem.getInstance().attach(this.fontSize)
-    BreakpointSystem.getInstance().attach(this.TitleFontSize)
-    BreakpointSystem.getInstance().attach(this.IPfontSize)
     BreakpointSystem.getInstance().attach(this.fontMargin)
     BreakpointSystem.getInstance().attach(this.RowPadding)
     BreakpointSystem.getInstance().attach(this.cardPadding)
     BreakpointSystem.getInstance().stop()
-    this.phonelistener.off('change');
+    //this.phonelistener.off('change');
   }
 
 
   build() {
     Column() {
-      Text($r('app.string.PublicNetwork'))
-        .fontSize(this.TitleFontSize.value)
-        //.margin({left:this.RowPadding.value})
+      Text($r('app.string.SwitchQuickly'))
+        .fontSize(this.fontSize.value)
+          //.margin({left:this.RowPadding.value})
         .fontWeight(FontWeight.Bold)
-      Column() {
-        Row() {
-          Text(this.address)
-            .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-        }
-        .justifyContent(FlexAlign.Start)
-        Text(this.IP)
-          .fontSize(this.IPfontSize.value)
-          .textAlign(TextAlign.Center)
-          .margin(this.RowPadding.value)
-
+      Row() {
+        Text(this.switchQuickly)
+          .fontSize(23)
+          .fontColor('grey')
       }
-      .alignItems(HorizontalAlign.Start)
-      .justifyContent(FlexAlign.Center)
-      .width('100%')
       .flexGrow(1)
+      .width('100%')
+      .justifyContent(FlexAlign.Center)
+      /*Row() {
+        Text($r('app.string.Switch'))
+          .fontSize(this.fontSize.value)
+          .fontWeight(FontWeight.Bold)
+        Text() {SymbolSpan($r('sys.symbol.chevron_right'))}
+        .fontSize(this.fontSize.value)
+        .margin({left:5})
+      }
+      .width('100%')
+      .justifyContent(FlexAlign.End)*/
     }
     .padding(this.cardPadding.value)
     .width('100%')
     .height('100%')
-    //.justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Start)
   }
 }
-export default PublicNetwork
+export default SwitchQuickly

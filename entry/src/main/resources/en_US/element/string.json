@@ -71,6 +71,10 @@
     {
       "name": "CellularData_Statistics_explanation",
       "value": "Set monthly traffic to enable"
+    },
+    {
+      "name": "SwitchQuickly",
+      "value": "SwitchQuickly"
     }
   ]
 }

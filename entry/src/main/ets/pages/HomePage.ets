@@ -7,6 +7,7 @@ import CurrrentNode from '../components/CurrentNode'
 import PublicNetwork from '../components/PublicNetwork'
 import Start from '../components/Start'
 import { getGreeting } from '../utils/getGreeting'
+import SwitchQuickly from '../components/SwitchQuickly'
 
 interface MarginGenerate {
   top: number, left:number, right: number,
@@ -206,7 +207,7 @@ struct Home {
                 GridCol({
                   span:{ xs: 6, sm: 6, md: 6, lg: 6, xl:6 }
                 }) {
-                  //SwitchMode()
+                  SwitchQuickly()
                 }
                 .height('100%')
                 .borderRadius(20)

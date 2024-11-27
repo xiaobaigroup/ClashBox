@@ -8,17 +8,22 @@ struct Start {
   @State fontSize: BreakpointState<number> = BreakpointState.of({
     sm: 28, md: 30, lg: 35, xl: 36
   });
+  @State speedfontSize: BreakpointState<number> = BreakpointState.of({
+    sm: 16, md: 20, lg: 21, xl: 21
+  });
 
   aboutToAppear() {
 
     BreakpointSystem.getInstance().attach(this.compStr)
     BreakpointSystem.getInstance().attach(this.fontSize)
+    BreakpointSystem.getInstance().attach(this.speedfontSize)
     BreakpointSystem.getInstance().start()
   }
   aboutToDisappear() {
 
     BreakpointSystem.getInstance().attach(this.compStr)
     BreakpointSystem.getInstance().attach(this.fontSize)
+    BreakpointSystem.getInstance().attach(this.speedfontSize)
     BreakpointSystem.getInstance().stop()
     //this.phonelistener.off('change');
   }
@@ -41,16 +46,20 @@ struct Start {
           Row() {
             Text(this.DownloadSpeed.toString() + ' B/s')
               .margin({ right: 3 })
+              .fontSize(this.speedfontSize.value)
             Text() {
               SymbolSpan($r('sys.symbol.chevron_up'))
+                .fontSize(this.speedfontSize.value)
             }
 
           }
           Row() {
             Text(this.UploadSpeed.toString() + ' B/s')
               .margin({ right: 3 })
+              .fontSize(this.speedfontSize.value)
             Text() {
               SymbolSpan($r('sys.symbol.chevron_down'))
+                .fontSize(this.speedfontSize.value)
             }
 
           }

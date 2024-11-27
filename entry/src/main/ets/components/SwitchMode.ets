@@ -1,7 +1,7 @@
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
 
 interface MarginGenerate {
-  left: number,
+  left: number, right: number, top: number,
   bottom?:number
 }
 
@@ -12,10 +12,10 @@ struct SwitchMode {
   @State isToggle3: boolean = false;
   @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
   @State fontSize: BreakpointState<number> = BreakpointState.of({
-    sm: 16, md: 21, lg: 26, xl: 27
+    sm: 16, md: 27, lg: 26, xl: 27
   });
   @State titleFontSize: BreakpointState<number> = BreakpointState.of({
-    sm: 18, md: 22, lg: 26, xl: 27
+    sm: 18, md: 29, lg: 26, xl: 27
   });
   @State RowPadding: BreakpointState<number> = BreakpointState.of({
     sm: 10, md: 9, lg: 10, xl: 20
@@ -25,6 +25,12 @@ struct SwitchMode {
     md: ({ left: 25 } as MarginGenerate),
     lg: ({ left: 8 } as MarginGenerate),
     xl: ({ left: 15 } as MarginGenerate)
+  });
+  @State cardPadding: BreakpointState<MarginGenerate> = BreakpointState.of({
+    sm: ({top: 12, bottom: 12, left: 10, right: 10} as MarginGenerate),
+    md: ({top: 12, bottom: 12, left: 10, right: 10} as MarginGenerate),
+    lg: ({top: 14, bottom: 14, left: 12, right: 12} as MarginGenerate),
+    xl: ({top: 14, bottom: 14, left: 12, right: 12} as MarginGenerate)
   });
 
   aboutToAppear() {
@@ -37,6 +43,7 @@ struct SwitchMode {
     BreakpointSystem.getInstance().attach(this.titleFontSize)
     BreakpointSystem.getInstance().attach(this.RowPadding)
     BreakpointSystem.getInstance().attach(this.fontMargin)
+    BreakpointSystem.getInstance().attach(this.cardPadding)
     BreakpointSystem.getInstance().start()
   }
   aboutToDisappear() {
@@ -46,6 +53,7 @@ struct SwitchMode {
     BreakpointSystem.getInstance().attach(this.titleFontSize)
     BreakpointSystem.getInstance().attach(this.fontMargin)
     BreakpointSystem.getInstance().attach(this.RowPadding)
+    BreakpointSystem.getInstance().attach(this.cardPadding)
     BreakpointSystem.getInstance().stop()
     //this.phonelistener.off('change');
   }
@@ -116,7 +124,7 @@ struct SwitchMode {
       }
       //.padding(this.RowPadding.value)
     }
-    .padding({top: 12, bottom: 12, left: 10, right: 10})
+    .padding(this.cardPadding.value)
     .width('100%')
     .height('100%')
     //.justifyContent(FlexAlign.Center)
