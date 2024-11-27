@@ -6,6 +6,7 @@ import CellularData from '../components/CellularData'
 import CurrrentNode from '../components/CurrentNode'
 import PublicNetwork from '../components/PublicNetwork'
 import Start from '../components/Start'
+import { getGreeting } from '../utils/getGreeting'
 
 interface MarginGenerate {
   top: number, left:number, right: number,
@@ -71,6 +72,9 @@ struct Home {
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
 
   aboutToAppear() {
+    this.greetings = getGreeting()
+    console.log('问候语:' + this.greetings)
+
     this.phonelistener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
       this.onPhoneLandscape(mediaQueryResult)
     });
