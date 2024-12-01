@@ -1,0 +1,10 @@
+{
+  "src": [
+    "pages/Index",
+    "pages/HomePage",
+    "pages/ProxyPage",
+    "pages/ConfigurationPage",
+    "pages/MorePage"
+
+  ]
+}

@@ -5,6 +5,8 @@ import Home from './HomePage'
 import ProxyPage  from './ProxyPage'
 import ConfigurationPage from './ConfigurationPage'
 import MorePage from './MorePage'
+import { ConfigurationConstant } from '@kit.AbilityKit'
+import { BusinessError } from '@kit.BasicServicesKit'
 
 interface marginGenerate {
   top: number, bottom: number,
@@ -14,6 +16,10 @@ interface marginGenerate {
 @Entry
 @Component
 struct Index {
+  //tabs图标文字颜色，修改resources/base(dark)/element/color.json中tabs_icon_text配置选中图标文字深浅模式颜色
+  // app.color.tabs_icon_text1配置非选中图标和文字深浅模式颜色
+  @State fontColorValue:ResourceColor = ($r('app.color.tabs_icon_text'));
+  @State fontColorValue1:ResourceColor = ($r('app.color.tabs_icon_text1'));
   @State currentIndex: number = 0
   @State isLandscape:boolean = false
   @StorageProp('bottomRectHeight') bottomRectHeight: number = 0;// 读取导航条区域的高度
@@ -65,12 +71,12 @@ struct Index {
     }) {
       Column() {
         SymbolGlyph(TabIcon)
-          .fontColor([this.currentIndex === index ? '#ff2649f6' : '#999'])
+          .fontColor([this.currentIndex === index ? this.fontColorValue : this.fontColorValue1])
           .fontSize(this.isLandscape ? 24 : this.TabIconfontSize.value)
           .margin({top: 5})
 
         Text(title)
-          .fontColor(this.currentIndex === index ? '#ff2649f6' : '#999')
+          .fontColor(this.currentIndex === index ? this.fontColorValue : this.fontColorValue1)
           .fontWeight(FontWeight.Medium)
           .margin(this.compMargin.value)
           .fontSize(this.isLandscape ? 12 : this.TabTitlefontSize.value)
@@ -133,6 +139,7 @@ struct Index {
     this.listener.off('change');
   }
 
+
   // 改变设备横竖屏状态函数
   /*private changeOrientation(isLandscape: boolean) {
     // 获取UIAbility实例的上下文信息
@@ -171,7 +178,7 @@ struct Index {
         rate: 0.5,
         lightUpDegree: 0.5 })*/
       //.blur(50)
-      .backgroundColor('#F1F3F5')
+      .backgroundColor($r('app.color.background'))
       .backdropBlur(60)
       .vertical(this.isLandscape ? true : this.compVertical.value)/**/
       .barWidth(this.isLandscape ? '63vp' : this.compBarWidth.value)/**/

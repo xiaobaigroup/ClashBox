@@ -94,18 +94,22 @@ struct TrafficStatistics {
           Column() {
             Text() {SymbolSpan($r('sys.symbol.chevron_down'))}
             .fontSize(this.chevronSize.value)
+            .fontColor($r('app.color.speed_down_icon'))
             Text(this.TotalDownloads.toString() + ' GB')
               //.margin(this.fontMargin.value)
               .fontSize(this.isLandscapePhone ? 14 : this.fontSize.value)
+              .fontColor($r('app.color.speed_down_icon'))
           }
           .margin({top:this.RowMargin.value, right: this.RowMargin.value})
           .justifyContent(FlexAlign.Center)
           Column() {
             Text() {SymbolSpan($r('sys.symbol.chevron_up'))}
             .fontSize(this.chevronSize.value)
+            .fontColor($r('app.color.speed_up_icon'))
             Text(this.TotalUpload.toString() + ' GB')
               //.margin(this.fontMargin.value)
               .fontSize(this.isLandscapePhone ? 14 : this.fontSize.value)
+              .fontColor($r('app.color.speed_up_icon'))
           }
           .margin({top:this.RowMargin.value})
           .justifyContent(FlexAlign.Center)

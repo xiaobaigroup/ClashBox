@@ -17,6 +17,8 @@ interface MarginGenerate {
 @Entry
 @Component
 struct Home {
+  //设置图标颜色，修改resources/base(dark)/element/color.json中settings_icon配置浅色和深色模式分别颜色
+  @State fontColorValue:ResourceColor = ($r('app.color.settings_icon'));
   //@Prop isLandscape: boolean
   @State currentBp: string = ''
   @State greetings: string = '早上好'
@@ -120,6 +122,7 @@ struct Home {
             Button({ type: ButtonType.Circle, stateEffect: true }) {
               SymbolGlyph($r('sys.symbol.gearshape'))
                 .fontSize(30)
+                .fontColor([this.fontColorValue])
             }
             .margin({right: this.gridMargin })
             .width(40)

@@ -2,31 +2,31 @@
   "color": [
     {
       "name": "start_window_background",
-      "value": "#FFFFFF"
+      "value": "#FC282828"
     },
     {
       "name": "settings_container_background",
-      "value": "#E7E8EA"
+      "value": "#FC565656"
     },
     {
       "name": "background",
-      "value": "#F1F3F5"
+      "value": "#FC282828"
     },
     {
       "name": "container_background",
-      "value": "#FFFFFFFF"
+      "value": "#FC565656"
     },
     {
       "name": "settings_icon",
-      "value": "#FF000000"
+      "value": "#D2D2D2"
     },
     {
       "name": "tabs_icon_text",
-      "value": "#0A59F7"
+      "value": "#317AF6"
     },
     {
       "name": "tabs_icon_text1",
-      "value": "#999"
+      "value": "#D2D2D2"
     },
     {
       "name": "speed_up_icon",
