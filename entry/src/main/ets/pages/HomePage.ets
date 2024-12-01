@@ -66,11 +66,12 @@ struct Home {
     if (mediaQueryResult.matches as boolean ) {
       this.isLandscapePhone = true
        console.log('手机横屏' + this.isLandscapePhone)
-      this.windowClass.setSpecificSystemBarEnabled('navigationIndicator', false)
+      //用于修改通知栏，预览器无法使用，请注释掉再开
+      //this.windowClass.setSpecificSystemBarEnabled('navigationIndicator', false)
     } else {
       this.isLandscapePhone = false
        console.log('手机竖屏' + this.isLandscapePhone)
-      this.windowClass.setSpecificSystemBarEnabled('navigationIndicator', true)
+      //this.windowClass.setSpecificSystemBarEnabled('navigationIndicator', true)
     }
   }
 

@@ -1,5 +1,39 @@
 import { BreakpointState, BreakpointSystem } from '../common/breakpointsystem';
 import { chartInterface, McLineChart, Options } from '@mcui/mccharts'
+import json from '@ohos.util.json';
+
+let downloadData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+let uploadData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+let DownloadData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+let UploadData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+let DownloadSpeed = 0
+let UploadSpeed = 0
+
+// 使用 async/await 来等待 Promise 解决
+async function updateDownloadData() {
+  DownloadSpeed = Math.floor(Math.random() * 1200)
+  UploadSpeed = Math.floor(Math.random() * 1200)
+  downloadData.unshift(DownloadSpeed);
+  downloadData.pop();
+  uploadData.unshift(UploadSpeed);
+  uploadData.pop();
+}
+
+function printData() {
+  //console.log('downloadData: ' + JSON.stringify(downloadData));
+  DownloadData = downloadData
+  //console.log('uploadData: ' + JSON.stringify(uploadData));
+  UploadData = uploadData
+  //console.log('UploadData: ' + JSON.stringify(UploadData));
+}
+
+setInterval(async () => {
+  await updateDownloadData(); // 调用更新数据的函数
+  printData();
+
+}, 1000);
+
+
 
 @Component
 struct Start {
@@ -8,6 +42,8 @@ struct Start {
   @State fontColorValue1:ResourceColor = ($r('app.color.speed_down_icon'));
   @State DownloadSpeed: number = 0
   @State UploadSpeed: number = 0
+  // 定时器ID，用于清除定时器
+  private timerId: number = 0;
   @State compStr: BreakpointState<string> = BreakpointState.of({
     sm: "sm",
     md: "md",
@@ -26,7 +62,7 @@ struct Start {
     lg: 21,
     xl: 21
   });
-  //图表
+  //初始化图表数据
   @State defOption: Options = new Options({
     //图例
     legend: {
@@ -39,7 +75,7 @@ struct Start {
     },
     //X轴
     xAxis: {
-      data: ['', '', '', '', '', '', ''],
+      data: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
       axisLine: {
         // 轴线样式
         show: true, // 是否显示
@@ -59,10 +95,59 @@ struct Start {
     //初始折线
     series: [
       {
-        data: [0, 0, 0, 0, 0, 0, 0]
+        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
       },
     ]
   })
+
+  onSpeedData() {
+    this.DownloadSpeed = DownloadSpeed
+    this.UploadSpeed = UploadSpeed
+    //图表
+    // 使用Option实例对象的setVal方法来实现，修改什么属性就传什么
+    this.defOption.setVal({
+      series: [
+        {
+          smooth: false, //平滑曲线
+          name: '上行速度(Kb/s)',
+          data: UploadData,
+          label: {
+            color: '#ffffa200',
+            offset: [-10, -10]//线条标签偏移量
+          },
+          //折线拐点配置
+          itemStyle: {
+            symbol: 'solidCircle',
+            symbolSize: 2,
+            borderWidth: 1
+          },
+          lineStyle: {
+            width: 2,
+            color: '#ffffa200'
+          }
+        },
+        {
+          smooth: false, //平滑曲线
+          name: '下行速度(Kb/s)',
+          data: DownloadData,
+          label: {
+            color: '#ff00aeff',
+            offset: [-10, -10]
+          },
+          //折线拐点配置
+          itemStyle: {
+            symbol: 'solidCircle',
+            symbolSize: 2,
+            borderWidth: 1
+          },
+          lineStyle: {
+            width: 2,
+            color: '#ff00aeff'
+          }
+        }
+      ]
+    })
+  }
 
   aboutToAppear() {
 
@@ -70,53 +155,11 @@ struct Start {
     BreakpointSystem.getInstance().attach(this.fontSize)
     BreakpointSystem.getInstance().attach(this.speedfontSize)
     BreakpointSystem.getInstance().start()
+    // 设置定时器，每秒调用一次 onSpeedData 函数
+    this.timerId = setInterval(() => {
+      this.onSpeedData();
+    }, 1000);
 
-    //图表
-    setTimeout(() => {
-      // 使用Option实例对象的setVal方法来实现，修改什么属性就传什么
-      this.defOption.setVal({
-        series: [
-          {
-            smooth: true, //平滑曲线
-            name: '上行速度(Kb/s)',
-            data: [11, 300, 50, 900, 210, 600, 250],
-            label: {
-              color: '#ffffa200',
-              offset: [-10, -10]//线条标签偏移量
-            },
-            //折线拐点配置
-            itemStyle: {
-              symbol: 'solidCircle',
-              symbolSize: 2,
-              borderWidth: 1
-            },
-            lineStyle: {
-              width: 2,
-              color: '#ffffa200'
-            }
-          },
-          {
-            smooth: true, //平滑曲线
-            name: '下行速度(Kb/s)',
-            data: [0, 500, 156, 700, 120, 900, 300],
-            label: {
-              color: '#ff00aeff',
-              offset: [-10, -10]
-            },
-            //折线拐点配置
-            itemStyle: {
-              symbol: 'solidCircle',
-              symbolSize: 2,
-              borderWidth: 1
-            },
-            lineStyle: {
-              width: 2,
-              color: '#ff00aeff'
-            }
-          }
-        ]
-      })
-    }, 2000)
   }
 
   aboutToDisappear() {
@@ -125,6 +168,9 @@ struct Start {
     BreakpointSystem.getInstance().attach(this.fontSize)
     BreakpointSystem.getInstance().attach(this.speedfontSize)
     BreakpointSystem.getInstance().stop()
+
+    // 清除定时器
+    clearInterval(this.timerId);
     //this.phonelistener.off('change');
   }
 
@@ -150,10 +196,13 @@ struct Start {
 
         Column() {
           Row() {
-            Text(this.DownloadSpeed.toString() + ' B/s')
-              .margin({ right: 3 })
+            Text(this.DownloadSpeed.toString())
+              .width(40)
+              //.margin({ right: 3 })
               .fontSize(this.speedfontSize.value)
               .fontColor($r('app.color.speed_up_icon'))
+            Text(' B/s')
+              .fontColor(this.fontColorValue)
             Text() {
               SymbolSpan($r('sys.symbol.chevron_up'))
                 .fontSize(this.speedfontSize.value)
@@ -163,10 +212,13 @@ struct Start {
           }
 
           Row() {
-            Text(this.UploadSpeed.toString() + ' B/s')
-              .margin({ right: 3 })
+            Text(this.UploadSpeed.toString())
+              .width(40)
+              //.margin({ right: 3 })
               .fontSize(this.speedfontSize.value)
               .fontColor($r('app.color.speed_down_icon'))
+            Text(' B/s')
+              .fontColor(this.fontColorValue1)
             Text() {
               SymbolSpan($r('sys.symbol.chevron_down'))
                 .fontSize(this.speedfontSize.value)
@@ -175,7 +227,7 @@ struct Start {
 
           }
         }
-        .width('67vp')
+        .width('100vp')
 
       }
       .height(40)

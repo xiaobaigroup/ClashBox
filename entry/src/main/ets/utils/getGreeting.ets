@@ -21,6 +21,7 @@ export function getGreeting(): string {
     { month: 6, day: 1, message: "儿童节快乐！" },
     { month: 9, day: 10, message: "教师节快乐！" },
     { month: 10, day: 1, message: "国庆节快乐！" },
+    //
   ];
 
   // 检查当前日期是否是节假日
