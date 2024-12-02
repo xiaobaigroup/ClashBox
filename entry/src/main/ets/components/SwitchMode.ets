@@ -1,5 +1,10 @@
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI';
+import { ThemeControl } from '@ohos.arkui.theme'
+import { gAppTheme } from '../pages/AppTheme'
+
+// 在页面build前执行ThemeControl，就可以改变主题颜色
+//ThemeControl.setDefaultTheme(gAppTheme)
 
 interface MarginGenerate {
   left: number, right: number, top: number,
@@ -8,6 +13,21 @@ interface MarginGenerate {
 
 @Component
 struct SwitchMode {
+  //自定义主题，颜色在AppTheme里面修改
+  @State font_secondary: ResourceColor = $r('sys.color.font_secondary')
+/*
+  @State backgroundPrimary: ResourceColor = $r('sys.color.background_primary')
+  @State fontPrimary: ResourceColor = $r('sys.color.font_primary')
+  @State iconOnPrimary: ResourceColor = $r('sys.color.icon_on_primary')
+  @State iconFourth: ResourceColor = $r('sys.color.icon_fourth')
+
+  onWillApplyTheme(theme: Theme) {
+    this.backgroundPrimary = theme.colors.backgroundPrimary;
+    this.fontPrimary = theme.colors.fontPrimary;
+    this.iconOnPrimary = theme.colors.iconOnPrimary;
+    this.iconFourth = theme.colors.iconFourth;
+  }
+*/
   @State isToggle1: boolean = false;
   @State isToggle2: boolean = false;
   @State isToggle3: boolean = false;
@@ -97,6 +117,7 @@ struct SwitchMode {
             .fontWeight(FontWeight.Bold)
             .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
             .margin(this.isLandscapePhone ? { left: 15 }: this.fontMargin.value)
+            .fontColor(this.font_secondary)
         }
         Row() {
           Checkbox({ name: 'checkbox', group: 'checkboxGroup' })
@@ -115,6 +136,7 @@ struct SwitchMode {
             .fontWeight(FontWeight.Bold)
             .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
             .margin(this.isLandscapePhone ? { left: 15 }: this.fontMargin.value)
+            .fontColor(this.font_secondary)
         }
         .margin({top: this.RowPadding.value})
         Row() {
@@ -134,6 +156,7 @@ struct SwitchMode {
             .fontWeight(FontWeight.Bold)
             .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
             .margin(this.isLandscapePhone ? { left: 15 }: this.fontMargin.value)
+            .fontColor(this.font_secondary)
         }
         .margin({top: this.RowPadding.value})
       }

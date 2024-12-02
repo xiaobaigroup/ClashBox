@@ -1,11 +1,16 @@
 import { BreakpointState, BreakpointSystem } from '../common/breakpointsystem';
 import { chartInterface, McLineChart, Options } from '@mcui/mccharts'
 import json from '@ohos.util.json';
+import { ThemeControl } from '@ohos.arkui.theme'
+import { gAppTheme } from '../pages/AppTheme'
 
-let downloadData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-let uploadData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-let DownloadData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-let UploadData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+// 在页面build前执行ThemeControl，就可以改变主题颜色
+//ThemeControl.setDefaultTheme(gAppTheme)
+
+let downloadData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+let uploadData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+let DownloadData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+let UploadData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 let DownloadSpeed = 0
 let UploadSpeed = 0
 
@@ -13,10 +18,10 @@ let UploadSpeed = 0
 async function updateDownloadData() {
   DownloadSpeed = Math.floor(Math.random() * 1200)
   UploadSpeed = Math.floor(Math.random() * 1200)
-  downloadData.unshift(DownloadSpeed);
-  downloadData.pop();
-  uploadData.unshift(UploadSpeed);
-  uploadData.pop();
+  downloadData.push(DownloadSpeed);
+  downloadData.shift();
+  uploadData.push(UploadSpeed);
+  uploadData.shift();
 }
 
 function printData() {
@@ -37,6 +42,19 @@ setInterval(async () => {
 
 @Component
 struct Start {
+  /*
+  @State backgroundPrimary: ResourceColor = $r('sys.color.background_primary')
+  @State fontPrimary: ResourceColor = $r('sys.color.font_primary')
+  @State iconOnPrimary: ResourceColor = $r('sys.color.icon_on_primary')
+  @State iconFourth: ResourceColor = $r('sys.color.icon_fourth')
+
+  onWillApplyTheme(theme: Theme) {
+    this.backgroundPrimary = theme.colors.backgroundPrimary;
+    this.fontPrimary = theme.colors.fontPrimary;
+    this.iconOnPrimary = theme.colors.iconOnPrimary;
+    this.iconFourth = theme.colors.iconFourth;
+  }
+*/
   //设置speed图标颜色，修改resources/base(dark)/element/color.json中speed_up_icon和app.color.speed_down_icon配置浅色和深色模式分别颜色
   @State fontColorValue:ResourceColor = ($r('app.color.speed_up_icon'));
   @State fontColorValue1:ResourceColor = ($r('app.color.speed_down_icon'));
@@ -71,11 +89,11 @@ struct Start {
     },
     //图表位置
     grid: {
-      top: 15
+      top: 15,
     },
     //X轴
     xAxis: {
-      data: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+      data: ['', '', '', '', '', '', '', '', '', '', '', ''],
       axisLine: {
         // 轴线样式
         show: true, // 是否显示
@@ -90,12 +108,36 @@ struct Start {
     {
       name: '单位(Kb/s)',
       min: 0,
-      max: 1024
+      max: 1300,
+      //刻度线
+      axisTick:{
+        show: true
     },
+      //轴线
+      axisLine:{
+        show: true
+      },
+      //Y轴分割线
+      splitLine: {
+        show: false
+      },
+      axisLabel:{
+        show: false
+      }
+    },
+    //动画
+    animation: false,
     //初始折线
     series: [
       {
-        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        lineStyle: {
+          width: 2,
+          color: '#ff0a59f7'
+        },
+        label: {
+          show: false
+        }
       },
     ]
   })
@@ -112,7 +154,8 @@ struct Start {
           name: '上行速度(Kb/s)',
           data: UploadData,
           label: {
-            color: '#ffffa200',
+            show: false,
+            color: '#FFF7980A',
             offset: [-10, -10]//线条标签偏移量
           },
           //折线拐点配置
@@ -123,7 +166,7 @@ struct Start {
           },
           lineStyle: {
             width: 2,
-            color: '#ffffa200'
+            color: '#FFF7980A'
           }
         },
         {
@@ -131,7 +174,8 @@ struct Start {
           name: '下行速度(Kb/s)',
           data: DownloadData,
           label: {
-            color: '#ff00aeff',
+            show: false,
+            color: '#ff0a59f7',
             offset: [-10, -10]
           },
           //折线拐点配置
@@ -142,7 +186,7 @@ struct Start {
           },
           lineStyle: {
             width: 2,
-            color: '#ff00aeff'
+            color: '#ff0a59f7'
           }
         }
       ]

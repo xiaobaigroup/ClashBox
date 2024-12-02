@@ -8,6 +8,14 @@ import PublicNetwork from '../components/PublicNetwork'
 import Start from '../components/Start'
 import { getGreeting } from '../utils/getGreeting'
 import SwitchQuickly from '../components/SwitchQuickly'
+import { ThemeControl } from '@ohos.arkui.theme'
+import { gAppTheme } from './AppTheme'
+
+// 在页面build前执行ThemeControl，就可以改变主题颜色
+//ThemeControl.setDefaultTheme(gAppTheme)
+
+
+
 
 interface MarginGenerate {
   top: number, left:number, right: number,
@@ -17,8 +25,11 @@ interface MarginGenerate {
 @Entry
 @Component
 struct Home {
+  //系统颜色调用
+  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary')//三级图标色，浅灰色
+
   //设置图标颜色，修改resources/base(dark)/element/color.json中settings_icon配置浅色和深色模式分别颜色
-  @State fontColorValue:ResourceColor = ($r('app.color.settings_icon'));
+ //@State fontColorValue:ResourceColor = ($r('app.color.settings_icon'));
   //@Prop isLandscape: boolean
   @State currentBp: string = ''
   @State greetings: string = '早上好'
@@ -123,7 +134,7 @@ struct Home {
             Button({ type: ButtonType.Circle, stateEffect: true }) {
               SymbolGlyph($r('sys.symbol.gearshape'))
                 .fontSize(30)
-                .fontColor([this.fontColorValue])
+                .fontColor([this.icon_secondary])
             }
             .margin({right: this.gridMargin })
             .width(40)

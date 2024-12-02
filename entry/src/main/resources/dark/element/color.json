@@ -18,23 +18,15 @@
     },
     {
       "name": "settings_icon",
-      "value": "#D2D2D2"
-    },
-    {
-      "name": "tabs_icon_text",
-      "value": "#317AF6"
-    },
-    {
-      "name": "tabs_icon_text1",
-      "value": "#D2D2D2"
+      "value": "#fff1f3f5"
     },
     {
       "name": "speed_up_icon",
-      "value": "#ffffa200"
+      "value": "#FFF7980A"
     },
     {
       "name": "speed_down_icon",
-      "value": "#ff00aeff"
+      "value": "#ff0a59f7"
     }
   ]
 }
