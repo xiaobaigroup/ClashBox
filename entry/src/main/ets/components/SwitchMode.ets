@@ -15,6 +15,7 @@ interface MarginGenerate {
 struct SwitchMode {
   //自定义主题，颜色在AppTheme里面修改
   @State font_secondary: ResourceColor = $r('sys.color.font_secondary')
+  @State icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize')//高亮图标，蓝色
 /*
   @State backgroundPrimary: ResourceColor = $r('sys.color.background_primary')
   @State fontPrimary: ResourceColor = $r('sys.color.font_primary')
@@ -103,7 +104,7 @@ struct SwitchMode {
         Row() {
           Checkbox({ name: 'checkbox', group: 'checkboxGroup' })
             .select($$this.isToggle1)
-            .selectedColor(0x39a2db)
+            .selectedColor(this.icon_emphasize)
             .shape(CheckBoxShape.CIRCLE)
             .onChange((value: boolean) => {
               //this.isToggle1 = true
@@ -122,7 +123,7 @@ struct SwitchMode {
         Row() {
           Checkbox({ name: 'checkbox', group: 'checkboxGroup' })
             .select($$this.isToggle2)
-            .selectedColor(0x39a2db)
+            .selectedColor(this.icon_emphasize)
             .shape(CheckBoxShape.CIRCLE)
             .onChange((value: boolean) => {
               //this.isToggle2 = true
@@ -142,7 +143,7 @@ struct SwitchMode {
         Row() {
           Checkbox({ name: 'checkbox', group: 'checkboxGroup' })
             .select($$this.isToggle3)
-            .selectedColor(0x39a2db)
+            .selectedColor(this.icon_emphasize)
             .shape(CheckBoxShape.CIRCLE)
             .onChange((value: boolean) => {
               //this.isToggle3 = true
