@@ -41,7 +41,7 @@ setInterval(async () => {
 
 
 @Component
-struct Start {
+struct Speed {
   /*
   @State backgroundPrimary: ResourceColor = $r('sys.color.background_primary')
   @State fontPrimary: ResourceColor = $r('sys.color.font_primary')
@@ -90,6 +90,8 @@ struct Start {
     //图表位置
     grid: {
       top: 15,
+      left: 31,
+      right: 31,
     },
     //X轴
     xAxis: {
@@ -99,23 +101,24 @@ struct Start {
         show: true, // 是否显示
       },
       axisTick: {
-        show: true,
+        show: false,
         interval: 2
       },
+      //坐标轴两侧是否留白
+      boundaryGap: false
     },
     //Y轴
     yAxis:
     {
-      name: '单位(Kb/s)',
       min: 0,
       max: 1300,
       //刻度线
       axisTick:{
-        show: true
+        show: false
     },
       //轴线
       axisLine:{
-        show: true
+        show: false
       },
       //Y轴分割线
       splitLine: {
@@ -132,7 +135,7 @@ struct Start {
       {
         data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         lineStyle: {
-          width: 2,
+          width: 3,
           color: '#ff0a59f7'
         },
         label: {
@@ -165,7 +168,7 @@ struct Start {
             borderWidth: 1
           },
           lineStyle: {
-            width: 2,
+            width: 3,
             color: '#FFF7980A'
           }
         },
@@ -185,7 +188,7 @@ struct Start {
             borderWidth: 1
           },
           lineStyle: {
-            width: 2,
+            width: 3,
             color: '#ff0a59f7'
           }
         }
@@ -222,13 +225,8 @@ struct Start {
     Column() {
       Row() {
         Row() {
-          Text() {
-            SymbolSpan($r('sys.symbol.play_fill'))
-          }
-          .fontSize(this.fontSize.value)
-          .fontColor('green')
-
-          Text($r('app.string.Start'))
+          //网络速率
+          Text($r('app.string.Speed'))
             .fontSize(this.fontSize.value)
         }
         .width('145vp')
@@ -304,4 +302,4 @@ struct Start {
   }
 }
 
-export default Start
+export default Speed
