@@ -2,23 +2,23 @@
   "color": [
     {
       "name": "start_window_background",
-      "value": "#FFFFFF"
+      "value": "#FC282828"
     },
     {
       "name": "settings_container_background",
-      "value": "#E7E8EA"
+      "value": "#FC565656"
     },
     {
       "name": "background",
-      "value": "#F1F3F5"
+      "value": "#FC282828"
     },
     {
       "name": "container_background",
-      "value": "#FFFFFFFF"
+      "value": "#FC565656"
     },
     {
       "name": "settings_icon",
-      "value": "#99000000"
+      "value": "#fff1f3f5"
     },
     {
       "name": "speed_up_icon",
@@ -30,5 +30,4 @@
     }
   ]
 }
-
 

@@ -1,5 +1,11 @@
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI'
+import { ThemeControl } from '@ohos.arkui.theme'
+import { gAppTheme } from '../pages/AppTheme'
+
+// 在页面build前执行ThemeControl，就可以改变主题颜色
+//ThemeControl.setDefaultTheme(gAppTheme)
+
 
 interface MarginGenerate {
   left: number,top: number, right: number,
@@ -8,6 +14,22 @@ interface MarginGenerate {
 
 @Component
 struct TrafficStatistics {
+  /* //自定义主题，颜色在AppTheme里面修改
+   @State font_secondary: ResourceColor = $r('sys.color.font_secondary')
+
+     @State backgroundPrimary: ResourceColor = $r('sys.color.background_primary')
+     @State fontPrimary: ResourceColor = $r('sys.color.font_primary')
+     @State iconOnPrimary: ResourceColor = $r('sys.color.icon_on_primary')
+     @State iconFourth: ResourceColor = $r('sys.color.icon_fourth')
+
+     onWillApplyTheme(theme: Theme) {
+       this.backgroundPrimary = theme.colors.backgroundPrimary;
+       this.fontPrimary = theme.colors.fontPrimary;
+       this.iconOnPrimary = theme.colors.iconOnPrimary;
+       this.iconFourth = theme.colors.iconFourth;
+     }
+   */
+  @State font_secondary: ResourceColor = $r('sys.color.font_secondary')
   @State TotalDownloads: number = 0
   @State TotalUpload: number = 0
   @State isLandscapePhone: boolean = false
@@ -94,18 +116,22 @@ struct TrafficStatistics {
           Column() {
             Text() {SymbolSpan($r('sys.symbol.chevron_down'))}
             .fontSize(this.chevronSize.value)
+            .fontColor($r('app.color.speed_down_icon'))
             Text(this.TotalDownloads.toString() + ' GB')
               //.margin(this.fontMargin.value)
               .fontSize(this.isLandscapePhone ? 14 : this.fontSize.value)
+              .fontColor($r('app.color.speed_down_icon'))
           }
           .margin({top:this.RowMargin.value, right: this.RowMargin.value})
           .justifyContent(FlexAlign.Center)
           Column() {
             Text() {SymbolSpan($r('sys.symbol.chevron_up'))}
             .fontSize(this.chevronSize.value)
+            .fontColor($r('app.color.speed_up_icon'))
             Text(this.TotalUpload.toString() + ' GB')
               //.margin(this.fontMargin.value)
               .fontSize(this.isLandscapePhone ? 14 : this.fontSize.value)
+              .fontColor($r('app.color.speed_up_icon'))
           }
           .margin({top:this.RowMargin.value})
           .justifyContent(FlexAlign.Center)
@@ -124,6 +150,7 @@ struct TrafficStatistics {
         .margin(this.barMargin.value)
         Text($r('app.string.CellularData_Statistics_explanation'))
           .fontSize(this.isLandscapePhone ? 14 : this.fontSize.value)
+          .fontColor(this.font_secondary)
 
       }
       .width('100%')

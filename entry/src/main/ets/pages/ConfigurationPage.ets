@@ -1,9 +1,17 @@
+import { ThemeControl } from '@ohos.arkui.theme'
+import { gAppTheme } from './AppTheme'
+
+// 在页面build前执行ThemeControl，就可以改变主题颜色
+//ThemeControl.setDefaultTheme(gAppTheme)
+
 @Entry
 @Component
 struct ConfigurationPage {
+
+
   build() {
     Column() {
-      Text('配置页')
+      Text('配置')
 
     }
     .width('100%')

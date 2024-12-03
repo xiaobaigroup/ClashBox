@@ -1,5 +1,10 @@
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI'
+import { ThemeControl } from '@ohos.arkui.theme'
+import { gAppTheme } from '../pages/AppTheme'
+
+// 在页面build前执行ThemeControl，就可以改变主题颜色
+//ThemeControl.setDefaultTheme(gAppTheme)
 
 interface MarginGenerate {
   left: number, right: number, top: number,
@@ -8,6 +13,22 @@ interface MarginGenerate {
 
 @Component
 struct SwitchQuickly {
+  //自定义主题，颜色在AppTheme里面修改
+  @State font_secondary: ResourceColor = $r('sys.color.font_secondary')
+  /*
+  @State backgroundPrimary: ResourceColor = $r('sys.color.background_primary')
+  @State fontPrimary: ResourceColor = $r('sys.color.font_primary')
+  @State iconOnPrimary: ResourceColor = $r('sys.color.icon_on_primary')
+  @State iconFourth: ResourceColor = $r('sys.color.icon_fourth')
+
+  onWillApplyTheme(theme: Theme) {
+    this.backgroundPrimary = theme.colors.backgroundPrimary;
+    this.fontPrimary = theme.colors.fontPrimary;
+    this.iconOnPrimary = theme.colors.iconOnPrimary;
+    this.iconFourth = theme.colors.iconFourth;
+  }
+*/
+
   @State switchQuickly: string = '123'
   @State isLandscapePhone: boolean = false
   @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
@@ -76,6 +97,7 @@ struct SwitchQuickly {
         Text(this.switchQuickly)
           .fontSize(23)
           .fontColor('grey')
+          .fontColor(this.font_secondary)
       }
       .flexGrow(1)
       .width('100%')
