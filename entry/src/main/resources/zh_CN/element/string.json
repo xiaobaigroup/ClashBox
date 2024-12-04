@@ -75,6 +75,30 @@
     {
       "name": "SwitchQuickly",
       "value": "快捷切换"
+    },
+    {
+      "name": "Log",
+      "value": "日志"
+    },
+    {
+      "name": "Resources",
+      "value": "资源"
+    },
+    {
+      "name": "Request",
+      "value": "请求"
+    },
+    {
+      "name": "Connect",
+      "value": "连接"
+    },
+    {
+      "name": "Overwrite",
+      "value": "覆写"
+    },
+    {
+      "name": "AccessControl",
+      "value": "访问控制"
     }
   ]
 }

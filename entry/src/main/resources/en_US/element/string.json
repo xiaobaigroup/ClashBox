@@ -75,6 +75,30 @@
     {
       "name": "SwitchQuickly",
       "value": "SwitchQuickly"
+    },
+    {
+      "name": "Log",
+      "value": "Log"
+    },
+    {
+      "name": "Resources",
+      "value": "Resources"
+    },
+    {
+      "name": "Request",
+      "value": "Request"
+    },
+    {
+      "name": "Connect",
+      "value": "Connect"
+    },
+    {
+      "name": "Overwrite",
+      "value": "Overwrite"
+    },
+    {
+      "name": "AccessControl",
+      "value": " AccessControl"
     }
   ]
 }
