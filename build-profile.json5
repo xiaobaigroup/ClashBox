@@ -5,13 +5,13 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "C:\\Users\\Administrator\\.ohos\\config\\default_ark-c_GHaKXQPSlgRpq87icEJdxV6-KvfZCI75qffJaZipOrI=.cer",
-          "storePassword": "0000001B939791A7E380932736EE022B4B4C9992848F2FD6CF34B4D19F87F1E1D3957C0323F4CE64EBEBA6",
+          "certpath": "C:\\Users\\Administrator\\.ohos\\config\\default_ark-c_XJo0PIuPWR05AaZ5GkdNS-yBpIYHsXYNXXQULlkB2gA=.cer",
+          "storePassword": "0000001B32B50FE5A00D5C20DC5AB3B34622133F1EFF026D7FC9D4653DF455E8640922F439046AA4AD4E1D",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001B272C1CFBDFADE880BEE391CF265D5C24CDD03447D2DCFB8503C20F8D7BE1C01A3664B8544A22DC",
-          "profile": "C:\\Users\\Administrator\\.ohos\\config\\default_ark-c_GHaKXQPSlgRpq87icEJdxV6-KvfZCI75qffJaZipOrI=.p7b",
+          "keyPassword": "0000001B0DD2E7D4553C3A49FC05534304CDD9C355FB029280CB8A2C8761A6A68C1A7582D42EA82E355F72",
+          "profile": "C:\\Users\\Administrator\\.ohos\\config\\default_ark-c_XJo0PIuPWR05AaZ5GkdNS-yBpIYHsXYNXXQULlkB2gA=.p7b",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\default_ark-c_GHaKXQPSlgRpq87icEJdxV6-KvfZCI75qffJaZipOrI=.p12"
+          "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\default_ark-c_XJo0PIuPWR05AaZ5GkdNS-yBpIYHsXYNXXQULlkB2gA=.p12"
         }
       }
     ],

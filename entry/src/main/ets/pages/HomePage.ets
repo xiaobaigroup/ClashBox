@@ -9,7 +9,7 @@ import Start from '../components/Speed'
 import { getGreeting } from '../utils/getGreeting'
 import SwitchQuickly from '../components/SwitchQuickly'
 import { ThemeControl } from '@ohos.arkui.theme'
-import { gAppTheme } from './AppTheme'
+import { gAppTheme } from '../common/AppTheme'
 
 // 在页面build前执行ThemeControl，就可以改变主题颜色
 //ThemeControl.setDefaultTheme(gAppTheme)
@@ -393,7 +393,7 @@ struct Home {
               break
 
           }
-          console.log('断点为：' + this.currentBp + '容器高：' + this.ContainerHeight + '顶部高：' + this.TopHeight)
+         // console.log('断点为：' + this.currentBp + '容器高：' + this.ContainerHeight + '顶部高：' + this.TopHeight)
         })
       }
       .width('100%')
@@ -408,11 +408,6 @@ struct Home {
     .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
     .width("100%")
 
-    //}
-    //.height('100%')
-    //.width('100%')
-    //.scrollBar(BarState.Off)
-    //.scrollable(ScrollDirection.Vertical)
   }
 }
 export default Home
