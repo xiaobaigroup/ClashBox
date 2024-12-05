@@ -1,31 +1,68 @@
-
 import { ProxyData } from "../common/ProxyListData"
 
 @Component
-struct ProcyListItem {
+struct ProxyListItem {
+  @State font_primary: ResourceColor = $r('sys.color.font_primary') //一级文本色，黑色
+  @State icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize') //高亮图标，蓝色
+  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //二级图标色，灰色
+  @State font_secondary: ResourceColor = $r('sys.color.font_secondary') //二级文本色，灰色
   @Prop itemObj: ProxyData
   @Prop index: number
-  onCheck = (index: number) => {}
+  onCheck = (index: number) => {
+  }
 
   build() {
-    Row() {
-      Text(this.itemObj.name)
-        .fontColor(Color.Black)
-        //.fontColor(this.itemObj.isCheck ? Color.Blue : Color.Gray)
-      Blank()
-      Checkbox({ name: 'checkbox', group: 'checkboxGroup' })
-        .select(this.itemObj.isCheck)
-        .selectedColor(0x39a2db)
-        .shape(CheckBoxShape.ROUNDED_SQUARE)
-        .onChange((value: boolean) => {
-          console.info('Checkbox change is' + value)
-          this.onCheck(this.index)
+    Flex({ direction: FlexDirection.Row, justifyContent: FlexAlign.SpaceBetween, }) {
+      Row() {
+        Row() {
+          Column() {
+            Text(this.itemObj.name)
+              .fontSize(20)
+              .width('100%')
+              .fontColor(this.font_primary)
+            //   .textAlign(TextAlign.Start)
+            Text(this.itemObj.passage)
+              .fontSize(14)
+              .width('100%')
+              .fontColor(this.font_secondary)
+          }
+
+          Text(this.itemObj.latency,)
+            .fontSize(18)//    .width('90%')
+            .fontColor(Color.Red)
+            .textAlign(TextAlign.End)
+
+        }
+        .padding({ right: 70 })
+        .justifyContent(FlexAlign.End)
+
+        Radio({
+          value: 'Radio', group: 'radioGroup',
+          indicatorType: RadioIndicatorType.TICK
         })
+          .checked(false)
+          .radioStyle({
+            checkedBackgroundColor: this.icon_emphasize,
+            //   uncheckedBorderColor: this.icon_secondary
+          })
+
+          .height(20)
+          .width(20)
+          .onChange((isChecked: boolean) => {
+            console.info('Radio2 change is' + isChecked)
+            this.onCheck(this.index)
+          })
+      }
+      // .padding({  right: 12})
+      .height(58)
+      .width('92%')
+
+      //     .alignItems(VerticalAlign.Center)
+      //    .justifyContent(FlexAlign.SpaceBetween)
+      //   .backgroundColor($r('app.color.background'))
     }
-    .width(200)
-    .height(48)
-    .padding(5)
   }
 }
 
-export default ProcyListItem
+
+export default ProxyListItem

@@ -150,7 +150,7 @@ struct Home {
       if (!this.isLandscapePhone) {
         Row() {
           Text(this.greetings)
-            .fontSize(28)
+            .fontSize(32)
             .fontWeight(FontWeight.Bold)
             .margin({ left: this.gridMargin })
           Blank()

@@ -48,7 +48,7 @@ struct MorePage {
     Column() {
       Row() {
         Text($r('app.string.More'))
-          .fontSize(28)
+          .fontSize(32)
           .fontWeight(FontWeight.Bold)
           .margin({ left: this.listMargin.value })
       }
