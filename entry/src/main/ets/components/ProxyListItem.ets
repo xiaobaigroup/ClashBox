@@ -1,4 +1,5 @@
 import { ProxyData } from "../common/ProxyListData"
+import { text } from '@kit.ArkGraphics2D';
 
 @Component
 struct ProxyListItem {
@@ -30,11 +31,12 @@ struct ProxyListItem {
           Text(this.itemObj.latency,)
             .fontSize(18)//    .width('90%')
             .fontColor(Color.Red)
-            .textAlign(TextAlign.End)
-
+            .textAlign(2)
+            .width('45%')
         }
-        .padding({ right: 70 })
-        .justifyContent(FlexAlign.End)
+        .padding({ right: 95 })
+        .width('100%')
+     //   .justifyContent(FlexAlign.End)
 
         Radio({
           value: 'Radio', group: 'radioGroup',
