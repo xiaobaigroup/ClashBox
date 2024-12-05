@@ -1,0 +1,20 @@
+{
+  "integer": [
+    {
+      "name": "vp_proxy_start_button_margin",
+      "value": 30
+    },
+    {
+      "name": "vp_proxy_not_start_button_width",
+      "value": 50
+    },
+    {
+      "name": "vp_proxy_not_start_button_height",
+      "value": 50
+    },
+    {
+      "name": "vp_proxy_started_button_width",
+      "value": 150
+    }
+  ]
+}

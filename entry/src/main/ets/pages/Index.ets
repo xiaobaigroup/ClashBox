@@ -89,6 +89,7 @@ struct Index {
             .fontColor([this.currentIndex === index ? this.icon_emphasize : this.icon_tertiary])
             .fontSize(this.isLandscape ? 24 : this.TabIconfontSize.value)
             .margin({top: 5})
+            .effectStrategy(SymbolEffectStrategy.SCALE)
 
           Text(title)
             .fontColor(this.currentIndex === index ? this.icon_emphasize : this.icon_tertiary)
@@ -199,7 +200,7 @@ struct Index {
       .barWidth(this.isLandscape ? '63vp' : this.compBarWidth.value)/**/
       .barHeight(this.isLandscape ? '100%' : this.compBarHeight.value)/**/
       .margin(this.compMargin.value)
-      .animationDuration(0)
+      .animationDuration(200)
       .onChange((index: number) => {
         this.currentIndex = index
 

@@ -48,3 +48,9 @@ export default class Constants {
     },
   ]
 }
+
+// 主页 -> 代理启动按钮内计时器的初始值
+export const PROXY_STARTED_DURATION_INIT_VALUE: string = '00:00:00'
+
+// 组件animation duration值: 300
+export const ANIMATION_DURATION_300: number = 300
