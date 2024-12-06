@@ -1,7 +1,7 @@
-import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
+import { BreakpointSystem, BreakpointState } from '../../common/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI'
 import { ThemeControl } from '@ohos.arkui.theme'
-import { gAppTheme } from '../common/AppTheme'
+import { gAppTheme } from '../../common/AppTheme'
 
 // 在页面build前执行ThemeControl，就可以改变主题颜色
 //ThemeControl.setDefaultTheme(gAppTheme)
@@ -12,35 +12,28 @@ interface MarginGenerate {
 }
 
 @Component
-struct PublicNetwork {
-  //自定义主题，颜色在AppTheme里面修改
+struct CurrrentNode {
+  /* //自定义主题，颜色在AppTheme里面修改
+ @State font_secondary: ResourceColor = $r('sys.color.font_secondary')
+
+   @State backgroundPrimary: ResourceColor = $r('sys.color.background_primary')
+   @State fontPrimary: ResourceColor = $r('sys.color.font_primary')
+   @State iconOnPrimary: ResourceColor = $r('sys.color.icon_on_primary')
+   @State iconFourth: ResourceColor = $r('sys.color.icon_fourth')
+
+   onWillApplyTheme(theme: Theme) {
+     this.backgroundPrimary = theme.colors.backgroundPrimary;
+     this.fontPrimary = theme.colors.fontPrimary;
+     this.iconOnPrimary = theme.colors.iconOnPrimary;
+     this.iconFourth = theme.colors.iconFourth;
+   }
+ */
   @State font_secondary: ResourceColor = $r('sys.color.font_secondary')
-  /*
-    @State backgroundPrimary: ResourceColor = $r('sys.color.background_primary')
-    @State fontPrimary: ResourceColor = $r('sys.color.font_primary')
-    @State iconOnPrimary: ResourceColor = $r('sys.color.icon_on_primary')
-    @State iconFourth: ResourceColor = $r('sys.color.icon_fourth')
-
-    onWillApplyTheme(theme: Theme) {
-      this.backgroundPrimary = theme.colors.backgroundPrimary;
-      this.fontPrimary = theme.colors.fontPrimary;
-      this.iconOnPrimary = theme.colors.iconOnPrimary;
-      this.iconFourth = theme.colors.iconFourth;
-    }
-  */
-
-  @State address: string = '中国大陆'
-  @State IP: string = '255.255.255.255'
+  @State currentNode: string = '暂无节点'
   @State isLandscapePhone: boolean = false
   @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
-  @State TitleFontSize: BreakpointState<number> = BreakpointState.of({
-    sm: 18, md: 29, lg: 26, xl: 27
-  });
   @State fontSize: BreakpointState<number> = BreakpointState.of({
-    sm: 16, md: 27, lg: 26, xl: 27
-  });
-  @State IPfontSize: BreakpointState<number> = BreakpointState.of({
-    sm: 20, md: 30, lg: 26, xl: 27
+    sm: 18, md: 29, lg: 26, xl: 27
   });
   @State RowPadding: BreakpointState<number> = BreakpointState.of({
     sm: 10, md: 10, lg: 10, xl: 20
@@ -77,8 +70,6 @@ struct PublicNetwork {
 
     BreakpointSystem.getInstance().attach(this.compStr)
     BreakpointSystem.getInstance().attach(this.fontSize)
-    BreakpointSystem.getInstance().attach(this.TitleFontSize)
-    BreakpointSystem.getInstance().attach(this.IPfontSize)
     BreakpointSystem.getInstance().attach(this.RowPadding)
     BreakpointSystem.getInstance().attach(this.fontMargin)
     BreakpointSystem.getInstance().attach(this.cardPadding)
@@ -88,8 +79,6 @@ struct PublicNetwork {
 
     BreakpointSystem.getInstance().attach(this.compStr)
     BreakpointSystem.getInstance().attach(this.fontSize)
-    BreakpointSystem.getInstance().attach(this.TitleFontSize)
-    BreakpointSystem.getInstance().attach(this.IPfontSize)
     BreakpointSystem.getInstance().attach(this.fontMargin)
     BreakpointSystem.getInstance().attach(this.RowPadding)
     BreakpointSystem.getInstance().attach(this.cardPadding)
@@ -100,34 +89,34 @@ struct PublicNetwork {
 
   build() {
     Column() {
-      Text($r('app.string.PublicNetwork'))
-        .fontSize(this.isLandscapePhone ? 18 : this.TitleFontSize.value)
+      Text($r('app.string.CurrentNode'))
+        .fontSize(this.isLandscapePhone ? 18 : this.fontSize.value)
         //.margin({left:this.RowPadding.value})
         .fontWeight(FontWeight.Bold)
-      Column() {
-        Row() {
-          Text(this.address)
-            .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-            .fontColor(this.font_secondary)
-        }
-        .justifyContent(FlexAlign.Start)
-        Text(this.IP)
-          .fontSize(this.isLandscapePhone ? 20 : this.IPfontSize.value)
-          .textAlign(TextAlign.Center)
-          .margin(this.RowPadding.value)
+      Row() {
+        Text(this.currentNode)
+          .fontSize(23)
+          .fontColor('grey')
           .fontColor(this.font_secondary)
-
       }
-      .alignItems(HorizontalAlign.Start)
-      .justifyContent(FlexAlign.Center)
-      .width('100%')
       .flexGrow(1)
+      .width('100%')
+      .justifyContent(FlexAlign.Center)
+      /*Row() {
+        Text($r('app.string.Switch'))
+          .fontSize(this.fontSize.value)
+          .fontWeight(FontWeight.Bold)
+        Text() {SymbolSpan($r('sys.symbol.chevron_right'))}
+        .fontSize(this.fontSize.value)
+        .margin({left:5})
+      }
+      .width('100%')
+      .justifyContent(FlexAlign.End)*/
     }
     .padding(this.cardPadding.value)
     .width('100%')
     .height('100%')
-    //.justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Start)
   }
 }
-export default PublicNetwork
+export default CurrrentNode
