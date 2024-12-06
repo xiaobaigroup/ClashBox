@@ -13,7 +13,7 @@ struct ProxyPage {
   //系统颜色调用
   @State icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize') //高亮图标，蓝色
   @State font_primary: ResourceColor = $r('sys.color.font_primary') //一级文本色，黑色
-
+  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级文本色，黑色
   @State container_background: ResourceColor = ($r('app.color.container_background'));
   /*
        预留自定义主题，颜色在AppTheme里面修改
@@ -24,6 +24,7 @@ struct ProxyPage {
           this.iconFourth = theme.colors.iconFourth;
        }
    */
+  @State private gridMargin: number = 0
   @State currentIndex: number = 0;
   @State proxyGroup1List: ProxyData[] = createGroup1Data();
   @State compStr: BreakpointState<string> = BreakpointState.of({
@@ -89,15 +90,15 @@ struct ProxyPage {
     } //
     //.alignItems(HorizontalAlign.Start)
     // .justifyContent(FlexAlign.Start)
-    .justifyContent(FlexAlign.Center)
+   // .justifyContent(FlexAlign.Center)
     .height(55)
     .margin({ right: 8, bottom: 10 })
-
-
     .onClick(() => {
       this.currentIndex = targetIndex;
       this.tabsController.changeIndex(this.currentIndex);
     })
+    .justifyContent(FlexAlign.Center)
+    .alignItems(HorizontalAlign.Start)
   }
 
   handleCheck(index: number) {
@@ -108,78 +109,93 @@ struct ProxyPage {
 
   build() {
     Column() {
-      Row() {
-        Text($r('app.string.Proxy'))
-          .fontSize(32)
-          .fontWeight(FontWeight.Bold)
-          .margin({ bottom: 15 })
-          .width('100%')
-          .textAlign(TextAlign.Start)
-      }
-
-      Tabs({ barPosition: BarPosition.Start, controller: this.tabsController }) {
-        TabContent() {
-          Column() {
-            List() {
-              ForEach(this.proxyGroup1List, (item: ProxyData, index: number) => {
-                ListItem() {
-                  ProxyListItem({
-                    index: index,
-                    itemObj: item,
-                    onCheck: (index: number) => {
-                      this.handleCheck(index)
-                    }
-                  })
-                    .backgroundColor($r('app.color.container_background'))
-                    .borderRadius(20)
-                    .width('93%')
-                    .height(58)
-                    .margin({ bottom: 10 })
-                    .padding({left:14,right: 14 })
-                }
-              })
-            }
-            .lanes(this.ListLanes.value)
-            .scrollBar(BarState.Auto)
-            .width('100%')
+        Row() {
+          Text($r('app.string.Proxy'))
+            .fontSize(32)
+            .fontWeight(FontWeight.Bold)
+            .width('83%')
+            .textAlign(TextAlign.Start)
+          Blank()
+          //编辑图标
+          Button({ type: ButtonType.Circle, stateEffect: true }) {
+            SymbolGlyph($r('sys.symbol.square_and_pencil'))
+              .fontSize(30)
+                //      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+              .fontColor([this.icon_secondary])
           }
-          .width('100%')
-          .height('100%')
+          .margin({ right: 50,bottom: 15 })
+          .width(40)
+          .height(40)
+          .backgroundColor($r('app.color.settings_container_background'))
 
-          //   .backgroundColor($r('app.color.background'))
-          //   .justifyContent(FlexAlign.SpaceBetween)
         }
-        .tabBar(this.TabBuilder('分组1', 0))
+        .width('100%')
+        .justifyContent(FlexAlign.SpaceBetween)
+        .alignItems(VerticalAlign.Top)
 
-        TabContent() {
-        }
-        .tabBar(this.TabBuilder('分组2', 1))
+        Tabs({ barPosition: BarPosition.Start, controller: this.tabsController }) {
+          TabContent() {
+            Column() {
+              List() {
+                ForEach(this.proxyGroup1List, (item: ProxyData, index: number) => {
+                  ListItem() {
+                    ProxyListItem({
+                      index: index,
+                      itemObj: item,
+                      onCheck: (index: number) => {
+                        this.handleCheck(index)
+                      }
+                    })
+                      .backgroundColor($r('app.color.container_background'))
+                      .borderRadius(20)
+                      .width('93%')
+                      .height(58)
+                      .margin({ bottom: 10 })
+                      .padding({left:14,right: 14 })
+                  }
+                })
+              }
+              .lanes(this.ListLanes.value)
+              .scrollBar(BarState.Auto)
+              .width('100%')
+            }
+            .width('100%')
+            .height('100%')
 
-        TabContent() {
-        }
-        .tabBar(this.TabBuilder('分组3', 2))
+            //   .backgroundColor($r('app.color.background'))
+            //   .justifyContent(FlexAlign.SpaceBetween)
+          }
+          .tabBar(this.TabBuilder('分组1', 0))
 
-        TabContent() {
-        }
-        .tabBar(this.TabBuilder('分组4', 3))
+          TabContent() {
+          }
+          .tabBar(this.TabBuilder('分组2', 1))
 
-        TabContent() {
-        }
-        .tabBar(this.TabBuilder('分组6', 4))
+          TabContent() {
+          }
+          .tabBar(this.TabBuilder('分组3', 2))
 
-        TabContent() {
+          TabContent() {
+          }
+          .tabBar(this.TabBuilder('分组4', 3))
+
+          TabContent() {
+          }
+          .tabBar(this.TabBuilder('分组6', 4))
+
+          TabContent() {
+          }
+          .tabBar(this.TabBuilder('分组7', 5))
         }
-        .tabBar(this.TabBuilder('分组7', 5))
+
+        .barMode(BarMode.Scrollable)
+        .barHeight(55)
+        .onChange((index: number) => {
+          this.currentIndex = index;
+        })
       }
 
-      .barMode(BarMode.Scrollable)
-      .barHeight(55)
-      .onChange((index: number) => {
-        this.currentIndex = index;
-      })
-    }
     .width('100%')
-
     //外边距
     .margin({ left: this.proxyPageMargin.value })
     .backgroundColor($r('app.color.background'))
