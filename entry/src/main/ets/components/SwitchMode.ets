@@ -2,6 +2,7 @@ import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI';
 import { ThemeControl } from '@ohos.arkui.theme'
 import { gAppTheme } from '../common/AppTheme'
+import { hilog } from '@kit.PerformanceAnalysisKit'
 
 // 在页面build前执行ThemeControl，就可以改变主题颜色
 //ThemeControl.setDefaultTheme(gAppTheme)
@@ -13,6 +14,7 @@ interface MarginGenerate {
 
 @Component
 struct SwitchMode {
+  private componentName:string = 'SwitchMode'
   //自定义主题，颜色在AppTheme里面修改
   @State font_secondary: ResourceColor = $r('sys.color.font_secondary')
   @State icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize')//高亮图标，蓝色
@@ -29,9 +31,11 @@ struct SwitchMode {
     this.iconFourth = theme.colors.iconFourth;
   }
 */
-  @State isToggle1: boolean = false;
-  @State isToggle2: boolean = false;
-  @State isToggle3: boolean = false;
+  // 代理模式Radio状态
+  @State radioRuleChecked: boolean = false;
+  @State radioOverallChecked: boolean = false;
+  @State radioDirectChecked: boolean = false;
+
   @State isLandscapePhone: boolean = false
   @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
   @State fontSize: BreakpointState<number> = BreakpointState.of({
@@ -102,17 +106,10 @@ struct SwitchMode {
         //.margin({left:this.RowPadding.value, bottom:7})
       Column() {
         Row() {
-          Checkbox({ name: 'checkbox', group: 'checkboxGroup' })
-            .select($$this.isToggle1)
-            .selectedColor(this.icon_emphasize)
-            .shape(CheckBoxShape.CIRCLE)
+          Radio({ value: 'rule', group: 'connectModeRadioGroup', indicatorType: RadioIndicatorType.DOT })
+            .checked($$this.radioRuleChecked)
             .onChange((value: boolean) => {
-              //this.isToggle1 = true
-              console.info('Checkbox1 change is' + value)
-              if(this.isToggle2 || this.isToggle3) {
-                this.isToggle2 = false
-                this.isToggle3 = false
-              }
+              hilog.info(0xA001, this.componentName, `#Radio()#rule#state: ${this.radioRuleChecked}`)
             })
           Text($r('app.string.Rule'))
             .fontWeight(FontWeight.Bold)
@@ -121,17 +118,10 @@ struct SwitchMode {
             .fontColor(this.font_secondary)
         }
         Row() {
-          Checkbox({ name: 'checkbox', group: 'checkboxGroup' })
-            .select($$this.isToggle2)
-            .selectedColor(this.icon_emphasize)
-            .shape(CheckBoxShape.CIRCLE)
+          Radio({ value: 'overall', group: 'connectModeRadioGroup', indicatorType: RadioIndicatorType.DOT })
+            .checked($$this.radioOverallChecked)
             .onChange((value: boolean) => {
-              //this.isToggle2 = true
-              console.info('Checkbox2 change is' + value)
-              if(this.isToggle1 || this.isToggle3) {
-                this.isToggle1 = false
-                this.isToggle3 = false
-              }
+              hilog.info(0xA001, this.componentName, `#Radio()#overall#state: ${this.radioRuleChecked}`)
             })
           Text($r('app.string.Overall'))
             .fontWeight(FontWeight.Bold)
@@ -141,17 +131,10 @@ struct SwitchMode {
         }
         .margin({top: this.RowPadding.value})
         Row() {
-          Checkbox({ name: 'checkbox', group: 'checkboxGroup' })
-            .select($$this.isToggle3)
-            .selectedColor(this.icon_emphasize)
-            .shape(CheckBoxShape.CIRCLE)
+          Radio({ value:'direct', group: 'connectModeRadioGroup', indicatorType: RadioIndicatorType.DOT })
+            .checked($$this.radioDirectChecked)
             .onChange((value: boolean) => {
-              //this.isToggle3 = true
-              console.info('Checkbox3 change is' + value)
-              if(this.isToggle1 || this.isToggle2) {
-                this.isToggle1 = false
-                this.isToggle2 = false
-              }
+              hilog.info(0xA001, this.componentName, `#Radio()#direct#state: ${this.radioRuleChecked}`)
             })
           Text($r('app.string.Direct'))
             .fontWeight(FontWeight.Bold)
