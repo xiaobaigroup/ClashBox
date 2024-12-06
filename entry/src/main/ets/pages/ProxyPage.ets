@@ -2,7 +2,7 @@ import { ThemeControl } from '@ohos.arkui.theme'
 import { gAppTheme } from '../common/AppTheme'
 import { BreakpointState, BreakpointSystem } from '../common/breakpointsystem';
 import { createGroup1Data, ProxyData } from '../common/ProxyListData';
-import ProcyListItem from '../components/ProxyListItem';
+import ProcyListItem from '../components/Proxy/ProxyListItem';
 
 // 在页面build前执行ThemeControl，就可以改变主题颜色
 //ThemeControl.setDefaultTheme(gAppTheme)
@@ -116,7 +116,7 @@ struct ProxyPage {
             //.constraintSize({minHeight:0, maxHeight:240})
             //.backgroundColor($r('app.color.list_background_color'))
             .width('100%')
-            .padding({ left: 12 })
+            //.padding({ left: 12 })
           }
           .width('100%')
           .height('100%')
@@ -141,9 +141,18 @@ struct ProxyPage {
         }
         .tabBar(this.TabBuilder('分组6', 4))
 
-        TabContent() {
+     /*   TabContent() {
         }
         .tabBar(this.TabBuilder('分组7', 5))
+        TabContent() {
+        }
+        .tabBar(this.TabBuilder('分组7', 6))
+        TabContent() {
+        }
+        .tabBar(this.TabBuilder('分组7', 7))
+        TabContent() {
+        }
+        .tabBar(this.TabBuilder('分组7', 8))*/
       }
       .barMode(BarMode.Scrollable)
       .barHeight(55)
@@ -153,6 +162,7 @@ struct ProxyPage {
 
     }
     .width('100%')
+    .alignItems(HorizontalAlign.Start)
     .margin({ left: this.proxyPageMargin.value })
 
   }
