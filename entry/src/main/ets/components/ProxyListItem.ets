@@ -38,26 +38,31 @@ struct ProxyListItem {
         Row() {
           Column() {
             Text(this.itemObj.name)
-              .fontSize(20)
+              .fontSize(13)
               .width('100%')
+              .textAlign(0)
+              .padding({ left: 8 })
               .fontColor(this.font_primary)
+
             //   .textAlign(TextAlign.Start)
             Text(this.itemObj.passage)
-              .fontSize(14)
+              .fontSize(8)
               .width('100%')
+              .padding({ left: 8 })
               .fontColor(this.font_secondary)
           }
 
+
           Text(this.itemObj.latency.toString() + 'ms')
-            .fontSize(18)//    .width('90%')
+            .fontSize(10)//    .width('90%')
             .fontColor(this.color)
             .textAlign(2)
-            .width('45%')
+            .width(45)
         }
-        .padding({ right: 95 })
+        .padding({ right: 45 })
         .width('100%')
+        .alignItems(VerticalAlign.Center)
 
-     //   .justifyContent(FlexAlign.End)
 
         Radio({
           value: 'Radio', group: 'radioGroup',
@@ -69,8 +74,8 @@ struct ProxyListItem {
             //   uncheckedBorderColor: this.icon_secondary
           })
 
-          .height(20)
-          .width(20)
+          .height(15)
+          .width(15)
           .onChange((isChecked: boolean) => {
             console.info('Radio2 change is' + isChecked)
             this.onCheck(this.index)
@@ -79,6 +84,7 @@ struct ProxyListItem {
       // .padding({  right: 12})
       .height(58)
       .width('92%')
+      .padding({ right: 13,bottom:10 })
 
       //     .alignItems(VerticalAlign.Center)
       //    .justifyContent(FlexAlign.SpaceBetween)
