@@ -1,5 +1,5 @@
 import { ProxyData } from "../common/ProxyListData"
-import { text } from '@kit.ArkGraphics2D';
+
 
 @Component
 struct ProxyListItem {
@@ -7,10 +7,28 @@ struct ProxyListItem {
   @State icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize') //高亮图标，蓝色
   @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //二级图标色，灰色
   @State font_secondary: ResourceColor = $r('sys.color.font_secondary') //二级文本色，灰色
+  @State color: ResourceColor = $r('sys.color.font_secondary')
   @Prop itemObj: ProxyData
   @Prop index: number
   onCheck = (index: number) => {
   }
+
+  aboutToAppear(): void {
+    // 假设我们有一个数值 value 和一个 Text 组件
+    let value: number = this.itemObj.latency/* 获取你的数值 */;
+    let color: Color;
+    // 根据数值设定颜色
+    if (value >= 0 && value <= 500) {
+      this.color = '#64BB5C';
+    } else if (value >= 501 && value <= 1000) {
+      this.color = '#f7ce00';
+    } else if (value >= 1001 ) {
+      this.color = '#e84026';
+    } else {
+      this.color = ($r('sys.color.font_secondary')); // 默认颜色
+    }
+  }
+
 
   build() {
     Flex({ direction: FlexDirection.Row, justifyContent: FlexAlign.SpaceBetween, }) {
@@ -28,14 +46,15 @@ struct ProxyListItem {
               .fontColor(this.font_secondary)
           }
 
-          Text(this.itemObj.latency,)
+          Text(this.itemObj.latency.toString() + 'ms')
             .fontSize(18)//    .width('90%')
-            .fontColor(Color.Red)
+            .fontColor(this.color)
             .textAlign(2)
             .width('45%')
         }
         .padding({ right: 95 })
         .width('100%')
+
      //   .justifyContent(FlexAlign.End)
 
         Radio({
