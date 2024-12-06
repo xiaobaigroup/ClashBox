@@ -5,6 +5,8 @@ import Home from './HomePage'
 import ProxyPage  from './ProxyPage'
 import ConfigurationPage from './ConfigurationPage'
 import MorePage from './MorePage'
+import { hilog } from '@kit.PerformanceAnalysisKit'
+
 //import { ThemeControl } from '@ohos.arkui.theme'
 //import { gAppTheme } from './AppTheme'
 
@@ -20,6 +22,9 @@ interface marginGenerate {
 @Entry
 @Component
 struct Index {
+
+  private componentName: string = 'Index'
+
   //系统颜色调用
   @State icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize')//高亮图标，蓝色
   @State icon_tertiary: ResourceColor = $r('sys.color.icon_tertiary')//三级图标色，浅灰色
@@ -104,26 +109,15 @@ struct Index {
     }
 
 
-    // 当设备横屏时条件成立
-    listener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
-
-    // 当满足媒体查询条件时，触发回调
-    onPortrait(mediaQueryResult:mediaquery.MediaQueryResult) {
-      if (mediaQueryResult.matches as boolean) { // 若设备为横屏状态，更改相应的页面布局
-        this.isLandscape = true
-        console.log('横屏' + this.isLandscape)
-      } else {
-        this.isLandscape = false
-        console.log('竖屏' + this.isLandscape)
-      }
-    }
+    // 当设备横屏时条件成立 ps:现在用于判定是否手机横屏
+    deviceHeightListener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
 
     aboutToAppear() {
 
-      // 绑定当前应用实例
-      // 绑定回调函数
-      this.listener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
-        this.onPortrait(mediaQueryResult)
+      // 开启change监听
+      this.deviceHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
+        AppStorage.setOrCreate('isLandscapePhone', mediaQueryResult.matches)
+        hilog.info(0x1000, this.componentName, `#媒体查询#设备高度改变#(320vp< height <= 500vp)结果: ${mediaQueryResult.matches}`)
       });
 
       BreakpointSystem.getInstance().attach(this.compStr)
@@ -152,7 +146,7 @@ struct Index {
       BreakpointSystem.getInstance().stop()
 
       // 解绑listener中注册的回调函数
-      this.listener.off('change');
+      this.deviceHeightListener.off('change');
     }
 
 
