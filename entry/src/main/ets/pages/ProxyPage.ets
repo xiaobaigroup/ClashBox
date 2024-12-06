@@ -3,6 +3,7 @@ import { gAppTheme } from '../common/AppTheme'
 import { BreakpointState, BreakpointSystem } from '../common/breakpointsystem';
 import { createGroup1Data, ProxyData } from '../common/ProxyListData';
 import ProxyListItem from '../components/ProxyListItem';
+import { SymbolGlyphModifier } from '@kit.ArkUI';
 
 // 在页面build前执行ThemeControl，就可以改变主题颜色
 //ThemeControl.setDefaultTheme(gAppTheme)
@@ -16,6 +17,11 @@ struct ProxyPage {
   @State font_secondary: ResourceColor = $r('sys.color.font_secondary') //一级文本反色，白色
   @State font_on_primary: ResourceColor = $r('sys.color.font_on_primary') //一级文本反色，白色
   @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级图标色，黑色
+  //长按菜单图标
+  @State startIconModifier: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.star')).fontSize('24vp');
+  @State startIconModifier1: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.bolt_filled_on_circle')).fontSize('24vp');
+  @State startIconModifier2: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.timer')).fontSize('24vp');
+
 
   @State container_background: ResourceColor = ($r('app.color.container_background'));
   @State currentIndex: number = 0;
@@ -35,11 +41,11 @@ struct ProxyPage {
     xl: 37
   });
   @State ListLanes: BreakpointState<number> = BreakpointState.of({
-    xs: 1,
-    sm: 1,
-    md: 2,
-    lg: 3,
-    xl: 3
+    xs: 2,
+    sm: 2,
+    md: 3,
+    lg: 4,
+    xl: 4
   });
   @State ListGutter: BreakpointState<number> = BreakpointState.of({
     xs: 1,
@@ -76,13 +82,25 @@ struct ProxyPage {
     BreakpointSystem.getInstance().attach(this.ListGutter)
     BreakpointSystem.getInstance().stop()
   }
+  @Builder
+  //长按菜单相关
+  MyMenu() {
+    Menu() {
+      MenuItem({ symbolStartIcon: this.startIconModifier, content: "收藏" })
+      MenuItem({ symbolStartIcon: this.startIconModifier1, content: "测速延迟" })
+      MenuItem({ symbolStartIcon: this.startIconModifier2, content: "测试速度" })
+    }
+    .backgroundColor($r('app.color.container_background'))
+    .borderRadius(20)
+  }
+
 
   @Builder
   TabBuilder(title: ResourceStr, targetIndex: number) {
     Column() {
       Column() {
         Text(title)
-          .fontSize(16)
+          .fontSize(14)
           .fontColor(this.currentIndex === targetIndex ? this.font_on_primary : this.font_secondary)
       }
       .borderRadius(21)
@@ -107,8 +125,8 @@ struct ProxyPage {
     let itemData = this.proxyGroup1List[index]
     itemData.isCheck = !itemData.isCheck
     //this.proxyGroup1List.splice(index, 1, itemData)
-
   }
+
 
   build() {
     Column() {
@@ -122,7 +140,7 @@ struct ProxyPage {
         //编辑图标
         Button({ type: ButtonType.Circle, stateEffect: true }) {
           SymbolGlyph($r('sys.symbol.square_and_pencil'))
-            .fontSize(30)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+            .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
             .fontColor([this.icon_secondary])
         }
         .margin({ right: 50, bottom: 15 })
@@ -140,7 +158,7 @@ struct ProxyPage {
           Column() {
             List() {
               ForEach(this.proxyGroup1List, (item: ProxyData, index: number) => {
-                ListItem() {
+                ListItem(){
                   ProxyListItem({
                     index: index,
                     itemObj: item,
@@ -151,18 +169,26 @@ struct ProxyPage {
                     .backgroundColor($r('app.color.container_background'))
                     .borderRadius(20)
                     .width('93%')
-                    .height(58)
+                    .height(50)
                     .margin({ bottom: 10 })
-                    .padding({ left: 14, right: 14 })
+                      //长按参数
+                    .bindContextMenu(this.MyMenu, ResponseType.LongPress,
+                      { preview: MenuPreviewMode.IMAGE,
+                        previewAnimationOptions: {scale: [0.8, 1.0]},
+                      })
+              //      .padding({ left: 14, right: 14 })
                 }
               })
             }
             .lanes(this.ListLanes.value)
             .scrollBar(BarState.Auto)
             .width('100%')
+
+          //  .padding({ right: this.proxyPageMargin.value })
           }
           .width('100%')
-          .height('100%')
+         .height('100%')
+          .padding({ right: this.proxyPageMargin.value })
 
           //   .backgroundColor($r('app.color.background'))
           //   .justifyContent(FlexAlign.SpaceBetween)
@@ -202,6 +228,7 @@ struct ProxyPage {
     .margin({ left: this.proxyPageMargin.value })
     .backgroundColor($r('app.color.background'))
   }
+
 }
 
 export default ProxyPage
