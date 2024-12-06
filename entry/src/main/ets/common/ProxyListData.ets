@@ -17,6 +17,9 @@ export class ProxyData {
   }
 }
 
+
+
+
 //临时数据
 export  const createGroup1Data = (): ProxyData[] => {
   let result: ProxyData[] = new Array()
@@ -25,6 +28,13 @@ export  const createGroup1Data = (): ProxyData[] => {
     new ProxyData($r('sys.symbol.gearshape'), '越南②', 'Shadowsocks', 500, false),
     new ProxyData($r('sys.symbol.gearshape'), '北朝鲜①', 'Vmess', 501, false),
     new ProxyData($r('sys.symbol.gearshape'), '北朝鲜②', 'Shadowsocks', 1001, false),
+    new ProxyData($r('sys.symbol.gearshape'), '中国香港①', 'Vmess', 20, false),
+    new ProxyData($r('sys.symbol.gearshape'), '中国香港②', 'Shadowsocks', 500, false),
+    new ProxyData($r('sys.symbol.gearshape'), '中国台湾①', 'Vmess', 501, false),
+    new ProxyData($r('sys.symbol.gearshape'), '中国台湾②', 'Shadowsocks', 1001, false),
+    new ProxyData($r('sys.symbol.gearshape'), '新加坡①', 'Shadowsocks', 500, false),
+    new ProxyData($r('sys.symbol.gearshape'), '新加坡②', 'Vmess', 501, false),
+
   ]
   return result
 }

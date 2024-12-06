@@ -178,7 +178,7 @@ struct Home {
       if (!this.isLandscapePhone) {
         Row() {
           Text(this.greetings)
-            .fontSize(28)
+            .fontSize(32)
             .fontWeight(FontWeight.Bold)
             .margin({ left: this.gridMargin })
           Blank()
@@ -456,7 +456,7 @@ struct Home {
             // 计时器文本
             Text( this.proxyStartingDuration )
               .fontSize(20)
-              // 使用透明度控制是否显示计时器，是因为用 `visibility` 来控制的话，不显示的时间长了之后，再次显示时候会延迟一秒，体验不好
+                // 使用透明度控制是否显示计时器，是因为用 `visibility` 来控制的话，不显示的时间长了之后，再次显示时候会延迟一秒，体验不好
               .fontColor(this.proxyEnabled ? Color.White : Color.Transparent)
               .fontWeight(FontWeight.Bold)
           }.width('100%')
