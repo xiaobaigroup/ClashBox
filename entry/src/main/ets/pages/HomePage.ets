@@ -466,6 +466,7 @@ struct Home {
         .margin($r('app.integer.vp_proxy_start_button_margin'))
         .width(this.proxyStartButtonWidth)
         .height(this.proxyStartButtonHeight)
+        .clip(true)
         .onClick( (event: ClickEvent) => {
           // TODO 调用启动代理方法 等待结果响应之后 再切换按钮状态开始计时
           this.proxyEnabled = !this.proxyEnabled
