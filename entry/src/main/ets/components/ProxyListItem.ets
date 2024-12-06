@@ -1,6 +1,7 @@
 import { ProxyData } from "../common/ProxyListData"
 
 
+
 @Component
 struct ProxyListItem {
   @State font_primary: ResourceColor = $r('sys.color.font_primary') //一级文本色，黑色
@@ -10,6 +11,7 @@ struct ProxyListItem {
   @State color: ResourceColor = $r('sys.color.font_secondary')
   @Prop itemObj: ProxyData
   @Prop index: number
+
   onCheck = (index: number) => {
   }
 
@@ -84,6 +86,5 @@ struct ProxyListItem {
     }
   }
 }
-
 
 export default ProxyListItem
