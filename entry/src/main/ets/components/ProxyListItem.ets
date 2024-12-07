@@ -7,10 +7,12 @@ struct ProxyListItem {
   @State font_primary: ResourceColor = $r('sys.color.font_primary') //一级文本色，黑色
   @State icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize') //高亮图标，蓝色
   @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //二级图标色，灰色
+  @State icon_fourth: ResourceColor = $r('sys.color.icon_fourth') //四级图标色，灰色
   @State font_secondary: ResourceColor = $r('sys.color.font_secondary') //二级文本色，灰色
   @State color: ResourceColor = $r('sys.color.font_secondary')
   @Prop itemObj: ProxyData
   @Prop index: number
+
 
   onCheck = (index: number) => {
   }
@@ -38,30 +40,25 @@ struct ProxyListItem {
         Row() {
           Column() {
             Text(this.itemObj.name)
-              .fontSize(13)
-              .width('100%')
-              .textAlign(0)
-              .padding({ left: 8 })
+              .fontSize(20)
               .fontColor(this.font_primary)
+          //    .textAlign(TextAlign.Start)
 
-            //   .textAlign(TextAlign.Start)
             Text(this.itemObj.passage)
-              .fontSize(8)
-              .width('100%')
-              .padding({ left: 8 })
+              .fontSize(14)
+        //      .textAlign(TextAlign.Start)
               .fontColor(this.font_secondary)
           }
-
+          .alignItems(HorizontalAlign.Start)
 
           Text(this.itemObj.latency.toString() + 'ms')
-            .fontSize(10)//    .width('90%')
+            .fontSize(18)
             .fontColor(this.color)
             .textAlign(2)
-            .width(45)
         }
-        .padding({ right: 45 })
         .width('100%')
-        .alignItems(VerticalAlign.Center)
+        .padding({right: 10 })
+        .justifyContent(FlexAlign.SpaceBetween)
 
 
         Radio({
@@ -74,21 +71,19 @@ struct ProxyListItem {
             //   uncheckedBorderColor: this.icon_secondary
           })
 
-          .height(15)
-          .width(15)
+          .height(20)
+          .width(20)
           .onChange((isChecked: boolean) => {
             console.info('Radio2 change is' + isChecked)
             this.onCheck(this.index)
           })
-      }
-      // .padding({  right: 12})
-      .height(58)
-      .width('92%')
-      .padding({ right: 13,bottom:10 })
 
-      //     .alignItems(VerticalAlign.Center)
-      //    .justifyContent(FlexAlign.SpaceBetween)
-      //   .backgroundColor($r('app.color.background'))
+      }
+      .height(58)
+      .width('100%')
+     .padding({left:12, right: 35 })
+      .alignItems(VerticalAlign.Center)
+      .justifyContent(FlexAlign.SpaceBetween)
     }
   }
 }
