@@ -34,10 +34,11 @@ struct moreListItem {
       .width('100%')
       .height(53)
       .borderRadius(20)
-      .backgroundColor('white')
+      .backgroundColor($r('app.color.container_background'))
       Row()
         .height(10)
     }
+
     .onClick(() => {
       this.onCheck(this.index)
     })

@@ -13,7 +13,6 @@ import RequestPage from '../components/More/Request';
 import Connect from '../components/More/Connect';
 import Overwrite from '../components/More/Overwrite';
 import Settings from '../components/More/Settings';
-import { mediaquery } from '@kit.ArkUI';
 import moreListItem from '../components/More/moreListItem';
 
 @Entry
@@ -41,7 +40,7 @@ struct MorePage {
     xs: "xs", sm: "sm", md: "md", lg: "lg", xl: "xl"
   })
   // 整体外边距
-  @State morePageMargin: BreakpointState<number> = BreakpointState.of({
+  @Provide('morePageMargin') morePageMargin: BreakpointState<number> = BreakpointState.of({
     xs: 12, sm: 14, md: 56, lg: 56, xl: 79
   })
   // 列表底边距
@@ -69,12 +68,12 @@ struct MorePage {
   handleCheck(index: number) {
     // 将isCheck变为true并更新数组
     let itemData = this.moreList[index]
-    itemData.isCheck = !itemData.isCheck
-    this.moreList.splice(index, 1, itemData)
+    //itemData.isCheck = !itemData.isCheck
+    //this.moreList.splice(index, 1, itemData)
     hilog.isLoggable(0xFF00, "MoretestTag", hilog.LogLevel.INFO);
     hilog.info(0xFF00, "MoretestTag", itemData.name)
     hilog.info(0xFF00, "MoretestTag", "isCheck状态: %{public}s", itemData.isCheck)
-    hilog.info(0xFF00, "jsHilogTest", " itemData: %{public}s", JSON.stringify( itemData))
+    //hilog.info(0xFF00, "jsHilogTest", " itemData: %{public}s", JSON.stringify( itemData))
     this.pageInfos.pushPathByName(itemData.name, false)
   }
 
@@ -82,23 +81,33 @@ struct MorePage {
   PagesMap(name: string) {
     if (name == 'Log') {
       Log()
-    }
+    } else
     if (name == 'Resources') {
       Resources()
-    }
-    if (name == 'Resources') {
+    } else
+    if (name == 'Request') {
       RequestPage()
-    }
-    if (name == 'Resources') {
+    } else
+    if (name == 'Connect') {
       Connect()
-    }
-    if (name == 'Resources') {
+    } else
+    if (name == 'Overwrite') {
       Overwrite()
     }
   }
 
   build() {
       Navigation(this.pageInfos) {
+        Row() {
+          Text($r('app.string.More'))
+            .fontSize(32)
+            .fontWeight(FontWeight.Bold)
+            .width('83%')
+            .textAlign(TextAlign.Start)
+        }
+        .margin({left: this.morePageMargin.value})
+        .width('100%')
+
             List() {
               ForEach(this.moreList, (item: moreData, index: number) => {
                 ListItem() {
@@ -111,32 +120,6 @@ struct MorePage {
                   })
                 }
                 .margin({bottom: this.listBottom.value })
-                /*.bindContentCover(item.isCheck, moreSheet({paramIndex: index}), {
-                  modalTransition: ModalTransition.NONE,
-                  onDisappear: () => {
-                    // 模态窗口消失时恢复isCheck的false状态并更新数组
-                    item.isCheck = false
-                    hilog.info(0xFF00, "MoretestTag", "isCheck状态2: %{public}s", item.isCheck)
-                    this.moreList.splice(index, 1, item)
-                    hilog.info(0xFF00, "jsHilogTest", " item: %{public}s", JSON.stringify( item))
-
-                  }
-                })*/
-                /*.bindSheet(item.isCheck, moreSheet({paramIndex: index}), {
-                  detents: [SheetSize.LARGE, SheetSize.MEDIUM, 200],
-                  backgroundColor: Color.Gray,
-                  blurStyle: BlurStyle.Thick,
-                  showClose: true,
-                  title: { title: item.title, subtitle: "subtitle" },
-                  onDisappear: () => {
-                    // 模态窗口消失时恢复isCheck的false状态并更新数组
-                    item.isCheck = false
-                    hilog.info(0xFF00, "MoretestTag", "isCheck状态2: %{public}s", item.isCheck)
-                    this.moreList.splice(index, 1, item)
-                    hilog.info(0xFF00, "jsHilogTest", " item: %{public}s", JSON.stringify( item))
-
-                  }
-                })*/
               })
               ListItem() {
                 Row() {
@@ -165,7 +148,7 @@ struct MorePage {
                 .width('100%')
                 .height(53)
                 .borderRadius(20)
-                .backgroundColor('white')
+                .backgroundColor($r('app.color.container_background'))
               }
               .onClick(() => {
                 this.isShowSettings = true
@@ -178,13 +161,13 @@ struct MorePage {
                 title: { title: $r('app.string.Settings') },
               })
             }
-            //.height('100%')
+            //.height(400)
             .margin({ top: 10, left: this.morePageMargin.value, right: this.morePageMargin.value })
             .borderRadius(18)
             .alignListItem(ListItemAlign.Center)
 
       }
-      .title($r('app.string.More'))
+      //.title($r('app.string.More'))
       .mode(this.isLandscapePhone ? NavigationMode.Stack : NavigationMode.Auto)
       .navDestination(this.PagesMap)
       .width('100%')

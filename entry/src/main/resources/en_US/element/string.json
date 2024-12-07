@@ -99,6 +99,26 @@
     {
       "name": "AccessControl",
       "value": " AccessControl"
+    },
+    {
+      "name": "EnableLoggerPrompt",
+      "value": "Please click on 'Enable Logging' in the upper right corner"
+    },
+    {
+      "name": "EnableLogger",
+      "value": "EnableLogger"
+    },
+    {
+      "name": "ClearLogs",
+      "value": "ClearLogs"
+    },
+    {
+      "name": "ExportLog",
+      "value": "ExportLog"
+    },
+    {
+      "name": "NoLogs",
+      "value": "NoLogs"
     }
   ]
 }

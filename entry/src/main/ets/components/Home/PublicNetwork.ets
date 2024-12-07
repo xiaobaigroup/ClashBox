@@ -31,7 +31,8 @@ struct PublicNetwork {
 
   @State address: string = '中国大陆'
   @State IP: string = '255.255.255.255'
-  @State isLandscapePhone: boolean = false
+  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
+  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
   @State TitleFontSize: BreakpointState<number> = BreakpointState.of({
     sm: 18, md: 29, lg: 26, xl: 27
@@ -58,22 +59,11 @@ struct PublicNetwork {
     xl: ({top: 14, bottom: 14, left: 12, right: 12} as MarginGenerate)
   });
 
-  onPhoneLandscape(mediaQueryResult:mediaquery.MediaQueryResult) {
-    if (mediaQueryResult.matches as boolean ) {
-      this.isLandscapePhone = true
-      console.log('手机横屏' + this.isLandscapePhone)
-    } else {
-      this.isLandscapePhone = false
-      console.log('手机竖屏' + this.isLandscapePhone)
-    }
-  }
+
 
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
 
   aboutToAppear() {
-    this.phonelistener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
-      this.onPhoneLandscape(mediaQueryResult)
-    });
 
     BreakpointSystem.getInstance().attach(this.compStr)
     BreakpointSystem.getInstance().attach(this.fontSize)
@@ -94,7 +84,7 @@ struct PublicNetwork {
     BreakpointSystem.getInstance().attach(this.RowPadding)
     BreakpointSystem.getInstance().attach(this.cardPadding)
     BreakpointSystem.getInstance().stop()
-    this.phonelistener.off('change');
+
   }
 
 

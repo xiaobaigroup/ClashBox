@@ -99,6 +99,26 @@
     {
       "name": "AccessControl",
       "value": "访问控制"
+    },
+    {
+      "name": "EnableLoggerPrompt",
+      "value": "请在右上角点击”启用日志记录“"
+    },
+    {
+      "name": "EnableLogger",
+      "value": "启用日志记录"
+    },
+    {
+      "name": "ClearLogs",
+      "value": "清空日志"
+    },
+    {
+      "name": "ExportLog",
+      "value": "导出日志"
+    },
+    {
+      "name": "NoLogs",
+      "value": "暂无日志"
     }
   ]
 }

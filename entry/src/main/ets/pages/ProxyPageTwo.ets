@@ -358,7 +358,7 @@ struct ProxyPage {
         .height(40)
         .backgroundColor($r('app.color.settings_container_background'))
         .bindSheet($$this.isShow, this.BindSheetEdit(), {
-          detents: [SheetSize.MEDIUM, SheetSize.LARGE, 200],
+          detents: [600, 300, 200],
           backgroundColor: $r('app.color.settings_container_background'),
           blurStyle: BlurStyle.BACKGROUND_REGULAR,
           showClose: true,
