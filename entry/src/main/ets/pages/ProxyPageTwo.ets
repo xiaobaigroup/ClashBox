@@ -2,7 +2,7 @@ import { ThemeControl } from '@ohos.arkui.theme'
 import { gAppTheme } from '../common/AppTheme'
 import { BreakpointState, BreakpointSystem } from '../common/breakpointsystem';
 import { createGroup1Data, ProxyData } from '../common/ProxyListData';
-import ProxyListItem from '../components/ProxyListItem';
+import ProxyListItem from '../components/Proxy/ProxyListItem';
 import { SymbolGlyphModifier } from '@kit.ArkUI';
 
 // 在页面build前执行ThemeControl，就可以改变主题颜色

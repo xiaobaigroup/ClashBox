@@ -42,10 +42,10 @@ export function getGreeting(): string {
     return "中午好！";
   } else if (currentHour >= 13 && currentHour < 18) {
     return "下午好！";
-  } else if (currentHour >= 18 && currentHour < 22) {
+  } else if (currentHour >= 18 && currentHour < 24) {
     return "晚上好！";
   } else {
-    return "夜已深, 请注意休息";
+    return "该睡了哦";
   }
 }
 

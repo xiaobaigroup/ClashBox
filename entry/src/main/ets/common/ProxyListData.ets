@@ -17,9 +17,6 @@ export class ProxyData {
   }
 }
 
-
-
-
 //临时数据
 export  const createGroup1Data = (): ProxyData[] => {
   let result: ProxyData[] = new Array()

@@ -2,7 +2,7 @@
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
 import { mediaquery, window } from '@kit.ArkUI'
 import Home from './HomePage'
-import ProxyPage  from './ProxyPage'
+import ProxyPage  from './ProxyPageTwo'
 import ConfigurationPage from './ConfigurationPage'
 import MorePage from './MorePage'
 import { hilog } from '@kit.PerformanceAnalysisKit'
@@ -116,6 +116,7 @@ struct Index {
 
       // 开启change监听
       this.deviceHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
+        this.isLandscape = mediaQueryResult.matches
         AppStorage.setOrCreate('isLandscapePhone', mediaQueryResult.matches)
         hilog.info(0x1000, this.componentName, `#媒体查询#设备高度改变#(320vp< height <= 500vp)结果: ${mediaQueryResult.matches}`)
       });

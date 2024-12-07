@@ -64,7 +64,9 @@ struct Home {
   @State greetings: string = '早上好'
   @State ContainerHeight: string = ''
   @State TopHeight: string = ''
-  @State isLandscapePhone: boolean = false
+  @State isShowSettings: boolean = false
+  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
+  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   @State compStr: BreakpointState<string> = BreakpointState.of({
     xs: "xs",
     sm: "sm",
@@ -122,31 +124,13 @@ struct Home {
     xl: '550vp'
   });
   windowClass = AppStorage.get<window.Window>('windowClass') as window.Window;
-  // 手机横屏高度条件
-  phonelistener: mediaquery.MediaQueryListener =
-    this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
+
   @State private gridMargin: number = 0
 
-  onPhoneLandscape(mediaQueryResult: mediaquery.MediaQueryResult) {
-    if (mediaQueryResult.matches as boolean) {
-      this.isLandscapePhone = true
-      console.log('手机横屏' + this.isLandscapePhone)
-      //用于修改通知栏，预览器无法使用，请注释掉再开
-      //this.windowClass.setSpecificSystemBarEnabled('navigationIndicator', false)
-    } else {
-      this.isLandscapePhone = false
-      console.log('手机竖屏' + this.isLandscapePhone)
-      //this.windowClass.setSpecificSystemBarEnabled('navigationIndicator', true)
-    }
-  }
 
   aboutToAppear() {
     this.greetings = getGreeting()
     console.log('问候语:' + this.greetings)
-
-    this.phonelistener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
-      this.onPhoneLandscape(mediaQueryResult)
-    });
 
     BreakpointSystem.getInstance().attach(this.compStr)
     BreakpointSystem.getInstance().attach(this.containerMargin)
@@ -170,7 +154,7 @@ struct Home {
     BreakpointSystem.getInstance().attach(this.containerHeight)
     BreakpointSystem.getInstance().attach(this.GridRowHeight)
     BreakpointSystem.getInstance().stop()
-    this.phonelistener.off('change');
+
   }
 
   build() {
@@ -203,6 +187,16 @@ struct Home {
           .width(40)
           .height(40)
           .backgroundColor($r('app.color.settings_container_background'))
+          .onClick(() => {
+            this.isShowSettings = true
+          })
+          .bindSheet($$this.isShowSettings, SettingsSheet(), {
+            detents: [SheetSize.LARGE, SheetSize.MEDIUM, 200],
+            //backgroundColor: Color.Gray,
+            blurStyle: BlurStyle.Thick,
+            showClose: true,
+            title: { title: $r('app.string.Settings') },
+          })
         }
         .width('100%')
         .margin({ bottom: 15 })
@@ -492,3 +486,14 @@ struct Home {
   }
 }
 export default Home
+
+// 通过@Builder构建模态展示界面
+@Builder function SettingsSheet() {
+
+  Column() {
+    Text('设置')
+  }
+  .width('100%')
+  .height('100%')
+  //.backgroundColor(Color.White)
+}

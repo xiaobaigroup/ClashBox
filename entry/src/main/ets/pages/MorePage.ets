@@ -14,6 +14,7 @@ import Connect from '../components/More/Connect';
 import Overwrite from '../components/More/Overwrite';
 import Settings from '../components/More/Settings';
 import { mediaquery } from '@kit.ArkUI';
+import moreListItem from '../components/More/moreListItem';
 
 @Entry
 @Component
@@ -31,7 +32,8 @@ struct MorePage {
      }
  */
   @State isShowSettings: boolean = false
-  @State isLandscapePhone: boolean = false
+  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
+  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   @State moreList: moreData[] = ListMoreData()
   @Provide('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   // 断点
@@ -47,20 +49,8 @@ struct MorePage {
     xs: 10, sm: 10, md: 14, lg: 14, xl: 14
   })
 
-  onPhoneLandscape(mediaQueryResult:mediaquery.MediaQueryResult) {
-    if (mediaQueryResult.matches as boolean ) {
-      this.isLandscapePhone = true
-    } else {
-      this.isLandscapePhone = false
-    }
-  }
-
-  phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)')
 
   aboutToAppear(): void {
-    this.phonelistener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
-      this.onPhoneLandscape(mediaQueryResult)
-    })
 
     BreakpointSystem.getInstance().attach(this.compStr)
     BreakpointSystem.getInstance().attach(this.morePageMargin)
@@ -73,7 +63,6 @@ struct MorePage {
     BreakpointSystem.getInstance().attach(this.morePageMargin)
     BreakpointSystem.getInstance().attach(this.listBottom)
     BreakpointSystem.getInstance().stop()
-    this.phonelistener.off('change')
   }
 
 
@@ -196,7 +185,7 @@ struct MorePage {
 
       }
       .title($r('app.string.More'))
-      .mode(this.isLandscapePhone? NavigationMode.Stack : NavigationMode.Auto)
+      .mode(this.isLandscapePhone ? NavigationMode.Stack : NavigationMode.Auto)
       .navDestination(this.PagesMap)
       .width('100%')
       .height('100%')
@@ -205,54 +194,7 @@ struct MorePage {
 
 export default MorePage
 
-@Component
-struct moreListItem {
-  @Prop itemObj: moreData
-  @Prop index: number
-  onCheck = (index: number) => {}
-
-  build() {
-    Row() {
-      Row() {
-        SymbolGlyph(this.itemObj.icons)
-          .fontSize(24)
-          .margin({left: 12})
-        Text(this.itemObj.title)
-          .height(48)
-          .fontWeight(FontWeight.Medium)
-          .padding({ left: 12 })
-          .fontSize(16)
-        Blank()
-        Row()
-          .width(10)
-          .height(10)
-          .margin({ right: 20 })
-          .border({
-            width: {
-              top: 2,
-              right: 2
-            },
-            color: '#000000'
-          })
-          .rotate({ angle: 45 })
-      }
-      .width('100%')
-      .height(53)
-      .borderRadius(20)
-      .backgroundColor('white')
-      Row()
-        .height(10)
-    }
-    .onClick(() => {
-      this.onCheck(this.index)
-    })
-  }
-}
-
 // 通过@Builder构建模态展示界面
-class Tmp {
-  paramIndex: number = 0
-}
 @Builder function SettingsSheet() {
 
   Column() {
