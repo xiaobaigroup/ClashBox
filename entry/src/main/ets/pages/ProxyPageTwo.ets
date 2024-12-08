@@ -159,11 +159,6 @@ struct ProxyPage {
   }
 
   aboutToDisappear(): void {
-    BreakpointSystem.getInstance().attach(this.compStr)
-    BreakpointSystem.getInstance().attach(this.proxyPageMargin)
-    BreakpointSystem.getInstance().attach(this.ListLanes)
-    BreakpointSystem.getInstance().attach(this.ListGutter)
-    BreakpointSystem.getInstance().stop()
     this.dialogController = null // 将dialogController置空
   }
 
@@ -176,13 +171,17 @@ struct ProxyPage {
             Text('访问https://speed.cloudflare.com')
               .fontSize(18)*/
             Web({ src: 'https://speed.cloudflare.com', controller: this.controller }) //测速网页得重新换个
+              .javaScriptAccess(true)
+              .onlineImageAccess(true)
+              .imageAccess(true)
+              .domStorageAccess(true)
           }
     }
-    .width('90%')
+    .width('100%')
     .height('100%')
     .alignItems(VerticalAlign.Center)
     .justifyContent(FlexAlign.Center)
-    .padding({bottom:100})
+ //   .padding({bottom:100})
     .backgroundColor(($r('app.color.container_background')))
   }
 

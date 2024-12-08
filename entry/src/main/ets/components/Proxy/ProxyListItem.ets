@@ -1,4 +1,4 @@
-import { ProxyData } from "../common/ProxyListData"
+import { ProxyData } from "../../common/ProxyListData"
 
 
 
