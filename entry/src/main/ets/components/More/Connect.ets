@@ -1,13 +1,62 @@
+import { BreakpointState } from "../../common/breakpointsystem"
+
 @Component
 struct Connect {
   @Consume('NavPathStack') pageInfos: NavPathStack
+  @Consume('morePageMargin') morePageMargin: BreakpointState<number>
+  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级图标色，黑色
 
   build() {
     NavDestination() {
-      Text('Connect页')
+      Row() {
+        //返回图标
+        Button({ type: ButtonType.Circle, stateEffect: true }) {
+          SymbolGlyph($r('sys.symbol.chevron_left'))
+            .fontSize(28)
+            .fontColor([this.icon_secondary])
+        }
+        .margin({left: this.morePageMargin.value})
+        .onClick(() => {
+          this.pageInfos.pop(true)
+        })
+        .width(40)
+        .height(40)
+        .backgroundColor($r('app.color.settings_container_background'))
+        Text($r('app.string.Connect'))
+          .fontSize(30)
+          .fontWeight(FontWeight.Bold)
+          .textAlign(TextAlign.Start)
+          .margin({left: 8})
+        Blank()
+        //搜索
+        Button({ type: ButtonType.Circle, stateEffect: true }) {
+          SymbolGlyph($r('sys.symbol.magnifyingglass'))
+            .fontSize(24)
+            .fontColor([this.icon_secondary])
+        }
+        .backgroundColor($r('app.color.settings_container_background'))
+        .margin({ right: 10 })
+        .width(40)
+        .height(40)
+        //清理图标
+        Button({ type: ButtonType.Circle, stateEffect: true }) {
+          SymbolGlyph($r('sys.symbol.clean_fill'))
+            .fontSize(24)
+            .fontColor([this.icon_secondary])
+        }
+        .margin({ right: this.morePageMargin.value })
+        .width(40)
+        .height(40)
+        .backgroundColor($r('app.color.settings_container_background'))
+      }
+      .width('100%')
+      .height(56)
+      .alignItems(VerticalAlign.Center)
     }
+    .hideTitleBar(true)
+    .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
-      this.pageInfos.pop(true);
+      this.pageInfos.clear();
       return true;
     })
   }

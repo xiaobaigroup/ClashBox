@@ -2,11 +2,10 @@ import { CustomColors, ThemeControl } from '@ohos.arkui.theme'
 import { gAppTheme } from '../common/AppTheme'
 import { BreakpointState, BreakpointSystem } from '../common/breakpointsystem';
 import { createGroup1Data, ProxyData } from '../common/ProxyListData';
-import ProxyListItem from '../components/ProxyListItem';
+import ProxyListItem from '../components/Proxy/ProxyListItem';
 import { AlertDialog } from '@kit.ArkUI'
 import { LengthMetrics, SymbolGlyphModifier } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
-import text from '@ohos.graphics.text';
 
 
 @CustomDialog
@@ -17,18 +16,17 @@ struct CustomDialogExample {
   confirm: () => void = () => {
   }
 
-  //弹窗内容
   build() {
     Column() {
       Text('速度和延迟的区别')
         .fontSize(20)
-        .padding({ bottom: 15 })
+        .padding({bottom:15})
         .fontWeight(700)
       Text('速度：通常指网络带宽，决定你下载文件及看视频、图片加载的速度。\n' +
         '延迟：通常指网络ping的时间，决定你打游戏的体验和访问网页的速度。\n' +
         '通常情况下，速度快不代表延迟低，延迟低也不能代表速度快，他们之间没有直接关系。')
         .fontSize(18)
-        .padding({ bottom: 8 })
+        .padding({bottom:8})
 
       Button('确定')
         .fontSize(16)
@@ -39,15 +37,9 @@ struct CustomDialogExample {
           }
         })
     }
-    .padding({
-      left: 24,
-      right: 24,
-      top: 16,
-      bottom: 16,
-    })
+    .padding({left:24,right:24,top:16,bottom:16})
   }
 }
-
 @Entry
 @Component
 struct ProxyPage {
@@ -63,8 +55,7 @@ struct ProxyPage {
   @State startIconModifier1: SymbolGlyphModifier =
     new SymbolGlyphModifier($r('sys.symbol.bolt_filled_on_circle')).fontSize('24vp');
   @State startIconModifier2: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.timer')).fontSize('24vp');
-  @State startIconModifier3: SymbolGlyphModifier =
-    new SymbolGlyphModifier($r('sys.symbol.questionmark_circle')).fontSize('24vp');
+  @State startIconModifier3: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.questionmark_circle')).fontSize('24vp');
   @State container_background: ResourceColor = ($r('app.color.container_background'));
   @State currentIndex: number = 0;
   @State proxyGroup1List: ProxyData[] = createGroup1Data();
@@ -98,6 +89,7 @@ struct ProxyPage {
     lg: 3,
     xl: 3
   });
+
   /*
        预留自定义主题，颜色在AppTheme里面修改
        onWillApplyTheme(theme: Theme) {
@@ -107,7 +99,10 @@ struct ProxyPage {
           this.iconFourth = theme.colors.iconFourth;
        }
    */
+  //@State private gridMargin: number = 0
+  private tabsController: TabsController = new TabsController()
   controller: webview.WebviewController = new webview.WebviewController();
+
   //弹窗
   dialogController: CustomDialogController | null = new CustomDialogController({
     builder: CustomDialogExample({
@@ -131,14 +126,14 @@ struct ProxyPage {
       }
     },
     alignment: DialogAlignment.Center,
+   // offset: { dx: 0, dy: -20 },
     customStyle: false,
     cornerRadius: 20,
     gridCount: 4,
     backgroundColor: ($r('app.color.container_background')),
     maskColor: ($r('app.color.dialog_maskcolor')),
+  // backgroundBlurStyle:BlurStyle.BACKGROUND_REGULAR
   })
-
-  private tabsController: TabsController = new TabsController()
 
   // 在自定义组件即将析构销毁时将dialogController置空
 
@@ -155,6 +150,7 @@ struct ProxyPage {
   }
 
   aboutToAppear(): void {
+
     BreakpointSystem.getInstance().attach(this.compStr)
     BreakpointSystem.getInstance().attach(this.proxyPageMargin)
     BreakpointSystem.getInstance().attach(this.ListLanes)
@@ -163,26 +159,30 @@ struct ProxyPage {
   }
 
   aboutToDisappear(): void {
+    BreakpointSystem.getInstance().attach(this.compStr)
+    BreakpointSystem.getInstance().attach(this.proxyPageMargin)
+    BreakpointSystem.getInstance().attach(this.ListLanes)
+    BreakpointSystem.getInstance().attach(this.ListGutter)
+    BreakpointSystem.getInstance().stop()
     this.dialogController = null // 将dialogController置空
   }
-
 
   @Builder
   BindSheetNetworkSpeed() {
     Row() {
-      Column() {
+          Column() {
         /*    Text('Webview')
               .fontSize(48)
             Text('访问https://speed.cloudflare.com')
               .fontSize(18)*/
-        Web({ src: 'https://speed.cloudflare.com', controller: this.controller }) //测速网页得重新换个
-      }
+            Web({ src: 'https://speed.cloudflare.com', controller: this.controller }) //测速网页得重新换个
+          }
     }
     .width('90%')
     .height('100%')
     .alignItems(VerticalAlign.Center)
     .justifyContent(FlexAlign.Center)
-    .padding({ bottom: 100 })
+    .padding({bottom:100})
     .backgroundColor(($r('app.color.container_background')))
   }
 

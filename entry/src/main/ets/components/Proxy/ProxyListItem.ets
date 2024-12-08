@@ -18,7 +18,7 @@ struct ProxyListItem {
   }
 
   aboutToAppear(): void {
-    // 假设我们有一个数值 value 和一个 Text 组件
+
     let value: number = this.itemObj.latency/* 获取你的数值 */;
     let color: Color;
     // 根据数值设定颜色

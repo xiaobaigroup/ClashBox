@@ -99,6 +99,114 @@
     {
       "name": "AccessControl",
       "value": " AccessControl"
+    },
+    {
+      "name": "EnableLoggerPrompt",
+      "value": "Please click on 'Enable Logging' in the upper right corner"
+    },
+    {
+      "name": "EnableLogger",
+      "value": "EnableLogger"
+    },
+    {
+      "name": "ClearLogs",
+      "value": "ClearLogs"
+    },
+    {
+      "name": "ExportLog",
+      "value": "ExportLog"
+    },
+    {
+      "name": "NoLogs",
+      "value": "NoLogs"
+    },
+    {
+      "name": "Basic",
+      "value": "Basic"
+    },
+    {
+      "name": "Network",
+      "value": "Network"
+    },
+    {
+      "name": "DNS",
+      "value": "DNS"
+    },
+    {
+      "name": "Language",
+      "value": "Language"
+    },
+    {
+      "name": "Appearance",
+      "value": "Appearance"
+    },
+    {
+      "name": "Backup_Recovery",
+      "value": "Backup and Recovery"
+    },
+    {
+      "name": "ApplicationLock",
+      "value": "Application Lock"
+    },
+    {
+      "name": "Notice",
+      "value": "Notice"
+    },
+    {
+      "name": "Backgrounder",
+      "value": "Backgrounder"
+    },
+    {
+      "name": "WipeData",
+      "value": "WipeData"
+    },
+    {
+      "name": "Disclaimer",
+      "value": "Disclaimer"
+    },
+    {
+      "name": "About",
+      "value": "About"
+    },
+    {
+      "name": "LanguageHint_Zh",
+      "value": "Simplified Chinese (default)"
+    },
+    {
+      "name": "LanguageHint_es",
+      "value": "English"
+    },
+    {
+      "name": "AppearanceSubtitle",
+      "value": "Dark mode, Theme color, Animation"
+    },
+    {
+      "name": "BackupSubtitle",
+      "value": "Export backup, Import backup, Automatic synchronization"
+    },
+    {
+      "name": "ApplicationicationLockSubtitle",
+      "value": "Set application lock, Fingerprint/Face unlock"
+    },
+    {
+      "name": "NoticeSubtitle",
+      "value": "Resident notifications and CellularData reminders"
+    },
+    {
+      "name": "BackgrounderSubtitle",
+      "value": "Download simulation, Play simulation"
+    },
+    {
+      "name": "WipeDataSubtitle",
+      "value": "Delete all data of the application"
+    },
+    {
+      "name": "Opened",
+      "value": "Opened"
+    },
+    {
+      "name": "Closed",
+      "value": "Closed"
     }
   ]
 }

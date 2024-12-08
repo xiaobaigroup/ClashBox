@@ -1,8 +1,8 @@
-import { moreData } from "../../common/Constants"
+import { settingsData } from "../../common/Constants"
 
 @Component
-struct moreListItem {
-  @Prop itemObj: moreData
+struct settingsListItem {
+  @Prop itemObj: settingsData
   @Prop index: number
   onCheck = (index: number) => {}
 
@@ -12,12 +12,21 @@ struct moreListItem {
         SymbolGlyph(this.itemObj.icons)
           .fontSize(24)
           .margin({left: 12})
-        Text(this.itemObj.title)
-          .height(48)
-          .fontWeight(FontWeight.Medium)
-          .padding({ left: 12 })
-          .fontSize(16)
+        Column() {
+          Text(this.itemObj.title)
+            //.height(48)
+            .fontWeight(FontWeight.Medium)
+            .fontSize(16)
+          Text(this.itemObj.subtitle)
+            .fontSize(14)
+        }
+        .padding({ left: 12 })
+        .alignItems(HorizontalAlign.Start)
         Blank()
+        Text(this.itemObj.hint)
+          .fontColor('gray')
+          .padding({ left: 12 })
+          .fontSize(14)
         Row()
           .width(10)
           .height(10)
@@ -38,10 +47,9 @@ struct moreListItem {
       Row()
         .height(10)
     }
-
     .onClick(() => {
       this.onCheck(this.index)
     })
   }
 }
-export default moreListItem
+export default settingsListItem
