@@ -119,6 +119,94 @@
     {
       "name": "NoLogs",
       "value": "暂无日志"
+    },
+    {
+      "name": "Basic",
+      "value": "基础"
+    },
+    {
+      "name": "Network",
+      "value": "网络"
+    },
+    {
+      "name": "DNS",
+      "value": "DNS"
+    },
+    {
+      "name": "Language",
+      "value": "语言"
+    },
+    {
+      "name": "Appearance",
+      "value": "外观"
+    },
+    {
+      "name": "Backup_Recovery",
+      "value": "备份与恢复"
+    },
+    {
+      "name": "ApplicationLock",
+      "value": "应用锁"
+    },
+    {
+      "name": "Notice",
+      "value": "通知"
+    },
+    {
+      "name": "Backgrounder",
+      "value": "后台运行"
+    },
+    {
+      "name": "WipeData",
+      "value": "清空数据"
+    },
+    {
+      "name": "Disclaimer",
+      "value": "免责声明"
+    },
+    {
+      "name": "About",
+      "value": "关于"
+    },
+    {
+      "name": "LanguageHint_Zh",
+      "value": "简体中文(默认)"
+    },
+    {
+      "name": "LanguageHint_es",
+      "value": "英语"
+    },
+    {
+      "name": "AppearanceSubtitle",
+      "value": "深色模式、主题色、动画"
+    },
+    {
+      "name": "BackupSubtitle",
+      "value": "导出备份、导入备份、自动同步"
+    },
+    {
+      "name": "ApplicationicationLockSubtitle",
+      "value": "设置应用锁、指纹\\人脸解锁"
+    },
+    {
+      "name": "NoticeSubtitle",
+      "value": "常驻通知、流量提醒"
+    },
+    {
+      "name": "BackgrounderSubtitle",
+      "value": "下载模拟、播放模拟"
+    },
+    {
+      "name": "WipeDataSubtitle",
+      "value": "删除应用的所有数据"
+    },
+    {
+      "name": "Opened",
+      "value": "已开启"
+    },
+    {
+      "name": "Closed",
+      "value": "已关闭"
     }
   ]
 }

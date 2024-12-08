@@ -1,10 +1,20 @@
 import { BreakpointState } from "../../common/breakpointsystem"
+import { ListOverwriteData, moreData } from "../../common/Constants"
+import moreListItem from "./moreListItem"
 
 @Component
 struct Overwrite {
   @Consume('NavPathStack') pageInfos: NavPathStack
   @Consume('morePageMargin') morePageMargin: BreakpointState<number>
+  @State overwriteList: moreData[] = ListOverwriteData()
   @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级图标色，黑色
+  @Consume('listBottom') listBottom: BreakpointState<number>
+
+  handleCheck(index: number) {
+    // 跳转
+    let itemData = this.overwriteList[index]
+    this.pageInfos.pushPathByName(itemData.name, false)
+  }
 
   build() {
     NavDestination() {
@@ -34,6 +44,25 @@ struct Overwrite {
       .height(56)
       .alignItems(VerticalAlign.Center)
 
+      List() {
+        ForEach(this.overwriteList, (item: moreData, index: number) => {
+          ListItem() {
+            moreListItem({
+              index: index,
+              itemObj: item,
+              onCheck: (index: number) => {
+                this.handleCheck(index)
+              }
+            })
+          }
+          .margin({bottom: this.listBottom.value })
+        })
+
+      }
+      //.height(400)
+      .margin({ top: 10, left: this.morePageMargin.value, right: this.morePageMargin.value })
+      .borderRadius(18)
+      .alignListItem(ListItemAlign.Center)
 
     }
     .hideTitleBar(true)

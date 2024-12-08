@@ -12,7 +12,7 @@ import Resources from '../components/More/Resources';
 import RequestPage from '../components/More/Request';
 import Connect from '../components/More/Connect';
 import Overwrite from '../components/More/Overwrite';
-import Settings from '../components/More/Settings';
+import Settings from '../components/Settings/Settings';
 import moreListItem from '../components/More/moreListItem';
 
 @Entry
@@ -44,7 +44,7 @@ struct MorePage {
     xs: 12, sm: 14, md: 56, lg: 56, xl: 79
   })
   // 列表底边距
-  @State listBottom: BreakpointState<number> = BreakpointState.of({
+  @Provide('listBottom') listBottom: BreakpointState<number> = BreakpointState.of({
     xs: 10, sm: 10, md: 14, lg: 14, xl: 14
   })
 
@@ -154,9 +154,9 @@ struct MorePage {
                 this.isShowSettings = true
               })
               .bindSheet($$this.isShowSettings, SettingsSheet(), {
-                detents: [SheetSize.LARGE, SheetSize.MEDIUM, 200],
-                //backgroundColor: Color.Gray,
-                blurStyle: BlurStyle.Thick,
+                detents: [700, SheetSize.MEDIUM, 200],
+                backgroundColor: $r('app.color.settings_container_background'),
+                blurStyle: BlurStyle.BACKGROUND_REGULAR,
                 showClose: true,
                 title: { title: $r('app.string.Settings') },
               })
@@ -181,7 +181,7 @@ export default MorePage
 @Builder function SettingsSheet() {
 
   Column() {
-    Text('设置')
+    Settings()
   }
   .width('100%')
   .height('100%')

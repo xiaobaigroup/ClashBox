@@ -2,7 +2,7 @@ import { CustomColors, ThemeControl } from '@ohos.arkui.theme'
 import { gAppTheme } from '../common/AppTheme'
 import { BreakpointState, BreakpointSystem } from '../common/breakpointsystem';
 import { createGroup1Data, ProxyData } from '../common/ProxyListData';
-import ProxyListItem from '../components/ProxyListItem';
+import ProxyListItem from '../components/Proxy/ProxyListItem';
 import { AlertDialog } from '@kit.ArkUI'
 import { LengthMetrics, SymbolGlyphModifier } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';

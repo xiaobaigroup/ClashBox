@@ -191,7 +191,7 @@ struct Home {
             this.isShowSettings = true
           })
           .bindSheet($$this.isShowSettings, SettingsSheet(), {
-            detents: [SheetSize.LARGE, SheetSize.MEDIUM, 200],
+            detents: [700, SheetSize.MEDIUM, 200],
             //backgroundColor: Color.Gray,
             blurStyle: BlurStyle.Thick,
             showClose: true,
