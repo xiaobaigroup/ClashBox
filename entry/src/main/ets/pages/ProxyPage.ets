@@ -1,27 +1,54 @@
-import { ThemeControl } from '@ohos.arkui.theme'
+import { CustomColors, ThemeControl } from '@ohos.arkui.theme'
 import { gAppTheme } from '../common/AppTheme'
 import { BreakpointState, BreakpointSystem } from '../common/breakpointsystem';
 import { createGroup1Data, ProxyData } from '../common/ProxyListData';
 import ProxyListItem from '../components/ProxyListItem';
 import { AlertDialog } from '@kit.ArkUI'
-
-import {
-  LengthMetrics,
-  SymbolGlyphModifier
-} from '@kit.ArkUI';
+import { LengthMetrics, SymbolGlyphModifier } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
 
 
+@CustomDialog
+struct CustomDialogExample {
+  controller?: CustomDialogController
+  cancel: () => void = () => {
+  }
+  confirm: () => void = () => {
+  }
 
+  build() {
+    Column() {
+      Text('速度和延迟的区别')
+        .fontSize(20)
+        .padding({bottom:15})
+        .fontWeight(700)
+      Text('速度：通常指网络带宽，决定你下载文件及看视频、图片加载的速度。\n' +
+        '延迟：通常指网络ping的时间，决定你打游戏的体验和访问网页的速度。\n' +
+        '通常情况下，速度快不代表延迟低，延迟低也不能代表速度快，他们之间没有直接关系。')
+        .fontSize(18)
+        .padding({bottom:8})
+
+      Button('确定')
+        .fontSize(16)
+        .width('100%')
+        .onClick(() => {
+          if (this.controller != undefined) {
+            this.controller.close()
+          }
+        })
+    }
+    .padding({left:24,right:24,top:16,bottom:16})
+  }
+}
 @Entry
 @Component
 struct ProxyPage {
   //系统颜色调用
   @State icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize') //高亮图标，蓝色
   @State font_primary: ResourceColor = $r('sys.color.font_primary') //一级文本色，黑色
-  @State font_secondary: ResourceColor = $r('sys.color.font_secondary') //一级文本反色，白色
+  @State font_secondary: ResourceColor = $r('sys.color.font_secondary') //二级文本色，深灰色
   @State font_on_primary: ResourceColor = $r('sys.color.font_on_primary') //一级文本反色，白色
-  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级图标色，黑色
+  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //二级图标色，黑色
   @State comp_divider: ResourceColor = $r('sys.color.comp_divider') //分割线
   //长按菜单图标
   @State startIconModifier: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.star')).fontSize('24vp');
@@ -62,6 +89,7 @@ struct ProxyPage {
     lg: 3,
     xl: 3
   });
+
   /*
        预留自定义主题，颜色在AppTheme里面修改
        onWillApplyTheme(theme: Theme) {
@@ -76,20 +104,50 @@ struct ProxyPage {
   controller: webview.WebviewController = new webview.WebviewController();
 
   //弹窗
-  dialogControllerConfirm: CustomDialogController = new CustomDialogController({
-    builder: AlertDialog({
-      primaryTitle: '速度和延迟的区别',
-      content: '速度：通常指网络带宽，决定你下载文件及看视频、图片加载的速度\n' +
-        '延迟：通常指网络ping的时间，决定你打游戏的体验和访问网页的速度\n' +
-        '通常情况下，速度快不代表延迟低，延迟低也不能代表速度快，他们之间没有直接关系',
-      primaryButton: {
-        value: '确认',
-        action: () => {
-        },
+  dialogController: CustomDialogController | null = new CustomDialogController({
+    builder: CustomDialogExample({
+      cancel: () => {
+        this.onCancel()
       },
+      confirm: () => {
+        this.onAccept()
+      }
     }),
+    cancel: this.existApp,
+    autoCancel: true,
+    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+      console.info("reason=" + JSON.stringify(dismissDialogAction.reason))
+      console.log("dialog onWillDismiss")
+      if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
+        dismissDialogAction.dismiss()
+      }
+      if (dismissDialogAction.reason == DismissReason.TOUCH_OUTSIDE) {
+        dismissDialogAction.dismiss()
+      }
+    },
+    alignment: DialogAlignment.Center,
+   // offset: { dx: 0, dy: -20 },
+    customStyle: false,
+    cornerRadius: 20,
+    gridCount: 4,
+    backgroundColor: ($r('app.color.container_background')),
+    maskColor: ($r('app.color.dialog_maskcolor')),
+  // backgroundBlurStyle:BlurStyle.BACKGROUND_REGULAR
   })
 
+  // 在自定义组件即将析构销毁时将dialogController置空
+
+  onCancel() {
+    console.info('Callback when the first button is clicked')
+  }
+
+  onAccept() {
+    console.info('Callback when the second button is clicked')
+  }
+
+  existApp() {
+    console.info('Click the callback in the blank area')
+  }
 
   aboutToAppear(): void {
 
@@ -106,6 +164,7 @@ struct ProxyPage {
     BreakpointSystem.getInstance().attach(this.ListLanes)
     BreakpointSystem.getInstance().attach(this.ListGutter)
     BreakpointSystem.getInstance().stop()
+    this.dialogController = null // 将dialogController置空
   }
 
   @Builder
@@ -333,7 +392,9 @@ struct ProxyPage {
         })
       MenuItem({ symbolStartIcon: this.startIconModifier3, content: "速度和延迟的区别" })
         .onClick(() => {
-          this.dialogControllerConfirm.open()
+          if (this.dialogController != null) {
+            this.dialogController.open()
+          }
         })
     }
     //分割线
@@ -407,7 +468,7 @@ struct ProxyPage {
         .height(40)
         .backgroundColor($r('app.color.settings_container_background'))
         .bindSheet($$this.isShowEdit, this.BindSheetEdit(), {
-          detents: [SheetSize.MEDIUM, SheetSize.LARGE, 200],
+          detents: [SheetSize.LARGE, 200],
           backgroundColor: $r('app.color.settings_container_background'),
           //     blurStyle: BlurStyle.BACKGROUND_REGULAR,
           showClose: true,
@@ -442,7 +503,10 @@ struct ProxyPage {
                     .bindContextMenu(this.MyMenu, ResponseType.LongPress,
                       {
                         preview: MenuPreviewMode.IMAGE,
-                        previewAnimationOptions: { scale: [1.0, 1.1] },
+                        previewAnimationOptions: {
+                          scale: [1.0, 1.0],
+                          transition: TransitionEffect.prototype.animation({ tempo: 1.5 })
+                        }
                       })
                 }
                 .padding({ bottom: 10, right: this.proxyPageMargin.value })

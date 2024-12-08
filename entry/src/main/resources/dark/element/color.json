@@ -27,6 +27,10 @@
     {
       "name": "speed_down_icon",
       "value": "#ff0a59f7"
+    },
+    {
+      "name": "dialog_maskcolor",
+      "value": "#B7000000"
     }
   ]
 }
