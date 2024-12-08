@@ -3,18 +3,14 @@ import { gAppTheme } from '../common/AppTheme'
 import { BreakpointState, BreakpointSystem } from '../common/breakpointsystem';
 import { createGroup1Data, ProxyData } from '../common/ProxyListData';
 import ProxyListItem from '../components/ProxyListItem';
+import { AlertDialog } from '@kit.ArkUI'
+
 import {
-  ComposeListItem,
-  DividerModifier,
-  IconType,
   LengthMetrics,
-  promptAction,
   SymbolGlyphModifier
 } from '@kit.ArkUI';
+import { webview } from '@kit.ArkWeb';
 
-
-// 在页面build前执行ThemeControl，就可以改变主题颜色
-//ThemeControl.setDefaultTheme(gAppTheme)
 
 
 @Entry
@@ -32,11 +28,12 @@ struct ProxyPage {
   @State startIconModifier1: SymbolGlyphModifier =
     new SymbolGlyphModifier($r('sys.symbol.bolt_filled_on_circle')).fontSize('24vp');
   @State startIconModifier2: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.timer')).fontSize('24vp');
+  @State startIconModifier3: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.questionmark_circle')).fontSize('24vp');
   @State container_background: ResourceColor = ($r('app.color.container_background'));
   @State currentIndex: number = 0;
   @State proxyGroup1List: ProxyData[] = createGroup1Data();
-  @State isShow: boolean = false
-  @State isShow1: boolean = false
+  @State isShowEdit: boolean = false
+  @State isShowNetworkSpeed: boolean = false
   @State compStr: BreakpointState<string> = BreakpointState.of({
     xs: "xs",
     sm: "sm",
@@ -76,6 +73,23 @@ struct ProxyPage {
    */
   //@State private gridMargin: number = 0
   private tabsController: TabsController = new TabsController()
+  controller: webview.WebviewController = new webview.WebviewController();
+
+  //弹窗
+  dialogControllerConfirm: CustomDialogController = new CustomDialogController({
+    builder: AlertDialog({
+      primaryTitle: '速度和延迟的区别',
+      content: '速度：通常指网络带宽，决定你下载文件及看视频、图片加载的速度\n' +
+        '延迟：通常指网络ping的时间，决定你打游戏的体验和访问网页的速度\n' +
+        '通常情况下，速度快不代表延迟低，延迟低也不能代表速度快，他们之间没有直接关系',
+      primaryButton: {
+        value: '确认',
+        action: () => {
+        },
+      },
+    }),
+  })
+
 
   aboutToAppear(): void {
 
@@ -93,32 +107,25 @@ struct ProxyPage {
     BreakpointSystem.getInstance().attach(this.ListGutter)
     BreakpointSystem.getInstance().stop()
   }
+
   @Builder
   BindSheetNetworkSpeed() {
-
-      Column() {
-        Row() {
-          Text('标签页(默认)')
-            .font({ size: 16 })
-            .fontColor(this.font_primary)
-
-          Radio({
-            value: 'Radio', group: 'radioGroup1',
-            indicatorType: RadioIndicatorType.TICK
-          })
-            .checked(true)
-            .radioStyle({
-              checkedBackgroundColor: this.icon_emphasize,
-              //   uncheckedBorderColor: this.icon_secondary
-            })
-        }
-        .width('100%')
-        .justifyContent(FlexAlign.SpaceBetween)
-      }
+    Row() {
+          Column() {
+        /*    Text('Webview')
+              .fontSize(48)
+            Text('访问https://speed.cloudflare.com')
+              .fontSize(18)*/
+            Web({ src: 'https://speed.cloudflare.com', controller: this.controller }) //测速网页得重新换个
+          }
     }
-
-
-
+    .width('90%')
+    .height('100%')
+    .alignItems(VerticalAlign.Center)
+    .justifyContent(FlexAlign.Center)
+    .padding({bottom:100})
+    .backgroundColor(($r('app.color.container_background')))
+  }
 
   @Builder
   //半模拟态编辑菜单
@@ -321,19 +328,12 @@ struct ProxyPage {
       MenuItem({ symbolStartIcon: this.startIconModifier, content: "收藏" })
       MenuItem({ symbolStartIcon: this.startIconModifier1, content: "测速延迟" })
       MenuItem({ symbolStartIcon: this.startIconModifier2, content: "测试速度" })
-        .bindSheet($$this.isShow1, this.BindSheetNetworkSpeed(), {
-          detents: [SheetSize.MEDIUM, SheetSize.LARGE, 200],
-          backgroundColor: $r('app.color.settings_container_background'),
-          blurStyle: BlurStyle.BACKGROUND_REGULAR,
-          showClose: true,
-          scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-          title: { title: "测试速度",subtitle:'测速功能由CloundFlare提供' },
-          width: ('100%'),
-       //   mode:SheetMode.EMBEDDED,
-       //   onWillAppear()
-        })
         .onClick(() => {
-          this.isShow1 = true
+          this.isShowNetworkSpeed = true
+        })
+      MenuItem({ symbolStartIcon: this.startIconModifier3, content: "速度和延迟的区别" })
+        .onClick(() => {
+          this.dialogControllerConfirm.open()
         })
     }
     //分割线
@@ -382,6 +382,17 @@ struct ProxyPage {
           .fontSize(32)
           .fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Start)
+          .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
+            detents: [SheetSize.LARGE, 200],
+            backgroundColor: $r('app.color.settings_container_background'),
+            //       blurStyle: BlurStyle.BACKGROUND_REGULAR,
+            showClose: true,
+            scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+            title: { title: "测试速度", subtitle: '测速功能由CloundFlare提供' },
+            width: ('100%'),
+            //onWillAppear:()
+            //   mode:SheetMode.EMBEDDED,
+          })
         Blank()
         //编辑图标
         Button({ type: ButtonType.Circle, stateEffect: true }) {
@@ -389,16 +400,16 @@ struct ProxyPage {
             .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
             .fontColor([this.icon_secondary])
             .onClick(() => {
-              this.isShow = true
+              this.isShowEdit = true
             })
         }
         .width(40)
         .height(40)
         .backgroundColor($r('app.color.settings_container_background'))
-        .bindSheet($$this.isShow, this.BindSheetEdit(), {
+        .bindSheet($$this.isShowEdit, this.BindSheetEdit(), {
           detents: [SheetSize.MEDIUM, SheetSize.LARGE, 200],
           backgroundColor: $r('app.color.settings_container_background'),
-          blurStyle: BlurStyle.BACKGROUND_REGULAR,
+          //     blurStyle: BlurStyle.BACKGROUND_REGULAR,
           showClose: true,
           scrollSizeMode: ScrollSizeMode.CONTINUOUS,
           title: { title: "编辑" },

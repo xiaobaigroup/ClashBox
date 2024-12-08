@@ -36,6 +36,11 @@
         ]
       }
     ],
+    "requestPermissions":[
+      {
+        "name": "ohos.permission.INTERNET",
+      }
+    ],
     "extensionAbilities": [
       {
         "name": "EntryBackupAbility",
