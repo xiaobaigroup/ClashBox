@@ -35,20 +35,20 @@ struct Settings {
   }
 
   @Builder
-  PagesMap(name: string) {
-    if (name == 'Log') {
+  SettingsPagesMap(name: string) {
+    if (name == '') {
       //Log()
     } else
-      if (name == 'Resources') {
+      if (name == '') {
         //Resources()
       } else
-      if (name == 'Request') {
+      if (name == '') {
         //RequestPage()
       } else
-      if (name == 'Connect') {
+      if (name == '') {
         //Connect()
       } else
-      if (name == 'Overwrite') {
+      if (name == '') {
         //Overwrite()
       }
   }
@@ -76,7 +76,7 @@ struct Settings {
       .alignListItem(ListItemAlign.Center)
     }
     .mode(this.isLandscapePhone ? NavigationMode.Stack : NavigationMode.Auto)
-    .navDestination(this.PagesMap)
+    .navDestination(this.SettingsPagesMap)
     .width('100%')
     .height('100%')
   }
