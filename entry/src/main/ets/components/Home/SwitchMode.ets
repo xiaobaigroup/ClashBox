@@ -1,7 +1,7 @@
-import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
+import { BreakpointSystem, BreakpointState } from '../../common/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI';
 import { ThemeControl } from '@ohos.arkui.theme'
-import { gAppTheme } from '../common/AppTheme'
+import { gAppTheme } from '../../common/AppTheme'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 
 // 在页面build前执行ThemeControl，就可以改变主题颜色
