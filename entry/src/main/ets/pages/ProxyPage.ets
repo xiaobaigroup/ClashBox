@@ -3,7 +3,14 @@ import { gAppTheme } from '../common/AppTheme'
 import { BreakpointState, BreakpointSystem } from '../common/breakpointsystem';
 import { createGroup1Data, ProxyData } from '../common/ProxyListData';
 import ProxyListItem from '../components/ProxyListItem';
-import { SymbolGlyphModifier } from '@kit.ArkUI';
+import {
+  ComposeListItem,
+  DividerModifier,
+  IconType,
+  LengthMetrics,
+  promptAction,
+  SymbolGlyphModifier
+} from '@kit.ArkUI';
 
 
 // 在页面build前执行ThemeControl，就可以改变主题颜色
@@ -19,7 +26,7 @@ struct ProxyPage {
   @State font_secondary: ResourceColor = $r('sys.color.font_secondary') //一级文本反色，白色
   @State font_on_primary: ResourceColor = $r('sys.color.font_on_primary') //一级文本反色，白色
   @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级图标色，黑色
-  @State comp_divider: ResourceColor = $r('sys.color.comp_divider') //四级图标色，黑色
+  @State comp_divider: ResourceColor = $r('sys.color.comp_divider') //分割线
   //长按菜单图标
   @State startIconModifier: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.star')).fontSize('24vp');
   @State startIconModifier1: SymbolGlyphModifier =
@@ -29,6 +36,7 @@ struct ProxyPage {
   @State currentIndex: number = 0;
   @State proxyGroup1List: ProxyData[] = createGroup1Data();
   @State isShow: boolean = false
+  @State isShow1: boolean = false
   @State compStr: BreakpointState<string> = BreakpointState.of({
     xs: "xs",
     sm: "sm",
@@ -85,6 +93,32 @@ struct ProxyPage {
     BreakpointSystem.getInstance().attach(this.ListGutter)
     BreakpointSystem.getInstance().stop()
   }
+  @Builder
+  BindSheetNetworkSpeed() {
+
+      Column() {
+        Row() {
+          Text('标签页(默认)')
+            .font({ size: 16 })
+            .fontColor(this.font_primary)
+
+          Radio({
+            value: 'Radio', group: 'radioGroup1',
+            indicatorType: RadioIndicatorType.TICK
+          })
+            .checked(true)
+            .radioStyle({
+              checkedBackgroundColor: this.icon_emphasize,
+              //   uncheckedBorderColor: this.icon_secondary
+            })
+        }
+        .width('100%')
+        .justifyContent(FlexAlign.SpaceBetween)
+      }
+    }
+
+
+
 
   @Builder
   //半模拟态编辑菜单
@@ -105,10 +139,10 @@ struct ProxyPage {
               .fontColor(this.font_primary)
 
             Radio({
-              value: 'Radio', group: 'radioGroup',
+              value: 'Radio', group: 'radioGroup1',
               indicatorType: RadioIndicatorType.TICK
             })
-              .checked(false)
+              .checked(true)
               .radioStyle({
                 checkedBackgroundColor: this.icon_emphasize,
                 //   uncheckedBorderColor: this.icon_secondary
@@ -125,7 +159,7 @@ struct ProxyPage {
               .fontColor(this.font_primary)
 
             Radio({
-              value: 'Radio', group: 'radioGroup',
+              value: 'Radio', group: 'radioGroup1',
               indicatorType: RadioIndicatorType.TICK
             })
               .checked(false)
@@ -138,7 +172,6 @@ struct ProxyPage {
           .justifyContent(FlexAlign.SpaceBetween)
         }
         .padding({ left: 15, right: 10 })
-        .alignItems(HorizontalAlign.Start)
         .justifyContent(FlexAlign.SpaceEvenly)
         .margin({ bottom: 10 })
         .width('100%')
@@ -160,10 +193,10 @@ struct ProxyPage {
               .fontColor(this.font_primary)
 
             Radio({
-              value: 'Radio', group: 'radioGroup',
+              value: 'Radio', group: 'radioGroup2',
               indicatorType: RadioIndicatorType.TICK
             })
-              .checked(false)
+              .checked(true)
               .radioStyle({
                 checkedBackgroundColor: this.icon_emphasize,
                 //   uncheckedBorderColor: this.icon_secondary
@@ -180,7 +213,7 @@ struct ProxyPage {
               .fontColor(this.font_primary)
 
             Radio({
-              value: 'Radio', group: 'radioGroup',
+              value: 'Radio', group: 'radioGroup2',
               indicatorType: RadioIndicatorType.TICK
             })
               .checked(false)
@@ -201,7 +234,7 @@ struct ProxyPage {
               .fontColor(this.font_primary)
 
             Radio({
-              value: 'Radio', group: 'radioGroup',
+              value: 'Radio', group: 'radioGroup2',
               indicatorType: RadioIndicatorType.TICK
             })
               .checked(false)
@@ -214,7 +247,6 @@ struct ProxyPage {
           .justifyContent(FlexAlign.SpaceBetween)
         }
         .padding({ left: 15, right: 10 })
-        .alignItems(HorizontalAlign.Start)
         .justifyContent(FlexAlign.SpaceEvenly)
         .margin({ bottom: 10 })
         .width('100%')
@@ -237,7 +269,7 @@ struct ProxyPage {
               .fontColor(this.font_primary)
 
             Radio({
-              value: 'Radio', group: 'radioGroup',
+              value: 'Radio', group: 'radioGroup3',
               indicatorType: RadioIndicatorType.TICK
             })
               .checked(false)
@@ -257,10 +289,10 @@ struct ProxyPage {
               .fontColor(this.font_primary)
 
             Radio({
-              value: 'Radio', group: 'radioGroup',
+              value: 'Radio', group: 'radioGroup3',
               indicatorType: RadioIndicatorType.TICK
             })
-              .checked(false)
+              .checked(true)
               .radioStyle({
                 checkedBackgroundColor: this.icon_emphasize,
                 //   uncheckedBorderColor: this.icon_secondary
@@ -271,7 +303,6 @@ struct ProxyPage {
           .justifyContent(FlexAlign.SpaceBetween)
         }
         .padding({ left: 15, right: 10 })
-        .alignItems(HorizontalAlign.Start)
         .justifyContent(FlexAlign.SpaceEvenly)
         .margin({ bottom: 10 })
         .height(94)
@@ -281,25 +312,32 @@ struct ProxyPage {
     }
     .padding({ left: 16, right: 16 })
     .width('100%')
-    .justifyContent(FlexAlign.SpaceBetween)
   }
 
   @Builder
   //长按菜单相关
   MyMenu() {
     Menu() {
-      MenuItemGroup() {
-        MenuItem({ symbolStartIcon: this.startIconModifier, content: "收藏" })
-      }
-
-      MenuItemGroup() {
-        MenuItem({ symbolStartIcon: this.startIconModifier1, content: "测速延迟" })
-      }
-
-      MenuItemGroup() {
-        MenuItem({ symbolStartIcon: this.startIconModifier2, content: "测试速度" })
-      }
+      MenuItem({ symbolStartIcon: this.startIconModifier, content: "收藏" })
+      MenuItem({ symbolStartIcon: this.startIconModifier1, content: "测速延迟" })
+      MenuItem({ symbolStartIcon: this.startIconModifier2, content: "测试速度" })
+        .bindSheet($$this.isShow1, this.BindSheetNetworkSpeed(), {
+          detents: [SheetSize.MEDIUM, SheetSize.LARGE, 200],
+          backgroundColor: $r('app.color.settings_container_background'),
+          blurStyle: BlurStyle.BACKGROUND_REGULAR,
+          showClose: true,
+          scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+          title: { title: "测试速度",subtitle:'测速功能由CloundFlare提供' },
+          width: ('100%'),
+       //   mode:SheetMode.EMBEDDED,
+       //   onWillAppear()
+        })
+        .onClick(() => {
+          this.isShow1 = true
+        })
     }
+    //分割线
+    .menuItemDivider({ color: this.comp_divider, strokeWidth: LengthMetrics.vp(1) })
     .backgroundColor($r('app.color.container_background'))
     .borderRadius(20)
   }
