@@ -31,6 +31,8 @@ export  const createGroup1Data = (): ProxyData[] => {
     new ProxyData($r('sys.symbol.gearshape'), '中国台湾②', 'Shadowsocks', 1001, false),
     new ProxyData($r('sys.symbol.gearshape'), '新加坡①', 'Shadowsocks', 500, false),
     new ProxyData($r('sys.symbol.gearshape'), '新加坡②', 'Vmess', 501, false),
+    new ProxyData($r('sys.symbol.gearshape'), '美国①', 'Shadowsocks', 500, false),
+    new ProxyData($r('sys.symbol.gearshape'), '美国②', 'Vmess', 501, false),
 
   ]
   return result
