@@ -2,19 +2,19 @@
   "color": [
     {
       "name": "start_window_background",
-      "value": "#FC282828"
+      "value": "#FF000000"
     },
     {
       "name": "settings_container_background",
-      "value": "#FC565656"
+      "value": "#1AFFFFFF"
     },
     {
       "name": "background",
-      "value": "#FC282828"
+      "value": "#FF000000"
     },
     {
       "name": "container_background",
-      "value": "#FC565656"
+      "value": "#1AFFFFFF"
     },
     {
       "name": "settings_icon",

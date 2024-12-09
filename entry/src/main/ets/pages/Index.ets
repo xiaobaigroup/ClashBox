@@ -93,7 +93,7 @@ struct Index {
         Column() {
           SymbolGlyph(TabIcon)
             .fontColor([this.currentIndex === index ? this.icon_emphasize : this.icon_tertiary])
-            .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+            .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)//分层颜色
             .fontSize(this.isLandscapePhone ? 24 : this.TabIconfontSize.value)
             .margin({top: 5})
             .effectStrategy(SymbolEffectStrategy.SCALE)
