@@ -1,6 +1,7 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import { ListOverwriteData, moreData } from "../../common/Constants"
 import moreListItem from "./moreListItem"
+import { hilog } from "@kit.PerformanceAnalysisKit"
 
 @Component
 struct Overwrite {
@@ -14,6 +15,8 @@ struct Overwrite {
     // 跳转
     let itemData = this.overwriteList[index]
     this.pageInfos.pushPathByName(itemData.name, false)
+    hilog.isLoggable(0xFF00, "OverwritetestTag", hilog.LogLevel.INFO);
+    hilog.info(0xFF00, "OverwritetestTag", itemData.name)
   }
 
   build() {
@@ -59,7 +62,8 @@ struct Overwrite {
         })
 
       }
-      //.height(400)
+      .width('100%')
+      .height(500)
       .margin({ top: 10, left: this.morePageMargin.value, right: this.morePageMargin.value })
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)
