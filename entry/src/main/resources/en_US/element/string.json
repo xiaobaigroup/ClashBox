@@ -121,6 +121,10 @@
       "value": "NoLogs"
     },
     {
+      "name": "AddConfig",
+      "value": "Add Configuration"
+    },
+    {
       "name": "Basic",
       "value": "Basic"
     },

@@ -12,6 +12,11 @@ import { ThemeControl } from '@ohos.arkui.theme'
 import { gAppTheme } from '../common/AppTheme'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Timer } from '../common/HHmmssTimer'
+import {
+  PROXY_STARTED_DURATION_INIT_VALUE,
+  ANIMATION_DURATION_300,
+  TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE
+} from '../common/Constants'
 import { PROXY_STARTED_DURATION_INIT_VALUE, ANIMATION_DURATION_300 } from '../common/Constants'
 import Settings from '../components/Settings/Settings'
 
@@ -173,7 +178,7 @@ struct Home {
           //编辑图标
           Button({ type: ButtonType.Circle, stateEffect: true }) {
             SymbolGlyph($r('sys.symbol.square_and_pencil'))
-              .fontSize(30)//         .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+              .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)//         .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
               .fontColor([this.icon_secondary])
           }
           .margin({ right: this.gridMargin })
@@ -184,7 +189,7 @@ struct Home {
           //设置图标
           Button({ type: ButtonType.Circle, stateEffect: true }) {
             SymbolGlyph($r('sys.symbol.gearshape'))
-              .fontSize(30)
+              .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
               .fontColor([this.icon_secondary]) //设置图标无法分层设为单色
           }
           .margin({ right: this.gridMargin })

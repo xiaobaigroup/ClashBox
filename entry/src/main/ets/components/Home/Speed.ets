@@ -230,7 +230,6 @@ struct Speed {
             .fontSize(this.fontSize.value)
         }
         .width('145vp')
-
         //.margin({ top: 10, left: 20 })
         Row() {
         }

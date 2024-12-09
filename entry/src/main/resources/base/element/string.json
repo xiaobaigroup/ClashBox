@@ -121,6 +121,10 @@
       "value": "暂无日志"
     },
     {
+      "name": "AddConfig",
+      "value": "添加配置"
+    },
+    {
       "name": "Basic",
       "value": "基础"
     },
