@@ -1,6 +1,7 @@
 // 对通过媒体查询监听断点的功能的简单封装
 import { mediaquery } from '@kit.ArkUI'
 import { hilog } from '@kit.PerformanceAnalysisKit'
+import { BusinessError } from '@kit.BasicServicesKit'
 
 export type BreakpointType = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl'
 
@@ -100,6 +101,13 @@ export class BreakpointState<T extends Object> {
   }
 
   public update(type: BreakpointType): void {
+    // try {
+    //   let result:string = Reflect.get<BreakpointOptions<T>, string>(this.options, type)
+    //   hilog.info(0x1000, 'breakpointsystem', `#update()#Reflect.get<BreakpointOptions<T>, string>(this.options, type)#result: ${result.toString()}`)
+    // } catch (e) {
+    //   hilog.error(0x1000, 'breakpointsystem', `#update()#Reflect.get<BreakpointOptions<T>, string>(${this.options}, ${type})#ERROR: ${e}`)
+    // }
+
     if (type === 'xs') {
       this.value = this.options.xs
     } else if (type === 'sm') {
