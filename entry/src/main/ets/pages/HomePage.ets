@@ -12,11 +12,7 @@ import { ThemeControl } from '@ohos.arkui.theme'
 import { gAppTheme } from '../common/AppTheme'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Timer } from '../common/HHmmssTimer'
-import {
-  PROXY_STARTED_DURATION_INIT_VALUE,
-  ANIMATION_DURATION_300,
-  TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE
-} from '../common/Constants'
+import { PROXY_STARTED_DURATION_INIT_VALUE, ANIMATION_DURATION_300 } from '../common/Constants'
 // 在页面build前执行ThemeControl，就可以改变主题颜色
 //ThemeControl.setDefaultTheme(gAppTheme)
 
@@ -53,12 +49,15 @@ struct Home {
   @State
   private proxyStartButtonHeight: Length = $r('app.integer.vp_proxy_not_start_button_height')
   // 按钮前Symbol动效
-  private ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE
+  private ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE  // 按钮前Symbol动效
   // 定时器Controller
   private proxyStartedTimer: Timer = new Timer()
 
   //系统颜色调用
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
   @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //二级图标色，灰色
+  @State font_primary: ResourceColor = $r('sys.color.font_primary') //一级文本色，黑色
+
   @State icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize') //高亮图标，蓝色
   //设置图标颜色，修改resources/base(dark)/element/color.json中settings_icon配置浅色和深色模式分别颜色
   //@State fontColorValue:ResourceColor = ($r('app.color.settings_icon'));
@@ -173,8 +172,8 @@ struct Home {
           //编辑图标
           Button({ type: ButtonType.Circle, stateEffect: true }) {
             SymbolGlyph($r('sys.symbol.square_and_pencil'))
-              .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)//         .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-              .fontColor([this.icon_secondary])
+              .fontSize(24)//         .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+              .fontColor([this.icon_primary])
           }
           .margin({ right: this.gridMargin })
           .width(40)
@@ -184,8 +183,8 @@ struct Home {
           //设置图标
           Button({ type: ButtonType.Circle, stateEffect: true }) {
             SymbolGlyph($r('sys.symbol.gearshape'))
-              .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
-              .fontColor([this.icon_secondary]) //设置图标无法分层设为单色
+              .fontSize(24)
+              .fontColor([this.icon_primary]) //设置图标无法分层设为单色
           }
           .margin({ right: this.gridMargin })
           .width(40)
@@ -424,7 +423,6 @@ struct Home {
               case 'xl':
                 this.gridMargin = 36
                 break
-
             }
             // console.log('断点为：' + this.currentBp + '容器高：' + this.ContainerHeight + '顶部高：' + this.TopHeight)
           })
