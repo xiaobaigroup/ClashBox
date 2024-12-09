@@ -1,3 +1,4 @@
+import { BreakpointState } from "./breakpointsystem";
 
 // 更多列表类
 export class moreData {
