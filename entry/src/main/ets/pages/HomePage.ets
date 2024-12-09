@@ -33,7 +33,7 @@ interface MarginGenerate {
 @Component
 struct Home {
   // 设置按钮导航
-  @Provide('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
+  @Provide('NavSettingsPathStack') SettingsPageInfos: NavPathStack = new NavPathStack()
 
   private componentName: string = 'HomePage'
 

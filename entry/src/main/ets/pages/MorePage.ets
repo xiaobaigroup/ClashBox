@@ -34,7 +34,10 @@ struct MorePage {
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   @State moreList: moreData[] = ListMoreData()
+  // 更多页面栈
   @Provide('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
+  // 设置页面栈
+  @Provide('NavSettingsPathStack') SettingsPageInfos: NavPathStack = new NavPathStack()
   // 断点
   @State compStr: BreakpointState<string> = BreakpointState.of({
     xs: "xs", sm: "sm", md: "md", lg: "lg", xl: "xl"
@@ -159,7 +162,10 @@ struct MorePage {
             backgroundColor: $r('app.color.settings_container_background'),
             blurStyle: BlurStyle.BACKGROUND_REGULAR,
             showClose: true,
-            //title: { title: $r('app.string.Settings') },
+            onDisappear: () => {
+              this.SettingsPageInfos.clear()
+              this.pageInfos.clear()
+            }
           })
         }
         .width('100%')

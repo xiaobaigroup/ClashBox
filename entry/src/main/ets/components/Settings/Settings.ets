@@ -19,7 +19,7 @@ struct Settings {
   @State isShowMenu: boolean = false
   // 当前设备`height`是否符合(320vp< height <= 500vp)
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
-  @Consume('NavPathStack') SettingsPageInfos: NavPathStack
+  @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   // 断点
   @State compStr: BreakpointState<string> = BreakpointState.of({
     xs: "xs", sm: "sm", md: "md", lg: "lg", xl: "xl"

@@ -1,7 +1,7 @@
 
 @Component
 struct Appearance {
-  @Consume('NavPathStack') SettingsPageInfos: NavPathStack
+  @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级图标色，黑色
 
   build() {

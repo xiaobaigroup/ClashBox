@@ -1,7 +1,7 @@
 
 @Component
 struct About {
-  @Consume('NavPathStack') SettingsPageInfos: NavPathStack
+  @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   //@Consume('morePageMargin') morePageMargin: BreakpointState<number>
   @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级图标色，黑色
 

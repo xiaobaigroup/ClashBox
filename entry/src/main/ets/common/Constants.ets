@@ -94,7 +94,7 @@ export const SettingsListItem = (): settingsData[] => {
   return result
 }
 
-// 设置页列表项
+// 设置页的多语言列表项
 export const LanguageListItem = (): settingsData[] => {
   let result: settingsData[] = new Array()
   result = [
