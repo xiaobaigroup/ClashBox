@@ -86,11 +86,26 @@ struct ConfigurationPage {
   // 配置页面ListItem的长按ContextMenu列表项集合
   @State
   private configListLongPressCtxMenus: Array<LongPressContextMenuItem> = [
-    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.star')).fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE), content: '收藏', callback: ()=>{this.favoriteConfig()} },
-    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.square_and_pencil')).fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE), content: '编辑', callback: ()=>{this.editConfig()} },
-    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.arrow_clockwise')).fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE), content: '更新', callback: ()=>{this.updateConfig()} },
-    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.share')).fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE), content: '分享', callback: ()=>{this.shareConfig()} },
-    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.qrcode')).fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE), content: '生成二维码', callback: ()=>{this.generateQRcode()} },
+    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.star'))
+        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
+      content: '收藏', callback: ()=>{this.favoriteConfig()}
+    },
+    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.square_and_pencil'))
+        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
+      content: '编辑', callback: ()=>{this.editConfig()}
+    },
+    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.arrow_clockwise'))
+        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
+      content: '更新', callback: ()=>{this.updateConfig()}
+    },
+    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.share'))
+        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
+      content: '分享', callback: ()=>{this.shareConfig()}
+    },
+    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.qrcode'))
+        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
+      content: '生成二维码', callback: ()=>{this.generateQRcode()}
+    },
   ]
   // 配置页面ListItem的长按ContextMenu的Builder
   @Builder
@@ -267,7 +282,7 @@ struct ConfigurationPage {
           backgroundColor: $r('app.color.background'),
           showClose: true,
           dragBar: true,
-          blurStyle: BlurStyle.Thick,
+          blurStyle: BlurStyle.COMPONENT_THICK,
           scrollSizeMode: ScrollSizeMode.CONTINUOUS,
           width: ('100%')
         })
@@ -276,7 +291,7 @@ struct ConfigurationPage {
         })
         // 悬浮新增配置按钮 END
       }
-      .backgroundColor($r('app.color.dialog_maskcolor'))
+      .backgroundColor($r('app.color.background'))
       // .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
       .width('100%')
       .height(this.isLandscapePhone ? '100%' :`calc(100% - ${TAB_CONTENT_TITLE_HEIGHT}vp)`)
