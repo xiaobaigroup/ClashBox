@@ -12,7 +12,11 @@ import { ThemeControl } from '@ohos.arkui.theme'
 import { gAppTheme } from '../common/AppTheme'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Timer } from '../common/HHmmssTimer'
-import { PROXY_STARTED_DURATION_INIT_VALUE, ANIMATION_DURATION_300 } from '../common/Constants'
+import {
+  PROXY_STARTED_DURATION_INIT_VALUE,
+  ANIMATION_DURATION_300,
+  TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE
+} from '../common/Constants'
 // 在页面build前执行ThemeControl，就可以改变主题颜色
 //ThemeControl.setDefaultTheme(gAppTheme)
 
@@ -172,7 +176,8 @@ struct Home {
           //编辑图标
           Button({ type: ButtonType.Circle, stateEffect: true }) {
             SymbolGlyph($r('sys.symbol.square_and_pencil'))
-              .fontSize(24)//         .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+              .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
+              // .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
               .fontColor([this.icon_primary])
           }
           .margin({ right: this.gridMargin })
@@ -183,7 +188,7 @@ struct Home {
           //设置图标
           Button({ type: ButtonType.Circle, stateEffect: true }) {
             SymbolGlyph($r('sys.symbol.gearshape'))
-              .fontSize(24)
+              .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
               .fontColor([this.icon_primary]) //设置图标无法分层设为单色
           }
           .margin({ right: this.gridMargin })
