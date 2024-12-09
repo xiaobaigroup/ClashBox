@@ -1,5 +1,6 @@
 // 对通过媒体查询监听断点的功能的简单封装
 import { mediaquery } from '@kit.ArkUI'
+import { hilog } from '@kit.PerformanceAnalysisKit'
 
 export type BreakpointType = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl'
 
@@ -51,11 +52,13 @@ export class BreakpointSystem {
       }
       breakpoint.mediaQueryListener = mediaquery.matchMediaSync(condition)
       if (breakpoint.mediaQueryListener.matches) {
+        hilog.info(0x1000, 'breakpointsystem', `#媒体查询#初始断点改变#${condition}#Breakpoint.name: ${breakpoint.name}}`)
         this.updateAllState(breakpoint.name)
       }
       breakpoint.mediaQueryListener.on('change', (mediaQueryResult) => {
         if (mediaQueryResult.matches) {
           this.updateAllState(breakpoint.name)
+          hilog.info(0x1000, 'breakpointsystem', `#媒体查询#断点改变#${condition}#Breakpoint.name: ${breakpoint.name}}`)
         }
       })
     })
@@ -77,10 +80,10 @@ export class BreakpointSystem {
 
 export interface BreakpointOptions<T> {
   xs?: T
-  sm?: T
-  md?: T
-  lg?: T
-  xl?: T
+  sm: T
+  md: T
+  lg: T
+  xl: T
   xxl?: T
 }
 
@@ -108,9 +111,14 @@ export class BreakpointState<T extends Object> {
     } else if (type === 'xl') {
       this.value = this.options.xl
     } else if (type === 'xxl') {
-      this.value = this.options.xxl
+      if (this.options?.xxl === undefined){
+        this.value = this.options.xl
+      } else {
+        this.value = this.options.xxl
+      }
     } else {
-      this.value = undefined
+      this.value = this.options.xl
+      hilog.info(0x1000, 'breakpointsystem', `#update(): 当前系统断点[${type}]没有匹配到对应的断点数据，默认使用xl断点数据`)
     }
   }
 }

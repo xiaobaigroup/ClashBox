@@ -41,7 +41,8 @@ struct Index {
   //  @State fontColorValue:ResourceColor = ($r('app.color.tabs_icon_text'));
   //  @State fontColorValue1:ResourceColor = ($r('app.color.tabs_icon_text1'));
     @State currentIndex: number = 0
-    @State isLandscape:boolean = false
+  // 设备高度是否 (320vp< height <= 500vp) 媒体查询
+    @State isLandscapePhone:boolean = false
     @StorageProp('bottomRectHeight') bottomRectHeight: number = 0;// 读取导航条区域的高度
     @StorageProp('topRectHeight') topRectHeight: number = 0;
     @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
@@ -93,7 +94,7 @@ struct Index {
           SymbolGlyph(TabIcon)
             .fontColor([this.currentIndex === index ? this.icon_emphasize : this.icon_tertiary])
             .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-            .fontSize(this.isLandscape ? 24 : this.TabIconfontSize.value)
+            .fontSize(this.isLandscapePhone ? 24 : this.TabIconfontSize.value)
             .margin({top: 5})
             .effectStrategy(SymbolEffectStrategy.SCALE)
 
@@ -101,25 +102,25 @@ struct Index {
             .fontColor(this.currentIndex === index ? this.icon_emphasize : this.icon_tertiary)
             .fontWeight(FontWeight.Medium)
             .margin(this.compMargin.value)
-            .fontSize(this.isLandscape ? 12 : this.TabTitlefontSize.value)
+            .fontSize(this.isLandscapePhone ? 12 : this.TabTitlefontSize.value)
         }
-        .margin(this.isLandscape ? {left: 39 } : '0vp')
+        .margin(this.isLandscapePhone ? {left: 39 } : '0vp')
       }
       .width('100%')
       .height('100%')
     }
 
 
-    // 当设备横屏时条件成立 ps:现在用于判定是否手机横屏
+    // 当设备横屏时条件成立 ps:现在用于判定是否手机(大折叠除外)横屏
     deviceHeightListener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
 
     aboutToAppear() {
 
       // 开启change监听
       this.deviceHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
-        this.isLandscape = mediaQueryResult.matches
-        AppStorage.setOrCreate('isLandscapePhone', mediaQueryResult.matches)
-        hilog.info(0x1000, this.componentName, `#媒体查询#设备高度改变#(320vp< height <= 500vp)结果: ${mediaQueryResult.matches}`)
+        this.isLandscapePhone = mediaQueryResult.matches
+        AppStorage.setOrCreate<boolean>('isLandscapePhone', this.isLandscapePhone)
+        hilog.info(0x1000, this.componentName, `#媒体查询#设备高度改变#(320vp< height <= 500vp)结果: ${this.isLandscapePhone}`)
       });
 
       BreakpointSystem.getInstance().attach(this.compStr)
@@ -153,19 +154,19 @@ struct Index {
 
 
     // 改变设备横竖屏状态函数
-    /*private changeOrientation(isLandscape: boolean) {
+    /*private changeOrientation(isLandscapePhone: boolean) {
       // 获取UIAbility实例的上下文信息
       let context:common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
       // 调用该接口手动改变设备横竖屏状态
       window.getLastWindow(context).then((lastWindow) => {
-        lastWindow.setPreferredOrientation(isLandscape ? window.Orientation.LANDSCAPE : window.Orientation.PORTRAIT)
+        lastWindow.setPreferredOrientation(isLandscapePhone ? window.Orientation.LANDSCAPE : window.Orientation.PORTRAIT)
       });
     }*/
 
   build() {
     Column() {
       Tabs({
-        barPosition:this.isLandscape ? BarPosition.Start : this.compBarPose.value
+        barPosition:this.isLandscapePhone ? BarPosition.Start : this.compBarPose.value
       }) {
         TabContent() {
           Home()
@@ -192,9 +193,9 @@ struct Index {
       //.blur(50)
       .backgroundColor($r('app.color.background'))
       .backdropBlur(60)
-      .vertical(this.isLandscape ? true : this.compVertical.value)/**/
-      .barWidth(this.isLandscape ? '63vp' : this.compBarWidth.value)/**/
-      .barHeight(this.isLandscape ? '100%' : this.compBarHeight.value)/**/
+      .vertical(this.isLandscapePhone ? true : this.compVertical.value)/**/
+      .barWidth(this.isLandscapePhone ? '63vp' : this.compBarWidth.value)/**/
+      .barHeight(this.isLandscapePhone ? '100%' : this.compBarHeight.value)/**/
       .margin(this.compMargin.value)
       .animationDuration(200)
       .onChange((index: number) => {
