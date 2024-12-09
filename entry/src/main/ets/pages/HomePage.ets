@@ -175,6 +175,7 @@ struct Home {
             .fontSize(32)
             .fontWeight(FontWeight.Bold)
             .margin({ left: this.gridMargin })
+            .fontColor(this.font_primary)
           Blank()
           //编辑图标
           Button({ type: ButtonType.Circle, stateEffect: true }) {

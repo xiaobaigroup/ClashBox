@@ -1,4 +1,5 @@
 import { BreakpointState } from "../../common/breakpointsystem";
+import { LIST_ITEM_HEIGHT } from "../../common/Constants";
 
 interface ConfigAddType {
   symbolStart? : Resource,
@@ -26,10 +27,10 @@ struct ConfigAdd {
         ForEach( this.configAddTypeArray, (item: ConfigAddType, index: number)=> {
           ListItem(){
             Row(){
-              SymbolGlyph(item.symbolStart).fontSize(24).fontColor([$r('app.color.settings_icon')]).margin({ right: 20 })
+              SymbolGlyph(item.symbolStart).fontSize(24).fontColor([$r('sys.color.font_primary')]).margin({ right: 20 })
               Text(item.text).fontSize(16).fontColor($r('sys.color.font_primary'))
               Blank()
-              SymbolGlyph(item.symbolEnd).fontSize(24).fontColor([$r('app.color.settings_icon')])
+              SymbolGlyph(item.symbolEnd).fontSize(24).fontColor([$r('sys.color.font_primary')])
             }
             .width('100%')
             .padding({ left: 12, right: 12 })
@@ -37,7 +38,7 @@ struct ConfigAdd {
           }
           .backgroundColor($r('app.color.container_background'))
           .width('100%')
-          .height(56)
+          .height(LIST_ITEM_HEIGHT)
           .clickEffect({ level: ClickEffectLevel.MIDDLE })
           .borderRadius(20)
         })

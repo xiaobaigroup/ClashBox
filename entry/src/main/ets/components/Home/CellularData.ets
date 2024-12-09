@@ -29,7 +29,7 @@ struct TrafficStatistics {
        this.iconFourth = theme.colors.iconFourth;
      }
    */
-  @State font_secondary: ResourceColor = $r('sys.color.font_secondary')
+  @State font_primary: ResourceColor = $r('sys.color.font_primary')
   @State TotalDownloads: number = 0
   @State TotalUpload: number = 0
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
@@ -100,6 +100,7 @@ struct TrafficStatistics {
         .fontSize(this.isLandscapePhone ? 18 : this.titleFontSize.value)
           //.margin({left:this.RowPadding.value})
         .fontWeight(FontWeight.Bold)
+        .fontColor($r('sys.color.font_primary'))
       Column() {
         Row() {
           Column() {
@@ -139,7 +140,7 @@ struct TrafficStatistics {
         .margin(this.barMargin.value)
         Text($r('app.string.CellularData_Statistics_explanation'))
           .fontSize(this.isLandscapePhone ? 14 : this.fontSize.value)
-          .fontColor(this.font_secondary)
+          .fontColor(this.font_primary)
 
       }
       .width('100%')

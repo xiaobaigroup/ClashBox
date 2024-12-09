@@ -135,3 +135,7 @@ export const BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36: BreakpointState<number> =
   lg: 36,
   xl: 36
 })
+
+/* List 相关*/
+// ListItem的高度
+export const LIST_ITEM_HEIGHT: number = 56
