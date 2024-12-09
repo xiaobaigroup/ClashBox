@@ -452,9 +452,19 @@ struct ProxyPage {
   }
 
   handleCheck(index: number) {
+    // let previousIndex = 0
+    // previousIndex = index
+    // let itemAllData = this.proxyGroup1List
+
     let itemData = this.proxyGroup1List[index]
     itemData.isCheck = !itemData.isCheck
     this.proxyGroup1List.splice(index, 1, itemData)
+  }
+
+  handleChange(index: number) {
+    let itemRadioData = this.proxyGroup1List[index]
+    itemRadioData.isCheck = !itemRadioData.isCheck
+    this.proxyGroup1List.splice(index, 1, itemRadioData)
   }
 
   build() {
@@ -517,6 +527,9 @@ struct ProxyPage {
                       itemObj: item,
                       onCheck: (index: number) => {
                         this.handleCheck(index)
+                      },
+                      onRadioChange: (index: number) => {
+                        this.handleChange(index)
                       }
                     })
                       .backgroundColor($r('app.color.container_background'))

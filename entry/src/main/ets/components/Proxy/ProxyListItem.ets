@@ -15,8 +15,8 @@ struct ProxyListItem {
   @Prop index: number
 
 
-  onCheck = (index: number) => {
-  }
+  onCheck = (index: number) => {}
+  onRadioChange = (index: number) => {}
 
   aboutToAppear(): void {
 
@@ -69,10 +69,10 @@ struct ProxyListItem {
           })
           .height(20)
           .width(20)
-          // .onChange((isChecked: boolean) => {
-          //   console.info('Radio2 change is' + isChecked)
-          //   this.onCheck(this.index)
-          // })
+          .onChange((isChecked: boolean) => {
+            console.info('Radio2 change is' + isChecked)
+            this.onRadioChange(this.index)
+          })
 
       }
       .height(58)
