@@ -14,7 +14,7 @@ interface MarginGenerate {
 @Component
 struct SwitchQuickly {
   //自定义主题，颜色在AppTheme里面修改
-  @State font_secondary: ResourceColor = $r('sys.color.font_secondary')
+  @State font_primary: ResourceColor = $r('sys.color.font_primary')
   /*
   @State backgroundPrimary: ResourceColor = $r('sys.color.background_primary')
   @State fontPrimary: ResourceColor = $r('sys.color.font_primary')
@@ -80,13 +80,13 @@ struct SwitchQuickly {
     Column() {
       Text($r('app.string.SwitchQuickly'))
         .fontSize(this.isLandscapePhone ? 18 : this.fontSize.value)
+        .fontColor(this.font_primary)
           //.margin({left:this.RowPadding.value})
         .fontWeight(FontWeight.Bold)
       Row() {
         Text(this.switchQuickly)
           .fontSize(23)
-          .fontColor('grey')
-          .fontColor(this.font_secondary)
+          .fontColor(this.font_primary)
       }
       .flexGrow(1)
       .width('100%')

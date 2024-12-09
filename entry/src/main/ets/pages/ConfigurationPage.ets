@@ -10,6 +10,7 @@ import {
   ANIMATION_DURATION_300,
   TAB_CONTENT_TITLE_HEIGHT,
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE,
+  LIST_ITEM_HEIGHT,
 } from '../common/Constants'
 import { LengthMetrics, promptAction, SymbolGlyphModifier } from '@kit.ArkUI'
 import ConfigAdd from '../components/Configuration/ConfigAdd'
@@ -60,7 +61,7 @@ struct ConfigurationPage {
   /* 配置列表List相关 */
   // 当前单选框选择的配置
   @State
-  private proxyRadioCheckedValue: number = -1
+  private currentConfigRadioCheckedValue: number = -1
   // 当前手指触摸的ListItem的对应 this.configList[index]
   @State
   private currentTouchConfigListIndex: number = -1
@@ -116,15 +117,19 @@ struct ConfigurationPage {
         ForEach(this.configListLongPressCtxMenus, (item: LongPressContextMenuItem, index: number) => {
           MenuItem({ symbolStartIcon: item?.symbolStartIcon, content: item?.content })
             .clickEffect({level: ClickEffectLevel.MIDDLE})
+            .contentFontColor($r('sys.color.font_primary'))
             .onClick( () => {
               // hilog.info(0xC002, this.componentName, `#configListLongPressCtxMenuBuilder#onClick():`)
               item.callback()
             })
         })
         // 文字红色 单独处理
-        MenuItem({ symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.trash_fill'))
-          .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
-          .fontColor(['#E6E54E36']), content: '删除' })
+        MenuItem({
+          symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.trash_fill'))
+            .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
+            .fontColor(['#E6E54E36']),
+          content: '删除'
+        })
           .contentFontColor('#E6E54E36')
           .onClick( () => {
             this.deleteConfig()
@@ -161,6 +166,7 @@ struct ConfigurationPage {
           Text($r('app.string.Configuration'))
             .fontSize(TAB_CONTENT_TITLE_FONT_SIZE)
             .fontWeight(TAB_CONTENT_TITLE_FONT_WEIGHT)
+            .fontColor($r('sys.color.font_primary'))
           Blank()
           //  刷新图标
           Button({ type: ButtonType.Circle, stateEffect: true }) {
@@ -202,8 +208,8 @@ struct ConfigurationPage {
                   Text(`index:${index}`).fontColor($r('sys.color.font_secondary'))
                 }.alignItems(HorizontalAlign.Start)
                 Blank()
-                Radio({ value: 'radio' + index, group: 'proxyConfigurationGroup' })
-                  .checked(index === this.proxyRadioCheckedValue)
+                Radio({ value: 'radio' + index, group: 'configGroup' })
+                  .checked(index === this.currentConfigRadioCheckedValue)
               }
               .width('100%')
               .padding({ left: 12, right: 12 })
@@ -211,7 +217,7 @@ struct ConfigurationPage {
             }
             .backgroundColor($r('app.color.container_background'))
             .width('100%')
-            .height(56)
+            .height(LIST_ITEM_HEIGHT)
             .clickEffect({ level: ClickEffectLevel.MIDDLE })
             .borderRadius(20)
             .bindContextMenu(this.configListLongPressCtxMenuBuilder, ResponseType.LongPress | ResponseType.RightClick,
@@ -221,7 +227,7 @@ struct ConfigurationPage {
                 placement: Placement.BottomRight
               })
             .onClick(() => {
-              this.proxyRadioCheckedValue = index
+              this.currentConfigRadioCheckedValue = index
               hilog.info(0xC002, this.componentName, `#ListItem#onClick: `)
             })
             .onTouch((event: TouchEvent) => {

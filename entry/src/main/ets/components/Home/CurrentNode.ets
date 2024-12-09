@@ -28,7 +28,7 @@ struct CurrrentNode {
      this.iconFourth = theme.colors.iconFourth;
    }
  */
-  @State font_secondary: ResourceColor = $r('sys.color.font_secondary')
+  @State font_primary: ResourceColor = $r('sys.color.font_primary')
   @State currentNode: string = '暂无节点'
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
@@ -81,11 +81,12 @@ struct CurrrentNode {
         .fontSize(this.isLandscapePhone ? 18 : this.fontSize.value)
         //.margin({left:this.RowPadding.value})
         .fontWeight(FontWeight.Bold)
+        .fontColor($r('sys.color.font_primary'))
       Row() {
         Text(this.currentNode)
           .fontSize(23)
           .fontColor('grey')
-          .fontColor(this.font_secondary)
+          .fontColor(this.font_primary)
       }
       .flexGrow(1)
       .width('100%')

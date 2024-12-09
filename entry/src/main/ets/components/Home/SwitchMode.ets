@@ -16,7 +16,7 @@ interface MarginGenerate {
 struct SwitchMode {
   private componentName:string = 'SwitchMode'
   //自定义主题，颜色在AppTheme里面修改
-  @State font_secondary: ResourceColor = $r('sys.color.font_secondary')
+  @State font_primary: ResourceColor = $r('sys.color.font_primary')
   @State icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize')//高亮图标，蓝色
 /*
   @State backgroundPrimary: ResourceColor = $r('sys.color.background_primary')
@@ -91,6 +91,7 @@ struct SwitchMode {
       Text($r('app.string.Mode'))
         .fontSize(this.isLandscapePhone ? 18 : this.titleFontSize.value)
         .fontWeight(FontWeight.Bold)
+        .fontColor($r('sys.color.font_primary'))
         //.margin({left:this.RowPadding.value, bottom:7})
       Column() {
         Row() {
@@ -103,7 +104,7 @@ struct SwitchMode {
             .fontWeight(FontWeight.Bold)
             .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
             .margin(this.isLandscapePhone ? { left: 15 }: this.fontMargin.value)
-            .fontColor(this.font_secondary)
+            .fontColor(this.font_primary)
         }
         Row() {
           Radio({ value: 'overall', group: 'connectModeRadioGroup', indicatorType: RadioIndicatorType.DOT })
@@ -115,7 +116,7 @@ struct SwitchMode {
             .fontWeight(FontWeight.Bold)
             .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
             .margin(this.isLandscapePhone ? { left: 15 }: this.fontMargin.value)
-            .fontColor(this.font_secondary)
+            .fontColor(this.font_primary)
         }
         .margin({top: this.RowPadding.value})
         Row() {
@@ -128,7 +129,7 @@ struct SwitchMode {
             .fontWeight(FontWeight.Bold)
             .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
             .margin(this.isLandscapePhone ? { left: 15 }: this.fontMargin.value)
-            .fontColor(this.font_secondary)
+            .fontColor(this.font_primary)
         }
         .margin({top: this.RowPadding.value})
       }

@@ -228,6 +228,7 @@ struct Speed {
           //网络速率
           Text($r('app.string.Speed'))
             .fontSize(this.fontSize.value)
+            .fontColor($r('sys.color.font_primary'))
         }
         .width('145vp')
         //.margin({ top: 10, left: 20 })

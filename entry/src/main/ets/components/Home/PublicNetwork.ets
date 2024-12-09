@@ -14,7 +14,7 @@ interface MarginGenerate {
 @Component
 struct PublicNetwork {
   //自定义主题，颜色在AppTheme里面修改
-  @State font_secondary: ResourceColor = $r('sys.color.font_secondary')
+  @State font_primary: ResourceColor = $r('sys.color.font_primary')
   /*
     @State backgroundPrimary: ResourceColor = $r('sys.color.background_primary')
     @State fontPrimary: ResourceColor = $r('sys.color.font_primary')
@@ -98,14 +98,14 @@ struct PublicNetwork {
         Row() {
           Text(this.address)
             .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-            .fontColor(this.font_secondary)
+            .fontColor(this.font_primary)
         }
         .justifyContent(FlexAlign.Start)
         Text(this.IP)
           .fontSize(this.isLandscapePhone ? 20 : this.IPfontSize.value)
           .textAlign(TextAlign.Center)
           .margin(this.RowPadding.value)
-          .fontColor(this.font_secondary)
+          .fontColor(this.font_primary)
 
       }
       .alignItems(HorizontalAlign.Start)
