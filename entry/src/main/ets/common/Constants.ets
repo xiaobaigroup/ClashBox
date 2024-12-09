@@ -32,9 +32,9 @@ export  const ListMoreData = (): moreData[] => {
 export  const ListOverwriteData = (): moreData[] => {
   let result: moreData[] = new Array()
   result = [
-    new moreData($r('sys.symbol.pencil_line_1'), 'Log', $r('app.string.Basic'),  false),
-    new moreData($r('sys.symbol.worldclock'), 'Resources', $r('app.string.Network'), false),
-    new moreData($r('sys.symbol.externaldrive_fill_3'), 'Request', $r('app.string.DNS'), false),
+    new moreData($r('sys.symbol.pencil_line_1'), 'Basic', $r('app.string.Basic'),  false),
+    new moreData($r('sys.symbol.worldclock'), 'Network', $r('app.string.Network'), false),
+    new moreData($r('sys.symbol.externaldrive_fill_3'), 'DNS', $r('app.string.DNS'), false),
   ]
   return result
 }
@@ -71,12 +71,23 @@ export const SettingsListItem = (): settingsData[] => {
     new settingsData($r('sys.symbol.translate_c2e'), 'Language', $r('app.string.Language'), '', $r('app.string.LanguageHint_Zh'), false),
     new settingsData($r('sys.symbol.brush_fill'), 'Appearance', $r('app.string.Appearance'), $r('app.string.AppearanceSubtitle'), '', false),
     new settingsData($r('sys.symbol.externaldrive_fill'), 'Backup', $r('app.string.Backup_Recovery'), $r('app.string.BackgrounderSubtitle'), '', false),
-    new settingsData($r('sys.symbol.lock_fill'), 'ApplicationLock', $r('app.string.ApplicationLock'), $r('app.string.ApplicationicationLockSubtitle'), '', false),
+    new settingsData($r('sys.symbol.lock_fill'), 'ApplicationLock', $r('app.string.ApplicationLock'), $r('app.string.ApplicationicationLockSubtitle'), $r('app.string.Opened'), false),
     new settingsData($r('sys.symbol.ellipsis_message_fill'), 'Notice', $r('app.string.Notice'), $r('app.string.NoticeSubtitle'), '', false),
     new settingsData($r('sys.symbol.checkmark_square_on_square_fill'), 'Backgrounder', $r('app.string.Backgrounder'), $r('app.string.BackgrounderSubtitle'), '', false),
     new settingsData($r('sys.symbol.trash_fill'), 'WipeData', $r('app.string.WipeData'), $r('app.string.WipeDataSubtitle'), '', false),
     new settingsData($r('sys.symbol.person_shield_fill'), 'Disclaimer', $r('app.string.Disclaimer'), '', '', false),
     new settingsData($r('sys.symbol.info_circle'), 'About', $r('app.string.About'), '', '', false),
+  ]
+  return result
+}
+
+// 设置页列表项
+export const LanguageListItem = (): settingsData[] => {
+  let result: settingsData[] = new Array()
+  result = [
+    new settingsData($r('sys.symbol.translate_c2e'), 'zh', $r('app.string.LanguageHint_Zh'), '', '', false),
+    new settingsData($r('sys.symbol.brush_fill'), 'es', $r('app.string.LanguageHint_es'), '', '', false),
+    //
   ]
   return result
 }

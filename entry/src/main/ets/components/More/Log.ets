@@ -122,9 +122,12 @@ struct Log {
     .backgroundColor($r('app.color.background'))
     //.title(this.TopBuilder)//getResourceString($r('app.string.Log'), this)
     .onBackPressed(() => {
-      this.pageInfos.clear();
-      return true;
-      this.isShowMenu = false
+      if (this.isShowMenu) {
+        this.isShowMenu = false
+      } else {
+        this.pageInfos.clear()
+      }
+      return true
     })
   }
 }

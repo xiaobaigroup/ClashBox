@@ -58,10 +58,10 @@ struct MorePage {
   }
 
   aboutToDisappear(): void {
-    BreakpointSystem.getInstance().attach(this.compStr)
-    BreakpointSystem.getInstance().attach(this.morePageMargin)
-    BreakpointSystem.getInstance().attach(this.listBottom)
-    BreakpointSystem.getInstance().stop()
+    // BreakpointSystem.getInstance().attach(this.compStr)
+    // BreakpointSystem.getInstance().attach(this.morePageMargin)
+    // BreakpointSystem.getInstance().attach(this.listBottom)
+    // BreakpointSystem.getInstance().stop()
   }
 
 
@@ -97,6 +97,7 @@ struct MorePage {
   }
 
   build() {
+    // Column() {
       Navigation(this.pageInfos) {
         Row() {
           Text($r('app.string.More'))
@@ -108,66 +109,66 @@ struct MorePage {
         .margin({left: this.morePageMargin.value})
         .width('100%')
 
-            List() {
-              ForEach(this.moreList, (item: moreData, index: number) => {
-                ListItem() {
-                  moreListItem({
-                    index: index,
-                    itemObj: item,
-                    onCheck: (index: number) => {
-                      this.handleCheck(index)
-                    }
-                  })
+        List() {
+          ForEach(this.moreList, (item: moreData, index: number) => {
+            ListItem() {
+              moreListItem({
+                index: index,
+                itemObj: item,
+                onCheck: (index: number) => {
+                  this.handleCheck(index)
                 }
-                .margin({bottom: this.listBottom.value })
-              })
-              ListItem() {
-                Row() {
-                  SymbolGlyph($r('sys.symbol.gearshape'))
-                    .fontSize(24)
-                    .margin({left: 12})
-                  Text($r('app.string.Settings'))
-                    .height(48)
-                    .fontWeight(FontWeight.Medium)
-                    .padding({ left: 12 })
-                    .fontSize(16)
-                  Blank()
-                  Row()
-                    .width(10)
-                    .height(10)
-                    .margin({ right: 20 })
-                    .border({
-                      width: {
-                        top: 2,
-                        right: 2
-                      },
-                      color: '#000000'
-                    })
-                    .rotate({ angle: 45 })
-                }
-                .width('100%')
-                .height(53)
-                .borderRadius(20)
-                .backgroundColor($r('app.color.container_background'))
-              }
-              .onClick(() => {
-                this.isShowSettings = true
-              })
-              .bindSheet($$this.isShowSettings, SettingsSheet(), {
-                detents: [700, SheetSize.MEDIUM, 200],
-                backgroundColor: $r('app.color.settings_container_background'),
-                blurStyle: BlurStyle.BACKGROUND_REGULAR,
-                showClose: true,
-                title: { title: $r('app.string.Settings') },
               })
             }
-            //.height(400)
-            .margin({ top: 10, left: this.morePageMargin.value, right: this.morePageMargin.value })
-            .borderRadius(18)
-            .alignListItem(ListItemAlign.Center)
+            .margin({bottom: this.listBottom.value })
+          })
+          ListItem() {
+            Row() {
+              SymbolGlyph($r('sys.symbol.gearshape'))
+                .fontSize(24)
+                .margin({left: 12})
+              Text($r('app.string.Settings'))
+                .height(48)
+                .fontWeight(FontWeight.Medium)
+                .padding({ left: 12 })
+                .fontSize(16)
+              Blank()
+              Row()
+                .width(10)
+                .height(10)
+                .margin({ right: 20 })
+                .border({
+                  width: {
+                    top: 2,
+                    right: 2
+                  },
+                  color: '#000000'
+                })
+                .rotate({ angle: 45 })
+            }
+            .width('94%')
+            .height(53)
+            .borderRadius(20)
+            .backgroundColor($r('app.color.container_background'))
+          }
+          .onClick(() => {
+            this.isShowSettings = true
+          })
+          .bindSheet($$this.isShowSettings, SettingsSheet(), {
+            detents: [700, SheetSize.MEDIUM, 200],
+            backgroundColor: $r('app.color.settings_container_background'),
+            blurStyle: BlurStyle.BACKGROUND_REGULAR,
+            showClose: true,
+            //title: { title: $r('app.string.Settings') },
+          })
+        }
+        .width('100%')
+        .height(700)
+        .margin({ top: 10, left: this.morePageMargin.value, right: this.morePageMargin.value })
+        .borderRadius(18)
+        .alignListItem(ListItemAlign.Center)
 
       }
-      //.title($r('app.string.More'))
       .mode(this.isLandscapePhone ? NavigationMode.Stack : NavigationMode.Auto)
       .navDestination(this.PagesMap)
       .width('100%')
@@ -177,7 +178,7 @@ struct MorePage {
 
 export default MorePage
 
-// 通过@Builder构建模态展示界面
+// 通过@Builder构建设置模态展示界面
 @Builder function SettingsSheet() {
 
   Column() {

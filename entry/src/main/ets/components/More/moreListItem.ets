@@ -31,7 +31,7 @@ struct moreListItem {
           })
           .rotate({ angle: 45 })
       }
-      .width('100%')
+      .width('94%')
       .height(53)
       .borderRadius(20)
       .backgroundColor($r('app.color.container_background'))

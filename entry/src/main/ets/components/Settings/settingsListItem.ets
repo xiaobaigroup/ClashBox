@@ -25,22 +25,13 @@ struct settingsListItem {
         Blank()
         Text(this.itemObj.hint)
           .fontColor('gray')
-          .padding({ left: 12 })
+          .padding({ left: 8 })
           .fontSize(14)
-        Row()
-          .width(10)
-          .height(10)
-          .margin({ right: 20 })
-          .border({
-            width: {
-              top: 2,
-              right: 2
-            },
-            color: '#000000'
-          })
-          .rotate({ angle: 45 })
+        SymbolGlyph($r('sys.symbol.chevron_right'))
+          .fontSize(24)
+          .margin({left: 12, right: 12})
       }
-      .width('100%')
+      .width('94%')
       .height(53)
       .borderRadius(20)
       .backgroundColor($r('app.color.container_background'))

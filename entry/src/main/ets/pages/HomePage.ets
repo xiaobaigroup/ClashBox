@@ -13,6 +13,8 @@ import { gAppTheme } from '../common/AppTheme'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Timer } from '../common/HHmmssTimer'
 import { PROXY_STARTED_DURATION_INIT_VALUE, ANIMATION_DURATION_300 } from '../common/Constants'
+import Settings from '../components/Settings/Settings'
+
 // 在页面build前执行ThemeControl，就可以改变主题颜色
 //ThemeControl.setDefaultTheme(gAppTheme)
 
@@ -27,6 +29,8 @@ interface MarginGenerate {
 @Entry
 @Component
 struct Home {
+  // 设置按钮导航
+  @Provide('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
 
   private componentName: string = 'HomePage'
 
@@ -192,10 +196,10 @@ struct Home {
           })
           .bindSheet($$this.isShowSettings, SettingsSheet(), {
             detents: [700, SheetSize.MEDIUM, 200],
-            //backgroundColor: Color.Gray,
-            blurStyle: BlurStyle.Thick,
+            backgroundColor: $r('app.color.settings_container_background'),
+            blurStyle: BlurStyle.BACKGROUND_REGULAR,
             showClose: true,
-            title: { title: $r('app.string.Settings') },
+            //title: { title: $r('app.string.Settings') },
           })
         }
         .width('100%')
@@ -491,7 +495,7 @@ export default Home
 @Builder function SettingsSheet() {
 
   Column() {
-    Text('设置')
+    Settings()
   }
   .width('100%')
   .height('100%')
