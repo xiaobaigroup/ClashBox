@@ -57,7 +57,9 @@ struct ProxyPage {
   @State font_secondary: ResourceColor = $r('sys.color.font_secondary') //二级文本色，深灰色
   @State font_on_primary: ResourceColor = $r('sys.color.font_on_primary') //一级文本反色，白色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
-  @State comp_divider: ResourceColor = $r('sys.color.comp_divider') //分割线
+  @State comp_divider: ResourceColor = $r('sys.color.comp_divider') //分割线颜色
+  @State background_secondary: ResourceColor = $r('sys.color.background_secondary') //二级背景色，实色
+
   //长按菜单图标
   @State startIconModifier: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.star')).fontSize('24vp');
   @State startIconModifier1: SymbolGlyphModifier =
