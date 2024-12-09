@@ -454,7 +454,7 @@ struct ProxyPage {
   handleCheck(index: number) {
     let itemData = this.proxyGroup1List[index]
     itemData.isCheck = !itemData.isCheck
-    //this.proxyGroup1List.splice(index, 1, itemData)
+    this.proxyGroup1List.splice(index, 1, itemData)
   }
 
   build() {

@@ -10,6 +10,7 @@ struct ProxyListItem {
   @State icon_fourth: ResourceColor = $r('sys.color.icon_fourth') //四级图标色，灰色
   @State font_secondary: ResourceColor = $r('sys.color.font_secondary') //二级文本色，灰色
   @State color: ResourceColor = $r('sys.color.font_secondary')
+  @State private RadioCheckedValue:number = -1
   @Prop itemObj: ProxyData
   @Prop index: number
 
@@ -42,11 +43,8 @@ struct ProxyListItem {
             Text(this.itemObj.name)
               .fontSize(20)
               .fontColor(this.font_primary)
-          //    .textAlign(TextAlign.Start)
-
             Text(this.itemObj.passage)
               .fontSize(14)
-        //      .textAlign(TextAlign.Start)
               .fontColor(this.font_secondary)
           }
           .alignItems(HorizontalAlign.Start)
@@ -60,23 +58,21 @@ struct ProxyListItem {
         .padding({right: 10 })
         .justifyContent(FlexAlign.SpaceBetween)
 
-
         Radio({
           value: 'Radio', group: 'radioGroup',
           indicatorType: RadioIndicatorType.TICK
         })
-          .checked(false)
+          .checked(this.itemObj.isCheck)
           .radioStyle({
             checkedBackgroundColor: this.icon_emphasize,
             //   uncheckedBorderColor: this.icon_secondary
           })
-
           .height(20)
           .width(20)
-          .onChange((isChecked: boolean) => {
-            console.info('Radio2 change is' + isChecked)
-            this.onCheck(this.index)
-          })
+          // .onChange((isChecked: boolean) => {
+          //   console.info('Radio2 change is' + isChecked)
+          //   this.onCheck(this.index)
+          // })
 
       }
       .height(58)
@@ -85,6 +81,9 @@ struct ProxyListItem {
       .alignItems(VerticalAlign.Center)
       .justifyContent(FlexAlign.SpaceBetween)
     }
+    .onClick(() => {
+      this.onCheck(this.index)
+    })
   }
 }
 
