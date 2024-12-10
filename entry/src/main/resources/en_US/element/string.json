@@ -211,6 +211,66 @@
     {
       "name": "Closed",
       "value": "Closed"
+    },
+    {
+      "name": "Edit",
+      "value": "Edit"
+    },
+    {
+      "name": "Tabs",
+      "value": "Tabs(Default)"
+    },
+    {
+      "name": "List",
+      "value": "List"
+    },
+    {
+      "name": "Default",
+      "value": "Default"
+    },
+    {
+      "name": "Delay",
+      "value": "Delay"
+    },
+    {
+      "name": "Name",
+      "value": "Name"
+    },
+    {
+      "name": "Relax",
+      "value": "Relax(Single-row)"
+    },
+    {
+      "name": "Compact",
+      "value": "Default(Multicolumn)"
+    },
+    {
+      "name": "Packet_mode",
+      "value": "Packet Mode"
+    },
+    {
+      "name": "Arrangement",
+      "value": "Arrangement"
+    },
+    {
+      "name": "Layout",
+      "value": "Layout"
+    },
+    {
+      "name": "Collect",
+      "value": "Collect"
+    },
+    {
+      "name": "Test_Delay",
+      "value": "Delay Testing"
+    },
+    {
+      "name": "Test_Speed",
+      "value": "Test Speed"
+    },
+    {
+      "name": "Delay_Speed",
+      "value": "The difference between speed and delay"
     }
   ]
 }

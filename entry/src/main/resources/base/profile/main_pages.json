@@ -2,7 +2,6 @@
   "src": [
     "pages/Index",
     "pages/HomePage",
-    "pages/ProxyPageTwo",
     "pages/ConfigurationPage",
     "pages/MorePage"
 

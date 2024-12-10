@@ -2,7 +2,7 @@
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
 import { mediaquery, window } from '@kit.ArkUI'
 import Home from './HomePage'
-import ProxyPage  from './ProxyPageTwo'
+import ProxyPage  from './ProxyPage'
 import ConfigurationPage from './ConfigurationPage'
 import MorePage from './MorePage'
 import { hilog } from '@kit.PerformanceAnalysisKit'

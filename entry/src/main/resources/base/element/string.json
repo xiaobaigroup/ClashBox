@@ -211,6 +211,66 @@
     {
       "name": "Closed",
       "value": "已关闭"
+    },
+    {
+      "name": "Edit",
+      "value": "编辑"
+    },
+    {
+      "name": "Tabs",
+      "value": "标签页(默认)"
+    },
+    {
+      "name": "List",
+      "value": "列表"
+    },
+    {
+      "name": "Default",
+      "value": "默认"
+    },
+    {
+      "name": "Delay",
+      "value": "延迟"
+    },
+    {
+      "name": "Name",
+      "value": "名称"
+    },
+    {
+      "name": "Relax",
+      "value": "宽松(单列)"
+    },
+    {
+      "name": "Compact",
+      "value": "标准(多列)"
+    },
+    {
+      "name": "Packet_mode",
+      "value": "分组方式"
+    },
+    {
+      "name": "Arrangement",
+      "value": "排列方式"
+    },
+    {
+      "name": "Layout",
+      "value": "布局"
+    },
+    {
+      "name": "Collect",
+      "value": "收藏"
+    },
+    {
+      "name": "Test_Delay",
+      "value": "测速延迟"
+    },
+    {
+      "name": "Test_Speed",
+      "value": "测试速度"
+    },
+    {
+      "name": "Delay_Speed",
+      "value": "速度和延迟的区别"
     }
   ]
 }
