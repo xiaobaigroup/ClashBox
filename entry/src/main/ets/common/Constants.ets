@@ -1,5 +1,27 @@
 import { BreakpointState } from "./breakpointsystem";
 
+
+/* 基础 */
+// borderRadius 20
+export const BORDER_RADIUS_20: number = 20
+// bindSheet Title 整体高度
+export const BIND_SHEET_TITLE_CONTAINER_HEIGHT: number = 56
+// bindSheet 在不使用默认的dragBar时，填充dragBar区域所占位的高度
+export const BIND_SHEET_DRAG_BAR_HEIGHT: number = 16
+// bindSheet Title 左侧返回symbol 高度
+export const BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT: number = 40
+// bindSheet Title 左侧返回symbol 高度
+export const BIND_SHEET_TITLE_LEFT_SYMBOL_HEIGHT: number = 40
+// bindSheet Title 左侧返回symbol 大小
+export const BIND_SHEET_TITLE_LEFT_SYMBOL_FONT_SIZE: number = 24
+// bindSheet Title main fontSize
+export const BIND_SHEET_MAIN_FONTSIZE: number = 20
+// bindSheet Title main fontWeight
+export const BIND_SHEET_MAIN_FONT_WEIGHT: number = FontWeight.Bold
+// bindSheet Title sub fontSize
+export const BIND_SHEET_SUB_FONTSIZE: number = 14
+
+
 // 更多列表类
 export class moreData {
   icons: Resource;
@@ -127,6 +149,15 @@ export const BPS_LIST_GUTTER_1_1_2_3_3: BreakpointState<number> = BreakpointStat
   xl: 20
 })
 
+// bindSheet内List内边距 Padding（主要是为了bindSheet内使用Navigation套List使用的，因为路由在md设备往上的默认双栏效果）
+export const BPS_NAVIGATION_LIST_PADDING_12_13_13_28_36: BreakpointState<number> = BreakpointState.of({
+  xs: 12,
+  sm: 13,
+  md: 13,
+  lg: 28,
+  xl: 36
+})
+
 // TabContent的title Margin
 export const BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36: BreakpointState<number> = BreakpointState.of({
   xs: 12,
@@ -137,5 +168,7 @@ export const BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36: BreakpointState<number> =
 })
 
 /* List 相关*/
+// List中子组件的间隔
+export const LIST_SPACE: number = 10
 // ListItem的高度
 export const LIST_ITEM_HEIGHT: number = 56
