@@ -62,7 +62,7 @@ struct CustomDialogExample {
 @Entry
 @Component
 struct ProxyGroupItem {
-  @State comp_divider: ResourceColor = $r('sys.color.comp_divider') //分割线颜色
+
   // 显式声明状态变量的类型，假数据组后期可改可删
   @State items: Item[] = [
     { text: '越南①', latency: 20, type: 'Vmess' },
@@ -198,14 +198,14 @@ struct ProxyGroupItem {
         })
     }
     //分割线
-    .menuItemDivider({ color: this.comp_divider, strokeWidth: LengthMetrics.vp(1) })
+    .menuItemDivider({ color:$r('app.color.divider'), strokeWidth: LengthMetrics.vp(1) })
     .backgroundColor($r('app.color.container_background'))
     .borderRadius(20)
   }
 
   build() {
     // 节点列表 START
-    Column() {
+   List({ space: 10, initialIndex: 0 }) {
       ForEach(this.items, (item: Item, index: number) => {
         ListItem() {
           Row() {
@@ -231,6 +231,7 @@ struct ProxyGroupItem {
           .padding({ left: 12, right: 12 })
           .alignItems(VerticalAlign.Center)
         }
+
         .onClick(() => {
           this.PorxyRadioCheckedValue = index
           hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
@@ -250,6 +251,7 @@ struct ProxyGroupItem {
           })
       })
     }
+   .divider({ strokeWidth: 1,color:$r('app.color.divider'),startMargin:16,endMargin:16})
     .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
       detents: [684, SheetSize.FIT_CONTENT],
       backgroundColor: $r('app.color.settings_container_background'),

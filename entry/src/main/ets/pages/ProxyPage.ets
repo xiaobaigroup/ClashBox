@@ -48,7 +48,6 @@ struct ProxyPage1 {
   @State font_on_primary: ResourceColor = $r('sys.color.font_on_primary') //一级文本反色，白色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
   /* ContextMenu */
-  @State comp_divider: ResourceColor = $r('sys.color.comp_divider') //分割线颜色
   @State background_secondary: ResourceColor = $r('sys.color.background_secondary') //二级背景色，实色
   /* Stack层叠布局 */
   // 所有子组件在容器内的对齐方式 TODO 【用户首选项】在设置里可以更改 Alignment.BottomStart 和 Alignment.BottomEnd Enlin@2024-12-04
@@ -180,7 +179,7 @@ struct ProxyPage1 {
           .width('100%')
           .justifyContent(FlexAlign.SpaceBetween)
 
-          Divider().strokeWidth(0.7).color(this.comp_divider).padding({ left: 5, right: 10 })
+          Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
 
           Row() {
             Text($r('app.string.List'))
@@ -242,7 +241,7 @@ struct ProxyPage1 {
         .width('100%')
         .justifyContent(FlexAlign.SpaceBetween)
 
-        Divider().strokeWidth(0.7).color(this.comp_divider).padding({ left: 5, right: 10 })
+        Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
 
         Row() {
           Text($r('app.string.Delay'))
@@ -264,7 +263,7 @@ struct ProxyPage1 {
         .width('100%')
         .justifyContent(FlexAlign.SpaceBetween)
 
-        Divider().strokeWidth(0.7).color(this.comp_divider).padding({ left: 5, right: 10 })
+        Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
 
 
         Row() {
@@ -322,7 +321,7 @@ struct ProxyPage1 {
         .width('100%')
         .justifyContent(FlexAlign.SpaceBetween)
 
-        Divider().strokeWidth(0.7).color(this.comp_divider).padding({ left: 5, right: 10 })
+        Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
 
         Row() {
           Text($r('app.string.Compact'))

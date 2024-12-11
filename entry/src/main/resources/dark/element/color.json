@@ -31,6 +31,10 @@
     {
       "name": "dialog_maskcolor",
       "value": "#B7000000"
+    },
+    {
+      "name": "divider",
+      "value": "#1AFFFFFF"
     }
   ]
 }

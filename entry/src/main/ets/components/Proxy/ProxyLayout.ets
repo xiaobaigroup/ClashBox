@@ -78,14 +78,14 @@ struct ProxyLayout {
               //展开后内容显示区域
               if (this.isContentShow && this.selectItem === item) {
 
-                Divider().strokeWidth(1).color(this.comp_divider).padding({ left: 16, right: 16 })
+                Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 16, right: 16 })
 
-                  List({ space: 10, initialIndex: 0 }) {
-                    ProxyGroupItem().margin({ bottom: 10 })
+                  List() {
+                    ProxyGroupItem()
                   }
                   .width('100%')
                   .height(undefined) //展开后界面高度
-                  //   .padding({  bottom: 10 })
+                  .padding({ top:10, bottom: 10 })
                   .divider({ strokeWidth: 1 })
               }
             }
