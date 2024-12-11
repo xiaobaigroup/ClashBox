@@ -53,6 +53,7 @@ struct CustomDialogExample {
           }
         })
     }
+   .backgroundColor($r('app.color.container_background'))
     .padding({
       left: 24,
       right: 24,
@@ -61,7 +62,6 @@ struct CustomDialogExample {
     })
   }
 }
-
 //自定义弹窗内容end
 
 //import { ThemeControl } from '@ohos.arkui.theme'
@@ -101,6 +101,8 @@ struct ProxyPage1 {
   //分组tabs相关
   @State currentIndex: number = 0;
   controller: webview.WebviewController = new webview.WebviewController();
+
+
   //弹窗
   dialogController: CustomDialogController | null = new CustomDialogController({
     builder: CustomDialogExample({
@@ -109,8 +111,14 @@ struct ProxyPage1 {
       },
       confirm: () => {
         this.onAccept()
-      }
+      },
     }),
+    alignment: DialogAlignment.Center,
+    // offset: { dx: 0, dy: -20 },
+    customStyle: false,
+    cornerRadius: 32,
+    gridCount: 4,
+    maskColor: $r('app.color.dialog_maskcolor'),
     cancel: this.existApp,
     autoCancel: true,
     onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
@@ -123,15 +131,8 @@ struct ProxyPage1 {
         dismissDialogAction.dismiss()
       }
     },
-    alignment: DialogAlignment.Center,
-    // offset: { dx: 0, dy: -20 },
-    customStyle: false,
-    cornerRadius: 32,
-    gridCount: 4,
-    backgroundColor: ($r('app.color.container_background')),
-    maskColor: ($r('app.color.dialog_maskcolor')),
-    // backgroundBlurStyle:BlurStyle.Thick
   })
+
   //长按菜单图标
   @State startIconModifier: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.star')).fontSize('24vp');
   @State startIconModifier1: SymbolGlyphModifier =

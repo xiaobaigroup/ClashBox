@@ -190,9 +190,9 @@ struct Index {
       /*.backgroundBrightness({
         rate: 0.5,
         lightUpDegree: 0.5 })*/
-      //.blur(50)
       .backgroundColor($r('app.color.background'))
-      .backdropBlur(60)
+      //.backdropBlur(60)
+     // .barOverlap(true)  //模糊效果，需要重新调整高度，此效果会加上tab的高度
       .vertical(this.isLandscapePhone ? true : this.compVertical.value)/**/
       .barWidth(this.isLandscapePhone ? '63vp' : this.compBarWidth.value)/**/
       .barHeight(this.isLandscapePhone ? '100%' : this.compBarHeight.value)/**/
@@ -200,12 +200,12 @@ struct Index {
       .animationDuration(200)
       .onChange((index: number) => {
         this.currentIndex = index
-
       })
     }
     .width('100%')
     .height('100%')
     .backgroundColor($r('app.color.background'))
-    .padding({ top: px2vp(this.topRectHeight)-5, bottom: px2vp(this.bottomRectHeight) })
-  }
+    .padding({ top: px2vp(this.topRectHeight)-5 ,bottom: px2vp(this.bottomRectHeight) })
+
+}
 }
