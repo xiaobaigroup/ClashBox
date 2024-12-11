@@ -7,6 +7,12 @@ import ConfigurationPage from './ConfigurationPage'
 import MorePage from './MorePage'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import ProxyLayout  from '../components/Proxy/ProxyLayout'
+import {
+  BPS_LIST_LANES_1_1_2_3_4,
+  BPS_LIST_GUTTER_1_1_2_3_3,
+  BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36,
+  BPS_NAVIGATION_LIST_PADDING_12_13_13_28_36
+} from '../common/Constants'
 
 
 //import { ThemeControl } from '@ohos.arkui.theme'
@@ -47,6 +53,8 @@ struct Index {
     @State isLandscapePhone:boolean = false
     @StorageProp('bottomRectHeight') bottomRectHeight: number = 0;// 读取导航条区域的高度
     @StorageProp('topRectHeight') topRectHeight: number = 0;
+
+    /* 断点布局相关 相关作用看定义时候的注释 */
     @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
     @State compDirection: BreakpointState<FlexDirection> = BreakpointState.of({
       sm: FlexDirection.Column,
@@ -84,6 +92,14 @@ struct Index {
       lg: ({ top: 5 } as marginGenerate),
       xl: ({ top: 5 } as marginGenerate)
     });
+  @Provide('breakPointStateListLanes')
+  private breakPointStateListLanes: BreakpointState<number> = BPS_LIST_LANES_1_1_2_3_4
+  @Provide('breakPointStateListGutter')
+  private breakPointStateListGutter: BreakpointState<number> = BPS_LIST_GUTTER_1_1_2_3_3
+  @Provide('breakPointStateTabContentTitleMargin')
+  private breakPointStateTabContentTitleMargin: BreakpointState<number> = BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36
+  @Provide('breakPointStateNavigationListPadding')
+  private breakPointStateNavigationListPadding: BreakpointState<number> = BPS_NAVIGATION_LIST_PADDING_12_13_13_28_36
 
     @Builder TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
 
@@ -134,6 +150,10 @@ struct Index {
       BreakpointSystem.getInstance().attach(this.compMargin)
       BreakpointSystem.getInstance().attach(this.TabIconfontSize)
       BreakpointSystem.getInstance().attach(this.TabTitlefontSize)
+      BreakpointSystem.getInstance().attach(this.breakPointStateListLanes)
+      BreakpointSystem.getInstance().attach(this.breakPointStateListGutter)
+      BreakpointSystem.getInstance().attach(this.breakPointStateTabContentTitleMargin)
+      BreakpointSystem.getInstance().attach(this.breakPointStateNavigationListPadding)
       BreakpointSystem.getInstance().start()
     }
 
@@ -146,8 +166,8 @@ struct Index {
       BreakpointSystem.getInstance().detach(this.compBarWidth)
       BreakpointSystem.getInstance().detach(this.compBarHeight)
       BreakpointSystem.getInstance().detach(this.compMargin)
-      BreakpointSystem.getInstance().attach(this.TabIconfontSize)
-      BreakpointSystem.getInstance().attach(this.TabTitlefontSize)
+      BreakpointSystem.getInstance().detach(this.TabIconfontSize)
+      BreakpointSystem.getInstance().detach(this.TabTitlefontSize)
       BreakpointSystem.getInstance().stop()
 
       // 解绑listener中注册的回调函数

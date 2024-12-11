@@ -54,6 +54,8 @@
           }
         ],
       }
-    ]
+    ],
+    // 指定路由映射json文件
+    "routerMap": "$profile:route_map"
   }
 }

@@ -11,9 +11,12 @@ import {
   TAB_CONTENT_TITLE_HEIGHT,
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE,
   LIST_ITEM_HEIGHT,
+  LIST_SPACE,
+  BORDER_RADIUS_20,
+  BIND_SHEET_CONTAINER_HEIGHT,
 } from '../common/Constants'
-import { LengthMetrics, promptAction, SymbolGlyphModifier } from '@kit.ArkUI'
-import ConfigAdd from '../components/Configuration/ConfigAdd'
+import { LengthMetrics, PromptAction, SymbolGlyphModifier } from '@kit.ArkUI'
+import ConfigAdd from '../components/configuration/ConfigAdd'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
 
@@ -37,26 +40,19 @@ struct ConfigurationPage {
 
   private componentName:string = 'ConfigurationPage'
 
-  /* Stack层叠布局 */
-  // 所有子组件在容器内的对齐方式 TODO 【用户首选项】在设置里可以更改 Alignment.BottomStart 和 Alignment.BottomEnd Enlin@2024-12-04
-  @State
-  stackAlignContentAlignment: Alignment = Alignment.BottomEnd
-  // 是否显示添加配置的的bindSheet
-  @State
-  private bindSheetIsShowOfConfigAddButton: boolean = false
+  private promptAction:PromptAction = this.getUIContext()?.getPromptAction()
 
-  @Builder
-  private ConfigAddBindSheetBuilder(){
-    ConfigAdd({breakPointStateTabContentTitleMargin: this.breakPointStateTabContentTitleMargin})
-  }
+  /* 断点布局相关 相关作用看定义时候的注释 */
+  @Consume('breakPointStateListLanes')
+  private breakPointStateListLanes: BreakpointState<number>
+  @Consume('breakPointStateListGutter')
+  private breakPointStateListGutter: BreakpointState<number>
+  @Consume('breakPointStateTabContentTitleMargin')
+  private breakPointStateTabContentTitleMargin: BreakpointState<number>
 
-  /* 断点布局相关 */
-  @State
-  private breakPointStateListLanes: BreakpointState<number> = BPS_LIST_LANES_1_1_2_3_4
-  @State
-  private breakPointStateListGutter: BreakpointState<number> = BPS_LIST_GUTTER_1_1_2_3_3
-  @State
-  private breakPointStateTabContentTitleMargin: BreakpointState<number> = BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36
+  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
+  @StorageProp('isLandscapePhone')
+  private isLandscapePhone: boolean = false
 
   /* 配置列表List相关 */
   // 当前单选框选择的配置
@@ -66,7 +62,7 @@ struct ConfigurationPage {
   @State
   private currentTouchConfigListIndex: number = -1
 
-  /* ContextMenu */
+  /* 配置页面内ListItem长按ContextMenu相关 */
   // TODO 删除 临时模拟数据配置列表数据
   private configList:Array<string> = [
     '配置1',
@@ -83,8 +79,7 @@ struct ConfigurationPage {
     '配置12',
     '配置13',
     '配置14']
-
-  // 配置页面ListItem的长按ContextMenu列表项集合
+  // ContextMenu列表项集合
   @State
   private configListLongPressCtxMenus: Array<LongPressContextMenuItem> = [
     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.star'))
@@ -136,7 +131,7 @@ struct ConfigurationPage {
           })
       }
       .backgroundColor($r('app.color.container_background'))
-      .borderRadius(20)
+      .borderRadius(BORDER_RADIUS_20)
       .menuItemDivider({ strokeWidth: LengthMetrics.vp(.4), color: $r('sys.color.comp_divider') })
       .width(200)
       .height('auto')
@@ -145,18 +140,32 @@ struct ConfigurationPage {
     .edgeEffect(EdgeEffect.Spring)
   }
 
-  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone')
-  private isLandscapePhone: boolean = false
+  /* Stack层叠布局 */
+  // 所有子组件在容器内的对齐方式 TODO 【用户首选项】在设置里可以更改 Alignment.BottomStart 和 Alignment.BottomEnd Enlin@2024-12-04
 
-  // 按钮宽度
+  /* 配置添加按钮bindSheet相关 */
+  // 按钮在Stack布局里的位置
+  @State
+  stackAlignContentAlignment: Alignment = Alignment.BottomEnd
+  // 是否显示bindSheet
+  @State
+  private bindSheetIsShowOfConfigAddButton: boolean = false
+  // 内容Builder
+  @Builder
+  private ConfigAddBindSheetBuilder(){
+    ConfigAdd()
+  }
+
+  /* 页面布局相关 */
+  // 配置添加按钮宽度
   private proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
-  // 按钮高度
+  // 配置添加按钮高度
   private proxyStartButtonHeight: Length = $r('app.integer.vp_proxy_not_start_button_height')
-  // 按钮Margin
+  // 配置添加按钮Margin
   private proxyStartButtonMargin: Length = $r('app.integer.vp_proxy_start_button_margin')
-  // 按钮前Symbol动效
+  // 配置添加按钮前Symbol动效
   private ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE
+
 
   build() {
     Column() {
@@ -181,7 +190,7 @@ struct ConfigurationPage {
           .onClick(() => {
             // TODO 国际化适配 更新配置中... 更新配置成功
             // TODO 调用 更新配置api
-            promptAction.showToast({ message: `配置更新中...` })
+            this.promptAction.showToast({ message: `配置更新中...` })
             hilog.info(0xC001, this.componentName, `#button#onClick()#更新配置`)
           })
         }
@@ -199,7 +208,7 @@ struct ConfigurationPage {
       // 主体 START
       Stack({ alignContent: this.stackAlignContentAlignment }) {
         // 配置列表 START
-        List({ space: 10 }) {
+        List({ space: LIST_SPACE }) {
           ForEach(this.configList, (item: string, index: number) => {
             ListItem() {
               Row() {
@@ -219,7 +228,7 @@ struct ConfigurationPage {
             .width('100%')
             .height(LIST_ITEM_HEIGHT)
             .clickEffect({ level: ClickEffectLevel.MIDDLE })
-            .borderRadius(20)
+            .borderRadius(BORDER_RADIUS_20)
             .bindContextMenu(this.configListLongPressCtxMenuBuilder, ResponseType.LongPress | ResponseType.RightClick,
               {
                 preview: MenuPreviewMode.IMAGE,
@@ -249,6 +258,7 @@ struct ConfigurationPage {
           left: this.breakPointStateTabContentTitleMargin.value,
           right: this.breakPointStateTabContentTitleMargin.value,
         })
+        // 110 = app.integer.vp_proxy_start_button_margin *2 + app.integer.vp_proxy_not_start_button_width
         .contentEndOffset(110)
         .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
         .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
@@ -283,14 +293,29 @@ struct ConfigurationPage {
         .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
         .clickEffect({ level: ClickEffectLevel.MIDDLE })
         .bindSheet( $$this.bindSheetIsShowOfConfigAddButton, this.ConfigAddBindSheetBuilder, {
-          title: { title: $r('app.string.AddConfig') },
-          detents: [684, SheetSize.FIT_CONTENT],
-          backgroundColor: $r('app.color.background'),
+          // title: { title: $r('app.string.AddConfig') },
+          detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT, SheetSize.LARGE],
+          backgroundColor: $r('app.color.container_background'),
           showClose: true,
-          dragBar: true,
-          blurStyle: BlurStyle.COMPONENT_THICK,
+          dragBar: false,
+          preferType: SheetType.CENTER,
+          // blurStyle: BlurStyle.COMPONENT_ULTRA_THICK,
+          blurStyle: BlurStyle.BACKGROUND_REGULAR,
           scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-          width: ('100%')
+          // width: ('100%'),
+          onWillDismiss: (dismissSheet :DismissSheetAction) => {
+            // 点击关闭按钮才能真正关闭半模态
+            if (dismissSheet.reason === DismissReason.CLOSE_BUTTON) {
+              dismissSheet.dismiss()
+              hilog.info(0xC020, this.componentName, `#button#bindSheet#onWillDismiss()#关闭配置添加按钮的bindSheet：DismissSheetAction.dismiss()`)
+            } else {
+              // TODO 国际化
+              this.promptAction.showToast({ message: '请点击右上角关闭按钮~' })
+            }
+          },
+          onWillSpringBackWhenDismiss: (springBack: SpringBackAction)=> {
+            springBack.springBack()
+          }
         })
         .onClick( () => {
           this.bindSheetIsShowOfConfigAddButton = !this.bindSheetIsShowOfConfigAddButton
@@ -309,10 +334,6 @@ struct ConfigurationPage {
 
   aboutToAppear(): void {
     hilog.info(0xC000, this.componentName, `#aboutToAppear`)
-    BreakpointSystem.getInstance().attach(this.breakPointStateListLanes)
-    BreakpointSystem.getInstance().attach(this.breakPointStateListGutter)
-    BreakpointSystem.getInstance().attach(this.breakPointStateTabContentTitleMargin)
-    BreakpointSystem.getInstance().start()
   }
 
   // aboutToDisappear(): void {
@@ -325,7 +346,7 @@ struct ConfigurationPage {
   favoriteConfig(): void {
     // TODO 收藏配置
     // this.currentTouchConfigListIndex
-    promptAction.showToast({message: `已收藏⭐`})
+    this.promptAction.showToast({message: `已收藏⭐`})
     hilog.info(0xC010, this.componentName, `#favoriteConfig#收藏配置：${this.currentTouchConfigListIndex}`)
   }
   /**
@@ -342,7 +363,7 @@ struct ConfigurationPage {
   private updateConfig(): void {
     // TODO 调用更新配置消息api
     // this.currentTouchConfigListIndex
-    promptAction.showToast({message: `配置更新中...`})
+    this.promptAction.showToast({message: `配置更新中...`})
     hilog.info(0xC012, this.componentName, `#updateConfig#更新配置：${this.currentTouchConfigListIndex}`)
   }
   /**

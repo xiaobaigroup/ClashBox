@@ -34,6 +34,14 @@
       "value": "#B7000000"
     },
     {
+      "name": "list_item_background_color",
+      "value": "#FFFFFFFF"
+    },
+    {
+      "name": "symbol_main_color",
+      "value": "#E6000000"
+    },
+    {
       "name": "divider",
       "value": "#F1F3F5"
     }
