@@ -10,15 +10,20 @@ import Backgrounder from "./Backgrounder"
 import WipeData from "./WipeData"
 import Disclaimer from "./Disclaimer"
 import About from "./About"
+import Language from "./Language"
+import TopBuilder from "./TopBuilder"
 
-@Entry
+
+//@Entry
 @Component
 struct Settings {
   @State settingsList: settingsData[] = SettingsListItem()
   @State LanguageList: settingsData[] = LanguageListItem()
-  @State isShowMenu: boolean = false
+  @Link isShowSettings: boolean
+  //@State isShowMenu: boolean = false
   // 当前设备`height`是否符合(320vp< height <= 500vp)
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级图标色，黑色
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   // 断点
   @State compStr: BreakpointState<string> = BreakpointState.of({
@@ -31,7 +36,7 @@ struct Settings {
   //@State endIconModifier: Resource = $r('app.media.ok')
 
   handleCheck(index: number) {
-    // 列表项跳转
+    // 列表项路由跳转
     let itemSettingsData = this.settingsList[index]
     this.SettingsPageInfos.pushPathByName(itemSettingsData.name, false)
     hilog.isLoggable(0xFF00, "SettingstestTag", hilog.LogLevel.INFO);
@@ -39,7 +44,7 @@ struct Settings {
   }
 
   handleMenuCheck(index: number) {
-    // 菜单项点击
+    // 语言菜单项点击
     let menuItemData = this.LanguageList[index]
     menuItemData.isCheck = !menuItemData.isCheck
     this.LanguageList.splice(index, 1, menuItemData)
@@ -57,35 +62,40 @@ struct Settings {
 
   }
 
+  // 设置页路由导航
   @Builder
   SettingsPagesMap(name: string) {
     if (name == 'Appearance') {
-      Appearance()
+      Appearance({isShowSettings: this.isShowSettings})
     } else
       if (name == 'Backup') {
-        Backup()
+        Backup({isShowSettings: this.isShowSettings})
       } else
       if (name == 'ApplicationLock') {
-        ApplicationLock()
+        ApplicationLock({isShowSettings: this.isShowSettings})
       } else
       if (name == 'Notice') {
-        Notice()
+        Notice({isShowSettings: this.isShowSettings})
       } else
       if (name == 'Backgrounder') {
-        Backgrounder()
+        Backgrounder({isShowSettings: this.isShowSettings})
       } else
       if (name == 'WipeData') {
-        WipeData()
+        WipeData({isShowSettings: this.isShowSettings})
       } else
       if (name == 'Disclaimer') {
-        Disclaimer()
+        Disclaimer({isShowSettings: this.isShowSettings})
       } else
       if (name == 'About') {
-        About()
+        About({isShowSettings: this.isShowSettings})
+      } else
+      if (name == 'Language') {
+        Language({isShowSettings: this.isShowSettings})
       }
   }
 
-  @Builder
+  // 语言切换菜单
+  /*@Builder
   LanguageMenu() {
     Menu() {
       ForEach(this.LanguageList, (menuItem: settingsData, index: number) => {
@@ -97,26 +107,20 @@ struct Settings {
           })
       }, (menuItem: settingsData) => JSON.stringify(menuItem))
     }
-  }
+  }*/
 
   build() {
     //Column() {
     Navigation(this.SettingsPageInfos) {
-      Row() {
-        Text($r('app.string.Settings'))
-          .fontSize(20)
-          .fontWeight(FontWeight.Bold)
-          .textAlign(TextAlign.Start)
-          .margin({left: 12})
-      }
-      .margin({bottom: 10})
-      .width('100%')
-      .height(56)
-      .alignItems(VerticalAlign.Center)
+      TopBuilder({
+        showBackButton: false,
+        title: $r('app.string.Settings'),
+        //isShowSettings: this.isShowSettings
+      })
       List() {
         ForEach(this.settingsList, (item: settingsData, index: number) => {
 
-            if (item.name === 'Language') {
+            /*if (item.name === 'Language') {
               ListItem() {
                   Row() {
                     SymbolGlyph(item.icons)
@@ -153,7 +157,7 @@ struct Settings {
                 this.isShowMenu = !this.isShowMenu
               })
               .margin({bottom: this.listBottom.value })
-            } else {
+            } else {*/
               ListItem() {
                 settingsListItem({
                   index: index,
@@ -164,14 +168,13 @@ struct Settings {
                 })
               }
               .margin({bottom: this.listBottom.value })
-            }
+            //}
 
         })
 
       }
       .width('100%')
-      .height(650)
-      //.margin({ top: 10, left: this.morePageMargin.value, right: this.morePageMargin.value })
+      .height(500)
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)
     }

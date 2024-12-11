@@ -4,16 +4,18 @@
  *
  */
 import { BreakpointState, BreakpointSystem } from '../common/breakpointsystem'
-import { ListMoreData, moreData } from '../common/Constants';
+import { BIND_SHEET_CONTAINER_HEIGHT, ListMoreData, moreData } from '../common/Constants';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { text } from '@kit.ArkGraphics2D';
 import Log from '../components/More/Log';
 import Resources from '../components/More/Resources';
 import RequestPage from '../components/More/Request';
 import Connect from '../components/More/Connect';
-import Overwrite from '../components/More/Overwrite';
+import Overwrite from '../components/More/Overwrite/Overwrite';
 import Settings from '../components/Settings/Settings';
 import moreListItem from '../components/More/moreListItem';
+import Basic from '../components/More/Overwrite/Basic';
+import DNS from '../components/More/Overwrite/DNS';
 
 @Entry
 @Component
@@ -44,7 +46,7 @@ struct MorePage {
   })
   // 整体外边距
   @Provide('morePageMargin') morePageMargin: BreakpointState<number> = BreakpointState.of({
-    xs: 12, sm: 14, md: 56, lg: 56, xl: 79
+    xs: 12, sm: 14, md: 16, lg: 16, xl: 16
   })
   // 列表底边距
   @Provide('listBottom') listBottom: BreakpointState<number> = BreakpointState.of({
@@ -69,17 +71,16 @@ struct MorePage {
 
 
   handleCheck(index: number) {
-    // 将isCheck变为true并更新数组
+    // 列表行点击处理
     let itemData = this.moreList[index]
-    //itemData.isCheck = !itemData.isCheck
-    //this.moreList.splice(index, 1, itemData)
     hilog.isLoggable(0xFF00, "MoretestTag", hilog.LogLevel.INFO);
     hilog.info(0xFF00, "MoretestTag", itemData.name)
     hilog.info(0xFF00, "MoretestTag", "isCheck状态: %{public}s", itemData.isCheck)
-    //hilog.info(0xFF00, "jsHilogTest", " itemData: %{public}s", JSON.stringify( itemData))
+    this.pageInfos.clear()
     this.pageInfos.pushPathByName(itemData.name, false)
   }
 
+  // 更多页路由表
   @Builder
   PagesMap(name: string) {
     if (name == 'Log') {
@@ -96,12 +97,30 @@ struct MorePage {
     } else
     if (name == 'Overwrite') {
       Overwrite()
+    } else
+    if (name == 'Basic') {
+      Basic()
+    } else
+    if (name == 'DNS') {
+      DNS()
     }
   }
+
+  // 通过@Builder构建设置模态展示界面
+  @Builder  SettingsSheet() {
+
+  Column() {
+    Settings({isShowSettings: this.isShowSettings})
+  }
+  .width('100%')
+  .height('100%')
+  //.backgroundColor(Color.White)
+}
 
   build() {
     // Column() {
       Navigation(this.pageInfos) {
+        // 顶部导航栏
         Row() {
           Text($r('app.string.More'))
             .fontSize(32)
@@ -125,6 +144,7 @@ struct MorePage {
             }
             .margin({bottom: this.listBottom.value })
           })
+          // 设置行
           ListItem() {
             Row() {
               SymbolGlyph($r('sys.symbol.gearshape'))
@@ -136,18 +156,9 @@ struct MorePage {
                 .padding({ left: 12 })
                 .fontSize(16)
               Blank()
-              Row()
-                .width(10)
-                .height(10)
-                .margin({ right: 20 })
-                .border({
-                  width: {
-                    top: 2,
-                    right: 2
-                  },
-                  color: '#000000'
-                })
-                .rotate({ angle: 45 })
+              SymbolGlyph($r('sys.symbol.chevron_right'))
+                .fontSize(28)
+                .margin({right: 12})
             }
             .width('94%')
             .height(53)
@@ -157,14 +168,15 @@ struct MorePage {
           .onClick(() => {
             this.isShowSettings = true
           })
-          .bindSheet($$this.isShowSettings, SettingsSheet(), {
-            detents: [700, SheetSize.MEDIUM, 200],
+          .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
+            detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],
+            dragBar: false,
             backgroundColor: $r('app.color.settings_container_background'),
             blurStyle: BlurStyle.BACKGROUND_REGULAR,
-            showClose: true,
+            preferType: SheetType.CENTER,
             onDisappear: () => {
               this.SettingsPageInfos.clear()
-              this.pageInfos.clear()
+              //this.pageInfos.clear()
             }
           })
         }
@@ -184,15 +196,6 @@ struct MorePage {
 
 export default MorePage
 
-// 通过@Builder构建设置模态展示界面
-@Builder function SettingsSheet() {
 
-  Column() {
-    Settings()
-  }
-  .width('100%')
-  .height('100%')
-  //.backgroundColor(Color.White)
-}
 
 

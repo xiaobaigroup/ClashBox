@@ -1,6 +1,6 @@
-import { BreakpointState } from "../../common/breakpointsystem"
-import { ListOverwriteData, moreData } from "../../common/Constants"
-import moreListItem from "./moreListItem"
+import { BreakpointState } from "../../../common/breakpointsystem"
+import { ListOverwriteData, moreData } from "../../../common/Constants"
+import moreListItem from "../moreListItem"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 
 @Component

@@ -271,6 +271,206 @@
     {
       "name": "Delay_Speed",
       "value": "The difference between speed and delay"
+    },
+    {
+      "name": "Reset_overwrite_settings",
+      "value": "Reset overwrite settings"
+    },
+    {
+      "name": "Reset_overwrite_settings_subtitle",
+      "value": "Reset overwrite to default value"
+    },
+    {
+      "name": "LogLevel",
+      "value": "Log Level"
+    },
+    {
+      "name": "UA",
+      "value": "UA"
+    },
+    {
+      "name": "TCP_Active",
+      "value": "TCP Maintains Active Interval"
+    },
+    {
+      "name": "Test_Latency_Link",
+      "value": "Test Latency Link"
+    },
+    {
+      "name": "Proxy_Port",
+      "value": "Proxy Port"
+    },
+    {
+      "name": "Hosts",
+      "value": "Hosts"
+    },
+    {
+      "name": "IPv6",
+      "value": "IPv6"
+    },
+    {
+      "name": "UnifiedLatency",
+      "value": "Unified Latency"
+    },
+    {
+      "name": "TCP_Concurrency",
+      "value": "TCP Concurrency"
+    },
+    {
+      "name": "External_Control",
+      "value": "External Control"
+    },
+    {
+      "name": "Info",
+      "value": "Info"
+    },
+    {
+      "name": "Default_UA",
+      "value": "Default(ClashNEXT/2.0.0Pre1)"
+    },
+    {
+      "name": "Default_test_latency_link",
+      "value": "Default(gstatic.com)"
+    },
+    {
+      "name": "Unified_Latency_Subtitle",
+      "value": "Remove additional latency such as handshakes"
+    },
+    {
+      "name": "External_Control_Subtitle",
+      "value": "Control Clash kernel through port 9090"
+    },
+    {
+      "name": "TCP_interval",
+      "value": "30s"
+    },
+    {
+      "name": "OverwriteDNS",
+      "value": "OverwriteDNS"
+    },
+    {
+      "name": "option",
+      "value": "Option"
+    },
+    {
+      "name": "State",
+      "value": "State"
+    },
+    {
+      "name": "State_subtitle",
+      "value": "After shutdown, the system DNS will be used"
+    },
+    {
+      "name": "UseHosts",
+      "value": "Use Hosts"
+    },
+    {
+      "name": "Use_System_Hosts",
+      "value": "Use System Hosts"
+    },
+    {
+      "name": "Follow_The_Rules",
+      "value": "Follow The Rules (configuration file rules)"
+    },
+    {
+      "name": "Follow_The_Rules_Subtitle",
+      "value": "proxy-server-nameserver needs to be configured"
+    },
+    {
+      "name": "Priority_Use_H3",
+      "value": "Priority Use of H3"
+    },
+    {
+      "name": "Priority_Use_H3_Subtitle",
+      "value": "Prioritize Using DOH's http/3"
+    },
+    {
+      "name": "DNS_Mode",
+      "value": "DNS Mode"
+    },
+    {
+      "name": "DNS_Mode_Subtitle",
+      "value": "fakeIP"
+    },
+    {
+      "name": "FakeIP_Range",
+      "value": "FakeIP Range"
+    },
+    {
+      "name": "FakeIP_Range_Subtitle_1",
+      "value": "198.18.0.1/16"
+    },
+    {
+      "name": "FakeIP_Filtering",
+      "value": "FakeIP Filtering"
+    },
+    {
+      "name": "Default_Domain_Name_Server",
+      "value": "Default Domain Name Server"
+    },
+    {
+      "name": "Default_Domain_Name_Server_Subtitle",
+      "value": "Used for resolving DNS servers"
+    },
+    {
+      "name": "Domain_Name_Server_Strategy",
+      "value": "Domain Name Server Strategy"
+    },
+    {
+      "name": "Domain_Name_Server_Strategy_Subtitle",
+      "value": "Specify the corresponding domain name server policy"
+    },
+    {
+      "name": "Domain_Name_Server",
+      "value": "Domain Name Server"
+    },
+    {
+      "name": "Domain_Name_Server_Subtitle",
+      "value": "Used for resolving domain names"
+    },
+    {
+      "name": "FallBack",
+      "value": "FallBack"
+    },
+    {
+      "name": "FallBack_Subtitle",
+      "value": "Usually using overseas DNS"
+    },
+    {
+      "name": "Proxy_Domain_Name_Server",
+      "value": "Proxy Domain Name Server"
+    },
+    {
+      "name": "Proxy_Domain_Name_Server_Subtitle",
+      "value": "Domain name used to resolve proxy nodes"
+    },
+    {
+      "name": "FallBack_Filtering",
+      "value": "FallBack Filtering"
+    },
+    {
+      "name": "GeoIP",
+      "value": "GeoIP"
+    },
+    {
+      "name": "GeoIP_Code",
+      "value": "GeoIP Code"
+    },
+    {
+      "name": "IP_Mask",
+      "value": "IP/Mask"
+    },
+    {
+      "name": "Domain_Name",
+      "value": "Domain Name"
+    },
+    {
+      "name": "GeoIP_Code_Subtitle_1",
+      "value": "CN"
+    },
+    {
+      "name": "GeoSite",
+      "value": "GeoSite"
     }
   ]
 }

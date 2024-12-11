@@ -12,24 +12,23 @@ struct moreListItem {
         SymbolGlyph(this.itemObj.icons)
           .fontSize(24)
           .margin({left: 12})
-        Text(this.itemObj.title)
-          .height(48)
-          .fontWeight(FontWeight.Medium)
-          .padding({ left: 12 })
-          .fontSize(16)
+        Column() {
+          Text(this.itemObj.title)
+            .fontWeight(FontWeight.Medium)
+            .fontSize(16)
+          if (this.itemObj.subtitle) {
+            Text(this.itemObj.subtitle)
+              .fontWeight(FontWeight.Normal)
+              .margin({top: 2 })
+              .fontSize(14)
+          }
+        }
+        .alignItems(HorizontalAlign.Start)
+        .padding({ left: 12 })
         Blank()
-        Row()
-          .width(10)
-          .height(10)
-          .margin({ right: 20 })
-          .border({
-            width: {
-              top: 2,
-              right: 2
-            },
-            color: '#000000'
-          })
-          .rotate({ angle: 45 })
+        SymbolGlyph($r('sys.symbol.chevron_right'))
+          .fontSize(28)
+          .margin({right: 12})
       }
       .width('94%')
       .height(53)

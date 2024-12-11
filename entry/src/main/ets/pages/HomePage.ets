@@ -15,7 +15,8 @@ import { Timer } from '../common/HHmmssTimer'
 import {
   PROXY_STARTED_DURATION_INIT_VALUE,
   ANIMATION_DURATION_300,
-  TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE
+  TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE,
+  BIND_SHEET_CONTAINER_HEIGHT
 } from '../common/Constants'
 import Settings from '../components/Settings/Settings'
 // 在页面build前执行ThemeControl，就可以改变主题颜色
@@ -69,7 +70,6 @@ struct Home {
   //设置图标颜色，修改resources/base(dark)/element/color.json中settings_icon配置浅色和深色模式分别颜色
   //@State fontColorValue:ResourceColor = ($r('app.color.settings_icon'));
 
-  //@Prop isLandscape: boolean
   @State currentBp: string = ''
   @State greetings: string = '早上好'
   @State ContainerHeight: string = ''
@@ -167,6 +167,17 @@ struct Home {
 
   }
 
+  // 通过@Builder构建设置模态展示界面
+  @Builder  SettingsSheet() {
+
+    Column() {
+      Settings({isShowSettings: this.isShowSettings})
+    }
+    .width('100%')
+    .height('100%')
+    //.backgroundColor(Color.White)
+  }
+
   build() {
     Column() {
       if (!this.isLandscapePhone) {
@@ -202,11 +213,12 @@ struct Home {
           .onClick(() => {
             this.isShowSettings = true
           })
-          .bindSheet($$this.isShowSettings, SettingsSheet(), {
-            detents: [700, SheetSize.MEDIUM, 200],
+          .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
+            detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],
+            preferType: SheetType.CENTER,
             backgroundColor: $r('app.color.settings_container_background'),
+            dragBar: false,
             blurStyle: BlurStyle.BACKGROUND_REGULAR,
-            showClose: true,
             //title: { title: $r('app.string.Settings') },
           })
         }
@@ -497,14 +509,3 @@ struct Home {
   }
 }
 export default Home
-
-// 通过@Builder构建模态展示界面
-@Builder function SettingsSheet() {
-
-  Column() {
-    Settings()
-  }
-  .width('100%')
-  .height('100%')
-  //.backgroundColor(Color.White)
-}

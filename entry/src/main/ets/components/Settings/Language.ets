@@ -1,7 +1,7 @@
 import TopBuilder from "./TopBuilder"
 
 @Component
-struct WipeData {
+struct Language {
   @Link isShowSettings: boolean
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   //@Consume('morePageMargin') morePageMargin: BreakpointState<number>
@@ -9,7 +9,7 @@ struct WipeData {
 
   build() {
     NavDestination() {
-      TopBuilder({title: $r('app.string.WipeData'), /*isShowSettings: this.isShowSettings*/})
+      TopBuilder({title: $r('app.string.Language'), /*isShowSettings: this.isShowSettings*/})
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.settings_container_background'))
@@ -20,4 +20,4 @@ struct WipeData {
     })
   }
 }
-export default WipeData
+export default Language

@@ -1,4 +1,5 @@
 import { BreakpointState } from "../../common/breakpointsystem"
+import { BIND_SHEET_TITLE_CONTAINER_HEIGHT } from "../../common/Constants"
 
 @Component
 struct Connect {
@@ -50,7 +51,7 @@ struct Connect {
         .backgroundColor($r('app.color.settings_container_background'))
       }
       .width('100%')
-      .height(56)
+      .height(BIND_SHEET_TITLE_CONTAINER_HEIGHT)
       .alignItems(VerticalAlign.Center)
     }
     .hideTitleBar(true)

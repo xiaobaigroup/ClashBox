@@ -271,6 +271,206 @@
     {
       "name": "Delay_Speed",
       "value": "速度和延迟的区别"
+    },
+    {
+      "name": "Reset_overwrite_settings",
+      "value": "重置覆写设置"
+    },
+    {
+      "name": "Reset_overwrite_settings_subtitle",
+      "value": "将覆写重置设为默认值"
+    },
+    {
+      "name": "LogLevel",
+      "value": "日志等级"
+    },
+    {
+      "name": "UA",
+      "value": "UA"
+    },
+    {
+      "name": "TCP_Active",
+      "value": "TCP保持活动间隔"
+    },
+    {
+      "name": "Test_Latency_Link",
+      "value": "测试延迟链接"
+    },
+    {
+      "name": "Proxy_Port",
+      "value": "代理端口"
+    },
+    {
+      "name": "Hosts",
+      "value": "Hosts"
+    },
+    {
+      "name": "IPv6",
+      "value": "IPv6"
+    },
+    {
+      "name": "UnifiedLatency",
+      "value": "统一延迟"
+    },
+    {
+      "name": "TCP_Concurrency",
+      "value": "TCP并发"
+    },
+    {
+      "name": "External_Control",
+      "value": "外部控制"
+    },
+    {
+      "name": "Info",
+      "value": "Info"
+    },
+    {
+      "name": "Default_UA",
+      "value": "默认(ClashNEXT/2.0.0Pre1)"
+    },
+    {
+      "name": "TCP_interval",
+      "value": "30秒"
+    },
+    {
+      "name": "Default_test_latency_link",
+      "value": "默认(gstatic.com)"
+    },
+    {
+      "name": "Unified_Latency_Subtitle",
+      "value": "去除握手等额外延迟"
+    },
+    {
+      "name": "External_Control_Subtitle",
+      "value": "通过9090端口控制Clash内核"
+    },
+    {
+      "name": "OverwriteDNS",
+      "value": "覆写DNS"
+    },
+    {
+      "name": "option",
+      "value": "选项"
+    },
+    {
+      "name": "State",
+      "value": "状态"
+    },
+    {
+      "name": "State_subtitle",
+      "value": "关闭后将使用系统DNS"
+    },
+    {
+      "name": "UseHosts",
+      "value": "使用Hosts"
+    },
+    {
+      "name": "Use_System_Hosts",
+      "value": "使用系统Hosts"
+    },
+    {
+      "name": "Follow_The_Rules",
+      "value": "遵守规则(配置文件Rules)"
+    },
+    {
+      "name": "Follow_The_Rules_Subtitle",
+      "value": "需配置proxy-server-nameserver"
+    },
+    {
+      "name": "Priority_Use_H3",
+      "value": "优先使用H3"
+    },
+    {
+      "name": "Priority_Use_H3_Subtitle",
+      "value": "优先使用DOH的http/3"
+    },
+    {
+      "name": "DNS_Mode",
+      "value": "DNS模式"
+    },
+    {
+      "name": "DNS_Mode_Subtitle",
+      "value": "fakeIP"
+    },
+    {
+      "name": "FakeIP_Range",
+      "value": "FakeIP范围"
+    },
+    {
+      "name": "FakeIP_Range_Subtitle_1",
+      "value": "198.18.0.1/16"
+    },
+    {
+      "name": "FakeIP_Filtering",
+      "value": "FakeIP过滤"
+    },
+    {
+      "name": "Default_Domain_Name_Server",
+      "value": "默认域名服务器"
+    },
+    {
+      "name": "Default_Domain_Name_Server_Subtitle",
+      "value": "用于解析DNS服务器"
+    },
+    {
+      "name": "Domain_Name_Server_Strategy",
+      "value": "域名服务器策略"
+    },
+    {
+      "name": "Domain_Name_Server_Strategy_Subtitle",
+      "value": "指定对应域名服务器策略"
+    },
+    {
+      "name": "Domain_Name_Server",
+      "value": "域名服务器"
+    },
+    {
+      "name": "Domain_Name_Server_Subtitle",
+      "value": "用于解析域名"
+    },
+    {
+      "name": "FallBack",
+      "value": "FallBack"
+    },
+    {
+      "name": "FallBack_Subtitle",
+      "value": "一般情况下使用境外DNS"
+    },
+    {
+      "name": "Proxy_Domain_Name_Server",
+      "value": "代理域名服务器"
+    },
+    {
+      "name": "Proxy_Domain_Name_Server_Subtitle",
+      "value": "用于解析代理节点的域名"
+    },
+    {
+      "name": "FallBack_Filtering",
+      "value": "FallBack过滤"
+    },
+    {
+      "name": "GeoIP",
+      "value": "GeoIP"
+    },
+    {
+      "name": "GeoIP_Code",
+      "value": "GeoIP代码"
+    },
+    {
+      "name": "GeoIP_Code_Subtitle_1",
+      "value": "CN"
+    },
+    {
+      "name": "GeoSite",
+      "value": "GeoSite"
+    },
+    {
+      "name": "IP_Mask",
+      "value": "IP/掩码"
+    },
+    {
+      "name": "Domain_Name",
+      "value": "域名"
     }
   ]
 }

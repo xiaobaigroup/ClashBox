@@ -112,7 +112,7 @@ struct ProxyPage1 {
     BreakpointSystem.getInstance().start()
   }
 
-  //分组tans内容
+  //分组tabs内容
   @Builder
   TabBuilder(title: ResourceStr, targetIndex: number) {
     Column() {
@@ -139,7 +139,7 @@ struct ProxyPage1 {
 
 
   @Builder
-  //半模拟态编辑菜单
+  //半模态编辑菜单
   ProxyBindSheetEdit() {
     Column() {
       Text($r('app.string.Packet_mode'))
@@ -211,8 +211,6 @@ struct ProxyPage1 {
         .height(94)
         .borderRadius(20)
         .backgroundColor(($r('app.color.container_background')))
-
-
 
       Text($r('app.string.Arrangement'))
         .width('100%')
