@@ -6,6 +6,8 @@ import ProxyPage  from './ProxyPage'
 import ConfigurationPage from './ConfigurationPage'
 import MorePage from './MorePage'
 import { hilog } from '@kit.PerformanceAnalysisKit'
+import ProxyLayout  from '../components/Proxy/ProxyLayout'
+
 
 //import { ThemeControl } from '@ohos.arkui.theme'
 //import { gAppTheme } from './AppTheme'
@@ -174,7 +176,7 @@ struct Index {
         .tabBar(this.TabBarBuilder($r('app.string.Home'), 0, $r('sys.symbol.house_fill')))
 
         TabContent() {
-          ProxyPage()
+          ProxyLayout()
         }
         .tabBar(this.TabBarBuilder( $r('app.string.Proxy'), 1, $r('sys.symbol.list_bullet_square_fill')))
         TabContent() {
@@ -192,7 +194,7 @@ struct Index {
         lightUpDegree: 0.5 })*/
       .backgroundColor($r('app.color.background'))
       //.backdropBlur(60)
-     // .barOverlap(true)  //模糊效果，需要重新调整高度，此效果会加上tab的高度
+   //  .barOverlap(true)  //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
       .vertical(this.isLandscapePhone ? true : this.compVertical.value)/**/
       .barWidth(this.isLandscapePhone ? '63vp' : this.compBarWidth.value)/**/
       .barHeight(this.isLandscapePhone ? '100%' : this.compBarHeight.value)/**/
@@ -206,6 +208,5 @@ struct Index {
     .height('100%')
     .backgroundColor($r('app.color.background'))
     .padding({ top: px2vp(this.topRectHeight)-5 ,bottom: px2vp(this.bottomRectHeight) })
-
 }
 }

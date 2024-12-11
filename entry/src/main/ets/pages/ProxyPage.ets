@@ -10,59 +10,17 @@ import {
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE,
   LIST_ITEM_HEIGHT,
 } from '../common/Constants'
-import {  LengthMetrics, SymbolGlyphModifier } from '@kit.ArkUI'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
 import { IntentionCode } from '@kit.InputKit'
-import { webview } from '@kit.ArkWeb'
+import  ProxyGroupItem  from '../components/Proxy/ProxyGroupItem'
 
-// 定义一个接口来描述列表项的数据结构,假数据，后期可改可删
+// todo 定义一个接口来描述列表项的数据结构,假数据，后期可改可删
 interface Item {
-  text: string;
   latency: number;
-  type:string
 }//
 
-//自定义弹窗内容
-@CustomDialog
-struct CustomDialogExample {
-  controller?: CustomDialogController
-  cancel: () => void = () => {
-  }
-  confirm: () => void = () => {
-  }
 
-  build() {
-    Column() {
-      Text('速度和延迟的区别')
-        .fontSize(20)
-        .padding({ bottom: 15 })
-        .fontWeight(700)
-      Text('速度：通常指网络带宽，决定你下载文件及看视频、图片加载的速度。\n' +
-        '延迟：通常指网络ping的时间，决定你打游戏的体验和访问网页的速度。\n' +
-        '通常情况下，速度快不代表延迟低，延迟低也不能代表速度快，他们之间没有直接关系。')
-        .fontSize(16)
-        .padding({ bottom: 8 })
-
-      Button('确定')
-        .fontSize(16)
-        .width('100%')
-        .onClick(() => {
-          if (this.controller != undefined) {
-            this.controller.close()
-          }
-        })
-    }
-   .backgroundColor($r('app.color.container_background'))
-    .padding({
-      left: 24,
-      right: 24,
-      top: 16,
-      bottom: 16
-    })
-  }
-}
-//自定义弹窗内容end
 
 //import { ThemeControl } from '@ohos.arkui.theme'
 //import { gAppTheme } from './AppTheme'
@@ -100,47 +58,9 @@ struct ProxyPage1 {
   @State isShowEdit: boolean = false
   //分组tabs相关
   @State currentIndex: number = 0;
-  controller: webview.WebviewController = new webview.WebviewController();
 
 
-  //弹窗
-  dialogController: CustomDialogController | null = new CustomDialogController({
-    builder: CustomDialogExample({
-      cancel: () => {
-        this.onCancel()
-      },
-      confirm: () => {
-        this.onAccept()
-      },
-    }),
-    alignment: DialogAlignment.Center,
-    // offset: { dx: 0, dy: -20 },
-    customStyle: false,
-    cornerRadius: 32,
-    gridCount: 4,
-    maskColor: $r('app.color.dialog_maskcolor'),
-    cancel: this.existApp,
-    autoCancel: true,
-    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-      console.info("reason=" + JSON.stringify(dismissDialogAction.reason))
-      console.log("dialog onWillDismiss")
-      if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
-        dismissDialogAction.dismiss()
-      }
-      if (dismissDialogAction.reason == DismissReason.TOUCH_OUTSIDE) {
-        dismissDialogAction.dismiss()
-      }
-    },
-  })
 
-  //长按菜单图标
-  @State startIconModifier: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.star')).fontSize('24vp');
-  @State startIconModifier1: SymbolGlyphModifier =
-    new SymbolGlyphModifier($r('sys.symbol.bolt_filled_on_circle')).fontSize('24vp');
-  @State startIconModifier2: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.timer')).fontSize('24vp');
-  @State startIconModifier3: SymbolGlyphModifier =
-    new SymbolGlyphModifier($r('sys.symbol.questionmark_circle')).fontSize('24vp');
-  @State isShowNetworkSpeed: boolean = false
   /* 断点布局相关 */
   @State
   private breakPointStateListLanes: BreakpointState<number> = BPS_LIST_LANES_1_1_2_3_4
@@ -149,46 +69,19 @@ struct ProxyPage1 {
   /* 配置列表List相关 */
   @State
   private breakPointStateTabContentTitleMargin: BreakpointState<number> = BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36
-  // 当前手指触摸的ListItem的对应 this.configList[index]
-  @State
-  private TouchPorxyListIndex: number = -1
-  @State private gridMargin: number = 0
+
   private tabsController: TabsController = new TabsController()
-  // 当前单选框选择的配置
-  @State
-  private PorxyRadioCheckedValue: number = -1
-
-  // TODO 删除 临时模拟数据配置列表数据
-  // 显式声明状态变量的类型，假数据组后期可改可删
-  @State items: Item[] = [
-    { text: '越南①', latency: 20 ,type:'Vmess'},
-    { text: '越南②', latency: 500 ,type:'Shadowsocks'},
-    { text: '北朝鲜①', latency: 501,type:'Vmess' },
-    { text: '中国香港①', latency: 20 ,type:'Trojan'},
-    { text: '中国香港②', latency: 1001,type:'Vmess' },
-    { text: '中国台湾①', latency: 501, type:'Shadowsocks'},
-    { text: '中国台湾②', latency: 20, type:'Vmess'},
-    { text: '越南②', latency: 500, type:'Trojan'},
-    { text: '美国①', latency: 1001, type:'Shadowsocks'},
-  ];
 
 
+  //todo 假数据 以后可以删掉
+@State items: Item[] = [
+  {  latency: 20},
+  { latency: 500 },
+  { latency: 1001 },
+];
   // 排序函数
   sortItems() {
     this.items.sort((a, b) => a.latency - b.latency);
-  }
-
-  // 辅助函数：根据单个Item的latency属性返回颜色
-  private getColorForLatency(latency: number): string | ResourceColor {
-    if (latency >= 0 && latency <= 500) {
-      return '#64BB5C';
-    } else if (latency >= 501 && latency <= 1000) {
-      return '#f7ce00';
-    } else if (latency > 1000) { // 注意这里使用>而不是>=，以避免重叠
-      return '#e84026';
-    } else {
-      return $r('sys.color.font_secondary'); // 默认颜色
-    }
   }
 
 
@@ -245,7 +138,7 @@ struct ProxyPage1 {
     .alignItems(HorizontalAlign.Start)
   }
 
-  @State private isClickable: boolean = false; // 控制按钮是否可点击
+
   @Builder
   //半模拟态编辑菜单
   ProxyBindSheetEdit() {
@@ -257,60 +150,70 @@ struct ProxyPage1 {
         .padding({ left: 15, bottom: 10 })
         .textAlign(0)
 
-      Column() {
-        Row() {
-          Text($r('app.string.Tabs'))
-            .font({ size: 16 })
-            .fontColor(this.font_primary)
+        Column() {
+          Row() {
+            Text($r('app.string.Tabs'))
+              .font({ size: 16 })
+              .fontColor(this.font_primary)
 
-          Radio({
-            value: 'Radio1', group: 'radioGroup1',
-            indicatorType: RadioIndicatorType.TICK,
-          })
-            .checked(this.isClickable)
-            .radioStyle({
-              checkedBackgroundColor: this.icon_emphasize,
-              //   uncheckedBorderColor: this.icon_secondary
+            Radio({
+              value: 'Radio1', group: 'radioGroup1',
+              indicatorType: RadioIndicatorType.TICK,
             })
-          /* 选中改变，后期接入
-          .onChange((isChecked: boolean) => {
-            if (isChecked) {
-              promptAction.showToast({ message: 'Vibration mode.' })
-            }
+              .checked(true)
+              .radioStyle({
+                checkedBackgroundColor: this.icon_emphasize,
+                //   uncheckedBorderColor: this.icon_secondary
+              })
+            /* 选中改变，后期接入
+            .onChange((isChecked: boolean) => {
+              if (isChecked) {
+                promptAction.showToast({ message: 'Vibration mode.' })
+              }
+            })*/
+          }
+    /*      .onClick(() => {
+            this.ProxyBindSheetEditRadio === true
+            hilog.info(0xB003, this.componentName, `#ProxyBindSheetEditRadio#onClick: `)
           })*/
-        }
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
-        .width('100%')
-        .justifyContent(FlexAlign.SpaceBetween)
+          .clickEffect({ level: ClickEffectLevel.MIDDLE })
+          .width('100%')
+          .justifyContent(FlexAlign.SpaceBetween)
 
-        Divider().strokeWidth(0.7).color(this.comp_divider).padding({ left: 5, right: 10 })
+          Divider().strokeWidth(0.7).color(this.comp_divider).padding({ left: 5, right: 10 })
 
-        Row() {
-          Text($r('app.string.List'))
-            .font({ size: 16 })
-            .fontColor(this.font_primary)
+          Row() {
+            Text($r('app.string.List'))
+              .font({ size: 16 })
+              .fontColor(this.font_primary)
 
-          Radio({
-            value: 'Radio2', group: 'radioGroup1',
-            indicatorType: RadioIndicatorType.TICK
-          })
-            .checked(false)
-            .radioStyle({
-              checkedBackgroundColor: this.icon_emphasize,
-              //   uncheckedBorderColor: this.icon_secondary
+            Radio({
+              value: 'Radio2', group: 'radioGroup1',
+              indicatorType: RadioIndicatorType.TICK
             })
+              .checked(false)
+              .radioStyle({
+                checkedBackgroundColor: this.icon_emphasize,
+                //   uncheckedBorderColor: this.icon_secondary
+              })
+          }
+     /*     .onClick(() => {
+            this.ProxyBindSheetEditRadio
+            hilog.info(0xB003, this.componentName, `#ProxyBindSheetEditRadio#onClick: `)
+          })*/
+          .clickEffect({ level: ClickEffectLevel.MIDDLE })
+          .width('100%')
+          .justifyContent(FlexAlign.SpaceBetween)
         }
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
+        .padding({ left: 15, right: 10 })
+        .justifyContent(FlexAlign.SpaceEvenly)
+        .margin({ bottom: 10 })
         .width('100%')
-        .justifyContent(FlexAlign.SpaceBetween)
-      }
-      .padding({ left: 15, right: 10 })
-      .justifyContent(FlexAlign.SpaceEvenly)
-      .margin({ bottom: 10 })
-      .width('100%')
-      .height(94)
-      .borderRadius(20)
-      .backgroundColor(($r('app.color.container_background')))
+        .height(94)
+        .borderRadius(20)
+        .backgroundColor(($r('app.color.container_background')))
+
+
 
       Text($r('app.string.Arrangement'))
         .width('100%')
@@ -321,7 +224,7 @@ struct ProxyPage1 {
 
       Column() {
         Row() {
-          Text('默认')
+          Text($r('app.string.Default'))
             .font({ size: 16 })
             .fontColor(this.font_primary)
 
@@ -335,7 +238,7 @@ struct ProxyPage1 {
               //   uncheckedBorderColor: this.icon_secondary
             })
         }
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
+     //   .clickEffect({ level: ClickEffectLevel.MIDDLE })
         .width('100%')
         .justifyContent(FlexAlign.SpaceBetween)
 
@@ -350,14 +253,14 @@ struct ProxyPage1 {
             value: 'Radio4', group: 'radioGroup2',
             indicatorType: RadioIndicatorType.TICK
           })
+            .onClick(() => this.sortItems())//按延迟排序
             .checked(false)
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
               //   uncheckedBorderColor: this.icon_secondary
             })
         }
-        .onClick(() => this.sortItems())//按延迟排序
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
+      //  .clickEffect({ level: ClickEffectLevel.MIDDLE })
         .width('100%')
         .justifyContent(FlexAlign.SpaceBetween)
 
@@ -379,7 +282,7 @@ struct ProxyPage1 {
               //   uncheckedBorderColor: this.icon_secondary
             })
         }
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
+      //  .clickEffect({ level: ClickEffectLevel.MIDDLE })
         .width('100%')
         .justifyContent(FlexAlign.SpaceBetween)
       }
@@ -415,7 +318,7 @@ struct ProxyPage1 {
               //   uncheckedBorderColor: this.icon_secondary
             })
         }
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
+      //  .clickEffect({ level: ClickEffectLevel.MIDDLE })
         .width('100%')
         .justifyContent(FlexAlign.SpaceBetween)
 
@@ -437,7 +340,7 @@ struct ProxyPage1 {
             })
 
         }
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
+      //  .clickEffect({ level: ClickEffectLevel.MIDDLE })
         .width('100%')
         .justifyContent(FlexAlign.SpaceBetween)
       }
@@ -452,68 +355,6 @@ struct ProxyPage1 {
     .width('100%')
   }//半模拟态编辑菜单end
 
-//半模拟态网络测速
-  @Builder
-  BindSheetNetworkSpeed() {
-    Row() {
-      Column() {
-        /*    Text('Webview')
-              .fontSize(48)
-            Text('访问https://speed.cloudflare.com')
-              .fontSize(18)*/
-        Web({ src: 'https://speed.cloudflare.com', controller: this.controller })//测速网页得重新换个
-          .javaScriptAccess(true)
-          .onlineImageAccess(true)
-          .imageAccess(true)
-          .domStorageAccess(true)
-      }
-    }
-    .width('100%')
-    .height('100%')
-    .alignItems(VerticalAlign.Center)
-    .justifyContent(FlexAlign.Center)
-    //   .padding({bottom:100})
-    .backgroundColor(($r('app.color.container_background')))
-  }//半模拟态网络测速 end
-
-  // 在自定义组件即将析构销毁时将dialogController置空
-  onCancel() {
-    console.info('Callback when the first button is clicked')
-  }
-
-  onAccept() {
-    console.info('Callback when the second button is clicked')
-  }
-
-  existApp() {
-    console.info('Click the callback in the blank area')
-  }
-
-  //长按菜单 start
-  @Builder
-  //长按菜单相关
-  MyMenu() {
-    Menu() {
-      MenuItem({ symbolStartIcon: this.startIconModifier, content: $r('app.string.Collect') })
-      MenuItem({ symbolStartIcon: this.startIconModifier1, content: $r('app.string.Test_Delay') })
-      MenuItem({ symbolStartIcon: this.startIconModifier2, content: $r('app.string.Test_Speed') })
-        .onClick(() => {
-          this.isShowNetworkSpeed = true
-        })
-      MenuItem({ symbolStartIcon: this.startIconModifier3, content: $r('app.string.Delay_Speed') })
-        .onClick(() => {
-          if (this.dialogController != null) {
-            this.dialogController.open()
-          }
-        })
-    }
-    //分割线
-    .menuItemDivider({ color: this.comp_divider, strokeWidth: LengthMetrics.vp(1) })
-    .backgroundColor($r('app.color.container_background'))
-    .borderRadius(20)
-  }
-  //长按菜单end
-
 
   build() {
     Column() {
@@ -524,17 +365,7 @@ struct ProxyPage1 {
             .fontSize(32)
             .fontWeight(FontWeight.Bold)
             .textAlign(TextAlign.Center)
-            .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
-              detents: [684, SheetSize.FIT_CONTENT],
-              backgroundColor: $r('app.color.settings_container_background'),
-              //       blurStyle: BlurStyle.BACKGROUND_REGULAR,
-              showClose: true,
-              scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-              title: { title: $r('app.string.Test_Speed'), subtitle: '测速功能由CloundFlare提供' },
-              width: ('100%'),
-              maskColor: $r('app.color.dialog_maskcolor')
-              //onWillAppear:()
-            })
+
           Blank()
           //编辑图标
           Button({ type: ButtonType.Circle, stateEffect: true }) {
@@ -576,49 +407,8 @@ struct ProxyPage1 {
         Column() { //分组标签页 start
           Tabs({ barPosition: BarPosition.Start, controller: this.tabsController }) {
             TabContent() {
-              // 节点列表 START
-              List({ space: 10 }) {
-                ForEach(this.items, (item: Item, index: number) => {
-                  ListItem() {
-                    Row() {
-                      Row() {
-                        Column() {
-                          Text(`${item.text}`).fontColor(($r('sys.color.font_primary'))).fontSize(20)
-                          Text(`${item.type}`).fontColor($r('sys.color.font_secondary')).fontSize(14)
-                        }.alignItems(HorizontalAlign.Start)
-
-                        Text(`${item.latency}`+'ms').fontColor(this.getColorForLatency(item.latency) as ResourceColor).fontSize(18)
-                      }
-                      .width('90%')
-                      .justifyContent(FlexAlign.SpaceBetween)
-
-
-                      Blank()
-                      Radio({ value: 'radio' + index, group: 'configGroup' })
-                        .checked(index === this.PorxyRadioCheckedValue)
-                    }
-                    .width('100%')
-                    .padding({ left: 12, right: 12 })
-                    .alignItems(VerticalAlign.Center)
-                  }
-                  .onClick(() => {
-                    this.PorxyRadioCheckedValue = index
-                    hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
-                  })
-                  .backgroundColor($r('app.color.container_background'))
-                  .width('100%')
-                  .height(LIST_ITEM_HEIGHT)
-                  .clickEffect({ level: ClickEffectLevel.MIDDLE })
-                  .borderRadius(20)
-                  .bindContextMenu(this.MyMenu, ResponseType.LongPress,
-                    {
-                      preview: MenuPreviewMode.IMAGE,
-                      previewAnimationOptions: {
-                        scale: [0.95, 1.0],
-                        transition: TransitionEffect.prototype.animation({ tempo: 1.5 })
-                      }
-                    })
-                })
+              List({ space: 10, initialIndex: 0 }) {
+                ProxyGroupItem() //list相关在components/ProxyGroupItem.ets文件里
               }
               .width('100%')
               .height('100%')
@@ -630,8 +420,6 @@ struct ProxyPage1 {
                 left: this.breakPointStateTabContentTitleMargin.value,
                 right: this.breakPointStateTabContentTitleMargin.value,
               })
-
-              //list end
             }
             // 节点列表 END
 
@@ -673,7 +461,6 @@ struct ProxyPage1 {
             this.currentIndex = index;
           })
         }
-
         //分组tabs end
 
         // 悬浮新增配置按钮 START
