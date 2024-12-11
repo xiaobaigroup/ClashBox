@@ -4,11 +4,13 @@ import { BreakpointState } from "./breakpointsystem";
 /* 基础 */
 // borderRadius 20
 export const BORDER_RADIUS_20: number = 20
+// bindSheet 初始默认高度
+export const BIND_SHEET_CONTAINER_HEIGHT: number = 684
 // bindSheet Title 整体高度
 export const BIND_SHEET_TITLE_CONTAINER_HEIGHT: number = 56
 // bindSheet 在不使用默认的dragBar时，填充dragBar区域所占位的高度
 export const BIND_SHEET_DRAG_BAR_HEIGHT: number = 16
-// bindSheet Title 左侧返回symbol 高度
+// bindSheet Title 左侧返回symbol 宽度
 export const BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT: number = 40
 // bindSheet Title 左侧返回symbol 高度
 export const BIND_SHEET_TITLE_LEFT_SYMBOL_HEIGHT: number = 40
