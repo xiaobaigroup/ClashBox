@@ -6,10 +6,10 @@ import { hilog } from "@kit.PerformanceAnalysisKit"
 @Component
 struct Overwrite {
   @Consume('NavPathStack') pageInfos: NavPathStack
-  @Consume('morePageMargin') morePageMargin: BreakpointState<number>
+  @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @State overwriteList: moreData[] = ListOverwriteData()
   @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级图标色，黑色
-  @Consume('listBottom') listBottom: BreakpointState<number>
+  @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
 
   handleCheck(index: number) {
     // 跳转

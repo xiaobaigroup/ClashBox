@@ -6,11 +6,29 @@ import MoreMenu from "./LogMoreMenu"
 @Component
 struct Log {
   @Consume('NavPathStack') pageInfos: NavPathStack
-  @Consume('morePageMargin') morePageMargin: BreakpointState<number>
+  @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @State isShowMenu: boolean = false
   @State EnableLogger: boolean = false
   @State isLogData: boolean = false
   @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级图标色，黑色
+
+  @Builder
+  MoreMenu() {
+    Menu() {
+      MenuItem({ content: $r('app.string.EnableLogger') })
+        .selectIcon(true)
+        .selected(this.EnableLogger)
+        .onChange((selected) => {
+          this.EnableLogger = !this.EnableLogger
+        })
+      if (this.EnableLogger) {
+        MenuItem({ content: $r('app.string.ClearLogs')})
+          .selectIcon(true)
+        MenuItem({ content: $r('app.string.ExportLog')})
+          .selectIcon(true)
+      }
+    }
+  }
 
   build() {
     NavDestination() {
@@ -53,13 +71,13 @@ struct Log {
                 .fontSize(24)
                 .fontColor([this.icon_secondary])
             }
-            .onClick(() => {
+            /*.onClick(() => {
               this.isShowMenu = !this.isShowMenu
-            })
+            })*/
             .margin({ right: this.morePageMargin.value })
             .width(40)
             .height(40)
-            //.bindMenu(this.MoreMenu())
+            .bindMenu(this.MoreMenu())
             .backgroundColor($r('app.color.settings_container_background'))
           }
           .zIndex(1)
@@ -106,13 +124,13 @@ struct Log {
         .width('100%')
         .height('100%')
 
-        if (this.isShowMenu) {
+       /* if (this.isShowMenu) {
           MoreMenu({
             isShowMenu: this.isShowMenu,
             EnableLogger: this.EnableLogger
           })
             .zIndex(2)
-        }
+        }*/
 
       }
       .width('100%')

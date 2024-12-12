@@ -11,7 +11,9 @@ import {
   BPS_LIST_LANES_1_1_2_3_4,
   BPS_LIST_GUTTER_1_1_2_3_3,
   BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36,
-  BPS_NAVIGATION_LIST_PADDING_12_13_13_28_36
+  BPS_NAVIGATION_LIST_PADDING_12_13_13_28_36,
+  morePageMargin_12_14_16,
+  morePagelistBottom_10_14
 } from '../common/Constants'
 
 
@@ -100,6 +102,10 @@ struct Index {
   private breakPointStateTabContentTitleMargin: BreakpointState<number> = BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36
   @Provide('breakPointStateNavigationListPadding')
   private breakPointStateNavigationListPadding: BreakpointState<number> = BPS_NAVIGATION_LIST_PADDING_12_13_13_28_36
+  @Provide('breakPointStatemorePageMargin')
+  private breakPointStatemorePageMargin: BreakpointState<number> = morePageMargin_12_14_16
+  @Provide('breakPointStatemorePagelistBottom')
+  private breakPointStatemorePagelistBottom: BreakpointState<number> = morePagelistBottom_10_14
 
     @Builder TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
 
@@ -154,20 +160,13 @@ struct Index {
       BreakpointSystem.getInstance().attach(this.breakPointStateListGutter)
       BreakpointSystem.getInstance().attach(this.breakPointStateTabContentTitleMargin)
       BreakpointSystem.getInstance().attach(this.breakPointStateNavigationListPadding)
+      BreakpointSystem.getInstance().attach(this.breakPointStatemorePageMargin)
+      BreakpointSystem.getInstance().attach(this.breakPointStatemorePagelistBottom)
       BreakpointSystem.getInstance().start()
     }
 
     aboutToDisappear() {
 
-      BreakpointSystem.getInstance().detach(this.compStr)
-      BreakpointSystem.getInstance().detach(this.compDirection)
-      BreakpointSystem.getInstance().detach(this.compBarPose)
-      BreakpointSystem.getInstance().detach(this.compVertical)
-      BreakpointSystem.getInstance().detach(this.compBarWidth)
-      BreakpointSystem.getInstance().detach(this.compBarHeight)
-      BreakpointSystem.getInstance().detach(this.compMargin)
-      BreakpointSystem.getInstance().detach(this.TabIconfontSize)
-      BreakpointSystem.getInstance().detach(this.TabTitlefontSize)
       BreakpointSystem.getInstance().stop()
 
       // 解绑listener中注册的回调函数

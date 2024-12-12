@@ -3,7 +3,7 @@ import { BreakpointState } from "../../common/breakpointsystem"
 @Component
 struct RequestPage {
   @Consume('NavPathStack') pageInfos: NavPathStack
-  @Consume('morePageMargin') morePageMargin: BreakpointState<number>
+  @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级图标色，黑色
 
   build() {

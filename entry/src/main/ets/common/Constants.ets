@@ -52,6 +52,8 @@ export  const ListMoreData = (): moreData[] => {
     new moreData($r('sys.symbol.list_bullet'), 'Request', $r('app.string.Request'), '', 0, false),
     new moreData($r('sys.symbol.swap'), 'Connect', $r('app.string.Connect'), '', 0, false),
     new moreData($r('sys.symbol.pencil_line'), 'Overwrite', $r('app.string.Overwrite'), '', 0, false),
+    new moreData($r('sys.symbol.navigation'), 'Diversion', $r('app.string.Diversion_Strategy'), '', 0, false),
+    new moreData($r('sys.symbol.clean_fill'), 'QueryIP', $r('app.string.Query_IP_Region'), $r('app.string.Query_IP_Region_Subtitle'), 0, false),
   ]
   return result
 }
@@ -92,9 +94,9 @@ export  const ListOverwriteDNSData = (): moreData[] => {
   result = [
     new moreData($r('sys.symbol.selector'), 'OverwriteDNS', $r('app.string.OverwriteDNS'), '', 2,  false),
     new moreData($r('sys.symbol.selector'), 'Option', $r('app.string.option'), '', 3, false),
-    new moreData($r('sys.symbol.selector'), 'State', $r('app.string.State'), $r('app.string.State_subtitle'), 2, true),
-    new moreData($r('sys.symbol.selector'), 'UseHosts', $r('app.string.UseHosts'), '', 2,  true),
-    new moreData($r('sys.symbol.selector'), 'Use-System-Hosts', $r('app.string.Use_System_Hosts'), '', 2, true),
+    new moreData($r('sys.symbol.selector'), 'State', $r('app.string.State'), $r('app.string.State_subtitle'), 2, false),
+    new moreData($r('sys.symbol.selector'), 'UseHosts', $r('app.string.UseHosts'), '', 2,  false),
+    new moreData($r('sys.symbol.selector'), 'Use-System-Hosts', $r('app.string.Use_System_Hosts'), '', 2, false),
     new moreData($r('sys.symbol.selector'), 'IPv6', $r('app.string.IPv6'), $r('app.string.Info'), 2,  false),
     new moreData($r('sys.symbol.selector'), 'Follow-The-Rules', $r('app.string.Follow_The_Rules'), $r('app.string.Follow_The_Rules_Subtitle'), 2, false),
     new moreData($r('sys.symbol.selector'), 'Priority-Use-H3', $r('app.string.Priority_Use_H3'), $r('app.string.Priority_Use_H3_Subtitle'), 2, false),
@@ -112,6 +114,20 @@ export  const ListOverwriteDNSData = (): moreData[] => {
     new moreData($r('sys.symbol.selector'), 'IP/Mask', $r('app.string.IP_Mask'), '', 1, false),
     new moreData($r('sys.symbol.selector'), 'LogLevel', $r('app.string.LogLevel'), '', 1,  false),
     new moreData($r('sys.symbol.selector'), 'Domain', $r('app.string.Domain_Name'), '', 1, false),
+  ]
+  return result
+}
+
+// 更多 -> 覆写 -> 网络Listitem
+export  const ListOverwriteNetworkData = (): moreData[] => {
+  let result: moreData[] = new Array()
+  result = [
+    new moreData($r('sys.symbol.key_shield_fill'), 'VPN', 'VPN', '', 2,  false),
+    new moreData($r('sys.symbol.selector'), 'Option', $r('app.string.option'), '', 3, false),
+    new moreData($r('sys.symbol.selector'), 'IPv6', $r('app.string.IPv6'), $r('app.string.Info'), 2,  false),
+    new moreData($r('sys.symbol.satellite_map_fill'), 'Stack-Mode', $r('app.string.Stack_Mode'), 'gvisor', 0, false),
+    new moreData($r('sys.symbol.slider_horizontal_2'), 'Route-Mode', $r('app.string.Route_Mode'), $r('app.string.Using_Configuration'), 0,  false),
+    new moreData($r('sys.symbol.local_fill'), 'Route-Address', $r('app.string.Routing_Address'), $r('app.string.Routing_Address_Subtitle'), 1, false),
   ]
   return result
 }
@@ -219,6 +235,16 @@ export const BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36: BreakpointState<number> =
   md: 28,
   lg: 36,
   xl: 36
+})
+
+// 更多页整体外边距
+export const morePageMargin_12_14_16: BreakpointState<number> = BreakpointState.of({
+  xs: 12, sm: 14, md: 16, lg: 16, xl: 16
+})
+
+// 更多页列表底边距
+export const morePagelistBottom_10_14: BreakpointState<number> = BreakpointState.of({
+  xs: 10, sm: 10, md: 14, lg: 14, xl: 14
 })
 
 /* List 相关*/

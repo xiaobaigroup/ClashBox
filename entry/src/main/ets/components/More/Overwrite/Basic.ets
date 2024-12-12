@@ -6,9 +6,10 @@ import OverwriteTop from "./OverwriteTopBuilder"
 @Component
 struct Basic {
   @Consume('NavPathStack') pageInfos: NavPathStack
-  @Consume('morePageMargin') morePageMargin: BreakpointState<number>
+  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @State overwriteBasicList: moreData[] = ListOverwriteBasicData()
-  @Consume('listBottom') listBottom: BreakpointState<number>
+  @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
 
   handleCheck(index: number) {
     // 跳转
@@ -130,10 +131,17 @@ struct Basic {
                     SymbolGlyph(item.icons)
                       .fontSize(24)
                       .margin({left: 12})
-                    Text(item.title)
-                      .fontWeight(FontWeight.Medium)
-                      .fontSize(16)
-                      .padding({ left: 12 })
+                    Column() {
+                      Text(item.title)
+                        .fontWeight(FontWeight.Medium)
+                        .fontSize(16)
+                      Text(item.subtitle)
+                        .fontWeight(FontWeight.Normal)
+                        .margin({top: 2})
+                        .fontSize(14)
+                    }
+                    .alignItems(HorizontalAlign.Start)
+                    .margin({ left: 12 })
                     Blank()
                     Toggle({ type: ToggleType.Switch, isOn: false })
                       .margin({right: 12})
@@ -161,7 +169,7 @@ struct Basic {
 
       }
       .width('100%')
-      .height(800)
+      .height(this.isLandscapePhone ? 275 : 800)
       .margin({ top: 10, left: this.morePageMargin.value, right: this.morePageMargin.value })
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)

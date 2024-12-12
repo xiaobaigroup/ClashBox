@@ -471,6 +471,50 @@
     {
       "name": "GeoSite",
       "value": "GeoSite"
+    },
+    {
+      "name": "Edit_FakeIP_Range",
+      "value": "Edit FakeIP Range"
+    },
+    {
+      "name": "Save",
+      "value": "Save"
+    },
+    {
+      "name": "Cancel",
+      "value": "Cancel"
+    },
+    {
+      "name": "Stack_Mode",
+      "value": "Stack Mode"
+    },
+    {
+      "name": "Route_Mode",
+      "value": "Route Mode"
+    },
+    {
+      "name": "Using_Configuration",
+      "value": "Using Configuration"
+    },
+    {
+      "name": "Routing_Address",
+      "value": "Routing Address"
+    },
+    {
+      "name": "Routing_Address_Subtitle",
+      "value": "Configure listening routing address"
+    },
+    {
+      "name": "Query_IP_Region",
+      "value": "Query IP Region"
+    },
+    {
+      "name": "Query_IP_Region_Subtitle",
+      "value": "Using GeoIP2 database to query the location of IP addresses"
+    },
+    {
+      "name": "Diversion_Strategy",
+      "value": "Diversion Strategy"
     }
   ]
 }

@@ -44,6 +44,10 @@
     {
       "name": "divider",
       "value": "#F1F3F5"
+    },
+    {
+      "name": "Dialog_BackgroundColor",
+      "value": "#D4D4D4"
     }
   ]
 }

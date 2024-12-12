@@ -6,7 +6,7 @@ struct OverwriteTop {
   @State title: ResourceStr = ''
   @State subtitle: ResourceStr = ''
   @Consume('NavPathStack') pageInfos: NavPathStack
-  @Consume('morePageMargin') morePageMargin: BreakpointState<number>
+  @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级图标色，黑色
 
   build() {
@@ -33,7 +33,7 @@ struct OverwriteTop {
         if(this.subtitle) {
           Text(this.subtitle)
             .fontWeight(FontWeight.Normal)
-            .margin({top: 2})
+            .margin({top: 2, left: 8})
             .fontSize(14)
         }
       }

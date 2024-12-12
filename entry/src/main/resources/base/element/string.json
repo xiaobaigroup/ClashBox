@@ -471,6 +471,50 @@
     {
       "name": "Domain_Name",
       "value": "域名"
+    },
+    {
+      "name": "Edit_FakeIP_Range",
+      "value": "编辑FakeIP范围"
+    },
+    {
+      "name": "Save",
+      "value": "保存"
+    },
+    {
+      "name": "Cancel",
+      "value": "取消"
+    },
+    {
+      "name": "Stack_Mode",
+      "value": "栈模式"
+    },
+    {
+      "name": "Route_Mode",
+      "value": "路由模式"
+    },
+    {
+      "name": "Using_Configuration",
+      "value": "使用配置"
+    },
+    {
+      "name": "Routing_Address",
+      "value": "路由地址"
+    },
+    {
+      "name": "Routing_Address_Subtitle",
+      "value": "配置监听路由地址"
+    },
+    {
+      "name": "Query_IP_Region",
+      "value": "查询IP地区"
+    },
+    {
+      "name": "Query_IP_Region_Subtitle",
+      "value": "使用GeoIP2数据库查询IP所在地区"
+    },
+    {
+      "name": "Diversion_Strategy",
+      "value": "分流策略"
     }
   ]
 }

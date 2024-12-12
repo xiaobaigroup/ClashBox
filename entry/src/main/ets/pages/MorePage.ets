@@ -16,6 +16,7 @@ import Settings from '../components/Settings/Settings';
 import moreListItem from '../components/More/moreListItem';
 import Basic from '../components/More/Overwrite/Basic';
 import DNS from '../components/More/Overwrite/DNS';
+import Network, { NetworkRouterAddress } from '../components/More/Overwrite/Network';
 
 @Entry
 @Component
@@ -40,33 +41,22 @@ struct MorePage {
   @Provide('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   // 设置页面栈
   @Provide('NavSettingsPathStack') SettingsPageInfos: NavPathStack = new NavPathStack()
-  // 断点
-  @State compStr: BreakpointState<string> = BreakpointState.of({
-    xs: "xs", sm: "sm", md: "md", lg: "lg", xl: "xl"
-  })
+
+  /* 断点布局相关 相关作用看定义时候的注释 */
   // 整体外边距
-  @Provide('morePageMargin') morePageMargin: BreakpointState<number> = BreakpointState.of({
-    xs: 12, sm: 14, md: 16, lg: 16, xl: 16
-  })
+  @Consume('breakPointStatemorePageMargin')
+  private morePageMargin: BreakpointState<number>
   // 列表底边距
-  @Provide('listBottom') listBottom: BreakpointState<number> = BreakpointState.of({
-    xs: 10, sm: 10, md: 14, lg: 14, xl: 14
-  })
+  @Consume('breakPointStatemorePagelistBottom')
+  private listBottom: BreakpointState<number>
 
 
   aboutToAppear(): void {
 
-    BreakpointSystem.getInstance().attach(this.compStr)
-    BreakpointSystem.getInstance().attach(this.morePageMargin)
-    BreakpointSystem.getInstance().attach(this.listBottom)
-    BreakpointSystem.getInstance().start()
   }
 
   aboutToDisappear(): void {
-    // BreakpointSystem.getInstance().attach(this.compStr)
-    // BreakpointSystem.getInstance().attach(this.morePageMargin)
-    // BreakpointSystem.getInstance().attach(this.listBottom)
-    // BreakpointSystem.getInstance().stop()
+
   }
 
 
@@ -103,6 +93,12 @@ struct MorePage {
     } else
     if (name == 'DNS') {
       DNS()
+    } else
+    if (name == 'Network') {
+      Network()
+    } else
+    if (name == 'Route-Address') {
+      NetworkRouterAddress()
     }
   }
 
@@ -181,7 +177,8 @@ struct MorePage {
           })
         }
         .width('100%')
-        .height(700)
+        // .layoutWeight(1) // 自适应占满剩余空间
+        .height(this.isLandscapePhone ? 275 : 700)
         .margin({ top: 10, left: this.morePageMargin.value, right: this.morePageMargin.value })
         .borderRadius(18)
         .alignListItem(ListItemAlign.Center)
