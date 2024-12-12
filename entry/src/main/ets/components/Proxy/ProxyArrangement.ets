@@ -1,13 +1,4 @@
-import { NodeParam, TreeController, TreeView } from "@kit.ArkUI"
 import {
-  TAB_CONTENT_TITLE_FONT_SIZE,
-  TAB_CONTENT_TITLE_FONT_WEIGHT,
-  BPS_LIST_LANES_1_1_2_3_4,
-  BPS_LIST_GUTTER_1_1_2_3_3,
-  BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36,
-  ANIMATION_DURATION_300,
-  TAB_CONTENT_TITLE_HEIGHT,
-  TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE,
   LIST_ITEM_HEIGHT,
 } from '../../common/Constants'
 import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem'
@@ -17,7 +8,7 @@ import ProxyGroupItem from './ProxyGroupItem'
 
 @Entry
 @Component
-struct ProxyLayout {
+struct ProxyArrangement {
   @State font_primary: ResourceColor = $r('sys.color.font_primary') //一级文本色，黑色
   @State comp_divider: ResourceColor = $r('sys.color.comp_divider') //分割线颜色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
@@ -29,19 +20,12 @@ struct ProxyLayout {
   @StorageProp('isLandscapePhone')
   private isLandscapePhone: boolean = false
   /* 断点布局相关 */
-  @State
-  private breakPointStateListLanes: BreakpointState<number> = BPS_LIST_LANES_1_1_2_3_4
-  @State
-  private breakPointStateListGutter: BreakpointState<number> = BPS_LIST_GUTTER_1_1_2_3_3
-  @State
-  private breakPointStateTabContentTitleMargin: BreakpointState<number> = BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36
+  @Consume
+  private breakPointStateTabContentTitleMargin: BreakpointState<number>
   private componentName: string = 'ProxyPage'
 
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
-    BreakpointSystem.getInstance().attach(this.breakPointStateListLanes)
-    BreakpointSystem.getInstance().attach(this.breakPointStateListGutter)
-    BreakpointSystem.getInstance().attach(this.breakPointStateTabContentTitleMargin)
     BreakpointSystem.getInstance().start()
   }
 
@@ -52,10 +36,10 @@ struct ProxyLayout {
           ListItem() {
             Column() {
               Row() {
-                Text(item.toString()).fontSize(18).fontColor($r('sys.color.font_primary'))
+                Text(item.toString()).fontSize(16).fontColor($r('sys.color.font_primary'))
                 SymbolGlyph(this.isContentShow && this.selectItem === item ? $r('sys.symbol.chevron_down') :
                 $r('sys.symbol.chevron_right'))
-                  .fontSize(18).fontColor([this.icon_primary])
+                  .fontSize(16).fontColor([this.icon_primary])
               }
               .padding({ left: 10, right: 10 })
               .onClick(() => {
@@ -110,4 +94,4 @@ struct ProxyLayout {
   }
 }
 
-export default ProxyLayout
+export default ProxyArrangement

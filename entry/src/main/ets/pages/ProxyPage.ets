@@ -9,17 +9,20 @@ import {
   TAB_CONTENT_TITLE_HEIGHT,
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE,
   LIST_ITEM_HEIGHT,
+  LIST_SPACE,
+  BORDER_RADIUS_20,
+  BIND_SHEET_CONTAINER_HEIGHT,
 } from '../common/Constants'
 import { hilog } from '@kit.PerformanceAnalysisKit'
-import { Callback } from '@ohos.base'
-import { IntentionCode } from '@kit.InputKit'
 import  ProxyGroupItem  from '../components/Proxy/ProxyGroupItem'
+import ProxyArrangement  from '../components/Proxy/ProxyArrangement'
+
+
 
 // todo 定义一个接口来描述列表项的数据结构,假数据，后期可改可删
 interface Item {
   latency: number;
 }//
-
 
 
 //import { ThemeControl } from '@ohos.arkui.theme'
@@ -30,7 +33,7 @@ interface Item {
 
 @Entry
 @Component
-struct ProxyPage1 {
+struct ProxyPage {
   /* 预留自定义主题，颜色在AppTheme里面修改
  onWillApplyTheme(theme: Theme) {
     this.backgroundPrimary = theme.colors.backgroundPrimary;
@@ -60,14 +63,13 @@ struct ProxyPage1 {
 
 
 
-  /* 断点布局相关 */
-  @State
-  private breakPointStateListLanes: BreakpointState<number> = BPS_LIST_LANES_1_1_2_3_4
-  @State
-  private breakPointStateListGutter: BreakpointState<number> = BPS_LIST_GUTTER_1_1_2_3_3
-  /* 配置列表List相关 */
-  @State
-  private breakPointStateTabContentTitleMargin: BreakpointState<number> = BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36
+  /* 断点布局相关 相关作用看定义时候的注释 */
+  @Consume('breakPointStateListLanes')
+  private breakPointStateListLanes: BreakpointState<number>
+  @Consume('breakPointStateListGutter')
+  private breakPointStateListGutter: BreakpointState<number>
+  @Consume('breakPointStateTabContentTitleMargin')
+  private breakPointStateTabContentTitleMargin: BreakpointState<number>
 
   private tabsController: TabsController = new TabsController()
 
@@ -106,9 +108,9 @@ struct ProxyPage1 {
   //栅格点位配置
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
-    BreakpointSystem.getInstance().attach(this.breakPointStateListLanes)
-    BreakpointSystem.getInstance().attach(this.breakPointStateListGutter)
-    BreakpointSystem.getInstance().attach(this.breakPointStateTabContentTitleMargin)
+ //   BreakpointSystem.getInstance().attach(this.breakPointStateListLanes)
+ //   BreakpointSystem.getInstance().attach(this.breakPointStateListGutter)
+ //   BreakpointSystem.getInstance().attach(this.breakPointStateTabContentTitleMargin)
     BreakpointSystem.getInstance().start()
   }
 
@@ -138,6 +140,11 @@ struct ProxyPage1 {
   }
 
 
+  // 定义ProxyArrangementSelected的值便于切换分组方式
+  @State ProxyArrangementSelected: string =  'ProxyArrangementSelected1';
+  @State ProxyArrangementChecked: boolean = true;
+
+
   @Builder
   //半模态编辑菜单
   ProxyBindSheetEdit() {
@@ -159,25 +166,25 @@ struct ProxyPage1 {
               value: 'Radio1', group: 'radioGroup1',
               indicatorType: RadioIndicatorType.TICK,
             })
-              .checked(true)
+              .checked(this.ProxyArrangementChecked)
+              .onChange((isChecked:boolean)=> {
+                if(isChecked){this.ProxyArrangementSelected ='ProxyArrangementSelected1' }
+              })
               .radioStyle({
                 checkedBackgroundColor: this.icon_emphasize,
                 //   uncheckedBorderColor: this.icon_secondary
               })
-            /* 选中改变，后期接入
-            .onChange((isChecked: boolean) => {
-              if (isChecked) {
-                promptAction.showToast({ message: 'Vibration mode.' })
-              }
-            })*/
           }
-    /*      .onClick(() => {
-            this.ProxyBindSheetEditRadio === true
+          // 点击时改变ProxyArrangementSelected状态
+          .onClick(() => {
+            this.ProxyArrangementSelected = 'ProxyArrangementSelected1';
+            this.ProxyArrangementChecked = true
             hilog.info(0xB003, this.componentName, `#ProxyBindSheetEditRadio#onClick: `)
-          })*/
+          })
           .clickEffect({ level: ClickEffectLevel.MIDDLE })
           .width('100%')
           .justifyContent(FlexAlign.SpaceBetween)
+
 
           Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
 
@@ -190,16 +197,20 @@ struct ProxyPage1 {
               value: 'Radio2', group: 'radioGroup1',
               indicatorType: RadioIndicatorType.TICK
             })
-              .checked(false)
+              .checked(!this.ProxyArrangementChecked)
+              .onChange((isChecked:boolean)=> {
+                if(isChecked){this.ProxyArrangementSelected ='ProxyArrangementSelected2' }
+              })
               .radioStyle({
                 checkedBackgroundColor: this.icon_emphasize,
                 //   uncheckedBorderColor: this.icon_secondary
               })
           }
-     /*     .onClick(() => {
-            this.ProxyBindSheetEditRadio
+          .onClick(() => {
+            this.ProxyArrangementSelected = 'ProxyArrangementSelected2';
+            this.ProxyArrangementChecked = false
             hilog.info(0xB003, this.componentName, `#ProxyBindSheetEditRadio#onClick: `)
-          })*/
+          })
           .clickEffect({ level: ClickEffectLevel.MIDDLE })
           .width('100%')
           .justifyContent(FlexAlign.SpaceBetween)
@@ -401,64 +412,73 @@ struct ProxyPage1 {
 
       // 代理页分组TAB+list主体
       Stack({ alignContent: this.stackAlignContentAlignment }) {
-        Column() { //分组标签页 start
-          Tabs({ barPosition: BarPosition.Start, controller: this.tabsController }) {
-            TabContent() {
-              List({ space: 10, initialIndex: 0 }) {
-                ProxyGroupItem() //list相关在components/ProxyGroupItem.ets文件里
+        // A组件，根据isProxyLayoutShown的状态决定是否显示
+        if (this.ProxyArrangementSelected === 'ProxyArrangementSelected1') {
+          Column() { //分组标签页 start
+            Tabs({ barPosition: BarPosition.Start, controller: this.tabsController }) {
+              TabContent() {
+                List({ space: 10, initialIndex: 0 }) {
+                  ProxyGroupItem() //list相关在components/ProxyGroupItem.ets文件里
+                }
+                .width('100%')
+                .height('100%')
+                .contentEndOffset(110)
+          //      .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
+                .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+                .chainAnimation(true)
+                .padding({
+                  left: this.breakPointStateTabContentTitleMargin.value,
+                  right: this.breakPointStateTabContentTitleMargin.value,
+                })
               }
-              .width('100%')
-              .height('100%')
-              .contentEndOffset(110)
-              .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
-              .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
-              .chainAnimation(true)
-              .padding({
-                left: this.breakPointStateTabContentTitleMargin.value,
-                right: this.breakPointStateTabContentTitleMargin.value,
-              })
-            }
-            // 节点列表 END
+              // 节点列表 END
 
-            //TODO 删除 临时模拟分组数据
-            .tabBar(this.TabBuilder('分组1', 0))
+              //TODO 删除 临时模拟分组数据
+              .tabBar(this.TabBuilder('分组1', 0))
 
-            TabContent() {
-            }
-            .tabBar(this.TabBuilder('分组2', 1))
+              TabContent() {
+              }
+              .tabBar(this.TabBuilder('分组2', 1))
 
-            TabContent() {
-            }
-            .tabBar(this.TabBuilder('分组3', 2))
+              TabContent() {
+              }
+              .tabBar(this.TabBuilder('分组3', 2))
 
-            TabContent() {
-            }
-            .tabBar(this.TabBuilder('分组4', 3))
+              TabContent() {
+              }
+              .tabBar(this.TabBuilder('分组4', 3))
 
-            TabContent() {
-            }
-            .tabBar(this.TabBuilder('分组5', 4))
+              TabContent() {
+              }
+              .tabBar(this.TabBuilder('分组5', 4))
 
-            TabContent() {
-            }
-            .tabBar(this.TabBuilder('分组6', 5))
+              TabContent() {
+              }
+              .tabBar(this.TabBuilder('分组6', 5))
 
-            TabContent() {
-            }
-            .tabBar(this.TabBuilder('分组7', 6))
+              TabContent() {
+              }
+              .tabBar(this.TabBuilder('分组7', 6))
 
-            TabContent() {
+              TabContent() {
+              }
+              .tabBar(this.TabBuilder('分组8', 7))
             }
-            .tabBar(this.TabBuilder('分组8', 7))
+            .barMode(BarMode.Scrollable)
+            .barHeight(55)
+            .fadingEdge(true)
+            .onChange((index: number) => {
+              this.currentIndex = index;
+            })
           }
-          .barMode(BarMode.Scrollable)
-          .barHeight(55)
-          .fadingEdge(true)
-          .onChange((index: number) => {
-            this.currentIndex = index;
-          })
+          //分组tabs end
         }
-        //分组tabs end
+
+        // 列表排列
+        else if (this.ProxyArrangementSelected === 'ProxyArrangementSelected2') {
+          ProxyArrangement()
+        }
+        //列表排列end
 
         // 悬浮新增配置按钮 START
         Button() {
@@ -482,21 +502,20 @@ struct ProxyPage1 {
         .clip(true)
         .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
         .clickEffect({ level: ClickEffectLevel.MIDDLE })
-
         // 悬浮新增配置按钮 END
       }
       .backgroundColor($r('app.color.background'))
       // .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
       .width('100%')
       .height(this.isLandscapePhone ? '100%' : `calc(100% - ${TAB_CONTENT_TITLE_HEIGHT}vp)`)
-
       // 主体 END
     }
     .width('100%')
     .height('100%')
-
   }
 }
 
 
-export default ProxyPage1
+
+
+export default ProxyPage

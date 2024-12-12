@@ -118,12 +118,12 @@ struct ProxyGroupItem {
   @StorageProp('isLandscapePhone')
   private isLandscapePhone: boolean = false
   /* 断点布局相关 */
-  @State
-  private breakPointStateListLanes: BreakpointState<number> = BPS_LIST_LANES_1_1_2_3_4
-  @State
-  private breakPointStateListGutter: BreakpointState<number> = BPS_LIST_GUTTER_1_1_2_3_3
-  @State
-  private breakPointStateTabContentTitleMargin: BreakpointState<number> = BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36
+  @Consume
+  private breakPointStateListLanes: BreakpointState<number>
+  @Consume
+  private breakPointStateListGutter: BreakpointState<number>
+  @Consume
+  private breakPointStateTabContentTitleMargin: BreakpointState<number>
   private componentName: string = 'ProxyPage'
   // 当前单选框选择的配置
   @State
@@ -131,9 +131,6 @@ struct ProxyGroupItem {
 
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
-    BreakpointSystem.getInstance().attach(this.breakPointStateListLanes)
-    BreakpointSystem.getInstance().attach(this.breakPointStateListGutter)
-    BreakpointSystem.getInstance().attach(this.breakPointStateTabContentTitleMargin)
     BreakpointSystem.getInstance().start()
   }
 
@@ -203,6 +200,8 @@ struct ProxyGroupItem {
     .borderRadius(20)
   }
 
+
+
   build() {
     // 节点列表 START
    List({ space: 10, initialIndex: 0 }) {
@@ -211,13 +210,13 @@ struct ProxyGroupItem {
           Row() {
             Row() {
               Column() {
-                Text(`${item.text}`).fontColor(($r('sys.color.font_primary'))).fontSize(20)
+                Text(`${item.text}`).fontColor(($r('sys.color.font_primary'))).fontSize(16)
                 Text(`${item.type}`).fontColor($r('sys.color.font_secondary')).fontSize(14)
               }.alignItems(HorizontalAlign.Start)
 
               Text(`${item.latency}` + 'ms')
                 .fontColor(this.getColorForLatency(item.latency) as ResourceColor)
-                .fontSize(18)
+                .fontSize(16)
             }
             .width('90%')
             .justifyContent(FlexAlign.SpaceBetween)
@@ -231,7 +230,6 @@ struct ProxyGroupItem {
           .padding({ left: 12, right: 12 })
           .alignItems(VerticalAlign.Center)
         }
-
         .onClick(() => {
           this.PorxyRadioCheckedValue = index
           hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)

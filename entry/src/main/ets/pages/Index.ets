@@ -6,7 +6,7 @@ import ProxyPage  from './ProxyPage'
 import ConfigurationPage from './ConfigurationPage'
 import MorePage from './MorePage'
 import { hilog } from '@kit.PerformanceAnalysisKit'
-import ProxyLayout  from '../components/Proxy/ProxyLayout'
+
 import {
   BPS_LIST_LANES_1_1_2_3_4,
   BPS_LIST_GUTTER_1_1_2_3_3,
@@ -196,7 +196,7 @@ struct Index {
         .tabBar(this.TabBarBuilder($r('app.string.Home'), 0, $r('sys.symbol.house_fill')))
 
         TabContent() {
-          ProxyLayout()
+          ProxyPage()
         }
         .tabBar(this.TabBarBuilder( $r('app.string.Proxy'), 1, $r('sys.symbol.list_bullet_square_fill')))
         TabContent() {
