@@ -2,22 +2,22 @@
   "routerMap": [
     {
       "name": "ImportConfigFromURL",
-      "pageSourceFile": "src/main/ets/components/configuration/ImportConfigFromURL.ets",
+      "pageSourceFile": "src/main/ets/components/Configuration/ImportConfigFromURL.ets",
       "buildFunction": "ImportConfigFromURLBuilder"
     },
     {
       "name": "ImportConfigFromQRcode",
-      "pageSourceFile": "src/main/ets/components/configuration/ImportConfigFromQRcode.ets",
+      "pageSourceFile": "src/main/ets/components/Configuration/ImportConfigFromQRcode.ets",
       "buildFunction": "ImportConfigFromQRcodeBuilder"
     },
     {
       "name": "ImportConfigFromFile",
-      "pageSourceFile": "src/main/ets/components/configuration/ImportConfigFromFile.ets",
+      "pageSourceFile": "src/main/ets/components/Configuration/ImportConfigFromFile.ets",
       "buildFunction": "ImportConfigFromFileBuilder"
     },
     {
       "name": "CreateNewConfig",
-      "pageSourceFile": "src/main/ets/components/configuration/CreateNewConfig.ets",
+      "pageSourceFile": "src/main/ets/components/Configuration/CreateNewConfig.ets",
       "buildFunction": "CreateNewConfigBuilder"
     }
   ]

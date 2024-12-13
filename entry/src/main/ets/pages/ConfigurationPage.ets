@@ -16,7 +16,7 @@ import {
   BIND_SHEET_CONTAINER_HEIGHT,
 } from '../common/Constants'
 import { LengthMetrics, PromptAction, SymbolGlyphModifier } from '@kit.ArkUI'
-import ConfigAdd from '../components/configuration/ConfigAdd'
+import ConfigAdd from '../components/Configuration/ConfigAdd'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
 
