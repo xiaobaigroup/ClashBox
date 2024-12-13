@@ -166,7 +166,7 @@ struct Index {
     }
 
     aboutToDisappear() {
-
+      // 停止监听断点事件，并清空断点对应数据
       BreakpointSystem.getInstance().stop()
 
       // 解绑listener中注册的回调函数

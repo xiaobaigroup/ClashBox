@@ -1,5 +1,6 @@
 import { BreakpointState } from "../../common/breakpointsystem";
 import {
+  BIND_SHEET_CONTAINER_HEIGHT,
   BIND_SHEET_DRAG_BAR_HEIGHT,
   BIND_SHEET_MAIN_FONTSIZE,
   BIND_SHEET_MAIN_FONT_WEIGHT,
@@ -91,7 +92,6 @@ struct ConfigAdd {
       // TODO 国际化
       // .title({ main: '添加配置', sub: ' '})
       // .titleMode(NavigationTitleMode.Mini)
-      // height + 16 是因为设计稿里这56 没包含了dragBar的高度（16）
       .title(
         {
           builder: ConfigAddBindSheetTitleBuilder({
@@ -105,11 +105,13 @@ struct ConfigAdd {
               left: this.breakPointStateNavigationListPadding.value,
               right: this.breakPointStateNavigationListPadding.value
             }}),
+          // height + 16 是因为设计稿里这56 没包含了dragBar的高度（16）
           height: BIND_SHEET_TITLE_CONTAINER_HEIGHT + BIND_SHEET_DRAG_BAR_HEIGHT
         },
         {
           // barStyle: BarStyle.STACK,
         })
+      .height(BIND_SHEET_CONTAINER_HEIGHT)
       .mode(NavigationMode.Stack)
       .hideBackButton(true)
       .navBarWidthRange([255, '100%'])

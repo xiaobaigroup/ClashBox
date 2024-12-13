@@ -53,10 +53,10 @@ export function ConfigAddBindSheetTitleBuilder(param: ConfigAddBindSheetTitleBui
 
   }
   .height('100%')
-  .width('100%')
+  .width('auto')
   .alignItems(VerticalAlign.Center)
   .padding(param.isSubPage ? 0 : param.padding)
-  .sharedTransition('configAddBindSheetTitle', { duration: 300, curve: Curve.Ease } )
+  // .sharedTransition('configAddBindSheetTitle', { duration: 300, curve: Curve.Ease } )
   // .animation({ duration: 200, curve: Curve.Ease })
   // 主副标题 END
 }
