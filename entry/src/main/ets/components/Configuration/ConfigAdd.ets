@@ -6,7 +6,9 @@ import {
   BIND_SHEET_MAIN_FONT_WEIGHT,
   BIND_SHEET_SUB_FONTSIZE,
   BIND_SHEET_TITLE_CONTAINER_HEIGHT,
-  BORDER_RADIUS_20, LIST_ITEM_HEIGHT, LIST_SPACE
+  BORDER_RADIUS_20, LIST_ITEM_HEIGHT,
+  LIST_ITEM_PADDING,
+  LIST_SPACE
 } from "../../common/Constants";
 import { hilog } from "@kit.PerformanceAnalysisKit";
 import { ConfigAddBindSheetTitleBuilder } from "../Common";
@@ -21,7 +23,7 @@ interface ConfigAddType {
 }
 
 @Component
-struct ConfigAdd {
+export struct ConfigAdd {
 
   private componentName: string = 'ConfigAdd';
 
@@ -62,7 +64,7 @@ struct ConfigAdd {
                 SymbolGlyph(item.symbolEnd).fontSize(24).fontColor([$r('sys.color.font_primary')])
               }
               .width('100%')
-              .padding({ left: 12, right: 12 })
+              .padding(LIST_ITEM_PADDING)
               .alignItems(VerticalAlign.Center)
             }
             // .backgroundColor($r('app.color.container_background'))
@@ -131,6 +133,3 @@ struct ConfigAdd {
   }
 
 }
-
-
-export default ConfigAdd

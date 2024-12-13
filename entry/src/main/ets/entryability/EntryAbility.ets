@@ -1,29 +1,34 @@
-import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
+import { AbilityConstant, Configuration, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 
+
 export default class EntryAbility extends UIAbility {
+ private currentLanguage: string | undefined = undefined
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
-    hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onCreate');
+    hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onCreate');
+    this.currentLanguage = this.context.config.language
+    AppStorage.setOrCreate<string>('language', this.currentLanguage)
+    hilog.info(0x0000, 'EntryAbility', `#onCreate#currentLanguage is [${this.currentLanguage}]`);
   }
 
 
   onDestroy(): void {
-    hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onDestroy');
+    hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onDestroy');
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {
     // Main window is created, set main page for this ability
-    hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
+    hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onWindowStageCreate');
     let windowClass: window.Window = windowStage.getMainWindowSync(); // 获取应用主窗口
 
     windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {
-        hilog.error(0x0000, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
+        hilog.error(0x0000, 'EntryAbility', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
         return;
       }
-      hilog.info(0x0000, 'testTag', 'Succeeded in loading the content.');
+      hilog.info(0x0000, 'EntryAbility', 'Succeeded in loading the content.');
     });
 
     // 1. 设置窗口全屏
@@ -60,18 +65,27 @@ export default class EntryAbility extends UIAbility {
 
   }
 
+  onConfigurationUpdate(newConfig: Configuration): void {
+    if (newConfig.language !== this.currentLanguage) {
+      this.currentLanguage = newConfig.language
+      hilog.info(0x0000, 'EntryAbility', `#onConfigurationUpdate#newConfig.language is [${this.currentLanguage}]`);
+      AppStorage.setOrCreate<string>('language', newConfig.language)
+    }
+
+  }
+
   onWindowStageDestroy(): void {
     // Main window is destroyed, release UI related resources
-    hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onWindowStageDestroy');
+    hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onWindowStageDestroy');
   }
 
   onForeground(): void {
     // Ability has brought to foreground
-    hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onForeground');
+    hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onForeground');
   }
 
   onBackground(): void {
     // Ability has back to background
-    hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onBackground');
+    hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onBackground');
   }
 }

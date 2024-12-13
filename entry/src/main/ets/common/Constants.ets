@@ -23,6 +23,16 @@ export const BIND_SHEET_MAIN_FONT_WEIGHT: number = FontWeight.Bold
 // bindSheet Title sub fontSize
 export const BIND_SHEET_SUB_FONTSIZE: number = 14
 
+// fontSize 14
+export const FONT_SIZE_14: number = 14
+// fontSize 16
+export const FONT_SIZE_16: number = 16
+
+// TextInput height
+export const TEXT_INPUT_HEIGHT: number = 45
+// TextArea
+export const TEXT_AREA_MAX_LENGTH: number = 999
+
 
 // 更多列表类
 export class moreData {
@@ -250,5 +260,20 @@ export const morePagelistBottom_10_14: BreakpointState<number> = BreakpointState
 /* List 相关*/
 // List中子组件的间隔
 export const LIST_SPACE: number = 10
-// ListItem的高度
+// ListItem的高度 56
 export const LIST_ITEM_HEIGHT: number = 56
+// ListItem的高度 45
+export const LIST_ITEM_HEIGHT_45: number = 56
+// ListItem 的 padding
+export const LIST_ITEM_PADDING: Padding = { left: 12, right: 12 }
+
+/* 配置页 */
+// 配置自动更新的间隔菜单显示文本默认值，用于获取string_array.json资源异常的时候显示
+export const CONFIG_AUTO_UPDATE_MENU_STRING_ARR: Array<string> = [
+  '1 minute',
+  '10 minute',
+  '30 minute',
+  '1 hour',
+  '1 day',
+  'Custom',
+]

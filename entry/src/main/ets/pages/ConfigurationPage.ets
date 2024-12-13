@@ -14,9 +14,10 @@ import {
   LIST_SPACE,
   BORDER_RADIUS_20,
   BIND_SHEET_CONTAINER_HEIGHT,
+  LIST_ITEM_PADDING,
 } from '../common/Constants'
 import { LengthMetrics, PromptAction, SymbolGlyphModifier } from '@kit.ArkUI'
-import ConfigAdd from '../components/Configuration/ConfigAdd'
+import { ConfigAdd } from '../components/Configuration/ConfigAdd'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
 
@@ -221,7 +222,7 @@ struct ConfigurationPage {
                   .checked(index === this.currentConfigRadioCheckedValue)
               }
               .width('100%')
-              .padding({ left: 12, right: 12 })
+              .padding(LIST_ITEM_PADDING)
               .alignItems(VerticalAlign.Center)
             }
             .backgroundColor($r('app.color.container_background'))
@@ -294,7 +295,7 @@ struct ConfigurationPage {
         .clickEffect({ level: ClickEffectLevel.MIDDLE })
         .bindSheet( $$this.bindSheetIsShowOfConfigAddButton, this.ConfigAddBindSheetBuilder, {
           // title: { title: $r('app.string.AddConfig') },
-          detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT, SheetSize.LARGE],
+          detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT, ],// SheetSize.LARGE
           backgroundColor: $r('app.color.container_background'),
           showClose: true,
           dragBar: false,

@@ -4,10 +4,11 @@ import {
   BIND_SHEET_MAIN_FONTSIZE,
   BIND_SHEET_SUB_FONTSIZE,
   BIND_SHEET_TITLE_CONTAINER_HEIGHT,
-  BIND_SHEET_DRAG_BAR_HEIGHT
+  BIND_SHEET_DRAG_BAR_HEIGHT,
 } from "../../common/Constants"
 import { ConfigAddBindSheetTitleBuilder } from "../Common"
 import { hilog } from "@kit.PerformanceAnalysisKit"
+import { ConfigInfo } from "./ConfigInfo"
 
 
 // 关联：route_map.json
@@ -26,11 +27,14 @@ export struct ImportConfigFromURL{
   @Consume('configAddPageInfos')
   // 页面栈
   private configAddPageInfos: NavPathStack
+  // TODO 路由传参
+  // 路由参数：是否是新配置（非已有配置进入编辑状态）
+  isNewConfig: boolean = false
 
   /* 断点相关 */
   // NV容器的padding
-  @Consume('breakPointStateNavigationListPadding')
-  breakPointStateNavigationListPadding: BreakpointState<number>
+  // @Consume('breakPointStateNavigationListPadding')
+  // breakPointStateNavigationListPadding: BreakpointState<number>
 
   // NV title Builder
   // TODO 国际化
@@ -39,14 +43,12 @@ export struct ImportConfigFromURL{
   @State
   private subTitle: string = '从URL(链接)导入'
 
+
   build() {
     NavDestination() {
-      Column() {
-        Text(this.componentName).fontSize(50)
-        Text(this.breakPointStateNavigationListPadding.value?.toString())
-
-      }.width('100%').height('100%').backgroundColor('#ffdd7f7f').alignItems(HorizontalAlign.Start)
+      ConfigInfo({isNewConfig: this.isNewConfig})
     }
+    .height('100%')
     .title({builder: ConfigAddBindSheetTitleBuilder({
       isSubPage: true,
       titlePaddingLeft: BIND_SHEET_DRAG_BAR_HEIGHT / 2,

@@ -1,0 +1,27 @@
+{
+  "strarray": [
+    {
+      "name": "config_auto_update_menu",
+      "value": [
+        {
+          "value": "1 minute"
+        },
+        {
+          "value": "10 minute"
+        },
+        {
+          "value": "30 minute"
+        },
+        {
+          "value": "1 hour"
+        },
+        {
+          "value": "1 day"
+        },
+        {
+          "value": "Custom"
+        }
+      ]
+    }
+  ]
+}

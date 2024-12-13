@@ -46,8 +46,9 @@ export struct ImportConfigFromQRcode{
         Text(this.componentName).fontSize(50)
         Text(this.breakPointStateNavigationListPadding.value?.toString())
 
-      }.width('100%').height('100%').backgroundColor('#ffd43400').alignItems(HorizontalAlign.Start)
+      }.width('100%').height('auto').backgroundColor('#ffd43400').alignItems(HorizontalAlign.Start)
     }
+    .height('100%')
     .title({builder: ConfigAddBindSheetTitleBuilder({
       isSubPage: true,
       titlePaddingLeft: BIND_SHEET_DRAG_BAR_HEIGHT / 2,
