@@ -29,6 +29,9 @@ struct ProxyArrangement {
     BreakpointSystem.getInstance().start()
   }
 
+  //分组tabs相关
+  @State listIndex: number = 0;
+
   build() {
     Column() {
       List({ space: 10, initialIndex: 0 }) {
@@ -41,6 +44,11 @@ struct ProxyArrangement {
                 $r('sys.symbol.chevron_right'))
                   .fontSize(16).fontColor([this.icon_primary])
               }
+              .onClick(() => {
+                this.listIndex = item;
+              })
+              .borderRadius(20)
+              .backgroundColor($r('app.color.container_background'))
               .padding({ left: 10, right: 10 })
               .onClick(() => {
                 animateTo({
@@ -62,19 +70,16 @@ struct ProxyArrangement {
               //展开后内容显示区域
               if (this.isContentShow && this.selectItem === item) {
 
-                Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 16, right: 16 })
-
+          //      Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 16, right: 16 })
                   List() {
                     ProxyGroupItem()
                   }
                   .width('100%')
                   .height(undefined) //展开后界面高度
-                  .padding({ top:10, bottom: 10 })
-                  .divider({ strokeWidth: 1 })
+                  .padding({ top:10, bottom: 20 })
               }
             }
-            .borderRadius(20)
-            .backgroundColor($r('app.color.container_background'))
+       //     .backgroundColor($r('app.color.container_background'))
             .width('100%')
           }
         }, (item: string) => item.toString())
@@ -95,3 +100,5 @@ struct ProxyArrangement {
 }
 
 export default ProxyArrangement
+
+

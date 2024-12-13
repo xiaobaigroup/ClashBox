@@ -9,6 +9,15 @@ import {
 import { LengthMetrics, SymbolGlyphModifier } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
 
+//断点布局
+export const BPS_LIST_LANES_2_2_3_4_4: BreakpointState<number> = BreakpointState.of({
+  xs: 2,
+  sm: 2,
+  md: 3,
+  lg: 4,
+  xl: 4,
+  xxl: 5
+})
 
 // 定义一个接口来描述列表项的数据结构,假数据，后期可改可删
 interface Item {
@@ -62,7 +71,6 @@ struct CustomDialogExample {
 @Entry
 @Component
 struct ProxyGroupItem {
-
   // 显式声明状态变量的类型，假数据组后期可改可删
   @State items: Item[] = [
     { text: '越南①', latency: 20, type: 'Vmess' },
@@ -114,16 +122,17 @@ struct ProxyGroupItem {
     new SymbolGlyphModifier($r('sys.symbol.questionmark_circle')).fontSize('24vp');
   // TODO 删除 临时模拟数据配置列表数据
   @State isShowNetworkSpeed: boolean = false
+  // 定义ProxyGroupItemSelected的值便于切换布局方式
+  @Consume ProxyGroupItemSelected: string
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone')
   private isLandscapePhone: boolean = false
   /* 断点布局相关 */
-  @Consume
-  private breakPointStateListLanes: BreakpointState<number>
+  @State
+  private breakPointStateListLanes: BreakpointState<number> = BPS_LIST_LANES_2_2_3_4_4
   @Consume
   private breakPointStateListGutter: BreakpointState<number>
-  @Consume
-  private breakPointStateTabContentTitleMargin: BreakpointState<number>
+
   private componentName: string = 'ProxyPage'
   // 当前单选框选择的配置
   @State
@@ -131,13 +140,17 @@ struct ProxyGroupItem {
 
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
+    BreakpointSystem.getInstance().attach(this.breakPointStateListLanes)
     BreakpointSystem.getInstance().start()
   }
 
+
   // 排序函数
-  sortItems() {
+ sortItems() {
     this.items.sort((a, b) => a.latency - b.latency);
   }
+
+
 
   //半模拟态网络测速
   @Builder
@@ -195,72 +208,136 @@ struct ProxyGroupItem {
         })
     }
     //分割线
-    .menuItemDivider({ color:$r('app.color.divider'), strokeWidth: LengthMetrics.vp(1) })
+    .menuItemDivider({ color: $r('app.color.divider'), strokeWidth: LengthMetrics.vp(1) })
     .backgroundColor($r('app.color.container_background'))
     .borderRadius(20)
   }
 
-
-
   build() {
-    // 节点列表 START
-   List({ space: 10, initialIndex: 0 }) {
-      ForEach(this.items, (item: Item, index: number) => {
-        ListItem() {
-          Row() {
+//多列排列
+    if (this.ProxyGroupItemSelected === 'ProxyGroupItemSelected1') {
+      // 节点列表 START
+      List({ space: 10, initialIndex: 0 }) {
+        ForEach(this.items, (item: Item, index: number) => {
+          ListItem() {
             Row() {
+
               Column() {
                 Text(`${item.text}`).fontColor(($r('sys.color.font_primary'))).fontSize(16)
                 Text(`${item.type}`).fontColor($r('sys.color.font_secondary')).fontSize(14)
-              }.alignItems(HorizontalAlign.Start)
 
-              Text(`${item.latency}` + 'ms')
-                .fontColor(this.getColorForLatency(item.latency) as ResourceColor)
-                .fontSize(16)
+
+                Blank(10)
+                Text(`${item.latency}` + 'ms')
+                  .fontColor(this.getColorForLatency(item.latency) as ResourceColor)
+                  .fontSize(16)
+              }.width('90%').alignItems(HorizontalAlign.Start)
+
+
+              Blank()
+              Radio({ value: 'radio' + index, group: 'configGroup' })
+                .checked(index === this.PorxyRadioCheckedValue)
             }
-            .width('90%')
-            .justifyContent(FlexAlign.SpaceBetween)
+            .width('100%')
+            .padding({ left: 14, right: 16 })
+            .alignItems(VerticalAlign.Center)
 
-
-            Blank()
-            Radio({ value: 'radio' + index, group: 'configGroup' })
-              .checked(index === this.PorxyRadioCheckedValue)
           }
-          .width('100%')
-          .padding({ left: 12, right: 12 })
-          .alignItems(VerticalAlign.Center)
-        }
-        .onClick(() => {
-          this.PorxyRadioCheckedValue = index
-          hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
-        })
-        .backgroundColor($r('app.color.container_background'))
-        .width('100%')
-        .height(LIST_ITEM_HEIGHT)
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
-        .borderRadius(20)
-        .bindContextMenu(this.MyMenu, ResponseType.LongPress,
-          {
-            preview: MenuPreviewMode.IMAGE,
-            previewAnimationOptions: {
-              scale: [0.95, 1.0],
-              transition: TransitionEffect.prototype.animation({ tempo: 1.5 })
-            }
+          .onClick(() => {
+            this.PorxyRadioCheckedValue = index
+            hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
           })
+          .backgroundColor($r('app.color.container_background'))
+          //  .width('100%')
+          .height(LIST_ITEM_HEIGHT + 20)
+          .clickEffect({ level: ClickEffectLevel.MIDDLE })
+          .borderRadius(20)
+          .bindContextMenu(this.MyMenu, ResponseType.LongPress,
+            {
+              preview: MenuPreviewMode.IMAGE,
+              previewAnimationOptions: {
+                scale: [0.95, 1.0],
+                transition: TransitionEffect.prototype.animation({ tempo: 1.5 })
+              }
+            })
+        })
+      }
+      .alignListItem(ListItemAlign.Center)
+      .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
+      // .divider({ strokeWidth: 1,color:$r('app.color.divider'),startMargin:16,endMargin:16})
+      .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
+        detents: [684, SheetSize.FIT_CONTENT],
+        backgroundColor: $r('app.color.settings_container_background'),
+        //       blurStyle: BlurStyle.BACKGROUND_REGULAR,
+        showClose: true,
+        scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+        title: { title: $r('app.string.Test_Speed'), subtitle: '测速功能由CloundFlare提供' },
+        width: ('100%'),
+        maskColor: $r('app.color.dialog_maskcolor')
+        //onWillAppear:()
       })
     }
-   .divider({ strokeWidth: 1,color:$r('app.color.divider'),startMargin:16,endMargin:16})
-    .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
-      detents: [684, SheetSize.FIT_CONTENT],
-      backgroundColor: $r('app.color.settings_container_background'),
-      //       blurStyle: BlurStyle.BACKGROUND_REGULAR,
-      showClose: true,
-      scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-      title: { title: $r('app.string.Test_Speed'), subtitle: '测速功能由CloundFlare提供' },
-      width: ('100%'),
-      maskColor: $r('app.color.dialog_maskcolor')
-      //onWillAppear:()
-    })
+    //单列排列
+    else if (this.ProxyGroupItemSelected === 'ProxyGroupItemSelected2') {
+      // 节点列表 START
+      List({ space: 10, initialIndex: 0 }) {
+        ForEach(this.items, (item: Item, index: number) => {
+          ListItem() {
+            Row() {
+              Row() {
+                Column() {
+                  Text(`${item.text}`).fontColor(($r('sys.color.font_primary'))).fontSize(16)
+                  Text(`${item.type}`).fontColor($r('sys.color.font_secondary')).fontSize(14)
+                }.alignItems(HorizontalAlign.Start)
+
+                Text(`${item.latency}` + 'ms')
+                  .fontColor(this.getColorForLatency(item.latency) as ResourceColor)
+                  .fontSize(16)
+              }
+              .width('90%')
+              .justifyContent(FlexAlign.SpaceBetween)
+
+
+              Blank()
+              Radio({ value: 'radio' + index, group: 'configGroup' })
+                .checked(index === this.PorxyRadioCheckedValue)
+            }
+            .width('100%')
+            .padding({ left: 12, right: 12 })
+            .alignItems(VerticalAlign.Center)
+          }
+          .onClick(() => {
+            this.PorxyRadioCheckedValue = index
+            hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
+          })
+          .backgroundColor($r('app.color.container_background'))
+          .width('100%')
+          .height(LIST_ITEM_HEIGHT)
+          .clickEffect({ level: ClickEffectLevel.MIDDLE })
+          .borderRadius(20)
+          .bindContextMenu(this.MyMenu, ResponseType.LongPress,
+            {
+              preview: MenuPreviewMode.IMAGE,
+              previewAnimationOptions: {
+                scale: [0.95, 1.0],
+                transition: TransitionEffect.prototype.animation({ tempo: 1.5 })
+              }
+            })
+        })
+      }
+      // .divider({ strokeWidth: 1,color:$r('app.color.divider'),startMargin:16,endMargin:16})
+      .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
+        detents: [684, SheetSize.FIT_CONTENT],
+        backgroundColor: $r('app.color.settings_container_background'),
+        //       blurStyle: BlurStyle.BACKGROUND_REGULAR,
+        showClose: true,
+        scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+        title: { title: $r('app.string.Test_Speed'), subtitle: '测速功能由CloundFlare提供' },
+        width: ('100%'),
+        maskColor: $r('app.color.dialog_maskcolor')
+        //onWillAppear:()
+      })
+    }
   }
 
   //长按菜单end
