@@ -18,7 +18,6 @@ import TopBuilder from "./TopBuilder"
 @Component
 struct Settings {
   @State settingsList: settingsData[] = SettingsListItem()
-  @State LanguageList: settingsData[] = LanguageListItem()
   @Link isShowSettings: boolean
   //@State isShowMenu: boolean = false
   // 当前设备`height`是否符合(320vp< height <= 500vp)
@@ -33,7 +32,7 @@ struct Settings {
   @State listBottom: BreakpointState<number> = BreakpointState.of({
     xs: 10, sm: 10, md: 14, lg: 14, xl: 14
   })
-  //@State endIconModifier: Resource = $r('app.media.ok')
+
 
   handleCheck(index: number) {
     // 列表项路由跳转
@@ -43,14 +42,14 @@ struct Settings {
     hilog.info(0xFF00, "SettingstestTag", itemSettingsData.name)
   }
 
-  handleMenuCheck(index: number) {
+/*  handleMenuCheck(index: number) {
     // 语言菜单项点击
     let menuItemData = this.LanguageList[index]
     menuItemData.isCheck = !menuItemData.isCheck
     this.LanguageList.splice(index, 1, menuItemData)
     hilog.isLoggable(0xFF00, "menutestTag", hilog.LogLevel.INFO);
     hilog.info(0xFF00, "menutestTag", "%{public}s", menuItemData.isCheck)
-  }
+  }*/
 
   aboutToAppear(): void {
     BreakpointSystem.getInstance().attach(this.compStr)

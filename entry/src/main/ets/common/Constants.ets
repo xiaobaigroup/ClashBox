@@ -183,10 +183,10 @@ export class settingsData {
 export const SettingsListItem = (): settingsData[] => {
   let result: settingsData[] = new Array()
   result = [
-    new settingsData($r('sys.symbol.translate_c2e'), 'Language', $r('app.string.Language'), '', $r('app.string.LanguageHint_Zh'), false),
+    new settingsData($r('sys.symbol.translate_c2e'), 'Language', $r('app.string.Language'), '', $r('app.string.Language_Subtitle'), false),
     new settingsData($r('sys.symbol.brush_fill'), 'Appearance', $r('app.string.Appearance'), $r('app.string.AppearanceSubtitle'), '', false),
     new settingsData($r('sys.symbol.externaldrive_fill'), 'Backup', $r('app.string.Backup_Recovery'), $r('app.string.BackgrounderSubtitle'), '', false),
-    new settingsData($r('sys.symbol.lock_fill'), 'ApplicationLock', $r('app.string.ApplicationLock'), $r('app.string.ApplicationicationLockSubtitle'), '', false),
+    new settingsData($r('sys.symbol.lock_fill'), 'ApplicationLock', $r('app.string.ApplicationLock'), $r('app.string.ApplicationicationLockSubtitle'), $r('app.string.Opened'), false),
     new settingsData($r('sys.symbol.ellipsis_message_fill'), 'Notice', $r('app.string.Notice'), $r('app.string.NoticeSubtitle'), '', false),
     new settingsData($r('sys.symbol.checkmark_square_on_square_fill'), 'Backgrounder', $r('app.string.Backgrounder'), $r('app.string.BackgrounderSubtitle'), '', false),
     new settingsData($r('sys.symbol.trash_fill'), 'WipeData', $r('app.string.WipeData'), $r('app.string.WipeDataSubtitle'), '', false),
@@ -196,13 +196,30 @@ export const SettingsListItem = (): settingsData[] => {
   return result
 }
 
+// 语言列表类
+export class LanguageData {
+  title: string | Resource;
+  subtitle: string | Resource;
+  areaID: string;
+  isCheck: boolean
+
+  constructor(title: ResourceStr, subtitle: ResourceStr, areaID: string, isCheck:boolean) {
+    this.title = title
+    this.subtitle = subtitle
+    this.areaID = areaID
+    this.isCheck = isCheck
+  }
+}
+
 // 设置页的多语言列表项
-export const LanguageListItem = (): settingsData[] => {
-  let result: settingsData[] = new Array()
+export const LanguageListItem = (): LanguageData[] => {
+  let result: LanguageData[] = new Array()
   result = [
-    new settingsData($r('sys.symbol.translate_c2e'), 'zh', $r('app.string.LanguageHint_Zh'), '', '', false),
-    new settingsData($r('sys.symbol.brush_fill'), 'es', $r('app.string.LanguageHint_es'), '', '', false),
-    //
+    new LanguageData($r('app.string.SimplifiedChinese'), $r('app.string.SimplifiedChinese_Subtitle'), 'zh-Hans', false),
+    new LanguageData($r('app.string.TraditionalChinese_HK'), $r('app.string.TraditionalChinese_HK_Subtitle'), 'zh-Hant', false),
+    new LanguageData($r('app.string.TraditionalChinese_TW'), $r('app.string.TraditionalChinese_TW_Subtitle'), 'zh-Hant', false),
+    new LanguageData($r('app.string.English'), $r('app.string.English_Subtitle'), 'en-Latn', false),
+
   ]
   return result
 }

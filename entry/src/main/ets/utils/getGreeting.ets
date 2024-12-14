@@ -2,10 +2,10 @@
 interface Holiday {
   month: number;
   day: number;
-  message: string;
+  message: Resource;
 }
 
-export function getGreeting(): string {
+export function getGreeting(): Resource {
   const currentDate = new Date();
   const currentHour = currentDate.getHours();
   const currentDay = currentDate.getDate();
@@ -13,14 +13,14 @@ export function getGreeting(): string {
 
   // 定义节假日祝福语列表
   const holidays: Holiday[] = [
-    { month: 2, day: 14, message: "巧克力真甜！" },
-    { month: 3, day: 8, message: "妇女节快乐！" },
-    { month: 3, day: 12, message: "植树节快乐！" },
-    { month: 5, day: 1, message: "劳动节快乐！" },
-    { month: 5, day: 4, message: "新青年！" },
-    { month: 6, day: 1, message: "儿童节快乐！" },
-    { month: 9, day: 10, message: "教师节快乐！" },
-    { month: 10, day: 1, message: "国庆节快乐！" },
+    { month: 2, day: 14, message: $r('app.string.Valentine') },
+    { month: 3, day: 8, message: $r('app.string.Women') },
+    { month: 3, day: 12, message: $r('app.string.Tree') },
+    { month: 5, day: 1, message: $r('app.string.Work')},
+    { month: 5, day: 4, message: $r('app.string.Youth') },
+    { month: 6, day: 1, message: $r('app.string.Children') },
+    { month: 9, day: 10, message: $r('app.string.Teacher') },
+    { month: 10, day: 1, message: $r('app.string.National')},
     //
   ];
 
@@ -35,17 +35,17 @@ export function getGreeting(): string {
 
   // 根据时间返回问候语
   if (currentHour >= 5 && currentHour < 8) {
-    return "早上好！";
+    return $r('app.string.GoodMorning');
   } else if (currentHour >= 8 && currentHour < 11) {
-    return "上午好！";
+    return $r('app.string.Good_Morning');
   } else if (currentHour >= 11 && currentHour < 13) {
-    return "中午好！";
+    return $r('app.string.Good_Afternoon');
   } else if (currentHour >= 13 && currentHour < 18) {
-    return "下午好！";
+    return $r('app.string.Good_afternoon');
   } else if (currentHour >= 18 && currentHour < 24) {
-    return "晚上好！";
+    return $r('app.string.GoodNiight');
   } else {
-    return "该睡了哦";
+    return $r('app.string.Sleep');
   }
 }
 

@@ -6,6 +6,7 @@ import { BIND_SHEET_DRAG_BAR_HEIGHT, BIND_SHEET_TITLE_CONTAINER_HEIGHT } from ".
 struct TopBuilder {
 
   @State title: ResourceStr = '设置'
+  @State subtitle: ResourceStr = ''
   @State showBackButton: boolean = true
   // @Link isShowSettings: boolean
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
@@ -29,10 +30,20 @@ struct TopBuilder {
           this.SettingsPageInfos.pop(true)
         })
       }
-      Text(this.title)
-        .fontSize(20)
-        .fontWeight(FontWeight.Bold)
-        .margin(this.showBackButton ? {left: 8, top: 24 } : {left: 16, top: 24 })
+      Column() {
+        Text(this.title)
+          .fontSize(20)
+          .fontWeight(FontWeight.Bold)
+          .margin(this.showBackButton ? {left: 8, top: 24 } : {left: 16, top: 24 })
+        if(this.subtitle) {
+          Text(this.subtitle)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .maxLines(1)
+            .fontSize(12)
+            .fontWeight(FontWeight.Bold)
+            .margin(this.showBackButton ? {left: 8, top: 24 } : {left: 16, top: 24 })
+        }
+      }.alignItems(HorizontalAlign.Center)
       Blank()
       /*Button({ type: ButtonType.Circle, stateEffect: true }) {
         SymbolGlyph($r('sys.symbol.xmark'))

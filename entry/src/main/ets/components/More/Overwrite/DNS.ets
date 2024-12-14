@@ -198,6 +198,9 @@ struct DNS {
                       if(index != 9 && index != 18 ) {
                         Text(item.subtitle)
                           .fontWeight(FontWeight.Normal)
+                          .textOverflow({ overflow: TextOverflow.MARQUEE })
+                          .maxLines(1)
+                          .width('85%')
                           .margin({ top: 2 })
                           .fontSize(14)
                       }
@@ -235,6 +238,9 @@ struct DNS {
                   Row() {
                     Text(item.title)
                       .fontWeight(FontWeight.Medium)
+                      .textOverflow({ overflow: TextOverflow.Ellipsis })
+                      .width('86%')
+                      .maxLines(1)
                       .fontSize(16)
                       .padding({ left: 12 })
                     Blank()

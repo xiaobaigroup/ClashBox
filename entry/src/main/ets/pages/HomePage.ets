@@ -71,7 +71,7 @@ struct Home {
   //@State fontColorValue:ResourceColor = ($r('app.color.settings_icon'));
 
   @State currentBp: string = ''
-  @State greetings: string = '早上好'
+  @State greetings: Resource = $r('app.string.GoodMorning')
   @State ContainerHeight: string = ''
   @State TopHeight: string = ''
   @State isShowSettings: boolean = false
@@ -219,7 +219,9 @@ struct Home {
             backgroundColor: $r('app.color.settings_container_background'),
             dragBar: false,
             blurStyle: BlurStyle.BACKGROUND_REGULAR,
-            //title: { title: $r('app.string.Settings') },
+            onDisappear: () => {
+              this.SettingsPageInfos.clear()
+            }
           })
         }
         .width('100%')

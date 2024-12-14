@@ -173,12 +173,8 @@
       "value": "关于"
     },
     {
-      "name": "LanguageHint_Zh",
+      "name": "Language_Subtitle",
       "value": "简体中文(默认)"
-    },
-    {
-      "name": "LanguageHint_es",
-      "value": "英语"
     },
     {
       "name": "AppearanceSubtitle",
@@ -515,6 +511,110 @@
     {
       "name": "Diversion_Strategy",
       "value": "分流策略"
+    },
+    {
+      "name": "Add",
+      "value": "添加"
+    },
+    {
+      "name": "Add_Router_Address",
+      "value": "添加路由地址"
+    },
+    {
+      "name": "Add_FakeIPfilter",
+      "value": "添加FakeIP过滤"
+    },
+    {
+      "name": "SystemLanguage",
+      "value": "系统语言"
+    },
+    {
+      "name": "SimplifiedChinese",
+      "value": "简体中文"
+    },
+    {
+      "name": "SimplifiedChinese_Subtitle",
+      "value": "简体中文"
+    },
+    {
+      "name": "TraditionalChinese_HK",
+      "value": "繁体中文(中国香港)"
+    },
+    {
+      "name": "TraditionalChinese_HK_Subtitle",
+      "value": "繁體中文(中國香港)"
+    },
+    {
+      "name": "TraditionalChinese_TW",
+      "value": "繁体中文(中国台湾)"
+    },
+    {
+      "name": "TraditionalChinese_TW_Subtitle",
+      "value": "繁體中文(中國台灣)"
+    },
+    {
+      "name": "English",
+      "value": "英语(通用)"
+    },
+    {
+      "name": "English_Subtitle",
+      "value": "English(General)"
+    },
+    {
+      "name": "GoodMorning",
+      "value": "早上好"
+    },
+    {
+      "name": "Good_Morning",
+      "value": "上午好"
+    },
+    {
+      "name": "Good_Afternoon",
+      "value": "中午好"
+    },
+    {
+      "name": "Good_afternoon",
+      "value": "下午好"
+    },
+    {
+      "name": "GoodNiight",
+      "value": "晚上好"
+    },
+    {
+      "name": "Sleep",
+      "value": "该睡啦"
+    },
+    {
+      "name": "Valentine",
+      "value": "巧克力真甜！"
+    },
+    {
+      "name": "Women",
+      "value": "妇女节快乐!"
+    },
+    {
+      "name": "Tree",
+      "value": "绿色森林！"
+    },
+    {
+      "name": "Youth",
+      "value": "新青年！"
+    },
+    {
+      "name": "Children",
+      "value": "儿童节快乐！"
+    },
+    {
+      "name": "Teacher",
+      "value": "教师节快乐！"
+    },
+    {
+      "name": "National",
+      "value": "国庆节快乐！"
+    },
+    {
+      "name": "Work",
+      "value": "劳动节快乐！"
     }
   ]
 }

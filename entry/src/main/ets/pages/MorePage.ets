@@ -17,6 +17,7 @@ import moreListItem from '../components/More/moreListItem';
 import Basic from '../components/More/Overwrite/Basic';
 import DNS from '../components/More/Overwrite/DNS';
 import Network, { NetworkRouterAddress } from '../components/More/Overwrite/Network';
+import { FakeIPfilter } from '../components/More/Overwrite/DNSsubpage';
 
 @Entry
 @Component
@@ -99,6 +100,9 @@ struct MorePage {
     } else
     if (name == 'Route-Address') {
       NetworkRouterAddress()
+    } else
+    if (name == 'FakeIP-Filtering') {
+      FakeIPfilter()
     }
   }
 
@@ -110,7 +114,7 @@ struct MorePage {
   }
   .width('100%')
   .height('100%')
-  //.backgroundColor(Color.White)
+
 }
 
   build() {

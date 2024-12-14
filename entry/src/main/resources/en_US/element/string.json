@@ -173,12 +173,8 @@
       "value": "About"
     },
     {
-      "name": "LanguageHint_Zh",
+      "name": "Language_Subtitle",
       "value": "Simplified Chinese (default)"
-    },
-    {
-      "name": "LanguageHint_es",
-      "value": "English"
     },
     {
       "name": "AppearanceSubtitle",
@@ -515,6 +511,110 @@
     {
       "name": "Diversion_Strategy",
       "value": "Diversion Strategy"
+    },
+    {
+      "name": "Add",
+      "value": "Add"
+    },
+    {
+      "name": "Add_Router_Address",
+      "value": "Add Router Address"
+    },
+    {
+      "name": "Add_FakeIPfilter",
+      "value": "Add FakeIP Filter"
+    },
+    {
+      "name": "SystemLanguage",
+      "value": "System Language"
+    },
+    {
+      "name": "SimplifiedChinese",
+      "value": "Simplified Chinese"
+    },
+    {
+      "name": "SimplifiedChinese_Subtitle",
+      "value": "简体中文"
+    },
+    {
+      "name": "TraditionalChinese_HK",
+      "value": "Traditional Chinese (Hong Kong, China)"
+    },
+    {
+      "name": "TraditionalChinese_HK_Subtitle",
+      "value": "繁体中文(中国香港)"
+    },
+    {
+      "name": "TraditionalChinese_TW",
+      "value": "Traditional Chinese (Taiwan, China)"
+    },
+    {
+      "name": "TraditionalChinese_TW_Subtitle",
+      "value": "繁体中文(中国台湾)"
+    },
+    {
+      "name": "English",
+      "value": "English(General)"
+    },
+    {
+      "name": "English_Subtitle",
+      "value": "English(General)"
+    },
+    {
+      "name": "GoodMorning",
+      "value": "Good Morning"
+    },
+    {
+      "name": "Good_Morning",
+      "value": "Good Morning"
+    },
+    {
+      "name": "Good_Afternoon",
+      "value": "Good Afternoon"
+    },
+    {
+      "name": "Good_afternoon",
+      "value": "Good Afternoon"
+    },
+    {
+      "name": "GoodNiight",
+      "value": "Good Night"
+    },
+    {
+      "name": "Sleep",
+      "value": "It's Time to Sleep"
+    },
+    {
+      "name": "Valentine",
+      "value": "Valentine's Day!"
+    },
+    {
+      "name": "Women",
+      "value": "Happy Women's Day!"
+    },
+    {
+      "name": "Tree",
+      "value": "Happy Arbor Day!"
+    },
+    {
+      "name": "Youth",
+      "value": "New Youth！"
+    },
+    {
+      "name": "Children",
+      "value": "Happy Children's Day!"
+    },
+    {
+      "name": "Teacher",
+      "value": "Happy Teachers' Day!"
+    },
+    {
+      "name": "National",
+      "value": "Happy National Day!"
+    },
+    {
+      "name": "Work",
+      "value": "Happy International Workers ' Day!"
     }
   ]
 }

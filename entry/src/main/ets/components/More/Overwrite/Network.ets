@@ -10,17 +10,18 @@ export struct theCustomDialog {
   @Link SaveInputValue: string
   @Link currentInputValue: string
   @Link theplaceholder: string
+  @Link theDialogTitle: ResourceStr
   cancel?: () => void
   confirm?: () => void
   controller: CustomDialogController
 
   build() {
     Column() {
-      Text($r('app.string.Edit_FakeIP_Range'))
+      Text(this.theDialogTitle)
         .fontWeight(FontWeight.Medium)
         .fontSize(20)
         .margin({ top: 15, bottom: 15 })
-      TextInput({placeholder: '例如：198.18.0.1/16', text: this.currentInputValue })
+      TextInput({placeholder: this.theplaceholder, text: this.currentInputValue })
         .onChange((value: string) => {
           this.currentInputValue = value
         })
@@ -30,6 +31,7 @@ export struct theCustomDialog {
         .height(39)
         .onClick(() => {
           this.SaveInputValue = this.currentInputValue
+          this.currentInputValue = this.theplaceholder
           this.controller.close()
           if (this.confirm) {
             this.confirm()
@@ -252,20 +254,27 @@ struct Network {
 }
 export default Network
 
-// 路由地址
+// 网络 -> 路由地址
 @Component
 export struct NetworkRouterAddress {
 
   @State SaveInputValue: string = ''
   @State currentInputValue: string = ''
-  @State theplaceholder: string = '例如：198.18.0.1/16'
+  @State theplaceholder: string = '请输入地址'
+  @State theDialogTitle: ResourceStr = $r('app.string.Add_Router_Address')
+  @State RouterAddressList: RouterAddressData[] = createRouterAddressData()
   @Consume('NavPathStack') pageInfos: NavPathStack
-  // FakeIP范围弹窗控制器
+  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
+  @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
+
+  // 添加路由地址弹窗控制器
   dialogController: CustomDialogController = new CustomDialogController({
     builder: theCustomDialog({
       theplaceholder: this.theplaceholder,
       currentInputValue: $currentInputValue,
       SaveInputValue: $SaveInputValue,
+      theDialogTitle: this.theDialogTitle,
       cancel: ()=> { this.onCancel() },
       confirm: ()=> { this.onAccept() },
     }),
@@ -276,10 +285,17 @@ export struct NetworkRouterAddress {
   }
   onAccept() {
     // 更新UI数组中对应元素
-    // let FakeIPRangeData = this.overwriteNetworkList[9]
-    // FakeIPRangeData.subtitle = this.SaveInputValue
-    // this.overwriteNetworkList.splice(9,1,FakeIPRangeData)
-    // 处理FakeIP范围变更
+    const newItem: RouterAddressData = new RouterAddressData(this.SaveInputValue, false)
+    this.RouterAddressList = [...this.RouterAddressList, newItem]
+
+  }
+
+  // 列表行删除
+  handleDelete(index: number) {
+    hilog.info(0xFF00, "NetworkRoutertestTag", "%{public}d", index)
+    hilog.info(0xFF00, "NetworkRoutertestTag", "1%{public}s", JSON.stringify(this.RouterAddressList))
+    this.RouterAddressList.splice(index, 1)
+    hilog.info(0xFF00, "NetworkRoutertestTag", "2%{public}s", JSON.stringify(this.RouterAddressList))
 
   }
 
@@ -292,13 +308,91 @@ export struct NetworkRouterAddress {
         subtitle: $r('app.string.Routing_Address')
       })
 
+      List() {
+        ForEach(this.RouterAddressList, (item: RouterAddressData, index: number) => {
+          // 数据列表行
+          ListItem() {
+            Row() {
+              Row() {
+                Text(item.name)
+                  .fontWeight(FontWeight.Medium)
+                  .fontSize(16)
+                  .margin({left: 12})
+                Blank()
+                SymbolGlyph($r('sys.symbol.trash_fill'))
+                  .fontSize(28)
+                  .margin({right: 12})
+                  .onClick(() => {
+                    this.handleDelete(index)
+                  })
+              }
+              .width('94%')
+              .height(53)
+              .borderRadius(20)
+              .backgroundColor($r('app.color.container_background'))
+              Row()
+                .height(10)
+            }
+
+          }
+          .margin({bottom: this.listBottom.value })
+        })
+
+        // 添加栏
+        ListItem() {
+          Row() {
+            SymbolGlyph($r('sys.symbol.plus'))
+              .fontSize(28)
+              .margin({left: 12, right: 16})
+            Text($r('app.string.Add'))
+              .fontWeight(FontWeight.Medium)
+              .fontSize(16)
+          }
+          .width('94%')
+          .height(53)
+          .borderRadius(20)
+          .backgroundColor($r('app.color.container_background'))
+        }
+        .onClick(() => {
+          this.dialogController.open()
+        })
+
+      }
+      .width('100%')
+      .height(this.isLandscapePhone ? 275 : 650)
+      .margin({ top: 10, left: this.morePageMargin.value, right: this.morePageMargin.value })
+      .borderRadius(18)
+      .alignListItem(ListItemAlign.Center)
+
 
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
-      this.pageInfos.clear();
+      this.pageInfos.pop(true);
       return true;
     })
   }
+}
+
+// 路由地址列表数据类
+class RouterAddressData {
+  name: string
+  isCheck: boolean
+
+  constructor(name: string, isCheck:boolean) {
+    this.name = name
+    this.isCheck = isCheck
+  }
+}
+
+// 数据
+const createRouterAddressData = (): RouterAddressData[] => {
+  let result: RouterAddressData[] = new Array()
+  result = [
+    new RouterAddressData('123', false),
+    new RouterAddressData('值', false),
+
+  ]
+  return result
 }

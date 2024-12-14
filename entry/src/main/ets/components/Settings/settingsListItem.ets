@@ -17,8 +17,13 @@ struct settingsListItem {
             //.height(48)
             .fontWeight(FontWeight.Medium)
             .fontSize(16)
-          Text(this.itemObj.subtitle)
-            .fontSize(14)
+          if(this.itemObj.subtitle) {
+            Text(this.itemObj.subtitle)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .width('60%')
+              .maxLines(1)
+              .fontSize(14)
+          }
         }
         .padding({ left: 12 })
         .alignItems(HorizontalAlign.Start)
