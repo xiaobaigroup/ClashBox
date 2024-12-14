@@ -4,9 +4,10 @@ import {
   BIND_SHEET_MAIN_FONTSIZE,
   BIND_SHEET_SUB_FONTSIZE,
   BIND_SHEET_TITLE_CONTAINER_HEIGHT,
-  BIND_SHEET_DRAG_BAR_HEIGHT
+  BIND_SHEET_DRAG_BAR_HEIGHT,
+  BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT
 } from "../../common/Constants"
-import { ConfigAddBindSheetTitleBuilder } from "../Common"
+import { BindSheetTitleCustomBuilder } from "../Common"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 
 
@@ -42,33 +43,44 @@ export struct ImportConfigFromFile{
 
   build() {
     NavDestination() {
+      // 替代`NavDestination`的标题栏 START
+      BindSheetTitleCustomBuilder({
+        pageInfos: this.configAddPageInfos,
+        isSubPage: true,
+        titlePaddingLeft: BIND_SHEET_DRAG_BAR_HEIGHT / 2,
+        mainTitle: this.mainTitle,
+        subTitle: this.subTitle,
+        mainTitleFontWeight: BIND_SHEET_MAIN_FONT_WEIGHT,
+        mainTitleFontSize: BIND_SHEET_MAIN_FONTSIZE,
+        subTitleFontSize: BIND_SHEET_SUB_FONTSIZE,
+        titleBackgroundColor: $r('app.color.background'),
+        padding: {
+          // 为什么设置`15`，看Builder的参数中`padding`的介绍：ConfigAddBindSheetTitleBuilderParam
+          left: 15,
+          // left: this.breakPointStateNavigationListPadding.value,
+          right: BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT + 15 * 2
+          // right: this.breakPointStateNavigationListPadding.value
+        },
+        menus: []
+      })
+      // 替代`NavDestination`的标题栏 END
+
+      // START
       Column() {
         Text(this.componentName).fontSize(50)
         Text(this.breakPointStateNavigationListPadding.value?.toString())
 
       }.width('100%').height('auto').backgroundColor('#ff007e59').alignItems(HorizontalAlign.Start)
+      // END
     }
     .height('100%')
-    .title({builder: ConfigAddBindSheetTitleBuilder({
-      isSubPage: true,
-      titlePaddingLeft: BIND_SHEET_DRAG_BAR_HEIGHT / 2,
-      mainTitle: this.mainTitle,
-      subTitle: this.subTitle,
-      mainTitleFontWeight: BIND_SHEET_MAIN_FONT_WEIGHT,
-      mainTitleFontSize: BIND_SHEET_MAIN_FONTSIZE,
-      subTitleFontSize: BIND_SHEET_SUB_FONTSIZE,
-      padding: {
-        // 为什么设置`15`，看Builder的参数中`padding`的介绍：ConfigAddBindSheetTitleBuilderParam
-        left: 15,
-        // left: this.breakPointStateNavigationListPadding.value,
-        // right: this.breakPointStateNavigationListPadding.value
-      }
-    }), height: BIND_SHEET_TITLE_CONTAINER_HEIGHT + BIND_SHEET_DRAG_BAR_HEIGHT})
+    .hideTitleBar(true)
+    // .title({builder: , height: BIND_SHEET_TITLE_CONTAINER_HEIGHT + BIND_SHEET_DRAG_BAR_HEIGHT})
     .backgroundColor($r('app.color.container_background'))
-    .onBackPressed(() => {
-      this.configAddPageInfos.pop()
-      return true
-    })
+    // .onBackPressed(() => {
+    //   this.configAddPageInfos.pop(true)
+    //   return true
+    // })
 
   }
 

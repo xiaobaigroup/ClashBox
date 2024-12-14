@@ -11,7 +11,7 @@ import {
   LIST_SPACE
 } from "../../common/Constants";
 import { hilog } from "@kit.PerformanceAnalysisKit";
-import { ConfigAddBindSheetTitleBuilder } from "../Common";
+import { BindSheetTitleCustomBuilder } from "../Common";
 
 interface ConfigAddType {
   symbolStart? : Resource,
@@ -96,7 +96,8 @@ export struct ConfigAdd {
       // .titleMode(NavigationTitleMode.Mini)
       .title(
         {
-          builder: ConfigAddBindSheetTitleBuilder({
+          builder: BindSheetTitleCustomBuilder({
+            pageInfos: this.configAddPageInfos,
             isSubPage: false,
             mainTitle: '添加配置',
             // subTitle: '',
@@ -106,7 +107,9 @@ export struct ConfigAdd {
             padding: {
               left: this.breakPointStateNavigationListPadding.value,
               right: this.breakPointStateNavigationListPadding.value
-            }}),
+            },
+            menus: []
+          }),
           // height + 16 是因为设计稿里这56 没包含了dragBar的高度（16）
           height: BIND_SHEET_TITLE_CONTAINER_HEIGHT + BIND_SHEET_DRAG_BAR_HEIGHT
         },
@@ -130,6 +133,8 @@ export struct ConfigAdd {
 
   aboutToDisappear(): void {
     hilog.info(0xC020, this.componentName, `#aboutToDisappear`)
+    this.configAddPageInfos.clear(true)
+    hilog.info(0xC020, this.componentName, `#aboutToDisappear#NV路由configAddPageInfos已清空！`)
   }
 
 }

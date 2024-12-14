@@ -268,12 +268,17 @@ export const LIST_ITEM_HEIGHT_45: number = 56
 export const LIST_ITEM_PADDING: Padding = { left: 12, right: 12 }
 
 /* 配置页 */
+// 自动更新间隔 实体
+export interface ConfigAutoUpdateGap{
+  label: string
+  value: number
+}
 // 配置自动更新的间隔菜单显示文本默认值，用于获取string_array.json资源异常的时候显示
-export const CONFIG_AUTO_UPDATE_MENU_STRING_ARR: Array<string> = [
-  '1 minute',
-  '10 minute',
-  '30 minute',
-  '1 hour',
-  '1 day',
-  'Custom',
+export const CONFIG_AUTO_UPDATE_MENU_STRING_ARR: Array<ConfigAutoUpdateGap> = [
+  { label: '1 minute', value: 1 },
+  { label: '10 minute', value: 10 },
+  { label: '30 minute', value: 30 },
+  { label: '1 hour', value: 60 },
+  { label: '1 day', value: 1440 },
+  { label: 'Custom', value: -1 },
 ]

@@ -500,7 +500,7 @@ struct Home {
           this.proxyStartButtonWidth = this.proxyEnabled ? $r('app.integer.vp_proxy_started_button_width') : $r('app.integer.vp_proxy_not_start_button_width')
         })
         .animation({duration: ANIMATION_DURATION_300, curve: Curve.Ease})
-        .clickEffect({level: ClickEffectLevel.MIDDLE})
+        .clickEffect({level: ClickEffectLevel.LIGHT})
       }
       .backgroundColor($r('app.color.background'))
       .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })

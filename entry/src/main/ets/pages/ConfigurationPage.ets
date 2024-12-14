@@ -4,9 +4,6 @@ import { BreakpointState, BreakpointSystem } from '../common/breakpointsystem'
 import {
   TAB_CONTENT_TITLE_FONT_SIZE,
   TAB_CONTENT_TITLE_FONT_WEIGHT,
-  BPS_LIST_LANES_1_1_2_3_4,
-  BPS_LIST_GUTTER_1_1_2_3_3,
-  BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36,
   ANIMATION_DURATION_300,
   TAB_CONTENT_TITLE_HEIGHT,
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE,
@@ -187,7 +184,7 @@ struct ConfigurationPage {
           .width(40)
           .height(40)
           .backgroundColor($r('app.color.settings_container_background'))
-          .clickEffect({ level: ClickEffectLevel.MIDDLE })
+          .clickEffect({ level: ClickEffectLevel.LIGHT })
           .onClick(() => {
             // TODO 国际化适配 更新配置中... 更新配置成功
             // TODO 调用 更新配置api
@@ -230,6 +227,7 @@ struct ConfigurationPage {
             .height(LIST_ITEM_HEIGHT)
             .clickEffect({ level: ClickEffectLevel.MIDDLE })
             .borderRadius(BORDER_RADIUS_20)
+            .hoverEffect(HoverEffect.Scale)
             .bindContextMenu(this.configListLongPressCtxMenuBuilder, ResponseType.LongPress | ResponseType.RightClick,
               {
                 preview: MenuPreviewMode.IMAGE,
@@ -292,8 +290,9 @@ struct ConfigurationPage {
         .height(this.proxyStartButtonHeight)
         .clip(true)
         .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
-        .bindSheet( $$this.bindSheetIsShowOfConfigAddButton, this.ConfigAddBindSheetBuilder, {
+        .clickEffect({ level: ClickEffectLevel.LIGHT })
+        .hoverEffect(HoverEffect.Scale)
+        .bindSheet( this.bindSheetIsShowOfConfigAddButton, this.ConfigAddBindSheetBuilder, {
           // title: { title: $r('app.string.AddConfig') },
           detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT, ],// SheetSize.LARGE
           backgroundColor: $r('app.color.container_background'),
@@ -308,6 +307,7 @@ struct ConfigurationPage {
             // 点击关闭按钮才能真正关闭半模态
             if (dismissSheet.reason === DismissReason.CLOSE_BUTTON) {
               dismissSheet.dismiss()
+              this.bindSheetIsShowOfConfigAddButton = false
               hilog.info(0xC020, this.componentName, `#button#bindSheet#onWillDismiss()#关闭配置添加按钮的bindSheet：DismissSheetAction.dismiss()`)
             } else {
               // TODO 国际化
@@ -319,7 +319,7 @@ struct ConfigurationPage {
           }
         })
         .onClick( () => {
-          this.bindSheetIsShowOfConfigAddButton = !this.bindSheetIsShowOfConfigAddButton
+          this.bindSheetIsShowOfConfigAddButton = true
         })
         // 悬浮新增配置按钮 END
       }
@@ -331,6 +331,8 @@ struct ConfigurationPage {
     }
     .width('100%')
     .height('100%')
+    .foregroundBlurStyle(this.bindSheetIsShowOfConfigAddButton ? BlurStyle.Thin : BlurStyle.NONE,{ colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: .3 })
+    .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Linear, delay: 0 })
   }
 
   aboutToAppear(): void {
