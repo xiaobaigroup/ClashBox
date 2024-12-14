@@ -49,6 +49,7 @@ struct ProxyPage {
   /* 配置列表List相关 */
   @State font_on_primary: ResourceColor = $r('sys.color.font_on_primary') //一级文本反色，白色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
+  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //二级图标色，深灰色
   /* ContextMenu */
   @State background_secondary: ResourceColor = $r('sys.color.background_secondary') //二级背景色，实色
   /* Stack层叠布局 */
@@ -379,156 +380,168 @@ struct ProxyPage {
     .width('100%')
   } //半模拟态编辑菜单end
 
+@State FristPage:boolean=true//为观看预览页的判定，更改后续可以删掉
+
   build() {
     Column() {
       // 标题栏
-          if (!this.isLandscapePhone) {
-            Row() {
-              Text($r('app.string.Proxy'))
-                .fontSize(32)
-                .fontWeight(FontWeight.Bold)
-                .textAlign(TextAlign.Center)
+        if (!this.isLandscapePhone) {
+          Row() {
+            Text($r('app.string.Proxy'))
+              .fontSize(32)
+              .fontWeight(FontWeight.Bold)
+              .textAlign(TextAlign.Center)
 
-              Blank()
-              //编辑图标
-              Button({ type: ButtonType.Circle, stateEffect: true }) {
-                SymbolGlyph($r('sys.symbol.square_and_pencil'))
-                  .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-                  .fontColor([this.icon_primary])
-              }
-              .width(40)
-              .height(40)
-              .backgroundColor($r('app.color.settings_container_background'))
-              .clickEffect({ level: ClickEffectLevel.MIDDLE })
-              .onClick(() => {
-                this.isShowEdit = true
-                hilog.info(0xB001, this.componentName, `#button#onClick()#编辑代理`)
-              })
-              .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
-                detents: [684, SheetSize.FIT_CONTENT],
-                backgroundColor: $r('app.color.background'),
-                //  blurStyle: BlurStyle.BACKGROUND_REGULAR,
-                showClose: true,
-                scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-                title: { title: $r('app.string.Edit') },
-                //   width: ('100%'),
-                preferType: SheetType.CENTER,
-                maskColor: $r('app.color.dialog_maskcolor')
-              })
+            Blank()
+            //编辑图标
+            Button({ type: ButtonType.Circle, stateEffect: true }) {
+              SymbolGlyph($r('sys.symbol.square_and_pencil'))
+                .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+                .fontColor([this.icon_primary])
             }
-            .alignItems(VerticalAlign.Center)
-            .width('100%')
-            .height(TAB_CONTENT_TITLE_HEIGHT)
-            .padding({
-              left: this.breakPointStateTabContentTitleMargin.value,
-              right: this.breakPointStateTabContentTitleMargin.value,
+            .width(40)
+            .height(40)
+            .backgroundColor($r('app.color.settings_container_background'))
+            .clickEffect({ level: ClickEffectLevel.MIDDLE })
+            .onClick(() => {
+              this.isShowEdit = true
+              hilog.info(0xB001, this.componentName, `#button#onClick()#编辑代理`)
+            })
+            .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
+              detents: [684, SheetSize.FIT_CONTENT],
+              backgroundColor: $r('app.color.background'),
+              //  blurStyle: BlurStyle.BACKGROUND_REGULAR,
+              showClose: true,
+              scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+              title: { title: $r('app.string.Edit') },
+              //   width: ('100%'),
+              preferType: SheetType.CENTER,
+              maskColor: $r('app.color.dialog_maskcolor')
             })
           }
-      //    }
+          .alignItems(VerticalAlign.Center)
+          .width('100%')
+          .height(TAB_CONTENT_TITLE_HEIGHT)
+          .padding({
+            left: this.breakPointStateTabContentTitleMargin.value,
+            right: this.breakPointStateTabContentTitleMargin.value,
+          })
+        }
 
+        if (this.FristPage) {//为观看预览页的判定if/elsep判定和更改后续可以删掉
+          Column() {
+            SymbolGlyph($r('sys.symbol.doc')).fontSize(24).fontColor([this.icon_secondary])
+            Text('暂无代理').fontSize(20).fontColor(this.font_secondary)
+          }.width('100%').height('90%').alignItems(HorizontalAlign.Center).justifyContent(FlexAlign.Center)//.padding({top:TAB_CONTENT_TITLE_HEIGHT})
+          .onClick(() => {
+            this.FristPage=!this.FristPage;
+          })
+        }
 
-      // 代理页分组TAB+list主体
-      Stack({ alignContent: this.stackAlignContentAlignment }) {
-        // A组件，根据isProxyLayoutShown的状态决定是否显示
-        if (this.ProxyArrangementSelected === 'ProxyArrangementSelected1') {
-          Column() { //分组标签页 start
-            Tabs({ barPosition: BarPosition.Start, controller: this.tabsController }) {
-              TabContent() {
-                List() {
-                  ProxyGroupItem() //list相关在components/ProxyGroupItem.ets文件里
+        else if (!this.FristPage) {//为观看的判定if/else后续可以删掉
+        // 代理页分组TAB+list主体
+        Stack({ alignContent: this.stackAlignContentAlignment }) {
+          // A组件，根据isProxyLayoutShown的状态决定是否显示
+          if (this.ProxyArrangementSelected === 'ProxyArrangementSelected1') {
+            Column() { //分组标签页 start
+              Tabs({ barPosition: BarPosition.Start, controller: this.tabsController }) {
+                TabContent() {
+                  List() {
+                    ProxyGroupItem() //list相关在components/ProxyGroupItem.ets文件里
+                  }
+                  .width('100%')
+                  .height('100%')
+                  .contentEndOffset(110)
+                  //      .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
+                  .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+                  .chainAnimation(true)
+
                 }
-                .width('100%')
-                .height('100%')
-                .contentEndOffset(110)
-                //      .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
-                .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
-                .chainAnimation(true)
-                .padding({
-                  left: this.breakPointStateTabContentTitleMargin.value,
-                  right: this.breakPointStateTabContentTitleMargin.value,
-                })
-              }
-              // 节点列表 END
+                // 节点列表 END
 
-              //TODO 删除 临时模拟分组数据
-              .tabBar(this.TabBuilder('分组1', 0))
+                //TODO 删除 临时模拟分组数据
+                .tabBar(this.TabBuilder('分组1', 0))
 
-              TabContent() {
-              }
-              .tabBar(this.TabBuilder('分组2', 1))
+                TabContent() {
+                }
+                .tabBar(this.TabBuilder('分组2', 1))
 
-              TabContent() {
-              }
-              .tabBar(this.TabBuilder('分组3', 2))
+                TabContent() {
+                }
+                .tabBar(this.TabBuilder('分组3', 2))
 
-              TabContent() {
-              }
-              .tabBar(this.TabBuilder('分组4', 3))
+                TabContent() {
+                }
+                .tabBar(this.TabBuilder('分组4', 3))
 
-              TabContent() {
-              }
-              .tabBar(this.TabBuilder('分组5', 4))
+                TabContent() {
+                }
+                .tabBar(this.TabBuilder('分组5', 4))
 
-              TabContent() {
-              }
-              .tabBar(this.TabBuilder('分组6', 5))
+                TabContent() {
+                }
+                .tabBar(this.TabBuilder('分组6', 5))
 
-              TabContent() {
-              }
-              .tabBar(this.TabBuilder('分组7', 6))
+                TabContent() {
+                }
+                .tabBar(this.TabBuilder('分组7', 6))
 
-              TabContent() {
+                TabContent() {
+                }
+                .tabBar(this.TabBuilder('分组8', 7))
               }
-              .tabBar(this.TabBuilder('分组8', 7))
+              .padding({
+                left: this.breakPointStateTabContentTitleMargin.value,
+                right: this.breakPointStateTabContentTitleMargin.value,
+              })
+              .barMode(BarMode.Scrollable)
+              .barHeight(55)
+              .fadingEdge(true)
+              .onChange((index: number) => {
+                this.currentIndex = index;
+              })
             }
-            .barMode(BarMode.Scrollable)
-            .barHeight(55)
-            .fadingEdge(true)
-            .onChange((index: number) => {
-              this.currentIndex = index;
-            })
+
+            //分组tabs end
           }
 
-          //分组tabs end
-        }
+          // 列表排列
+          else if (this.ProxyArrangementSelected === 'ProxyArrangementSelected2') {
+            ProxyArrangement()
+          }
+          //列表排列end
 
-        // 列表排列
-        else if (this.ProxyArrangementSelected === 'ProxyArrangementSelected2') {
-          ProxyArrangement()
-        }
-        //列表排列end
+          // 悬浮新增配置按钮 START
+          Button() {
+            Stack({ alignContent: Alignment.Center }) {
+              SymbolGlyph($r('sys.symbol.bolt_filled_on_circle'))
+                .fontSize(24)
+                .fontColor([Color.White])
+                .symbolEffect(this.ReplaceSymbolEffect)
+                .align(Alignment.Center)
+            }.width('100%')
+          }
+          .shadow({
+            radius: 10,
+            color: $r('app.color.speed_down_icon'),
+            offsetY: 4,
+            type: ShadowType.BLUR
+          })
+          .margin(this.proxyStartButtonMargin)
+          .width(this.proxyStartButtonWidth)
+          .height(this.proxyStartButtonHeight)
+          .clip(true)
+          .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
+          .clickEffect({ level: ClickEffectLevel.MIDDLE })
 
-        // 悬浮新增配置按钮 START
-        Button() {
-          Stack({ alignContent: Alignment.Center }) {
-            SymbolGlyph($r('sys.symbol.bolt_filled_on_circle'))
-              .fontSize(24)
-              .fontColor([Color.White])
-              .symbolEffect(this.ReplaceSymbolEffect)
-              .align(Alignment.Center)
-          }.width('100%')
+          // 悬浮新增配置按钮 END
         }
-        .shadow({
-          radius: 10,
-          color: $r('app.color.speed_down_icon'),
-          offsetY: 4,
-          type: ShadowType.BLUR
-        })
-        .margin(this.proxyStartButtonMargin)
-        .width(this.proxyStartButtonWidth)
-        .height(this.proxyStartButtonHeight)
-        .clip(true)
-        .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
-
-        // 悬浮新增配置按钮 END
+        .backgroundColor($r('app.color.background'))
+        // .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
+        .width('100%')
+        .height(this.isLandscapePhone ? '100%' : `calc(100% - ${TAB_CONTENT_TITLE_HEIGHT}vp)`)
+        // 主体 END
       }
-      .backgroundColor($r('app.color.background'))
-      // .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
-      .width('100%')
-      .height(this.isLandscapePhone ? '100%' : `calc(100% - ${TAB_CONTENT_TITLE_HEIGHT}vp)`)
-
-      // 主体 END
     }
     .width('100%')
     .height('100%')

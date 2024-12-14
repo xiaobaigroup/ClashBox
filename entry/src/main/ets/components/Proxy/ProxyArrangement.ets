@@ -4,6 +4,7 @@ import {
 import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem'
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import ProxyGroupItem from './ProxyGroupItem'
+import { StartOptions } from '@kit.AbilityKit'
 
 
 @Entry
@@ -12,8 +13,6 @@ struct ProxyArrangement {
   @State font_primary: ResourceColor = $r('sys.color.font_primary') //一级文本色，黑色
   @State comp_divider: ResourceColor = $r('sys.color.comp_divider') //分割线颜色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
-  @State arr: string[] =
-    ["分组1", "分组2", "分组3", "分组4", "分组5", "分组6"]
   @State isContentShow: boolean = true;
   @State selectItem: number = 0;
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
@@ -29,8 +28,9 @@ struct ProxyArrangement {
     BreakpointSystem.getInstance().start()
   }
 
-  //分组tabs相关
-  @State listIndex: number = 0;
+  @Provide arr: string[] =
+    ["分组1", "分组2", "分组3", "分组4", "分组5", "分组6"]
+  @Provide listIndex: number = 0;
 
   build() {
     Column() {
@@ -42,7 +42,7 @@ struct ProxyArrangement {
                 Text(item.toString()).fontSize(16).fontColor($r('sys.color.font_primary'))
                 SymbolGlyph(this.isContentShow && this.selectItem === item ? $r('sys.symbol.chevron_down') :
                 $r('sys.symbol.chevron_right'))
-                  .fontSize(16).fontColor([this.icon_primary])
+                  .fontSize(25).fontColor([this.icon_primary])
               }
               .onClick(() => {
                 this.listIndex = item;
@@ -74,9 +74,11 @@ struct ProxyArrangement {
                   List() {
                     ProxyGroupItem()
                   }
+                  .borderRadius(20)
+                  .scrollBar(BarState.Off)
                   .width('100%')
-                  .height(undefined) //展开后界面高度
-                  .padding({ top:10, bottom: 20 })
+                  .height(400) //展开后界面高度
+                  .padding({ top:10, bottom: 10 })
               }
             }
        //     .backgroundColor($r('app.color.container_background'))
@@ -96,7 +98,7 @@ struct ProxyArrangement {
       right: this.breakPointStateTabContentTitleMargin.value,
     })
     .backgroundColor($r('app.color.background'))
-  }
+    }
 }
 
 export default ProxyArrangement

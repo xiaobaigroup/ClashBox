@@ -223,7 +223,7 @@ struct ProxyGroupItem {
             Row() {
 
               Column() {
-                Text(`${item.text}`).fontColor(($r('sys.color.font_primary'))).fontSize(16)
+                Text(`${item.text}`).fontColor(($r('sys.color.font_primary'))).fontSize(18).fontWeight(FontWeight.Medium)
                 Text(`${item.type}`).fontColor($r('sys.color.font_secondary')).fontSize(14)
 
 
@@ -262,19 +262,18 @@ struct ProxyGroupItem {
             })
         })
       }
+      .scrollBar(BarState.Off)
       .alignListItem(ListItemAlign.Center)
       .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
       // .divider({ strokeWidth: 1,color:$r('app.color.divider'),startMargin:16,endMargin:16})
       .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
         detents: [684, SheetSize.FIT_CONTENT],
         backgroundColor: $r('app.color.settings_container_background'),
-        //       blurStyle: BlurStyle.BACKGROUND_REGULAR,
         showClose: true,
         scrollSizeMode: ScrollSizeMode.CONTINUOUS,
         title: { title: $r('app.string.Test_Speed'), subtitle: '测速功能由CloundFlare提供' },
         width: ('100%'),
         maskColor: $r('app.color.dialog_maskcolor')
-        //onWillAppear:()
       })
     }
     //单列排列
@@ -325,17 +324,16 @@ struct ProxyGroupItem {
             })
         })
       }
-      // .divider({ strokeWidth: 1,color:$r('app.color.divider'),startMargin:16,endMargin:16})
+      .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring)
       .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
         detents: [684, SheetSize.FIT_CONTENT],
         backgroundColor: $r('app.color.settings_container_background'),
-        //       blurStyle: BlurStyle.BACKGROUND_REGULAR,
         showClose: true,
         scrollSizeMode: ScrollSizeMode.CONTINUOUS,
         title: { title: $r('app.string.Test_Speed'), subtitle: '测速功能由CloundFlare提供' },
         width: ('100%'),
         maskColor: $r('app.color.dialog_maskcolor')
-        //onWillAppear:()
       })
     }
   }
