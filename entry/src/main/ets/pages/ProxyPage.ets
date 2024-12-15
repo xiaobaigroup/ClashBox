@@ -72,8 +72,10 @@ struct ProxyPage {
   @State ProxyArrangementSelected: string = 'ProxyArrangementSelected1';
   @State ProxyArrangementChecked: boolean = true;
   // 定义ProxyGroupItemSelected的值便于切换布局方式
-  @Provide ProxyGroupItemSelected: string = 'ProxyGroupItemSelected1'
+  @Provide ProxyGroupItemSelected: string = 'ProxyGroupItemSelectedWide'
   @State ProxyGroupItemChecked: boolean = true;
+  ProxyGroupItemChecked1: boolean = false;
+
   /* 断点布局相关 相关作用看定义时候的注释 */
   @Consume('breakPointStateListLanes')
   private breakPointStateListLanes: BreakpointState<number>
@@ -144,8 +146,8 @@ struct ProxyPage {
         .width('100%')
         .fontSize(16)
         .fontColor(this.font_secondary)
-        .padding({ left: 15, bottom: 10 })
         .textAlign(0)
+        .padding({bottom:10})
 
       Column() {
         Row() {
@@ -210,9 +212,8 @@ struct ProxyPage {
         .width('100%')
         .justifyContent(FlexAlign.SpaceBetween)
       }
-      .padding({ left: 15, right: 10 })
+      .padding({left:12,right:12})
       .justifyContent(FlexAlign.SpaceEvenly)
-      .margin({ bottom: 10 })
       .width('100%')
       .height(94)
       .borderRadius(20)
@@ -222,8 +223,8 @@ struct ProxyPage {
         .width('100%')
         .fontSize(16)
         .fontColor(this.font_secondary)
-        .padding({ left: 15, bottom: 10 })
         .textAlign(0)
+        .padding({top:10,bottom:10})
 
       Column() {
         Row() {
@@ -271,7 +272,7 @@ struct ProxyPage {
 
 
         Row() {
-          Text($r('app.string.Name'))
+          Text($r('app.string.Wide'))
             .font({ size: 16 })
             .fontColor(this.font_primary)
 
@@ -279,35 +280,34 @@ struct ProxyPage {
             value: 'Radio5', group: 'radioGroup2',
             indicatorType: RadioIndicatorType.TICK
           })
-            .checked(false)
+            .checked(true)
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
               //   uncheckedBorderColor: this.icon_secondary
             })
         }
-        //  .clickEffect({ level: ClickEffectLevel.MIDDLE })
+        .clickEffect({ level: ClickEffectLevel.MIDDLE })
         .width('100%')
         .justifyContent(FlexAlign.SpaceBetween)
       }
-      .padding({ left: 15, right: 10 })
+      .padding({left:12,right:12})
       .justifyContent(FlexAlign.SpaceEvenly)
-      .margin({ bottom: 10 })
       .width('100%')
       .height(142)
       .borderRadius(20)
       .backgroundColor(($r('app.color.container_background')))
 
 
-      Text($r('app.string.Layout'))
+      Text($r('app.string.Card_Size'))
         .width('100%')
         .fontSize(16)
         .fontColor(this.font_secondary)
-        .padding({ left: 15, bottom: 10 })
         .textAlign(0)
+        .padding({top:10,bottom:10})
 
       Column() {
         Row() {
-          Text($r('app.string.Relax'))
+          Text($r('app.string.Thin'))
             .font({ size: 16 })
             .fontColor(this.font_primary)
 
@@ -315,11 +315,9 @@ struct ProxyPage {
             value: 'Radio6', group: 'radioGroup3',
             indicatorType: RadioIndicatorType.TICK
           })
-            .checked(!this.ProxyGroupItemChecked)
-            .onChange((isChecked: boolean) => {
-              if (isChecked) {
-                this.ProxyGroupItemSelected = 'ProxyGroupItemSelected2'
-              }
+            .checked(this.ProxyGroupItemChecked)
+            .onChange(() => {
+                this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedWide';
             })
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
@@ -328,8 +326,9 @@ struct ProxyPage {
         }
         // 点击时改变ProxyGroupItemSelected状态
         .onClick(() => {
-          this.ProxyGroupItemSelected = 'ProxyGroupItemSelected2';
-          this.ProxyGroupItemChecked = false
+          this.ProxyGroupItemSelected= 'ProxyGroupItemSelectedWide';
+          this.ProxyGroupItemChecked = true;
+          this.ProxyGroupItemChecked1 = false;
           hilog.info(0xB003, this.componentName, `#ProxyBindSheetEditRadio#onClick: `)
         })
         .clickEffect({ level: ClickEffectLevel.MIDDLE })
@@ -339,7 +338,7 @@ struct ProxyPage {
         Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
 
         Row() {
-          Text($r('app.string.Compact'))
+          Text($r('app.string.Wide'))
             .font({ size: 16 })
             .fontColor(this.font_primary)
 
@@ -347,10 +346,10 @@ struct ProxyPage {
             value: 'Radio7', group: 'radioGroup3',
             indicatorType: RadioIndicatorType.TICK
           })
-            .checked(this.ProxyGroupItemChecked)
+            .checked(!this.ProxyGroupItemChecked)
             .onChange((isChecked: boolean) => {
               if (isChecked) {
-                this.ProxyGroupItemSelected = 'ProxyGroupItemSelected1'
+                this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedThin';
               }
             })
             .radioStyle({
@@ -361,22 +360,56 @@ struct ProxyPage {
         }
         // 点击时改变ProxyGroupItemSelected状态
         .onClick(() => {
-          this.ProxyGroupItemSelected = 'ProxyGroupItemSelected1';
-          this.ProxyGroupItemChecked = true
+          this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedThin';
+          this.ProxyGroupItemChecked = false
+          this.ProxyGroupItemChecked1 = false
+          hilog.info(0xB003, this.componentName, `#ProxyBindSheetEditRadio#onClick: `)
+        })
+        .clickEffect({ level: ClickEffectLevel.MIDDLE })
+        .width('100%')
+        .justifyContent(FlexAlign.SpaceBetween)
+            Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
+
+        Row() {
+          Text($r('app.string.Mini'))
+            .font({ size: 16 })
+            .fontColor(this.font_primary)
+
+          Radio({
+            value: 'Radio8', group: 'radioGroup3',
+            indicatorType: RadioIndicatorType.TICK
+          })
+            .checked(this.ProxyGroupItemChecked1)
+            .onChange((isChecked: boolean) => {
+              if (isChecked) {
+                this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedMini';
+              }
+            })
+            .radioStyle({
+              checkedBackgroundColor: this.icon_emphasize,
+              //   uncheckedBorderColor: this.icon_secondary
+            })
+        }
+        // 点击时改变ProxyGroupItemSelected状态
+        .onClick(() => {
+          this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedMini';
+          this.ProxyGroupItemChecked1=true;
           hilog.info(0xB003, this.componentName, `#ProxyBindSheetEditRadio#onClick: `)
         })
         .clickEffect({ level: ClickEffectLevel.MIDDLE })
         .width('100%')
         .justifyContent(FlexAlign.SpaceBetween)
       }
-      .padding({ left: 15, right: 10 })
+      .padding({left:12,right:12})
       .justifyContent(FlexAlign.SpaceEvenly)
-      .margin({ bottom: 10 })
-      .height(94)
+      .height(142)
       .borderRadius(20)
       .backgroundColor(($r('app.color.container_background')))
     }
-    .padding({ left: 16, right: 16 })
+    .padding({
+      left: this.breakPointStateTabContentTitleMargin.value,
+      right: this.breakPointStateTabContentTitleMargin.value,
+    })
     .width('100%')
   } //半模拟态编辑菜单end
 
@@ -408,7 +441,7 @@ struct ProxyPage {
               hilog.info(0xB001, this.componentName, `#button#onClick()#编辑代理`)
             })
             .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
-              detents: [684, SheetSize.FIT_CONTENT],
+              detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT, ],
               backgroundColor: $r('app.color.background'),
               //  blurStyle: BlurStyle.BACKGROUND_REGULAR,
               showClose: true,
@@ -441,7 +474,7 @@ struct ProxyPage {
         else if (!this.FristPage) {//为观看的判定if/else后续可以删掉
         // 代理页分组TAB+list主体
         Stack({ alignContent: this.stackAlignContentAlignment }) {
-          // A组件，根据isProxyLayoutShown的状态决定是否显示
+          //根据ProxyArrangementSelected的状态决定是否显示
           if (this.ProxyArrangementSelected === 'ProxyArrangementSelected1') {
             Column() { //分组标签页 start
               Tabs({ barPosition: BarPosition.Start, controller: this.tabsController }) {

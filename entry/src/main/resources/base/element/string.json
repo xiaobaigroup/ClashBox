@@ -233,12 +233,16 @@
       "value": "名称"
     },
     {
-      "name": "Relax",
-      "value": "宽松(单列)"
+      "name": "Wide",
+      "value": "宽(单列)"
     },
     {
-      "name": "Compact",
-      "value": "标准(默认多列)"
+      "name": "Thin",
+      "value": "窄(默认多列)"
+    },
+    {
+      "name": "Mini",
+      "value": "迷你(多列)"
     },
     {
       "name": "Packet_mode",
@@ -249,8 +253,8 @@
       "value": "排列方式"
     },
     {
-      "name": "Layout",
-      "value": "布局"
+      "name": "Card_Size",
+      "value": "卡片尺寸"
     },
     {
       "name": "Collect",

@@ -233,12 +233,16 @@
       "value": "Name"
     },
     {
-      "name": "Relax",
-      "value": "Relax(Single-row)"
+      "name": "Wide",
+      "value": "Wide(Single)"
     },
     {
-      "name": "Compact",
-      "value": "Default(Multicolumn)"
+      "name": "Thin",
+      "value": "Thin(Multicolumn)"
+    },
+    {
+      "name": "Mini",
+      "value": "Mini(Multicolumn)"
     },
     {
       "name": "Packet_mode",
@@ -249,8 +253,8 @@
       "value": "Arrangement"
     },
     {
-      "name": "Layout",
-      "value": "Layout"
+      "name": "Card_Size",
+      "value": "布局"
     },
     {
       "name": "Collect",

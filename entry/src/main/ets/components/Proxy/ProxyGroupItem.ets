@@ -1,11 +1,6 @@
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem'
-import {
-  BPS_LIST_GUTTER_1_1_2_3_3,
-  BPS_LIST_LANES_1_1_2_3_4,
-  BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36,
-  LIST_ITEM_HEIGHT
-} from '../../common/Constants'
+import { BIND_SHEET_CONTAINER_HEIGHT, LIST_ITEM_HEIGHT } from '../../common/Constants'
 import { LengthMetrics, SymbolGlyphModifier } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
 
@@ -122,8 +117,9 @@ struct ProxyGroupItem {
     new SymbolGlyphModifier($r('sys.symbol.questionmark_circle')).fontSize('24vp');
   // TODO 删除 临时模拟数据配置列表数据
   @State isShowNetworkSpeed: boolean = false
-  // 定义ProxyGroupItemSelected的值便于切换布局方式
+  // 定义ProxyGroupItemSelectedWide的值便于切换布局方式
   @Consume ProxyGroupItemSelected: string
+
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone')
   private isLandscapePhone: boolean = false
@@ -132,7 +128,6 @@ struct ProxyGroupItem {
   private breakPointStateListLanes: BreakpointState<number> = BPS_LIST_LANES_2_2_3_4_4
   @Consume
   private breakPointStateListGutter: BreakpointState<number>
-
   private componentName: string = 'ProxyPage'
   // 当前单选框选择的配置
   @State
@@ -144,13 +139,10 @@ struct ProxyGroupItem {
     BreakpointSystem.getInstance().start()
   }
 
-
   // 排序函数
- sortItems() {
+  sortItems() {
     this.items.sort((a, b) => a.latency - b.latency);
   }
-
-
 
   //半模拟态网络测速
   @Builder
@@ -211,11 +203,11 @@ struct ProxyGroupItem {
     .menuItemDivider({ color: $r('app.color.divider'), strokeWidth: LengthMetrics.vp(1) })
     .backgroundColor($r('app.color.container_background'))
     .borderRadius(20)
-  }
+  } //长按菜单end
 
   build() {
-//多列排列
-    if (this.ProxyGroupItemSelected === 'ProxyGroupItemSelected1') {
+    //多列排列宽
+    if (this.ProxyGroupItemSelected === 'ProxyGroupItemSelectedWide') {
       // 节点列表 START
       List({ space: 10, initialIndex: 0 }) {
         ForEach(this.items, (item: Item, index: number) => {
@@ -223,9 +215,11 @@ struct ProxyGroupItem {
             Row() {
 
               Column() {
-                Text(`${item.text}`).fontColor(($r('sys.color.font_primary'))).fontSize(18).fontWeight(FontWeight.Medium)
+                Text(`${item.text}`)
+                  .fontColor(($r('sys.color.font_primary')))
+                  .fontSize(18)
+                  .fontWeight(FontWeight.Medium)
                 Text(`${item.type}`).fontColor($r('sys.color.font_secondary')).fontSize(14)
-
 
                 Blank(10)
                 Text(`${item.latency}` + 'ms')
@@ -267,7 +261,7 @@ struct ProxyGroupItem {
       .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
       // .divider({ strokeWidth: 1,color:$r('app.color.divider'),startMargin:16,endMargin:16})
       .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
-        detents: [684, SheetSize.FIT_CONTENT],
+        detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
         backgroundColor: $r('app.color.settings_container_background'),
         showClose: true,
         scrollSizeMode: ScrollSizeMode.CONTINUOUS,
@@ -277,7 +271,7 @@ struct ProxyGroupItem {
       })
     }
     //单列排列
-    else if (this.ProxyGroupItemSelected === 'ProxyGroupItemSelected2') {
+    else if (this.ProxyGroupItemSelected === 'ProxyGroupItemSelectedThin') {
       // 节点列表 START
       List({ space: 10, initialIndex: 0 }) {
         ForEach(this.items, (item: Item, index: number) => {
@@ -285,7 +279,7 @@ struct ProxyGroupItem {
             Row() {
               Row() {
                 Column() {
-                  Text(`${item.text}`).fontColor(($r('sys.color.font_primary'))).fontSize(16)
+                  Text(`${item.text}`).fontColor(($r('sys.color.font_primary'))).fontSize(18).fontWeight(FontWeight.Medium)
                   Text(`${item.type}`).fontColor($r('sys.color.font_secondary')).fontSize(14)
                 }.alignItems(HorizontalAlign.Start)
 
@@ -302,7 +296,7 @@ struct ProxyGroupItem {
                 .checked(index === this.PorxyRadioCheckedValue)
             }
             .width('100%')
-            .padding({ left: 12, right: 12 })
+            .padding({ left: 14, right: 16 })
             .alignItems(VerticalAlign.Center)
           }
           .onClick(() => {
@@ -327,7 +321,68 @@ struct ProxyGroupItem {
       .scrollBar(BarState.Off)
       .edgeEffect(EdgeEffect.Spring)
       .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
-        detents: [684, SheetSize.FIT_CONTENT],
+        detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
+        backgroundColor: $r('app.color.settings_container_background'),
+        showClose: true,
+        scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+        title: { title: $r('app.string.Test_Speed'), subtitle: '测速功能由CloundFlare提供' },
+        width: ('100%'),
+        maskColor: $r('app.color.dialog_maskcolor')
+      })
+    }
+
+    //迷你排列
+    else if (this.ProxyGroupItemSelected === 'ProxyGroupItemSelectedMini') {
+      // 节点列表 START
+      List({ space: 10, initialIndex: 0 }) {
+        ForEach(this.items, (item: Item, index: number) => {
+          ListItem() {
+            Row() {
+              Column() {
+                Text(`${item.text}`).fontColor(($r('sys.color.font_primary'))).fontSize(18).fontWeight(FontWeight.Medium)
+                Row() {
+                  Text(`${item.type}`).fontColor($r('sys.color.font_secondary')).fontSize(14).maxLines(1).width(50).textOverflow({ overflow: TextOverflow.Clip})
+                  Text(`${item.latency}` + 'ms')
+                    .fontColor(this.getColorForLatency(item.latency) as ResourceColor)
+                    .fontSize(14)
+                }.justifyContent(FlexAlign.Start)
+              }
+              .width('90%')
+              .alignItems(HorizontalAlign.Start)
+
+
+              Blank()
+              Radio({ value: 'radio' + index, group: 'configGroup' })
+                .checked(index === this.PorxyRadioCheckedValue)
+            }
+            .width('100%')
+            .padding({ left: 14, right: 16 })
+            .alignItems(VerticalAlign.Center)
+          }
+          .onClick(() => {
+            this.PorxyRadioCheckedValue = index
+            hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
+          })
+          .backgroundColor($r('app.color.container_background'))
+          .width('100%')
+          .height(LIST_ITEM_HEIGHT)
+          .clickEffect({ level: ClickEffectLevel.MIDDLE })
+          .borderRadius(20)
+          .bindContextMenu(this.MyMenu, ResponseType.LongPress,
+            {
+              preview: MenuPreviewMode.IMAGE,
+              previewAnimationOptions: {
+                scale: [0.95, 1.0],
+                transition: TransitionEffect.prototype.animation({ tempo: 1.5 })
+              }
+            })
+        })
+      }
+      .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
+      .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring)
+      .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
+        detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
         backgroundColor: $r('app.color.settings_container_background'),
         showClose: true,
         scrollSizeMode: ScrollSizeMode.CONTINUOUS,
@@ -337,8 +392,6 @@ struct ProxyGroupItem {
       })
     }
   }
-
-  //长按菜单end
 
   // 辅助函数：根据单个Item的latency属性返回颜色
   private getColorForLatency(latency: number): string | ResourceColor {
