@@ -158,6 +158,12 @@ struct ProxyPage {
             indicatorType: RadioIndicatorType.TICK,
           })
             .checked(this.currentRadioValue1 === 0)
+            .onChange((isChecked: boolean) => {
+              if(isChecked) {
+                this.currentRadioValue1 = 0
+                this.ProxyArrangementSelected = 'ProxyArrangementSelected1'
+              }
+            })
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
               //   uncheckedBorderColor: this.icon_secondary
@@ -180,6 +186,12 @@ struct ProxyPage {
             indicatorType: RadioIndicatorType.TICK
           })
             .checked(this.currentRadioValue1 === 1)
+            .onChange((isChecked: boolean) => {
+              if(isChecked) {
+                this.currentRadioValue1 = 1
+                this.ProxyArrangementSelected = 'ProxyArrangementSelected2'
+              }
+            })
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
               //   uncheckedBorderColor: this.icon_secondary
@@ -205,6 +217,11 @@ struct ProxyPage {
             indicatorType: RadioIndicatorType.TICK
           })
             .checked(this.currentRadioValue2 === 0)
+            .onChange((isChecked: boolean) => {
+              if(isChecked) {
+                this.currentRadioValue2 = 0
+              }
+            })
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
               //   uncheckedBorderColor: this.icon_secondary
@@ -225,6 +242,11 @@ struct ProxyPage {
             indicatorType: RadioIndicatorType.TICK
           })
             .checked(this.currentRadioValue2 === 1)
+            .onChange((isChecked: boolean) => {
+              if(isChecked) {
+                this.currentRadioValue2 = 1
+              }
+            })
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
               //   uncheckedBorderColor: this.icon_secondary
@@ -246,6 +268,11 @@ struct ProxyPage {
             indicatorType: RadioIndicatorType.TICK
           })
             .checked(this.currentRadioValue2 === 2)
+            .onChange((isChecked: boolean) => {
+              if(isChecked) {
+                this.currentRadioValue2 = 2
+              }
+            })
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
               //   uncheckedBorderColor: this.icon_secondary
@@ -269,6 +296,12 @@ struct ProxyPage {
             indicatorType: RadioIndicatorType.TICK
           })
             .checked(this.currentRadioValue3 === 0)
+            .onChange((isChecked: boolean) => {
+              if(isChecked) {
+                this.currentRadioValue3 = 0
+                this.ProxyGroupItemSelected= 'ProxyGroupItemSelectedWide'
+              }
+            })
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
               //   uncheckedBorderColor: this.icon_secondary
@@ -291,6 +324,12 @@ struct ProxyPage {
             indicatorType: RadioIndicatorType.TICK
           })
             .checked(this.currentRadioValue3 === 1)
+            .onChange((isChecked: boolean) => {
+              if(isChecked) {
+                this.currentRadioValue3 = 1
+                this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedThin'
+              }
+            })
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
               //   uncheckedBorderColor: this.icon_secondary
@@ -313,6 +352,12 @@ struct ProxyPage {
             indicatorType: RadioIndicatorType.TICK
           })
             .checked(this.currentRadioValue3 === 2)
+            .onChange((isChecked: boolean) => {
+              if(isChecked) {
+                this.currentRadioValue3 = 2
+                this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedMini'
+              }
+            })
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
               //   uncheckedBorderColor: this.icon_secondary
