@@ -18,6 +18,7 @@ import Basic from '../components/More/Overwrite/Basic';
 import DNS from '../components/More/Overwrite/DNS';
 import Network, { NetworkRouterAddress } from '../components/More/Overwrite/Network';
 import { FakeIPfilter } from '../components/More/Overwrite/DNSsubpage';
+import { mediaquery } from '@kit.ArkUI';
 
 @Entry
 @Component
@@ -42,6 +43,8 @@ struct MorePage {
   @Provide('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   // 设置页面栈
   @Provide('NavSettingsPathStack') SettingsPageInfos: NavPathStack = new NavPathStack()
+  // 平板竖屏判断
+  @Provide('tabletVertical') istabletVertical: boolean = false
 
   /* 断点布局相关 相关作用看定义时候的注释 */
   // 整体外边距
@@ -50,14 +53,24 @@ struct MorePage {
   // 列表底边距
   @Consume('breakPointStatemorePagelistBottom')
   private listBottom: BreakpointState<number>
+  // 列表高度
+  @Consume('breakPointStateListHeight')
+  private listHeight: BreakpointState<number>
+
+  // 平板竖屏判断
+  deviceHeightListener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(1000vp< height)');
 
 
   aboutToAppear(): void {
-
+    // 开启change监听
+    this.deviceHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
+      this.istabletVertical = mediaQueryResult.matches
+    });
   }
 
   aboutToDisappear(): void {
-
+    // 解绑listener中注册的回调函数
+    this.deviceHeightListener.off('change')
   }
 
 
@@ -182,13 +195,14 @@ struct MorePage {
         }
         .width('100%')
         // .layoutWeight(1) // 自适应占满剩余空间
-        .height(this.isLandscapePhone ? 275 : 700)
+        .height(this.isLandscapePhone ? 275 : this.listHeight.value)
         .margin({ top: 10, left: this.morePageMargin.value, right: this.morePageMargin.value })
         .borderRadius(18)
         .alignListItem(ListItemAlign.Center)
 
       }
       .mode(this.isLandscapePhone ? NavigationMode.Stack : NavigationMode.Auto)
+      .navBarWidth(330)
       .navDestination(this.PagesMap)
       .width('100%')
       .height('100%')

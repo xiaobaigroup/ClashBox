@@ -62,6 +62,10 @@ struct DNS {
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @State overwriteDNSList: moreData[] = ListOverwriteDNSData()
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
+  // 列表高度
+  @Consume('breakPointStateListHeight') listHeight: BreakpointState<number>
+  // 平板竖屏判断
+  @Consume('tabletVertical') istabletVertical: boolean
   @State SaveInputValue: string = ''
   @State currentInputValue: string = ''
   // 弹窗控制器
@@ -195,7 +199,7 @@ struct DNS {
                       Text(item.title)
                         .fontWeight(FontWeight.Medium)
                         .fontSize(16)
-                      if(index != 9 && index != 18 ) {
+                      if(index != 9 && index != 18 && item.subtitle) {
                         Text(item.subtitle)
                           .fontWeight(FontWeight.Normal)
                           .textOverflow({ overflow: TextOverflow.MARQUEE })
@@ -288,7 +292,7 @@ struct DNS {
 
       }
       .width('100%')
-      .height(this.isLandscapePhone ? 275 : 650)
+      .height(this.isLandscapePhone ? 275 : (this.istabletVertical ? 900 : this.listHeight.value))
       .margin({ top: 10, left: this.morePageMargin.value, right: this.morePageMargin.value })
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)

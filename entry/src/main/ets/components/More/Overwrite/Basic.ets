@@ -10,6 +10,10 @@ struct Basic {
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @State overwriteBasicList: moreData[] = ListOverwriteBasicData()
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
+  // 列表高度
+  @Consume('breakPointStateListHeight') listHeight: BreakpointState<number>
+  // 平板竖屏判断
+  @Consume('tabletVertical') istabletVertical: boolean
 
   handleCheck(index: number) {
     // 跳转
@@ -137,13 +141,15 @@ struct Basic {
                       Text(item.title)
                         .fontWeight(FontWeight.Medium)
                         .fontSize(16)
-                      Text(item.subtitle)
-                        .fontWeight(FontWeight.Normal)
-                        .textOverflow({ overflow: TextOverflow.MARQUEE })
-                        .maxLines(1)
-                        .margin({top: 2})
-                        .fontSize(14)
-                        .width('70%')
+                      if(item.subtitle) {
+                        Text(item.subtitle)
+                          .fontWeight(FontWeight.Normal)
+                          .textOverflow({ overflow: TextOverflow.MARQUEE })
+                          .maxLines(1)
+                          .margin({top: 2})
+                          .fontSize(14)
+                          .width('70%')
+                      }
                     }
                     .alignItems(HorizontalAlign.Start)
                     .margin({ left: 12 })
@@ -174,7 +180,7 @@ struct Basic {
 
       }
       .width('100%')
-      .height(this.isLandscapePhone ? 275 : 800)
+      .height(this.isLandscapePhone ? 275 : (this.istabletVertical ? 900 : this.listHeight.value))
       .margin({ top: 10, left: this.morePageMargin.value, right: this.morePageMargin.value })
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)

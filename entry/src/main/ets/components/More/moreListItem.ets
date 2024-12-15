@@ -18,9 +18,9 @@ struct moreListItem {
             .fontSize(16)
           if (this.itemObj.subtitle) {
             Text(this.itemObj.subtitle)
-              .textOverflow({ overflow: TextOverflow.MARQUEE })
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
               .maxLines(1)
-              .width('80%')
+              .width('75%')
               .fontWeight(FontWeight.Normal)
               .margin({top: 2 })
               .fontSize(14)

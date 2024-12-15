@@ -13,7 +13,8 @@ import {
   BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36,
   BPS_NAVIGATION_LIST_PADDING_12_13_13_28_36,
   morePageMargin_12_14_16,
-  morePagelistBottom_10_14
+  morePagelistBottom_10_14,
+  listHeight_610_590
 } from '../common/Constants'
 
 
@@ -98,6 +99,8 @@ struct Index {
   private breakPointStateListLanes: BreakpointState<number> = BPS_LIST_LANES_1_1_2_3_4
   @Provide('breakPointStateListGutter')
   private breakPointStateListGutter: BreakpointState<number> = BPS_LIST_GUTTER_1_1_2_3_3
+  @Provide('breakPointStateListHeight')
+  private breakPointStateListHeight: BreakpointState<number> = listHeight_610_590
   @Provide('breakPointStateTabContentTitleMargin')
   private breakPointStateTabContentTitleMargin: BreakpointState<number> = BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36
   @Provide('breakPointStateNavigationListPadding')
@@ -162,6 +165,7 @@ struct Index {
       BreakpointSystem.getInstance().attach(this.breakPointStateNavigationListPadding)
       BreakpointSystem.getInstance().attach(this.breakPointStatemorePageMargin)
       BreakpointSystem.getInstance().attach(this.breakPointStatemorePagelistBottom)
+      BreakpointSystem.getInstance().attach(this.breakPointStateListHeight)
       BreakpointSystem.getInstance().start()
     }
 

@@ -274,6 +274,11 @@ export const morePagelistBottom_10_14: BreakpointState<number> = BreakpointState
   xs: 10, sm: 10, md: 14, lg: 14, xl: 14
 })
 
+// 列表高度
+export const listHeight_610_590: BreakpointState<number> = BreakpointState.of({
+  xs: 610, sm: 610, md: 590, lg: 590, xl: 590
+})
+
 /* List 相关*/
 // List中子组件的间隔
 export const LIST_SPACE: number = 10

@@ -144,7 +144,7 @@ struct ProxyGroupItem {
     this.items.sort((a, b) => a.latency - b.latency);
   }
 
-  //半模拟态网络测速
+  //半模态窗口测速网站
   @Builder
   BindSheetNetworkSpeed() {
     Row() {

@@ -99,6 +99,10 @@ struct ProxyPage {
   //定义组件名
   private componentName: string = 'ProxyPage'
 
+  @State currentRadioValue1: number = 0 // 分组方式切换
+  @State currentRadioValue2: number = 0 // 排列方式切换
+  @State currentRadioValue3: number = 0 // 卡片尺寸切换
+
   // 排序函数
   sortItems() {
     this.items.sort((a, b) => a.latency - b.latency);
@@ -138,282 +142,202 @@ struct ProxyPage {
     .alignItems(HorizontalAlign.Start)
   }
 
+
+
   @Builder
-  //半模态编辑菜单
+  //半模态编辑菜单Start
   ProxyBindSheetEdit() {
     Column() {
-      Text($r('app.string.Packet_mode'))
-        .width('100%')
-        .fontSize(16)
-        .fontColor(this.font_secondary)
-        .textAlign(0)
-        .padding({bottom:10})
-
+      EditTitle({title: $r('app.string.Packet_mode')})
       Column() {
         Row() {
           Text($r('app.string.Tabs'))
-            .font({ size: 16 })
-            .fontColor(this.font_primary)
-
+            .EditText()
           Radio({
             value: 'Radio1', group: 'radioGroup1',
             indicatorType: RadioIndicatorType.TICK,
           })
-            .checked(this.ProxyArrangementChecked)
-            .onChange((isChecked: boolean) => {
-              if (isChecked) {
-                this.ProxyArrangementSelected = 'ProxyArrangementSelected1'
-              }
-            })
+            .checked(this.currentRadioValue1 === 0)
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
               //   uncheckedBorderColor: this.icon_secondary
             })
         }
-        // 点击时改变ProxyArrangementSelected状态
+        .EditRow()
+        // 点击后改变ProxyArrangementSelected状态为 标签
         .onClick(() => {
-          this.ProxyArrangementSelected = 'ProxyArrangementSelected1';
-          this.ProxyArrangementChecked = true
-          hilog.info(0xB003, this.componentName, `#ProxyBindSheetEditRadio#onClick: `)
+          this.currentRadioValue1 = 0
+          this.ProxyArrangementSelected = 'ProxyArrangementSelected1'
         })
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
-        .width('100%')
-        .justifyContent(FlexAlign.SpaceBetween)
-
 
         Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
 
         Row() {
           Text($r('app.string.List'))
-            .font({ size: 16 })
-            .fontColor(this.font_primary)
-
+            .EditText()
           Radio({
             value: 'Radio2', group: 'radioGroup1',
             indicatorType: RadioIndicatorType.TICK
           })
-            .checked(!this.ProxyArrangementChecked)
-            .onChange((isChecked: boolean) => {
-              if (isChecked) {
-                this.ProxyArrangementSelected = 'ProxyArrangementSelected2'
-              }
-            })
+            .checked(this.currentRadioValue1 === 1)
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
               //   uncheckedBorderColor: this.icon_secondary
             })
         }
+        .EditRow()
+        // 点击后改变ProxyArrangementSelected状态为 列表
         .onClick(() => {
-          this.ProxyArrangementSelected = 'ProxyArrangementSelected2';
-          this.ProxyArrangementChecked = false
-          hilog.info(0xB003, this.componentName, `#ProxyBindSheetEditRadio#onClick: `)
+          this.currentRadioValue1 = 1
+          this.ProxyArrangementSelected = 'ProxyArrangementSelected2'
         })
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
-        .width('100%')
-        .justifyContent(FlexAlign.SpaceBetween)
       }
-      .padding({left:12,right:12})
-      .justifyContent(FlexAlign.SpaceEvenly)
-      .width('100%')
       .height(94)
-      .borderRadius(20)
-      .backgroundColor(($r('app.color.container_background')))
+      .EditColumn()
 
-      Text($r('app.string.Arrangement'))
-        .width('100%')
-        .fontSize(16)
-        .fontColor(this.font_secondary)
-        .textAlign(0)
-        .padding({top:10,bottom:10})
-
+      EditTitle({title: $r('app.string.Arrangement')})
       Column() {
         Row() {
           Text($r('app.string.Default'))
-            .font({ size: 16 })
-            .fontColor(this.font_primary)
-
+            .EditText()
           Radio({
             value: 'Radio3', group: 'radioGroup2',
             indicatorType: RadioIndicatorType.TICK
           })
-            .checked(true)
+            .checked(this.currentRadioValue2 === 0)
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
               //   uncheckedBorderColor: this.icon_secondary
             })
         }
-        //   .clickEffect({ level: ClickEffectLevel.MIDDLE })
-        .width('100%')
-        .justifyContent(FlexAlign.SpaceBetween)
+        .EditRow()
+        .onClick(() => {
+          this.currentRadioValue2 = 0
+        })
 
         Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
 
         Row() {
           Text($r('app.string.Delay'))
-            .font({ size: 16 })
-            .fontColor(this.font_primary)
-
+            .EditText()
           Radio({
             value: 'Radio4', group: 'radioGroup2',
             indicatorType: RadioIndicatorType.TICK
           })
-            .onClick(() => this.sortItems())//按延迟排序
-            .checked(false)
+            .checked(this.currentRadioValue2 === 1)
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
               //   uncheckedBorderColor: this.icon_secondary
             })
         }
-        //  .clickEffect({ level: ClickEffectLevel.MIDDLE })
-        .width('100%')
-        .justifyContent(FlexAlign.SpaceBetween)
+        .EditRow()
+        .onClick(() => {
+          this.sortItems()  //按延迟排序
+          this.currentRadioValue2 = 1
+        })
 
         Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
 
-
         Row() {
           Text($r('app.string.Wide'))
-            .font({ size: 16 })
-            .fontColor(this.font_primary)
-
+            .EditText()
           Radio({
             value: 'Radio5', group: 'radioGroup2',
             indicatorType: RadioIndicatorType.TICK
           })
-            .checked(true)
+            .checked(this.currentRadioValue2 === 2)
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
               //   uncheckedBorderColor: this.icon_secondary
             })
         }
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
-        .width('100%')
-        .justifyContent(FlexAlign.SpaceBetween)
+        .EditRow()
+        .onClick(() => {
+          this.currentRadioValue2 = 2
+        })
       }
-      .padding({left:12,right:12})
-      .justifyContent(FlexAlign.SpaceEvenly)
-      .width('100%')
       .height(142)
-      .borderRadius(20)
-      .backgroundColor(($r('app.color.container_background')))
+      .EditColumn()
 
-
-      Text($r('app.string.Card_Size'))
-        .width('100%')
-        .fontSize(16)
-        .fontColor(this.font_secondary)
-        .textAlign(0)
-        .padding({top:10,bottom:10})
-
+      EditTitle({title: $r('app.string.Card_Size')})
       Column() {
         Row() {
           Text($r('app.string.Thin'))
-            .font({ size: 16 })
-            .fontColor(this.font_primary)
-
+            .EditText()
           Radio({
             value: 'Radio6', group: 'radioGroup3',
             indicatorType: RadioIndicatorType.TICK
           })
-            .checked(this.ProxyGroupItemChecked)
-            .onChange(() => {
-                this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedWide';
-            })
+            .checked(this.currentRadioValue3 === 0)
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
               //   uncheckedBorderColor: this.icon_secondary
             })
         }
-        // 点击时改变ProxyGroupItemSelected状态
+        .EditRow()
+        // 点击后改变ProxyGroupItemSelected状态为 多列
         .onClick(() => {
-          this.ProxyGroupItemSelected= 'ProxyGroupItemSelectedWide';
-          this.ProxyGroupItemChecked = true;
-          this.ProxyGroupItemChecked1 = false;
-          hilog.info(0xB003, this.componentName, `#ProxyBindSheetEditRadio#onClick: `)
+          this.currentRadioValue3 = 0
+          this.ProxyGroupItemSelected= 'ProxyGroupItemSelectedWide'
         })
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
-        .width('100%')
-        .justifyContent(FlexAlign.SpaceBetween)
 
         Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
 
         Row() {
           Text($r('app.string.Wide'))
-            .font({ size: 16 })
-            .fontColor(this.font_primary)
-
+            .EditText()
           Radio({
             value: 'Radio7', group: 'radioGroup3',
             indicatorType: RadioIndicatorType.TICK
           })
-            .checked(!this.ProxyGroupItemChecked)
-            .onChange((isChecked: boolean) => {
-              if (isChecked) {
-                this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedThin';
-              }
-            })
+            .checked(this.currentRadioValue3 === 1)
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
               //   uncheckedBorderColor: this.icon_secondary
             })
-
         }
-        // 点击时改变ProxyGroupItemSelected状态
+        // 点击后改变ProxyGroupItemSelected状态为 单列
         .onClick(() => {
-          this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedThin';
-          this.ProxyGroupItemChecked = false
-          this.ProxyGroupItemChecked1 = false
-          hilog.info(0xB003, this.componentName, `#ProxyBindSheetEditRadio#onClick: `)
+          this.currentRadioValue3 = 1
+          this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedThin'
         })
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
-        .width('100%')
-        .justifyContent(FlexAlign.SpaceBetween)
-            Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
+        .EditRow()
+
+        Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
 
         Row() {
           Text($r('app.string.Mini'))
-            .font({ size: 16 })
-            .fontColor(this.font_primary)
-
+            .EditText()
           Radio({
             value: 'Radio8', group: 'radioGroup3',
             indicatorType: RadioIndicatorType.TICK
           })
-            .checked(this.ProxyGroupItemChecked1)
-            .onChange((isChecked: boolean) => {
-              if (isChecked) {
-                this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedMini';
-              }
-            })
+            .checked(this.currentRadioValue3 === 2)
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
               //   uncheckedBorderColor: this.icon_secondary
             })
         }
-        // 点击时改变ProxyGroupItemSelected状态
+        .EditRow()
+        // 点击后改变ProxyGroupItemSelected状态为 迷你
         .onClick(() => {
-          this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedMini';
-          this.ProxyGroupItemChecked1=true;
-          hilog.info(0xB003, this.componentName, `#ProxyBindSheetEditRadio#onClick: `)
+          this.currentRadioValue3 = 2
+          this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedMini'
         })
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
-        .width('100%')
-        .justifyContent(FlexAlign.SpaceBetween)
       }
-      .padding({left:12,right:12})
-      .justifyContent(FlexAlign.SpaceEvenly)
       .height(142)
-      .borderRadius(20)
-      .backgroundColor(($r('app.color.container_background')))
+      .EditColumn()
+
     }
     .padding({
       left: this.breakPointStateTabContentTitleMargin.value,
       right: this.breakPointStateTabContentTitleMargin.value,
     })
     .width('100%')
-  } //半模拟态编辑菜单end
+  }
+  //半模态编辑菜单end
 
-@State FristPage:boolean=true//为观看预览页的判定，更改后续可以删掉
+@State FristPage:boolean=true // 为观看预览页的判定，更改后续可以删掉
 
   build() {
     Column() {
@@ -461,7 +385,7 @@ struct ProxyPage {
           })
         }
 
-        if (this.FristPage) {//为观看预览页的判定if/elsep判定和更改后续可以删掉
+        if (this.FristPage) {//为观看预览页的判定if/else判定和更改后续可以删掉
           Column() {
             SymbolGlyph($r('sys.symbol.doc')).fontSize(24).fontColor([this.icon_secondary])
             Text('暂无代理').fontSize(20).fontColor(this.font_secondary)
@@ -583,3 +507,41 @@ struct ProxyPage {
 
 
 export default ProxyPage
+
+// 半模态编辑页Column公共样式（含非通用公共属性采用Extend继承的方式抽取）
+@Extend(Column) function EditColumn() {
+  .padding({left:12,right:12})
+  .width('100%')
+  .margin({bottom: 10})
+  .borderRadius(20)
+  .backgroundColor(($r('app.color.container_background')))
+  .justifyContent(FlexAlign.SpaceEvenly) // 非通用公共属性
+}
+
+// 半模态编辑页Row公共样式（含非通用公共属性采用Extend继承的方式抽取）
+@Extend(Row) function EditRow() {
+  .width('100%')
+  .justifyContent(FlexAlign.SpaceBetween) // 非通用公共属性
+  .clickEffect({ level: ClickEffectLevel.MIDDLE }) // 非通用公共属性
+}
+
+// 半模态编辑页Text共同属性（Text独有属性采用Extend继承的方式抽取）
+@Extend(Text) function EditText() {
+  .font({ size: 16 })
+  .fontColor($r('sys.color.font_primary')) // 一级文本色，黑色
+}
+
+// 半模态编辑页标题
+@Component
+struct EditTitle {
+  @State font_secondary: ResourceColor = $r('sys.color.font_secondary') //二级文本色，深灰色
+  @State title: ResourceStr = $r('app.string.Packet_mode')
+  build() {
+    Text(this.title)
+      .width('100%')
+      .fontSize(16)
+      .fontColor(this.font_secondary)
+      .textAlign(0)
+      .margin({bottom:10})
+  }
+}
