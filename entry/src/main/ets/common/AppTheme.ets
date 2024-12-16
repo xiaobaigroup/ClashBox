@@ -35,7 +35,7 @@ class OrangeAppTheme implements CustomTheme {
 }
 
 /* 导出 */
-// 自定义主题名称 TODO 补充不提名称字符串
+// 自定义主题名称 TODO 补充主题名称字符串
 export type CustomThemeName = 'blueAppTheme' | 'redAppTheme' | 'orangeAppTheme'
 // 自定义主题HashMap
 let _CUSTOM_THEME_MAP: HashMap<CustomThemeName, CustomTheme> = new HashMap<CustomThemeName, CustomTheme>()
