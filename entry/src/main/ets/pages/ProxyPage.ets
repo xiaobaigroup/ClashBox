@@ -248,7 +248,7 @@ struct ProxyPage {
         Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
 
         Row() {
-          Text($r('app.string.Wide'))
+          Text($r('app.string.Name'))
             .EditText()
           Radio({
             value: 'Radio5', group: 'radioGroup2',
