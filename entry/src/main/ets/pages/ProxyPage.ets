@@ -7,8 +7,7 @@ import {
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import ProxyGroupItem from '../components/Proxy/ProxyGroupItem'
 import ProxyArrangement from '../components/Proxy/ProxyArrangement'
-import { ThemeControl } from '@ohos.arkui.theme'
-import { gAppTheme } from '../common/AppTheme'
+
 
 // todo 定义一个接口来描述列表项的数据结构,假数据，后期可改可删
 interface Item {
@@ -16,19 +15,16 @@ interface Item {
 } //
 
 
-// 在页面build前执行ThemeControl，就可以改变主题颜色
-ThemeControl.setDefaultTheme(gAppTheme)
-
 @Entry
 @Component
 struct ProxyPage {
- //  预留自定义主题，颜色在AppTheme里面修改
- onWillApplyTheme(theme: Theme) {
-    this.icon_emphasize = theme.colors.iconEmphasize;
- }
+
   //tabs图标文字颜色，修改resources/base(dark)/element/color.json中tabs_icon_text配置选中图标文字深浅模式颜色
   //系统颜色调用
-  @Prop icon_emphasize: ResourceColor  //高亮图标,可在apptheme改色
+
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
   @State font_primary: ResourceColor = $r('sys.color.font_primary') //一级文本色，黑色
   @State font_secondary: ResourceColor = $r('sys.color.font_secondary') //二级文本色，深灰色
   @State container_background: ResourceColor = ($r('app.color.container_background')); //卡片颜色

@@ -1,6 +1,6 @@
 //主页 栅格布局、媒体查询
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
-import { mediaquery, window } from '@kit.ArkUI'
+import { window } from '@kit.ArkUI'
 import SwitchMode from '../components/Home/SwitchMode'
 import CellularData from '../components/Home/CellularData'
 import CurrrentNode from '../components/Home/CurrentNode'
@@ -8,8 +8,6 @@ import PublicNetwork from '../components/Home/PublicNetwork'
 import Start from '../components/Home/Speed'
 import { getGreeting } from '../utils/getGreeting'
 import SwitchQuickly from '../components/Home/SwitchQuickly'
-import { ThemeControl } from '@ohos.arkui.theme'
-import { gAppTheme } from '../common/AppTheme'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Timer } from '../common/HHmmssTimer'
 import {
@@ -19,10 +17,6 @@ import {
   BIND_SHEET_CONTAINER_HEIGHT
 } from '../common/Constants'
 import Settings from '../components/Settings/Settings'
-
-
-// 在页面build前执行ThemeControl，就可以改变主题颜色
-ThemeControl.setDefaultTheme(gAppTheme)
 
 
 interface MarginGenerate {
@@ -35,11 +29,10 @@ interface MarginGenerate {
 @Entry
 @Component
 struct Home {
-  //预留自定义主题，颜色在AppTheme里面修改
-  onWillApplyTheme(theme: Theme) {
-    this.icon_emphasize = theme.colors.iconEmphasize;
-  }
-  @Prop icon_emphasize: ResourceColor  //高亮图标,可在apptheme更换
+
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
   // 设置按钮导航
   @Provide('NavSettingsPathStack') SettingsPageInfos: NavPathStack = new NavPathStack()
 

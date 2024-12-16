@@ -1,6 +1,5 @@
-import { ThemeControl } from '@ohos.arkui.theme'
-import { gAppTheme } from '../common/AppTheme'
-import { BreakpointState, BreakpointSystem } from '../common/breakpointsystem'
+import { CustomThemeName } from '../common/AppTheme'
+import { BreakpointState } from '../common/breakpointsystem'
 import {
   TAB_CONTENT_TITLE_FONT_SIZE,
   TAB_CONTENT_TITLE_FONT_WEIGHT,
@@ -18,9 +17,6 @@ import { ConfigAdd } from '../components/Configuration/ConfigAdd'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
 
-// 在页面build前执行ThemeControl，就可以改变主题颜色
-//ThemeControl.setDefaultTheme(gAppTheme)
-
 /**
  * 长按菜单参数
  */
@@ -37,6 +33,10 @@ interface LongPressContextMenuItem {
 struct ConfigurationPage {
 
   private componentName:string = 'ConfigurationPage'
+
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
 
   private promptAction:PromptAction = this.getUIContext()?.getPromptAction()
 
@@ -77,7 +77,7 @@ struct ConfigurationPage {
     '配置12',
     '配置13',
     '配置14']
-  // ContextMenu列表项集合
+  // ContextMenu列表项集合 TODO 国际化
   @State
   private configListLongPressCtxMenus: Array<LongPressContextMenuItem> = [
     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.star'))
@@ -217,6 +217,9 @@ struct ConfigurationPage {
                 Blank()
                 Radio({ value: 'radio' + index, group: 'configGroup' })
                   .checked(index === this.currentConfigRadioCheckedValue)
+                  .radioStyle({
+                    checkedBackgroundColor: this.icon_emphasize,
+                  })
               }
               .width('100%')
               .padding(LIST_ITEM_PADDING)
@@ -288,6 +291,7 @@ struct ConfigurationPage {
         .margin(this.proxyStartButtonMargin)
         .width(this.proxyStartButtonWidth)
         .height(this.proxyStartButtonHeight)
+        .backgroundColor(this.icon_emphasize)
         .clip(true)
         .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
         .clickEffect({ level: ClickEffectLevel.LIGHT })

@@ -17,10 +17,8 @@ import {
   listHeight_610_590
 } from '../common/Constants'
 import { ThemeControl } from '@ohos.arkui.theme'
-import { gAppTheme } from '../common/AppTheme'
+import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
 
-// 在页面build前执行ThemeControl，就可以改变主题颜色
-ThemeControl.setDefaultTheme(gAppTheme)
 
 //
 interface marginGenerate {
@@ -34,14 +32,25 @@ struct Index {
 
   private componentName: string = 'Index'
 
-  //系统颜色调用
-  @State icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize')//高亮图标,可在apptheme更换
+  // @StorageProp('selectedTheme')
+  // TODO 使用用户首选项之后 删掉`@State`，取消注释上面的`@StorageProp`
+  @State
+  selectedTheme: CustomThemeName = 'blueAppTheme'
+
+  // 系统颜色调用（现在每个主题中只有一个颜色，如果有多个颜色，可以把这个换成主题色对应的`CustomTheme`）
+  @Provide('icon_emphasize')
+  icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize')//高亮图标,可在apptheme更换
   @State icon_tertiary: ResourceColor = $r('sys.color.icon_tertiary')//三级图标色，浅灰色
 
-  //预留自定义主题，颜色在AppTheme里面修改
-   onWillApplyTheme(theme: Theme) {
-     this.icon_emphasize = theme.colors.iconEmphasize;
-   }
+  // 预留自定义主题，颜色在AppTheme里面修改
+  /**
+   *
+   * @param theme
+   */
+  onWillApplyTheme(theme: Theme) {
+    hilog.info(0x1000, this.componentName, `#onWillApplyTheme`)
+    this.icon_emphasize = theme.colors.iconEmphasize;
+  }
     //tabs图标文字颜色，修改resources/base(dark)/element/color.json中tabs_icon_text配置选中图标文字深浅模式颜色
     // app.color.tabs_icon_text1配置非选中图标和文字深浅模式颜色
   //  @State fontColorValue:ResourceColor = ($r('app.color.tabs_icon_text'));
@@ -137,6 +146,11 @@ struct Index {
     deviceHeightListener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
 
     aboutToAppear() {
+      hilog.info(0x1000, this.componentName, `#aboutToAppear`)
+
+      // 在页面build前执行ThemeControl，就可以改变主题颜色
+      ThemeControl.setDefaultTheme(CUSTOM_THEME_MAP.get(this.selectedTheme))
+      hilog.info(0x1000, this.componentName, `#aboutToAppear#ThemeControl.setDefaultTheme(${this.selectedTheme})`)
 
       // 开启change监听
       this.deviceHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
@@ -165,6 +179,7 @@ struct Index {
     }
 
     aboutToDisappear() {
+      hilog.info(0x1000, this.componentName, `#aboutToDisappear`)
       // 停止监听断点事件，并清空断点对应数据
       BreakpointSystem.getInstance().stop()
 
@@ -226,5 +241,5 @@ struct Index {
     .height('100%')
     .backgroundColor($r('app.color.background'))
     .padding({ top: px2vp(this.topRectHeight)-5 ,bottom: px2vp(this.bottomRectHeight) })
-}
+  }
 }

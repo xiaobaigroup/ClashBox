@@ -1,11 +1,7 @@
 import { BreakpointSystem, BreakpointState } from '../../common/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI';
-import { ThemeControl } from '@ohos.arkui.theme'
-import { gAppTheme } from '../../common/AppTheme'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 
-// 在页面build前执行ThemeControl，就可以改变主题颜色
-ThemeControl.setDefaultTheme(gAppTheme)
 
 interface MarginGenerate {
   left: number, right: number, top: number,
@@ -17,7 +13,8 @@ struct SwitchMode {
   private componentName:string = 'SwitchMode'
   //自定义主题，颜色在AppTheme里面修改
   @State font_primary: ResourceColor = $r('sys.color.font_primary')
-  @Prop icon_emphasize: ResourceColor //高亮图标,可在apptheme更换
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor //高亮图标,可在apptheme更换
 
   onWillApplyTheme(theme: Theme) {
     this.icon_emphasize = theme.colors.iconEmphasize;

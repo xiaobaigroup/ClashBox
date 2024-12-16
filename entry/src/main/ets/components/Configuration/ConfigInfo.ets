@@ -69,9 +69,9 @@ export struct ConfigInfo{
       // TODO 国际化
       Text('配置名').margin({bottom: 10}).fontColor($r('sys.color.font_secondary')).fontSize(FONT_SIZE_16)
       TextInput({ placeholder: '输入配置名' }).margin({bottom: 10}).width('100%').height(TEXT_INPUT_HEIGHT).borderRadius(BORDER_RADIUS_20)
+        .id('text_input_config_name')
         .maxLength(TEXT_AREA_MAX_LENGTH)
         .enterKeyType(EnterKeyType.Next)
-        .key('text_input_config_name')
         .defaultFocus(true)
         .onChange( (value: string, previewText: PreviewText) => {
           this.configData.configName = value.trim()
@@ -87,10 +87,10 @@ export struct ConfigInfo{
       Text('URL').margin({bottom: 10}).fontColor($r('sys.color.font_secondary')).fontSize(FONT_SIZE_16)
       // TODO 国际化
       TextArea({ placeholder: '输入链接...' }).margin({bottom: 10}).width('100%').height(TEXT_INPUT_HEIGHT * 2).borderRadius(BORDER_RADIUS_20)
+        .id('text_area_config_url')
         .maxLength(TEXT_AREA_MAX_LENGTH)
         .wordBreak(WordBreak.BREAK_ALL)
         .enterKeyType(EnterKeyType.Done)
-        .key('text_area_config_url')
         .type(TextAreaType.URL)
         .onChange( (value: string, previewText: PreviewText) => {
           this.configData.configURL = value.trim()

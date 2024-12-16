@@ -3,12 +3,7 @@ import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem
 import { BIND_SHEET_CONTAINER_HEIGHT, LIST_ITEM_HEIGHT } from '../../common/Constants'
 import { LengthMetrics, SymbolGlyphModifier } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
-import { ThemeControl } from '@ohos.arkui.theme'
-import { gAppTheme } from '../../common/AppTheme'
 
-
-// 在页面build前执行ThemeControl，就可以改变主题颜色
-ThemeControl.setDefaultTheme(gAppTheme)
 
 //断点布局
 export const BPS_LIST_LANES_2_2_3_4_4: BreakpointState<number> = BreakpointState.of({
@@ -30,12 +25,10 @@ interface Item {
 //自定义弹窗内容
 @CustomDialog
 struct CustomDialogExample {
-  //  预留自定义主题，颜色在AppTheme里面修改
-  onWillApplyTheme(theme: Theme) {
-    this.icon_emphasize = theme.colors.iconEmphasize;
-  }
-  //系统颜色调用
-  @Prop icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize') //高亮图标，蓝色
+
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
 
   controller?: CustomDialogController
   cancel: () => void = () => {
@@ -84,8 +77,10 @@ struct ProxyGroupItem {
   onWillApplyTheme(theme: Theme) {
     this.icon_emphasize = theme.colors.iconEmphasize;
   }
-  //系统颜色调用
- @Prop icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize') //高亮图标，蓝色
+
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
 
   // 显式声明状态变量的类型，假数据组后期可改可删
   @State items: Item[] = [
