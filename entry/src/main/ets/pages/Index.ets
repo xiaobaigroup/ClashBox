@@ -14,7 +14,8 @@ import {
   BPS_NAVIGATION_LIST_PADDING_12_13_13_28_36,
   morePageMargin_12_14_16,
   morePagelistBottom_10_14,
-  listHeight_610_590
+  listHeight_610_590,
+  SettingslistHeight_590_500
 } from '../common/Constants'
 import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
@@ -113,6 +114,8 @@ struct Index {
   private breakPointStatemorePageMargin: BreakpointState<number> = morePageMargin_12_14_16
   @Provide('breakPointStatemorePagelistBottom')
   private breakPointStatemorePagelistBottom: BreakpointState<number> = morePagelistBottom_10_14
+  @Provide('breakPointStateSettingslistHeight')
+  private breakPointStateSettingslistHeight: BreakpointState<number> = SettingslistHeight_590_500
 
     @Builder TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
 
@@ -175,6 +178,7 @@ struct Index {
       BreakpointSystem.getInstance().attach(this.breakPointStatemorePageMargin)
       BreakpointSystem.getInstance().attach(this.breakPointStatemorePagelistBottom)
       BreakpointSystem.getInstance().attach(this.breakPointStateListHeight)
+      BreakpointSystem.getInstance().attach(this.breakPointStateSettingslistHeight)
       BreakpointSystem.getInstance().start()
     }
 

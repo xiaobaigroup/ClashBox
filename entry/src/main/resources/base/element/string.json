@@ -623,6 +623,66 @@
     {
       "name": "None_Proxy",
       "value": "暂无代理"
+    },
+    {
+      "name": "Application_Version",
+      "value": "应用版本"
+    },
+    {
+      "name": "Kernel_Version",
+      "value": "内核版本"
+    },
+    {
+      "name": "Experimental_Function",
+      "value": "实验功能"
+    },
+    {
+      "name": "Experimental_Function_Subtitle",
+      "value": "开启实验功能可能会导致应用不稳定"
+    },
+    {
+      "name": "Contributors",
+      "value": "贡献者名单"
+    },
+    {
+      "name": "UseGuidance",
+      "value": "使用引导"
+    },
+    {
+      "name": "Check_Updates",
+      "value": "检查更新"
+    },
+    {
+      "name": "UpdateChannels",
+      "value": "更新渠道"
+    },
+    {
+      "name": "UpdateChannels_Subtitle1",
+      "value": "Github(默认)"
+    },
+    {
+      "name": "Auto_Check_Updates",
+      "value": "自动检查更新"
+    },
+    {
+      "name": "Official_Telegram_Channel",
+      "value": "官方Telegram频道"
+    },
+    {
+      "name": "Official_Discord_Community",
+      "value": "官方Discord社区"
+    },
+    {
+      "name": "Development_Team_Email",
+      "value": "开发团队电子邮件"
+    },
+    {
+      "name": "ProjectRepositories",
+      "value": "项目仓库"
+    },
+    {
+      "name": "FQ",
+      "value": "常见问题"
     }
   ]
 }

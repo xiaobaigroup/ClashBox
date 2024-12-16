@@ -18,7 +18,6 @@ struct Language {
   build() {
     NavDestination() {
       TopBuilder({title: $r('app.string.Language'), /*isShowSettings: this.isShowSettings*/})
-
       List() {
         // 跟随系统语言
         ListItem() {
@@ -93,11 +92,10 @@ struct Language {
       .width('100%')
       .alignListItem(ListItemAlign.Center)
       .height(this.isLandscapePhone ? 275 : 800)
-      .margin({ top: 10, left: this.morePageMargin.value, right: this.morePageMargin.value })
+      .margin({ left: this.morePageMargin.value, right: this.morePageMargin.value })
 
     }
     .hideTitleBar(true)
-    .backgroundColor($r('app.color.settings_container_background'))
     .backgroundBlurStyle(BlurStyle.BACKGROUND_REGULAR)
     .onBackPressed(() => {
       this.SettingsPageInfos.clear();

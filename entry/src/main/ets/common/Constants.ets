@@ -224,6 +224,68 @@ export const LanguageListItem = (): LanguageData[] => {
   return result
 }
 
+// 设置页关于列表
+export interface AboutListItemProp {
+  name?: string
+  title: string | Resource
+  subtitle?: string | Resource
+  sign?: number
+  children?: Array<AboutListItemProp>
+}
+export const AboutList:AboutListItemProp[] = [
+  {
+    title: 'Version',
+    children: [
+      { title: $r('app.string.Application_Version'), subtitle: '2.0.000 Preview1',sign: 0, name: 'ApplicationVersion' },
+      { title: $r('app.string.Kernel_Version'), subtitle: 'Unknown',sign: 0, name: 'KernelVersion' }
+    ]
+  },
+  {
+    title: 'Experiment',
+    children: [
+      { title: $r('app.string.Experimental_Function'), subtitle: $r('app.string.Experimental_Function_Subtitle'), sign: 1, name: 'ExperimentalFunction' },
+    ]
+  },
+  {
+    title: 'Contributors',
+    children: [
+      { title: $r('app.string.Contributors'), subtitle: '', sign: 2, name: 'Contributors' },
+    ]
+  },
+  {
+    title: 'General',
+    children: [
+      { title: $r('app.string.UseGuidance'), subtitle: '', sign: 2, name: 'UseGuidance' },
+      { title: $r('app.string.FQ'), subtitle: '', sign: 2, name: 'FQ' },
+    ]
+  },
+  { title: 'Update',
+    children: [
+      { title: $r('app.string.Check_Updates'), subtitle: '', sign: 2, name: 'Update' },
+      { title: $r('app.string.UpdateChannels'), subtitle: $r('app.string.UpdateChannels_Subtitle1'), sign: 3, name: 'UpdateChannels',
+        children: [
+          { title: $r('app.string.UpdateChannels_Subtitle1'), name: 'Github' },
+         ]
+      },
+      { title: $r('app.string.Auto_Check_Updates'), subtitle: '', sign: 1, name: 'Auto' },
+    ]
+  },
+  {
+    title: 'Contact',
+    children: [
+      { title: $r('app.string.Official_Telegram_Channel'), subtitle: '', sign: 2, name: 'Telegram' },
+      { title: $r('app.string.Official_Discord_Community'), subtitle: '', sign: 2, name: 'Discord' },
+      { title: $r('app.string.Development_Team_Email'), subtitle: '', sign: 2, name: 'Email' },
+    ]
+  },
+  {
+    title: 'Repositories',
+    children: [
+      { title: $r('app.string.ProjectRepositories'), subtitle: '', sign: 2, name: 'Repositories' },
+    ]
+  }
+]
+
 
 /* 断点相关 */
 // List组件的布局 列数或行数
@@ -266,7 +328,7 @@ export const BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36: BreakpointState<number> =
 
 // 更多页整体外边距
 export const morePageMargin_12_14_16: BreakpointState<number> = BreakpointState.of({
-  xs: 12, sm: 14, md: 16, lg: 16, xl: 16
+  xs: 12, sm: 16, md: 16, lg: 16, xl: 16
 })
 
 // 更多页列表底边距
@@ -277,6 +339,11 @@ export const morePagelistBottom_10_14: BreakpointState<number> = BreakpointState
 // 列表高度
 export const listHeight_610_590: BreakpointState<number> = BreakpointState.of({
   xs: 610, sm: 610, md: 590, lg: 590, xl: 590
+})
+
+// 列表高度
+export const SettingslistHeight_590_500: BreakpointState<number> = BreakpointState.of({
+  xs: 590, sm: 590, md: 500, lg: 500, xl: 500
 })
 
 /* List 相关*/

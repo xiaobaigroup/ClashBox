@@ -24,14 +24,11 @@ struct Settings {
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级图标色，黑色
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  // 断点
-  @State compStr: BreakpointState<string> = BreakpointState.of({
-    xs: "xs", sm: "sm", md: "md", lg: "lg", xl: "xl"
-  })
   // 列表底边距
-  @State listBottom: BreakpointState<number> = BreakpointState.of({
-    xs: 10, sm: 10, md: 14, lg: 14, xl: 14
-  })
+  @Consume('breakPointStatemorePagelistBottom') private listBottom: BreakpointState<number>
+  // 列表高度
+  @Consume('breakPointStateSettingslistHeight')
+  private SettingslistHeight: BreakpointState<number>
 
 
   handleCheck(index: number) {
@@ -52,7 +49,6 @@ struct Settings {
   }*/
 
   aboutToAppear(): void {
-    BreakpointSystem.getInstance().attach(this.compStr)
     BreakpointSystem.getInstance().attach(this.listBottom)
     BreakpointSystem.getInstance().start()
   }
@@ -61,7 +57,7 @@ struct Settings {
 
   }
 
-  // 设置页路由导航
+  // 设置页路由表
   @Builder
   SettingsPagesMap(name: string) {
     if (name == 'Appearance') {
@@ -114,66 +110,24 @@ struct Settings {
       TopBuilder({
         showBackButton: false,
         title: $r('app.string.Settings'),
-        //isShowSettings: this.isShowSettings
       })
       List() {
         ForEach(this.settingsList, (item: settingsData, index: number) => {
-
-            /*if (item.name === 'Language') {
-              ListItem() {
-                  Row() {
-                    SymbolGlyph(item.icons)
-                      .fontSize(24)
-                      .margin({ left: 12 })
-                    Text(item.title)
-                      //.width('100%')
-                      .height(48)
-                      .fontWeight(FontWeight.Medium)
-                      .padding({ left: 12 })
-                      .fontSize(16)
-                    Blank()
-                    Text(item.hint)
-                      .fontColor('gray')
-                      .margin({ right: 8 })
-                      .fontSize(14)
-                    SymbolGlyph($r('sys.symbol.chevron_right'))
-                      .fontSize(24)
-                      .margin({ right: 12})
-                      .bindContextMenu(this.isShowMenu, this.LanguageMenu,
-                        {
-                          onDisappear: ()=>{
-                            this.isShowMenu = false;
-                          }
-                        })
-
-                  }
-                  .width('94%')
-                  .height(53)
-                  .borderRadius(20)
-                  .backgroundColor($r('app.color.container_background'))
+          ListItem() {
+            settingsListItem({
+              index: index,
+              itemObj: item,
+              onCheck: (index: number) => {
+                this.handleCheck(index)
               }
-              .onClick(() => {
-                this.isShowMenu = !this.isShowMenu
-              })
-              .margin({bottom: this.listBottom.value })
-            } else {*/
-              ListItem() {
-                settingsListItem({
-                  index: index,
-                  itemObj: item,
-                  onCheck: (index: number) => {
-                    this.handleCheck(index)
-                  }
-                })
-              }
-              .margin({bottom: this.listBottom.value })
-            //}
-
+            })
+          }
+          .margin({bottom: this.listBottom.value })
         })
 
       }
       .width('100%')
-      .height(500)
+      .height(this.isLandscapePhone ? 300 : this.SettingslistHeight.value)
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)
     }

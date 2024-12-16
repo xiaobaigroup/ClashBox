@@ -216,7 +216,7 @@ struct Home {
           .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
             detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],
             preferType: SheetType.CENTER,
-            backgroundColor: $r('app.color.settings_container_background'),
+            backgroundColor: $r('app.color.container_background'),
             dragBar: false,
             blurStyle: BlurStyle.BACKGROUND_REGULAR,
             onDisappear: () => {
