@@ -5,7 +5,7 @@ import { gAppTheme } from '../../common/AppTheme'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 
 // 在页面build前执行ThemeControl，就可以改变主题颜色
-//ThemeControl.setDefaultTheme(gAppTheme)
+ThemeControl.setDefaultTheme(gAppTheme)
 
 interface MarginGenerate {
   left: number, right: number, top: number,
@@ -17,20 +17,12 @@ struct SwitchMode {
   private componentName:string = 'SwitchMode'
   //自定义主题，颜色在AppTheme里面修改
   @State font_primary: ResourceColor = $r('sys.color.font_primary')
-  @State icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize')//高亮图标，蓝色
-/*
-  @State backgroundPrimary: ResourceColor = $r('sys.color.background_primary')
-  @State fontPrimary: ResourceColor = $r('sys.color.font_primary')
-  @State iconOnPrimary: ResourceColor = $r('sys.color.icon_on_primary')
-  @State iconFourth: ResourceColor = $r('sys.color.icon_fourth')
+  @Prop icon_emphasize: ResourceColor //高亮图标,可在apptheme更换
 
   onWillApplyTheme(theme: Theme) {
-    this.backgroundPrimary = theme.colors.backgroundPrimary;
-    this.fontPrimary = theme.colors.fontPrimary;
-    this.iconOnPrimary = theme.colors.iconOnPrimary;
-    this.iconFourth = theme.colors.iconFourth;
+    this.icon_emphasize = theme.colors.iconEmphasize;
   }
-*/
+
   // 代理模式Radio状态
   @State radioRuleChecked: boolean = false;
   @State radioOverallChecked: boolean = false;
@@ -100,6 +92,9 @@ struct SwitchMode {
             .onChange((value: boolean) => {
               hilog.info(0xA001, this.componentName, `#Radio()#rule#state: ${this.radioRuleChecked}`)
             })
+            .radioStyle({
+              checkedBackgroundColor: this.icon_emphasize,
+            })
           Text($r('app.string.Rule'))
             .fontWeight(FontWeight.Bold)
             .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
@@ -111,6 +106,9 @@ struct SwitchMode {
             .checked($$this.radioOverallChecked)
             .onChange((value: boolean) => {
               hilog.info(0xA001, this.componentName, `#Radio()#overall#state: ${this.radioRuleChecked}`)
+            })
+            .radioStyle({
+              checkedBackgroundColor: this.icon_emphasize,
             })
           Text($r('app.string.Overall'))
             .fontWeight(FontWeight.Bold)
@@ -124,6 +122,9 @@ struct SwitchMode {
             .checked($$this.radioDirectChecked)
             .onChange((value: boolean) => {
               hilog.info(0xA001, this.componentName, `#Radio()#direct#state: ${this.radioRuleChecked}`)
+            })
+            .radioStyle({
+              checkedBackgroundColor: this.icon_emphasize,
             })
           Text($r('app.string.Direct'))
             .fontWeight(FontWeight.Bold)

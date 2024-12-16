@@ -11,7 +11,6 @@ import { StartOptions } from '@kit.AbilityKit'
 @Component
 struct ProxyArrangement {
   @State font_primary: ResourceColor = $r('sys.color.font_primary') //一级文本色，黑色
-  @State comp_divider: ResourceColor = $r('sys.color.comp_divider') //分割线颜色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
   @State isContentShow: boolean = true;
   @State selectItem: number = 0;

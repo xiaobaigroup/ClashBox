@@ -1,22 +1,14 @@
 import { BreakpointState, BreakpointSystem } from '../common/breakpointsystem'
 import {
-  TAB_CONTENT_TITLE_FONT_SIZE,
-  TAB_CONTENT_TITLE_FONT_WEIGHT,
-  BPS_LIST_LANES_1_1_2_3_4,
-  BPS_LIST_GUTTER_1_1_2_3_3,
-  BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36,
   ANIMATION_DURATION_300,
   TAB_CONTENT_TITLE_HEIGHT,
-  TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE,
-  LIST_ITEM_HEIGHT,
-  LIST_SPACE,
-  BORDER_RADIUS_20,
   BIND_SHEET_CONTAINER_HEIGHT,
 } from '../common/Constants'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import ProxyGroupItem from '../components/Proxy/ProxyGroupItem'
 import ProxyArrangement from '../components/Proxy/ProxyArrangement'
-
+import { ThemeControl } from '@ohos.arkui.theme'
+import { gAppTheme } from '../common/AppTheme'
 
 // todo 定义一个接口来描述列表项的数据结构,假数据，后期可改可删
 interface Item {
@@ -24,25 +16,19 @@ interface Item {
 } //
 
 
-//import { ThemeControl } from '@ohos.arkui.theme'
-//import { gAppTheme } from './AppTheme'
-
 // 在页面build前执行ThemeControl，就可以改变主题颜色
-//ThemeControl.setDefaultTheme(gAppTheme)
+ThemeControl.setDefaultTheme(gAppTheme)
 
 @Entry
 @Component
 struct ProxyPage {
-  /* 预留自定义主题，颜色在AppTheme里面修改
+ //  预留自定义主题，颜色在AppTheme里面修改
  onWillApplyTheme(theme: Theme) {
-    this.backgroundPrimary = theme.colors.backgroundPrimary;
-    this.fontPrimary = theme.colors.fontPrimary;
-    this.iconOnPrimary = theme.colors.iconOnPrimary;
-    this.iconFourth = theme.colors.iconFourth;
- } */
+    this.icon_emphasize = theme.colors.iconEmphasize;
+ }
   //tabs图标文字颜色，修改resources/base(dark)/element/color.json中tabs_icon_text配置选中图标文字深浅模式颜色
   //系统颜色调用
-  @State icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize') //高亮图标，蓝色
+  @Prop icon_emphasize: ResourceColor  //高亮图标,可在apptheme改色
   @State font_primary: ResourceColor = $r('sys.color.font_primary') //一级文本色，黑色
   @State font_secondary: ResourceColor = $r('sys.color.font_secondary') //二级文本色，深灰色
   @State container_background: ResourceColor = ($r('app.color.container_background')); //卡片颜色
@@ -75,6 +61,7 @@ struct ProxyPage {
   @Provide ProxyGroupItemSelected: string = 'ProxyGroupItemSelectedWide'
   @State ProxyGroupItemChecked: boolean = true;
   ProxyGroupItemChecked1: boolean = false;
+   if(ProxyGroupItemSelected='ProxyGroupItemSelectedWide'){this.ProxyGroupItemChecked}
 
   /* 断点布局相关 相关作用看定义时候的注释 */
   @Consume('breakPointStateListLanes')
@@ -416,7 +403,6 @@ struct ProxyPage {
               showClose: true,
               scrollSizeMode: ScrollSizeMode.CONTINUOUS,
               title: { title: $r('app.string.Edit') },
-              //   width: ('100%'),
               preferType: SheetType.CENTER,
               maskColor: $r('app.color.dialog_maskcolor')
             })
@@ -430,7 +416,7 @@ struct ProxyPage {
           })
         }
 
-        if (this.FristPage) {//为观看预览页的判定if/else判定和更改后续可以删掉
+        if (this.FristPage) {//为观看预览页的判定if/else，判定和更改后续可以删掉
           Column() {
             SymbolGlyph($r('sys.symbol.doc')).fontSize(24).fontColor([this.icon_secondary])
             Text('暂无代理').fontSize(20).fontColor(this.font_secondary)
@@ -525,17 +511,17 @@ struct ProxyPage {
           }
           .shadow({
             radius: 10,
-            color: $r('app.color.speed_down_icon'),
+            color: this.icon_emphasize,
             offsetY: 4,
             type: ShadowType.BLUR
           })
+          .backgroundColor(this.icon_emphasize)
           .margin(this.proxyStartButtonMargin)
           .width(this.proxyStartButtonWidth)
           .height(this.proxyStartButtonHeight)
           .clip(true)
           .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
           .clickEffect({ level: ClickEffectLevel.MIDDLE })
-
           // 悬浮新增配置按钮 END
         }
         .backgroundColor($r('app.color.background'))

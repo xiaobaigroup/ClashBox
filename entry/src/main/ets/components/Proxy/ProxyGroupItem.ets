@@ -3,6 +3,12 @@ import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem
 import { BIND_SHEET_CONTAINER_HEIGHT, LIST_ITEM_HEIGHT } from '../../common/Constants'
 import { LengthMetrics, SymbolGlyphModifier } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
+import { ThemeControl } from '@ohos.arkui.theme'
+import { gAppTheme } from '../../common/AppTheme'
+
+
+// 在页面build前执行ThemeControl，就可以改变主题颜色
+ThemeControl.setDefaultTheme(gAppTheme)
 
 //断点布局
 export const BPS_LIST_LANES_2_2_3_4_4: BreakpointState<number> = BreakpointState.of({
@@ -24,6 +30,13 @@ interface Item {
 //自定义弹窗内容
 @CustomDialog
 struct CustomDialogExample {
+  //  预留自定义主题，颜色在AppTheme里面修改
+  onWillApplyTheme(theme: Theme) {
+    this.icon_emphasize = theme.colors.iconEmphasize;
+  }
+  //系统颜色调用
+  @Prop icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize') //高亮图标，蓝色
+
   controller?: CustomDialogController
   cancel: () => void = () => {
   }
@@ -50,6 +63,7 @@ struct CustomDialogExample {
             this.controller.close()
           }
         })
+        .backgroundColor(this.icon_emphasize)
     }
     .backgroundColor($r('app.color.container_background'))
     .padding({
@@ -66,6 +80,13 @@ struct CustomDialogExample {
 @Entry
 @Component
 struct ProxyGroupItem {
+  //  预留自定义主题，颜色在AppTheme里面修改
+  onWillApplyTheme(theme: Theme) {
+    this.icon_emphasize = theme.colors.iconEmphasize;
+  }
+  //系统颜色调用
+ @Prop icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize') //高亮图标，蓝色
+
   // 显式声明状态变量的类型，假数据组后期可改可删
   @State items: Item[] = [
     { text: '越南①', latency: 20, type: 'Vmess' },
@@ -231,6 +252,9 @@ struct ProxyGroupItem {
               Blank()
               Radio({ value: 'radio' + index, group: 'configGroup' })
                 .checked(index === this.PorxyRadioCheckedValue)
+                .radioStyle({
+                  checkedBackgroundColor: this.icon_emphasize,
+                })
             }
             .width('100%')
             .padding({ left: 14, right: 16 })
@@ -262,11 +286,11 @@ struct ProxyGroupItem {
       // .divider({ strokeWidth: 1,color:$r('app.color.divider'),startMargin:16,endMargin:16})
       .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
         detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
+        preferType: SheetType.CENTER,
         backgroundColor: $r('app.color.settings_container_background'),
         showClose: true,
         scrollSizeMode: ScrollSizeMode.CONTINUOUS,
         title: { title: $r('app.string.Test_Speed'), subtitle: '测速功能由CloundFlare提供' },
-        width: ('100%'),
         maskColor: $r('app.color.dialog_maskcolor')
       })
     }
@@ -294,6 +318,9 @@ struct ProxyGroupItem {
               Blank()
               Radio({ value: 'radio' + index, group: 'configGroup' })
                 .checked(index === this.PorxyRadioCheckedValue)
+                .radioStyle({
+                  checkedBackgroundColor: this.icon_emphasize,
+                })
             }
             .width('100%')
             .padding({ left: 14, right: 16 })
@@ -322,11 +349,11 @@ struct ProxyGroupItem {
       .edgeEffect(EdgeEffect.Spring)
       .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
         detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
+        preferType: SheetType.CENTER,
         backgroundColor: $r('app.color.settings_container_background'),
         showClose: true,
         scrollSizeMode: ScrollSizeMode.CONTINUOUS,
         title: { title: $r('app.string.Test_Speed'), subtitle: '测速功能由CloundFlare提供' },
-        width: ('100%'),
         maskColor: $r('app.color.dialog_maskcolor')
       })
     }
@@ -354,6 +381,9 @@ struct ProxyGroupItem {
               Blank()
               Radio({ value: 'radio' + index, group: 'configGroup' })
                 .checked(index === this.PorxyRadioCheckedValue)
+                .radioStyle({
+                  checkedBackgroundColor: this.icon_emphasize,
+                })
             }
             .width('100%')
             .padding({ left: 14, right: 16 })
@@ -382,12 +412,12 @@ struct ProxyGroupItem {
       .scrollBar(BarState.Off)
       .edgeEffect(EdgeEffect.Spring)
       .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
-        detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
+        detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT, ],
+        preferType: SheetType.CENTER,
         backgroundColor: $r('app.color.settings_container_background'),
         showClose: true,
         scrollSizeMode: ScrollSizeMode.CONTINUOUS,
         title: { title: $r('app.string.Test_Speed'), subtitle: '测速功能由CloundFlare提供' },
-        width: ('100%'),
         maskColor: $r('app.color.dialog_maskcolor')
       })
     }

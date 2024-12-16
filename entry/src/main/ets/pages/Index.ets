@@ -16,13 +16,11 @@ import {
   morePagelistBottom_10_14,
   listHeight_610_590
 } from '../common/Constants'
-
-
-//import { ThemeControl } from '@ohos.arkui.theme'
-//import { gAppTheme } from './AppTheme'
+import { ThemeControl } from '@ohos.arkui.theme'
+import { gAppTheme } from '../common/AppTheme'
 
 // 在页面build前执行ThemeControl，就可以改变主题颜色
-//ThemeControl.setDefaultTheme(gAppTheme)
+ThemeControl.setDefaultTheme(gAppTheme)
 
 //
 interface marginGenerate {
@@ -37,16 +35,13 @@ struct Index {
   private componentName: string = 'Index'
 
   //系统颜色调用
-  @State icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize')//高亮图标，蓝色
+  @State icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize')//高亮图标,可在apptheme更换
   @State icon_tertiary: ResourceColor = $r('sys.color.icon_tertiary')//三级图标色，浅灰色
 
-  /* 预留自定义主题，颜色在AppTheme里面修改
+  //预留自定义主题，颜色在AppTheme里面修改
    onWillApplyTheme(theme: Theme) {
-      this.backgroundPrimary = theme.colors.backgroundPrimary;
-      this.fontPrimary = theme.colors.fontPrimary;
-      this.iconOnPrimary = theme.colors.iconOnPrimary;
-      this.iconFourth = theme.colors.iconFourth;
-   } */
+     this.icon_emphasize = theme.colors.iconEmphasize;
+   }
     //tabs图标文字颜色，修改resources/base(dark)/element/color.json中tabs_icon_text配置选中图标文字深浅模式颜色
     // app.color.tabs_icon_text1配置非选中图标和文字深浅模式颜色
   //  @State fontColorValue:ResourceColor = ($r('app.color.tabs_icon_text'));

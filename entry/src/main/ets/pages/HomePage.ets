@@ -19,8 +19,10 @@ import {
   BIND_SHEET_CONTAINER_HEIGHT
 } from '../common/Constants'
 import Settings from '../components/Settings/Settings'
+
+
 // 在页面build前执行ThemeControl，就可以改变主题颜色
-//ThemeControl.setDefaultTheme(gAppTheme)
+ThemeControl.setDefaultTheme(gAppTheme)
 
 
 interface MarginGenerate {
@@ -33,6 +35,11 @@ interface MarginGenerate {
 @Entry
 @Component
 struct Home {
+  //预留自定义主题，颜色在AppTheme里面修改
+  onWillApplyTheme(theme: Theme) {
+    this.icon_emphasize = theme.colors.iconEmphasize;
+  }
+  @Prop icon_emphasize: ResourceColor  //高亮图标,可在apptheme更换
   // 设置按钮导航
   @Provide('NavSettingsPathStack') SettingsPageInfos: NavPathStack = new NavPathStack()
 
@@ -66,7 +73,7 @@ struct Home {
   @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //二级图标色，灰色
   @State font_primary: ResourceColor = $r('sys.color.font_primary') //一级文本色，黑色
 
-  @State icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize') //高亮图标，蓝色
+
   //设置图标颜色，修改resources/base(dark)/element/color.json中settings_icon配置浅色和深色模式分别颜色
   //@State fontColorValue:ResourceColor = ($r('app.color.settings_icon'));
 
@@ -480,8 +487,8 @@ struct Home {
               .fontWeight(FontWeight.Bold)
           }.width('100%')
         }
-        // .backgroundColor($r('app.color.speed_down_icon'))
-        .shadow({radius: 10, color: $r('app.color.speed_down_icon'), offsetY: 4, type: ShadowType.BLUR})
+        .backgroundColor(this.icon_emphasize)
+        .shadow({radius: 10, color: this.icon_emphasize, offsetY: 4, type: ShadowType.BLUR})
         .margin($r('app.integer.vp_proxy_start_button_margin'))
         .width(this.proxyStartButtonWidth)
         .height(this.proxyStartButtonHeight)
