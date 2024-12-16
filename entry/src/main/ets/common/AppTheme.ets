@@ -3,7 +3,7 @@
 import { CustomColors, CustomTheme } from '@ohos.arkui.theme'
 
 export class AppColors implements CustomColors {
-  iconEmphasize: ResourceColor = $r('sys.color.alert')  //高亮图标色
+  iconEmphasize: ResourceColor = $r('sys.color.icon_emphasize')  //高亮图标色
 }
 
 export class CustomTheme1 implements CustomTheme {

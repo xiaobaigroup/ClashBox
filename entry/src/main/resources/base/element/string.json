@@ -619,6 +619,10 @@
     {
       "name": "Work",
       "value": "劳动节快乐！"
+    },
+    {
+      "name": "None_Proxy",
+      "value": "暂无代理"
     }
   ]
 }

@@ -97,13 +97,13 @@ struct PublicNetwork {
       Column() {
         Row() {
           Text(this.address)
-            .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+            .fontSize(this.isLandscapePhone ? 12 : this.fontSize.value)
             .fontColor(this.font_primary)
         }
         .justifyContent(FlexAlign.Start)
         Text(this.IP)
           .fontSize(this.isLandscapePhone ? 20 : this.IPfontSize.value)
-          .textAlign(TextAlign.Center)
+          .textAlign(TextAlign.Start)
           .margin(this.RowPadding.value)
           .fontColor(this.font_primary)
 

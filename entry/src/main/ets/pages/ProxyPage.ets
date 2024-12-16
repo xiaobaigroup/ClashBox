@@ -417,9 +417,9 @@ struct ProxyPage {
         }
 
         if (this.FristPage) {//为观看预览页的判定if/else，判定和更改后续可以删掉
-          Column() {
+          Column({ space: 5 }) {
             SymbolGlyph($r('sys.symbol.doc')).fontSize(24).fontColor([this.icon_secondary])
-            Text('暂无代理').fontSize(20).fontColor(this.font_secondary)
+            Text($r('app.string.None_Proxy')).fontSize(20).fontColor(this.font_secondary)
           }.width('100%').height('90%').alignItems(HorizontalAlign.Center).justifyContent(FlexAlign.Center)//.padding({top:TAB_CONTENT_TITLE_HEIGHT})
           .onClick(() => {
             this.FristPage=!this.FristPage;
