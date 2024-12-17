@@ -63,7 +63,7 @@ export struct ConfigAdd {
           ForEach( this.configAddTypeArray, (item: ConfigAddType, index: number)=> {
             ListItem(){
               Row(){
-                SymbolGlyph(item.symbolStart).fontSize(24).fontColor([$r('app.color.symbol_main_color')]).margin({ right: 20 })
+                SymbolGlyph(item.symbolStart).fontSize(24).fontColor([$r('sys.color.icon')]).margin({ right: 20 })
                 Text(item.text).fontSize(16).fontColor($r('sys.color.font_primary'))
                 Blank()
                 SymbolGlyph(item.symbolEnd).fontSize(24).fontColor([$r('sys.color.font_primary')])

@@ -73,6 +73,7 @@ export struct ConfigInfo{
         .maxLength(TEXT_AREA_MAX_LENGTH)
         .enterKeyType(EnterKeyType.Next)
         .defaultFocus(true)
+        .clickEffect({ level: ClickEffectLevel.MIDDLE })
         .onChange( (value: string, previewText: PreviewText) => {
           this.configData.configName = value.trim()
         })
@@ -92,6 +93,7 @@ export struct ConfigInfo{
         .wordBreak(WordBreak.BREAK_ALL)
         .enterKeyType(EnterKeyType.Done)
         .type(TextAreaType.URL)
+        .clickEffect({ level: ClickEffectLevel.MIDDLE })
         .onChange( (value: string, previewText: PreviewText) => {
           this.configData.configURL = value.trim()
         })
