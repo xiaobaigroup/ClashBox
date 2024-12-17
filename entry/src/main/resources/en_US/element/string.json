@@ -623,6 +623,66 @@
     {
       "name": "None_Proxy",
       "value": "None Proxy"
+    },
+    {
+      "name": "Application_Version",
+      "value": "Application Version"
+    },
+    {
+      "name": "Kernel_Version",
+      "value": "Kernel Version"
+    },
+    {
+      "name": "Experimental_Function",
+      "value": "Experimental Function"
+    },
+    {
+      "name": "Experimental_Function_Subtitle",
+      "value": "Enabling the experimental function may lead to application instability"
+    },
+    {
+      "name": "Contributors",
+      "value": "List of Contributors"
+    },
+    {
+      "name": "UseGuidance",
+      "value": "Use Guidance"
+    },
+    {
+      "name": "Check_Updates",
+      "value": "Check for Updates"
+    },
+    {
+      "name": "UpdateChannels",
+      "value": "Update Channels"
+    },
+    {
+      "name": "UpdateChannels_Subtitle1",
+      "value": "Github(Default)"
+    },
+    {
+      "name": "Auto_Check_Updates",
+      "value": "Automatically Check for Updates"
+    },
+    {
+      "name": "Official_Telegram_Channel",
+      "value": "Official Telegram Channel"
+    },
+    {
+      "name": "Official_Discord_Community",
+      "value": "Official Discord Community"
+    },
+    {
+      "name": "Development_Team_Email",
+      "value": "Development Team Email"
+    },
+    {
+      "name": "ProjectRepositories",
+      "value": "Project Repositories"
+    },
+    {
+      "name": "FQ",
+      "value": "Frequent Questions"
     }
   ]
 }

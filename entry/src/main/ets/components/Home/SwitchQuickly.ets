@@ -1,10 +1,6 @@
 import { BreakpointSystem, BreakpointState } from '../../common/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI'
-import { ThemeControl } from '@ohos.arkui.theme'
-import { gAppTheme } from '../../common/AppTheme'
 
-// 在页面build前执行ThemeControl，就可以改变主题颜色
-//ThemeControl.setDefaultTheme(gAppTheme)
 
 interface MarginGenerate {
   left: number, right: number, top: number,

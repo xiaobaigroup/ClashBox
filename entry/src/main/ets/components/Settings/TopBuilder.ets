@@ -25,7 +25,8 @@ struct TopBuilder {
         .margin({left: 16, top: BIND_SHEET_DRAG_BAR_HEIGHT })
         .width(40)
         .height(40)
-        .backgroundColor('#CACACA')
+        .clickEffect({ level: ClickEffectLevel.LIGHT })
+        .backgroundColor($r('app.color.settings_container_background'))
         .onClick(() => {
           this.SettingsPageInfos.pop(true)
         })

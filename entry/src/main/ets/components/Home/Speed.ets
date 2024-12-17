@@ -1,11 +1,7 @@
 import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem';
 import { chartInterface, McLineChart, Options } from '@mcui/mccharts'
 import json from '@ohos.util.json';
-import { ThemeControl } from '@ohos.arkui.theme'
-import { gAppTheme } from '../../common/AppTheme'
 
-// 在页面build前执行ThemeControl，就可以改变主题颜色
-//ThemeControl.setDefaultTheme(gAppTheme)
 
 let downloadData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 let uploadData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
