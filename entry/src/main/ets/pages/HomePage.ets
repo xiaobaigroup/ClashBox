@@ -214,8 +214,8 @@ struct Home {
           .height(40)
           .backgroundColor($r('app.color.settings_container_background'))
           .onClick(() => {
-            this.isEnableIndexForegroundBlur = true
             this.isShowSettings = true
+            this.isEnableIndexForegroundBlur = true
           })
           .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
             detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],
@@ -223,7 +223,8 @@ struct Home {
             backgroundColor: $r('app.color.container_background'),
             dragBar: false,
             blurStyle: BlurStyle.BACKGROUND_REGULAR,
-            onDisappear: () => {
+            onWillDismiss: () => {
+              this.isShowSettings = false
               this.isEnableIndexForegroundBlur = false
               this.SettingsPageInfos.clear()
             }

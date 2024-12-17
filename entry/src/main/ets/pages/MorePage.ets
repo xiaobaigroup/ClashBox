@@ -183,8 +183,8 @@ struct MorePage {
             .backgroundColor($r('app.color.container_background'))
           }
           .onClick(() => {
-            this.isEnableIndexForegroundBlur = true
             this.isShowSettings = true
+            this.isEnableIndexForegroundBlur = true
           })
           .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
             detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],
@@ -192,7 +192,8 @@ struct MorePage {
             backgroundColor: $r('app.color.container_background'),
             blurStyle: BlurStyle.BACKGROUND_REGULAR,
             preferType: SheetType.CENTER,
-            onDisappear: () => {
+            onWillDismiss: () => {
+              this.isShowSettings = false
               this.isEnableIndexForegroundBlur = false
               this.SettingsPageInfos.clear()
               //this.pageInfos.clear()
@@ -201,12 +202,14 @@ struct MorePage {
         }
         .width('100%')
         // .layoutWeight(1) // 自适应占满剩余空间
+        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
         .height(this.isLandscapePhone ? 275 : this.listHeight.value)
         .margin({ top: 10, left: this.morePageMargin.value, right: this.morePageMargin.value })
         .borderRadius(18)
         .alignListItem(ListItemAlign.Center)
 
       }
+      .hideToolBar(true)
       .mode(this.isLandscapePhone ? NavigationMode.Stack : NavigationMode.Auto)
       .navBarWidth(330)
       .navDestination(this.PagesMap)

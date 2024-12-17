@@ -179,6 +179,7 @@ struct Basic {
         })
 
       }
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
       .width('100%')
       .height(this.isLandscapePhone ? 275 : (this.istabletVertical ? 900 : this.listHeight.value))
       .margin({ top: 10, left: this.morePageMargin.value, right: this.morePageMargin.value })

@@ -715,6 +715,14 @@
     {
       "name": "Dear_Group_Members_Subtitle",
       "value": "Thank you for your suggestions qwq"
+    },
+    {
+      "name": "Confirm",
+      "value": "I got it"
+    },
+    {
+      "name": "Disclaimer_Content",
+      "value": "This software is only for non-commercial purposes such as learning, communication, scientific research, etc. It is prohibited to use this software for commercial purposes. Any commercial activities are unrelated to this software."
     }
   ]
 }

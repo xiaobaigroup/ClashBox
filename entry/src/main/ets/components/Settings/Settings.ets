@@ -1,5 +1,5 @@
 import { BreakpointState, BreakpointSystem } from "../../common/breakpointsystem"
-import { LanguageListItem, settingsData, SettingsListItem } from "../../common/Constants"
+import { FONT_SIZE_16, LanguageListItem, settingsData, SettingsListItem } from "../../common/Constants"
 import settingsListItem from "./settingsListItem"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import Appearance from "./Appearance"
@@ -13,8 +13,40 @@ import About, { AboutContributors } from "./About"
 import Language from "./Language"
 import TopBuilder from "./TopBuilder"
 
+// 免责声明弹窗
+@CustomDialog
+@Component
+struct DisclaimerCustomDialog {
+  confirm: () => void = () => {}
+  controller?: CustomDialogController
 
-//@Entry
+  build() {
+    Column() {
+      Text($r('app.string.Disclaimer'))
+        .fontSize(20)
+        .margin({ top: 15, bottom: 15 })
+      Text($r('app.string.Disclaimer_Content'))
+        .textAlign(TextAlign.Center)
+        .fontSize(FONT_SIZE_16)
+      Button($r('app.string.Confirm'))
+        .margin({ top: 15 })
+        .width('100%')
+        .backgroundColor($r('app.color.speed_down_icon'))
+        .onClick(() => {
+          if (this.controller != undefined) {
+            this.controller.close()
+            this.confirm()
+          }
+        })
+        .fontColor(Color.White)
+    }
+    .backgroundColor($r('app.color.Dialog_BackgroundColor'))
+    .padding({left: 24, right: 24})
+    .height(195)
+    .borderRadius(32)
+  }
+}
+
 @Component
 struct Settings {
   @State settingsList: settingsData[] = SettingsListItem()
@@ -30,13 +62,47 @@ struct Settings {
   @Consume('breakPointStateSettingslistHeight')
   private SettingslistHeight: BreakpointState<number>
 
+  /* 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur')
+  private isEnableIndexForegroundBlur: boolean
+  // 免责声明弹窗控制器
+  dialogController: CustomDialogController | null = new CustomDialogController({
+    builder: DisclaimerCustomDialog({
+      confirm: () => {
+        this.onAccept()
+      }
+    }),
+    autoCancel: false,
+    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+      if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
+        dismissDialogAction.dismiss()
+      }
+      if (dismissDialogAction.reason == DismissReason.TOUCH_OUTSIDE) {
+        dismissDialogAction.dismiss()
+      }
+    },
+    // alignment: DialogAlignment.Center,
+    // offset: { dx: 0, dy: -20 },
+    // gridCount: 4,
+    // customStyle: false,
+  })
+
+  onAccept() {
+
+  }
 
   handleCheck(index: number) {
-    // 列表项路由跳转
-    let itemSettingsData = this.settingsList[index]
-    this.SettingsPageInfos.pushPathByName(itemSettingsData.name, false)
-    hilog.isLoggable(0xFF00, "SettingstestTag", hilog.LogLevel.INFO);
-    hilog.info(0xFF00, "SettingstestTag", itemSettingsData.name)
+    if(index === 7) {
+      if (this.dialogController != null) {
+        this.dialogController.open()
+      }
+    } else {
+      // 列表项路由跳转
+      let itemSettingsData = this.settingsList[index]
+      this.SettingsPageInfos.pushPathByName(itemSettingsData.name, false)
+      hilog.isLoggable(0xFF00, "SettingstestTag", hilog.LogLevel.INFO);
+      hilog.info(0xFF00, "SettingstestTag", itemSettingsData.name)
+    }
   }
 
 /*  handleMenuCheck(index: number) {
@@ -53,8 +119,9 @@ struct Settings {
     BreakpointSystem.getInstance().start()
   }
 
-  aboutToDisappear(): void {
-
+  // 在自定义组件即将析构销毁时将dialogController置空
+  aboutToDisappear() {
+    this.dialogController = null // 将dialogController置空
   }
 
   // 设置页路由表

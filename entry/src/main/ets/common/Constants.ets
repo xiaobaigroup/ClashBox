@@ -355,9 +355,9 @@ export const morePagelistBottom_10_14: BreakpointState<number> = BreakpointState
   xs: 10, sm: 10, md: 14, lg: 14, xl: 14
 })
 
-// 列表高度
+// 列表高度（主要是更多相关页面使用）
 export const listHeight_610_590: BreakpointState<number> = BreakpointState.of({
-  xs: 610, sm: 610, md: 590, lg: 590, xl: 590
+  xs: 620, sm: 620, md: 590, lg: 590, xl: 590
 })
 
 // 设置页列表高度

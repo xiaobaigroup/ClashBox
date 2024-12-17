@@ -209,9 +209,12 @@ struct About {
 
         })
       }
+      .width('100%')
+      // .scrollBar(BarState.Off)
       .alignListItem(ListItemAlign.Center)
       .height(this.isLandscapePhone ? 300 : this.SettingslistHeight.value)
-      .margin({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+      // .margin({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
     }
     .width('100%')
     .backgroundBlurStyle(BlurStyle.BACKGROUND_REGULAR)
@@ -359,9 +362,12 @@ export struct AboutContributors {
           .padding({left: 12, top: 12, bottom: 12})
         })
       }
+      .width('100%')
+      // .scrollBar(BarState.Off)
       .alignListItem(ListItemAlign.Center)
       .height(this.isLandscapePhone ? 300 : this.SettingslistHeight.value)
-      .margin({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+      // .margin({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
     }
     .width('100%')
     .backgroundBlurStyle(BlurStyle.BACKGROUND_REGULAR)
