@@ -19,7 +19,7 @@
         "description": "$string:EntryAbility_desc",
         "icon": "$media:layered_image",
         "label": "$string:EntryAbility_label",
-        "startWindowIcon": "$media:foreground",
+        "startWindowIcon": "$media:foreground_pre",
         "startWindowBackground": "$color:start_window_background",
         "orientation": "auto_rotation_restricted",
         "supportWindowMode": ["floating","split","fullscreen"],
