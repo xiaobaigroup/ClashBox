@@ -52,6 +52,10 @@
     {
       "name": "symbol_logo_name_color",
       "value": "#E6000000"
+    },
+    {
+      "name": "button_container_background",
+      "value": "#E6E8E9"
     }
   ]
 }

@@ -66,6 +66,9 @@ struct Home {
   @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //二级图标色，灰色
   @State font_primary: ResourceColor = $r('sys.color.font_primary') //一级文本色，黑色
 
+  /* 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur')
+  private isEnableIndexForegroundBlur: boolean
 
   //设置图标颜色，修改resources/base(dark)/element/color.json中settings_icon配置浅色和深色模式分别颜色
   //@State fontColorValue:ResourceColor = ($r('app.color.settings_icon'));
@@ -211,6 +214,7 @@ struct Home {
           .height(40)
           .backgroundColor($r('app.color.settings_container_background'))
           .onClick(() => {
+            this.isEnableIndexForegroundBlur = true
             this.isShowSettings = true
           })
           .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
@@ -220,6 +224,7 @@ struct Home {
             dragBar: false,
             blurStyle: BlurStyle.BACKGROUND_REGULAR,
             onDisappear: () => {
+              this.isEnableIndexForegroundBlur = false
               this.SettingsPageInfos.clear()
             }
           })

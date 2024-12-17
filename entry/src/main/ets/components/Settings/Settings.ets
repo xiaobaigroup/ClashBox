@@ -9,7 +9,7 @@ import Notice from "./Notice"
 import Backgrounder from "./Backgrounder"
 import WipeData from "./WipeData"
 import Disclaimer from "./Disclaimer"
-import About from "./About"
+import About, { AboutContributors } from "./About"
 import Language from "./Language"
 import TopBuilder from "./TopBuilder"
 
@@ -86,6 +86,9 @@ struct Settings {
       } else
       if (name == 'Language') {
         Language({isShowSettings: this.isShowSettings})
+      } else
+      if (name == 'Contributors') {
+        AboutContributors()
       }
   }
 

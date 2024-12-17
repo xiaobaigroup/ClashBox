@@ -232,7 +232,7 @@ export interface AboutListItemProp {
   sign?: number
   children?: Array<AboutListItemProp>
 }
-export const AboutList:AboutListItemProp[] = [
+export const AboutList: AboutListItemProp[] = [
   {
     title: 'Version',
     children: [
@@ -284,6 +284,25 @@ export const AboutList:AboutListItemProp[] = [
       { title: $r('app.string.ProjectRepositories'), subtitle: '', sign: 2, name: 'Repositories' },
     ]
   }
+]
+
+// 设置页关于列表
+export interface ContributorsListItemProp {
+  image?: Resource
+  title: string | Resource
+  subtitle?: string | Resource
+  contact?: string | Resource
+  contact2?: string
+}
+export const ContributorsList: ContributorsListItemProp[] = [
+  { title: '小白', subtitle: $r('app.string.XiaoBai_Subtitle'), contact: 'Github', image: $rawfile('XiaoBai.png')},
+  { title: '船长', subtitle: $r('app.string.ChuanZhang_Subtitle'), contact: $r('app.string.Email'), image: $rawfile('chuanzhang.png')},
+  { title: '柯蓝KL', subtitle: $r('app.string.KL_Subtitle'), contact: $r('app.string.Email'), contact2: 'Telegram', image: $rawfile('kl.png')},
+  { title: '恩临大帝', subtitle: $r('app.string.FrondEnd_Development'), contact: $r('app.string.Email'), image: $rawfile('enlin.png')},
+  { title: 'crazypig321', subtitle: $r('app.string.FrondEnd_Development'), contact: 'Github', image: $rawfile('crazypig321.png')},
+  { title: '小雅', subtitle: $r('app.string.FrondEnd_Development'), contact: 'Github', image: $rawfile('ya.png')},
+  { title: '凛凛早露', subtitle: $r('app.string.LLZL_Subtitle'), image: $rawfile('llzl.png')},
+  { title: $r('app.string.Dear_Group_Members'), subtitle: $r('app.string.Dear_Group_Members_Subtitle'), image: $rawfile('group.jpg')},
 ]
 
 
@@ -341,9 +360,9 @@ export const listHeight_610_590: BreakpointState<number> = BreakpointState.of({
   xs: 610, sm: 610, md: 590, lg: 590, xl: 590
 })
 
-// 列表高度
+// 设置页列表高度
 export const SettingslistHeight_590_500: BreakpointState<number> = BreakpointState.of({
-  xs: 590, sm: 590, md: 500, lg: 500, xl: 500
+  xs: 620, sm: 620, md: 500, lg: 500, xl: 500
 })
 
 /* List 相关*/

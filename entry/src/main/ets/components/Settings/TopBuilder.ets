@@ -35,16 +35,16 @@ struct TopBuilder {
         Text(this.title)
           .fontSize(20)
           .fontWeight(FontWeight.Bold)
-          .margin(this.showBackButton ? {left: 8, top: 24 } : {left: 16, top: 24 })
+          .margin(this.showBackButton ? {left: 8, top: 21 } : {left: 16, top: 21 })
         if(this.subtitle) {
           Text(this.subtitle)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
             .maxLines(1)
             .fontSize(12)
-            .fontWeight(FontWeight.Bold)
-            .margin(this.showBackButton ? {left: 8, top: 24 } : {left: 16, top: 24 })
+            .fontWeight(FontWeight.Normal)
+            .margin(this.showBackButton ? {left: 8, top: 2 } : {left: 16, top: 2})
         }
-      }.alignItems(HorizontalAlign.Center)
+      }.alignItems(HorizontalAlign.Start)
       Blank()
       /*Button({ type: ButtonType.Circle, stateEffect: true }) {
         SymbolGlyph($r('sys.symbol.xmark'))

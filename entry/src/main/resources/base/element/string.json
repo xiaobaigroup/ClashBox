@@ -683,6 +683,38 @@
     {
       "name": "FQ",
       "value": "常见问题"
+    },
+    {
+      "name": "XiaoBai_Subtitle",
+      "value": "ClashMeta内核移植"
+    },
+    {
+      "name": "FrondEnd_Development",
+      "value": "前端开发"
+    },
+    {
+      "name": "KL_Subtitle",
+      "value": "UI设计、Logo设计、功能规划"
+    },
+    {
+      "name": "Email",
+      "value": "电子邮件"
+    },
+    {
+      "name": "ChuanZhang_Subtitle",
+      "value": "统筹、后端测试"
+    },
+    {
+      "name": "LLZL_Subtitle",
+      "value": "为Logo设计提供灵感"
+    },
+    {
+      "name": "Dear_Group_Members",
+      "value": "各位群友们"
+    },
+    {
+      "name": "Dear_Group_Members_Subtitle",
+      "value": "感谢你们的建议qwq"
     }
   ]
 }

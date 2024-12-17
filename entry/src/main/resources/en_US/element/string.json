@@ -683,6 +683,38 @@
     {
       "name": "FQ",
       "value": "Frequent Questions"
+    },
+    {
+      "name": "XiaoBai_Subtitle",
+      "value": "ClashMeta Kernel Porting"
+    },
+    {
+      "name": "FrondEnd_Development",
+      "value": "Frond-End Development"
+    },
+    {
+      "name": "KL_Subtitle",
+      "value": "UI design, Logo design, Functional planning"
+    },
+    {
+      "name": "Email",
+      "value": "Email"
+    },
+    {
+      "name": "ChuanZhang_Subtitle",
+      "value": "Coordination and Backend testing"
+    },
+    {
+      "name": "LLZL_Subtitle",
+      "value": "Provide inspiration for Logo design"
+    },
+    {
+      "name": "Dear_Group_Members",
+      "value": "Dear Group Members"
+    },
+    {
+      "name": "Dear_Group_Members_Subtitle",
+      "value": "Thank you for your suggestions qwq"
     }
   ]
 }

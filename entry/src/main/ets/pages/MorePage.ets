@@ -57,6 +57,10 @@ struct MorePage {
   @Consume('breakPointStateListHeight')
   private listHeight: BreakpointState<number>
 
+  /* 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur')
+  private isEnableIndexForegroundBlur: boolean
+
   // 平板竖屏判断
   deviceHeightListener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(1000vp< height)');
 
@@ -179,6 +183,7 @@ struct MorePage {
             .backgroundColor($r('app.color.container_background'))
           }
           .onClick(() => {
+            this.isEnableIndexForegroundBlur = true
             this.isShowSettings = true
           })
           .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
@@ -188,6 +193,7 @@ struct MorePage {
             blurStyle: BlurStyle.BACKGROUND_REGULAR,
             preferType: SheetType.CENTER,
             onDisappear: () => {
+              this.isEnableIndexForegroundBlur = false
               this.SettingsPageInfos.clear()
               //this.pageInfos.clear()
             }
