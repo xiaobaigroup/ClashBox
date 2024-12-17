@@ -250,7 +250,7 @@ struct ProxyGroupItem {
 
 
               Blank()
-              Radio({ value: 'radio' + index, group: 'configGroup' })
+                Radio({ value: 'radio' + index, group: 'ProxyGroup' })
                 .checked(index === this.PorxyRadioCheckedValue)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
@@ -316,7 +316,7 @@ struct ProxyGroupItem {
 
 
               Blank()
-              Radio({ value: 'radio' + index, group: 'configGroup' })
+              Radio({ value: 'radio' + index, group: 'ProxyGroup' })
                 .checked(index === this.PorxyRadioCheckedValue)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
@@ -379,7 +379,7 @@ struct ProxyGroupItem {
 
 
               Blank()
-              Radio({ value: 'radio' + index, group: 'configGroup' })
+              Radio({ value: 'radio' + index, group: 'ProxyGroup' })
                 .checked(index === this.PorxyRadioCheckedValue)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,

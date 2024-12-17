@@ -401,6 +401,7 @@ struct ProxyPage {
               backgroundColor: $r('app.color.background'),
               //  blurStyle: BlurStyle.BACKGROUND_REGULAR,
               showClose: true,
+              dragBar: false,
               scrollSizeMode: ScrollSizeMode.CONTINUOUS,
               title: { title: $r('app.string.Edit') },
               preferType: SheetType.CENTER,
@@ -437,6 +438,7 @@ struct ProxyPage {
                   List() {
                     ProxyGroupItem() //list相关在components/ProxyGroupItem.ets文件里
                   }
+                  .scrollBar(BarState.Off)
                   .width('100%')
                   .height('100%')
                   .contentEndOffset(110)
