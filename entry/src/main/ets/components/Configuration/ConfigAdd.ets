@@ -27,8 +27,13 @@ export struct ConfigAdd {
 
   private componentName: string = 'ConfigAdd';
 
+  /* 断点相关 */
   @Consume('breakPointStateNavigationListPadding')
   breakPointStateNavigationListPadding: BreakpointState<number>
+
+  /* 是否开启 配置页 `bindSheet` 组件的前景模糊 */
+  @Provide('isEnableConfigPageBindSheetForegroundBlur')
+  private isEnableConfigPageBindSheetForegroundBlur: boolean = false
 
   /* List 相关 */
   private configAddTypeArray: Array<ConfigAddType> = [
@@ -41,8 +46,8 @@ export struct ConfigAdd {
 
   /* NV路由 相关 */
   // 路由栈
-  @Provide('configAddPageInfos')
-  private configAddPageInfos: NavPathStack = new NavPathStack()
+  @Consume('configAddPageInfos')
+  private configAddPageInfos: NavPathStack
 
   // NV title Builder
   @State
@@ -120,6 +125,8 @@ export struct ConfigAdd {
       .mode(NavigationMode.Stack)
       .hideBackButton(true)
       .navBarWidthRange([255, '100%'])
+      .foregroundBlurStyle(this.isEnableConfigPageBindSheetForegroundBlur ? BlurStyle.Thin : BlurStyle.NONE,{ colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: .3 })
+      .animation({ duration: 200, curve: Curve.Ease })
       // NV路由 END
     }
     .height('auto')

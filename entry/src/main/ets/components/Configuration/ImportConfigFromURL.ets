@@ -1,4 +1,3 @@
-import { BreakpointState } from "../../common/breakpointsystem"
 import {
   BIND_SHEET_MAIN_FONT_WEIGHT,
   BIND_SHEET_MAIN_FONTSIZE,
@@ -12,6 +11,7 @@ import { ConfigInfo } from "./ConfigInfo"
 import { PromptAction } from "@kit.ArkUI"
 import { ConfigData } from "../../common/PageArgumentEntity"
 import { util } from "@kit.ArkTS"
+import { ConfigCustomDialog } from './ConfigCustomDialog'
 
 
 // 关联：route_map.json
@@ -26,6 +26,14 @@ export struct ImportConfigFromURL{
 
   private componentName: string = 'ImportConfigFromURL'
   private promptAction:PromptAction = this.getUIContext()?.getPromptAction()
+
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
+
+  /* 是否开启 配置页 `bindSheet` 组件的前景模糊 */
+  @Consume('isEnableConfigPageBindSheetForegroundBlur')
+  private isEnableConfigPageBindSheetForegroundBlur: boolean
 
   /* NV 路由相关 */
   @Consume('configAddPageInfos')
@@ -44,6 +52,7 @@ export struct ImportConfigFromURL{
     configURL: '',
     isConfigAutoUpdate: false,
   }
+
   /* 断点相关 */
   // NV容器的padding
   // @Consume('breakPointStateNavigationListPadding')
@@ -61,21 +70,47 @@ export struct ImportConfigFromURL{
   private saveMenus: BindSheetTitleCustomBuilderMenu = {
     symbol: $r('sys.symbol.save'),
     symbolFontColor: ['#e6ffffff'],
+    // 跟随主题色：由于在这里直接赋值 this.icon_emphasize 编译器提示需要初始化 this.icon_emphasize 的值，放到了 aboutToAppear 回调里重新赋值
     symbolBackgroundColor: '#FF0A59F7',
     action: () => {
       this.saveConfig(this.isNewConfig)
     }
   }
+  // 当前显示的工具集合 默认为空 待两个input都有值之后才加入保存按钮菜单
   @State
   private menus: Array<BindSheetTitleCustomBuilderMenu> = []
 
   /* Input事件相关变量 */
-  // 配置名 Input 是否有值
-  private configNameInputHaveText: boolean = false
-  // 配置 URL 是否有值
-  private configURLInputHaveText: boolean = false
+  // [true: 都有值, false: 不是所有的input都有值]
+  @State
+  private allInputHaveValue: boolean = false
 
   /* 父子传参 */
+
+
+  /* 自定义弹框 */
+  // 配置是否保存弹框 Controller定义
+  private configCustomDialogController: CustomDialogController | null= new CustomDialogController({
+    builder: ConfigCustomDialog({
+      cancelButtonBackgroundColor: Color.Transparent,
+      // confirmButtonBackgroundColor: this.icon_emphasize_copy,
+      cancel: () => {
+        this.isEnableConfigPageBindSheetForegroundBlur = false
+        this.configAddPageInfos.pop(true)
+      },
+      confirm: ()=> {
+        this.isEnableConfigPageBindSheetForegroundBlur = false
+        this.saveConfig(this.isNewConfig)
+      }
+    }),
+    cancel: () => {
+      this.isEnableConfigPageBindSheetForegroundBlur = false
+    },
+    autoCancel: true,
+    alignment: DialogAlignment.Center,
+    width: 328,
+    backgroundColor: $r('app.color.list_item_background_color'),
+  })
 
 
   build() {
@@ -111,19 +146,32 @@ export struct ImportConfigFromURL{
     .hideTitleBar(true)
     // .title({builder: , height: BIND_SHEET_TITLE_CONTAINER_HEIGHT + BIND_SHEET_DRAG_BAR_HEIGHT})
     .backgroundColor($r('app.color.container_background'))
-    // .onBackPressed(() => {
-    //   this.configAddPageInfos.pop(true)
-    //   return true
-    // })
+    .onBackPressed(() => {
+      if (this.allInputHaveValue) {
+        // 弹框是否保存已经编辑好的配置
+        this.configCustomDialogController?.open()
+        // 更改bindSheet的前景模糊
+        this.isEnableConfigPageBindSheetForegroundBlur = true
+        return true
+      } else {
+        return false
+      }
+    })
+    .animation({ duration: 200, curve: Curve.Ease })
 
   }
 
   aboutToAppear(): void {
     hilog.info(0xCA10, this.componentName, `#aboutToAppear`)
+    this.saveMenus.symbolBackgroundColor = this.icon_emphasize
   }
 
   aboutToDisappear(): void {
     hilog.info(0xCA10, this.componentName, `#aboutToDisappear`)
+    // 自定义弹框 清空
+    this.configCustomDialogController = null
+    this.isEnableConfigPageBindSheetForegroundBlur = false
+    hilog.info(0xCA10, this.componentName, `#aboutToDisappear#置空[配置页内bindSheet是否保存自定义弹框]`)
   }
 
   /**
@@ -153,12 +201,28 @@ export struct ImportConfigFromURL{
    *    true: 显示保存按钮。 false反之
    */
   configDataChanged() {
-    if (this.configData.configName.length > 0 && this.configData.configURL.length > 0) {
+    this.checkAllInputHaveValue()
+    if (this.allInputHaveValue) {
       if (this.menus.filter(i => i === this.saveMenus).length <= 0) {
+        // 新增`保存配置`菜单按钮
         this.menus.push(this.saveMenus)
       }
     } else {
-      this.menus.pop()
+      // 移除`保存配置`菜单按钮
+      for (let i = 0; i < this.menus.length; i++) {
+        if (this.menus[i] === this.saveMenus) {
+          this.menus.splice(i, 1)
+          break
+        }
+      }
     }
+  }
+
+  /**
+   * 检查配置名 Input && 配置 URL 是否都有值
+   */
+  checkAllInputHaveValue() {
+    this.allInputHaveValue = (this.configData.configName.length > 0 && this.configData.configURL.length > 0)
+    hilog.info(0xCA11, this.componentName, `#checkAllInputHaveValue is [${this.allInputHaveValue}]}`)
   }
 }

@@ -40,6 +40,10 @@ struct ConfigurationPage {
 
   private promptAction:PromptAction = this.getUIContext()?.getPromptAction()
 
+  /* 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur')
+  private isEnableIndexForegroundBlur: boolean
+
   /* 断点布局相关 相关作用看定义时候的注释 */
   @Consume('breakPointStateListLanes')
   private breakPointStateListLanes: BreakpointState<number>
@@ -51,6 +55,11 @@ struct ConfigurationPage {
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone')
   private isLandscapePhone: boolean = false
+
+  /* NV路由 相关 */
+  // 路由栈
+  @Provide('configAddPageInfos')
+  private configAddPageInfos: NavPathStack = new NavPathStack()
 
   /* 配置列表List相关 */
   // 当前单选框选择的配置
@@ -308,14 +317,12 @@ struct ConfigurationPage {
           scrollSizeMode: ScrollSizeMode.CONTINUOUS,
           // width: ('100%'),
           onWillDismiss: (dismissSheet :DismissSheetAction) => {
-            // 点击关闭按钮才能真正关闭半模态
-            if (dismissSheet.reason === DismissReason.CLOSE_BUTTON) {
+            // 在二级路由页面内只能通过点击关闭按钮才能关掉bindSheet
+            if (this.configAddPageInfos.size() <= 0 || (dismissSheet.reason === DismissReason.CLOSE_BUTTON)) {
               dismissSheet.dismiss()
               this.bindSheetIsShowOfConfigAddButton = false
+              this.isEnableIndexForegroundBlur = false
               hilog.info(0xC020, this.componentName, `#button#bindSheet#onWillDismiss()#关闭配置添加按钮的bindSheet：DismissSheetAction.dismiss()`)
-            } else {
-              // TODO 国际化
-              this.promptAction.showToast({ message: '请点击右上角关闭按钮~' })
             }
           },
           onWillSpringBackWhenDismiss: (springBack: SpringBackAction)=> {
@@ -324,6 +331,7 @@ struct ConfigurationPage {
         })
         .onClick( () => {
           this.bindSheetIsShowOfConfigAddButton = true
+          this.isEnableIndexForegroundBlur = true
         })
         // 悬浮新增配置按钮 END
       }
@@ -335,7 +343,6 @@ struct ConfigurationPage {
     }
     .width('100%')
     .height('100%')
-    .foregroundBlurStyle(this.bindSheetIsShowOfConfigAddButton ? BlurStyle.Thin : BlurStyle.NONE,{ colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: .3 })
     .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Linear, delay: 0 })
   }
 
