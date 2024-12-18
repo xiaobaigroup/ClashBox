@@ -2,6 +2,10 @@ import { settingsData } from "../../common/Constants"
 
 @Component
 struct settingsListItem {
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
   @Prop itemObj: settingsData
   @Prop index: number
   onCheck = (index: number) => {}
@@ -12,6 +16,7 @@ struct settingsListItem {
         SymbolGlyph(this.itemObj.icons)
           .fontSize(24)
           .margin({left: 12})
+          .fontColor([this.icon_emphasize])
         Column() {
           Text(this.itemObj.title)
             //.height(48)
@@ -35,6 +40,7 @@ struct settingsListItem {
         SymbolGlyph($r('sys.symbol.chevron_right'))
           .fontSize(24)
           .margin({left: 12, right: 12})
+          .fontColor([this.icon_primary])
       }
       .width('94%')
       .height(53)

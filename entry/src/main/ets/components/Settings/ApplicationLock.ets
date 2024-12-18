@@ -5,7 +5,7 @@ struct ApplicationLock {
   @Link isShowSettings: boolean
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   //@Consume('morePageMargin') morePageMargin: BreakpointState<number>
-  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
 
   build() {
     NavDestination() {

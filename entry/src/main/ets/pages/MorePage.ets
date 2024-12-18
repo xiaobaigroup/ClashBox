@@ -23,18 +23,11 @@ import { mediaquery } from '@kit.ArkUI';
 @Entry
 @Component
 struct MorePage {
-  //系统颜色调用
-  /*  @State icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize')//高亮图标，蓝色
-    @State icon_tertiary: ResourceColor = $r('sys.color.icon_tertiary')//三级图标色，浅灰色
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
 
-     预留自定义主题，颜色在AppTheme里面修改
-     onWillApplyTheme(theme: Theme) {
-        this.backgroundPrimary = theme.colors.backgroundPrimary;
-        this.fontPrimary = theme.colors.fontPrimary;
-        this.iconOnPrimary = theme.colors.iconOnPrimary;
-        this.iconFourth = theme.colors.iconFourth;
-     }
- */
   @State isShowSettings: boolean = false
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
@@ -167,6 +160,7 @@ struct MorePage {
               SymbolGlyph($r('sys.symbol.gearshape'))
                 .fontSize(24)
                 .margin({left: 12})
+                .fontColor([this.icon_primary])
               Text($r('app.string.Settings'))
                 .height(48)
                 .fontWeight(FontWeight.Medium)
@@ -176,6 +170,7 @@ struct MorePage {
               SymbolGlyph($r('sys.symbol.chevron_right'))
                 .fontSize(28)
                 .margin({right: 12})
+                .fontColor([this.icon_primary])
             }
             .width('94%')
             .height(53)

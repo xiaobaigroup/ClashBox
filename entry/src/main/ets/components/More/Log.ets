@@ -10,7 +10,7 @@ struct Log {
   @State isShowMenu: boolean = false
   @State EnableLogger: boolean = false
   @State isLogData: boolean = false
-  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
 
   @Builder
   MoreMenu() {
@@ -40,7 +40,7 @@ struct Log {
             Button({ type: ButtonType.Circle, stateEffect: true }) {
               SymbolGlyph($r('sys.symbol.chevron_left'))
                 .fontSize(28)
-                .fontColor([this.icon_secondary])
+                .fontColor([this.icon_primary])
             }
             .margin({left: this.morePageMargin.value})
             .onClick(() => {
@@ -59,7 +59,7 @@ struct Log {
             Button({ type: ButtonType.Circle, stateEffect: true }) {
               SymbolGlyph($r('sys.symbol.magnifyingglass'))
                 .fontSize(24)
-                .fontColor([this.icon_secondary])
+                .fontColor([this.icon_primary])
             }
             .backgroundColor($r('app.color.settings_container_background'))
             .margin({ right: 10 })
@@ -69,7 +69,7 @@ struct Log {
             Button({ type: ButtonType.Circle, stateEffect: true }) {
               SymbolGlyph($r('sys.symbol.dot_grid_2x2'))
                 .fontSize(24)
-                .fontColor([this.icon_secondary])
+                .fontColor([this.icon_primary])
             }
             /*.onClick(() => {
               this.isShowMenu = !this.isShowMenu
@@ -90,7 +90,7 @@ struct Log {
             Column() {
               SymbolGlyph($r('sys.symbol.checkmark_circle'))
                 .fontSize(24)
-                .fontColor([this.icon_secondary])
+                .fontColor([this.icon_primary])
                 .margin({bottom: 4 })
               Text($r('app.string.EnableLoggerPrompt'))
             }
@@ -103,7 +103,7 @@ struct Log {
             Column() {
               SymbolGlyph($r('sys.symbol.doc'))
                 .fontSize(24)
-                .fontColor([this.icon_secondary])
+                .fontColor([this.icon_primary])
                 .margin({bottom: 4 })
               Text($r('app.string.NoLogs'))
             }

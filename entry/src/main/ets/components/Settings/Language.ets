@@ -6,13 +6,16 @@ import { promptAction } from "@kit.ArkUI"
 
 @Component
 struct Language {
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
   @Link isShowSettings: boolean
   @State SystemLanguageSubtitle: ResourceStr = $r('app.string.SimplifiedChinese')
   @State private currentRadioCheck: number = -1
   @State SettingsLanguageList: LanguageData[] = LanguageListItem()
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
-  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
 
   build() {
@@ -39,6 +42,9 @@ struct Language {
             Radio({ value: 'language' , group: 'languageGroup' })
               .checked(this.currentRadioCheck === -1)
               .margin({right: 12 })
+              .radioStyle({
+                checkedBackgroundColor: this.icon_emphasize,
+              })
           }
           .width('94%')
           .height(53)
@@ -74,6 +80,9 @@ struct Language {
               Radio({ value: 'language' + index, group: 'languageGroup' })
                 .checked(index === this.currentRadioCheck)
                 .margin({right: 12 })
+                .radioStyle({
+                  checkedBackgroundColor: this.icon_emphasize,
+                })
             }
             .width('94%')
             .height(53)

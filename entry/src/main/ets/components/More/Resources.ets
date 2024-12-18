@@ -4,7 +4,7 @@ import { BreakpointState } from "../../common/breakpointsystem"
 struct Resources {
   @Consume('NavPathStack') pageInfos: NavPathStack
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
-  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
 
   build() {
     NavDestination() {
@@ -13,7 +13,7 @@ struct Resources {
         Button({ type: ButtonType.Circle, stateEffect: true }) {
           SymbolGlyph($r('sys.symbol.chevron_left'))
             .fontSize(28)
-            .fontColor([this.icon_secondary])
+            .fontColor([this.icon_primary])
         }
         .margin({left: this.morePageMargin.value})
         .onClick(() => {

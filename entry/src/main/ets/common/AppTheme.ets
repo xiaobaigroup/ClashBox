@@ -5,7 +5,8 @@ import { HashMap } from '@kit.ArkTS'
 /* 鸿蒙蓝 blueAppTheme */
 // 主题颜色
 class BlueAppThemeColors implements CustomColors {
-  iconEmphasize: ResourceColor = $r('sys.color.icon_emphasize')  //高亮图标色
+  iconEmphasize: ResourceColor = '#ffff7700'
+
 }
 // 主题配置
 class BlueAppTheme implements CustomTheme {

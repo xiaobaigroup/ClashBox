@@ -5,7 +5,7 @@ import { BIND_SHEET_TITLE_CONTAINER_HEIGHT } from "../../common/Constants"
 struct Connect {
   @Consume('NavPathStack') pageInfos: NavPathStack
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
-  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
 
   build() {
     NavDestination() {
@@ -14,7 +14,7 @@ struct Connect {
         Button({ type: ButtonType.Circle, stateEffect: true }) {
           SymbolGlyph($r('sys.symbol.chevron_left'))
             .fontSize(28)
-            .fontColor([this.icon_secondary])
+            .fontColor([this.icon_primary])
         }
         .margin({left: this.morePageMargin.value})
         .onClick(() => {
@@ -33,7 +33,7 @@ struct Connect {
         Button({ type: ButtonType.Circle, stateEffect: true }) {
           SymbolGlyph($r('sys.symbol.magnifyingglass'))
             .fontSize(24)
-            .fontColor([this.icon_secondary])
+            .fontColor([this.icon_primary])
         }
         .backgroundColor($r('app.color.settings_container_background'))
         .margin({ right: 10 })
@@ -43,7 +43,7 @@ struct Connect {
         Button({ type: ButtonType.Circle, stateEffect: true }) {
           SymbolGlyph($r('sys.symbol.clean_fill'))
             .fontSize(24)
-            .fontColor([this.icon_secondary])
+            .fontColor([this.icon_primary])
         }
         .margin({ right: this.morePageMargin.value })
         .width(40)

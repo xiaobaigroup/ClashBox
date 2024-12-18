@@ -3,7 +3,7 @@
 struct MoreMenu {
   @Link isShowMenu: boolean
   @Link EnableLogger: boolean
-  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
 
   build() {
     Column() {

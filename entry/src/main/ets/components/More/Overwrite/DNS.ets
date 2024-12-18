@@ -12,6 +12,9 @@ struct FakeIPCustomDialog {
   cancel?: () => void
   confirm?: () => void
   controller: CustomDialogController
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
 
   build() {
     Column() {
@@ -34,13 +37,13 @@ struct FakeIPCustomDialog {
             this.confirm()
           }
         })
-        .backgroundColor($r('app.color.speed_down_icon'))
+        .backgroundColor(this.icon_emphasize)
         .fontColor(Color.White)
       Button($r('app.string.Cancel'))
         .height(39)
         .width('100%')
-        .fontColor($r('app.color.speed_down_icon'))
-        .backgroundColor($r('app.color.Dialog_BackgroundColor'))
+        .fontColor($r('sys.color.font_primary'))
+        .backgroundColor('#00ffffff')
         .onClick(() => {
           this.controller.close()
           if (this.cancel) {
@@ -49,7 +52,7 @@ struct FakeIPCustomDialog {
         })
     }
     .padding({left: 16, right: 16})
-    .backgroundColor($r('app.color.Dialog_BackgroundColor'))
+    .backgroundColor($r('app.color.container_background'))
     .width('100%')
     .height(195)
   }
@@ -57,6 +60,10 @@ struct FakeIPCustomDialog {
 
 @Component
 struct DNS {
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
   @Consume('NavPathStack') pageInfos: NavPathStack
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
@@ -174,7 +181,7 @@ struct DNS {
                     .fontSize(14)
                   SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
                     .fontSize(14)
-                    .fontColor([$r('app.color.settings_container_background')])
+                    .fontColor([this.icon_primary])
                     .margin({left: 7, right: 20})
                 }
                 .width('94%')
@@ -221,6 +228,7 @@ struct DNS {
                     SymbolGlyph($r('sys.symbol.chevron_right'))
                       .fontSize(28)
                       .margin({right: 12})
+                      .fontColor([this.icon_primary])
                   }
                   .width('94%')
                   .height(53)
@@ -250,6 +258,7 @@ struct DNS {
                     Blank()
                     Toggle({ type: ToggleType.Switch, isOn: item.isCheck })
                       .margin({right: 12})
+                      .selectedColor(this.icon_emphasize)
                       .onChange((isOn: boolean) => {
                         if(isOn) {
                           this.handleToggle(index)

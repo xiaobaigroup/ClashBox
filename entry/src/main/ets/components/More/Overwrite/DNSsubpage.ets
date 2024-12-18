@@ -5,7 +5,7 @@ import OverwriteTop from "./OverwriteTopBuilder"
 // DNS -> FakeIP过滤
 @Component
 export struct FakeIPfilter {
-
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
   @State SaveInputValue: string = ''
   @State currentInputValue: string = ''
   @State theplaceholder: string = '请输入内容'
@@ -63,6 +63,7 @@ export struct FakeIPfilter {
                   .margin({left: 12})
                 Blank()
                 SymbolGlyph($r('sys.symbol.trash_fill'))
+                  .fontColor([this.icon_primary])
                   .fontSize(28)
                   .margin({right: 12})
                   .onClick(() => {
@@ -87,6 +88,7 @@ export struct FakeIPfilter {
             SymbolGlyph($r('sys.symbol.plus'))
               .fontSize(28)
               .margin({left: 12, right: 16})
+              .fontColor([this.icon_primary])
             Text($r('app.string.Add'))
               .fontWeight(FontWeight.Medium)
               .fontSize(16)

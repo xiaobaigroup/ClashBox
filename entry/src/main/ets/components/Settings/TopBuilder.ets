@@ -10,7 +10,7 @@ struct TopBuilder {
   @State showBackButton: boolean = true
   // @Link isShowSettings: boolean
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
 
 
   build() {
@@ -20,7 +20,7 @@ struct TopBuilder {
         Button({ type: ButtonType.Circle, stateEffect: true }) {
           SymbolGlyph($r('sys.symbol.chevron_left'))
             .fontSize(28)
-            .fontColor([this.icon_secondary])
+            .fontColor([this.icon_primary])
         }
         .margin({left: 16, top: BIND_SHEET_DRAG_BAR_HEIGHT })
         .width(40)

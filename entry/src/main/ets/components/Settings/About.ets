@@ -8,6 +8,10 @@ import { BusinessError } from "@kit.BasicServicesKit"
 
 @Component
 struct About {
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
   @Link isShowSettings: boolean
   @State aboutList: AboutListItemProp[] = AboutList
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
@@ -138,7 +142,7 @@ struct About {
                         .margin({right: 5})
                       SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
                         .fontSize(14)
-                        .fontColor([$r('app.color.settings_container_background')])
+                        .fontColor([this.icon_primary])
                         .margin({left: 7, right: 20})
                     }.width('100%')
                     // .bindMenu(this.MyMenu(itemChild.children))
@@ -170,6 +174,7 @@ struct About {
                       if(itemChild.sign === 1) {
                         // 开关型
                         Toggle({ type: ToggleType.Switch, isOn: false })
+                          .selectedColor(this.icon_emphasize)
                           .margin({right: 12})
                           .onChange((isOn: boolean) => {
                             if(isOn) {
@@ -181,6 +186,7 @@ struct About {
                         SymbolGlyph($r('sys.symbol.chevron_right'))
                           .fontSize(28)
                           .margin({right: 12})
+                          .fontColor([this.icon_primary])
                       } else if(itemChild.sign === 0) {
                         // 普通型
                         Text(itemChild.subtitle)
@@ -232,6 +238,9 @@ export default About
 // 贡献者名单页面
 @Component
 export struct AboutContributors {
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
   @State ContributorsList: ContributorsListItemProp[] = ContributorsList
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
@@ -330,7 +339,7 @@ export struct AboutContributors {
                 Row() {
                   Button(item.contact, { type: ButtonType.Capsule, stateEffect: true })
                     .backgroundColor($r('app.color.button_container_background'))
-                    .fontColor($r('app.color.speed_down_icon'))
+                    .fontColor(this.icon_emphasize)
                     .width(90)
                     .height(26)
                     .onClick(() => {
@@ -339,7 +348,7 @@ export struct AboutContributors {
                   if(item.contact2) {
                     Button(item.contact2, { type: ButtonType.Capsule, stateEffect: true })
                       .backgroundColor($r('app.color.button_container_background'))
-                      .fontColor($r('app.color.speed_down_icon'))
+                      .fontColor(this.icon_emphasize)
                       .margin({left: 6})
                       .width(90)
                       .height(26)

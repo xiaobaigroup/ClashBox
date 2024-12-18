@@ -365,12 +365,16 @@ struct ProxyPage {
   }
   //半模态编辑菜单end
 
+
+  /* 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur')
+  private isEnableIndexForegroundBlur: boolean
 @State FristPage:boolean=true // 为观看预览页的判定，更改后续可以删掉
 
   build() {
     Column() {
       // 标题栏
-        if (!this.isLandscapePhone) {
+       if (!this.isLandscapePhone) {
           Row() {
             Text($r('app.string.Proxy'))
               .fontSize(32)
@@ -390,6 +394,7 @@ struct ProxyPage {
             .clickEffect({ level: ClickEffectLevel.MIDDLE })
             .onClick(() => {
               this.isShowEdit = true
+              this.isEnableIndexForegroundBlur = true
               hilog.info(0xB001, this.componentName, `#button#onClick()#编辑代理`)
             })
             .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
@@ -401,7 +406,11 @@ struct ProxyPage {
               scrollSizeMode: ScrollSizeMode.CONTINUOUS,
               title: { title: $r('app.string.Edit') },
               preferType: SheetType.CENTER,
-              maskColor: $r('app.color.dialog_maskcolor')
+     //         maskColor: $r('app.color.dialog_maskcolor'),
+              onWillDismiss: () => {
+                this.isShowEdit = false
+                this.isEnableIndexForegroundBlur = false
+              }
             })
           }
           .alignItems(VerticalAlign.Center)
@@ -411,7 +420,7 @@ struct ProxyPage {
             left: this.breakPointStateTabContentTitleMargin.value,
             right: this.breakPointStateTabContentTitleMargin.value,
           })
-        }
+       }
 
         if (this.FristPage) {//为观看预览页的判定if/else，判定和更改后续可以删掉
           Column({ space: 5 }) {

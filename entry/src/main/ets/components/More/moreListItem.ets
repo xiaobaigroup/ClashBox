@@ -2,6 +2,7 @@ import { moreData } from "../../common/Constants"
 
 @Component
 struct moreListItem {
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
   @Prop itemObj: moreData
   @Prop index: number
   onCheck = (index: number) => {}
@@ -12,6 +13,7 @@ struct moreListItem {
         SymbolGlyph(this.itemObj.icons)
           .fontSize(24)
           .margin({left: 12})
+          .fontColor([this.icon_primary])
         Column() {
           Text(this.itemObj.title)
             .fontWeight(FontWeight.Medium)
@@ -32,6 +34,7 @@ struct moreListItem {
         SymbolGlyph($r('sys.symbol.chevron_right'))
           .fontSize(28)
           .margin({right: 12})
+          .fontColor([this.icon_primary])
       }
       .width('94%')
       .height(53)

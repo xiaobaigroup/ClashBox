@@ -17,6 +17,10 @@ import TopBuilder from "./TopBuilder"
 @CustomDialog
 @Component
 struct DisclaimerCustomDialog {
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
   confirm: () => void = () => {}
   controller?: CustomDialogController
 
@@ -31,7 +35,7 @@ struct DisclaimerCustomDialog {
       Button($r('app.string.Confirm'))
         .margin({ top: 15 })
         .width('100%')
-        .backgroundColor($r('app.color.speed_down_icon'))
+        .backgroundColor(this.icon_emphasize)
         .onClick(() => {
           if (this.controller != undefined) {
             this.controller.close()
@@ -40,7 +44,7 @@ struct DisclaimerCustomDialog {
         })
         .fontColor(Color.White)
     }
-    .backgroundColor($r('app.color.Dialog_BackgroundColor'))
+    .backgroundColor($r('app.color.container_background'))
     .padding({left: 24, right: 24})
     .height(195)
     .borderRadius(32)
@@ -49,12 +53,12 @@ struct DisclaimerCustomDialog {
 
 @Component
 struct Settings {
+
   @State settingsList: settingsData[] = SettingsListItem()
   @Link isShowSettings: boolean
   //@State isShowMenu: boolean = false
   // 当前设备`height`是否符合(320vp< height <= 500vp)
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
-  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级图标色，黑色
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   // 列表底边距
   @Consume('breakPointStatemorePagelistBottom') private listBottom: BreakpointState<number>

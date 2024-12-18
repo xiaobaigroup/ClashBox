@@ -25,7 +25,9 @@ interface Item {
 //自定义弹窗内容
 @CustomDialog
 struct CustomDialogExample {
-
+  /* 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur')
+  private isEnableIndexForegroundBlur: boolean
   /* 主题色 */
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
@@ -54,6 +56,7 @@ struct CustomDialogExample {
         .onClick(() => {
           if (this.controller != undefined) {
             this.controller.close()
+            this.isEnableIndexForegroundBlur=false
           }
         })
         .backgroundColor(this.icon_emphasize)
@@ -110,7 +113,7 @@ struct ProxyGroupItem {
     customStyle: false,
     cornerRadius: 32,
     gridCount: 4,
-    maskColor: $r('app.color.dialog_maskcolor'),
+   // maskColor: $r('app.color.dialog_maskcolor'),
     cancel: this.existApp,
     autoCancel: true,
     onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
@@ -118,9 +121,11 @@ struct ProxyGroupItem {
       console.log("dialog onWillDismiss")
       if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
         dismissDialogAction.dismiss()
+        this.isEnableIndexForegroundBlur=false
       }
       if (dismissDialogAction.reason == DismissReason.TOUCH_OUTSIDE) {
         dismissDialogAction.dismiss()
+        this.isEnableIndexForegroundBlur=false
       }
     },
   })
@@ -148,6 +153,9 @@ struct ProxyGroupItem {
   // 当前单选框选择的配置
   @State
   private PorxyRadioCheckedValue: number = -1
+  /* 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur')
+  private isEnableIndexForegroundBlur: boolean
 
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
@@ -207,11 +215,13 @@ struct ProxyGroupItem {
       MenuItem({ symbolStartIcon: this.startIconModifier2, content: $r('app.string.Test_Speed') })
         .onClick(() => {
           this.isShowNetworkSpeed = true
+          this.isEnableIndexForegroundBlur=true
         })
       MenuItem({ symbolStartIcon: this.startIconModifier3, content: $r('app.string.Delay_Speed') })
         .onClick(() => {
           if (this.dialogController != null) {
             this.dialogController.open()
+            this.isEnableIndexForegroundBlur=true
           }
         })
     }
@@ -271,7 +281,8 @@ struct ProxyGroupItem {
               previewAnimationOptions: {
                 scale: [0.95, 1.0],
                 transition: TransitionEffect.prototype.animation({ tempo: 1.5 })
-              }
+              },
+
             })
         })
       }
@@ -286,7 +297,11 @@ struct ProxyGroupItem {
         showClose: true,
         scrollSizeMode: ScrollSizeMode.CONTINUOUS,
         title: { title: $r('app.string.Test_Speed'), subtitle: '测速功能由CloundFlare提供' },
-        maskColor: $r('app.color.dialog_maskcolor')
+      //  maskColor: $r('app.color.dialog_maskcolor'),
+        onWillDismiss: () => {
+          this.isShowNetworkSpeed = false
+          this.isEnableIndexForegroundBlur = false
+        }
       })
     }
     //单列排列
@@ -349,7 +364,11 @@ struct ProxyGroupItem {
         showClose: true,
         scrollSizeMode: ScrollSizeMode.CONTINUOUS,
         title: { title: $r('app.string.Test_Speed'), subtitle: '测速功能由CloundFlare提供' },
-        maskColor: $r('app.color.dialog_maskcolor')
+     //   maskColor: $r('app.color.dialog_maskcolor'),
+        onWillDismiss: () => {
+          this.isShowNetworkSpeed = false
+          this.isEnableIndexForegroundBlur = false
+        }
       })
     }
 
@@ -413,7 +432,11 @@ struct ProxyGroupItem {
         showClose: true,
         scrollSizeMode: ScrollSizeMode.CONTINUOUS,
         title: { title: $r('app.string.Test_Speed'), subtitle: '测速功能由CloundFlare提供' },
-        maskColor: $r('app.color.dialog_maskcolor')
+   //     maskColor: $r('app.color.dialog_maskcolor'),
+        onWillDismiss: () => {
+          this.isShowNetworkSpeed = false
+          this.isEnableIndexForegroundBlur = false
+        }
       })
     }
   }

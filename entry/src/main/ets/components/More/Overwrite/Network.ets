@@ -14,6 +14,9 @@ export struct theCustomDialog {
   cancel?: () => void
   confirm?: () => void
   controller: CustomDialogController
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
 
   build() {
     Column() {
@@ -37,13 +40,13 @@ export struct theCustomDialog {
             this.confirm()
           }
         })
-        .backgroundColor($r('app.color.speed_down_icon'))
+        .backgroundColor(this.icon_emphasize)
         .fontColor(Color.White)
       Button($r('app.string.Cancel'))
         .height(39)
         .width('100%')
-        .fontColor($r('app.color.speed_down_icon'))
-        .backgroundColor($r('app.color.Dialog_BackgroundColor'))
+        .fontColor(this.icon_emphasize)
+        .backgroundColor('#00ffffff')
         .onClick(() => {
           this.controller.close()
           if (this.cancel) {
@@ -52,7 +55,7 @@ export struct theCustomDialog {
         })
     }
     .padding({left: 16, right: 16})
-    .backgroundColor($r('app.color.Dialog_BackgroundColor'))
+    .backgroundColor($r('app.color.container_background'))
     .width('100%')
     .height(195)
   }
@@ -60,6 +63,10 @@ export struct theCustomDialog {
 
 @Component
 struct Network {
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
   @Consume('NavPathStack') pageInfos: NavPathStack
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
@@ -109,6 +116,7 @@ struct Network {
                   SymbolGlyph(item.icons)
                     .fontSize(24)
                     .margin({left: 12})
+                    .fontColor([this.icon_primary])
                   Text(item.title)
                     .fontWeight(FontWeight.Medium)
                     .fontSize(16)
@@ -120,8 +128,9 @@ struct Network {
                     .fontSize(14)
                   SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
                     .fontSize(14)
-                    .fontColor([$r('app.color.settings_container_background')])
+                  //  .fontColor([$r('app.color.settings_container_background')])
                     .margin({left: 7, right: 20})
+                    .fontColor([this.icon_primary])
                 }
                 .width('94%')
                 .height(53)
@@ -144,6 +153,7 @@ struct Network {
                     SymbolGlyph(item.icons)
                       .fontSize(24)
                       .margin({left: 12})
+                      .fontColor([this.icon_primary])
                     Column() {
                       Text(item.title)
                         .fontWeight(FontWeight.Medium)
@@ -167,6 +177,7 @@ struct Network {
                     SymbolGlyph($r('sys.symbol.chevron_right'))
                       .fontSize(28)
                       .margin({right: 12})
+                      .fontColor([this.icon_primary])
                   }
                   .width('94%')
                   .height(53)
@@ -189,12 +200,15 @@ struct Network {
                     SymbolGlyph(item.icons)
                       .fontSize(24)
                       .margin({left: 12})
+                      .fontColor([this.icon_primary])
+
                     Text(item.title)
                       .fontWeight(FontWeight.Medium)
                       .fontSize(16)
                       .padding({ left: 12 })
                     Blank()
                     Toggle({ type: ToggleType.Switch, isOn: item.isCheck })
+                      .selectedColor(this.icon_emphasize)
                       .margin({right: 12})
                       .onChange((isOn: boolean) => {
                         if(isOn) {
@@ -257,7 +271,7 @@ export default Network
 // 网络 -> 路由地址
 @Component
 export struct NetworkRouterAddress {
-
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
   @State SaveInputValue: string = ''
   @State currentInputValue: string = ''
   @State theplaceholder: string = '请输入地址'
@@ -320,6 +334,7 @@ export struct NetworkRouterAddress {
                   .margin({left: 12})
                 Blank()
                 SymbolGlyph($r('sys.symbol.trash_fill'))
+                  .fontColor([this.icon_primary])
                   .fontSize(28)
                   .margin({right: 12})
                   .onClick(() => {
@@ -344,6 +359,7 @@ export struct NetworkRouterAddress {
             SymbolGlyph($r('sys.symbol.plus'))
               .fontSize(28)
               .margin({left: 12, right: 16})
+              .fontColor([this.icon_primary])
             Text($r('app.string.Add'))
               .fontWeight(FontWeight.Medium)
               .fontSize(16)

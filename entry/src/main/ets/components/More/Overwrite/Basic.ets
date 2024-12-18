@@ -5,6 +5,11 @@ import OverwriteTop from "./OverwriteTopBuilder"
 
 @Component
 struct Basic {
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
+
   @Consume('NavPathStack') pageInfos: NavPathStack
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
@@ -64,6 +69,7 @@ struct Basic {
                   SymbolGlyph(item.icons)
                     .fontSize(24)
                     .margin({left: 12})
+                    .fontColor([this.icon_primary])
 
                   Text(item.title)
                     .fontWeight(FontWeight.Medium)
@@ -78,8 +84,9 @@ struct Basic {
                     .fontSize(14)
                   SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
                     .fontSize(14)
-                    .fontColor([$r('app.color.settings_container_background')])
+             //       .fontColor([$r('app.color.settings_container_background')])
                     .margin({left: 7, right: 20})
+                    .fontColor([this.icon_primary])
                 }
                 .width('94%')
                 .height(53)
@@ -102,6 +109,7 @@ struct Basic {
                   SymbolGlyph(item.icons)
                     .fontSize(24)
                     .margin({left: 12})
+                    .fontColor([this.icon_primary])
 
                   Text(item.title)
                     .fontWeight(FontWeight.Medium)
@@ -115,6 +123,7 @@ struct Basic {
                   SymbolGlyph($r('sys.symbol.chevron_right'))
                     .fontSize(28)
                     .margin({right: 12})
+                    .fontColor([this.icon_primary])
                 }
                 .width('94%')
                 .height(53)
@@ -137,6 +146,7 @@ struct Basic {
                     SymbolGlyph(item.icons)
                       .fontSize(24)
                       .margin({left: 12})
+                      .fontColor([this.icon_primary])
                     Column() {
                       Text(item.title)
                         .fontWeight(FontWeight.Medium)
@@ -155,6 +165,7 @@ struct Basic {
                     .margin({ left: 12 })
                     Blank()
                     Toggle({ type: ToggleType.Switch, isOn: false })
+                      .selectedColor(this.icon_emphasize)
                       .margin({right: 12})
                       .onChange((isOn: boolean) => {
                         if(isOn) {
