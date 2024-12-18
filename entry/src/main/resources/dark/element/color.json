@@ -29,16 +29,8 @@
       "value": "#ff0a59f7"
     },
     {
-      "name": "dialog_maskcolor",
-      "value": "#B7000000"
-    },
-    {
       "name": "list_item_background_color",
       "value": "#1AFFFFFF"
-    },
-    {
-      "name": "symbol_main_color",
-      "value": "#FF0A59F7"
     },
     {
       "name": "divider",

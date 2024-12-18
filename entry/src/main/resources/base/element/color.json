@@ -28,26 +28,13 @@
       "name": "speed_down_icon",
       "value": "#ff0a59f7"
     },
-
-    {
-      "name": "dialog_maskcolor",
-      "value": "#B7000000"
-    },
     {
       "name": "list_item_background_color",
       "value": "#FFFFFFFF"
     },
     {
-      "name": "symbol_main_color",
-      "value": "#E6000000"
-    },
-    {
       "name": "divider",
       "value": "#F1F3F5"
-    },
-    {
-      "name": "Dialog_BackgroundColor",
-      "value": "#D4D4D4"
     },
     {
       "name": "symbol_logo_name_color",
