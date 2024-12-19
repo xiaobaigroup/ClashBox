@@ -265,6 +265,8 @@ export const AboutList: AboutListItemProp[] = [
       { title: $r('app.string.UpdateChannels'), subtitle: $r('app.string.UpdateChannels_Subtitle1'), sign: 3, name: 'UpdateChannels',
         children: [
           { title: $r('app.string.UpdateChannels_Subtitle1'), name: 'Github' },
+          { title: '蓝奏云', name: 'LZY' }, // 测试用
+          { title: '百度云', name: 'BDY' }, // 测试用
          ]
       },
       { title: $r('app.string.Auto_Check_Updates'), subtitle: '', sign: 1, name: 'Auto' },

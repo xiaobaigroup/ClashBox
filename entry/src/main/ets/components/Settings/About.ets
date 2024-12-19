@@ -5,6 +5,7 @@ import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { common, Want } from "@kit.AbilityKit"
 import { BusinessError } from "@kit.BasicServicesKit"
+import { SymbolGlyphModifier } from "@kit.ArkUI"
 
 @Component
 struct About {
@@ -13,6 +14,7 @@ struct About {
   icon_emphasize: ResourceColor
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
   @Link isShowSettings: boolean
+  @State EnableUpdateChenChannels: number = 0
   @State aboutList: AboutListItemProp[] = AboutList
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
@@ -91,6 +93,57 @@ struct About {
     }
   }
 
+  // 更新渠道更改处理
+  switchUpdateChenChannels(index: number) {
+    hilog.info(0xFF00, "AboutUpdateTag", "index: %{public}d", index)
+    switch (index) {
+      case 0:
+        // Github
+        hilog.info(0xFF00, "AboutUpdateTag", "Github")
+
+      break
+      case 1:
+        // XXX
+        hilog.info(0xFF00, "AboutUpdateTag", "XXX")
+
+      break
+      case 2:
+        // XXXX
+        hilog.info(0xFF00, "AboutUpdateTag", "XXXX")
+
+      break
+
+    }
+  }
+
+  // 更新渠道菜单
+  @Builder
+  UpdateMenu(item: AboutListItemProp[], index: number) {
+    Menu() {
+      ForEach(item, (menuItem: AboutListItemProp, index: number) => {
+        MenuItem({/* symbolEndIcon: this.endIconModifier, */content: menuItem.title })
+          .selectIcon(true)
+          .selected(this.EnableUpdateChenChannels === index)
+          .onChange((selected) => {
+            // 修改关于页面更新渠道显示的subtitle
+            if (this.aboutList && this.aboutList.length > 4 && this.aboutList[4].children) {
+              // 检查this.aboutList[4].children[1]是否存在
+              const childItem = this.aboutList[4].children[1];
+              if (childItem) {
+                // 如果存在，更新它的subtitle属性
+                childItem.subtitle = menuItem.title;
+              }
+              // 使用splice来修改subtitle
+              this.aboutList[4].children.splice(1, 1, childItem);
+            }
+            this.switchUpdateChenChannels(index)
+            this.EnableUpdateChenChannels = index
+
+          })
+      }, (menuItem: AboutListItemProp) => JSON.stringify(menuItem))
+    }
+  }
+
   build() {
     NavDestination() {
       // 标题
@@ -123,7 +176,7 @@ struct About {
           .height(220)
         }.margin({bottom: 10 })
 
-        ForEach(this.aboutList, (item: AboutListItemProp) => {
+        ForEach(this.aboutList, (item: AboutListItemProp, index: number) => {
           ListItem() {
             Column() {
               ForEach(item.children, (itemChild: AboutListItemProp) => {
@@ -136,21 +189,24 @@ struct About {
                         .padding({ left: 12 })
                         .fontSize(16)
                       Blank()
-                      Text(itemChild.subtitle)
-                        .fontWeight(FontWeight.Normal)
-                        .fontSize(14)
-                        .margin({right: 5})
-                      SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
-                        .fontSize(14)
-                        .fontColor([this.icon_primary])
-                        .margin({left: 7, right: 20})
+                      Row() {
+                        Text(itemChild.subtitle)
+                          .fontWeight(FontWeight.Normal)
+                          .fontSize(14)
+                          .margin({right: 5})
+                        SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
+                          .fontSize(14)
+                          .fontColor([this.icon_primary])
+                          .margin({left: 7})
+                      }.margin({right: 20})
+                       .bindMenu(this.UpdateMenu(itemChild.children, index))
                     }.width('100%')
-                    // .bindMenu(this.MyMenu(itemChild.children))
                     // 分割线
                     Row().height(0.5).backgroundColor('#0D000000').width('93%')
                   }
                   .onClick(() => {
-                    // this.pageInfos.pushPath({ name: itemChild.name }, false);
+                    // 这里什么都没有
+
                   })
                 } else { // 无子项
                   Column() {
@@ -178,6 +234,7 @@ struct About {
                           .margin({right: 12})
                           .onChange((isOn: boolean) => {
                             if(isOn) {
+                              // 进入开关事件处理
                               this.handleToggle(itemChild.name)
                             }
                           })
@@ -202,6 +259,7 @@ struct About {
                     if(itemChild.sign === 0) {
                       // 似乎可以留个彩蛋
                     } else if(itemChild.sign === 2) {
+                      // 进入列表行跳转处理
                       this.handleCheck(itemChild.name)
                     }
                   })
@@ -354,7 +412,7 @@ export struct AboutContributors {
                       .height(26)
                       .onClick(() => {
                         // 柯蓝KL Telegram
-
+                        this.implicitStartAbility('https://xxxx')
                       })
                   }
                 }
