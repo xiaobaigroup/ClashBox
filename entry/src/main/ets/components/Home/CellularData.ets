@@ -10,21 +10,7 @@ interface MarginGenerate {
 
 @Component
 struct TrafficStatistics {
-  /* //自定义主题，颜色在AppTheme里面修改
-   @State font_secondary: ResourceColor = $r('sys.color.font_secondary')
-
-     @State backgroundPrimary: ResourceColor = $r('sys.color.background_primary')
-     @State fontPrimary: ResourceColor = $r('sys.color.font_primary')
-     @State iconOnPrimary: ResourceColor = $r('sys.color.icon_on_primary')
-     @State iconFourth: ResourceColor = $r('sys.color.icon_fourth')
-
-     onWillApplyTheme(theme: Theme) {
-       this.backgroundPrimary = theme.colors.backgroundPrimary;
-       this.fontPrimary = theme.colors.fontPrimary;
-       this.iconOnPrimary = theme.colors.iconOnPrimary;
-       this.iconFourth = theme.colors.iconFourth;
-     }
-   */
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
   @State font_primary: ResourceColor = $r('sys.color.font_primary')
   @State TotalDownloads: number = 0
   @State TotalUpload: number = 0
@@ -102,22 +88,22 @@ struct TrafficStatistics {
           Column() {
             Text() {SymbolSpan($r('sys.symbol.chevron_down'))}
             .fontSize(this.chevronSize.value)
-            .fontColor($r('app.color.speed_down_icon'))
+            .fontColor(this.icon_primary)
             Text(this.TotalDownloads.toString() + ' GB')
               //.margin(this.fontMargin.value)
               .fontSize(this.isLandscapePhone ? 14 : this.fontSize.value)
-              .fontColor($r('app.color.speed_down_icon'))
+              .fontColor(this.icon_primary)
           }
           .margin({top:this.RowMargin.value, right: this.RowMargin.value})
           .justifyContent(FlexAlign.Center)
           Column() {
             Text() {SymbolSpan($r('sys.symbol.chevron_up'))}
             .fontSize(this.chevronSize.value)
-            .fontColor($r('app.color.speed_up_icon'))
+            .fontColor(this.icon_primary)
             Text(this.TotalUpload.toString() + ' GB')
               //.margin(this.fontMargin.value)
               .fontSize(this.isLandscapePhone ? 14 : this.fontSize.value)
-              .fontColor($r('app.color.speed_up_icon'))
+              .fontColor(this.icon_primary)
           }
           .margin({top:this.RowMargin.value})
           .justifyContent(FlexAlign.Center)
@@ -127,11 +113,15 @@ struct TrafficStatistics {
         .alignItems(VerticalAlign.Center)
         .justifyContent(FlexAlign.Center)
         Column() {
-
+          Progress({ value: 60,total: 100, type: ProgressType.Capsule  })
+            .style({enableSmoothEffect: true,borderColor:'#00ffffff'})
+            .color('#ff46b1e3')
+            .width('100%')
+            .height('100%')
         }
-        .width('90%')
-        .backgroundColor('#B2B2B2')
-        .height(this.barHeight.value)
+       .width('90%')
+        .backgroundColor('#4d46b1e3')
+         .height(this.barHeight.value)
         .borderRadius(this.barHeight.value)
         .margin(this.barMargin.value)
         Text($r('app.string.CellularData_Statistics_explanation'))
