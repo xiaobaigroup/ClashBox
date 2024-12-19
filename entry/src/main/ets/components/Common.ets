@@ -42,9 +42,9 @@ export interface BindSheetTitleCustomBuilderParam{
   // 标题的左边距（`isSubPage`为`true`的时候生效）
   titlePaddingLeft?: Length
   // 主标题（下文中`mainTitle`开头的属性是主标题的样式属性)
-  mainTitle: string,
+  mainTitle: ResourceStr,
   // 副标题（`isSubPage`为`true`的时候生效）（下文中`subTitle`开头的属性是副标题的样式属性)
-  subTitle?: string,
+  subTitle?: ResourceStr,
   mainTitleFontWeight?: number,
   mainTitleFontSize: number,
   // subTitleFontWeight?: number,
@@ -95,7 +95,7 @@ export function BindSheetTitleCustomBuilder(param: BindSheetTitleCustomBuilderPa
         .maxLines(1)
         .textOverflow({overflow: TextOverflow.MARQUEE})
         .animation({ duration: 200, curve: Curve.Ease })
-      if (param.subTitle != null && param.subTitle != ''){
+      if (param?.subTitle != undefined && param.subTitle != ''){
         Text(param.subTitle)
           .fontSize(param.subTitleFontSize??14)
           .fontColor($r('sys.color.font_secondary'))
@@ -106,8 +106,8 @@ export function BindSheetTitleCustomBuilder(param: BindSheetTitleCustomBuilderPa
       }
     }
     .alignItems(HorizontalAlign.Start)
-    // 子页面避让菜单menus、返回按钮（所以param.menus.length + 1）
-    .width(param.isSubPage ? `calc(100% - ${(BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT + 10) * (param.menus.length + 1)}vp)` : '100%')
+    // 避让菜单menus、返回按钮（所以param.menus.length + 1）
+    .width(`calc(100% - ${(BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT + 10) * (param.menus.length + 1)}vp)`)
     .height(param.subTitle != null && param.subTitle != '' ? param.mainTitleFontSize * 2 : param.mainTitleFontSize )
     .padding({ left: param.isSubPage ? param.titlePaddingLeft??0 : 0 })
     .animation({ duration: 200, curve: Curve.Ease })

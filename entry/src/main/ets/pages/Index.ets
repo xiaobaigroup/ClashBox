@@ -170,7 +170,7 @@ struct Index {
     this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
 
   aboutToAppear() {
-    hilog.info(0x1000, this.componentName, `#aboutToAppear`)
+    hilog.info(0x1000, this.componentName, `#aboutToAppear executed`)
 
     // 在页面build前执行ThemeControl，就可以改变主题颜色
     ThemeControl.setDefaultTheme(CUSTOM_THEME_MAP.get(this.selectedTheme))
@@ -205,7 +205,7 @@ struct Index {
   }
 
   aboutToDisappear() {
-    hilog.info(0x1000, this.componentName, `#aboutToDisappear`)
+    hilog.info(0x1000, this.componentName, `#aboutToDisappear executed`)
     // 停止监听断点事件，并清空断点对应数据
     BreakpointSystem.getInstance().stop()
 

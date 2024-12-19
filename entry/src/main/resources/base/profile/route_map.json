@@ -3,22 +3,35 @@
     {
       "name": "ImportConfigFromURL",
       "pageSourceFile": "src/main/ets/components/Configuration/ImportConfigFromURL.ets",
-      "buildFunction": "ImportConfigFromURLBuilder"
+      "buildFunction": "ImportConfigFromURLBuilder",
+      "data": {
+        "description": "配置页 -> bindSheet -> 从URL(链接)导入",
+        "remark": "配置页 -> 长按`ListItem`弹出`bindContextMenu` -> 编辑: 共用这同一个路由页面"
+      }
     },
     {
       "name": "ImportConfigFromQRcode",
       "pageSourceFile": "src/main/ets/components/Configuration/ImportConfigFromQRcode.ets",
-      "buildFunction": "ImportConfigFromQRcodeBuilder"
+      "buildFunction": "ImportConfigFromQRcodeBuilder",
+      "data": {
+        "description": "配置页 -> bindSheet -> 从二维码导入"
+      }
     },
     {
       "name": "ImportConfigFromFile",
       "pageSourceFile": "src/main/ets/components/Configuration/ImportConfigFromFile.ets",
-      "buildFunction": "ImportConfigFromFileBuilder"
+      "buildFunction": "ImportConfigFromFileBuilder",
+      "data": {
+        "description": "配置页 -> bindSheet -> 从文件导入"
+      }
     },
     {
       "name": "CreateNewConfig",
       "pageSourceFile": "src/main/ets/components/Configuration/CreateNewConfig.ets",
-      "buildFunction": "CreateNewConfigBuilder"
+      "buildFunction": "CreateNewConfigBuilder",
+      "data": {
+        "description": "配置页 -> bindSheet -> 新建空白配置"
+      }
     }
   ]
 }

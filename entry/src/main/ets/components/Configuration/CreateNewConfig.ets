@@ -68,7 +68,7 @@ export struct CreateNewConfig{
       // START
       Column() {
         Text(this.componentName).fontSize(50)
-        Text(this.breakPointStateNavigationListPadding.value?.toString())
+        Text(`breakPointStateNavigationListPadding.value is [${this.breakPointStateNavigationListPadding.value?.toString()}]`)
 
       }.width('100%').height('auto').backgroundColor('#ffac70e9').alignItems(HorizontalAlign.Start)
       // END
@@ -85,10 +85,10 @@ export struct CreateNewConfig{
   }
 
   aboutToAppear(): void {
-    hilog.info(0xCA40, this.componentName, `#aboutToAppear`)
+    hilog.info(0xCA40, this.componentName, `#aboutToAppear executed`)
   }
 
   aboutToDisappear(): void {
-    hilog.info(0xCA40, this.componentName, `#aboutToDisappear`)
+    hilog.info(0xCA40, this.componentName, `#aboutToDisappear executed`)
   }
 }

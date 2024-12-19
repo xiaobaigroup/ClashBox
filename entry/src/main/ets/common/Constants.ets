@@ -33,6 +33,13 @@ export const TEXT_INPUT_HEIGHT: number = 45
 // TextArea
 export const TEXT_AREA_MAX_LENGTH: number = 999
 
+// type：routeName
+export enum RouteName {
+  ImportConfigFromURL = 'ImportConfigFromURL',
+  ImportConfigFromQRcode = 'ImportConfigFromQRcode',
+  ImportConfigFromFile = 'ImportConfigFromFile',
+  CreateNewConfig = 'CreateNewConfig',
+}
 
 // 更多列表类
 export class moreData {

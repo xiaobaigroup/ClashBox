@@ -23,15 +23,16 @@ export struct ConfigInfo{
   private componentName: string = 'ConfigInfo'
   private promptAction:PromptAction = this.getUIContext()?.getPromptAction()
 
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
+
   /* 系统语言 */
   @StorageProp('language')
   @Watch('languageChange')
   private currentLanguage: string = ''
 
-  /* TODO 路由参数：是否为新配置（非已有配置进入编辑状态） */
-  @Prop
-  isNewConfig:boolean
-
+  // 配置详情
   @Link
   configData: ConfigData
 
@@ -55,7 +56,7 @@ export struct ConfigInfo{
     {value: this.configAutoUpdateMenuStringArr[4].label, action: () => {hilog.info(0xCA11, this.componentName, `#ListItem#自动更新间隔bindMenu: 1天`)}},
     {value: this.configAutoUpdateMenuStringArr[5].label, action: () => {hilog.info(0xCA11, this.componentName, `#ListItem#自动更新间隔bindMenu: 自定义`)}},
   ]
-  // 配置自动更新 已选择的间隔时间 文本
+  // 配置自动更新 已选择的间隔
   @State
   private configAutoUpdateTimeGapSelected: ConfigAutoUpdateGap = this.configAutoUpdateMenuStringArr[2]
   // 配置是否自动更新间隔菜单 是否显示
@@ -68,15 +69,16 @@ export struct ConfigInfo{
       // 配置名input
       // TODO 国际化
       Text('配置名').margin({bottom: 10}).fontColor($r('sys.color.font_secondary')).fontSize(FONT_SIZE_16)
-      TextInput({ placeholder: '输入配置名' }).margin({bottom: 10}).width('100%').height(TEXT_INPUT_HEIGHT).borderRadius(BORDER_RADIUS_20)
+      TextInput({ text: $$this.configData.configName, placeholder: '输入配置名' }).margin({bottom: 10}).width('100%').height(TEXT_INPUT_HEIGHT).borderRadius(BORDER_RADIUS_20)
         .id('text_input_config_name')
+        .caretColor(this.icon_emphasize)
         .maxLength(TEXT_AREA_MAX_LENGTH)
         .enterKeyType(EnterKeyType.Next)
         .defaultFocus(true)
         .clickEffect({ level: ClickEffectLevel.MIDDLE })
-        .onChange( (value: string, previewText: PreviewText) => {
-          this.configData.configName = value.trim()
-        })
+        // .onChange( (value: string, previewText: PreviewText) => {
+        //   this.configData.configName = value.trim()
+        // })
         .onSubmit( (enterKey: EnterKeyType, event: SubmitEvent) => {
           // 焦点切换给`URL`框
           focusControl.requestFocus('text_area_config_url')
@@ -87,29 +89,37 @@ export struct ConfigInfo{
       // TODO 国际化
       Text('URL').margin({bottom: 10}).fontColor($r('sys.color.font_secondary')).fontSize(FONT_SIZE_16)
       // TODO 国际化
-      TextArea({ placeholder: '输入链接...' }).margin({bottom: 10}).width('100%').height(TEXT_INPUT_HEIGHT * 2).borderRadius(BORDER_RADIUS_20)
+      TextArea({ text: $$this.configData.configURL, placeholder: '输入链接...' }).margin({bottom: 10}).width('100%').height(TEXT_INPUT_HEIGHT * 2).borderRadius(BORDER_RADIUS_20)
         .id('text_area_config_url')
+        .caretColor(this.icon_emphasize)
         .maxLength(TEXT_AREA_MAX_LENGTH)
         .wordBreak(WordBreak.BREAK_ALL)
         .enterKeyType(EnterKeyType.Done)
         .type(TextAreaType.URL)
         .clickEffect({ level: ClickEffectLevel.MIDDLE })
-        .onChange( (value: string, previewText: PreviewText) => {
-          this.configData.configURL = value.trim()
-        })
+        // .onChange( (value: string, previewText: PreviewText) => {
+        //   this.configData.configURL = value.trim()
+        // })
 
-      // 配置自动更新
+      // 配置自动更新 START
       List({space:LIST_SPACE}){
         ListItemGroup({style:ListItemGroupStyle.CARD}){
-          // 自动更新开关
+          // 自动更新开关 START
           ListItem({ style:ListItemStyle.CARD }){
             Row(){
               // TODO 国际化
               Text('自动更新').fontColor($r('sys.color.font_primary')).fontSize(FONT_SIZE_16)
               Blank()
-              Toggle({ type: ToggleType.Switch, isOn: this.isConfigAutoUpdate!! })
+              Toggle({ type: ToggleType.Switch, isOn: this.configData.isConfigAutoUpdate })
+                .selectedColor(this.icon_emphasize)
                 .onChange((isOn: boolean) => {
                   hilog.info(0xCA11, this.componentName, `#ListItem#Toggle#自动更新状态: ${isOn}`)
+                  // 自动更新间隔 显式动画
+                  this.getUIContext()?.animateTo({
+                    duration: 200
+                  }, () => {
+                    this.configData.isConfigAutoUpdate = isOn
+                  })
                 })
             }.width('100%').alignItems(VerticalAlign.Center)
           }
@@ -118,32 +128,43 @@ export struct ConfigInfo{
           .borderRadius(BORDER_RADIUS_20)
           .clickEffect({ level: ClickEffectLevel.MIDDLE })
           .onClick( ()=> {
-            this.isConfigAutoUpdate = !this.isConfigAutoUpdate
+            // 自动更新间隔 显式动画
+            this.getUIContext()?.animateTo({
+              duration: 200
+            }, () => {
+              this.configData.isConfigAutoUpdate = !this.configData.isConfigAutoUpdate
+            })
           })
-          // 自动更新间隔
-          ListItem({ style:ListItemStyle.CARD }){
-            Row(){
-              // TODO 国际化
-              Text('自动更新间隔').fontColor($r('sys.color.font_primary')).fontSize(FONT_SIZE_16)
-              Blank()
-              // TODO 国际化
+          // 自动更新开关 END
+
+          // 自动更新间隔 START
+          if (this.configData.isConfigAutoUpdate) {
+            ListItem({ style:ListItemStyle.CARD }){
               Row(){
-                Text(this.configAutoUpdateTimeGapSelected.label).fontColor($r('sys.color.font_secondary')).fontSize(FONT_SIZE_14)
-                Column(){
-                  SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill')).fontColor([$r('sys.color.font_secondary')]).fontSize(8)
+                // TODO 国际化
+                Text('自动更新间隔').fontColor($r('sys.color.font_primary')).fontSize(FONT_SIZE_16)
+                Blank()
+                // TODO 国际化
+                Row(){
+                  Text(this.configAutoUpdateTimeGapSelected.label).fontColor($r('sys.color.font_secondary')).fontSize(FONT_SIZE_14)
+                  Column(){
+                    SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill')).fontColor([$r('sys.color.font_secondary')]).fontSize(8)
+                  }
+                  .width(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).height(8)
+                  .alignItems(HorizontalAlign.Center)
                 }
-                .width(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).height(8)
-                .alignItems(HorizontalAlign.Center)
-              }
-              .width('auto')
-            }.width('100%').alignItems(VerticalAlign.Center)
+                .width('auto')
+              }.width('100%').alignItems(VerticalAlign.Center)
+            }
+            .height(LIST_ITEM_HEIGHT_45)
+            .padding(LIST_ITEM_PADDING)
+            .borderRadius(BORDER_RADIUS_20)
+            .clickEffect({ level: ClickEffectLevel.MIDDLE })
+            .bindMenu(this.configAutoUpdateMenus, { placement: Placement.RightBottom })
+            // hilog.info(0xCA11, this.componentName, `#ListItem#ContextMenu#自动更新间隔: ${isOn}`)
           }
-          .height(LIST_ITEM_HEIGHT_45)
-          .padding(LIST_ITEM_PADDING)
-          .borderRadius(BORDER_RADIUS_20)
-          .clickEffect({ level: ClickEffectLevel.MIDDLE })
-          .bindMenu(this.configAutoUpdateMenus, { placement: Placement.RightBottom })
-          // hilog.info(0xCA11, this.componentName, `#ListItem#ContextMenu#自动更新间隔: ${isOn}`)
+          // 自动更新间隔 END
+
         }
         .margin({right: 0, left:0 })
         .divider({
@@ -158,8 +179,9 @@ export struct ConfigInfo{
       .height('auto')
       .borderRadius(BORDER_RADIUS_20)
       .backgroundColor($r('app.color.container_background'))
-      Text(this.breakPointStateNavigationListPadding.value?.toString())
-      Text(`isNewConfig: ${this.isNewConfig}`).fontSize(35)
+      Text(`breakPointStateNavigationListPadding.value is [${this.breakPointStateNavigationListPadding.value?.toString()}]`)
+      Text(`isNewConfig: ${this.configData.isNewConfig}`).fontSize(35)
+      // 配置自动更新 END
     }
     .width('100%')
     .height('100%')
@@ -173,12 +195,12 @@ export struct ConfigInfo{
   }
 
   aboutToAppear(): void {
-    hilog.info(0xCA11, this.componentName, `#aboutToAppear`)
+    hilog.info(0xCA11, this.componentName, `#aboutToAppear executed`)
     this.getConfigAutoUpdateMenuStringArr()
   }
 
   aboutToDisappear(): void {
-    hilog.info(0xCA11, this.componentName, `#aboutToDisappear`)
+    hilog.info(0xCA11, this.componentName, `#aboutToDisappear executed`)
   }
 
   /**
@@ -192,6 +214,8 @@ export struct ConfigInfo{
 
   /**
    * 从系统资源里 获取菜单集合值
+   *    因为[自动更新间隔]不止是展示的，还有对应的value需要用，所以不是直接用的`$r()`格式使用的，
+   *    就导致如果系统语言环境改变之后，需要手动适配更新[自动更新间隔]对应的string数组
    */
   getConfigAutoUpdateMenuStringArr() {
     try {
@@ -218,4 +242,16 @@ export struct ConfigInfo{
       hilog.error(0xCA11, this.componentName, `#aboutToAppear#getStringArrayValueSync($r('app.strarray.config_auto_update_menu')#ERROR: code is [${error.code}],message is [${error.message}]`)
     }
   }
+
+  /**
+   * 处理器：匹配当前`configData`的中已选择的间隔时间对象 用于将对应的`label`显示到页面上
+   */
+  configAutoUpdateTimeGapSelectedValueHandler(){
+    let gap: number  = this.configData?.configAutoUpdateTimeGapSelectedValue ?? -99
+    let gapArr: Array<ConfigAutoUpdateGap> = CONFIG_AUTO_UPDATE_MENU_STRING_ARR.filter( (item) => item.value === gap)
+    if (gapArr.length > 0) {
+      this.configAutoUpdateTimeGapSelected = gapArr[0]
+    }
+  }
+
 }

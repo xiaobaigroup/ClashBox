@@ -1,6 +1,6 @@
 //主页 栅格布局、媒体查询
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
-import { window } from '@kit.ArkUI'
+import { ThemeControl, window } from '@kit.ArkUI'
 import SwitchMode from '../components/Home/SwitchMode'
 import CellularData from '../components/Home/CellularData'
 import CurrrentNode from '../components/Home/CurrentNode'
@@ -17,6 +17,7 @@ import {
   BIND_SHEET_CONTAINER_HEIGHT
 } from '../common/Constants'
 import Settings from '../components/Settings/Settings'
+import { CUSTOM_THEME_MAP } from '../common/AppTheme'
 
 
 interface MarginGenerate {
@@ -498,8 +499,14 @@ struct Home {
           hilog.info(0xA002, this.componentName, `代理启动按钮状态：${this.proxyEnabled}`)
           // 开始计时器
           if (this.proxyEnabled) {
+            // TODO 删除下面两行 为了测试更换固定主题色用的
             this.proxyStartedTimer.start( (formatTime) => { this.proxyStartingDuration = formatTime } )
+            ThemeControl.setDefaultTheme(CUSTOM_THEME_MAP.get('redAppTheme'))
+            hilog.info(0xA002, this.componentName, `#Button#onClick#ThemeControl.setDefaultTheme(redAppTheme)`)
           } else {
+            // TODO 删除下面两行 为了测试更换固定主题色用的
+            ThemeControl.setDefaultTheme(CUSTOM_THEME_MAP.get('orangeAppTheme'))
+            hilog.info(0xA002, this.componentName, `#Button#onClick#ThemeControl.setDefaultTheme(orangeAppTheme)`)
             this.proxyStartedTimer.reset()
             // 如果`reset()`就取消注释这句，如果是`pause()`就注释这句
             this.proxyStartingDuration = PROXY_STARTED_DURATION_INIT_VALUE

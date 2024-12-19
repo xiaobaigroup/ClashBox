@@ -1,4 +1,3 @@
-import { CustomThemeName } from '../common/AppTheme'
 import { BreakpointState } from '../common/breakpointsystem'
 import {
   TAB_CONTENT_TITLE_FONT_SIZE,
@@ -11,11 +10,13 @@ import {
   BORDER_RADIUS_20,
   BIND_SHEET_CONTAINER_HEIGHT,
   LIST_ITEM_PADDING,
+  RouteName,
 } from '../common/Constants'
 import { LengthMetrics, PromptAction, SymbolGlyphModifier } from '@kit.ArkUI'
 import { ConfigAdd } from '../components/Configuration/ConfigAdd'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
+import { ConfigData } from '../common/PageArgumentEntity'
 
 /**
  * 长按菜单参数
@@ -62,30 +63,77 @@ struct ConfigurationPage {
   private configAddPageInfos: NavPathStack = new NavPathStack()
 
   /* 配置列表List相关 */
-  // 当前单选框选择的配置
+  // 当前单选框选择的配置 TODO 待接入用户首选项，先写死 configName，单选框控制现在只用到configName所以先不给值
+  // @StorageProp('currentConfigRadioCheckedConfigData')
   @State
-  private currentConfigRadioCheckedValue: number = -1
-  // 当前手指触摸的ListItem的对应 this.configList[index]
+  private currentConfigRadioCheckedConfigData: ConfigData = {
+    configId: '',
+    isNewConfig: false,
+    configName: 'VMess-TikTok专用',
+    configURL: '',
+    isConfigAutoUpdate: false
+  }
+  // 当前手指触摸的ListItem的对应 `this.configList` 中的 `configName`
   @State
-  private currentTouchConfigListIndex: number = -1
+  private currentTouchConfigData: ConfigData = {
+    configId: '',
+    isNewConfig: false,
+    configName: '',
+    configURL: '',
+    isConfigAutoUpdate: false
+  }
 
   /* 配置页面内ListItem长按ContextMenu相关 */
   // TODO 删除 临时模拟数据配置列表数据
-  private configList:Array<string> = [
-    '配置1',
-    '配置2',
-    '配置3',
-    '配置4',
-    '配置5',
-    '配置6',
-    '配置7',
-    '配置8',
-    '配置9',
-    '配置10',
-    '配置11',
-    '配置12',
-    '配置13',
-    '配置14']
+  private configList: Array<ConfigData> = [
+    {
+      configId: 'SS-Youtube速度快',
+      isNewConfig: false,
+      configName: 'SS-Youtube速度快',
+      configURL: 'https://aaa.com:8344',
+      isConfigAutoUpdate: true,
+      configAutoUpdateTimeGapSelectedValue: 10,
+      createdDate: new Date('2024-05-21 21:21:21'),
+      lastUpdateDateTime: new Date('2024-12-18 17:51:00'),
+      trafficUsed: '1329.43GB',
+      trafficTotal: '5000GB'
+    },
+    {
+      configId: 'Trojan-INS专用',
+      isNewConfig: false,
+      configName: 'Trojan-INS专用',
+      configURL: 'http://ealion.com/ins-test',
+      isConfigAutoUpdate: true,
+      configAutoUpdateTimeGapSelectedValue: 233,
+      createdDate: new Date('2023-12-20 04:14:35'),
+      lastUpdateDateTime: new Date('2024-12-18 15:00:00'),
+      trafficUsed: '234.42GB',
+      trafficTotal: '700GB'
+    },
+    {
+      configId: 'VMess-TikTok专用',
+      isNewConfig: false,
+      configName: 'VMess-TikTok专用',
+      configURL: 'https://enlin.com:2333',
+      isConfigAutoUpdate: false,
+      createdDate: new Date('2024-06-16 12:34:56'),
+      lastUpdateDateTime: new Date('2024-12-18 12:00:00'),
+      trafficUsed: '874.04GB',
+      trafficTotal: '2000GB'
+    },
+    {
+    configId: 'VMess-TG专用',
+    isNewConfig: false,
+    configName: 'VMess-TG专用',
+    configURL: 'https://telegram-vmess.enlin.com',
+    isConfigAutoUpdate: true,
+    configAutoUpdateTimeGapSelectedValue: 1440,
+    createdDate: new Date('2024-01-01 12:24:34'),
+    lastUpdateDateTime: new Date('2024-12-19 08:00:00'),
+    trafficUsed: '34.05GB',
+    trafficTotal: '800GB'
+  },
+  ]
   // ContextMenu列表项集合 TODO 国际化
   @State
   private configListLongPressCtxMenus: Array<LongPressContextMenuItem> = [
@@ -156,7 +204,9 @@ struct ConfigurationPage {
   stackAlignContentAlignment: Alignment = Alignment.BottomEnd
   // 是否显示bindSheet
   @State
-  private bindSheetIsShowOfConfigAddButton: boolean = false
+  private isShowConfigAddBindSheet: boolean = false
+  // 是否需要往`bindSheet`里`push`路由页面
+  private isPushRoute2BindSheet: boolean = false
   // 内容Builder
   @Builder
   private ConfigAddBindSheetBuilder(){
@@ -216,16 +266,16 @@ struct ConfigurationPage {
       Stack({ alignContent: this.stackAlignContentAlignment }) {
         // 配置列表 START
         List({ space: LIST_SPACE }) {
-          ForEach(this.configList, (item: string, index: number) => {
+          ForEach(this.configList, (item: ConfigData, index: number) => {
             ListItem() {
               Row() {
                 Column() {
-                  Text(item).fontColor(($r('sys.color.font_primary')))
+                  Text(item.configName).fontColor(($r('sys.color.font_primary')))
                   Text(`index:${index}`).fontColor($r('sys.color.font_secondary'))
                 }.alignItems(HorizontalAlign.Start)
                 Blank()
                 Radio({ value: 'radio' + index, group: 'configGroup' })
-                  .checked(index === this.currentConfigRadioCheckedValue)
+                  .checked(item.configName === this.currentConfigRadioCheckedConfigData.configName)
                   .radioStyle({
                     checkedBackgroundColor: this.icon_emphasize,
                   })
@@ -247,14 +297,14 @@ struct ConfigurationPage {
                 placement: Placement.BottomRight
               })
             .onClick(() => {
-              this.currentConfigRadioCheckedValue = index
-              hilog.info(0xC002, this.componentName, `#ListItem#onClick: `)
+              this.currentConfigRadioCheckedConfigData = item
+              hilog.info(0xC002, this.componentName, `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
             })
             .onTouch((event: TouchEvent) => {
               if (event.type === TouchType.Down) {
-                // TODO 现在用来代替获取长按的是哪一个ListItem，这个index也就是 `this.configList` 的index
-                this.currentTouchConfigListIndex = index
-                hilog.info(0xC002, this.componentName, `#ListItem#onTouch(TouchType.Down): configList[index] is: ${this.currentTouchConfigListIndex},configList[name] is: ${item}`)
+                // TODO 现在用来代替获取长按的是哪一个ListItem，目前用`configName`作为每一个item的唯一性属性
+                this.currentTouchConfigData = item
+                hilog.info(0xC002, this.componentName, `#ListItem#onTouch(TouchType.Down): configName is [${this.currentTouchConfigData.configName}]`)
               }
             })
             // .gesture(LongPressGesture({ repeat: false }).onAction(() => {
@@ -305,7 +355,7 @@ struct ConfigurationPage {
         .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
         .clickEffect({ level: ClickEffectLevel.LIGHT })
         .hoverEffect(HoverEffect.Scale)
-        .bindSheet( this.bindSheetIsShowOfConfigAddButton, this.ConfigAddBindSheetBuilder, {
+        .bindSheet( this.isShowConfigAddBindSheet, this.ConfigAddBindSheetBuilder, {
           // title: { title: $r('app.string.AddConfig') },
           detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT, ],// SheetSize.LARGE
           backgroundColor: $r('app.color.container_background'),
@@ -316,12 +366,26 @@ struct ConfigurationPage {
           blurStyle: BlurStyle.BACKGROUND_REGULAR,
           scrollSizeMode: ScrollSizeMode.CONTINUOUS,
           // width: ('100%'),
+          /**
+           * 半模态页面显示（动画开始前）回调函数
+           *    目前`通过URL(链接)导入`和`长按配置编辑`是用的同一个页面，
+           *    这里主要是用来处理拉起`bindSheet`之后可以等`bindSheet`渲染完毕之后正确传入路由信息
+           */
+          onWillAppear: () => {
+            hilog.info(0xC020, this.componentName, `#button#bindSheet#onWillAppear() executed`)
+            if (this.isPushRoute2BindSheet) {
+              this.pushEditConfigRoute2BindSheet()
+              this.isPushRoute2BindSheet = false
+            }
+          },
+          // 半模态页面交互式关闭回调函数
           onWillDismiss: (dismissSheet :DismissSheetAction) => {
-            // 在二级路由页面内只能通过点击关闭按钮才能关掉bindSheet
+          // 在二级路由页面内只能通过点击关闭按钮才能关掉bindSheet
             if (this.configAddPageInfos.size() <= 0 || (dismissSheet.reason === DismissReason.CLOSE_BUTTON)) {
               dismissSheet.dismiss()
-              this.bindSheetIsShowOfConfigAddButton = false
+              this.isShowConfigAddBindSheet = false
               this.isEnableIndexForegroundBlur = false
+              this.configAddPageInfos.clear(true)
               hilog.info(0xC020, this.componentName, `#button#bindSheet#onWillDismiss()#关闭配置添加按钮的bindSheet：DismissSheetAction.dismiss()`)
             }
           },
@@ -330,7 +394,7 @@ struct ConfigurationPage {
           }
         })
         .onClick( () => {
-          this.bindSheetIsShowOfConfigAddButton = true
+          this.isShowConfigAddBindSheet = true
           this.isEnableIndexForegroundBlur = true
         })
         // 悬浮新增配置按钮 END
@@ -347,54 +411,71 @@ struct ConfigurationPage {
   }
 
   aboutToAppear(): void {
-    hilog.info(0xC000, this.componentName, `#aboutToAppear`)
+    hilog.info(0xC000, this.componentName, `#aboutToAppear executed`)
   }
 
-  // aboutToDisappear(): void {
-  //   hilog.info(0xC000, this.componentName, `#aboutToDisappear`)
-  // }
+  aboutToDisappear(): void {
+    hilog.info(0xC000, this.componentName, `#aboutToDisappear executed`)
+  }
+
+  /**
+   * 页面内通用 `配置NV路由` push方法
+   * @param routeName 将要路由的页面名称
+   * @param param     路由参数
+   * @param animated  是否启用转场动画
+   */
+  pushDestinationByName(routeName: RouteName, param: Object | null, animated?: boolean): void {
+    this.configAddPageInfos.pushDestinationByName(routeName, param, animated)
+    hilog.info(0xC000, this.componentName, `#pushDestinationByName#NavPathStack.pushDestinationByName(${routeName}, ${JSON.stringify(param)}, ${animated})`)
+
+  }
+
+  /**
+   * 拉起配置编辑页 并传参
+   */
+  pushEditConfigRoute2BindSheet(){
+    this.pushDestinationByName(RouteName.ImportConfigFromURL, this.currentTouchConfigData)
+  }
 
   /**
    * 收藏配置
    */
   favoriteConfig(): void {
-    // TODO 收藏配置
-    // this.currentTouchConfigListIndex
+    // TODO 收藏配置 & 判断是否已经收藏
     this.promptAction.showToast({message: `已收藏⭐`})
-    hilog.info(0xC010, this.componentName, `#favoriteConfig#收藏配置：${this.currentTouchConfigListIndex}`)
+    // this.promptAction.showToast({message: `已经收藏过了哦~⭐`})
+    hilog.info(0xC010, this.componentName, `#favoriteConfig#收藏配置: configName is [${this.currentTouchConfigData.configName}]`)
   }
   /**
    * 编辑配置
    */
   private editConfig(): void {
     // TODO 编辑bindSheet
-    // this.currentTouchConfigListIndex
-    hilog.info(0xC011, this.componentName, `#editConfig#编辑配置：${this.currentTouchConfigListIndex}`)
+    hilog.info(0xC011, this.componentName, `#editConfig#编辑配置: configName is [${this.currentTouchConfigData.configName}]`)
+    this.isShowConfigAddBindSheet = true
+    this.isPushRoute2BindSheet = true
   }
   /**
    * 更新配置
    */
   private updateConfig(): void {
     // TODO 调用更新配置消息api
-    // this.currentTouchConfigListIndex
     this.promptAction.showToast({message: `配置更新中...`})
-    hilog.info(0xC012, this.componentName, `#updateConfig#更新配置：${this.currentTouchConfigListIndex}`)
+    hilog.info(0xC012, this.componentName, `#updateConfig#更新配置: configName is [${this.currentTouchConfigData.configName}]`)
   }
   /**
    * 分享配置
    */
   shareConfig(): void {
     // TODO 处理待分享数据 并调用系统分享接口
-    // this.currentTouchConfigListIndex
-    hilog.info(0xC013, this.componentName, `#shareConfig#分享配置：${this.currentTouchConfigListIndex}`)
+    hilog.info(0xC013, this.componentName, `#shareConfig#分享配置: configName is [${this.currentTouchConfigData.configName}]`)
   }
   /**
    * 生成配置二维码
    */
   generateQRcode(): void {
     // TODO 弹出bindSheet 在其中实现“配置url”生成二维码的功能
-    // this.currentTouchConfigListIndex
-    hilog.info(0xC014, this.componentName, `#generateQRcode#生成二维码：${this.currentTouchConfigListIndex}`)
+    hilog.info(0xC014, this.componentName, `#generateQRcode#生成二维码: configName is [${this.currentTouchConfigData.configName}]`)
   }
   /**
    * 删除配置
@@ -402,9 +483,10 @@ struct ConfigurationPage {
   deleteConfig(): void {
     // TODO 删除用户首选项里的此配置
     // TODO 弹confirm框确认是否删除？
-    // this.currentTouchConfigListIndex
-    hilog.info(0xC014, this.componentName, `#deleteConfig#删除配置：${this.currentTouchConfigListIndex}`)
+    hilog.info(0xC015, this.componentName, `#deleteConfig#删除配置: configName is [${this.currentTouchConfigData.configName}]`)
   }
 
 }
+
+
 export default ConfigurationPage

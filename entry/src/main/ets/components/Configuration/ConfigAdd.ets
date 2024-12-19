@@ -8,7 +8,8 @@ import {
   BIND_SHEET_TITLE_CONTAINER_HEIGHT,
   BORDER_RADIUS_20, LIST_ITEM_HEIGHT,
   LIST_ITEM_PADDING,
-  LIST_SPACE
+  LIST_SPACE,
+  RouteName
 } from "../../common/Constants";
 import { hilog } from "@kit.PerformanceAnalysisKit";
 import { BindSheetTitleCustomBuilder } from "../Common";
@@ -18,7 +19,7 @@ interface ConfigAddType {
   // 内容
   text: ResourceStr,
   // NV路由栈name
-  navPathStackName?: string,
+  navPathStackName?: RouteName,
   symbolEnd?: Resource
 }
 
@@ -35,13 +36,17 @@ export struct ConfigAdd {
   @Provide('isEnableConfigPageBindSheetForegroundBlur')
   private isEnableConfigPageBindSheetForegroundBlur: boolean = false
 
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
+
   /* List 相关 */
   private configAddTypeArray: Array<ConfigAddType> = [
     // TODO 国际化
-    { symbolStart: $r('sys.symbol.paperclip'), text: '从URL(链接)导入', navPathStackName: 'ImportConfigFromURL', symbolEnd: $r('sys.symbol.chevron_right')},
-    { symbolStart: $r('sys.symbol.qrcode'), text: '从二维码导入', navPathStackName: 'ImportConfigFromQRcode', symbolEnd: $r('sys.symbol.chevron_right')},
-    { symbolStart: $r('sys.symbol.doc_text_fill'), text: '从文件导入', navPathStackName: 'ImportConfigFromFile', symbolEnd: $r('sys.symbol.chevron_right')},
-    { symbolStart: $r('sys.symbol.doc'), text: '新建空白配置', navPathStackName: 'CreateNewConfig', symbolEnd: $r('sys.symbol.chevron_right')},
+    { symbolStart: $r('sys.symbol.paperclip'), text: '从URL(链接)导入', navPathStackName: RouteName.ImportConfigFromURL, symbolEnd: $r('sys.symbol.chevron_right')},
+    { symbolStart: $r('sys.symbol.qrcode'), text: '从二维码导入', navPathStackName: RouteName.ImportConfigFromQRcode, symbolEnd: $r('sys.symbol.chevron_right')},
+    { symbolStart: $r('sys.symbol.doc_text_fill'), text: '从文件导入', navPathStackName: RouteName.ImportConfigFromFile, symbolEnd: $r('sys.symbol.chevron_right')},
+    { symbolStart: $r('sys.symbol.doc'), text: '新建空白配置', navPathStackName: RouteName.CreateNewConfig, symbolEnd: $r('sys.symbol.chevron_right')},
   ]
 
   /* NV路由 相关 */
@@ -63,10 +68,10 @@ export struct ConfigAdd {
           ForEach( this.configAddTypeArray, (item: ConfigAddType, index: number)=> {
             ListItem(){
               Row(){
-                SymbolGlyph(item.symbolStart).fontSize(24).fontColor([$r('sys.color.icon')]).margin({ right: 20 })
+                SymbolGlyph(item.symbolStart).fontSize(24).fontColor([this.icon_emphasize]).margin({ right: 20 })
                 Text(item.text).fontSize(16).fontColor($r('sys.color.font_primary'))
                 Blank()
-                SymbolGlyph(item.symbolEnd).fontSize(24).fontColor([$r('sys.color.font_primary')])
+                SymbolGlyph(item.symbolEnd).fontSize(24).fontColor([$r('sys.color.icon')])
               }
               .width('100%')
               .padding(LIST_ITEM_PADDING)
@@ -128,6 +133,16 @@ export struct ConfigAdd {
       .foregroundBlurStyle(this.isEnableConfigPageBindSheetForegroundBlur ? BlurStyle.Thin : BlurStyle.NONE,{ colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: .3 })
       .animation({ duration: 200, curve: Curve.Ease })
       // NV路由 END
+
+      Button() {
+        Text('getAllPathName')
+      }
+      .width('auto')
+      .height('auto')
+      .onClick(() => {
+        hilog.info(0xC020, this.componentName, `#Button#NavPathStack.getAllPathName(), result is: ${JSON.stringify(this.configAddPageInfos.getAllPathName())}`)
+      }).margin({ bottom: 91 })
+
     }
     .height('auto')
     // .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK, { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 1.0 })
@@ -135,11 +150,11 @@ export struct ConfigAdd {
   }
 
   aboutToAppear(): void {
-    hilog.info(0xC020, this.componentName, `#aboutToAppear`)
+    hilog.info(0xC020, this.componentName, `#aboutToAppear executed`)
   }
 
   aboutToDisappear(): void {
-    hilog.info(0xC020, this.componentName, `#aboutToDisappear`)
+    hilog.info(0xC020, this.componentName, `#aboutToDisappear executed`)
     this.configAddPageInfos.clear(true)
     hilog.info(0xC020, this.componentName, `#aboutToDisappear#NV路由configAddPageInfos已清空！`)
   }

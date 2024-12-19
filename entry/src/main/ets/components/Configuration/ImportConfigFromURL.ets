@@ -4,6 +4,7 @@ import {
   BIND_SHEET_SUB_FONTSIZE,
   BIND_SHEET_DRAG_BAR_HEIGHT,
   BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT,
+  RouteName,
 } from "../../common/Constants"
 import { BindSheetTitleCustomBuilder, BindSheetTitleCustomBuilderMenu } from "../Common"
 import { hilog } from "@kit.PerformanceAnalysisKit"
@@ -12,6 +13,7 @@ import { PromptAction } from "@kit.ArkUI"
 import { ConfigData } from "../../common/PageArgumentEntity"
 import { util } from "@kit.ArkTS"
 import { ConfigCustomDialog } from './ConfigCustomDialog'
+import { BusinessError } from "@kit.BasicServicesKit"
 
 
 // 关联：route_map.json
@@ -39,10 +41,7 @@ export struct ImportConfigFromURL{
   @Consume('configAddPageInfos')
   // 页面栈
   private configAddPageInfos: NavPathStack
-  // TODO 路由传参
-  // 路由参数：是否为新配置（非已有配置进入编辑状态）
-  isNewConfig: boolean = true
-  // 配置详情
+  // 配置详情（要添加到用户首选项里的数据）
   @State
   @Watch('configDataChanged')
   private configData: ConfigData = {
@@ -73,7 +72,7 @@ export struct ImportConfigFromURL{
     // 跟随主题色：由于在这里直接赋值 this.icon_emphasize 编译器提示需要初始化 this.icon_emphasize 的值，放到了 aboutToAppear 回调里重新赋值
     symbolBackgroundColor: '#FF0A59F7',
     action: () => {
-      this.saveConfig(this.isNewConfig)
+      this.saveConfig(this.configData.isNewConfig)
     }
   }
   // 当前显示的工具集合 默认为空 待两个input都有值之后才加入保存按钮菜单
@@ -100,7 +99,7 @@ export struct ImportConfigFromURL{
       },
       confirm: ()=> {
         this.isEnableConfigPageBindSheetForegroundBlur = false
-        this.saveConfig(this.isNewConfig)
+        this.saveConfig(this.configData.isNewConfig)
       }
     }),
     cancel: () => {
@@ -118,10 +117,11 @@ export struct ImportConfigFromURL{
       // 替代`NavDestination`的标题栏 START
       BindSheetTitleCustomBuilder({
         pageInfos: this.configAddPageInfos,
-        isSubPage: true,
+        // isSubPage: true,
+        isSubPage: this.configData.isNewConfig,
         titlePaddingLeft: BIND_SHEET_DRAG_BAR_HEIGHT / 2,
-        mainTitle: this.mainTitle,
-        subTitle: this.subTitle,
+        mainTitle: this.configData.isNewConfig ? this.mainTitle : '编辑配置',
+        subTitle: this.configData.isNewConfig ? this.subTitle : '',
         mainTitleFontWeight: BIND_SHEET_MAIN_FONT_WEIGHT,
         mainTitleFontSize: BIND_SHEET_MAIN_FONTSIZE,
         subTitleFontSize: BIND_SHEET_SUB_FONTSIZE,
@@ -139,7 +139,7 @@ export struct ImportConfigFromURL{
       // 替代`NavDestination`的标题栏 END
 
       // 配置信息 START
-      ConfigInfo({isNewConfig: this.isNewConfig, configData: $configData})
+      ConfigInfo({configData: $configData})
       // 配置信息 END
     }
     .height('100%')
@@ -157,17 +157,30 @@ export struct ImportConfigFromURL{
         return false
       }
     })
+    .onReady( () => {
+      let paramJsonStr: string = JSON.stringify(this.configAddPageInfos.getParamByName(RouteName.ImportConfigFromURL))
+      hilog.info(0xCA11, this.componentName, `#aboutToAppear#NavPathStack.getParamByName(${RouteName.ImportConfigFromURL}), result is: ${paramJsonStr}`)
+
+      if( this.configAddPageInfos.getParamByName(RouteName.ImportConfigFromURL).length > 0 && this.configAddPageInfos.getParamByName(RouteName.ImportConfigFromURL)[0] !== null ) {
+        try {
+          this.configData = (JSON.parse(paramJsonStr) as Array<ConfigData>)[0]
+        } catch (e) {
+          let error = e as BusinessError;
+          hilog.error(0xCA11, this.componentName, `#aboutToAppear#JSON.parse(paramJsonStr) as ConfigData#ERROR: code is [${error.code}],message is [${error.message}]`)
+        }
+      }
+    })
     .animation({ duration: 200, curve: Curve.Ease })
 
   }
 
   aboutToAppear(): void {
-    hilog.info(0xCA10, this.componentName, `#aboutToAppear`)
+    hilog.info(0xCA10, this.componentName, `#aboutToAppear executed`)
     this.saveMenus.symbolBackgroundColor = this.icon_emphasize
   }
 
   aboutToDisappear(): void {
-    hilog.info(0xCA10, this.componentName, `#aboutToDisappear`)
+    hilog.info(0xCA10, this.componentName, `#aboutToDisappear executed`)
     // 自定义弹框 清空
     this.configCustomDialogController = null
     this.isEnableConfigPageBindSheetForegroundBlur = false

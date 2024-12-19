@@ -33,8 +33,22 @@ export interface ConfigData{
   isConfigAutoUpdate: boolean
   // 自动更新间隔
   configAutoUpdateTimeGapSelectedValue?: number
-  // 代理列表
-  // proxyList:
+  // 创建日期
+  createdDate?: Date
+  // 最后更新/编辑日期 yyyy-MM-dd hh:mm:ss
+  lastUpdateDateTime?: Date
+  // 已用流量
+  trafficUsed?: string
+  // 所有流量
+  trafficTotal?: string
+
+  // 代理列表 TODO 还用不到 先设为可选属性
+  proxyList?: Array<ProxyData>
+}
+
+// 代理 -> 新增代理
+export interface ProxyData{
+
 }
 
 
