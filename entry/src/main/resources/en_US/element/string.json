@@ -723,6 +723,22 @@
     {
       "name": "Disclaimer_Content",
       "value": "This software is only for non-commercial purposes such as learning, communication, scientific research, etc. It is prohibited to use this software for commercial purposes. Any commercial activities are unrelated to this software."
+    },
+    {
+      "name": "Speed_Delay",
+      "value": "The difference between speed and delay"
+    },
+    {
+      "name": "Speed_Delay_Content",
+      "value": "Speed: usually refers to network bandwidth, which determines the speed at which you download files, watch videos, and load images\nDelay: usually refers to the time of network ping, which determines your gaming experience and the speed of accessing web pages\nUsually, fast speed does not necessarily mean low latency, and low latency does not necessarily mean fast speed. There is no direct relationship between them"
+    },
+    {
+      "name": "Sure",
+      "value": "Sure"
+    },
+    {
+      "name": "Test_Speed_Explain",
+      "value": "By CloundFlare"
     }
   ]
 }

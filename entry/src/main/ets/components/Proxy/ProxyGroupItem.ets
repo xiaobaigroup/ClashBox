@@ -40,17 +40,15 @@ struct CustomDialogExample {
 
   build() {
     Column() {
-      Text('速度和延迟的区别')
+      Text($r('app.string.Speed_Delay'))
         .fontSize(20)
         .padding({ bottom: 15 })
         .fontWeight(700)
-      Text('速度：通常指网络带宽，决定你下载文件及看视频、图片加载的速度。\n' +
-        '延迟：通常指网络ping的时间，决定你打游戏的体验和访问网页的速度。\n' +
-        '通常情况下，速度快不代表延迟低，延迟低也不能代表速度快，他们之间没有直接关系。')
+      Text($r('app.string.Speed_Delay_Content'))
         .fontSize(16)
         .padding({ bottom: 8 })
 
-      Button('确定')
+      Button($r('app.string.Sure'))
         .fontSize(16)
         .width('100%')
         .onClick(() => {
@@ -177,7 +175,7 @@ struct ProxyGroupItem {
               .fontSize(48)
             Text('访问https://speed.cloudflare.com')
               .fontSize(18)*/
-        Web({ src: 'https://speed.cloudflare.com', controller: this.controller })//测速网页得重新换个
+        Web({ src: 'https://speed.cloudflare.com', controller: this.controller })
           .javaScriptAccess(true)
           .onlineImageAccess(true)
           .imageAccess(true)
@@ -296,7 +294,7 @@ struct ProxyGroupItem {
         backgroundColor: $r('app.color.settings_container_background'),
         showClose: true,
         scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-        title: { title: $r('app.string.Test_Speed'), subtitle: '测速功能由CloundFlare提供' },
+        title: { title: $r('app.string.Test_Speed'), subtitle:$r('app.string.Test_Speed_Explain')  },
       //  maskColor: $r('app.color.dialog_maskcolor'),
         onWillDismiss: () => {
           this.isShowNetworkSpeed = false

@@ -723,6 +723,22 @@
     {
       "name": "Disclaimer_Content",
       "value": "本软件仅供学习交流、科研等非商业性质的用途，禁止将本软件用于商业目的。如有任何商业行为，均与本软件无关。"
+    },
+    {
+      "name": "Speed_Delay",
+      "value": "速度和延迟的区别"
+    },
+    {
+      "name": "Speed_Delay_Content",
+      "value": "速度：通常指网络带宽，决定你下载文件及看视频、图片加载的速度\n延迟：通常指网络ping的时间，决定你打游戏的体验和访问网页的速度\n通常情况下，速度快不代表延迟低，延迟低也不能代表速度快，他们之间没有直接关系"
+    },
+    {
+      "name": "Sure",
+      "value": "确定"
+    },
+    {
+      "name": "Test_Speed_Explain",
+      "value": "测速功能由CloundFlare提供"
     }
   ]
 }
