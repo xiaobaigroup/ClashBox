@@ -1,25 +1,16 @@
 {
   "strarray": [
     {
-      "name": "config_auto_update_menu",
+      "name": "config_auto_update_text_picker",
       "value": [
         {
-          "value": "1 minute"
+          "value": "Minute"
         },
         {
-          "value": "10 minute"
+          "value": "Hour"
         },
         {
-          "value": "30 minute"
-        },
-        {
-          "value": "1 hour"
-        },
-        {
-          "value": "1 day"
-        },
-        {
-          "value": "Custom"
+          "value": "Day"
         }
       ]
     }

@@ -32,7 +32,9 @@ export interface ConfigData{
   // 是否自动更新
   isConfigAutoUpdate: boolean
   // 自动更新间隔
-  configAutoUpdateTimeGapSelectedValue?: number
+  configAutoUpdateTimeGapValue?: number
+  // 自动更新间隔`TextPicker`对应的索引（默认数据参照`Constants.CONFIG_AUTO_UPDATE_TIME_GAT_STRING_ARR` & $r('app.strarray.config_auto_update_text_picker')）
+  configAutoUpdateTimeGapTextPickerIndex?: number
   // 创建日期
   createdDate?: Date
   // 最后更新/编辑日期 yyyy-MM-dd hh:mm:ss

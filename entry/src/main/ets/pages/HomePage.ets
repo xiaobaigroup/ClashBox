@@ -467,7 +467,7 @@ struct Home {
         .animation({duration: ANIMATION_DURATION_300, curve:Curve.Ease})
 
         // 代理启动按钮层
-        Button(){
+        Column(){
           Row(){
             Stack( { alignContent: Alignment.Center } ){
               SymbolGlyph( this.proxyEnabled ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill') )
@@ -487,6 +487,7 @@ struct Home {
               .fontWeight(FontWeight.Bold)
           }.width('100%')
         }
+        .borderRadius(100)
         .backgroundColor(this.icon_emphasize)
         .shadow({radius: 10, color: this.icon_emphasize, offsetY: 4, type: ShadowType.BLUR})
         .margin($r('app.integer.vp_proxy_start_button_margin'))

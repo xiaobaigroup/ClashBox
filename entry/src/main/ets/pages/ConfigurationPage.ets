@@ -92,7 +92,8 @@ struct ConfigurationPage {
       configName: 'SS-Youtube速度快',
       configURL: 'https://aaa.com:8344',
       isConfigAutoUpdate: true,
-      configAutoUpdateTimeGapSelectedValue: 10,
+      configAutoUpdateTimeGapValue: 10,
+      configAutoUpdateTimeGapTextPickerIndex: 1,
       createdDate: new Date('2024-05-21 21:21:21'),
       lastUpdateDateTime: new Date('2024-12-18 17:51:00'),
       trafficUsed: '1329.43GB',
@@ -104,7 +105,8 @@ struct ConfigurationPage {
       configName: 'Trojan-INS专用',
       configURL: 'http://ealion.com/ins-test',
       isConfigAutoUpdate: true,
-      configAutoUpdateTimeGapSelectedValue: 233,
+      configAutoUpdateTimeGapValue: 233,
+      configAutoUpdateTimeGapTextPickerIndex: 0,
       createdDate: new Date('2023-12-20 04:14:35'),
       lastUpdateDateTime: new Date('2024-12-18 15:00:00'),
       trafficUsed: '234.42GB',
@@ -127,7 +129,8 @@ struct ConfigurationPage {
     configName: 'VMess-TG专用',
     configURL: 'https://telegram-vmess.enlin.com',
     isConfigAutoUpdate: true,
-    configAutoUpdateTimeGapSelectedValue: 1440,
+    configAutoUpdateTimeGapValue: 7,
+    configAutoUpdateTimeGapTextPickerIndex: 2,
     createdDate: new Date('2024-01-01 12:24:34'),
     lastUpdateDateTime: new Date('2024-12-19 08:00:00'),
     trafficUsed: '34.05GB',
@@ -327,18 +330,16 @@ struct ConfigurationPage {
         // 配置列表 END
 
         // 悬浮新增配置按钮 START
-        Button() {
-          Row() {
-            Stack({ alignContent: Alignment.Center }) {
-              SymbolGlyph($r('sys.symbol.plus'))
-                .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
-                .fontColor([Color.White])
-                .symbolEffect(this.ReplaceSymbolEffect)
-                .align(Alignment.Center)
-            }
-            .width(this.proxyStartButtonHeight)
-            .height(this.proxyStartButtonHeight)
-          }.width('100%')
+        Column() {
+          Stack({ alignContent: Alignment.Center }) {
+            SymbolGlyph($r('sys.symbol.plus'))
+              .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
+              .fontColor([Color.White])
+              .symbolEffect(this.ReplaceSymbolEffect)
+              .align(Alignment.Center)
+          }
+          .width('100%')
+          .height('100%')
         }
         // .backgroundColor($r('app.color.speed_down_icon'))
         .shadow({
@@ -347,6 +348,7 @@ struct ConfigurationPage {
           offsetY: 4,
           type: ShadowType.BLUR
         })
+        .borderRadius(100)
         .margin(this.proxyStartButtonMargin)
         .width(this.proxyStartButtonWidth)
         .height(this.proxyStartButtonHeight)

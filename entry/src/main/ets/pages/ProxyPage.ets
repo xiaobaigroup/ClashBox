@@ -506,15 +506,17 @@ struct ProxyPage {
           }
           //列表排列end
 
-          // 悬浮新增配置按钮 START
-          Button() {
+          // 悬浮代理测速按钮 START
+          Column() {
             Stack({ alignContent: Alignment.Center }) {
               SymbolGlyph($r('sys.symbol.bolt_filled_on_circle'))
                 .fontSize(24)
                 .fontColor([Color.White])
                 .symbolEffect(this.ReplaceSymbolEffect)
                 .align(Alignment.Center)
-            }.width('100%')
+            }
+            .width('100%')
+            .height('100%')
           }
           .shadow({
             radius: 10,
@@ -522,14 +524,15 @@ struct ProxyPage {
             offsetY: 4,
             type: ShadowType.BLUR
           })
+          .borderRadius(100)
           .backgroundColor(this.icon_emphasize)
           .margin(this.proxyStartButtonMargin)
           .width(this.proxyStartButtonWidth)
           .height(this.proxyStartButtonHeight)
           .clip(true)
           .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
-          .clickEffect({ level: ClickEffectLevel.MIDDLE })
-          // 悬浮新增配置按钮 END
+          .clickEffect({ level: ClickEffectLevel.LIGHT })
+          // 悬浮代理测速按钮 END
         }
         .backgroundColor($r('app.color.background'))
         // .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })

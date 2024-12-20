@@ -8,9 +8,9 @@ export default class EntryAbility extends UIAbility {
  private currentLanguage: string | undefined = undefined
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onCreate');
-    this.currentLanguage = this.context.config.language
+/*    this.currentLanguage = this.context.config.language
     AppStorage.setOrCreate<string>('language', this.currentLanguage)
-    hilog.info(0x0000, 'EntryAbility', `#onCreate#currentLanguage is [${this.currentLanguage}]`);
+    hilog.info(0x0000, 'EntryAbility', `#onCreate#currentLanguage is [${this.currentLanguage}]`);*/
   }
 
 
@@ -65,14 +65,14 @@ export default class EntryAbility extends UIAbility {
 
   }
 
-  onConfigurationUpdate(newConfig: Configuration): void {
+  /*onConfigurationUpdate(newConfig: Configuration): void {
     if (newConfig.language !== this.currentLanguage) {
       this.currentLanguage = newConfig.language
       hilog.info(0x0000, 'EntryAbility', `#onConfigurationUpdate#newConfig.language is [${this.currentLanguage}]`);
       AppStorage.setOrCreate<string>('language', newConfig.language)
     }
 
-  }
+  }*/
 
   onWindowStageDestroy(): void {
     // Main window is destroyed, release UI related resources

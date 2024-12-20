@@ -184,7 +184,7 @@ export struct ImportConfigFromURL{
     // 自定义弹框 清空
     this.configCustomDialogController = null
     this.isEnableConfigPageBindSheetForegroundBlur = false
-    hilog.info(0xCA10, this.componentName, `#aboutToDisappear#置空[配置页内bindSheet是否保存自定义弹框]`)
+    hilog.info(0xCA10, this.componentName, `#aboutToDisappear#置空[配置页bindSheet内提示是否保存配置信息的自定义弹框]`)
   }
 
   /**

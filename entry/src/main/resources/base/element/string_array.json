@@ -1,25 +1,16 @@
 {
   "strarray": [
     {
-      "name": "config_auto_update_menu",
+      "name": "config_auto_update_text_picker",
       "value": [
         {
-          "value": "5分钟"
+          "value": "分钟"
         },
         {
-          "value": "10分钟"
+          "value": "小时"
         },
         {
-          "value": "30分钟"
-        },
-        {
-          "value": "1小时"
-        },
-        {
-          "value": "1天"
-        },
-        {
-          "value": "自定义"
+          "value": "天"
         }
       ]
     }

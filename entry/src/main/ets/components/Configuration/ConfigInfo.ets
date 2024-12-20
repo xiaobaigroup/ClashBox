@@ -8,9 +8,8 @@ import {
   LIST_ITEM_HEIGHT_45,
   TEXT_INPUT_HEIGHT,
   FONT_SIZE_14,
-  TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE,
-  CONFIG_AUTO_UPDATE_MENU_STRING_ARR,
-  ConfigAutoUpdateGap,
+  CONFIG_AUTO_UPDATE_TIME_GAT_STRING_ARR,
+  LIST_ITEM_HEIGHT,
 } from "../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { PromptAction } from "@kit.ArkUI"
@@ -28,9 +27,11 @@ export struct ConfigInfo{
   icon_emphasize: ResourceColor
 
   /* 系统语言 */
+/*
   @StorageProp('language')
   @Watch('languageChange')
   private currentLanguage: string = ''
+*/
 
   // 配置详情
   @Link
@@ -46,30 +47,44 @@ export struct ConfigInfo{
   @State
   private isConfigAutoUpdate: boolean = false
   // 配置自动更新的间隔菜单显示文本默认值，用于获取string_array.json资源异常的时候显示
-  private configAutoUpdateMenuStringArr: Array<ConfigAutoUpdateGap> = CONFIG_AUTO_UPDATE_MENU_STRING_ARR
-  // 配置自动更新的间隔菜单
-  private configAutoUpdateMenus: Array<MenuElement> = [
-    {value: this.configAutoUpdateMenuStringArr[0].label, action: () => {hilog.info(0xCA11, this.componentName, `#ListItem#自动更新间隔bindMenu#: 5分钟`)}},
-    {value: this.configAutoUpdateMenuStringArr[1].label, action: () => {hilog.info(0xCA11, this.componentName, `#ListItem#自动更新间隔bindMenu: 10分钟`)}},
-    {value: this.configAutoUpdateMenuStringArr[2].label, action: () => {hilog.info(0xCA11, this.componentName, `#ListItem#自动更新间隔bindMenu: 30分钟`)}},
-    {value: this.configAutoUpdateMenuStringArr[3].label, action: () => {hilog.info(0xCA11, this.componentName, `#ListItem#自动更新间隔bindMenu: 1小时`)}},
-    {value: this.configAutoUpdateMenuStringArr[4].label, action: () => {hilog.info(0xCA11, this.componentName, `#ListItem#自动更新间隔bindMenu: 1天`)}},
-    {value: this.configAutoUpdateMenuStringArr[5].label, action: () => {hilog.info(0xCA11, this.componentName, `#ListItem#自动更新间隔bindMenu: 自定义`)}},
-  ]
-  // 配置自动更新 已选择的间隔
+  private configAutoUpdateTextPickerStringArr: Array<string> = CONFIG_AUTO_UPDATE_TIME_GAT_STRING_ARR
+
+  // 配置自动更新 填写的间隔值（由于`configData.configAutoUpdateTimeGapValue`是`number`类型，用这个变量当作一个中间变量利用`@Watch`实现双向绑定）
   @State
-  private configAutoUpdateTimeGapSelected: ConfigAutoUpdateGap = this.configAutoUpdateMenuStringArr[2]
+  @Watch('configAutoUpdateTimeGapInputChanged')
+  private configAutoUpdateTimeGapInputValue: string = String(this.configData.configAutoUpdateTimeGapValue)
+  // 配置自动更新 已选择的间隔 index
+  /*@State
+  private configAutoUpdateTimeGapTextPickerSelectedIndex: number = 1*/
   // 配置是否自动更新间隔菜单 是否显示
   // @State
   // private isShowConfigAutoUpdateMenu: boolean = false
+  // ListItem里自动更新间隔`TextPicker`组件所在的`ListItem`的高度
+  @State
+  private heightOfTextPickerInTheListItem: number = LIST_ITEM_HEIGHT_45
+  // ListItem里自动更新间隔`TextPicker`组件的`fontSize`
+  @State
+  private fontSizeOfTextPickerInTheListItem: number = FONT_SIZE_16
+  // ListItem里自动更新间隔`TextPicker`组件的`fontWeight`
+  @State
+  private fontWeightOfTextPickerInTheListItem: FontWeight = FontWeight.Medium
+  // ListItem里自动更新间隔`TextPicker`组件的分割线样式
+  @State
+  private dividerOfTextPickerInTheListItem: DividerOptions | null = null
+  // ListItem里自动更新间隔`TextPicker`组件的每个选择项高度
+  @State
+  private itemHeightOfTextPickerInTheListItem: number = FONT_SIZE_16 * 1.5
+  // ListItem里自动更新间隔`TextPicker`组件的渐隐效果
+  @State
+  private gradientHeightOfTextPickerInTheListItem: number = FONT_SIZE_16
 
 
   build() {
-    Column() {
+    Column({ space: 10 }) {
       // 配置名input
       // TODO 国际化
-      Text('配置名').margin({bottom: 10}).fontColor($r('sys.color.font_secondary')).fontSize(FONT_SIZE_16)
-      TextInput({ text: $$this.configData.configName, placeholder: '输入配置名' }).margin({bottom: 10}).width('100%').height(TEXT_INPUT_HEIGHT).borderRadius(BORDER_RADIUS_20)
+      Text('配置名').fontColor($r('sys.color.font_secondary')).fontSize(FONT_SIZE_16)
+      TextInput({ text: $$this.configData.configName, placeholder: '输入配置名' }).width('100%').height(TEXT_INPUT_HEIGHT).borderRadius(BORDER_RADIUS_20)
         .id('text_input_config_name')
         .caretColor(this.icon_emphasize)
         .maxLength(TEXT_AREA_MAX_LENGTH)
@@ -87,19 +102,23 @@ export struct ConfigInfo{
 
       // 配置 URL
       // TODO 国际化
-      Text('URL').margin({bottom: 10}).fontColor($r('sys.color.font_secondary')).fontSize(FONT_SIZE_16)
+      Text('URL').fontColor($r('sys.color.font_secondary')).fontSize(FONT_SIZE_16)
       // TODO 国际化
-      TextArea({ text: $$this.configData.configURL, placeholder: '输入链接...' }).margin({bottom: 10}).width('100%').height(TEXT_INPUT_HEIGHT * 2).borderRadius(BORDER_RADIUS_20)
+      TextArea({ text: $$this.configData.configURL, placeholder: '输入链接...' }).width('100%').height(TEXT_INPUT_HEIGHT * 2).borderRadius(BORDER_RADIUS_20)
         .id('text_area_config_url')
         .caretColor(this.icon_emphasize)
         .maxLength(TEXT_AREA_MAX_LENGTH)
         .wordBreak(WordBreak.BREAK_ALL)
-        .enterKeyType(EnterKeyType.Done)
+        .enterKeyType(this.configData.isConfigAutoUpdate ? EnterKeyType.Next : EnterKeyType.Done)
         .type(TextAreaType.URL)
         .clickEffect({ level: ClickEffectLevel.MIDDLE })
         // .onChange( (value: string, previewText: PreviewText) => {
         //   this.configData.configURL = value.trim()
         // })
+        .onSubmit( (enterKey: EnterKeyType) => {
+          // 条件判断是否需要将焦点切换给`自动更新时间间隔`框
+          this.configData.isConfigAutoUpdate ? focusControl.requestFocus('text_input_auto_update_time') : null
+        })
 
       // 配置自动更新 START
       List({space:LIST_SPACE}){
@@ -114,12 +133,18 @@ export struct ConfigInfo{
                 .selectedColor(this.icon_emphasize)
                 .onChange((isOn: boolean) => {
                   hilog.info(0xCA11, this.componentName, `#ListItem#Toggle#自动更新状态: ${isOn}`)
+                  focusControl.requestFocus('text_input_auto_update_time')
                   // 自动更新间隔 显式动画
                   this.getUIContext()?.animateTo({
                     duration: 200
                   }, () => {
                     this.configData.isConfigAutoUpdate = isOn
                   })
+                  // （1. 新配置 || 2. 老配置之前没开自动更新，编辑的时候才打开自动更新）处理
+                  if (isOn && this.configData?.configAutoUpdateTimeGapTextPickerIndex === undefined){
+                    // `TextPicker` 默认选择`小时`
+                    this.configData.configAutoUpdateTimeGapTextPickerIndex = 1
+                  }
                 })
             }.width('100%').alignItems(VerticalAlign.Center)
           }
@@ -144,24 +169,97 @@ export struct ConfigInfo{
                 // TODO 国际化
                 Text('自动更新间隔').fontColor($r('sys.color.font_primary')).fontSize(FONT_SIZE_16)
                 Blank()
-                // TODO 国际化
                 Row(){
-                  Text(this.configAutoUpdateTimeGapSelected.label).fontColor($r('sys.color.font_secondary')).fontSize(FONT_SIZE_14)
-                  Column(){
-                    SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill')).fontColor([$r('sys.color.font_secondary')]).fontSize(8)
-                  }
-                  .width(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).height(8)
-                  .alignItems(HorizontalAlign.Center)
+                  // TODO 国际化
+                  TextInput({ text: $$this.configAutoUpdateTimeGapInputValue, placeholder: '请输入' })
+                    .width(50)
+                    .height(30)
+                    .padding(0)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize(FONT_SIZE_16)
+                    .lineHeight(FONT_SIZE_16)
+                    .placeholderFont({size: FONT_SIZE_14})
+                    .textAlign(TextAlign.Center)
+                    .backgroundColor(Color.Transparent)
+                    .borderRadius(0)
+                    .border({
+                      color: { top: Color.Transparent, bottom: this.icon_emphasize },
+                      width: { top: 1, bottom: 1 },
+                      style: { top: null, right: null, bottom: BorderStyle.Solid, left: null}
+                    })
+                    .id('text_input_auto_update_time')
+                    .caretColor(this.icon_emphasize)
+                    .maxLength(5)
+                    .enterKeyType(EnterKeyType.Done)
+                    .type(InputType.Number)
+                    // 干喔~不知道为什么放在ListItem里面不生效
+                    // .showUnderline(true)
+                  TextPicker({
+                    range: $r('app.strarray.config_auto_update_text_picker'),
+                    selected: $$this.configData.configAutoUpdateTimeGapTextPickerIndex
+                  })
+                    .canLoop(false)
+                    .width(60)
+                    .height(this.heightOfTextPickerInTheListItem)
+                    // .backgroundColor('#ffffc0c0')
+                    .defaultPickerItemHeight(this.itemHeightOfTextPickerInTheListItem)
+                    .gradientHeight(this.gradientHeightOfTextPickerInTheListItem)
+                    .selectedTextStyle({
+                      color: this.icon_emphasize,
+                      font: {
+                        size: this.fontSizeOfTextPickerInTheListItem,
+                        weight: this.fontWeightOfTextPickerInTheListItem
+                      }
+                    })
+                    .divider(this.dividerOfTextPickerInTheListItem)
+                    // 手指按下之后静态
+                    // .onHover( (isHover: boolean, event: HoverEvent) => {
+                    //
+                    // })
+                    // 手指触摸动态改变`TextPicker`和所在`ListItem`的样式
+                    .onTouch((event: TouchEvent) => {
+                      let ctx = this.getUIContext()
+                      if (event.type === TouchType.Down) {
+                        ctx.animateTo({
+                          duration: 200,
+                          curve: Curve.Ease
+                        }, () => {
+                          this.heightOfTextPickerInTheListItem = 100
+                          this.fontSizeOfTextPickerInTheListItem = FONT_SIZE_16 * 1.5
+                          this.fontWeightOfTextPickerInTheListItem = FontWeight.Bold
+                          this.dividerOfTextPickerInTheListItem = {
+                            strokeWidth: 1,
+                            startMargin: 5,
+                            endMargin: 5,
+                            color: this.icon_emphasize
+                          }
+                          this.itemHeightOfTextPickerInTheListItem = FONT_SIZE_16 * 2
+                          this.gradientHeightOfTextPickerInTheListItem = FONT_SIZE_16 * 2
+                        })
+                      } else if (event.type === TouchType.Up){
+                        ctx.animateTo({
+                          duration: 200,
+                          curve: Curve.Ease
+                        }, () => {
+                          this.heightOfTextPickerInTheListItem = LIST_ITEM_HEIGHT
+                          this.fontSizeOfTextPickerInTheListItem = FONT_SIZE_16
+                          this.fontWeightOfTextPickerInTheListItem = FontWeight.Medium
+                          this.dividerOfTextPickerInTheListItem = null
+                          this.itemHeightOfTextPickerInTheListItem = FONT_SIZE_16 * 1.5
+                          this.gradientHeightOfTextPickerInTheListItem = FONT_SIZE_16
+                        })
+                      }
+                    })
+                    // .animation({ duration: 200, curve: Curve.Ease })
                 }
                 .width('auto')
               }.width('100%').alignItems(VerticalAlign.Center)
             }
-            .height(LIST_ITEM_HEIGHT_45)
+            .height(this.heightOfTextPickerInTheListItem)
             .padding(LIST_ITEM_PADDING)
             .borderRadius(BORDER_RADIUS_20)
             .clickEffect({ level: ClickEffectLevel.MIDDLE })
-            .bindMenu(this.configAutoUpdateMenus, { placement: Placement.RightBottom })
-            // hilog.info(0xCA11, this.componentName, `#ListItem#ContextMenu#自动更新间隔: ${isOn}`)
+            .animation({ duration: 200, curve: Curve.Ease })
           }
           // 自动更新间隔 END
 
@@ -174,14 +272,13 @@ export struct ConfigInfo{
           endMargin: LIST_ITEM_PADDING.right
         })
       }
-      .margin({bottom: 10})
       .width('100%')
       .height('auto')
       .borderRadius(BORDER_RADIUS_20)
       .backgroundColor($r('app.color.container_background'))
+      // 配置自动更新 END
       Text(`breakPointStateNavigationListPadding.value is [${this.breakPointStateNavigationListPadding.value?.toString()}]`)
       Text(`isNewConfig: ${this.configData.isNewConfig}`).fontSize(35)
-      // 配置自动更新 END
     }
     .width('100%')
     .height('100%')
@@ -196,7 +293,7 @@ export struct ConfigInfo{
 
   aboutToAppear(): void {
     hilog.info(0xCA11, this.componentName, `#aboutToAppear executed`)
-    this.getConfigAutoUpdateMenuStringArr()
+    // this.getConfigAutoUpdateMenuStringArr()
   }
 
   aboutToDisappear(): void {
@@ -207,51 +304,44 @@ export struct ConfigInfo{
    * 系统语言发生改变事件
    * @param changedPropertyName
    */
-  languageChange(changedPropertyName: string) {
+  /*languageChange(changedPropertyName: string) {
     hilog.info(0xCA11, this.componentName, `#languageChange#监听到系统语言发生改变: ${this.currentLanguage}`)
-    this.getConfigAutoUpdateMenuStringArr()
-  }
+    // this.getConfigAutoUpdateMenuStringArr()
+    // 更换语言之后更换`TextPicker`显示的文本
+    // this.configAutoUpdateTimeGapTextPickerSelectedValue = this.configAutoUpdateMenuStringArr[this.configAutoUpdateTimeGapTextPickerSelectedIndex]
+  }*/
 
   /**
+   * TODO `bindMenu`改成了`TextPicker`，支持直接使用Resource的方式来适应系统语言的改变
    * 从系统资源里 获取菜单集合值
    *    因为[自动更新间隔]不止是展示的，还有对应的value需要用，所以不是直接用的`$r()`格式使用的，
    *    就导致如果系统语言环境改变之后，需要手动适配更新[自动更新间隔]对应的string数组
    */
-  getConfigAutoUpdateMenuStringArr() {
+ /* getConfigAutoUpdateMenuStringArr() {
     try {
       let resourceManager = this.getUIContext().getHostContext()?.resourceManager
-      let configAutoUpdateMenuStringArr = resourceManager?.getStringArrayValueSync($r('app.strarray.config_auto_update_menu').id) as Array<string>
-      hilog.info(0xCA11, this.componentName, `#aboutToAppear#getStringArrayValueSync($r('app.strarray.config_auto_update_menu')#configAutoUpdateMenuStringArr: index[${configAutoUpdateMenuStringArr.length}], value [${configAutoUpdateMenuStringArr}])}`)
-      if (configAutoUpdateMenuStringArr.length <= 0) {
+      let configAutoUpdateTimeGapStringArr = resourceManager?.getStringArrayValueSync($r('app.strarray.config_auto_update_text_picker').id) as Array<string>
+      hilog.info(0xCA11, this.componentName, `#aboutToAppear#getStringArrayValueSync($r('app.strarray.config_auto_update_menu')#configAutoUpdateMenuStringArr: index[${configAutoUpdateTimeGapStringArr.length}], value [${configAutoUpdateTimeGapStringArr}])}`)
+      if (configAutoUpdateTimeGapStringArr.length <= 0) {
         // TODO 国际化
         this.promptAction.showToast({message: `菜单数据获取失败！`})
         hilog.error(0xCA11, this.componentName, `#aboutToAppear#getStringArrayValueSync($r('app.strarray.config_auto_update_menu')#ERROR: 配置自动更新时间间隔菜单数据获取数据为空！`)
       } else {
         // 给菜单赋值
-        configAutoUpdateMenuStringArr.forEach( (item: string, index) => {
-          this.configAutoUpdateMenuStringArr[index].label = item
+        configAutoUpdateTimeGapStringArr.forEach( (item: string, index) => {
+          this.configAutoUpdateMenuStringArr[index] = item
         })
-        this.configAutoUpdateMenus.forEach( (item: MenuElement, index) => {
-          item.value = this.configAutoUpdateMenuStringArr[index].label
-        })
-        // TODO 这里有个问题 后面处理：如果在已经更改了默认间隔30分钟之后，切换了系统语言，这里显示的会被重置回默认值
-        this.configAutoUpdateTimeGapSelected.label = configAutoUpdateMenuStringArr[2]
       }
     } catch (e) {
       let error = e as BusinessError;
       hilog.error(0xCA11, this.componentName, `#aboutToAppear#getStringArrayValueSync($r('app.strarray.config_auto_update_menu')#ERROR: code is [${error.code}],message is [${error.message}]`)
     }
-  }
+  }*/
 
   /**
-   * 处理器：匹配当前`configData`的中已选择的间隔时间对象 用于将对应的`label`显示到页面上
+   *
    */
-  configAutoUpdateTimeGapSelectedValueHandler(){
-    let gap: number  = this.configData?.configAutoUpdateTimeGapSelectedValue ?? -99
-    let gapArr: Array<ConfigAutoUpdateGap> = CONFIG_AUTO_UPDATE_MENU_STRING_ARR.filter( (item) => item.value === gap)
-    if (gapArr.length > 0) {
-      this.configAutoUpdateTimeGapSelected = gapArr[0]
-    }
+  configAutoUpdateTimeGapInputChanged() {
+    this.configData.configAutoUpdateTimeGapValue = Number(this.configAutoUpdateTimeGapInputValue)
   }
-
 }
