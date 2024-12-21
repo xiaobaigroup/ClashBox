@@ -24,7 +24,7 @@ interface Item {
 
 //自定义弹窗内容
 @CustomDialog
-struct CustomDialogExample {
+struct ProxyCustomDialog {
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
@@ -97,8 +97,8 @@ struct ProxyGroupItem {
   ];
   controller: webview.WebviewController = new webview.WebviewController();
   //弹窗
-  dialogController: CustomDialogController | null = new CustomDialogController({
-    builder: CustomDialogExample({
+  ProxyDialogController: CustomDialogController | null = new CustomDialogController({
+    builder: ProxyCustomDialog({
       cancel: () => {
         this.onCancel()
       },
@@ -217,8 +217,8 @@ struct ProxyGroupItem {
         })
       MenuItem({ symbolStartIcon: this.startIconModifier3, content: $r('app.string.Delay_Speed') })
         .onClick(() => {
-          if (this.dialogController != null) {
-            this.dialogController.open()
+          if (this.ProxyDialogController != null) {
+            this.ProxyDialogController.open()
             this.isEnableIndexForegroundBlur=true
           }
         })

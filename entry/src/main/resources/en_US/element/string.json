@@ -739,6 +739,14 @@
     {
       "name": "Test_Speed_Explain",
       "value": "By CloundFlare"
+    },
+    {
+      "name": "Home_Save_Layout",
+      "value": "Do you want to save the current layout？"
+    },
+    {
+      "name": "Give_Up",
+      "value": "Give Up"
     }
   ]
 }

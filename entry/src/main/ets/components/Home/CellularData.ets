@@ -119,9 +119,9 @@ struct TrafficStatistics {
             .width('100%')
             .height('100%')
         }
-       .width('90%')
+        .width('90%')
         .backgroundColor('#4d46b1e3')
-         .height(this.barHeight.value)
+        .height(this.barHeight.value)
         .borderRadius(this.barHeight.value)
         .margin(this.barMargin.value)
         Text($r('app.string.CellularData_Statistics_explanation'))

@@ -739,6 +739,14 @@
     {
       "name": "Test_Speed_Explain",
       "value": "测速功能由CloundFlare提供"
+    },
+    {
+      "name": "Home_Save_Layout",
+      "value": "是否保存当前布局"
+    },
+    {
+      "name": "Give_Up",
+      "value": "放弃"
     }
   ]
 }
