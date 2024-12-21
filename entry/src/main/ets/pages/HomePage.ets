@@ -34,6 +34,9 @@ struct Home {
   /* 主题色 */
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
+  /* 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur')
+  private isEnableIndexForegroundBlur: boolean
   // 设置按钮导航
   @Provide('NavSettingsPathStack') SettingsPageInfos: NavPathStack = new NavPathStack()
   // 所有子组件在容器内的对齐方式 TODO 【用户首选项】在设置里可以更改 Alignment.BottomStart 和 Alignment.BottomEnd Enlin@2024-12-04
@@ -128,9 +131,11 @@ struct Home {
       console.log("dialog onWillDismiss")
       if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
         dismissDialogAction.dismiss()
+        this.isEnableIndexForegroundBlur=false
       }
       if (dismissDialogAction.reason == DismissReason.TOUCH_OUTSIDE) {
         dismissDialogAction.dismiss()
+        this.isEnableIndexForegroundBlur=false
       }
     },
     alignment: DialogAlignment.Center,
@@ -160,9 +165,6 @@ struct Home {
   private ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE // 按钮前Symbol动效
   // 定时器Controller
   private proxyStartedTimer: Timer = new Timer()
-  /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur')
-  private isEnableIndexForegroundBlur: boolean
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
   @State private gridMargin: number = 0
@@ -221,6 +223,7 @@ struct Home {
 
     //.backgroundColor(Color.White)
   }
+
 
   build() {
     Column() {
@@ -310,6 +313,7 @@ struct Home {
           .onClick(() => {
             if (this.SaveDialogController != null) {
               this.SaveDialogController.open()
+              this.isEnableIndexForegroundBlur = true
             }
           })
 
@@ -636,6 +640,9 @@ struct SaveCustomDialog {
   /* 主题色 */
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
+  /* 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur')
+  private isEnableIndexForegroundBlur: boolean
   controller?: CustomDialogController
   cancel: () => void = () => {
   }
@@ -658,6 +665,7 @@ struct SaveCustomDialog {
             if (this.controller != undefined) {
               this.controller.close()
             }
+            this.isEnableIndexForegroundBlur = false
           })
         Blank(8)
         Button($r('app.string.Save'))
@@ -668,6 +676,7 @@ struct SaveCustomDialog {
             if (this.controller != undefined) {
               this.controller.close()
             }
+            this.isEnableIndexForegroundBlur = false
           })
       }.padding({ top: 23 })
     }
