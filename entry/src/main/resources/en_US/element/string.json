@@ -753,6 +753,10 @@
       "value": "Collected⭐"
     },
     {
+      "name": "uncollected_tip",
+      "value": "Uncollected💔"
+    },
+    {
       "name": "Test_Delay_Tip",
       "value": "Delayed speed measurement, please wait..."
     }

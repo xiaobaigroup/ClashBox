@@ -1,5 +1,16 @@
+import {
+  ANIMATION_DURATION_300,
+  BIND_SHEET_DRAG_BAR_HEIGHT,
+  BIND_SHEET_TITLE_CONTAINER_HEIGHT,
+  BIND_SHEET_TITLE_LEFT_SYMBOL_HEIGHT,
+  BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT,
+  TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE,
+  FONT_SIZE_16
+} from "../common/Constants"
+
+
 /* bindSheet 里套 `Navigation`、`NavDestination`是的标题栏的替代品 START */
-// 前提：不使用NavDestination的标题栏.hideTitleBar(true)。不使用`bindSheet`的`dragBar`，仅使用`bindSheet`自带的`close`按钮。
+// XXX 前提：不使用NavDestination的标题栏.hideTitleBar(true)。不使用`bindSheet`的`dragBar`，仅使用`bindSheet`自带的`close`按钮。
 
 /*
  * 不在`.title`属性里设置这个`Builder`标题组件是因为`bindSheet`里使用NV的话，用自带返回按钮和标题栏的有很多问题，
@@ -8,14 +19,6 @@
  *    比如切换路由的时候返回按钮下面会短暂的变透明、给标题栏设置背景颜色后，自带的返回按钮依然是默认背景颜色
  *    由于api12没有单独隐藏返回按钮的api，所以v这是在直接隐藏了整个标题栏 `.hideTitleBar(true)` 的情况下使用的bindSheet套NV的通用标题栏
  */
-import {
-  BIND_SHEET_DRAG_BAR_HEIGHT,
-  BIND_SHEET_TITLE_CONTAINER_HEIGHT,
-  BIND_SHEET_TITLE_LEFT_SYMBOL_HEIGHT,
-  BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT,
-  TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE
-} from "../common/Constants"
-
 
 /* BindSheetTitleCustomBuilder 组件内菜单 */
 export interface BindSheetTitleCustomBuilderMenu{
@@ -94,7 +97,7 @@ export function BindSheetTitleCustomBuilder(param: BindSheetTitleCustomBuilderPa
         .lineHeight(24)
         .maxLines(1)
         .textOverflow({overflow: TextOverflow.MARQUEE})
-        .animation({ duration: 200, curve: Curve.Ease })
+        .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
       if (param?.subTitle != undefined && param.subTitle != ''){
         Text(param.subTitle)
           .fontSize(param.subTitleFontSize??14)
@@ -102,7 +105,7 @@ export function BindSheetTitleCustomBuilder(param: BindSheetTitleCustomBuilderPa
           .lineHeight(16)
           .maxLines(1)
           .textOverflow({overflow: TextOverflow.MARQUEE})
-          .animation({ duration: 200, curve: Curve.Ease })
+          .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
       }
     }
     .alignItems(HorizontalAlign.Start)
@@ -110,7 +113,7 @@ export function BindSheetTitleCustomBuilder(param: BindSheetTitleCustomBuilderPa
     .width(`calc(100% - ${(BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT + 10) * (param.menus.length + 1)}vp)`)
     .height(param.subTitle != null && param.subTitle != '' ? param.mainTitleFontSize * 2 : param.mainTitleFontSize )
     .padding({ left: param.isSubPage ? param.titlePaddingLeft??0 : 0 })
-    .animation({ duration: 200, curve: Curve.Ease })
+    .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
     // 主副标题 END
 
     // 菜单按钮 START
@@ -143,7 +146,104 @@ export function BindSheetTitleCustomBuilder(param: BindSheetTitleCustomBuilderPa
   .padding(param.isSubPage ? param.padding : 15 )
   .backgroundColor(param?.titleBackgroundColor)
   // .sharedTransition('configAddBindSheetTitle', { duration: 300, curve: Curve.Ease } )
-  // .animation({ duration: 200, curve: Curve.Ease })
+  // .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
 }
 
 /* bindSheet 里套 `Navigation`、`NavDestination`是的标题栏的替代品 START */
+
+
+/* `Confirm`类型的`CustomDialog` START */
+// XXX 注意副标题不要太长，否则副标题会折行到按钮组虾苗，则需要修改`Text`外层添加`Scroll`组件
+
+@CustomDialog
+export struct CustomConfirmDialog {
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
+
+  title: string = 'No Title!'
+  subTitle?: string
+
+  controller?: CustomDialogController
+  name? :string = ''
+  // 取消事件
+  cancel: () => void = () => {}
+  // 取消按钮 文本内容
+  cancelValue: string = 'Cancel'
+  // 取消按钮 字体颜色
+  cancelFontColor? : ResourceColor = $r('sys.color.warning')
+  // 取消按钮 按钮背景颜色
+  cancelButtonBackgroundColor?: ResourceColor = Color.Transparent
+  // 确认按钮 事件
+  confirm: () => void = () => {}
+  // 确认按钮 文本内容
+  confirmValue: string = 'Confirm'
+  // 确认按钮 按钮背景颜色
+  confirmButtonBackgroundColor?: ResourceColor = $r('sys.color.ohos_id_color_button_normal')
+
+
+  build() {
+    Column({ space: FONT_SIZE_16 }) {
+      // 主标题 START
+      Row(){
+        Text(this.title)
+          .fontSize(20)
+          .lineHeight(23)
+          .fontColor($r('sys.color.font_primary'))
+          .fontWeight(FontWeight.Bold)
+      }
+      // .height(55)
+      // 主标题 END
+
+      // 副标题 START
+      if (this?.subTitle) {
+        Row(){
+          Text(this.subTitle)
+            .fontSize(FONT_SIZE_16)
+            .lineHeight(20)
+            .fontColor($r('sys.color.font_secondary'))
+            .fontWeight(FontWeight.Bold)
+        }
+        // .height(55)
+      }
+      // 副标题 END
+
+      // Blank()
+
+      // 按钮组 START
+      Row(){
+        Button(this.cancelValue)
+          .width(144)
+          .fontSize(FONT_SIZE_16)
+          .fontColor(this.cancelFontColor)
+          .backgroundColor(this.cancelButtonBackgroundColor)
+          .onClick(() => {
+            if (this.controller != undefined) {
+              this.cancel()
+              this.controller.close()
+            }
+          })
+        Text(' ').width(8)
+        Button(this.confirmValue)
+          .width(144)
+          .height('100%')
+          .fontSize(FONT_SIZE_16)
+          .fontColor($r('sys.color.font_on_primary'))
+            // .backgroundColor(this?.confirmButtonBackgroundColor ?? $r('sys.color.comp_background_emphasize'))
+          .backgroundColor(this.icon_emphasize ?? $r('sys.color.comp_background_emphasize'))
+          .onClick(() => {
+            if (this.controller != undefined) {
+              this.confirm()
+              this.controller.close()
+            }
+          })
+      }
+      .height(40)
+      // 按钮组 END
+    }
+    .alignItems(HorizontalAlign.Center)
+    .padding( FONT_SIZE_16 )
+    .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
+  }
+}
+/* `Confirm`类型的`CustomDialog` END */

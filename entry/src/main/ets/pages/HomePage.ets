@@ -1,6 +1,6 @@
 //主页 栅格布局、媒体查询
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
-import { ThemeControl, window } from '@kit.ArkUI'
+import { PromptAction, ThemeControl, window } from '@kit.ArkUI'
 import SwitchMode from '../components/Home/SwitchMode'
 import CellularData from '../components/Home/CellularData'
 import CurrrentNode from '../components/Home/CurrentNode'
@@ -37,6 +37,8 @@ struct Home {
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
+  private promptAction:PromptAction = this.getUIContext()?.getPromptAction()
+
   // 设置按钮导航
   @Provide('NavSettingsPathStack') SettingsPageInfos: NavPathStack = new NavPathStack()
   // 所有子组件在容器内的对齐方式 TODO 【用户首选项】在设置里可以更改 Alignment.BottomStart 和 Alignment.BottomEnd Enlin@2024-12-04
@@ -126,18 +128,6 @@ struct Home {
     }),
     cancel: this.existApp,
     autoCancel: true,
-    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-      console.info("reason=" + JSON.stringify(dismissDialogAction.reason))
-      console.log("dialog onWillDismiss")
-      if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
-        dismissDialogAction.dismiss()
-        this.isEnableIndexForegroundBlur=false
-      }
-      if (dismissDialogAction.reason == DismissReason.TOUCH_OUTSIDE) {
-        dismissDialogAction.dismiss()
-        this.isEnableIndexForegroundBlur=false
-      }
-    },
     alignment: DialogAlignment.Center,
     //  offset: { dx: 0, dy: -20 },
     customStyle: false,
@@ -200,15 +190,35 @@ struct Home {
 
   // 在自定义组件即将析构销毁时将dialogController置空
   onCancel() {
-    console.info('Callback when the first button is clicked')
+    this.restoreLayout()
+    hilog.info(0xA000, this.componentName, '#onCancel: Callback when the first button is clicked')
   }
 
   onAccept() {
-    console.info('Callback when the second button is clicked')
+    this.saveHomeLayout()
+    hilog.info(0xA000, this.componentName, '#onAccept: Callback when the second button is clicked')
   }
 
   existApp() {
-    console.info('Click the callback in the blank area')
+    hilog.info(0xA000, this.componentName, '#existApp: Click the callback in the blank area')
+  }
+
+  /**
+   * 还原主页卡片布局
+   */
+  restoreLayout(){
+    // TODO 国际化
+    this.promptAction.showToast({ message: `布局已还原🫡` })
+    this.isShowHomeEdit = false
+  }
+
+  /**
+   * 保存主页卡片布局
+   */
+  saveHomeLayout(){
+    // TODO 国际化
+    this.promptAction.showToast({ message: `布局已保存💾` })
+    this.isShowHomeEdit = false
   }
 
   // 通过@Builder构建设置模态展示界面
@@ -236,17 +246,17 @@ struct Home {
               .margin({ left: this.gridMargin })
               .fontColor(this.font_primary)
             Blank()
-            if (!this.isShowHomeEdit) {//编辑布局按钮判定
+            if (!this.isShowHomeEdit) {
+              //编辑布局按钮判定：非编辑状态
               //编辑按钮
               Button({ type: ButtonType.Circle, stateEffect: true }) {
                 SymbolGlyph($r('sys.symbol.square_and_pencil'))
                   .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
                   .fontColor([this.icon_primary])
               }
+              .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:50}).combine(TransitionEffect.SLIDE))
               .onClick(() => {
-                animateTo({ duration: 1000 }, () => {
-                  this.isShowHomeEdit = true
-                })
+                this.isShowHomeEdit = true
               })
               .margin({ right: this.gridMargin })
               .width(40)
@@ -263,6 +273,7 @@ struct Home {
               .width(40)
               .height(40)
               .backgroundColor($r('app.color.settings_container_background'))
+              .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:0}).combine(TransitionEffect.SLIDE))
               .onClick(() => {
                 this.isShowSettings = true
                 this.isEnableIndexForegroundBlur = true
@@ -279,53 +290,54 @@ struct Home {
                   this.SettingsPageInfos.clear()
                 }
               })
-            }
-            else if (this.isShowHomeEdit) {//编辑布局按钮判定
-                //添加按钮
-                Button({ type: ButtonType.Circle, stateEffect: true }) {
-                  SymbolGlyph($r('sys.symbol.plus'))
-                    .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-                    .fontColor([Color.White])
+            } else {
+              //编辑布局按钮判定：是编辑状态
+              //添加按钮
+              Button({ type: ButtonType.Circle, stateEffect: true }) {
+                SymbolGlyph($r('sys.symbol.plus'))
+                  .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+                  .fontColor([Color.White])
 
-                }
-                .margin({ right: this.gridMargin })
-                .width(40)
-                .height(40)
-                .backgroundColor(this.icon_emphasize)
-
-                //保存按钮
-                Button({ type: ButtonType.Circle, stateEffect: true }) {
-                  SymbolGlyph($r('sys.symbol.save'))
-                    .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
-                    .fontColor([Color.White])
-                }
-                .margin({ right: this.gridMargin })
-                .width(40)
-                .height(40)
-                .backgroundColor(this.icon_emphasize)
-                .onClick(() => {
-                  if (this.SaveDialogController != null) {
-                    this.SaveDialogController.open()
-                    this.isEnableIndexForegroundBlur = true
-                  }
-                })
-
-                //取消按钮
-                Button({ type: ButtonType.Circle, stateEffect: true }) {
-                  SymbolGlyph($r('sys.symbol.xmark'))
-                    .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
-                    .fontColor([Color.White])
-                }
-                .margin({ right: this.gridMargin })
-                .width(40)
-                .height(40)
-                .backgroundColor(this.icon_emphasize)
-                .onClick(() => {
-                  animateTo({ duration: 1000 }, () => {
-                    this.isShowHomeEdit = false
-                  })
-                })
               }
+              .margin({ right: this.gridMargin })
+              .width(40)
+              .height(40)
+              .backgroundColor(this.icon_emphasize)
+              .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:100}).combine(TransitionEffect.SLIDE))
+
+              //保存按钮
+              Button({ type: ButtonType.Circle, stateEffect: true }) {
+                SymbolGlyph($r('sys.symbol.save'))
+                  .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
+                  .fontColor([Color.White])
+              }
+              .margin({ right: this.gridMargin })
+              .width(40)
+              .height(40)
+              .backgroundColor(this.icon_emphasize)
+              .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:50}).combine(TransitionEffect.SLIDE))
+              .onClick(() => {
+                this.saveHomeLayout()
+              })
+
+              //取消按钮
+              Button({ type: ButtonType.Circle, stateEffect: true }) {
+                SymbolGlyph($r('sys.symbol.xmark'))
+                  .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
+                  .fontColor([Color.White])
+              }
+              .margin({ right: this.gridMargin })
+              .width(40)
+              .height(40)
+              .backgroundColor(this.icon_emphasize)
+              .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:0}).combine(TransitionEffect.SLIDE))
+              .onClick(() => {
+                if (this.SaveDialogController != null) {
+                  this.SaveDialogController.open()
+                  this.isEnableIndexForegroundBlur = true
+                }
+              })
+            }
           }
           .width('100%')
           .margin({ bottom: 15 })
@@ -664,6 +676,7 @@ struct SaveCustomDialog {
             if (this.controller != undefined) {
               this.controller.close()
             }
+            this.cancel()
             this.isEnableIndexForegroundBlur = false
           })
         Blank(8)
@@ -675,6 +688,7 @@ struct SaveCustomDialog {
             if (this.controller != undefined) {
               this.controller.close()
             }
+            this.confirm()
             this.isEnableIndexForegroundBlur = false
           })
       }.padding({ top: 23 })

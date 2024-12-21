@@ -10,6 +10,7 @@ import {
   FONT_SIZE_14,
   CONFIG_AUTO_UPDATE_TIME_GAT_STRING_ARR,
   LIST_ITEM_HEIGHT,
+  ANIMATION_DURATION_300,
 } from "../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { PromptAction } from "@kit.ArkUI"
@@ -132,11 +133,11 @@ export struct ConfigInfo{
               Toggle({ type: ToggleType.Switch, isOn: this.configData.isConfigAutoUpdate })
                 .selectedColor(this.icon_emphasize)
                 .onChange((isOn: boolean) => {
-                  hilog.info(0xCA11, this.componentName, `#ListItem#Toggle#自动更新状态: ${isOn}`)
+                  hilog.info(0xCA1A, this.componentName, `#ListItem#Toggle#自动更新状态: ${isOn}`)
                   focusControl.requestFocus('text_input_auto_update_time')
                   // 自动更新间隔 显式动画
                   this.getUIContext()?.animateTo({
-                    duration: 200
+                    duration: ANIMATION_DURATION_300
                   }, () => {
                     this.configData.isConfigAutoUpdate = isOn
                   })
@@ -155,7 +156,7 @@ export struct ConfigInfo{
           .onClick( ()=> {
             // 自动更新间隔 显式动画
             this.getUIContext()?.animateTo({
-              duration: 200
+              duration: ANIMATION_DURATION_300
             }, () => {
               this.configData.isConfigAutoUpdate = !this.configData.isConfigAutoUpdate
             })
@@ -221,7 +222,7 @@ export struct ConfigInfo{
                       let ctx = this.getUIContext()
                       if (event.type === TouchType.Down) {
                         ctx.animateTo({
-                          duration: 200,
+                          duration: ANIMATION_DURATION_300,
                           curve: Curve.Ease
                         }, () => {
                           this.heightOfTextPickerInTheListItem = 100
@@ -238,7 +239,7 @@ export struct ConfigInfo{
                         })
                       } else if (event.type === TouchType.Up){
                         ctx.animateTo({
-                          duration: 200,
+                          duration: ANIMATION_DURATION_300,
                           curve: Curve.Ease
                         }, () => {
                           this.heightOfTextPickerInTheListItem = LIST_ITEM_HEIGHT
@@ -250,7 +251,7 @@ export struct ConfigInfo{
                         })
                       }
                     })
-                    // .animation({ duration: 200, curve: Curve.Ease })
+                    // .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
                 }
                 .width('auto')
               }.width('100%').alignItems(VerticalAlign.Center)
@@ -259,7 +260,7 @@ export struct ConfigInfo{
             .padding(LIST_ITEM_PADDING)
             .borderRadius(BORDER_RADIUS_20)
             .clickEffect({ level: ClickEffectLevel.MIDDLE })
-            .animation({ duration: 200, curve: Curve.Ease })
+            .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
           }
           // 自动更新间隔 END
 
@@ -292,12 +293,12 @@ export struct ConfigInfo{
   }
 
   aboutToAppear(): void {
-    hilog.info(0xCA11, this.componentName, `#aboutToAppear executed`)
+    hilog.info(0xCA1A, this.componentName, `#aboutToAppear executed`)
     // this.getConfigAutoUpdateMenuStringArr()
   }
 
   aboutToDisappear(): void {
-    hilog.info(0xCA11, this.componentName, `#aboutToDisappear executed`)
+    hilog.info(0xCA1A, this.componentName, `#aboutToDisappear executed`)
   }
 
   /**
@@ -305,7 +306,7 @@ export struct ConfigInfo{
    * @param changedPropertyName
    */
   /*languageChange(changedPropertyName: string) {
-    hilog.info(0xCA11, this.componentName, `#languageChange#监听到系统语言发生改变: ${this.currentLanguage}`)
+    hilog.info(0xCA1A, this.componentName, `#languageChange#监听到系统语言发生改变: ${this.currentLanguage}`)
     // this.getConfigAutoUpdateMenuStringArr()
     // 更换语言之后更换`TextPicker`显示的文本
     // this.configAutoUpdateTimeGapTextPickerSelectedValue = this.configAutoUpdateMenuStringArr[this.configAutoUpdateTimeGapTextPickerSelectedIndex]
@@ -321,11 +322,11 @@ export struct ConfigInfo{
     try {
       let resourceManager = this.getUIContext().getHostContext()?.resourceManager
       let configAutoUpdateTimeGapStringArr = resourceManager?.getStringArrayValueSync($r('app.strarray.config_auto_update_text_picker').id) as Array<string>
-      hilog.info(0xCA11, this.componentName, `#aboutToAppear#getStringArrayValueSync($r('app.strarray.config_auto_update_menu')#configAutoUpdateMenuStringArr: index[${configAutoUpdateTimeGapStringArr.length}], value [${configAutoUpdateTimeGapStringArr}])}`)
+      hilog.info(0xCA1A, this.componentName, `#aboutToAppear#getStringArrayValueSync($r('app.strarray.config_auto_update_menu')#configAutoUpdateMenuStringArr: index[${configAutoUpdateTimeGapStringArr.length}], value [${configAutoUpdateTimeGapStringArr}])}`)
       if (configAutoUpdateTimeGapStringArr.length <= 0) {
         // TODO 国际化
         this.promptAction.showToast({message: `菜单数据获取失败！`})
-        hilog.error(0xCA11, this.componentName, `#aboutToAppear#getStringArrayValueSync($r('app.strarray.config_auto_update_menu')#ERROR: 配置自动更新时间间隔菜单数据获取数据为空！`)
+        hilog.error(0xCA1A, this.componentName, `#aboutToAppear#getStringArrayValueSync($r('app.strarray.config_auto_update_menu')#ERROR: 配置自动更新时间间隔菜单数据获取数据为空！`)
       } else {
         // 给菜单赋值
         configAutoUpdateTimeGapStringArr.forEach( (item: string, index) => {
@@ -334,7 +335,7 @@ export struct ConfigInfo{
       }
     } catch (e) {
       let error = e as BusinessError;
-      hilog.error(0xCA11, this.componentName, `#aboutToAppear#getStringArrayValueSync($r('app.strarray.config_auto_update_menu')#ERROR: code is [${error.code}],message is [${error.message}]`)
+      hilog.error(0xCA1A, this.componentName, `#aboutToAppear#getStringArrayValueSync($r('app.strarray.config_auto_update_menu')#ERROR: code is [${error.code}],message is [${error.message}]`)
     }
   }*/
 

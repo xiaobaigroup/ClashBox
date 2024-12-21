@@ -19,6 +19,15 @@ export interface UserPreferences{
 
 
 /* 配置 */
+// 配置来源类型
+export enum ConfigDataSource{
+  URL,
+  QR_CODE,
+  FILE,
+  BLANK_FILE,
+  COPY
+}
+
 // 配置 -> 新增配置时的传输数据
 export interface ConfigData{
   // 配置id
@@ -43,6 +52,13 @@ export interface ConfigData{
   trafficUsed?: string
   // 所有流量
   trafficTotal?: string
+  // 是否收藏
+  isFavorite?: boolean
+  // 配置来源类型
+  source?: ConfigDataSource
+  // 副本源配置id
+  copySourceConfigId?: string
+
 
   // 代理列表 TODO 还用不到 先设为可选属性
   proxyList?: Array<ProxyData>

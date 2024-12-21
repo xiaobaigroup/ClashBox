@@ -69,15 +69,6 @@ export struct ImportConfigFromQRcode{
       Column() {
         Text(this.componentName).fontSize(50)
         Text(`breakPointStateNavigationListPadding.value is [${this.breakPointStateNavigationListPadding.value?.toString()}]`)
-        Button() {
-          Text('getAllPathName')
-        }
-        .width('auto')
-        .height('auto')
-        .onClick(() => {
-          hilog.info(0xC020, this.componentName, `#Button#NavPathStack.getAllPathName(), result is: ${JSON.stringify(this.configAddPageInfos.getAllPathName())}`)
-        }).margin({ bottom: 91 })
-
       }.width('100%').height('auto').backgroundColor('#ffd43400').alignItems(HorizontalAlign.Start)
       // END
     }
@@ -93,10 +84,10 @@ export struct ImportConfigFromQRcode{
   }
 
   aboutToAppear(): void {
-    hilog.info(0xCA20, this.componentName, `#aboutToAppear executed`)
+    hilog.info(0xCB10, this.componentName, `#aboutToAppear executed`)
   }
 
   aboutToDisappear(): void {
-    hilog.info(0xCA20, this.componentName, `#aboutToDisappear`)
+    hilog.info(0xCB10, this.componentName, `#aboutToDisappear`)
   }
 }

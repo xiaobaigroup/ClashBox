@@ -16,7 +16,8 @@ import { LengthMetrics, PromptAction, SymbolGlyphModifier } from '@kit.ArkUI'
 import { ConfigAdd } from '../components/Configuration/ConfigAdd'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
-import { ConfigData } from '../common/PageArgumentEntity'
+import { ConfigData, ConfigDataSource } from '../common/PageArgumentEntity'
+import { CustomConfirmDialog } from '../components/Common'
 
 /**
  * 长按菜单参数
@@ -73,8 +74,10 @@ struct ConfigurationPage {
     configURL: '',
     isConfigAutoUpdate: false
   }
-  // 当前手指触摸的ListItem的对应 `this.configList` 中的 `configName`
-  @State
+  /**
+   * XXX 当前手指触摸的ListItem的对应 `this.configList` 中的 `configName`
+   *    List的长按菜单中的响应都是根据这个的对象中的属性来处理的，是个不稳定因素
+   */
   private currentTouchConfigData: ConfigData = {
     configId: '',
     isNewConfig: false,
@@ -85,6 +88,7 @@ struct ConfigurationPage {
 
   /* 配置页面内ListItem长按ContextMenu相关 */
   // TODO 删除 临时模拟数据配置列表数据
+  @State
   private configList: Array<ConfigData> = [
     {
       configId: 'SS-Youtube速度快',
@@ -97,7 +101,9 @@ struct ConfigurationPage {
       createdDate: new Date('2024-05-21 21:21:21'),
       lastUpdateDateTime: new Date('2024-12-18 17:51:00'),
       trafficUsed: '1329.43GB',
-      trafficTotal: '5000GB'
+      trafficTotal: '5000GB',
+      isFavorite: false,
+      source: ConfigDataSource.URL,
     },
     {
       configId: 'Trojan-INS专用',
@@ -110,7 +116,9 @@ struct ConfigurationPage {
       createdDate: new Date('2023-12-20 04:14:35'),
       lastUpdateDateTime: new Date('2024-12-18 15:00:00'),
       trafficUsed: '234.42GB',
-      trafficTotal: '700GB'
+      trafficTotal: '700GB',
+      isFavorite: true,
+      source: ConfigDataSource.QR_CODE,
     },
     {
       configId: 'VMess-TikTok专用',
@@ -121,52 +129,104 @@ struct ConfigurationPage {
       createdDate: new Date('2024-06-16 12:34:56'),
       lastUpdateDateTime: new Date('2024-12-18 12:00:00'),
       trafficUsed: '874.04GB',
-      trafficTotal: '2000GB'
+      trafficTotal: '2000GB',
+      isFavorite: true,
+      source: ConfigDataSource.COPY,
     },
     {
-    configId: 'VMess-TG专用',
-    isNewConfig: false,
-    configName: 'VMess-TG专用',
-    configURL: 'https://telegram-vmess.enlin.com',
-    isConfigAutoUpdate: true,
-    configAutoUpdateTimeGapValue: 7,
-    configAutoUpdateTimeGapTextPickerIndex: 2,
-    createdDate: new Date('2024-01-01 12:24:34'),
-    lastUpdateDateTime: new Date('2024-12-19 08:00:00'),
-    trafficUsed: '34.05GB',
-    trafficTotal: '800GB'
-  },
-  ]
-  // ContextMenu列表项集合 TODO 国际化
-  @State
-  private configListLongPressCtxMenus: Array<LongPressContextMenuItem> = [
-    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.star'))
-        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-      content: '收藏', callback: ()=>{this.favoriteConfig()}
+      configId: 'VMess-TG专用',
+      isNewConfig: false,
+      configName: 'VMess-TG专用',
+      configURL: 'https://telegram-vmess.enlin.com',
+      isConfigAutoUpdate: true,
+      configAutoUpdateTimeGapValue: 7,
+      configAutoUpdateTimeGapTextPickerIndex: 2,
+      createdDate: new Date('2024-01-01 12:24:34'),
+      lastUpdateDateTime: new Date('2024-12-19 08:00:00'),
+      trafficUsed: '34.05GB',
+      trafficTotal: '800GB',
+      isFavorite: false,
+      source: ConfigDataSource.QR_CODE,
     },
+  ]
+
+  // ContextMenu 收藏&取消收藏列表项集合
+  // private configListLongPressCtxMenusForFavorite: Array<LongPressContextMenuItem> = []
+  // ContextMenu 列表项 动态替换用
+  private configListLongPressCtxMenuForUnFavorite: LongPressContextMenuItem = {
+    symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.star_fill'))
+      .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.multi_color_11')]),
+    content: '取消收藏', callback: ()=>{ this.cancelFavoriteConfig() }
+  }
+  private configListLongPressCtxMenuForFavorite: LongPressContextMenuItem = {
+    symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.star'))
+      .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
+    content: '收藏', callback: ()=>{ this.favoriteConfig() }
+  }
+  // ContextMenu列表项集合 TODO 国际化
+  private configListLongPressCtxMenus: Array<LongPressContextMenuItem> = [
+    // { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.star'))
+    //     .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
+    //   content: '收藏', callback: ()=>{this.favoriteConfig()}
+    // },
     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.square_and_pencil'))
         .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
       content: '编辑', callback: ()=>{this.editConfig()}
     },
     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.arrow_clockwise'))
         .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-      content: '更新', callback: ()=>{this.updateConfig()}
+      content: '更新', callback: ()=>{this.updateConfig(this.currentTouchConfigData.configId)}
     },
     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.share'))
         .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-      content: '分享', callback: ()=>{this.shareConfig()}
+      content: '分享链接', callback: ()=>{this.shareConfigURL()}
     },
     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.qrcode'))
         .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
       content: '生成二维码', callback: ()=>{this.generateQRcode()}
     },
+    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.doc_text'))
+      .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
+      content: '导出配置文件', callback: ()=>{this.generateQRcode()}
+    },
+    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.plus_square_on_square'))
+      .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
+      content: '创建副本', callback: ()=>{this.generateQRcode()}
+    },
   ]
   // 配置页面ListItem的长按ContextMenu的Builder
   @Builder
-  configListLongPressCtxMenuBuilder() {
+  configListLongPressCtxMenuBuilder(isFavorite:boolean) {
     // 当菜单过多（横屏时），自身的滚动条不支持回弹，套一层Scroll
     Scroll(){
       Menu() {
+        // 根据当前配置信息来判断显示[收藏 /取消收藏] 单独处理 START
+        if (isFavorite) {
+          MenuItem({
+            symbolStartIcon: this.configListLongPressCtxMenuForUnFavorite.symbolStartIcon!
+              .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
+            content: this.configListLongPressCtxMenuForUnFavorite.content
+          })
+            .clickEffect({level: ClickEffectLevel.MIDDLE})
+            .contentFontColor($r('sys.color.font_primary'))
+            .onClick( () => {
+              this.configListLongPressCtxMenuForUnFavorite.callback()
+            })
+        } else {
+          MenuItem({
+            symbolStartIcon: this.configListLongPressCtxMenuForFavorite.symbolStartIcon!
+              .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
+            content: this.configListLongPressCtxMenuForFavorite.content
+          })
+            .clickEffect({level: ClickEffectLevel.MIDDLE})
+            .contentFontColor($r('sys.color.font_primary'))
+            .onClick( () => {
+              this.configListLongPressCtxMenuForFavorite.callback()
+            })
+        }
+        // 根据当前配置信息来判断显示[收藏 /取消收藏] 单独处理 END
+
+        // 遍历其他菜单 START
         ForEach(this.configListLongPressCtxMenus, (item: LongPressContextMenuItem, index: number) => {
           MenuItem({ symbolStartIcon: item?.symbolStartIcon, content: item?.content })
             .clickEffect({level: ClickEffectLevel.MIDDLE})
@@ -176,27 +236,67 @@ struct ConfigurationPage {
               item.callback()
             })
         })
-        // 文字红色 单独处理
+        // 遍历其他菜单 END
+
+        // 删除配置 文字红色 单独处理 START
+        // 删除配置 文字红色 单独处理 START
         MenuItem({
           symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.trash_fill'))
             .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
             .fontColor(['#E6E54E36']),
+          // TODO 国际化
           content: '删除'
         })
+          .clickEffect({level: ClickEffectLevel.MIDDLE})
           .contentFontColor('#E6E54E36')
           .onClick( () => {
-            this.deleteConfig()
+            this.configCustomDialogController?.open()
+            this.isEnableIndexForegroundBlur = true
           })
+        // 删除配置 文字红色 单独处理 END
       }
       .backgroundColor($r('app.color.container_background'))
       .borderRadius(BORDER_RADIUS_20)
       .menuItemDivider({ strokeWidth: LengthMetrics.vp(.4), color: $r('sys.color.comp_divider') })
       .width(200)
       .height('auto')
+      .transition(TransitionEffect.asymmetric(TransitionEffect.move(TransitionEdge.END), TransitionEffect.move(TransitionEdge.START))
+        .animation({ duration: 300, curve: Curve.Ease })
+        .combine(TransitionEffect.OPACITY)
+      )
     }
     .nestedScroll({scrollForward: NestedScrollMode.SELF_FIRST, scrollBackward: NestedScrollMode.SELF_FIRST})
     .edgeEffect(EdgeEffect.Spring)
   }
+  /* 自定义弹框 */
+  // 配置是否保存弹框 Controller定义
+  private configCustomDialogController: CustomDialogController | null= new CustomDialogController({
+    builder: CustomConfirmDialog({
+      // TODO 国际化
+      title: '是否删除当前配置？',
+      cancelValue: '删除',
+      confirmValue: '取消',
+      cancelButtonBackgroundColor: Color.Transparent,
+      // 不可以使用`@Consume`注解的变量
+      // confirmButtonBackgroundColor: this.icon_emphasize,
+      cancel: () => {
+        this.isEnableIndexForegroundBlur = false
+        // TODO 国际化
+        this.promptAction.showToast({ message: `就知道是你点错喽~` })
+      },
+      confirm: ()=> {
+        this.isEnableIndexForegroundBlur = false
+        this.deleteConfig()
+      }
+    }),
+    cancel: () => {
+      this.isEnableIndexForegroundBlur = false
+    },
+    autoCancel: true,
+    alignment: DialogAlignment.Center,
+    width: 328,
+    backgroundColor: $r('app.color.list_item_background_color'),
+  })
 
   /* Stack层叠布局 */
   // 所有子组件在容器内的对齐方式 TODO 【用户首选项】在设置里可以更改 Alignment.BottomStart 和 Alignment.BottomEnd Enlin@2024-12-04
@@ -250,8 +350,8 @@ struct ConfigurationPage {
           .onClick(() => {
             // TODO 国际化适配 更新配置中... 更新配置成功
             // TODO 调用 更新配置api
-            this.promptAction.showToast({ message: `配置更新中...` })
             hilog.info(0xC001, this.componentName, `#button#onClick()#更新配置`)
+            this.updateConfig()
           })
         }
         .alignItems(VerticalAlign.Center)
@@ -293,7 +393,7 @@ struct ConfigurationPage {
             .clickEffect({ level: ClickEffectLevel.MIDDLE })
             .borderRadius(BORDER_RADIUS_20)
             .hoverEffect(HoverEffect.Scale)
-            .bindContextMenu(this.configListLongPressCtxMenuBuilder, ResponseType.LongPress | ResponseType.RightClick,
+            .bindContextMenu(this.configListLongPressCtxMenuBuilder(item?.isFavorite ?? false), ResponseType.LongPress | ResponseType.RightClick,
               {
                 preview: MenuPreviewMode.IMAGE,
                 previewAnimationOptions: { scale: [1.0, 1.1] },
@@ -360,12 +460,13 @@ struct ConfigurationPage {
         .bindSheet( this.isShowConfigAddBindSheet, this.ConfigAddBindSheetBuilder, {
           // title: { title: $r('app.string.AddConfig') },
           detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT, ],// SheetSize.LARGE
-          backgroundColor: $r('app.color.container_background'),
+          // backgroundColor: $r('app.color.container_background'),
+          backgroundColor: $r('app.color.background'),
           showClose: true,
           dragBar: false,
           preferType: SheetType.CENTER,
           // blurStyle: BlurStyle.COMPONENT_ULTRA_THICK,
-          blurStyle: BlurStyle.BACKGROUND_REGULAR,
+          // blurStyle: BlurStyle.BACKGROUND_REGULAR,
           scrollSizeMode: ScrollSizeMode.CONTINUOUS,
           // width: ('100%'),
           /**
@@ -414,10 +515,16 @@ struct ConfigurationPage {
 
   aboutToAppear(): void {
     hilog.info(0xC000, this.componentName, `#aboutToAppear executed`)
+    for (let i = 0; i < this.configList.length; i++) {
+
+    }
   }
 
   aboutToDisappear(): void {
     hilog.info(0xC000, this.componentName, `#aboutToDisappear executed`)
+    this.configCustomDialogController = null
+    this.isEnableIndexForegroundBlur = false
+    hilog.info(0xC000, this.componentName, `#aboutToDisappear#置空[配置页\`bindSheet\`内提示是否删除配置信息的自定义弹框]`)
   }
 
   /**
@@ -435,18 +542,27 @@ struct ConfigurationPage {
   /**
    * 拉起配置编辑页 并传参
    */
-  pushEditConfigRoute2BindSheet(){
+  private pushEditConfigRoute2BindSheet(){
     this.pushDestinationByName(RouteName.ImportConfigFromURL, this.currentTouchConfigData)
   }
 
   /**
    * 收藏配置
    */
-  favoriteConfig(): void {
+  private favoriteConfig(): void {
     // TODO 收藏配置 & 判断是否已经收藏
-    this.promptAction.showToast({message: `已收藏⭐`})
-    // this.promptAction.showToast({message: `已经收藏过了哦~⭐`})
+    this.promptAction.showToast({ message: $r('app.string.Collect_Tip') })
     hilog.info(0xC010, this.componentName, `#favoriteConfig#收藏配置: configName is [${this.currentTouchConfigData.configName}]`)
+    this.currentTouchConfigData.isFavorite = true
+  }
+  /**
+   * 取消收藏配置
+   */
+  private cancelFavoriteConfig(): void {
+    // TODO 取消收藏配置 & 判断是否已经收藏
+    this.promptAction.showToast({ message: $r('app.string.uncollected_tip') })
+    hilog.info(0xC010, this.componentName, `#favoriteConfig#取消收藏配置: configName is [${this.currentTouchConfigData.configName}]`)
+    this.currentTouchConfigData.isFavorite = false
   }
   /**
    * 编辑配置
@@ -460,32 +576,48 @@ struct ConfigurationPage {
   /**
    * 更新配置
    */
-  private updateConfig(): void {
+  private updateConfig(configId?: string): void {
     // TODO 调用更新配置消息api
     this.promptAction.showToast({message: `配置更新中...`})
-    hilog.info(0xC012, this.componentName, `#updateConfig#更新配置: configName is [${this.currentTouchConfigData.configName}]`)
+    if (configId){
+      // TODO 单个配置更新
+      hilog.info(0xC012, this.componentName, `#updateConfig#更新配置{单个}: configName is [${this.currentTouchConfigData.configName}], configId is [${this.currentTouchConfigData.configId}]`)
+    } else {
+      // TODO 所有配置更新
+      hilog.info(0xC012, this.componentName, `#updateConfig#更新配置{所有}`)
+    }
   }
   /**
-   * 分享配置
+   * 分享配置的URL
    */
-  shareConfig(): void {
-    // TODO 处理待分享数据 并调用系统分享接口
+  private shareConfigURL(): void {
+    // TODO 处理待分享数据 并调用系统分享接口 只有URL导入的配置才可以分享链接
+    this.promptAction.showToast({ message: `只有URL导入的配置才可以分享链接` })
     hilog.info(0xC013, this.componentName, `#shareConfig#分享配置: configName is [${this.currentTouchConfigData.configName}]`)
   }
   /**
-   * 生成配置二维码
+   * 生成配置的URL转成的二维码
+   *    1. URL & 二维码 导入的配置用对应URL生成二维码
+   *    2. 其他方式导入的配置不能生成二维码
    */
-  generateQRcode(): void {
-    // TODO 弹出bindSheet 在其中实现“配置url”生成二维码的功能
+  private generateQRcode(): void {
+    // TODO 弹框CustomDialog，在其中实现“配置url”生成二维码的功能
     hilog.info(0xC014, this.componentName, `#generateQRcode#生成二维码: configName is [${this.currentTouchConfigData.configName}]`)
+  }
+  /**
+   * 导出配置
+   */
+  private exportConfig(): void {
+    // TODO 删除用户首选项里的此配置
+    hilog.info(0xC015, this.componentName, `#deleteConfig#删除配置: configName is [${this.currentTouchConfigData.configName}]`)
   }
   /**
    * 删除配置
    */
-  deleteConfig(): void {
+  private deleteConfig(): void {
     // TODO 删除用户首选项里的此配置
-    // TODO 弹confirm框确认是否删除？
-    hilog.info(0xC015, this.componentName, `#deleteConfig#删除配置: configName is [${this.currentTouchConfigData.configName}]`)
+    this.promptAction.showToast({ message: `已删除配置💔` })
+    hilog.info(0xC016, this.componentName, `#deleteConfig#删除配置: configName is [${this.currentTouchConfigData.configName}]`)
   }
 
 }

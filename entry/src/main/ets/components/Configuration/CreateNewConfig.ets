@@ -85,10 +85,10 @@ export struct CreateNewConfig{
   }
 
   aboutToAppear(): void {
-    hilog.info(0xCA40, this.componentName, `#aboutToAppear executed`)
+    hilog.info(0xCD10, this.componentName, `#aboutToAppear executed`)
   }
 
   aboutToDisappear(): void {
-    hilog.info(0xCA40, this.componentName, `#aboutToDisappear executed`)
+    hilog.info(0xCD10, this.componentName, `#aboutToDisappear executed`)
   }
 }

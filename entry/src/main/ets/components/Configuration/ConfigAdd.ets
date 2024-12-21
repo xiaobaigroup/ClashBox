@@ -1,5 +1,6 @@
 import { BreakpointState } from "../../common/breakpointsystem";
 import {
+  ANIMATION_DURATION_300,
   BIND_SHEET_CONTAINER_HEIGHT,
   BIND_SHEET_DRAG_BAR_HEIGHT,
   BIND_SHEET_MAIN_FONTSIZE,
@@ -131,18 +132,8 @@ export struct ConfigAdd {
       .hideBackButton(true)
       .navBarWidthRange([255, '100%'])
       .foregroundBlurStyle(this.isEnableConfigPageBindSheetForegroundBlur ? BlurStyle.Thin : BlurStyle.NONE,{ colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: .3 })
-      .animation({ duration: 200, curve: Curve.Ease })
+      .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
       // NV路由 END
-
-      Button() {
-        Text('getAllPathName')
-      }
-      .width('auto')
-      .height('auto')
-      .onClick(() => {
-        hilog.info(0xC020, this.componentName, `#Button#NavPathStack.getAllPathName(), result is: ${JSON.stringify(this.configAddPageInfos.getAllPathName())}`)
-      }).margin({ bottom: 91 })
-
     }
     .height('auto')
     // .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK, { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 1.0 })

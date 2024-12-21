@@ -15,7 +15,8 @@ import {
   morePageMargin_12_14_16,
   morePagelistBottom_10_14,
   listHeight_610_590,
-  SettingslistHeight_590_500
+  SettingslistHeight_590_500,
+  ANIMATION_DURATION_300
 } from '../common/Constants'
 import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
@@ -272,6 +273,6 @@ struct Index {
       { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: .3 }
     )
     .padding({ top: px2vp(this.topRectHeight) - 5, bottom: px2vp(this.bottomRectHeight) })
-    .animation({ duration: 200, curve: Curve.Ease })
+    .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
   }
 }

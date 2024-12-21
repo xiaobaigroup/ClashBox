@@ -753,6 +753,10 @@
       "value": "已收藏⭐"
     },
     {
+      "name": "uncollected_tip",
+      "value": "已取消收藏💔"
+    },
+    {
       "name": "Test_Delay_Tip",
       "value": "延迟测速中，请稍后..."
     }

@@ -5,6 +5,7 @@ import {
   BIND_SHEET_DRAG_BAR_HEIGHT,
   BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT,
   RouteName,
+  ANIMATION_DURATION_300,
 } from "../../common/Constants"
 import { BindSheetTitleCustomBuilder, BindSheetTitleCustomBuilderMenu } from "../Common"
 import { hilog } from "@kit.PerformanceAnalysisKit"
@@ -12,7 +13,7 @@ import { ConfigInfo } from "./ConfigInfo"
 import { PromptAction } from "@kit.ArkUI"
 import { ConfigData } from "../../common/PageArgumentEntity"
 import { util } from "@kit.ArkTS"
-import { ConfigCustomDialog } from './ConfigCustomDialog'
+import { CustomConfirmDialog } from '../Common'
 import { BusinessError } from "@kit.BasicServicesKit"
 
 
@@ -90,9 +91,14 @@ export struct ImportConfigFromURL{
   /* 自定义弹框 */
   // 配置是否保存弹框 Controller定义
   private configCustomDialogController: CustomDialogController | null= new CustomDialogController({
-    builder: ConfigCustomDialog({
+    builder: CustomConfirmDialog({
+      // TODO 国际化
+      title: '是否保存当前配置？',
+      cancelValue: '取消',
+      confirmValue: '保存',
       cancelButtonBackgroundColor: Color.Transparent,
-      // confirmButtonBackgroundColor: this.icon_emphasize_copy,
+      // 不可以使用`@Consume`注解的变量
+      // confirmButtonBackgroundColor: this.icon_emphasize,
       cancel: () => {
         this.isEnableConfigPageBindSheetForegroundBlur = false
         this.configAddPageInfos.pop(true)
@@ -170,7 +176,7 @@ export struct ImportConfigFromURL{
         }
       }
     })
-    .animation({ duration: 200, curve: Curve.Ease })
+    .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
 
   }
 
@@ -184,13 +190,13 @@ export struct ImportConfigFromURL{
     // 自定义弹框 清空
     this.configCustomDialogController = null
     this.isEnableConfigPageBindSheetForegroundBlur = false
-    hilog.info(0xCA10, this.componentName, `#aboutToDisappear#置空[配置页bindSheet内提示是否保存配置信息的自定义弹框]`)
+    hilog.info(0xCA10, this.componentName, `#aboutToDisappear#置空[配置页\`bindSheet\`内提示是否保存配置信息的自定义弹框]`)
   }
 
   /**
    * TODO 保存配置
    */
-  saveConfig(isNewConfig: boolean){
+  async saveConfig(isNewConfig: boolean){
     if (isNewConfig) {
       this.promptAction.showToast({ message: `保存中...` })
       // this.menus.push({ symbol: $r('sys.symbol.heart') })
@@ -236,6 +242,6 @@ export struct ImportConfigFromURL{
    */
   checkAllInputHaveValue() {
     this.allInputHaveValue = (this.configData.configName.length > 0 && this.configData.configURL.length > 0)
-    hilog.info(0xCA11, this.componentName, `#checkAllInputHaveValue is [${this.allInputHaveValue}]}`)
+    hilog.info(0xCA12, this.componentName, `#checkAllInputHaveValue is [${this.allInputHaveValue}]}`)
   }
 }
