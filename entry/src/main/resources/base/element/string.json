@@ -747,6 +747,14 @@
     {
       "name": "Give_Up",
       "value": "放弃"
+    },
+    {
+      "name": "Collect_Tip",
+      "value": "已收藏⭐"
+    },
+    {
+      "name": "Test_Delay_Tip",
+      "value": "延迟测速中，请稍后..."
     }
   ]
 }

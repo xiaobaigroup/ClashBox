@@ -1,10 +1,9 @@
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem'
 import { BIND_SHEET_CONTAINER_HEIGHT, LIST_ITEM_HEIGHT } from '../../common/Constants'
-import { LengthMetrics, SymbolGlyphModifier } from '@kit.ArkUI';
+import { LengthMetrics, SymbolGlyphModifier,PromptAction } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
 import { Item } from '../../pages/ProxyPage';
-
 //断点布局
 export const BPS_LIST_LANES_2_2_3_4_4: BreakpointState<number> = BreakpointState.of({
   xs: 2,
@@ -188,14 +187,17 @@ struct ProxyGroupItem {
   existApp() {
     console.info('Click the callback in the blank area')
   }
-
+//收藏与ping延迟即时动作
+  private ProxyPromptAction:PromptAction = this.getUIContext()?.getPromptAction()
   //长按菜单 start
   @Builder
   //长按菜单相关
   MyMenu() {
     Menu() {
       MenuItem({ symbolStartIcon: this.startIconModifier, content: $r('app.string.Collect') })
+        .onClick(()=>{this.ProxyPromptAction.showToast({ message: $r('app.string.Collect_Tip') })})
       MenuItem({ symbolStartIcon: this.startIconModifier1, content: $r('app.string.Test_Delay') })
+        .onClick(()=>{this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })})
       MenuItem({ symbolStartIcon: this.startIconModifier2, content: $r('app.string.Test_Speed') })
         .onClick(() => {
           this.isShowNetworkSpeed = true

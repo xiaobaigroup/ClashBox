@@ -747,6 +747,14 @@
     {
       "name": "Give_Up",
       "value": "Give Up"
+    },
+    {
+      "name": "Collect_Tip",
+      "value": "Collected⭐"
+    },
+    {
+      "name": "Test_Delay_Tip",
+      "value": "Delayed speed measurement, please wait..."
     }
   ]
 }
