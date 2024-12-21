@@ -592,7 +592,11 @@ struct ConfigurationPage {
    */
   private shareConfigURL(): void {
     // TODO 处理待分享数据 并调用系统分享接口 只有URL导入的配置才可以分享链接
-    this.promptAction.showToast({ message: `只有URL导入的配置才可以分享链接` })
+    if (this.currentTouchConfigData.source === ConfigDataSource.URL || this.currentTouchConfigData.source === ConfigDataSource.QR_CODE) {
+      this.promptAction.showToast({ message: `TODO 拉起系统分享` })
+    } else {
+      this.promptAction.showToast({ message: `此配置不可分享链接，您可导出配置文件` })
+    }
     hilog.info(0xC013, this.componentName, `#shareConfig#分享配置: configName is [${this.currentTouchConfigData.configName}]`)
   }
   /**
