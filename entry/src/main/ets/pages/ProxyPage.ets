@@ -7,21 +7,13 @@ import {
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import ProxyGroupItem from '../components/Proxy/ProxyGroupItem'
 import ProxyArrangement from '../components/Proxy/ProxyArrangement'
-
-
-// todo 定义一个接口来描述列表项的数据结构,假数据，后期可改可删
-interface Item {
-  latency: number;
-} //
+import { intl } from '@kit.LocalizationKit'
 
 
 @Entry
 @Component
 struct ProxyPage {
-
-  //tabs图标文字颜色，修改resources/base(dark)/element/color.json中tabs_icon_text配置选中图标文字深浅模式颜色
   //系统颜色调用
-
   /* 主题色 */
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
@@ -42,12 +34,6 @@ struct ProxyPage {
   @State isShowEdit: boolean = false
   //分组tabs相关
   @State currentIndex: number = 0;
-  //todo 假数据 以后可以删掉
-  @State items: Item[] = [
-    { latency: 20 },
-    { latency: 500 },
-    { latency: 1001 },
-  ];
   //假数据延迟颜色设置
   @State color: ResourceColor = $r('sys.color.font_secondary')
   // 定义ProxyArrangementSelected的值便于切换分组方式
@@ -86,10 +72,6 @@ struct ProxyPage {
   @State currentRadioValue2: number = 0 // 排列方式切换
   @State currentRadioValue3: number = 0 // 卡片尺寸切换
 
-  // 排序函数
-  sortItems() {
-    this.items.sort((a, b) => a.latency - b.latency);
-  }
 
   //栅格点位配置
   aboutToAppear(): void {
@@ -124,8 +106,6 @@ struct ProxyPage {
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Start)
   }
-
-
 
   @Builder
   //半模态编辑菜单Start
@@ -210,7 +190,9 @@ struct ProxyPage {
             .checked(this.currentRadioValue2 === 0)
             .onChange((isChecked: boolean) => {
               if(isChecked) {
-                this.currentRadioValue2 = 0
+                animateTo({ duration: 1000 }, () => {
+                  this.currentRadioValue2 = 0
+                })
               }
             })
             .radioStyle({
@@ -220,7 +202,10 @@ struct ProxyPage {
         }
         .EditRow()
         .onClick(() => {
-          this.currentRadioValue2 = 0
+          this.DefaultSortItems()
+          animateTo({ duration: 1000 }, () => {
+            this.currentRadioValue2 = 0
+          })
         })
 
         Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
@@ -235,7 +220,9 @@ struct ProxyPage {
             .checked(this.currentRadioValue2 === 1)
             .onChange((isChecked: boolean) => {
               if(isChecked) {
-                this.currentRadioValue2 = 1
+                animateTo({ duration: 1000 }, () => {
+                  this.currentRadioValue2 = 1
+                })
               }
             })
             .radioStyle({
@@ -245,8 +232,10 @@ struct ProxyPage {
         }
         .EditRow()
         .onClick(() => {
-          this.sortItems()  //按延迟排序
-          this.currentRadioValue2 = 1
+          this.LatencySortItems()  //按延迟排序
+          animateTo({ duration: 1000 }, () => {
+            this.currentRadioValue2 = 1
+          })
         })
 
         Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
@@ -261,7 +250,9 @@ struct ProxyPage {
             .checked(this.currentRadioValue2 === 2)
             .onChange((isChecked: boolean) => {
               if(isChecked) {
-                this.currentRadioValue2 = 2
+                animateTo({ duration: 1000 }, () => {
+                  this.currentRadioValue2 = 2
+                })
               }
             })
             .radioStyle({
@@ -271,7 +262,10 @@ struct ProxyPage {
         }
         .EditRow()
         .onClick(() => {
-          this.currentRadioValue2 = 2
+          this.NameSortItems()
+          animateTo({ duration: 1000 }, () => {
+            this.currentRadioValue2 = 2
+          })
         })
       }
       .height(142)
@@ -572,8 +566,43 @@ struct ProxyPage {
     .width('100%')
     .height('100%')
   }
-}
 
+  // todo 节点假数据组后期可改可删 start
+  @Provide items: Item[] = [
+    { text: '越南①', latency: 20, type: 'Vmess',index:1 },
+    { text: '越南②', latency: 500, type: 'Shadowsocks',index:2 },
+    { text: '北朝鲜①', latency: 501, type: 'Vmess',index:3 },
+    { text: '中国香港①', latency: 20, type: 'Trojan',index:4 },
+    { text: '中国香港②', latency: 1001, type: 'Vmess' ,index:5},
+    { text: '中国台湾①', latency: 501, type: 'Shadowsocks',index:6 },
+    { text: '中国台湾②', latency: 20, type: 'Vmess',index:7 },
+    { text: '越南②', latency: 500, type: 'Trojan' ,index:8},
+    { text: '美国①', latency: 1001, type: 'Shadowsocks',index:9 },
+  ];
+  // 延迟排序
+  LatencySortItems() {
+    this.items.sort((a, b) => a.latency - b.latency);
+  }
+  //按名称排序
+  NameSortItems() {
+    this.items.sort((a, b) => {
+  return ProxyCollator.compare(a.text, b.text);})
+  }
+  //默认排序
+  DefaultSortItems() {
+    this.items.sort((a, b) => a.index - b.index);
+  }
+}
+//中文排序
+let ProxyCollator = new intl.Collator("zh-CN");
+
+// 定义一个接口来描述列表项的数据结构,假数据，后期可改可删
+export interface Item {
+  text: string;
+  latency: number;
+  type: string
+  index: number
+} //todo 节点假数据组后期可改可删 end
 
 export default ProxyPage
 

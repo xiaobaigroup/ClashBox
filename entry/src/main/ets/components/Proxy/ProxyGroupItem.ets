@@ -3,7 +3,7 @@ import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem
 import { BIND_SHEET_CONTAINER_HEIGHT, LIST_ITEM_HEIGHT } from '../../common/Constants'
 import { LengthMetrics, SymbolGlyphModifier } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
-
+import { Item } from '../../pages/ProxyPage';
 
 //断点布局
 export const BPS_LIST_LANES_2_2_3_4_4: BreakpointState<number> = BreakpointState.of({
@@ -15,12 +15,7 @@ export const BPS_LIST_LANES_2_2_3_4_4: BreakpointState<number> = BreakpointState
   xxl: 5
 })
 
-// 定义一个接口来描述列表项的数据结构,假数据，后期可改可删
-interface Item {
-  text: string;
-  latency: number;
-  type: string
-} //
+
 
 //自定义弹窗内容
 @CustomDialog
@@ -83,20 +78,15 @@ struct ProxyGroupItem {
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
 
-  // 显式声明状态变量的类型，假数据组后期可改可删
-  @State items: Item[] = [
-    { text: '越南①', latency: 20, type: 'Vmess' },
-    { text: '越南②', latency: 500, type: 'Shadowsocks' },
-    { text: '北朝鲜①', latency: 501, type: 'Vmess' },
-    { text: '中国香港①', latency: 20, type: 'Trojan' },
-    { text: '中国香港②', latency: 1001, type: 'Vmess' },
-    { text: '中国台湾①', latency: 501, type: 'Shadowsocks' },
-    { text: '中国台湾②', latency: 20, type: 'Vmess' },
-    { text: '越南②', latency: 500, type: 'Trojan' },
-    { text: '美国①', latency: 1001, type: 'Shadowsocks' },
-  ];
+
+
+  //节点假数据组后期可改可删
+  @Consume items: Item[]
+
   controller: webview.WebviewController = new webview.WebviewController();
-  //弹窗
+
+
+//弹窗
   ProxyDialogController: CustomDialogController | null = new CustomDialogController({
     builder: ProxyCustomDialog({
       cancel: () => {
@@ -161,10 +151,6 @@ struct ProxyGroupItem {
     BreakpointSystem.getInstance().start()
   }
 
-  // 排序函数
-  sortItems() {
-    this.items.sort((a, b) => a.latency - b.latency);
-  }
 
   //半模态窗口测速网站
   @Builder
@@ -237,7 +223,6 @@ struct ProxyGroupItem {
         ForEach(this.items, (item: Item, index: number) => {
           ListItem() {
             Row() {
-
               Column() {
                 Text(`${item.text}`)
                   .fontColor(($r('sys.color.font_primary')))
@@ -250,8 +235,6 @@ struct ProxyGroupItem {
                   .fontColor(this.getColorForLatency(item.latency) as ResourceColor)
                   .fontSize(16)
               }.width('90%').alignItems(HorizontalAlign.Start)
-
-
               Blank()
                 Radio({ value: 'radio' + index, group: 'ProxyGroup' })
                 .checked(index === this.PorxyRadioCheckedValue)
