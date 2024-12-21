@@ -113,7 +113,7 @@ struct TrafficStatistics {
         .alignItems(VerticalAlign.Center)
         .justifyContent(FlexAlign.Center)
         Column() {
-          Progress({ value: 60,total: 100, type: ProgressType.Capsule  })
+          Progress({ value: 60,total: 100, type: ProgressType.Capsule  })//value为使用流量的值
             .style({enableSmoothEffect: true,borderColor:'#00ffffff'})
             .color('#ff46b1e3')
             .width('100%')

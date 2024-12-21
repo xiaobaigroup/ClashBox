@@ -284,6 +284,8 @@ struct ProxyGroupItem {
             })
         })
       }
+      // transition保证组件离场不被立即析构，可设置其他转场效果
+      .transition(TransitionEffect.OPACITY)
       .scrollBar(BarState.Off)
       .alignListItem(ListItemAlign.Center)
       .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
@@ -353,6 +355,8 @@ struct ProxyGroupItem {
             })
         })
       }
+      // transition保证组件离场不被立即析构，可设置其他转场效果
+      .transition(TransitionEffect.OPACITY)
       .scrollBar(BarState.Off)
       .edgeEffect(EdgeEffect.Spring)
       .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
@@ -420,6 +424,8 @@ struct ProxyGroupItem {
             })
         })
       }
+      // transition保证组件离场不被立即析构，可设置其他转场效果
+      .transition(TransitionEffect.OPACITY)
       .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
       .scrollBar(BarState.Off)
       .edgeEffect(EdgeEffect.Spring)

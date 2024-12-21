@@ -227,7 +227,7 @@ struct Home {
 
   build() {
     Column() {
-      if (!this.isShowHomeEdit) {
+
         if (!this.isLandscapePhone) {
           Row() {
             Text(this.greetings)
@@ -236,104 +236,103 @@ struct Home {
               .margin({ left: this.gridMargin })
               .fontColor(this.font_primary)
             Blank()
-            //编辑图标
-            Button({ type: ButtonType.Circle, stateEffect: true }) {
-              SymbolGlyph($r('sys.symbol.square_and_pencil'))
-                .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-                .fontColor([this.icon_primary])
-            }
-            .onClick(() => {
-              this.isShowHomeEdit = true
-            })
-            .margin({ right: this.gridMargin })
-            .width(40)
-            .height(40)
-            .backgroundColor($r('app.color.settings_container_background'))
-
-            //设置图标
-            Button({ type: ButtonType.Circle, stateEffect: true }) {
-              SymbolGlyph($r('sys.symbol.gearshape'))
-                .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
-                .fontColor([this.icon_primary]) //设置图标无法分层设为单色
-            }
-            .margin({ right: this.gridMargin })
-            .width(40)
-            .height(40)
-            .backgroundColor($r('app.color.settings_container_background'))
-            .onClick(() => {
-              this.isShowSettings = true
-              this.isEnableIndexForegroundBlur = true
-            })
-            .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
-              detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],
-              preferType: SheetType.CENTER,
-              backgroundColor: $r('app.color.container_background'),
-              dragBar: false,
-              blurStyle: BlurStyle.BACKGROUND_REGULAR,
-              onWillDismiss: () => {
-                this.isShowSettings = false
-                this.isEnableIndexForegroundBlur = false
-                this.SettingsPageInfos.clear()
+            if (!this.isShowHomeEdit) {//编辑布局按钮判定
+              //编辑按钮
+              Button({ type: ButtonType.Circle, stateEffect: true }) {
+                SymbolGlyph($r('sys.symbol.square_and_pencil'))
+                  .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+                  .fontColor([this.icon_primary])
               }
-            })
+              .onClick(() => {
+                animateTo({ duration: 1000 }, () => {
+                  this.isShowHomeEdit = true
+                })
+              })
+              .margin({ right: this.gridMargin })
+              .width(40)
+              .height(40)
+              .backgroundColor($r('app.color.settings_container_background'))
+
+              //设置按钮
+              Button({ type: ButtonType.Circle, stateEffect: true }) {
+                SymbolGlyph($r('sys.symbol.gearshape'))
+                  .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
+                  .fontColor([this.icon_primary]) //设置图标无法分层设为单色
+              }
+              .margin({ right: this.gridMargin })
+              .width(40)
+              .height(40)
+              .backgroundColor($r('app.color.settings_container_background'))
+              .onClick(() => {
+                this.isShowSettings = true
+                this.isEnableIndexForegroundBlur = true
+              })
+              .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
+                detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],
+                preferType: SheetType.CENTER,
+                backgroundColor: $r('app.color.container_background'),
+                dragBar: false,
+                blurStyle: BlurStyle.BACKGROUND_REGULAR,
+                onWillDismiss: () => {
+                  this.isShowSettings = false
+                  this.isEnableIndexForegroundBlur = false
+                  this.SettingsPageInfos.clear()
+                }
+              })
+            }
+            else if (this.isShowHomeEdit) {//编辑布局按钮判定
+                //添加按钮
+                Button({ type: ButtonType.Circle, stateEffect: true }) {
+                  SymbolGlyph($r('sys.symbol.plus'))
+                    .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+                    .fontColor([Color.White])
+
+                }
+                .margin({ right: this.gridMargin })
+                .width(40)
+                .height(40)
+                .backgroundColor(this.icon_emphasize)
+
+                //保存按钮
+                Button({ type: ButtonType.Circle, stateEffect: true }) {
+                  SymbolGlyph($r('sys.symbol.save'))
+                    .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
+                    .fontColor([Color.White])
+                }
+                .margin({ right: this.gridMargin })
+                .width(40)
+                .height(40)
+                .backgroundColor(this.icon_emphasize)
+                .onClick(() => {
+                  if (this.SaveDialogController != null) {
+                    this.SaveDialogController.open()
+                    this.isEnableIndexForegroundBlur = true
+                  }
+                })
+
+                //取消按钮
+                Button({ type: ButtonType.Circle, stateEffect: true }) {
+                  SymbolGlyph($r('sys.symbol.xmark'))
+                    .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
+                    .fontColor([Color.White])
+                }
+                .margin({ right: this.gridMargin })
+                .width(40)
+                .height(40)
+                .backgroundColor(this.icon_emphasize)
+                .onClick(() => {
+                  animateTo({ duration: 1000 }, () => {
+                    this.isShowHomeEdit = false
+                  })
+                })
+              }
           }
           .width('100%')
           .margin({ bottom: 15 })
+          .geometryTransition("Button")
+          // transition保证组件离场不被立即析构，可设置其他转场效果
+          .transition(TransitionEffect.OPACITY)
         }
-      } else if (this.isShowHomeEdit) {
-        Row() {
-          Text(this.greetings)
-            .fontSize(32)
-            .fontWeight(FontWeight.Bold)
-            .margin({ left: this.gridMargin })
-            .fontColor(this.font_primary)
-          Blank()
-          //添加图标
-          Button({ type: ButtonType.Circle, stateEffect: true }) {
-            SymbolGlyph($r('sys.symbol.plus'))
-              .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-              .fontColor([Color.White])
-
-          }
-          .margin({ right: this.gridMargin })
-          .width(40)
-          .height(40)
-          .backgroundColor(this.icon_emphasize)
-
-          //保存图标
-          Button({ type: ButtonType.Circle, stateEffect: true }) {
-            SymbolGlyph($r('sys.symbol.save'))
-              .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
-              .fontColor([Color.White])
-          }
-          .margin({ right: this.gridMargin })
-          .width(40)
-          .height(40)
-          .backgroundColor(this.icon_emphasize)
-          .onClick(() => {
-            if (this.SaveDialogController != null) {
-              this.SaveDialogController.open()
-              this.isEnableIndexForegroundBlur = true
-            }
-          })
-
-          //删除图标
-          Button({ type: ButtonType.Circle, stateEffect: true }) {
-            SymbolGlyph($r('sys.symbol.xmark'))
-              .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
-              .fontColor([Color.White])
-          }
-          .margin({ right: this.gridMargin })
-          .width(40)
-          .height(40)
-          .backgroundColor(this.icon_emphasize)
-          .onClick(() => {
-            this.isShowHomeEdit = false
-          })
-        }
-        .width('100%')
-        .margin({ bottom: 15 })
-      }
 
 
       Stack({ alignContent: this.stackAlignContentAlignment }) {
