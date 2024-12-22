@@ -33,6 +33,23 @@ export const TEXT_INPUT_HEIGHT: number = 45
 // TextArea
 export const TEXT_AREA_MAX_LENGTH: number = 999
 
+/* TabContent标题栏 */
+// 工具symbol大小
+export const TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE:Length = 24
+
+// 整个title区域的高度
+export const TAB_CONTENT_TITLE_HEIGHT: number = 56
+// fontSize
+export const TAB_CONTENT_TITLE_FONT_SIZE: number = 30
+// fontWeight
+export const TAB_CONTENT_TITLE_FONT_WEIGHT: number = FontWeight.Bold
+
+// 主页 -> 代理启动按钮内计时器的初始值
+export const PROXY_STARTED_DURATION_INIT_VALUE: string = '00:00:00'
+
+// 组件animation duration值: 300
+export const ANIMATION_DURATION_300: number = 300
+
 // type：routeName
 export enum RouteName {
   ImportConfigFromURL = 'ImportConfigFromURL',
@@ -149,25 +166,9 @@ export  const ListOverwriteNetworkData = (): moreData[] => {
   return result
 }
 
-
-/* TabContent标题栏 */
-// 工具symbol大小
-export const TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE:Length = 24
-
-// 整个title区域的高度
-export const TAB_CONTENT_TITLE_HEIGHT: number = 56
-// fontSize
-export const TAB_CONTENT_TITLE_FONT_SIZE: number = 30
-// fontWeight
-export const TAB_CONTENT_TITLE_FONT_WEIGHT: number = FontWeight.Bold
-
-// 主页 -> 代理启动按钮内计时器的初始值
-export const PROXY_STARTED_DURATION_INIT_VALUE: string = '00:00:00'
-
-// 组件animation duration值: 300
-export const ANIMATION_DURATION_300: number = 300
-
-// 设置列表类
+/**
+ * 设置列表参数
+ */
 export class settingsData {
   icons: Resource;
   name?: string;
@@ -186,7 +187,9 @@ export class settingsData {
   }
 }
 
-// 设置页列表项
+/**
+ * 设置页列表
+ */
 export const SettingsListItem = (): settingsData[] => {
   let result: settingsData[] = new Array()
   result = [
@@ -203,7 +206,9 @@ export const SettingsListItem = (): settingsData[] => {
   return result
 }
 
-// 语言列表类
+/**
+ * 语言列表参数
+ */
 export class LanguageData {
   title: string | Resource;
   subtitle: string | Resource;
@@ -217,8 +222,9 @@ export class LanguageData {
     this.isCheck = isCheck
   }
 }
-
-// 设置页的多语言列表项
+/**
+ * 设置页多语言列表
+ */
 export const LanguageListItem = (): LanguageData[] => {
   let result: LanguageData[] = new Array()
   result = [
@@ -231,7 +237,53 @@ export const LanguageListItem = (): LanguageData[] => {
   return result
 }
 
-// 设置页关于列表
+/**
+ * 外观页参数
+ */
+export interface AppearanceListItemProp {
+  icon?: Resource
+  title: string | Resource
+  subtitle: string | Resource
+  subtitle2?: string | Resource
+  children?: Array<AppearanceListItemProp>
+}
+/**
+ * 外观页列表
+ */
+export const AppearanceList: AppearanceListItemProp[] = [
+  { icon: $r('sys.symbol.circle_righthalf_inset_filled'),  title: $r('app.string.dark_mode'), subtitle: $r('app.string.follow_system'),
+    children: [
+      { title: $r('app.string.follow_system'), subtitle: ''},
+      { title: $r('app.string.always_light'), subtitle: ''},
+      { title: $r('app.string.always_dark'), subtitle: ''},
+    ]
+  },
+  { icon: $r('sys.symbol.paintpalette_fill'), title: $r('app.string.theme_color'), subtitle: $r('app.string.star_river_blue'),
+    children: [
+      { title: $r('app.string.star_river_blue'), subtitle: ''},
+      { title: $r('app.string.cat_blue'), subtitle: ''},
+      { title: $r('app.string.yellow'), subtitle: ''},
+      { title: $r('app.string.red'), subtitle: ''},
+      { title: $r('app.string.purple'), subtitle: ''},
+      { title: $r('app.string.pink'), subtitle: ''},
+      { title: $r('app.string.green'), subtitle: ''},
+    ]
+  },
+  { icon: $r('sys.symbol.message'), title: $r('app.string.homepage_greetings'), subtitle: $r('app.string.homepage_greetings_subtitle')},
+  { icon: $r('sys.symbol.local_fill'), title: $r('app.string.suspension_button_position'), subtitle: $r('app.string.right'),
+    children: [
+      { title: $r('app.string.right'), subtitle: ''},
+      { title: $r('app.string.middle'), subtitle: ''},
+      { title: $r('app.string.left'), subtitle: ''},
+    ]
+  },
+  { icon: $r('sys.symbol.rectangle_on_rectangle_fill'), title: $r('app.string.blurred_background'), subtitle: $r('app.string.blurred_background_subtitle')},
+  { icon: $r('sys.symbol.livephoto'), title: $r('app.string.animation_effects'), subtitle: $r('app.string.animation_effects_subtitle'), subtitle2: $r('app.string.Experimental_Function')},
+]
+
+/**
+ * 关于列表参数
+ */
 export interface AboutListItemProp {
   name?: string
   title: string | Resource
@@ -239,6 +291,9 @@ export interface AboutListItemProp {
   sign?: number
   children?: Array<AboutListItemProp>
 }
+/**
+ * 关于列表
+ */
 export const AboutList: AboutListItemProp[] = [
   {
     title: 'Version',
@@ -295,7 +350,9 @@ export const AboutList: AboutListItemProp[] = [
   }
 ]
 
-// 设置页关于列表
+/**
+ * 贡献者名单参数
+ */
 export interface ContributorsListItemProp {
   image?: Resource
   title: string | Resource
@@ -303,6 +360,9 @@ export interface ContributorsListItemProp {
   contact?: string | Resource
   contact2?: string
 }
+/**
+ * 贡献者名单列表
+ */
 export const ContributorsList: ContributorsListItemProp[] = [
   { title: '小白', subtitle: $r('app.string.XiaoBai_Subtitle'), contact: 'Github', image: $rawfile('XiaoBai.png')},
   { title: '船长', subtitle: $r('app.string.ChuanZhang_Subtitle'), contact: $r('app.string.Email'), image: $rawfile('chuanzhang.png')},

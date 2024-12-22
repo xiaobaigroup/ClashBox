@@ -72,7 +72,7 @@ struct DNS {
   // 列表高度
   @Consume('breakPointStateListHeight') listHeight: BreakpointState<number>
   // 平板竖屏判断
-  @Consume('tabletVertical') istabletVertical: boolean
+  @StorageProp('istabletVertical')  private istabletVertical: boolean = false
   @State SaveInputValue: string = ''
   @State currentInputValue: string = ''
   // 弹窗控制器

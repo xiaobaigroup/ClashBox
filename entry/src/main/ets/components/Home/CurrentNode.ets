@@ -9,7 +9,7 @@ interface MarginGenerate {
 
 
 @Component
-struct CurrrentNode {
+struct CurrentNode {
   /* //自定义主题，颜色在AppTheme里面修改
  @State font_secondary: ResourceColor = $r('sys.color.font_secondary')
 
@@ -105,4 +105,4 @@ struct CurrrentNode {
     .alignItems(HorizontalAlign.Start)
   }
 }
-export default CurrrentNode
+export default CurrentNode

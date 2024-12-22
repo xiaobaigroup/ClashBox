@@ -759,6 +759,106 @@
     {
       "name": "Test_Delay_Tip",
       "value": "延迟测速中，请稍后..."
+    },
+    {
+      "name": "dark_mode",
+      "value": "深色模式"
+    },
+    {
+      "name": "theme_color",
+      "value": "主题色"
+    },
+    {
+      "name": "homepage_greetings",
+      "value": "主页问候"
+    },
+    {
+      "name": "suspension_button_position",
+      "value": "悬浮按钮位置"
+    },
+    {
+      "name": "blurred_background",
+      "value": "背景模糊"
+    },
+    {
+      "name": "animation_effects",
+      "value": "动画效果"
+    },
+    {
+      "name": "homepage_greetings_subtitle",
+      "value": "主页标题的问候语"
+    },
+    {
+      "name": "blurred_background_subtitle",
+      "value": "关闭以缓解APP内的卡顿问题"
+    },
+    {
+      "name": "animation_effects_subtitle",
+      "value": "不建议关闭"
+    },
+    {
+      "name": "star_river_blue",
+      "value": "星河蓝(默认)"
+    },
+    {
+      "name": "cat_blue",
+      "value": "猫咪蓝"
+    },
+    {
+      "name": "yellow",
+      "value": "便单黄"
+    },
+    {
+      "name": "red",
+      "value": "华为红"
+    },
+    {
+      "name": "purple",
+      "value": "优雅紫"
+    },
+    {
+      "name": "pink",
+      "value": "哔哩粉"
+    },
+    {
+      "name": "green",
+      "value": "小草绿"
+    },
+    {
+      "name": "follow_system",
+      "value": "跟随系统"
+    },
+    {
+      "name": "always_light",
+      "value": "始终浅色"
+    },
+    {
+      "name": "always_dark",
+      "value": "始终深色"
+    },
+    {
+      "name": "right",
+      "value": "右侧(默认)"
+    },
+    {
+      "name": "middle",
+      "value": "中间"
+    },
+    {
+      "name": "left",
+      "value": "左侧"
+    },
+    {
+      "name": "color_preview",
+      "value": "颜色预览!"
+    },
+    {
+      "name": "configuration_1",
+      "value": "配置1"
+    },
+    {
+      "name": "proxy_1",
+      "value": "代理1"
     }
   ]
 }

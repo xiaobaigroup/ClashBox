@@ -8,7 +8,6 @@ import ApplicationLock from "./ApplicationLock"
 import Notice from "./Notice"
 import Backgrounder from "./Backgrounder"
 import WipeData from "./WipeData"
-import Disclaimer from "./Disclaimer"
 import About, { AboutContributors } from "./About"
 import Language from "./Language"
 import TopBuilder from "./TopBuilder"
@@ -56,7 +55,6 @@ struct Settings {
 
   @State settingsList: settingsData[] = SettingsListItem()
   @Link isShowSettings: boolean
-  //@State isShowMenu: boolean = false
   // 当前设备`height`是否符合(320vp< height <= 500vp)
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
@@ -97,6 +95,7 @@ struct Settings {
 
   handleCheck(index: number) {
     if(index === 7) {
+      // 免责声明弹窗
       if (this.dialogController != null) {
         this.dialogController.open()
       }
@@ -148,9 +147,6 @@ struct Settings {
       } else
       if (name == 'WipeData') {
         WipeData({isShowSettings: this.isShowSettings})
-      } else
-      if (name == 'Disclaimer') {
-        Disclaimer({isShowSettings: this.isShowSettings})
       } else
       if (name == 'About') {
         About({isShowSettings: this.isShowSettings})

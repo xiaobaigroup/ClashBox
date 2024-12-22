@@ -6,7 +6,6 @@
 import { BreakpointState, BreakpointSystem } from '../common/breakpointsystem'
 import { BIND_SHEET_CONTAINER_HEIGHT, ListMoreData, moreData } from '../common/Constants';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { text } from '@kit.ArkGraphics2D';
 import Log from '../components/More/Log';
 import Resources from '../components/More/Resources';
 import RequestPage from '../components/More/Request';
@@ -18,15 +17,15 @@ import Basic from '../components/More/Overwrite/Basic';
 import DNS from '../components/More/Overwrite/DNS';
 import Network, { NetworkRouterAddress } from '../components/More/Overwrite/Network';
 import { FakeIPfilter } from '../components/More/Overwrite/DNSsubpage';
-import { mediaquery } from '@kit.ArkUI';
 
 @Entry
 @Component
 struct MorePage {
+  private componentName: string = 'MorePage'
   /* 主题色 */
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  //一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
 
   @State isShowSettings: boolean = false
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
@@ -36,8 +35,6 @@ struct MorePage {
   @Provide('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   // 设置页面栈
   @Provide('NavSettingsPathStack') SettingsPageInfos: NavPathStack = new NavPathStack()
-  // 平板竖屏判断
-  @Provide('tabletVertical') istabletVertical: boolean = false
 
   /* 断点布局相关 相关作用看定义时候的注释 */
   // 整体外边距
@@ -54,20 +51,13 @@ struct MorePage {
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
 
-  // 平板竖屏判断
-  deviceHeightListener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(1000vp< height)');
 
+  aboutToAppear() {
 
-  aboutToAppear(): void {
-    // 开启change监听
-    this.deviceHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
-      this.istabletVertical = mediaQueryResult.matches
-    });
   }
 
-  aboutToDisappear(): void {
-    // 解绑listener中注册的回调函数
-    this.deviceHeightListener.off('change')
+  aboutToDisappear() {
+
   }
 
 

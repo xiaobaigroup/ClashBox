@@ -25,7 +25,7 @@ class RedAppTheme implements CustomTheme {
 }
 
 // TODO 测试用 有了色值之后更换
-/* 橙色 redTheme */
+/* 橙色 OrangeTheme */
 // 主题颜色
 class OrangeAppThemeColors implements CustomColors {
   iconEmphasize: ResourceColor = Color.Orange

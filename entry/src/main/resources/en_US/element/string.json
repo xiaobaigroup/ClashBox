@@ -759,6 +759,106 @@
     {
       "name": "Test_Delay_Tip",
       "value": "Delayed speed measurement, please wait..."
+    },
+    {
+      "name": "dark_mode",
+      "value": "Dark Mode"
+    },
+    {
+      "name": "theme_color",
+      "value": "Theme Color"
+    },
+    {
+      "name": "homepage_greetings",
+      "value": "Homepage Greetings"
+    },
+    {
+      "name": "suspension_button_position",
+      "value": "Suspension Button Position"
+    },
+    {
+      "name": "blurred_background",
+      "value": "Blurred Background"
+    },
+    {
+      "name": "animation_effects",
+      "value": "Animation Effects"
+    },
+    {
+      "name": "homepage_greetings_subtitle",
+      "value": "Greetings from the homepage title"
+    },
+    {
+      "name": "blurred_background_subtitle",
+      "value": "Close to alleviate lag issues within the app"
+    },
+    {
+      "name": "animation_effects_subtitle",
+      "value": "Not recommended to close"
+    },
+    {
+      "name": "star_river_blue",
+      "value": "Star River Blue (default)"
+    },
+    {
+      "name": "cat_blue",
+      "value": "Cat Blue"
+    },
+    {
+      "name": "yellow",
+      "value": "Yellow"
+    },
+    {
+      "name": "red",
+      "value": "Red"
+    },
+    {
+      "name": "purple",
+      "value": "Purple"
+    },
+    {
+      "name": "pink",
+      "value": "Pink"
+    },
+    {
+      "name": "green",
+      "value": "Green"
+    },
+    {
+      "name": "follow_system",
+      "value": "Follow the System"
+    },
+    {
+      "name": "always_light",
+      "value": "Always Light Color"
+    },
+    {
+      "name": "always_dark",
+      "value": "Always Dark Color"
+    },
+    {
+      "name": "right",
+      "value": "Right"
+    },
+    {
+      "name": "middle",
+      "value": "Middle"
+    },
+    {
+      "name": "left",
+      "value": "Left"
+    },
+    {
+      "name": "color_preview",
+      "value": "Color Preview !"
+    },
+    {
+      "name": "configuration_1",
+      "value": "Configuration 1"
+    },
+    {
+      "name": "proxy_1",
+      "value": "Proxy 1"
     }
   ]
 }

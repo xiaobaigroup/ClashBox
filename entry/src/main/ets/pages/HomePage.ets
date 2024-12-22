@@ -1,9 +1,8 @@
 //主页 栅格布局、媒体查询
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
-import { promptAction, PromptAction, ThemeControl, window } from '@kit.ArkUI'
+import { PromptAction, ThemeControl, window } from '@kit.ArkUI'
 import SwitchMode from '../components/Home/SwitchMode'
 import CellularData from '../components/Home/CellularData'
-import CurrrentNode from '../components/Home/CurrentNode'
 import PublicNetwork from '../components/Home/PublicNetwork'
 import Speed from '../components/Home/Speed'
 import { getGreeting } from '../utils/getGreeting'
@@ -18,7 +17,7 @@ import {
 } from '../common/Constants'
 import Settings from '../components/Settings/Settings'
 import { CUSTOM_THEME_MAP } from '../common/AppTheme'
-import { AlertDialog } from '@kit.ArkUI'
+import CurrentNode from '../components/Home/CurrentNode'
 
 
 interface MarginGenerate {
@@ -26,6 +25,10 @@ interface MarginGenerate {
   left: number,
   right: number,
   bottom?: number,
+}
+
+interface HomeCardData {
+  name: string
 }
 
 @Entry
@@ -56,11 +59,7 @@ struct Home {
   @State TopHeight: string = ''
   @State isShowSettings: boolean = false
   @State compStr: BreakpointState<string> = BreakpointState.of({
-    xs: "xs",
-    sm: "sm",
-    md: "md",
-    lg: "lg",
-    xl: "xl"
+    xs: "xs", sm: "sm", md: "md", lg: "lg", xl: "xl"
   })
   @State containerMargin1: BreakpointState<MarginGenerate> = BreakpointState.of({
     xs: ({ top: 15 } as MarginGenerate),
@@ -86,32 +85,16 @@ struct Home {
     xl: ({ top: 25, left: 15 } as MarginGenerate)
   });
   @State containerMargin: BreakpointState<string> = BreakpointState.of({
-    xs: '6vp',
-    sm: '6vp',
-    md: '12vp',
-    lg: '15vp',
-    xl: '15vp'
+    xs: '6vp', sm: '6vp', md: '12vp', lg: '15vp', xl: '15vp'
   });
   @State containerRightMargin: BreakpointState<string> = BreakpointState.of({
-    xs: '0vp',
-    sm: '0vp',
-    md: '0vp',
-    lg: '15vp',
-    xl: '15vp'
+    xs: '0vp', sm: '0vp', md: '0vp', lg: '15vp', xl: '15vp'
   });
   @State containerHeight: BreakpointState<string> = BreakpointState.of({
-    xs: '156vp',
-    sm: '160vp',
-    md: '232.7vp',
-    lg: '240vp',
-    xl: '240vp'
+    xs: '156vp', sm: '160vp', md: '232.7vp', lg: '240vp', xl: '240vp'
   });
   @State GridRowHeight: BreakpointState<string> = BreakpointState.of({
-    xs: '715vp',
-    sm: '715vp',
-    md: '1050vp',
-    lg: '550vp',
-    xl: '550vp'
+    xs: '715vp', sm: '715vp', md: '1050vp', lg: '550vp', xl: '550vp'
   });
   windowClass = AppStorage.get<window.Window>('windowClass') as window.Window;
   //编辑按钮点击后显示编辑状态判定
@@ -283,7 +266,7 @@ struct Home {
               preferType: SheetType.CENTER,
               backgroundColor: $r('app.color.background'),
               dragBar: false,
-    //          blurStyle: BlurStyle.BACKGROUND_REGULAR,
+              // blurStyle: BlurStyle.BACKGROUND_REGULAR,
               onWillDismiss: () => {
                 this.isShowSettings = false
                 this.isEnableIndexForegroundBlur = false
@@ -355,194 +338,91 @@ struct Home {
             breakpoints: {
               value: ["320vp", "600vp", "840vp", "1000vp"],
               reference: BreakpointsReference.WindowSize
-            },
-          }) {
+            }, })
+          {   // 速率图
               GridCol({
-                span: {
-                  xs: 12,
-                  sm: 12,
-                  md: this.isLandscapePhone ? 6 : 10,
-                  lg: 6,
-                  xl: 6
-                },
-                offset: {
-                  xs: 0,
-                  sm: 0,
-                  md: this.isLandscapePhone ? 0 : 1,
-                  lg: 0,
-                  xl: 0
-                }
+                span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 10, lg: 6, xl: 6 },
+                offset: { xs: 0, sm: 0, md: this.isLandscapePhone ? 0 : 1, lg: 0, xl: 0 }
               }) {
                 Speed()
               }
               .borderRadius(20)
+              .clickEffect({ level: ClickEffectLevel.MIDDLE })
               .backgroundColor($r('app.color.container_background'))
               .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
               .margin({ right: this.isLandscapePhone ? this.containerMargin.value : this.containerRightMargin.value })
-              .clickEffect({ level: ClickEffectLevel.MIDDLE })
-
 
             GridCol({
-              span: {
-                xs: 12,
-                sm: 12,
-                md: this.isLandscapePhone ? 6 : 10,
-                lg: 6,
-                xl: 6
-              },
-              offset: {
-                xs: 0,
-                sm: 0,
-                md: this.isLandscapePhone ? 0 : 2,
-                lg: 0,
-                xl: 0
-              }
+              span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 10, lg: 6, xl: 6 },
+              offset: { xs: 0, sm: 0, md: this.isLandscapePhone ? 0 : 2, lg: 0, xl: 0 }
             }) {
               GridRow() {
 
-                  GridCol({
-                    span: {
-                      xs: 6,
-                      sm: 6,
-                      md: 6,
-                      lg: 6,
-                      xl: 6
-                    }
-                  }) {
-                    SwitchMode()
-                  }
-                  .height('100%')
-                  .borderRadius(20)
-                  .margin({ right: this.containerMargin.value })
-                  .backgroundColor($r('app.color.container_background'))
-                  .clickEffect({ level: ClickEffectLevel.MIDDLE })
+                GridCol({
+                  span: { xs: 6, sm: 6, md: 6, lg: 6, xl: 6 }
+                }) {
+                  SwitchMode()
+                }
+                .margin({ right: this.containerMargin.value })
+                .GridColStyle()
 
                 GridCol({
-                  span: {
-                    xs: 6,
-                    sm: 6,
-                    md: 6,
-                    lg: 6,
-                    xl: 6
-                  },
+                  span: { xs: 6, sm: 6, md: 6, lg: 6, xl: 6 },
                 }) {
                   CellularData()
                 }
-                .height('100%')
-                .borderRadius(20)
                 .margin({ left: this.containerMargin.value })
-                .backgroundColor($r('app.color.container_background'))
-                .clickEffect({ level: ClickEffectLevel.MIDDLE })
+                .GridColStyle()
               }
             }
             .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
             .margin(this.isLandscapePhone ? { left: 12 } : this.containerMargin1.value)
 
             GridCol({
-              span: {
-                xs: 12,
-                sm: 12,
-                md: this.isLandscapePhone ? 6 : 10,
-                lg: 6,
-                xl: 6
-              },
-              offset: {
-                xs: 0,
-                sm: 0,
-                md: this.isLandscapePhone ? 0 : 2,
-                lg: 0,
-                xl: 0
-              }
+              span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 10, lg: 6, xl: 6 },
+              offset: { xs: 0, sm: 0, md: this.isLandscapePhone ? 0 : 2, lg: 0, xl: 0 }
             }) {
               GridRow() {
                 GridCol({
-                  span: {
-                    xs: 6,
-                    sm: 6,
-                    md: 6,
-                    lg: 6,
-                    xl: 6
-                  }
+                  span: { xs: 6, sm: 6, md: 6, lg: 6, xl: 6 }
                 }) {
-                  CurrrentNode()
+                  CurrentNode()
                 }
-                .height('100%')
-                .borderRadius(20)
                 .margin({ right: this.containerMargin.value })
-                .backgroundColor($r('app.color.container_background'))
-                .clickEffect({ level: ClickEffectLevel.MIDDLE })
+                .GridColStyle()
 
                 GridCol({
-                  span: {
-                    xs: 6,
-                    sm: 6,
-                    md: 6,
-                    lg: 6,
-                    xl: 6
-                  },
+                  span: { xs: 6, sm: 6, md: 6, lg: 6, xl: 6 },
                 }) {
                   PublicNetwork()
                 }
-                .height('100%')
-                .borderRadius(20)
                 .margin({ left: this.containerMargin.value })
-                .backgroundColor($r('app.color.container_background'))
-                .clickEffect({ level: ClickEffectLevel.MIDDLE })
+                .GridColStyle()
               }
             }
             .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
             .margin(this.isLandscapePhone ? { top: 20, right: 12 } : this.containerMargin2.value)
 
             GridCol({
-              span: {
-                xs: 12,
-                sm: 12,
-                md: this.isLandscapePhone ? 6 : 10,
-                lg: 6,
-                xl: 6
-              },
-              offset: {
-                xs: 0,
-                sm: 0,
-                md: this.isLandscapePhone ? 0 : 2,
-                lg: 0,
-                xl: 0
-              }
+              span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 10, lg: 6, xl: 6 },
+              offset: { xs: 0, sm: 0, md: this.isLandscapePhone ? 0 : 2, lg: 0, xl: 0 }
             }) {
               GridRow() {
                 GridCol({
-                  span: {
-                    xs: 6,
-                    sm: 6,
-                    md: 6,
-                    lg: 6,
-                    xl: 6
-                  }
+                  span: { xs: 6, sm: 6, md: 6, lg: 6, xl: 6 }
                 }) {
                   SwitchQuickly()
                 }
-                .height('100%')
-                .borderRadius(20)
                 .margin({ right: this.containerMargin.value })
-                .backgroundColor($r('app.color.container_background'))
-                .clickEffect({ level: ClickEffectLevel.MIDDLE })
+                .GridColStyle()
 
                 GridCol({
-                  span: {
-                    xs: 6,
-                    sm: 6,
-                    md: 6,
-                    lg: 6,
-                    xl: 6
-                  },
+                  span: { xs: 6, sm: 6, md: 6, lg: 6, xl: 6 },
                 }) {
                   //TrafficStatistics()
                 }
-                .height('100%')
-                .borderRadius(20)
                 .margin({ left: this.containerMargin.value })
-                .backgroundColor($r('app.color.container_background'))
-                .clickEffect({ level: ClickEffectLevel.MIDDLE })
+                .GridColStyle()
               }
             }
             .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
@@ -567,7 +447,7 @@ struct Home {
                 this.gridMargin = 36
                 break
             }
-            // console.log('断点为：' + this.currentBp + '容器高：' + this.ContainerHeight + '顶部高：' + this.TopHeight)
+
           })
         }
         .width('100%')
@@ -622,12 +502,12 @@ struct Home {
             this.proxyStartedTimer.start((formatTime) => {
               this.proxyStartingDuration = formatTime
             })
-            ThemeControl.setDefaultTheme(CUSTOM_THEME_MAP.get('redAppTheme'))
-            hilog.info(0xA002, this.componentName, `#Button#onClick#ThemeControl.setDefaultTheme(redAppTheme)`)
+            // ThemeControl.setDefaultTheme(CUSTOM_THEME_MAP.get('redAppTheme'))
+            // hilog.info(0xA002, this.componentName, `#Button#onClick#ThemeControl.setDefaultTheme(redAppTheme)`)
           } else {
             // TODO 删除下面两行 为了测试更换固定主题色用的
-            ThemeControl.setDefaultTheme(CUSTOM_THEME_MAP.get('orangeAppTheme'))
-            hilog.info(0xA002, this.componentName, `#Button#onClick#ThemeControl.setDefaultTheme(orangeAppTheme)`)
+            // ThemeControl.setDefaultTheme(CUSTOM_THEME_MAP.get('orangeAppTheme'))
+            // hilog.info(0xA002, this.componentName, `#Button#onClick#ThemeControl.setDefaultTheme(orangeAppTheme)`)
             this.proxyStartedTimer.reset()
             // 如果`reset()`就取消注释这句，如果是`pause()`就注释这句
             this.proxyStartingDuration = PROXY_STARTED_DURATION_INIT_VALUE
@@ -657,10 +537,8 @@ struct SaveCustomDialog {
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
   controller?: CustomDialogController
-  cancel: () => void = () => {
-  }
-  confirm: () => void = () => {
-  }
+  cancel: () => void = () => {}
+  confirm: () => void = () => {}
 
   build() {
     Column() {
@@ -704,3 +582,12 @@ struct SaveCustomDialog {
 }
 
 export default Home
+
+// 小卡片共有属性
+@Extend(GridCol)
+function GridColStyle() {
+  .height('100%')
+  .borderRadius(20)
+  .backgroundColor($r('app.color.container_background'))
+  .clickEffect({ level: ClickEffectLevel.MIDDLE })
+}

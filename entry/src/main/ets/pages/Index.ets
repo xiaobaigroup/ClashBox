@@ -60,6 +60,7 @@ struct Index {
   @State currentIndex: number = 0
   // 设备高度是否 (320vp< height <= 500vp) 媒体查询
   @State isLandscapePhone: boolean = false
+  @State istabletVertical: boolean = false
   @StorageProp('bottomRectHeight') bottomRectHeight: number = 0; // 读取导航条区域的高度
   @StorageProp('topRectHeight') topRectHeight: number = 0;
   /* 断点布局相关 相关作用看定义时候的注释 */
@@ -169,6 +170,9 @@ struct Index {
   // 当设备横屏时条件成立 ps:现在用于判定是否手机(大折叠除外)横屏
   deviceHeightListener: mediaquery.MediaQueryListener =
     this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
+  // 平板竖屏判断
+  tabletHeightListener:mediaquery.MediaQueryListener =
+    this.getUIContext().getMediaQuery().matchMediaSync('(1000vp< height)');
 
   aboutToAppear() {
     hilog.info(0x1000, this.componentName, `#aboutToAppear executed`)
@@ -183,6 +187,12 @@ struct Index {
       AppStorage.setOrCreate<boolean>('isLandscapePhone', this.isLandscapePhone)
       hilog.info(0x1000, this.componentName,
         `#媒体查询#设备高度改变#(320vp< height <= 500vp)结果: ${this.isLandscapePhone}`)
+    });
+    this.tabletHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
+      this.istabletVertical = mediaQueryResult.matches
+      AppStorage.setOrCreate<boolean>('istabletVertical', this.istabletVertical)
+      hilog.info(0xFF00, this.componentName,
+        `#媒体查询#设备高度改变#(1000vp< height)平板竖屏结果: ${this.istabletVertical}`)
     });
 
     BreakpointSystem.getInstance().attach(this.compStr)
@@ -212,6 +222,7 @@ struct Index {
 
     // 解绑listener中注册的回调函数
     this.deviceHeightListener.off('change');
+    this.tabletHeightListener.off('change')
   }
 
   // 改变设备横竖屏状态函数
