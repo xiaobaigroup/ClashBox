@@ -3,6 +3,8 @@ import { AppearanceList, AppearanceListItemProp } from "../../common/Constants"
 import TopBuilder from "./TopBuilder"
 import { ThemeControl } from "@kit.ArkUI"
 import { CUSTOM_THEME_MAP } from "../../common/AppTheme"
+import { common } from "@kit.AbilityKit"
+import { setAutoColorMode, setDarkColorMode, setLightColorMode } from "../../common/ThemeModeChangeFunctions"
 
 @Component
 struct Appearance {
@@ -14,6 +16,14 @@ struct Appearance {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   //一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  // 深色模式选中
+  @StorageProp('enableDarkMode') enableDarkMode: boolean = false;
+  // 是否跟随系统
+  @StorageProp('isFollowSystemSetting') isFollowSystemSetting: boolean = true;
+  // 当前主题颜色模式
+  @StorageProp('currentColorMode') currentColorMode: number = 0;
+  private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  // 断点系统
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
   // 按钮宽度
   @State
@@ -27,6 +37,8 @@ struct Appearance {
   @State EnableThemeColor: number = 0
   // 按钮位置选中序号
   @State EnableButtonPosition: number = 0
+  // 按钮位置偏移量（默认在右侧的偏移量）
+  @State ButtonPositionOffset: number = 92
 
   // 切换菜单
   @Builder
@@ -52,7 +64,7 @@ struct Appearance {
             // }
             // this.switchUpdateChenChannels(index)
             this.EnableDarkMode = index
-
+            this.switchThemeMode(index)
           })
         }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
       }
@@ -102,10 +114,33 @@ struct Appearance {
             // }
             // this.switchUpdateChenChannels(index)
             this.EnableButtonPosition = index
-
+            this.switchButtonPosition(index)
           })
         }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
       }
+    }
+  }
+
+  // 切换主题模式
+  switchThemeMode(index: number) {
+    switch (index) {
+      case 0:
+        // 跟随系统
+        this.isFollowSystemSetting = true
+        this.enableDarkMode = false
+        setAutoColorMode(this.context)
+        break;
+      case 1:
+        // 始终浅色
+        this.isFollowSystemSetting = false
+        setLightColorMode(this.context)
+        break
+      case 2:
+        // 始终深色
+        this.isFollowSystemSetting = false
+        this.enableDarkMode = true
+        setDarkColorMode(this.context)
+        break
     }
   }
 
@@ -136,6 +171,29 @@ struct Appearance {
         // 小草绿
       break
     }
+  }
+
+  // 切换按钮位置
+  switchButtonPosition(index:number) {
+    switch (index) {
+      case 0:
+        // 右侧
+        this.ButtonPositionOffset = 92
+      break
+      case 1:
+        // 中间
+        this.ButtonPositionOffset = 0
+      break
+      case 2:
+        // 左侧
+        this.ButtonPositionOffset = -92
+      break
+    }
+  }
+
+  aboutToDisappear(): void {
+    AppStorage.setOrCreate('enableDarkMode', this.enableDarkMode);
+    AppStorage.setOrCreate('isFollowSystemSetting', this.isFollowSystemSetting);
   }
 
   build() {
@@ -210,7 +268,7 @@ struct Appearance {
               .height(this.proxyStartButtonHeight)
             }.width(this.proxyStartButtonHeight)
           }
-          .offset({x: 92, y: 52})
+          .offset({x: this.ButtonPositionOffset, y: 52})
           .borderRadius(100)
           .backgroundColor(this.icon_emphasize)
           .shadow({
@@ -231,9 +289,25 @@ struct Appearance {
                 .margin({left: 12})
                 .fontColor([this.icon_emphasize])
               Column() {
-                Text(item.title)
-                  .fontWeight(FontWeight.Medium)
-                  .fontSize(16)
+                Row() {
+                  Text(item.title)
+                    .fontWeight(FontWeight.Medium)
+                    .fontSize(16)
+                  if(item.subtitle2) {
+                    Column() {
+                      Text(item.subtitle2)
+                        .fontColor(Color.White)
+                        .fontSize(10)
+                    }
+                    .alignItems(HorizontalAlign.Center)
+                    .justifyContent(FlexAlign.Center)
+                    .width(50)
+                    .height(18)
+                    .borderRadius(6)
+                    .margin({left: 2})
+                    .backgroundColor(this.icon_emphasize)
+                  }
+                }
                 if(!item.children) {
                   Text(item.subtitle)
                     .fontWeight(FontWeight.Normal)

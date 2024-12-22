@@ -11,6 +11,8 @@ export default class EntryAbility extends UIAbility {
 /*    this.currentLanguage = this.context.config.language
     AppStorage.setOrCreate<string>('language', this.currentLanguage)
     hilog.info(0x0000, 'EntryAbility', `#onCreate#currentLanguage is [${this.currentLanguage}]`);*/
+    // 当前主题模式
+    AppStorage.setOrCreate<ConfigurationConstant.ColorMode>('currentColorMode', this.context.config.colorMode)
   }
 
 
