@@ -1,11 +1,11 @@
 //主页 栅格布局、媒体查询
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
-import { PromptAction, ThemeControl, window } from '@kit.ArkUI'
+import { promptAction, PromptAction, ThemeControl, window } from '@kit.ArkUI'
 import SwitchMode from '../components/Home/SwitchMode'
 import CellularData from '../components/Home/CellularData'
 import CurrrentNode from '../components/Home/CurrentNode'
 import PublicNetwork from '../components/Home/PublicNetwork'
-import Start from '../components/Home/Speed'
+import Speed from '../components/Home/Speed'
 import { getGreeting } from '../utils/getGreeting'
 import SwitchQuickly from '../components/Home/SwitchQuickly'
 import { hilog } from '@kit.PerformanceAnalysisKit'
@@ -238,113 +238,113 @@ struct Home {
   build() {
     Column() {
 
-        if (!this.isLandscapePhone) {
-          Row() {
-            Text(this.greetings)
-              .fontSize(32)
-              .fontWeight(FontWeight.Bold)
-              .margin({ left: this.gridMargin })
-              .fontColor(this.font_primary)
-            Blank()
-            if (!this.isShowHomeEdit) {
-              //编辑布局按钮判定：非编辑状态
-              //编辑按钮
-              Button({ type: ButtonType.Circle, stateEffect: true }) {
-                SymbolGlyph($r('sys.symbol.square_and_pencil'))
-                  .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-                  .fontColor([this.icon_primary])
-              }
-              .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:50}).combine(TransitionEffect.SLIDE))
-              .onClick(() => {
-                this.isShowHomeEdit = true
-              })
-              .margin({ right: this.gridMargin })
-              .width(40)
-              .height(40)
-              .backgroundColor($r('app.color.settings_container_background'))
-
-              //设置按钮
-              Button({ type: ButtonType.Circle, stateEffect: true }) {
-                SymbolGlyph($r('sys.symbol.gearshape'))
-                  .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
-                  .fontColor([this.icon_primary]) //设置图标无法分层设为单色
-              }
-              .margin({ right: this.gridMargin })
-              .width(40)
-              .height(40)
-              .backgroundColor($r('app.color.settings_container_background'))
-              .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:0}).combine(TransitionEffect.SLIDE))
-              .onClick(() => {
-                this.isShowSettings = true
-                this.isEnableIndexForegroundBlur = true
-              })
-              .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
-                detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],
-                preferType: SheetType.CENTER,
-                backgroundColor: $r('app.color.container_background'),
-                dragBar: false,
-                blurStyle: BlurStyle.BACKGROUND_REGULAR,
-                onWillDismiss: () => {
-                  this.isShowSettings = false
-                  this.isEnableIndexForegroundBlur = false
-                  this.SettingsPageInfos.clear()
-                }
-              })
-            } else {
-              //编辑布局按钮判定：是编辑状态
-              //添加按钮
-              Button({ type: ButtonType.Circle, stateEffect: true }) {
-                SymbolGlyph($r('sys.symbol.plus'))
-                  .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-                  .fontColor([Color.White])
-
-              }
-              .margin({ right: this.gridMargin })
-              .width(40)
-              .height(40)
-              .backgroundColor(this.icon_emphasize)
-              .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:100}).combine(TransitionEffect.SLIDE))
-
-              //保存按钮
-              Button({ type: ButtonType.Circle, stateEffect: true }) {
-                SymbolGlyph($r('sys.symbol.save'))
-                  .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
-                  .fontColor([Color.White])
-              }
-              .margin({ right: this.gridMargin })
-              .width(40)
-              .height(40)
-              .backgroundColor(this.icon_emphasize)
-              .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:50}).combine(TransitionEffect.SLIDE))
-              .onClick(() => {
-                this.saveHomeLayout()
-              })
-
-              //取消按钮
-              Button({ type: ButtonType.Circle, stateEffect: true }) {
-                SymbolGlyph($r('sys.symbol.xmark'))
-                  .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
-                  .fontColor([Color.White])
-              }
-              .margin({ right: this.gridMargin })
-              .width(40)
-              .height(40)
-              .backgroundColor(this.icon_emphasize)
-              .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:0}).combine(TransitionEffect.SLIDE))
-              .onClick(() => {
-                if (this.SaveDialogController != null) {
-                  this.SaveDialogController.open()
-                  this.isEnableIndexForegroundBlur = true
-                }
-              })
+      if (!this.isLandscapePhone) {
+        Row() {
+          Text(this.greetings)
+            .fontSize(32)
+            .fontWeight(FontWeight.Bold)
+            .margin({ left: this.gridMargin })
+            .fontColor(this.font_primary)
+          Blank()
+          if (!this.isShowHomeEdit) {
+            //编辑布局按钮判定：非编辑状态
+            //编辑按钮
+            Button({ type: ButtonType.Circle, stateEffect: true }) {
+              SymbolGlyph($r('sys.symbol.square_and_pencil'))
+                .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+                .fontColor([this.icon_primary])
             }
+            .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:50}).combine(TransitionEffect.SLIDE))
+            .onClick(() => {
+              this.isShowHomeEdit = true
+            })
+            .margin({ right: this.gridMargin })
+            .width(40)
+            .height(40)
+            .backgroundColor($r('app.color.settings_container_background'))
+
+            //设置按钮
+            Button({ type: ButtonType.Circle, stateEffect: true }) {
+              SymbolGlyph($r('sys.symbol.gearshape'))
+                .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
+                .fontColor([this.icon_primary]) //设置图标无法分层设为单色
+            }
+            .margin({ right: this.gridMargin })
+            .width(40)
+            .height(40)
+            .backgroundColor($r('app.color.settings_container_background'))
+            .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:0}).combine(TransitionEffect.SLIDE))
+            .onClick(() => {
+              this.isShowSettings = true
+              this.isEnableIndexForegroundBlur = true
+            })
+            .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
+              detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],
+              preferType: SheetType.CENTER,
+              backgroundColor: $r('app.color.background'),
+              dragBar: false,
+    //          blurStyle: BlurStyle.BACKGROUND_REGULAR,
+              onWillDismiss: () => {
+                this.isShowSettings = false
+                this.isEnableIndexForegroundBlur = false
+                this.SettingsPageInfos.clear()
+              }
+            })
+          } else {
+            //编辑布局按钮判定：是编辑状态
+            //添加按钮
+            Button({ type: ButtonType.Circle, stateEffect: true }) {
+              SymbolGlyph($r('sys.symbol.plus'))
+                .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+                .fontColor([Color.White])
+
+            }
+            .margin({ right: this.gridMargin })
+            .width(40)
+            .height(40)
+            .backgroundColor(this.icon_emphasize)
+            .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:100}).combine(TransitionEffect.SLIDE))
+
+            //保存按钮
+            Button({ type: ButtonType.Circle, stateEffect: true }) {
+              SymbolGlyph($r('sys.symbol.save'))
+                .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
+                .fontColor([Color.White])
+            }
+            .margin({ right: this.gridMargin })
+            .width(40)
+            .height(40)
+            .backgroundColor(this.icon_emphasize)
+            .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:50}).combine(TransitionEffect.SLIDE))
+            .onClick(() => {
+              this.saveHomeLayout()
+            })
+
+            //取消按钮
+            Button({ type: ButtonType.Circle, stateEffect: true }) {
+              SymbolGlyph($r('sys.symbol.xmark'))
+                .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
+                .fontColor([Color.White])
+            }
+            .margin({ right: this.gridMargin })
+            .width(40)
+            .height(40)
+            .backgroundColor(this.icon_emphasize)
+            .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:0}).combine(TransitionEffect.SLIDE))
+            .onClick(() => {
+              if (this.SaveDialogController != null) {
+                this.SaveDialogController.open()
+                this.isEnableIndexForegroundBlur = true
+              }
+            })
           }
-          .width('100%')
-          .margin({ bottom: 15 })
-          .geometryTransition("Button")
-          // transition保证组件离场不被立即析构，可设置其他转场效果
-          .transition(TransitionEffect.OPACITY)
         }
+        .width('100%')
+        .margin({ bottom: 15 })
+        .geometryTransition("Button")
+        // transition保证组件离场不被立即析构，可设置其他转场效果
+        .transition(TransitionEffect.OPACITY)
+      }
 
 
       Stack({ alignContent: this.stackAlignContentAlignment }) {
@@ -357,29 +357,30 @@ struct Home {
               reference: BreakpointsReference.WindowSize
             },
           }) {
-            GridCol({
-              span: {
-                xs: 12,
-                sm: 12,
-                md: this.isLandscapePhone ? 6 : 10,
-                lg: 6,
-                xl: 6
-              },
-              offset: {
-                xs: 0,
-                sm: 0,
-                md: this.isLandscapePhone ? 0 : 1,
-                lg: 0,
-                xl: 0
+              GridCol({
+                span: {
+                  xs: 12,
+                  sm: 12,
+                  md: this.isLandscapePhone ? 6 : 10,
+                  lg: 6,
+                  xl: 6
+                },
+                offset: {
+                  xs: 0,
+                  sm: 0,
+                  md: this.isLandscapePhone ? 0 : 1,
+                  lg: 0,
+                  xl: 0
+                }
+              }) {
+                Speed()
               }
-            }) {
-              Start()
-            }
-            .borderRadius(20)
-            .backgroundColor($r('app.color.container_background'))
-            .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
-            .margin({ right: this.isLandscapePhone ? this.containerMargin.value : this.containerRightMargin.value })
-            .clickEffect({ level: ClickEffectLevel.MIDDLE })
+              .borderRadius(20)
+              .backgroundColor($r('app.color.container_background'))
+              .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+              .margin({ right: this.isLandscapePhone ? this.containerMargin.value : this.containerRightMargin.value })
+              .clickEffect({ level: ClickEffectLevel.MIDDLE })
+
 
             GridCol({
               span: {
@@ -398,22 +399,23 @@ struct Home {
               }
             }) {
               GridRow() {
-                GridCol({
-                  span: {
-                    xs: 6,
-                    sm: 6,
-                    md: 6,
-                    lg: 6,
-                    xl: 6
+
+                  GridCol({
+                    span: {
+                      xs: 6,
+                      sm: 6,
+                      md: 6,
+                      lg: 6,
+                      xl: 6
+                    }
+                  }) {
+                    SwitchMode()
                   }
-                }) {
-                  SwitchMode()
-                }
-                .height('100%')
-                .borderRadius(20)
-                .margin({ right: this.containerMargin.value })
-                .backgroundColor($r('app.color.container_background'))
-                .clickEffect({ level: ClickEffectLevel.MIDDLE })
+                  .height('100%')
+                  .borderRadius(20)
+                  .margin({ right: this.containerMargin.value })
+                  .backgroundColor($r('app.color.container_background'))
+                  .clickEffect({ level: ClickEffectLevel.MIDDLE })
 
                 GridCol({
                   span: {
@@ -545,7 +547,6 @@ struct Home {
             }
             .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
             .margin(this.isLandscapePhone ? { top: 20, left: 12 } : this.containerMargin3.value)
-
           }
           .height(this.isLandscapePhone ? '360vp' : this.GridRowHeight.value)
           .width('100%')
@@ -637,6 +638,7 @@ struct Home {
         })
         .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
         .clickEffect({ level: ClickEffectLevel.LIGHT })
+
       }
       .backgroundColor($r('app.color.background'))
       .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })

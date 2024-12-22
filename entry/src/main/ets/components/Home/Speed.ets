@@ -218,83 +218,81 @@ struct Speed {
   }
 
   build() {
-    Column() {
-      Row() {
+      Column() {
         Row() {
-          //网络速率
-          Text($r('app.string.Speed'))
-            .fontSize(this.fontSize.value)
-            .fontColor($r('sys.color.font_primary'))
-        }
-        .width('145vp')
-        //.margin({ top: 10, left: 20 })
-        Row() {
-        }
-        .flexGrow(1)
-
-        Column() {
           Row() {
-            Text(this.DownloadSpeed.toString())
-              .width(40)
-              //.margin({ right: 3 })
-              .fontSize(this.speedfontSize.value)
-              .fontColor($r('app.color.speed_up_icon'))
-            Text(' B/s')
-              .fontColor(this.fontColorValue)
-            Text() {
-              SymbolSpan($r('sys.symbol.chevron_up'))
+            //网络速率
+            Text($r('app.string.Speed'))
+              .fontSize(this.fontSize.value)
+              .fontColor($r('sys.color.font_primary'))
+          }
+          .width('145vp')
+
+          //.margin({ top: 10, left: 20 })
+          Row() {
+          }
+          .flexGrow(1)
+
+          Column() {
+            Row() {
+              Text(this.DownloadSpeed.toString())
+                .width(50)//.margin({ right: 3 })
                 .fontSize(this.speedfontSize.value)
-                .fontColor([this.fontColorValue])
+                .fontColor($r('app.color.speed_up_icon'))
+              Text(' B/s')
+                .fontColor(this.fontColorValue)
+              Text() {
+                SymbolSpan($r('sys.symbol.chevron_up'))
+                  .fontSize(this.speedfontSize.value)
+                  .fontColor([this.fontColorValue])
+              }
             }
 
-          }
-
-          Row() {
-            Text(this.UploadSpeed.toString())
-              .width(40)
-              //.margin({ right: 3 })
-              .fontSize(this.speedfontSize.value)
-              .fontColor($r('app.color.speed_down_icon'))
-            Text(' B/s')
-              .fontColor(this.fontColorValue1)
-            Text() {
-              SymbolSpan($r('sys.symbol.chevron_down'))
+            Row() {
+              Text(this.UploadSpeed.toString())
+                .width(50)//.margin({ right: 3 })
                 .fontSize(this.speedfontSize.value)
-                .fontColor([this.fontColorValue1])
+                .fontColor($r('app.color.speed_down_icon'))
+              Text(' B/s')
+                .fontColor(this.fontColorValue1)
+              Text() {
+                SymbolSpan($r('sys.symbol.chevron_down'))
+                  .fontSize(this.speedfontSize.value)
+                  .fontColor([this.fontColorValue1])
+              }
+
             }
-
           }
+          .width('100vp')
         }
-        .width('100vp')
+        .height(40)
+        .width('100%')
+        .alignItems(VerticalAlign.Center)
+
+        Row() {
+
+        }
+        .justifyContent(FlexAlign.Center)
+        .width('100%')
+
+        //图表
+        Row() {
+          McLineChart({
+            options: this.defOption
+          })
+        }
+        .height('85%')
 
       }
-      .height(40)
+      .padding({
+        top: 12,
+        bottom: 12,
+        left: 10,
+        right: 10
+      })
       .width('100%')
-      .alignItems(VerticalAlign.Center)
+      .height('100%')
 
-      Row() {
-
-      }
-      .justifyContent(FlexAlign.Center)
-      .width('100%')
-
-      //图表
-      Row() {
-        McLineChart({
-          options: this.defOption
-        })
-      }
-      .height('85%')
-
-    }
-    .padding({
-      top: 12,
-      bottom: 12,
-      left: 10,
-      right: 10
-    })
-    .width('100%')
-    .height('100%')
   }
 }
 

@@ -43,6 +43,10 @@
     {
       "name": "button_container_background",
       "value": "#0DFFFFFF"
+    },
+    {
+      "name": "back",
+      "value": "#FF191919"
     }
   ]
 }

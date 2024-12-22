@@ -281,7 +281,8 @@ struct About {
       .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
     }
     .width('100%')
-    .backgroundBlurStyle(BlurStyle.BACKGROUND_REGULAR)
+    .backgroundColor($r('app.color.background'))
+  //  .backgroundBlurStyle(BlurStyle.BACKGROUND_REGULAR)
     .hideTitleBar(true)
     .onBackPressed(() => {
       this.SettingsPageInfos.clear();
@@ -437,7 +438,8 @@ export struct AboutContributors {
       .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
     }
     .width('100%')
-    .backgroundBlurStyle(BlurStyle.BACKGROUND_REGULAR)
+    .backgroundColor($r('app.color.background'))
+//    .backgroundBlurStyle(BlurStyle.BACKGROUND_REGULAR)
     .hideTitleBar(true)
     .onBackPressed(() => {
       this.SettingsPageInfos.pop(true)

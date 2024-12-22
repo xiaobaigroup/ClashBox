@@ -105,7 +105,8 @@ struct Language {
 
     }
     .hideTitleBar(true)
-    .backgroundBlurStyle(BlurStyle.BACKGROUND_REGULAR)
+    .backgroundColor($r('app.color.background'))
+ //   .backgroundBlurStyle(BlurStyle.BACKGROUND_REGULAR)
     .onBackPressed(() => {
       this.SettingsPageInfos.clear();
       return true;

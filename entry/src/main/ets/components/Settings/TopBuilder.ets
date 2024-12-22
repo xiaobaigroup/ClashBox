@@ -26,7 +26,7 @@ struct TopBuilder {
         .width(40)
         .height(40)
         .clickEffect({ level: ClickEffectLevel.LIGHT })
-        .backgroundColor($r('app.color.settings_container_background'))
+        .backgroundColor($r('app.color.back'))
         .onClick(() => {
           this.SettingsPageInfos.pop(true)
         })

@@ -14,8 +14,8 @@ struct Appearance {
 
     }
     .hideTitleBar(true)
-    .backgroundColor($r('app.color.settings_container_background'))
-    .backgroundBlurStyle(BlurStyle.BACKGROUND_REGULAR)
+    .backgroundColor($r('app.color.background'))
+ //   .backgroundBlurStyle(BlurStyle.BACKGROUND_REGULAR)
     .onBackPressed(() => {
       this.SettingsPageInfos.clear();
       return true;
