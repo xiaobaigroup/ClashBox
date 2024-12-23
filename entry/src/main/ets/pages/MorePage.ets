@@ -39,6 +39,8 @@ struct MorePage {
   @Provide isShowCloudconfig: boolean = false
   // 设置页语言选中暂存变量
   @Provide currentLanguage: ResourceStr = $r('app.string.Language_Subtitle')
+  // 设置页实验功能提示框显示变量
+  @Provide isShowExperimentalFunction: boolean = true
   /* 断点布局相关 相关作用看定义时候的注释 */
   // 整体外边距
   @Consume('breakPointStatemorePageMargin')

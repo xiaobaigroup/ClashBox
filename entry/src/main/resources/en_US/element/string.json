@@ -970,7 +970,35 @@
     },
     {
       "name": "backgrounder_tips",
-      "value": "You can only choose to turn on one of the options, which may result in an increase in power consumption"
+      "value": "Tips: You can only choose to turn on one of the options, which may result in an increase in power consumption"
+    },
+    {
+      "name": "notice_main_switch",
+      "value": "The Main Switch of the Notice"
+    },
+    {
+      "name": "background_notice",
+      "value": "Background Notice"
+    },
+    {
+      "name": "background_notice_subtitle",
+      "value": "Not recommended to close"
+    },
+    {
+      "name": "cellular_data_reminder",
+      "value": "CellularData Reminder"
+    },
+    {
+      "name": "cellular_data_reminder_subtitle",
+      "value": "Reminder after reaching a certain limit of data usage"
+    },
+    {
+      "name": "time_reminder",
+      "value": "Time Reminder"
+    },
+    {
+      "name": "time_reminder_subtitle",
+      "value": "Reminder when VPN is not turned off for a long time"
     }
   ]
 }

@@ -48,6 +48,8 @@ struct Home {
   @Provide isShowCloudconfig: boolean = false
   // 设置页语言选中暂存变量
   @Provide currentLanguage: ResourceStr = $r('app.string.Language_Subtitle')
+  // 设置页实验功能提示框显示变量
+  @Provide isShowExperimentalFunction: boolean = true
   // 所有子组件在容器内的对齐方式 TODO 【用户首选项】在设置里可以更改 Alignment.BottomStart 和 Alignment.BottomEnd Enlin@2024-12-04
   @State
   stackAlignContentAlignment: Alignment = Alignment.BottomEnd

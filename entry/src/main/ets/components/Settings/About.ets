@@ -11,6 +11,8 @@ import { promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 
 @Component
 struct About {
+  // 实验功能提示框展示变量
+  @Consume isShowExperimentalFunction: boolean
   /* 主题色 */
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
@@ -83,12 +85,16 @@ struct About {
   }
 
   // 列表行开关事件处理
-  handleToggle(name?: string) {
+  handleToggle(isOn: boolean, name: string) {
     switch (name) {
       case 'ExperimentalFunction':
-        // 实验功能
+        // 实验功能开关
         hilog.info(0xFF00, "AboutestTag", "实验功能")
-
+        if(isOn) {
+          this.isShowExperimentalFunction = true
+        } else {
+          this.isShowExperimentalFunction = false
+        }
         break
       case 'Auto':
         // 自动检查更新
@@ -213,7 +219,6 @@ struct About {
                   }
                   .onClick(() => {
                     // 这里什么都没有
-
                   })
                 } else { // 无子项
                   Column() {
@@ -236,14 +241,12 @@ struct About {
                       Blank()
                       if(itemChild.sign === 1) {
                         // 开关型
-                        Toggle({ type: ToggleType.Switch, isOn: false })
+                        Toggle({ type: ToggleType.Switch, isOn: itemChild.isOn })
                           .selectedColor(this.icon_emphasize)
                           .margin({right: 12})
                           .onChange((isOn: boolean) => {
-                            if(isOn) {
-                              // 进入开关事件处理
-                              this.handleToggle(itemChild.name)
-                            }
+                            // 进入开关事件处理
+                            this.handleToggle(isOn, itemChild.name)
                           })
                       } else if(itemChild.sign === 2) {
                         // 跳转型

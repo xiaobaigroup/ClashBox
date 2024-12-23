@@ -8,6 +8,8 @@ import { setAutoColorMode, setDarkColorMode, setLightColorMode } from "../../com
 
 @Component
 struct Appearance {
+  // 实验功能提示框展示变量
+  @Consume isShowExperimentalFunction: boolean
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @State appearanceList: AppearanceListItemProp[] = AppearanceList
   /* 主题色 */
@@ -283,20 +285,22 @@ struct Appearance {
                   Text(item.title)
                     .fontWeight(FontWeight.Medium)
                     .fontSize(16)
-                  // 实验功能提示框
-                  if(item.subtitle2) {
-                    Column() {
-                      Text(item.subtitle2)
-                        .fontColor(Color.White)
-                        .fontSize(10)
+                  if(this.isShowExperimentalFunction) {
+                    // 实验功能提示框
+                    if(item.subtitle2) {
+                      Column() {
+                        Text(item.subtitle2)
+                          .fontColor(Color.White)
+                          .fontSize(10)
+                      }
+                      .alignItems(HorizontalAlign.Center)
+                      .justifyContent(FlexAlign.Center)
+                      .width(50)
+                      .height(18)
+                      .borderRadius(4)
+                      .margin({left: 2})
+                      .backgroundColor(this.icon_emphasize)
                     }
-                    .alignItems(HorizontalAlign.Center)
-                    .justifyContent(FlexAlign.Center)
-                    .width(50)
-                    .height(18)
-                    .borderRadius(6)
-                    .margin({left: 2})
-                    .backgroundColor(this.icon_emphasize)
                   }
                 }
                 if(!item.children) {

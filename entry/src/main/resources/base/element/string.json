@@ -970,7 +970,35 @@
     },
     {
       "name": "backgrounder_tips",
-      "value": "您只能选择开启其中的一个选项，开启后可能会导致耗电量增加"
+      "value": "Tips：您只能选择开启其中的一个选项，开启后可能会导致耗电量增加"
+    },
+    {
+      "name": "notice_main_switch",
+      "value": "通知总开关"
+    },
+    {
+      "name": "background_notice",
+      "value": "后台通知"
+    },
+    {
+      "name": "background_notice_subtitle",
+      "value": "不建议关闭"
+    },
+    {
+      "name": "cellular_data_reminder",
+      "value": "流量提醒"
+    },
+    {
+      "name": "cellular_data_reminder_subtitle",
+      "value": "流量使用到一定额度后提醒"
+    },
+    {
+      "name": "time_reminder",
+      "value": "时间提醒"
+    },
+    {
+      "name": "time_reminder_subtitle",
+      "value": "长时间未关闭VPN时提醒"
     }
   ]
 }

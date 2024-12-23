@@ -103,6 +103,8 @@ export default Backup
 @Component
 export struct CloudBackup {
   @Consume isShowCloudconfig: boolean
+  // 实验功能提示框展示变量
+  @Consume isShowExperimentalFunction: boolean
   @State isLogon: boolean = false
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   //一级图标色，黑色
@@ -124,19 +126,21 @@ export struct CloudBackup {
             Text($r('app.string.cloud_backup'))
               .fontWeight(FontWeight.Medium)
               .fontSize(16)
-            // 实验功能提示框
-            Column() {
-              Text($r('app.string.experimental_function'))
-                .fontColor(Color.White)
-                .fontSize(10)
+            if(this.isShowExperimentalFunction) {
+              // 实验功能提示框
+              Column() {
+                Text($r('app.string.experimental_function'))
+                  .fontColor(Color.White)
+                  .fontSize(10)
+              }
+              .alignItems(HorizontalAlign.Center)
+              .justifyContent(FlexAlign.Center)
+              .width(50)
+              .height(18)
+              .borderRadius(4)
+              .margin({left: 2})
+              .backgroundColor(this.icon_emphasize)
             }
-            .alignItems(HorizontalAlign.Center)
-            .justifyContent(FlexAlign.Center)
-            .width(50)
-            .height(18)
-            .borderRadius(6)
-            .margin({left: 2})
-            .backgroundColor(this.icon_emphasize)
           }
           Text($r('app.string.cloud_backup_subtitle'))
             .fontWeight(FontWeight.Normal)
