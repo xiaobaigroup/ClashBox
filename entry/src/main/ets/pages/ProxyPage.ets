@@ -499,8 +499,8 @@ struct ProxyPage {
 
       if (this.FristPage) { //为观看预览页的判定if/else，判定和更改后续可以删掉
         Column({ space: 5 }) {
-          SymbolGlyph($r('sys.symbol.doc')).fontSize(24).fontColor([this.icon_secondary])
-          Text($r('app.string.None_Proxy')).fontSize(20).fontColor(this.font_secondary)
+          SymbolGlyph($r('sys.symbol.doc')).fontSize(32).fontColor([this.icon_secondary])
+          Text($r('app.string.None_Proxy')).fontSize(20).fontColor(this.font_secondary).textAlign(TextAlign.Center)
         }
         .width('100%')
         .height('90%')

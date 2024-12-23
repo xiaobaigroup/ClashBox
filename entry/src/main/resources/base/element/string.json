@@ -622,7 +622,7 @@
     },
     {
       "name": "None_Proxy",
-      "value": "暂无代理"
+      "value": "当前页面暂无代理\n请检查配置"
     },
     {
       "name": "Application_Version",
@@ -859,6 +859,10 @@
     {
       "name": "proxy_1",
       "value": "代理1"
+    },
+    {
+      "name": "home_edit",
+      "value": "编辑主页"
     },
     {
       "name": "cloud_backup",

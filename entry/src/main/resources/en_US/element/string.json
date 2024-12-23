@@ -861,6 +861,10 @@
       "value": "Proxy 1"
     },
     {
+      "name": "home_edit",
+      "value": "Home Edit"
+    },
+    {
       "name": "cloud_backup",
       "value": "Cloud Backup"
     },
