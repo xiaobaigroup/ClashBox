@@ -9,7 +9,7 @@ struct Language {
   /* 主题色 */
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
-  @Link isShowSettings: boolean
+  @Consume currentLanguage: ResourceStr
   @State SystemLanguageSubtitle: ResourceStr = $r('app.string.SimplifiedChinese')
   @State private currentRadioCheck: number = -1
   @State SettingsLanguageList: LanguageData[] = LanguageListItem()
@@ -95,6 +95,11 @@ struct Language {
             this.currentRadioCheck = index
             // 修改语言
             i18n.System.setAppPreferredLanguage(item.areaID)
+            if(index === 0) {
+              this.currentLanguage = $r('app.string.Language_Subtitle')
+            } else {
+              this.currentLanguage = item.title
+            }
           })
         })
       }

@@ -1,19 +1,25 @@
+import { BreakpointState } from "../../common/breakpointsystem"
 import TopBuilder from "./TopBuilder"
 
 @Component
 struct Backgrounder {
-  @Link isShowSettings: boolean
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  //@Consume('morePageMargin') morePageMargin: BreakpointState<number>
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
+  //一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
 
   build() {
     NavDestination() {
-      TopBuilder({title: $r('app.string.Backgrounder'), /*isShowSettings: this.isShowSettings*/})
+      TopBuilder({title: $r('app.string.Backgrounder')})
+      Column() {
+
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Center)
+      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
-  //  .backgroundBlurStyle(BlurStyle.BACKGROUND_REGULAR)
     .onBackPressed(() => {
       this.SettingsPageInfos.clear();
       return true;

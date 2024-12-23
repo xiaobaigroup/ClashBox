@@ -919,6 +919,58 @@
     {
       "name": "connect_test",
       "value": "连接测试"
+    },
+    {
+      "name": "current_version",
+      "value": "当前版本"
+    },
+    {
+      "name": "latest_version",
+      "value": "最新版本"
+    },
+    {
+      "name": "go_download_update",
+      "value": "前往下载更新(Github)"
+    },
+    {
+      "name": "ignore_update",
+      "value": "忽略本次更新"
+    },
+    {
+      "name": "go_download_update_subtitle",
+      "value": "建议先开启代理"
+    },
+    {
+      "name": "check_update_tips",
+      "value": "目前仅支持从Github下载更新，您也可以选择加入我们的Telegram频道获取更新。"
+    },
+    {
+      "name": "simulate_download",
+      "value": "模拟下载"
+    },
+    {
+      "name": "simulate_download_subtitle",
+      "value": "通过模拟下载以保留程序后台"
+    },
+    {
+      "name": "simulate_player",
+      "value": "模拟播放"
+    },
+    {
+      "name": "simulate_player_subtitle",
+      "value": "通过播放空白音频以保留程序后台"
+    },
+    {
+      "name": "simulate_record",
+      "value": "模拟录音"
+    },
+    {
+      "name": "simulate_record_subtitle",
+      "value": "通过模拟录音以保留程序后台"
+    },
+    {
+      "name": "backgrounder_tips",
+      "value": "您只能选择开启其中的一个选项，开启后可能会导致耗电量增加"
     }
   ]
 }

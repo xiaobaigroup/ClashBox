@@ -8,7 +8,6 @@ import { setAutoColorMode, setDarkColorMode, setLightColorMode } from "../../com
 
 @Component
 struct Appearance {
-  @Link isShowSettings: boolean
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @State appearanceList: AppearanceListItemProp[] = AppearanceList
   /* 主题色 */
@@ -284,6 +283,7 @@ struct Appearance {
                   Text(item.title)
                     .fontWeight(FontWeight.Medium)
                     .fontSize(16)
+                  // 实验功能提示框
                   if(item.subtitle2) {
                     Column() {
                       Text(item.subtitle2)

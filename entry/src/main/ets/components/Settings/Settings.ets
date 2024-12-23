@@ -8,7 +8,7 @@ import ApplicationLock from "./ApplicationLock"
 import Notice from "./Notice"
 import Backgrounder from "./Backgrounder"
 import WipeData from "./WipeData"
-import About, { AboutContributors } from "./About"
+import About, { AboutContributors, CheckUpdate } from "./About"
 import Language from "./Language"
 import TopBuilder from "./TopBuilder"
 
@@ -55,6 +55,7 @@ struct Settings {
 
   @State settingsList: settingsData[] = SettingsListItem()
   @Link isShowSettings: boolean
+  @Consume currentLanguage: ResourceStr
   // 当前设备`height`是否符合(320vp< height <= 500vp)
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
@@ -131,7 +132,7 @@ struct Settings {
   @Builder
   SettingsPagesMap(name: string) {
     if (name == 'Appearance') {
-      Appearance({isShowSettings: this.isShowSettings})
+      Appearance()
     } else
       if (name == 'Backup') {
         Backup()
@@ -143,22 +144,25 @@ struct Settings {
         Notice({isShowSettings: this.isShowSettings})
       } else
       if (name == 'Backgrounder') {
-        Backgrounder({isShowSettings: this.isShowSettings})
+        Backgrounder()
       } else
       if (name == 'WipeData') {
         WipeData({isShowSettings: this.isShowSettings})
       } else
       if (name == 'About') {
-        About({isShowSettings: this.isShowSettings})
+        About()
       } else
       if (name == 'Language') {
-        Language({isShowSettings: this.isShowSettings})
+        Language()
       } else
       if (name == 'Contributors') {
         AboutContributors()
       } else
       if (name == 'CloudBackup') {
         CloudBackup()
+      } else
+      if (name == 'CheckUpdate') {
+        CheckUpdate()
       }
   }
 
@@ -208,6 +212,12 @@ struct Settings {
     .navDestination(this.SettingsPagesMap)
     .width('100%')
     .height('100%')
+    .onAppear(() => {
+      // 刷新语言行的语言提示
+      const itemData = this.settingsList[0]
+      itemData.hint = this.currentLanguage
+      this.settingsList.splice(0, 1, itemData)
+    })
   }
 }
 export default Settings

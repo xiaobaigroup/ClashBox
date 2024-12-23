@@ -347,7 +347,7 @@ export const AboutList: AboutListItemProp[] = [
   { title: 'Update',
     subtitle: '',
     children: [
-      { title: $r('app.string.Check_Updates'), subtitle: '', sign: 2, name: 'Update' },
+      { title: $r('app.string.Check_Updates'), subtitle: '', sign: 2, name: 'CheckUpdate' },
       { title: $r('app.string.UpdateChannels'), subtitle: $r('app.string.UpdateChannels_Subtitle1'), sign: 3, name: 'UpdateChannels',
         children: [
           { title: $r('app.string.UpdateChannels_Subtitle1'), name: 'Github', subtitle: '' },
@@ -398,6 +398,43 @@ export const ContributorsList: ContributorsListItemProp[] = [
   { title: '小雅', subtitle: $r('app.string.FrondEnd_Development'), contact: 'Github', image: $rawfile('ya.png')},
   { title: '凛凛早露', subtitle: $r('app.string.LLZL_Subtitle'), image: $rawfile('llzl.png')},
   { title: $r('app.string.Dear_Group_Members'), subtitle: $r('app.string.Dear_Group_Members_Subtitle'), image: $rawfile('group.jpg')},
+]
+
+/**
+ * 检查更新页列表参数
+ */
+export interface CheckUpdateListItemProp {
+  icons?: Resource
+  title: string | Resource
+  subtitle: string | Resource
+  children?: Array<CheckUpdateListItemProp>
+}
+/**
+ *  检查更新页列表
+ */
+export const CheckUpdateList: CheckUpdateListItemProp[] = [
+  {
+    title: 'Version',
+    subtitle: '',
+    children: [
+      { title: $r('app.string.current_version'), subtitle: '2.0.000 Preview1' },
+      { title: $r('app.string.latest_version'), subtitle: '2.0.000' }
+    ]
+  },
+  {
+    title: 'Go',
+    subtitle: '',
+    children: [
+      { icons: $r('sys.symbol.arrowshape_down_to_line_fill'), title: $r('app.string.go_download_update'), subtitle: $r('app.string.go_download_update_subtitle') },
+    ]
+  },
+  {
+    title: 'Ignore',
+    subtitle: '',
+    children: [
+      { icons: $r('sys.symbol.hand_raised_hexagon'), title: $r('app.string.ignore_update'), subtitle: '' },
+    ]
+  }
 ]
 
 

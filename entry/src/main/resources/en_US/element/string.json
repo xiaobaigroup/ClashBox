@@ -919,6 +919,58 @@
     {
       "name": "connect_test",
       "value": "Test Connection"
+    },
+    {
+      "name": "current_version",
+      "value": "Current Version"
+    },
+    {
+      "name": "latest_version",
+      "value": "Latest Version"
+    },
+    {
+      "name": "go_download_update",
+      "value": "Go to download update (Github)"
+    },
+    {
+      "name": "ignore_update",
+      "value": "Ignore this update"
+    },
+    {
+      "name": "go_download_update_subtitle",
+      "value": "Suggest activating the proxy first"
+    },
+    {
+      "name": "check_update_tips",
+      "value": "At present, we only support downloading updates from Github. You can also choose to join our Telegram channel to get updates."
+    },
+    {
+      "name": "simulate_download",
+      "value": "Simulated Download"
+    },
+    {
+      "name": "simulate_download_subtitle",
+      "value": "Simulate downloading to preserve the program backend"
+    },
+    {
+      "name": "simulate_player",
+      "value": "Simulated Playing"
+    },
+    {
+      "name": "simulate_record",
+      "value": "Simulated Recording"
+    },
+    {
+      "name": "simulate_record_subtitle",
+      "value": "By simulating recordings to preserve the program background"
+    },
+    {
+      "name": "simulate_player_subtitle",
+      "value": "By playing blank audio to preserve the program background"
+    },
+    {
+      "name": "backgrounder_tips",
+      "value": "You can only choose to turn on one of the options, which may result in an increase in power consumption"
     }
   ]
 }

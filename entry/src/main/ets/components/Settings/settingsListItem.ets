@@ -3,9 +3,9 @@ import { settingsData } from "../../common/Constants"
 @Component
 struct settingsListItem {
   /* 主题色 */
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  //一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @Prop itemObj: settingsData
   @Prop index: number
   onCheck = (index: number) => {}

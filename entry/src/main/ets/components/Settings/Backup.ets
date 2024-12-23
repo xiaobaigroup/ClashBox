@@ -120,9 +120,24 @@ export struct CloudBackup {
           .margin({left: 12})
           .fontColor([this.icon_emphasize])
         Column() {
-          Text($r('app.string.cloud_backup'))
-            .fontWeight(FontWeight.Medium)
-            .fontSize(16)
+          Row() {
+            Text($r('app.string.cloud_backup'))
+              .fontWeight(FontWeight.Medium)
+              .fontSize(16)
+            // 实验功能提示框
+            Column() {
+              Text($r('app.string.experimental_function'))
+                .fontColor(Color.White)
+                .fontSize(10)
+            }
+            .alignItems(HorizontalAlign.Center)
+            .justifyContent(FlexAlign.Center)
+            .width(50)
+            .height(18)
+            .borderRadius(6)
+            .margin({left: 2})
+            .backgroundColor(this.icon_emphasize)
+          }
           Text($r('app.string.cloud_backup_subtitle'))
             .fontWeight(FontWeight.Normal)
             .textOverflow({ overflow: TextOverflow.MARQUEE })

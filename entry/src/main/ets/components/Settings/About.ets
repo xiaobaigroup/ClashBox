@@ -1,24 +1,28 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import { AboutListItemProp, AboutList, BORDER_RADIUS_20, ContributorsListItemProp,
-  ContributorsList } from "../../common/Constants"
+  ContributorsList,
+  CheckUpdateList,
+  CheckUpdateListItemProp} from "../../common/Constants"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { common, Want } from "@kit.AbilityKit"
 import { BusinessError } from "@kit.BasicServicesKit"
-import { SymbolGlyphModifier } from "@kit.ArkUI"
+import { promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 
 @Component
 struct About {
   /* 主题色 */
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
-  @Link isShowSettings: boolean
+  // 一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  // 二级图标色，黑色
+  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary')
   @State EnableUpdateChenChannels: number = 0
   @State aboutList: AboutListItemProp[] = AboutList
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
-  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //一级图标色，黑色
+
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   // 列表高度
   @Consume('breakPointStateSettingslistHeight') private SettingslistHeight: BreakpointState<number>
@@ -182,7 +186,8 @@ struct About {
           ListItem() {
             Column() {
               ForEach(item.children, (itemChild: AboutListItemProp) => {
-                if (itemChild.children) { // 存在子项
+                if (itemChild.children) {
+                  // 存在子项
                   Column() {
                     Row() {
                       Text(itemChild.title)
@@ -293,7 +298,9 @@ export default About
 
 
 
-// 贡献者名单页面
+/**
+ *  贡献者名单页面
+ */
 @Component
 export struct AboutContributors {
   /* 主题色 */
@@ -430,15 +437,137 @@ export struct AboutContributors {
         })
       }
       .width('100%')
-      // .scrollBar(BarState.Off)
       .alignListItem(ListItemAlign.Center)
       .height(this.isLandscapePhone ? 300 : this.SettingslistHeight.value)
-      // .margin({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
       .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
     }
     .width('100%')
     .backgroundColor($r('app.color.background'))
-//    .backgroundBlurStyle(BlurStyle.BACKGROUND_REGULAR)
+    .hideTitleBar(true)
+    .onBackPressed(() => {
+      this.SettingsPageInfos.pop(true)
+      return true
+    })
+  }
+}
+
+/**
+ *  检查更新页
+ */
+@Component
+export struct CheckUpdate {
+
+  @State updateList: CheckUpdateListItemProp[] = CheckUpdateList
+  @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
+  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+  /* 主题色 */
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  //一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+
+  // 隐式 Want 跳转网站
+  async implicitStartAbility(url: string) {
+    try {
+      let want: Want = {
+        // 如果希望仅在特定包中隐式查询，请取消下面的注释行
+        // bundleName: "com.example.myapplication",
+        "action": "ohos.want.action.viewData",
+        // entities可以省略
+        "entities": [ "entity.system.browsable" ],
+        "uri": url,
+      }
+      let context = getContext(this) as common.UIAbilityContext;
+      await context.startAbility(want)
+      console.info(`explicit start ability succeed`)
+    } catch (error) {
+      console.info(`explicit start ability failed with ${error.code}`)
+    }
+  }
+
+  build() {
+    NavDestination() {
+      TopBuilder({title: $r('app.string.Check_Updates')})
+      Column() {
+        ForEach(this.updateList, (item: CheckUpdateListItemProp, index: number) => {
+          Column() {
+            ForEach(item.children, (itemChild: CheckUpdateListItemProp) => {
+              Column() {
+                Row() {
+                  // 图标
+                  if(itemChild.icons) {
+                    SymbolGlyph(itemChild.icons)
+                      .fontSize(24)
+                      .margin({left: 12, right: 12})
+                      .fontColor([this.icon_emphasize])
+                  }
+                  // 标题
+                  Column() {
+                    Text(itemChild.title)
+                      .fontWeight(FontWeight.Medium)
+                      .fontSize(16)
+                    if(itemChild.subtitle && item.title != 'Version') {
+                      Text(itemChild.subtitle)
+                        .fontWeight(FontWeight.Normal)
+                        .fontSize(14)
+                        .margin({top: 2})
+                    }
+                  }
+                  .height(53)
+                  .justifyContent(FlexAlign.Center)
+                  .alignItems(HorizontalAlign.Start)
+                  .margin({ left: 12 })
+                  Blank()
+                  if(item.title === 'Version') {
+                    Text(itemChild.subtitle)
+                      .fontWeight(FontWeight.Normal)
+                      .fontSize(14)
+                      .margin({ right: 12})
+                  } else {
+                    SymbolGlyph($r('sys.symbol.chevron_right'))
+                      .fontSize(24)
+                      .margin({ right: 12})
+                      .fontColor([this.icon_primary])
+                  }
+                }
+                .width('100%')
+                .justifyContent(FlexAlign.Start)
+                // 分割线
+                Row().height(0.5).backgroundColor('#0D000000').width('93%')
+              }.width('100%')
+              .onClick(() => {
+                if(index === 1) {
+                  // 前往下载网页
+                  hilog.info(0xFF00, "checkUpdateTest", "前往下载网页")
+                  // 网站的URL后期需要更换为动态变化
+                  // this.implicitStartAbility('https://xxxx')
+                  // 预览版暂不提供此功能
+                  promptAction.showToast({
+                    message: '开发中，敬请期待',
+                    duration: 2000
+                  })
+                } else if(index === 2) {
+                  // 忽略本次更新
+                  hilog.info(0xFF00, "checkUpdateTest", "忽略本次更新")
+
+                }
+              })
+            })
+          }
+          .width('100%')
+          .backgroundColor($r('app.color.container_background'))
+          .borderRadius(BORDER_RADIUS_20)
+          .margin({bottom: 10 })
+        })
+        // 提示
+        Text($r('app.string.check_update_tips'))
+          .fontWeight(FontWeight.Normal)
+          .fontSize(15)
+      }
+      .width('100%')
+      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+    }
+    .width('100%')
+    .backgroundColor($r('app.color.background'))
     .hideTitleBar(true)
     .onBackPressed(() => {
       this.SettingsPageInfos.pop(true)
