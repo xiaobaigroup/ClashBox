@@ -18,7 +18,7 @@ struct Basic {
   // 列表高度
   @Consume('breakPointStateListHeight') listHeight: BreakpointState<number>
   // 平板竖屏判断
-  @Consume('tabletVertical') istabletVertical: boolean
+  @StorageProp('istabletVertical')  private istabletVertical: boolean = false
 
   handleCheck(index: number) {
     // 跳转

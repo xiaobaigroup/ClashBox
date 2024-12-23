@@ -633,11 +633,11 @@
       "value": "Kernel Version"
     },
     {
-      "name": "Experimental_Function",
+      "name": "experimental_function",
       "value": "Experimental Function"
     },
     {
-      "name": "Experimental_Function_Subtitle",
+      "name": "experimental_function_Subtitle",
       "value": "Enabling the experimental function may lead to application instability"
     },
     {
@@ -859,6 +859,62 @@
     {
       "name": "proxy_1",
       "value": "Proxy 1"
+    },
+    {
+      "name": "cloud_backup",
+      "value": "Cloud Backup"
+    },
+    {
+      "name": "backup",
+      "value": "Backup"
+    },
+    {
+      "name": "restore",
+      "value": "Restore"
+    },
+    {
+      "name": "cloud_backup_subtitle",
+      "value": "Connect to the server through the WebDav protocol"
+    },
+    {
+      "name": "backup_subtitle",
+      "value": "Back up application data locally"
+    },
+    {
+      "name": "restore_subtitle",
+      "value": "Restore data by backing up files"
+    },
+    {
+      "name": "enabled",
+      "value": "Enabled"
+    },
+    {
+      "name": "not_enabled",
+      "value": "Not Enabled"
+    },
+    {
+      "name": "webdav_config",
+      "value": "WebDav Config"
+    },
+    {
+      "name": "server_address",
+      "value": "Server Address"
+    },
+    {
+      "name": "account_name",
+      "value": "Account Name"
+    },
+    {
+      "name": "password",
+      "value": "Password"
+    },
+    {
+      "name": "log_on",
+      "value": "Log on"
+    },
+    {
+      "name": "connect_test",
+      "value": "Test Connection"
     }
   ]
 }

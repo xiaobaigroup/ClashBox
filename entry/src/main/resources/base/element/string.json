@@ -633,11 +633,11 @@
       "value": "内核版本"
     },
     {
-      "name": "Experimental_Function",
+      "name": "experimental_function",
       "value": "实验功能"
     },
     {
-      "name": "Experimental_Function_Subtitle",
+      "name": "experimental_function_Subtitle",
       "value": "开启实验功能可能会导致应用不稳定"
     },
     {
@@ -859,6 +859,62 @@
     {
       "name": "proxy_1",
       "value": "代理1"
+    },
+    {
+      "name": "cloud_backup",
+      "value": "云备份"
+    },
+    {
+      "name": "backup",
+      "value": "备份"
+    },
+    {
+      "name": "restore",
+      "value": "恢复"
+    },
+    {
+      "name": "cloud_backup_subtitle",
+      "value": "通过WebDav协议连接服务器"
+    },
+    {
+      "name": "backup_subtitle",
+      "value": "将应用数据备份到本地"
+    },
+    {
+      "name": "restore_subtitle",
+      "value": "通过备份文件恢复数据"
+    },
+    {
+      "name": "enabled",
+      "value": "已启用"
+    },
+    {
+      "name": "not_enabled",
+      "value": "未启用"
+    },
+    {
+      "name": "webdav_config",
+      "value": "WebDav配置"
+    },
+    {
+      "name": "server_address",
+      "value": "服务器地址"
+    },
+    {
+      "name": "account_name",
+      "value": "账号名"
+    },
+    {
+      "name": "password",
+      "value": "密码"
+    },
+    {
+      "name": "log_on",
+      "value": "登录"
+    },
+    {
+      "name": "connect_test",
+      "value": "连接测试"
     }
   ]
 }

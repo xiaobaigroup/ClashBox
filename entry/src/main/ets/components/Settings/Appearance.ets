@@ -4,7 +4,7 @@ import TopBuilder from "./TopBuilder"
 import { ThemeControl } from "@kit.ArkUI"
 import { CUSTOM_THEME_MAP } from "../../common/AppTheme"
 import { common } from "@kit.AbilityKit"
-import { setAutoColorMode, setDarkColorMode, setLightColorMode } from "../../common/ThemeModeChangeFunctions"
+import { setAutoColorMode, setDarkColorMode, setLightColorMode } from "../../common/ColorModeChangeFunctions"
 
 @Component
 struct Appearance {
@@ -51,20 +51,10 @@ struct Appearance {
             .selectIcon(true)
           .selected(this.EnableDarkMode === index)
           .onChange((selected) => {
-            // 修改关于页面更新渠道显示的subtitle
-            // if (this.aboutList && this.aboutList.length > 4 && this.aboutList[4].children) {
-            //   // 检查this.aboutList[4].children[1]是否存在
-            //   const childItem = this.aboutList[4].children[1];
-            //   if (childItem) {
-            //     // 如果存在，更新它的subtitle属性
-            //     childItem.subtitle = menuItem.title;
-            //   }
-            //   // 使用splice来修改subtitle
-            //   this.aboutList[4].children.splice(1, 1, childItem);
-            // }
-            // this.switchUpdateChenChannels(index)
             this.EnableDarkMode = index
-            this.switchThemeMode(index)
+            this.switchColorMode(index)
+            // UI刷新
+            this.refreshColorModeList(menuItem.title)
           })
         }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
       }
@@ -76,20 +66,10 @@ struct Appearance {
             .selectIcon(true)
           .selected(this.EnableThemeColor === index)
           .onChange((selected) => {
-            // 修改关于页面更新渠道显示的subtitle
-            // if (this.aboutList && this.aboutList.length > 4 && this.aboutList[4].children) {
-            //   // 检查this.aboutList[4].children[1]是否存在
-            //   const childItem = this.aboutList[4].children[1];
-            //   if (childItem) {
-            //     // 如果存在，更新它的subtitle属性
-            //     childItem.subtitle = menuItem.title;
-            //   }
-            //   // 使用splice来修改subtitle
-            //   this.aboutList[4].children.splice(1, 1, childItem);
-            // }
-            // this.switchUpdateChenChannels(index)
             this.EnableThemeColor = index
             this.switchThemeColor(index)
+            // UI刷新
+            this.refreshThemeColorList(menuItem.title)
           })
         }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
       }
@@ -101,28 +81,18 @@ struct Appearance {
             .selectIcon(true)
           .selected(this.EnableButtonPosition === index)
           .onChange((selected) => {
-            // 修改关于页面更新渠道显示的subtitle
-            // if (this.aboutList && this.aboutList.length > 4 && this.aboutList[4].children) {
-            //   // 检查this.aboutList[4].children[1]是否存在
-            //   const childItem = this.aboutList[4].children[1];
-            //   if (childItem) {
-            //     // 如果存在，更新它的subtitle属性
-            //     childItem.subtitle = menuItem.title;
-            //   }
-            //   // 使用splice来修改subtitle
-            //   this.aboutList[4].children.splice(1, 1, childItem);
-            // }
-            // this.switchUpdateChenChannels(index)
             this.EnableButtonPosition = index
             this.switchButtonPosition(index)
+            // UI刷新
+            this.refreshButtonPositionList(menuItem.title)
           })
         }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
       }
     }
   }
 
-  // 切换主题模式
-  switchThemeMode(index: number) {
+  // 切换颜色模式
+  switchColorMode(index: number) {
     switch (index) {
       case 0:
         // 跟随系统
@@ -191,9 +161,30 @@ struct Appearance {
     }
   }
 
+  // 刷新颜色模式列表行UI
+  refreshColorModeList(title: ResourceStr) {
+    const ItemData = this.appearanceList[0]
+    ItemData.subtitle = title
+    this.appearanceList.splice(0, 1, ItemData)
+  }
+
+  // 刷新主题色列表行UI
+  refreshThemeColorList(title: ResourceStr) {
+    const ThemeColorItemData = this.appearanceList[1]
+    ThemeColorItemData.subtitle = title
+    this.appearanceList.splice(1, 1, ThemeColorItemData)
+  }
+
+  // 刷新按钮位置列表行UI
+  refreshButtonPositionList(title: ResourceStr) {
+    const ButtonPositionItemData = this.appearanceList[3]
+    ButtonPositionItemData.subtitle = title
+    this.appearanceList.splice(3, 1, ButtonPositionItemData)
+  }
+
   aboutToDisappear(): void {
-    AppStorage.setOrCreate('enableDarkMode', this.enableDarkMode);
-    AppStorage.setOrCreate('isFollowSystemSetting', this.isFollowSystemSetting);
+    AppStorage.setOrCreate('enableDarkMode', this.enableDarkMode)
+    AppStorage.setOrCreate('isFollowSystemSetting', this.isFollowSystemSetting)
   }
 
   build() {

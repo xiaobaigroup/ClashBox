@@ -116,29 +116,31 @@ struct About {
     }
   }
 
+  // 刷新更新渠道列表UI
+  refreshUpdateChenChannels(title: ResourceStr) {
+    // 修改关于页面更新渠道显示的subtitle
+    // 先检查是否存在children
+    const childItem = this.aboutList[4]
+    if (childItem && childItem.children) {
+      childItem.children[1].subtitle = title
+      // 使用splice来更新父组件数组
+      this.aboutList.splice(4, 1, childItem)
+    }
+  }
+
   // 更新渠道菜单
   @Builder
   UpdateMenu(item: AboutListItemProp[], index: number) {
     Menu() {
       ForEach(item, (menuItem: AboutListItemProp, index: number) => {
-        MenuItem({/* symbolEndIcon: this.endIconModifier, */content: menuItem.title })
+        MenuItem({ content: menuItem.title })
           .selectIcon(true)
           .selected(this.EnableUpdateChenChannels === index)
           .onChange((selected) => {
-            // 修改关于页面更新渠道显示的subtitle
-            if (this.aboutList && this.aboutList.length > 4 && this.aboutList[4].children) {
-              // 检查this.aboutList[4].children[1]是否存在
-              const childItem = this.aboutList[4].children[1];
-              if (childItem) {
-                // 如果存在，更新它的subtitle属性
-                childItem.subtitle = menuItem.title;
-              }
-              // 使用splice来修改subtitle
-              this.aboutList[4].children.splice(1, 1, childItem);
-            }
             this.switchUpdateChenChannels(index)
             this.EnableUpdateChenChannels = index
-
+            // UI刷新
+            this.refreshUpdateChenChannels(menuItem.title)
           })
       }, (menuItem: AboutListItemProp) => JSON.stringify(menuItem))
     }

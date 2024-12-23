@@ -35,7 +35,8 @@ struct MorePage {
   @Provide('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   // 设置页面栈
   @Provide('NavSettingsPathStack') SettingsPageInfos: NavPathStack = new NavPathStack()
-
+  // 设置 -> 备份与恢复 -> 是否启用云备份配置
+  @Provide isShowCloudconfig: boolean = false
   /* 断点布局相关 相关作用看定义时候的注释 */
   // 整体外边距
   @Consume('breakPointStatemorePageMargin')

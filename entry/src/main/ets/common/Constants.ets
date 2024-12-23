@@ -278,7 +278,26 @@ export const AppearanceList: AppearanceListItemProp[] = [
     ]
   },
   { icon: $r('sys.symbol.rectangle_on_rectangle_fill'), title: $r('app.string.blurred_background'), subtitle: $r('app.string.blurred_background_subtitle')},
-  { icon: $r('sys.symbol.livephoto'), title: $r('app.string.animation_effects'), subtitle: $r('app.string.animation_effects_subtitle'), subtitle2: $r('app.string.Experimental_Function')},
+  { icon: $r('sys.symbol.livephoto'), title: $r('app.string.animation_effects'), subtitle: $r('app.string.animation_effects_subtitle'), subtitle2: $r('app.string.experimental_function')},
+]
+
+/**
+ * 备份与恢复页参数
+ */
+export interface BackupListItemProp {
+  icons: Resource
+  title: string | Resource
+  subtitle: string | Resource
+  subtitle2?: string | Resource
+  subtitle3: string | Resource
+}
+/**
+ * 备份与恢复页列表
+ */
+export const BackupList: BackupListItemProp[] = [
+  { icons: $r('sys.symbol.icloud'), title: $r('app.string.cloud_backup'), subtitle: $r('app.string.cloud_backup_subtitle'), subtitle2: $r('app.string.experimental_function'), subtitle3: $r('app.string.not_enabled') },
+  { icons: $r('sys.symbol.arrowshape_up_to_line_fill'), title: $r('app.string.backup'), subtitle: $r('app.string.backup_subtitle'), subtitle3: '' },
+  { icons: $r('sys.symbol.arrowshape_down_to_line_fill'), title: $r('app.string.restore'), subtitle: $r('app.string.restore_subtitle'), subtitle3: '' },
 ]
 
 /**
@@ -287,7 +306,7 @@ export const AppearanceList: AppearanceListItemProp[] = [
 export interface AboutListItemProp {
   name?: string
   title: string | Resource
-  subtitle?: string | Resource
+  subtitle: string | Resource
   sign?: number
   children?: Array<AboutListItemProp>
 }
@@ -297,6 +316,7 @@ export interface AboutListItemProp {
 export const AboutList: AboutListItemProp[] = [
   {
     title: 'Version',
+    subtitle: '',
     children: [
       { title: $r('app.string.Application_Version'), subtitle: '2.0.000 Preview1',sign: 0, name: 'ApplicationVersion' },
       { title: $r('app.string.Kernel_Version'), subtitle: 'Unknown',sign: 0, name: 'KernelVersion' }
@@ -304,31 +324,35 @@ export const AboutList: AboutListItemProp[] = [
   },
   {
     title: 'Experiment',
+    subtitle: '',
     children: [
-      { title: $r('app.string.Experimental_Function'), subtitle: $r('app.string.Experimental_Function_Subtitle'), sign: 1, name: 'ExperimentalFunction' },
+      { title: $r('app.string.experimental_function'), subtitle: $r('app.string.experimental_function_Subtitle'), sign: 1, name: 'ExperimentalFunction' },
     ]
   },
   {
     title: 'Contributors',
+    subtitle: '',
     children: [
       { title: $r('app.string.Contributors'), subtitle: '', sign: 2, name: 'Contributors' },
     ]
   },
   {
     title: 'General',
+    subtitle: '',
     children: [
       { title: $r('app.string.UseGuidance'), subtitle: '', sign: 2, name: 'UseGuidance' },
       { title: $r('app.string.FQ'), subtitle: '', sign: 2, name: 'FQ' },
     ]
   },
   { title: 'Update',
+    subtitle: '',
     children: [
       { title: $r('app.string.Check_Updates'), subtitle: '', sign: 2, name: 'Update' },
       { title: $r('app.string.UpdateChannels'), subtitle: $r('app.string.UpdateChannels_Subtitle1'), sign: 3, name: 'UpdateChannels',
         children: [
-          { title: $r('app.string.UpdateChannels_Subtitle1'), name: 'Github' },
-          { title: '蓝奏云', name: 'LZY' }, // 测试用
-          { title: '百度云', name: 'BDY' }, // 测试用
+          { title: $r('app.string.UpdateChannels_Subtitle1'), name: 'Github', subtitle: '' },
+          { title: '蓝奏云', name: 'LZY', subtitle: '' }, // 测试用
+          { title: '百度云', name: 'BDY', subtitle: '' }, // 测试用
          ]
       },
       { title: $r('app.string.Auto_Check_Updates'), subtitle: '', sign: 1, name: 'Auto' },
@@ -336,6 +360,7 @@ export const AboutList: AboutListItemProp[] = [
   },
   {
     title: 'Contact',
+    subtitle: '',
     children: [
       { title: $r('app.string.Official_Telegram_Channel'), subtitle: '', sign: 2, name: 'Telegram' },
       { title: $r('app.string.Official_Discord_Community'), subtitle: '', sign: 2, name: 'Discord' },
@@ -344,6 +369,7 @@ export const AboutList: AboutListItemProp[] = [
   },
   {
     title: 'Repositories',
+    subtitle: '',
     children: [
       { title: $r('app.string.ProjectRepositories'), subtitle: '', sign: 2, name: 'Repositories' },
     ]

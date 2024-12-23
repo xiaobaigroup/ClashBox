@@ -1,9 +1,9 @@
 import { BreakpointState, BreakpointSystem } from "../../common/breakpointsystem"
-import { FONT_SIZE_16, LanguageListItem, settingsData, SettingsListItem } from "../../common/Constants"
+import { FONT_SIZE_16, settingsData, SettingsListItem } from "../../common/Constants"
 import settingsListItem from "./settingsListItem"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import Appearance from "./Appearance"
-import Backup from "./Backup"
+import Backup, { CloudBackup } from "./Backup"
 import ApplicationLock from "./ApplicationLock"
 import Notice from "./Notice"
 import Backgrounder from "./Backgrounder"
@@ -134,7 +134,7 @@ struct Settings {
       Appearance({isShowSettings: this.isShowSettings})
     } else
       if (name == 'Backup') {
-        Backup({isShowSettings: this.isShowSettings})
+        Backup()
       } else
       if (name == 'ApplicationLock') {
         ApplicationLock({isShowSettings: this.isShowSettings})
@@ -156,6 +156,9 @@ struct Settings {
       } else
       if (name == 'Contributors') {
         AboutContributors()
+      } else
+      if (name == 'CloudBackup') {
+        CloudBackup()
       }
   }
 
