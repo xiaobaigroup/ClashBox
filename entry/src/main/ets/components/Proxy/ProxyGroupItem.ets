@@ -85,7 +85,7 @@ struct ProxyGroupItem {
   controller: webview.WebviewController = new webview.WebviewController();
 
 
-//弹窗
+  //弹窗
   ProxyDialogController: CustomDialogController | null = new CustomDialogController({
     builder: ProxyCustomDialog({
       cancel: () => {
@@ -100,7 +100,7 @@ struct ProxyGroupItem {
     customStyle: false,
     cornerRadius: 32,
     gridCount: 4,
-   // maskColor: $r('app.color.dialog_maskcolor'),
+    // maskColor: $r('app.color.dialog_maskcolor'),
     cancel: this.existApp,
     autoCancel: true,
     onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
@@ -187,7 +187,7 @@ struct ProxyGroupItem {
   existApp() {
     console.info('Click the callback in the blank area')
   }
-//收藏与ping延迟即时动作
+  //收藏与ping延迟即时动作
   private ProxyPromptAction:PromptAction = this.getUIContext()?.getPromptAction()
   //长按菜单 start
   @Builder
@@ -238,7 +238,7 @@ struct ProxyGroupItem {
                   .fontSize(16)
               }.width('90%').alignItems(HorizontalAlign.Start)
               Blank()
-                Radio({ value: 'radio' + index, group: 'ProxyGroup' })
+              Radio({ value: 'radio' + index, group: 'ProxyGroup' })
                 .checked(index === this.PorxyRadioCheckedValue)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
@@ -282,7 +282,7 @@ struct ProxyGroupItem {
         showClose: true,
         scrollSizeMode: ScrollSizeMode.CONTINUOUS,
         title: { title: $r('app.string.Test_Speed'), subtitle:$r('app.string.Test_Speed_Explain')  },
-      //  maskColor: $r('app.color.dialog_maskcolor'),
+        //  maskColor: $r('app.color.dialog_maskcolor'),
         onWillDismiss: () => {
           this.isShowNetworkSpeed = false
           this.isEnableIndexForegroundBlur = false
@@ -351,7 +351,7 @@ struct ProxyGroupItem {
         showClose: true,
         scrollSizeMode: ScrollSizeMode.CONTINUOUS,
         title: { title: $r('app.string.Test_Speed'), subtitle: '测速功能由CloundFlare提供' },
-     //   maskColor: $r('app.color.dialog_maskcolor'),
+        //   maskColor: $r('app.color.dialog_maskcolor'),
         onWillDismiss: () => {
           this.isShowNetworkSpeed = false
           this.isEnableIndexForegroundBlur = false
@@ -421,7 +421,7 @@ struct ProxyGroupItem {
         showClose: true,
         scrollSizeMode: ScrollSizeMode.CONTINUOUS,
         title: { title: $r('app.string.Test_Speed'), subtitle: '测速功能由CloundFlare提供' },
-   //     maskColor: $r('app.color.dialog_maskcolor'),
+        //     maskColor: $r('app.color.dialog_maskcolor'),
         onWillDismiss: () => {
           this.isShowNetworkSpeed = false
           this.isEnableIndexForegroundBlur = false

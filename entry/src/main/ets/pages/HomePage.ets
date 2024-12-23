@@ -155,6 +155,7 @@ struct Home {
     BreakpointSystem.getInstance().attach(this.containerHeight)
     BreakpointSystem.getInstance().attach(this.GridRowHeight)
     BreakpointSystem.getInstance().start()
+
   }
 
   aboutToDisappear() {
@@ -220,17 +221,18 @@ struct Home {
 
   build() {
     Column() {
-
       if (!this.isLandscapePhone) {
         Row() {
+          if (!this.isShowHomeEdit) {
+            //编辑布局按钮判定：非编辑状态
           Text(this.greetings)
             .fontSize(32)
             .fontWeight(FontWeight.Bold)
             .margin({ left: this.gridMargin })
             .fontColor(this.font_primary)
+            .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:0}).combine(TransitionEffect.SLIDE))
           Blank()
-          if (!this.isShowHomeEdit) {
-            //编辑布局按钮判定：非编辑状态
+
             //编辑按钮
             Button({ type: ButtonType.Circle, stateEffect: true }) {
               SymbolGlyph($r('sys.symbol.square_and_pencil'))
@@ -275,6 +277,13 @@ struct Home {
             })
           } else {
             //编辑布局按钮判定：是编辑状态
+            Text($r('app.string.home_edit'))
+              .fontSize(32)
+              .fontWeight(FontWeight.Bold)
+              .margin({ left: this.gridMargin })
+              .fontColor(this.font_primary)
+              .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:100}).combine(TransitionEffect.SLIDE))
+            Blank()
             //添加按钮
             Button({ type: ButtonType.Circle, stateEffect: true }) {
               SymbolGlyph($r('sys.symbol.plus'))
@@ -526,6 +535,7 @@ struct Home {
     }
   }
 }
+
 
 //保存弹窗样式和内容
 @CustomDialog
