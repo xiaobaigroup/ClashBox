@@ -201,11 +201,11 @@
       "value": "删除应用的所有数据"
     },
     {
-      "name": "Opened",
+      "name": "already_open",
       "value": "已开启"
     },
     {
-      "name": "Closed",
+      "name": "already_close",
       "value": "已关闭"
     },
     {
@@ -999,6 +999,30 @@
     {
       "name": "time_reminder_subtitle",
       "value": "长时间未关闭VPN时提醒"
+    },
+    {
+      "name": "simulate_download_closed_tips",
+      "value": "是否关闭？"
+    },
+    {
+      "name": "simulate_download_closed_content_text",
+      "value": "关闭此选项将会导致clashNEXT无法在后台长时间运行"
+    },
+    {
+      "name": "simulate_record_open_tips",
+      "value": "是否开启？"
+    },
+    {
+      "name": "simulate_record_open_content_text",
+      "value": "建议使用“模拟下载”来保持应用的后台长时运行，本选项可能会导致应用的耗电量增加"
+    },
+    {
+      "name": "open",
+      "value": "开启"
+    },
+    {
+      "name": "close",
+      "value": "关闭"
     }
   ]
 }

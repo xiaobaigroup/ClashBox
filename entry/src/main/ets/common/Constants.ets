@@ -196,7 +196,7 @@ export const SettingsListItem = (): settingsData[] => {
     new settingsData($r('sys.symbol.translate_c2e'), 'Language', $r('app.string.Language'), '', $r('app.string.Language_Subtitle'), false),
     new settingsData($r('sys.symbol.brush_fill'), 'Appearance', $r('app.string.Appearance'), $r('app.string.AppearanceSubtitle'), '', false),
     new settingsData($r('sys.symbol.externaldrive_fill'), 'Backup', $r('app.string.Backup_Recovery'), $r('app.string.BackgrounderSubtitle'), '', false),
-    new settingsData($r('sys.symbol.lock_fill'), 'ApplicationLock', $r('app.string.ApplicationLock'), $r('app.string.ApplicationicationLockSubtitle'), $r('app.string.Opened'), false),
+    new settingsData($r('sys.symbol.lock_fill'), 'ApplicationLock', $r('app.string.ApplicationLock'), $r('app.string.ApplicationicationLockSubtitle'), $r('app.string.already_open'), false),
     new settingsData($r('sys.symbol.ellipsis_message_fill'), 'Notice', $r('app.string.Notice'), $r('app.string.NoticeSubtitle'), '', false),
     new settingsData($r('sys.symbol.checkmark_square_on_square_fill'), 'Backgrounder', $r('app.string.Backgrounder'), $r('app.string.BackgrounderSubtitle'), '', false),
     new settingsData($r('sys.symbol.trash_fill'), 'WipeData', $r('app.string.WipeData'), $r('app.string.WipeDataSubtitle'), '', false),
@@ -317,24 +317,6 @@ export const NoticeList: NoticeListItemProp[] = [
   { icons: $r('sys.symbol.ellipsis_message_fill'), title: $r('app.string.background_notice'), subtitle: $r('app.string.background_notice_subtitle'), isOn: true },
   { icons: $r('sys.symbol.mobiledata'), title: $r('app.string.cellular_data_reminder'), subtitle: $r('app.string.cellular_data_reminder_subtitle'), subtitle2: $r('app.string.not_enabled') },
   { icons: $r('sys.symbol.clock'), title: $r('app.string.time_reminder'), subtitle: $r('app.string.time_reminder_subtitle'), subtitle2: $r('app.string.not_enabled') },
-]
-
-/**
- * 后台运行页参数
- */
-export interface BackgroundListItemProp {
-  icons: Resource
-  title: string | Resource
-  subtitle: string | Resource
-  subtitle2?: string | Resource
-}
-/**
- * 后台运行页列表
- */
-export const BackgroundList: BackgroundListItemProp[] = [
-  { icons: $r('sys.symbol.arrow_down_circle'), title: $r('app.string.simulate_download'), subtitle: $r('app.string.simulate_download_subtitle') },
-  { icons: $r('sys.symbol.media_center'), title: $r('app.string.simulate_player'), subtitle: $r('app.string.simulate_player_subtitle'), subtitle2: $r('app.string.experimental_function') },
-  { icons: $r('sys.symbol.mic_circle'), title: $r('app.string.simulate_record'), subtitle: $r('app.string.simulate_record_subtitle'), subtitle2: $r('app.string.experimental_function') },
 ]
 
 /**

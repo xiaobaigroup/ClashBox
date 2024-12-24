@@ -1,115 +1,273 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { BackgroundList, BackgroundListItemProp } from "../../common/Constants"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 
+// 开启&关闭提示弹窗组件（横排按钮）
+@CustomDialog
+export struct theRowCustomDialog {
+  @State theDialogTitle: ResourceStr = ''
+  @State contentText: ResourceStr = ''
+  cancel?: () => void
+  confirm?: () => void
+  controller: CustomDialogController
+  /* 主题色 */
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  @BuilderParam leftButton: () => void = this.defaultBuilder
+  // 默认的左按钮(蓝色字体开启)
+  @Builder
+  defaultBuilder() {
+    Button($r('app.string.open'))
+      .width('100%')
+      .height(39)
+      .fontColor(this.icon_emphasize)
+      .backgroundColor($r('app.color.container_background'))
+  }
+
+  build() {
+    Column() {
+      // 标题
+      Text(this.theDialogTitle)
+        .fontWeight(FontWeight.Medium)
+        .fontSize(20)
+        .margin({ top: 15, bottom: 15 })
+      // 内容文本
+      Text(this.contentText)
+        .fontWeight(FontWeight.Regular)
+        .fontSize(18)
+        .margin({bottom: 8 })
+      Row() {
+        // 左按钮
+        Row() {
+          this.leftButton()
+        }.width('50%')
+        .onClick(() => {
+          this.controller.close()
+          if (this.confirm) {
+            this.confirm()
+          }
+        })
+        Button($r('app.string.Cancel'))
+          .height(39)
+          .width('50%')
+          .fontColor(Color.White)
+          .backgroundColor(this.icon_emphasize)
+          .onClick(() => {
+            this.controller.close()
+            if (this.cancel) {
+              this.cancel()
+            }
+          })
+      }.width('100%')
+    }
+    .padding({left: 16, right: 16})
+    .backgroundColor($r('app.color.container_background'))
+    .width('100%')
+    .height(175)
+  }
+}
+
 @Component
 struct Backgrounder {
-  // 实验功能提示框展示变量
-  @Consume isShowExperimentalFunction: boolean
-  @State backgrounderList: BackgroundListItemProp[] = BackgroundList
+  // 模拟下载控制变量
+  @State isDown: boolean = false
+  // 模拟播放控制变量
+  @State isPlay: boolean = false
+  // 模拟录音控制变量
+  @State isRecord: boolean = false
+  // 模拟下载关闭提示弹窗标题
+  @State theColsedDialogTitle: ResourceStr = $r('app.string.simulate_download_closed_tips')
+  // 模拟下载关闭提示弹窗内容文本
+  @State closedContentText: ResourceStr = $r('app.string.simulate_download_closed_content_text')
+  // 模拟录音启用提示弹窗标题
+  @State theOpenDialogTitle: ResourceStr = $r('app.string.simulate_record_open_tips')
+  // 模拟录音启用提示弹窗内容文本
+  @State openContentText: ResourceStr = $r('app.string.simulate_record_open_content_text')
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   //一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
 
-  // 列表行开关事件处理
-  handleToggle(isOn: boolean, index: number) {
-    switch (index) {
-      case 0:
-        // 模拟下载
-        hilog.info(0xFF00, "BackgroundertestTag", "模拟下载")
-        if(isOn) {
-          // 开启
+  /**
+   * 关闭模拟下载提示弹窗控制器
+   */
+  closeDialogController: CustomDialogController = new CustomDialogController({
+    builder: theRowCustomDialog({
+      theDialogTitle: this.theColsedDialogTitle,
+      contentText: this.closedContentText,
+      cancel: ()=> { this.oncloseCancel() },
+      confirm: ()=> { this.oncloseAccept() },
+      leftButton: this.closedBuilder
+    }),
+  })
+  /**
+   * 模拟下载关闭提示弹窗左按钮
+   */
+  @Builder
+  closedBuilder() {
+    Button($r('app.string.close'))
+      .backgroundColor($r('app.color.container_background'))
+      .width('100%')
+      .height(39)
+      .fontColor(Color.Red)
+  }
+  // 模拟下载关闭提示弹窗-取消
+  oncloseCancel() {
+    // 将模拟下载设置为 true
+    this.isDown = true
+  }
+  // 模拟下载关闭提示弹窗-关闭
+  oncloseAccept() {
+    // 将模拟下载设置为 false
+    this.isDown = false
+    hilog.info(0xFF00, "BackgrounderSwitchtestTag", "模拟下载设置为: %{public}s", this.isDown)
+    // 关闭模拟下载逻辑处理
+    hilog.info(0xFF00, "BackgroundertestTag", "模拟下载正在关闭")
+    this.onCloseDown()
+  }
 
-        } else {
-          // 关闭
-
-        }
-        break
-      case 1:
-        // 模拟播放
-        hilog.info(0xFF00, "BackgroundertestTag", "模拟播放")
-        if(isOn) {
-          // 开启
-
-        } else {
-          // 关闭
-
-        }
-      break
-      case 2:
-        // 模拟录音
-        hilog.info(0xFF00, "BackgroundertestTag", "模拟录音")
-        if(isOn) {
-          // 开启
-
-        } else {
-          // 关闭
-
-        }
-      break
+  /**
+   * 启用模拟模拟录音提示弹窗控制器
+   */
+  openDialogController: CustomDialogController = new CustomDialogController({
+    builder: theRowCustomDialog({
+      theDialogTitle: this.theOpenDialogTitle,
+      contentText: this.openContentText,
+      cancel: ()=> { this.onopenCancel() },
+      confirm: ()=> { this.onopenAccept() }
+    }),
+  })
+  // 模拟录音启用提示弹窗-取消
+  onopenCancel() {
+    // 将模拟录音设置为 false
+    this.isRecord = false
+    hilog.info(0xFF00, "BackgrounderSwitchtestTag", "模拟录音设置为: %{public}s", this.isRecord)
+  }
+  // 模拟录音启用提示弹窗-启用
+  onopenAccept() {
+    // 将模拟录音设置为 true
+    this.isRecord = true
+    // 关闭其它两个模拟
+    if(this.isDown) {
+      // 关闭模拟下载
+      this.oncloseAccept()
+    } else if (this.isPlay) {
+      // 关闭模拟播放
+      this.isPlay = false
     }
+    // 启用模拟录音逻辑处理
+    hilog.info(0xFF00, "BackgroundertestTag", "模拟录音正在开启")
+    this.onOpenRecord()
+  }
+
+  /**
+   * 启用模拟下载
+   */
+  onOpenDown() {
+
+  }
+  /**
+   * 关闭模拟下载
+   */
+  onCloseDown() {
+
+  }
+  /**
+   * 启用模拟播放
+   */
+  onOpenPlay() {
+
+  }
+  /**
+   * 关闭模拟播放
+   */
+  onClosePlay() {
+
+  }
+  /**
+   * 启用模拟录音
+   */
+  onOpenRecord() {
+
+  }
+  /**
+   * 关闭模拟录音
+   */
+  onCloseRecord() {
+
   }
 
   build() {
     NavDestination() {
       TopBuilder({title: $r('app.string.Backgrounder')})
       Column() {
-        ForEach(this.backgrounderList, (item: BackgroundListItemProp, index: number) => {
-          Row() {
-            SymbolGlyph(item.icons)
-              .fontSize(24)
-              .margin({left: 12})
-              .fontColor([this.icon_emphasize])
-            Column() {
-              Row() {
-                Text(item.title)
-                  .fontWeight(FontWeight.Medium)
-                  .fontSize(16)
-                if(this.isShowExperimentalFunction) {
-                  // 实验功能提示框
-                  if(item.subtitle2) {
-                    Column() {
-                      Text(item.subtitle2)
-                        .fontColor(Color.White)
-                        .fontSize(10)
-                    }
-                    .alignItems(HorizontalAlign.Center)
-                    .justifyContent(FlexAlign.Center)
-                    .width(50)
-                    .height(18)
-                    .borderRadius(4)
-                    .margin({left: 2})
-                    .backgroundColor(this.icon_emphasize)
-                  }
+        // 模拟下载
+        RowList({
+          icons: $r('sys.symbol.arrow_down_circle'),
+          title: $r('app.string.simulate_download'),
+          subtitle: $r('app.string.simulate_download_subtitle')
+        }) {
+          Toggle({ type: ToggleType.Switch, isOn: $$this.isDown })
+            .selectedColor(this.icon_emphasize)
+            .margin({right: 12})
+            .onChange((isOn: boolean) => {
+              if(isOn) {
+                // 关闭其它两个模拟并开启模拟下载
+                this.isPlay = false
+                this.isRecord = false
+                // 模拟下载开启逻辑处理
+                this.onOpenDown()
+              } else {
+                // 打开模拟下载关闭提示弹窗
+                if(!this.isPlay && !this.isRecord) {
+                  this.closeDialogController.open()
                 }
               }
-              Text(item.subtitle)
-                .fontWeight(FontWeight.Normal)
-                .textOverflow({ overflow: TextOverflow.MARQUEE })
-                .maxLines(1)
-                .margin({top: 2})
-                .fontSize(14)
-                .width('65%')
-            }
-            .alignItems(HorizontalAlign.Start)
-            .margin({ left: 12 })
-            Blank()
-            Toggle({ type: ToggleType.Switch, isOn: false })
-              .selectedColor(this.icon_emphasize)
-              .margin({right: 12})
-              .onChange((isOn: boolean) => {
-                this.handleToggle(isOn, index)
-              })
-          }
-          .width('100%')
-          .height(53)
-          .borderRadius(20)
-          .margin({bottom: 10})
-          .backgroundColor($r('app.color.container_background'))
-        })
+            })
+        }
+        // 模拟播放
+        RowList({
+          icons: $r('sys.symbol.media_center'),
+          title: $r('app.string.simulate_player'),
+          subtitle: $r('app.string.simulate_player_subtitle'),
+          subtitle2: $r('app.string.experimental_function')
+        }) {
+          Toggle({ type: ToggleType.Switch, isOn: $$this.isPlay })
+            .selectedColor(this.icon_emphasize)
+            .margin({right: 12})
+            .onChange((isOn: boolean) => {
+              if(isOn) {
+                // 关闭其它两个模拟并开启模拟播放
+                this.isDown = false
+                this.isRecord = false
+                // 开启
+                this.onOpenPlay()
+              } else {
+                // 关闭模拟播放
+                this.onClosePlay()
+              }
+            })
+        }
+        // 模拟录音
+        RowList({
+          icons: $r('sys.symbol.mic_circle'),
+          title: $r('app.string.simulate_record'),
+          subtitle: $r('app.string.simulate_record_subtitle'),
+          subtitle2: $r('app.string.experimental_function')
+        }) {
+          Toggle({ type: ToggleType.Switch, isOn: $$this.isRecord })
+            .selectedColor(this.icon_emphasize)
+            .margin({right: 12})
+            .onChange((isOn: boolean) => {
+              if(isOn) {
+                // 打开模拟录音启用提示弹窗
+                this.openDialogController.open()
+              } else {
+                // 模拟录音关闭逻辑处理
+                this.onCloseRecord()
+              }
+            })
+        }
         // 提示
         Text($r('app.string.backgrounder_tips'))
           .fontWeight(FontWeight.Normal)
@@ -128,3 +286,76 @@ struct Backgrounder {
   }
 }
 export default Backgrounder
+
+/**
+ * 列表行通用组件
+ */
+@Component
+struct RowList {
+  // 实验功能提示框展示变量
+  @Consume isShowExperimentalFunction: boolean
+  //一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  @State icons: Resource = $r('sys.symbol.arrow_down_circle')
+  @State title: ResourceStr = ''
+  @State subtitle: ResourceStr = ''
+  @State subtitle2: ResourceStr = ''
+  @BuilderParam switchToggle: () => void = this.defaultBuilder
+  // 默认开关
+  @Builder
+  defaultBuilder() {
+    Toggle({ type: ToggleType.Switch, isOn: false })
+      .selectedColor(this.icon_emphasize)
+      .margin({right: 12})
+  }
+
+  build() {
+    Row() {
+      SymbolGlyph(this.icons)
+        .fontSize(24)
+        .margin({left: 12})
+        .fontColor([this.icon_emphasize])
+      Column() {
+        Row() {
+          Text(this.title)
+            .fontWeight(FontWeight.Medium)
+            .fontSize(16)
+          if(this.isShowExperimentalFunction) {
+            // 实验功能提示框
+            if(this.subtitle2) {
+              Column() {
+                Text(this.subtitle2)
+                  .fontColor(Color.White)
+                  .fontSize(10)
+              }
+              .alignItems(HorizontalAlign.Center)
+              .justifyContent(FlexAlign.Center)
+              .width(50)
+              .height(18)
+              .borderRadius(4)
+              .margin({left: 2})
+              .backgroundColor(this.icon_emphasize)
+            }
+          }
+        }
+        Text(this.subtitle)
+          .fontWeight(FontWeight.Normal)
+          .textOverflow({ overflow: TextOverflow.MARQUEE })
+          .maxLines(1)
+          .margin({top: 2})
+          .fontSize(14)
+          .width('65%')
+      }
+      .alignItems(HorizontalAlign.Start)
+      .margin({ left: 12 })
+      Blank()
+      this.switchToggle()
+    }
+    .width('100%')
+    .height(53)
+    .borderRadius(20)
+    .margin({bottom: 10})
+    .backgroundColor($r('app.color.container_background'))
+  }
+}
