@@ -47,6 +47,30 @@
     {
       "name": "back",
       "value": "#FFE4E7E8"
+    },
+    {
+      "name": "theme_color_main_cat_blue",
+      "value": "#E61E4377"
+    },
+    {
+      "name": "theme_color_main_yellow",
+      "value": "#E6F7B500"
+    },
+    {
+      "name": "theme_color_main_red",
+      "value": "#E6D41C26"
+    },
+    {
+      "name": "theme_color_main_purple",
+      "value": "#E6722ED1"
+    },
+    {
+      "name": "theme_color_main_pink",
+      "value": "#E6FB7299"
+    },
+    {
+      "name": "theme_color_main_green",
+      "value": "#E682D41C"
     }
   ]
 }

@@ -44,10 +44,10 @@ export struct ConfigAdd {
   /* List 相关 */
   private configAddTypeArray: Array<ConfigAddType> = [
     // TODO 国际化
-    { symbolStart: $r('sys.symbol.paperclip'), text: '从URL(链接)导入', navPathStackName: RouteName.ImportConfigFromURL, symbolEnd: $r('sys.symbol.chevron_right')},
-    { symbolStart: $r('sys.symbol.qrcode'), text: '从二维码导入', navPathStackName: RouteName.ImportConfigFromQRcode, symbolEnd: $r('sys.symbol.chevron_right')},
-    { symbolStart: $r('sys.symbol.doc_text_fill'), text: '从文件导入', navPathStackName: RouteName.ImportConfigFromFile, symbolEnd: $r('sys.symbol.chevron_right')},
-    { symbolStart: $r('sys.symbol.doc'), text: '新建空白配置', navPathStackName: RouteName.CreateNewConfig, symbolEnd: $r('sys.symbol.chevron_right')},
+    { symbolStart: $r('sys.symbol.paperclip'), text: '从URL(链接)导入', navPathStackName: RouteName.IMPORT_CONFIG_FROM_URL, symbolEnd: $r('sys.symbol.chevron_right')},
+    { symbolStart: $r('sys.symbol.qrcode'), text: '从二维码导入', navPathStackName: RouteName.IMPORT_CONFIG_FROM_QR_CODE, symbolEnd: $r('sys.symbol.chevron_right')},
+    { symbolStart: $r('sys.symbol.doc_text_fill'), text: '从文件导入', navPathStackName: RouteName.IMPORT_CONFIG_FROM_FILE, symbolEnd: $r('sys.symbol.chevron_right')},
+    { symbolStart: $r('sys.symbol.doc'), text: '新建空白配置', navPathStackName: RouteName.CREATE_NEW_CONFIG, symbolEnd: $r('sys.symbol.chevron_right')},
   ]
 
   /* NV路由 相关 */
@@ -131,7 +131,7 @@ export struct ConfigAdd {
       .mode(NavigationMode.Stack)
       .hideBackButton(true)
       .navBarWidthRange([255, '100%'])
-      .foregroundBlurStyle(this.isEnableConfigPageBindSheetForegroundBlur ? BlurStyle.Thin : BlurStyle.NONE,{ colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: .3 })
+      .foregroundBlurStyle(this.isEnableConfigPageBindSheetForegroundBlur ? BlurStyle.Thin : BlurStyle.NONE,{ colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 })
       .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
       // NV路由 END
     }

@@ -543,7 +543,7 @@ struct ConfigurationPage {
    * 拉起配置编辑页 并传参
    */
   private pushEditConfigRoute2BindSheet(){
-    this.pushDestinationByName(RouteName.ImportConfigFromURL, this.currentTouchConfigData)
+    this.pushDestinationByName(RouteName.IMPORT_CONFIG_FROM_URL, this.currentTouchConfigData)
   }
 
   /**

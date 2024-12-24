@@ -164,10 +164,10 @@ export struct ImportConfigFromURL{
       }
     })
     .onReady( () => {
-      let paramJsonStr: string = JSON.stringify(this.configAddPageInfos.getParamByName(RouteName.ImportConfigFromURL))
-      hilog.info(0xCA11, this.componentName, `#aboutToAppear#NavPathStack.getParamByName(${RouteName.ImportConfigFromURL}), result is: ${paramJsonStr}`)
+      let paramJsonStr: string = JSON.stringify(this.configAddPageInfos.getParamByName(RouteName.IMPORT_CONFIG_FROM_URL))
+      hilog.info(0xCA11, this.componentName, `#aboutToAppear#NavPathStack.getParamByName(${RouteName.IMPORT_CONFIG_FROM_URL}), result is: ${paramJsonStr}`)
 
-      if( this.configAddPageInfos.getParamByName(RouteName.ImportConfigFromURL).length > 0 && this.configAddPageInfos.getParamByName(RouteName.ImportConfigFromURL)[0] !== null ) {
+      if( this.configAddPageInfos.getParamByName(RouteName.IMPORT_CONFIG_FROM_URL).length > 0 && this.configAddPageInfos.getParamByName(RouteName.IMPORT_CONFIG_FROM_URL)[0] !== null ) {
         try {
           this.configData = (JSON.parse(paramJsonStr) as Array<ConfigData>)[0]
         } catch (e) {

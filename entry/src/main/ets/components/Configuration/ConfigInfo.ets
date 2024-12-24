@@ -267,7 +267,7 @@ export struct ConfigInfo{
         }
         .margin({right: 0, left:0 })
         .divider({
-          strokeWidth: .4,
+          strokeWidth: 0.4,
           color: $r('sys.color.comp_divider'),
           startMargin: LIST_ITEM_PADDING.left,
           endMargin: LIST_ITEM_PADDING.right

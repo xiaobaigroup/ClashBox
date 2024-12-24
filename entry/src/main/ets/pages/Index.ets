@@ -281,7 +281,7 @@ struct Index {
     .backgroundColor($r('app.color.background'))
     .foregroundBlurStyle(
       this.isEnableIndexForegroundBlur ? BlurStyle.Thin : BlurStyle.NONE,
-      { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: .3 }
+      { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
     )
     .padding({ top: px2vp(this.topRectHeight) - 5, bottom: px2vp(this.bottomRectHeight) })
     .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })

@@ -1,3 +1,4 @@
+import { CustomThemeName } from "./AppTheme";
 import { BreakpointState } from "./breakpointsystem";
 
 
@@ -50,12 +51,12 @@ export const PROXY_STARTED_DURATION_INIT_VALUE: string = '00:00:00'
 // 组件animation duration值: 300
 export const ANIMATION_DURATION_300: number = 300
 
-// type：routeName
+// enum：routeName
 export enum RouteName {
-  ImportConfigFromURL = 'ImportConfigFromURL',
-  ImportConfigFromQRcode = 'ImportConfigFromQRcode',
-  ImportConfigFromFile = 'ImportConfigFromFile',
-  CreateNewConfig = 'CreateNewConfig',
+  IMPORT_CONFIG_FROM_URL = 'ImportConfigFromURL',
+  IMPORT_CONFIG_FROM_QR_CODE = 'ImportConfigFromQRcode',
+  IMPORT_CONFIG_FROM_FILE = 'ImportConfigFromFile',
+  CREATE_NEW_CONFIG = 'CreateNewConfig',
 }
 
 // 更多列表类
@@ -245,6 +246,10 @@ export interface AppearanceListItemProp {
   title: string | Resource
   subtitle: string | Resource
   subtitle2?: string | Resource
+  // 自定义主题的名字
+  customThemeName?: CustomThemeName
+  // `start`方向上`Symbol`的颜色数组
+  startSymbolFontColor?: Array<ResourceColor>
   children?: Array<AppearanceListItemProp>
 }
 /**
@@ -260,13 +265,13 @@ export const AppearanceList: AppearanceListItemProp[] = [
   },
   { icon: $r('sys.symbol.paintpalette_fill'), title: $r('app.string.theme_color'), subtitle: $r('app.string.star_river_blue'),
     children: [
-      { title: $r('app.string.star_river_blue'), subtitle: ''},
-      { title: $r('app.string.cat_blue'), subtitle: ''},
-      { title: $r('app.string.yellow'), subtitle: ''},
-      { title: $r('app.string.red'), subtitle: ''},
-      { title: $r('app.string.purple'), subtitle: ''},
-      { title: $r('app.string.pink'), subtitle: ''},
-      { title: $r('app.string.green'), subtitle: ''},
+      { title: $r('app.string.star_river_blue'), subtitle: '', customThemeName: 'blueAppTheme', startSymbolFontColor: [$r('sys.color.icon_emphasize')] },
+      { title: $r('app.string.cat_blue'), subtitle: '', customThemeName: 'catBlueAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_cat_blue')] },
+      { title: $r('app.string.yellow'), subtitle: '', customThemeName: 'yellowAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_yellow')] },
+      { title: $r('app.string.red'), subtitle: '', customThemeName: 'redAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_red')] },
+      { title: $r('app.string.purple'), subtitle: '', customThemeName: 'purpleAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_purple')] },
+      { title: $r('app.string.pink'), subtitle: '', customThemeName: 'pinkAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_pink')] },
+      { title: $r('app.string.green'), subtitle: '', customThemeName: 'greenAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_green')] },
     ]
   },
   { icon: $r('sys.symbol.message'), title: $r('app.string.homepage_greetings'), subtitle: $r('app.string.homepage_greetings_subtitle')},

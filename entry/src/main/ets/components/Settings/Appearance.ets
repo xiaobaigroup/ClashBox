@@ -1,8 +1,8 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import { AppearanceList, AppearanceListItemProp } from "../../common/Constants"
 import TopBuilder from "./TopBuilder"
-import { ThemeControl } from "@kit.ArkUI"
-import { CUSTOM_THEME_MAP } from "../../common/AppTheme"
+import { SymbolGlyphModifier, ThemeControl } from "@kit.ArkUI"
+import { CustomThemeName, CUSTOM_THEME_MAP } from "../../common/AppTheme"
 import { common } from "@kit.AbilityKit"
 import { setAutoColorMode, setDarkColorMode, setLightColorMode } from "../../common/ColorModeChangeFunctions"
 
@@ -48,8 +48,11 @@ struct Appearance {
       // 切换深色模式
       Menu() {
         ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
-          MenuItem({ content: menuItem.title })
-            .selectIcon(true)
+          MenuItem({
+            content: menuItem.title,
+            symbolEndIcon: this.EnableDarkMode === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+          })
+            // .selectIcon(true)
           .selected(this.EnableDarkMode === index)
           .onChange((selected) => {
             this.EnableDarkMode = index
@@ -63,12 +66,16 @@ struct Appearance {
       // 切换主题色
       Menu() {
         ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
-          MenuItem({ content: menuItem.title })
-            .selectIcon(true)
+          MenuItem({
+            content: menuItem.title,
+            symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.paintpalette_fill')).fontColor(menuItem.startSymbolFontColor),
+            symbolEndIcon: this.EnableThemeColor === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+          })
+            // .selectIcon(true)
           .selected(this.EnableThemeColor === index)
           .onChange((selected) => {
             this.EnableThemeColor = index
-            this.switchThemeColor(index)
+            this.changeThemeColor(menuItem?.customThemeName ?? 'blueAppTheme')
             // UI刷新
             this.refreshThemeColorList(menuItem.title)
           })
@@ -115,33 +122,12 @@ struct Appearance {
     }
   }
 
-  switchThemeColor(index: number) {
-    switch (index) {
-      case 0:
-        // 星河蓝
-        ThemeControl.setDefaultTheme(CUSTOM_THEME_MAP.get('blueAppTheme'))
-      break;
-      case 1:
-        // 猫咪蓝
-      break
-      case 2:
-        // 便单黄
-        ThemeControl.setDefaultTheme(CUSTOM_THEME_MAP.get('orangeAppTheme'))
-      break
-      case 3:
-        // 华为红
-        ThemeControl.setDefaultTheme(CUSTOM_THEME_MAP.get('redAppTheme'))
-      break
-      case 4:
-        // 优雅紫
-      break
-      case 5:
-        // 哔哩粉
-      break
-      case 6:
-        // 小草绿
-      break
-    }
+  /**
+   * 更改主题配置
+   * @param customThemeName 自定义主题的名字
+   */
+  changeThemeColor(customThemeName: CustomThemeName) {
+    ThemeControl.setDefaultTheme(CUSTOM_THEME_MAP.get(customThemeName))
   }
 
   // 切换按钮位置
@@ -247,6 +233,12 @@ struct Appearance {
           .alignItems(HorizontalAlign.Start)
           .backgroundColor($r('app.color.container_background'))
           .padding({left: 16, top: 15})
+          .shadow({
+            color: '#1a000000',
+            radius: 60,
+            type: ShadowType.COLOR
+          })
+
           // 按钮预览区
           Column() {
             Row() {
@@ -272,6 +264,7 @@ struct Appearance {
         }
         .width('100%')
         .height(220)
+        .clickEffect({ level: ClickEffectLevel.MIDDLE })
         // 列表区
         ForEach(this.appearanceList, (item: AppearanceListItemProp, index: number) => {
           Row() {
@@ -346,6 +339,7 @@ struct Appearance {
             .borderRadius(20)
             .backgroundColor($r('app.color.container_background'))
           }
+          .clickEffect({ level: ClickEffectLevel.MIDDLE })
         })
       }
       .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
