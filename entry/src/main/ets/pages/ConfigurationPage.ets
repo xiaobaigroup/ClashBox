@@ -341,7 +341,7 @@ struct ConfigurationPage {
           Button({ type: ButtonType.Circle, stateEffect: true }) {
             SymbolGlyph($r('sys.symbol.arrow_clockwise'))
               .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
-              .fontColor([$r('sys.color.icon_secondary')])
+              .fontColor([$r('sys.color.icon_primary')])
           }
           .width(40)
           .height(40)
