@@ -166,21 +166,6 @@ struct Settings {
       }
   }
 
-  // 语言切换菜单
-  /*@Builder
-  LanguageMenu() {
-    Menu() {
-      ForEach(this.LanguageList, (menuItem: settingsData, index: number) => {
-        MenuItem({ content: menuItem.title })
-          .selected(menuItem.isCheck)
-          .selectIcon(true)
-          .onClick(() => {
-            this.handleMenuCheck(index)
-          })
-      }, (menuItem: settingsData) => JSON.stringify(menuItem))
-    }
-  }*/
-
   build() {
     //Column() {
     Navigation(this.SettingsPageInfos) {
@@ -208,6 +193,7 @@ struct Settings {
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)
     }
+    .hideToolBar(true)
     .mode(this.isLandscapePhone ? NavigationMode.Stack : NavigationMode.Auto)
     .navDestination(this.SettingsPagesMap)
     .width('100%')

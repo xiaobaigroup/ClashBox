@@ -269,18 +269,6 @@ struct Home {
               this.isShowSettings = true
               this.isEnableIndexForegroundBlur = true
             })
-            .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
-              detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],
-              preferType: SheetType.CENTER,
-              backgroundColor: $r('app.color.background'),
-              dragBar: false,
-              // blurStyle: BlurStyle.BACKGROUND_REGULAR,
-              onWillDismiss: () => {
-                this.isShowSettings = false
-                this.isEnableIndexForegroundBlur = false
-                this.SettingsPageInfos.clear()
-              }
-            })
           } else {
             //编辑布局按钮判定：是编辑状态
             Text($r('app.string.home_edit'))
@@ -343,7 +331,6 @@ struct Home {
         // transition保证组件离场不被立即析构，可设置其他转场效果
         .transition(TransitionEffect.OPACITY)
       }
-
 
       Stack({ alignContent: this.stackAlignContentAlignment }) {
         // 主页卡片层
@@ -538,6 +525,18 @@ struct Home {
       .backgroundColor($r('app.color.background'))
       .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
       .width("100%")
+      .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
+        detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],
+        preferType: SheetType.CENTER,
+        backgroundColor: $r('app.color.background'),
+        dragBar: false,
+        // blurStyle: BlurStyle.BACKGROUND_REGULAR,
+        onWillDismiss: () => {
+          this.isShowSettings = false
+          this.isEnableIndexForegroundBlur = false
+          this.SettingsPageInfos.clear()
+        }
+      })
     }
   }
 }

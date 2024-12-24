@@ -143,8 +143,10 @@ struct About {
   UpdateMenu(item: AboutListItemProp[], index: number) {
     Menu() {
       ForEach(item, (menuItem: AboutListItemProp, index: number) => {
-        MenuItem({ content: menuItem.title })
-          .selectIcon(true)
+        MenuItem({
+          content: menuItem.title,
+          symbolEndIcon: this.EnableUpdateChenChannels === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+        })
           .selected(this.EnableUpdateChenChannels === index)
           .onChange((selected) => {
             this.switchUpdateChenChannels(index)

@@ -10,13 +10,23 @@ export struct FakeIPfilter {
   @State currentInputValue: string = ''
   @State theplaceholder: string = '请输入内容'
   @State theDialogTitle: ResourceStr = $r('app.string.Add_FakeIPfilter')
+  // 编辑路由地址弹窗默认输入框文本值
+  @State theEditPlaceholder: number = 0
+  // 编辑路由地址弹窗保存的输入文本
+  @State SaveEditInputValue: string = ''
+  // 编辑路由地址弹窗当前输入文本
+  @State currentEditInputValue: string = ''
+  // 编辑路由地址弹窗标题
+  @State theEditDialogTitle: ResourceStr = $r('app.string.edit_fakeIP_filter')
   @State FakeIPfilterList: FakeIPfilterData[] = createFakeIPfilterData()
   @Consume('NavPathStack') pageInfos: NavPathStack
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
 
-  // FakeIP过滤弹窗控制器
+  /**
+   * FakeIP添加过滤弹窗控制器
+   */
   dialogController: CustomDialogController = new CustomDialogController({
     builder: theCustomDialog({
       theplaceholder: this.theplaceholder,
@@ -38,6 +48,28 @@ export struct FakeIPfilter {
 
   }
 
+  /**
+   * FakeIP编辑过滤弹窗控制器
+   */
+  editDialogController: CustomDialogController = new CustomDialogController({
+    builder: theCustomDialog({
+      theplaceholder: $theEditPlaceholder,
+      currentInputValue: $currentEditInputValue,
+      SaveInputValue: $SaveEditInputValue,
+      theDialogTitle: this.theEditDialogTitle,
+      cancel: ()=> { this.oneditCancel() },
+      confirm: ()=> { this.oneditAccept() },
+    }),
+  })
+  oneditCancel() {
+
+  }
+  oneditAccept() {
+    // 更新UI数组中对应元素
+    const editItem: FakeIPfilterData = new FakeIPfilterData(this.SaveEditInputValue, false)
+    this.FakeIPfilterList.splice(this.theEditPlaceholder, 1, editItem)
+  }
+
   // 列表行删除
   handleDelete(index: number) {
     this.FakeIPfilterList.splice(index, 1)
@@ -47,8 +79,8 @@ export struct FakeIPfilter {
     NavDestination() {
       // 导航栏
       OverwriteTop({
-        title: $r('app.string.Network'),
-        subtitle: $r('app.string.Routing_Address')
+        title: $r('app.string.FakeIP_Filtering'),
+        subtitle: ''
       })
 
       List() {
@@ -80,6 +112,12 @@ export struct FakeIPfilter {
 
           }
           .margin({bottom: this.listBottom.value })
+          .onClick(() => {
+            // 进入列表行数据编辑
+            this.currentEditInputValue = item.name
+            this.theEditPlaceholder = index
+            this.editDialogController.open()
+          })
         })
 
         // 添加栏

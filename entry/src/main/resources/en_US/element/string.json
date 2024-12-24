@@ -1023,6 +1023,14 @@
     {
       "name": "close",
       "value": "Close"
+    },
+    {
+      "name": "edit_router_address",
+      "value": "Edit Router Address"
+    },
+    {
+      "name": "edit_fakeIP_filter",
+      "value": "Edit FakeIP Filter"
     }
   ]
 }

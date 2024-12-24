@@ -52,7 +52,6 @@ struct Appearance {
             content: menuItem.title,
             symbolEndIcon: this.EnableDarkMode === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
           })
-            // .selectIcon(true)
           .selected(this.EnableDarkMode === index)
           .onChange((selected) => {
             this.EnableDarkMode = index
@@ -71,7 +70,6 @@ struct Appearance {
             symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.paintpalette_fill')).fontColor(menuItem.startSymbolFontColor),
             symbolEndIcon: this.EnableThemeColor === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
           })
-            // .selectIcon(true)
           .selected(this.EnableThemeColor === index)
           .onChange((selected) => {
             this.EnableThemeColor = index
@@ -85,8 +83,10 @@ struct Appearance {
       // 切换按钮位置
       Menu() {
         ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
-          MenuItem({ content: menuItem.title })
-            .selectIcon(true)
+          MenuItem({
+            content: menuItem.title,
+            symbolEndIcon: this.EnableButtonPosition === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+          })
           .selected(this.EnableButtonPosition === index)
           .onChange((selected) => {
             this.EnableButtonPosition = index

@@ -4,7 +4,9 @@ import { ListOverwriteNetworkData, moreData } from "../../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import OverwriteTop from "./OverwriteTopBuilder"
 
-// 弹窗组件
+/**
+ * 通用弹窗组件（竖排按钮）
+ */
 @CustomDialog
 export struct theCustomDialog {
   @Link SaveInputValue: string
@@ -108,145 +110,91 @@ struct Network {
 
       List() {
         ForEach(this.overwriteNetworkList, (item: moreData, index: number) => {
-          if (item.sign === 0 ) {
-            // 展开型
-            ListItem() {
+          ListItem() {
+            Row() {
               Row() {
-                Row() {
-                  SymbolGlyph(item.icons)
-                    .fontSize(24)
-                    .margin({left: 12})
-                    .fontColor([this.icon_primary])
+                SymbolGlyph(item.icons)
+                  .fontSize(24)
+                  .margin({left: 12})
+                  .fontColor([this.icon_primary])
+                Column() {
                   Text(item.title)
                     .fontWeight(FontWeight.Medium)
                     .fontSize(16)
-                    .padding({ left: 12 })
-                  Blank()
+                  if (item.sign === 1) {
+                    if(index != 9 && index != 18 ) {
+                      Text(item.subtitle)
+                        .fontWeight(FontWeight.Normal)
+                        .margin({ top: 2 })
+                        .fontSize(14)
+                    }
+                  }
+                }
+                .alignItems(HorizontalAlign.Start)
+                .margin({ left: 12 })
+                Blank()
+                if (item.sign === 0 ) {
+                  // 展开型
                   Text(item.subtitle)
                     .fontWeight(FontWeight.Normal)
                     .margin({top: 2 })
                     .fontSize(14)
                   SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
                     .fontSize(14)
-                  //  .fontColor([$r('app.color.settings_container_background')])
                     .margin({left: 7, right: 20})
                     .fontColor([this.icon_primary])
+                } else if (item.sign === 1) {
+                  // 跳转型
+                  if(index === 9 || index === 18) {
+                    Text(item.subtitle)
+                      .fontWeight(FontWeight.Normal)
+                      .margin({right: 4 })
+                      .fontSize(14)
+                  }
+                  SymbolGlyph($r('sys.symbol.chevron_right'))
+                    .fontSize(28)
+                    .margin({right: 12})
+                    .fontColor([this.icon_primary])
+                } else if (item.sign === 2 ) {
+                  // 开关型
+                  Toggle({ type: ToggleType.Switch, isOn: item.isCheck })
+                    .selectedColor(this.icon_emphasize)
+                    .margin({right: 12})
+                    .onChange((isOn: boolean) => {
+                      if(isOn) {
+                        this.handleToggle(index)
+                      }
+                    })
+                }
+              }
+              .width('94%')
+              .height(53)
+              .borderRadius(20)
+              .backgroundColor($r('app.color.container_background'))
+            }
+            .onClick(() => {
+              if(item.sign === 1) {
+                this.handleCheck(index)
+              }
+            })
+          }
+          .margin({bottom: this.listBottom.value })
+          if (item.sign === 3) {
+            // 标题栏
+            ListItem() {
+              Row() {
+                Row() {
+                  Text(item.title)
+                    .fontWeight(FontWeight.Normal)
+                    .fontSize(16)
                 }
                 .width('94%')
-                .height(53)
-                .borderRadius(20)
-                .backgroundColor($r('app.color.container_background'))
+                .height(29)
                 Row()
                   .height(10)
               }
-              .onClick(() => {
-                this.handleCheck(index)
-              })
             }
-            .margin({bottom: this.listBottom.value })
-          } else
-            if (item.sign === 1 ) {
-              // 跳转型
-              ListItem() {
-                Row() {
-                  Row() {
-                    SymbolGlyph(item.icons)
-                      .fontSize(24)
-                      .margin({left: 12})
-                      .fontColor([this.icon_primary])
-                    Column() {
-                      Text(item.title)
-                        .fontWeight(FontWeight.Medium)
-                        .fontSize(16)
-                      if(index != 9 && index != 18 ) {
-                        Text(item.subtitle)
-                          .fontWeight(FontWeight.Normal)
-                          .margin({ top: 2 })
-                          .fontSize(14)
-                      }
-                    }
-                    .alignItems(HorizontalAlign.Start)
-                    .margin({ left: 12 })
-                    Blank()
-                    if(index === 9 || index === 18) {
-                      Text(item.subtitle)
-                        .fontWeight(FontWeight.Normal)
-                        .margin({right: 4 })
-                        .fontSize(14)
-                    }
-                    SymbolGlyph($r('sys.symbol.chevron_right'))
-                      .fontSize(28)
-                      .margin({right: 12})
-                      .fontColor([this.icon_primary])
-                  }
-                  .width('94%')
-                  .height(53)
-                  .borderRadius(20)
-                  .backgroundColor($r('app.color.container_background'))
-                  Row()
-                    .height(10)
-                }
-                .onClick(() => {
-                  this.handleCheck(index)
-                })
-              }
-              .margin({bottom: this.listBottom.value })
-            } else
-            if (item.sign === 2 ) {
-              // 开关型
-              ListItem() {
-                Row() {
-                  Row() {
-                    SymbolGlyph(item.icons)
-                      .fontSize(24)
-                      .margin({left: 12})
-                      .fontColor([this.icon_primary])
-
-                    Text(item.title)
-                      .fontWeight(FontWeight.Medium)
-                      .fontSize(16)
-                      .padding({ left: 12 })
-                    Blank()
-                    Toggle({ type: ToggleType.Switch, isOn: item.isCheck })
-                      .selectedColor(this.icon_emphasize)
-                      .margin({right: 12})
-                      .onChange((isOn: boolean) => {
-                        if(isOn) {
-                          this.handleToggle(index)
-                        }
-                      })
-                  }
-                  .width('94%')
-                  .height(53)
-                  .borderRadius(20)
-                  .backgroundColor($r('app.color.container_background'))
-                  Row()
-                    .height(10)
-                }
-                .onClick(() => {
-                  this.handleCheck(index)
-                })
-              }
-              .margin({bottom: this.listBottom.value })
-            } else
-            if (item.sign === 3) {
-              // 标题栏
-              ListItem() {
-                Row() {
-                  Row() {
-                    Text(item.title)
-                      .fontWeight(FontWeight.Normal)
-                      .fontSize(16)
-                    //.padding({ left: 12 })
-                    Blank()
-                  }
-                  .width('94%')
-                  .height(29)
-                  Row()
-                    .height(10)
-                }
-              }
-            }
+          }
 
         })
 
@@ -271,38 +219,75 @@ export default Network
 // 网络 -> 路由地址
 @Component
 export struct NetworkRouterAddress {
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
+  //一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  // 添加路由地址弹窗保存的输入文本
   @State SaveInputValue: string = ''
+  // 编辑路由地址弹窗保存的输入文本
+  @State SaveEditInputValue: string = ''
+  // 添加路由地址弹窗当前输入文本
   @State currentInputValue: string = ''
+  // 编辑路由地址弹窗当前输入文本
+  @State currentEditInputValue: string = ''
+  // 添加路由地址弹窗默认输入框文本
   @State theplaceholder: string = '请输入地址'
+  // 编辑路由地址弹窗默认输入框文本值
+  @State theEditPlaceholder: number = 0
+  // 添加路由地址弹窗标题
   @State theDialogTitle: ResourceStr = $r('app.string.Add_Router_Address')
+  // 编辑路由地址弹窗标题
+  @State theEditDialogTitle: ResourceStr = $r('app.string.edit_router_address')
   @State RouterAddressList: RouterAddressData[] = createRouterAddressData()
   @Consume('NavPathStack') pageInfos: NavPathStack
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
 
-  // 添加路由地址弹窗控制器
-  dialogController: CustomDialogController = new CustomDialogController({
+  /**
+   * 添加路由地址弹窗控制器
+   */
+  addDialogController: CustomDialogController = new CustomDialogController({
     builder: theCustomDialog({
       theplaceholder: this.theplaceholder,
       currentInputValue: $currentInputValue,
       SaveInputValue: $SaveInputValue,
       theDialogTitle: this.theDialogTitle,
-      cancel: ()=> { this.onCancel() },
-      confirm: ()=> { this.onAccept() },
+      cancel: ()=> { this.onaddCancel() },
+      confirm: ()=> { this.onaddAccept() },
     }),
   })
-
-  onCancel() {
+  onaddCancel() {
 
   }
-  onAccept() {
-    // 更新UI数组中对应元素
+  onaddAccept() {
+    // 在UI数组末尾添加对应元素
     const newItem: RouterAddressData = new RouterAddressData(this.SaveInputValue, false)
     this.RouterAddressList = [...this.RouterAddressList, newItem]
+  }
+
+  /**
+   * 编辑路由地址弹窗控制器
+   */
+  editDialogController: CustomDialogController = new CustomDialogController({
+    builder: theCustomDialog({
+      theplaceholder: $theEditPlaceholder,
+      currentInputValue: $currentEditInputValue,
+      SaveInputValue: $SaveEditInputValue,
+      theDialogTitle: this.theEditDialogTitle,
+      cancel: ()=> { this.oneditCancel() },
+      confirm: ()=> { this.oneditAccept() },
+    }),
+  })
+  oneditCancel() {
 
   }
+  oneditAccept() {
+    // 更新UI数组中对应元素
+    const editItem: RouterAddressData = new RouterAddressData(this.SaveEditInputValue, false)
+    this.RouterAddressList.splice(this.theEditPlaceholder, 1, editItem)
+  }
+
+
 
   // 列表行删除
   handleDelete(index: number) {
@@ -338,6 +323,7 @@ export struct NetworkRouterAddress {
                   .fontSize(28)
                   .margin({right: 12})
                   .onClick(() => {
+                    // 进去列表行删除
                     this.handleDelete(index)
                   })
               }
@@ -351,6 +337,12 @@ export struct NetworkRouterAddress {
 
           }
           .margin({bottom: this.listBottom.value })
+          .onClick(() => {
+            // 进入列表行数据编辑
+            this.currentEditInputValue = item.name
+            this.theEditPlaceholder = index
+            this.editDialogController.open()
+          })
         })
 
         // 添加栏
@@ -370,7 +362,7 @@ export struct NetworkRouterAddress {
           .backgroundColor($r('app.color.container_background'))
         }
         .onClick(() => {
-          this.dialogController.open()
+          this.addDialogController.open()
         })
 
       }
@@ -391,7 +383,9 @@ export struct NetworkRouterAddress {
   }
 }
 
-// 路由地址列表数据类
+/**
+ * 路由地址列表数据类
+ */
 class RouterAddressData {
   name: string
   isCheck: boolean

@@ -1,12 +1,14 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import { getResourceString } from "../../utils/getResourceString"
 import MoreMenu from "./LogMoreMenu"
+import { SymbolGlyphModifier } from "@kit.ArkUI"
 
 @Entry
 @Component
 struct Log {
   @Consume('NavPathStack') pageInfos: NavPathStack
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State isShowMenu: boolean = false
   @State EnableLogger: boolean = false
   @State isLogData: boolean = false
@@ -15,17 +17,25 @@ struct Log {
   @Builder
   MoreMenu() {
     Menu() {
-      MenuItem({ content: $r('app.string.EnableLogger') })
-        .selectIcon(true)
+      MenuItem({
+        content: $r('app.string.EnableLogger'),
+        symbolEndIcon: this.EnableLogger ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+      })
         .selected(this.EnableLogger)
         .onChange((selected) => {
           this.EnableLogger = !this.EnableLogger
         })
       if (this.EnableLogger) {
         MenuItem({ content: $r('app.string.ClearLogs')})
-          .selectIcon(true)
+          .onClick(() => {
+            // 清空日志操作
+
+          })
         MenuItem({ content: $r('app.string.ExportLog')})
-          .selectIcon(true)
+          .onClick(() => {
+            // 导出日志操作
+
+          })
       }
     }
   }
@@ -138,7 +148,6 @@ struct Log {
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
-    //.title(this.TopBuilder)//getResourceString($r('app.string.Log'), this)
     .onBackPressed(() => {
       if (this.isShowMenu) {
         this.isShowMenu = false

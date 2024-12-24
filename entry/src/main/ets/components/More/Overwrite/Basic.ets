@@ -61,131 +61,73 @@ struct Basic {
 
       List() {
         ForEach(this.overwriteBasicList, (item: moreData, index: number) => {
-          if (item.sign === 0 ) {
-            // 展开型
-            ListItem() {
+          ListItem() {
+            Row() {
               Row() {
-                Row() {
-                  SymbolGlyph(item.icons)
-                    .fontSize(24)
-                    .margin({left: 12})
-                    .fontColor([this.icon_primary])
-
+                SymbolGlyph(item.icons)
+                  .fontSize(24)
+                  .margin({left: 12})
+                  .fontColor([this.icon_primary])
+                Column() {
                   Text(item.title)
                     .fontWeight(FontWeight.Medium)
                     .fontSize(16)
-                    .padding({ left: 12 })
-                  Blank()
+                  if(index === 7 || index === 9 ) {
+                    Text(item.subtitle)
+                      .fontWeight(FontWeight.Normal)
+                      .margin({ top: 2 })
+                      .fontSize(14)
+                  }
+                }
+                .alignItems(HorizontalAlign.Start)
+                .margin({ left: 12 })
+                Blank()
+                if (item.sign === 0 ) {
+                  // 展开型
                   Text(item.subtitle)
                     .fontWeight(FontWeight.Normal)
-                    .textOverflow({ overflow: TextOverflow.Ellipsis })
-                    .maxLines(1)
                     .margin({top: 2 })
                     .fontSize(14)
                   SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
                     .fontSize(14)
-             //       .fontColor([$r('app.color.settings_container_background')])
                     .margin({left: 7, right: 20})
                     .fontColor([this.icon_primary])
-                }
-                .width('94%')
-                .height(53)
-                .borderRadius(20)
-                .backgroundColor($r('app.color.container_background'))
-                Row()
-                  .height(10)
-              }
-              .onClick(() => {
-                this.handleCheck(index)
-              })
-            }
-            .margin({bottom: this.listBottom.value })
-          } else
-            if (item.sign === 1 ) {
-              // 跳转型
-            ListItem() {
-              Row() {
-                Row() {
-                  SymbolGlyph(item.icons)
-                    .fontSize(24)
-                    .margin({left: 12})
-                    .fontColor([this.icon_primary])
-
-                  Text(item.title)
-                    .fontWeight(FontWeight.Medium)
-                    .fontSize(16)
-                    .padding({ left: 12 })
-                  Blank()
-                  Text(item.subtitle)
-                    .fontWeight(FontWeight.Normal)
-                    .margin({right: 4 })
-                    .fontSize(14)
+                } else if (item.sign === 1) {
+                  // 跳转型
+                  if(index != 5) {
+                    Text(item.subtitle)
+                      .fontWeight(FontWeight.Normal)
+                      .margin({right: 4 })
+                      .fontSize(14)
+                  }
                   SymbolGlyph($r('sys.symbol.chevron_right'))
                     .fontSize(28)
                     .margin({right: 12})
                     .fontColor([this.icon_primary])
-                }
-                .width('94%')
-                .height(53)
-                .borderRadius(20)
-                .backgroundColor($r('app.color.container_background'))
-                Row()
-                  .height(10)
-              }
-              .onClick(() => {
-                this.handleCheck(index)
-              })
-            }
-            .margin({bottom: this.listBottom.value })
-          } else
-            if (item.sign === 2 ) {
-              // 开关型
-              ListItem() {
-                Row() {
-                  Row() {
-                    SymbolGlyph(item.icons)
-                      .fontSize(24)
-                      .margin({left: 12})
-                      .fontColor([this.icon_primary])
-                    Column() {
-                      Text(item.title)
-                        .fontWeight(FontWeight.Medium)
-                        .fontSize(16)
-                      if(item.subtitle) {
-                        Text(item.subtitle)
-                          .fontWeight(FontWeight.Normal)
-                          .textOverflow({ overflow: TextOverflow.MARQUEE })
-                          .maxLines(1)
-                          .margin({top: 2})
-                          .fontSize(14)
-                          .width('70%')
+                } else if (item.sign === 2 ) {
+                  // 开关型
+                  Toggle({ type: ToggleType.Switch, isOn: item.isCheck })
+                    .selectedColor(this.icon_emphasize)
+                    .margin({right: 12})
+                    .onChange((isOn: boolean) => {
+                      if(isOn) {
+                        this.handleToggle(index)
                       }
-                    }
-                    .alignItems(HorizontalAlign.Start)
-                    .margin({ left: 12 })
-                    Blank()
-                    Toggle({ type: ToggleType.Switch, isOn: false })
-                      .selectedColor(this.icon_emphasize)
-                      .margin({right: 12})
-                      .onChange((isOn: boolean) => {
-                        if(isOn) {
-                          this.handleToggle(index)
-                        }
-                      })
-                  }
-                  .width('94%')
-                  .height(53)
-                  .borderRadius(20)
-                  .backgroundColor($r('app.color.container_background'))
-                  Row()
-                    .height(10)
+                    })
                 }
-                .onClick(() => {
-                  this.handleCheck(index)
-                })
               }
-              .margin({bottom: this.listBottom.value })
+              .width('94%')
+              .height(53)
+              .borderRadius(20)
+              .backgroundColor($r('app.color.container_background'))
             }
+            .onClick(() => {
+              if(item.sign === 1) {
+                this.handleCheck(index)
+              }
+            })
+          }
+          .margin({bottom: this.listBottom.value })
 
         })
 

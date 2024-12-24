@@ -1023,6 +1023,14 @@
     {
       "name": "close",
       "value": "关闭"
+    },
+    {
+      "name": "edit_router_address",
+      "value": "编辑路由地址"
+    },
+    {
+      "name": "edit_fakeIP_filter",
+      "value": "编辑FakeIP过滤"
     }
   ]
 }
