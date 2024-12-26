@@ -39,6 +39,10 @@
     "requestPermissions":[
       {
         "name": "ohos.permission.INTERNET",
+      },
+      {
+        // 振动器
+        "name": "ohos.permission.VIBRATE"
       }
     ],
     "extensionAbilities": [

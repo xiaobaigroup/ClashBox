@@ -135,6 +135,15 @@ export function BindSheetTitleCustomBuilder(param: BindSheetTitleCustomBuilderPa
             item.action()
           }
         })
+        .transition(
+          TransitionEffect.OPACITY.animation({duration: ANIMATION_DURATION_300, delay:0})
+            .combine(
+              TransitionEffect.asymmetric(
+                TransitionEffect.move(TransitionEdge.END),
+                TransitionEffect.move(TransitionEdge.END)
+              )
+            )
+        )
       })
     }
     // 菜单按钮 END
@@ -145,7 +154,7 @@ export function BindSheetTitleCustomBuilder(param: BindSheetTitleCustomBuilderPa
   // 为什么设置`15`，看参数类型中`padding`的介绍
   .padding(param.isSubPage ? param.padding : 15 )
   .backgroundColor(param?.titleBackgroundColor)
-  // .sharedTransition('configAddBindSheetTitle', { duration: 300, curve: Curve.Ease } )
+  // .sharedTransition('configAddBindSheetTitle', { duration: ANIMATION_DURATION_300, curve: Curve.Ease } )
   // .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
 }
 

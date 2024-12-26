@@ -242,6 +242,6 @@ export struct ImportConfigFromURL{
    */
   checkAllInputHaveValue() {
     this.allInputHaveValue = (this.configData.configName.length > 0 && this.configData.configURL.length > 0)
-    hilog.info(0xCA12, this.componentName, `#checkAllInputHaveValue is [${this.allInputHaveValue}]}`)
+    // hilog.info(0xCA12, this.componentName, `#checkAllInputHaveValue is [${this.allInputHaveValue}]}`)
   }
 }

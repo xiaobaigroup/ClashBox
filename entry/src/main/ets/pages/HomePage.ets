@@ -5,7 +5,7 @@ import SwitchMode from '../components/Home/SwitchMode'
 import CellularData from '../components/Home/CellularData'
 import PublicNetwork from '../components/Home/PublicNetwork'
 import Speed from '../components/Home/Speed'
-import { getGreeting } from '../utils/getGreeting'
+import { getGreeting } from '../utils/GreetingUtil'
 import SwitchQuickly from '../components/Home/SwitchQuickly'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Timer } from '../common/HHmmssTimer'
@@ -246,7 +246,7 @@ struct Home {
             .fontWeight(FontWeight.Bold)
             .margin({ left: this.gridMargin })
             .fontColor(this.font_primary)
-            .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:0}).combine(TransitionEffect.SLIDE))
+            .transition(TransitionEffect.OPACITY.animation({duration: ANIMATION_DURATION_300, delay:0}).combine(TransitionEffect.SLIDE))
           Blank()
 
             //编辑按钮
@@ -255,7 +255,7 @@ struct Home {
                 .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
                 .fontColor([this.icon_primary])
             }
-            .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:50}).combine(TransitionEffect.SLIDE))
+            .transition(TransitionEffect.OPACITY.animation({duration: ANIMATION_DURATION_300, delay:50}).combine(TransitionEffect.SLIDE))
             .onClick(() => {
               this.isShowHomeEdit = true
             })
@@ -274,7 +274,7 @@ struct Home {
             .width(40)
             .height(40)
             .backgroundColor($r('app.color.settings_container_background'))
-            .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:0}).combine(TransitionEffect.SLIDE))
+            .transition(TransitionEffect.OPACITY.animation({duration: ANIMATION_DURATION_300, delay:0}).combine(TransitionEffect.SLIDE))
             .onClick(() => {
               this.isShowSettings = true
               this.isEnableIndexForegroundBlur = true
@@ -286,7 +286,7 @@ struct Home {
               .fontWeight(FontWeight.Bold)
               .margin({ left: this.gridMargin })
               .fontColor(this.font_primary)
-              .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:100}).combine(TransitionEffect.SLIDE))
+              .transition(TransitionEffect.OPACITY.animation({duration: ANIMATION_DURATION_300, delay:100}).combine(TransitionEffect.SLIDE))
             Blank()
             //添加按钮
             Button({ type: ButtonType.Circle, stateEffect: true }) {
@@ -299,7 +299,7 @@ struct Home {
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
-            .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:100}).combine(TransitionEffect.SLIDE))
+            .transition(TransitionEffect.OPACITY.animation({duration: ANIMATION_DURATION_300, delay:100}).combine(TransitionEffect.SLIDE))
 
             //保存按钮
             Button({ type: ButtonType.Circle, stateEffect: true }) {
@@ -311,7 +311,7 @@ struct Home {
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
-            .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:50}).combine(TransitionEffect.SLIDE))
+            .transition(TransitionEffect.OPACITY.animation({duration: ANIMATION_DURATION_300, delay:50}).combine(TransitionEffect.SLIDE))
             .onClick(() => {
               this.saveHomeLayout()
             })
@@ -326,7 +326,7 @@ struct Home {
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
-            .transition(TransitionEffect.OPACITY.animation({duration: 300, delay:0}).combine(TransitionEffect.SLIDE))
+            .transition(TransitionEffect.OPACITY.animation({duration: ANIMATION_DURATION_300, delay:0}).combine(TransitionEffect.SLIDE))
             .onClick(() => {
               if (this.SaveDialogController != null) {
                 this.SaveDialogController.open()
@@ -514,12 +514,12 @@ struct Home {
             this.proxyStartedTimer.start((formatTime) => {
               this.proxyStartingDuration = formatTime
             })
-            // ThemeControl.setDefaultTheme(CUSTOM_THEME_MAP.get('redAppTheme'))
-            // hilog.info(0xA002, this.componentName, `#Button#onClick#ThemeControl.setDefaultTheme(redAppTheme)`)
+            ThemeControl.setDefaultTheme(CUSTOM_THEME_MAP.get('redAppTheme'))
+            hilog.info(0xA002, this.componentName, `#Button#onClick#ThemeControl.setDefaultTheme(redAppTheme)`)
           } else {
             // TODO 删除下面两行 为了测试更换固定主题色用的
-            // ThemeControl.setDefaultTheme(CUSTOM_THEME_MAP.get('orangeAppTheme'))
-            // hilog.info(0xA002, this.componentName, `#Button#onClick#ThemeControl.setDefaultTheme(orangeAppTheme)`)
+            ThemeControl.setDefaultTheme(CUSTOM_THEME_MAP.get('yellowAppTheme'))
+            hilog.info(0xA002, this.componentName, `#Button#onClick#ThemeControl.setDefaultTheme(orangeAppTheme)`)
             this.proxyStartedTimer.reset()
             // 如果`reset()`就取消注释这句，如果是`pause()`就注释这句
             this.proxyStartingDuration = PROXY_STARTED_DURATION_INIT_VALUE

@@ -1,5 +1,4 @@
-import {
-  LIST_ITEM_HEIGHT,
+import { ANIMATION_DURATION_300, LIST_ITEM_HEIGHT,
 } from '../../common/Constants'
 import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem'
 import { hilog } from "@kit.PerformanceAnalysisKit"
@@ -51,7 +50,7 @@ struct ProxyArrangement {
               .padding({ left: 10, right: 10 })
               .onClick(() => {
                 animateTo({
-                  duration: 300,
+                  duration: ANIMATION_DURATION_300,
                   onFinish: () => {
                     console.info('animation end');
                   }

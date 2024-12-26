@@ -1,9 +1,8 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import { NoticeList, NoticeListItemProp } from "../../common/Constants"
-import { getResourceString } from "../../utils/getResourceString"
+import { getResourceString } from "../../utils/ResourceStringUtil"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
-import { faceDetector } from "@kit.CoreVisionKit"
 
 /**
  * 通知页

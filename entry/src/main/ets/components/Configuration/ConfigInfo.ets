@@ -14,8 +14,9 @@ import {
 } from "../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { PromptAction } from "@kit.ArkUI"
-import { BusinessError } from "@kit.BasicServicesKit"
 import { ConfigData } from "../../common/PageArgumentEntity"
+import { customVibrator } from "../../utils/VibratorUtil"
+import { customSound } from "../../utils/SoundPoolUtil"
 
 @Component
 export struct ConfigInfo{
@@ -98,6 +99,7 @@ export struct ConfigInfo{
         .onSubmit( (enterKey: EnterKeyType, event: SubmitEvent) => {
           // 焦点切换给`URL`框
           focusControl.requestFocus('text_area_config_url')
+          customVibrator.vibratorTriggerOfHapticClockTimer()
         })
 
 
@@ -119,6 +121,7 @@ export struct ConfigInfo{
         .onSubmit( (enterKey: EnterKeyType) => {
           // 条件判断是否需要将焦点切换给`自动更新时间间隔`框
           this.configData.isConfigAutoUpdate ? focusControl.requestFocus('text_input_auto_update_time') : null
+          customVibrator.vibratorTriggerOfHapticClockTimer()
         })
 
       // 配置自动更新 START
@@ -134,10 +137,13 @@ export struct ConfigInfo{
                 .selectedColor(this.icon_emphasize)
                 .onChange((isOn: boolean) => {
                   hilog.info(0xCA1A, this.componentName, `#ListItem#Toggle#自动更新状态: ${isOn}`)
+                  // 焦点置于`自动更新间隔`文本框
                   focusControl.requestFocus('text_input_auto_update_time')
+                  customVibrator.vibratorTriggerOfHapticClockTimer()
                   // 自动更新间隔 显式动画
                   this.getUIContext()?.animateTo({
-                    duration: ANIMATION_DURATION_300
+                    duration: ANIMATION_DURATION_300,
+                    curve: Curve.Ease
                   }, () => {
                     this.configData.isConfigAutoUpdate = isOn
                   })
@@ -193,6 +199,9 @@ export struct ConfigInfo{
                     .maxLength(5)
                     .enterKeyType(EnterKeyType.Done)
                     .type(InputType.Number)
+                    .onSubmit( (enterKey: EnterKeyType, event: SubmitEvent) => {
+                      customVibrator.vibratorTriggerOfHapticClockTimer()
+                    })
                     // 干喔~不知道为什么放在ListItem里面不生效
                     // .showUnderline(true)
                   TextPicker({
@@ -213,6 +222,10 @@ export struct ConfigInfo{
                       }
                     })
                     .divider(this.dividerOfTextPickerInTheListItem)
+                    .onChange( () => {
+                      customVibrator.vibratorTriggerOfHapticClockTimer()
+                      customSound.playAudioForSoundPool()
+                    })
                     // 手指按下之后静态
                     // .onHover( (isHover: boolean, event: HoverEvent) => {
                     //
@@ -295,10 +308,12 @@ export struct ConfigInfo{
   aboutToAppear(): void {
     hilog.info(0xCA1A, this.componentName, `#aboutToAppear executed`)
     // this.getConfigAutoUpdateMenuStringArr()
+    customSound.initSoundPool(3, 'beat_short.wav')
   }
 
   aboutToDisappear(): void {
     hilog.info(0xCA1A, this.componentName, `#aboutToDisappear executed`)
+    customSound.destroySoundPool()
   }
 
   /**
@@ -340,7 +355,7 @@ export struct ConfigInfo{
   }*/
 
   /**
-   *
+   * @Watch监听事件：配置自动更新 填写的间隔值
    */
   configAutoUpdateTimeGapInputChanged() {
     this.configData.configAutoUpdateTimeGapValue = Number(this.configAutoUpdateTimeGapInputValue)

@@ -18,6 +18,8 @@ import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
 import { ConfigData, ConfigDataSource } from '../common/PageArgumentEntity'
 import { CustomConfirmDialog } from '../components/Common'
+import { customVibrator } from "../utils/VibratorUtil"
+
 
 /**
  * 长按菜单参数
@@ -261,7 +263,7 @@ struct ConfigurationPage {
       .width(200)
       .height('auto')
       .transition(TransitionEffect.asymmetric(TransitionEffect.move(TransitionEdge.END), TransitionEffect.move(TransitionEdge.START))
-        .animation({ duration: 300, curve: Curve.Ease })
+        .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
         .combine(TransitionEffect.OPACITY)
       )
     }
@@ -397,10 +399,14 @@ struct ConfigurationPage {
               {
                 preview: MenuPreviewMode.IMAGE,
                 previewAnimationOptions: { scale: [1.0, 1.1] },
-                placement: Placement.BottomRight
+                placement: Placement.BottomRight,
+                aboutToAppear: () => {
+                  customVibrator.vibratorTriggerOfHapticClockTimer()
+                }
               })
             .onClick(() => {
               this.currentConfigRadioCheckedConfigData = item
+              customVibrator.vibratorTriggerOfHapticClockTimer()
               hilog.info(0xC002, this.componentName, `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
             })
             .onTouch((event: TouchEvent) => {
