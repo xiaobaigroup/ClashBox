@@ -52,12 +52,13 @@ struct Language {
           .backgroundColor($r('app.color.container_background'))
         }
         .margin({bottom: 10})
+        .clickEffect({ level: ClickEffectLevel.MIDDLE })
         .onClick(() => {
           // 点击整行对应单选框选中
            this.currentRadioCheck = -1
           // 恢复默认
           i18n.System.setAppPreferredLanguage("default")
-          promptAction.showToast({message: '重启应用生效', duration: 2000 })
+          promptAction.showToast({message: $r('app.string.restart_app_tips'), duration: 2000 })
         })
         ForEach(this.SettingsLanguageList, (item: LanguageData, index: number) => {
           // 语言列表
@@ -90,6 +91,7 @@ struct Language {
             .backgroundColor($r('app.color.container_background'))
           }
           .margin({bottom: 10})
+          .clickEffect({ level: ClickEffectLevel.MIDDLE })
           .onClick(() => {
             // 点击整行对应单选框选中
             this.currentRadioCheck = index

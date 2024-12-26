@@ -1,5 +1,5 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { AppearanceList, AppearanceListItemProp } from "../../common/Constants"
+import { ANIMATION_DURATION_300, AppearanceList, AppearanceListItemProp } from "../../common/Constants"
 import TopBuilder from "./TopBuilder"
 import { SymbolGlyphModifier, ThemeControl } from "@kit.ArkUI"
 import { CustomThemeName, CUSTOM_THEME_MAP } from "../../common/AppTheme"
@@ -26,6 +26,10 @@ struct Appearance {
   private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
   // 断点系统
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+  // 手机横屏判断
+  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  // 滚动列表高度
+  @Consume('breakPointStateSettingslistHeight') private SettingslistHeight: BreakpointState<number>
   // 按钮宽度
   @State
   private proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
@@ -179,170 +183,195 @@ struct Appearance {
       // 顶部导航区
       TopBuilder({title: $r('app.string.Appearance')})
       // 功能区
-      Column() {
-        // 颜色预览区
-        Stack() {
-          // 单选框预览区
-          Column() {
-            Row() {
-              Text($r('app.string.color_preview'))
-                .width(80)
-                .fontWeight(FontWeight.Bold)
-                .fontSize(16)
-                .margin({ right: 9 })
-                .fontColor(this.font_primary)
-              Radio({ value: 'preview', group: 'appearanceRadioGroup', })
-                .checked(true)
-                .radioStyle({
-                  checkedBackgroundColor: this.icon_emphasize,
-                })
-            }
-            Row() {
-              Text($r('app.string.configuration_1'))
-                .fontWeight(FontWeight.Bold)
-                .width(80)
-                .fontSize(16)
-                .margin({ right: 9 })
-                .fontColor(this.font_primary)
-              Radio({ value: 'config', group: 'appearanceRadioGroup',})
-                .checked(false)
-                .radioStyle({
-                  checkedBackgroundColor: this.icon_emphasize,
-                })
-            }
-            .margin({top: 10})
-            Row() {
-              Text($r('app.string.proxy_1'))
-                .fontWeight(FontWeight.Bold)
-                .width(80)
-                .fontSize(16)
-                .margin({ right: 9 })
-                .fontColor(this.font_primary)
-              Radio({ value:'proxy', group: 'appearanceRadioGroup',})
-                .checked(false)
-                .radioStyle({
-                  checkedBackgroundColor: this.icon_emphasize,
-                })
-            }
-            .margin({top: 10})
-          }
-          .width(188)
-          .height(130)
-          .borderRadius(20)
-          .backdropBlur(2)
-          .alignItems(HorizontalAlign.Start)
-          .backgroundColor($r('app.color.container_background'))
-          .padding({left: 16, top: 15})
-          .shadow({
-            color: '#1a000000',
-            radius: 60,
-            type: ShadowType.COLOR
-          })
-
-          // 按钮预览区
-          Column() {
-            Row() {
-              Stack({ alignContent: Alignment.Center }) {
-                SymbolGlyph($r('sys.symbol.play_fill'))
-                  .fontSize(24)
-                  .fontColor([Color.White])
-                  .align(Alignment.Center)
+      Scroll() {
+        Column() {
+          // 颜色预览区
+          Stack() {
+            // 单选框预览区
+            Column() {
+              Row() {
+                Text($r('app.string.color_preview'))
+                  .width(80)
+                  .fontWeight(FontWeight.Bold)
+                  .fontSize(16)
+                  .margin({ right: 9 })
+                  .fontColor(this.font_primary)
+                Radio({ value: 'preview', group: 'appearanceRadioGroup', })
+                  .checked(true)
+                  .radioStyle({
+                    checkedBackgroundColor: this.icon_emphasize,
+                  })
               }
-              .width(this.proxyStartButtonHeight)
-              .height(this.proxyStartButtonHeight)
-            }.width(this.proxyStartButtonHeight)
+              Row() {
+                Text($r('app.string.configuration_1'))
+                  .fontWeight(FontWeight.Bold)
+                  .width(80)
+                  .fontSize(16)
+                  .margin({ right: 9 })
+                  .fontColor(this.font_primary)
+                Radio({ value: 'config', group: 'appearanceRadioGroup',})
+                  .checked(false)
+                  .radioStyle({
+                    checkedBackgroundColor: this.icon_emphasize,
+                  })
+              }
+              .margin({top: 10})
+              Row() {
+                Text($r('app.string.proxy_1'))
+                  .fontWeight(FontWeight.Bold)
+                  .width(80)
+                  .fontSize(16)
+                  .margin({ right: 9 })
+                  .fontColor(this.font_primary)
+                Radio({ value:'proxy', group: 'appearanceRadioGroup',})
+                  .checked(false)
+                  .radioStyle({
+                    checkedBackgroundColor: this.icon_emphasize,
+                  })
+              }
+              .margin({top: 10})
+            }
+            .width(188)
+            .height(130)
+            .borderRadius(20)
+            .backdropBlur(2)
+            .alignItems(HorizontalAlign.Start)
+            .backgroundColor($r('app.color.container_background'))
+            .padding({left: 16, top: 15})
+            .shadow({
+              color: '#1a000000',
+              radius: 60,
+              type: ShadowType.COLOR
+            })
+
+            // 按钮预览区
+            Column() {
+              Row() {
+                Stack({ alignContent: Alignment.Center }) {
+                  SymbolGlyph($r('sys.symbol.play_fill'))
+                    .fontSize(24)
+                    .fontColor([Color.White])
+                    .align(Alignment.Center)
+                }
+                .width(this.proxyStartButtonHeight)
+                .height(this.proxyStartButtonHeight)
+              }.width(this.proxyStartButtonHeight)
+            }
+            .offset({x: this.ButtonPositionOffset, y: 52})
+            .borderRadius(100)
+            .backgroundColor(this.icon_emphasize)
+            .shadow({
+              radius: 10,
+              color: this.icon_emphasize,
+              offsetY: 4,
+              type: ShadowType.BLUR
+            })
           }
-          .offset({x: this.ButtonPositionOffset, y: 52})
-          .borderRadius(100)
-          .backgroundColor(this.icon_emphasize)
-          .shadow({
-            radius: 10,
-            color: this.icon_emphasize,
-            offsetY: 4,
-            type: ShadowType.BLUR
+          .width('100%')
+          .height(220)
+          .clickEffect({ level: ClickEffectLevel.MIDDLE })
+          // 列表区
+          ForEach(this.appearanceList, (item: AppearanceListItemProp, index: number) => {
+            Row() {
+              Row() {
+                SymbolGlyph(item.icon)
+                  .fontSize(24)
+                  .margin({left: 12})
+                  .fontColor([this.icon_emphasize])
+                Column() {
+                  Row() {
+                    Text(item.title)
+                      .fontWeight(FontWeight.Medium)
+                      .fontSize(16)
+                    if(this.isShowExperimentalFunction) {
+                      // 实验功能提示框
+                      if(item.subtitle2) {
+                        Column() {
+                          Text(item.subtitle2)
+                            .fontColor(Color.White)
+                            .fontSize(10)
+                        }
+                        .alignItems(HorizontalAlign.Center)
+                        .justifyContent(FlexAlign.Center)
+                        .width(50)
+                        .height(18)
+                        .borderRadius(4)
+                        .margin({left: 2})
+                        .backgroundColor(this.icon_emphasize)
+                      }
+                    }
+                  }
+                  if(!item.children) {
+                    Text(item.subtitle)
+                      .fontWeight(FontWeight.Normal)
+                      .textOverflow({ overflow: TextOverflow.MARQUEE })
+                      .maxLines(1)
+                      .margin({ top: 2 })
+                      .fontSize(14)
+                      .width('70%')
+                  }
+                }
+                .margin({ left: 12 })
+                .alignItems(HorizontalAlign.Start)
+                Blank()
+                if(item.children) {
+                  Row() {
+                    Text(item.subtitle)
+                      .fontWeight(FontWeight.Normal)
+                      .textOverflow({ overflow: TextOverflow.Ellipsis })
+                      .maxLines(1)
+                      .margin({top: 2 })
+                      .fontSize(14)
+                    SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
+                      .fontSize(14)
+                      .margin({left: 7, right: 20})
+                      .fontColor([this.icon_primary])
+                  }.bindMenu(this.switchMenu(item.children, index))
+                } else {
+                  Toggle({ type: ToggleType.Switch, isOn: item.isOn })
+                    .selectedColor(this.icon_emphasize)
+                    .margin({right: 12})
+                    .onChange((isOn: boolean) => {
+                      if(isOn) {
+                        //this.handleToggle(index)
+                      }
+                    })
+                }
+              }
+              .margin({bottom: 10})
+              .width('100%')
+              .height(53)
+              .borderRadius(20)
+              .backgroundColor($r('app.color.container_background'))
+            }
+            .clickEffect({ level: ClickEffectLevel.MIDDLE })
+            .onClick(() => {
+              if (index === 2 || index === 4 || index === 5) {
+                // 改变对应开关状态 显式动画
+                this.getUIContext()?.animateTo({
+                  duration: ANIMATION_DURATION_300,
+                  curve: Curve.Ease
+                }, () => {
+                  const childItem = this.appearanceList[index]
+                  childItem.isOn = !childItem.isOn
+                  // 使用splice来更新父组件数组
+                  this.appearanceList.splice(index, 1, childItem)
+                })
+
+              }
+            })
+
           })
         }
         .width('100%')
-        .height(220)
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
-        // 列表区
-        ForEach(this.appearanceList, (item: AppearanceListItemProp, index: number) => {
-          Row() {
-            Row() {
-              SymbolGlyph(item.icon)
-                .fontSize(24)
-                .margin({left: 12})
-                .fontColor([this.icon_emphasize])
-              Column() {
-                Row() {
-                  Text(item.title)
-                    .fontWeight(FontWeight.Medium)
-                    .fontSize(16)
-                  if(this.isShowExperimentalFunction) {
-                    // 实验功能提示框
-                    if(item.subtitle2) {
-                      Column() {
-                        Text(item.subtitle2)
-                          .fontColor(Color.White)
-                          .fontSize(10)
-                      }
-                      .alignItems(HorizontalAlign.Center)
-                      .justifyContent(FlexAlign.Center)
-                      .width(50)
-                      .height(18)
-                      .borderRadius(4)
-                      .margin({left: 2})
-                      .backgroundColor(this.icon_emphasize)
-                    }
-                  }
-                }
-                if(!item.children) {
-                  Text(item.subtitle)
-                    .fontWeight(FontWeight.Normal)
-                    .textOverflow({ overflow: TextOverflow.MARQUEE })
-                    .maxLines(1)
-                    .margin({ top: 2 })
-                    .fontSize(14)
-                    .width('70%')
-                }
-              }
-              .margin({ left: 12 })
-              .alignItems(HorizontalAlign.Start)
-              Blank()
-              if(item.children) {
-                Row() {
-                  Text(item.subtitle)
-                    .fontWeight(FontWeight.Normal)
-                    .textOverflow({ overflow: TextOverflow.Ellipsis })
-                    .maxLines(1)
-                    .margin({top: 2 })
-                    .fontSize(14)
-                  SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
-                    .fontSize(14)
-                    .margin({left: 7, right: 20})
-                    .fontColor([this.icon_primary])
-                }.bindMenu(this.switchMenu(item.children, index))
-              } else {
-                Toggle({ type: ToggleType.Switch, isOn: false })
-                  .selectedColor(this.icon_emphasize)
-                  .margin({right: 12})
-                  .onChange((isOn: boolean) => {
-                    if(isOn) {
-                      //this.handleToggle(index)
-                    }
-                  })
-              }
-            }
-            .margin({bottom: 10})
-            .width('100%')
-            .height(53)
-            .borderRadius(20)
-            .backgroundColor($r('app.color.container_background'))
-          }
-          .clickEffect({ level: ClickEffectLevel.MIDDLE })
-        })
+        .alignItems(HorizontalAlign.Start)
+        .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
       }
-      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+      .width('100%')
+      .align(Alignment.Top)
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+      .height(this.isLandscapePhone ? 300 : this.SettingslistHeight.value)
+
     }
     .width('100%')
     .backgroundColor($r('app.color.background'))

@@ -44,7 +44,10 @@ struct TopBuilder {
             .fontWeight(FontWeight.Normal)
             .margin(this.showBackButton ? {left: 8, top: 2 } : {left: 16, top: 2})
         }
-      }.alignItems(HorizontalAlign.Start)
+      }
+      .justifyContent(FlexAlign.Center)
+      .alignItems(HorizontalAlign.Start)
+      .height(BIND_SHEET_TITLE_CONTAINER_HEIGHT)
       Blank()
       /*Button({ type: ButtonType.Circle, stateEffect: true }) {
         SymbolGlyph($r('sys.symbol.xmark'))

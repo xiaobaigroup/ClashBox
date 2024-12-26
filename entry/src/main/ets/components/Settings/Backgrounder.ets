@@ -357,5 +357,6 @@ struct RowList {
     .borderRadius(20)
     .margin({bottom: 10})
     .backgroundColor($r('app.color.container_background'))
+    .clickEffect({ level: ClickEffectLevel.MIDDLE })
   }
 }

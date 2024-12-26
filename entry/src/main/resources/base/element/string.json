@@ -1095,6 +1095,14 @@
     {
       "name": "threshold_data",
       "value": "阈值流量"
+    },
+    {
+      "name": "restart_app_tips",
+      "value": "重启应用生效"
+    },
+    {
+      "name": "click_prompt",
+      "value": "点击右边开关哦"
     }
   ]
 }

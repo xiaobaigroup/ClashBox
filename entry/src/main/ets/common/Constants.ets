@@ -243,6 +243,7 @@ export const LanguageListItem = (): LanguageData[] => {
  */
 export interface AppearanceListItemProp {
   icon?: Resource
+  isOn?: boolean
   title: string | Resource
   subtitle: string | Resource
   subtitle2?: string | Resource
@@ -274,7 +275,7 @@ export const AppearanceList: AppearanceListItemProp[] = [
       { title: $r('app.string.green'), subtitle: '', customThemeName: 'greenAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_green')] },
     ]
   },
-  { icon: $r('sys.symbol.message'), title: $r('app.string.homepage_greetings'), subtitle: $r('app.string.homepage_greetings_subtitle')},
+  { icon: $r('sys.symbol.message'), title: $r('app.string.homepage_greetings'), subtitle: $r('app.string.homepage_greetings_subtitle'), isOn: false},
   { icon: $r('sys.symbol.local_fill'), title: $r('app.string.suspension_button_position'), subtitle: $r('app.string.right'),
     children: [
       { title: $r('app.string.right'), subtitle: ''},
@@ -282,8 +283,8 @@ export const AppearanceList: AppearanceListItemProp[] = [
       { title: $r('app.string.left'), subtitle: ''},
     ]
   },
-  { icon: $r('sys.symbol.rectangle_on_rectangle_fill'), title: $r('app.string.blurred_background'), subtitle: $r('app.string.blurred_background_subtitle')},
-  { icon: $r('sys.symbol.livephoto'), title: $r('app.string.animation_effects'), subtitle: $r('app.string.animation_effects_subtitle'), subtitle2: $r('app.string.experimental_function')},
+  { icon: $r('sys.symbol.rectangle_on_rectangle_fill'), title: $r('app.string.blurred_background'), subtitle: $r('app.string.blurred_background_subtitle'), isOn: false},
+  { icon: $r('sys.symbol.livephoto'), title: $r('app.string.animation_effects'), subtitle: $r('app.string.animation_effects_subtitle'), subtitle2: $r('app.string.experimental_function'), isOn: false},
 ]
 
 /**

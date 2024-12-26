@@ -1095,6 +1095,14 @@
     {
       "name": "threshold_data",
       "value": "Threshold Data"
+    },
+    {
+      "name": "restart_app_tips",
+      "value": "Restart application to take effect"
+    },
+    {
+      "name": "click_prompt",
+      "value": "Click the right switch"
     }
   ]
 }

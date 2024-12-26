@@ -2,7 +2,8 @@ import { BreakpointState } from "../../common/breakpointsystem"
 import { AboutListItemProp, AboutList, BORDER_RADIUS_20, ContributorsListItemProp,
   ContributorsList,
   CheckUpdateList,
-  CheckUpdateListItemProp} from "../../common/Constants"
+  CheckUpdateListItemProp,
+  ANIMATION_DURATION_300} from "../../common/Constants"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { common, Want } from "@kit.AbilityKit"
@@ -188,7 +189,9 @@ struct About {
           .backgroundColor($r('app.color.container_background'))
           .borderRadius(BORDER_RADIUS_20)
           .height(220)
-        }.margin({bottom: 10 })
+        }
+        .margin({bottom: 10 })
+        .clickEffect({ level: ClickEffectLevel.MIDDLE })
 
         ForEach(this.aboutList, (item: AboutListItemProp, index: number) => {
           ListItem() {
@@ -219,6 +222,7 @@ struct About {
                     // 分割线
                     Row().height(0.5).backgroundColor('#0D000000').width('93%')
                   }
+                  .clickEffect({ level: ClickEffectLevel.MIDDLE })
                   .onClick(() => {
                     // 这里什么都没有
                   })
@@ -267,9 +271,31 @@ struct About {
                     // 分割线
                     Row().height(0.5).backgroundColor('#0D000000').width('93%')
                   }
+                  .clickEffect({ level: ClickEffectLevel.MIDDLE })
                   .onClick(() => {
                     if(itemChild.sign === 0) {
                       // 似乎可以留个彩蛋
+
+                    } else if(itemChild.sign === 1) {
+                      if (itemChild.name === 'ExperimentalFunction') {
+                        // 点击提示 防误触
+                        promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
+                      } else {
+                        // 改变自动检查更新开关状态 显式动画
+                        this.getUIContext()?.animateTo({
+                          duration: ANIMATION_DURATION_300,
+                          curve: Curve.Ease
+                        }, () => {
+                          const childItem = this.aboutList[4]
+                          if (childItem && childItem.children) {
+                            childItem.children[2].isOn = !childItem.children[2].isOn
+                            // 使用splice来更新父组件数组
+                            this.aboutList.splice(4, 1, childItem)
+                          }
+                        })
+
+                      }
+
                     } else if(itemChild.sign === 2) {
                       // 进入列表行跳转处理
                       this.handleCheck(itemChild.name)
@@ -408,6 +434,7 @@ export struct AboutContributors {
               if(item.contact) {
                 Row() {
                   Button(item.contact, { type: ButtonType.Capsule, stateEffect: true })
+                    .clickEffect({ level: ClickEffectLevel.MIDDLE })
                     .backgroundColor($r('app.color.button_container_background'))
                     .fontColor(this.icon_emphasize)
                     .width(90)
@@ -417,6 +444,7 @@ export struct AboutContributors {
                     })
                   if(item.contact2) {
                     Button(item.contact2, { type: ButtonType.Capsule, stateEffect: true })
+                      .clickEffect({ level: ClickEffectLevel.MIDDLE })
                       .backgroundColor($r('app.color.button_container_background'))
                       .fontColor(this.icon_emphasize)
                       .margin({left: 6})
@@ -434,6 +462,7 @@ export struct AboutContributors {
               }
             }
           }
+          .clickEffect({ level: ClickEffectLevel.MIDDLE })
           .backgroundColor($r('app.color.container_background'))
           .borderRadius(BORDER_RADIUS_20)
           .margin({bottom: 10 })
@@ -538,7 +567,9 @@ export struct CheckUpdate {
                 .justifyContent(FlexAlign.Start)
                 // 分割线
                 Row().height(0.5).backgroundColor('#0D000000').width('93%')
-              }.width('100%')
+              }
+              .width('100%')
+              .clickEffect({ level: ClickEffectLevel.MIDDLE })
               .onClick(() => {
                 if(index === 1) {
                   // 前往下载网页

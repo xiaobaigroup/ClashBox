@@ -49,6 +49,7 @@ struct settingsListItem {
       Row()
         .height(10)
     }
+    .clickEffect({ level: ClickEffectLevel.MIDDLE })
     .onClick(() => {
       this.onCheck(this.index)
     })

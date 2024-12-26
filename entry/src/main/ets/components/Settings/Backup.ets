@@ -1,5 +1,5 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { BackupList, BackupListItemProp } from "../../common/Constants"
+import { ANIMATION_DURATION_300, BackupList, BackupListItemProp } from "../../common/Constants"
 import TopBuilder from "./TopBuilder"
 
 @Component
@@ -170,24 +170,33 @@ export struct CloudBackup {
           .alignItems(HorizontalAlign.Start)
           .margin({ left: 12 })
           Blank()
-          Toggle({ type: ToggleType.Switch, isOn: false })
+          Toggle({ type: ToggleType.Switch, isOn: $$this.isShowCloudconfig })
             .selectedColor(this.icon_emphasize)
             .margin({right: 12})
             .onChange((isOn: boolean) => {
-              if(isOn) {
-                // 开启云备份 TODO 【用户首选项】保存云备份启用状态 Ya@2024-12-24
-                this.isShowCloudconfig = true
-              } else {
-                // 关闭云备份
-                this.isShowCloudconfig = false
-              }
+              // 开关云备份 显式动画 TODO 【用户首选项】保存云备份启用状态 Ya@2024-12-24
+              this.getUIContext()?.animateTo({
+                duration: ANIMATION_DURATION_300,
+                curve: Curve.Ease
+              }, () => {
+                this.isShowCloudconfig = isOn
+              })
             })
         }
         .width('100%')
         .height(53)
         .borderRadius(20)
         .margin({bottom: 10})
+        .clickEffect({ level: ClickEffectLevel.MIDDLE })
         .backgroundColor($r('app.color.container_background'))
+        .onClick( ()=> {
+          // 展开流量提醒设置列表行 显式动画
+          this.getUIContext()?.animateTo({
+            duration: ANIMATION_DURATION_300
+          }, () => {
+            this.isShowCloudconfig = !this.isShowCloudconfig
+          })
+        })
 
         // WebDav服务器配置区
         if(this.isShowCloudconfig) {
@@ -213,6 +222,7 @@ export struct CloudBackup {
                 .height(40)
                 .borderRadius(20)
                 .backgroundColor(this.icon_emphasize)
+                .clickEffect({ level: ClickEffectLevel.MIDDLE })
                 .onClick(() => {
                   // 暂时写成点击后赋值为true，后续需要根据登录状态来赋值
                   this.isLogon = true
@@ -225,6 +235,7 @@ export struct CloudBackup {
                 .borderRadius(20)
                 .margin({left: 10})
                 .backgroundColor(this.icon_emphasize)
+                .clickEffect({ level: ClickEffectLevel.MIDDLE })
                 .opacity(this.isLogon ? 1 : 0.5)
                 .onClick(() => {
                   // 连接测试
@@ -237,6 +248,7 @@ export struct CloudBackup {
           .width('100%')
           .padding(10)
           .borderRadius(20)
+          .clickEffect({ level: ClickEffectLevel.MIDDLE })
           .backgroundColor($r('app.color.container_background'))
         }
       }

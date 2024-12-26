@@ -1,14 +1,27 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { NoticeList, NoticeListItemProp } from "../../common/Constants"
+import {
+  ANIMATION_DURATION_300,
+  FONT_SIZE_14,
+  FONT_SIZE_16,
+  LIST_ITEM_HEIGHT_45,
+  LIST_ITEM_HEIGHT,
+  NoticeList,
+  NoticeListItemProp,
+  LIST_ITEM_PADDING,
+  BORDER_RADIUS_20} from "../../common/Constants"
 import { getResourceString } from "../../utils/ResourceStringUtil"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
+import { customVibrator } from "../../utils/VibratorUtil"
+import { customSound } from "../../utils/SoundPoolUtil"
+import { promptAction } from "@kit.ArkUI"
 
 /**
  * 通知页
  */
 @Component
 struct Notice {
+  private componentName: string = 'Notice'
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @State noticeList: NoticeListItemProp[] = NoticeList
   //一级图标色，黑色
@@ -26,6 +39,23 @@ struct Notice {
     getResourceString($r('app.string.hour'), this),
     getResourceString($r('app.string.day'), this)
   ]
+  @State
+  private heightOfTextPickerInTheListItem: number = LIST_ITEM_HEIGHT_45
+  // ListItem里自动更新间隔`TextPicker`组件的`fontSize`
+  @State
+  private fontSizeOfTextPickerInTheListItem: number = FONT_SIZE_16
+  // ListItem里自动更新间隔`TextPicker`组件的`fontWeight`
+  @State
+  private fontWeightOfTextPickerInTheListItem: FontWeight = FontWeight.Medium
+  // ListItem里自动更新间隔`TextPicker`组件的分割线样式
+  @State
+  private dividerOfTextPickerInTheListItem: DividerOptions | null = null
+  // ListItem里自动更新间隔`TextPicker`组件的每个选择项高度
+  @State
+  private itemHeightOfTextPickerInTheListItem: number = FONT_SIZE_16 * 1.5
+  // ListItem里自动更新间隔`TextPicker`组件的渐隐效果
+  @State
+  private gradientHeightOfTextPickerInTheListItem: number = FONT_SIZE_16
 
   // 刷新流量提醒行UI  TODO 【用户首选项】保存通知页的数组 即流量提醒启用状态 Ya@2024-12-26
   refreshCellularDataReminder() {
@@ -45,11 +75,21 @@ struct Notice {
     }
   }
 
+  aboutToAppear(): void {
+    hilog.info(0xFF00, this.componentName, `#aboutToAppear executed`)
+    customSound.initSoundPool(3, 'beat_short.wav')
+  }
+
+  aboutToDisappear(): void {
+    hilog.info(0xFF00, this.componentName, `#aboutToDisappear executed`)
+    customSound.destroySoundPool()
+  }
+
   build() {
     NavDestination() {
       TopBuilder({title: $r('app.string.Notice')})
       Column() {
-        // 通知总开关
+        // 通知总开关 Start
         Row() {
           SymbolGlyph($r('sys.symbol.message_on_message_fill'))
             .fontSize(24)
@@ -60,20 +100,27 @@ struct Notice {
             .margin({ left: 12 })
             .fontSize(16)
           Blank()
-          // 后台通知开关
+          // 通知总开关
           Toggle({ type: ToggleType.Switch, isOn: $$this.Enablednotice })
             .selectedColor(this.icon_emphasize)
             .margin({right: 12})
             .onChange((isOn: boolean) => {
-              if(isOn) {
-                this.Enablednotice = true
-              } else {
-                this.Enablednotice = false
-              }
+              // 显示后台通知设置 显式动画
+              this.getUIContext()?.animateTo({
+                duration: 1200,
+                curve: Curve.Ease
+              }, () => {
+                this.Enablednotice = isOn
+              })
             })
         }
         .RowStyle()
         .margin({bottom: 10})
+        .onClick( ()=> {
+          // 点击提示
+          promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
+        })
+        // 通知总开关 End
         if(this.Enablednotice) {
           // 后台通知&流量提醒 Start
           ForEach(this.noticeList, (item: NoticeListItemProp, index: number) => {
@@ -125,12 +172,15 @@ struct Notice {
               if(index === 1) {
                 // 跳转至流量提醒
                 this.SettingsPageInfos.pushPathByName('CellularDataReminder', false)
+              } else if (index === 0) {
+                // 点击提示
+                promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
               }
             })
           })
           // 时间提醒与时间设置Column Start
           Column() {
-            // 时间提醒行
+            // 时间提醒行 Start
             Row() {
               SymbolGlyph($r('sys.symbol.clock'))
                 .fontSize(24)
@@ -157,13 +207,25 @@ struct Notice {
                 .margin({right: 12})
                 .onChange((isOn: boolean) => {
                   // 逻辑处理 TODO 【用户首选项】保存时间提醒开关的启用状态 Ya@2024-12-26
-                  if(isOn) {
-                    this.EnabledTimenotice = true
-                  } else {
-                    this.EnabledTimenotice = false
-                  }
+                  // 展开提醒时间设置行 显式动画
+                  this.getUIContext()?.animateTo({
+                    duration: ANIMATION_DURATION_300,
+                    curve: Curve.Ease
+                  }, () => {
+                    this.EnabledTimenotice = isOn
+                  })
                 })
-            }.RowStyle()
+            }
+            .RowStyle()
+            .onClick( ()=> {
+              // 展开提醒时间设置行 显式动画
+              this.getUIContext()?.animateTo({
+                duration: ANIMATION_DURATION_300
+              }, () => {
+                this.EnabledTimenotice = !this.EnabledTimenotice
+              })
+            })
+            // 时间提醒行 End
             // 提醒时间设置行 Start
             if (this.EnabledTimenotice) {
               // 分割线
@@ -181,22 +243,75 @@ struct Notice {
                 Blank()
                 TextInput({placeholder: $r('app.string.text_input_placeholder'), text: $$this.currentNumber})
                   .TextInputStyle()
-                  .borderColor(this.icon_emphasize)
-                TextPicker({range: this.TimeUnitFruits, selected: this.TimeUnitSelect})
-                  .width('15%')
-                  .height(56)
-                  .margin({right: 9})
-                  .defaultPickerItemHeight(23)
-                  .disappearTextStyle({font: {size: 14, weight: FontWeight.Normal}})
-                  .textStyle({font: {size: 14, weight: FontWeight.Normal}})
-                  .selectedTextStyle({color: this.icon_emphasize, font: {size: 16, weight: FontWeight.Regular}})
+                  .caretColor(this.icon_emphasize)
+                  .borderColor({bottom: this.icon_emphasize})
+                  .onSubmit( (enterKey: EnterKeyType, event: SubmitEvent) => {
+                    customVibrator.vibratorTriggerOfHapticClockTimer()
+                  })
+                TextPicker({range: this.TimeUnitFruits, selected: $$this.TimeUnitSelect})
+                  .canLoop(false)
+                  .width(60)
+                  .height(this.heightOfTextPickerInTheListItem)
+                  .defaultPickerItemHeight(this.itemHeightOfTextPickerInTheListItem)
+                  .gradientHeight(this.gradientHeightOfTextPickerInTheListItem)
+                  .selectedTextStyle({
+                    color: this.icon_emphasize,
+                    font: {
+                      size: this.fontSizeOfTextPickerInTheListItem,
+                      weight: this.fontWeightOfTextPickerInTheListItem
+                    }
+                  })
+                  .divider(this.dividerOfTextPickerInTheListItem)
+                    // 手指触摸动态改变`TextPicker`和所在`Row`的样式
+                  .onTouch((event: TouchEvent) => {
+                    let ctx = this.getUIContext()
+                    if (event.type === TouchType.Down) {
+                      ctx.animateTo({
+                        duration: ANIMATION_DURATION_300,
+                        curve: Curve.Ease
+                      }, () => {
+                        this.heightOfTextPickerInTheListItem = 100
+                        this.fontSizeOfTextPickerInTheListItem = FONT_SIZE_16 * 1.5
+                        this.fontWeightOfTextPickerInTheListItem = FontWeight.Bold
+                        this.dividerOfTextPickerInTheListItem = {
+                          strokeWidth: 1,
+                          startMargin: 5,
+                          endMargin: 5,
+                          color: this.icon_emphasize
+                        }
+                        this.itemHeightOfTextPickerInTheListItem = FONT_SIZE_16 * 2
+                        this.gradientHeightOfTextPickerInTheListItem = FONT_SIZE_16 * 2
+                      })
+                    } else if (event.type === TouchType.Up){
+                      ctx.animateTo({
+                        duration: ANIMATION_DURATION_300,
+                        curve: Curve.Ease
+                      }, () => {
+                        this.heightOfTextPickerInTheListItem = LIST_ITEM_HEIGHT
+                        this.fontSizeOfTextPickerInTheListItem = FONT_SIZE_16
+                        this.fontWeightOfTextPickerInTheListItem = FontWeight.Medium
+                        this.dividerOfTextPickerInTheListItem = null
+                        this.itemHeightOfTextPickerInTheListItem = FONT_SIZE_16 * 1.5
+                        this.gradientHeightOfTextPickerInTheListItem = FONT_SIZE_16
+                      })
+                    }
+                  })
                   .onChange((value: string | string[], index: number | number[]) => {
-                    hilog.info(0xFF00, "NoticetestTag", "选择的时间单位index:", index)
+                    // 震动和声音反馈
+                    customVibrator.vibratorTriggerOfHapticClockTimer()
+                    customSound.playAudioForSoundPool()
+                    hilog.info(0xFF00, "NoticetestTag", "选择的时间单位为: %{public}s", JSON.stringify(value))
+                    hilog.info(0xFF00, "NoticetestTag", "选择的时间单位index: %{public}s", JSON.stringify(index))
                     hilog.info(0xFF00, "NoticetestTag", "当前输入为: %{public}s", this.currentNumber)
                     // TODO 待实现时间提醒功能，this.currentNumber为输入框输入数字，index为单位选择器对应角标，具体对应单位参照this.TimeUnitFruits
 
                   })
-              }.RowStyle()
+              }
+              .width('100%')
+              .height(this.heightOfTextPickerInTheListItem)
+              .borderRadius(BORDER_RADIUS_20)
+              .clickEffect({ level: ClickEffectLevel.MIDDLE })
+              .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
             } // 提醒时间设置行 End
 
           } // 时间提醒与时间设置Column End
@@ -286,15 +401,25 @@ export struct CellularDataReminder {
               .selectedColor(this.icon_emphasize)
               .margin({right: 12})
               .onChange((isOn: boolean) => {
-                if(isOn) {
-                  this.EnableCellularDataReminder = true
-                } else {
-                  this.EnableCellularDataReminder = false
-                }
+                // 展开流量提醒设置列表行 显式动画
+                this.getUIContext()?.animateTo({
+                  duration: ANIMATION_DURATION_300,
+                  curve: Curve.Ease
+                }, () => {
+                  this.EnableCellularDataReminder = isOn
+                })
               })
           }
           .RowStyle()
           .margin({bottom: 10})
+          .onClick( ()=> {
+            // 展开流量提醒设置列表行 显式动画
+            this.getUIContext()?.animateTo({
+              duration: ANIMATION_DURATION_300
+            }, () => {
+              this.EnableCellularDataReminder = !this.EnableCellularDataReminder
+            })
+          })
           if(this.EnableCellularDataReminder) {
             // 每小时通知
             Column() {
@@ -307,11 +432,13 @@ export struct CellularDataReminder {
                   .selectedColor(this.icon_emphasize)
                   .margin({right: 12})
                   .onChange((isOn: boolean) => {
-                    if(isOn) {
-                      this.perHourNotice = true
-                    } else {
-                      this.perHourNotice = false
-                    }
+                    // 展开每小时通知流量设置行 显式动画
+                    this.getUIContext()?.animateTo({
+                      duration: ANIMATION_DURATION_300,
+                      curve: Curve.Ease
+                    }, () => {
+                      this.perHourNotice = isOn
+                    })
                   })
               }
               if(this.perHourNotice) {
@@ -331,6 +458,16 @@ export struct CellularDataReminder {
             }
             .ColumnStyle()
             .margin({bottom: 10})
+            .onClick( ()=> {
+              if (!this.perHourNotice) {
+                // 展开每小时通知流量设置行 显式动画
+                this.getUIContext()?.animateTo({
+                  duration: ANIMATION_DURATION_300
+                }, () => {
+                  this.perHourNotice = !this.perHourNotice
+                })
+              }
+            })
             // 每日通知
             Column() {
               noticeRow({
@@ -342,11 +479,13 @@ export struct CellularDataReminder {
                   .selectedColor(this.icon_emphasize)
                   .margin({right: 12})
                   .onChange((isOn: boolean) => {
-                    if(isOn) {
-                      this.perDayNotice = true
-                    } else {
-                      this.perDayNotice = false
-                    }
+                    // 展开每日通知流量设置行 显式动画
+                    this.getUIContext()?.animateTo({
+                      duration: ANIMATION_DURATION_300,
+                      curve: Curve.Ease
+                    }, () => {
+                      this.perDayNotice = isOn
+                    })
                   })
               }
               if(this.perDayNotice) {
@@ -366,6 +505,16 @@ export struct CellularDataReminder {
             }
             .ColumnStyle()
             .margin({bottom: 10})
+            .onClick( ()=> {
+              if (!this.perDayNotice) {
+                // 展开每日通知流量设置行 显式动画
+                this.getUIContext()?.animateTo({
+                  duration: ANIMATION_DURATION_300
+                }, () => {
+                  this.perDayNotice = !this.perDayNotice
+                })
+              }
+            })
             // 每周通知
             Column() {
               noticeRow({
@@ -377,11 +526,13 @@ export struct CellularDataReminder {
                   .selectedColor(this.icon_emphasize)
                   .margin({right: 12})
                   .onChange((isOn: boolean) => {
-                    if(isOn) {
-                      this.perWeekNotice = true
-                    } else {
-                      this.perWeekNotice = false
-                    }
+                    // 展开每周通知流量设置行 显式动画
+                    this.getUIContext()?.animateTo({
+                      duration: ANIMATION_DURATION_300,
+                      curve: Curve.Ease
+                    }, () => {
+                      this.perWeekNotice = isOn
+                    })
                   })
               }
               if(this.perWeekNotice) {
@@ -401,6 +552,16 @@ export struct CellularDataReminder {
             }
             .ColumnStyle()
             .margin({bottom: 10})
+            .onClick( ()=> {
+              if (!this.perWeekNotice) {
+                // 展开每周通知流量设置行 显式动画
+                this.getUIContext()?.animateTo({
+                  duration: ANIMATION_DURATION_300
+                }, () => {
+                  this.perWeekNotice = !this.perWeekNotice
+                })
+              }
+            })
             // 每月通知
             Column() {
               noticeRow({
@@ -412,11 +573,13 @@ export struct CellularDataReminder {
                   .selectedColor(this.icon_emphasize)
                   .margin({right: 12})
                   .onChange((isOn: boolean) => {
-                    if(isOn) {
-                      this.perMonthNotice = true
-                    } else {
-                      this.perMonthNotice = false
-                    }
+                    // 展开每月通知流量设置行 显式动画
+                    this.getUIContext()?.animateTo({
+                      duration: ANIMATION_DURATION_300,
+                      curve: Curve.Ease
+                    }, () => {
+                      this.perMonthNotice = isOn
+                    })
                   })
               }
               if(this.perMonthNotice) {
@@ -436,6 +599,16 @@ export struct CellularDataReminder {
             }
             .ColumnStyle()
             .margin({bottom: 10})
+            .onClick( ()=> {
+              if (!this.perMonthNotice) {
+                // 展开每月通知流量设置行 显式动画
+                this.getUIContext()?.animateTo({
+                  duration: ANIMATION_DURATION_300
+                }, () => {
+                  this.perMonthNotice = !this.perMonthNotice
+                })
+              }
+            })
             // 总量通知
             Column() {
               noticeRow({
@@ -447,11 +620,13 @@ export struct CellularDataReminder {
                   .selectedColor(this.icon_emphasize)
                   .margin({right: 12})
                   .onChange((isOn: boolean) => {
-                    if(isOn) {
-                      this.totalDataNotice = true
-                    } else {
-                      this.totalDataNotice = false
-                    }
+                    // 展开总量通知流量设置行 显式动画
+                    this.getUIContext()?.animateTo({
+                      duration: ANIMATION_DURATION_300,
+                      curve: Curve.Ease
+                    }, () => {
+                      this.totalDataNotice = isOn
+                    })
                   })
               }
               if(this.totalDataNotice) {
@@ -471,6 +646,17 @@ export struct CellularDataReminder {
             }
             .ColumnStyle()
             .margin({bottom: 10})
+            .onClick( ()=> {
+              if (!this.totalDataNotice) {
+                // 展开总量通知流量设置行 显式动画
+                this.getUIContext()?.animateTo({
+                  duration: ANIMATION_DURATION_300
+                }, () => {
+                  this.totalDataNotice = !this.totalDataNotice
+                })
+              }
+            })
+
           }
         }
         .width('100%')
@@ -501,6 +687,7 @@ function RowStyle() {
   .width('100%')
   .height(53)
   .borderRadius(20)
+  .clickEffect({ level: ClickEffectLevel.MIDDLE })
   .backgroundColor($r('app.color.container_background'))
 }
 /**
@@ -510,6 +697,7 @@ function RowStyle() {
 function ColumnStyle() {
   .width('100%')
   .borderRadius(20)
+  .clickEffect({ level: ClickEffectLevel.MIDDLE })
   .backgroundColor($r('app.color.container_background'))
 }
 /**
@@ -517,18 +705,22 @@ function ColumnStyle() {
  */
 @Extend(TextInput)
 function TextInputStyle() {
-  .width('20%')
+  .width(50)
+  .height(30)
+  .padding(0)
+  .maxLength(5)
   .borderRadius(0)
   .type(InputType.Number)
-  .fontSize(15)
+  .fontSize(FONT_SIZE_16)
+  .lineHeight(FONT_SIZE_16)
   .textAlign(TextAlign.Center)
-  .padding({ left: 5, right: 5 })
-  .margin({right: 2, top: 10, bottom: 10})
-  .backgroundColor($r('app.color.container_background'))
+  .enterKeyType(EnterKeyType.Done)
+  .backgroundColor(Color.Transparent)
+  .placeholderFont({size: FONT_SIZE_14})
+  .fontColor($r('sys.color.font_secondary'))
   .border({
-    width: { bottom: 2 },
-    // 实线
-    style: { top: BorderStyle.Solid }
+    width: {  bottom: 1 },
+    style: { top: null, right: null, bottom: BorderStyle.Solid, left: null}
   })
 }
 
