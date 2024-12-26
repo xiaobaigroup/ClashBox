@@ -1031,6 +1031,70 @@
     {
       "name": "edit_fakeIP_filter",
       "value": "Edit FakeIP Filter"
+    },
+    {
+      "name": "min",
+      "value": "min"
+    },
+    {
+      "name": "day",
+      "value": "d"
+    },
+    {
+      "name": "hour",
+      "value": "h"
+    },
+    {
+      "name": "text_input_placeholder",
+      "value": "Please input"
+    },
+    {
+      "name": "reminder_time",
+      "value": "Reminder Time"
+    },
+    {
+      "name": "per_hour_notice",
+      "value": "Notice at per hour"
+    },
+    {
+      "name": "per_day_notice",
+      "value": "Notice at per day"
+    },
+    {
+      "name": "per_week_notice",
+      "value": "Notice at per week"
+    },
+    {
+      "name": "per_month_notice",
+      "value": "Notice at per month"
+    },
+    {
+      "name": "per_hour_notice_subtitle",
+      "value": "Remind when the Data used within one hour reaches the threshold"
+    },
+    {
+      "name": "per_day_notice_subtitle",
+      "value": "Remind when the Data used within a day reaches the threshold"
+    },
+    {
+      "name": "per_week_notice_subtitle",
+      "value": "Remind when the Data used within a week reaches the threshold"
+    },
+    {
+      "name": "per_month_notice_subtitle",
+      "value": "Remind when the Data used within a month reaches the threshold"
+    },
+    {
+      "name": "total_data_notice",
+      "value": "Total Notice"
+    },
+    {
+      "name": "total_data_notice_subtitle",
+      "value": "Remind when the usage of Data reaches the threshold"
+    },
+    {
+      "name": "threshold_data",
+      "value": "Threshold Data"
     }
   ]
 }

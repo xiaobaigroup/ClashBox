@@ -321,7 +321,7 @@ export interface NoticeListItemProp {
 export const NoticeList: NoticeListItemProp[] = [
   { icons: $r('sys.symbol.ellipsis_message_fill'), title: $r('app.string.background_notice'), subtitle: $r('app.string.background_notice_subtitle'), isOn: true },
   { icons: $r('sys.symbol.mobiledata'), title: $r('app.string.cellular_data_reminder'), subtitle: $r('app.string.cellular_data_reminder_subtitle'), subtitle2: $r('app.string.not_enabled') },
-  { icons: $r('sys.symbol.clock'), title: $r('app.string.time_reminder'), subtitle: $r('app.string.time_reminder_subtitle'), subtitle2: $r('app.string.not_enabled') },
+  // { icons: $r('sys.symbol.clock'), title: $r('app.string.time_reminder'), subtitle: $r('app.string.time_reminder_subtitle'), subtitle2: $r('app.string.not_enabled') },
 ]
 
 /**

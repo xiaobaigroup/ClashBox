@@ -34,6 +34,8 @@ interface HomeCardData {
 @Entry
 @Component
 struct Home {
+  // 页面名称 主页
+  private componentName: string = 'HomePage'
   /* 主题色 */
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
@@ -41,29 +43,33 @@ struct Home {
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
   private promptAction:PromptAction = this.getUIContext()?.getPromptAction()
-
+  // 设置模态页控制变量
+  @State isShowSettings: boolean = false
   // 设置按钮导航
   @Provide('NavSettingsPathStack') SettingsPageInfos: NavPathStack = new NavPathStack()
   // 设置 -> 备份与恢复 -> 是否启用云备份配置
   @Provide isShowCloudconfig: boolean = false
   // 设置页语言选中暂存变量
   @Provide currentLanguage: ResourceStr = $r('app.string.Language_Subtitle')
+  // 设置 -> 通知 -> 流量提醒启用状态变量
+  @Provide EnableCellularDataReminder: boolean = false
   // 设置页实验功能提示框显示变量
   @Provide isShowExperimentalFunction: boolean = true
   // 所有子组件在容器内的对齐方式 TODO 【用户首选项】在设置里可以更改 Alignment.BottomStart 和 Alignment.BottomEnd Enlin@2024-12-04
   @State
   stackAlignContentAlignment: Alignment = Alignment.BottomEnd
-  /* Stack层叠布局 */
   //系统颜色调用
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
-  /* 代理启动按钮 */
-  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //二级图标色，灰色
-  @State font_primary: ResourceColor = $r('sys.color.font_primary') //一级文本色，黑色
+  //一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  //二级图标色，灰色
+  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary')
+  //一级文本色，黑色
+  @State font_primary: ResourceColor = $r('sys.color.font_primary')
   @State currentBp: string = ''
+  // 默认问候语
   @State greetings: Resource = $r('app.string.GoodMorning')
   @State ContainerHeight: string = ''
   @State TopHeight: string = ''
-  @State isShowSettings: boolean = false
   @State compStr: BreakpointState<string> = BreakpointState.of({
     xs: "xs", sm: "sm", md: "md", lg: "lg", xl: "xl"
   })
@@ -103,9 +109,33 @@ struct Home {
     xs: '715vp', sm: '715vp', md: '1050vp', lg: '550vp', xl: '550vp'
   });
   windowClass = AppStorage.get<window.Window>('windowClass') as window.Window;
+  /* Stack层叠布局 */
+  /* 代理启动按钮 */
   //编辑按钮点击后显示编辑状态判定
   @State isShowHomeEdit: boolean = false
-  //是否保存弹窗
+  // 代理启动按钮状态
+  @State
+  private proxyEnabled: boolean = false
+  // 代理启动持续的时间
+  @State
+  private proxyStartingDuration: string = PROXY_STARTED_DURATION_INIT_VALUE
+  // 按钮宽度
+  @State
+  private proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
+  // 按钮高度
+  @State
+  private proxyStartButtonHeight: Length = $r('app.integer.vp_proxy_not_start_button_height')
+  // 按钮前Symbol动效
+  private ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE // 按钮前Symbol动效
+  // 定时器Controller
+  private proxyStartedTimer: Timer = new Timer()
+  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
+  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+  @State private gridMargin: number = 0
+
+  /**
+   * 是否保存布局弹窗
+   */
   SaveDialogController: CustomDialogController | null = new CustomDialogController({
     builder: SaveCustomDialog({
       cancel: () => {
@@ -127,26 +157,6 @@ struct Home {
     //    backgroundColor: Color.White,
     //   shadow: ({ radius: 20, color: Color.Grey, offsetX: 50, offsetY: 0}),
   })
-  private componentName: string = 'HomePage'
-  // 代理启动按钮状态
-  @State
-  private proxyEnabled: boolean = false
-  // 代理启动持续的时间
-  @State
-  private proxyStartingDuration: string = PROXY_STARTED_DURATION_INIT_VALUE
-  // 按钮宽度
-  @State
-  private proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
-  // 按钮高度
-  @State
-  private proxyStartButtonHeight: Length = $r('app.integer.vp_proxy_not_start_button_height')
-  // 按钮前Symbol动效
-  private ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE // 按钮前Symbol动效
-  // 定时器Controller
-  private proxyStartedTimer: Timer = new Timer()
-  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
-  @State private gridMargin: number = 0
 
   aboutToAppear() {
     this.greetings = getGreeting()
@@ -542,7 +552,9 @@ struct Home {
 }
 
 
-//保存弹窗样式和内容
+/**
+ * 保存样式和内容弹窗控制器
+ */
 @CustomDialog
 struct SaveCustomDialog {
   /* 主题色 */

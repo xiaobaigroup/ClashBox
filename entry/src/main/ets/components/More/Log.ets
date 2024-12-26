@@ -1,6 +1,4 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { getResourceString } from "../../utils/getResourceString"
-import MoreMenu from "./LogMoreMenu"
 import { SymbolGlyphModifier } from "@kit.ArkUI"
 
 @Entry

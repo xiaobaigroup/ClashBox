@@ -20,7 +20,7 @@ struct Language {
 
   build() {
     NavDestination() {
-      TopBuilder({title: $r('app.string.Language'), /*isShowSettings: this.isShowSettings*/})
+      TopBuilder({title: $r('app.string.Language')})
       List() {
         // 跟随系统语言
         ListItem() {
@@ -93,7 +93,7 @@ struct Language {
           .onClick(() => {
             // 点击整行对应单选框选中
             this.currentRadioCheck = index
-            // 修改语言
+            // 修改语言 TODO 【用户首选项】保存所选语言 Ya@2024-12-26
             i18n.System.setAppPreferredLanguage(item.areaID)
             if(index === 0) {
               this.currentLanguage = $r('app.string.Language_Subtitle')
@@ -111,7 +111,6 @@ struct Language {
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
- //   .backgroundBlurStyle(BlurStyle.BACKGROUND_REGULAR)
     .onBackPressed(() => {
       this.SettingsPageInfos.clear();
       return true;

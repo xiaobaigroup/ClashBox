@@ -344,7 +344,6 @@ struct Appearance {
       }
       .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
     }
-
     .width('100%')
     .backgroundColor($r('app.color.background'))
     .hideTitleBar(true)

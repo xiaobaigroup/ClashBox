@@ -1,3 +1,4 @@
+// 单次点击后不消失菜单，已弃用
 
 @Component
 struct MoreMenu {

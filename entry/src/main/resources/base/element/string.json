@@ -1031,6 +1031,70 @@
     {
       "name": "edit_fakeIP_filter",
       "value": "编辑FakeIP过滤"
+    },
+    {
+      "name": "min",
+      "value": "分钟"
+    },
+    {
+      "name": "day",
+      "value": "天"
+    },
+    {
+      "name": "hour",
+      "value": "小时"
+    },
+    {
+      "name": "text_input_placeholder",
+      "value": "请输入"
+    },
+    {
+      "name": "reminder_time",
+      "value": "提醒时间"
+    },
+    {
+      "name": "per_hour_notice",
+      "value": "每小时通知"
+    },
+    {
+      "name": "per_day_notice",
+      "value": "每天通知"
+    },
+    {
+      "name": "per_week_notice",
+      "value": "每周通知"
+    },
+    {
+      "name": "per_month_notice",
+      "value": "每月通知"
+    },
+    {
+      "name": "per_hour_notice_subtitle",
+      "value": "一小时内使用的流量达到阈值后提醒"
+    },
+    {
+      "name": "per_day_notice_subtitle",
+      "value": "一天内使用的流量达到阈值后提醒"
+    },
+    {
+      "name": "per_week_notice_subtitle",
+      "value": "一周内使用的流量达到阈值后提醒"
+    },
+    {
+      "name": "per_month_notice_subtitle",
+      "value": "一个月内使用的流量达到阈值后提醒"
+    },
+    {
+      "name": "total_data_notice",
+      "value": "总量通知"
+    },
+    {
+      "name": "total_data_notice_subtitle",
+      "value": "使用的流量达到阈值后提醒"
+    },
+    {
+      "name": "threshold_data",
+      "value": "阈值流量"
     }
   ]
 }

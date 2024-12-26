@@ -5,7 +5,7 @@ import { hilog } from "@kit.PerformanceAnalysisKit"
 import Appearance from "./Appearance"
 import Backup, { CloudBackup } from "./Backup"
 import ApplicationLock from "./ApplicationLock"
-import Notice from "./Notice"
+import Notice, { CellularDataReminder } from "./Notice"
 import Backgrounder from "./Backgrounder"
 import WipeData from "./WipeData"
 import About, { AboutContributors, CheckUpdate } from "./About"
@@ -125,7 +125,7 @@ struct Settings {
 
   // 在自定义组件即将析构销毁时将dialogController置空
   aboutToDisappear() {
-    this.dialogController = null // 将dialogController置空
+    this.dialogController = null
   }
 
   // 设置页路由表
@@ -141,7 +141,7 @@ struct Settings {
         ApplicationLock({isShowSettings: this.isShowSettings})
       } else
       if (name == 'Notice') {
-        Notice({isShowSettings: this.isShowSettings})
+        Notice()
       } else
       if (name == 'Backgrounder') {
         Backgrounder()
@@ -163,6 +163,9 @@ struct Settings {
       } else
       if (name == 'CheckUpdate') {
         CheckUpdate()
+      } else
+      if (name == 'CellularDataReminder') {
+        CellularDataReminder()
       }
   }
 

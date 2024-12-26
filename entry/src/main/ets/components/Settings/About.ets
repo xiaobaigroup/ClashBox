@@ -88,7 +88,7 @@ struct About {
   handleToggle(isOn: boolean, name: string) {
     switch (name) {
       case 'ExperimentalFunction':
-        // 实验功能开关
+        // 实验功能开关 TODO 【用户首选项】保存实验功能开关的启用状态 Ya@2024-12-26
         hilog.info(0xFF00, "AboutestTag", "实验功能")
         if(isOn) {
           this.isShowExperimentalFunction = true
@@ -126,7 +126,7 @@ struct About {
     }
   }
 
-  // 刷新更新渠道列表UI
+  // 刷新更新渠道列表UI TODO 【用户首选项】保存选择的更新渠道 Ya@2024-12-20
   refreshUpdateChenChannels(title: ResourceStr) {
     // 修改关于页面更新渠道显示的subtitle
     // 先检查是否存在children
