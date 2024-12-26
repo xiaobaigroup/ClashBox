@@ -1,7 +1,9 @@
 /**
  * 传感器：震动器的使用工具类
- *    前提条件：声明权限使用`ohos.permission.VIBRATE`
- *    使用方法：async (state) => { sound.playAudio("audio.mp3") }
+ *    前提条件：`module.json5中`声明权限使用`ohos.permission.VIBRATE`
+ *    使用方法：
+ *      0. import { customSound } from "../../utils/SoundPoolUtil"
+ *      1. customSound.playAudioForSoundPool()
  *
  * @author Enlin
  */
@@ -14,6 +16,10 @@ const componentName: string = 'VibratorUtil'
 
 class VibratorUtil{
 
+  /**
+   * XXX 当前设备是否可用传感器能力（暂时不用此方法）
+   * @returns
+   */
   public isAvailable(){
     // hilog.error(0x6100, componentName, `ERROR: #isAvailable#canIUse('SystemCapability.Sensors.MiscDevice') result is ${canIUse('SystemCapability.Sensors.MiscDevice')}`)
     return canIUse('SystemCapability.Sensors.MiscDevice')

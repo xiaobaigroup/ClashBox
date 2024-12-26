@@ -1,12 +1,24 @@
 /**
  * 使用`SoundPool`播放短时音频工具类(例如`TextPicker`选择器每触发一次`onChange`事件时就会播放一次短时音频)
+ *
  *    XXX 目前快速滑动`TextPicker`组件之后触发的播放，还是没达到NEXT时钟APP内计时器的效果
+ *    XXX 编译时候老是提示接口的canIUse老是提示，但是接口的canIUse没找到怎么用
+ *
  *    前提条件：将文件存储在该`module`下面的`rawfile`文件夹里面
- *    使用方法：
- *      0. import { sound } from "../../utils/SoundPoolUtil"
- *      1. sound.initSoundPool(最大播放的流数, '音频文件名.后缀名')
- *      2. sound.playAudioForSoundPool()
- *      3. sound.destroySoundPool()
+ *    使用方法（必须按照顺序）：
+ *      0. 引入工具类：
+ *            import { sound } from "../../utils/SoundPoolUtil"
+ *      1. 初始化短时音频池（最好在在使用处的`aboutToAppear`方法内）：
+ *            sound.initSoundPool(最大播放的流数, '音频文件名.后缀名')
+ *      2. 播放音频：
+ *            sound.playAudioForSoundPool()
+ *      3. 销毁短时音频池（最好在在使用处的`aboutToDisappear`方法内）：
+ *            sound.destroySoundPool()
+ *
+ *    备注：工具类待测试，如果其他地方使用了，并且用了以下页面内不同的音频，请重新测试之前所有页面内音频是否正常
+ *    目前已经在使用此工具类的文件为：
+ *      1. 页面文件名：[ConfigInfo.ets]，音频文件名：[beat_short.wav]
+ *      2. 页面文件名：[]，音频文件名：[]
  *
  * @author Enlin
  */
@@ -27,10 +39,10 @@ class SoundManager {
 
   /**
    * 初始化`SoundPool`
-   * @param maxStreams    soundPool实例的最大播放的流数
+   * @param maxStreams    soundPool实例的最大播放的流数，不应填写过大，如使用时不会瞬时触发多次的，应设置为1
    * @param audioFileName 短时音频在`rawfile`文件夹下面的名字
    */
-  public async initSoundPool(maxStreams: number, audioFileName: string) {
+  public async initSoundPool(maxStreams: number = 3, audioFileName: string) {
     if (audioFileName && canIUse('SystemCapability.Multimedia.Media.SoundPool')) {
       try {
         await this.createSoundPool(maxStreams, audioFileName)

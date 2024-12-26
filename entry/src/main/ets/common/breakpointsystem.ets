@@ -52,13 +52,13 @@ export class BreakpointSystem {
       }
       breakpoint.mediaQueryListener = mediaquery.matchMediaSync(condition)
       if (breakpoint.mediaQueryListener.matches) {
-        hilog.info(0x1000, 'breakpointsystem', `#媒体查询#初始断点改变#${condition}#Breakpoint.name: ${breakpoint.name}}`)
+        hilog.info(0x1000, 'breakpointsystem', `#媒体查询#初始断点改变#${condition}#current Breakpoint.name: [${breakpoint.name}]`)
         this.updateAllState(breakpoint.name)
       }
       breakpoint.mediaQueryListener.on('change', (mediaQueryResult) => {
         if (mediaQueryResult.matches) {
           this.updateAllState(breakpoint.name)
-          hilog.info(0x1000, 'breakpointsystem', `#媒体查询#断点改变#${condition}#Breakpoint.name: ${breakpoint.name}}`)
+          hilog.info(0x1000, 'breakpointsystem', `#媒体查询#断点改变#${condition}#current Breakpoint.name: [${breakpoint.name}]`)
         }
       })
     })
