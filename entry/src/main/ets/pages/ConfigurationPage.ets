@@ -19,6 +19,12 @@ import { Callback } from '@ohos.base'
 import { ConfigData, ConfigDataSource } from '../common/PageArgumentEntity'
 import { CustomConfirmDialog } from '../components/Common'
 import { customVibrator } from "../utils/VibratorUtil"
+import { common } from '@kit.AbilityKit'
+import { configShare } from '../utils/SystemShareUtil'
+// XXX 测试用 删除
+import { showFileNameListOfFileDir } from '../utils/FileUtil'
+import { fileIo as fs } from '@kit.CoreFileKit'
+import { Decimal } from '@kit.ArkTS'
 
 
 /**
@@ -37,6 +43,10 @@ interface LongPressContextMenuItem {
 struct ConfigurationPage {
 
   private componentName:string = 'ConfigurationPage'
+  private context = getContext() as common.UIAbilityContext
+
+  // 获取应用沙箱文件路径
+  private pathOfContextFilesDir = this.context.filesDir
 
   /* 主题色 */
   @Consume('icon_emphasize')
@@ -276,8 +286,8 @@ struct ConfigurationPage {
     builder: CustomConfirmDialog({
       // TODO 国际化
       title: '是否删除当前配置？',
-      cancelValue: '删除',
-      confirmValue: '取消',
+      cancelText: '删除',
+      confirmText: '取消',
       cancelButtonBackgroundColor: Color.Transparent,
       // 不可以使用`@Consume`注解的变量
       // confirmButtonBackgroundColor: this.icon_emphasize,
@@ -339,7 +349,7 @@ struct ConfigurationPage {
             .fontWeight(TAB_CONTENT_TITLE_FONT_WEIGHT)
             .fontColor($r('sys.color.font_primary'))
           Blank()
-          //  刷新图标
+          // 刷新图标
           Button({ type: ButtonType.Circle, stateEffect: true }) {
             SymbolGlyph($r('sys.symbol.arrow_clockwise'))
               .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
@@ -354,6 +364,13 @@ struct ConfigurationPage {
             // TODO 调用 更新配置api
             hilog.info(0xC001, this.componentName, `#button#onClick()#更新配置`)
             this.updateConfig()
+            // XXX 删除 测试用 获取指定应用沙箱[路径]下的所有文件名
+            let fileNames = showFileNameListOfFileDir(this.context.filesDir)
+            // 输出文件信息
+            fileNames.forEach( (fileName: string) => {
+              const fileStat: fs.Stat = fs.statSync(`${this.context.filesDir}/${fileName}`)
+              hilog.info(0x1020, this.componentName, `#showFileNameListOfFileDir#“${this.context.filesDir}”文件夹下文件“${fileName}”的大小为: ${fileStat.size}Byte = ${Decimal.div(fileStat.size, 1024).toFixed(2, Decimal.ROUND_DOWN)}KB`)
+            })
           })
         }
         .alignItems(VerticalAlign.Center)
@@ -521,9 +538,18 @@ struct ConfigurationPage {
 
   aboutToAppear(): void {
     hilog.info(0xC000, this.componentName, `#aboutToAppear executed`)
-    for (let i = 0; i < this.configList.length; i++) {
-
-    }
+    let fileNames: Array<string> = showFileNameListOfFileDir(this.context.filesDir)
+    // XXX 删除 这里模拟获取URL下载的列表
+    fileNames.forEach( (fileName:string) => {
+      let newConfig: ConfigData = {
+        configId: fileName.slice(0, fileName.length - 5),
+        isNewConfig: false,
+        configName: fileName.slice(0, fileName.length - 5),
+        configURL: 'https://www.gov.cn/',
+        isConfigAutoUpdate: false
+      }
+      this.configList.push(newConfig)
+    })
   }
 
   aboutToDisappear(): void {
@@ -598,12 +624,11 @@ struct ConfigurationPage {
    */
   private shareConfigURL(): void {
     // TODO 处理待分享数据 并调用系统分享接口 只有URL导入的配置才可以分享链接
-    if (this.currentTouchConfigData.source === ConfigDataSource.URL || this.currentTouchConfigData.source === ConfigDataSource.QR_CODE) {
-      this.promptAction.showToast({ message: `TODO 拉起系统分享` })
-    } else {
-      this.promptAction.showToast({ message: `此配置不可分享链接，您可导出配置文件` })
-    }
     hilog.info(0xC013, this.componentName, `#shareConfig#分享配置: configName is [${this.currentTouchConfigData.configName}]`)
+    let systemShareResult: boolean = configShare(this.context, this.currentTouchConfigData.configURL, this.currentTouchConfigData.configId)
+    if (!systemShareResult) {
+      this.promptAction.showToast({ message: `分享错误，请联系开发者！🐛` })
+    }
   }
   /**
    * 生成配置的URL转成的二维码

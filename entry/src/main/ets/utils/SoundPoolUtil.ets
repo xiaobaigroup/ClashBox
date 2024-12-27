@@ -4,7 +4,7 @@
  *    XXX 目前快速滑动`TextPicker`组件之后触发的播放，还是没达到NEXT时钟APP内计时器的效果
  *    XXX 编译时候老是提示接口的canIUse老是提示，但是接口的canIUse没找到怎么用
  *
- *    前提条件：将文件存储在该`module`下面的`rawfile`文件夹里面
+ *    前提条件：将音频文件存储在该`module`下面的`rawfile`文件夹里面
  *    使用方法（必须按照顺序）：
  *      0. 引入工具类：
  *            import { sound } from "../../utils/SoundPoolUtil"

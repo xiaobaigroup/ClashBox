@@ -8,6 +8,14 @@ import {
   FONT_SIZE_16
 } from "../common/Constants"
 
+/* 通用属性 START */
+@Styles
+function outerLayerContainerCommonStyles(){
+  .padding( FONT_SIZE_16 )
+  .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
+}
+/* 通用属性 END */
+
 
 /* bindSheet 里套 `Navigation`、`NavDestination`是的标题栏的替代品 START */
 // XXX 前提：不使用NavDestination的标题栏.hideTitleBar(true)。不使用`bindSheet`的`dragBar`，仅使用`bindSheet`自带的`close`按钮。
@@ -162,7 +170,7 @@ export function BindSheetTitleCustomBuilder(param: BindSheetTitleCustomBuilderPa
 
 
 /* `Confirm`类型的`CustomDialog` START */
-// XXX 注意副标题不要太长，否则副标题会折行到按钮组虾苗，则需要修改`Text`外层添加`Scroll`组件
+// XXX 注意副标题不要太长，否则副标题会折行到按钮组下面，则需要修改`Text`外层添加`Scroll`组件
 
 @CustomDialog
 export struct CustomConfirmDialog {
@@ -170,15 +178,15 @@ export struct CustomConfirmDialog {
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
 
-  title: string = 'No Title!'
-  subTitle?: string
+  title: ResourceStr = 'No Title!'
+  subTitle?: ResourceStr
 
   controller?: CustomDialogController
-  name? :string = ''
+  name? :ResourceStr = ''
   // 取消事件
   cancel: () => void = () => {}
   // 取消按钮 文本内容
-  cancelValue: string = 'Cancel'
+  cancelText: ResourceStr = 'Cancel'
   // 取消按钮 字体颜色
   cancelFontColor? : ResourceColor = $r('sys.color.warning')
   // 取消按钮 按钮背景颜色
@@ -186,7 +194,7 @@ export struct CustomConfirmDialog {
   // 确认按钮 事件
   confirm: () => void = () => {}
   // 确认按钮 文本内容
-  confirmValue: string = 'Confirm'
+  confirmText: ResourceStr = 'Confirm'
   // 确认按钮 按钮背景颜色
   confirmButtonBackgroundColor?: ResourceColor = $r('sys.color.ohos_id_color_button_normal')
 
@@ -205,7 +213,7 @@ export struct CustomConfirmDialog {
       // 主标题 END
 
       // 副标题 START
-      if (this?.subTitle) {
+      if (this.subTitle != undefined) {
         Row(){
           Text(this.subTitle)
             .fontSize(FONT_SIZE_16)
@@ -221,7 +229,7 @@ export struct CustomConfirmDialog {
 
       // 按钮组 START
       Row(){
-        Button(this.cancelValue)
+        Button(this.cancelText)
           .width(144)
           .fontSize(FONT_SIZE_16)
           .fontColor(this.cancelFontColor)
@@ -233,7 +241,7 @@ export struct CustomConfirmDialog {
             }
           })
         Text(' ').width(8)
-        Button(this.confirmValue)
+        Button(this.confirmText)
           .width(144)
           .height('100%')
           .fontSize(FONT_SIZE_16)
@@ -251,8 +259,72 @@ export struct CustomConfirmDialog {
       // 按钮组 END
     }
     .alignItems(HorizontalAlign.Center)
-    .padding( FONT_SIZE_16 )
-    .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
+    .outerLayerContainerCommonStyles()
   }
 }
 /* `Confirm`类型的`CustomDialog` END */
+
+
+/* 下载中`CustomDialog`小型弹框 START */
+@CustomDialog
+export struct CustomDownloadingDialog {
+
+  controller?: CustomDialogController
+
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
+
+  title: ResourceStr = 'No Title!'
+  // 取消下载事件
+  cancel: () => void = () => {}
+  // 取消下载按钮 文本内容
+  cancelText: ResourceStr = 'Cancel'
+  // 取消下载按钮 字体颜色
+  cancelFontColor? : ResourceColor = $r('sys.color.warning')
+  // 取消下载按钮 按钮背景颜色
+  cancelButtonBackgroundColor?: ResourceColor = $r('sys.color.comp_background_tertiary')
+
+
+  build() {
+    Column() {
+      // 主标题 START
+      Text(this.title)
+        .fontSize(20)
+        .lineHeight(23)
+        .fontColor($r('sys.color.font_primary'))
+        .fontWeight(FontWeight.Bold)
+      // 主标题 END
+
+      // 加载动画 START
+      Stack({ alignContent: Alignment.Center }){
+        LoadingProgress()
+          .color($r('sys.color.icon_secondary'))
+          .width(40)
+          .height(40)
+      }
+      .width('100%')
+      .height(72)
+      // 加载动画 END
+
+      // 取消下载按钮 START
+      Button(this.cancelText)
+        .width('100%')
+        .height(40)
+        .fontSize(FONT_SIZE_16)
+        .fontColor(this.cancelFontColor)
+        .backgroundColor(this.cancelButtonBackgroundColor)
+        .onClick(() => {
+          if (this.controller != undefined) {
+            this.cancel()
+            this.controller.close()
+          }
+        })
+    }
+    // 取消下载按钮 END
+    .alignItems(HorizontalAlign.Center)
+    .outerLayerContainerCommonStyles()
+  }
+
+}
+/* 下载中`CustomDialog`小型弹框 END */

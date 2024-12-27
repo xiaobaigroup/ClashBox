@@ -7,7 +7,7 @@ import {
   RouteName,
   ANIMATION_DURATION_300,
 } from "../../common/Constants"
-import { BindSheetTitleCustomBuilder, BindSheetTitleCustomBuilderMenu } from "../Common"
+import { BindSheetTitleCustomBuilder, BindSheetTitleCustomBuilderMenu, CustomDownloadingDialog } from "../Common"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { ConfigInfo } from "./ConfigInfo"
 import { PromptAction } from "@kit.ArkUI"
@@ -15,6 +15,8 @@ import { ConfigData } from "../../common/PageArgumentEntity"
 import { util } from "@kit.ArkTS"
 import { CustomConfirmDialog } from '../Common'
 import { BusinessError } from "@kit.BasicServicesKit"
+import { deleteDownloadTask, requestDownloadFile } from "../../utils/HttpUtil"
+import { common } from "@kit.AbilityKit"
 
 
 // 关联：route_map.json
@@ -28,6 +30,7 @@ export function ImportConfigFromURLBuilder(name: string, param: Object){
 export struct ImportConfigFromURL{
 
   private componentName: string = 'ImportConfigFromURL'
+  private context = getContext() as common.UIAbilityContext
   private promptAction:PromptAction = this.getUIContext()?.getPromptAction()
 
   /* 主题色 */
@@ -90,12 +93,12 @@ export struct ImportConfigFromURL{
 
   /* 自定义弹框 */
   // 配置是否保存弹框 Controller定义
-  private configCustomDialogController: CustomDialogController | null= new CustomDialogController({
+  private configCustomConfirmDialogController: CustomDialogController | null= new CustomDialogController({
     builder: CustomConfirmDialog({
       // TODO 国际化
       title: '是否保存当前配置？',
-      cancelValue: '取消',
-      confirmValue: '保存',
+      cancelText: '取消',
+      confirmText: '保存',
       cancelButtonBackgroundColor: Color.Transparent,
       // 不可以使用`@Consume`注解的变量
       // confirmButtonBackgroundColor: this.icon_emphasize,
@@ -116,6 +119,34 @@ export struct ImportConfigFromURL{
     width: 328,
     backgroundColor: $r('app.color.list_item_background_color'),
   })
+  // 配置下载弹框 title动态值
+  // TODO 国际化
+  @State
+  private customDownloadingDialogTitle: ResourceStr = '正在下载配置文件'
+  // 配置下载弹框 Controller定义
+  private configCustomDownloadingDialogController: CustomDialogController | null= new CustomDialogController({
+    builder: CustomDownloadingDialog({
+      // TODO 国际化
+      title: this.customDownloadingDialogTitle,
+      cancelText: '取消下载',
+      cancel: () => {
+        // XXX 取消下载文件 若已下载部分将此删除
+        deleteDownloadTask(() => {
+          this.configCustomDownloadingDialogController?.close()
+        })
+        // TODO 国际化
+        this.promptAction.showToast({ message: `已取消下载配置😵` })
+      },
+    }),
+    // cancel: () => {},
+    autoCancel: false,
+    alignment: DialogAlignment.Center,
+    width: 328,
+    backgroundColor: $r('app.color.list_item_background_color'),
+    onWillDismiss: () => {}
+  })
+
+
 
 
   build() {
@@ -155,7 +186,7 @@ export struct ImportConfigFromURL{
     .onBackPressed(() => {
       if (this.allInputHaveValue) {
         // 弹框是否保存已经编辑好的配置
-        this.configCustomDialogController?.open()
+        this.configCustomConfirmDialogController?.open()
         // 更改bindSheet的前景模糊
         this.isEnableConfigPageBindSheetForegroundBlur = true
         return true
@@ -188,7 +219,8 @@ export struct ImportConfigFromURL{
   aboutToDisappear(): void {
     hilog.info(0xCA10, this.componentName, `#aboutToDisappear executed`)
     // 自定义弹框 清空
-    this.configCustomDialogController = null
+    this.configCustomConfirmDialogController = null
+    this.configCustomDownloadingDialogController = null
     this.isEnableConfigPageBindSheetForegroundBlur = false
     hilog.info(0xCA10, this.componentName, `#aboutToDisappear#置空[配置页\`bindSheet\`内提示是否保存配置信息的自定义弹框]`)
   }
@@ -198,11 +230,30 @@ export struct ImportConfigFromURL{
    */
   async saveConfig(isNewConfig: boolean){
     if (isNewConfig) {
-      this.promptAction.showToast({ message: `保存中...` })
-      // this.menus.push({ symbol: $r('sys.symbol.heart') })
+      // this.promptAction.showToast({ message: `保存中...` })
+      this.customDownloadingDialogTitle = '正在下载配置文件'
+      this.configCustomDownloadingDialogController?.open()
     } else {
-      this.promptAction.showToast({ message: `更新配置信息中...` })
+      // this.promptAction.showToast({ message: `更新配置信息中...` })
+      this.customDownloadingDialogTitle = '正在更新配置文件'
+      this.configCustomDownloadingDialogController?.open()
     }
+    // await httpGet('http://192.168.3.33:2333/file/clash-config').then((rep: rcp.Response) => {
+    //   hilog.info(0xCA60, this.componentName, `Response succeeded: ${rep}`);
+    // }).catch((err: BusinessError) => {
+    //   hilog.error(0xCA60, this.componentName, `Response err: Code is ${err.code}, message is ${JSON.stringify(err)}`);
+    // })
+
+    // XXX 下载配置
+    let savePath = `${this.context.filesDir}/${this.configData.configId}.yaml`
+    requestDownloadFile(this.context, this.configData.configURL, savePath, () => {
+      // TODO 国际化
+      this.promptAction.showToast({ message: `配置下载已完成🫡` })
+      this.configCustomDownloadingDialogController?.close()
+      // TODO 关闭上层bindSheet（现在先pop一个路由，防止再次点击保存按钮导致文件重名报错）
+      this.configAddPageInfos.pop(true)
+    })
+
   }
 
   /**

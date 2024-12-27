@@ -31,7 +31,7 @@ export enum ConfigDataSource{
 // 配置 -> 新增配置时的传输数据
 export interface ConfigData{
   // 配置id
-  configId: string
+  readonly configId: string
   // 是否为新配置（非已有配置进入编辑状态）
   isNewConfig: boolean
   // 配置名
