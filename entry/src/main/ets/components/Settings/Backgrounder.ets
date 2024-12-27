@@ -74,6 +74,10 @@ struct Backgrounder {
   @State isPlay: boolean = false
   // 模拟录音控制变量
   @State isRecord: boolean = false
+  // 设置 -> 后台运行 -> 流量提醒启用状态变量
+  @Consume Enablebackgrounder: boolean
+  // 实验功能提示框展示变量
+  @Consume isShowExperimentalFunction: boolean
   // 模拟下载关闭提示弹窗标题
   @State theColsedDialogTitle: ResourceStr = $r('app.string.simulate_download_closed_tips')
   // 模拟下载关闭提示弹窗内容文本
@@ -225,53 +229,55 @@ struct Backgrounder {
               }
             })
         }
-        // 模拟播放
-        RowList({
-          icons: $r('sys.symbol.media_center'),
-          title: $r('app.string.simulate_player'),
-          subtitle: $r('app.string.simulate_player_subtitle'),
-          subtitle2: $r('app.string.experimental_function')
-        }) {
-          Toggle({ type: ToggleType.Switch, isOn: $$this.isPlay })
-            .selectedColor(this.icon_emphasize)
-            .margin({right: 12})
-            .onChange((isOn: boolean) => {
-              if(isOn) {
-                // 关闭其它两个模拟并开启模拟播放
-                this.isDown = false
-                this.isRecord = false
-                // 开启
-                this.onOpenPlay()
-              } else {
-                // 关闭模拟播放
-                this.onClosePlay()
-              }
-            })
+        if(this.isShowExperimentalFunction) {
+          // 模拟播放
+          RowList({
+            icons: $r('sys.symbol.media_center'),
+            title: $r('app.string.simulate_player'),
+            subtitle: $r('app.string.simulate_player_subtitle'),
+            subtitle2: $r('app.string.experimental_function')
+          }) {
+            Toggle({ type: ToggleType.Switch, isOn: $$this.isPlay })
+              .selectedColor(this.icon_emphasize)
+              .margin({right: 12})
+              .onChange((isOn: boolean) => {
+                if(isOn) {
+                  // 关闭其它两个模拟并开启模拟播放
+                  this.isDown = false
+                  this.isRecord = false
+                  // 开启
+                  this.onOpenPlay()
+                } else {
+                  // 关闭模拟播放
+                  this.onClosePlay()
+                }
+              })
+          }
+          // 模拟录音
+          RowList({
+            icons: $r('sys.symbol.mic_circle'),
+            title: $r('app.string.simulate_record'),
+            subtitle: $r('app.string.simulate_record_subtitle'),
+            subtitle2: $r('app.string.experimental_function')
+          }) {
+            Toggle({ type: ToggleType.Switch, isOn: $$this.isRecord })
+              .selectedColor(this.icon_emphasize)
+              .margin({right: 12})
+              .onChange((isOn: boolean) => {
+                if(isOn) {
+                  // 打开模拟录音启用提示弹窗
+                  this.openDialogController.open()
+                } else {
+                  // 模拟录音关闭逻辑处理
+                  this.onCloseRecord()
+                }
+              })
+          }
+          // 提示
+          Text($r('app.string.backgrounder_tips'))
+            .fontWeight(FontWeight.Normal)
+            .fontSize(15)
         }
-        // 模拟录音
-        RowList({
-          icons: $r('sys.symbol.mic_circle'),
-          title: $r('app.string.simulate_record'),
-          subtitle: $r('app.string.simulate_record_subtitle'),
-          subtitle2: $r('app.string.experimental_function')
-        }) {
-          Toggle({ type: ToggleType.Switch, isOn: $$this.isRecord })
-            .selectedColor(this.icon_emphasize)
-            .margin({right: 12})
-            .onChange((isOn: boolean) => {
-              if(isOn) {
-                // 打开模拟录音启用提示弹窗
-                this.openDialogController.open()
-              } else {
-                // 模拟录音关闭逻辑处理
-                this.onCloseRecord()
-              }
-            })
-        }
-        // 提示
-        Text($r('app.string.backgrounder_tips'))
-          .fontWeight(FontWeight.Normal)
-          .fontSize(15)
       }
       .width('100%')
       .alignItems(HorizontalAlign.Start)
@@ -284,6 +290,16 @@ struct Backgrounder {
       return true;
     })
   }
+
+  aboutToDisappear(): void {
+    // 改变后台运行全局变量的状态
+    if(this.isDown || this.isPlay || this.isRecord) {
+      this.Enablebackgrounder = true
+    } else {
+      this.Enablebackgrounder = false
+    }
+  }
+
 }
 export default Backgrounder
 
@@ -292,8 +308,6 @@ export default Backgrounder
  */
 @Component
 struct RowList {
-  // 实验功能提示框展示变量
-  @Consume isShowExperimentalFunction: boolean
   //一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
@@ -321,23 +335,22 @@ struct RowList {
           Text(this.title)
             .fontWeight(FontWeight.Medium)
             .fontSize(16)
-          if(this.isShowExperimentalFunction) {
-            // 实验功能提示框
-            if(this.subtitle2) {
-              Column() {
-                Text(this.subtitle2)
-                  .fontColor(Color.White)
-                  .fontSize(10)
-              }
-              .alignItems(HorizontalAlign.Center)
-              .justifyContent(FlexAlign.Center)
-              .width(50)
-              .height(18)
-              .borderRadius(4)
-              .margin({left: 2})
-              .backgroundColor(this.icon_emphasize)
+          // 实验功能提示框
+          if(this.subtitle2) {
+            Column() {
+              Text(this.subtitle2)
+                .fontColor(Color.White)
+                .fontSize(10)
             }
+            .alignItems(HorizontalAlign.Center)
+            .justifyContent(FlexAlign.Center)
+            .width(50)
+            .height(18)
+            .borderRadius(4)
+            .margin({left: 2})
+            .backgroundColor(this.icon_emphasize)
           }
+
         }
         Text(this.subtitle)
           .fontWeight(FontWeight.Normal)

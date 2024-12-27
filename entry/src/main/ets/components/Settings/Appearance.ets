@@ -5,6 +5,7 @@ import { SymbolGlyphModifier, ThemeControl } from "@kit.ArkUI"
 import { CustomThemeName, CUSTOM_THEME_MAP } from "../../common/AppTheme"
 import { common } from "@kit.AbilityKit"
 import { setAutoColorMode, setDarkColorMode, setLightColorMode } from "../../common/ColorModeChangeFunctions"
+import { hilog } from "@kit.PerformanceAnalysisKit"
 
 @Component
 struct Appearance {
@@ -173,6 +174,10 @@ struct Appearance {
     this.appearanceList.splice(3, 1, ButtonPositionItemData)
   }
 
+  aboutToAppear(): void {
+    hilog.info(0xFF00, "AppearanceTag", "实验功能显示: %{public}s", this.isShowExperimentalFunction)
+  }
+
   aboutToDisappear(): void {
     AppStorage.setOrCreate('enableDarkMode', this.enableDarkMode)
     AppStorage.setOrCreate('isFollowSystemSetting', this.isFollowSystemSetting)
@@ -273,17 +278,84 @@ struct Appearance {
           // 列表区
           ForEach(this.appearanceList, (item: AppearanceListItemProp, index: number) => {
             Row() {
-              Row() {
-                SymbolGlyph(item.icon)
-                  .fontSize(24)
-                  .margin({left: 12})
-                  .fontColor([this.icon_emphasize])
-                Column() {
+              if(!this.isShowExperimentalFunction) {
+                if(index != 5) {
                   Row() {
-                    Text(item.title)
-                      .fontWeight(FontWeight.Medium)
-                      .fontSize(16)
-                    if(this.isShowExperimentalFunction) {
+                    SymbolGlyph(item.icon)
+                      .fontSize(24)
+                      .margin({left: 12})
+                      .fontColor([this.icon_emphasize])
+                    Column() {
+                      Row() {
+                        Text(item.title)
+                          .fontWeight(FontWeight.Medium)
+                          .fontSize(16)
+                        // 实验功能提示框
+                        if(item.subtitle2) {
+                          Column() {
+                            Text(item.subtitle2)
+                              .fontColor(Color.White)
+                              .fontSize(10)
+                          }
+                          .alignItems(HorizontalAlign.Center)
+                          .justifyContent(FlexAlign.Center)
+                          .width(50)
+                          .height(18)
+                          .borderRadius(4)
+                          .margin({left: 2})
+                          .backgroundColor(this.icon_emphasize)
+                        }
+                      }
+                      if(!item.children) {
+                        Text(item.subtitle)
+                          .fontWeight(FontWeight.Normal)
+                          .textOverflow({ overflow: TextOverflow.MARQUEE })
+                          .maxLines(1)
+                          .margin({ top: 2 })
+                          .fontSize(14)
+                          .width('70%')
+                      }
+                    }
+                    .margin({ left: 12 })
+                    .alignItems(HorizontalAlign.Start)
+                    Blank()
+                    if(item.children) {
+                      Row() {
+                        Text(item.subtitle)
+                          .fontWeight(FontWeight.Normal)
+                          .textOverflow({ overflow: TextOverflow.Ellipsis })
+                          .maxLines(1)
+                          .margin({top: 2 })
+                          .fontSize(14)
+                        SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
+                          .fontSize(14)
+                          .margin({left: 7, right: 20})
+                          .fontColor([this.icon_primary])
+                      }.bindMenu(this.switchMenu(item.children, index))
+                    } else {
+                      Toggle({ type: ToggleType.Switch, isOn: item.isOn })
+                        .selectedColor(this.icon_emphasize)
+                        .margin({right: 12})
+                        .onChange((isOn: boolean) => {
+                          if(isOn) {
+                            //this.handleToggle(index)
+                          }
+                        })
+                    }
+                  }
+                  .RowStyle()
+                }
+              } else if(this.isShowExperimentalFunction) {
+                Row() {
+                  SymbolGlyph(item.icon)
+                    .fontSize(24)
+                    .margin({left: 12})
+                    .fontColor([this.icon_emphasize])
+                  Column() {
+                    Row() {
+                      Text(item.title)
+                        .fontWeight(FontWeight.Medium)
+                        .fontSize(16)
                       // 实验功能提示框
                       if(item.subtitle2) {
                         Column() {
@@ -300,49 +372,45 @@ struct Appearance {
                         .backgroundColor(this.icon_emphasize)
                       }
                     }
+                    if(!item.children) {
+                      Text(item.subtitle)
+                        .fontWeight(FontWeight.Normal)
+                        .textOverflow({ overflow: TextOverflow.MARQUEE })
+                        .maxLines(1)
+                        .margin({ top: 2 })
+                        .fontSize(14)
+                        .width('70%')
+                    }
                   }
-                  if(!item.children) {
-                    Text(item.subtitle)
-                      .fontWeight(FontWeight.Normal)
-                      .textOverflow({ overflow: TextOverflow.MARQUEE })
-                      .maxLines(1)
-                      .margin({ top: 2 })
-                      .fontSize(14)
-                      .width('70%')
+                  .margin({ left: 12 })
+                  .alignItems(HorizontalAlign.Start)
+                  Blank()
+                  if(item.children) {
+                    Row() {
+                      Text(item.subtitle)
+                        .fontWeight(FontWeight.Normal)
+                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+                        .maxLines(1)
+                        .margin({top: 2 })
+                        .fontSize(14)
+                      SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
+                        .fontSize(14)
+                        .margin({left: 7, right: 20})
+                        .fontColor([this.icon_primary])
+                    }.bindMenu(this.switchMenu(item.children, index))
+                  } else {
+                    Toggle({ type: ToggleType.Switch, isOn: item.isOn })
+                      .selectedColor(this.icon_emphasize)
+                      .margin({right: 12})
+                      .onChange((isOn: boolean) => {
+                        if(isOn) {
+                          //this.handleToggle(index)
+                        }
+                      })
                   }
                 }
-                .margin({ left: 12 })
-                .alignItems(HorizontalAlign.Start)
-                Blank()
-                if(item.children) {
-                  Row() {
-                    Text(item.subtitle)
-                      .fontWeight(FontWeight.Normal)
-                      .textOverflow({ overflow: TextOverflow.Ellipsis })
-                      .maxLines(1)
-                      .margin({top: 2 })
-                      .fontSize(14)
-                    SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
-                      .fontSize(14)
-                      .margin({left: 7, right: 20})
-                      .fontColor([this.icon_primary])
-                  }.bindMenu(this.switchMenu(item.children, index))
-                } else {
-                  Toggle({ type: ToggleType.Switch, isOn: item.isOn })
-                    .selectedColor(this.icon_emphasize)
-                    .margin({right: 12})
-                    .onChange((isOn: boolean) => {
-                      if(isOn) {
-                        //this.handleToggle(index)
-                      }
-                    })
-                }
+                .RowStyle()
               }
-              .margin({bottom: 10})
-              .width('100%')
-              .height(53)
-              .borderRadius(20)
-              .backgroundColor($r('app.color.container_background'))
             }
             .clickEffect({ level: ClickEffectLevel.MIDDLE })
             .onClick(() => {
@@ -380,6 +448,19 @@ struct Appearance {
       this.SettingsPageInfos.clear();
       return true;
     })
+
   }
 }
 export default Appearance
+
+/**
+ * 列表Row共有样式
+ */
+@Extend(Row)
+function RowStyle() {
+  .margin({bottom: 10})
+  .width('100%')
+  .height(53)
+  .borderRadius(20)
+  .backgroundColor($r('app.color.container_background'))
+}

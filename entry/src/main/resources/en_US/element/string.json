@@ -1103,6 +1103,22 @@
     {
       "name": "click_prompt",
       "value": "Click the right switch"
+    },
+    {
+      "name": "vibrate_feedback",
+      "value": "Vibration Feedback"
+    },
+    {
+      "name": "background_notice_tips",
+      "value": "You have enabled the \"background operation\" option, and the resident notification cannot be turned off. To turn off the resident notification, please turn off the background operation first"
+    },
+    {
+      "name": "kernel_subtitle",
+      "value": "Switch clash kernel"
+    },
+    {
+      "name": "kernel",
+      "value": "Kernel"
     }
   ]
 }

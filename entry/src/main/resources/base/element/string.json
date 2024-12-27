@@ -154,7 +154,7 @@
     },
     {
       "name": "Notice",
-      "value": "通知"
+      "value": "通知与反馈"
     },
     {
       "name": "Backgrounder",
@@ -190,7 +190,7 @@
     },
     {
       "name": "NoticeSubtitle",
-      "value": "常驻通知、流量提醒"
+      "value": "常驻通知、流量提醒、震动反馈"
     },
     {
       "name": "BackgrounderSubtitle",
@@ -978,7 +978,7 @@
     },
     {
       "name": "background_notice",
-      "value": "后台通知"
+      "value": "常驻通知"
     },
     {
       "name": "background_notice_subtitle",
@@ -1103,6 +1103,22 @@
     {
       "name": "click_prompt",
       "value": "点击右边开关哦"
+    },
+    {
+      "name": "vibrate_feedback",
+      "value": "震动反馈"
+    },
+    {
+      "name": "background_notice_tips",
+      "value": "您已开启“后台运行“选项，常驻通知无法关闭，若要关闭常驻通知，请先关闭后台运行"
+    },
+    {
+      "name": "kernel",
+      "value": "内核"
+    },
+    {
+      "name": "kernel_subtitle",
+      "value": "切换Clash内核"
     }
   ]
 }

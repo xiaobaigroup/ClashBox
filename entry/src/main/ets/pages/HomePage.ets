@@ -55,6 +55,8 @@ struct Home {
   @Provide EnableCellularDataReminder: boolean = false
   // 设置页实验功能提示框显示变量
   @Provide isShowExperimentalFunction: boolean = true
+  // 设置 -> 后台运行 -> 流量提醒启用状态变量
+  @Provide Enablebackgrounder: boolean = false
   // 所有子组件在容器内的对齐方式 TODO 【用户首选项】在设置里可以更改 Alignment.BottomStart 和 Alignment.BottomEnd Enlin@2024-12-04
   @State
   stackAlignContentAlignment: Alignment = Alignment.BottomEnd

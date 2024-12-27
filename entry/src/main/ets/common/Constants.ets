@@ -200,6 +200,7 @@ export const SettingsListItem = (): settingsData[] => {
     new settingsData($r('sys.symbol.lock_fill'), 'ApplicationLock', $r('app.string.ApplicationLock'), $r('app.string.ApplicationicationLockSubtitle'), $r('app.string.already_open'), false),
     new settingsData($r('sys.symbol.ellipsis_message_fill'), 'Notice', $r('app.string.Notice'), $r('app.string.NoticeSubtitle'), '', false),
     new settingsData($r('sys.symbol.checkmark_square_on_square_fill'), 'Backgrounder', $r('app.string.Backgrounder'), $r('app.string.BackgrounderSubtitle'), '', false),
+    new settingsData($r('sys.symbol.satellite_map_fill'), 'Kernel', $r('app.string.kernel'), $r('app.string.kernel_subtitle'), '', false),
     new settingsData($r('sys.symbol.trash_fill'), 'WipeData', $r('app.string.WipeData'), $r('app.string.WipeDataSubtitle'), '', false),
     new settingsData($r('sys.symbol.person_shield_fill'), 'Disclaimer', $r('app.string.Disclaimer'), '', '', false),
     new settingsData($r('sys.symbol.info_circle'), 'About', $r('app.string.About'), '', '', false),
@@ -304,25 +305,6 @@ export const BackupList: BackupListItemProp[] = [
   { icons: $r('sys.symbol.icloud'), title: $r('app.string.cloud_backup'), subtitle: $r('app.string.cloud_backup_subtitle'), subtitle2: $r('app.string.experimental_function'), subtitle3: $r('app.string.not_enabled') },
   { icons: $r('sys.symbol.arrowshape_up_to_line_fill'), title: $r('app.string.backup'), subtitle: $r('app.string.backup_subtitle'), subtitle3: '' },
   { icons: $r('sys.symbol.arrowshape_down_to_line_fill'), title: $r('app.string.restore'), subtitle: $r('app.string.restore_subtitle'), subtitle3: '' },
-]
-
-/**
- * 通知页参数
- */
-export interface NoticeListItemProp {
-  icons: Resource
-  title: string | Resource
-  subtitle: string | Resource
-  subtitle2?: string | Resource
-  isOn?: boolean
-}
-/**
- * 通知页子列表
- */
-export const NoticeList: NoticeListItemProp[] = [
-  { icons: $r('sys.symbol.ellipsis_message_fill'), title: $r('app.string.background_notice'), subtitle: $r('app.string.background_notice_subtitle'), isOn: true },
-  { icons: $r('sys.symbol.mobiledata'), title: $r('app.string.cellular_data_reminder'), subtitle: $r('app.string.cellular_data_reminder_subtitle'), subtitle2: $r('app.string.not_enabled') },
-  // { icons: $r('sys.symbol.clock'), title: $r('app.string.time_reminder'), subtitle: $r('app.string.time_reminder_subtitle'), subtitle2: $r('app.string.not_enabled') },
 ]
 
 /**

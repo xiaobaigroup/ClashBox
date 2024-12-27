@@ -43,6 +43,8 @@ struct MorePage {
   @Provide isShowExperimentalFunction: boolean = true
   // 设置 -> 通知 -> 流量提醒启用状态变量
   @Provide EnableCellularDataReminder: boolean = false
+  // 设置 -> 后台运行 -> 流量提醒启用状态变量
+  @Provide Enablebackgrounder: boolean = false
   /* 断点布局相关 相关作用看定义时候的注释 */
   // 整体外边距
   @Consume('breakPointStatemorePageMargin')

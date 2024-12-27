@@ -5,9 +5,6 @@ import {
   FONT_SIZE_16,
   LIST_ITEM_HEIGHT_45,
   LIST_ITEM_HEIGHT,
-  NoticeList,
-  NoticeListItemProp,
-  LIST_ITEM_PADDING,
   BORDER_RADIUS_20} from "../../common/Constants"
 import { getResourceString } from "../../utils/ResourceStringUtil"
 import TopBuilder from "./TopBuilder"
@@ -22,15 +19,23 @@ import { promptAction } from "@kit.ArkUI"
 @Component
 struct Notice {
   private componentName: string = 'Notice'
+  // 设置 -> 后台运行 -> 流量提醒启用状态变量
+  @Consume Enablebackgrounder: boolean
+  // 设置页路由栈
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  @State noticeList: NoticeListItemProp[] = NoticeList
   //一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 流量提醒启用状态变量
   @Consume EnableCellularDataReminder: boolean
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+  // 震动反馈开关变量
+  @State Enabledvibrate: boolean = false
+  // 通知总开关变量
   @State Enablednotice: boolean = false
+  // 常驻通知开关变量
+  @State EnabledPermanentnotice: boolean = true
+  // 时间提醒开关变量
   @State EnabledTimenotice: boolean = false
   @State currentNumber: number = 0
   private TimeUnitSelect: number = 1
@@ -57,23 +62,6 @@ struct Notice {
   @State
   private gradientHeightOfTextPickerInTheListItem: number = FONT_SIZE_16
 
-  // 刷新流量提醒行UI  TODO 【用户首选项】保存通知页的数组 即流量提醒启用状态 Ya@2024-12-26
-  refreshCellularDataReminder() {
-    hilog.info(0xFF00, "NoticePageTag", "当前流量提醒启用状态为: %{public}s", this.EnableCellularDataReminder)
-    if(this.EnableCellularDataReminder) {
-      // 通知页数组流量提醒状态 -> 已启用
-      const ItemData = this.noticeList[1]
-      ItemData.subtitle2 = $r('app.string.enabled')
-      hilog.info(0xFF00, "NoticePageReminderTrueTag", "当前流量提醒启用状态: %{public}s", getResourceString(ItemData.subtitle2, this))
-      this.noticeList.splice(1, 1, ItemData)
-    } else {
-      // 通知页数组流量提醒状态 -> 未启用
-      const ItemData = this.noticeList[1]
-      ItemData.subtitle2 = $r('app.string.not_enabled')
-      hilog.info(0xFF00, "NoticePageReminderFalseTag", "当前流量提醒启用状态: %{public}s", getResourceString(ItemData.subtitle2, this))
-      this.noticeList.splice(1, 1, ItemData)
-    }
-  }
 
   aboutToAppear(): void {
     hilog.info(0xFF00, this.componentName, `#aboutToAppear executed`)
@@ -89,142 +77,161 @@ struct Notice {
     NavDestination() {
       TopBuilder({title: $r('app.string.Notice')})
       Column() {
-        // 通知总开关 Start
+        // 震动反馈开关 Start
         Row() {
-          SymbolGlyph($r('sys.symbol.message_on_message_fill'))
-            .fontSize(24)
-            .margin({left: 12})
-            .fontColor([this.icon_emphasize])
-          Text($r('app.string.notice_main_switch'))
-            .fontWeight(FontWeight.Medium)
-            .margin({ left: 12 })
-            .fontSize(16)
-          Blank()
-          // 通知总开关
-          Toggle({ type: ToggleType.Switch, isOn: $$this.Enablednotice })
-            .selectedColor(this.icon_emphasize)
-            .margin({right: 12})
-            .onChange((isOn: boolean) => {
-              // 显示后台通知设置 显式动画
-              this.getUIContext()?.animateTo({
-                duration: 1200,
-                curve: Curve.Ease
-              }, () => {
-                this.Enablednotice = isOn
+          noticeRow({
+            noticeTitle: $r('app.string.vibrate_feedback'),
+            noticeIcons: $r('sys.symbol.bell_fill')
+          }) {
+            // 震动反馈开关
+            Toggle({ type: ToggleType.Switch, isOn: $$this.Enabledvibrate })
+              .selectedColor(this.icon_emphasize)
+              .margin({right: 12})
+              .onChange((isOn: boolean) => {
+                // 显示后台通知设置 显式动画
+                this.getUIContext()?.animateTo({
+                  duration: ANIMATION_DURATION_300,
+                  curve: Curve.Ease
+                }, () => {
+                  this.Enabledvibrate = isOn
+                })
               })
-            })
+          }
         }
         .RowStyle()
         .margin({bottom: 10})
         .onClick( ()=> {
-          // 点击提示
+          // 显示后台通知设置 显式动画
+          this.getUIContext()?.animateTo({
+            duration: ANIMATION_DURATION_300,
+          }, () => {
+            this.Enabledvibrate = !this.Enabledvibrate
+          })
+        })
+        // 震动反馈开关 End
+        // 通知总开关 Start
+        Row() {
+          noticeRow({
+            noticeTitle: $r('app.string.notice_main_switch'),
+            noticeIcons: $r('sys.symbol.message_on_message_fill')
+          }) {
+            // 通知总开关
+            Toggle({ type: ToggleType.Switch, isOn: $$this.Enablednotice })
+              .selectedColor(this.icon_emphasize)
+              .margin({right: 12})
+              .onChange((isOn: boolean) => {
+                // 显示后台通知设置 显式动画
+                this.getUIContext()?.animateTo({
+                  duration: 1200,
+                  curve: Curve.Ease
+                }, () => {
+                  this.Enablednotice = isOn
+                })
+              })
+          }
+        }
+        .RowStyle()
+        .margin({bottom: 10})
+        .onClick( ()=> {
+          // 点击提示 防误触
           promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
         })
         // 通知总开关 End
         if(this.Enablednotice) {
-          // 后台通知&流量提醒 Start
-          ForEach(this.noticeList, (item: NoticeListItemProp, index: number) => {
-            Row() {
-              SymbolGlyph(item.icons)
-                .fontSize(24)
-                .margin({left: 12})
-                .fontColor([this.icon_emphasize])
-              Column() {
-                Text(item.title)
-                  .fontWeight(FontWeight.Medium)
-                  .fontSize(16)
-                Text(item.subtitle)
-                  .fontWeight(FontWeight.Normal)
-                  .textOverflow({ overflow: TextOverflow.MARQUEE })
-                  .maxLines(1)
-                  .margin({top: 2})
-                  .fontSize(14)
-                  .width('65%')
-              }
-              .alignItems(HorizontalAlign.Start)
-              .margin({ left: 12 })
-              Blank()
-              if(index === 0) {
-                // 后台通知开关
-                Toggle({ type: ToggleType.Switch, isOn: item.isOn })
-                  .selectedColor(this.icon_emphasize)
-                  .margin({right: 12})
-                  .onChange((isOn: boolean) => {
-                    // 逻辑处理 TODO 待完成后台通知的实现逻辑
-
-                  })
-              } else {
-                // 流量提醒
-                Text(item.subtitle2)
-                  .fontWeight(FontWeight.Normal)
-                  .margin({right: 4 })
-                  .fontSize(14)
-                SymbolGlyph($r('sys.symbol.chevron_right'))
-                  .fontSize(28)
-                  .margin({right: 12})
-                  .fontColor([this.icon_primary])
-              }
+          // 常驻通知 Start
+          Row() {
+            noticeRow({
+              noticeTitle: $r('app.string.background_notice'),
+              noticeIcons: $r('sys.symbol.ellipsis_message_fill'),
+              noticeSubtitle: $r('app.string.background_notice_subtitle')
+            }) {
+              // 常驻通知开关
+              Toggle({ type: ToggleType.Switch, isOn: $$this.EnabledPermanentnotice })
+                .selectedColor(this.icon_emphasize)
+                .margin({right: 12})
+                .opacity(this.Enablebackgrounder ? 0.5 : 1)
+                .hitTestBehavior(this.Enablebackgrounder ? HitTestMode.None : HitTestMode.Default)
+                .onChange((isOn: boolean) => {
+                  if(!this.Enablebackgrounder) {
+                    // 显示后台通知设置 显式动画
+                    this.getUIContext()?.animateTo({
+                      duration: ANIMATION_DURATION_300,
+                      curve: Curve.Ease
+                    }, () => {
+                      this.EnabledPermanentnotice = isOn
+                    })
+                  }
+                })
             }
-            .RowStyle()
-            .margin({bottom: 10})
-            .onClick(() => {
-              // 流量提醒
-              if(index === 1) {
-                // 跳转至流量提醒
-                this.SettingsPageInfos.pushPathByName('CellularDataReminder', false)
-              } else if (index === 0) {
-                // 点击提示
-                promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
-              }
-            })
+          }
+          .RowStyle()
+          .margin({bottom: 10})
+          .onClick( ()=> {
+            if(!this.Enablebackgrounder) {
+              // 点击提示
+              promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
+            }
           })
+          // 常驻通知 End
+          // 常驻通知提醒 Start
+          if(this.Enablebackgrounder) {
+            Text($r('app.string.background_notice_tips'))
+              .fontWeight(FontWeight.Normal)
+              .margin({ bottom: 10})
+              .fontSize(15)
+          }
+          // 常驻通知提醒 End
+          // 流量提醒 Start
+          Row() {
+            noticeRow({
+              noticeTitle: $r('app.string.cellular_data_reminder'),
+              noticeIcons: $r('sys.symbol.mobiledata'),
+              noticeSubtitle: $r('app.string.cellular_data_reminder_subtitle')
+            }) {
+              // 使用文本与箭头替换掉默认的开关
+              Text(this.EnableCellularDataReminder ? $r('app.string.enabled') : $r('app.string.not_enabled'))
+                .fontWeight(FontWeight.Normal)
+                .margin({right: 4 })
+                .fontSize(14)
+              SymbolGlyph($r('sys.symbol.chevron_right'))
+                .fontSize(28)
+                .fontColor([this.icon_primary])
+                .margin({right: 12})
+            }
+          }
+          .RowStyle()
+          .margin({bottom: 10})
+          .onClick( ()=> {
+            // 点击跳转至流量提醒设置
+            this.SettingsPageInfos.pushPathByName('CellularDataReminder', false)
+          })
+          // 流量提醒 End
           // 时间提醒与时间设置Column Start
           Column() {
             // 时间提醒行 Start
             Row() {
-              SymbolGlyph($r('sys.symbol.clock'))
-                .fontSize(24)
-                .margin({left: 12})
-                .fontColor([this.icon_emphasize])
-              Column() {
-                Text( $r('app.string.time_reminder'))
-                  .fontWeight(FontWeight.Medium)
-                  .fontSize(16)
-                Text($r('app.string.time_reminder_subtitle'))
-                  .fontWeight(FontWeight.Normal)
-                  .textOverflow({ overflow: TextOverflow.MARQUEE })
-                  .maxLines(1)
-                  .margin({top: 2})
-                  .fontSize(14)
-                  .width('65%')
-              }
-              .alignItems(HorizontalAlign.Start)
-              .margin({ left: 12 })
-              Blank()
-              // 时间提醒开关
-              Toggle({ type: ToggleType.Switch, isOn: $$this.EnabledTimenotice })
-                .selectedColor(this.icon_emphasize)
-                .margin({right: 12})
-                .onChange((isOn: boolean) => {
-                  // 逻辑处理 TODO 【用户首选项】保存时间提醒开关的启用状态 Ya@2024-12-26
-                  // 展开提醒时间设置行 显式动画
-                  this.getUIContext()?.animateTo({
-                    duration: ANIMATION_DURATION_300,
-                    curve: Curve.Ease
-                  }, () => {
-                    this.EnabledTimenotice = isOn
+              noticeRow({
+                noticeTitle: $r('app.string.time_reminder'),
+                noticeIcons: $r('sys.symbol.clock'),
+                noticeSubtitle: $r('app.string.time_reminder_subtitle')
+              }) {
+                // 时间提醒开关
+                Toggle({ type: ToggleType.Switch, isOn: $$this.EnabledTimenotice })
+                  .selectedColor(this.icon_emphasize)
+                  .margin({right: 12})
+                  .onChange((isOn: boolean) => {
+                    // 逻辑处理 TODO 【用户首选项】保存时间提醒开关的启用状态 Ya@2024-12-26
+                    // 展开提醒时间设置行 显式动画
+                    this.getUIContext()?.animateTo({
+                      duration: ANIMATION_DURATION_300,
+                      curve: Curve.Ease
+                    }, () => {
+                      this.EnabledTimenotice = isOn
+                    })
                   })
-                })
+              }
             }
             .RowStyle()
-            .onClick( ()=> {
-              // 展开提醒时间设置行 显式动画
-              this.getUIContext()?.animateTo({
-                duration: ANIMATION_DURATION_300
-              }, () => {
-                this.EnabledTimenotice = !this.EnabledTimenotice
-              })
-            })
             // 时间提醒行 End
             // 提醒时间设置行 Start
             if (this.EnabledTimenotice) {
@@ -312,12 +319,23 @@ struct Notice {
               .borderRadius(BORDER_RADIUS_20)
               .clickEffect({ level: ClickEffectLevel.MIDDLE })
               .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
-            } // 提醒时间设置行 End
-
-          } // 时间提醒与时间设置Column End
+            }
+            // 提醒时间设置行 End
+          }
           .ColumnStyle()
-        } // 后台通知&流量提醒 End
-
+          .onClick( ()=> {
+            if (!this.EnabledTimenotice) {
+              // 展开提醒时间设置行 显式动画
+              this.getUIContext()?.animateTo({
+                duration: ANIMATION_DURATION_300
+              }, () => {
+                this.EnabledTimenotice = !this.EnabledTimenotice
+              })
+            }
+          })
+          // 时间提醒与时间设置Column End
+        }
+        // 常驻通知&流量提醒&时间提醒 End
       }
       .width('100%')
       .alignItems(HorizontalAlign.Start)
@@ -329,10 +347,7 @@ struct Notice {
       this.SettingsPageInfos.clear();
       return true;
     })
-    // 当通知页即将弹出至栈顶时触发
-    .onWillShow(() => {
-      this.refreshCellularDataReminder()
-    })
+
   }
 }
 export default Notice
@@ -377,38 +392,25 @@ export struct CellularDataReminder {
         Column() {
           // 流量提醒总开关行
           Row() {
-            SymbolGlyph($r('sys.symbol.mobiledata'))
-              .fontSize(24)
-              .margin({left: 12})
-              .fontColor([this.icon_emphasize])
-            Column() {
-              Text( $r('app.string.cellular_data_reminder'))
-                .fontWeight(FontWeight.Medium)
-                .fontSize(16)
-              Text($r('app.string.cellular_data_reminder_subtitle'))
-                .fontWeight(FontWeight.Normal)
-                .textOverflow({ overflow: TextOverflow.MARQUEE })
-                .maxLines(1)
-                .margin({top: 2})
-                .fontSize(14)
-                .width('65%')
-            }
-            .alignItems(HorizontalAlign.Start)
-            .margin({ left: 12 })
-            Blank()
-            // 流量提醒总开关
-            Toggle({ type: ToggleType.Switch, isOn: $$this.EnableCellularDataReminder })
-              .selectedColor(this.icon_emphasize)
-              .margin({right: 12})
-              .onChange((isOn: boolean) => {
-                // 展开流量提醒设置列表行 显式动画
-                this.getUIContext()?.animateTo({
-                  duration: ANIMATION_DURATION_300,
-                  curve: Curve.Ease
-                }, () => {
-                  this.EnableCellularDataReminder = isOn
+            noticeRow({
+              noticeTitle: $r('app.string.cellular_data_reminder'),
+              noticeIcons: $r('sys.symbol.mobiledata'),
+              noticeSubtitle: $r('app.string.cellular_data_reminder_subtitle')
+            }) {
+              // 流量提醒总开关  TODO 【用户首选项】保存通知页的流量提醒开关启用状态 Ya@2024-12-26
+              Toggle({ type: ToggleType.Switch, isOn: $$this.EnableCellularDataReminder })
+                .selectedColor(this.icon_emphasize)
+                .margin({right: 12})
+                .onChange((isOn: boolean) => {
+                  // 展开流量提醒设置列表行 显式动画
+                  this.getUIContext()?.animateTo({
+                    duration: ANIMATION_DURATION_300,
+                    curve: Curve.Ease
+                  }, () => {
+                    this.EnableCellularDataReminder = isOn
+                  })
                 })
-              })
+            }
           }
           .RowStyle()
           .margin({bottom: 10})
@@ -731,6 +733,8 @@ function TextInputStyle() {
 struct noticeRow {
   // 标题
   @State noticeTitle: ResourceStr = ''
+  // 图标
+  @State noticeIcons: Resource = $r('sys.symbol.stopwatch_2')
   // 副标题
   @State noticeSubtitle: ResourceStr = ''
   // 主题色
@@ -747,6 +751,12 @@ struct noticeRow {
 
   build() {
     Row() {
+      if(this.noticeIcons) {
+        SymbolGlyph(this.noticeIcons)
+          .fontSize(24)
+          .margin({left: 12})
+          .fontColor([this.icon_emphasize])
+      }
       Column() {
         Text(this.noticeTitle)
           .fontWeight(FontWeight.Medium)
@@ -757,10 +767,9 @@ struct noticeRow {
           .maxLines(1)
           .margin({top: 2})
           .fontSize(14)
-          .width('75%')
       }
       .alignItems(HorizontalAlign.Start)
-      .margin({ left: 14 })
+      .margin({ left: this.noticeIcons != null ? 12 : 14 })
       Blank()
       this.noticeToggle()
     }

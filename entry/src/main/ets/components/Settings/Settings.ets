@@ -201,7 +201,7 @@ struct Settings {
     .navDestination(this.SettingsPagesMap)
     .width('100%')
     .height('100%')
-    .onAppear(() => {
+    .onAppear(() => {  // TODO 需要一个回到navigation页面的监听来执行下面的数组操作
       // 刷新语言行的语言提示
       const itemData = this.settingsList[0]
       itemData.hint = this.currentLanguage
