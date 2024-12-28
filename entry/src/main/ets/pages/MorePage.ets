@@ -17,19 +17,28 @@ import Basic from '../components/More/Overwrite/Basic';
 import DNS from '../components/More/Overwrite/DNS';
 import Network, { NetworkRouterAddress } from '../components/More/Overwrite/Network';
 import { FakeIPfilter } from '../components/More/Overwrite/DNSsubpage';
+import { getResourceString } from '../utils/ResourceStringUtil';
+import { extractLocationInfo, getIpInfo, mapLocation } from '../utils/getIpInfo';
+import { promptAction } from '@kit.ArkUI';
 
 @Entry
 @Component
 struct MorePage {
   private componentName: string = 'MorePage'
+  // 设置页显示变量
+  @State isShowSettings: boolean = false
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   //一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
 
-  @State isShowSettings: boolean = false
+  // 查询IP地址弹窗默认文本
+  @State QueryIPplaceholder: string = getResourceString($r('app.string.query_ip_region_placeholder'), this)
+  // 添加路由地址弹窗标题
+  @State QueryIPDialogTitle: ResourceStr = $r('app.string.query_ip_region')
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  // 更多页列表数组
   @State moreList: moreData[] = ListMoreData()
   // 更多页面栈
   @Provide('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
@@ -60,6 +69,36 @@ struct MorePage {
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
 
+  /**
+   * 查询IP地址弹窗控制器
+   */
+  QueryIPDialogController: CustomDialogController = new CustomDialogController({
+    builder: theQueryIPDialog({
+      theplaceholder: this.QueryIPplaceholder,
+      theDialogTitle: this.QueryIPDialogTitle,
+      cancel: ()=> { this.onQueryIPclose() },
+    }),
+    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+      // 1、PRESS_BACK    点击三键back、左滑/右滑、键盘ESC。
+      // 2、TOUCH_OUTSIDE    点击遮障层时
+      // 3、CLOSE_BUTTON    点击关闭按钮
+      if (dismissDialogAction.reason === DismissReason.TOUCH_OUTSIDE) {
+        // 点击遮蔽层不响应，防误触
+      } else {
+        // 完成IP地址查询后主动通过dismiss主动关闭对话框
+        dismissDialogAction.dismiss()
+        // 关闭背景模糊
+        this.isEnableIndexForegroundBlur = false
+      }
+    },
+  })
+  /**
+   * 查询IP弹窗关闭处理
+   */
+  onQueryIPclose() {
+    // 关闭背景模糊
+    this.isEnableIndexForegroundBlur = false
+  }
 
   aboutToAppear() {
 
@@ -69,15 +108,21 @@ struct MorePage {
 
   }
 
-
   handleCheck(index: number) {
-    // 列表行点击处理
-    let itemData = this.moreList[index]
-    hilog.isLoggable(0xFF00, "MoretestTag", hilog.LogLevel.INFO);
-    hilog.info(0xFF00, "MoretestTag", itemData.name)
-    hilog.info(0xFF00, "MoretestTag", "isCheck状态: %{public}s", itemData.isCheck)
-    this.pageInfos.clear()
-    this.pageInfos.pushPathByName(itemData.name, false)
+    if(index === 6) {
+      // 模糊背景
+      this.isEnableIndexForegroundBlur = true
+      // 召唤查询IP弹窗
+      this.QueryIPDialogController.open()
+    } else {
+      // 列表行点击处理
+      let itemData = this.moreList[index]
+      hilog.isLoggable(0xFF00, "MoretestTag", hilog.LogLevel.INFO);
+      hilog.info(0xFF00, "MoretestTag", itemData.name)
+      hilog.info(0xFF00, "MoretestTag", "isCheck状态: %{public}s", itemData.isCheck)
+      this.pageInfos.clear()
+      this.pageInfos.pushPathByName(itemData.name, false)
+    }
   }
 
   // 更多页路由表
@@ -180,6 +225,7 @@ struct MorePage {
             this.isShowSettings = true
             this.isEnableIndexForegroundBlur = true
           })
+          // 设置页半模态窗口
           .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
             detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],
             dragBar: false,
@@ -213,6 +259,91 @@ struct MorePage {
 }
 
 export default MorePage
+
+/**
+ * 查询IP地址弹窗组件（竖排按钮）
+ */
+@CustomDialog
+export struct theQueryIPDialog {
+  @State SubmitInputValue: string = ''
+  @State currentInputValue: string = ''
+  @State IPaddressinfo: string = ''
+  @Link theplaceholder: string
+  @Link theDialogTitle: ResourceStr
+  cancel?: () => void
+  controller: CustomDialogController
+  // 主题色
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+
+  async fetchIpInfo(IP: string) {
+    try {
+      // 调用 getIpInfo 函数并等待结果
+      const ipInfo = await getIpInfo(IP)
+      hilog.info(0xFF00, "MoreIPtestTag", "IP Info: %{public}s", JSON.stringify(ipInfo))
+      const locationInfo = extractLocationInfo(ipInfo)
+      if (locationInfo) {
+        // 查询完成提示
+        promptAction.showToast({message: $r('app.string.ip_address_query_success_tips'), duration: 2000 })
+        // 使用模板字符串来只输出值，不输出键名
+        hilog.info(0xFF00, "MoreIPtestTag", "IP地址: %{public}s", `${locationInfo.country},${locationInfo.province}, ${locationInfo.city}`)
+        const theIPaddress = mapLocation(locationInfo)
+        this.IPaddressinfo = `${theIPaddress.country} ${theIPaddress.province} ${theIPaddress.city}`
+        hilog.info(0xFF00, "MoreIPtestTag", "IP地址(完整): %{public}s", this.IPaddressinfo)
+      } else {
+        hilog.info(0xFF00, "MoreIPtestTag", "提取位置信息失败")
+      }
+    } catch (err) {
+      // 处理错误情况
+      const IPinfoError = `Error:${JSON.stringify(err)}`
+      hilog.info(0xFF00, "MoreIPtestTag", "IP Info: %{public}s", IPinfoError)
+    }
+  }
+
+  build() {
+    Column() {
+      Text(this.theDialogTitle)
+        .fontWeight(FontWeight.Medium)
+        .fontSize(20)
+        .margin({ top: 15, bottom: 15 })
+      TextInput({placeholder: this.theplaceholder, text: this.currentInputValue })
+        .onChange((value: string) => {
+          this.currentInputValue = value
+        })
+        .margin({bottom: 10 })
+        .onSubmit((enterKey: EnterKeyType, event: SubmitEvent) => {
+          this.SubmitInputValue = this.currentInputValue
+          // 查询开始提示
+          promptAction.showToast({message: $r('app.string.ip_address_query_tips'), duration: 1600 })
+          this.fetchIpInfo(this.SubmitInputValue)
+        })
+      if(this.SubmitInputValue != '') {
+        Row() {
+          Text(this.IPaddressinfo)
+            .fontSize(16)
+            .margin({left: 3})
+        }
+        .width('100%')
+        .margin({bottom: 8})
+        .justifyContent(FlexAlign.Start)
+      }
+      Button($r('app.string.close'))
+        .width('100%')
+        .height(39)
+        .onClick(() => {
+          this.currentInputValue = ''
+          this.controller.close()
+          if (this.cancel) {
+            this.cancel()
+          }
+        })
+        .backgroundColor(this.icon_emphasize)
+        .fontColor(Color.White)
+    }
+    .padding({left: 16, right: 16, bottom: 16})
+    .backgroundColor($r('app.color.container_background'))
+    .width('100%')
+  }
+}
 
 
 

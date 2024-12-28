@@ -42,8 +42,8 @@ struct FakeIPCustomDialog {
       Button($r('app.string.Cancel'))
         .height(39)
         .width('100%')
-        .fontColor($r('sys.color.font_primary'))
-        .backgroundColor('#00ffffff')
+        .fontColor(this.icon_emphasize)
+        .backgroundColor($r('app.color.container_background'))
         .onClick(() => {
           this.controller.close()
           if (this.cancel) {
@@ -75,6 +75,9 @@ struct DNS {
   @StorageProp('istabletVertical')  private istabletVertical: boolean = false
   @State SaveInputValue: string = ''
   @State currentInputValue: string = ''
+  /* 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur')
+  private isEnableIndexForegroundBlur: boolean
   // 弹窗控制器
   dialogController: CustomDialogController = new CustomDialogController({
     builder: FakeIPCustomDialog({
@@ -83,12 +86,28 @@ struct DNS {
       cancel: ()=> { this.onCancel() },
       confirm: ()=> { this.onAccept() },
     }),
+    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+      // 1、PRESS_BACK    点击三键back、左滑/右滑、键盘ESC。
+      // 2、TOUCH_OUTSIDE    点击遮障层时
+      // 3、CLOSE_BUTTON    点击关闭按钮
+      if (dismissDialogAction.reason === DismissReason.TOUCH_OUTSIDE) {
+        // 点击遮蔽层不响应，防误触
+      } else {
+        // 完成IP地址查询后主动通过dismiss主动关闭对话框
+        dismissDialogAction.dismiss()
+        // 关闭背景模糊
+        this.isEnableIndexForegroundBlur = false
+      }
+    },
   })
 
   onCancel() {
-
+    // 关闭背景模糊
+    this.isEnableIndexForegroundBlur = false
   }
   onAccept() {
+    // 关闭背景模糊
+    this.isEnableIndexForegroundBlur = false
     // 更新UI数组中对应元素
     let FakeIPRangeData = this.overwriteDNSList[9]
     FakeIPRangeData.subtitle = this.SaveInputValue
@@ -100,6 +119,8 @@ struct DNS {
   // 列表行点击事件处理
   handleCheck(index: number) {
     if(index === 9) {
+      // 启用背景模糊
+      this.isEnableIndexForegroundBlur = true
       this.dialogController.open()
     } else {
       // 跳转

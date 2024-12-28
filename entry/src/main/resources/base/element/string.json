@@ -505,11 +505,11 @@
       "value": "配置监听路由地址"
     },
     {
-      "name": "Query_IP_Region",
+      "name": "query_ip_region",
       "value": "查询IP地区"
     },
     {
-      "name": "Query_IP_Region_Subtitle",
+      "name": "query_ip_region_Subtitle",
       "value": "使用GeoIP2数据库查询IP所在地区"
     },
     {
@@ -1119,6 +1119,18 @@
     {
       "name": "kernel_subtitle",
       "value": "切换Clash内核"
+    },
+    {
+      "name": "query_ip_region_placeholder",
+      "value": "支持IPv4和IPv6地址，回车键查询"
+    },
+    {
+      "name": "ip_address_query_tips",
+      "value": "IP地址查询中"
+    },
+    {
+      "name": "ip_address_query_success_tips",
+      "value": "IP地址查询成功"
     }
   ]
 }

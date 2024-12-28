@@ -505,11 +505,11 @@
       "value": "Configure listening routing address"
     },
     {
-      "name": "Query_IP_Region",
+      "name": "query_ip_region",
       "value": "Query IP Region"
     },
     {
-      "name": "Query_IP_Region_Subtitle",
+      "name": "query_ip_region_Subtitle",
       "value": "Using GeoIP2 database to query the location of IP addresses"
     },
     {
@@ -1119,6 +1119,18 @@
     {
       "name": "kernel",
       "value": "Kernel"
+    },
+    {
+      "name": "query_ip_region_placeholder",
+      "value": "Support IPv4 and IPv6 addresses, enter key query"
+    },
+    {
+      "name": "ip_address_query_tips",
+      "value": "IP address query in progress"
+    },
+    {
+      "name": "ip_address_query_success_tips",
+      "value": "IP address query succeeded"
     }
   ]
 }

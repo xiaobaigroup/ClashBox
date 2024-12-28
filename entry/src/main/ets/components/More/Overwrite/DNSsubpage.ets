@@ -23,7 +23,8 @@ export struct FakeIPfilter {
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
-
+  /* 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
   /**
    * FakeIP添加过滤弹窗控制器
    */
@@ -36,12 +37,28 @@ export struct FakeIPfilter {
       cancel: ()=> { this.onCancel() },
       confirm: ()=> { this.onAccept() },
     }),
+    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+      // 1、PRESS_BACK    点击三键back、左滑/右滑、键盘ESC。
+      // 2、TOUCH_OUTSIDE    点击遮障层时
+      // 3、CLOSE_BUTTON    点击关闭按钮
+      if (dismissDialogAction.reason === DismissReason.TOUCH_OUTSIDE) {
+        // 点击遮蔽层不响应，防误触
+      } else {
+        // 完成IP地址查询后主动通过dismiss主动关闭对话框
+        dismissDialogAction.dismiss()
+        // 关闭背景模糊
+        this.isEnableIndexForegroundBlur = false
+      }
+    },
   })
 
   onCancel() {
-
+    // 关闭背景模糊
+    this.isEnableIndexForegroundBlur = false
   }
   onAccept() {
+    // 关闭背景模糊
+    this.isEnableIndexForegroundBlur = false
     // 更新UI数组中对应元素
     const newItem: FakeIPfilterData = new FakeIPfilterData(this.SaveInputValue, false)
     this.FakeIPfilterList = [...this.FakeIPfilterList, newItem]
@@ -60,11 +77,27 @@ export struct FakeIPfilter {
       cancel: ()=> { this.oneditCancel() },
       confirm: ()=> { this.oneditAccept() },
     }),
+    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+      // 1、PRESS_BACK    点击三键back、左滑/右滑、键盘ESC。
+      // 2、TOUCH_OUTSIDE    点击遮障层时
+      // 3、CLOSE_BUTTON    点击关闭按钮
+      if (dismissDialogAction.reason === DismissReason.TOUCH_OUTSIDE) {
+        // 点击遮蔽层不响应，防误触
+      } else {
+        // 完成IP地址查询后主动通过dismiss主动关闭对话框
+        dismissDialogAction.dismiss()
+        // 关闭背景模糊
+        this.isEnableIndexForegroundBlur = false
+      }
+    },
   })
   oneditCancel() {
-
+    // 关闭背景模糊
+    this.isEnableIndexForegroundBlur = false
   }
   oneditAccept() {
+    // 关闭背景模糊
+    this.isEnableIndexForegroundBlur = false
     // 更新UI数组中对应元素
     const editItem: FakeIPfilterData = new FakeIPfilterData(this.SaveEditInputValue, false)
     this.FakeIPfilterList.splice(this.theEditPlaceholder, 1, editItem)
@@ -113,6 +146,8 @@ export struct FakeIPfilter {
           }
           .margin({bottom: this.listBottom.value })
           .onClick(() => {
+            // 启用背景模糊
+            this.isEnableIndexForegroundBlur = true
             // 进入列表行数据编辑
             this.currentEditInputValue = item.name
             this.theEditPlaceholder = index
@@ -137,6 +172,8 @@ export struct FakeIPfilter {
           .backgroundColor($r('app.color.container_background'))
         }
         .onClick(() => {
+          // 启用背景模糊
+          this.isEnableIndexForegroundBlur = true
           this.dialogController.open()
         })
 

@@ -88,7 +88,7 @@ export  const ListMoreData = (): moreData[] => {
     new moreData($r('sys.symbol.swap'), 'Connect', $r('app.string.Connect'), '', 0, false),
     new moreData($r('sys.symbol.pencil_line'), 'Overwrite', $r('app.string.Overwrite'), '', 0, false),
     new moreData($r('sys.symbol.navigation'), 'Diversion', $r('app.string.Diversion_Strategy'), '', 0, false),
-    new moreData($r('sys.symbol.clean_fill'), 'QueryIP', $r('app.string.Query_IP_Region'), $r('app.string.Query_IP_Region_Subtitle'), 0, false),
+    new moreData($r('sys.symbol.clean_fill'), 'QueryIP', $r('app.string.query_ip_region'), $r('app.string.query_ip_region_Subtitle'), 0, false),
   ]
   return result
 }
