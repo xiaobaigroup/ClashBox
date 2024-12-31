@@ -34,7 +34,7 @@ struct settingsListItem {
         .alignItems(HorizontalAlign.Start)
         Blank()
         Text(this.itemObj.hint)
-          .fontColor('gray')
+          .fontColor($r('sys.color.font_secondary'))
           .padding({ left: 8 })
           .fontSize(14)
         SymbolGlyph($r('sys.symbol.chevron_right'))
