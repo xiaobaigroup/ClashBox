@@ -16,15 +16,13 @@ import { LengthMetrics, PromptAction, SymbolGlyphModifier } from '@kit.ArkUI'
 import { ConfigAdd } from '../components/Configuration/ConfigAdd'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
-import { ConfigData, ConfigDataSource } from '../common/PageArgumentEntity'
+import { ConfigData, ConfigDataSourceType } from '../common/PageArgumentEntity'
 import { CustomConfirmDialog } from '../components/Common'
 import { customVibrator } from "../utils/VibratorUtil"
 import { common } from '@kit.AbilityKit'
 import { configShare } from '../utils/SystemShareUtil'
 // XXX 测试用 删除
 import { showFileNameListOfFileDir } from '../utils/FileUtil'
-import { fileIo as fs } from '@kit.CoreFileKit'
-import { Decimal } from '@kit.ArkTS'
 
 
 /**
@@ -80,21 +78,21 @@ struct ConfigurationPage {
   // @StorageProp('currentConfigRadioCheckedConfigData')
   @State
   private currentConfigRadioCheckedConfigData: ConfigData = {
-    configId: '',
+    configId: 'e91a4efc-cf14-467d-90c2-fec156806bfa',
     isNewConfig: false,
-    configName: 'VMess-TikTok专用',
-    configURL: '',
+    configName: '',
+    configUrl: '',
     isConfigAutoUpdate: false
   }
   /**
-   * XXX 当前手指触摸的ListItem的对应 `this.configList` 中的 `configName`
+   * XXX 当前手指触摸的ListItem的对应 `this.configList` 中的 `configId`
    *    List的长按菜单中的响应都是根据这个的对象中的属性来处理的，是个不稳定因素
    */
   private currentTouchConfigData: ConfigData = {
     configId: '',
     isNewConfig: false,
     configName: '',
-    configURL: '',
+    configUrl: '',
     isConfigAutoUpdate: false
   }
 
@@ -103,62 +101,63 @@ struct ConfigurationPage {
   @State
   private configList: Array<ConfigData> = [
     {
-      configId: 'SS-Youtube速度快',
+      configId: 'a4e2593d-9927-4f57-8868-f316190657a1',
       isNewConfig: false,
       configName: 'SS-Youtube速度快',
-      configURL: 'https://aaa.com:8344',
+      configUrl: 'https://aaa.com:8344',
       isConfigAutoUpdate: true,
       configAutoUpdateTimeGapValue: 10,
       configAutoUpdateTimeGapTextPickerIndex: 1,
-      createdDate: new Date('2024-05-21 21:21:21'),
-      lastUpdateDateTime: new Date('2024-12-18 17:51:00'),
+      createdDate: '2024-05-21 21:21:21',
+      lastUpdateDateTime: '2024-12-18 17:51:00',
       trafficUsed: '1329.43GB',
       trafficTotal: '5000GB',
       isFavorite: false,
-      source: ConfigDataSource.URL,
+      sourceType: ConfigDataSourceType.URL,
     },
     {
-      configId: 'Trojan-INS专用',
+      configId: 'd30612ae-369b-4515-bf60-67873fc1bc4a',
       isNewConfig: false,
       configName: 'Trojan-INS专用',
-      configURL: 'http://ealion.com/ins-test',
+      configUrl: 'http://ealion.com/ins-test',
       isConfigAutoUpdate: true,
       configAutoUpdateTimeGapValue: 233,
       configAutoUpdateTimeGapTextPickerIndex: 0,
-      createdDate: new Date('2023-12-20 04:14:35'),
-      lastUpdateDateTime: new Date('2024-12-18 15:00:00'),
+      createdDate: '2023-12-20 04:14:35',
+      lastUpdateDateTime: '2024-12-18 15:00:00',
       trafficUsed: '234.42GB',
       trafficTotal: '700GB',
       isFavorite: true,
-      source: ConfigDataSource.QR_CODE,
+      sourceType: ConfigDataSourceType.QR_CODE,
     },
     {
-      configId: 'VMess-TikTok专用',
+      configId: 'e91a4efc-cf14-467d-90c2-fec156806bfa',
       isNewConfig: false,
       configName: 'VMess-TikTok专用',
-      configURL: 'https://enlin.com:2333',
+      configUrl: 'https://enlin.com:2333',
       isConfigAutoUpdate: false,
-      createdDate: new Date('2024-06-16 12:34:56'),
-      lastUpdateDateTime: new Date('2024-12-18 12:00:00'),
+      createdDate: '2024-06-16 12:34:56',
+      lastUpdateDateTime: '2024-12-18 12:00:00',
       trafficUsed: '874.04GB',
       trafficTotal: '2000GB',
       isFavorite: true,
-      source: ConfigDataSource.COPY,
+      sourceType: ConfigDataSourceType.COPY,
+      copySourceConfigId: 'a4e2593d-9927-4f57-8868-f316190657a1',
     },
     {
-      configId: 'VMess-TG专用',
+      configId: '027617f1-5dea-4322-9836-e4187073d328',
       isNewConfig: false,
       configName: 'VMess-TG专用',
-      configURL: 'https://telegram-vmess.enlin.com',
+      configUrl: 'https://telegram-vmess.enlin.com',
       isConfigAutoUpdate: true,
       configAutoUpdateTimeGapValue: 7,
       configAutoUpdateTimeGapTextPickerIndex: 2,
-      createdDate: new Date('2024-01-01 12:24:34'),
-      lastUpdateDateTime: new Date('2024-12-19 08:00:00'),
+      createdDate: '2024-01-01 12:24:34',
+      lastUpdateDateTime: '2024-12-19 08:00:00',
       trafficUsed: '34.05GB',
       trafficTotal: '800GB',
       isFavorite: false,
-      source: ConfigDataSource.QR_CODE,
+      sourceType: ConfigDataSourceType.QR_CODE,
     },
   ]
 
@@ -183,27 +182,28 @@ struct ConfigurationPage {
     // },
     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.square_and_pencil'))
         .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-      content: '编辑', callback: ()=>{this.editConfig()}
+      content: '编辑', callback: ()=>{ this.editConfig() }
     },
     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.arrow_clockwise'))
         .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-      content: '更新', callback: ()=>{this.updateConfig(this.currentTouchConfigData.configId)}
+      content: '更新', callback: ()=>{ this.updateConfig(this.currentTouchConfigData.configId) }
     },
     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.share'))
         .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-      content: '分享链接', callback: ()=>{this.shareConfigURL()}
+      content: '分享', callback: ()=>{ this.shareConfigUrl() }
     },
     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.qrcode'))
         .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-      content: '生成二维码', callback: ()=>{this.generateQRcode()}
+      content: '生成二维码', callback: ()=>{ this.generateQRcode() }
     },
-    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.doc_text'))
+    // XXX 分享链接和导出配置文件都已经集成到了“分享”菜单里
+/*    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.doc_text'))
       .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-      content: '导出配置文件', callback: ()=>{this.generateQRcode()}
-    },
+      content: '导出配置文件', callback: ()=>{ this.generateQRcode() }
+    },*/
     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.plus_square_on_square'))
       .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-      content: '创建副本', callback: ()=>{this.generateQRcode()}
+      content: '创建副本', callback: ()=>{ this.generateQRcode() }
     },
   ]
   // 配置页面ListItem的长按ContextMenu的Builder
@@ -360,17 +360,9 @@ struct ConfigurationPage {
           .backgroundColor($r('app.color.settings_container_background'))
           .clickEffect({ level: ClickEffectLevel.LIGHT })
           .onClick(() => {
-            // TODO 国际化适配 更新配置中... 更新配置成功
-            // TODO 调用 更新配置api
+            // TODO 国际化适配 更新配置中... 更新配置成功、
             hilog.info(0xC001, this.componentName, `#button#onClick()#更新配置`)
             this.updateConfig()
-            // XXX 删除 测试用 获取指定应用沙箱[路径]下的所有文件名
-            let fileNames = showFileNameListOfFileDir(this.context.filesDir)
-            // 输出文件信息
-            fileNames.forEach( (fileName: string) => {
-              const fileStat: fs.Stat = fs.statSync(`${this.context.filesDir}/${fileName}`)
-              hilog.info(0x1020, this.componentName, `#showFileNameListOfFileDir#“${this.context.filesDir}”文件夹下文件“${fileName}”的大小为: ${fileStat.size}Byte = ${Decimal.div(fileStat.size, 1024).toFixed(2, Decimal.ROUND_DOWN)}KB`)
-            })
           })
         }
         .alignItems(VerticalAlign.Center)
@@ -397,7 +389,7 @@ struct ConfigurationPage {
                 }.alignItems(HorizontalAlign.Start)
                 Blank()
                 Radio({ value: 'radio' + index, group: 'configGroup' })
-                  .checked(item.configName === this.currentConfigRadioCheckedConfigData.configName)
+                  .checked(item.configId === this.currentConfigRadioCheckedConfigData.configId)
                   .radioStyle({
                     checkedBackgroundColor: this.icon_emphasize,
                   })
@@ -538,18 +530,8 @@ struct ConfigurationPage {
 
   aboutToAppear(): void {
     hilog.info(0xC000, this.componentName, `#aboutToAppear executed`)
-    let fileNames: Array<string> = showFileNameListOfFileDir(this.context.filesDir)
-    // XXX 删除 这里模拟获取URL下载的列表
-    fileNames.forEach( (fileName:string) => {
-      let newConfig: ConfigData = {
-        configId: fileName.slice(0, fileName.length - 5),
-        isNewConfig: false,
-        configName: fileName.slice(0, fileName.length - 5),
-        configURL: 'https://www.gov.cn/',
-        isConfigAutoUpdate: false
-      }
-      this.configList.push(newConfig)
-    })
+    // XXX 删除 这里模拟获取所有hap沙箱路径配置文件的文件名
+    showFileNameListOfFileDir(this.context.filesDir)
   }
 
   aboutToDisappear(): void {
@@ -622,10 +604,10 @@ struct ConfigurationPage {
   /**
    * 分享配置的URL
    */
-  private shareConfigURL(): void {
+  private shareConfigUrl(): void {
     // TODO 处理待分享数据 并调用系统分享接口 只有URL导入的配置才可以分享链接
     hilog.info(0xC013, this.componentName, `#shareConfig#分享配置: configName is [${this.currentTouchConfigData.configName}]`)
-    let systemShareResult: boolean = configShare(this.context, this.currentTouchConfigData.configURL, this.currentTouchConfigData.configId)
+    let systemShareResult: boolean = configShare(this.context, this.currentTouchConfigData.configUrl, this.currentTouchConfigData.configId)
     if (!systemShareResult) {
       this.promptAction.showToast({ message: `分享错误，请联系开发者！🐛` })
     }
@@ -637,6 +619,11 @@ struct ConfigurationPage {
    */
   private generateQRcode(): void {
     // TODO 弹框CustomDialog，在其中实现“配置url”生成二维码的功能
+    if (this.currentTouchConfigData.sourceType !== ConfigDataSourceType.URL &&
+      this.currentTouchConfigData.sourceType !== ConfigDataSourceType.QR_CODE ) {
+      // TODO 国际化
+      this.promptAction.showToast({ message: `此配置仅支持分享配置文件~🫡` })
+    }
     hilog.info(0xC014, this.componentName, `#generateQRcode#生成二维码: configName is [${this.currentTouchConfigData.configName}]`)
   }
   /**

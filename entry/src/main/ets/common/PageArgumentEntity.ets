@@ -20,7 +20,7 @@ export interface UserPreferences{
 
 /* 配置 */
 // 配置来源类型
-export enum ConfigDataSource{
+export enum ConfigDataSourceType{
   URL,
   QR_CODE,
   FILE,
@@ -37,26 +37,26 @@ export interface ConfigData{
   // 配置名
   configName: string
   // 配置URL
-  configURL: string
+  configUrl: string
   // 是否自动更新
   isConfigAutoUpdate: boolean
-  // 自动更新间隔
+  // 自动更新间隔对应的值
   configAutoUpdateTimeGapValue?: number
   // 自动更新间隔`TextPicker`对应的索引（默认数据参照`Constants.CONFIG_AUTO_UPDATE_TIME_GAT_STRING_ARR` & $r('app.strarray.config_auto_update_text_picker')）
   configAutoUpdateTimeGapTextPickerIndex?: number
-  // 创建日期
-  createdDate?: Date
+  // 创建日期 yyyy-MM-dd hh:mm:ss
+  createdDate?: string
   // 最后更新/编辑日期 yyyy-MM-dd hh:mm:ss
-  lastUpdateDateTime?: Date
-  // 已用流量
+  lastUpdateDateTime?: string
+  // 套餐已用流量
   trafficUsed?: string
-  // 所有流量
+  // 套餐所有流量
   trafficTotal?: string
-  // 是否收藏
+  // 配置是否收藏
   isFavorite?: boolean
   // 配置来源类型
-  source?: ConfigDataSource
-  // 副本源配置id
+  sourceType?: ConfigDataSourceType
+  // 如果是副本配置，对应源配置id
   copySourceConfigId?: string
 
 

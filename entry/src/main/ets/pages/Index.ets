@@ -34,13 +34,17 @@ interface marginGenerate {
 @Component
 struct Index {
   private componentName: string = 'Index'
-  // @StorageProp('selectedTheme')
+  // @StorageProp('theme')
   // TODO 使用用户首选项之后 删掉`@State`，取消注释上面的`@StorageProp`
   @State
   selectedTheme: CustomThemeName = 'blueAppTheme'
-  // 系统颜色调用（现在每个主题中只有一个颜色，如果有多个颜色，可以把这个换成主题色对应的`CustomTheme`）
+  /**
+   * 主题色
+   *    示例中主题配置里配置了一个颜色，所以只用`ResourceColor`类型的变量来接收色值，
+   *    如果有多个颜色，就把这个变量换成`CustomTheme`类型的变量）
+   */
   @Provide('icon_emphasize')
-  icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize') //高亮图标,可在apptheme更换
+  icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize')
   @State icon_tertiary: ResourceColor = $r('sys.color.icon_tertiary') //三级图标色，浅灰色
 
   // 预留自定义主题，颜色在AppTheme里面修改

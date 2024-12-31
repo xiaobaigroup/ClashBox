@@ -15,7 +15,6 @@ import { ConfigData } from "../../common/PageArgumentEntity"
 import { util } from "@kit.ArkTS"
 import { CustomConfirmDialog } from '../Common'
 import { BusinessError } from "@kit.BasicServicesKit"
-import { deleteDownloadTask, requestDownloadFile } from "../../utils/HttpUtil"
 import { common } from "@kit.AbilityKit"
 
 
@@ -52,7 +51,7 @@ export struct ImportConfigFromURL{
     configId: util.generateRandomUUID(),
     isNewConfig: true,
     configName: '',
-    configURL: '',
+    configUrl: '',
     isConfigAutoUpdate: false,
   }
 
@@ -130,10 +129,8 @@ export struct ImportConfigFromURL{
       title: this.customDownloadingDialogTitle,
       cancelText: '取消下载',
       cancel: () => {
-        // XXX 取消下载文件 若已下载部分将此删除
-        deleteDownloadTask(() => {
-          this.configCustomDownloadingDialogController?.close()
-        })
+        // TODO 取消下载文件 若已下载部分将此删除
+        // ...
         // TODO 国际化
         this.promptAction.showToast({ message: `已取消下载配置😵` })
       },
@@ -213,6 +210,7 @@ export struct ImportConfigFromURL{
 
   aboutToAppear(): void {
     hilog.info(0xCA10, this.componentName, `#aboutToAppear executed`)
+    // XXX 没有写`this.icon_emphasize`的`Watch`事件，是因为如果在设置页面里设置了其他主题色时，这个页面一定不是打开的状态
     this.saveMenus.symbolBackgroundColor = this.icon_emphasize
   }
 
@@ -229,31 +227,14 @@ export struct ImportConfigFromURL{
    * TODO 保存配置
    */
   async saveConfig(isNewConfig: boolean){
+    // TODO 国际化
     if (isNewConfig) {
-      // this.promptAction.showToast({ message: `保存中...` })
       this.customDownloadingDialogTitle = '正在下载配置文件'
       this.configCustomDownloadingDialogController?.open()
     } else {
-      // this.promptAction.showToast({ message: `更新配置信息中...` })
       this.customDownloadingDialogTitle = '正在更新配置文件'
       this.configCustomDownloadingDialogController?.open()
     }
-    // await httpGet('http://192.168.3.33:2333/file/clash-config').then((rep: rcp.Response) => {
-    //   hilog.info(0xCA60, this.componentName, `Response succeeded: ${rep}`);
-    // }).catch((err: BusinessError) => {
-    //   hilog.error(0xCA60, this.componentName, `Response err: Code is ${err.code}, message is ${JSON.stringify(err)}`);
-    // })
-
-    // XXX 下载配置
-    let savePath = `${this.context.filesDir}/${this.configData.configId}.yaml`
-    requestDownloadFile(this.context, this.configData.configURL, savePath, () => {
-      // TODO 国际化
-      this.promptAction.showToast({ message: `配置下载已完成🫡` })
-      this.configCustomDownloadingDialogController?.close()
-      // TODO 关闭上层bindSheet（现在先pop一个路由，防止再次点击保存按钮导致文件重名报错）
-      this.configAddPageInfos.pop(true)
-    })
-
   }
 
   /**
@@ -261,7 +242,7 @@ export struct ImportConfigFromURL{
    *    true: 显示保存按钮。 false反之
    */
   // checkInput() {
-  //   if(this.configNameInputHaveText && this.configURLInputHaveText) {
+  //   if(this.configNameInputHaveText && this.configUrlInputHaveText) {
   //     this.menus.push(this.saveMenus)
   //   }
   // }
@@ -292,7 +273,7 @@ export struct ImportConfigFromURL{
    * 检查配置名 Input && 配置 URL 是否都有值
    */
   checkAllInputHaveValue() {
-    this.allInputHaveValue = (this.configData.configName.length > 0 && this.configData.configURL.length > 0)
+    this.allInputHaveValue = (this.configData.configName.length > 0 && this.configData.configUrl.length > 0)
     // hilog.info(0xCA12, this.componentName, `#checkAllInputHaveValue is [${this.allInputHaveValue}]}`)
   }
 }

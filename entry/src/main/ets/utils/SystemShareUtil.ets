@@ -16,10 +16,10 @@ const componentName: string = 'SystemShareUtil'
 /**
  * 配置分享
  * @param context   common.UIAbilityContext
- * @param configURL URL字符串
+ * @param configUrl 字符串类型的URL
  * @param configId  配置文件id（要通过此名称获取应用沙箱中该文件的uri）
  */
-export function configShare(context: common.UIAbilityContext, configURL: string | null, configId: string): boolean{
+export function configShare(context: common.UIAbilityContext, configUrl: string | null, configId: string): boolean{
   // 补充文件后缀
   if (!configId.endsWith('.yaml')) {
     configId = configId + '.yaml'
@@ -29,7 +29,7 @@ export function configShare(context: common.UIAbilityContext, configURL: string 
     hilog.error(0x1000, componentName, `ERROR: #configShare: “${configId}”文件不存在`)
     return false
   }
-  hilog.info(0x1000, componentName, `#configShare#confingURL: ${configURL}, configId: ${configId}`)
+  hilog.info(0x1000, componentName, `#configShare#confingURL: ${configUrl}, configId: ${configId}`)
   try {
 
     // 通过沙箱路径获取文件uri
@@ -48,11 +48,11 @@ export function configShare(context: common.UIAbilityContext, configURL: string 
       thumbnailUri: uri,
     })
     // URL 分享
-    if (configURL != null && configURL.trim() !== '') {
+    if (configUrl != null && configUrl.trim() !== '') {
       data.addRecord({
         utd: utd.UniformDataType.HYPERLINK,
         // title: 'URL',
-        content: configURL.trim()
+        content: configUrl.trim()
       })
       // 制作二维码
       // data.addRecord({

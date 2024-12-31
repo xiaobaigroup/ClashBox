@@ -27,7 +27,7 @@ export function fileIsExist(context: common.UIAbilityContext, fileName: string):
 }
 
 /**
- * 同步获取指定应用沙箱[路径]下的所有文件名
+ * 同步获取指定[应用沙箱路径]下的所有文件名
  *
  * @param path 沙箱路径
  */

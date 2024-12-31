@@ -107,7 +107,7 @@ export struct ConfigInfo{
       // TODO 国际化
       Text('URL').fontColor($r('sys.color.font_secondary')).fontSize(FONT_SIZE_16)
       // TODO 国际化
-      TextArea({ text: $$this.configData.configURL, placeholder: '输入链接...' }).width('100%').height(TEXT_INPUT_HEIGHT * 2).borderRadius(BORDER_RADIUS_20)
+      TextArea({ text: $$this.configData.configUrl, placeholder: '输入链接...' }).width('100%').height(TEXT_INPUT_HEIGHT * 2).borderRadius(BORDER_RADIUS_20)
         .id('text_area_config_url')
         .caretColor(this.icon_emphasize)
         .maxLength(TEXT_AREA_MAX_LENGTH)
@@ -116,7 +116,7 @@ export struct ConfigInfo{
         .type(TextAreaType.URL)
         .clickEffect({ level: ClickEffectLevel.MIDDLE })
         // .onChange( (value: string, previewText: PreviewText) => {
-        //   this.configData.configURL = value.trim()
+        //   this.configData.configUrl = value.trim()
         // })
         .onSubmit( (enterKey: EnterKeyType) => {
           // 条件判断是否需要将焦点切换给`自动更新时间间隔`框
