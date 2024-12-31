@@ -230,7 +230,7 @@ struct MorePage {
             detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],
             dragBar: false,
             backgroundColor: $r('app.color.container_background'),
-            blurStyle: BlurStyle.BACKGROUND_REGULAR,
+            //blurStyle: BlurStyle.BACKGROUND_REGULAR,
             preferType: SheetType.CENTER,
             onWillDismiss: () => {
               this.isShowSettings = false
