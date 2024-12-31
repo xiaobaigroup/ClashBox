@@ -1,6 +1,6 @@
 {
   "app": {
-    "bundleName": "org.ohos.clash",
+    "bundleName": "org.xbgroup.clashnext",
     "vendor": "example",
     "versionCode": 1000000,
     "versionName": "1.0.0",
