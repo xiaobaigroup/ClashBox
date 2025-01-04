@@ -119,6 +119,14 @@ struct ProxyPage {
       .width(this.currentIndex === targetIndex ? 96 : 87)
       .justifyContent(FlexAlign.Center)
       .backgroundColor(this.currentIndex === targetIndex ? this.icon_emphasize : this.container_background)
+      .animation(
+        {
+          duration: ANIMATION_DURATION_300,
+          tempo:0.3,
+          curve: Curve.Ease,
+          iterations: 1,
+          playMode: PlayMode.Normal
+        })
     }
     .height(55)
     .margin({ right: 8, bottom: 10 })
@@ -146,7 +154,7 @@ struct ProxyPage {
             .checked(this.currentRadioValue1 === 0)
             .onChange((isChecked: boolean) => {
               if (isChecked) {
-                animateTo({ duration: 1000 }, () => {
+                animateTo({ duration: 500 }, () => {
                   this.currentRadioValue1 = 0
                 })
                 this.ProxyArrangementSelected = 'ProxyArrangementSelected1'
@@ -160,7 +168,7 @@ struct ProxyPage {
         .EditRow()
         // 点击后改变ProxyArrangementSelected状态为 标签
         .onClick(() => {
-          animateTo({ duration: 1000 }, () => {
+          animateTo({ duration: 500 }, () => {
             this.currentRadioValue1 = 0
           })
           this.ProxyArrangementSelected = 'ProxyArrangementSelected1'
@@ -178,7 +186,7 @@ struct ProxyPage {
             .checked(this.currentRadioValue1 === 1)
             .onChange((isChecked: boolean) => {
               if (isChecked) {
-                animateTo({ duration: 1000 }, () => {
+                animateTo({ duration: 500 }, () => {
                   this.currentRadioValue1 = 1
                 })
                 this.ProxyArrangementSelected = 'ProxyArrangementSelected2'
@@ -192,7 +200,7 @@ struct ProxyPage {
         .EditRow()
         // 点击后改变ProxyArrangementSelected状态为 列表
         .onClick(() => {
-          animateTo({ duration: 1000 }, () => {
+          animateTo({ duration: 500 }, () => {
             this.currentRadioValue1 = 1
           })
           this.ProxyArrangementSelected = 'ProxyArrangementSelected2'
@@ -213,7 +221,7 @@ struct ProxyPage {
             .checked(this.currentRadioValue2 === 0)
             .onChange((isChecked: boolean) => {
               if (isChecked) {
-                animateTo({ duration: 1000 }, () => {
+                animateTo({ duration: 500 }, () => {
                   this.currentRadioValue2 = 0
                 })
               }
@@ -226,7 +234,7 @@ struct ProxyPage {
         .EditRow()
         .onClick(() => {
           this.DefaultSortItems()
-          animateTo({ duration: 1000 }, () => {
+          animateTo({ duration: 500 }, () => {
             this.currentRadioValue2 = 0
           })
         })
@@ -243,7 +251,7 @@ struct ProxyPage {
             .checked(this.currentRadioValue2 === 1)
             .onChange((isChecked: boolean) => {
               if (isChecked) {
-                animateTo({ duration: 1000 }, () => {
+                animateTo({ duration: 500 }, () => {
                   this.currentRadioValue2 = 1
                 })
               }
@@ -256,7 +264,7 @@ struct ProxyPage {
         .EditRow()
         .onClick(() => {
           this.LatencySortItems() //按延迟排序
-          animateTo({ duration: 1000 }, () => {
+          animateTo({ duration: 500 }, () => {
             this.currentRadioValue2 = 1
           })
         })
@@ -273,7 +281,7 @@ struct ProxyPage {
             .checked(this.currentRadioValue2 === 2)
             .onChange((isChecked: boolean) => {
               if (isChecked) {
-                animateTo({ duration: 1000 }, () => {
+                animateTo({ duration: 500 }, () => {
                   this.currentRadioValue2 = 2
                 })
               }
@@ -286,7 +294,7 @@ struct ProxyPage {
         .EditRow()
         .onClick(() => {
           this.NameSortItems()
-          animateTo({ duration: 1000 }, () => {
+          animateTo({ duration: 500 }, () => {
             this.currentRadioValue2 = 2
           })
         })
@@ -306,7 +314,7 @@ struct ProxyPage {
             .checked(this.currentRadioValue3 === 0)
             .onChange((isChecked: boolean) => {
               if (isChecked) {
-                animateTo({ duration: 1000 }, () => {
+                animateTo({ duration: 500 }, () => {
                   this.currentRadioValue3 = 0
                 })
                 this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedWide'
@@ -320,7 +328,7 @@ struct ProxyPage {
         .EditRow()
         // 点击后改变ProxyGroupItemSelected状态为 多列
         .onClick(() => {
-          animateTo({ duration: 1000 }, () => {
+          animateTo({ duration: 500 }, () => {
             this.currentRadioValue3 = 0
           })
           this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedWide'
@@ -338,7 +346,7 @@ struct ProxyPage {
             .checked(this.currentRadioValue3 === 1)
             .onChange((isChecked: boolean) => {
               if (isChecked) {
-                animateTo({ duration: 1000 }, () => {
+                animateTo({ duration: 500 }, () => {
                   this.currentRadioValue3 = 1
                 })
                 this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedThin'
@@ -351,7 +359,7 @@ struct ProxyPage {
         }
         // 点击后改变ProxyGroupItemSelected状态为 单列
         .onClick(() => {
-          animateTo({ duration: 1000 }, () => {
+          animateTo({ duration: 500 }, () => {
             this.currentRadioValue3 = 1
           })
           this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedThin'
@@ -370,7 +378,7 @@ struct ProxyPage {
             .checked(this.currentRadioValue3 === 2)
             .onChange((isChecked: boolean) => {
               if (isChecked) {
-                animateTo({ duration: 1000 }, () => {
+                animateTo({ duration: 500 }, () => {
                   this.currentRadioValue3 = 2
                 })
                 this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedMini'
@@ -384,7 +392,7 @@ struct ProxyPage {
         .EditRow()
         // 点击后改变ProxyGroupItemSelected状态为 迷你
         .onClick(() => {
-          animateTo({ duration: 1000 }, () => {
+          animateTo({ duration: 500 }, () => {
             this.currentRadioValue3 = 2
           })
           this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedMini'
@@ -449,7 +457,7 @@ struct ProxyPage {
         // transition保证组件离场不被立即析构，可设置其他转场效果
         .transition(TransitionEffect.OPACITY)
         .onClick(() => {
-          animateTo({ duration: 1000 }, () => {
+          animateTo({ duration:ANIMATION_DURATION_300 }, () => {
             this.FristPage = false
           })
         })
@@ -468,10 +476,13 @@ struct ProxyPage {
                   //      .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
                 }
 
-
                 .tabBar(this.TabBuilder('分组1', 0))
 
                 TabContent() {
+                  ProxyGroupItem() //list相关在components/ProxyGroupItem.ets文件里
+                    .padding({right: this.breakPointStateTabContentTitleMargin.value,})
+                    .width('100%')
+                    .height('100%')
                 }
                 .tabBar(this.TabBuilder('分组2', 1))
 
@@ -499,6 +510,7 @@ struct ProxyPage {
                 }
                 .tabBar(this.TabBuilder('分组8', 7))
               }
+              .animationDuration(200)
               .barMode(BarMode.Scrollable)
               .barHeight(55)
               .fadingEdge(false)
@@ -513,6 +525,10 @@ struct ProxyPage {
             // transition保证组件离场不被立即析构，可设置其他转场效果
             .transition(TransitionEffect.OPACITY)
             .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
+            .foregroundBlurStyle(
+              this.isEnableIndexForegroundBlur ? BlurStyle.Thin : BlurStyle.NONE,
+              { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
+            )
             //分组tabs end
           }
 

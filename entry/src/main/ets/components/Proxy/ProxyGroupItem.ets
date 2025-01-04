@@ -220,8 +220,8 @@ struct ProxyGroupItem {
           ListItem() {
             Row() {
               Column() {
-                Text(`${item.text}`).ItemText()
-                Text(`${item.type}`).ItemType()
+                Text(`${item.text}`).ItemTextStyle()
+                Text(`${item.type}`).ItemTypeStyle()
 
                 Blank(10)
                 Text(`${item.latency}` + 'ms')
@@ -280,8 +280,8 @@ struct ProxyGroupItem {
             Row() {
               Row() {
                 Column() {
-                  Text(`${item.text}`).ItemText()
-                  Text(`${item.type}`).ItemType()
+                  Text(`${item.text}`).ItemTextStyle()
+                  Text(`${item.type}`).ItemTypeStyle()
                 }.alignItems(HorizontalAlign.Start)
 
                 Text(`${item.latency}` + 'ms')
@@ -339,9 +339,9 @@ struct ProxyGroupItem {
           ListItem() {
             Row() {
               Column() {
-                Text(`${item.text}`).ItemText()
+                Text(`${item.text}`).ItemTextStyle()
                 Row() {
-                  Text(`${item.type}`).ItemType().maxLines(1).width(50).textOverflow({ overflow: TextOverflow.Clip})
+                  Text(`${item.type}`).ItemTypeStyle().maxLines(1).width(50).textOverflow({ overflow: TextOverflow.Clip})
                   Text(`${item.latency}` + 'ms')
                     .fontColor(this.getColorForLatency(item.latency) as ResourceColor)
                     .fontSize(14)
@@ -413,6 +413,7 @@ function ListStyle() {
   .transition(TransitionEffect.OPACITY)
   .scrollBar(BarState.Off)
   .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+  .contentEndOffset(110)
 }
 
 //ListItem公用样式
@@ -432,17 +433,17 @@ function ListRowStyle() {
   .alignItems(VerticalAlign.Center)
 }
 
-//Item中text公用样式
+//Item中text（节点国家）公用样式
 @Extend(Text)
-function ItemText() {
+function ItemTextStyle() {
   .fontColor(($r('sys.color.font_primary')))
   .fontSize(18)
   .fontWeight(FontWeight.Medium)
 }
 
-//Item中type公用样式
+//Item中type（节点类型）公用样式
 @Extend(Text)
-function ItemType() {
+function ItemTypeStyle() {
   .fontColor($r('sys.color.font_secondary'))
   .fontSize(14)
 }
