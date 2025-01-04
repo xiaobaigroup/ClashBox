@@ -86,7 +86,7 @@ interface LocationMapping {
   city: Record<string, string>
 }
 
-// 位置映射表 // TODO 地区映射表不完全且未国际化
+// 位置映射表  TODO 地区映射表不完全且未国际化
 const locationMappings: LocationMapping = {
   country: {
     'CN': '中国',

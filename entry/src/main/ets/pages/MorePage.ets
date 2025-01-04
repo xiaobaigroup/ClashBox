@@ -18,7 +18,7 @@ import DNS from '../components/More/Overwrite/DNS';
 import Network, { NetworkRouterAddress } from '../components/More/Overwrite/Network';
 import { FakeIPfilter } from '../components/More/Overwrite/DNSsubpage';
 import { getResourceString } from '../utils/ResourceStringUtil';
-import { extractLocationInfo, getIpInfo, mapLocation } from '../utils/getIpInfo';
+import { extractLocationInfo, getIpInfo, mapLocation } from '../utils/GetIpInfo';
 import { promptAction } from '@kit.ArkUI';
 
 @Entry
@@ -56,18 +56,14 @@ struct MorePage {
   @Provide Enablebackgrounder: boolean = false
   /* 断点布局相关 相关作用看定义时候的注释 */
   // 整体外边距
-  @Consume('breakPointStatemorePageMargin')
-  private morePageMargin: BreakpointState<number>
+  @Consume('breakPointStatemorePageMargin')  private morePageMargin: BreakpointState<number>
   // 列表底边距
-  @Consume('breakPointStatemorePagelistBottom')
-  private listBottom: BreakpointState<number>
+  @Consume('breakPointStatemorePagelistBottom') private listBottom: BreakpointState<number>
   // 列表高度
-  @Consume('breakPointStateListHeight')
-  private listHeight: BreakpointState<number>
+  @Consume('breakPointStateListHeight') private listHeight: BreakpointState<number>
 
   /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur')
-  private isEnableIndexForegroundBlur: boolean
+  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
 
   /**
    * 查询IP地址弹窗控制器

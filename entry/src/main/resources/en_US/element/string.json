@@ -510,7 +510,7 @@
     },
     {
       "name": "query_ip_region_Subtitle",
-      "value": "Using GeoIP2 database to query the location of IP addresses"
+      "value": "Using ip-api to query the location of IP addresses"
     },
     {
       "name": "Diversion_Strategy",
