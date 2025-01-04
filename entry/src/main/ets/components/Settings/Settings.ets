@@ -95,7 +95,7 @@ struct Settings {
   }
 
   handleCheck(index: number) {
-    if(index === 7) {
+    if(index === 8) {
       // 免责声明弹窗
       if (this.dialogController != null) {
         this.dialogController.open()

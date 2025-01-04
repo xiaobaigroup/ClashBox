@@ -456,41 +456,19 @@ export const CheckUpdateList: CheckUpdateListItemProp[] = [
 /* 断点相关 */
 // List组件的布局 列数或行数
 export const BPS_LIST_LANES_1_1_2_3_4: BreakpointState<number> = BreakpointState.of({
-  xs: 1,
-  sm: 1,
-  md: 2,
-  lg: 3,
-  xl: 3,
-  xxl: 4
-})
-
+  xs: 1,  sm: 1,  md: 2,  lg: 3,  xl: 3,  xxl: 4 })
 
 // List组件的布局 列间距
 export const BPS_LIST_GUTTER_1_1_2_3_3: BreakpointState<number> = BreakpointState.of({
-  xs: 5,
-  sm: 8,
-  md: 10,
-  lg: 15,
-  xl: 20
-})
+  xs: 5,  sm: 8,  md: 10,  lg: 15,  xl: 20 })
 
 // bindSheet内List内边距 Padding（主要是为了bindSheet内使用Navigation套List使用的，因为路由在md设备往上的默认双栏效果）
 export const BPS_NAVIGATION_LIST_PADDING_12_13_13_28_36: BreakpointState<number> = BreakpointState.of({
-  xs: 12,
-  sm: 13,
-  md: 13,
-  lg: 28,
-  xl: 36
-})
+  xs: 12,  sm: 13,  md: 13,  lg: 28,  xl: 36 })
 
 // TabContent的title Margin
 export const BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36: BreakpointState<number> = BreakpointState.of({
-  xs: 12,
-  sm: 13,
-  md: 28,
-  lg: 36,
-  xl: 36
-})
+  xs: 12,  sm: 13,  md: 28,  lg: 36,  xl: 36 })
 
 // 更多页整体外边距
 export const morePageMargin_12_14_16: BreakpointState<number> = BreakpointState.of({
@@ -510,6 +488,88 @@ export const listHeight_610_590: BreakpointState<number> = BreakpointState.of({
 // 设置页列表高度
 export const SettingslistHeight_590_500: BreakpointState<number> = BreakpointState.of({
   xs: 620, sm: 620, md: 500, lg: 500, xl: 500
+})
+
+// MarginGenerate
+export interface MarginGenerate {
+  left: number, top: number, right: number,
+  bottom?:number
+}
+/**
+ * 主页卡片内边距
+ */
+export const HomeCardPadding_14_15_16_17: BreakpointState<MarginGenerate> = BreakpointState.of({
+  sm: ({top: 14, bottom: 18, left: 14, right: 14} as MarginGenerate),
+  md: ({top: 15, bottom: 20, left: 15, right: 15} as MarginGenerate),
+  lg: ({top: 16, bottom: 22, left: 16, right: 16} as MarginGenerate),
+  xl: ({top: 17, bottom: 25, left: 17, right: 17} as MarginGenerate)
+})
+/**
+ * 主页卡片标题下边距（5，7，9）
+ */
+export const HomeCardTitleBottomMargin: BreakpointState<number> = BreakpointState.of({
+  sm: 5, md: 7, lg: 9, xl: 9
+})
+/**
+ * 主页模式卡片上下边距（3，6）
+ */
+export const HomeCardSwitchModeRowMargin: BreakpointState<number> = BreakpointState.of({
+  sm: 3, md: 6, lg: 6, xl: 6
+})
+/**
+ * 主页模式卡片字体大小（16，27，26，27）
+ */
+export const HomeCardSwitchModeFontSize: BreakpointState<number> = BreakpointState.of({
+  sm: 16, md: 27, lg: 26, xl: 27
+})
+/**
+ * 主页模式卡片文本上下边距（6，7）
+ */
+export const HomeCardSwitchModeTextMargin: BreakpointState<MarginGenerate> = BreakpointState.of({
+  sm: ({ top: 6, bottom: 6 } as MarginGenerate),
+  md: ({ top: 7, bottom: 7 } as MarginGenerate),
+  lg: ({ top: 7, bottom: 7 } as MarginGenerate),
+  xl: ({ top: 7, bottom: 7 } as MarginGenerate)
+})
+/**
+ * 主页流量统计卡片统计条边距
+ */
+export const HomeCardCellularDatabarMargin: BreakpointState<MarginGenerate> = BreakpointState.of({
+  xs: ({ top: 10, bottom: 7 } as MarginGenerate),
+  sm: ({ top: 10, bottom: 7 } as MarginGenerate),
+  md: ({ top: 15, bottom: 9 } as MarginGenerate),
+  lg: ({ top: 15, bottom: 9 } as MarginGenerate),
+  xl: ({ top: 15, bottom: 9 } as MarginGenerate)
+})
+/**
+ * 主页流量统计卡片统计条高度
+ */
+export const HomeCardCellularDatabarHeight_6_5: BreakpointState<number> = BreakpointState.of({
+  sm: 6, md: 5, lg: 5, xl: 5
+})
+/**
+ * 主页流量统计卡片上下行箭头图标大小（16，22，26，27）
+ */
+export const HomeCardCellularDataChevronSize: BreakpointState<number> = BreakpointState.of({
+  sm: 16, md: 22, lg: 26, xl: 27
+})
+/**
+ * 主页流量统计卡片上下行箭头组件部分间距（20,10）
+ */
+export const HomeCardCellularDataChevronRowMargin: BreakpointState<number> = BreakpointState.of({
+  sm: 20, md: 10, lg: 10, xl: 20
+})
+/**
+ * 主页流量统计卡片内容文本字体大小（14,23,26,21）
+ */
+export const HomeCardCellularDataFontSize: BreakpointState<number> = BreakpointState.of({
+  sm: 14, md: 23, lg: 26, xl: 21
+})
+/**
+ * 主页卡片标题字体大小
+ */
+export const CardTitleFontSize_18_29_26_27: BreakpointState<number> = BreakpointState.of({
+  sm: 18, md: 29, lg: 26, xl: 27
 })
 
 /* List 相关*/

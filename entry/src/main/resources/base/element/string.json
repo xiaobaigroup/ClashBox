@@ -510,7 +510,7 @@
     },
     {
       "name": "query_ip_region_Subtitle",
-      "value": "使用GeoIP2数据库查询IP所在地区"
+      "value": "使用ip-api查询IP所在地区"
     },
     {
       "name": "Diversion_Strategy",

@@ -1,12 +1,7 @@
 import { BreakpointSystem, BreakpointState } from '../../common/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI'
-
-
-interface MarginGenerate {
-  left: number, right: number, top: number,
-  bottom?:number
-}
-
+import { MarginGenerate } from '../../common/Constants'
+import { CardTitle } from './CardTitleBuilder'
 
 @Component
 struct CurrentNode {
@@ -30,9 +25,6 @@ struct CurrentNode {
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
-  @State fontSize: BreakpointState<number> = BreakpointState.of({
-    sm: 18, md: 29, lg: 26, xl: 27
-  });
   @State RowPadding: BreakpointState<number> = BreakpointState.of({
     sm: 10, md: 10, lg: 10, xl: 20
   });
@@ -42,12 +34,8 @@ struct CurrentNode {
     lg: ({ left: 50 } as MarginGenerate),
     xl: ({ left: 50 } as MarginGenerate)
   });
-  @State cardPadding: BreakpointState<MarginGenerate> = BreakpointState.of({
-    sm: ({top: 12, bottom: 12, left: 10, right: 10} as MarginGenerate),
-    md: ({top: 12, bottom: 12, left: 10, right: 10} as MarginGenerate),
-    lg: ({top: 14, bottom: 14, left: 12, right: 12} as MarginGenerate),
-    xl: ({top: 14, bottom: 14, left: 12, right: 12} as MarginGenerate)
-  });
+  // 卡片内边距
+  @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
 
 
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
@@ -55,30 +43,22 @@ struct CurrentNode {
   aboutToAppear() {
 
     BreakpointSystem.getInstance().attach(this.compStr)
-    BreakpointSystem.getInstance().attach(this.fontSize)
     BreakpointSystem.getInstance().attach(this.RowPadding)
     BreakpointSystem.getInstance().attach(this.fontMargin)
-    BreakpointSystem.getInstance().attach(this.cardPadding)
     BreakpointSystem.getInstance().start()
   }
   aboutToDisappear() {
 
     BreakpointSystem.getInstance().attach(this.compStr)
-    BreakpointSystem.getInstance().attach(this.fontSize)
     BreakpointSystem.getInstance().attach(this.fontMargin)
     BreakpointSystem.getInstance().attach(this.RowPadding)
-    BreakpointSystem.getInstance().attach(this.cardPadding)
     BreakpointSystem.getInstance().stop()
   }
 
 
   build() {
     Column() {
-      Text($r('app.string.CurrentNode'))
-        .fontSize(this.isLandscapePhone ? 18 : this.fontSize.value)
-        //.margin({left:this.RowPadding.value})
-        .fontWeight(FontWeight.Bold)
-        .fontColor($r('sys.color.font_primary'))
+      CardTitle({title: $r('app.string.CurrentNode')})
       Row() {
         Text(this.currentNode)
           .fontSize(23)

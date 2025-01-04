@@ -1,4 +1,3 @@
-import { hilog } from "@kit.PerformanceAnalysisKit"
 import { BIND_SHEET_DRAG_BAR_HEIGHT, BIND_SHEET_TITLE_CONTAINER_HEIGHT } from "../../common/Constants"
 
 @Preview

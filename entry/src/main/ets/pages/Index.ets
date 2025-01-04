@@ -6,7 +6,6 @@ import ProxyPage from './ProxyPage'
 import ConfigurationPage from './ConfigurationPage'
 import MorePage from './MorePage'
 import { hilog } from '@kit.PerformanceAnalysisKit'
-
 import {
   BPS_LIST_LANES_1_1_2_3_4,
   BPS_LIST_GUTTER_1_1_2_3_3,
@@ -16,7 +15,19 @@ import {
   morePagelistBottom_10_14,
   listHeight_610_590,
   SettingslistHeight_590_500,
-  ANIMATION_DURATION_300
+  ANIMATION_DURATION_300,
+  MarginGenerate,
+  HomeCardPadding_14_15_16_17,
+  HomeCardCellularDatabarMargin,
+  CardTitleFontSize_18_29_26_27,
+  HomeCardCellularDatabarHeight_6_5,
+  HomeCardCellularDataChevronSize,
+  HomeCardCellularDataChevronRowMargin,
+  HomeCardCellularDataFontSize,
+  HomeCardTitleBottomMargin,
+  HomeCardSwitchModeRowMargin,
+  HomeCardSwitchModeFontSize,
+  HomeCardSwitchModeTextMargin
 } from '../common/Constants'
 import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
@@ -122,6 +133,39 @@ struct Index {
     lg: ({ top: 5 } as marginGenerate),
     xl: ({ top: 5 } as marginGenerate)
   });
+  // 主页卡片内边距
+  @Provide('breakPointStateHomeCardPadding')
+  private breakPointStateHomeCardPadding: BreakpointState<MarginGenerate> = HomeCardPadding_14_15_16_17
+  // 主页卡片标题下边距
+  @Provide('breakPointStateHomeCardTitleBottomMargin')
+  private breakPointStateHomeCardTitleBottomMargin: BreakpointState<number> = HomeCardTitleBottomMargin
+  // 主页模式卡片上下边距
+  @Provide('breakPointStateHomeCardSwitchModeRowMargin')
+  private breakPointStateHomeCardSwitchModeRowMargin: BreakpointState<number> = HomeCardSwitchModeRowMargin
+  // 主页模式卡片内容文本字体大小
+  @Provide('breakPointStateHomeCardSwitchModeFontSize')
+  private breakPointStateHomeCardSwitchModeFontSize: BreakpointState<number> = HomeCardSwitchModeFontSize
+  // 主页模式卡片文本上下边距
+  @Provide('breakPointStateHomeCardSwitchModeTextMargin')
+  private breakPointStateHomeCardSwitchModeTextMargin: BreakpointState<MarginGenerate> = HomeCardSwitchModeTextMargin
+  // 主页流量统计卡片统计条边距
+  @Provide('breakPointStateCardCellularDatabarMargin')
+  private breakPointStateCellularDatabarMargin: BreakpointState<MarginGenerate> = HomeCardCellularDatabarMargin
+  // 主页流量统计卡片统计条高度
+  @Provide('breakPointStateCardCellularDatabarHeight')
+  private breakPointStateCellularDatabarHeight: BreakpointState<number> = HomeCardCellularDatabarHeight_6_5
+  // 主页流量统计卡片上下行箭头图标大小
+  @Provide('breakPointStateCardCellularDataChevronSize')
+  private breakPointStateCellularDataChevronSize: BreakpointState<number> = HomeCardCellularDataChevronSize
+  // 主页流量统计卡片上下行箭头组件部分间距
+  @Provide('breakPointStateCardCellularDataChevronRowMargin')
+  private breakPointStateCellularDataChevronRowMargin: BreakpointState<number> = HomeCardCellularDataChevronRowMargin
+  // 主页流量统计卡片内容文本字体大小
+  @Provide('breakPointStateCardCellularDataFontSize')
+  private breakPointStateCellularDataFontSize: BreakpointState<number> = HomeCardCellularDataFontSize
+  // 主页卡片标题字体大小
+  @Provide('breakPointStateCardTitleFontSize')
+  private breakPointStateCardTitleFontSize: BreakpointState<number> = CardTitleFontSize_18_29_26_27
   @Provide('breakPointStateListLanes')
   private breakPointStateListLanes: BreakpointState<number> = BPS_LIST_LANES_1_1_2_3_4
   @Provide('breakPointStateListGutter')
@@ -208,6 +252,7 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.compMargin)
     BreakpointSystem.getInstance().attach(this.TabIconfontSize)
     BreakpointSystem.getInstance().attach(this.TabTitlefontSize)
+    BreakpointSystem.getInstance().attach(this.breakPointStateHomeCardPadding)
     BreakpointSystem.getInstance().attach(this.breakPointStateListLanes)
     BreakpointSystem.getInstance().attach(this.breakPointStateListGutter)
     BreakpointSystem.getInstance().attach(this.breakPointStateTabContentTitleMargin)
@@ -216,6 +261,16 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.breakPointStatemorePagelistBottom)
     BreakpointSystem.getInstance().attach(this.breakPointStateListHeight)
     BreakpointSystem.getInstance().attach(this.breakPointStateSettingslistHeight)
+    BreakpointSystem.getInstance().attach(this.breakPointStateCellularDataChevronSize)
+    BreakpointSystem.getInstance().attach(this.breakPointStateCellularDataChevronRowMargin)
+    BreakpointSystem.getInstance().attach(this.breakPointStateHomeCardSwitchModeTextMargin)
+    BreakpointSystem.getInstance().attach(this.breakPointStateHomeCardTitleBottomMargin)
+    BreakpointSystem.getInstance().attach(this.breakPointStateHomeCardSwitchModeRowMargin)
+    BreakpointSystem.getInstance().attach(this.breakPointStateHomeCardSwitchModeFontSize)
+    BreakpointSystem.getInstance().attach(this.breakPointStateCellularDatabarMargin)
+    BreakpointSystem.getInstance().attach(this.breakPointStateCellularDatabarHeight)
+    BreakpointSystem.getInstance().attach(this.breakPointStateCellularDataFontSize)
+    BreakpointSystem.getInstance().attach(this.breakPointStateCardTitleFontSize)
     BreakpointSystem.getInstance().start()
   }
 
