@@ -3,7 +3,8 @@ import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem
 import { BIND_SHEET_CONTAINER_HEIGHT, LIST_ITEM_HEIGHT } from '../../common/Constants'
 import { LengthMetrics, SymbolGlyphModifier,PromptAction } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
-import { Item } from '../../pages/ProxyPage';
+import { Item } from '../../common/ProxyData';
+
 //断点布局
 export const BPS_LIST_LANES_2_2_3_4_4: BreakpointState<number> = BreakpointState.of({
   xs: 2,
@@ -77,13 +78,10 @@ struct ProxyGroupItem {
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
 
-
-
   //节点假数据组后期可改可删
   @Consume items: Item[]
 
   controller: webview.WebviewController = new webview.WebviewController();
-
 
   //弹窗
   ProxyDialogController: CustomDialogController | null = new CustomDialogController({
@@ -156,10 +154,6 @@ struct ProxyGroupItem {
   BindSheetNetworkSpeed() {
     Row() {
       Column() {
-        /*    Text('Webview')
-              .fontSize(48)
-            Text('访问https://speed.cloudflare.com')
-              .fontSize(18)*/
         Web({ src: 'https://speed.cloudflare.com', controller: this.controller })
           .javaScriptAccess(true)
           .onlineImageAccess(true)
@@ -226,17 +220,14 @@ struct ProxyGroupItem {
           ListItem() {
             Row() {
               Column() {
-                Text(`${item.text}`)
-                  .fontColor(($r('sys.color.font_primary')))
-                  .fontSize(18)
-                  .fontWeight(FontWeight.Medium)
-                Text(`${item.type}`).fontColor($r('sys.color.font_secondary')).fontSize(14)
+                Text(`${item.text}`).ItemText()
+                Text(`${item.type}`).ItemType()
 
                 Blank(10)
                 Text(`${item.latency}` + 'ms')
                   .fontColor(this.getColorForLatency(item.latency) as ResourceColor)
                   .fontSize(16)
-              }.width('90%').alignItems(HorizontalAlign.Start)
+              }.alignItems(HorizontalAlign.Start)
               Blank()
               Radio({ value: 'radio' + index, group: 'ProxyGroup' })
                 .checked(index === this.PorxyRadioCheckedValue)
@@ -244,20 +235,14 @@ struct ProxyGroupItem {
                   checkedBackgroundColor: this.icon_emphasize,
                 })
             }
-            .width('100%')
-            .padding({ left: 14, right: 16 })
-            .alignItems(VerticalAlign.Center)
-
+            .ListRowStyle()
           }
           .onClick(() => {
             this.PorxyRadioCheckedValue = index
             hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
           })
-          .backgroundColor($r('app.color.container_background'))
-          //  .width('100%')
-          .height(LIST_ITEM_HEIGHT + 20)
-          .clickEffect({ level: ClickEffectLevel.MIDDLE })
-          .borderRadius(20)
+          .ListItemStyle()
+          .height(LIST_ITEM_HEIGHT + 32)
           .bindContextMenu(this.MyMenu, ResponseType.LongPress,
             {
               preview: MenuPreviewMode.IMAGE,
@@ -269,10 +254,7 @@ struct ProxyGroupItem {
             })
         })
       }
-      // transition保证组件离场不被立即析构，可设置其他转场效果
-      .transition(TransitionEffect.OPACITY)
-      .scrollBar(BarState.Off)
-      .alignListItem(ListItemAlign.Center)
+      .ListStyle()
       .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
       // .divider({ strokeWidth: 1,color:$r('app.color.divider'),startMargin:16,endMargin:16})
       .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
@@ -298,17 +280,15 @@ struct ProxyGroupItem {
             Row() {
               Row() {
                 Column() {
-                  Text(`${item.text}`).fontColor(($r('sys.color.font_primary'))).fontSize(18).fontWeight(FontWeight.Medium)
-                  Text(`${item.type}`).fontColor($r('sys.color.font_secondary')).fontSize(14)
+                  Text(`${item.text}`).ItemText()
+                  Text(`${item.type}`).ItemType()
                 }.alignItems(HorizontalAlign.Start)
 
                 Text(`${item.latency}` + 'ms')
                   .fontColor(this.getColorForLatency(item.latency) as ResourceColor)
                   .fontSize(16)
-              }
-              .width('90%')
+              }.width('90%')
               .justifyContent(FlexAlign.SpaceBetween)
-
 
               Blank()
               Radio({ value: 'radio' + index, group: 'ProxyGroup' })
@@ -317,19 +297,14 @@ struct ProxyGroupItem {
                   checkedBackgroundColor: this.icon_emphasize,
                 })
             }
-            .width('100%')
-            .padding({ left: 14, right: 16 })
-            .alignItems(VerticalAlign.Center)
+            .ListRowStyle()
           }
           .onClick(() => {
             this.PorxyRadioCheckedValue = index
             hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
           })
-          .backgroundColor($r('app.color.container_background'))
-          .width('100%')
+          .ListItemStyle()
           .height(LIST_ITEM_HEIGHT)
-          .clickEffect({ level: ClickEffectLevel.MIDDLE })
-          .borderRadius(20)
           .bindContextMenu(this.MyMenu, ResponseType.LongPress,
             {
               preview: MenuPreviewMode.IMAGE,
@@ -340,10 +315,7 @@ struct ProxyGroupItem {
             })
         })
       }
-      // transition保证组件离场不被立即析构，可设置其他转场效果
-      .transition(TransitionEffect.OPACITY)
-      .scrollBar(BarState.Off)
-      .edgeEffect(EdgeEffect.Spring)
+      .ListStyle()
       .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
         detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
         preferType: SheetType.CENTER,
@@ -367,17 +339,15 @@ struct ProxyGroupItem {
           ListItem() {
             Row() {
               Column() {
-                Text(`${item.text}`).fontColor(($r('sys.color.font_primary'))).fontSize(18).fontWeight(FontWeight.Medium)
+                Text(`${item.text}`).ItemText()
                 Row() {
-                  Text(`${item.type}`).fontColor($r('sys.color.font_secondary')).fontSize(14).maxLines(1).width(50).textOverflow({ overflow: TextOverflow.Clip})
+                  Text(`${item.type}`).ItemType().maxLines(1).width(50).textOverflow({ overflow: TextOverflow.Clip})
                   Text(`${item.latency}` + 'ms')
                     .fontColor(this.getColorForLatency(item.latency) as ResourceColor)
                     .fontSize(14)
                 }.justifyContent(FlexAlign.Start)
               }
-              .width('90%')
               .alignItems(HorizontalAlign.Start)
-
 
               Blank()
               Radio({ value: 'radio' + index, group: 'ProxyGroup' })
@@ -386,19 +356,14 @@ struct ProxyGroupItem {
                   checkedBackgroundColor: this.icon_emphasize,
                 })
             }
-            .width('100%')
-            .padding({ left: 14, right: 16 })
-            .alignItems(VerticalAlign.Center)
+            .ListRowStyle()
           }
           .onClick(() => {
             this.PorxyRadioCheckedValue = index
             hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
           })
-          .backgroundColor($r('app.color.container_background'))
-          .width('100%')
+          .ListItemStyle()
           .height(LIST_ITEM_HEIGHT)
-          .clickEffect({ level: ClickEffectLevel.MIDDLE })
-          .borderRadius(20)
           .bindContextMenu(this.MyMenu, ResponseType.LongPress,
             {
               preview: MenuPreviewMode.IMAGE,
@@ -409,11 +374,8 @@ struct ProxyGroupItem {
             })
         })
       }
-      // transition保证组件离场不被立即析构，可设置其他转场效果
-      .transition(TransitionEffect.OPACITY)
       .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
-      .scrollBar(BarState.Off)
-      .edgeEffect(EdgeEffect.Spring)
+      .ListStyle()
       .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
         detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT, ],
         preferType: SheetType.CENTER,
@@ -443,5 +405,48 @@ struct ProxyGroupItem {
     }
   }
 }
+
+//list公用样式
+@Extend(List)
+function ListStyle() {
+  // transition保证组件离场不被立即析构，可设置其他转场效果
+  .transition(TransitionEffect.OPACITY)
+  .scrollBar(BarState.Off)
+  .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+}
+
+//ListItem公用样式
+@Extend(ListItem)
+function ListItemStyle() {
+  .clickEffect({ level: ClickEffectLevel.MIDDLE })
+  .borderRadius(20)
+  .backgroundColor($r('app.color.container_background'))
+  .width('100%')
+}
+
+//List中Row公用样式
+@Extend(Row)
+function ListRowStyle() {
+  .width('100%')
+  .padding({ left: 14, right:8})
+  .alignItems(VerticalAlign.Center)
+}
+
+//Item中text公用样式
+@Extend(Text)
+function ItemText() {
+  .fontColor(($r('sys.color.font_primary')))
+  .fontSize(18)
+  .fontWeight(FontWeight.Medium)
+}
+
+//Item中type公用样式
+@Extend(Text)
+function ItemType() {
+  .fontColor($r('sys.color.font_secondary'))
+  .fontSize(14)
+}
+
+
 
 export default ProxyGroupItem

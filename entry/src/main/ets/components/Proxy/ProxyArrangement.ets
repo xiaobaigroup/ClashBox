@@ -3,14 +3,12 @@ import { ANIMATION_DURATION_300, LIST_ITEM_HEIGHT,
 import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem'
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import ProxyGroupItem from './ProxyGroupItem'
-import { StartOptions } from '@kit.AbilityKit'
+
 
 
 @Entry
 @Component
 struct ProxyArrangement {
-  @State font_primary: ResourceColor = $r('sys.color.font_primary') //一级文本色，黑色
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
   @State isContentShow: boolean = true;
   @State selectItem: number = 0;
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
@@ -40,7 +38,7 @@ struct ProxyArrangement {
                 Text(item.toString()).fontSize(16).fontColor($r('sys.color.font_primary'))
                 SymbolGlyph(this.isContentShow && this.selectItem === item ? $r('sys.symbol.chevron_down') :
                 $r('sys.symbol.chevron_right'))
-                  .fontSize(25).fontColor([this.icon_primary])
+                  .fontSize(25).fontColor([$r('sys.color.icon_primary')])
               }
               .onClick(() => {
                 this.listIndex = item;
@@ -69,11 +67,9 @@ struct ProxyArrangement {
               if (this.isContentShow && this.selectItem === item) {
 
           //      Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 16, right: 16 })
-                  List() {
-                    ProxyGroupItem()
-                  }
+
+              ProxyGroupItem()
                   .borderRadius(20)
-                  .scrollBar(BarState.Off)
                   .width('100%')
                   .height(400) //展开后界面高度
                   .padding({ top:10, bottom: 10 })

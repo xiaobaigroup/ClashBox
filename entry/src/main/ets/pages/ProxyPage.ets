@@ -8,17 +8,10 @@ import { hilog } from '@kit.PerformanceAnalysisKit'
 import ProxyGroupItem from '../components/Proxy/ProxyGroupItem'
 import ProxyArrangement from '../components/Proxy/ProxyArrangement'
 import { intl } from '@kit.LocalizationKit'
+import { Item, ProxyData } from '../common/ProxyData'
 
 //中文排序
 let ProxyCollator = new intl.Collator("zh-CN");
-
-// 定义一个接口来描述列表项的数据结构,假数据，后期可改可删
-export interface Item {
-  text: string;
-  latency: number;
-  type: string
-  index: number
-}
 
 @Entry
 @Component
@@ -46,6 +39,7 @@ struct ProxyPage {
   @State isShowEdit: boolean = false
   //分组tabs相关
   @State currentIndex: number = 0;
+
   //假数据延迟颜色设置
   @State color: ResourceColor = $r('sys.color.font_secondary')
   // 定义ProxyArrangementSelected的值便于切换分组方式
@@ -59,63 +53,9 @@ struct ProxyPage {
   @State currentRadioValue2: number = 0 // 排列方式切换
   @State currentRadioValue3: number = 0 // 卡片尺寸切换
   @State FristPage: boolean = true // 为观看预览页的判定，更改后续可以删掉
-  // todo 节点假数据组后期可改可删 start
-  @Provide items: Item[] = [
-    {
-      text: '越南①',
-      latency: 20,
-      type: 'Vmess',
-      index: 1
-    },
-    {
-      text: '越南②',
-      latency: 500,
-      type: 'Shadowsocks',
-      index: 2
-    },
-    {
-      text: '北朝鲜①',
-      latency: 501,
-      type: 'Vmess',
-      index: 3
-    },
-    {
-      text: '中国香港①',
-      latency: 20,
-      type: 'Trojan',
-      index: 4
-    },
-    {
-      text: '中国香港②',
-      latency: 1001,
-      type: 'Vmess',
-      index: 5
-    },
-    {
-      text: '中国台湾①',
-      latency: 501,
-      type: 'Shadowsocks',
-      index: 6
-    },
-    {
-      text: '中国台湾②',
-      latency: 20,
-      type: 'Vmess',
-      index: 7
-    },
-    {
-      text: '越南②',
-      latency: 500,
-      type: 'Trojan',
-      index: 8
-    },
-    {
-      text: '美国①',
-      latency: 1001,
-      type: 'Shadowsocks',
-      index: 9
-    },
-  ];// todo 节点假数据组后期可改可删 end
+  /*节点相关数据以及排序 */
+  //节点数据组
+  @Provide items: Item[] = ProxyData.ProxyItems();
 
   // 延迟排序
   LatencySortItems() {
@@ -497,7 +437,7 @@ struct ProxyPage {
         })
       }
 
-      if (this.FristPage) { //为观看预览页的判定if/else，判定和更改后续可以删掉
+      if (this.FristPage) { //为观看预览页的判定if/else，判定和更改后续可以删掉判定
         Column({ space: 5 }) {
           SymbolGlyph($r('sys.symbol.doc')).fontSize(32).fontColor([this.icon_secondary])
           Text($r('app.string.None_Proxy')).fontSize(20).fontColor(this.font_secondary).textAlign(TextAlign.Center)
@@ -513,7 +453,7 @@ struct ProxyPage {
             this.FristPage = false
           })
         })
-      } else if (!this.FristPage) { //为观看的判定if/else后续可以删掉
+      } else if (!this.FristPage) { //为观看的判定if/else后续可以删掉判定
         // 代理页分组TAB+list主体
         Stack({ alignContent: this.stackAlignContentAlignment }) {
           //根据ProxyArrangementSelected的状态决定是否显示
@@ -521,21 +461,14 @@ struct ProxyPage {
             Column() { //分组标签页 start
               Tabs({ barPosition: BarPosition.Start, controller: this.tabsController }) {
                 TabContent() {
-                  List() {
-                    ProxyGroupItem() //list相关在components/ProxyGroupItem.ets文件里
-                  }
-                  .scrollBar(BarState.Off)
+                ProxyGroupItem() //list相关在components/ProxyGroupItem.ets文件里
+                  .padding({right: this.breakPointStateTabContentTitleMargin.value,})
                   .width('100%')
                   .height('100%')
-                  .contentEndOffset(110)
                   //      .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
-                  .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
-                  .chainAnimation(true)
-
                 }
-                // 节点列表 END
 
-                //TODO 删除 临时模拟分组数据
+
                 .tabBar(this.TabBuilder('分组1', 0))
 
                 TabContent() {
@@ -566,20 +499,20 @@ struct ProxyPage {
                 }
                 .tabBar(this.TabBuilder('分组8', 7))
               }
-              .padding({
-                left: this.breakPointStateTabContentTitleMargin.value,
-                right: this.breakPointStateTabContentTitleMargin.value,
-              })
               .barMode(BarMode.Scrollable)
               .barHeight(55)
-              .fadingEdge(true)
+              .fadingEdge(false)
               .onChange((index: number) => {
                 this.currentIndex = index;
               })
             }
+            .padding({
+              left: this.breakPointStateTabContentTitleMargin.value,
+            })
+            .width('100%')
             // transition保证组件离场不被立即析构，可设置其他转场效果
             .transition(TransitionEffect.OPACITY)
-
+            .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
             //分组tabs end
           }
 
@@ -647,6 +580,7 @@ struct ProxyPage {
 }
 
 export default ProxyPage
+
 
 // 半模态编辑页Column公共样式（含非通用公共属性采用Extend继承的方式抽取）
 @Extend(Column)
