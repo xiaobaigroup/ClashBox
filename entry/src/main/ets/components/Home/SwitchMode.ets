@@ -43,6 +43,7 @@ struct SwitchMode {
   build() {
     Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.SpaceBetween }) {
       CardTitle({ title: $r('app.string.Mode') })
+      Blank(5)
       Flex({ direction: FlexDirection.Column,alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
         Text($r('app.string.Rule'))
           .TextStyle()
@@ -51,7 +52,7 @@ struct SwitchMode {
           .backgroundColor(this.currentChecked === 1 ? $r('app.color.container_background') : '#00ffffff')
      //     .shadow(this.currentChecked === 1 ? { radius: 3,color:$r('app.color.shadow')} : { } )
           .onClick(() => {
-            animateTo({ duration: 700}, () => {
+            animateTo({duration: ANIMATION_DURATION_300, curve: Curve.Ease}, () => {
               this.currentChecked = 1
             })})
         Text($r('app.string.Overall'))
@@ -61,7 +62,7 @@ struct SwitchMode {
           .backgroundColor(this.currentChecked === 2 ? $r('app.color.container_background') : '#00ffffff')
     //      .shadow(this.currentChecked === 2 ? { radius: 3, color:$r('app.color.shadow')} : { } )
           .onClick(() => {
-            animateTo({ duration: 700}, () => {
+            animateTo({duration: ANIMATION_DURATION_300, curve: Curve.Ease}, () => {
               this.currentChecked = 2
             })})
         Text($r('app.string.Direct'))
@@ -71,7 +72,7 @@ struct SwitchMode {
           .backgroundColor(this.currentChecked === 3 ? $r('app.color.container_background') : '#00ffffff')
     //      .shadow(this.currentChecked === 3 ? { radius: 3, color:$r('app.color.shadow')} : { } )
           .onClick(() => {
-            animateTo({ duration: 700}, () => {
+            animateTo({duration: ANIMATION_DURATION_300, curve: Curve.Ease}, () => {
               this.currentChecked = 3
             })})
       }
@@ -123,6 +124,7 @@ function TextStyle() {
   .fontWeight(FontWeight.Bold)
   .textAlign(TextAlign.Center)
   .transition(TransitionEffect.OPACITY)
+  .clickEffect({ level: ClickEffectLevel.MIDDLE,scale:0.8})
 }
 
 
