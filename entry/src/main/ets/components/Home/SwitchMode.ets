@@ -119,7 +119,7 @@ export default SwitchMode
 @Extend(Text)
 function TextStyle() {
   .width('100%')
-  .height(32.67)
+  .height(vp2px(32.67))
   .borderRadius(18)
   .fontWeight(FontWeight.Bold)
   .textAlign(TextAlign.Center)
