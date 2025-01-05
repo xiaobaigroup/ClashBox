@@ -627,14 +627,13 @@ function EditText() {
 // 半模态编辑页标题
 @Component
 struct EditTitle {
-  @State font_secondary: ResourceColor = $r('sys.color.font_secondary') //二级文本色，深灰色
   @State title: ResourceStr = $r('app.string.Packet_mode')
 
   build() {
     Text(this.title)
       .width('100%')
       .fontSize(16)
-      .fontColor(this.font_secondary)
+      .fontColor($r('sys.color.font_secondary'))
       .textAlign(0)
       .margin({ bottom: 10 })
   }

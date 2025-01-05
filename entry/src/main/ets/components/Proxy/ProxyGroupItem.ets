@@ -308,6 +308,7 @@ struct ProxyGroupItem {
           .bindContextMenu(this.MyMenu, ResponseType.LongPress,
             {
               preview: MenuPreviewMode.IMAGE,
+              placement: Placement.BottomRight,
               previewAnimationOptions: {
                 scale: [0.95, 1.0],
                 transition: TransitionEffect.prototype.animation({ tempo: 1.5 })
