@@ -1,7 +1,7 @@
 import { BreakpointSystem, BreakpointState } from '../../common/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit'
-import { MarginGenerate } from '../../common/Constants';
+import { ANIMATION_DURATION_300, MarginGenerate } from '../../common/Constants';
 import { CardTitle } from './CardTitleBuilder';
 
 @Component
@@ -39,81 +39,91 @@ struct SwitchMode {
 
   }
 
+
   build() {
-    Column() {
-      CardTitle({title: $r('app.string.Mode')})
-      Column() {
-        Row() {
-          // Radio({ value: 'rule', group: 'connectModeRadioGroup', indicatorType: RadioIndicatorType.DOT })
-          //   .checked($$this.radioRuleChecked)
-          //   .onChange((value: boolean) => {
-          //     hilog.info(0xA001, this.componentName, `#Radio()#rule#state: ${this.radioRuleChecked}`)
-          //   })
-          //   .radioStyle({
-          //     checkedBackgroundColor: this.icon_emphasize,
-          //   })
-          Text($r('app.string.Rule'))
-            .fontWeight(FontWeight.Bold)
-            .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-            .margin(this.fontMargin.value)
-            .fontColor(this.currentChecked === 1 ? this.font_primary : $r('sys.color.font_secondary'))
-        }
-        .width('98%')
-        .borderRadius(18)
-        .backgroundColor(this.currentChecked === 1 ? $r('app.color.container_background') : '')
-        .justifyContent(FlexAlign.Center)
-        .margin({top: this.RowMargin.value})
-        .onClick(() => {
-          this.currentChecked = 1
-        })
-        Row() {
-          Text($r('app.string.Overall'))
-            .fontWeight(FontWeight.Bold)
-            .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-            .margin(this.fontMargin.value)
-            .fontColor(this.currentChecked === 2 ? this.font_primary : $r('sys.color.font_secondary'))
-        }
-        .width('98%')
-        .borderRadius(18)
-        .backgroundColor(this.currentChecked === 2 ? $r('app.color.container_background') : '')
-        .justifyContent(FlexAlign.Center)
-        .margin({top: this.RowMargin.value})
-        .onClick(() => {
-          this.currentChecked = 2
-        })
-        Row() {
-          Text($r('app.string.Direct'))
-            .fontWeight(FontWeight.Bold)
-            .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-            .margin(this.fontMargin.value)
-            .fontColor(this.currentChecked === 3 ? this.font_primary : $r('sys.color.font_secondary'))
-        }
-        .width('98%')
-        .borderRadius(18)
-        .backgroundColor(this.currentChecked === 3 ? $r('app.color.container_background') : '')
-        .justifyContent(FlexAlign.Center)
-        .margin({top: this.RowMargin.value})
+    Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.SpaceBetween }) {
+      CardTitle({ title: $r('app.string.Mode') })
+      Flex({ direction: FlexDirection.Column,alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
+        Text($r('app.string.Rule'))
+          .TextStyle()
+          .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+          .fontColor(this.currentChecked === 1 ? this.font_primary : $r('sys.color.font_secondary'))
+          .backgroundColor(this.currentChecked === 1 ? $r('app.color.container_background') : '#00ffffff')
+     //     .shadow(this.currentChecked === 1 ? { radius: 3,color:$r('app.color.shadow')} : { } )
+          .onClick(() => {
+            animateTo({ duration: 700}, () => {
+              this.currentChecked = 1
+            })})
+        Text($r('app.string.Overall'))
+          .TextStyle()
+          .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+          .fontColor(this.currentChecked === 2 ? this.font_primary : $r('sys.color.font_secondary'))
+          .backgroundColor(this.currentChecked === 2 ? $r('app.color.container_background') : '#00ffffff')
+    //      .shadow(this.currentChecked === 2 ? { radius: 3, color:$r('app.color.shadow')} : { } )
+          .onClick(() => {
+            animateTo({ duration: 700}, () => {
+              this.currentChecked = 2
+            })})
+        Text($r('app.string.Direct'))
+          .TextStyle()
+          .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+          .fontColor(this.currentChecked === 3 ? this.font_primary : $r('sys.color.font_secondary'))
+          .backgroundColor(this.currentChecked === 3 ? $r('app.color.container_background') : '#00ffffff')
+    //      .shadow(this.currentChecked === 3 ? { radius: 3, color:$r('app.color.shadow')} : { } )
+          .onClick(() => {
+            animateTo({ duration: 700}, () => {
+              this.currentChecked = 3
+            })})
       }
       .width('100%')
-      .layoutWeight(1)
-      .borderRadius(20)
       .backgroundColor($r('sys.color.comp_background_tertiary'))
-      .onClick(() => {
-        this.currentChecked = 3
-      })
-
+      .borderRadius(20)
+      .padding(2)
     }
-    .padding(this.cardPadding.value)
     .width('100%')
-    // .height('100%')
-    .alignItems(HorizontalAlign.Center)
+    .height('100%')
+    .padding(this.cardPadding.value)
 
+    /*     Column({ space: 2 }) {
+           Button() {
+             // Radio({ value: 'rule', group: 'connectModeRadioGroup', indicatorType: RadioIndicatorType.DOT })
+             //   .checked($$this.radioRuleChecked)
+             //   .onChange((value: boolean) => {
+             //     hilog.info(0xA001, this.componentName, `#Radio()#rule#state: ${this.radioRuleChecked}`)
+             //   })
+             //   .radioStyle({
+             //     checkedBackgroundColor: this.icon_emphasize,
+             //   })
+             Text($r('app.string.Rule'))
+               .fontWeight(FontWeight.Bold)
+               .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+       //        .margin(this.fontMargin.value)
+               .fontColor(this.currentChecked === 1 ? this.font_primary : $r('sys.color.font_secondary'))
+           }
+           .width('98%')
+           .borderRadius(18)
+       //    .shadow({ radius: 3, color:$r('app.color.shadow')  })
+           .backgroundColor(this.currentChecked === 1 ? $r('app.color.container_background') : '')
+        //   .justifyContent(FlexAlign.Center)
+     //      .margin({top: this.RowMargin.value,right:this.RowMargin.value,left:this.RowMargin.value})
+           .onClick(() => {
+             this.currentChecked = 1
+           })*/
   }
 }
 export default SwitchMode
 
 
-
+//按钮公用样式
+@Extend(Text)
+function TextStyle() {
+  .width('100%')
+  .height(32.67)
+  .borderRadius(18)
+  .fontWeight(FontWeight.Bold)
+  .textAlign(TextAlign.Center)
+  .transition(TransitionEffect.OPACITY)
+}
 
 
 

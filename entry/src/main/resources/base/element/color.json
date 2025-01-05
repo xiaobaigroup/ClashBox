@@ -71,6 +71,10 @@
     {
       "name": "theme_color_main_green",
       "value": "#E682D41C"
+    },
+    {
+      "name": "shadow",
+      "value": "#33000000"
     }
   ]
 }
