@@ -79,7 +79,7 @@ struct SwitchMode {
       .width('100%')
       .backgroundColor($r('sys.color.comp_background_tertiary'))
       .borderRadius(20)
-      .padding(2)
+      .padding({ top:2,bottom:2,left:3,right:3 })
     }
     .width('100%')
     .height('100%')
