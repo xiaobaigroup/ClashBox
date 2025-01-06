@@ -44,7 +44,8 @@ struct SwitchMode {
     Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.SpaceBetween }) {
       CardTitle({ title: $r('app.string.Mode') })
       Blank(5)
-      Flex({ direction: FlexDirection.Column,alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
+
+      Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
         Text($r('app.string.Rule'))
           .TextStyle()
           .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
@@ -66,7 +67,7 @@ struct SwitchMode {
           .backgroundColor(this.currentChecked === 3 ? $r('app.color.container_background') : '#00ffffff')
     //      .shadow(this.currentChecked === 3 ? { radius: 3, color:$r('app.color.shadow')} : { } )
           .onClick(() => {this.currentChecked = 3})
-      }
+        }
       .width('100%')
       .backgroundColor($r('sys.color.comp_background_tertiary'))
       .borderRadius(20)

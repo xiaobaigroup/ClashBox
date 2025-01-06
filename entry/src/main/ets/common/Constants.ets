@@ -572,6 +572,13 @@ export const CardTitleFontSize_18_29_26_27: BreakpointState<number> = Breakpoint
   sm: 18, md: 29, lg: 26, xl: 27
 })
 
+/**
+ * 主页卡片角标删除按钮大小
+ */
+export const DeleteButtonSize_24_32: BreakpointState<number> = BreakpointState.of({
+  sm: 24, md: 32, lg: 32, xl: 32
+})
+
 /* List 相关*/
 // List中子组件的间隔
 export const LIST_SPACE: number = 10

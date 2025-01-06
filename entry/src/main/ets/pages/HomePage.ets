@@ -13,7 +13,8 @@ import {
   PROXY_STARTED_DURATION_INIT_VALUE,
   ANIMATION_DURATION_300,
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE,
-  BIND_SHEET_CONTAINER_HEIGHT
+  BIND_SHEET_CONTAINER_HEIGHT,
+  TAB_CONTENT_TITLE_HEIGHT
 } from '../common/Constants'
 import Settings from '../components/Settings/Settings'
 import { CUSTOM_THEME_MAP } from '../common/AppTheme'
@@ -110,6 +111,7 @@ struct Home {
   @State GridRowHeight: BreakpointState<string> = BreakpointState.of({
     xs: '715vp', sm: '715vp', md: '1050vp', lg: '550vp', xl: '550vp'
   });
+
   windowClass = AppStorage.get<window.Window>('windowClass') as window.Window;
   /* Stack层叠布局 */
   /* 代理启动按钮 */
@@ -212,6 +214,7 @@ struct Home {
     // TODO 国际化
     this.promptAction.showToast({ message: `布局已还原🫡` })
     this.isShowHomeEdit = false
+    this.isShowDeleteButton = false
   }
 
   /**
@@ -221,6 +224,7 @@ struct Home {
     // TODO 国际化
     this.promptAction.showToast({ message: `布局已保存💾` })
     this.isShowHomeEdit = false
+    this.isShowDeleteButton = false
   }
 
   // 通过@Builder构建设置模态展示界面
@@ -236,6 +240,41 @@ struct Home {
     //.backgroundColor(Color.White)
   }
 
+  /*
+  编辑模式下右上角删除按钮
+   */
+  @Consume deleteButtonSize: BreakpointState<number>
+  //删除按钮是否出现判定
+  @State isShowDeleteButton :boolean = false
+  //网络测速大模块里的
+  @Builder
+  DeleteButton1(){
+    Button(){
+      SymbolGlyph($r('sys.symbol.xmark'))
+        .fontSize(16)
+        .fontColor(['#fff'])
+    }
+    .borderRadius(20)
+    .width(this.deleteButtonSize.value)
+    .height(this.deleteButtonSize.value)
+    .backgroundColor('#ffe84026')
+    .position({ x: '95%',y:-4 })
+  }
+  //普通模块里的
+  @Builder
+  DeleteButton2(){
+    Button(){
+      SymbolGlyph($r('sys.symbol.xmark'))
+        .fontSize(16)
+        .fontColor(['#fff'])
+    }
+      .borderRadius(20)
+      .width(this.deleteButtonSize.value)
+      .height(this.deleteButtonSize.value)
+      .backgroundColor('#ffe84026')
+      .position({ x: '90%',y:-4 })
+  }
+
 
   build() {
     Column() {
@@ -243,13 +282,13 @@ struct Home {
         Row() {
           if (!this.isShowHomeEdit) {
             //编辑布局按钮判定：非编辑状态
-          Text(this.greetings)
-            .fontSize(32)
-            .fontWeight(FontWeight.Bold)
-            .margin({ left: this.gridMargin })
-            .fontColor(this.font_primary)
-            .transition(TransitionEffect.OPACITY.animation({duration: ANIMATION_DURATION_300, delay:0}).combine(TransitionEffect.SLIDE))
-          Blank()
+            Text(this.greetings)
+              .fontSize(32)
+              .fontWeight(FontWeight.Bold)
+              .margin({ left: this.gridMargin })
+              .fontColor(this.font_primary)
+              .transition(TransitionEffect.OPACITY.animation({duration: ANIMATION_DURATION_300, delay:0}).combine(TransitionEffect.SLIDE))
+            Blank()
 
             //编辑按钮
             Button({ type: ButtonType.Circle, stateEffect: true }) {
@@ -260,6 +299,7 @@ struct Home {
             .transition(TransitionEffect.OPACITY.animation({duration: ANIMATION_DURATION_300, delay:50}).combine(TransitionEffect.SLIDE))
             .onClick(() => {
               this.isShowHomeEdit = true
+              this.isShowDeleteButton = true
             })
             .margin({ right: this.gridMargin })
             .width(40)
@@ -338,7 +378,8 @@ struct Home {
           }
         }
         .width('100%')
-        .margin({ bottom: 15 })
+        .height(TAB_CONTENT_TITLE_HEIGHT)
+      //  .margin({ bottom: 15 })
         .geometryTransition("Button")
         // transition保证组件离场不被立即析构，可设置其他转场效果
         .transition(TransitionEffect.OPACITY)
@@ -354,17 +395,21 @@ struct Home {
               reference: BreakpointsReference.WindowSize
             }, })
           {   // 速率图
-              GridCol({
-                span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 10, lg: 6, xl: 6 },
-                offset: { xs: 0, sm: 0, md: this.isLandscapePhone ? 0 : 1, lg: 0, xl: 0 }
-              }) {
-                Speed()
+            GridCol({
+              span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 10, lg: 6, xl: 6 },
+              offset: { xs: 0, sm: 0, md: this.isLandscapePhone ? 0 : 1, lg: 0, xl: 0 }
+            }) {
+              Speed()
+              if(this.isShowDeleteButton) {
+                this.DeleteButton1()
               }
-              .borderRadius(20)
-              .clickEffect({ level: ClickEffectLevel.MIDDLE })
-              .backgroundColor($r('app.color.container_background'))
-              .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
-              .margin({ right: this.isLandscapePhone ? this.containerMargin.value : this.containerRightMargin.value })
+            }
+            .borderRadius(20)
+            .clickEffect({ level: ClickEffectLevel.MIDDLE })
+            .backgroundColor($r('app.color.container_background'))
+            .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+            .margin({ right: this.isLandscapePhone ? this.containerMargin.value : this.containerRightMargin.value })
+
 
             GridCol({
               span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 10, lg: 6, xl: 6 },
@@ -376,6 +421,9 @@ struct Home {
                   span: { xs: 6, sm: 6, md: 6, lg: 6, xl: 6 }
                 }) {
                   SwitchMode()
+                  if(this.isShowDeleteButton) {
+                    this.DeleteButton2()
+                  }
                 }
                 .margin({ right: this.containerMargin.value })
                 .GridColStyle()
@@ -384,6 +432,9 @@ struct Home {
                   span: { xs: 6, sm: 6, md: 6, lg: 6, xl: 6 },
                 }) {
                   CellularData()
+                  if(this.isShowDeleteButton) {
+                    this.DeleteButton2()
+                  }
                 }
                 .margin({ left: this.containerMargin.value })
                 .GridColStyle()
@@ -401,6 +452,9 @@ struct Home {
                   span: { xs: 6, sm: 6, md: 6, lg: 6, xl: 6 }
                 }) {
                   CurrentNode()
+                  if(this.isShowDeleteButton) {
+                    this.DeleteButton2()
+                  }
                 }
                 .margin({ right: this.containerMargin.value })
                 .GridColStyle()
@@ -409,6 +463,9 @@ struct Home {
                   span: { xs: 6, sm: 6, md: 6, lg: 6, xl: 6 },
                 }) {
                   PublicNetwork()
+                  if(this.isShowDeleteButton) {
+                    this.DeleteButton2()
+                  }
                 }
                 .margin({ left: this.containerMargin.value })
                 .GridColStyle()
@@ -426,6 +483,9 @@ struct Home {
                   span: { xs: 6, sm: 6, md: 6, lg: 6, xl: 6 }
                 }) {
                   SwitchQuickly()
+                  if(this.isShowDeleteButton) {
+                    this.DeleteButton2()
+                  }
                 }
                 .margin({ right: this.containerMargin.value })
                 .GridColStyle()
@@ -434,6 +494,9 @@ struct Home {
                   span: { xs: 6, sm: 6, md: 6, lg: 6, xl: 6 },
                 }) {
                   //TrafficStatistics()
+                  if(this.isShowDeleteButton) {
+                    this.DeleteButton2()
+                  }
                 }
                 .margin({ left: this.containerMargin.value })
                 .GridColStyle()
@@ -466,10 +529,10 @@ struct Home {
         }
         .width('100%')
         .height('100%')
-        .padding({ left: this.gridMargin, right: this.gridMargin })
+        .padding({ left:this.isLandscapePhone ?this.gridMargin  :this.gridMargin , right: this.gridMargin , top:this.isLandscapePhone ? 19  : '4vp'})
         .scrollBar(BarState.Off)
         .scrollable(ScrollDirection.Vertical)
-        .margin(this.isLandscapePhone ? { top: 19 } : '0vp')
+     //   .margin(this.isLandscapePhone ? { top: 19 } : '0vp')
         .edgeEffect(EdgeEffect.Spring)
         .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
 
@@ -529,7 +592,8 @@ struct Home {
 
       }
       .backgroundColor($r('app.color.background'))
-      .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
+    //  .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
+      .height(this.isLandscapePhone ? '100%' : `calc(100% - ${TAB_CONTENT_TITLE_HEIGHT}vp)`)
       .width("100%")
       .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
         detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],

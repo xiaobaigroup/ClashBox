@@ -27,7 +27,8 @@ import {
   HomeCardTitleBottomMargin,
   HomeCardSwitchModeRowMargin,
   HomeCardSwitchModeFontSize,
-  HomeCardSwitchModeTextMargin
+  HomeCardSwitchModeTextMargin,
+  DeleteButtonSize_24_32
 } from '../common/Constants'
 import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
@@ -133,6 +134,8 @@ struct Index {
     lg: ({ top: 5 } as marginGenerate),
     xl: ({ top: 5 } as marginGenerate)
   });
+
+
   // 主页卡片内边距
   @Provide('breakPointStateHomeCardPadding')
   private breakPointStateHomeCardPadding: BreakpointState<MarginGenerate> = HomeCardPadding_14_15_16_17
@@ -182,6 +185,9 @@ struct Index {
   private breakPointStatemorePagelistBottom: BreakpointState<number> = morePagelistBottom_10_14
   @Provide('breakPointStateSettingslistHeight')
   private breakPointStateSettingslistHeight: BreakpointState<number> = SettingslistHeight_590_500
+  //主页编辑模式 删除按钮尺寸
+  @Provide('deleteButtonSize')
+  private deleteButtonSize: BreakpointState<number> = DeleteButtonSize_24_32
 
   @Builder
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
@@ -271,6 +277,7 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.breakPointStateCellularDatabarHeight)
     BreakpointSystem.getInstance().attach(this.breakPointStateCellularDataFontSize)
     BreakpointSystem.getInstance().attach(this.breakPointStateCardTitleFontSize)
+    BreakpointSystem.getInstance().attach(this.deleteButtonSize)
     BreakpointSystem.getInstance().start()
   }
 
@@ -325,24 +332,26 @@ struct Index {
         lightUpDegree: 0.5 })*/
       .backgroundColor($r('app.color.background'))
       //.backdropBlur(60)
-      //  .barOverlap(true)  //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
+    //  .barOverlap(true)  //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
       .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
       .barWidth(this.isLandscapePhone ? '63vp' : this.compBarWidth.value) /**/
       .barHeight(this.isLandscapePhone ? '100%' : this.compBarHeight.value) /**/
-      .margin(this.compMargin.value)
+      .padding(this.compMargin.value)
       .animationDuration(200)
       .onChange((index: number) => {
         this.currentIndex = index
       })
+
     }
     .width('100%')
     .height('100%')
     .backgroundColor($r('app.color.background'))
+
     .foregroundBlurStyle(
       this.isEnableIndexForegroundBlur ? BlurStyle.Thin : BlurStyle.NONE,
       { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
     )
-    .padding({ top: px2vp(this.topRectHeight) - 5, bottom: px2vp(this.bottomRectHeight) })
+    .padding({ top: px2vp(this.topRectHeight) , bottom: this.isLandscapePhone ? 0 :px2vp(this.bottomRectHeight) -15})
     .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
   }
 }
