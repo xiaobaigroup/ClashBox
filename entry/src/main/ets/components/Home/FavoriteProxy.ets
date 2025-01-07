@@ -34,7 +34,7 @@ struct FavoriteProxy {
   build() {
     Column() {
       CardTitle({ title: $r('app.string.FavoriteProxy') })
-
+      //拥有收藏节点的布局 start
       if (this.isCheckFavoriteProxy) {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceEvenly }) {
           Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
@@ -95,8 +95,9 @@ struct FavoriteProxy {
         .backgroundColor($r('app.color.background'))
         .borderRadius(10)
         .padding({ left: 8, right: 5 })
-      }
+      }//拥有收藏节点的布局 end
 
+      //没有收藏节点的布局 start
       else if (!this.isCheckFavoriteProxy)
       {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
@@ -115,7 +116,7 @@ struct FavoriteProxy {
         .onClick(() => {
           this.isCheckFavoriteProxy=true
         })//为预览而设置的点击事件，后端接入修改或删除
-      }
+      }//没有收藏节点的布局 end
     }
     .padding(this.cardPadding.value)
     .width('100%')

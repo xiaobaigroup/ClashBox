@@ -32,7 +32,7 @@ struct FavoriteConfiguration {
   build() {
     Column() {
       CardTitle({ title: $r('app.string.FavoriteConfiguration') })
-
+      //拥有收藏配置的布局 start
       if (this.isCheckFavoriteConfiguration) {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceEvenly }) {
           Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
@@ -93,8 +93,9 @@ struct FavoriteConfiguration {
         .backgroundColor($r('app.color.background'))
         .borderRadius(10)
         .padding({ left: 8, right: 5 })
-      }
+      }//拥有收藏配置的布局 end
 
+     //没有收藏配置时的布局 start
       else if (!this.isCheckFavoriteConfiguration)
       {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
@@ -113,7 +114,7 @@ struct FavoriteConfiguration {
         .onClick(() => {
           this.isCheckFavoriteConfiguration=true
         })//为预览而设置的点击事件，后端接入修改或删除
-      }
+      }//没有收藏配置时的布局 end
     }
     .padding(this.cardPadding.value)
     .width('100%')

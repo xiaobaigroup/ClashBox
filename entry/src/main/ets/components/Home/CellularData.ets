@@ -28,13 +28,6 @@ struct CellularDataStat {
   @Consume('HomeCardCellularDataSmFontSize') private HomeCardCellularDataSmFontSize: BreakpointState<number>
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
 
-  aboutToAppear() {
-
-  }
-  aboutToDisappear() {
-
-  }
-
 
   build() {
     Column() {

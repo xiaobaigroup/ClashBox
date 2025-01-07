@@ -32,7 +32,8 @@ import {
   HomeCardCellularDataSmFontSize,
   HomeCardPrpxySmFontSize,
   ProxyFontSize_24_29_26_27,
-  HomeCardIPSmFontSize
+  HomeCardIPSmFontSize,
+  IPfontSize
 } from '../common/Constants'
 import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
@@ -206,7 +207,7 @@ struct Index {
   //主页卡片内容IP地址小字体大小
   @Provide('HomeCardIPSmFontSize')
   private HomeCardIPSmFontSize: BreakpointState<number> = HomeCardIPSmFontSize
-
+  @Provide('IPfontSize') IPfontSize: BreakpointState<number> = IPfontSize
 
   @Builder
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
@@ -301,6 +302,7 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.HomeCardPrpxySmFontSize)
     BreakpointSystem.getInstance().attach(this.ProxyFontSize_24_29_26_27)
     BreakpointSystem.getInstance().attach(this.HomeCardIPSmFontSize)
+    BreakpointSystem.getInstance().attach(this.IPfontSize)
     BreakpointSystem.getInstance().start()
   }
 

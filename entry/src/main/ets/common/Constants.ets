@@ -603,6 +603,12 @@ export const DeleteButtonSize_24_32: BreakpointState<number> = BreakpointState.o
 export const HomeCardIPSmFontSize: BreakpointState<number> = BreakpointState.of({
   sm: 12, md: 18, lg: 16, xl: 18
 })
+/**
+ * 主页卡片内容IP地址字体大小
+ */
+export const IPfontSize: BreakpointState<number> = BreakpointState.of({
+  sm: 20, md: 30, lg: 26, xl: 27
+});
 /* List 相关*/
 // List中子组件的间隔
 export const LIST_SPACE: number = 10

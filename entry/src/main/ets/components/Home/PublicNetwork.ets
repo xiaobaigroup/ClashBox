@@ -14,46 +14,12 @@ struct PublicNetwork {
   @State IP: string = '255.255.255.255'
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
-  @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
-  @State fontSize: BreakpointState<number> = BreakpointState.of({
-    sm: 16, md: 27, lg: 26, xl: 27
-  });
-  @State IPfontSize: BreakpointState<number> = BreakpointState.of({
-    sm: 20, md: 30, lg: 26, xl: 27
-  });
-  @State RowPadding: BreakpointState<number> = BreakpointState.of({
-    sm: 10, md: 10, lg: 10, xl: 20
-  });
-  @State fontMargin: BreakpointState<MarginGenerate> = BreakpointState.of({
-    sm: ({ left: 20 } as MarginGenerate),
-    md: ({ left: 55 } as MarginGenerate),
-    lg: ({ left: 50 } as MarginGenerate),
-    xl: ({ left: 50 } as MarginGenerate)
-  });
   // 卡片内边距
   @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
+  // 主页卡片内容IP地址字体大小
+  @Consume('IPfontSize')  private IPfontSize: BreakpointState<number>
 
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
-
-  aboutToAppear() {
-
-    BreakpointSystem.getInstance().attach(this.compStr)
-    BreakpointSystem.getInstance().attach(this.fontSize)
-    BreakpointSystem.getInstance().attach(this.IPfontSize)
-    BreakpointSystem.getInstance().attach(this.RowPadding)
-    BreakpointSystem.getInstance().attach(this.fontMargin)
-    BreakpointSystem.getInstance().start()
-  }
-  aboutToDisappear() {
-
-    BreakpointSystem.getInstance().attach(this.compStr)
-    BreakpointSystem.getInstance().attach(this.fontSize)
-    BreakpointSystem.getInstance().attach(this.IPfontSize)
-    BreakpointSystem.getInstance().attach(this.fontMargin)
-    BreakpointSystem.getInstance().attach(this.RowPadding)
-    BreakpointSystem.getInstance().stop()
-
-  }
 
 
   build() {
@@ -66,7 +32,7 @@ struct PublicNetwork {
             .fontColor($r('sys.color.font_secondary'))
 
         Text(this.IP)
-          .fontSize(this.isLandscapePhone ? 20 : this.IPfontSize.value)
+          .fontSize(this.isLandscapePhone ? 20 :this.IPfontSize.value)
           .textAlign(TextAlign.Start)
           .fontColor($r('sys.color.font_primary'))
 
