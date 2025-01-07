@@ -90,7 +90,7 @@ struct FavoriteConfiguration {
         }
         .width('100%')
         .height('82%')
-        .backgroundColor($r('app.color.background'))
+        .backgroundColor($r('sys.color.comp_background_tertiary'))
         .borderRadius(10)
         .padding({ left: 8, right: 5 })
       }//拥有收藏配置的布局 end
