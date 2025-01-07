@@ -104,7 +104,7 @@ struct FavoriteConfiguration {
             .fontColor([$r('sys.color.font_secondary')])
             .padding({bottom:5})
 
-          Text('您在配置页面收藏的配置将会显示在此处')
+          Text($r('app.string.FavoriteConfigurationTips'))
             .fontSize(this.isLandscapePhone ? 12:this.HomeCardIPSmFontSize.value)
             .fontColor($r('sys.color.font_secondary'))
             .textAlign(TextAlign.Center)

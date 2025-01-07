@@ -1135,6 +1135,14 @@
     {
       "name": "ip_address_query_success_tips",
       "value": "IP address query succeeded"
+    },
+    {
+      "name": "FavoriteConfigurationTips",
+      "value": "The configurations you have collected on the configuration page will be displayed here"
+    },
+    {
+      "name": "FavoriteProxyTips",
+      "value": "The nodes you have collected on the proxy page will be displayed here"
     }
   ]
 }

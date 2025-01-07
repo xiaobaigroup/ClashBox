@@ -106,7 +106,7 @@ struct FavoriteProxy {
             .fontColor([$r('sys.color.font_secondary')])
             .padding({bottom:5})
 
-          Text('您在代理页面收藏的节点' + '将会显示在此处')
+          Text($r('app.string.FavoriteProxyTips'))
             .fontSize(this.isLandscapePhone ? 12:this.HomeCardIPSmFontSize.value)
             .fontColor($r('sys.color.font_secondary'))
             .textAlign(TextAlign.Center)

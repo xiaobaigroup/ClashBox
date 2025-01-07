@@ -13,6 +13,7 @@ export struct CardTitle {
         .fontSize(this.isLandscapePhone ? 18 : this.titleFontSize.value)
         .fontWeight(FontWeight.Bold)
         .fontColor($r('sys.color.font_primary'))
+        .maxLines(1)
     }
     .width('100%')
     .margin({bottom: this.titleBottomMargin.value})
