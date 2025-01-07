@@ -37,6 +37,10 @@
       "value": "#F1F3F5"
     },
     {
+      "name": "FavoriteProxyDivider",
+      "value": "#0D000000"
+    },
+    {
       "name": "symbol_logo_name_color",
       "value": "#E6000000"
     },

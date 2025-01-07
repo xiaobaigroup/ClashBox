@@ -3,7 +3,8 @@ import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem
 import { BIND_SHEET_CONTAINER_HEIGHT, LIST_ITEM_HEIGHT } from '../../common/Constants'
 import { LengthMetrics, SymbolGlyphModifier,PromptAction } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
-import { Item } from '../../common/ProxyData';
+import {  Item, ProxyData } from '../../common/ProxyData';
+
 
 //断点布局
 export const BPS_LIST_LANES_2_2_3_4_4: BreakpointState<number> = BreakpointState.of({
@@ -14,7 +15,6 @@ export const BPS_LIST_LANES_2_2_3_4_4: BreakpointState<number> = BreakpointState
   xl: 4,
   xxl: 5
 })
-
 
 
 //自定义弹窗内容
@@ -225,7 +225,7 @@ struct ProxyGroupItem {
 
                 Blank(10)
                 Text(`${item.latency}` + 'ms')
-                  .fontColor(this.getColorForLatency(item.latency) as ResourceColor)
+                  .fontColor(ProxyData.getColorForLatency(item.latency))
                   .fontSize(16)
               }.alignItems(HorizontalAlign.Start)
               Blank()
@@ -285,7 +285,7 @@ struct ProxyGroupItem {
                 }.alignItems(HorizontalAlign.Start)
 
                 Text(`${item.latency}` + 'ms')
-                  .fontColor(this.getColorForLatency(item.latency) as ResourceColor)
+                  .fontColor(ProxyData.getColorForLatency(item.latency))
                   .fontSize(16)
               }.width('90%')
               .justifyContent(FlexAlign.SpaceBetween)
@@ -344,7 +344,7 @@ struct ProxyGroupItem {
                 Row() {
                   Text(`${item.type}`).ItemTypeStyle().maxLines(1).width(50).textOverflow({ overflow: TextOverflow.Clip})
                   Text(`${item.latency}` + 'ms')
-                    .fontColor(this.getColorForLatency(item.latency) as ResourceColor)
+                    .fontColor(ProxyData.getColorForLatency(item.latency))
                     .fontSize(14)
                 }.justifyContent(FlexAlign.Start)
               }
@@ -392,63 +392,50 @@ struct ProxyGroupItem {
       })
     }
   }
-
-  // 辅助函数：根据单个Item的latency属性返回颜色
-  private getColorForLatency(latency: number): string | ResourceColor {
-    if (latency >= 0 && latency <= 500) {
-      return '#64BB5C';
-    } else if (latency >= 501 && latency <= 1000) {
-      return '#f7ce00';
-    } else if (latency > 1000) { // 注意这里使用>而不是>=，以避免重叠
-      return '#e84026';
-    } else {
-      return $r('sys.color.font_secondary'); // 默认颜色
-    }
   }
-}
 
-//list公用样式
-@Extend(List)
-function ListStyle() {
-  // transition保证组件离场不被立即析构，可设置其他转场效果
-  .transition(TransitionEffect.OPACITY)
-  .scrollBar(BarState.Off)
-  .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
-  .contentEndOffset(110)
-}
+  //list公用样式
+  @Extend(List)
+  function ListStyle() {
+    // transition保证组件离场不被立即析构，可设置其他转场效果
+    .transition(TransitionEffect.OPACITY)
+    .scrollBar(BarState.Off)
+    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+    .contentEndOffset(110)
+  }
 
-//ListItem公用样式
-@Extend(ListItem)
-function ListItemStyle() {
-  .clickEffect({ level: ClickEffectLevel.MIDDLE })
-  .borderRadius(20)
-  .backgroundColor($r('app.color.container_background'))
-  .width('100%')
-}
+  //ListItem公用样式
+  @Extend(ListItem)
+  function ListItemStyle() {
+    .clickEffect({ level: ClickEffectLevel.MIDDLE })
+    .borderRadius(20)
+    .backgroundColor($r('app.color.container_background'))
+    .width('100%')
+  }
 
-//List中Row公用样式
-@Extend(Row)
-function ListRowStyle() {
-  .width('100%')
-  .padding({ left: 14, right:8})
-  .alignItems(VerticalAlign.Center)
-}
+  //List中Row公用样式
+  @Extend(Row)
+  function ListRowStyle() {
+    .width('100%')
+    .padding({ left: 14, right:8})
+    .alignItems(VerticalAlign.Center)
+  }
 
-//Item中text（节点国家）公用样式
-@Extend(Text)
-function ItemTextStyle() {
-  .fontColor(($r('sys.color.font_primary')))
-  .fontSize(18)
-  .fontWeight(FontWeight.Medium)
-}
+  //Item中text（节点国家）公用样式
+  @Extend(Text)
+  function ItemTextStyle() {
+    .fontColor(($r('sys.color.font_primary')))
+    .fontSize(18)
+    .fontWeight(FontWeight.Medium)
+  }
 
-//Item中type（节点类型）公用样式
-@Extend(Text)
-function ItemTypeStyle() {
-  .fontColor($r('sys.color.font_secondary'))
-  .fontSize(14)
-}
-
+  //Item中type（节点类型）公用样式
+  @Extend(Text)
+  function ItemTypeStyle() {
+    .fontColor($r('sys.color.font_secondary'))
+    .fontSize(14)
+  }
 
 
-export default ProxyGroupItem
+
+  export default ProxyGroupItem

@@ -54,8 +54,8 @@ struct ProxyPage {
   @State currentRadioValue3: number = 0 // 卡片尺寸切换
   @State FristPage: boolean = true // 为观看预览页的判定，更改后续可以删掉
   /*节点相关数据以及排序 */
-  //节点数据组
-  @Provide items: Item[] = ProxyData.ProxyItems();
+  //节点假数据组后期可改可删
+  @Consume items: Item[]
 
   // 延迟排序
   LatencySortItems() {

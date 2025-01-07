@@ -28,10 +28,15 @@ import {
   HomeCardSwitchModeRowMargin,
   HomeCardSwitchModeFontSize,
   HomeCardSwitchModeTextMargin,
-  DeleteButtonSize_24_32
+  DeleteButtonSize_24_32,
+  HomeCardCellularDataSmFontSize,
+  HomeCardPrpxySmFontSize,
+  ProxyFontSize_24_29_26_27,
+  HomeCardIPSmFontSize
 } from '../common/Constants'
 import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
+import { Item, ProxyData } from '../common/ProxyData'
 
 
 //
@@ -68,7 +73,8 @@ struct Index {
     hilog.info(0x1000, this.componentName, `#onWillApplyTheme`)
     this.icon_emphasize = theme.colors.iconEmphasize;
   }
-
+  //节点数据组
+  @Provide items: Item[] = ProxyData.ProxyItems();
   //tabs图标文字颜色，修改resources/base(dark)/element/color.json中tabs_icon_text配置选中图标文字深浅模式颜色
   // app.color.tabs_icon_text1配置非选中图标和文字深浅模式颜色
   //  @State fontColorValue:ResourceColor = ($r('app.color.tabs_icon_text'));
@@ -188,6 +194,19 @@ struct Index {
   //主页编辑模式 删除按钮尺寸
   @Provide('deleteButtonSize')
   private deleteButtonSize: BreakpointState<number> = DeleteButtonSize_24_32
+  //主页卡片内容流量统计下部小字体大小（10,16,14,16）
+  @Provide('HomeCardCellularDataSmFontSize')
+  private HomeCardCellularDataSmFontSize: BreakpointState<number> = HomeCardCellularDataSmFontSize
+  //主页卡片内容当前节点延迟字体大小（16,20,18,24）
+  @Provide('HomeCardPrpxySmFontSize')
+  private HomeCardPrpxySmFontSize: BreakpointState<number> = HomeCardPrpxySmFontSize
+  //主页卡片内容当前节点字体大小
+  @Provide('ProxyFontSize_24_29_26_27')
+  private ProxyFontSize_24_29_26_27: BreakpointState<number> = ProxyFontSize_24_29_26_27
+  //主页卡片内容IP地址小字体大小
+  @Provide('HomeCardIPSmFontSize')
+  private HomeCardIPSmFontSize: BreakpointState<number> = HomeCardIPSmFontSize
+
 
   @Builder
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
@@ -278,6 +297,10 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.breakPointStateCellularDataFontSize)
     BreakpointSystem.getInstance().attach(this.breakPointStateCardTitleFontSize)
     BreakpointSystem.getInstance().attach(this.deleteButtonSize)
+    BreakpointSystem.getInstance().attach(this.HomeCardCellularDataSmFontSize)
+    BreakpointSystem.getInstance().attach(this.HomeCardPrpxySmFontSize)
+    BreakpointSystem.getInstance().attach(this.ProxyFontSize_24_29_26_27)
+    BreakpointSystem.getInstance().attach(this.HomeCardIPSmFontSize)
     BreakpointSystem.getInstance().start()
   }
 

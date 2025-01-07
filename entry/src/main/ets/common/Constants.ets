@@ -566,10 +566,29 @@ export const HomeCardCellularDataFontSize: BreakpointState<number> = BreakpointS
   sm: 14, md: 23, lg: 26, xl: 21
 })
 /**
+ * 主页卡片内容流量统计下部小字体大小（10,16,14,16）
+ */
+export const HomeCardCellularDataSmFontSize: BreakpointState<number> = BreakpointState.of({
+  sm: 10, md: 16, lg: 14, xl: 16
+})
+
+/**
+ * 主页卡片内容当前节点小字体大小（16,20,18,24）
+ */
+export const HomeCardPrpxySmFontSize: BreakpointState<number> = BreakpointState.of({
+  sm: 16, md: 20, lg: 18, xl: 24
+})
+/**
  * 主页卡片标题字体大小
  */
 export const CardTitleFontSize_18_29_26_27: BreakpointState<number> = BreakpointState.of({
   sm: 18, md: 29, lg: 26, xl: 27
+})
+/**
+ * 主页卡片当前节点字体大小
+ */
+export const ProxyFontSize_24_29_26_27: BreakpointState<number> = BreakpointState.of({
+  sm: 24, md: 32, lg: 32, xl: 32
 })
 
 /**
@@ -578,7 +597,12 @@ export const CardTitleFontSize_18_29_26_27: BreakpointState<number> = Breakpoint
 export const DeleteButtonSize_24_32: BreakpointState<number> = BreakpointState.of({
   sm: 24, md: 32, lg: 32, xl: 32
 })
-
+/**
+ * 主页卡片内容IP地址小字体大小（12,16,14,16）
+ */
+export const HomeCardIPSmFontSize: BreakpointState<number> = BreakpointState.of({
+  sm: 12, md: 18, lg: 16, xl: 18
+})
 /* List 相关*/
 // List中子组件的间隔
 export const LIST_SPACE: number = 10

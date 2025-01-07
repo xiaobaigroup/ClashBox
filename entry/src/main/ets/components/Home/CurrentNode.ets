@@ -2,26 +2,17 @@ import { BreakpointSystem, BreakpointState } from '../../common/breakpointsystem
 import { mediaquery } from '@kit.ArkUI'
 import { MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
+import { Item, ProxyData  } from '../../common/ProxyData'
+
 
 @Component
 struct CurrentNode {
-  /* //自定义主题，颜色在AppTheme里面修改
- @State font_secondary: ResourceColor = $r('sys.color.font_secondary')
 
-   @State backgroundPrimary: ResourceColor = $r('sys.color.background_primary')
-   @State fontPrimary: ResourceColor = $r('sys.color.font_primary')
-   @State iconOnPrimary: ResourceColor = $r('sys.color.icon_on_primary')
-   @State iconFourth: ResourceColor = $r('sys.color.icon_fourth')
-
-   onWillApplyTheme(theme: Theme) {
-     this.backgroundPrimary = theme.colors.backgroundPrimary;
-     this.fontPrimary = theme.colors.fontPrimary;
-     this.iconOnPrimary = theme.colors.iconOnPrimary;
-     this.iconFourth = theme.colors.iconFourth;
-   }
- */
   @State font_primary: ResourceColor = $r('sys.color.font_primary')
-  @State currentNode: string = '暂无节点'
+  //节点假数据组后期可改可删
+  @Consume items: Item[]
+
+
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
@@ -36,8 +27,10 @@ struct CurrentNode {
   });
   // 卡片内边距
   @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
-
-
+  //主页卡片内容当前延迟小字体大小（16,20,18,24）
+  @Consume('HomeCardPrpxySmFontSize') private HomeCardPrpxySmFontSize: BreakpointState<number>
+  //主页卡片内容当前节点字体大小
+  @Consume('ProxyFontSize_24_29_26_27') private ProxyFontSize_24_29_26_27: BreakpointState<number>
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
 
   aboutToAppear() {
@@ -59,15 +52,20 @@ struct CurrentNode {
   build() {
     Column() {
       CardTitle({title: $r('app.string.CurrentNode')})
-      Row() {
-        Text(this.currentNode)
-          .fontSize(23)
-          .fontColor('grey')
+      Column() {
+        Text(`${this.items[0].text}`)//此处items[]里的数字为节点假数据（common/ProxyData）数组里的单一项，后端接入后此处应改为选中的节点项
+          .fontSize(this.isLandscapePhone ? 24 :this.ProxyFontSize_24_29_26_27.value)
+          .fontWeight(FontWeight.Bold)
           .fontColor(this.font_primary)
+
+        Text('ping ' +`${this.items[0].latency}`+ 'ms')//此处items[]里的数字为节点假数据（common/ProxyData）数组里的单一项，后端接入后此处应改为选中的节点项
+          .fontSize(this.isLandscapePhone ?16:this.HomeCardPrpxySmFontSize.value)
+          .fontColor(ProxyData.getColorForLatency(this.items[0].latency))//此处items[]里的数字为节点假数据（common/ProxyData）数组里的单一项，后端接入后此处应改为选中的节点项
       }
       .flexGrow(1)
       .width('100%')
-      .justifyContent(FlexAlign.Center)
+      .justifyContent(FlexAlign.SpaceBetween)
+      .alignItems(HorizontalAlign.Start)
       /*Row() {
         Text($r('app.string.Switch'))
           .fontSize(this.fontSize.value)
@@ -86,3 +84,4 @@ struct CurrentNode {
   }
 }
 export default CurrentNode
+

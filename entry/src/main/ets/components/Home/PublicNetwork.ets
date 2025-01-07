@@ -5,21 +5,10 @@ import { CardTitle } from './CardTitleBuilder'
 
 @Component
 struct PublicNetwork {
-  //自定义主题，颜色在AppTheme里面修改
-  @State font_primary: ResourceColor = $r('sys.color.font_primary')
-  /*
-    @State backgroundPrimary: ResourceColor = $r('sys.color.background_primary')
-    @State fontPrimary: ResourceColor = $r('sys.color.font_primary')
-    @State iconOnPrimary: ResourceColor = $r('sys.color.icon_on_primary')
-    @State iconFourth: ResourceColor = $r('sys.color.icon_fourth')
-
-    onWillApplyTheme(theme: Theme) {
-      this.backgroundPrimary = theme.colors.backgroundPrimary;
-      this.fontPrimary = theme.colors.fontPrimary;
-      this.iconOnPrimary = theme.colors.iconOnPrimary;
-      this.iconFourth = theme.colors.iconFourth;
-    }
-  */
+  //下部文字大小
+  //主页卡片内容IP地址小字体大小
+  @Consume('HomeCardIPSmFontSize')
+  private HomeCardIPSmFontSize: BreakpointState<number>
 
   @State address: string = '中国大陆'
   @State IP: string = '255.255.255.255'
@@ -71,21 +60,19 @@ struct PublicNetwork {
     Column() {
       CardTitle({title: $r('app.string.PublicNetwork')})
       Column() {
-        Row() {
+
           Text(this.address)
-            .fontSize(this.isLandscapePhone ? 12 : this.fontSize.value)
-            .fontColor(this.font_primary)
-        }
-        .justifyContent(FlexAlign.Start)
+            .fontSize(this.isLandscapePhone ? 12:this.HomeCardIPSmFontSize.value)
+            .fontColor($r('sys.color.font_secondary'))
+
         Text(this.IP)
           .fontSize(this.isLandscapePhone ? 20 : this.IPfontSize.value)
           .textAlign(TextAlign.Start)
-          .margin(this.RowPadding.value)
-          .fontColor(this.font_primary)
+          .fontColor($r('sys.color.font_primary'))
 
       }
       .alignItems(HorizontalAlign.Start)
-      .justifyContent(FlexAlign.Center)
+      .justifyContent(FlexAlign.Start)
       .width('100%')
       .flexGrow(1)
     }

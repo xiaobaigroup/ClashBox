@@ -73,8 +73,12 @@
       "value": "设置每月流量以启用"
     },
     {
-      "name": "SwitchQuickly",
-      "value": "快捷切换"
+      "name": "FavoriteProxy",
+      "value": "收藏节点"
+    },
+    {
+      "name": "FavoriteConfiguration",
+      "value": "收藏配置"
     },
     {
       "name": "Log",

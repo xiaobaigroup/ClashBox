@@ -6,7 +6,6 @@ import CellularData from '../components/Home/CellularData'
 import PublicNetwork from '../components/Home/PublicNetwork'
 import Speed from '../components/Home/Speed'
 import { getGreeting } from '../utils/GreetingUtil'
-import SwitchQuickly from '../components/Home/SwitchQuickly'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Timer } from '../common/HHmmssTimer'
 import {
@@ -19,6 +18,8 @@ import {
 import Settings from '../components/Settings/Settings'
 import { CUSTOM_THEME_MAP } from '../common/AppTheme'
 import CurrentNode from '../components/Home/CurrentNode'
+import FavoriteProxy from '../components/Home/FavoriteProxy'
+import FavoriteConfiguration from '../components/Home/FavoriteConfiguration'
 
 
 interface MarginGenerate {
@@ -255,8 +256,8 @@ struct Home {
         .fontColor(['#fff'])
     }
     .borderRadius(20)
-    .width(this.deleteButtonSize.value)
-    .height(this.deleteButtonSize.value)
+    .width(this.isLandscapePhone?24 :this.deleteButtonSize.value)
+    .height(this.isLandscapePhone?24 :this.deleteButtonSize.value)
     .backgroundColor('#ffe84026')
     .position({ x: '95%',y:-4 })
   }
@@ -268,11 +269,11 @@ struct Home {
         .fontSize(16)
         .fontColor(['#fff'])
     }
-      .borderRadius(20)
-      .width(this.deleteButtonSize.value)
-      .height(this.deleteButtonSize.value)
-      .backgroundColor('#ffe84026')
-      .position({ x: '90%',y:-4 })
+    .borderRadius(20)
+    .width(this.isLandscapePhone?24 :this.deleteButtonSize.value)
+    .height(this.isLandscapePhone?24 :this.deleteButtonSize.value)
+    .backgroundColor('#ffe84026')
+    .position({ x: '90%',y:-4 })
   }
 
 
@@ -379,7 +380,7 @@ struct Home {
         }
         .width('100%')
         .height(TAB_CONTENT_TITLE_HEIGHT)
-      //  .margin({ bottom: 15 })
+        //  .margin({ bottom: 15 })
         .geometryTransition("Button")
         // transition保证组件离场不被立即析构，可设置其他转场效果
         .transition(TransitionEffect.OPACITY)
@@ -482,7 +483,7 @@ struct Home {
                 GridCol({
                   span: { xs: 6, sm: 6, md: 6, lg: 6, xl: 6 }
                 }) {
-                  SwitchQuickly()
+                  FavoriteProxy()
                   if(this.isShowDeleteButton) {
                     this.DeleteButton2()
                   }
@@ -493,7 +494,7 @@ struct Home {
                 GridCol({
                   span: { xs: 6, sm: 6, md: 6, lg: 6, xl: 6 },
                 }) {
-                  //TrafficStatistics()
+                  FavoriteConfiguration()
                   if(this.isShowDeleteButton) {
                     this.DeleteButton2()
                   }
@@ -532,7 +533,7 @@ struct Home {
         .padding({ left:this.isLandscapePhone ?this.gridMargin  :this.gridMargin , right: this.gridMargin , top:this.isLandscapePhone ? 19  : '4vp'})
         .scrollBar(BarState.Off)
         .scrollable(ScrollDirection.Vertical)
-     //   .margin(this.isLandscapePhone ? { top: 19 } : '0vp')
+        //   .margin(this.isLandscapePhone ? { top: 19 } : '0vp')
         .edgeEffect(EdgeEffect.Spring)
         .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
 
@@ -592,7 +593,7 @@ struct Home {
 
       }
       .backgroundColor($r('app.color.background'))
-    //  .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
+      //  .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
       .height(this.isLandscapePhone ? '100%' : `calc(100% - ${TAB_CONTENT_TITLE_HEIGHT}vp)`)
       .width("100%")
       .bindSheet($$this.isShowSettings, this.SettingsSheet(), {

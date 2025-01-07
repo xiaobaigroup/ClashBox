@@ -73,8 +73,12 @@
       "value": "Set monthly traffic to enable"
     },
     {
-      "name": "SwitchQuickly",
-      "value": "SwitchQuickly"
+      "name": "FavoriteProxy",
+      "value": "FavoriteProxy"
+    },
+    {
+      "name": "FavoriteConfiguration",
+      "value": "FavoriteConfiguration"
     },
     {
       "name": "Log",
