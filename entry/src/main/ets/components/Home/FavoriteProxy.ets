@@ -92,7 +92,7 @@ struct FavoriteProxy {
         }
         .width('100%')
         .height('82%')
-        .backgroundColor($r('sys.color.comp_background_tertiary'))
+        .backgroundColor($r('app.color.home_card_background'))
         .borderRadius(10)
         .padding({ left: 8, right: 5 })
       }//拥有收藏节点的布局 end
@@ -106,7 +106,7 @@ struct FavoriteProxy {
             .fontColor([$r('sys.color.font_secondary')])
             .padding({bottom:5})
 
-          Text($r('app.string.FavoriteProxyTips'))
+          Text($r('app.string.favorite_proxy_tips'))
             .fontSize(this.isLandscapePhone ? 12:this.HomeCardIPSmFontSize.value)
             .fontColor($r('sys.color.font_secondary'))
             .textAlign(TextAlign.Center)

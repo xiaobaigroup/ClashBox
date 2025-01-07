@@ -1137,12 +1137,16 @@
       "value": "IP地址查询成功"
     },
     {
-      "name": "FavoriteConfigurationTips",
+      "name": "favorite_configuration_tips",
       "value": "您在配置页面收藏的配置将会显示在此处"
     },
     {
-      "name": "FavoriteProxyTips",
+      "name": "favorite_proxy_tips",
       "value": "您在代理页面收藏的节点将会显示在此处"
+    },
+    {
+      "name": "test_piblic_network",
+      "value": "测速"
     }
   ]
 }

@@ -79,6 +79,10 @@
     {
       "name": "shadow",
       "value": "#33000000"
+    },
+    {
+      "name": "home_card_background",
+      "value": "#0D000000"
     }
   ]
 }

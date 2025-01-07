@@ -69,7 +69,7 @@ struct SwitchMode {
           .onClick(() => {this.currentChecked = 3})
         }
       .width('100%')
-      .backgroundColor($r('sys.color.comp_background_tertiary'))
+      .backgroundColor($r('app.color.home_card_background'))
       .borderRadius(20)
       .padding({ top:2,bottom:2,left:3,right:3 })
     }

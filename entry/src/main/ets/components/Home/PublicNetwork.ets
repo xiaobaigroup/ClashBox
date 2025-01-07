@@ -9,7 +9,8 @@ struct PublicNetwork {
   //主页卡片内容IP地址小字体大小
   @Consume('HomeCardIPSmFontSize')
   private HomeCardIPSmFontSize: BreakpointState<number>
-
+  /* 主题色 */
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State address: string = '中国大陆'
   @State IP: string = '255.255.255.255'
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
@@ -18,7 +19,8 @@ struct PublicNetwork {
   @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
   // 主页卡片内容IP地址字体大小
   @Consume('IPfontSize')  private IPfontSize: BreakpointState<number>
-
+  // 内容文本字体大小
+  @Consume('breakPointStateHomeCardSwitchModeFontSize') private fontSize: BreakpointState<number>
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
 
 
@@ -41,6 +43,15 @@ struct PublicNetwork {
       .justifyContent(FlexAlign.Start)
       .width('100%')
       .flexGrow(1)
+
+      Row() {
+        Button($r('app.string.test_piblic_network'))
+          .width('55%')
+          .height('25%')
+          .fontColor(this.icon_emphasize)
+          .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+          .backgroundColor($r('app.color.home_card_background'))
+      }.width('100%').justifyContent(FlexAlign.End)
     }
     .padding(this.cardPadding.value)
     .width('100%')

@@ -1137,12 +1137,16 @@
       "value": "IP address query succeeded"
     },
     {
-      "name": "FavoriteConfigurationTips",
+      "name": "favorite_configuration_tips",
       "value": "The configurations you have collected on the configuration page will be displayed here"
     },
     {
-      "name": "FavoriteProxyTips",
+      "name": "favorite_proxy_tips",
       "value": "The nodes you have collected on the proxy page will be displayed here"
+    },
+    {
+      "name": "test_piblic_network",
+      "value": "Test Network"
     }
   ]
 }
