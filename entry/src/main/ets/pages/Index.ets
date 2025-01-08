@@ -34,7 +34,8 @@ import {
   ProxyFontSize_24_29_26_27,
   HomeCardIPSmFontSize,
   IPfontSize,
-  HomeCardEditHeight
+  HomeCardEditHeight,
+  SpeedfontSize12_16_14_16
 } from '../common/Constants'
 import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
@@ -213,6 +214,9 @@ struct Index {
   //主页卡片内容编辑添加半模拟态里卡片高度
   @Provide('HomeCardEditHeight')
   private HomeCardEditHeight: BreakpointState<number> = HomeCardEditHeight
+  //主页卡片内容网络测速字体大小
+  @Provide('SpeedfontSize12_16_14_16')
+  private SpeedfontSize12_16_14_16: BreakpointState<number> = SpeedfontSize12_16_14_16
 
   /*
     主页卡片组件截图
@@ -313,6 +317,7 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.HomeCardIPSmFontSize)
     BreakpointSystem.getInstance().attach(this.IPfontSize)
     BreakpointSystem.getInstance().attach(this.HomeCardEditHeight)
+    BreakpointSystem.getInstance().attach(this.SpeedfontSize12_16_14_16)
     BreakpointSystem.getInstance().start()
   }
 

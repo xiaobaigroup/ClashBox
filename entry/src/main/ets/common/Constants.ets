@@ -609,6 +609,15 @@ export const HomeCardIPSmFontSize: BreakpointState<number> = BreakpointState.of(
 export const IPfontSize: BreakpointState<number> = BreakpointState.of({
   sm: 20, md: 30, lg: 26, xl: 27
 });
+/**
+ * 主页卡片内容网络测速字体大小
+ */
+export const SpeedfontSize12_16_14_16: BreakpointState<number> = BreakpointState.of({
+  sm: 12,
+  md: 16,
+  lg: 14,
+  xl: 16
+});
 
 /**
  * 主页卡片内容编辑添加半模拟态里卡片高度

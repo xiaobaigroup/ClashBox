@@ -1,7 +1,7 @@
 import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem';
-import { chartInterface, McLineChart, Options } from '@mcui/mccharts'
-import json from '@ohos.util.json';
-
+import { McLineChart, Options } from '@mcui/mccharts'
+import { CardTitle } from './CardTitleBuilder';
+import { MarginGenerate } from '../../common/Constants';
 
 
 let downloadData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -35,48 +35,16 @@ setInterval(async () => {
 
 }, 1000);
 
-
-
 @Component
 struct Speed {
-  /*
-  @State backgroundPrimary: ResourceColor = $r('sys.color.background_primary')
-  @State fontPrimary: ResourceColor = $r('sys.color.font_primary')
-  @State iconOnPrimary: ResourceColor = $r('sys.color.icon_on_primary')
-  @State iconFourth: ResourceColor = $r('sys.color.icon_fourth')
-
-  onWillApplyTheme(theme: Theme) {
-    this.backgroundPrimary = theme.colors.backgroundPrimary;
-    this.fontPrimary = theme.colors.fontPrimary;
-    this.iconOnPrimary = theme.colors.iconOnPrimary;
-    this.iconFourth = theme.colors.iconFourth;
-  }
-*/
-  //设置speed图标颜色，修改resources/base(dark)/element/color.json中speed_up_icon和app.color.speed_down_icon配置浅色和深色模式分别颜色
-  @State fontColorValue:ResourceColor = ($r('app.color.speed_up_icon'));
-  @State fontColorValue1:ResourceColor = ($r('app.color.speed_down_icon'));
   @State DownloadSpeed: number = 0
   @State UploadSpeed: number = 0
-  // 定时器ID，用于清除定时器
-  private timerId: number = 0;
-  @State compStr: BreakpointState<string> = BreakpointState.of({
-    sm: "sm",
-    md: "md",
-    lg: "lg",
-    xl: "xl"
-  })
-  @State fontSize: BreakpointState<number> = BreakpointState.of({
-    sm: 28,
-    md: 30,
-    lg: 35,
-    xl: 36
-  });
-  @State speedfontSize: BreakpointState<number> = BreakpointState.of({
-    sm: 16,
-    md: 20,
-    lg: 21,
-    xl: 21
-  });
+  // 卡片内边距
+  @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
+  //主页卡片内容网络测速字体大小
+  @Consume('SpeedfontSize12_16_14_16') private SpeedfontSize12_16_14_16: BreakpointState<number>
+  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
+  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
   //初始化图表数据
   @State defOption: Options = new Options({
     //图例
@@ -86,9 +54,9 @@ struct Speed {
     },
     //图表位置
     grid: {
-      top: 15,
-      left: 31,
-      right: 31,
+      top: 0,
+      left: 17,
+      right: 17,
     },
     //X轴
     xAxis: {
@@ -110,18 +78,18 @@ struct Speed {
       min: 0,
       max: 1300,
       //刻度线
-      axisTick:{
+      axisTick: {
         show: false
-    },
+      },
       //轴线
-      axisLine:{
+      axisLine: {
         show: false
       },
       //Y轴分割线
       splitLine: {
         show: false
       },
-      axisLabel:{
+      axisLabel: {
         show: false
       }
     },
@@ -141,6 +109,11 @@ struct Speed {
       },
     ]
   })
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
+  // 定时器ID，用于清除定时器
+  private timerId: number = 0;
 
   onSpeedData() {
     this.DownloadSpeed = DownloadSpeed
@@ -149,31 +122,31 @@ struct Speed {
     // 使用Option实例对象的setVal方法来实现，修改什么属性就传什么
     this.defOption.setVal({
       series: [
-   /*     {
-          smooth: false, //平滑曲线
-          name: '上行速度(Kb/s)',
-          data: UploadData,
-          label: {
-            show: false,
-            color: '#FFF7980A',
-            offset: [-10, -10]//线条标签偏移量
-          },
-          //折线拐点配置
-          itemStyle: {
-            symbol: 'solidCircle',
-            symbolSize: 2,
-            borderWidth: 1
-          },
-          lineStyle: {
-            width: 3,
-            color: '#FFF7980A'
-          },
-          // 区域颜色，线性渐变
-          areaStyle: {
-            show: true,
-            gradient: ['#99f7980a']
-          },
-        },*/
+      /*     {
+             smooth: false, //平滑曲线
+             name: '上行速度(Kb/s)',
+             data: UploadData,
+             label: {
+               show: false,
+               color: '#FFF7980A',
+               offset: [-10, -10]//线条标签偏移量
+             },
+             //折线拐点配置
+             itemStyle: {
+               symbol: 'solidCircle',
+               symbolSize: 2,
+               borderWidth: 1
+             },
+             lineStyle: {
+               width: 3,
+               color: '#FFF7980A'
+             },
+             // 区域颜色，线性渐变
+             areaStyle: {
+               show: true,
+               gradient: ['#99f7980a']
+             },
+           },*/
         {
           smooth: true, //平滑曲线
           name: '下行速度(Kb/s)',
@@ -181,7 +154,7 @@ struct Speed {
           label: {
             show: false,
             color: '#ff759bf5',
-            offset: [-10, -10]
+            offset: [0, 0]
           },
           //折线拐点配置
           itemStyle: {
@@ -204,11 +177,6 @@ struct Speed {
   }
 
   aboutToAppear() {
-
-    BreakpointSystem.getInstance().attach(this.compStr)
-    BreakpointSystem.getInstance().attach(this.fontSize)
-    BreakpointSystem.getInstance().attach(this.speedfontSize)
-    BreakpointSystem.getInstance().start()
     // 设置定时器，每秒调用一次 onSpeedData 函数
     this.timerId = setInterval(() => {
       this.onSpeedData();
@@ -216,96 +184,54 @@ struct Speed {
 
   }
 
+  //系统颜色调用
+
   aboutToDisappear() {
-
-    BreakpointSystem.getInstance().attach(this.compStr)
-    BreakpointSystem.getInstance().attach(this.fontSize)
-    BreakpointSystem.getInstance().attach(this.speedfontSize)
-    BreakpointSystem.getInstance().stop()
-
     // 清除定时器
     clearInterval(this.timerId);
     //this.phonelistener.off('change');
   }
-  //系统颜色调用
-  /* 主题色 */
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
+
   build() {
-      Column() {
-        Row() {
-          Row() {
-            //网络速率
-            Text($r('app.string.Speed'))
-              .fontSize(this.fontSize.value)
+    Column() {
+      Flex() {
+        CardTitle({title: $r('app.string.Speed')})
+
+        Column() {
+          Row({space:5}) {
+            Text(this.DownloadSpeed.toString() + ' B/s')
+              .fontSize(this.isLandscapePhone ? 12:this.SpeedfontSize12_16_14_16.value)
               .fontColor($r('sys.color.font_primary'))
-          }
-          .width('145vp')
+              .textAlign(TextAlign.End)
 
-          //.margin({ top: 10, left: 20 })
-          Row() {
-          }
-          .flexGrow(1)
+            SymbolGlyph($r('sys.symbol.chevron_up'))
+              .fontColor([$r('sys.color.font_primary')])
 
-          Column() {
-            Row() {
-              Text(this.DownloadSpeed.toString())
-                .width(50)//.margin({ right: 3 })
-                .fontSize(this.speedfontSize.value)
-                .fontColor(this.fontColorValue)
-              Text(' B/s')
-                .fontColor(this.fontColorValue)
-              Text() {
-                SymbolSpan($r('sys.symbol.chevron_up'))
-                  .fontSize(this.speedfontSize.value)
-                  .fontColor([this.fontColorValue])
-              }
-            }
+          }.width('100%').justifyContent(FlexAlign.End)
 
-            Row() {
-              Text(this.UploadSpeed.toString())
-                .width(50)//.margin({ right: 3 })
-                .fontSize(this.speedfontSize.value)
-                .fontColor($r('app.color.speed_down_icon'))
-              Text(' B/s')
-                .fontColor(this.fontColorValue1)
-              Text() {
-                SymbolSpan($r('sys.symbol.chevron_down'))
-                  .fontSize(this.speedfontSize.value)
-                  .fontColor([this.fontColorValue1])
-              }
+          Row({space:5}) {
+            Text(this.UploadSpeed.toString() + ' B/s')
+              .fontSize(this.isLandscapePhone ? 12:this.SpeedfontSize12_16_14_16.value)
+              .fontColor($r('sys.color.font_primary'))
+              .textAlign(TextAlign.End)
 
-            }
-          }
-          .width('100vp')
+            SymbolGlyph($r('sys.symbol.chevron_down'))
+              .fontColor([$r('sys.color.font_primary')])
+
+          }.width('100%').justifyContent(FlexAlign.End)
         }
-        .height(40)
-        .width('100%')
-        .alignItems(VerticalAlign.Center)
-
-        Row() {
-
-        }
-        .justifyContent(FlexAlign.Center)
-        .width('100%')
-
-        //图表
-        Row() {
-          McLineChart({
-            options: this.defOption
-          })
-        }
-        .height('85%')
       }
-      .padding({
-        top: 12,
-        bottom: 12,
-        left: 10,
-        right: 10
-      })
       .width('100%')
-      .height('100%')
-      .id('SpeedId')
+
+      //图表
+        McLineChart({
+          options: this.defOption
+        })
+    }
+    .padding(this.cardPadding.value)
+    .width('100%')
+    .height('100%')
+    .id('SpeedId')
   }
 }
 
