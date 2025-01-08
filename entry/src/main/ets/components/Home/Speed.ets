@@ -133,7 +133,7 @@ struct Speed {
         data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         lineStyle: {
           width: 3,
-          color: '#ff0a59f7'
+          color: '#ff759bf5'
         },
         label: {
           show: false
@@ -149,7 +149,7 @@ struct Speed {
     // 使用Option实例对象的setVal方法来实现，修改什么属性就传什么
     this.defOption.setVal({
       series: [
-        {
+   /*     {
           smooth: false, //平滑曲线
           name: '上行速度(Kb/s)',
           data: UploadData,
@@ -167,15 +167,20 @@ struct Speed {
           lineStyle: {
             width: 3,
             color: '#FFF7980A'
-          }
-        },
+          },
+          // 区域颜色，线性渐变
+          areaStyle: {
+            show: true,
+            gradient: ['#99f7980a']
+          },
+        },*/
         {
-          smooth: false, //平滑曲线
+          smooth: true, //平滑曲线
           name: '下行速度(Kb/s)',
           data: DownloadData,
           label: {
             show: false,
-            color: '#ff0a59f7',
+            color: '#ff759bf5',
             offset: [-10, -10]
           },
           //折线拐点配置
@@ -186,8 +191,13 @@ struct Speed {
           },
           lineStyle: {
             width: 3,
-            color: '#ff0a59f7'
-          }
+            color: '#ff759bf5'
+          },
+          // 区域颜色，线性渐变
+          areaStyle: {
+            show: true,
+            gradient: ['#ff759bf5']
+          },
         }
       ]
     })
@@ -217,7 +227,10 @@ struct Speed {
     clearInterval(this.timerId);
     //this.phonelistener.off('change');
   }
-
+  //系统颜色调用
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
   build() {
       Column() {
         Row() {
@@ -239,7 +252,7 @@ struct Speed {
               Text(this.DownloadSpeed.toString())
                 .width(50)//.margin({ right: 3 })
                 .fontSize(this.speedfontSize.value)
-                .fontColor($r('app.color.speed_up_icon'))
+                .fontColor(this.fontColorValue)
               Text(' B/s')
                 .fontColor(this.fontColorValue)
               Text() {
