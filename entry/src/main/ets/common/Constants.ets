@@ -609,6 +609,13 @@ export const HomeCardIPSmFontSize: BreakpointState<number> = BreakpointState.of(
 export const IPfontSize: BreakpointState<number> = BreakpointState.of({
   sm: 20, md: 30, lg: 26, xl: 27
 });
+
+/**
+ * 主页卡片内容编辑添加半模拟态里卡片高度
+ */
+export const HomeCardEditHeight: BreakpointState<number> = BreakpointState.of({
+  sm: 160, md: 210, lg: 180, xl:210
+});
 /* List 相关*/
 // List中子组件的间隔
 export const LIST_SPACE: number = 10

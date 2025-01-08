@@ -1145,8 +1145,8 @@
       "value": "您在代理页面收藏的节点将会显示在此处"
     },
     {
-      "name": "test_piblic_network",
-      "value": "测速"
+      "name": "refresh_IP",
+      "value": "刷新"
     }
   ]
 }

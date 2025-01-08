@@ -33,11 +33,13 @@ import {
   HomeCardPrpxySmFontSize,
   ProxyFontSize_24_29_26_27,
   HomeCardIPSmFontSize,
-  IPfontSize
+  IPfontSize,
+  HomeCardEditHeight
 } from '../common/Constants'
 import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
 import { Item, ProxyData } from '../common/ProxyData'
+import { image } from '@kit.ImageKit'
 
 
 //
@@ -208,7 +210,14 @@ struct Index {
   @Provide('HomeCardIPSmFontSize')
   private HomeCardIPSmFontSize: BreakpointState<number> = HomeCardIPSmFontSize
   @Provide('IPfontSize') IPfontSize: BreakpointState<number> = IPfontSize
+  //主页卡片内容编辑添加半模拟态里卡片高度
+  @Provide('HomeCardEditHeight')
+  private HomeCardEditHeight: BreakpointState<number> = HomeCardEditHeight
 
+  /*
+    主页卡片组件截图
+   */
+  @Provide ('HomeCardPixmap')pixmap: image.PixelMap | undefined = undefined
   @Builder
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
 
@@ -303,6 +312,7 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.ProxyFontSize_24_29_26_27)
     BreakpointSystem.getInstance().attach(this.HomeCardIPSmFontSize)
     BreakpointSystem.getInstance().attach(this.IPfontSize)
+    BreakpointSystem.getInstance().attach(this.HomeCardEditHeight)
     BreakpointSystem.getInstance().start()
   }
 

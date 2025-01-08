@@ -45,7 +45,7 @@ struct PublicNetwork {
       .flexGrow(1)
 
       Row() {
-        Button($r('app.string.test_piblic_network'))
+        Button($r('app.string.refresh_IP'))
           .width('55%')
           .height('25%')
           .fontColor(this.icon_emphasize)

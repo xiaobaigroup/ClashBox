@@ -229,7 +229,7 @@ struct ProxyGroupItem {
                   .fontSize(16)
               }.alignItems(HorizontalAlign.Start)
               Blank()
-              Radio({ value: 'radio' + index, group: 'ProxyGroup' })
+              Radio({ value: 'ProxyRadio' + index, group: 'ProxyGroup' })
                 .checked(index === this.PorxyRadioCheckedValue)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
@@ -291,7 +291,7 @@ struct ProxyGroupItem {
               .justifyContent(FlexAlign.SpaceBetween)
 
               Blank()
-              Radio({ value: 'radio' + index, group: 'ProxyGroup' })
+              Radio({ value: 'ProxyRadio' + index, group: 'ProxyGroup' })
                 .checked(index === this.PorxyRadioCheckedValue)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
@@ -351,7 +351,7 @@ struct ProxyGroupItem {
               .alignItems(HorizontalAlign.Start)
 
               Blank()
-              Radio({ value: 'radio' + index, group: 'ProxyGroup' })
+              Radio({ value: 'ProxyRadio' + index, group: 'ProxyGroup' })
                 .checked(index === this.PorxyRadioCheckedValue)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,

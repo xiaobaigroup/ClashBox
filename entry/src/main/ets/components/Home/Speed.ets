@@ -3,6 +3,7 @@ import { chartInterface, McLineChart, Options } from '@mcui/mccharts'
 import json from '@ohos.util.json';
 
 
+
 let downloadData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 let uploadData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 let DownloadData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -282,7 +283,6 @@ struct Speed {
           })
         }
         .height('85%')
-
       }
       .padding({
         top: 12,
@@ -292,7 +292,7 @@ struct Speed {
       })
       .width('100%')
       .height('100%')
-
+      .id('SpeedId')
   }
 }
 

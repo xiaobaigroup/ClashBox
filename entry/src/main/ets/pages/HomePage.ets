@@ -1,6 +1,6 @@
 //主页 栅格布局、媒体查询
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
-import { PromptAction, ThemeControl, window } from '@kit.ArkUI'
+import { componentSnapshot, LengthMetrics, promptAction, PromptAction, ThemeControl, window } from '@kit.ArkUI'
 import SwitchMode from '../components/Home/SwitchMode'
 import CellularData from '../components/Home/CellularData'
 import PublicNetwork from '../components/Home/PublicNetwork'
@@ -20,6 +20,8 @@ import { CUSTOM_THEME_MAP } from '../common/AppTheme'
 import CurrentNode from '../components/Home/CurrentNode'
 import FavoriteProxy from '../components/Home/FavoriteProxy'
 import FavoriteConfiguration from '../components/Home/FavoriteConfiguration'
+import { CardEdit } from '../components/Home/CardEdit'
+import { image } from '@kit.ImageKit'
 
 
 interface MarginGenerate {
@@ -29,22 +31,13 @@ interface MarginGenerate {
   bottom?: number,
 }
 
-interface HomeCardData {
-  name: string
-}
 
 @Entry
 @Component
 struct Home {
-  // 页面名称 主页
-  private componentName: string = 'HomePage'
   /* 主题色 */
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
-  /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur')
-  private isEnableIndexForegroundBlur: boolean
-  private promptAction:PromptAction = this.getUIContext()?.getPromptAction()
   // 设置模态页控制变量
   @State isShowSettings: boolean = false
   // 设置按钮导航
@@ -62,20 +55,24 @@ struct Home {
   // 所有子组件在容器内的对齐方式 TODO 【用户首选项】在设置里可以更改 Alignment.BottomStart 和 Alignment.BottomEnd Enlin@2024-12-04
   @State
   stackAlignContentAlignment: Alignment = Alignment.BottomEnd
-  //系统颜色调用
   //一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   //二级图标色，灰色
   @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary')
   //一级文本色，黑色
   @State font_primary: ResourceColor = $r('sys.color.font_primary')
+  //系统颜色调用
   @State currentBp: string = ''
   // 默认问候语
   @State greetings: Resource = $r('app.string.GoodMorning')
   @State ContainerHeight: string = ''
   @State TopHeight: string = ''
   @State compStr: BreakpointState<string> = BreakpointState.of({
-    xs: "xs", sm: "sm", md: "md", lg: "lg", xl: "xl"
+    xs: "xs",
+    sm: "sm",
+    md: "md",
+    lg: "lg",
+    xl: "xl"
   })
   @State containerMargin1: BreakpointState<MarginGenerate> = BreakpointState.of({
     xs: ({ top: 15 } as MarginGenerate),
@@ -91,7 +88,6 @@ struct Home {
     lg: ({ top: 25, right: 15 } as MarginGenerate),
     xl: ({ top: 25, right: 15 } as MarginGenerate)
   });
-  //设置图标颜色，修改resources/base(dark)/element/color.json中settings_icon配置浅色和深色模式分别颜色
   //@State fontColorValue:ResourceColor = ($r('app.color.settings_icon'));
   @State containerMargin3: BreakpointState<MarginGenerate> = BreakpointState.of({
     xs: ({ top: 45 } as MarginGenerate),
@@ -101,43 +97,41 @@ struct Home {
     xl: ({ top: 25, left: 15 } as MarginGenerate)
   });
   @State containerMargin: BreakpointState<string> = BreakpointState.of({
-    xs: '6vp', sm: '6vp', md: '12vp', lg: '15vp', xl: '15vp'
+    xs: '6vp',
+    sm: '6vp',
+    md: '12vp',
+    lg: '15vp',
+    xl: '15vp'
   });
   @State containerRightMargin: BreakpointState<string> = BreakpointState.of({
-    xs: '0vp', sm: '0vp', md: '0vp', lg: '15vp', xl: '15vp'
+    xs: '0vp',
+    sm: '0vp',
+    md: '0vp',
+    lg: '15vp',
+    xl: '15vp'
   });
+  //设置图标颜色，修改resources/base(dark)/element/color.json中settings_icon配置浅色和深色模式分别颜色
   @State containerHeight: BreakpointState<string> = BreakpointState.of({
-    xs: '156vp', sm: '160vp', md: '232.7vp', lg: '240vp', xl: '240vp'
+    xs: '156vp',
+    sm: '160vp',
+    md: '232.7vp',
+    lg: '240vp',
+    xl: '240vp'
   });
   @State GridRowHeight: BreakpointState<string> = BreakpointState.of({
-    xs: '715vp', sm: '715vp', md: '1050vp', lg: '550vp', xl: '550vp'
+    xs: '715vp',
+    sm: '715vp',
+    md: '1050vp',
+    lg: '550vp',
+    xl: '550vp'
   });
-
   windowClass = AppStorage.get<window.Window>('windowClass') as window.Window;
-  /* Stack层叠布局 */
-  /* 代理启动按钮 */
   //编辑按钮点击后显示编辑状态判定
   @State isShowHomeEdit: boolean = false
-  // 代理启动按钮状态
-  @State
-  private proxyEnabled: boolean = false
-  // 代理启动持续的时间
-  @State
-  private proxyStartingDuration: string = PROXY_STARTED_DURATION_INIT_VALUE
-  // 按钮宽度
-  @State
-  private proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
-  // 按钮高度
-  @State
-  private proxyStartButtonHeight: Length = $r('app.integer.vp_proxy_not_start_button_height')
-  // 按钮前Symbol动效
-  private ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE // 按钮前Symbol动效
-  // 定时器Controller
-  private proxyStartedTimer: Timer = new Timer()
-  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
-  @State private gridMargin: number = 0
-
+  /*
+  主页卡片组件截图
+ */
+  @Consume pixmap: image.PixelMap | undefined
   /**
    * 是否保存布局弹窗
    */
@@ -162,6 +156,58 @@ struct Home {
     //    backgroundColor: Color.White,
     //   shadow: ({ radius: 20, color: Color.Grey, offsetX: 50, offsetY: 0}),
   })
+
+  /*
+  编辑模式下右上角删除按钮
+   */
+  @Consume deleteButtonSize: BreakpointState<number>
+  //删除按钮是否出现判定
+  @State isShowDeleteButton: boolean = false
+  //卡片编辑半模拟态判定
+  @State isShowCardEdit: boolean = false
+  /* 卡片卸载添加判定及卡片 */
+  @Provide
+  ('isShowSpeed') isShowSpeed: boolean = true
+  @Provide
+  ('isShowSwitchMode') isShowSwitchMode: boolean = true
+  @Provide
+  ('isShowCellularData') isShowCellularData: boolean = true
+  @Provide
+  ('isShowCurrentNode') isShowCurrentNode: boolean = true
+  @Provide
+  ('isShowPublicNetwork') isShowPublicNetwork: boolean = true
+  @Provide
+  ('isShowFavoriteProxy') isShowFavoriteProxy: boolean = true
+  @Provide
+  ('isShowFavoriteConfiguration') isShowFavoriteConfiguration: boolean = true
+  // 页面名称 主页
+  private componentName: string = 'HomePage'
+  /* 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur')
+  private isEnableIndexForegroundBlur: boolean
+  /* Stack层叠布局 */
+  /* 代理启动按钮 */
+  private promptAction: PromptAction = this.getUIContext()?.getPromptAction()
+  // 代理启动按钮状态
+  @State
+  private proxyEnabled: boolean = false
+  // 代理启动持续的时间
+  @State
+  private proxyStartingDuration: string = PROXY_STARTED_DURATION_INIT_VALUE
+  // 按钮宽度
+  @State
+  private proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
+  // 按钮高度
+  @State
+  private proxyStartButtonHeight: Length = $r('app.integer.vp_proxy_not_start_button_height')
+  // 按钮前Symbol动效
+  private ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE // 按钮前Symbol动效
+  // 定时器Controller
+  private proxyStartedTimer: Timer = new Timer()
+  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
+  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+  @State private gridMargin: number = 0
+  //网络测速大模块里的
 
   aboutToAppear() {
     this.greetings = getGreeting()
@@ -211,17 +257,24 @@ struct Home {
   /**
    * 还原主页卡片布局
    */
-  restoreLayout(){
+  restoreLayout() {
     // TODO 国际化
     this.promptAction.showToast({ message: `布局已还原🫡` })
     this.isShowHomeEdit = false
     this.isShowDeleteButton = false
+    this.isShowSpeed = true
+    this.isShowSwitchMode = true
+    this.isShowCellularData = true
+    this.isShowCurrentNode = true
+    this.isShowPublicNetwork = true
+    this.isShowFavoriteProxy = true
+    this.isShowFavoriteConfiguration = true
   }
 
   /**
    * 保存主页卡片布局
    */
-  saveHomeLayout(){
+  saveHomeLayout() {
     // TODO 国际化
     this.promptAction.showToast({ message: `布局已保存💾` })
     this.isShowHomeEdit = false
@@ -231,51 +284,19 @@ struct Home {
   // 通过@Builder构建设置模态展示界面
   @Builder
   SettingsSheet() {
-
     Column() {
       Settings({ isShowSettings: this.isShowSettings })
     }
     .width('100%')
     .height('100%')
-
     //.backgroundColor(Color.White)
   }
 
-  /*
-  编辑模式下右上角删除按钮
-   */
-  @Consume deleteButtonSize: BreakpointState<number>
-  //删除按钮是否出现判定
-  @State isShowDeleteButton :boolean = false
-  //网络测速大模块里的
+  //卡片编辑半模拟态
   @Builder
-  DeleteButton1(){
-    Button(){
-      SymbolGlyph($r('sys.symbol.xmark'))
-        .fontSize(16)
-        .fontColor(['#fff'])
-    }
-    .borderRadius(20)
-    .width(this.isLandscapePhone?24 :this.deleteButtonSize.value)
-    .height(this.isLandscapePhone?24 :this.deleteButtonSize.value)
-    .backgroundColor('#ffe84026')
-    .position({ x: '95%',y:-4 })
+  CardEdit() {
+    CardEdit()
   }
-  //普通模块里的
-  @Builder
-  DeleteButton2(){
-    Button(){
-      SymbolGlyph($r('sys.symbol.xmark'))
-        .fontSize(16)
-        .fontColor(['#fff'])
-    }
-    .borderRadius(20)
-    .width(this.isLandscapePhone?24 :this.deleteButtonSize.value)
-    .height(this.isLandscapePhone?24 :this.deleteButtonSize.value)
-    .backgroundColor('#ffe84026')
-    .position({ x: '90%',y:-4 })
-  }
-
 
   build() {
     Column() {
@@ -288,7 +309,8 @@ struct Home {
               .fontWeight(FontWeight.Bold)
               .margin({ left: this.gridMargin })
               .fontColor(this.font_primary)
-              .transition(TransitionEffect.OPACITY.animation({duration: ANIMATION_DURATION_300, delay:0}).combine(TransitionEffect.SLIDE))
+              .transition(TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+                .combine(TransitionEffect.SLIDE))
             Blank()
 
             //编辑按钮
@@ -297,7 +319,8 @@ struct Home {
                 .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
                 .fontColor([this.icon_primary])
             }
-            .transition(TransitionEffect.OPACITY.animation({duration: ANIMATION_DURATION_300, delay:50}).combine(TransitionEffect.SLIDE))
+            .transition(TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 50 })
+              .combine(TransitionEffect.SLIDE))
             .onClick(() => {
               this.isShowHomeEdit = true
               this.isShowDeleteButton = true
@@ -317,7 +340,8 @@ struct Home {
             .width(40)
             .height(40)
             .backgroundColor($r('app.color.settings_container_background'))
-            .transition(TransitionEffect.OPACITY.animation({duration: ANIMATION_DURATION_300, delay:0}).combine(TransitionEffect.SLIDE))
+            .transition(TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+              .combine(TransitionEffect.SLIDE))
             .onClick(() => {
               this.isShowSettings = true
               this.isEnableIndexForegroundBlur = true
@@ -329,20 +353,25 @@ struct Home {
               .fontWeight(FontWeight.Bold)
               .margin({ left: this.gridMargin })
               .fontColor(this.font_primary)
-              .transition(TransitionEffect.OPACITY.animation({duration: ANIMATION_DURATION_300, delay:100}).combine(TransitionEffect.SLIDE))
+              .transition(TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 100 })
+                .combine(TransitionEffect.SLIDE))
             Blank()
             //添加按钮
             Button({ type: ButtonType.Circle, stateEffect: true }) {
               SymbolGlyph($r('sys.symbol.plus'))
                 .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
                 .fontColor([Color.White])
-
             }
             .margin({ right: this.gridMargin })
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
-            .transition(TransitionEffect.OPACITY.animation({duration: ANIMATION_DURATION_300, delay:100}).combine(TransitionEffect.SLIDE))
+            .transition(TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 100 })
+              .combine(TransitionEffect.SLIDE))
+            .onClick(() => {
+              this.isShowCardEdit = true
+              this.isEnableIndexForegroundBlur = true
+            })
 
             //保存按钮
             Button({ type: ButtonType.Circle, stateEffect: true }) {
@@ -354,7 +383,8 @@ struct Home {
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
-            .transition(TransitionEffect.OPACITY.animation({duration: ANIMATION_DURATION_300, delay:50}).combine(TransitionEffect.SLIDE))
+            .transition(TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 50 })
+              .combine(TransitionEffect.SLIDE))
             .onClick(() => {
               this.saveHomeLayout()
             })
@@ -369,7 +399,8 @@ struct Home {
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
-            .transition(TransitionEffect.OPACITY.animation({duration: ANIMATION_DURATION_300, delay:0}).combine(TransitionEffect.SLIDE))
+            .transition(TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+              .combine(TransitionEffect.SLIDE))
             .onClick(() => {
               if (this.SaveDialogController != null) {
                 this.SaveDialogController.open()
@@ -385,157 +416,345 @@ struct Home {
         // transition保证组件离场不被立即析构，可设置其他转场效果
         .transition(TransitionEffect.OPACITY)
       }
-
+//TODO 挂载和卸载无动画效果，后面需要加入
       Stack({ alignContent: this.stackAlignContentAlignment }) {
         // 主页卡片层
         Scroll() {
-          GridRow({
-            columns: 12,
-            breakpoints: {
-              value: ["320vp", "600vp", "840vp", "1000vp"],
-              reference: BreakpointsReference.WindowSize
-            }, })
-          {   // 速率图
-            GridCol({
-              span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 10, lg: 6, xl: 6 },
-              offset: { xs: 0, sm: 0, md: this.isLandscapePhone ? 0 : 1, lg: 0, xl: 0 }
-            }) {
-              Speed()
-              if(this.isShowDeleteButton) {
-                this.DeleteButton1()
+          Flex({
+            wrap: FlexWrap.Wrap,
+            justifyContent: FlexAlign.SpaceBetween,
+            space: { main: LengthMetrics.vp(10), cross: LengthMetrics.vp(10) }
+          }) { // 子组件多行布局
+            GridRow({
+              columns: 12,
+              breakpoints: {
+                value: ["320vp", "600vp", "840vp", "1000vp"],
+                reference: BreakpointsReference.WindowSize
+              },
+            }) { // 速率图
+              if (this.isShowSpeed) {
+                GridCol({
+                  span: {
+                    xs: 12,
+                    sm: 12,
+                    md: this.isLandscapePhone ? 6 : 10,
+                    lg: 6,
+                    xl: 6
+                  },
+                  offset: {
+                    xs: 0,
+                    sm: 0,
+                    md: this.isLandscapePhone ? 0 : 1,
+                    lg: 0,
+                    xl: 0
+                  }
+                }) {
+                  Stack({ alignContent: Alignment.TopEnd }) {
+                    Speed()
+                    if (this.isShowDeleteButton) {
+                      DeleteButton1()
+                        .position({ x: '95%', y: -4 })
+                        .onClick(() => {
+                          this.isShowSpeed = false
+                          //组件截图到半模拟态的添加小卡片里，方便操作
+                          componentSnapshot.get('SpeedId', (error: Error, pixmap: image.PixelMap) => {
+                            if (error) {
+                              console.log("error: " + JSON.stringify(error))
+                              return;
+                            }
+                            this.pixmap = pixmap //截图效果为后效果
+                          })
+                        })
+                    }
+                  }
+                }
+                .borderRadius(20)
+                .clickEffect({ level: ClickEffectLevel.MIDDLE })
+                .backgroundColor($r('app.color.container_background'))
+                .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+                .margin({ right: this.isLandscapePhone ? this.containerMargin.value : this.containerRightMargin.value })
+                .onDetach(() => {
+                  promptAction.showToast({
+                    message: '已删除...',
+                    duration: 2000,
+                    bottom: 500
+                  })
+                })
+                .onAttach(() => {
+                })
               }
-            }
-            .borderRadius(20)
-            .clickEffect({ level: ClickEffectLevel.MIDDLE })
-            .backgroundColor($r('app.color.container_background'))
-            .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
-            .margin({ right: this.isLandscapePhone ? this.containerMargin.value : this.containerRightMargin.value })
 
+              GridCol({
+                span: {
+                  xs: 12,
+                  sm: 12,
+                  md: this.isLandscapePhone ? 6 : 10,
+                  lg: 6,
+                  xl: 6
+                },
+                offset: {
+                  xs: 0,
+                  sm: 0,
+                  md: this.isLandscapePhone ? 0 : 2,
+                  lg: 0,
+                  xl: 0
+                }
+              }) {
+                GridRow() {
 
-            GridCol({
-              span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 10, lg: 6, xl: 6 },
-              offset: { xs: 0, sm: 0, md: this.isLandscapePhone ? 0 : 2, lg: 0, xl: 0 }
-            }) {
-              GridRow() {
+                  if (this.isShowSwitchMode) {
+                    GridCol({
+                      span: {
+                        xs: 6,
+                        sm: 6,
+                        md: 6,
+                        lg: 6,
+                        xl: 6
+                      }
+                    }) {
+                      Stack({ alignContent: Alignment.TopEnd }) {
+                        SwitchMode()
+                        if (this.isShowDeleteButton) {
+                          DeleteButton2()
+                            .position({ x: '90%', y: -4 })
+                            .onClick(() => {
+                              this.isShowSwitchMode = false
+                            })
+                        }
+                      }
+                    }
+                    .margin({ right: this.containerMargin.value })
+                    .GridColStyle()
+                    .onDetach(() => {
+                      promptAction.showToast({
+                        message: '已删除...',
+                        duration: 2000,
+                        bottom: 500
+                      })
+                    })
+                    .onAttach(() => {
+                    })
+                  }
 
-                GridCol({
-                  span: { xs: 6, sm: 6, md: 6, lg: 6, xl: 6 }
-                }) {
-                  SwitchMode()
-                  if(this.isShowDeleteButton) {
-                    this.DeleteButton2()
+                  if (this.isShowCellularData) {
+                    GridCol({
+                      span: {
+                        xs: 6,
+                        sm: 6,
+                        md: 6,
+                        lg: 6,
+                        xl: 6
+                      },
+                    }) {
+                      Stack({ alignContent: Alignment.TopEnd }) {
+                        CellularData()
+                        if (this.isShowDeleteButton) {
+                          DeleteButton2()
+                            .position({ x: '90%', y: -4 })
+                            .onClick(() => {
+                              this.isShowCellularData = false
+                            })
+                        }
+                      }
+                    }
+                    .margin({ left: this.containerMargin.value })
+                    .GridColStyle()
                   }
                 }
-                .margin({ right: this.containerMargin.value })
-                .GridColStyle()
-
-                GridCol({
-                  span: { xs: 6, sm: 6, md: 6, lg: 6, xl: 6 },
-                }) {
-                  CellularData()
-                  if(this.isShowDeleteButton) {
-                    this.DeleteButton2()
-                  }
-                }
-                .margin({ left: this.containerMargin.value })
-                .GridColStyle()
               }
-            }
-            .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
-            .margin(this.isLandscapePhone ? { left: 12 } : this.containerMargin1.value)
+              .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+              .margin(this.isLandscapePhone ? { left: 12 } : this.containerMargin1.value)
 
-            GridCol({
-              span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 10, lg: 6, xl: 6 },
-              offset: { xs: 0, sm: 0, md: this.isLandscapePhone ? 0 : 2, lg: 0, xl: 0 }
-            }) {
-              GridRow() {
-                GridCol({
-                  span: { xs: 6, sm: 6, md: 6, lg: 6, xl: 6 }
-                }) {
-                  CurrentNode()
-                  if(this.isShowDeleteButton) {
-                    this.DeleteButton2()
+
+              GridCol({
+                span: {
+                  xs: 12,
+                  sm: 12,
+                  md: this.isLandscapePhone ? 6 : 10,
+                  lg: 6,
+                  xl: 6
+                },
+                offset: {
+                  xs: 0,
+                  sm: 0,
+                  md: this.isLandscapePhone ? 0 : 2,
+                  lg: 0,
+                  xl: 0
+                }
+              }) {
+                GridRow() {
+                  if (this.isShowCurrentNode) {
+                    GridCol({
+                      span: {
+                        xs: 6,
+                        sm: 6,
+                        md: 6,
+                        lg: 6,
+                        xl: 6
+                      }
+                    }) {
+                      Stack({ alignContent: Alignment.TopEnd }) {
+                        CurrentNode()
+                        if (this.isShowDeleteButton) {
+                          DeleteButton2()
+                            .position({ x: '90%', y: -4 })
+                            .onClick(() => {
+                              this.isShowCurrentNode = false
+                            })
+                        }
+                      }
+                    }
+                    .margin({ right: this.containerMargin.value })
+                    .GridColStyle()
+                  }
+
+                  if (this.isShowPublicNetwork) {
+                    GridCol({
+                      span: {
+                        xs: 6,
+                        sm: 6,
+                        md: 6,
+                        lg: 6,
+                        xl: 6
+                      },
+                    }) {
+                      Stack({ alignContent: Alignment.TopEnd }) {
+                        PublicNetwork()
+                        if (this.isShowDeleteButton) {
+                          DeleteButton2()
+                            .position({ x: '90%', y: -4 })
+                            .onClick(() => {
+                              this.isShowPublicNetwork = false
+                            })
+                        }
+                      }
+                    }
+                    .margin({ left: this.containerMargin.value })
+                    .GridColStyle()
                   }
                 }
-                .margin({ right: this.containerMargin.value })
-                .GridColStyle()
-
-                GridCol({
-                  span: { xs: 6, sm: 6, md: 6, lg: 6, xl: 6 },
-                }) {
-                  PublicNetwork()
-                  if(this.isShowDeleteButton) {
-                    this.DeleteButton2()
-                  }
-                }
-                .margin({ left: this.containerMargin.value })
-                .GridColStyle()
               }
-            }
-            .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
-            .margin(this.isLandscapePhone ? { top: 20, right: 12 } : this.containerMargin2.value)
+              .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+              .margin(this.isLandscapePhone ? { top: 20, right: 12 } : this.containerMargin2.value)
 
-            GridCol({
-              span: { xs: 12, sm: 12, md: this.isLandscapePhone ? 6 : 10, lg: 6, xl: 6 },
-              offset: { xs: 0, sm: 0, md: this.isLandscapePhone ? 0 : 2, lg: 0, xl: 0 }
-            }) {
-              GridRow() {
-                GridCol({
-                  span: { xs: 6, sm: 6, md: 6, lg: 6, xl: 6 }
-                }) {
-                  FavoriteProxy()
-                  if(this.isShowDeleteButton) {
-                    this.DeleteButton2()
+              GridCol({
+                span: {
+                  xs: 12,
+                  sm: 12,
+                  md: this.isLandscapePhone ? 6 : 10,
+                  lg: 6,
+                  xl: 6
+                },
+                offset: {
+                  xs: 0,
+                  sm: 0,
+                  md: this.isLandscapePhone ? 0 : 2,
+                  lg: 0,
+                  xl: 0
+                }
+              }) {
+                GridRow() {
+                  if (this.isShowFavoriteProxy) {
+                    GridCol({
+                      span: {
+                        xs: 6,
+                        sm: 6,
+                        md: 6,
+                        lg: 6,
+                        xl: 6
+                      }
+                    }) {
+                      Stack({ alignContent: Alignment.TopEnd }) {
+                        FavoriteProxy()
+                        if (this.isShowDeleteButton) {
+                          DeleteButton2()
+                            .position({ x: '90%', y: -4 })
+                            .onClick(() => {
+                              this.isShowFavoriteProxy = false
+                            })
+                        }
+                      }
+                    }
+                    .margin({ right: this.containerMargin.value })
+                    .GridColStyle()
+                  }
+
+                  if (this.isShowFavoriteConfiguration) {
+                    GridCol({
+                      span: {
+                        xs: 6,
+                        sm: 6,
+                        md: 6,
+                        lg: 6,
+                        xl: 6
+                      },
+                    }) {
+                      Stack({ alignContent: Alignment.TopEnd }) {
+                        FavoriteConfiguration()
+                        if (this.isShowDeleteButton) {
+                          DeleteButton2()
+                            .position({ x: '90%', y: -4 })
+                            .onClick(() => {
+                              this.isShowFavoriteConfiguration = false
+                            })
+                        }
+                      }
+                    }
+                    .margin({ left: this.containerMargin.value })
+                    .GridColStyle()
                   }
                 }
-                .margin({ right: this.containerMargin.value })
-                .GridColStyle()
-
-                GridCol({
-                  span: { xs: 6, sm: 6, md: 6, lg: 6, xl: 6 },
-                }) {
-                  FavoriteConfiguration()
-                  if(this.isShowDeleteButton) {
-                    this.DeleteButton2()
-                  }
-                }
-                .margin({ left: this.containerMargin.value })
-                .GridColStyle()
               }
+              .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+              .margin(this.isLandscapePhone ? { top: 20, left: 12 } : this.containerMargin3.value)
             }
-            .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
-            .margin(this.isLandscapePhone ? { top: 20, left: 12 } : this.containerMargin3.value)
+            .height(this.isLandscapePhone ? '360vp' : this.GridRowHeight.value)
+            .width('100%')
+            .onBreakpointChange((breakpoint) => {
+              this.currentBp = breakpoint
+              switch (this.currentBp) {
+                case 'xs':
+                  this.gridMargin = 12
+                  break
+                case 'sm':
+                  this.gridMargin = 14
+                  break
+                case 'md':
+                  this.gridMargin = 28
+                  break
+                case 'lg':
+                case 'xl':
+                  this.gridMargin = 36
+                  break
+              }
+
+            })
           }
-          .height(this.isLandscapePhone ? '360vp' : this.GridRowHeight.value)
-          .width('100%')
-          .onBreakpointChange((breakpoint) => {
-            this.currentBp = breakpoint
-            switch (this.currentBp) {
-              case 'xs':
-                this.gridMargin = 12
-                break
-              case 'sm':
-                this.gridMargin = 14
-                break
-              case 'md':
-                this.gridMargin = 28
-                break
-              case 'lg':
-              case 'xl':
-                this.gridMargin = 36
-                break
-            }
-
-          })
         }
         .width('100%')
         .height('100%')
-        .padding({ left:this.isLandscapePhone ?this.gridMargin  :this.gridMargin , right: this.gridMargin , top:this.isLandscapePhone ? 19  : '4vp'})
+        .padding({
+          left: this.isLandscapePhone ? this.gridMargin : this.gridMargin,
+          right: this.gridMargin,
+          top: this.isLandscapePhone ? 19 : '4vp'
+        })
         .scrollBar(BarState.Off)
         .scrollable(ScrollDirection.Vertical)
-        //   .margin(this.isLandscapePhone ? { top: 19 } : '0vp')
+        .margin(this.isLandscapePhone ? { top: 19 } : '0vp')
         .edgeEffect(EdgeEffect.Spring)
         .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
+        .bindSheet($$this.isShowCardEdit, this.CardEdit(), {
+          detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
+          preferType: SheetType.CENTER,
+          backgroundColor: $r('app.color.settings_container_background'),
+          showClose: true,
+          scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+          title: { title: '添加组件小卡片' },
+          onWillDismiss: () => {
+            this.isShowCardEdit = false
+            this.isEnableIndexForegroundBlur = false
+          }
+        })
 
         // 代理启动按钮层
         Column() {
@@ -621,12 +840,15 @@ struct SaveCustomDialog {
   /* 主题色 */
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
+  controller?: CustomDialogController
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
-  controller?: CustomDialogController
-  cancel: () => void = () => {}
-  confirm: () => void = () => {}
+
+  cancel: () => void = () => {
+  }
+  confirm: () => void = () => {
+  }
 
   build() {
     Column() {
@@ -678,4 +900,52 @@ function GridColStyle() {
   .borderRadius(20)
   .backgroundColor($r('app.color.container_background'))
   .clickEffect({ level: ClickEffectLevel.MIDDLE })
+}
+
+//网络测速大卡片里的删除按钮
+@Component
+struct DeleteButton1 {
+  /*
+编辑模式下右上角删除按钮
+ */
+  @Consume deleteButtonSize: BreakpointState<number>
+  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
+  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+
+  build() {
+    Button() {
+      SymbolGlyph($r('sys.symbol.xmark'))
+        .fontSize(16)
+        .fontColor(['#fff'])
+    }
+    .borderRadius(20)
+    .width(this.isLandscapePhone ? 24 : this.deleteButtonSize.value)
+    .height(this.isLandscapePhone ? 24 : this.deleteButtonSize.value)
+    .backgroundColor('#ffe84026')
+  }
+}
+
+//普通模卡片里的删除按钮
+@Component
+struct DeleteButton2 {
+  /*
+编辑模式下右上角删除按钮
+ */
+  @Consume deleteButtonSize: BreakpointState<number>
+  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
+  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+
+  build() {
+    Button() {
+      SymbolGlyph($r('sys.symbol.xmark'))
+        .fontSize(16)
+        .fontColor(['#fff'])
+    }
+    .borderRadius(20)
+    .width(this.isLandscapePhone ? 24 : this.deleteButtonSize.value)
+    .height(this.isLandscapePhone ? 24 : this.deleteButtonSize.value)
+    .backgroundColor('#ffe84026')
+
+    // .position({ x:20,y:0 })
+  }
 }

@@ -1145,8 +1145,8 @@
       "value": "The nodes you have collected on the proxy page will be displayed here"
     },
     {
-      "name": "test_piblic_network",
-      "value": "Test Network"
+      "name": "refresh_IP",
+      "value": "Refresh"
     }
   ]
 }

@@ -148,7 +148,7 @@ struct ProxyPage {
           Text($r('app.string.Tabs'))
             .EditText()
           Radio({
-            value: 'Radio1', group: 'radioGroup1',
+            value: 'ProxyArrangementSelected1', group: 'ProxyArrangementSelectedRadioGroup',
             indicatorType: RadioIndicatorType.TICK,
           })
             .checked(this.currentRadioValue1 === 0)
@@ -180,7 +180,7 @@ struct ProxyPage {
           Text($r('app.string.List'))
             .EditText()
           Radio({
-            value: 'Radio2', group: 'radioGroup1',
+            value: 'ProxyArrangementSelected2', group: 'ProxyArrangementSelectedRadioGroup',
             indicatorType: RadioIndicatorType.TICK
           })
             .checked(this.currentRadioValue1 === 1)
@@ -215,12 +215,13 @@ struct ProxyPage {
           Text($r('app.string.Default'))
             .EditText()
           Radio({
-            value: 'Radio3', group: 'radioGroup2',
+            value: 'SortRadio1', group: 'SortRadioGroup',
             indicatorType: RadioIndicatorType.TICK
           })
             .checked(this.currentRadioValue2 === 0)
             .onChange((isChecked: boolean) => {
               if (isChecked) {
+                this.DefaultSortItems()
                 animateTo({ duration: 500 }, () => {
                   this.currentRadioValue2 = 0
                 })
@@ -245,12 +246,13 @@ struct ProxyPage {
           Text($r('app.string.Delay'))
             .EditText()
           Radio({
-            value: 'Radio4', group: 'radioGroup2',
+            value: 'SortRadio2', group: 'SortRadioGroup',
             indicatorType: RadioIndicatorType.TICK
           })
             .checked(this.currentRadioValue2 === 1)
             .onChange((isChecked: boolean) => {
               if (isChecked) {
+                this.LatencySortItems()
                 animateTo({ duration: 500 }, () => {
                   this.currentRadioValue2 = 1
                 })
@@ -275,12 +277,13 @@ struct ProxyPage {
           Text($r('app.string.Name'))
             .EditText()
           Radio({
-            value: 'Radio5', group: 'radioGroup2',
+            value: 'SortRadio3', group: 'SortRadioGroup',
             indicatorType: RadioIndicatorType.TICK
           })
             .checked(this.currentRadioValue2 === 2)
             .onChange((isChecked: boolean) => {
               if (isChecked) {
+                this.NameSortItems()
                 animateTo({ duration: 500 }, () => {
                   this.currentRadioValue2 = 2
                 })
@@ -308,7 +311,7 @@ struct ProxyPage {
           Text($r('app.string.Thin'))
             .EditText()
           Radio({
-            value: 'Radio6', group: 'radioGroup3',
+            value: 'ProxyGroupItemSelectedRadio1', group: 'ProxyGroupItemSelectedRadioGroup',
             indicatorType: RadioIndicatorType.TICK
           })
             .checked(this.currentRadioValue3 === 0)
@@ -340,7 +343,7 @@ struct ProxyPage {
           Text($r('app.string.Wide'))
             .EditText()
           Radio({
-            value: 'Radio7', group: 'radioGroup3',
+            value: 'ProxyGroupItemSelectedRadio2', group: 'ProxyGroupItemSelectedRadioGroup',
             indicatorType: RadioIndicatorType.TICK
           })
             .checked(this.currentRadioValue3 === 1)
