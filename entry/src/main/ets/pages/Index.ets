@@ -35,7 +35,10 @@ import {
   HomeCardIPSmFontSize,
   IPfontSize,
   HomeCardEditHeight,
-  SpeedfontSize12_16_14_16
+  SpeedfontSize12_16_14_16,
+  gutterHomeGridcol_12_15,
+  gutterHomeGridcol,
+  HomeCardAreaPadding
 } from '../common/Constants'
 import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
@@ -77,8 +80,7 @@ struct Index {
     hilog.info(0x1000, this.componentName, `#onWillApplyTheme`)
     this.icon_emphasize = theme.colors.iconEmphasize;
   }
-  //节点数据组
-  @Provide items: Item[] = ProxyData.ProxyItems();
+
   //tabs图标文字颜色，修改resources/base(dark)/element/color.json中tabs_icon_text配置选中图标文字深浅模式颜色
   // app.color.tabs_icon_text1配置非选中图标和文字深浅模式颜色
   //  @State fontColorValue:ResourceColor = ($r('app.color.tabs_icon_text'));
@@ -144,6 +146,9 @@ struct Index {
     lg: ({ top: 5 } as marginGenerate),
     xl: ({ top: 5 } as marginGenerate)
   });
+  //节点数据组
+  @Provide items: Item[] = ProxyData.ProxyItems();
+
 
 
   // 主页卡片内边距
@@ -217,6 +222,12 @@ struct Index {
   //主页卡片内容网络测速字体大小
   @Provide('SpeedfontSize12_16_14_16')
   private SpeedfontSize12_16_14_16: BreakpointState<number> = SpeedfontSize12_16_14_16
+  //主页栅格卡片间距
+  @Provide('gutterHomeGridcol_12_15')
+  private gutterHomeGridcol_12_15: BreakpointState<gutterHomeGridcol> = gutterHomeGridcol_12_15
+  //主页整个卡片区域边距
+  @Provide('HomeCardAreaPadding')
+  private HomeCardAreaPadding: BreakpointState<MarginGenerate> = HomeCardAreaPadding
 
   /*
     主页卡片组件截图
@@ -318,6 +329,8 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.IPfontSize)
     BreakpointSystem.getInstance().attach(this.HomeCardEditHeight)
     BreakpointSystem.getInstance().attach(this.SpeedfontSize12_16_14_16)
+    BreakpointSystem.getInstance().attach(this.gutterHomeGridcol_12_15)
+    BreakpointSystem.getInstance().attach(this.HomeCardAreaPadding)
     BreakpointSystem.getInstance().start()
   }
 
@@ -386,12 +399,11 @@ struct Index {
     .width('100%')
     .height('100%')
     .backgroundColor($r('app.color.background'))
-
     .foregroundBlurStyle(
       this.isEnableIndexForegroundBlur ? BlurStyle.Thin : BlurStyle.NONE,
       { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
     )
-    .padding({ top: px2vp(this.topRectHeight) , bottom: this.isLandscapePhone ? 0 :px2vp(this.bottomRectHeight) -15})
+    .padding({ top:px2vp(this.topRectHeight) , bottom: this.isLandscapePhone ? 0 :px2vp(this.bottomRectHeight) -15})
     .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
   }
 }

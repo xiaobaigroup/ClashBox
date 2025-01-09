@@ -138,6 +138,9 @@ struct ProxyGroupItem {
   // 当前单选框选择的配置
   @State
   private PorxyRadioCheckedValue: number = -1
+
+
+
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
@@ -189,7 +192,9 @@ struct ProxyGroupItem {
   MyMenu() {
     Menu() {
       MenuItem({ symbolStartIcon: this.startIconModifier, content: $r('app.string.Collect') })
-        .onClick(()=>{this.ProxyPromptAction.showToast({ message: $r('app.string.Collect_Tip') })})
+        .onClick(()=>{
+          this.ProxyPromptAction.showToast({ message: $r('app.string.Collect_Tip') })
+        })
       MenuItem({ symbolStartIcon: this.startIconModifier1, content: $r('app.string.Test_Delay') })
         .onClick(()=>{this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })})
       MenuItem({ symbolStartIcon: this.startIconModifier2, content: $r('app.string.Test_Speed') })

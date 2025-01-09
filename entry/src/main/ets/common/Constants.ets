@@ -495,6 +495,7 @@ export interface MarginGenerate {
   left: number, top: number, right: number,
   bottom?:number
 }
+
 /**
  * 主页卡片内边距
  */
@@ -503,6 +504,30 @@ export const HomeCardPadding_14_15_16_17: BreakpointState<MarginGenerate> = Brea
   md: ({top: 15, bottom: 20, left: 15, right: 15} as MarginGenerate),
   lg: ({top: 16, bottom: 22, left: 16, right: 16} as MarginGenerate),
   xl: ({top: 17, bottom: 25, left: 17, right: 17} as MarginGenerate)
+})
+
+/**
+ * 主页整个卡片区域边距
+ */
+export const HomeCardAreaPadding: BreakpointState<MarginGenerate> = BreakpointState.of({
+  sm: ({top: 4, left: 14, right: 14} as MarginGenerate),
+  md: ({top: 4, left: 80, right: 80} as MarginGenerate),
+  lg: ({top: 4, left: 14, right: 14} as MarginGenerate),
+  xl: ({top: 4, left: 14, right: 14} as MarginGenerate)
+})
+
+// 主页栅格卡片间距定义
+export interface gutterHomeGridcol {
+  x: number, y: number
+}
+/**
+ * 主页栅格卡片间距
+ */
+export const gutterHomeGridcol_12_15: BreakpointState<gutterHomeGridcol> = BreakpointState.of({
+  sm: ({x: 12, y: 15} as gutterHomeGridcol),
+  md: ({x: 35, y: 22}  as gutterHomeGridcol),
+  lg: ({x: 17.6, y: 22}  as gutterHomeGridcol),
+  xl: ({x: 17.6, y: 22}  as gutterHomeGridcol)
 })
 /**
  * 主页卡片标题下边距（5，7，9）
@@ -607,7 +632,7 @@ export const HomeCardIPSmFontSize: BreakpointState<number> = BreakpointState.of(
  * 主页卡片内容IP地址字体大小
  */
 export const IPfontSize: BreakpointState<number> = BreakpointState.of({
-  sm: 20, md: 30, lg: 26, xl: 27
+  sm: 18, md: 24, lg: 20, xl: 24
 });
 /**
  * 主页卡片内容网络测速字体大小

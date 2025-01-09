@@ -13,7 +13,9 @@ import {
   ANIMATION_DURATION_300,
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE,
   BIND_SHEET_CONTAINER_HEIGHT,
-  TAB_CONTENT_TITLE_HEIGHT
+  TAB_CONTENT_TITLE_HEIGHT,
+  gutterHomeGridcol,
+  MarginGenerate,
 } from '../common/Constants'
 import Settings from '../components/Settings/Settings'
 import { CUSTOM_THEME_MAP } from '../common/AppTheme'
@@ -22,14 +24,6 @@ import FavoriteProxy from '../components/Home/FavoriteProxy'
 import FavoriteConfiguration from '../components/Home/FavoriteConfiguration'
 import { CardEdit } from '../components/Home/CardEdit'
 import { image } from '@kit.ImageKit'
-
-
-interface MarginGenerate {
-  top: number,
-  left: number,
-  right: number,
-  bottom?: number,
-}
 
 
 @Entry
@@ -74,35 +68,7 @@ struct Home {
     lg: "lg",
     xl: "xl"
   })
-  @State containerMargin1: BreakpointState<MarginGenerate> = BreakpointState.of({
-    xs: ({ top: 15 } as MarginGenerate),
-    sm: ({ top: 15 } as MarginGenerate),
-    md: ({ top: 28 } as MarginGenerate),
-    lg: ({ top: 0, left: 15 } as MarginGenerate),
-    xl: ({ top: 0, left: 15 } as MarginGenerate)
-  });
-  @State containerMargin2: BreakpointState<MarginGenerate> = BreakpointState.of({
-    xs: ({ top: 30 } as MarginGenerate),
-    sm: ({ top: 30 } as MarginGenerate),
-    md: ({ top: 56 } as MarginGenerate),
-    lg: ({ top: 25, right: 15 } as MarginGenerate),
-    xl: ({ top: 25, right: 15 } as MarginGenerate)
-  });
-  //@State fontColorValue:ResourceColor = ($r('app.color.settings_icon'));
-  @State containerMargin3: BreakpointState<MarginGenerate> = BreakpointState.of({
-    xs: ({ top: 45 } as MarginGenerate),
-    sm: ({ top: 45 } as MarginGenerate),
-    md: ({ top: 84 } as MarginGenerate),
-    lg: ({ top: 25, left: 15 } as MarginGenerate),
-    xl: ({ top: 25, left: 15 } as MarginGenerate)
-  });
-  @State containerMargin: BreakpointState<string> = BreakpointState.of({
-    xs: '6vp',
-    sm: '6vp',
-    md: '12vp',
-    lg: '15vp',
-    xl: '15vp'
-  });
+
   @State containerRightMargin: BreakpointState<string> = BreakpointState.of({
     xs: '0vp',
     sm: '0vp',
@@ -206,19 +172,20 @@ struct Home {
   private proxyStartedTimer: Timer = new Timer()
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
-  @State private gridMargin: number = 0
-  //网络测速大模块里的
+  // 主页卡片内边距
+  @Consume('breakPointStateHomeCardPadding') private cardPadding: BreakpointState<MarginGenerate>
+  // 主页卡片内边距
+  @Consume('gutterHomeGridcol_12_15') private gutterHomeGridcol: BreakpointState<gutterHomeGridcol>
+  //主页整个卡片区域边距
+  @Consume('HomeCardAreaPadding') private HomeCardAreaPadding: BreakpointState<MarginGenerate>
+  @Consume('breakPointStateTabContentTitleMargin')
+  private breakPointStateTabContentTitleMargin: BreakpointState<number>
 
   aboutToAppear() {
     this.greetings = getGreeting()
     console.log('问候语:' + this.greetings)
 
     BreakpointSystem.getInstance().attach(this.compStr)
-    BreakpointSystem.getInstance().attach(this.containerMargin)
-    BreakpointSystem.getInstance().attach(this.containerRightMargin)
-    BreakpointSystem.getInstance().attach(this.containerMargin1)
-    BreakpointSystem.getInstance().attach(this.containerMargin2)
-    BreakpointSystem.getInstance().attach(this.containerMargin3)
     BreakpointSystem.getInstance().attach(this.containerHeight)
     BreakpointSystem.getInstance().attach(this.GridRowHeight)
     BreakpointSystem.getInstance().start()
@@ -228,11 +195,6 @@ struct Home {
   aboutToDisappear() {
 
     BreakpointSystem.getInstance().attach(this.compStr)
-    BreakpointSystem.getInstance().attach(this.containerMargin)
-    BreakpointSystem.getInstance().attach(this.containerRightMargin)
-    BreakpointSystem.getInstance().attach(this.containerMargin1)
-    BreakpointSystem.getInstance().attach(this.containerMargin2)
-    BreakpointSystem.getInstance().attach(this.containerMargin3)
     BreakpointSystem.getInstance().attach(this.containerHeight)
     BreakpointSystem.getInstance().attach(this.GridRowHeight)
     BreakpointSystem.getInstance().stop()
@@ -242,15 +204,18 @@ struct Home {
   // 在自定义组件即将析构销毁时将dialogController置空
   onCancel() {
     this.restoreLayout()
+    this.isEnableIndexForegroundBlur=false
     hilog.info(0xA000, this.componentName, '#onCancel: Callback when the first button is clicked')
   }
 
   onAccept() {
     this.saveHomeLayout()
+    this.isEnableIndexForegroundBlur=false
     hilog.info(0xA000, this.componentName, '#onAccept: Callback when the second button is clicked')
   }
 
   existApp() {
+    this.isEnableIndexForegroundBlur=false
     hilog.info(0xA000, this.componentName, '#existApp: Click the callback in the blank area')
   }
 
@@ -301,13 +266,13 @@ struct Home {
   build() {
     Column() {
       if (!this.isLandscapePhone) {
-        Row() {
+        Row({space:10}) {
           if (!this.isShowHomeEdit) {
             //编辑布局按钮判定：非编辑状态
             Text(this.greetings)
               .fontSize(32)
               .fontWeight(FontWeight.Bold)
-              .margin({ left: this.gridMargin })
+       //       .margin({ left: this.gridMargin })
               .fontColor(this.font_primary)
               .transition(TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
                 .combine(TransitionEffect.SLIDE))
@@ -325,7 +290,7 @@ struct Home {
               this.isShowHomeEdit = true
               this.isShowDeleteButton = true
             })
-            .margin({ right: this.gridMargin })
+       //     .margin({ right: this.gridMargin })
             .width(40)
             .height(40)
             .backgroundColor($r('app.color.settings_container_background'))
@@ -336,7 +301,7 @@ struct Home {
                 .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
                 .fontColor([this.icon_primary]) //设置图标无法分层设为单色
             }
-            .margin({ right: this.gridMargin })
+         //   .margin({ right: this.gridMargin })
             .width(40)
             .height(40)
             .backgroundColor($r('app.color.settings_container_background'))
@@ -351,7 +316,7 @@ struct Home {
             Text($r('app.string.home_edit'))
               .fontSize(32)
               .fontWeight(FontWeight.Bold)
-              .margin({ left: this.gridMargin })
+         //     .margin({ left: this.gridMargin })
               .fontColor(this.font_primary)
               .transition(TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 100 })
                 .combine(TransitionEffect.SLIDE))
@@ -362,7 +327,7 @@ struct Home {
                 .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
                 .fontColor([Color.White])
             }
-            .margin({ right: this.gridMargin })
+         //   .margin({ right: this.gridMargin })
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
@@ -379,7 +344,7 @@ struct Home {
                 .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
                 .fontColor([Color.White])
             }
-            .margin({ right: this.gridMargin })
+         //   .margin({ right: this.gridMargin })
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
@@ -395,7 +360,7 @@ struct Home {
                 .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
                 .fontColor([Color.White])
             }
-            .margin({ right: this.gridMargin })
+         //   .margin({ right: this.gridMargin })
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
@@ -411,350 +376,182 @@ struct Home {
         }
         .width('100%')
         .height(TAB_CONTENT_TITLE_HEIGHT)
-        //  .margin({ bottom: 15 })
         .geometryTransition("Button")
+        .padding({
+          left: this.breakPointStateTabContentTitleMargin.value,
+          right: this.breakPointStateTabContentTitleMargin.value,
+        })
         // transition保证组件离场不被立即析构，可设置其他转场效果
         .transition(TransitionEffect.OPACITY)
       }
 //TODO 挂载和卸载无动画效果，后面需要加入
-      Stack({ alignContent: this.stackAlignContentAlignment }) {
+Stack({ alignContent: this.stackAlignContentAlignment }) {
         // 主页卡片层
-        Scroll() {
-          Flex({
-            wrap: FlexWrap.Wrap,
-            justifyContent: FlexAlign.SpaceBetween,
-            space: { main: LengthMetrics.vp(10), cross: LengthMetrics.vp(10) }
-          }) { // 子组件多行布局
-            GridRow({
-              columns: 12,
-              breakpoints: {
-                value: ["320vp", "600vp", "840vp", "1000vp"],
-                reference: BreakpointsReference.WindowSize
-              },
-            }) { // 速率图
-              if (this.isShowSpeed) {
-                GridCol({
-                  span: {
-                    xs: 12,
-                    sm: 12,
-                    md: this.isLandscapePhone ? 6 : 10,
-                    lg: 6,
-                    xl: 6
-                  },
-                  offset: {
-                    xs: 0,
-                    sm: 0,
-                    md: this.isLandscapePhone ? 0 : 1,
-                    lg: 0,
-                    xl: 0
-                  }
-                }) {
-                  Stack({ alignContent: Alignment.TopEnd }) {
-                    Speed()
-                    if (this.isShowDeleteButton) {
-                      DeleteButton1()
-                        .position({ x: '95%', y: -4 })
-                        .onClick(() => {
-                          this.isShowSpeed = false
-                          //组件截图到半模拟态的添加小卡片里，方便操作
-                          componentSnapshot.get('SpeedId', (error: Error, pixmap: image.PixelMap) => {
-                            if (error) {
-                              console.log("error: " + JSON.stringify(error))
-                              return;
-                            }
-                            this.pixmap = pixmap //截图效果为后效果
-                          })
-                        })
+  Scroll() {
+    GridRow({ gutter:this.isLandscapePhone ?{x:12 ,y:15}: this.gutterHomeGridcol.value}){
+      if (this.isShowSpeed) {
+      GridCol({ span: {xs:this.isLandscapePhone ? 6:12, md:this.isLandscapePhone ? 6:12,lg:6},order: 1 }){
+          Stack({ alignContent: Alignment.TopEnd }) {
+            Speed()
+            if (this.isShowDeleteButton) {
+              DeleteButton1()
+                .position({ x: '95%', y: -4 })
+                .onClick(() => {
+                  this.isShowSpeed = false
+                  //组件截图到半模拟态的添加小卡片里，方便操作
+                  componentSnapshot.get('SpeedId', (error: Error, pixmap: image.PixelMap) => {
+                    if (error) {
+                      console.log("error: " + JSON.stringify(error))
+                      return;
                     }
-                  }
-                }
-                .borderRadius(20)
-                .clickEffect({ level: ClickEffectLevel.MIDDLE })
-                .backgroundColor($r('app.color.container_background'))
-                .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
-                .margin({ right: this.isLandscapePhone ? this.containerMargin.value : this.containerRightMargin.value })
-                .onDetach(() => {
-                  promptAction.showToast({
-                    message: '已删除...',
-                    duration: 2000,
-                    bottom: 500
+                    this.pixmap = pixmap //截图效果为后效果
                   })
                 })
-                .onAttach(() => {
-                })
-              }
-
-              GridCol({
-                span: {
-                  xs: 12,
-                  sm: 12,
-                  md: this.isLandscapePhone ? 6 : 10,
-                  lg: 6,
-                  xl: 6
-                },
-                offset: {
-                  xs: 0,
-                  sm: 0,
-                  md: this.isLandscapePhone ? 0 : 2,
-                  lg: 0,
-                  xl: 0
-                }
-              }) {
-                GridRow() {
-
-                  if (this.isShowSwitchMode) {
-                    GridCol({
-                      span: {
-                        xs: 6,
-                        sm: 6,
-                        md: 6,
-                        lg: 6,
-                        xl: 6
-                      }
-                    }) {
-                      Stack({ alignContent: Alignment.TopEnd }) {
-                        SwitchMode()
-                        if (this.isShowDeleteButton) {
-                          DeleteButton2()
-                            .position({ x: '90%', y: -4 })
-                            .onClick(() => {
-                              this.isShowSwitchMode = false
-                            })
-                        }
-                      }
-                    }
-                    .margin({ right: this.containerMargin.value })
-                    .GridColStyle()
-                    .onDetach(() => {
-                      promptAction.showToast({
-                        message: '已删除...',
-                        duration: 2000,
-                        bottom: 500
-                      })
-                    })
-                    .onAttach(() => {
-                    })
-                  }
-
-                  if (this.isShowCellularData) {
-                    GridCol({
-                      span: {
-                        xs: 6,
-                        sm: 6,
-                        md: 6,
-                        lg: 6,
-                        xl: 6
-                      },
-                    }) {
-                      Stack({ alignContent: Alignment.TopEnd }) {
-                        CellularData()
-                        if (this.isShowDeleteButton) {
-                          DeleteButton2()
-                            .position({ x: '90%', y: -4 })
-                            .onClick(() => {
-                              this.isShowCellularData = false
-                            })
-                        }
-                      }
-                    }
-                    .margin({ left: this.containerMargin.value })
-                    .GridColStyle()
-                  }
-                }
-              }
-              .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
-              .margin(this.isLandscapePhone ? { left: 12 } : this.containerMargin1.value)
-
-
-              GridCol({
-                span: {
-                  xs: 12,
-                  sm: 12,
-                  md: this.isLandscapePhone ? 6 : 10,
-                  lg: 6,
-                  xl: 6
-                },
-                offset: {
-                  xs: 0,
-                  sm: 0,
-                  md: this.isLandscapePhone ? 0 : 2,
-                  lg: 0,
-                  xl: 0
-                }
-              }) {
-                GridRow() {
-                  if (this.isShowCurrentNode) {
-                    GridCol({
-                      span: {
-                        xs: 6,
-                        sm: 6,
-                        md: 6,
-                        lg: 6,
-                        xl: 6
-                      }
-                    }) {
-                      Stack({ alignContent: Alignment.TopEnd }) {
-                        CurrentNode()
-                        if (this.isShowDeleteButton) {
-                          DeleteButton2()
-                            .position({ x: '90%', y: -4 })
-                            .onClick(() => {
-                              this.isShowCurrentNode = false
-                            })
-                        }
-                      }
-                    }
-                    .margin({ right: this.containerMargin.value })
-                    .GridColStyle()
-                  }
-
-                  if (this.isShowPublicNetwork) {
-                    GridCol({
-                      span: {
-                        xs: 6,
-                        sm: 6,
-                        md: 6,
-                        lg: 6,
-                        xl: 6
-                      },
-                    }) {
-                      Stack({ alignContent: Alignment.TopEnd }) {
-                        PublicNetwork()
-                        if (this.isShowDeleteButton) {
-                          DeleteButton2()
-                            .position({ x: '90%', y: -4 })
-                            .onClick(() => {
-                              this.isShowPublicNetwork = false
-                            })
-                        }
-                      }
-                    }
-                    .margin({ left: this.containerMargin.value })
-                    .GridColStyle()
-                  }
-                }
-              }
-              .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
-              .margin(this.isLandscapePhone ? { top: 20, right: 12 } : this.containerMargin2.value)
-
-              GridCol({
-                span: {
-                  xs: 12,
-                  sm: 12,
-                  md: this.isLandscapePhone ? 6 : 10,
-                  lg: 6,
-                  xl: 6
-                },
-                offset: {
-                  xs: 0,
-                  sm: 0,
-                  md: this.isLandscapePhone ? 0 : 2,
-                  lg: 0,
-                  xl: 0
-                }
-              }) {
-                GridRow() {
-                  if (this.isShowFavoriteProxy) {
-                    GridCol({
-                      span: {
-                        xs: 6,
-                        sm: 6,
-                        md: 6,
-                        lg: 6,
-                        xl: 6
-                      }
-                    }) {
-                      Stack({ alignContent: Alignment.TopEnd }) {
-                        FavoriteProxy()
-                        if (this.isShowDeleteButton) {
-                          DeleteButton2()
-                            .position({ x: '90%', y: -4 })
-                            .onClick(() => {
-                              this.isShowFavoriteProxy = false
-                            })
-                        }
-                      }
-                    }
-                    .margin({ right: this.containerMargin.value })
-                    .GridColStyle()
-                  }
-
-                  if (this.isShowFavoriteConfiguration) {
-                    GridCol({
-                      span: {
-                        xs: 6,
-                        sm: 6,
-                        md: 6,
-                        lg: 6,
-                        xl: 6
-                      },
-                    }) {
-                      Stack({ alignContent: Alignment.TopEnd }) {
-                        FavoriteConfiguration()
-                        if (this.isShowDeleteButton) {
-                          DeleteButton2()
-                            .position({ x: '90%', y: -4 })
-                            .onClick(() => {
-                              this.isShowFavoriteConfiguration = false
-                            })
-                        }
-                      }
-                    }
-                    .margin({ left: this.containerMargin.value })
-                    .GridColStyle()
-                  }
-                }
-              }
-              .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
-              .margin(this.isLandscapePhone ? { top: 20, left: 12 } : this.containerMargin3.value)
             }
-            .height(this.isLandscapePhone ? '360vp' : this.GridRowHeight.value)
-            .width('100%')
-            .onBreakpointChange((breakpoint) => {
-              this.currentBp = breakpoint
-              switch (this.currentBp) {
-                case 'xs':
-                  this.gridMargin = 12
-                  break
-                case 'sm':
-                  this.gridMargin = 14
-                  break
-                case 'md':
-                  this.gridMargin = 28
-                  break
-                case 'lg':
-                case 'xl':
-                  this.gridMargin = 36
-                  break
-              }
+          }
+      }
+      .borderRadius(20)
+      .clickEffect({ level: ClickEffectLevel.MIDDLE })
+      .backgroundColor($r('app.color.container_background'))
+      .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+  //    .margin({ right: this.isLandscapePhone ? this.containerMargin.value : this.containerRightMargin.value })
+      .onDetach(() => {
+      })
+      .onAttach(() => {
+      })
+     }
 
-            })
+      if (this.isShowSwitchMode) {
+        GridCol({ span:{xs:this.isLandscapePhone ? 3:6 ,md:this.isLandscapePhone ? 3:6,lg:3},order: 2}) {
+          Stack({ alignContent: Alignment.TopEnd }) {
+            SwitchMode()
+            if (this.isShowDeleteButton) {
+              DeleteButton2()
+                .position({ x: '90%', y: -4 })
+                .onClick(() => {
+                  this.isShowSwitchMode = false
+                })
+            }
           }
         }
-        .width('100%')
-        .height('100%')
-        .padding({
-          left: this.isLandscapePhone ? this.gridMargin : this.gridMargin,
-          right: this.gridMargin,
-          top: this.isLandscapePhone ? 19 : '4vp'
+       // .margin({ right: this.containerMargin.value })
+        .GridColStyle()
+        .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+        .onDetach(() => {
         })
-        .scrollBar(BarState.Off)
-        .scrollable(ScrollDirection.Vertical)
-        .margin(this.isLandscapePhone ? { top: 19 } : '0vp')
-        .edgeEffect(EdgeEffect.Spring)
-        .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
-        .bindSheet($$this.isShowCardEdit, this.CardEdit(), {
-          detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
-          preferType: SheetType.CENTER,
-          backgroundColor: $r('app.color.settings_container_background'),
-          showClose: true,
-          scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-          title: { title: '添加组件小卡片' },
-          onWillDismiss: () => {
-            this.isShowCardEdit = false
-            this.isEnableIndexForegroundBlur = false
+        .onAttach(() => {
+        })
+      }
+
+      if (this.isShowCellularData) {
+        GridCol({ span:{xs:this.isLandscapePhone ? 3:6 ,md:this.isLandscapePhone ? 3:6,lg:3},order: 3}) {
+          Stack({ alignContent: Alignment.TopEnd }) {
+            CellularData()
+            if (this.isShowDeleteButton) {
+              DeleteButton2()
+                .position({ x: '90%', y: -4 })
+                .onClick(() => {
+                  this.isShowCellularData = false
+                })
+            }
           }
-        })
+        }
+        //   .margin({ left: this.containerMargin.value })
+        .GridColStyle()
+        .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+      }
+
+      if (this.isShowCurrentNode) {
+        GridCol({ span:{xs:this.isLandscapePhone ? 3:6 ,md:this.isLandscapePhone ? 3:6,lg:3},order: 4}) {
+          Stack({ alignContent: Alignment.TopEnd }) {
+            CurrentNode()
+            if (this.isShowDeleteButton) {
+              DeleteButton2()
+                .position({ x: '90%', y: -4 })
+                .onClick(() => {
+                  this.isShowCurrentNode = false
+                })
+            }
+          }
+        }
+        .GridColStyle()
+        .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+      }
+
+      if (this.isShowPublicNetwork) {
+        GridCol({ span:{xs:this.isLandscapePhone ? 3:6 ,md:this.isLandscapePhone ? 3:6,lg:3},order: 5}) {
+          Stack({ alignContent: Alignment.TopEnd }) {
+            PublicNetwork()
+            if (this.isShowDeleteButton) {
+              DeleteButton2()
+                .position({ x: '90%', y: -4 })
+                .onClick(() => {
+                  this.isShowPublicNetwork = false
+                })
+            }
+          }
+        }
+        .GridColStyle()
+        .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+      }
+
+      if (this.isShowFavoriteProxy) {
+        GridCol({ span:{xs:this.isLandscapePhone ? 3:6 ,md:this.isLandscapePhone ? 3:6,lg:3},order: 6}) {
+          Stack({ alignContent: Alignment.TopEnd }) {
+            FavoriteProxy()
+            if (this.isShowDeleteButton) {
+              DeleteButton2()
+                .position({ x: '90%', y: -4 })
+                .onClick(() => {
+                  this.isShowFavoriteProxy = false
+                })
+            }
+          }
+        }
+        .GridColStyle()
+        .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+      }
+
+      if (this.isShowFavoriteConfiguration) {
+        GridCol({ span:{xs:this.isLandscapePhone ? 3:6 ,md:this.isLandscapePhone ? 3:6,lg:3},order: 7}) {
+          Stack({ alignContent: Alignment.TopEnd }) {
+            FavoriteConfiguration()
+            if (this.isShowDeleteButton) {
+              DeleteButton2()
+                .position({ x: '90%', y: -4 })
+                .onClick(() => {
+                  this.isShowFavoriteConfiguration = false
+                })
+            }
+          }
+        }
+        .GridColStyle()
+        .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+      }
+    }
+    .width('100%')
+    .height('100%')
+    .padding(this.isLandscapePhone ?{top: 4, left: 14, right: 14}:this.HomeCardAreaPadding.value)
+    .margin({top:this.isLandscapePhone ? 18 :0})//GridRow的尾括号
+  }
+  .width('100%')
+  .height('100%')
+  .scrollBar(BarState.Off)
+  .scrollable(ScrollDirection.Vertical)
+  .edgeEffect(EdgeEffect.Spring)
+  .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
+  .bindSheet($$this.isShowCardEdit, this.CardEdit(), {
+    detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
+    preferType: SheetType.CENTER,
+    backgroundColor: $r('app.color.settings_container_background'),
+    showClose: true,
+    scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+    title: { title: '添加组件小卡片' },
+    onWillDismiss: () => {
+      this.isShowCardEdit = false
+      this.isEnableIndexForegroundBlur = false
+    }
+  })
 
         // 代理启动按钮层
         Column() {
@@ -812,7 +609,7 @@ struct Home {
 
       }
       .backgroundColor($r('app.color.background'))
-      //  .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
+  //    .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
       .height(this.isLandscapePhone ? '100%' : `calc(100% - ${TAB_CONTENT_TITLE_HEIGHT}vp)`)
       .width("100%")
       .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
@@ -827,7 +624,7 @@ struct Home {
           this.SettingsPageInfos.clear()
         }
       })
-    }
+    }.width('100%').height('100%')
   }
 }
 
@@ -896,7 +693,7 @@ export default Home
 // 小卡片共有属性
 @Extend(GridCol)
 function GridColStyle() {
-  .height('100%')
+//  .aspectRatio(1)
   .borderRadius(20)
   .backgroundColor($r('app.color.container_background'))
   .clickEffect({ level: ClickEffectLevel.MIDDLE })

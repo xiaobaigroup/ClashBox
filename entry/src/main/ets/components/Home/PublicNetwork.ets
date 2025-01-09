@@ -6,38 +6,36 @@ import { CardTitle } from './CardTitleBuilder'
 @Component
 struct PublicNetwork {
   //下部文字大小
-  //主页卡片内容IP地址小字体大小
-  @Consume('HomeCardIPSmFontSize')
-  private HomeCardIPSmFontSize: BreakpointState<number>
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State address: string = '中国大陆'
   @State IP: string = '255.255.255.255'
+  phonelistener: mediaquery.MediaQueryListener =
+    this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
+  //主页卡片内容IP地址小字体大小
+  @Consume('HomeCardIPSmFontSize')
+  private HomeCardIPSmFontSize: BreakpointState<number>
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
   // 卡片内边距
-  @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
+  @Consume('breakPointStateHomeCardPadding') private cardPadding: BreakpointState<MarginGenerate>
   // 主页卡片内容IP地址字体大小
-  @Consume('IPfontSize')  private IPfontSize: BreakpointState<number>
+  @Consume('IPfontSize') private IPfontSize: BreakpointState<number>
   // 内容文本字体大小
   @Consume('breakPointStateHomeCardSwitchModeFontSize') private fontSize: BreakpointState<number>
-  phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
-
 
   build() {
     Column() {
-      CardTitle({title: $r('app.string.PublicNetwork')})
+      CardTitle({ title: $r('app.string.PublicNetwork') })
       Column() {
-
-          Text(this.address)
-            .fontSize(this.isLandscapePhone ? 12:this.HomeCardIPSmFontSize.value)
-            .fontColor($r('sys.color.font_secondary'))
+        Text(this.address)
+          .fontSize(this.isLandscapePhone ? 12 : this.HomeCardIPSmFontSize.value)
+          .fontColor($r('sys.color.font_secondary'))
 
         Text(this.IP)
-          .fontSize(this.isLandscapePhone ? 20 :this.IPfontSize.value)
-          .textAlign(TextAlign.Start)
+          .fontSize(this.isLandscapePhone ? 18 : this.IPfontSize.value)
+          .textAlign(TextAlign.JUSTIFY)
           .fontColor($r('sys.color.font_primary'))
-
       }
       .alignItems(HorizontalAlign.Start)
       .justifyContent(FlexAlign.Start)
@@ -60,4 +58,5 @@ struct PublicNetwork {
     .alignItems(HorizontalAlign.Start)
   }
 }
+
 export default PublicNetwork
