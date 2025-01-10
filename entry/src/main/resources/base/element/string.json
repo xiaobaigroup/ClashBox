@@ -1147,6 +1147,10 @@
     {
       "name": "refresh_IP",
       "value": "刷新"
+    },
+    {
+      "name": "add_home_card",
+      "value": "添加组件小卡片"
     }
   ]
 }

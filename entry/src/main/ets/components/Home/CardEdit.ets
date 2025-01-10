@@ -40,11 +40,11 @@ export struct CardEdit {
   //主页卡片内容编辑添加半模拟态里卡片高度
   @Consume('HomeCardEditHeight') private HomeCardEditHeight: BreakpointState<number>
 
-
   build() {
     Flex({ wrap: FlexWrap.Wrap,justifyContent:FlexAlign.SpaceBetween, space: { main: LengthMetrics.vp(10), cross: LengthMetrics.vp(10) } }) { // 子组件多行布局
       if (!this.isShowSpeed) {
         Image(this.pixmapSpeed)
+          .width('100%')
           .ImageItemStyle()
           .height(this.isLandscapePhone ? 200: this.HomeCardEditHeight.value)
           .onAttach(() => {
@@ -62,9 +62,8 @@ export struct CardEdit {
       if (!this.isShowSwitchMode) {
         Image(this.pixmapSwitchMode)
             .width('48.5%')
-            .borderRadius(20)
+            .ImageItemStyle()
             .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
-            .backgroundColor($r('app.color.container_background'))
         .onClick(() => {
           animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
           this.isShowSwitchMode=true
@@ -76,9 +75,8 @@ export struct CardEdit {
       if (!this.isShowCellularData) {
         Image(this.pixmapCellularData)
           .width('48.5%')
-          .borderRadius(20)
+          .ImageItemStyle()
           .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
-          .backgroundColor($r('app.color.container_background'))
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
               this.isShowCellularData=true
@@ -90,9 +88,8 @@ export struct CardEdit {
       if (!this.isShowCurrentNode) {
         Image(this.pixmapCurrentNode)
           .width('48.5%')
-          .borderRadius(20)
+          .ImageItemStyle()
           .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
-          .backgroundColor($r('app.color.container_background'))
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
               this.isShowCurrentNode=true
@@ -104,9 +101,8 @@ export struct CardEdit {
       if (!this.isShowPublicNetwork) {
         Image(this.pixmapPublicNetwork)
           .width('48.5%')
-          .borderRadius(20)
+          .ImageItemStyle()
           .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
-          .backgroundColor($r('app.color.container_background'))
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
               this.isShowPublicNetwork=true
@@ -118,9 +114,8 @@ export struct CardEdit {
       if (!this.isShowFavoriteProxy) {
        Image(this.pixmapFavoriteProxy)
           .width('48.5%')
-          .borderRadius(20)
+          .ImageItemStyle()
           .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
-          .backgroundColor($r('app.color.container_background'))
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
             this.isShowFavoriteProxy=true
@@ -132,9 +127,8 @@ export struct CardEdit {
       if (!this.isShowFavoriteConfiguration) {
         Image(this.pixmapFavoriteConfiguration)
           .width('48.5%')
-          .borderRadius(20)
+          .ImageItemStyle()
           .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
-          .backgroundColor($r('app.color.container_background'))
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
             this.isShowFavoriteConfiguration=true
@@ -150,7 +144,6 @@ export struct CardEdit {
 
 @Extend(Image)
 function ImageItemStyle() {
-  .width('100%')
   .borderRadius(20)
   .backgroundColor($r('app.color.container_background'))
 }

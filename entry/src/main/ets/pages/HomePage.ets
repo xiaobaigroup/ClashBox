@@ -269,6 +269,7 @@ struct Home {
     CardEdit()
   }
 
+
   build() {
     Column() {
       if (!this.isLandscapePhone) {
@@ -622,10 +623,10 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
     .bindSheet($$this.isShowCardEdit, this.CardEdit(), {
       detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
       preferType: SheetType.CENTER,
-      backgroundColor: $r('app.color.settings_container_background'),
+      backgroundColor: $r('app.color.background'),
       showClose: true,
       scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-      title: { title: '添加组件小卡片' },
+      title: { title: $r('app.string.add_home_card') },
       onWillDismiss: () => {
         this.isShowCardEdit = false
         this.isEnableIndexForegroundBlur = false
@@ -823,7 +824,6 @@ struct DeleteButton2 {
     .width(this.isLandscapePhone ? 24 : this.deleteButtonSize.value)
     .height(this.isLandscapePhone ? 24 : this.deleteButtonSize.value)
     .backgroundColor('#ffe84026')
-
-    // .position({ x:20,y:0 })
+    // .position({ x:20,y:0 })设置在此处会不生效 因此写在了每个删除按钮下方
   }
 }
