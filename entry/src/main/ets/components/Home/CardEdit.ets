@@ -7,6 +7,7 @@ import PublicNetwork from "./PublicNetwork"
 import SwitchMode from "./SwitchMode"
 import { image } from "@kit.ImageKit"
 import { LengthMetrics } from "@kit.ArkUI"
+import { ANIMATION_DURATION_300 } from "../../common/Constants"
 
 //TODO 1.后续需要把各文件组件换为截图，以减少性能消耗。2.挂载和卸载无动画效果，后面需要加入
 @Component
@@ -51,8 +52,11 @@ export struct CardEdit {
           .onDetach(() => {
           })//卸载回调
           .onClick(() => {
-            this.isShowSpeed = true
+            animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+              this.isShowSpeed = true
+            })
           })
+          .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
       }
 
       if (!this.isShowSwitchMode) {
@@ -62,8 +66,11 @@ export struct CardEdit {
             .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
             .backgroundColor($r('app.color.container_background'))
         .onClick(() => {
+          animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
           this.isShowSwitchMode=true
+          })
         })
+          .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
       }
 
       if (!this.isShowCellularData) {
@@ -73,8 +80,11 @@ export struct CardEdit {
           .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .backgroundColor($r('app.color.container_background'))
           .onClick(() => {
-            this.isShowCellularData=true
+            animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+              this.isShowCellularData=true
+            })
           })
+          .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
       }
 
       if (!this.isShowCurrentNode) {
@@ -84,8 +94,11 @@ export struct CardEdit {
           .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .backgroundColor($r('app.color.container_background'))
           .onClick(() => {
-            this.isShowCurrentNode=true
+            animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+              this.isShowCurrentNode=true
+            })
           })
+          .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
       }
 
       if (!this.isShowPublicNetwork) {
@@ -95,8 +108,11 @@ export struct CardEdit {
           .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .backgroundColor($r('app.color.container_background'))
           .onClick(() => {
-            this.isShowPublicNetwork=true
+            animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+              this.isShowPublicNetwork=true
+            })
           })
+          .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
       }
 
       if (!this.isShowFavoriteProxy) {
@@ -106,8 +122,11 @@ export struct CardEdit {
           .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .backgroundColor($r('app.color.container_background'))
           .onClick(() => {
+            animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
             this.isShowFavoriteProxy=true
+            })
           })
+         .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
       }
 
       if (!this.isShowFavoriteConfiguration) {
@@ -117,8 +136,11 @@ export struct CardEdit {
           .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .backgroundColor($r('app.color.container_background'))
           .onClick(() => {
+            animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
             this.isShowFavoriteConfiguration=true
+            })
           })
+          .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
       }
     }
     .width('100%')
