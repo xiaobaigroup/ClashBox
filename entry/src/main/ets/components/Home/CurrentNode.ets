@@ -39,21 +39,12 @@ struct CurrentNode {
       .width('100%')
       .justifyContent(FlexAlign.SpaceBetween)
       .alignItems(HorizontalAlign.Start)
-      /*Row() {
-        Text($r('app.string.Switch'))
-          .fontSize(this.fontSize.value)
-          .fontWeight(FontWeight.Bold)
-        Text() {SymbolSpan($r('sys.symbol.chevron_right'))}
-        .fontSize(this.fontSize.value)
-        .margin({left:5})
-      }
-      .width('100%')
-      .justifyContent(FlexAlign.End)*/
     }
     .padding(this.cardPadding.value)
     .width('100%')
     .height('100%')
     .alignItems(HorizontalAlign.Start)
+    .id('CurrentNodeId')
   }
 }
 export default CurrentNode

@@ -232,7 +232,15 @@ struct Index {
   /*
     主页卡片组件截图
    */
-  @Provide ('HomeCardPixmap')pixmap: image.PixelMap | undefined = undefined
+  @Provide ('pixmapSpeed')pixmapSpeed: image.PixelMap | undefined = undefined
+  @Provide ('pixmapSwitchMode')pixmapSwitchMode: image.PixelMap | undefined = undefined
+  @Provide ('pixmapCellularData')pixmapCellularData: image.PixelMap | undefined = undefined
+  @Provide ('pixmapCurrentNode')pixmapCurrentNode: image.PixelMap | undefined = undefined
+  @Provide ('pixmapPublicNetwork')pixmapPublicNetwork: image.PixelMap | undefined = undefined
+  @Provide ('pixmapFavoriteProxy')pixmapFavoriteProxy: image.PixelMap | undefined = undefined
+  @Provide ('pixmapFavoriteConfiguration')pixmapFavoriteConfiguration: image.PixelMap | undefined = undefined
+
+
   @Builder
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
 

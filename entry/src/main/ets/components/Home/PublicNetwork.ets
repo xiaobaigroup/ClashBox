@@ -56,6 +56,7 @@ struct PublicNetwork {
     .height('100%')
     //.justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Start)
+    .id('PublicNetworkId')
   }
 }
 

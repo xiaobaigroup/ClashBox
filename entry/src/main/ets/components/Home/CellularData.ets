@@ -77,7 +77,6 @@ struct CellularDataStat {
 
       }
       .width('100%')
-
       .alignItems(HorizontalAlign.Center)
       .justifyContent(FlexAlign.Center)
 
@@ -85,7 +84,7 @@ struct CellularDataStat {
     .padding(this.cardPadding.value)
     .width('100%')
     .height('100%')
-   // .alignItems(HorizontalAlign.Start)
+    .id('CellularDataId')
   }
 }
 export default CellularDataStat

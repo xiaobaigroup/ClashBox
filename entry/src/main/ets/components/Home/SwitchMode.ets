@@ -76,32 +76,7 @@ struct SwitchMode {
     .width('100%')
     .height('100%')
     .padding(this.cardPadding.value)
-
-    /*     Column({ space: 2 }) {
-           Button() {
-             // Radio({ value: 'rule', group: 'connectModeRadioGroup', indicatorType: RadioIndicatorType.DOT })
-             //   .checked($$this.radioRuleChecked)
-             //   .onChange((value: boolean) => {
-             //     hilog.info(0xA001, this.componentName, `#Radio()#rule#state: ${this.radioRuleChecked}`)
-             //   })
-             //   .radioStyle({
-             //     checkedBackgroundColor: this.icon_emphasize,
-             //   })
-             Text($r('app.string.Rule'))
-               .fontWeight(FontWeight.Bold)
-               .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-       //        .margin(this.fontMargin.value)
-               .fontColor(this.currentChecked === 1 ? this.font_primary : $r('sys.color.font_secondary'))
-           }
-           .width('98%')
-           .borderRadius(18)
-       //    .shadow({ radius: 3, color:$r('app.color.shadow')  })
-           .backgroundColor(this.currentChecked === 1 ? $r('app.color.container_background') : '')
-        //   .justifyContent(FlexAlign.Center)
-     //      .margin({top: this.RowMargin.value,right:this.RowMargin.value,left:this.RowMargin.value})
-           .onClick(() => {
-             this.currentChecked = 1
-           })*/
+    .id('SwitchModeId')
   }
 }
 export default SwitchMode

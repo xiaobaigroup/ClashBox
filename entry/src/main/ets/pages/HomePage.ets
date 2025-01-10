@@ -97,7 +97,13 @@ struct Home {
   /*
   主页卡片组件截图
  */
-  @Consume pixmap: image.PixelMap | undefined
+  @Consume ('pixmapSpeed')pixmapSpeed: image.PixelMap | undefined
+  @Consume ('pixmapSwitchMode')pixmapSwitchMode: image.PixelMap | undefined
+  @Consume ('pixmapCellularData')pixmapCellularData: image.PixelMap | undefined
+  @Consume ('pixmapCurrentNode')pixmapCurrentNode: image.PixelMap | undefined
+  @Consume ('pixmapPublicNetwork')pixmapPublicNetwork: image.PixelMap | undefined
+  @Consume ('pixmapFavoriteProxy')pixmapFavoriteProxy: image.PixelMap | undefined
+  @Consume ('pixmapFavoriteConfiguration')pixmapFavoriteConfiguration: image.PixelMap | undefined
   /**
    * 是否保存布局弹窗
    */
@@ -408,7 +414,7 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                         console.log("error: " + JSON.stringify(error))
                         return;
                       }
-                      this.pixmap = pixmap //截图效果为后效果
+                      this.pixmapSpeed = pixmap //截图效果为后效果
                     })
                   })
               }
@@ -434,6 +440,14 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                   .position({ x: '90%', y: -4 })
                   .onClick(() => {
                     this.isShowSwitchMode = false
+                    //组件截图到半模拟态的添加小卡片里，方便操作
+                    componentSnapshot.get('SwitchModeId', (error: Error, pixmap: image.PixelMap) => {
+                      if (error) {
+                        console.log("error: " + JSON.stringify(error))
+                        return;
+                      }
+                      this.pixmapSwitchMode = pixmap //截图效果为后效果
+                    })
                   })
               }
             }
@@ -456,6 +470,14 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                   .position({ x: '90%', y: -4 })
                   .onClick(() => {
                     this.isShowCellularData = false
+                    //组件截图到半模拟态的添加小卡片里，方便操作
+                    componentSnapshot.get('CellularDataId', (error: Error, pixmap: image.PixelMap) => {
+                      if (error) {
+                        console.log("error: " + JSON.stringify(error))
+                        return;
+                      }
+                      this.pixmapCellularData = pixmap //截图效果为后效果
+                    })
                   })
               }
             }
@@ -474,6 +496,14 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                   .position({ x: '90%', y: -4 })
                   .onClick(() => {
                     this.isShowCurrentNode = false
+                    //组件截图到半模拟态的添加小卡片里，方便操作
+                    componentSnapshot.get('CurrentNodeId', (error: Error, pixmap: image.PixelMap) => {
+                      if (error) {
+                        console.log("error: " + JSON.stringify(error))
+                        return;
+                      }
+                      this.pixmapCurrentNode = pixmap //截图效果为后效果
+                    })
                   })
               }
             }
@@ -491,6 +521,14 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                   .position({ x: '90%', y: -4 })
                   .onClick(() => {
                     this.isShowPublicNetwork = false
+                    //组件截图到半模拟态的添加小卡片里，方便操作
+                    componentSnapshot.get('PublicNetworkId', (error: Error, pixmap: image.PixelMap) => {
+                      if (error) {
+                        console.log("error: " + JSON.stringify(error))
+                        return;
+                      }
+                      this.pixmapPublicNetwork = pixmap //截图效果为后效果
+                    })
                   })
               }
             }
@@ -508,6 +546,14 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                   .position({ x: '90%', y: -4 })
                   .onClick(() => {
                     this.isShowFavoriteProxy = false
+                    //组件截图到半模拟态的添加小卡片里，方便操作
+                    componentSnapshot.get('FavoriteProxyId', (error: Error, pixmap: image.PixelMap) => {
+                      if (error) {
+                        console.log("error: " + JSON.stringify(error))
+                        return;
+                      }
+                      this.pixmapFavoriteProxy = pixmap //截图效果为后效果
+                    })
                   })
               }
             }
@@ -525,6 +571,14 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                   .position({ x: '90%', y: -4 })
                   .onClick(() => {
                     this.isShowFavoriteConfiguration = false
+                    //组件截图到半模拟态的添加小卡片里，方便操作
+                    componentSnapshot.get('FavoriteConfigurationId', (error: Error, pixmap: image.PixelMap) => {
+                      if (error) {
+                        console.log("error: " + JSON.stringify(error))
+                        return;
+                      }
+                      this.pixmapFavoriteConfiguration = pixmap //截图效果为后效果
+                    })
                   })
               }
             }
@@ -534,15 +588,12 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
         }
       }
       .width('100%')
-      .height('100%')
       .padding(this.isLandscapePhone ? { top: 4, left: 25, right: 25 } : this.HomeCardAreaPadding.value)
-      .margin({ top: this.isLandscapePhone ? 18 : 0 }) //GridRow的尾括号
+    //  .margin({ top: this.isLandscapePhone ? 18 : 0 }) //GridRow的尾括号
+      .margin({top: this.isLandscapePhone ? '0vp' : '0vp', bottom: this.isLandscapePhone ? '0vp' :  '65vp' })
     }
     .width('100%')
-    .height('115%')
-
-    //  .contentEndOffset(110)
-    // .scrollSnap({snapAlign:ScrollSnapAlign.START, snapPagination:[0,110],enableSnapToStart:true, enableSnapToEnd:false })
+    .height('100%')
     .scrollBar(BarState.Off)
     .scrollable(ScrollDirection.Vertical)
     .edgeEffect(EdgeEffect.Spring)
@@ -559,7 +610,7 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
         this.isEnableIndexForegroundBlur = false
       }
     })
-  }.width('100%').height('100%').alignItems(this.isLandscapePhone ? HorizontalAlign.Center:HorizontalAlign.Start)//.padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
+  }.width('100%').height('100%').alignItems(HorizontalAlign.Start)//.padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
 
 
         // 代理启动按钮层

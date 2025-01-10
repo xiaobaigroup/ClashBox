@@ -18,7 +18,13 @@ export struct CardEdit {
   /*
   主页卡片组件截图
  */
-  @Consume pixmap: image.PixelMap | undefined
+  @Consume ('pixmapSpeed')pixmapSpeed: image.PixelMap | undefined
+  @Consume ('pixmapSwitchMode')pixmapSwitchMode: image.PixelMap | undefined
+  @Consume ('pixmapCellularData')pixmapCellularData: image.PixelMap | undefined
+  @Consume ('pixmapCurrentNode')pixmapCurrentNode: image.PixelMap | undefined
+  @Consume ('pixmapPublicNetwork')pixmapPublicNetwork: image.PixelMap | undefined
+  @Consume ('pixmapFavoriteProxy')pixmapFavoriteProxy: image.PixelMap | undefined
+  @Consume ('pixmapFavoriteConfiguration')pixmapFavoriteConfiguration: image.PixelMap | undefined
   //卡片卸载添加判定及卡片id
   @Consume('isShowSpeed') isShowSpeed: boolean
   @Consume('isShowSwitchMode') isShowSwitchMode: boolean
@@ -37,7 +43,7 @@ export struct CardEdit {
   build() {
     Flex({ wrap: FlexWrap.Wrap,justifyContent:FlexAlign.SpaceBetween, space: { main: LengthMetrics.vp(10), cross: LengthMetrics.vp(10) } }) { // 子组件多行布局
       if (!this.isShowSpeed) {
-        Image(this.pixmap)
+        Image(this.pixmapSpeed)
           .ImageItemStyle()
           .height(this.isLandscapePhone ? 200: this.HomeCardEditHeight.value)
           .onAttach(() => {
@@ -50,7 +56,7 @@ export struct CardEdit {
       }
 
       if (!this.isShowSwitchMode) {
-          SwitchMode()
+        Image(this.pixmapSwitchMode)
             .width('48.5%')
             .borderRadius(20)
             .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
@@ -61,7 +67,7 @@ export struct CardEdit {
       }
 
       if (!this.isShowCellularData) {
-        CellularData()
+        Image(this.pixmapCellularData)
           .width('48.5%')
           .borderRadius(20)
           .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
@@ -72,7 +78,7 @@ export struct CardEdit {
       }
 
       if (!this.isShowCurrentNode) {
-        CurrentNode()
+        Image(this.pixmapCurrentNode)
           .width('48.5%')
           .borderRadius(20)
           .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
@@ -83,7 +89,7 @@ export struct CardEdit {
       }
 
       if (!this.isShowPublicNetwork) {
-        PublicNetwork()
+        Image(this.pixmapPublicNetwork)
           .width('48.5%')
           .borderRadius(20)
           .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
@@ -94,7 +100,7 @@ export struct CardEdit {
       }
 
       if (!this.isShowFavoriteProxy) {
-        FavoriteProxy()
+       Image(this.pixmapFavoriteProxy)
           .width('48.5%')
           .borderRadius(20)
           .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
@@ -105,7 +111,7 @@ export struct CardEdit {
       }
 
       if (!this.isShowFavoriteConfiguration) {
-        FavoriteConfiguration()
+        Image(this.pixmapFavoriteConfiguration)
           .width('48.5%')
           .borderRadius(20)
           .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
