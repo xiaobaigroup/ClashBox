@@ -536,6 +536,12 @@ export const HomeCardTitleBottomMargin: BreakpointState<number> = BreakpointStat
   sm: 5, md: 7, lg: 9, xl: 9
 })
 /**
+ * 主页卡片标题按钮间距
+ */
+export const HomeCardTitleButtonPadding: BreakpointState<number> = BreakpointState.of({
+  sm: 10, md: 20, lg: 22, xl: 22
+})
+/**
  * 主页模式卡片上下边距（3，6）
  */
 export const HomeCardSwitchModeRowMargin: BreakpointState<number> = BreakpointState.of({

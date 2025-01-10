@@ -38,7 +38,8 @@ import {
   SpeedfontSize12_16_14_16,
   gutterHomeGridcol_12_15,
   gutterHomeGridcol,
-  HomeCardAreaPadding
+  HomeCardAreaPadding,
+  HomeCardTitleButtonPadding
 } from '../common/Constants'
 import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
@@ -228,6 +229,11 @@ struct Index {
   //主页整个卡片区域边距
   @Provide('HomeCardAreaPadding')
   private HomeCardAreaPadding: BreakpointState<MarginGenerate> = HomeCardAreaPadding
+  /**
+   * 主页卡片标题按钮间距
+   */
+  @Provide('HomeCardTitleButtonPadding')
+  private HomeCardTitleButtonPadding: BreakpointState<number> = HomeCardTitleButtonPadding
 
   /*
     主页卡片组件截图
@@ -339,6 +345,7 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.SpeedfontSize12_16_14_16)
     BreakpointSystem.getInstance().attach(this.gutterHomeGridcol_12_15)
     BreakpointSystem.getInstance().attach(this.HomeCardAreaPadding)
+    BreakpointSystem.getInstance().attach(this.HomeCardTitleButtonPadding)
     BreakpointSystem.getInstance().start()
   }
 

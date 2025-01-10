@@ -186,6 +186,10 @@ struct Home {
   @Consume('HomeCardAreaPadding') private HomeCardAreaPadding: BreakpointState<MarginGenerate>
   @Consume('breakPointStateTabContentTitleMargin')
   private breakPointStateTabContentTitleMargin: BreakpointState<number>
+  /**
+   * 主页卡片标题按钮间距
+   */
+  @Consume('HomeCardTitleButtonPadding') private HomeCardTitleButtonPadding: BreakpointState<number>
 
   aboutToAppear() {
     this.greetings = getGreeting()
@@ -278,7 +282,7 @@ struct Home {
   build() {
     Column() {
       if (!this.isLandscapePhone) {
-        Row({space:10}) {
+        Row({space: this.HomeCardTitleButtonPadding.value}) {
           if (!this.isShowHomeEdit) {
             //编辑布局按钮判定：非编辑状态
             Text(this.greetings)
