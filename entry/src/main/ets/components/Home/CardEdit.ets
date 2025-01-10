@@ -37,8 +37,7 @@ export struct CardEdit {
 
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
-  //主页卡片内容编辑添加半模拟态里卡片高度
-  @Consume('HomeCardEditHeight') private HomeCardEditHeight: BreakpointState<number>
+
 
   build() {
     Flex({ wrap: FlexWrap.Wrap,justifyContent:FlexAlign.SpaceBetween, space: { main: LengthMetrics.vp(10), cross: LengthMetrics.vp(10) } }) { // 子组件多行布局
@@ -46,7 +45,7 @@ export struct CardEdit {
         Image(this.pixmapSpeed)
           .width('100%')
           .ImageItemStyle()
-          .height(this.isLandscapePhone ? 200: this.HomeCardEditHeight.value)
+     //     .height(this.isLandscapePhone ? 200: this.HomeCardEditHeight.value)
           .onAttach(() => {
           })//挂载回调
           .onDetach(() => {
@@ -63,7 +62,7 @@ export struct CardEdit {
         Image(this.pixmapSwitchMode)
             .width('48.5%')
             .ImageItemStyle()
-            .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
+    //        .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
         .onClick(() => {
           animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
           this.isShowSwitchMode=true
@@ -76,7 +75,7 @@ export struct CardEdit {
         Image(this.pixmapCellularData)
           .width('48.5%')
           .ImageItemStyle()
-          .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
+    //      .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
               this.isShowCellularData=true
@@ -89,7 +88,7 @@ export struct CardEdit {
         Image(this.pixmapCurrentNode)
           .width('48.5%')
           .ImageItemStyle()
-          .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
+    //      .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
               this.isShowCurrentNode=true
@@ -102,7 +101,7 @@ export struct CardEdit {
         Image(this.pixmapPublicNetwork)
           .width('48.5%')
           .ImageItemStyle()
-          .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
+   //       .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
               this.isShowPublicNetwork=true
@@ -115,7 +114,7 @@ export struct CardEdit {
        Image(this.pixmapFavoriteProxy)
           .width('48.5%')
           .ImageItemStyle()
-          .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
+    //      .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
             this.isShowFavoriteProxy=true
@@ -128,7 +127,7 @@ export struct CardEdit {
         Image(this.pixmapFavoriteConfiguration)
           .width('48.5%')
           .ImageItemStyle()
-          .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
+    //      .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
             this.isShowFavoriteConfiguration=true

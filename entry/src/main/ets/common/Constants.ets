@@ -650,12 +650,6 @@ export const SpeedfontSize12_16_14_16: BreakpointState<number> = BreakpointState
   xl: 16
 });
 
-/**
- * 主页卡片内容编辑添加半模拟态里卡片高度
- */
-export const HomeCardEditHeight: BreakpointState<number> = BreakpointState.of({
-  sm: 160, md: 210, lg: 180, xl:210
-});
 /* List 相关*/
 // List中子组件的间隔
 export const LIST_SPACE: number = 10
