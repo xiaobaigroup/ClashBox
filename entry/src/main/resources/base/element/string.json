@@ -1151,6 +1151,14 @@
     {
       "name": "add_home_card",
       "value": "添加组件小卡片"
+    },
+    {
+      "name": "proxy_INFO",
+      "value": "节点信息"
+    },
+    {
+      "name": "refresh_IP2",
+      "value": "刷新IP"
     }
   ]
 }

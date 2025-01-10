@@ -1151,6 +1151,14 @@
     {
       "name": "add_home_card",
       "value": "Add Home Card"
+    },
+    {
+      "name": "proxy_INFO",
+      "value": "Proxy INFO"
+    },
+    {
+      "name": "refresh_IP2",
+      "value": "Refresh IP"
     }
   ]
 }

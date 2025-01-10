@@ -38,7 +38,8 @@ import {
   gutterHomeGridcol_12_15,
   gutterHomeGridcol,
   HomeCardAreaPadding,
-  HomeCardTitleButtonPadding
+  HomeCardTitleButtonPadding,
+  HomeCardEditHeight
 } from '../common/Constants'
 import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
@@ -227,10 +228,15 @@ struct Index {
   @Provide('HomeCardAreaPadding')
   private HomeCardAreaPadding: BreakpointState<MarginGenerate> = HomeCardAreaPadding
   /**
-   * 主页卡片标题按钮间距
+   * 主页添加卡片半模拟态卡片高度
    */
   @Provide('HomeCardTitleButtonPadding')
   private HomeCardTitleButtonPadding: BreakpointState<number> = HomeCardTitleButtonPadding
+  /**
+   * 主页卡片标题按钮间距
+   */
+  @Provide('HomeCardEditHeight')
+  private HomeCardEditHeight: BreakpointState<number> = HomeCardEditHeight
 
   /*
     主页卡片组件截图
@@ -342,6 +348,7 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.gutterHomeGridcol_12_15)
     BreakpointSystem.getInstance().attach(this.HomeCardAreaPadding)
     BreakpointSystem.getInstance().attach(this.HomeCardTitleButtonPadding)
+    BreakpointSystem.getInstance().attach(this.HomeCardEditHeight)
     BreakpointSystem.getInstance().start()
   }
 

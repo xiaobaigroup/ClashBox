@@ -8,8 +8,8 @@ import { CardTitle } from './CardTitleBuilder';
 struct SwitchMode {
   private componentName:string = 'SwitchMode'
   //自定义主题，颜色在AppTheme里面修改
-  @State font_primary: ResourceColor = $r('sys.color.font_primary')
   @Consume('icon_emphasize') icon_emphasize: ResourceColor //高亮图标,可在apptheme更换
+  @State font_primary: ResourceColor = $r('sys.color.font_primary')
 
   onWillApplyTheme(theme: Theme) {
     this.icon_emphasize = theme.colors.iconEmphasize;
@@ -39,7 +39,6 @@ struct SwitchMode {
 
   }
 
-
   build() {
     Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.SpaceBetween }) {
       CardTitle({ title: $r('app.string.Mode') })
@@ -50,23 +49,31 @@ struct SwitchMode {
           .TextStyle()
           .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
           .fontColor(this.currentChecked === 1 ? this.font_primary : $r('sys.color.font_secondary'))
-          .backgroundColor(this.currentChecked === 1 ? $r('app.color.container_background') : '#00ffffff')
+          .backgroundColor(this.currentChecked === 1 ? $r('app.color.container_background'):'#00ffffff')
      //     .shadow(this.currentChecked === 1 ? { radius: 3,color:$r('app.color.shadow')} : { } )
-          .onClick(() => {this.currentChecked = 1})
+          .onClick(() => {
+            this.currentChecked = 1
+          })
+
         Text($r('app.string.Overall'))
           .TextStyle()
           .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
           .fontColor(this.currentChecked === 2 ? this.font_primary : $r('sys.color.font_secondary'))
-          .backgroundColor(this.currentChecked === 2 ? $r('app.color.container_background') : '#00ffffff')
+          .backgroundColor(this.currentChecked === 2 ? $r('app.color.container_background'):'#00ffffff')
     //      .shadow(this.currentChecked === 2 ? { radius: 3, color:$r('app.color.shadow')} : { } )
-          .onClick(() => {this.currentChecked = 2})
+          .onClick(() => {
+            this.currentChecked = 2
+            })
+
         Text($r('app.string.Direct'))
           .TextStyle()
           .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
           .fontColor(this.currentChecked === 3 ? this.font_primary : $r('sys.color.font_secondary'))
-          .backgroundColor(this.currentChecked === 3 ? $r('app.color.container_background') : '#00ffffff')
+          .backgroundColor(this.currentChecked === 3 ? $r('app.color.container_background'):'#00ffffff')
     //      .shadow(this.currentChecked === 3 ? { radius: 3, color:$r('app.color.shadow')} : { } )
-          .onClick(() => {this.currentChecked = 3})
+          .onClick(() => {
+            this.currentChecked = 3
+            })
         }
       .width('100%')
       .backgroundColor($r('app.color.home_card_background'))
@@ -90,7 +97,7 @@ function TextStyle() {
   .borderRadius(18)
   .fontWeight(FontWeight.Bold)
   .textAlign(TextAlign.Center)
-  .transition(TransitionEffect.OPACITY)
+ // .transition(TransitionEffect.translate({y:10}).animation({ duration: 300, curve: Curve.Ease }))
   .clickEffect({ level: ClickEffectLevel.MIDDLE,scale:0.8})
 }
 

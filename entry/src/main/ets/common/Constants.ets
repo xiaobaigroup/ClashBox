@@ -641,6 +641,12 @@ export const IPfontSize: BreakpointState<number> = BreakpointState.of({
   sm: 18, md: 24, lg: 20, xl: 24
 });
 /**
+* 主页添加卡片半模拟态卡片高度
+  */
+  export const HomeCardEditHeight: BreakpointState<number> = BreakpointState.of({
+  sm: 160, md: 210, lg: 220, xl: 240
+});
+/**
  * 主页卡片内容网络测速字体大小
  */
 export const SpeedfontSize12_16_14_16: BreakpointState<number> = BreakpointState.of({

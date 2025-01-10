@@ -1,6 +1,6 @@
 //主页 栅格布局、媒体查询
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
-import { componentSnapshot, LengthMetrics, promptAction, PromptAction, ThemeControl, window } from '@kit.ArkUI'
+import { componentSnapshot, curves, LengthMetrics, promptAction, PromptAction, ThemeControl, window } from '@kit.ArkUI'
 import SwitchMode from '../components/Home/SwitchMode'
 import CellularData from '../components/Home/CellularData'
 import PublicNetwork from '../components/Home/PublicNetwork'
@@ -24,6 +24,7 @@ import FavoriteProxy from '../components/Home/FavoriteProxy'
 import FavoriteConfiguration from '../components/Home/FavoriteConfiguration'
 import { CardEdit } from '../components/Home/CardEdit'
 import { image } from '@kit.ImageKit'
+import ProxyINFO from '../components/Home/ProxyINFO'
 
 
 @Entry
@@ -138,20 +139,14 @@ struct Home {
   //卡片编辑半模拟态判定
   @State isShowCardEdit: boolean = false
   /* 卡片卸载添加判定及卡片 */
-  @Provide
-  ('isShowSpeed') isShowSpeed: boolean = true
-  @Provide
-  ('isShowSwitchMode') isShowSwitchMode: boolean = true
-  @Provide
-  ('isShowCellularData') isShowCellularData: boolean = true
-  @Provide
-  ('isShowCurrentNode') isShowCurrentNode: boolean = true
-  @Provide
-  ('isShowPublicNetwork') isShowPublicNetwork: boolean = true
-  @Provide
-  ('isShowFavoriteProxy') isShowFavoriteProxy: boolean = true
-  @Provide
-  ('isShowFavoriteConfiguration') isShowFavoriteConfiguration: boolean = true
+  @Provide('isShowSpeed') isShowSpeed: boolean = true
+  @Provide('isShowSwitchMode') isShowSwitchMode: boolean = true
+  @Provide('isShowCellularData') isShowCellularData: boolean = true
+  @Provide('isShowCurrentNode') isShowCurrentNode: boolean = true
+  @Provide('isShowPublicNetwork') isShowPublicNetwork: boolean = true
+  @Provide('isShowFavoriteProxy') isShowFavoriteProxy: boolean = true
+  @Provide('isShowFavoriteConfiguration') isShowFavoriteConfiguration: boolean = true
+  @Provide('isShowProxyINFO') isShowProxyINFO: boolean = false
   // 页面名称 主页
   private componentName: string = 'HomePage'
   /* 是否开启 `Index` 页面的前景模糊 */
@@ -434,16 +429,13 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                 }
               }
             }
-            .borderRadius(20)
-            .clickEffect({ level: ClickEffectLevel.MIDDLE })
-            .backgroundColor($r('app.color.container_background'))
+            .GridColStyle()
             .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
             //    .margin({ right: this.isLandscapePhone ? this.containerMargin.value : this.containerRightMargin.value })
             .onDetach(() => {
             }) //消失触发回调
             .onAttach(() => {
             }) //显示时触发回调
-            .transition(TransitionEffect.scale({ x: 0, y: 0 }).animation({ duration: ANIMATION_DURATION_300 }))
           }
 
           if (this.isShowSwitchMode) {
@@ -475,11 +467,6 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
             // .margin({ right: this.containerMargin.value })
             .GridColStyle()
             .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
-            .onDetach(() => {
-            })
-            .onAttach(() => {
-            })
-            .transition(TransitionEffect.scale({ x: 0, y: 0 }).animation({ duration: ANIMATION_DURATION_300 }))
           }
 
           if (this.isShowCellularData) {
@@ -511,7 +498,6 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
             //   .margin({ left: this.containerMargin.value })
             .GridColStyle()
             .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
-            .transition(TransitionEffect.scale({ x: 0, y: 0 }).animation({ duration: ANIMATION_DURATION_300 }))
           }
 
           if (this.isShowCurrentNode) {
@@ -542,7 +528,6 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
             }
             .GridColStyle()
             .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
-            .transition(TransitionEffect.scale({ x: 0, y: 0 }).animation({ duration: ANIMATION_DURATION_300 }))
           }
 
           if (this.isShowPublicNetwork) {
@@ -573,7 +558,6 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
             }
             .GridColStyle()
             .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
-            .transition(TransitionEffect.scale({ x: 0, y: 0 }).animation({ duration: ANIMATION_DURATION_300 }))
           }
 
           if (this.isShowFavoriteProxy) {
@@ -604,7 +588,6 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
             }
             .GridColStyle()
             .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
-            .transition(TransitionEffect.scale({ x: 0, y: 0 }).animation({ duration: ANIMATION_DURATION_300 }))
           }
 
           if (this.isShowFavoriteConfiguration) {
@@ -635,7 +618,29 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
             }
             .GridColStyle()
             .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
-            .transition(TransitionEffect.scale({ x: 0, y: 0 }).animation({ duration: ANIMATION_DURATION_300 }))
+          }
+
+          if (this.isShowProxyINFO) {
+            GridCol({
+              span: { xs: this.isLandscapePhone ? 6 : 12, md: this.isLandscapePhone ? 6 : 12, lg: 6 },
+              order: 1
+            }) {
+              Stack({ alignContent: Alignment.TopEnd }) {
+                ProxyINFO()
+                if (this.isShowDeleteButton) {
+                  DeleteButton1()
+                    .position({ x: '95%', y: -4 })
+                    .onClick(() => {
+                      animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                        this.isShowProxyINFO = false
+                      })
+                    })
+                }
+              }
+            }
+            .GridColStyle()
+            .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+            //    .margin({ right: this.isLandscapePhone ? this.containerMargin.value : this.containerRightMargin.value })
           }
         } //GridRow的尾括号
         .width('100%')
@@ -807,6 +812,7 @@ function GridColStyle() {
   .borderRadius(20)
   .backgroundColor($r('app.color.container_background'))
   .clickEffect({ level: ClickEffectLevel.MIDDLE })
+  .transition(TransitionEffect.scale({ x: 0, y: 0 }).animation({ duration: ANIMATION_DURATION_300 }))
 }
 
 //网络测速大卡片里的删除按钮

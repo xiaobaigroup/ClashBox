@@ -1,13 +1,8 @@
-import { BreakpointState } from "../../common/breakpointsystem"
-import CellularData from "./CellularData"
-import CurrentNode from "./CurrentNode"
-import FavoriteConfiguration from "./FavoriteConfiguration"
-import FavoriteProxy from "./FavoriteProxy"
-import PublicNetwork from "./PublicNetwork"
-import SwitchMode from "./SwitchMode"
 import { image } from "@kit.ImageKit"
 import { LengthMetrics } from "@kit.ArkUI"
 import { ANIMATION_DURATION_300 } from "../../common/Constants"
+import ProxyINFO from "./ProxyINFO"
+import { BreakpointState } from "../../common/breakpointsystem"
 
 //TODO 1.后续需要把各文件组件换为截图，以减少性能消耗。2.挂载和卸载无动画效果，后面需要加入
 @Component
@@ -26,6 +21,7 @@ export struct CardEdit {
   @Consume ('pixmapPublicNetwork')pixmapPublicNetwork: image.PixelMap | undefined
   @Consume ('pixmapFavoriteProxy')pixmapFavoriteProxy: image.PixelMap | undefined
   @Consume ('pixmapFavoriteConfiguration')pixmapFavoriteConfiguration: image.PixelMap | undefined
+
   //卡片卸载添加判定及卡片id
   @Consume('isShowSpeed') isShowSpeed: boolean
   @Consume('isShowSwitchMode') isShowSwitchMode: boolean
@@ -34,10 +30,14 @@ export struct CardEdit {
   @Consume('isShowPublicNetwork') isShowPublicNetwork: boolean
   @Consume('isShowFavoriteProxy') isShowFavoriteProxy: boolean
   @Consume('isShowFavoriteConfiguration') isShowFavoriteConfiguration: boolean
+  @Consume('isShowProxyINFO') isShowProxyINFO: boolean
 
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
-
+  /**
+   * 主页卡片标题按钮间距
+   */
+  @Consume('HomeCardEditHeight') private HomeCardEditHeight: BreakpointState<number>
 
   build() {
     Flex({ wrap: FlexWrap.Wrap,justifyContent:FlexAlign.SpaceBetween, space: { main: LengthMetrics.vp(10), cross: LengthMetrics.vp(10) } }) { // 子组件多行布局
@@ -55,7 +55,25 @@ export struct CardEdit {
               this.isShowSpeed = true
             })
           })
+      }
+
+      if (!this.isShowProxyINFO) {
+        ProxyINFO()
+          .width('100%')
+          .height(this.HomeCardEditHeight.value)
+          .borderRadius(20)
+          .backgroundColor($r('app.color.container_background'))
           .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
+            //     .height(this.isLandscapePhone ? 200: this.HomeCardEditHeight.value)
+          .onAttach(() => {
+          })//挂载回调
+          .onDetach(() => {
+          })//卸载回调
+          .onClick(() => {
+            animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+              this.isShowProxyINFO = true
+            })
+          })
       }
 
       if (!this.isShowSwitchMode) {
@@ -68,7 +86,6 @@ export struct CardEdit {
           this.isShowSwitchMode=true
           })
         })
-          .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
       }
 
       if (!this.isShowCellularData) {
@@ -81,7 +98,6 @@ export struct CardEdit {
               this.isShowCellularData=true
             })
           })
-          .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
       }
 
       if (!this.isShowCurrentNode) {
@@ -94,7 +110,6 @@ export struct CardEdit {
               this.isShowCurrentNode=true
             })
           })
-          .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
       }
 
       if (!this.isShowPublicNetwork) {
@@ -107,7 +122,6 @@ export struct CardEdit {
               this.isShowPublicNetwork=true
             })
           })
-          .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
       }
 
       if (!this.isShowFavoriteProxy) {
@@ -120,7 +134,6 @@ export struct CardEdit {
             this.isShowFavoriteProxy=true
             })
           })
-         .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
       }
 
       if (!this.isShowFavoriteConfiguration) {
@@ -133,7 +146,6 @@ export struct CardEdit {
             this.isShowFavoriteConfiguration=true
             })
           })
-          .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
       }
     }
     .width('100%')
@@ -145,5 +157,6 @@ export struct CardEdit {
 function ImageItemStyle() {
   .borderRadius(20)
   .backgroundColor($r('app.color.container_background'))
+  .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
 }
 
