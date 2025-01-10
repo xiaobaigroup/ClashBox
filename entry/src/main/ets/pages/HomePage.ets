@@ -232,7 +232,9 @@ struct Home {
     // TODO 国际化
     this.promptAction.showToast({ message: `布局已还原🫡` })
     this.isShowHomeEdit = false
-    this.isShowDeleteButton = false
+    animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+      this.isShowDeleteButton = false
+    })
     this.isShowSpeed = true
     this.isShowSwitchMode = true
     this.isShowCellularData = true
@@ -249,7 +251,9 @@ struct Home {
     // TODO 国际化
     this.promptAction.showToast({ message: `布局已保存💾` })
     this.isShowHomeEdit = false
-    this.isShowDeleteButton = false
+    animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+      this.isShowDeleteButton = false
+    })
   }
 
   // 通过@Builder构建设置模态展示界面
@@ -268,6 +272,7 @@ struct Home {
   CardEdit() {
     CardEdit()
   }
+
 
 
   build() {
@@ -295,7 +300,9 @@ struct Home {
               .combine(TransitionEffect.SLIDE))
             .onClick(() => {
               this.isShowHomeEdit = true
-              this.isShowDeleteButton = true
+              animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                this.isShowDeleteButton = true
+              })
             })
        //     .margin({ right: this.gridMargin })
             .width(40)
@@ -618,7 +625,7 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
     .height(this.isLandscapePhone ?'100%': '')
     .scrollBar(BarState.Off)
     .scrollable(ScrollDirection.Vertical)
-    .edgeEffect(EdgeEffect.Spring)
+    .edgeEffect(this.isLandscapePhone ? EdgeEffect.None:EdgeEffect.Spring)
     .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
     .bindSheet($$this.isShowCardEdit, this.CardEdit(), {
       detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
@@ -801,6 +808,7 @@ struct DeleteButton1 {
     .width(this.isLandscapePhone ? 24 : this.deleteButtonSize.value)
     .height(this.isLandscapePhone ? 24 : this.deleteButtonSize.value)
     .backgroundColor('#ffe84026')
+    .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
   }
 }
 
@@ -824,6 +832,8 @@ struct DeleteButton2 {
     .width(this.isLandscapePhone ? 24 : this.deleteButtonSize.value)
     .height(this.isLandscapePhone ? 24 : this.deleteButtonSize.value)
     .backgroundColor('#ffe84026')
+    .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
     // .position({ x:20,y:0 })设置在此处会不生效 因此写在了每个删除按钮下方
   }
 }
+
