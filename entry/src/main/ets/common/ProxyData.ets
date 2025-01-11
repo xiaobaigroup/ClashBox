@@ -4,7 +4,8 @@ export interface Item {
   text: string
   latency: number
   type: string
-  index: number
+  id: number
+  isShowFavoriteProxy: boolean
 }
 
 
@@ -16,64 +17,75 @@ export class ProxyData {
       text: '越南①',
       latency: 20,
       type: 'Vmess',
-      index: 1,
+      id: 1,
+      isShowFavoriteProxy:false
     },
     {
       text: '越南②',
       latency: 500,
       type: 'Shadowsocks',
-      index: 2
+      id: 2,
+      isShowFavoriteProxy:false
     },
     {
       text: '北朝鲜①',
       latency: 501,
       type: 'Vmess',
-      index: 3
+      id: 3,
+      isShowFavoriteProxy:false
     },
     {
       text: '中国香港①',
       latency: 20,
       type: 'Trojan',
-      index: 4
+      id: 4,
+      isShowFavoriteProxy:false
     },
     {
       text: '中国香港②',
       latency: 1001,
       type: 'Vmess',
-      index: 5
+      id: 5,
+      isShowFavoriteProxy:false
     },
     {
       text: '中国台湾①',
       latency: 501,
       type: 'Shadowsocks',
-      index: 6
+      id: 6,
+      isShowFavoriteProxy:false
     },
     {
       text: '中国台湾②',
       latency: 20,
       type: 'Vmess',
-      index: 7
+      id: 7,
+      isShowFavoriteProxy:false
     },
     {
       text: '越南②',
       latency: 500,
       type: 'Trojan',
-      index: 8
+      id: 8,
+      isShowFavoriteProxy:false
     },
     {
       text: '美国①',
       latency: 1001,
       type: 'Shadowsocks',
-      index: 9
+      id: 9,
+      isShowFavoriteProxy:false
     },
     {
       text: '美国②',
       latency: 102,
       type: 'Shadowsocks',
-      index: 10
+      id: 10,
+      isShowFavoriteProxy:false
     },
   ]
 
+//延迟颜色设定
   public static ProxyItems(): Item[] {
     return ProxyData.items;
   }
@@ -95,3 +107,4 @@ export class ProxyData {
     return $r('sys.color.font_secondary');
   }
 }
+

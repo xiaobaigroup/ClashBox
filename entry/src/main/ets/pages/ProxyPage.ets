@@ -8,7 +8,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit'
 import ProxyGroupItem from '../components/Proxy/ProxyGroupItem'
 import ProxyArrangement from '../components/Proxy/ProxyArrangement'
 import { intl } from '@kit.LocalizationKit'
-import { Item, ProxyData } from '../common/ProxyData'
+import { Item } from '../common/ProxyData'
 import ClashViewModel from '../entryability/ClashViewModel'
 
 //中文排序
@@ -72,7 +72,7 @@ struct ProxyPage {
 
   //默认排序
   DefaultSortItems() {
-    this.items.sort((a, b) => a.index - b.index);
+    this.items.sort((a, b) => a.id - b.id);
   }
 
   /* 断点布局相关 相关作用看定义时候的注释 */

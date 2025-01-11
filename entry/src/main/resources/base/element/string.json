@@ -61,6 +61,10 @@
       "value": "当前节点"
     },
     {
+      "name": "CurrentConfiguration",
+      "value": "当前配置"
+    },
+    {
       "name": "PublicNetwork",
       "value": "IP地址"
     },
@@ -1159,6 +1163,10 @@
     {
       "name": "refresh_IP2",
       "value": "刷新IP"
+    },
+    {
+      "name": "proxy_name",
+      "value": "节点名"
     }
   ]
 }

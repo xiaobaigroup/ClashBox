@@ -57,6 +57,10 @@
       "value": "CurrentNode"
     },
     {
+      "name": "CurrentConfiguration",
+      "value": "Current Configuration"
+    },
+    {
       "name": "PublicNetwork",
       "value": "PublicNetwork"
     },
@@ -1159,6 +1163,10 @@
     {
       "name": "refresh_IP2",
       "value": "Refresh IP"
+    },
+    {
+      "name": "proxy_name",
+      "value": "Proxy Name"
     }
   ]
 }
