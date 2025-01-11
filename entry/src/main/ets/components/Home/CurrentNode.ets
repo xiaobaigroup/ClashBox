@@ -18,7 +18,8 @@ struct CurrentNode {
   @Consume('HomeCardPrpxySmFontSize') private HomeCardPrpxySmFontSize: BreakpointState<number>
   //主页卡片内容当前节点字体大小
   @Consume('ProxyFontSize_24_29_26_27') private ProxyFontSize_24_29_26_27: BreakpointState<number>
-
+  // 当前代理节点单选框选择的配置
+  @Consume private ProxyRadioCheckedValue: number
 
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
 
@@ -26,14 +27,27 @@ struct CurrentNode {
     Column() {
       CardTitle({title: $r('app.string.CurrentNode')})
       Column() {
-        Text(`${this.items[0].text}`)//此处items[]里的数字为节点假数据（common/ProxyData）数组里的单一项，后端接入后此处应改为选中的节点项
-          .fontSize(this.isLandscapePhone ? 24 :this.ProxyFontSize_24_29_26_27.value)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(this.font_primary)
+        if (this.ProxyRadioCheckedValue >= 0) {
+          Text(`${this.items[this.ProxyRadioCheckedValue].text}`)
 
-        Text('ping ' +`${this.items[0].latency}`+ 'ms')//此处items[]里的数字为节点假数据（common/ProxyData）数组里的单一项，后端接入后此处应改为选中的节点项
-          .fontSize(this.isLandscapePhone ?16:this.HomeCardPrpxySmFontSize.value)
-          .fontColor(ProxyData.getColorForLatency(this.items[0].latency))//此处items[]里的数字为节点假数据（common/ProxyData）数组里的单一项，后端接入后此处应改为选中的节点项
+            .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize_24_29_26_27.value)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(this.font_primary)
+
+          Text('ping ' + `${this.items[this.ProxyRadioCheckedValue].latency}` + 'ms')
+            .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)
+            .fontColor(ProxyData.getColorForLatency(this.items[this.ProxyRadioCheckedValue].latency))
+        }
+        else if(this.ProxyRadioCheckedValue < 0){
+          Text('节点名')
+            .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize_24_29_26_27.value)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(this.font_primary)
+
+          Text('ping ' + '延迟')
+            .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)
+            .fontColor('#64BB5C')
+        }
       }
       .flexGrow(1)
       .width('100%')
@@ -48,4 +62,3 @@ struct CurrentNode {
   }
 }
 export default CurrentNode
-

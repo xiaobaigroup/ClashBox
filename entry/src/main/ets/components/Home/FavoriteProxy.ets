@@ -17,8 +17,6 @@ struct FavoriteProxy {
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
   //radio选中判定
   @State FavoriteProxyRadio :number =0
-  //收藏节点判定
-  @State FavoriteProxy :number =0
 
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
@@ -29,6 +27,12 @@ struct FavoriteProxy {
 编辑模式下右上角删除按钮
  */
   @Consume deleteButtonSize: BreakpointState<number>
+  // 当前代理节点长按选择的值
+  @Consume private FavoriteProxy: number
+  // 当前代理节点单选选择的值
+  @Consume private ProxyRadioCheckedValue: number
+  // 当前代理节点长按选择的值
+  @Consume private ProxyItemLongPressValue: number
 
   build() {
     Column() {
@@ -40,15 +44,20 @@ struct FavoriteProxy {
             Text(`${this.items[this.FavoriteProxy].text}`)
               .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
               .fontColor($r('sys.color.font_primary'))
-            Radio({ value: 'FavoriteProxyRadio1', group: 'FavoriteProxyRadioGroup' })
+            Radio({ value: 'FavoriteProxyRadio1', group: 'FavoriteProxyGroup' })
               .width(this.isLandscapePhone ? 16 : this.fontSize.value)
               .checked(this.FavoriteProxyRadio === 1)
               .radioStyle({
                 checkedBackgroundColor: this.icon_emphasize,
               })
+              .onChange(() => {
+                this.FavoriteProxyRadio === 1
+                this.ProxyRadioCheckedValue = this.FavoriteProxy
+              })
           }
           .onClick(() => {
             this.FavoriteProxyRadio = 1
+            this.ProxyRadioCheckedValue = this.FavoriteProxy
           })
           .clickEffect({ level: ClickEffectLevel.MIDDLE })
 
@@ -58,15 +67,20 @@ struct FavoriteProxy {
             Text(`${this.items[this.FavoriteProxy+1].text}`)
               .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
               .fontColor($r('sys.color.font_primary'))
-            Radio({ value: 'FavoriteProxyRadio2', group: 'FavoriteProxyRadioGroup' })
+            Radio({ value: 'FavoriteProxyRadio2', group: 'FavoriteProxyGroup' })
               .width(this.isLandscapePhone ? 16 : this.fontSize.value)
               .checked(this.FavoriteProxyRadio === 2)
               .radioStyle({
                 checkedBackgroundColor: this.icon_emphasize,
               })
+              .onChange(() => {
+                this.FavoriteProxyRadio === 2
+                this.ProxyRadioCheckedValue = this.FavoriteProxy+1
+              })
           }
           .onClick(() => {
             this.FavoriteProxyRadio = 2
+            this.ProxyRadioCheckedValue = this.FavoriteProxy
           })
           .clickEffect({ level: ClickEffectLevel.MIDDLE })
 
@@ -76,16 +90,20 @@ struct FavoriteProxy {
             Text(`${this.items[this.FavoriteProxy+2].text}`)
               .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
               .fontColor($r('sys.color.font_primary'))
-            Radio({ value: 'FavoriteProxyRadio3', group: 'FavoriteProxyRadioGroup' })
+            Radio({ value: 'FavoriteProxyRadio3', group: 'FavoriteProxyGroup' })
               .width(this.isLandscapePhone ? 16 : this.fontSize.value)
               .checked(this.FavoriteProxyRadio === 3)
               .radioStyle({
                 checkedBackgroundColor: this.icon_emphasize,
               })
+              .onChange(() => {
+                this.FavoriteProxyRadio === 3
+                this.ProxyRadioCheckedValue = this.FavoriteProxy+2
+              })
           }
           .onClick(() => {
             this.FavoriteProxyRadio = 3
-            this.FavoriteProxy=-1
+            this.ProxyRadioCheckedValue = this.FavoriteProxy
           })
           .clickEffect({ level: ClickEffectLevel.MIDDLE })
         }
@@ -112,9 +130,6 @@ struct FavoriteProxy {
         }
         .width('100%')
         .height("78%")
-        .onClick(() => {
-          this.FavoriteProxy=0
-        })//为预览而设置的点击事件，后端接入修改或删除
       }//没有收藏节点的布局 end
     }
     .padding(this.cardPadding.value)

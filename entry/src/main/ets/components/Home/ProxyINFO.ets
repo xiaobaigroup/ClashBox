@@ -19,6 +19,7 @@ struct ProxyINFO{
   @State IP: string = '255.255.255.255'
   @State DownloadSpeed: number = 0
   @State UploadSpeed: number = 0
+
   //主页卡片内容IP地址小字体大小
   @Consume('HomeCardIPSmFontSize')
   private HomeCardIPSmFontSize: BreakpointState<number>
@@ -38,7 +39,7 @@ struct ProxyINFO{
             .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize_24_29_26_27.value)
             .fontWeight(FontWeight.Bold)
             .fontColor($r('sys.color.font_primary'))
-          Text(this.address + this.IP)
+          Text(this.address +'-'+ this.IP)
             .fontSize(this.isLandscapePhone ? 12 : this.HomeCardIPSmFontSize.value)
             .fontColor($r('sys.color.font_secondary'))
         }

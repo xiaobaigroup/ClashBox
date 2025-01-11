@@ -241,6 +241,7 @@ struct Home {
     this.isShowPublicNetwork = true
     this.isShowFavoriteProxy = true
     this.isShowFavoriteConfiguration = true
+    this.isShowProxyINFO = false
   }
 
   /**

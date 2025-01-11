@@ -147,9 +147,6 @@ struct Index {
     lg: ({ top: 5 } as marginGenerate),
     xl: ({ top: 5 } as marginGenerate)
   });
-  //节点数据组
-  @Provide items: Item[] = ProxyData.ProxyItems();
-
 
 
   // 主页卡片内边距
@@ -237,7 +234,17 @@ struct Index {
    */
   @Provide('HomeCardEditHeight')
   private HomeCardEditHeight: BreakpointState<number> = HomeCardEditHeight
-
+/*
+代理页Provide相关数据
+ */
+  // 当前代理节点单选选择的值
+  @Provide private ProxyRadioCheckedValue: number =-1
+  // 当前代理节点长按选择的值
+  @Provide private ProxyItemLongPressValue: number = -1
+  // 当前代理节点收藏的值
+  @Provide private FavoriteProxy: number =-1
+  //节点数据组
+  @Provide items: Item[] = ProxyData.ProxyItems();
   /*
     主页卡片组件截图
    */

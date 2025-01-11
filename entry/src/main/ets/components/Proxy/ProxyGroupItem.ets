@@ -1,6 +1,7 @@
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem'
-import { BIND_SHEET_CONTAINER_HEIGHT, LIST_ITEM_HEIGHT } from '../../common/Constants'
+import { BIND_SHEET_CONTAINER_HEIGHT, LIST_ITEM_HEIGHT,
+  TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE } from '../../common/Constants'
 import { LengthMetrics, SymbolGlyphModifier,PromptAction } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
 import {  Item, ProxyData } from '../../common/ProxyData';
@@ -78,9 +79,6 @@ struct ProxyGroupItem {
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
 
-  //节点假数据组后期可改可删
-  @Consume items: Item[]
-
   controller: webview.WebviewController = new webview.WebviewController();
 
   //弹窗
@@ -121,6 +119,7 @@ struct ProxyGroupItem {
   @State startIconModifier2: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.timer')).fontSize('24vp');
   @State startIconModifier3: SymbolGlyphModifier =
     new SymbolGlyphModifier($r('sys.symbol.questionmark_circle')).fontSize('24vp');
+  @State startIconModifier4: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.star_fill')).fontSize('24vp').fontColor([$r('sys.color.multi_color_11')]);
   // TODO 删除 临时模拟数据配置列表数据
   @State isShowNetworkSpeed: boolean = false
   // 定义ProxyGroupItemSelectedWide的值便于切换布局方式
@@ -135,11 +134,6 @@ struct ProxyGroupItem {
   @Consume
   private breakPointStateListGutter: BreakpointState<number>
   private componentName: string = 'ProxyPage'
-  // 当前单选框选择的配置
-  @State
-  private PorxyRadioCheckedValue: number = -1
-
-
 
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur')
@@ -186,15 +180,39 @@ struct ProxyGroupItem {
   }
   //收藏与ping延迟即时动作
   private ProxyPromptAction:PromptAction = this.getUIContext()?.getPromptAction()
+
+
   //长按菜单 start
   @Builder
   //长按菜单相关
-  MyMenu() {
+  MyMenu(isShowFavoriteProxy:boolean) {
     Menu() {
-      MenuItem({ symbolStartIcon: this.startIconModifier, content: $r('app.string.Collect') })
-        .onClick(()=>{
-          this.ProxyPromptAction.showToast({ message: $r('app.string.Collect_Tip') })
+      // 根据当前配置信息来判断显示[收藏 /取消收藏] 单独处理 START
+      if (!isShowFavoriteProxy) {
+        MenuItem({
+          symbolStartIcon: this.proxyListLongPressCtxMenuForFavorite.symbolStartIcon!
+            .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
+          content: this.proxyListLongPressCtxMenuForFavorite.content
         })
+          .clickEffect({level: ClickEffectLevel.MIDDLE})
+          .contentFontColor($r('sys.color.font_primary'))
+          .onClick( () => {
+            this.proxyListLongPressCtxMenuForFavorite.callback()
+            this.FavoriteProxy = this.ProxyItemLongPressValue
+          })
+      } else {
+        MenuItem({
+          symbolStartIcon: this.proxyListLongPressCtxMenuForUnFavorite.symbolStartIcon!
+            .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
+          content: this.proxyListLongPressCtxMenuForUnFavorite.content
+        })
+          .clickEffect({level: ClickEffectLevel.MIDDLE})
+          .contentFontColor($r('sys.color.font_primary'))
+          .onClick( () => {
+            this.proxyListLongPressCtxMenuForUnFavorite.callback()
+            this.FavoriteProxy =-1
+          })
+      }
       MenuItem({ symbolStartIcon: this.startIconModifier1, content: $r('app.string.Test_Delay') })
         .onClick(()=>{this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })})
       MenuItem({ symbolStartIcon: this.startIconModifier2, content: $r('app.string.Test_Speed') })
@@ -216,6 +234,15 @@ struct ProxyGroupItem {
     .borderRadius(20)
   } //长按菜单end
 
+  //节点假数据组后期可改可删
+  @Consume items: Item[]
+  // 当前代理节点单选选择的值
+  @Consume private ProxyRadioCheckedValue: number
+  // 当前代理节点长按选择的值
+  @Consume private ProxyItemLongPressValue: number
+  // 当前代理节点收藏的值
+  @Consume private FavoriteProxy: number
+
   build() {
     //多列排列宽
     if (this.ProxyGroupItemSelected === 'ProxyGroupItemSelectedWide') {
@@ -235,7 +262,7 @@ struct ProxyGroupItem {
               }.alignItems(HorizontalAlign.Start)
               Blank()
               Radio({ value: 'ProxyRadio' + index, group: 'ProxyGroup' })
-                .checked(index === this.PorxyRadioCheckedValue)
+                .checked(index === this.ProxyRadioCheckedValue)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
@@ -243,19 +270,21 @@ struct ProxyGroupItem {
             .ListRowStyle()
           }
           .onClick(() => {
-            this.PorxyRadioCheckedValue = index
+            this.ProxyRadioCheckedValue = index
             hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
           })
           .ListItemStyle()
           .height(LIST_ITEM_HEIGHT + 32)
-          .bindContextMenu(this.MyMenu, ResponseType.LongPress,
+          .bindContextMenu(this.MyMenu(item?.isShowFavoriteProxy ?? false), ResponseType.LongPress,
             {
               preview: MenuPreviewMode.IMAGE,
+              onAppear: (() => {
+                this.ProxyItemLongPressValue=index
+              }),
               previewAnimationOptions: {
                 scale: [0.95, 1.0],
                 transition: TransitionEffect.prototype.animation({ tempo: 1.5 })
               },
-
             })
         })
       }
@@ -297,7 +326,7 @@ struct ProxyGroupItem {
 
               Blank()
               Radio({ value: 'ProxyRadio' + index, group: 'ProxyGroup' })
-                .checked(index === this.PorxyRadioCheckedValue)
+                .checked(index === this.ProxyRadioCheckedValue)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
@@ -305,15 +334,18 @@ struct ProxyGroupItem {
             .ListRowStyle()
           }
           .onClick(() => {
-            this.PorxyRadioCheckedValue = index
+            this.ProxyRadioCheckedValue = index
             hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
           })
           .ListItemStyle()
           .height(LIST_ITEM_HEIGHT)
-          .bindContextMenu(this.MyMenu, ResponseType.LongPress,
+          .bindContextMenu(this.MyMenu(item?.isShowFavoriteProxy ?? false), ResponseType.LongPress,
             {
               preview: MenuPreviewMode.IMAGE,
               placement: Placement.BottomRight,
+              onAppear: (() => {
+                this.ProxyItemLongPressValue=index
+              }),
               previewAnimationOptions: {
                 scale: [0.95, 1.0],
                 transition: TransitionEffect.prototype.animation({ tempo: 1.5 })
@@ -357,7 +389,7 @@ struct ProxyGroupItem {
 
               Blank()
               Radio({ value: 'ProxyRadio' + index, group: 'ProxyGroup' })
-                .checked(index === this.PorxyRadioCheckedValue)
+                .checked(index === this.ProxyRadioCheckedValue)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
@@ -365,14 +397,17 @@ struct ProxyGroupItem {
             .ListRowStyle()
           }
           .onClick(() => {
-            this.PorxyRadioCheckedValue = index
+            this.ProxyRadioCheckedValue = index
             hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
           })
           .ListItemStyle()
           .height(LIST_ITEM_HEIGHT)
-          .bindContextMenu(this.MyMenu, ResponseType.LongPress,
+          .bindContextMenu(this.MyMenu(item?.isShowFavoriteProxy ?? false), ResponseType.LongPress,
             {
               preview: MenuPreviewMode.IMAGE,
+              onAppear: (() => {
+                this.ProxyItemLongPressValue=index
+              }),
               previewAnimationOptions: {
                 scale: [0.95, 1.0],
                 transition: TransitionEffect.prototype.animation({ tempo: 1.5 })
@@ -397,7 +432,43 @@ struct ProxyGroupItem {
       })
     }
   }
+
+  private proxyListLongPressCtxMenuForFavorite: LongPressContextMenuItem = {
+    symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.star'))
+      .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
+    content: '收藏', callback: ()=>{ this.favoriteProxy() }
   }
+  private proxyListLongPressCtxMenuForUnFavorite: LongPressContextMenuItem = {
+    symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.star_fill'))
+      .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.multi_color_11')]),
+    content: '取消收藏', callback: ()=>{ this.cancelFavoriteProxy() }
+  }
+  /**
+   * 收藏配置
+   */
+  private favoriteProxy(): void {
+    // TODO 收藏配置 & 判断是否已经收藏
+    this.ProxyPromptAction.showToast({ message: $r('app.string.Collect_Tip') })
+    this.items[this.ProxyItemLongPressValue].isShowFavoriteProxy = true
+  }
+  /**
+   * 取消收藏配置
+   */
+  private cancelFavoriteProxy(): void {
+    // TODO 取消收藏配置 & 判断是否已经收藏
+    this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_tip') })
+    this.items[this.ProxyItemLongPressValue].isShowFavoriteProxy = false
+  }
+}
+/**
+ * 长按菜单参数
+ */
+interface LongPressContextMenuItem {
+  symbolStartIcon?: SymbolGlyphModifier,
+  symbolEndIcon?: SymbolGlyphModifier,
+  content: ResourceStr
+  callback : Callback<void>
+}
 
   //list公用样式
   @Extend(List)
