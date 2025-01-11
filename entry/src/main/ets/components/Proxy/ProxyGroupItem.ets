@@ -266,8 +266,10 @@ struct ProxyGroupItem {
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
-                .onChange(() => {
-                  this.ProxyRadioCheckedValue = index
+                .onChange((isChecked: boolean) => {
+                  if (isChecked) {
+                    this.ProxyRadioCheckedValue = index
+                  }
                 })
             }
             .ListRowStyle()
@@ -333,6 +335,11 @@ struct ProxyGroupItem {
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
+                .onChange((isChecked: boolean) => {
+                  if (isChecked) {
+                    this.ProxyRadioCheckedValue = index
+                  }
+                })
             }
             .ListRowStyle()
           }
@@ -395,6 +402,11 @@ struct ProxyGroupItem {
                 .checked(index === this.ProxyRadioCheckedValue)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
+                })
+                .onChange((isChecked: boolean) => {
+                  if (isChecked) {
+                    this.ProxyRadioCheckedValue = index
+                  }
                 })
             }
             .ListRowStyle()

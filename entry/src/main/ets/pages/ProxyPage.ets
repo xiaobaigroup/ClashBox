@@ -79,7 +79,7 @@ struct ProxyPage {
   private breakPointStateListLanes: BreakpointState<number>
   @Consume('breakPointStateListGutter')
   private breakPointStateListGutter: BreakpointState<number>
-  //半模拟态 end
+
   @Consume('breakPointStateTabContentTitleMargin')
   private breakPointStateTabContentTitleMargin: BreakpointState<number>
   private tabsController: TabsController = new TabsController()
