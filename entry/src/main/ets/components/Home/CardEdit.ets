@@ -3,6 +3,7 @@ import { LengthMetrics } from "@kit.ArkUI"
 import { ANIMATION_DURATION_300 } from "../../common/Constants"
 import ProxyINFO from "./ProxyINFO"
 import { BreakpointState } from "../../common/breakpointsystem"
+import CurrentConfiguration from "./CurrentConfiguration"
 
 //TODO 1.后续需要把各文件组件换为截图，以减少性能消耗。2.挂载和卸载无动画效果，后面需要加入
 @Component
@@ -31,6 +32,7 @@ export struct CardEdit {
   @Consume('isShowFavoriteProxy') isShowFavoriteProxy: boolean
   @Consume('isShowFavoriteConfiguration') isShowFavoriteConfiguration: boolean
   @Consume('isShowProxyINFO') isShowProxyINFO: boolean
+  @Consume('isShowCurrentConfiguration') isShowCurrentConfiguration: boolean
 
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
@@ -144,6 +146,21 @@ export struct CardEdit {
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
             this.isShowFavoriteConfiguration=true
+            })
+          })
+      }
+
+      if (!this.isShowCurrentConfiguration) {
+        CurrentConfiguration()
+          .width('48.5%')
+          .height(this.HomeCardEditHeight.value)
+          .borderRadius(20)
+          .backgroundColor($r('app.color.container_background'))
+          .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
+            //      .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
+          .onClick(() => {
+            animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+              this.isShowCurrentConfiguration=true
             })
           })
       }

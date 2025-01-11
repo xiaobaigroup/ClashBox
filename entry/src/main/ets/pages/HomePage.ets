@@ -25,6 +25,7 @@ import FavoriteConfiguration from '../components/Home/FavoriteConfiguration'
 import { CardEdit } from '../components/Home/CardEdit'
 import { image } from '@kit.ImageKit'
 import ProxyINFO from '../components/Home/ProxyINFO'
+import CurrentConfiguration from '../components/Home/CurrentConfiguration'
 
 
 @Entry
@@ -147,6 +148,7 @@ struct Home {
   @Provide('isShowFavoriteProxy') isShowFavoriteProxy: boolean = true
   @Provide('isShowFavoriteConfiguration') isShowFavoriteConfiguration: boolean = true
   @Provide('isShowProxyINFO') isShowProxyINFO: boolean = false
+  @Provide('isShowCurrentConfiguration') isShowCurrentConfiguration: boolean = false
   // 页面名称 主页
   private componentName: string = 'HomePage'
   /* 是否开启 `Index` 页面的前景模糊 */
@@ -643,6 +645,29 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
             .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
             //    .margin({ right: this.isLandscapePhone ? this.containerMargin.value : this.containerRightMargin.value })
           }
+
+          if (this.isShowCurrentConfiguration) {
+            GridCol({
+              span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : 6, lg: 3 },
+              order: 4
+            }) {
+              Stack({ alignContent: Alignment.TopEnd }) {
+                CurrentConfiguration()
+                if (this.isShowDeleteButton) {
+                  DeleteButton2()
+                    .position({ x: '90%', y: -4 })
+                    .onClick(() => {
+                      animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                        this.isShowCurrentConfiguration = false
+                      })
+                    })
+                }
+              }
+            }
+            .GridColStyle()
+            .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+          }
+
         } //GridRow的尾括号
         .width('100%')
         .padding(this.isLandscapePhone ? { top: 4, left: 25, right: 25 } : this.HomeCardAreaPadding.value)

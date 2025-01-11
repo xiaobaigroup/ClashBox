@@ -85,7 +85,6 @@ export class ProxyData {
     },
   ]
 
-
 //延迟颜色设定
   public static ProxyItems(): Item[] {
     return ProxyData.items;
@@ -107,6 +106,5 @@ export class ProxyData {
     // 默认情况下，返回系统定义的次要字体颜色，适用于无效或未知的延迟值
     return $r('sys.color.font_secondary');
   }
-
-
 }
+

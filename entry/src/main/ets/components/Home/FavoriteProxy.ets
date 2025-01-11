@@ -64,7 +64,8 @@ struct FavoriteProxy {
           Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
 
           Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-            Text(`${this.items[this.FavoriteProxy+1].text}`)
+            //TODO 此处items[this.FavoriteProxy]中的this.FavoriteProxy为收藏点击一次取值的数值，后面需要更改（我不会需要大佬sos）
+            Text(`${this.items[this.FavoriteProxy].text}`)
               .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
               .fontColor($r('sys.color.font_primary'))
             Radio({ value: 'FavoriteProxyRadio2', group: 'FavoriteProxyGroup' })
@@ -75,7 +76,8 @@ struct FavoriteProxy {
               })
               .onChange(() => {
                 this.FavoriteProxyRadio === 2
-                this.ProxyRadioCheckedValue = this.FavoriteProxy+1
+                //TODO 此处this.FavoriteProxy为收藏点击一次取值的数值，后面需要更改（我不会需要大佬sos）
+                this.ProxyRadioCheckedValue = this.FavoriteProxy
               })
           }
           .onClick(() => {
@@ -87,7 +89,8 @@ struct FavoriteProxy {
           Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
 
           Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-            Text(`${this.items[this.FavoriteProxy+2].text}`)
+            //TODO 此处items[this.FavoriteProxy]中的this.FavoriteProxy为收藏点击一次取值的数值，后面需要更改（我不会需要大佬sos）
+            Text(`${this.items[this.FavoriteProxy].text}`)
               .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
               .fontColor($r('sys.color.font_primary'))
             Radio({ value: 'FavoriteProxyRadio3', group: 'FavoriteProxyGroup' })
@@ -98,7 +101,8 @@ struct FavoriteProxy {
               })
               .onChange(() => {
                 this.FavoriteProxyRadio === 3
-                this.ProxyRadioCheckedValue = this.FavoriteProxy+2
+                //TODO 此处this.FavoriteProxy为收藏点击一次取值的数值，后面需要更改（我不会需要大佬sos）
+                this.ProxyRadioCheckedValue = this.FavoriteProxy
               })
           }
           .onClick(() => {

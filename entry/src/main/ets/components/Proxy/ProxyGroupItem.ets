@@ -18,7 +18,7 @@ export const BPS_LIST_LANES_2_2_3_4_4: BreakpointState<number> = BreakpointState
 })
 
 
-//自定义弹窗内容
+/* 速度与延迟区别弹窗 */
 @CustomDialog
 struct ProxyCustomDialog {
   /* 是否开启 `Index` 页面的前景模糊 */
@@ -70,18 +70,12 @@ struct ProxyCustomDialog {
 @Entry
 @Component
 struct ProxyGroupItem {
-  //  预留自定义主题，颜色在AppTheme里面修改
-  onWillApplyTheme(theme: Theme) {
-    this.icon_emphasize = theme.colors.iconEmphasize;
-  }
 
   /* 主题色 */
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
 
-  controller: webview.WebviewController = new webview.WebviewController();
-
-  //弹窗
+  /* 速度与延迟区别弹窗 */
   ProxyDialogController: CustomDialogController | null = new CustomDialogController({
     builder: ProxyCustomDialog({
       cancel: () => {
@@ -112,39 +106,54 @@ struct ProxyGroupItem {
       }
     },
   })
+
+  /*长按菜单相关参数  */
   //长按菜单图标
-  @State startIconModifier: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.star')).fontSize('24vp');
   @State startIconModifier1: SymbolGlyphModifier =
     new SymbolGlyphModifier($r('sys.symbol.bolt_filled_on_circle')).fontSize('24vp');
   @State startIconModifier2: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.timer')).fontSize('24vp');
   @State startIconModifier3: SymbolGlyphModifier =
     new SymbolGlyphModifier($r('sys.symbol.questionmark_circle')).fontSize('24vp');
-  @State startIconModifier4: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.star_fill')).fontSize('24vp').fontColor([$r('sys.color.multi_color_11')]);
-  // TODO 删除 临时模拟数据配置列表数据
-  @State isShowNetworkSpeed: boolean = false
-  // 定义ProxyGroupItemSelectedWide的值便于切换布局方式
-  @Consume ProxyGroupItemSelected: string
+
+  //报错信息参数
+  private componentName: string = 'ProxyPage'
 
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone')
-  private isLandscapePhone: boolean = false
+  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+
   /* 断点布局相关 */
   @State
   private breakPointStateListLanes: BreakpointState<number> = BPS_LIST_LANES_2_2_3_4_4
   @Consume
   private breakPointStateListGutter: BreakpointState<number>
-  private componentName: string = 'ProxyPage'
+
+  /* 本页布局相关参数 */
+  // 定义ProxyGroupItemSelectedWide的值便于切换布局方式
+  @Consume ProxyGroupItemSelected: string
+  //是否显示网络测速半模拟态判定
+  @State isShowNetworkSpeed: boolean = false
+  //网络测速半模拟态web控制器
+  controller: webview.WebviewController = new webview.WebviewController();
 
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
+
+  /* 代理节点数据相关参数  */
+  //节点假数据组后期可改可删
+  @Consume items: Item[]
+  // 当前代理节点单选选择的值
+  @Consume private ProxyRadioCheckedValue: number
+  // 当前代理节点长按选择的值
+  @Consume private ProxyItemLongPressValue: number
+  // 当前代理节点收藏的值
+  @Consume private FavoriteProxy: number
 
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     BreakpointSystem.getInstance().attach(this.breakPointStateListLanes)
     BreakpointSystem.getInstance().start()
   }
-
 
   //半模态窗口测速网站
   @Builder
@@ -196,7 +205,7 @@ struct ProxyGroupItem {
         })
           .clickEffect({level: ClickEffectLevel.MIDDLE})
           .contentFontColor($r('sys.color.font_primary'))
-          .onClick( () => {
+          .onClick(() => {
             this.proxyListLongPressCtxMenuForFavorite.callback()
             this.FavoriteProxy = this.ProxyItemLongPressValue
           })
@@ -234,15 +243,6 @@ struct ProxyGroupItem {
     .borderRadius(20)
   } //长按菜单end
 
-  //节点假数据组后期可改可删
-  @Consume items: Item[]
-  // 当前代理节点单选选择的值
-  @Consume private ProxyRadioCheckedValue: number
-  // 当前代理节点长按选择的值
-  @Consume private ProxyItemLongPressValue: number
-  // 当前代理节点收藏的值
-  @Consume private FavoriteProxy: number
-
   build() {
     //多列排列宽
     if (this.ProxyGroupItemSelected === 'ProxyGroupItemSelectedWide') {
@@ -265,6 +265,9 @@ struct ProxyGroupItem {
                 .checked(index === this.ProxyRadioCheckedValue)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
+                })
+                .onChange(() => {
+                  this.ProxyRadioCheckedValue = index
                 })
             }
             .ListRowStyle()
@@ -447,7 +450,7 @@ struct ProxyGroupItem {
    * 收藏配置
    */
   private favoriteProxy(): void {
-    // TODO 收藏配置 & 判断是否已经收藏
+    // TODO 收藏节点 & 判断是否已经收藏
     this.ProxyPromptAction.showToast({ message: $r('app.string.Collect_Tip') })
     this.items[this.ProxyItemLongPressValue].isShowFavoriteProxy = true
   }
@@ -455,7 +458,7 @@ struct ProxyGroupItem {
    * 取消收藏配置
    */
   private cancelFavoriteProxy(): void {
-    // TODO 取消收藏配置 & 判断是否已经收藏
+    // TODO 取消收藏节点 & 判断是否已经收藏
     this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_tip') })
     this.items[this.ProxyItemLongPressValue].isShowFavoriteProxy = false
   }

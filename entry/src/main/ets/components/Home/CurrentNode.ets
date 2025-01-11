@@ -29,7 +29,6 @@ struct CurrentNode {
       Column() {
         if (this.ProxyRadioCheckedValue >= 0) {
           Text(`${this.items[this.ProxyRadioCheckedValue].text}`)
-
             .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize_24_29_26_27.value)
             .fontWeight(FontWeight.Bold)
             .fontColor(this.font_primary)
@@ -39,14 +38,19 @@ struct CurrentNode {
             .fontColor(ProxyData.getColorForLatency(this.items[this.ProxyRadioCheckedValue].latency))
         }
         else if(this.ProxyRadioCheckedValue < 0){
-          Text('节点名')
+          Text($r('app.string.proxy_name'))
             .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize_24_29_26_27.value)
             .fontWeight(FontWeight.Bold)
             .fontColor(this.font_primary)
 
-          Text('ping ' + '延迟')
-            .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)
-            .fontColor('#64BB5C')
+          Row(){
+            Text('ping ')
+              .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)
+              .fontColor('#64BB5C')
+            Text($r('app.string.Delay'))
+              .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)
+              .fontColor('#64BB5C')
+          }
         }
       }
       .flexGrow(1)
