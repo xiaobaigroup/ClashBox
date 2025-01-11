@@ -1,70 +1,8 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
+import { theRowCustomDialog } from "../Common"
 
-// 开启&关闭提示弹窗组件（横排按钮）
-@CustomDialog
-export struct theRowCustomDialog {
-  @State theDialogTitle: ResourceStr = ''
-  @State contentText: ResourceStr = ''
-  cancel?: () => void
-  confirm?: () => void
-  controller: CustomDialogController
-  /* 主题色 */
-  @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  @BuilderParam leftButton: () => void = this.defaultBuilder
-  // 默认的左按钮(蓝色字体开启)
-  @Builder
-  defaultBuilder() {
-    Button($r('app.string.open'))
-      .width('100%')
-      .height(39)
-      .fontColor(this.icon_emphasize)
-      .backgroundColor($r('app.color.container_background'))
-  }
-
-  build() {
-    Column() {
-      // 标题
-      Text(this.theDialogTitle)
-        .fontWeight(FontWeight.Medium)
-        .fontSize(20)
-        .margin({ top: 15, bottom: 15 })
-      // 内容文本
-      Text(this.contentText)
-        .fontWeight(FontWeight.Regular)
-        .fontSize(18)
-        .margin({bottom: 8 })
-      Row() {
-        // 左按钮
-        Row() {
-          this.leftButton()
-        }.width('50%')
-        .onClick(() => {
-          this.controller.close()
-          if (this.confirm) {
-            this.confirm()
-          }
-        })
-        Button($r('app.string.Cancel'))
-          .height(39)
-          .width('50%')
-          .fontColor(Color.White)
-          .backgroundColor(this.icon_emphasize)
-          .onClick(() => {
-            this.controller.close()
-            if (this.cancel) {
-              this.cancel()
-            }
-          })
-      }.width('100%')
-    }
-    .padding({left: 16, right: 16})
-    .backgroundColor($r('app.color.container_background'))
-    .width('100%')
-    .height(175)
-  }
-}
 
 @Component
 struct Backgrounder {

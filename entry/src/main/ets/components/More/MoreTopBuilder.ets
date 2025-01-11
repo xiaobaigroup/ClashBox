@@ -1,0 +1,71 @@
+/**
+ * 更多页顶部导航栏
+ * @param title 标题文本
+ * @param searchButton 搜索按钮
+ * @param otherButton 其它功能按钮
+ */
+@Component
+export struct MoreTop {
+  @Consume('NavPathStack') pageInfos: NavPathStack
+  // 一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  // 标题
+  @State title: ResourceStr = ''
+  // 搜索按钮
+  @BuilderParam searchButton: () => void = this.searchDefaultButton
+  // 其它按钮
+  @BuilderParam otherButton: () => void = this.otherDefaultButton
+
+  @Builder searchDefaultButton() {
+    // 默认搜索按钮
+    Button({ type: ButtonType.Circle, stateEffect: true }) {
+      SymbolGlyph($r('sys.symbol.magnifyingglass'))
+        .fontSize(24)
+        .fontColor([this.icon_primary])
+    }
+    .backgroundColor($r('app.color.settings_container_background'))
+    .margin({ right: 10 })
+    .width(40)
+    .height(40)
+  }
+  @Builder otherDefaultButton() {
+    // 默认功能按钮为更多
+    Button({ type: ButtonType.Circle, stateEffect: true }) {
+      SymbolGlyph($r('sys.symbol.dot_grid_2x2'))
+        .fontSize(24)
+        .fontColor([this.icon_primary])
+    }
+    .width(40)
+    .height(40)
+    .backgroundColor($r('app.color.settings_container_background'))
+  }
+
+  build() {
+    Row() {
+      // 返回图标
+      Button({ type: ButtonType.Circle, stateEffect: true }) {
+        SymbolGlyph($r('sys.symbol.chevron_left'))
+          .fontSize(28)
+          .fontColor([this.icon_primary])
+      }
+      .width(40)
+      .height(40)
+      .backgroundColor($r('app.color.settings_container_background'))
+      .onClick(() => {
+        this.pageInfos.pop(true)
+      })
+      Text(this.title)
+        .fontSize(30)
+        .fontWeight(FontWeight.Bold)
+        .textAlign(TextAlign.Start)
+        .margin({left: 8})
+      Blank()
+      this.searchButton()
+      this.otherButton()
+    }
+    .zIndex(1)
+    .layoutWeight(1)
+    .height(56)
+    .alignItems(VerticalAlign.Center)
+  }
+}

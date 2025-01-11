@@ -157,10 +157,6 @@
       "value": "Backup and Recovery"
     },
     {
-      "name": "ApplicationLock",
-      "value": "Application Lock"
-    },
-    {
       "name": "Notice",
       "value": "Notice"
     },
@@ -1167,6 +1163,46 @@
     {
       "name": "proxy_name",
       "value": "Proxy Name"
+    },
+    {
+      "name": "beta_kernel_subtitle",
+      "value": "When enabled, the kernel under test will be displayed"
+    },
+    {
+      "name": "beta_kernel",
+      "value": "Beta kernel"
+    },
+    {
+      "name": "default_kernel",
+      "value": "ClashMeta(Default)"
+    },
+    {
+      "name": "filter",
+      "value": "Filter"
+    },
+    {
+      "name": "not_filter",
+      "value": "Not Filter"
+    },
+    {
+      "name": "information_only",
+      "value": "Information only"
+    },
+    {
+      "name": "warning_only",
+      "value": "Warning only"
+    },
+    {
+      "name": "error_only",
+      "value": "Error only"
+    },
+    {
+      "name": "reset",
+      "value": "Reset"
+    },
+    {
+      "name": "override_reset_prompt",
+      "value": "Reset override settings?"
     }
   ]
 }

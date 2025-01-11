@@ -197,7 +197,7 @@ export const SettingsListItem = (): settingsData[] => {
     new settingsData($r('sys.symbol.translate_c2e'), 'Language', $r('app.string.Language'), '', $r('app.string.Language_Subtitle'), false),
     new settingsData($r('sys.symbol.brush_fill'), 'Appearance', $r('app.string.Appearance'), $r('app.string.AppearanceSubtitle'), '', false),
     new settingsData($r('sys.symbol.externaldrive_fill'), 'Backup', $r('app.string.Backup_Recovery'), $r('app.string.BackgrounderSubtitle'), '', false),
-    new settingsData($r('sys.symbol.lock_fill'), 'ApplicationLock', $r('app.string.ApplicationLock'), $r('app.string.ApplicationicationLockSubtitle'), $r('app.string.already_open'), false),
+    //new settingsData($r('sys.symbol.lock_fill'), 'Kernel', $r('app.string.Kernel'), $r('app.string.ApplicationicationLockSubtitle'), $r('app.string.already_open'), false),
     new settingsData($r('sys.symbol.ellipsis_message_fill'), 'Notice', $r('app.string.Notice'), $r('app.string.NoticeSubtitle'), '', false),
     new settingsData($r('sys.symbol.checkmark_square_on_square_fill'), 'Backgrounder', $r('app.string.Backgrounder'), $r('app.string.BackgrounderSubtitle'), '', false),
     new settingsData($r('sys.symbol.satellite_map_fill'), 'Kernel', $r('app.string.kernel'), $r('app.string.kernel_subtitle'), '', false),
@@ -364,8 +364,7 @@ export const AboutList: AboutListItemProp[] = [
       { title: $r('app.string.UpdateChannels'), subtitle: $r('app.string.UpdateChannels_Subtitle1'), sign: 3, name: 'UpdateChannels',
         children: [
           { title: $r('app.string.UpdateChannels_Subtitle1'), name: 'Github', subtitle: '' },
-          { title: '蓝奏云', name: 'LZY', subtitle: '' }, // 测试用
-          { title: '百度云', name: 'BDY', subtitle: '' }, // 测试用
+          { title: 'Gitee', name: 'Gitee', subtitle: '' }
          ]
       },
       { title: $r('app.string.Auto_Check_Updates'), subtitle: '', sign: 1, name: 'Auto', isOn: false },
@@ -650,10 +649,7 @@ export const IPfontSize: BreakpointState<number> = BreakpointState.of({
  * 主页卡片内容网络测速字体大小
  */
 export const SpeedfontSize12_16_14_16: BreakpointState<number> = BreakpointState.of({
-  sm: 12,
-  md: 16,
-  lg: 14,
-  xl: 16
+  sm: 12,  md: 16,  lg: 14,  xl: 16
 });
 
 /* List 相关*/

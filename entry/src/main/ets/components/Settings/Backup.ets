@@ -126,6 +126,7 @@ export struct CloudBackup {
   //一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  // 页面内边距
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
 
   build() {
@@ -236,7 +237,7 @@ export struct CloudBackup {
                 .margin({left: 10})
                 .backgroundColor(this.icon_emphasize)
                 .clickEffect({ level: ClickEffectLevel.MIDDLE })
-                .opacity(this.isLogon ? 1 : 0.5)
+                .enabled(this.isLogon ? true : false)
                 .onClick(() => {
                   // 连接测试
 

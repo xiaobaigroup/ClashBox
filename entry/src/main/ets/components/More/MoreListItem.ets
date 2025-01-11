@@ -1,12 +1,9 @@
-import { settingsData } from "../../common/Constants"
+import { moreData } from "../../common/Constants"
 
 @Component
-struct settingsListItem {
-  /* 主题色 */
-  @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  //一级图标色，黑色
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
-  @Prop itemObj: settingsData
+struct moreListItem {
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
+  @Prop itemObj: moreData
   @Prop index: number
   onCheck = (index: number) => {}
 
@@ -16,29 +13,27 @@ struct settingsListItem {
         SymbolGlyph(this.itemObj.icons)
           .fontSize(24)
           .margin({left: 12})
-          .fontColor([this.icon_emphasize])
+          .fontColor([this.icon_primary])
         Column() {
           Text(this.itemObj.title)
             .fontWeight(FontWeight.Medium)
             .fontSize(16)
-          if(this.itemObj.subtitle) {
+          if (this.itemObj.subtitle) {
             Text(this.itemObj.subtitle)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
-              .width('60%')
               .maxLines(1)
+              .width('75%')
+              .fontWeight(FontWeight.Normal)
+              .margin({top: 2 })
               .fontSize(14)
           }
         }
-        .padding({ left: 12 })
         .alignItems(HorizontalAlign.Start)
+        .padding({ left: 12 })
         Blank()
-        Text(this.itemObj.hint)
-          .fontColor($r('sys.color.font_secondary'))
-          .padding({ left: 8 })
-          .fontSize(14)
         SymbolGlyph($r('sys.symbol.chevron_right'))
-          .fontSize(24)
-          .margin({left: 12, right: 12})
+          .fontSize(28)
+          .margin({right: 12})
           .fontColor([this.icon_primary])
       }
       .width('94%')
@@ -48,10 +43,10 @@ struct settingsListItem {
       Row()
         .height(10)
     }
-    .clickEffect({ level: ClickEffectLevel.MIDDLE })
+
     .onClick(() => {
       this.onCheck(this.index)
     })
   }
 }
-export default settingsListItem
+export default moreListItem

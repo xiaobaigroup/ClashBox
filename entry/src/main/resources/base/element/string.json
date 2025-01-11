@@ -157,10 +157,6 @@
       "value": "备份与恢复"
     },
     {
-      "name": "ApplicationLock",
-      "value": "应用锁"
-    },
-    {
       "name": "Notice",
       "value": "通知与反馈"
     },
@@ -1167,6 +1163,46 @@
     {
       "name": "proxy_name",
       "value": "节点名"
+    },
+    {
+      "name": "beta_kernel",
+      "value": "测试版内核"
+    },
+    {
+      "name": "beta_kernel_subtitle",
+      "value": "开启后将显示正在测试中的内核"
+    },
+    {
+      "name": "default_kernel",
+      "value": "ClashMeta(默认)"
+    },
+    {
+      "name": "filter",
+      "value": "筛选"
+    },
+    {
+      "name": "not_filter",
+      "value": "不筛选"
+    },
+    {
+      "name": "information_only",
+      "value": "仅信息"
+    },
+    {
+      "name": "warning_only",
+      "value": "仅警告"
+    },
+    {
+      "name": "error_only",
+      "value": "仅报错"
+    },
+    {
+      "name": "reset",
+      "value": "重置"
+    },
+    {
+      "name": "override_reset_prompt",
+      "value": "是否重置覆写设置？"
     }
   ]
 }

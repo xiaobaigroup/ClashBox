@@ -1,7 +1,6 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { getResourceString } from "../../utils/ResourceStringUtil"
-import MoreMenu from "./LogMoreMenu"
-import { SymbolGlyphModifier } from "@kit.ArkUI"
+import { Font, SymbolGlyphModifier } from "@kit.ArkUI"
+import { MoreTop } from "./MoreTopBuilder"
 
 @Entry
 @Component
@@ -12,7 +11,9 @@ struct Log {
   @State isShowMenu: boolean = false
   @State EnableLogger: boolean = false
   @State isLogData: boolean = false
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
+  // 一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  @State filterChecked: number = 0
 
   @Builder
   MoreMenu() {
@@ -36,8 +37,54 @@ struct Log {
             // 导出日志操作
 
           })
+        MenuItem({
+          builder: ():void => this.FilterMenu(),
+          content: $r('app.string.filter'),
+          symbolEndIcon: new SymbolGlyphModifier($r('sys.symbol.chevron_right')).fontColor([this.icon_emphasize])
+        })
       }
     }
+  }
+
+  @Builder
+  FilterMenu() {
+    Menu() {
+      MenuItem({ content: $r('app.string.filter') })
+        .contentFont({ weight: FontWeight.Bold })
+      MenuItem({
+        content: $r('app.string.not_filter'),
+        symbolEndIcon: this.filterChecked === 0 ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+      })
+        .onClick(() => {
+          this.filterChecked = 0
+        })
+      MenuItem({
+        content: $r('app.string.information_only'),
+        symbolEndIcon: this.filterChecked === 1 ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+      })
+        .onClick(() => {
+          this.filterChecked = 1
+        })
+      MenuItem({
+        content: $r('app.string.warning_only'),
+        symbolEndIcon: this.filterChecked === 2 ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+      })
+        .onClick(() => {
+          this.filterChecked = 2
+        })
+      MenuItem({
+        content: $r('app.string.error_only'),
+        symbolEndIcon: this.filterChecked === 3 ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+      })
+        .onClick(() => {
+          this.filterChecked = 3
+        })
+    }
+  }
+
+
+  @Builder
+  logOther() {
   }
 
   build() {
@@ -46,54 +93,20 @@ struct Log {
         Column() {
           // 导航区
           Row() {
-            //返回图标
-            Button({ type: ButtonType.Circle, stateEffect: true }) {
-              SymbolGlyph($r('sys.symbol.chevron_left'))
-                .fontSize(28)
-                .fontColor([this.icon_primary])
-            }
-            .margin({left: this.morePageMargin.value})
-            .onClick(() => {
-              this.pageInfos.pop(true)
+            MoreTop({
+              title: $r('app.string.Log'),
+              otherButton: this.logOther
             })
-            .width(40)
-            .height(40)
-            .backgroundColor($r('app.color.settings_container_background'))
-            Text($r('app.string.Log'))
-              .fontSize(30)
-              .fontWeight(FontWeight.Bold)
-              .textAlign(TextAlign.Start)
-              .margin({left: 8})
-            Blank()
-            //搜索
-            Button({ type: ButtonType.Circle, stateEffect: true }) {
-              SymbolGlyph($r('sys.symbol.magnifyingglass'))
-                .fontSize(24)
-                .fontColor([this.icon_primary])
-            }
-            .backgroundColor($r('app.color.settings_container_background'))
-            .margin({ right: 10 })
-            .width(40)
-            .height(40)
-            //更多图标
             Button({ type: ButtonType.Circle, stateEffect: true }) {
               SymbolGlyph($r('sys.symbol.dot_grid_2x2'))
                 .fontSize(24)
                 .fontColor([this.icon_primary])
             }
-            /*.onClick(() => {
-              this.isShowMenu = !this.isShowMenu
-            })*/
-            .margin({ right: this.morePageMargin.value })
             .width(40)
             .height(40)
             .bindMenu(this.MoreMenu())
             .backgroundColor($r('app.color.settings_container_background'))
-          }
-          .zIndex(1)
-          .width('100%')
-          .height(56)
-          .alignItems(VerticalAlign.Center)
+          }.width('100%')
 
           // 主体
           if (this.EnableLogger === false) {
@@ -133,6 +146,8 @@ struct Log {
         }
         .width('100%')
         .height('100%')
+        .justifyContent(FlexAlign.Start)
+        .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
 
        /* if (this.isShowMenu) {
           MoreMenu({

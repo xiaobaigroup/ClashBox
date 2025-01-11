@@ -245,8 +245,8 @@ struct Index {
   @Provide private FavoriteProxy: number =-1
   //节点数据组
   @Provide items: Item[] = ProxyData.ProxyItems();
-  /*
-    主页卡片组件截图
+  /**
+   * 主页卡片组件截图
    */
   @Provide ('pixmapSpeed')pixmapSpeed: image.PixelMap | undefined = undefined
   @Provide ('pixmapSwitchMode')pixmapSwitchMode: image.PixelMap | undefined = undefined

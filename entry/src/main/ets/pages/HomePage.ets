@@ -266,7 +266,7 @@ struct Home {
   @Builder
   SettingsSheet() {
     Column() {
-      Settings({ isShowSettings: this.isShowSettings })
+      Settings()
     }
     .width('100%')
     .height('100%')
