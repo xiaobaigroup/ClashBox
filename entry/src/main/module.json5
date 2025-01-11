@@ -47,6 +47,11 @@
     ],
     "extensionAbilities": [
       {
+        "name": "ClashVpnAbility",
+        "srcEntry": "./ets/entryability/ClashVpnAbility.ets",
+        "type": "vpn"
+      },
+      {
         "name": "EntryBackupAbility",
         "srcEntry": "./ets/entrybackupability/EntryBackupAbility.ets",
         "type": "backup",

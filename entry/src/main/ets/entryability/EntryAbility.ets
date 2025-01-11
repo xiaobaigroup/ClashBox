@@ -2,12 +2,15 @@ import { AbilityConstant, Configuration, ConfigurationConstant, UIAbility, Want 
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { ClashVpnService } from 'proxy_core/src/main/ets/rpc/ClashVpnService';
+import ClashViewModel from './ClashViewModel';
 
 
 export default class EntryAbility extends UIAbility {
  private currentLanguage: string | undefined = undefined
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onCreate');
+
 /*    this.currentLanguage = this.context.config.language
     AppStorage.setOrCreate<string>('language', this.currentLanguage)
     hilog.info(0x0000, 'EntryAbility', `#onCreate#currentLanguage is [${this.currentLanguage}]`);*/
@@ -20,11 +23,11 @@ export default class EntryAbility extends UIAbility {
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onDestroy');
   }
 
-  onWindowStageCreate(windowStage: window.WindowStage): void {
+  async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     // Main window is created, set main page for this ability
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onWindowStageCreate');
     let windowClass: window.Window = windowStage.getMainWindowSync(); // 获取应用主窗口
-
+    await ClashViewModel.init(this.context)
     windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {
         hilog.error(0x0000, 'EntryAbility', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');

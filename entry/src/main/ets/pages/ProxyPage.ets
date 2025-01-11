@@ -9,6 +9,7 @@ import ProxyGroupItem from '../components/Proxy/ProxyGroupItem'
 import ProxyArrangement from '../components/Proxy/ProxyArrangement'
 import { intl } from '@kit.LocalizationKit'
 import { Item, ProxyData } from '../common/ProxyData'
+import ClashViewModel from '../entryability/ClashViewModel'
 
 //中文排序
 let ProxyCollator = new intl.Collator("zh-CN");
@@ -103,6 +104,7 @@ struct ProxyPage {
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     BreakpointSystem.getInstance().start()
+    ClashViewModel.getProxyGroups()
   }
 
   //分组tabs内容

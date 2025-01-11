@@ -672,7 +672,7 @@ export struct CellularDataReminder {
     }
     .width('100%')
     .hideTitleBar(true)
-    .hideToolBar(true)
+    //.hideToolBar(true)
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
       this.SettingsPageInfos.clear();

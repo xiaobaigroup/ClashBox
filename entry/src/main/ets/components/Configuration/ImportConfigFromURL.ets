@@ -10,12 +10,13 @@ import {
 import { BindSheetTitleCustomBuilder, BindSheetTitleCustomBuilderMenu, CustomDownloadingDialog } from "../Common"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { ConfigInfo } from "./ConfigInfo"
-import { PromptAction } from "@kit.ArkUI"
+import { PromptAction, window } from "@kit.ArkUI"
 import { ConfigData } from "../../common/PageArgumentEntity"
 import { util } from "@kit.ArkTS"
 import { CustomConfirmDialog } from '../Common'
 import { BusinessError } from "@kit.BasicServicesKit"
 import { common } from "@kit.AbilityKit"
+import ClashViewModel from "../../entryability/ClashViewModel"
 
 
 // 关联：route_map.json
@@ -231,9 +232,23 @@ export struct ImportConfigFromURL{
     if (isNewConfig) {
       this.customDownloadingDialogTitle = '正在下载配置文件'
       this.configCustomDownloadingDialogController?.open()
+      try {
+        await ClashViewModel.addOrUpdateProfile(this.configData, null)
+      } catch (e) {
+        console.error("ClashNext", e.message, e.stack);
+        this.promptAction.showToast({message:"下载失败: " + e.message || e})
+      }
+      this.configCustomDownloadingDialogController?.close()
     } else {
       this.customDownloadingDialogTitle = '正在更新配置文件'
       this.configCustomDownloadingDialogController?.open()
+      try {
+        await ClashViewModel.addOrUpdateProfile(this.configData, this.configData.configId)
+      } catch (e) {
+        console.error("ClashNext", e.message, e.stack);
+        this.promptAction.showToast({message:"下载失败: " + e.message || e})
+      }
+      this.configCustomDownloadingDialogController?.close()
     }
   }
 

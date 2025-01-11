@@ -23,6 +23,7 @@ import { common } from '@kit.AbilityKit'
 import { configShare } from '../utils/SystemShareUtil'
 // XXX 测试用 删除
 import { showFileNameListOfFileDir } from '../utils/FileUtil'
+import ClashViewModel from '../entryability/ClashViewModel'
 
 
 /**
@@ -532,12 +533,33 @@ struct ConfigurationPage {
     hilog.info(0xC000, this.componentName, `#aboutToAppear executed`)
     // XXX 删除 这里模拟获取所有hap沙箱路径配置文件的文件名
     showFileNameListOfFileDir(this.context.filesDir)
+    this.fetchProfiles()
+  }
+  // 获取配置列表
+  async fetchProfiles(){
+    const profiles = await ClashViewModel.getProfiles()
+    this.configList = profiles.map((d)=>{
+      return {
+        configId: d.id,
+        configName: d.name,
+        configUrl: d.url,
+        isConfigAutoUpdate: d.autoUpdate,
+        configAutoUpdateTimeGapValue: d.autoUpdateDuration
+      } as ConfigData
+    })
+    // TODO 临时测试
+    if(this.configList[0]){
+      await ClashViewModel.loadProfileAndConfig(this.configList[0].configId)
+      await ClashViewModel.getProxyGroups()
+    }
   }
 
   aboutToDisappear(): void {
     hilog.info(0xC000, this.componentName, `#aboutToDisappear executed`)
+
     this.configCustomDialogController = null
     this.isEnableIndexForegroundBlur = false
+
     hilog.info(0xC000, this.componentName, `#aboutToDisappear#置空[配置页\`bindSheet\`内提示是否删除配置信息的自定义弹框]`)
   }
 
@@ -590,16 +612,22 @@ struct ConfigurationPage {
   /**
    * 更新配置
    */
-  private updateConfig(configId?: string): void {
+  private async  updateConfig(configId?: string): Promise<void> {
     // TODO 调用更新配置消息api
     this.promptAction.showToast({message: `配置更新中...`})
     if (configId){
+      // TODO loading and try
+      ClashViewModel.updateProfileConfig(configId)
       // TODO 单个配置更新
       hilog.info(0xC012, this.componentName, `#updateConfig#更新配置{单个}: configName is [${this.currentTouchConfigData.configName}], configId is [${this.currentTouchConfigData.configId}]`)
     } else {
       // TODO 所有配置更新
       hilog.info(0xC012, this.componentName, `#updateConfig#更新配置{所有}`)
+      // TODO loading and try
+      await ClashViewModel.updateProfileConfig(null)
     }
+
+
   }
   /**
    * 分享配置的URL
@@ -636,12 +664,13 @@ struct ConfigurationPage {
   /**
    * 删除配置
    */
-  private deleteConfig(): void {
+  private async  deleteConfig(): Promise<void> {
     // TODO 删除用户首选项里的此配置
     this.promptAction.showToast({ message: `已删除配置💔` })
     hilog.info(0xC016, this.componentName, `#deleteConfig#删除配置: configName is [${this.currentTouchConfigData.configName}]`)
+    await ClashViewModel.deleteProfile(this.currentTouchConfigData.configId)
+    this.fetchProfiles()
   }
-
 }
 
 

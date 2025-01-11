@@ -5,13 +5,13 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "C:\\Users\\Administrator\\.ohos\\config\\default_ark-c_GHaKXQPSlgRpq87icEJdxV6-KvfZCI75qffJaZipOrI=.cer",
-          "storePassword": "0000001BB88F7E2D3D71FF17C5545661F61D053886C93A69C99926E1DA51F067BCFFF3409E4495D6BAD26C",
+          "certpath": "/Users/fiber/.ohos/config/default_ClashNEXT_HMPBKNGhCHuIPAA1ZqRurRxNw5tOXirXzi3le10Hywk=.cer",
+          "storePassword": "0000001A0875133F579DC32229825343723261B21A2C51616BAB2C8B38EA9133AE15C5E481F9704C9065",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001B2864219857410F3B5DC3EBEEA1D8697071D2624CE6171287C1AF3BB2CE786424979B8F33BF5E61",
-          "profile": "C:\\Users\\Administrator\\.ohos\\config\\default_ark-c_GHaKXQPSlgRpq87icEJdxV6-KvfZCI75qffJaZipOrI=.p7b",
+          "keyPassword": "0000001ABD2D1205B0C90562DF0666F36D3BB49188CE984B083FAF8E75908B171D64928F5E98AF1AD719",
+          "profile": "/Users/fiber/.ohos/config/default_ClashNEXT_HMPBKNGhCHuIPAA1ZqRurRxNw5tOXirXzi3le10Hywk=.p7b",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\default_ark-c_GHaKXQPSlgRpq87icEJdxV6-KvfZCI75qffJaZipOrI=.p12"
+          "storeFile": "/Users/fiber/.ohos/config/default_ClashNEXT_HMPBKNGhCHuIPAA1ZqRurRxNw5tOXirXzi3le10Hywk=.p12"
         }
       }
     ],
@@ -50,6 +50,10 @@
           ]
         }
       ]
+    },
+    {
+      "name": "proxy_core",
+      "srcPath": "./proxy_core",
     }
   ]
 }
