@@ -244,6 +244,7 @@ struct Home {
     this.isShowFavoriteProxy = true
     this.isShowFavoriteConfiguration = true
     this.isShowProxyINFO = false
+    this.isShowCurrentConfiguration = false
   }
 
   /**
