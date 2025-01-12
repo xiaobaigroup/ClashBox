@@ -1203,6 +1203,42 @@
     {
       "name": "override_reset_prompt",
       "value": "是否重置覆写设置？"
+    },
+    {
+      "name": "write_url",
+      "value": "输入网址"
+    },
+    {
+      "name": "title",
+      "value": "标题"
+    },
+    {
+      "name": "shortcuts_card",
+      "value": "快捷方式小卡片"
+    },
+    {
+      "name": "shortcuts",
+      "value": "快捷方式"
+    },
+    {
+      "name": "click_modify",
+      "value": "点我修改"
+    },
+    {
+      "name": "option1",
+      "value": "选项1"
+    },
+    {
+      "name": "option2",
+      "value": "选项2"
+    },
+    {
+      "name": "option3",
+      "value": "选项3"
+    },
+    {
+      "name": "null_title_tips",
+      "value": "!!!需要输入标题，并确保你的网址含有‘https://’前缀，才可打开网址"
     }
   ]
 }

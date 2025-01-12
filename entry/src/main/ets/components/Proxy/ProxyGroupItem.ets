@@ -17,7 +17,6 @@ export const BPS_LIST_LANES_2_2_3_4_4: BreakpointState<number> = BreakpointState
   xxl: 5
 })
 
-
 /* 速度与延迟区别弹窗 */
 @CustomDialog
 struct ProxyCustomDialog {
@@ -189,6 +188,7 @@ struct ProxyGroupItem {
   }
   //收藏与ping延迟即时动作
   private ProxyPromptAction:PromptAction = this.getUIContext()?.getPromptAction()
+
 
 
   //长按菜单 start
