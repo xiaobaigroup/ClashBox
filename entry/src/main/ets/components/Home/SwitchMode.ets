@@ -28,6 +28,8 @@ struct SwitchMode {
   @Consume('breakPointStateHomeCardSwitchModeTextMargin') private fontMargin: BreakpointState<MarginGenerate>
   // 卡片内边距
   @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
+  //编辑按钮点击后显示编辑状态判定
+  @Consume isShowHomeEdit: boolean
 
   // 手机横屏高度条件
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
@@ -51,7 +53,10 @@ struct SwitchMode {
           .backgroundColor(this.currentChecked === 1 ? $r('app.color.container_background'):'#00ffffff')
      //     .shadow(this.currentChecked === 1 ? { radius: 3,color:$r('app.color.shadow')} : { } )
           .onClick(() => {
-            this.currentChecked = 1
+            //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
+            if (!this.isShowHomeEdit) {
+              this.currentChecked = 1
+            }
           })
 
         Text($r('app.string.Overall'))
@@ -61,7 +66,10 @@ struct SwitchMode {
           .backgroundColor(this.currentChecked === 2 ? $r('app.color.container_background'):'#00ffffff')
     //      .shadow(this.currentChecked === 2 ? { radius: 3, color:$r('app.color.shadow')} : { } )
           .onClick(() => {
-            this.currentChecked = 2
+            //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
+            if (!this.isShowHomeEdit) {
+              this.currentChecked = 2
+            }
             })
 
         Text($r('app.string.Direct'))
@@ -71,7 +79,10 @@ struct SwitchMode {
           .backgroundColor(this.currentChecked === 3 ? $r('app.color.container_background'):'#00ffffff')
     //      .shadow(this.currentChecked === 3 ? { radius: 3, color:$r('app.color.shadow')} : { } )
           .onClick(() => {
-            this.currentChecked = 3
+            //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
+            if (!this.isShowHomeEdit) {
+              this.currentChecked = 3
+            }
             })
         }
       .width('100%')

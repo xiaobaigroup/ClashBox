@@ -255,7 +255,9 @@ struct Index {
   @Provide ('pixmapPublicNetwork')pixmapPublicNetwork: image.PixelMap | undefined = undefined
   @Provide ('pixmapFavoriteProxy')pixmapFavoriteProxy: image.PixelMap | undefined = undefined
   @Provide ('pixmapFavoriteConfiguration')pixmapFavoriteConfiguration: image.PixelMap | undefined = undefined
-
+  @Provide ('pixmapCurrentConfiguration')pixmapCurrentConfiguration: image.PixelMap | undefined = undefined
+  @Provide ('pixmapProxyINFO')pixmapProxyINFO: image.PixelMap | undefined = undefined
+  @Provide ('pixmapShortcuts')pixmapShortcuts: image.PixelMap | undefined = undefined
 
   @Builder
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {

@@ -28,6 +28,8 @@ struct FavoriteConfiguration {
 编辑模式下右上角删除按钮
  */
   @Consume deleteButtonSize: BreakpointState<number>
+  //编辑按钮点击后显示编辑状态判定
+  @Consume isShowHomeEdit: boolean
 
   build() {
     Column() {
@@ -47,7 +49,10 @@ struct FavoriteConfiguration {
               })
           }
           .onClick(() => {
-            this.FavoriteConfigurationRadio = 1
+            //在home页编辑状态时，无法操作
+            if (!this.isShowHomeEdit) {
+              this.FavoriteConfigurationRadio = 1
+            }
           })
           .clickEffect({ level: ClickEffectLevel.MIDDLE })
 
@@ -65,7 +70,10 @@ struct FavoriteConfiguration {
               })
           }
           .onClick(() => {
-            this.FavoriteConfigurationRadio = 2
+            //在home页编辑状态时，无法操作
+            if (!this.isShowHomeEdit) {
+              this.FavoriteConfigurationRadio = 2
+            }
           })
           .clickEffect({ level: ClickEffectLevel.MIDDLE })
 
@@ -83,8 +91,11 @@ struct FavoriteConfiguration {
               })
           }
           .onClick(() => {
-            this.FavoriteConfigurationRadio = 3
-            this.isCheckFavoriteConfiguration=false//为预览而设置的点击事件，后端接入修改或删除
+            //在home页编辑状态时，无法操作
+            if (!this.isShowHomeEdit) {
+              this.FavoriteConfigurationRadio = 3
+              this.isCheckFavoriteConfiguration = false //为预览而设置的点击事件，后端接入修改或删除
+            }
           })
           .clickEffect({ level: ClickEffectLevel.MIDDLE })
         }
@@ -112,7 +123,10 @@ struct FavoriteConfiguration {
         .width('100%')
         .height("78%")
         .onClick(() => {
+          //在home页编辑状态时，无法操作
+          if (!this.isShowHomeEdit) {
           this.isCheckFavoriteConfiguration=true
+            }
         })//为预览而设置的点击事件，后端接入修改或删除
       }//没有收藏配置时的布局 end
     }

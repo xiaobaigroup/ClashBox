@@ -23,7 +23,9 @@ struct Shortcuts {
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
-
+  @Consume('isShowShortcuts') isShowShortcuts: boolean
+  //编辑按钮点击后显示编辑状态判定
+  @Consume isShowHomeEdit: boolean
   @State isShowShortcutsEdit :boolean = false
   //标题输入文本内容
   @State inputTitleValue1: string = ""
@@ -38,6 +40,9 @@ struct Shortcuts {
   icon_emphasize: ResourceColor
   @Consume('breakPointStateTabContentTitleMargin')
   private breakPointStateTabContentTitleMargin: BreakpointState<number>
+  aboutToAppear() {
+    let uiContextShortcuts: UIContext = this.getUIContext();
+  }
 
   // 隐式 Want 跳转网站
   async implicitStartAbility(url: string) {
@@ -70,17 +75,23 @@ struct Shortcuts {
           .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
           .ShortcutsTextStyle()
           .onClick(() => {
-            if (this.inputWebValue1 != '') {
-              this.implicitStartAbility(this.inputWebValue1)
-            }else {
-              this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
+            //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+            if (this.isShowShortcuts && this.isShowHomeEdit==false) {
+              if (this.inputWebValue1 != '') {
+                this.implicitStartAbility(this.inputWebValue1)
+              } else {
+                this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
+              }
             }
           })
           .gesture(
             LongPressGesture()
               .onAction(() => {
-                this.isShowShortcutsEdit = true
-                this.isEnableIndexForegroundBlur=true
+                //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+                if (this.isShowShortcuts && this.isShowHomeEdit==false) {
+                  this.isShowShortcutsEdit = true
+                  this.isEnableIndexForegroundBlur = true
+                }
               })
           )
 
@@ -90,17 +101,23 @@ struct Shortcuts {
           .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
           .ShortcutsTextStyle()
           .onClick(() => {
-            if (this.inputWebValue2 != '') {
-              this.implicitStartAbility(this.inputWebValue2)
-            }else {
-              this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
+            //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+            if (this.isShowShortcuts && this.isShowHomeEdit==false) {
+              if (this.inputWebValue2 != '') {
+                this.implicitStartAbility(this.inputWebValue2)
+              } else {
+                this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
+              }
             }
           })
           .gesture(
             LongPressGesture()
               .onAction(() => {
+                //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+                if (this.isShowShortcuts && this.isShowHomeEdit==false) {
                 this.isShowShortcutsEdit = true
                 this.isEnableIndexForegroundBlur=true
+                  }
               })
           )
 
@@ -110,17 +127,23 @@ struct Shortcuts {
           .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
           .ShortcutsTextStyle()
           .onClick(() => {
+            //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+            if (this.isShowShortcuts && this.isShowHomeEdit==false) {
             if (this.inputWebValue3 != '') {
               this.implicitStartAbility(this.inputWebValue3)
             }else {
               this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
             }
+            }
           })
           .gesture(
             LongPressGesture()
               .onAction(() => {
-                this.isShowShortcutsEdit = true
-                this.isEnableIndexForegroundBlur=true
+                //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+                if (this.isShowShortcuts && this.isShowHomeEdit==false) {
+                  this.isShowShortcutsEdit = true
+                  this.isEnableIndexForegroundBlur = true
+                }
               })
           )
       }
@@ -128,8 +151,9 @@ struct Shortcuts {
       .height('82%')
       .backgroundColor($r('app.color.home_card_background'))
       .borderRadius(10)
-      .padding({ top:8,bottom:8 ,left:5})
+      .padding({left:5,right:5})
     }
+    .id('ShortcutsId')
     .padding(this.cardPadding.value)
     .width('100%')
     .height('100%')
@@ -681,6 +705,7 @@ function TextInputStyle() {
 function ShortcutsTextStyle() {
   .fontColor($r('sys.color.font_primary'))
   .maxLines(1)
+  .textOverflow({ overflow: TextOverflow.Ellipsis })
   .width('100%')
   .clickEffect({ level: ClickEffectLevel.MIDDLE })
 }

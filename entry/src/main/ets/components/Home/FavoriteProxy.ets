@@ -34,6 +34,9 @@ struct FavoriteProxy {
   @Consume private ProxyRadioCheckedValue: number
   // 当前代理节点长按选择的值
   @Consume private ProxyItemLongPressValue: number
+  //编辑按钮点击后显示编辑状态判定
+  @Consume isShowHomeEdit: boolean
+
 
   build() {
     Column() {
@@ -52,13 +55,19 @@ struct FavoriteProxy {
                 checkedBackgroundColor: this.icon_emphasize,
               })
               .onChange(() => {
+                //在home页编辑状态时，无法操作
+                if (!this.isShowHomeEdit) {
                 this.FavoriteProxyRadio === 1
                 this.ProxyRadioCheckedValue = this.FavoriteProxy
+                  }
               })
           }
           .onClick(() => {
-            this.FavoriteProxyRadio = 1
-            this.ProxyRadioCheckedValue = this.FavoriteProxy
+            //在home页编辑状态时，无法操作
+            if (!this.isShowHomeEdit) {
+              this.FavoriteProxyRadio = 1
+              this.ProxyRadioCheckedValue = this.FavoriteProxy
+            }
           })
           .clickEffect({ level: ClickEffectLevel.MIDDLE })
 
@@ -76,14 +85,20 @@ struct FavoriteProxy {
                 checkedBackgroundColor: this.icon_emphasize,
               })
               .onChange(() => {
-                this.FavoriteProxyRadio === 2
-                //TODO 此处this.FavoriteProxy为收藏点击一次取值的数值，后面需要更改（我不会需要大佬sos）
-                this.ProxyRadioCheckedValue = this.FavoriteProxy
+                //在home页编辑状态时，无法操作
+                if (!this.isShowHomeEdit) {
+                  this.FavoriteProxyRadio === 2
+                  //TODO 此处this.FavoriteProxy为收藏点击一次取值的数值，后面需要更改（我不会需要大佬sos）
+                  this.ProxyRadioCheckedValue = this.FavoriteProxy
+                }
               })
           }
           .onClick(() => {
-            this.FavoriteProxyRadio = 2
-            this.ProxyRadioCheckedValue = this.FavoriteProxy
+            //在home页编辑状态时，无法操作
+            if (!this.isShowHomeEdit) {
+              this.FavoriteProxyRadio = 2
+              this.ProxyRadioCheckedValue = this.FavoriteProxy
+            }
           })
           .clickEffect({ level: ClickEffectLevel.MIDDLE })
 
@@ -101,14 +116,20 @@ struct FavoriteProxy {
                 checkedBackgroundColor: this.icon_emphasize,
               })
               .onChange(() => {
-                this.FavoriteProxyRadio === 3
-                //TODO 此处this.FavoriteProxy为收藏点击一次取值的数值，后面需要更改（我不会需要大佬sos）
-                this.ProxyRadioCheckedValue = this.FavoriteProxy
+                //在home页编辑状态时，无法操作
+                if (!this.isShowHomeEdit) {
+                  this.FavoriteProxyRadio === 3
+                  //TODO 此处this.FavoriteProxy为收藏点击一次取值的数值，后面需要更改（我不会需要大佬sos）
+                  this.ProxyRadioCheckedValue = this.FavoriteProxy
+                }
               })
           }
           .onClick(() => {
+            //在home页编辑状态时，无法操作
+            if (!this.isShowHomeEdit) {
             this.FavoriteProxyRadio = 3
             this.ProxyRadioCheckedValue = this.FavoriteProxy
+              }
           })
           .clickEffect({ level: ClickEffectLevel.MIDDLE })
         }

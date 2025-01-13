@@ -92,7 +92,7 @@ struct Home {
   });
   windowClass = AppStorage.get<window.Window>('windowClass') as window.Window;
   //编辑按钮点击后显示编辑状态判定
-  @State isShowHomeEdit: boolean = false
+  @Provide isShowHomeEdit: boolean = false
   /*
   主页卡片组件截图
  */
@@ -103,6 +103,9 @@ struct Home {
   @Consume ('pixmapPublicNetwork')pixmapPublicNetwork: image.PixelMap | undefined
   @Consume ('pixmapFavoriteProxy')pixmapFavoriteProxy: image.PixelMap | undefined
   @Consume ('pixmapFavoriteConfiguration')pixmapFavoriteConfiguration: image.PixelMap | undefined
+  @Consume ('pixmapCurrentConfiguration')pixmapCurrentConfiguration: image.PixelMap | undefined
+  @Consume ('pixmapProxyINFO')pixmapProxyINFO: image.PixelMap | undefined
+  @Consume ('pixmapShortcuts')pixmapShortcuts: image.PixelMap | undefined
   /**
    * 是否保存布局弹窗
    */
@@ -644,6 +647,14 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                   DeleteButton1()
                     .position({ x: '95%', y: -4 })
                     .onClick(() => {
+                      //组件截图到半模拟态的添加小卡片里，方便操作
+                      componentSnapshot.get('ProxyINFOId', (error: Error, pixmap: image.PixelMap) => {
+                        if (error) {
+                          console.log("error: " + JSON.stringify(error))
+                          return;
+                        }
+                        this.pixmapProxyINFO = pixmap //截图效果为后效果
+                      })
                       animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
                         this.isShowProxyINFO = false
                       })
@@ -672,6 +683,14 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                   DeleteButton2()
                     .position({ x: '90%', y: -4 })
                     .onClick(() => {
+                      //组件截图到半模拟态的添加小卡片里，方便操作
+                      componentSnapshot.get('CurrentConfigurationId', (error: Error, pixmap: image.PixelMap) => {
+                        if (error) {
+                          console.log("error: " + JSON.stringify(error))
+                          return;
+                        }
+                        this.pixmapCurrentConfiguration = pixmap //截图效果为后效果
+                      })
                       animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
                         this.isShowCurrentConfiguration = false
                       })
@@ -695,6 +714,14 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                   DeleteButton2()
                     .position({ x: '90%', y: -4 })
                     .onClick(() => {
+                      //组件截图到半模拟态的添加小卡片里，方便操作
+                      componentSnapshot.get('ShortcutsId', (error: Error, pixmap: image.PixelMap) => {
+                        if (error) {
+                          console.log("error: " + JSON.stringify(error))
+                          return;
+                        }
+                        this.pixmapShortcuts = pixmap //截图效果为后效果
+                      })
                       animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
                         this.isShowShortcuts = false
                       })
