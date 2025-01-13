@@ -1203,6 +1203,30 @@
     {
       "name": "override_reset_prompt",
       "value": "Reset override settings?"
+    },
+    {
+      "name": "write_url",
+      "value": "Write URL"
+    },
+    {
+      "name": "title",
+      "value": "Title"
+    },
+    {
+      "name": "shortcuts_card",
+      "value": "Shortcuts Card"
+    },
+    {
+      "name": "shortcuts",
+      "value": "Shortcuts"
+    },
+    {
+      "name": "click_modify",
+      "value": "Click Me Modify"
+    },
+    {
+      "name": "null_title_tips",
+      "value": "!!!You need to enter a title and ensure that your website contains the prefix 'https://' before opening the website"
     }
   ]
 }
