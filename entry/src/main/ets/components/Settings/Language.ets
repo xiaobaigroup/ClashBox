@@ -3,20 +3,26 @@ import { i18n } from "@kit.LocalizationKit"
 import { LanguageData, LanguageListItem } from "../../common/Constants"
 import { BreakpointState } from "../../common/breakpointsystem"
 import { promptAction } from "@kit.ArkUI"
+import { hilog } from "@kit.PerformanceAnalysisKit"
 
 @Component
 struct Language {
-  /* 主题色 */
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
+  // 主题色
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @Consume currentLanguage: ResourceStr
   @State SystemLanguageSubtitle: ResourceStr = $r('app.string.SimplifiedChinese')
   @State private currentRadioCheck: number = -1
   @State SettingsLanguageList: LanguageData[] = LanguageListItem()
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
-  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  //一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+
+  onChangeLanguage(areaID: string) {
+    // 修改语言 TODO 【用户首选项】保存所选语言 Ya@2025-01-11
+    i18n.System.setAppPreferredLanguage(areaID)
+  }
 
   build() {
     NavDestination() {
@@ -39,12 +45,13 @@ struct Language {
             .margin({ left: 12 })
             .alignItems(HorizontalAlign.Start)
             Blank()
-            Radio({ value: 'language' , group: 'languageGroup' })
+            Radio({ value: 'language-1' , group: 'languageGroup' })
               .checked(this.currentRadioCheck === -1)
               .margin({right: 12 })
               .radioStyle({
                 checkedBackgroundColor: this.icon_emphasize,
               })
+              .hitTestBehavior(HitTestMode.None)
           }
           .width('94%')
           .height(53)
@@ -57,7 +64,7 @@ struct Language {
           // 点击整行对应单选框选中
            this.currentRadioCheck = -1
           // 恢复默认
-          i18n.System.setAppPreferredLanguage("default")
+          this.onChangeLanguage("default")
           promptAction.showToast({message: $r('app.string.restart_app_tips'), duration: 2000 })
         })
         ForEach(this.SettingsLanguageList, (item: LanguageData, index: number) => {
@@ -84,6 +91,7 @@ struct Language {
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
+                .hitTestBehavior(HitTestMode.None)
             }
             .width('94%')
             .height(53)
@@ -95,8 +103,9 @@ struct Language {
           .onClick(() => {
             // 点击整行对应单选框选中
             this.currentRadioCheck = index
-            // 修改语言 TODO 【用户首选项】保存所选语言 Ya@2024-12-26
-            i18n.System.setAppPreferredLanguage(item.areaID)
+            hilog.info(0xFF00, "SettingsLanguagetestTag", "当前选中：%{public}d", this.currentRadioCheck)
+            // 改变语言
+            this.onChangeLanguage(item.areaID)
             if(index === 0) {
               this.currentLanguage = $r('app.string.Language_Subtitle')
             } else {

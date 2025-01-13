@@ -1,11 +1,16 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { ANIMATION_DURATION_300, AppearanceList, AppearanceListItemProp } from "../../common/Constants"
+import {
+  ANIMATION_DURATION_300,
+  AppearanceList,
+  AppearanceListItemProp,
+} from "../../common/Constants"
 import TopBuilder from "./TopBuilder"
 import { SymbolGlyphModifier, ThemeControl } from "@kit.ArkUI"
 import { CustomThemeName, CUSTOM_THEME_MAP } from "../../common/AppTheme"
 import { common } from "@kit.AbilityKit"
 import { setAutoColorMode, setDarkColorMode, setLightColorMode } from "../../common/ColorModeChangeFunctions"
 import { hilog } from "@kit.PerformanceAnalysisKit"
+import { menuRowList, toggleRowList } from "../Common"
 
 @Component
 struct Appearance {
@@ -32,19 +37,29 @@ struct Appearance {
   // 滚动列表高度
   @Consume('breakPointStateSettingslistHeight') private SettingslistHeight: BreakpointState<number>
   // 按钮宽度
-  @State
-  private proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
+  @State private proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
   // 按钮高度
-  @State
-  private proxyStartButtonHeight: Length = $r('app.integer.vp_proxy_not_start_button_height')
-  // 主题模式选中序号
+  @State private proxyStartButtonHeight: Length = $r('app.integer.vp_proxy_not_start_button_height')
+  // 深色模式选中序号
   @State EnableDarkMode: number = 0
+  // 深色模式选中文本
+  @State EnableDarkModeText: ResourceStr = $r('app.string.follow_system')
   // 主题色选中序号
   @State EnableThemeColor: number = 0
+  // 主题色选中文本
+  @State EnableThemeColorText: ResourceStr = $r('app.string.star_river_blue')
   // 按钮位置选中序号
   @State EnableButtonPosition: number = 0
+  // 按钮位置选中文本
+  @State EnableButtonPositionText: ResourceStr = $r('app.string.right')
   // 按钮位置偏移量（默认在右侧的偏移量）
   @State ButtonPositionOffset: number = 92
+  // 背景模糊启用变量
+  @State isBlurr: boolean= false
+  // 动画效果启用变量
+  @State isAnimation: boolean= false
+  // 主页问候启用变量
+  @State isGreeting: boolean= false
 
   // 切换菜单
   @Builder
@@ -62,7 +77,7 @@ struct Appearance {
             this.EnableDarkMode = index
             this.switchColorMode(index)
             // UI刷新
-            this.refreshColorModeList(menuItem.title)
+            this.EnableDarkModeText = menuItem.title
           })
         }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
       }
@@ -80,25 +95,24 @@ struct Appearance {
             this.EnableThemeColor = index
             this.changeThemeColor(menuItem?.customThemeName ?? 'blueAppTheme')
             // UI刷新
-            this.refreshThemeColorList(menuItem.title)
+            this.EnableThemeColorText = menuItem.title
           })
         }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
       }
-    } else if(index === 3) {
-      // 切换按钮位置
+    } else if (index === 2) {
       Menu() {
         ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
           MenuItem({
             content: menuItem.title,
             symbolEndIcon: this.EnableButtonPosition === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
           })
-          .selected(this.EnableButtonPosition === index)
-          .onChange((selected) => {
-            this.EnableButtonPosition = index
-            this.switchButtonPosition(index)
-            // UI刷新
-            this.refreshButtonPositionList(menuItem.title)
-          })
+            .selected(this.EnableButtonPosition === index)
+            .onChange((selected) => {
+              this.EnableButtonPosition = index
+              this.switchButtonPosition(index)
+              // UI刷新
+              this.EnableButtonPositionText = menuItem.title
+            })
         }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
       }
     }
@@ -141,37 +155,22 @@ struct Appearance {
       case 0:
         // 右侧
         this.ButtonPositionOffset = 92
+        // 需接入全局按钮位置控制
+
       break
       case 1:
         // 中间
         this.ButtonPositionOffset = 0
+        // 需接入全局按钮位置控制
+
       break
       case 2:
         // 左侧
         this.ButtonPositionOffset = -92
+        // 需接入全局按钮位置控制
+
       break
     }
-  }
-
-  // 刷新颜色模式列表行UI
-  refreshColorModeList(title: ResourceStr) {
-    const ItemData = this.appearanceList[0]
-    ItemData.subtitle = title
-    this.appearanceList.splice(0, 1, ItemData)
-  }
-
-  // 刷新主题色列表行UI
-  refreshThemeColorList(title: ResourceStr) {
-    const ThemeColorItemData = this.appearanceList[1]
-    ThemeColorItemData.subtitle = title
-    this.appearanceList.splice(1, 1, ThemeColorItemData)
-  }
-
-  // 刷新按钮位置列表行UI
-  refreshButtonPositionList(title: ResourceStr) {
-    const ButtonPositionItemData = this.appearanceList[3]
-    ButtonPositionItemData.subtitle = title
-    this.appearanceList.splice(3, 1, ButtonPositionItemData)
   }
 
   aboutToAppear(): void {
@@ -183,14 +182,63 @@ struct Appearance {
     AppStorage.setOrCreate('isFollowSystemSetting', this.isFollowSystemSetting)
   }
 
+  @Builder
+  ThemeColorTipsText() {
+    Text(this.EnableThemeColorText)
+      .fontWeight(FontWeight.Normal)
+      .textOverflow({ overflow: TextOverflow.Ellipsis })
+      .maxLines(1)
+      .margin({top: 2 })
+      .fontSize(14)
+  }
+  @Builder
+  ThemeColorMenuEntrance() {
+    // 确保children存在
+    if(this.appearanceList && this.appearanceList[1].children) {
+      this.switchMenu(this.appearanceList[1].children, 1)
+    }
+  }
+  @Builder
+  DarkModeTipsText() {
+    Text(this.EnableDarkModeText)
+      .fontWeight(FontWeight.Normal)
+      .textOverflow({ overflow: TextOverflow.Ellipsis })
+      .maxLines(1)
+      .margin({top: 2 })
+      .fontSize(14)
+  }
+  @Builder
+  DarkModeMenuEntrance() {
+    // 确保children存在
+    if(this.appearanceList && this.appearanceList[0].children) {
+      this.switchMenu(this.appearanceList[0].children, 0)
+    }
+  }
+  @Builder
+  ButtonPositionTipsText() {
+    Text(this.EnableButtonPositionText)
+      .fontWeight(FontWeight.Normal)
+      .textOverflow({ overflow: TextOverflow.Ellipsis })
+      .maxLines(1)
+      .margin({top: 2 })
+      .fontSize(14)
+  }
+  @Builder
+  ButtonPositionMenuEntrance() {
+    // 确保children存在
+    if(this.appearanceList && this.appearanceList[2].children) {
+      this.switchMenu(this.appearanceList[2].children, 2)
+    }
+  }
+
   build() {
     NavDestination() {
       // 顶部导航区
       TopBuilder({title: $r('app.string.Appearance')})
       // 功能区
-      Scroll() {
-        Column() {
-          // 颜色预览区
+      List({ space: 10 }) {
+        // 预览区
+        ListItem() {
           Stack() {
             // 单选框预览区
             Column() {
@@ -275,170 +323,153 @@ struct Appearance {
           .width('100%')
           .height(220)
           .clickEffect({ level: ClickEffectLevel.MIDDLE })
-          // 列表区
-          ForEach(this.appearanceList, (item: AppearanceListItemProp, index: number) => {
-            Row() {
-              if(!this.isShowExperimentalFunction) {
-                if(index != 5) {
-                  Row() {
-                    SymbolGlyph(item.icon)
-                      .fontSize(24)
-                      .margin({left: 12})
-                      .fontColor([this.icon_emphasize])
-                    Column() {
-                      Row() {
-                        Text(item.title)
-                          .fontWeight(FontWeight.Medium)
-                          .fontSize(16)
-                        // 实验功能提示框
-                        if(item.subtitle2) {
-                          Column() {
-                            Text(item.subtitle2)
-                              .fontColor(Color.White)
-                              .fontSize(10)
-                          }
-                          .alignItems(HorizontalAlign.Center)
-                          .justifyContent(FlexAlign.Center)
-                          .width(50)
-                          .height(18)
-                          .borderRadius(4)
-                          .margin({left: 2})
-                          .backgroundColor(this.icon_emphasize)
-                        }
-                      }
-                      if(!item.children) {
-                        Text(item.subtitle)
-                          .fontWeight(FontWeight.Normal)
-                          .textOverflow({ overflow: TextOverflow.MARQUEE })
-                          .maxLines(1)
-                          .margin({ top: 2 })
-                          .fontSize(14)
-                          .width('70%')
-                      }
-                    }
-                    .margin({ left: 12 })
-                    .alignItems(HorizontalAlign.Start)
-                    Blank()
-                    if(item.children) {
-                      Row() {
-                        Text(item.subtitle)
-                          .fontWeight(FontWeight.Normal)
-                          .textOverflow({ overflow: TextOverflow.Ellipsis })
-                          .maxLines(1)
-                          .margin({top: 2 })
-                          .fontSize(14)
-                        SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
-                          .fontSize(14)
-                          .margin({left: 7, right: 20})
-                          .fontColor([this.icon_primary])
-                      }.bindMenu(this.switchMenu(item.children, index))
-                    } else {
-                      Toggle({ type: ToggleType.Switch, isOn: item.isOn })
-                        .selectedColor(this.icon_emphasize)
-                        .margin({right: 12})
-                        .onChange((isOn: boolean) => {
-                          if(isOn) {
-                            //this.handleToggle(index)
-                          }
-                        })
-                    }
-                  }
-                  .RowStyle()
-                }
-              } else if(this.isShowExperimentalFunction) {
-                Row() {
-                  SymbolGlyph(item.icon)
-                    .fontSize(24)
-                    .margin({left: 12})
-                    .fontColor([this.icon_emphasize])
-                  Column() {
-                    Row() {
-                      Text(item.title)
-                        .fontWeight(FontWeight.Medium)
-                        .fontSize(16)
-                      // 实验功能提示框
-                      if(item.subtitle2) {
-                        Column() {
-                          Text(item.subtitle2)
-                            .fontColor(Color.White)
-                            .fontSize(10)
-                        }
-                        .alignItems(HorizontalAlign.Center)
-                        .justifyContent(FlexAlign.Center)
-                        .width(50)
-                        .height(18)
-                        .borderRadius(4)
-                        .margin({left: 2})
-                        .backgroundColor(this.icon_emphasize)
-                      }
-                    }
-                    if(!item.children) {
-                      Text(item.subtitle)
-                        .fontWeight(FontWeight.Normal)
-                        .textOverflow({ overflow: TextOverflow.MARQUEE })
-                        .maxLines(1)
-                        .margin({ top: 2 })
-                        .fontSize(14)
-                        .width('70%')
-                    }
-                  }
-                  .margin({ left: 12 })
-                  .alignItems(HorizontalAlign.Start)
-                  Blank()
-                  if(item.children) {
-                    Row() {
-                      Text(item.subtitle)
-                        .fontWeight(FontWeight.Normal)
-                        .textOverflow({ overflow: TextOverflow.Ellipsis })
-                        .maxLines(1)
-                        .margin({top: 2 })
-                        .fontSize(14)
-                      SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
-                        .fontSize(14)
-                        .margin({left: 7, right: 20})
-                        .fontColor([this.icon_primary])
-                    }.bindMenu(this.switchMenu(item.children, index))
-                  } else {
-                    Toggle({ type: ToggleType.Switch, isOn: item.isOn })
-                      .selectedColor(this.icon_emphasize)
-                      .margin({right: 12})
-                      .onChange((isOn: boolean) => {
-                        if(isOn) {
-                          //this.handleToggle(index)
-                        }
-                      })
-                  }
-                }
-                .RowStyle()
-              }
-            }
-            .clickEffect({ level: ClickEffectLevel.MIDDLE })
-            .onClick(() => {
-              if (index === 2 || index === 4 || index === 5) {
-                // 改变对应开关状态 显式动画
-                this.getUIContext()?.animateTo({
-                  duration: ANIMATION_DURATION_300,
-                  curve: Curve.Ease
-                }, () => {
-                  const childItem = this.appearanceList[index]
-                  childItem.isOn = !childItem.isOn
-                  // 使用splice来更新父组件数组
-                  this.appearanceList.splice(index, 1, childItem)
-                })
-
-              }
-            })
-
-          })
         }
-        .width('100%')
-        .alignItems(HorizontalAlign.Start)
-        .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+        // 列表区 Start
+        ListItem() {
+          Column() {
+            // 主题色
+            menuRowList({
+              icons: $r('sys.symbol.paintpalette_fill'),
+              title: $r('app.string.theme_color'),
+              // 确保this指向父组件
+              tips: (): void => { this.ThemeColorTipsText() },
+              menu: (): void => { this.ThemeColorMenuEntrance() }
+            })
+            // 分割线
+            Row().height(0.5).backgroundColor('#0D000000').width('93%')
+            // 深色模式
+            menuRowList({
+              icons: $r('sys.symbol.circle_righthalf_inset_filled'),
+              title: $r('app.string.dark_mode'),
+              // 确保this指向父组件
+              tips: (): void => { this.DarkModeTipsText() },
+              menu: (): void => { this.DarkModeMenuEntrance() }
+            })
+            // 分割线
+            Row().height(0.5).backgroundColor('#0D000000').width('93%')
+            // 背景模糊
+            Row() {
+              toggleRowList({
+                icons: $r('sys.symbol.rectangle_on_rectangle_fill'),
+                title: $r('app.string.blurred_background'),
+                subtitle: $r('app.string.blurred_background_subtitle'),
+              }) {
+                // 背景模糊开关
+                Toggle({ type: ToggleType.Switch, isOn: $$this.isBlurr })
+                  .selectedColor(this.icon_emphasize)
+                  .margin({right: 12})
+                  .onChange((isOn: boolean) => {
+                    // 打开背景模糊 显式动画
+                    this.getUIContext()?.animateTo({
+                      duration: ANIMATION_DURATION_300,
+                      curve: Curve.Ease
+                    }, () => {
+                      this.isBlurr = isOn
+                    })
+                  })
+              }
+            }.onClick(()=> {
+              // 打开背景模糊 显式动画
+              this.getUIContext()?.animateTo({
+                duration: ANIMATION_DURATION_300
+              }, () => {
+                this.isBlurr = !this.isBlurr
+              })
+            })
+            if(this.isShowExperimentalFunction) {
+              // 分割线
+              Row().height(0.5).backgroundColor('#0D000000').width('93%')
+              // 动画效果
+              Row() {
+                toggleRowList({
+                  icons: $r('sys.symbol.livephoto'),
+                  title: $r('app.string.animation_effects'),
+                  subtitle: $r('app.string.animation_effects_subtitle'),
+                  isExperimentalFunction: true
+                }) {
+                  // 动画效果开关
+                  Toggle({ type: ToggleType.Switch, isOn: $$this.isAnimation })
+                    .selectedColor(this.icon_emphasize)
+                    .margin({right: 12})
+                    .onChange((isOn: boolean) => {
+                      // 打开动画效果 显式动画
+                      this.getUIContext()?.animateTo({
+                        duration: ANIMATION_DURATION_300,
+                        curve: Curve.Ease
+                      }, () => {
+                        this.isAnimation = isOn
+                      })
+                    })
+                }
+              }.onClick(()=> {
+                // 打开动画效果 显式动画
+                this.getUIContext()?.animateTo({
+                  duration: ANIMATION_DURATION_300
+                }, () => {
+                  this.isAnimation = !this.isAnimation
+                })
+              })
+            }
+          }
+          .width('100%')
+          .borderRadius(20)
+          .clickEffect({ level: ClickEffectLevel.MIDDLE })
+          .backgroundColor($r('app.color.container_background'))
+        }
+        ListItem() {
+          Column() {
+            // 主页问候
+            Row() {
+              toggleRowList({
+                icons: $r('sys.symbol.message'),
+                title: $r('app.string.homepage_greetings'),
+                subtitle: $r('app.string.homepage_greetings_subtitle'),
+              }) {
+                // 主页问候开关
+                Toggle({ type: ToggleType.Switch, isOn: $$this.isGreeting })
+                  .selectedColor(this.icon_emphasize)
+                  .margin({right: 12})
+                  .onChange((isOn: boolean) => {
+                    // 打开主页问候 显式动画
+                    this.getUIContext()?.animateTo({
+                      duration: ANIMATION_DURATION_300,
+                      curve: Curve.Ease
+                    }, () => {
+                      this.isGreeting = isOn
+                    })
+                  })
+              }
+            }.onClick(()=> {
+              // 打开主页问候 显式动画
+              this.getUIContext()?.animateTo({
+                duration: ANIMATION_DURATION_300
+              }, () => {
+                this.isGreeting = !this.isGreeting
+              })
+            })
+            // 分割线
+            Row().height(0.5).backgroundColor('#0D000000').width('93%')
+            // 悬浮按钮位置
+            menuRowList({
+              icons: $r('sys.symbol.local_fill'),
+              title: $r('app.string.suspension_button_position'),
+              // 确保this指向父组件
+              tips: (): void => { this.ButtonPositionTipsText() },
+              menu: (): void => { this.ButtonPositionMenuEntrance() }
+            })
+          }
+          .width('100%')
+          .borderRadius(20)
+          .clickEffect({ level: ClickEffectLevel.MIDDLE })
+          .backgroundColor($r('app.color.container_background'))
+        }
+        // 列表区 End
       }
       .width('100%')
       .align(Alignment.Top)
       .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
       .height(this.isLandscapePhone ? 300 : this.SettingslistHeight.value)
+      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value, bottom: this.breakPointStatemorePageMargin.value })
 
     }
     .width('100%')
@@ -452,15 +483,3 @@ struct Appearance {
   }
 }
 export default Appearance
-
-/**
- * 列表Row共有样式
- */
-@Extend(Row)
-function RowStyle() {
-  .margin({bottom: 10})
-  .width('100%')
-  .height(53)
-  .borderRadius(20)
-  .backgroundColor($r('app.color.container_background'))
-}

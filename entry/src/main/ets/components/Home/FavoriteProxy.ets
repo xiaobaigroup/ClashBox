@@ -2,7 +2,9 @@ import { BreakpointState } from '../../common/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI'
 import { MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
-import { Item } from '../../common/ProxyData'
+import { Item, ProxyData } from '../../common/ProxyData'
+
+
 
 @Component
 struct FavoriteProxy {
@@ -17,7 +19,6 @@ struct FavoriteProxy {
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
   //radio选中判定
   @State FavoriteProxyRadio :number =0
-
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   //主页卡片内容IP地址小字体大小
@@ -119,7 +120,7 @@ struct FavoriteProxy {
       }//拥有收藏节点的布局 end
 
       //没有收藏节点的布局 start
-      else if (this.FavoriteProxy<0)
+     else if (this.FavoriteProxy<0)
       {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
           SymbolGlyph($r('sys.symbol.star'))
@@ -144,3 +145,5 @@ struct FavoriteProxy {
   }
 }
 export default FavoriteProxy
+
+

@@ -19,7 +19,6 @@ struct settingsListItem {
           .fontColor([this.icon_emphasize])
         Column() {
           Text(this.itemObj.title)
-            //.height(48)
             .fontWeight(FontWeight.Medium)
             .fontSize(16)
           if(this.itemObj.subtitle) {

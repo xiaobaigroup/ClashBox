@@ -1,4 +1,5 @@
 import { BreakpointState } from "../../common/breakpointsystem"
+import { MoreTop } from "./MoreTopBuilder"
 
 @Component
 struct Resources {
@@ -6,33 +7,30 @@ struct Resources {
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
 
+  @Builder
+  reaourceSearch() {
+  }
+  @Builder
+  reaourceOther() {
+  }
+
   build() {
     NavDestination() {
-      Row() {
-        //返回图标
-        Button({ type: ButtonType.Circle, stateEffect: true }) {
-          SymbolGlyph($r('sys.symbol.chevron_left'))
-            .fontSize(28)
-            .fontColor([this.icon_primary])
-        }
-        .margin({left: this.morePageMargin.value})
-        .onClick(() => {
-          this.pageInfos.pop(true)
-        })
-        .width(40)
-        .height(40)
-        .backgroundColor($r('app.color.settings_container_background'))
-        Text($r('app.string.Resources'))
-          .fontSize(30)
-          .fontWeight(FontWeight.Bold)
-          .textAlign(TextAlign.Start)
-          .margin({left: 8})
-        Blank()
+      Column() {
+        Row() {
+          MoreTop({
+            title: $r('app.string.Resources'),
+            searchButton: this.reaourceSearch,
+            otherButton: this.reaourceOther
+          })
+        }.width('100%')
+
 
       }
       .width('100%')
-      .height(56)
-      .alignItems(VerticalAlign.Center)
+      .height('100%')
+      .justifyContent(FlexAlign.Start)
+      .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))

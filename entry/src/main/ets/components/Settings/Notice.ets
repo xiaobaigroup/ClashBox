@@ -12,6 +12,7 @@ import { hilog } from "@kit.PerformanceAnalysisKit"
 import { customVibrator } from "../../utils/VibratorUtil"
 import { customSound } from "../../utils/SoundPoolUtil"
 import { promptAction } from "@kit.ArkUI"
+import { toggleRowList } from "../Common"
 
 /**
  * 通知页
@@ -31,6 +32,8 @@ struct Notice {
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
   // 震动反馈开关变量
   @State Enabledvibrate: boolean = false
+  // 震动反馈开关变量
+  @State Enabledsound: boolean = false
   // 通知总开关变量
   @State Enablednotice: boolean = false
   // 常驻通知开关变量
@@ -76,103 +79,141 @@ struct Notice {
   build() {
     NavDestination() {
       TopBuilder({title: $r('app.string.Notice')})
-      Column() {
-        // 震动反馈开关 Start
-        Row() {
-          noticeRow({
-            noticeTitle: $r('app.string.vibrate_feedback'),
-            noticeIcons: $r('sys.symbol.bell_fill')
-          }) {
-            // 震动反馈开关
-            Toggle({ type: ToggleType.Switch, isOn: $$this.Enabledvibrate })
-              .selectedColor(this.icon_emphasize)
-              .margin({right: 12})
-              .onChange((isOn: boolean) => {
-                // 显示后台通知设置 显式动画
-                this.getUIContext()?.animateTo({
-                  duration: ANIMATION_DURATION_300,
-                  curve: Curve.Ease
-                }, () => {
-                  this.Enabledvibrate = isOn
-                })
-              })
-          }
-        }
-        .RowStyle()
-        .margin({bottom: 10})
-        .onClick( ()=> {
-          // 显示后台通知设置 显式动画
-          this.getUIContext()?.animateTo({
-            duration: ANIMATION_DURATION_300,
-          }, () => {
-            this.Enabledvibrate = !this.Enabledvibrate
-          })
-        })
-        // 震动反馈开关 End
-        // 通知总开关 Start
-        Row() {
-          noticeRow({
-            noticeTitle: $r('app.string.notice_main_switch'),
-            noticeIcons: $r('sys.symbol.message_on_message_fill')
-          }) {
-            // 通知总开关
-            Toggle({ type: ToggleType.Switch, isOn: $$this.Enablednotice })
-              .selectedColor(this.icon_emphasize)
-              .margin({right: 12})
-              .onChange((isOn: boolean) => {
-                // 显示后台通知设置 显式动画
-                this.getUIContext()?.animateTo({
-                  duration: 1200,
-                  curve: Curve.Ease
-                }, () => {
-                  this.Enablednotice = isOn
-                })
-              })
-          }
-        }
-        .RowStyle()
-        .margin({bottom: 10})
-        .onClick( ()=> {
-          // 点击提示 防误触
-          promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
-        })
-        // 通知总开关 End
-        if(this.Enablednotice) {
-          // 常驻通知 Start
+      Column({space: 10}) {
+        // 反馈 Start
+        Column({space: 10}) {
+          // 震动反馈开关 Start
           Row() {
-            noticeRow({
-              noticeTitle: $r('app.string.background_notice'),
-              noticeIcons: $r('sys.symbol.ellipsis_message_fill'),
-              noticeSubtitle: $r('app.string.background_notice_subtitle')
+            toggleRowList({
+              title: $r('app.string.vibrate_feedback'),
+              icons: $r('sys.symbol.rectangle_portrait_wave_2')
             }) {
-              // 常驻通知开关
-              Toggle({ type: ToggleType.Switch, isOn: $$this.EnabledPermanentnotice })
+              // 震动反馈开关
+              Toggle({ type: ToggleType.Switch, isOn: $$this.Enabledvibrate })
                 .selectedColor(this.icon_emphasize)
                 .margin({right: 12})
-                .opacity(this.Enablebackgrounder ? 0.5 : 1)
-                .hitTestBehavior(this.Enablebackgrounder ? HitTestMode.None : HitTestMode.Default)
                 .onChange((isOn: boolean) => {
-                  if(!this.Enablebackgrounder) {
-                    // 显示后台通知设置 显式动画
-                    this.getUIContext()?.animateTo({
-                      duration: ANIMATION_DURATION_300,
-                      curve: Curve.Ease
-                    }, () => {
-                      this.EnabledPermanentnotice = isOn
-                    })
-                  }
+                  // 显示后台通知设置 显式动画
+                  this.getUIContext()?.animateTo({
+                    duration: ANIMATION_DURATION_300,
+                    curve: Curve.Ease
+                  }, () => {
+                    this.Enabledvibrate = isOn
+                  })
                 })
             }
           }
           .RowStyle()
-          .margin({bottom: 10})
           .onClick( ()=> {
-            if(!this.Enablebackgrounder) {
-              // 点击提示
-              promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
-            }
+            // 显示后台通知设置 显式动画
+            this.getUIContext()?.animateTo({
+              duration: ANIMATION_DURATION_300,
+            }, () => {
+              this.Enabledvibrate = !this.Enabledvibrate
+            })
           })
-          // 常驻通知 End
+          // 震动反馈开关 End
+          // 声音反馈开关 Start
+          Row() {
+            toggleRowList({
+              title: $r('app.string.sound_feedback'),
+              icons: $r('sys.symbol.bell_fill')
+            }) {
+              // 震动反馈开关
+              Toggle({ type: ToggleType.Switch, isOn: $$this.Enabledsound })
+                .selectedColor(this.icon_emphasize)
+                .margin({right: 12})
+                .onChange((isOn: boolean) => {
+                  // 显示后台通知设置 显式动画
+                  this.getUIContext()?.animateTo({
+                    duration: ANIMATION_DURATION_300,
+                    curve: Curve.Ease
+                  }, () => {
+                    this.Enabledsound = isOn
+                  })
+                })
+            }
+          }
+          .RowStyle()
+          .onClick( ()=> {
+            // 显示后台通知设置 显式动画
+            this.getUIContext()?.animateTo({
+              duration: ANIMATION_DURATION_300,
+            }, () => {
+              this.Enabledsound = !this.Enabledsound
+            })
+          })
+          // 声音反馈开关 End
+        }.ColumnStyle()
+        // 反馈 End
+        // 通知 Start
+        Column({space: 10}) {
+          // 通知总开关 Start
+          Row() {
+            toggleRowList({
+              title: $r('app.string.notice_main_switch'),
+              icons: $r('sys.symbol.message_on_message_fill')
+            }) {
+              // 通知总开关
+              Toggle({ type: ToggleType.Switch, isOn: $$this.Enablednotice })
+                .selectedColor(this.icon_emphasize)
+                .margin({right: 12})
+                .onChange((isOn: boolean) => {
+                  // 显示后台通知设置 显式动画
+                  this.getUIContext()?.animateTo({
+                    duration: 1200,
+                    curve: Curve.Ease
+                  }, () => {
+                    this.Enablednotice = isOn
+                  })
+                })
+            }
+          }
+          .RowStyle()
+          .onClick( ()=> {
+            // 点击提示 防误触
+            promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
+          })
+          // 通知总开关 End
+          if (this.Enablednotice) {
+            // 常驻通知 Start
+            Row() {
+              toggleRowList({
+                title: $r('app.string.background_notice'),
+                icons: $r('sys.symbol.ellipsis_message_fill'),
+                subtitle: $r('app.string.background_notice_subtitle')
+              }) {
+                // 常驻通知开关
+                Toggle({ type: ToggleType.Switch, isOn: $$this.EnabledPermanentnotice })
+                  .selectedColor(this.icon_emphasize)
+                  .margin({right: 12})
+                  .opacity(this.Enablebackgrounder ? 0.5 : 1)
+                  .hitTestBehavior(this.Enablebackgrounder ? HitTestMode.None : HitTestMode.Default)
+                  .onChange((isOn: boolean) => {
+                    if(!this.Enablebackgrounder) {
+                      // 显示后台通知设置 显式动画
+                      this.getUIContext()?.animateTo({
+                        duration: ANIMATION_DURATION_300,
+                        curve: Curve.Ease
+                      }, () => {
+                        this.EnabledPermanentnotice = isOn
+                      })
+                    }
+                  })
+              }
+            }
+            .RowStyle()
+            .onClick( ()=> {
+              if(!this.Enablebackgrounder) {
+                // 点击提示
+                promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
+              }
+            })
+            // 常驻通知 End
+          }
+        }.ColumnStyle()
+        // 通知 End
+        if(this.Enablednotice) {
           // 常驻通知提醒 Start
           if(this.Enablebackgrounder) {
             Text($r('app.string.background_notice_tips'))
@@ -183,10 +224,10 @@ struct Notice {
           // 常驻通知提醒 End
           // 流量提醒 Start
           Row() {
-            noticeRow({
-              noticeTitle: $r('app.string.cellular_data_reminder'),
-              noticeIcons: $r('sys.symbol.mobiledata'),
-              noticeSubtitle: $r('app.string.cellular_data_reminder_subtitle')
+            toggleRowList({
+              title: $r('app.string.cellular_data_reminder'),
+              icons: $r('sys.symbol.mobiledata'),
+              subtitle: $r('app.string.cellular_data_reminder_subtitle')
             }) {
               // 使用文本与箭头替换掉默认的开关
               Text(this.EnableCellularDataReminder ? $r('app.string.enabled') : $r('app.string.not_enabled'))
@@ -200,7 +241,6 @@ struct Notice {
             }
           }
           .RowStyle()
-          .margin({bottom: 10})
           .onClick( ()=> {
             // 点击跳转至流量提醒设置
             this.SettingsPageInfos.pushPathByName('CellularDataReminder', false)
@@ -210,10 +250,10 @@ struct Notice {
           Column() {
             // 时间提醒行 Start
             Row() {
-              noticeRow({
-                noticeTitle: $r('app.string.time_reminder'),
-                noticeIcons: $r('sys.symbol.clock'),
-                noticeSubtitle: $r('app.string.time_reminder_subtitle')
+              toggleRowList({
+                title: $r('app.string.time_reminder'),
+                icons: $r('sys.symbol.clock'),
+                subtitle: $r('app.string.time_reminder_subtitle')
               }) {
                 // 时间提醒开关
                 Toggle({ type: ToggleType.Switch, isOn: $$this.EnabledTimenotice })
@@ -392,10 +432,10 @@ export struct CellularDataReminder {
         Column() {
           // 流量提醒总开关行
           Row() {
-            noticeRow({
-              noticeTitle: $r('app.string.cellular_data_reminder'),
-              noticeIcons: $r('sys.symbol.mobiledata'),
-              noticeSubtitle: $r('app.string.cellular_data_reminder_subtitle')
+            toggleRowList({
+              title: $r('app.string.cellular_data_reminder'),
+              icons: $r('sys.symbol.mobiledata'),
+              subtitle: $r('app.string.cellular_data_reminder_subtitle')
             }) {
               // 流量提醒总开关  TODO 【用户首选项】保存通知页的流量提醒开关启用状态 Ya@2024-12-26
               Toggle({ type: ToggleType.Switch, isOn: $$this.EnableCellularDataReminder })
@@ -425,9 +465,9 @@ export struct CellularDataReminder {
           if(this.EnableCellularDataReminder) {
             // 每小时通知
             Column() {
-              noticeRow({
-                noticeTitle: $r('app.string.per_hour_notice'),
-                noticeSubtitle: $r('app.string.per_hour_notice_subtitle')
+              toggleRowList({
+                title: $r('app.string.per_hour_notice'),
+                subtitle: $r('app.string.per_hour_notice_subtitle')
               }) {
                 // 每小时通知开关
                 Toggle({ type: ToggleType.Switch, isOn: $$this.perHourNotice })
@@ -472,9 +512,9 @@ export struct CellularDataReminder {
             })
             // 每日通知
             Column() {
-              noticeRow({
-                noticeTitle: $r('app.string.per_day_notice'),
-                noticeSubtitle: $r('app.string.per_day_notice_subtitle')
+              toggleRowList({
+                title: $r('app.string.per_day_notice'),
+                subtitle: $r('app.string.per_day_notice_subtitle')
               }) {
                 // 每日通知开关
                 Toggle({ type: ToggleType.Switch, isOn: $$this.perDayNotice })
@@ -519,9 +559,9 @@ export struct CellularDataReminder {
             })
             // 每周通知
             Column() {
-              noticeRow({
-                noticeTitle: $r('app.string.per_week_notice'),
-                noticeSubtitle: $r('app.string.per_week_notice_subtitle')
+              toggleRowList({
+                title: $r('app.string.per_week_notice'),
+                subtitle: $r('app.string.per_week_notice_subtitle')
               }) {
                 // 每周通知开关
                 Toggle({ type: ToggleType.Switch, isOn: $$this.perWeekNotice })
@@ -566,9 +606,9 @@ export struct CellularDataReminder {
             })
             // 每月通知
             Column() {
-              noticeRow({
-                noticeTitle: $r('app.string.per_month_notice'),
-                noticeSubtitle: $r('app.string.per_month_notice_subtitle')
+              toggleRowList({
+                title: $r('app.string.per_month_notice'),
+                subtitle: $r('app.string.per_month_notice_subtitle')
               }) {
                 // 每月通知开关
                 Toggle({ type: ToggleType.Switch, isOn: $$this.perMonthNotice })
@@ -613,9 +653,9 @@ export struct CellularDataReminder {
             })
             // 总量通知
             Column() {
-              noticeRow({
-                noticeTitle: $r('app.string.total_data_notice'),
-                noticeSubtitle: $r('app.string.total_data_notice_subtitle')
+              toggleRowList({
+                title: $r('app.string.total_data_notice'),
+                subtitle: $r('app.string.total_data_notice_subtitle')
               }) {
                 // 总量通知开关
                 Toggle({ type: ToggleType.Switch, isOn: $$this.totalDataNotice })
@@ -726,56 +766,7 @@ function TextInputStyle() {
   })
 }
 
-/**
- * 通知开关行
- */
-@Component
-struct noticeRow {
-  // 标题
-  @State noticeTitle: ResourceStr = ''
-  // 图标
-  @State noticeIcons: Resource = $r('sys.symbol.stopwatch_2')
-  // 副标题
-  @State noticeSubtitle: ResourceStr = ''
-  // 主题色
-  @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  // 通知开关
-  @BuilderParam noticeToggle: () => void = this.defaultBuilder
-  // 默认开关
-  @Builder
-  defaultBuilder() {
-    Toggle({ type: ToggleType.Switch, isOn: false })
-      .selectedColor(this.icon_emphasize)
-      .margin({right: 12})
-  }
 
-  build() {
-    Row() {
-      if(this.noticeIcons) {
-        SymbolGlyph(this.noticeIcons)
-          .fontSize(24)
-          .margin({left: 12})
-          .fontColor([this.icon_emphasize])
-      }
-      Column() {
-        Text(this.noticeTitle)
-          .fontWeight(FontWeight.Medium)
-          .fontSize(16)
-        Text(this.noticeSubtitle)
-          .fontWeight(FontWeight.Normal)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .maxLines(1)
-          .margin({top: 2})
-          .fontSize(14)
-      }
-      .alignItems(HorizontalAlign.Start)
-      .margin({ left: this.noticeIcons != null ? 12 : 14 })
-      Blank()
-      this.noticeToggle()
-    }
-    .RowStyle()
-  }
-}
 
 /**
  * 通知阈值输入行

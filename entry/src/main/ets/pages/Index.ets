@@ -19,7 +19,6 @@ import {
   MarginGenerate,
   HomeCardPadding_14_15_16_17,
   HomeCardCellularDatabarMargin,
-  CardTitleFontSize_18_29_26_27,
   HomeCardCellularDatabarHeight_6_5,
   HomeCardCellularDataChevronSize,
   HomeCardCellularDataChevronRowMargin,
@@ -31,15 +30,16 @@ import {
   DeleteButtonSize_24_32,
   HomeCardCellularDataSmFontSize,
   HomeCardPrpxySmFontSize,
-  ProxyFontSize_24_29_26_27,
   HomeCardIPSmFontSize,
   IPfontSize,
-  SpeedfontSize12_16_14_16,
   gutterHomeGridcol_12_15,
   gutterHomeGridcol,
   HomeCardAreaPadding,
   HomeCardTitleButtonPadding,
-  HomeCardEditHeight
+  HomeCardEditHeight,
+  CardTitleFontSize_18_20_22_22,
+  HomeProxyFontSize_24_26_26_27,
+  SpeedfontSize12_14_14_16
 } from '../common/Constants'
 import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
@@ -184,7 +184,7 @@ struct Index {
   private breakPointStateCellularDataFontSize: BreakpointState<number> = HomeCardCellularDataFontSize
   // 主页卡片标题字体大小
   @Provide('breakPointStateCardTitleFontSize')
-  private breakPointStateCardTitleFontSize: BreakpointState<number> = CardTitleFontSize_18_29_26_27
+  private breakPointStateCardTitleFontSize: BreakpointState<number> = CardTitleFontSize_18_20_22_22
   @Provide('breakPointStateListLanes')
   private breakPointStateListLanes: BreakpointState<number> = BPS_LIST_LANES_1_1_2_3_4
   @Provide('breakPointStateListGutter')
@@ -211,16 +211,16 @@ struct Index {
   @Provide('HomeCardPrpxySmFontSize')
   private HomeCardPrpxySmFontSize: BreakpointState<number> = HomeCardPrpxySmFontSize
   //主页卡片内容当前节点字体大小
-  @Provide('ProxyFontSize_24_29_26_27')
-  private ProxyFontSize_24_29_26_27: BreakpointState<number> = ProxyFontSize_24_29_26_27
+  @Provide('HomeProxyFontSize')
+  private ProxyFontSize: BreakpointState<number> = HomeProxyFontSize_24_26_26_27
   //主页卡片内容IP地址小字体大小
   @Provide('HomeCardIPSmFontSize')
   private HomeCardIPSmFontSize: BreakpointState<number> = HomeCardIPSmFontSize
   @Provide('IPfontSize') IPfontSize: BreakpointState<number> = IPfontSize
 
   //主页卡片内容网络测速字体大小
-  @Provide('SpeedfontSize12_16_14_16')
-  private SpeedfontSize12_16_14_16: BreakpointState<number> = SpeedfontSize12_16_14_16
+  @Provide('SpeedfontSize12_14_14_16')
+  private SpeedfontSize12_14_14_16: BreakpointState<number> = SpeedfontSize12_14_14_16
   //主页栅格卡片间距
   @Provide('gutterHomeGridcol_12_15')
   private gutterHomeGridcol_12_15: BreakpointState<gutterHomeGridcol> = gutterHomeGridcol_12_15
@@ -250,8 +250,8 @@ struct Index {
   @Provide items: Item[] = ProxyData.ProxyItems();
 
   @Provide proxyGroups: ProxyGroup[] = []
-  /*
-    主页卡片组件截图
+  /**
+   * 主页卡片组件截图
    */
   @Provide ('pixmapSpeed')pixmapSpeed: image.PixelMap | undefined = undefined
   @Provide ('pixmapSwitchMode')pixmapSwitchMode: image.PixelMap | undefined = undefined
@@ -353,10 +353,10 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.deleteButtonSize)
     BreakpointSystem.getInstance().attach(this.HomeCardCellularDataSmFontSize)
     BreakpointSystem.getInstance().attach(this.HomeCardPrpxySmFontSize)
-    BreakpointSystem.getInstance().attach(this.ProxyFontSize_24_29_26_27)
+    BreakpointSystem.getInstance().attach(this.ProxyFontSize)
     BreakpointSystem.getInstance().attach(this.HomeCardIPSmFontSize)
     BreakpointSystem.getInstance().attach(this.IPfontSize)
-    BreakpointSystem.getInstance().attach(this.SpeedfontSize12_16_14_16)
+    BreakpointSystem.getInstance().attach(this.SpeedfontSize12_14_14_16)
     BreakpointSystem.getInstance().attach(this.gutterHomeGridcol_12_15)
     BreakpointSystem.getInstance().attach(this.HomeCardAreaPadding)
     BreakpointSystem.getInstance().attach(this.HomeCardTitleButtonPadding)

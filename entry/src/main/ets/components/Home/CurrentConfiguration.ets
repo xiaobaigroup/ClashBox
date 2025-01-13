@@ -9,25 +9,25 @@ struct CurrentConfiguration {
   // 内容文本字体大小
   @Consume('breakPointStateHomeCardSwitchModeFontSize') private fontSize: BreakpointState<number>
   //主页卡片内容当前节点字体大小
-  @Consume('ProxyFontSize_24_29_26_27') private ProxyFontSize_24_29_26_27: BreakpointState<number>
+  @Consume('ProxyFontSize') private ProxyFontSize: BreakpointState<number>
   // 卡片内边距
   @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
 
   build() {
-    Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.End, justifyContent: FlexAlign.SpaceBetween}) {
+    Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.End, justifyContent: FlexAlign.SpaceBetween}) {
       Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.Start }) {
         CardTitle({ title: $r('app.string.CurrentConfiguration') })
         Text('配置名')
-          .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize_24_29_26_27.value)
+          .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
           .fontWeight(FontWeight.Bold)
           .fontColor($r('sys.color.font_primary'))
       }
 
         Button($r('app.string.refresh_IP'))
-          .width('100%')
-          .height('25%')
+          .width('55%')
+          .height('34%')
           .fontColor(this.icon_emphasize)
           .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
           .backgroundColor($r('app.color.home_card_background'))

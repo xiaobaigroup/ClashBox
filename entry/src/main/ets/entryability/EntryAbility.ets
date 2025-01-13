@@ -2,9 +2,8 @@ import { AbilityConstant, Configuration, ConfigurationConstant, UIAbility, Want 
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { ClashVpnService } from 'proxy_core/src/main/ets/rpc/ClashVpnService';
 import ClashViewModel from './ClashViewModel';
-
+import { KeyboardAvoidMode } from '@kit.ArkUI';
 
 export default class EntryAbility extends UIAbility {
  private currentLanguage: string | undefined = undefined

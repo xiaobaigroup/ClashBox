@@ -16,7 +16,7 @@ export struct CardTitle {
         .maxLines(1)
     }
     .width('100%')
-    .margin({bottom: this.titleBottomMargin.value})
+    .padding({bottom: this.titleBottomMargin.value})
     .justifyContent(FlexAlign.Start)
   }
 }

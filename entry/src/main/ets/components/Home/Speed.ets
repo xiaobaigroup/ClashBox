@@ -42,7 +42,7 @@ struct Speed {
   // 卡片内边距
   @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
   //主页卡片内容网络测速字体大小
-  @Consume('SpeedfontSize12_16_14_16') private SpeedfontSize12_16_14_16: BreakpointState<number>
+  @Consume('SpeedfontSize12_14_14_16') private SpeedfontSize12_14_14_16: BreakpointState<number>
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
   //初始化图表数据
@@ -200,7 +200,7 @@ struct Speed {
         Column() {
           Row({space:5}) {
             Text(this.DownloadSpeed.toString() + ' B/s')
-              .fontSize(this.isLandscapePhone ? 12:this.SpeedfontSize12_16_14_16.value)
+              .fontSize(this.isLandscapePhone ? 12:this.SpeedfontSize12_14_14_16.value)
               .fontColor($r('sys.color.font_primary'))
               .textAlign(TextAlign.End)
 
@@ -211,7 +211,7 @@ struct Speed {
 
           Row({space:5}) {
             Text(this.UploadSpeed.toString() + ' B/s')
-              .fontSize(this.isLandscapePhone ? 12:this.SpeedfontSize12_16_14_16.value)
+              .fontSize(this.isLandscapePhone ? 12:this.SpeedfontSize12_14_14_16.value)
               .fontColor($r('sys.color.font_primary'))
               .textAlign(TextAlign.End)
 

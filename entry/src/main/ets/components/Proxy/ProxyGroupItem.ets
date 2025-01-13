@@ -1,6 +1,8 @@
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem'
-import { BIND_SHEET_CONTAINER_HEIGHT, LIST_ITEM_HEIGHT,
+import {
+  ANIMATION_DURATION_300,
+  BIND_SHEET_CONTAINER_HEIGHT, LIST_ITEM_HEIGHT,
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE } from '../../common/Constants'
 import { LengthMetrics, SymbolGlyphModifier,PromptAction } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
@@ -16,7 +18,6 @@ export const BPS_LIST_LANES_2_2_3_4_4: BreakpointState<number> = BreakpointState
   xl: 4,
   xxl: 5
 })
-
 
 /* 速度与延迟区别弹窗 */
 @CustomDialog
@@ -191,6 +192,7 @@ struct ProxyGroupItem {
   private ProxyPromptAction:PromptAction = this.getUIContext()?.getPromptAction()
 
 
+
   //长按菜单 start
   @Builder
   //长按菜单相关
@@ -266,8 +268,10 @@ struct ProxyGroupItem {
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
-                .onChange(() => {
-                  this.ProxyRadioCheckedValue = index
+                .onChange((isChecked: boolean) => {
+                  if (isChecked) {
+                    this.ProxyRadioCheckedValue = index
+                  }
                 })
             }
             .ListRowStyle()
@@ -333,6 +337,11 @@ struct ProxyGroupItem {
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
+                .onChange((isChecked: boolean) => {
+                  if (isChecked) {
+                    this.ProxyRadioCheckedValue = index
+                  }
+                })
             }
             .ListRowStyle()
           }
@@ -395,6 +404,11 @@ struct ProxyGroupItem {
                 .checked(index === this.ProxyRadioCheckedValue)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
+                })
+                .onChange((isChecked: boolean) => {
+                  if (isChecked) {
+                    this.ProxyRadioCheckedValue = index
+                  }
                 })
             }
             .ListRowStyle()

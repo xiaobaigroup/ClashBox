@@ -2,13 +2,25 @@ import { BreakpointState } from "../../common/breakpointsystem"
 import { MoreTop } from "./MoreTopBuilder"
 
 @Component
-struct RequestPage {
+struct Diversion {
   @Consume('NavPathStack') pageInfos: NavPathStack
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
+  // 一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
 
   @Builder
-  requestOther() {
+  diversionSearch() {
+  }
+  @Builder
+  diversionOther() {
+    Button({ type: ButtonType.Circle, stateEffect: true }) {
+      SymbolGlyph($r('sys.symbol.plus'))
+        .fontSize(24)
+        .fontColor([this.icon_primary])
+    }
+    .width(40)
+    .height(40)
+    .backgroundColor($r('app.color.settings_container_background'))
   }
 
   build() {
@@ -16,8 +28,9 @@ struct RequestPage {
       Column() {
         Row() {
           MoreTop({
-            title: $r('app.string.Request'),
-            otherButton: this.requestOther
+            title: $r('app.string.Diversion_Strategy'),
+            searchButton: this.diversionSearch,
+            otherButton: this.diversionOther
           })
         }.width('100%')
 
@@ -37,4 +50,4 @@ struct RequestPage {
   }
 }
 
-export default RequestPage
+export default Diversion

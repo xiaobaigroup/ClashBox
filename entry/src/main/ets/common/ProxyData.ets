@@ -8,7 +8,6 @@ export interface Item {
   isShowFavoriteProxy: boolean
 }
 
-
 // todo 节点假数据组后期可改可删
 export class ProxyData {
   private static items: Item[] = [
@@ -106,5 +105,28 @@ export class ProxyData {
     // 默认情况下，返回系统定义的次要字体颜色，适用于无效或未知的延迟值
     return $r('sys.color.font_secondary');
   }
+
+
+  // 使用鸿蒙系统提供的响应式机制
+  private static selectedItems: Item[] = [];
+
+  // 如果鸿蒙系统提供了类似Vue的computed属性，可以这样做
+  public static get getSelectedTexts(): string {
+    return ProxyData.selectedItems.map(item => item.text).join(', ');
+  }
+
+  // 方法用于添加选中的项
+  public static selectItem(item: Item): void {
+    if (ProxyData.selectedItems.length < 3 && !ProxyData.selectedItems.some(selected => selected.id === item.id)) {
+      ProxyData.selectedItems.push(item);
+    }
+  }
+
+  // 清空选中的项
+  public static clearSelection(): void {
+    ProxyData.selectedItems.splice(0, ProxyData.selectedItems.length);
+  }
 }
+
+
 

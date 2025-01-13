@@ -27,6 +27,7 @@ import { image } from '@kit.ImageKit'
 import ProxyINFO from '../components/Home/ProxyINFO'
 import CurrentConfiguration from '../components/Home/CurrentConfiguration'
 import ClashViewModel from '../entryability/ClashViewModel'
+import Shortcuts from '../components/Home/Shortcuts'
 
 
 @Entry
@@ -64,6 +65,8 @@ struct Home {
   @State greetings: Resource = $r('app.string.GoodMorning')
   @State ContainerHeight: string = ''
   @State TopHeight: string = ''
+  /* 主页卡片高度*/
+  @Consume('HomeCardEditHeight') private HomeCardEditHeight: BreakpointState<number>
   @State compStr: BreakpointState<string> = BreakpointState.of({
     xs: "xs",
     sm: "sm",
@@ -79,14 +82,8 @@ struct Home {
     lg: '15vp',
     xl: '15vp'
   });
-  //设置图标颜色，修改resources/base(dark)/element/color.json中settings_icon配置浅色和深色模式分别颜色
-  @State containerHeight: BreakpointState<string> = BreakpointState.of({
-    xs: '156vp',
-    sm: '160vp',
-    md: '232.7vp',
-    lg: '240vp',
-    xl: '240vp'
-  });
+
+
   @State GridRowHeight: BreakpointState<string> = BreakpointState.of({
     xs: '715vp',
     sm: '715vp',
@@ -150,6 +147,7 @@ struct Home {
   @Provide('isShowFavoriteConfiguration') isShowFavoriteConfiguration: boolean = true
   @Provide('isShowProxyINFO') isShowProxyINFO: boolean = false
   @Provide('isShowCurrentConfiguration') isShowCurrentConfiguration: boolean = false
+  @Provide('isShowShortcuts') isShowShortcuts: boolean = false
   // 页面名称 主页
   private componentName: string = 'HomePage'
   /* 是否开启 `Index` 页面的前景模糊 */
@@ -194,7 +192,6 @@ struct Home {
     console.log('问候语:' + this.greetings)
 
     BreakpointSystem.getInstance().attach(this.compStr)
-    BreakpointSystem.getInstance().attach(this.containerHeight)
     BreakpointSystem.getInstance().attach(this.GridRowHeight)
     BreakpointSystem.getInstance().start()
 
@@ -203,7 +200,6 @@ struct Home {
   aboutToDisappear() {
 
     BreakpointSystem.getInstance().attach(this.compStr)
-    BreakpointSystem.getInstance().attach(this.containerHeight)
     BreakpointSystem.getInstance().attach(this.GridRowHeight)
     BreakpointSystem.getInstance().stop()
     this.SaveDialogController = null // 将dialogController置空
@@ -246,6 +242,7 @@ struct Home {
     this.isShowFavoriteConfiguration = true
     this.isShowProxyINFO = false
     this.isShowCurrentConfiguration = false
+    this.isShowShortcuts = false
   }
 
   /**
@@ -264,7 +261,7 @@ struct Home {
   @Builder
   SettingsSheet() {
     Column() {
-      Settings({ isShowSettings: this.isShowSettings })
+      Settings()
     }
     .width('100%')
     .height('100%')
@@ -408,6 +405,7 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
     List() {
       ListItem() {
         GridRow({ gutter: this.isLandscapePhone ? { x: 12, y: 15 } : this.gutterHomeGridcol.value }) {
+          //网络速度小卡片
           if (this.isShowSpeed) {
             GridCol({
               span: { xs: this.isLandscapePhone ? 6 : 12, md: this.isLandscapePhone ? 6 : 12, lg: 6 },
@@ -434,8 +432,12 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                 }
               }
             }
-            .GridColStyle()
-            .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+           .aspectRatio(2.07)
+            .borderRadius(20)
+            .backgroundColor($r('app.color.container_background'))
+            .clickEffect({ level: ClickEffectLevel.MIDDLE })
+            .transition(TransitionEffect.scale({ x: 0, y: 0 }).animation({ duration: ANIMATION_DURATION_300 }))
+            .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
             //    .margin({ right: this.isLandscapePhone ? this.containerMargin.value : this.containerRightMargin.value })
             .onDetach(() => {
             }) //消失触发回调
@@ -443,6 +445,7 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
             }) //显示时触发回调
           }
 
+          //分流模式小卡片
           if (this.isShowSwitchMode) {
             GridCol({
               span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : 6, lg: 3 },
@@ -471,9 +474,10 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
             }
             // .margin({ right: this.containerMargin.value })
             .GridColStyle()
-            .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+            .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
           }
 
+          //流量统计小卡片
           if (this.isShowCellularData) {
             GridCol({
               span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : 6, lg: 3 },
@@ -502,9 +506,10 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
             }
             //   .margin({ left: this.containerMargin.value })
             .GridColStyle()
-            .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+            .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
           }
 
+          //当前节点小卡片
           if (this.isShowCurrentNode) {
             GridCol({
               span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : 6, lg: 3 },
@@ -532,9 +537,10 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
               }
             }
             .GridColStyle()
-            .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+            .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
           }
 
+          //IP地址小卡片
           if (this.isShowPublicNetwork) {
             GridCol({
               span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : 6, lg: 3 },
@@ -562,9 +568,10 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
               }
             }
             .GridColStyle()
-            .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+            .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
           }
 
+          //收藏节点小卡片
           if (this.isShowFavoriteProxy) {
             GridCol({
               span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : 6, lg: 3 },
@@ -592,9 +599,10 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
               }
             }
             .GridColStyle()
-            .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+            .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
           }
 
+          //收藏配置小卡片
           if (this.isShowFavoriteConfiguration) {
             GridCol({
               span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : 6, lg: 3 },
@@ -622,9 +630,10 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
               }
             }
             .GridColStyle()
-            .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+            .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
           }
 
+          //节点信息小卡片
           if (this.isShowProxyINFO) {
             GridCol({
               span: { xs: this.isLandscapePhone ? 6 : 12, md: this.isLandscapePhone ? 6 : 12, lg: 6 },
@@ -643,11 +652,16 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                 }
               }
             }
-            .GridColStyle()
-            .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+            .aspectRatio(2.07)
+            .borderRadius(20)
+            .backgroundColor($r('app.color.container_background'))
+            .clickEffect({ level: ClickEffectLevel.MIDDLE })
+            .transition(TransitionEffect.scale({ x: 0, y: 0 }).animation({ duration: ANIMATION_DURATION_300 }))
+            .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
             //    .margin({ right: this.isLandscapePhone ? this.containerMargin.value : this.containerRightMargin.value })
           }
 
+          //当前配置小卡片
           if (this.isShowCurrentConfiguration) {
             GridCol({
               span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : 6, lg: 3 },
@@ -667,9 +681,31 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
               }
             }
             .GridColStyle()
-            .height(this.isLandscapePhone ? '160vp' : this.containerHeight.value)
+            .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
           }
 
+          //快捷方式小卡片
+          if (this.isShowShortcuts) {
+            GridCol({
+              span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : 6, lg: 3 },
+              order: 8
+            }) {
+              Stack({ alignContent: Alignment.TopEnd }) {
+                Shortcuts()
+                if (this.isShowDeleteButton) {
+                  DeleteButton2()
+                    .position({ x: '90%', y: -4 })
+                    .onClick(() => {
+                      animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                        this.isShowShortcuts = false
+                      })
+                    })
+                }
+              }
+            }
+            .GridColStyle()
+            .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
+          }
         } //GridRow的尾括号
         .width('100%')
         .padding(this.isLandscapePhone ? { top: 4, left: 25, right: 25 } : this.HomeCardAreaPadding.value)
@@ -758,8 +794,9 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
       .height(this.isLandscapePhone ? '100%' : `calc(100% - ${TAB_CONTENT_TITLE_HEIGHT}vp)`)
       .width("100%")
       .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
-        detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],
+        detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE],
         preferType: SheetType.CENTER,
+        scrollSizeMode: ScrollSizeMode.CONTINUOUS,
         backgroundColor: $r('app.color.background'),
         dragBar: false,
         // blurStyle: BlurStyle.BACKGROUND_REGULAR,
@@ -838,7 +875,7 @@ export default Home
 // 小卡片共有属性
 @Extend(GridCol)
 function GridColStyle() {
-//  .aspectRatio(1)
+  .aspectRatio(1)
   .borderRadius(20)
   .backgroundColor($r('app.color.container_background'))
   .clickEffect({ level: ClickEffectLevel.MIDDLE })

@@ -71,7 +71,6 @@ struct TopBuilder {
     .alignItems(VerticalAlign.Top)
     .width('100%')
     .height(BIND_SHEET_TITLE_CONTAINER_HEIGHT)
-
   }
 }
 

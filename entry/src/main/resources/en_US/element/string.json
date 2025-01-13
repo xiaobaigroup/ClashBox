@@ -157,10 +157,6 @@
       "value": "Backup and Recovery"
     },
     {
-      "name": "ApplicationLock",
-      "value": "Application Lock"
-    },
-    {
       "name": "Notice",
       "value": "Notice"
     },
@@ -197,7 +193,7 @@
       "value": "Set application lock, Fingerprint/Face unlock"
     },
     {
-      "name": "NoticeSubtitle",
+      "name": "subtitle",
       "value": "Resident notifications and CellularData reminders"
     },
     {
@@ -1167,6 +1163,86 @@
     {
       "name": "proxy_name",
       "value": "Proxy Name"
+    },
+    {
+      "name": "beta_kernel_subtitle",
+      "value": "When enabled, the kernel under test will be displayed"
+    },
+    {
+      "name": "beta_kernel",
+      "value": "Beta kernel"
+    },
+    {
+      "name": "default_kernel",
+      "value": "ClashMeta(Default)"
+    },
+    {
+      "name": "filter",
+      "value": "Filter"
+    },
+    {
+      "name": "not_filter",
+      "value": "Not Filter"
+    },
+    {
+      "name": "information_only",
+      "value": "Information only"
+    },
+    {
+      "name": "warning_only",
+      "value": "Warning only"
+    },
+    {
+      "name": "error_only",
+      "value": "Error only"
+    },
+    {
+      "name": "reset",
+      "value": "Reset"
+    },
+    {
+      "name": "override_reset_prompt",
+      "value": "Reset override settings?"
+    },
+    {
+      "name": "write_url",
+      "value": "Write URL"
+    },
+    {
+      "name": "title",
+      "value": "Title"
+    },
+    {
+      "name": "shortcuts_card",
+      "value": "Shortcuts Card"
+    },
+    {
+      "name": "shortcuts",
+      "value": "Shortcuts"
+    },
+    {
+      "name": "long_press_modify",
+      "value": "LongPress Me Modify"
+    },
+    {
+      "name": "null_title_tips",
+      "value": "!!!You need to enter a title and ensure that your website contains the prefix 'https://' before opening the website"
+    },
+    {
+      "name": "sound_feedback",
+      "value": "Sound Feedback"
+    },
+    {
+      "name": "option1",
+      "value": "Option1"
+    },
+    {
+      "name": "option2",
+      "value": "Option2"
+    },
+    {
+      "name": "option3",
+      "value": "Option3"
     }
   ]
 }

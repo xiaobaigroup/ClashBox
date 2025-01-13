@@ -197,8 +197,8 @@ export const SettingsListItem = (): settingsData[] => {
     new settingsData($r('sys.symbol.translate_c2e'), 'Language', $r('app.string.Language'), '', $r('app.string.Language_Subtitle'), false),
     new settingsData($r('sys.symbol.brush_fill'), 'Appearance', $r('app.string.Appearance'), $r('app.string.AppearanceSubtitle'), '', false),
     new settingsData($r('sys.symbol.externaldrive_fill'), 'Backup', $r('app.string.Backup_Recovery'), $r('app.string.BackgrounderSubtitle'), '', false),
-    new settingsData($r('sys.symbol.lock_fill'), 'ApplicationLock', $r('app.string.ApplicationLock'), $r('app.string.ApplicationicationLockSubtitle'), $r('app.string.already_open'), false),
-    new settingsData($r('sys.symbol.ellipsis_message_fill'), 'Notice', $r('app.string.Notice'), $r('app.string.NoticeSubtitle'), '', false),
+    //new settingsData($r('sys.symbol.lock_fill'), 'Kernel', $r('app.string.Kernel'), $r('app.string.ApplicationicationLockSubtitle'), $r('app.string.already_open'), false),
+    new settingsData($r('sys.symbol.ellipsis_message_fill'), 'Notice', $r('app.string.Notice'), $r('app.string.subtitle'), '', false),
     new settingsData($r('sys.symbol.checkmark_square_on_square_fill'), 'Backgrounder', $r('app.string.Backgrounder'), $r('app.string.BackgrounderSubtitle'), '', false),
     new settingsData($r('sys.symbol.satellite_map_fill'), 'Kernel', $r('app.string.kernel'), $r('app.string.kernel_subtitle'), '', false),
     new settingsData($r('sys.symbol.trash_fill'), 'WipeData', $r('app.string.WipeData'), $r('app.string.WipeDataSubtitle'), '', false),
@@ -240,14 +240,10 @@ export const LanguageListItem = (): LanguageData[] => {
 }
 
 /**
- * 外观页参数
+ * 外观页菜单参数
  */
 export interface AppearanceListItemProp {
-  icon?: Resource
-  isOn?: boolean
   title: string | Resource
-  subtitle: string | Resource
-  subtitle2?: string | Resource
   // 自定义主题的名字
   customThemeName?: CustomThemeName
   // `start`方向上`Symbol`的颜色数组
@@ -255,56 +251,48 @@ export interface AppearanceListItemProp {
   children?: Array<AppearanceListItemProp>
 }
 /**
- * 外观页列表
+ * 外观页菜单列表
  */
 export const AppearanceList: AppearanceListItemProp[] = [
-  { icon: $r('sys.symbol.circle_righthalf_inset_filled'),  title: $r('app.string.dark_mode'), subtitle: $r('app.string.follow_system'),
+  { title: $r('app.string.dark_mode'),
     children: [
-      { title: $r('app.string.follow_system'), subtitle: ''},
-      { title: $r('app.string.always_light'), subtitle: ''},
-      { title: $r('app.string.always_dark'), subtitle: ''},
+      { title: $r('app.string.follow_system') },
+      { title: $r('app.string.always_light') },
+      { title: $r('app.string.always_dark') },
     ]
   },
-  { icon: $r('sys.symbol.paintpalette_fill'), title: $r('app.string.theme_color'), subtitle: $r('app.string.star_river_blue'),
+  { title: $r('app.string.theme_color'),
     children: [
-      { title: $r('app.string.star_river_blue'), subtitle: '', customThemeName: 'blueAppTheme', startSymbolFontColor: [$r('sys.color.icon_emphasize')] },
-      { title: $r('app.string.cat_blue'), subtitle: '', customThemeName: 'catBlueAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_cat_blue')] },
-      { title: $r('app.string.yellow'), subtitle: '', customThemeName: 'yellowAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_yellow')] },
-      { title: $r('app.string.red'), subtitle: '', customThemeName: 'redAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_red')] },
-      { title: $r('app.string.purple'), subtitle: '', customThemeName: 'purpleAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_purple')] },
-      { title: $r('app.string.pink'), subtitle: '', customThemeName: 'pinkAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_pink')] },
-      { title: $r('app.string.green'), subtitle: '', customThemeName: 'greenAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_green')] },
+      { title: $r('app.string.star_river_blue'), customThemeName: 'blueAppTheme', startSymbolFontColor: [$r('sys.color.icon_emphasize')] },
+      { title: $r('app.string.cat_blue'), customThemeName: 'catBlueAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_cat_blue')] },
+      { title: $r('app.string.yellow'), customThemeName: 'yellowAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_yellow')] },
+      { title: $r('app.string.red'), customThemeName: 'redAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_red')] },
+      { title: $r('app.string.purple'), customThemeName: 'purpleAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_purple')] },
+      { title: $r('app.string.pink'), customThemeName: 'pinkAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_pink')] },
+      { title: $r('app.string.green'), customThemeName: 'greenAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_green')] },
     ]
   },
-  { icon: $r('sys.symbol.message'), title: $r('app.string.homepage_greetings'), subtitle: $r('app.string.homepage_greetings_subtitle'), isOn: false},
-  { icon: $r('sys.symbol.local_fill'), title: $r('app.string.suspension_button_position'), subtitle: $r('app.string.right'),
+  { title: $r('app.string.suspension_button_position'),
     children: [
-      { title: $r('app.string.right'), subtitle: ''},
-      { title: $r('app.string.middle'), subtitle: ''},
-      { title: $r('app.string.left'), subtitle: ''},
+      { title: $r('app.string.right') },
+      { title: $r('app.string.middle') },
+      { title: $r('app.string.left') },
     ]
-  },
-  { icon: $r('sys.symbol.rectangle_on_rectangle_fill'), title: $r('app.string.blurred_background'), subtitle: $r('app.string.blurred_background_subtitle'), isOn: false},
-  { icon: $r('sys.symbol.livephoto'), title: $r('app.string.animation_effects'), subtitle: $r('app.string.animation_effects_subtitle'), subtitle2: $r('app.string.experimental_function'), isOn: false},
-]
-
-/**
- * 备份与恢复页参数
- */
-export interface BackupListItemProp {
-  icons: Resource
-  title: string | Resource
-  subtitle: string | Resource
-  subtitle2?: string | Resource
-  subtitle3: string | Resource
-}
-/**
- * 备份与恢复页列表
- */
-export const BackupList: BackupListItemProp[] = [
-  { icons: $r('sys.symbol.icloud'), title: $r('app.string.cloud_backup'), subtitle: $r('app.string.cloud_backup_subtitle'), subtitle2: $r('app.string.experimental_function'), subtitle3: $r('app.string.not_enabled') },
-  { icons: $r('sys.symbol.arrowshape_up_to_line_fill'), title: $r('app.string.backup'), subtitle: $r('app.string.backup_subtitle'), subtitle3: '' },
-  { icons: $r('sys.symbol.arrowshape_down_to_line_fill'), title: $r('app.string.restore'), subtitle: $r('app.string.restore_subtitle'), subtitle3: '' },
+  }
+  // { title: 'Theme',
+  //   subtitle: '',
+  //   children:[
+  //     { icon: $r('sys.symbol.rectangle_on_rectangle_fill'), title: $r('app.string.blurred_background'), subtitle: $r('app.string.blurred_background_subtitle'), isOn: false},
+  //     { icon: $r('sys.symbol.livephoto'), title: $r('app.string.animation_effects'), subtitle: $r('app.string.animation_effects_subtitle'), subtitle2: $r('app.string.experimental_function'), isOn: false},
+  //   ]
+  // },
+  // { title: 'Ability',
+  //   subtitle: '',
+  //   children: [
+  //     { icon: $r('sys.symbol.message'), title: $r('app.string.homepage_greetings'), subtitle: $r('app.string.homepage_greetings_subtitle'), isOn: false},
+  //
+  //   ]
+  // }
 ]
 
 /**
@@ -364,8 +352,7 @@ export const AboutList: AboutListItemProp[] = [
       { title: $r('app.string.UpdateChannels'), subtitle: $r('app.string.UpdateChannels_Subtitle1'), sign: 3, name: 'UpdateChannels',
         children: [
           { title: $r('app.string.UpdateChannels_Subtitle1'), name: 'Github', subtitle: '' },
-          { title: '蓝奏云', name: 'LZY', subtitle: '' }, // 测试用
-          { title: '百度云', name: 'BDY', subtitle: '' }, // 测试用
+          { title: 'Gitee', name: 'Gitee', subtitle: '' }
          ]
       },
       { title: $r('app.string.Auto_Check_Updates'), subtitle: '', sign: 1, name: 'Auto', isOn: false },
@@ -511,7 +498,7 @@ export const HomeCardPadding_14_15_16_17: BreakpointState<MarginGenerate> = Brea
  */
 export const HomeCardAreaPadding: BreakpointState<MarginGenerate> = BreakpointState.of({
   sm: ({top: 4, left: 14, right: 14} as MarginGenerate),
-  md: ({top: 4, left: 80, right: 80} as MarginGenerate),
+  md: ({top: 4, left: 110, right: 110} as MarginGenerate),
   lg: ({top: 4, left: 14, right: 14} as MarginGenerate),
   xl: ({top: 4, left: 14, right: 14} as MarginGenerate)
 })
@@ -551,7 +538,7 @@ export const HomeCardSwitchModeRowMargin: BreakpointState<number> = BreakpointSt
  * 主页模式卡片字体大小（16，27，26，27）
  */
 export const HomeCardSwitchModeFontSize: BreakpointState<number> = BreakpointState.of({
-  sm: 16, md: 27, lg: 26, xl: 27
+  sm: 16, md: 20, lg: 20, xl: 22
 })
 /**
  * 主页模式卡片文本上下边距（6，7）
@@ -588,13 +575,13 @@ export const HomeCardCellularDataChevronSize: BreakpointState<number> = Breakpoi
  * 主页流量统计卡片上下行箭头组件部分间距（20,10）
  */
 export const HomeCardCellularDataChevronRowMargin: BreakpointState<number> = BreakpointState.of({
-  sm: 20, md: 10, lg: 10, xl: 20
+  sm: 10, md: 10, lg: 10, xl: 15
 })
 /**
  * 主页流量统计卡片内容文本字体大小（14,23,26,21）
  */
 export const HomeCardCellularDataFontSize: BreakpointState<number> = BreakpointState.of({
-  sm: 14, md: 23, lg: 26, xl: 21
+  sm: 14, md: 16, lg: 18, xl: 18
 })
 /**
  * 主页卡片内容流量统计下部小字体大小（10,16,14,16）
@@ -612,14 +599,14 @@ export const HomeCardPrpxySmFontSize: BreakpointState<number> = BreakpointState.
 /**
  * 主页卡片标题字体大小
  */
-export const CardTitleFontSize_18_29_26_27: BreakpointState<number> = BreakpointState.of({
-  sm: 18, md: 29, lg: 26, xl: 27
+export const CardTitleFontSize_18_20_22_22: BreakpointState<number> = BreakpointState.of({
+  sm: 18, md: 20, lg: 22, xl: 22
 })
 /**
  * 主页卡片当前节点字体大小
  */
-export const ProxyFontSize_24_29_26_27: BreakpointState<number> = BreakpointState.of({
-  sm: 24, md: 32, lg: 32, xl: 32
+export const HomeProxyFontSize_24_26_26_27: BreakpointState<number> = BreakpointState.of({
+  sm: 24, md: 26, lg: 26, xl: 27
 })
 
 /**
@@ -644,16 +631,13 @@ export const IPfontSize: BreakpointState<number> = BreakpointState.of({
 * 主页添加卡片半模拟态卡片高度
   */
   export const HomeCardEditHeight: BreakpointState<number> = BreakpointState.of({
-  sm: 160, md: 210, lg: 220, xl: 240
+  sm: 160, md: 160, lg: 180, xl: 180
 });
 /**
  * 主页卡片内容网络测速字体大小
  */
-export const SpeedfontSize12_16_14_16: BreakpointState<number> = BreakpointState.of({
-  sm: 12,
-  md: 16,
-  lg: 14,
-  xl: 16
+export const SpeedfontSize12_14_14_16: BreakpointState<number> = BreakpointState.of({
+  sm: 12,  md: 14,  lg: 14,  xl: 16
 });
 
 /* List 相关*/

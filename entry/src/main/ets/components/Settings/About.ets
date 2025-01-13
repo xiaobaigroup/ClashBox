@@ -14,9 +14,8 @@ import { promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 struct About {
   // 实验功能提示框展示变量
   @Consume isShowExperimentalFunction: boolean
-  /* 主题色 */
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
+  // 主题色
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   // 二级图标色，黑色

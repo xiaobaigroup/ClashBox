@@ -4,6 +4,7 @@ import { ANIMATION_DURATION_300 } from "../../common/Constants"
 import ProxyINFO from "./ProxyINFO"
 import { BreakpointState } from "../../common/breakpointsystem"
 import CurrentConfiguration from "./CurrentConfiguration"
+import Shortcuts from "./Shortcuts"
 
 //TODO 1.后续需要把各文件组件换为截图，以减少性能消耗。2.挂载和卸载无动画效果，后面需要加入
 @Component
@@ -33,12 +34,10 @@ export struct CardEdit {
   @Consume('isShowFavoriteConfiguration') isShowFavoriteConfiguration: boolean
   @Consume('isShowProxyINFO') isShowProxyINFO: boolean
   @Consume('isShowCurrentConfiguration') isShowCurrentConfiguration: boolean
-
+  @Consume('isShowShortcuts') isShowShortcuts: boolean
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
-  /**
-   * 主页卡片标题按钮间距
-   */
+  /* 主页卡片高度*/
   @Consume('HomeCardEditHeight') private HomeCardEditHeight: BreakpointState<number>
 
   build() {
@@ -64,6 +63,7 @@ export struct CardEdit {
           .width('100%')
           .height(this.HomeCardEditHeight.value)
           .borderRadius(20)
+          .aspectRatio(2.07)
           .backgroundColor($r('app.color.container_background'))
           .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
             //     .height(this.isLandscapePhone ? 200: this.HomeCardEditHeight.value)
@@ -154,6 +154,7 @@ export struct CardEdit {
         CurrentConfiguration()
           .width('48.5%')
           .height(this.HomeCardEditHeight.value)
+          .aspectRatio(1)
           .borderRadius(20)
           .backgroundColor($r('app.color.container_background'))
           .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
@@ -164,10 +165,31 @@ export struct CardEdit {
             })
           })
       }
+
+      if (!this.isShowShortcuts) {
+        Shortcuts()
+          .width('48.5%')
+          .height(this.HomeCardEditHeight.value)
+          .aspectRatio(1)
+          .borderRadius(20)
+          .backgroundColor($r('app.color.container_background'))
+          .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
+            //      .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
+          .onClick(() => {
+            animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+              this.isShowShortcuts=true
+            })
+          })
+      }
     }
     .width('100%')
-    .padding({  left: 14, right: 14 })
+    .padding({
+      left: this.breakPointStateTabContentTitleMargin.value,
+      right: this.breakPointStateTabContentTitleMargin.value,
+    })
   }
+  @Consume('breakPointStateTabContentTitleMargin')
+  private breakPointStateTabContentTitleMargin: BreakpointState<number>
 }
 
 @Extend(Image)

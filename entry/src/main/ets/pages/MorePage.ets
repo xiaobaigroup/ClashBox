@@ -11,8 +11,9 @@ import Resources from '../components/More/Resources';
 import RequestPage from '../components/More/Request';
 import Connect from '../components/More/Connect';
 import Overwrite from '../components/More/Overwrite/Overwrite';
+import Diversion from '../components/More/Diversion';
 import Settings from '../components/Settings/Settings';
-import moreListItem from '../components/More/moreListItem';
+import moreListItem from '../components/More/MoreListItem';
 import Basic from '../components/More/Overwrite/Basic';
 import DNS from '../components/More/Overwrite/DNS';
 import Network, { NetworkRouterAddress } from '../components/More/Overwrite/Network';
@@ -139,6 +140,9 @@ struct MorePage {
     if (name == 'Overwrite') {
       Overwrite()
     } else
+    if (name == 'Diversion') {
+      Diversion()
+    } else
     if (name == 'Basic') {
       Basic()
     } else
@@ -160,7 +164,7 @@ struct MorePage {
   @Builder  SettingsSheet() {
 
   Column() {
-    Settings({isShowSettings: this.isShowSettings})
+    Settings()
   }
   .width('100%')
   .height('100%')

@@ -4,7 +4,7 @@ import settingsListItem from "./settingsListItem"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import Appearance from "./Appearance"
 import Backup, { CloudBackup } from "./Backup"
-import ApplicationLock from "./ApplicationLock"
+import Kernel from "./Kernel"
 import Notice, { CellularDataReminder } from "./Notice"
 import Backgrounder from "./Backgrounder"
 import WipeData from "./WipeData"
@@ -50,11 +50,11 @@ struct DisclaimerCustomDialog {
   }
 }
 
+@Entry
 @Component
 struct Settings {
 
   @State settingsList: settingsData[] = SettingsListItem()
-  @Link isShowSettings: boolean
   @Consume currentLanguage: ResourceStr
   // 当前设备`height`是否符合(320vp< height <= 500vp)
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
@@ -62,8 +62,7 @@ struct Settings {
   // 列表底边距
   @Consume('breakPointStatemorePagelistBottom') private listBottom: BreakpointState<number>
   // 列表高度
-  @Consume('breakPointStateSettingslistHeight')
-  private SettingslistHeight: BreakpointState<number>
+  @Consume('breakPointStateSettingslistHeight') private SettingslistHeight: BreakpointState<number>
 
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur')
@@ -95,7 +94,7 @@ struct Settings {
   }
 
   handleCheck(index: number) {
-    if(index === 8) {
+    if(index === 7) {
       // 免责声明弹窗
       if (this.dialogController != null) {
         this.dialogController.open()
@@ -118,9 +117,15 @@ struct Settings {
     hilog.info(0xFF00, "menutestTag", "%{public}s", menuItemData.isCheck)
   }*/
 
+  onPageShow(): void {
+    hilog.info(0xFF00, "SettingstestTag", "进入页面刷新", )
+    // 刷新语言行的语言提示
+    const itemData = this.settingsList[0]
+    itemData.hint = this.currentLanguage
+    this.settingsList.splice(0, 1, itemData)
+  }
+
   aboutToAppear(): void {
-    BreakpointSystem.getInstance().attach(this.listBottom)
-    BreakpointSystem.getInstance().start()
   }
 
   // 在自定义组件即将析构销毁时将dialogController置空
@@ -137,9 +142,6 @@ struct Settings {
       if (name == 'Backup') {
         Backup()
       } else
-      if (name == 'ApplicationLock') {
-        ApplicationLock({isShowSettings: this.isShowSettings})
-      } else
       if (name == 'Notice') {
         Notice()
       } else
@@ -147,7 +149,7 @@ struct Settings {
         Backgrounder()
       } else
       if (name == 'WipeData') {
-        WipeData({isShowSettings: this.isShowSettings})
+        WipeData()
       } else
       if (name == 'About') {
         About()
@@ -166,11 +168,13 @@ struct Settings {
       } else
       if (name == 'CellularDataReminder') {
         CellularDataReminder()
+      } else
+      if (name == 'Kernel') {
+        Kernel()
       }
   }
 
   build() {
-    //Column() {
     Navigation(this.SettingsPageInfos) {
       TopBuilder({
         showBackButton: false,
@@ -201,11 +205,8 @@ struct Settings {
     .navDestination(this.SettingsPagesMap)
     .width('100%')
     .height('100%')
-    .onAppear(() => {  // TODO 需要一个回到navigation页面的监听来执行下面的数组操作
-      // 刷新语言行的语言提示
-      const itemData = this.settingsList[0]
-      itemData.hint = this.currentLanguage
-      this.settingsList.splice(0, 1, itemData)
+    .onAppear(() => {
+
     })
   }
 }

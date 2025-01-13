@@ -157,10 +157,6 @@
       "value": "备份与恢复"
     },
     {
-      "name": "ApplicationLock",
-      "value": "应用锁"
-    },
-    {
       "name": "Notice",
       "value": "通知与反馈"
     },
@@ -197,7 +193,7 @@
       "value": "设置应用锁、指纹/人脸解锁"
     },
     {
-      "name": "NoticeSubtitle",
+      "name": "subtitle",
       "value": "常驻通知、流量提醒、震动反馈"
     },
     {
@@ -1117,6 +1113,10 @@
       "value": "震动反馈"
     },
     {
+      "name": "sound_feedback",
+      "value": "声音反馈"
+    },
+    {
       "name": "background_notice_tips",
       "value": "您已开启“后台运行“选项，常驻通知无法关闭，若要关闭常驻通知，请先关闭后台运行"
     },
@@ -1167,6 +1167,82 @@
     {
       "name": "proxy_name",
       "value": "节点名"
+    },
+    {
+      "name": "beta_kernel",
+      "value": "测试版内核"
+    },
+    {
+      "name": "beta_kernel_subtitle",
+      "value": "开启后将显示正在测试中的内核"
+    },
+    {
+      "name": "default_kernel",
+      "value": "ClashMeta(默认)"
+    },
+    {
+      "name": "filter",
+      "value": "筛选"
+    },
+    {
+      "name": "not_filter",
+      "value": "不筛选"
+    },
+    {
+      "name": "information_only",
+      "value": "仅信息"
+    },
+    {
+      "name": "warning_only",
+      "value": "仅警告"
+    },
+    {
+      "name": "error_only",
+      "value": "仅报错"
+    },
+    {
+      "name": "reset",
+      "value": "重置"
+    },
+    {
+      "name": "override_reset_prompt",
+      "value": "是否重置覆写设置？"
+    },
+    {
+      "name": "write_url",
+      "value": "输入网址"
+    },
+    {
+      "name": "title",
+      "value": "标题"
+    },
+    {
+      "name": "shortcuts_card",
+      "value": "快捷方式小卡片"
+    },
+    {
+      "name": "shortcuts",
+      "value": "快捷方式"
+    },
+    {
+      "name": "long_press_modify",
+      "value": "长按我修改"
+    },
+    {
+      "name": "option1",
+      "value": "选项1"
+    },
+    {
+      "name": "option2",
+      "value": "选项2"
+    },
+    {
+      "name": "option3",
+      "value": "选项3"
+    },
+    {
+      "name": "null_title_tips",
+      "value": "请输入标题和网址，并确保你的网址含有‘https://’前缀!!!"
     }
   ]
 }
