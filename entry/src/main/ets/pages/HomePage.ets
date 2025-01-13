@@ -26,6 +26,7 @@ import { CardEdit } from '../components/Home/CardEdit'
 import { image } from '@kit.ImageKit'
 import ProxyINFO from '../components/Home/ProxyINFO'
 import CurrentConfiguration from '../components/Home/CurrentConfiguration'
+import ClashViewModel from '../entryability/ClashViewModel'
 
 
 @Entry
@@ -728,7 +729,7 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
         .width(this.proxyStartButtonWidth)
         .height(this.proxyStartButtonHeight)
         .clip(true)
-        .onClick((event: ClickEvent) => {
+        .onClick(async (event: ClickEvent) => {
           // TODO 调用启动代理方法 等待结果响应之后 再切换按钮状态开始计时
           this.proxyEnabled = !this.proxyEnabled
           hilog.info(0xA002, this.componentName, `代理启动按钮状态：${this.proxyEnabled}`)
@@ -737,10 +738,12 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
             this.proxyStartedTimer.start((formatTime) => {
               this.proxyStartingDuration = formatTime
             })
+            await ClashViewModel.StartVpn()
           } else {
             this.proxyStartedTimer.reset()
             // 如果`reset()`就取消注释这句，如果是`pause()`就注释这句
             this.proxyStartingDuration = PROXY_STARTED_DURATION_INIT_VALUE
+            await ClashViewModel.StopVpn()
           }
 
           this.proxyStartButtonWidth = this.proxyEnabled ? $r('app.integer.vp_proxy_started_button_width') :

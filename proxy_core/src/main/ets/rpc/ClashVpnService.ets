@@ -72,13 +72,14 @@ export class ClashVpnService{
   ParseConfig(): Config {
     let vpnConfig = new Config();
     let option = JSON.parse(getVpnOptions()) as VpnOptions
+    console.debug("ParseConfig", JSON.stringify(option))
     if (option.ipv4Address != "") {
       vpnConfig.addresses[0].address = new Address(option.ipv4Address.split("/")[0], 1)
-      option.routeAddress.filter(a => isIpv4(a)).map(f=>f.split("/")[0])
+      option.routeAddress?.filter(a => isIpv4(a)).map(f=>f.split("/")[0])
     }
     if (option.ipv6Address != ""){
       vpnConfig.addresses[0].address = new Address(option.ipv6Address.split("/")[0], 2)
-      option.routeAddress.filter(a => isIpv6(a)).map(f=>f.split("/")[0])
+      option.routeAddress?.filter(a => isIpv6(a)).map(f=>f.split("/")[0])
     }
     let packageName = ""
     if(option.accessControl?.mode){
@@ -92,16 +93,16 @@ export class ClashVpnService{
       // TODO ohos 不支持
       // not use option.bypassDomain option.port
     }
+    console.debug("vpnConfig", JSON.stringify(vpnConfig))
     return vpnConfig;
   }
-  async StartVpn(configPath: string): Promise<boolean> {
+  async StartVpn(): Promise<boolean> {
     let config = this.ParseConfig();
     let tunFd = -1
     try {
       this.vpnConnection = vpnExtension.createVpnConnection(this.context as common.VpnExtensionContext);
       tunFd = await this.vpnConnection.create(config)
       console.log("ClashVPN", `获取tunFd: ${tunFd}`)
-      console.log("ClashVPN", `加载配置文件(golang) ${configPath}`)
       startTun(tunFd, async (id: number, fd: number) => {
         await this.vpnConnection?.protect(fd)
         setFdMap(id)

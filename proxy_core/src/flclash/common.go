@@ -5,6 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+	"runtime"
+	"strings"
+	"sync"
+
 	"github.com/metacubex/mihomo/adapter"
 	"github.com/metacubex/mihomo/adapter/inbound"
 	"github.com/metacubex/mihomo/adapter/outboundgroup"
@@ -23,11 +29,6 @@ import (
 	rp "github.com/metacubex/mihomo/rules/provider"
 	"github.com/metacubex/mihomo/tunnel"
 	"github.com/samber/lo"
-	"os"
-	"path/filepath"
-	"runtime"
-	"strings"
-	"sync"
 )
 
 var (
@@ -70,6 +71,7 @@ func getProfileProvidersPath(id string) string {
 
 func getRawConfigWithId(id string) *config.RawConfig {
 	path := getProfilePath(id)
+	fmt.Println("getRawConfigWithId", path)
 	bytes, err := readFile(path)
 	if err != nil {
 		log.Errorln("profile is not exist")

@@ -5,13 +5,14 @@ package tun
 import "C"
 import (
 	"core/state"
+	"net"
+	"net/netip"
+
 	"github.com/metacubex/mihomo/constant"
 	LC "github.com/metacubex/mihomo/listener/config"
 	"github.com/metacubex/mihomo/listener/sing_tun"
 	"github.com/metacubex/mihomo/log"
 	"github.com/metacubex/mihomo/tunnel"
-	"net"
-	"net/netip"
 )
 
 type Props struct {
@@ -28,7 +29,7 @@ func Start(fd int, device string, stack constant.TUNStack) (*sing_tun.Listener, 
 	var prefix4 []netip.Prefix
 	tempPrefix4, err := netip.ParsePrefix(state.DefaultIpv4Address)
 	if err != nil {
-		log.Errorln("startTUN error:", err)
+		log.Errorln("startTUN tempPrefix4 error:", err)
 		return nil, err
 	}
 	prefix4 = append(prefix4, tempPrefix4)
@@ -36,7 +37,7 @@ func Start(fd int, device string, stack constant.TUNStack) (*sing_tun.Listener, 
 	if state.CurrentState.Ipv6 {
 		tempPrefix6, err := netip.ParsePrefix(state.DefaultIpv6Address)
 		if err != nil {
-			log.Errorln("startTUN error:", err)
+			log.Errorln("startTUN  tempPrefix6 error:", err)
 			return nil, err
 		}
 		prefix6 = append(prefix6, tempPrefix6)

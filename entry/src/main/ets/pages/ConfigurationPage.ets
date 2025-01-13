@@ -414,9 +414,10 @@ struct ConfigurationPage {
                   customVibrator.vibratorTriggerOfHapticClockTimer()
                 }
               })
-            .onClick(() => {
+            .onClick(async  () => {
               this.currentConfigRadioCheckedConfigData = item
               customVibrator.vibratorTriggerOfHapticClockTimer()
+              await ClashViewModel.loadProfileAndConfig(item.configId)
               hilog.info(0xC002, this.componentName, `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
             })
             .onTouch((event: TouchEvent) => {
@@ -547,11 +548,6 @@ struct ConfigurationPage {
         configAutoUpdateTimeGapValue: d.autoUpdateDuration
       } as ConfigData
     })
-    // TODO 临时测试
-    if(this.configList[0]){
-      await ClashViewModel.loadProfileAndConfig(this.configList[0].configId)
-      await ClashViewModel.getProxyGroups()
-    }
   }
 
   aboutToDisappear(): void {

@@ -45,6 +45,9 @@ import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
 import { Item, ProxyData } from '../common/ProxyData'
 import { image } from '@kit.ImageKit'
+import { ProxyGroup } from 'proxy_core'
+import { EventHub, EventKey } from '../common/EventHub'
+import ClashViewModel from '../entryability/ClashViewModel'
 
 
 //
@@ -245,6 +248,8 @@ struct Index {
   @Provide private FavoriteProxy: number =-1
   //节点数据组
   @Provide items: Item[] = ProxyData.ProxyItems();
+
+  @Provide proxyGroups: ProxyGroup[] = []
   /*
     主页卡片组件截图
    */
@@ -357,6 +362,10 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.HomeCardTitleButtonPadding)
     BreakpointSystem.getInstance().attach(this.HomeCardEditHeight)
     BreakpointSystem.getInstance().start()
+
+    EventHub.on(EventKey.FetchProxyGroup, async ()=>{
+      this.proxyGroups = await ClashViewModel.getProxyGroups()
+    })
   }
 
   aboutToDisappear() {

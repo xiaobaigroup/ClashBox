@@ -10,6 +10,8 @@ import ProxyArrangement from '../components/Proxy/ProxyArrangement'
 import { intl } from '@kit.LocalizationKit'
 import { Item } from '../common/ProxyData'
 import ClashViewModel from '../entryability/ClashViewModel'
+import { ProxyGroup } from 'proxy_core'
+import { EventHub, EventKey } from '../common/EventHub'
 
 //中文排序
 let ProxyCollator = new intl.Collator("zh-CN");
@@ -53,11 +55,17 @@ struct ProxyPage {
   @State currentRadioValue1: number = 0 // 分组方式切换
   @State currentRadioValue2: number = 0 // 排列方式切换
   @State currentRadioValue3: number = 0 // 卡片尺寸切换
-  @State FristPage: boolean = true // 为观看预览页的判定，更改后续可以删掉
+  @State FristPage: boolean = true
   /*节点相关数据以及排序 */
   //节点假数据组后期可改可删
   @Consume items: Item[]
 
+  @Consume
+  proxyGroups: ProxyGroup[]
+
+  hasGroups(){
+    this.FristPage = this.proxyGroups.length == 0;
+  }
   // 延迟排序
   LatencySortItems() {
     this.items.sort((a, b) => a.latency - b.latency);
@@ -104,8 +112,8 @@ struct ProxyPage {
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     BreakpointSystem.getInstance().start()
-    ClashViewModel.getProxyGroups()
   }
+
 
   //分组tabs内容
   @Builder
@@ -450,7 +458,7 @@ struct ProxyPage {
         })
       }
 
-      if (this.FristPage) { //为观看预览页的判定if/else，判定和更改后续可以删掉判定
+      if (this.proxyGroups.length == 0) { //为观看预览页的判定if/else，判定和更改后续可以删掉判定
         Column({ space: 5 }) {
           SymbolGlyph($r('sys.symbol.doc')).fontSize(32).fontColor([this.icon_secondary])
           Text($r('app.string.None_Proxy')).fontSize(20).fontColor(this.font_secondary).textAlign(TextAlign.Center)
@@ -461,59 +469,22 @@ struct ProxyPage {
         .justifyContent(FlexAlign.Center) //.padding({top:TAB_CONTENT_TITLE_HEIGHT})
         // transition保证组件离场不被立即析构，可设置其他转场效果
         .transition(TransitionEffect.OPACITY)
-        .onClick(() => {
-          animateTo({ duration:ANIMATION_DURATION_300 }, () => {
-            this.FristPage = false
-          })
-        })
-      } else if (!this.FristPage) { //为观看的判定if/else后续可以删掉判定
+      } else if (this.proxyGroups.length > 0) { //为观看的判定if/else后续可以删掉判定
         // 代理页分组TAB+list主体
         Stack({ alignContent: this.stackAlignContentAlignment }) {
           //根据ProxyArrangementSelected的状态决定是否显示
           if (this.ProxyArrangementSelected === 'ProxyArrangementSelected1') {
             Column() { //分组标签页 start
               Tabs({ barPosition: BarPosition.Start, controller: this.tabsController }) {
-                TabContent() {
-                ProxyGroupItem() //list相关在components/ProxyGroupItem.ets文件里
-                  .padding({right: this.breakPointStateTabContentTitleMargin.value,})
-                  .width('100%')
-                  .height('100%')
-                  //      .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
-                }
-
-                .tabBar(this.TabBuilder('分组1', 0))
-
-                TabContent() {
-                  ProxyGroupItem() //list相关在components/ProxyGroupItem.ets文件里
-                    .padding({right: this.breakPointStateTabContentTitleMargin.value,})
-                    .width('100%')
-                    .height('100%')
-                }
-                .tabBar(this.TabBuilder('分组2', 1))
-
-                TabContent() {
-                }
-                .tabBar(this.TabBuilder('分组3', 2))
-
-                TabContent() {
-                }
-                .tabBar(this.TabBuilder('分组4', 3))
-
-                TabContent() {
-                }
-                .tabBar(this.TabBuilder('分组5', 4))
-
-                TabContent() {
-                }
-                .tabBar(this.TabBuilder('分组6', 5))
-
-                TabContent() {
-                }
-                .tabBar(this.TabBuilder('分组7', 6))
-
-                TabContent() {
-                }
-                .tabBar(this.TabBuilder('分组8', 7))
+                ForEach(this.proxyGroups, (g:ProxyGroup, i: number)=>{
+                  TabContent() {
+                    ProxyGroupItem({items: g.proxies as Item[]}) //list相关在components/ProxyGroupItem.ets文件里
+                      .padding({right: this.breakPointStateTabContentTitleMargin.value,})
+                      .width('100%')
+                      .height('100%')
+                  }
+                  .tabBar(this.TabBuilder(g.name, i))
+                })
               }
               .animationDuration(200)
               .barMode(BarMode.Scrollable)
@@ -598,6 +569,8 @@ struct ProxyPage {
     .width('100%')
     .height('100%')
   }
+
+
 }
 
 export default ProxyPage

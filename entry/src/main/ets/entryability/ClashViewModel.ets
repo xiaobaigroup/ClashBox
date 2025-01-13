@@ -1,11 +1,12 @@
 import { ProfileRepo } from "proxy_core/src/main/ets/ProfileRepo";
 import { Context } from "@kit.AbilityKit";
-import { SocketProxyService, Profile, ProfileType, UpdateConfigParams } from "proxy_core";
+import { SocketProxyService, Profile, ProfileType, UpdateConfigParams, ClashConfig } from "proxy_core";
 import { vpnExtension } from "@kit.NetworkKit";
 import { ConfigData } from "../common/PageArgumentEntity";
 import { promptAction } from "@kit.ArkUI";
-import { ClashConfig, ProxyGroup } from "proxy_core/src/main/ets/models/Common";
+import { ProxyGroup } from "proxy_core/src/main/ets/models/Common";
 import { ConfigExtendedParams } from "proxy_core/src/main/ets/models/ClashConfig";
+import { EventHub, EventKey } from "../common/EventHub";
 
 export class ClashViewModel{
   profileRepo = new ProfileRepo()
@@ -45,6 +46,7 @@ export class ClashViewModel{
     }else{
       promptAction.showToast({message: "文件保存失败！"})
     }
+    EventHub.sendEvent(EventKey.FetchProfile, null)
   }
   async updateProfileConfig(id: string | null): Promise<void>{
     if(id){
@@ -62,7 +64,7 @@ export class ClashViewModel{
         await this.profileRepo.addOrUpdate(p)
       }
     }
-
+    EventHub.sendEvent(EventKey.FetchProfile, null)
   }
   async getProfiles(): Promise<Profile[]>{
     return await this.profileRepo.queryAll()
@@ -74,6 +76,7 @@ export class ClashViewModel{
     let p = await this.getProfile(id)
     p?.delete()
     await this.profileRepo.delete(id)
+    EventHub.sendEvent(EventKey.FetchProfile, null)
   }
   async getProxyGroups(): Promise<ProxyGroup[]>{
       return this.socketProxy.queryProxyGroups()
@@ -84,8 +87,21 @@ export class ClashViewModel{
       config: new ClashConfig(),
       params: {} as ConfigExtendedParams
     } as UpdateConfigParams)
-    promptAction.showToast({message: result, duration: 3000})
+    if (result != ""){
+      promptAction.showToast({message: result, duration: 3000})
+    }
+    EventHub.sendEvent(EventKey.FetchProxyGroup, null)
   }
+
+  async StartVpn(){
+    this.socketProxy.startClash()
+  }
+
+  async StopVpn(){
+    this.socketProxy.stopClash()
+  }
+
+
 }
 
 export default new ClashViewModel()

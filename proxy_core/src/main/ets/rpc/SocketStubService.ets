@@ -27,17 +27,15 @@ export class SocketStubService {
       // nativeSubscribeLogcat((value: string)=>{
       //   this.sendClient(client, value)
       // })
-    }  else if(code == ClashRpcType.fetchAndValid){
-      // nativeFetchAndValid(params[0] as string, params[1] as string, params[2] as boolean, (type:string, value: string)=>{
-      //   console.debug("socketService stub result", type)
-      //   this.sendClient(client, json.stringify({type:type, value: value}))
-      //   if (type == "fetch_complete")
-      //       client.close()
-      // })
     } else {
-      let result = await this.onRemoteMessage(code, params)
-      console.debug("socketService stub result", result)
-      this.sendClient(client, json.stringify({ result: result}))
+      try {
+        let result = await this.onRemoteMessage(code, params)
+        console.debug("socketService stub result", result)
+        this.sendClient(client, json.stringify({ result: result}))
+      } catch (e) {
+        console.error("socketService stub error", e.message, e.stack)
+        this.sendClient(client, json.stringify({ result: e.message}))
+      }
     }
   }
   onRemoteMessage(code: number, data: (string | number| boolean)[]): Promise<string | number | boolean> {
@@ -109,9 +107,15 @@ export class SocketStubService {
           break;
         }
         case ClashRpcType.startClash: {
+          this.startVpn().then((r)=>{
+            resolve(r)
+          }).catch((e:Error)=>{
+            reject(e)
+          })
           break;
         }
         case ClashRpcType.stopClash:{
+          this.stopVpn()
           resolve(true)
           break;
         }
@@ -143,8 +147,8 @@ export class SocketStubService {
     }
   }
   vpnService = new ClashVpnService()
-  async startVpn(){
-    this.vpnService.StartVpn("")
+  startVpn() {
+    return this.vpnService.StartVpn()
   }
   stopVpn(){
     this.vpnService.stopVpn()

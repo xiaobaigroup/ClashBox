@@ -33,7 +33,7 @@ sourceFile="./"
 outputFile="libflclash.so"
 
 # 构建命令，生成共享库
-/Users/fiber/git/golang_go/bin/go build -tlsmodegd  -buildmode c-shared -tags "ohos"   -gcflags="all=-N -l" -o $outputFile $sourceFile
+/Users/fiber/git/golang_go/bin/go build -tlsmodegd  -buildmode c-shared -tags "ohos with_gvisor"   -gcflags="all=-N -l" -o $outputFile $sourceFile
 
 # 检查编译结果
 if [ -f "$outputFile" ]; then

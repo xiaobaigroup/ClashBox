@@ -6,6 +6,7 @@ import "C"
 import (
 	"core/state"
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	napi "github.com/likuai2010/ohos-napi"
@@ -45,6 +46,7 @@ func validateConfig(env js.Env, this js.Value, args []js.Value) any {
 
 func updateConfig(env js.Env, this js.Value, args []js.Value) any {
 	paramsString, _ := napi.GetValueStringUtf8(env.Env, args[0].Value)
+	fmt.Println("updateConfig", paramsString)
 	promise := env.NewPromise()
 	bytes := []byte(paramsString)
 	go func() {

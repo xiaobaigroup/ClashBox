@@ -1,5 +1,5 @@
-import { UpdateConfigParams } from "../models/ClashConfig";
-import { ClashConfig, OverrideSlot, ProxyGroup, ProxySort, TunnelState } from "../models/Common";
+import { TunnelState, UpdateConfigParams } from "../models/ClashConfig";
+import {  OverrideSlot, ProxyGroup, ProxySort} from "../models/Common";
 
 export interface Provider {
   name: string;

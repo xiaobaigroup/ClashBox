@@ -400,12 +400,11 @@ func New(options LC.Tun, tunnel C.Tunnel, additions ...inbound.Addition) (l *Lis
 		}
 	}
 	l.tunIf = tunIf
-
 	tunStack, err := tun.NewStack(strings.ToLower(options.Stack.String()), stackOptions)
 	if err != nil {
 		return
 	}
-
+	fmt.Println("debug2")
 	err = tunStack.Start()
 	if err != nil {
 		return

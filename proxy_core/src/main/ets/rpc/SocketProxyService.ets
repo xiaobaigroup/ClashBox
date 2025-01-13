@@ -3,13 +3,13 @@ import {  RpcResult } from './RpcRequest';
 import { JSON, util } from '@kit.ArkTS';
 import { common } from '@kit.AbilityKit';
 import { ClashRpcType, IClashManager, ProviderType, Provider } from './IClashManager';
-import { ClashConfig, FetchInfo, OverrideSlot,
+import { FetchInfo, OverrideSlot,
   Proxy,
   ProxyGroup,
-  ProxySort, Traffic, TunnelState,
+  ProxySort, Traffic,
   UsedProxy } from '../models/Common';
 import { promptAction, PromptAction } from '@kit.ArkUI';
-import { UpdateConfigParams } from '../models/ClashConfig';
+import { TunnelState, UpdateConfigParams } from '../models/ClashConfig';
 
 
 export class SocketProxyService implements IClashManager{
@@ -48,20 +48,21 @@ export class SocketProxyService implements IClashManager{
   async queryProxyGroups(): Promise<ProxyGroup[]> {
     let result = await this.sendMessageRequest(ClashRpcType.queryProxyGroup,[])
     let map = JSON.parse(result as string) as Record<string, string | Record<string, string[] | string>>
+    console.log("queryProxyGroups", result)
     let groupNames = map[UsedProxy.GLOBAL]["all"] as string[]
     groupNames = ["GLOBAL", ...groupNames]
     groupNames = groupNames.filter(e => {
       const proxy = map[e] as Record<string, string>
       const indexes = ["Selector","URLTest", "Fallback", "LoadBalance", "Relay"].indexOf(proxy["type"])
-      console.log("queryProxyGroups", proxy["type"], indexes);
       return indexes > -1
     })
     console.log("queryProxyGroups", groupNames);
     const groupsRaw = groupNames.map((groupName) =>{
       const group = map[groupName];
       group["proxies"] = (group["all"] ?? []).map((n:string) =>{
+          map[n]["text"] = map[n]["name"]
           return map[n]
-      }).filter((d:string) => !d)
+      }).filter((d: string) => d != null && d != undefined)
       return {
         name: group["name"] as string,
         now: group["now"] as string,
@@ -70,7 +71,7 @@ export class SocketProxyService implements IClashManager{
         proxies: group["proxies"]
       } as ProxyGroup
     })
-    console.log("queryProxyGroups", JSON.stringify(groupsRaw));
+    console.log("queryProxyGroups", JSON.stringify(groupsRaw[1]));
     return groupsRaw
   }
 
