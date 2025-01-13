@@ -40,6 +40,8 @@ export struct CardEdit {
   @Consume('isShowShortcuts') isShowShortcuts: boolean
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+  /* 是否开启全局动画判定 */
+  @Consume ('isAnimation') isAnimation: boolean
   /* 主页卡片高度*/
   @Consume('HomeCardEditHeight') private HomeCardEditHeight: BreakpointState<number>
 
@@ -50,6 +52,7 @@ export struct CardEdit {
         Image(this.pixmapSpeed)
           .width('100%')
           .ImageItemStyle()
+          .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
      //     .height(this.isLandscapePhone ? 200: this.HomeCardEditHeight.value)
           .onAttach(() => {
           })//挂载回调
@@ -70,7 +73,7 @@ export struct CardEdit {
           .borderRadius(20)
           .aspectRatio(2.07)
           .backgroundColor($r('app.color.container_background'))
-          .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
+          .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
               this.isShowProxyINFO = true
@@ -80,6 +83,7 @@ export struct CardEdit {
         Image(this.pixmapProxyINFO)
           .width('100%')
           .ImageItemStyle()
+          .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
               this.isShowProxyINFO = true
@@ -92,6 +96,7 @@ export struct CardEdit {
         Image(this.pixmapSwitchMode)
             .width('48.5%')
             .ImageItemStyle()
+          .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
     //        .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
         .onClick(() => {
           animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
@@ -105,6 +110,7 @@ export struct CardEdit {
         Image(this.pixmapCellularData)
           .width('48.5%')
           .ImageItemStyle()
+          .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
     //      .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
@@ -118,6 +124,7 @@ export struct CardEdit {
         Image(this.pixmapCurrentNode)
           .width('48.5%')
           .ImageItemStyle()
+          .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
               this.isShowCurrentNode=true
@@ -130,6 +137,7 @@ export struct CardEdit {
         Image(this.pixmapPublicNetwork)
           .width('48.5%')
           .ImageItemStyle()
+          .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
    //       .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
@@ -143,6 +151,7 @@ export struct CardEdit {
        Image(this.pixmapFavoriteProxy)
           .width('48.5%')
           .ImageItemStyle()
+         .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
     //      .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
@@ -156,6 +165,7 @@ export struct CardEdit {
         Image(this.pixmapFavoriteConfiguration)
           .width('48.5%')
           .ImageItemStyle()
+          .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
     //      .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
@@ -172,7 +182,7 @@ export struct CardEdit {
           .aspectRatio(1)
           .borderRadius(20)
           .backgroundColor($r('app.color.container_background'))
-          .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
+          .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
             //      .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
@@ -183,6 +193,7 @@ export struct CardEdit {
         Image(this.pixmapCurrentConfiguration)
           .width('48.5%')
           .ImageItemStyle()
+          .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
               this.isShowCurrentConfiguration = true
@@ -199,7 +210,7 @@ export struct CardEdit {
           .aspectRatio(1)
           .borderRadius(20)
           .backgroundColor($r('app.color.container_background'))
-          .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
+          .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
             //      .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
@@ -210,6 +221,7 @@ export struct CardEdit {
         Image(this.pixmapShortcuts)
           .width('48.5%')
           .ImageItemStyle()
+          .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
               this.isShowShortcuts = true
@@ -232,6 +244,5 @@ export struct CardEdit {
 function ImageItemStyle() {
   .borderRadius(20)
   .backgroundColor($r('app.color.container_background'))
-  .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
 }
 

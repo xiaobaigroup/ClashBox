@@ -121,6 +121,8 @@ struct ProxyGroupItem {
 
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+  /* 是否开启全局动画判定 */
+  @Consume ('isAnimation') isAnimation: boolean
 
   /* 断点布局相关 */
   @State
@@ -290,12 +292,13 @@ struct ProxyGroupItem {
               }),
               previewAnimationOptions: {
                 scale: [0.95, 1.0],
-                transition: TransitionEffect.prototype.animation({ tempo: 1.5 })
+                transition: this.isAnimation ?TransitionEffect.prototype.animation({ tempo: 1.5 }):null
               },
             })
         })
       }
       .ListStyle()
+      .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
       .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
       // .divider({ strokeWidth: 1,color:$r('app.color.divider'),startMargin:16,endMargin:16})
       .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
@@ -360,12 +363,13 @@ struct ProxyGroupItem {
               }),
               previewAnimationOptions: {
                 scale: [0.95, 1.0],
-                transition: TransitionEffect.prototype.animation({ tempo: 1.5 })
+                transition:  this.isAnimation ?TransitionEffect.prototype.animation({ tempo: 1.5 }):null
               }
             })
         })
       }
       .ListStyle()
+      .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
       .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
         detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
         preferType: SheetType.CENTER,
@@ -427,13 +431,14 @@ struct ProxyGroupItem {
               }),
               previewAnimationOptions: {
                 scale: [0.95, 1.0],
-                transition: TransitionEffect.prototype.animation({ tempo: 1.5 })
+                transition:  this.isAnimation ?TransitionEffect.prototype.animation({ tempo: 1.5 }):null
               }
             })
         })
       }
       .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
       .ListStyle()
+      .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
       .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
         detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT, ],
         preferType: SheetType.CENTER,
@@ -491,7 +496,6 @@ interface LongPressContextMenuItem {
   @Extend(List)
   function ListStyle() {
     // transition保证组件离场不被立即析构，可设置其他转场效果
-    .transition(TransitionEffect.OPACITY)
     .scrollBar(BarState.Off)
     .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
     .contentEndOffset(110)

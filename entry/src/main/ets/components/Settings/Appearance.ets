@@ -53,11 +53,14 @@ struct Appearance {
   // 按钮位置选中文本
   @State EnableButtonPositionText: ResourceStr = $r('app.string.right')
   // 按钮位置偏移量（默认在右侧的偏移量）
-  @State ButtonPositionOffset: number = 92
+  @State ButtonPositionOffset: number = 16
+  // 所有子组件在容器内的对齐方式
+  @Consume ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
   // 背景模糊启用变量
-  @State isBlurr: boolean= false
-  // 动画效果启用变量
-  @State isAnimation: boolean= false
+//  @State isBlurr: boolean= false
+  @Consume ('isEnableIndexForegroundBlur') private isBlurr: boolean
+  /* 是否开启全局动画判定 */
+  @Consume ('isAnimation') isAnimation: boolean
   // 主页问候启用变量
   @State isGreeting: boolean= false
 
@@ -154,19 +157,22 @@ struct Appearance {
     switch (index) {
       case 0:
         // 右侧
-        this.ButtonPositionOffset = 92
+        this.ButtonPositionOffset = 16
+        this.stackAlignContentAlignment = Alignment.BottomEnd
         // 需接入全局按钮位置控制
 
       break
       case 1:
         // 中间
         this.ButtonPositionOffset = 0
+        this.stackAlignContentAlignment = Alignment.Bottom
         // 需接入全局按钮位置控制
 
       break
       case 2:
         // 左侧
-        this.ButtonPositionOffset = -92
+        this.ButtonPositionOffset = -16
+        this.stackAlignContentAlignment = Alignment.BottomStart
         // 需接入全局按钮位置控制
 
       break
@@ -239,86 +245,85 @@ struct Appearance {
       List({ space: 10 }) {
         // 预览区
         ListItem() {
-          Stack() {
-            // 单选框预览区
-            Column() {
-              Row() {
-                Text($r('app.string.color_preview'))
-                  .width(80)
-                  .fontWeight(FontWeight.Bold)
-                  .fontSize(16)
-                  .margin({ right: 9 })
-                  .fontColor(this.font_primary)
-                Radio({ value: 'preview', group: 'appearanceRadioGroup', })
-                  .checked(true)
-                  .radioStyle({
-                    checkedBackgroundColor: this.icon_emphasize,
-                  })
-              }
-              Row() {
-                Text($r('app.string.configuration_1'))
-                  .fontWeight(FontWeight.Bold)
-                  .width(80)
-                  .fontSize(16)
-                  .margin({ right: 9 })
-                  .fontColor(this.font_primary)
-                Radio({ value: 'config', group: 'appearanceRadioGroup',})
-                  .checked(false)
-                  .radioStyle({
-                    checkedBackgroundColor: this.icon_emphasize,
-                  })
-              }
-              .margin({top: 10})
-              Row() {
-                Text($r('app.string.proxy_1'))
-                  .fontWeight(FontWeight.Bold)
-                  .width(80)
-                  .fontSize(16)
-                  .margin({ right: 9 })
-                  .fontColor(this.font_primary)
-                Radio({ value:'proxy', group: 'appearanceRadioGroup',})
-                  .checked(false)
-                  .radioStyle({
-                    checkedBackgroundColor: this.icon_emphasize,
-                  })
-              }
-              .margin({top: 10})
-            }
-            .width(188)
-            .height(130)
-            .borderRadius(20)
-            .backdropBlur(2)
-            .alignItems(HorizontalAlign.Start)
-            .backgroundColor($r('app.color.container_background'))
-            .padding({left: 16, top: 15})
-            .shadow({
-              color: '#1a000000',
-              radius: 60,
-              type: ShadowType.COLOR
-            })
-
-            // 按钮预览区
-            Column() {
-              Row() {
-                Stack({ alignContent: Alignment.Center }) {
-                  SymbolGlyph($r('sys.symbol.play_fill'))
-                    .fontSize(24)
-                    .fontColor([Color.White])
-                    .align(Alignment.Center)
+          Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
+            Stack({ alignContent: this.stackAlignContentAlignment }) {
+              // 单选框预览区
+              Column() {
+                Row() {
+                  Text($r('app.string.color_preview'))
+                    .width(80)
+                    .fontWeight(FontWeight.Bold)
+                    .fontSize(16)
+                    .margin({ right: 9 })
+                    .fontColor(this.font_primary)
+                  Radio({ value: 'preview', group: 'appearanceRadioGroup', })
+                    .checked(true)
+                    .radioStyle({
+                      checkedBackgroundColor: this.icon_emphasize,
+                    })
                 }
-                .width(this.proxyStartButtonHeight)
-                .height(this.proxyStartButtonHeight)
-              }.width(this.proxyStartButtonHeight)
+
+                Row() {
+                  Text($r('app.string.configuration_1'))
+                    .fontWeight(FontWeight.Bold)
+                    .width(80)
+                    .fontSize(16)
+                    .margin({ right: 9 })
+                    .fontColor(this.font_primary)
+                  Radio({ value: 'config', group: 'appearanceRadioGroup', })
+                    .checked(false)
+                    .radioStyle({
+                      checkedBackgroundColor: this.icon_emphasize,
+                    })
+                }
+                .margin({ top: 10 })
+
+                Row() {
+                  Text($r('app.string.proxy_1'))
+                    .fontWeight(FontWeight.Bold)
+                    .width(80)
+                    .fontSize(16)
+                    .margin({ right: 9 })
+                    .fontColor(this.font_primary)
+                  Radio({ value: 'proxy', group: 'appearanceRadioGroup', })
+                    .checked(false)
+                    .radioStyle({
+                      checkedBackgroundColor: this.icon_emphasize,
+                    })
+                }
+                .margin({ top: 10 })
+              }
+              .width(188)
+              .height(130)
+              .borderRadius(20)
+              .backdropBlur(2)
+              .alignItems(HorizontalAlign.Start)
+              .backgroundColor($r('app.color.container_background'))
+              .padding({ left: 16, top: 15 })
+              .shadow({
+                color: '#1a000000',
+                radius: 60,
+                type: ShadowType.COLOR
+              })
+
+              // 按钮预览区
+              Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
+                SymbolGlyph($r('sys.symbol.play_fill'))
+                  .fontSize(24)
+                  .fontColor([Color.White])
+              }
+              .offset({x:this.ButtonPositionOffset ,y: 13})
+              .borderRadius(100)
+              .backgroundColor(this.icon_emphasize)
+              .shadow({
+                radius: 10,
+                color: this.icon_emphasize,
+                offsetY: 4,
+                type: ShadowType.BLUR
+              })
+              .width(this.proxyStartButtonHeight)
+              .height(this.proxyStartButtonHeight)
             }
-            .offset({x: this.ButtonPositionOffset, y: 52})
-            .borderRadius(100)
-            .backgroundColor(this.icon_emphasize)
-            .shadow({
-              radius: 10,
-              color: this.icon_emphasize,
-              offsetY: 4,
-              type: ShadowType.BLUR
-            })
           }
           .width('100%')
           .height(220)

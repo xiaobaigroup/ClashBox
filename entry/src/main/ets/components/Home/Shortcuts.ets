@@ -52,7 +52,7 @@ struct Shortcuts {
         // bundleName: "com.example.myapplication",
         "action": "ohos.want.action.viewData",
         // entities可以省略
-     //   "entities": [ "entity.system.browsable" ],
+        //   "entities": [ "entity.system.browsable" ],
         "uri": url,
       }
       let context = getContext(this) as common.UIAbilityContext;
@@ -115,9 +115,9 @@ struct Shortcuts {
               .onAction(() => {
                 //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
                 if (this.isShowShortcuts && this.isShowHomeEdit==false) {
-                this.isShowShortcutsEdit = true
-                this.isEnableIndexForegroundBlur=true
-                  }
+                  this.isShowShortcutsEdit = true
+                  this.isEnableIndexForegroundBlur=true
+                }
               })
           )
 
@@ -129,11 +129,11 @@ struct Shortcuts {
           .onClick(() => {
             //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
             if (this.isShowShortcuts && this.isShowHomeEdit==false) {
-            if (this.inputWebValue3 != '') {
-              this.implicitStartAbility(this.inputWebValue3)
-            }else {
-              this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
-            }
+              if (this.inputWebValue3 != '') {
+                this.implicitStartAbility(this.inputWebValue3)
+              }else {
+                this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
+              }
             }
           })
           .gesture(
@@ -185,17 +185,17 @@ struct Shortcuts {
       console.log("dialog onWillDismiss")
       if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
         dismissDialogAction.dismiss()
-    //    this.isEnableIndexForegroundBlur=false
+        //    this.isEnableIndexForegroundBlur=false
       }
       if (dismissDialogAction.reason == DismissReason.TOUCH_OUTSIDE) {
         dismissDialogAction.dismiss()
-     //   this.isEnableIndexForegroundBlur=false
+        //   this.isEnableIndexForegroundBlur=false
       }
     },
     alignment: DialogAlignment.Center,
     cornerRadius: 32,
     gridCount: 4,
-    backgroundColor: Color.White,
+    backgroundColor: $r('app.color.container_background'),
   })
 
   //绑定第二个按钮弹窗
@@ -211,17 +211,17 @@ struct Shortcuts {
       console.log("dialog onWillDismiss")
       if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
         dismissDialogAction.dismiss()
-     //   this.isEnableIndexForegroundBlur=false
+        //   this.isEnableIndexForegroundBlur=false
       }
       if (dismissDialogAction.reason == DismissReason.TOUCH_OUTSIDE) {
         dismissDialogAction.dismiss()
-    //    this.isEnableIndexForegroundBlur=false
+        //    this.isEnableIndexForegroundBlur=false
       }
     },
     alignment: DialogAlignment.Center,
     cornerRadius: 32,
     gridCount: 4,
-    backgroundColor: Color.White,
+    backgroundColor: $r('app.color.container_background'),
   })
 
   //绑定第三个按钮弹窗
@@ -237,17 +237,17 @@ struct Shortcuts {
       console.log("dialog onWillDismiss")
       if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
         dismissDialogAction.dismiss()
-     //   this.isEnableIndexForegroundBlur=false
+        //   this.isEnableIndexForegroundBlur=false
       }
       if (dismissDialogAction.reason == DismissReason.TOUCH_OUTSIDE) {
         dismissDialogAction.dismiss()
-     //   this.isEnableIndexForegroundBlur=false
+        //   this.isEnableIndexForegroundBlur=false
       }
     },
     alignment: DialogAlignment.Center,
     cornerRadius: 32,
     gridCount: 4,
-    backgroundColor: Color.White,
+    backgroundColor: $r('app.color.container_background'),
   })
   // 在自定义组件即将析构销毁时将弹窗置空
   aboutToDisappear() {
@@ -433,7 +433,7 @@ struct Shortcuts {
       }
     }
     .width('100%')
-   // .contentEndOffset(50)
+    // .contentEndOffset(50)
     .padding({
       left: this.breakPointStateTabContentTitleMargin.value,
       right: this.breakPointStateTabContentTitleMargin.value,
@@ -489,7 +489,7 @@ struct WebCustomDialog1 {
           .onClick(() => {
             if (this.controller != undefined) {
               this.controller.close()
-          //    this.isEnableIndexForegroundBlur = false
+              //    this.isEnableIndexForegroundBlur = false
             }
           })
 
@@ -501,12 +501,12 @@ struct WebCustomDialog1 {
             this.inputWebValue1.toString()
             if (this.controller != undefined) {
               this.controller.close()
-           //   this.isEnableIndexForegroundBlur = false
+              //   this.isEnableIndexForegroundBlur = false
             }
           })
       }
 
-    } .width('100%').padding({top:15,bottom:15,left:24,right:24})
+    } .width('100%').padding({top:15,bottom:15,left:24,right:24}).backgroundColor($r('app.color.container_background'))
   }
 }
 
@@ -556,7 +556,7 @@ struct WebCustomDialog2 {
           .onClick(() => {
             if (this.controller != undefined) {
               this.controller.close()
-          //    this.isEnableIndexForegroundBlur = false
+              //    this.isEnableIndexForegroundBlur = false
             }
           })
 
@@ -569,13 +569,13 @@ struct WebCustomDialog2 {
             this.inputWebValue2.toString()
             if (this.controller != undefined) {
               this.controller.close()
-          //    this.isEnableIndexForegroundBlur = false
+              //    this.isEnableIndexForegroundBlur = false
             }
           })
 
       }
 
-    } .width('100%').padding({top:15,bottom:15,left:24,right:24})
+    } .width('100%').padding({top:15,bottom:15,left:24,right:24}).backgroundColor($r('app.color.container_background'))
   }
 }
 
@@ -625,7 +625,7 @@ struct WebCustomDialog3 {
           .onClick(() => {
             if (this.controller != undefined) {
               this.controller.close()
-      //        this.isEnableIndexForegroundBlur = false
+              //        this.isEnableIndexForegroundBlur = false
             }
           })
 
@@ -638,13 +638,13 @@ struct WebCustomDialog3 {
             this.inputWebValue3.toString()
             if (this.controller != undefined) {
               this.controller.close()
-         //     this.isEnableIndexForegroundBlur = false
+              //     this.isEnableIndexForegroundBlur = false
             }
           })
 
       }
 
-    } .width('100%').padding({top:15,bottom:15,left:24,right:24})
+    } .width('100%').padding({top:15,bottom:15,left:24,right:24}).backgroundColor($r('app.color.container_background'))
   }
 }
 

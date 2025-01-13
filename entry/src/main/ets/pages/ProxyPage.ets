@@ -23,6 +23,8 @@ struct ProxyPage {
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
+  /* 是否开启全局动画判定 */
+  @Consume ('isAnimation') isAnimation: boolean
   @State font_primary: ResourceColor = $r('sys.color.font_primary') //一级文本色，黑色
   @State font_secondary: ResourceColor = $r('sys.color.font_secondary') //二级文本色，深灰色
   @State container_background: ResourceColor = ($r('app.color.container_background')); //卡片颜色
@@ -32,9 +34,6 @@ struct ProxyPage {
   @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //二级图标色，深灰色
 
   /* Stack层叠布局 */
-  // 所有子组件在容器内的对齐方式 TODO 【用户首选项】在设置里可以更改 Alignment.BottomStart 和 Alignment.BottomEnd Enlin@2024-12-04
-  @State
-  stackAlignContentAlignment: Alignment = Alignment.BottomEnd
   //编辑按钮点击
   @State isShowEdit: boolean = false
   //分组tabs相关
@@ -458,7 +457,7 @@ struct ProxyPage {
         .alignItems(HorizontalAlign.Center)
         .justifyContent(FlexAlign.Center) //.padding({top:TAB_CONTENT_TITLE_HEIGHT})
         // transition保证组件离场不被立即析构，可设置其他转场效果
-        .transition(TransitionEffect.OPACITY)
+        .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
         .onClick(() => {
           animateTo({ duration:ANIMATION_DURATION_300 }, () => {
             this.FristPage = false
@@ -466,7 +465,7 @@ struct ProxyPage {
         })
       } else if (!this.FristPage) { //为观看的判定if/else后续可以删掉判定
         // 代理页分组TAB+list主体
-        Stack({ alignContent: this.stackAlignContentAlignment }) {
+        Stack({ alignContent: Alignment.BottomEnd }) {
           //根据ProxyArrangementSelected的状态决定是否显示
           if (this.ProxyArrangementSelected === 'ProxyArrangementSelected1') {
             Column() { //分组标签页 start
@@ -537,7 +536,7 @@ struct ProxyPage {
           // 列表排列
           else if (this.ProxyArrangementSelected === 'ProxyArrangementSelected2') {
             ProxyArrangement()// transition保证组件离场不被立即析构，可设置其他转场效果
-              .transition(TransitionEffect.OPACITY)
+              .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
           }
           //列表排列end
 

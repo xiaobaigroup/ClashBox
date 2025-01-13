@@ -49,9 +49,8 @@ struct Home {
   @Provide isShowExperimentalFunction: boolean = true
   // 设置 -> 后台运行 -> 流量提醒启用状态变量
   @Provide Enablebackgrounder: boolean = false
-  // 所有子组件在容器内的对齐方式 TODO 【用户首选项】在设置里可以更改 Alignment.BottomStart 和 Alignment.BottomEnd Enlin@2024-12-04
-  @State
-  stackAlignContentAlignment: Alignment = Alignment.BottomEnd
+  // 所有子组件在容器内的对齐方式
+  @Consume ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
   //一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   //二级图标色，灰色
@@ -66,30 +65,7 @@ struct Home {
   @State TopHeight: string = ''
   /* 主页卡片高度*/
   @Consume('HomeCardEditHeight') private HomeCardEditHeight: BreakpointState<number>
-  @State compStr: BreakpointState<string> = BreakpointState.of({
-    xs: "xs",
-    sm: "sm",
-    md: "md",
-    lg: "lg",
-    xl: "xl"
-  })
 
-  @State containerRightMargin: BreakpointState<string> = BreakpointState.of({
-    xs: '0vp',
-    sm: '0vp',
-    md: '0vp',
-    lg: '15vp',
-    xl: '15vp'
-  });
-
-
-  @State GridRowHeight: BreakpointState<string> = BreakpointState.of({
-    xs: '715vp',
-    sm: '715vp',
-    md: '1050vp',
-    lg: '550vp',
-    xl: '550vp'
-  });
   windowClass = AppStorage.get<window.Window>('windowClass') as window.Window;
   //编辑按钮点击后显示编辑状态判定
   @Provide isShowHomeEdit: boolean = false
@@ -121,14 +97,8 @@ struct Home {
     cancel: this.existApp,
     autoCancel: true,
     alignment: DialogAlignment.Center,
-    //  offset: { dx: 0, dy: -20 },
     customStyle: false,
     cornerRadius: 32,
-    //   height: 117,
-    //   borderStyle: BorderStyle.Dashed,//使用borderStyle属性，需要和borderWidth属性一起使用
-    //   borderColor: Color.Blue,//使用borderColor属性，需要和borderWidth属性一起使用
-    //    backgroundColor: Color.White,
-    //   shadow: ({ radius: 20, color: Color.Grey, offsetX: 50, offsetY: 0}),
   })
 
   /*
@@ -153,20 +123,18 @@ struct Home {
   // 页面名称 主页
   private componentName: string = 'HomePage'
   /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur')
-  private isEnableIndexForegroundBlur: boolean
+  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+  /* 是否开启全局动画判定 */
+  @Consume ('isAnimation') isAnimation: boolean
   /* Stack层叠布局 */
   /* 代理启动按钮 */
   private promptAction: PromptAction = this.getUIContext()?.getPromptAction()
   // 代理启动按钮状态
-  @State
-  private proxyEnabled: boolean = false
+  @State private proxyEnabled: boolean = false
   // 代理启动持续的时间
-  @State
-  private proxyStartingDuration: string = PROXY_STARTED_DURATION_INIT_VALUE
+  @State private proxyStartingDuration: string = PROXY_STARTED_DURATION_INIT_VALUE
   // 按钮宽度
-  @State
-  private proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
+  @State private proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
   // 按钮高度
   @State
   private proxyStartButtonHeight: Length = $r('app.integer.vp_proxy_not_start_button_height')
@@ -182,28 +150,19 @@ struct Home {
   @Consume('gutterHomeGridcol_12_15') private gutterHomeGridcol: BreakpointState<gutterHomeGridcol>
   //主页整个卡片区域边距
   @Consume('HomeCardAreaPadding') private HomeCardAreaPadding: BreakpointState<MarginGenerate>
-  @Consume('breakPointStateTabContentTitleMargin')
-  private breakPointStateTabContentTitleMargin: BreakpointState<number>
+  @Consume('breakPointStateTabContentTitleMargin') private breakPointStateTabContentTitleMargin: BreakpointState<number>
   /**
    * 主页卡片标题按钮间距
    */
   @Consume('HomeCardTitleButtonPadding') private HomeCardTitleButtonPadding: BreakpointState<number>
 
+
   aboutToAppear() {
     this.greetings = getGreeting()
     console.log('问候语:' + this.greetings)
-
-    BreakpointSystem.getInstance().attach(this.compStr)
-    BreakpointSystem.getInstance().attach(this.GridRowHeight)
-    BreakpointSystem.getInstance().start()
-
   }
 
   aboutToDisappear() {
-
-    BreakpointSystem.getInstance().attach(this.compStr)
-    BreakpointSystem.getInstance().attach(this.GridRowHeight)
-    BreakpointSystem.getInstance().stop()
     this.SaveDialogController = null // 将dialogController置空
   }
 
@@ -232,9 +191,9 @@ struct Home {
     // TODO 国际化
     this.promptAction.showToast({ message: `布局已还原🫡` })
     this.isShowHomeEdit = false
-    animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-      this.isShowDeleteButton = false
-    })
+      animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+        this.isShowDeleteButton = false
+      })
     this.isShowSpeed = true
     this.isShowSwitchMode = true
     this.isShowCellularData = true
@@ -254,9 +213,11 @@ struct Home {
     // TODO 国际化
     this.promptAction.showToast({ message: `布局已保存💾` })
     this.isShowHomeEdit = false
-    animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-      this.isShowDeleteButton = false
-    })
+    if (this.isAnimation) {
+      animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+        this.isShowDeleteButton = false
+      })
+    }else {this.isShowDeleteButton = false}
   }
 
   // 通过@Builder构建设置模态展示界面
@@ -289,8 +250,8 @@ struct Home {
               .fontWeight(FontWeight.Bold)
        //       .margin({ left: this.gridMargin })
               .fontColor(this.font_primary)
-              .transition(TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
-                .combine(TransitionEffect.SLIDE))
+              .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+                .combine(TransitionEffect.SLIDE):null)
             Blank()
 
             //编辑按钮
@@ -299,13 +260,15 @@ struct Home {
                 .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
                 .fontColor([this.icon_primary])
             }
-            .transition(TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 50 })
-              .combine(TransitionEffect.SLIDE))
+            .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+              .combine(TransitionEffect.SLIDE):null)
             .onClick(() => {
               this.isShowHomeEdit = true
-              animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-                this.isShowDeleteButton = true
-              })
+              if (this.isAnimation) {
+                animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                  this.isShowDeleteButton = true
+                })
+              }else {this.isShowDeleteButton = true}
             })
        //     .margin({ right: this.gridMargin })
             .width(40)
@@ -322,8 +285,8 @@ struct Home {
             .width(40)
             .height(40)
             .backgroundColor($r('app.color.settings_container_background'))
-            .transition(TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
-              .combine(TransitionEffect.SLIDE))
+            .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+              .combine(TransitionEffect.SLIDE):null)
             .onClick(() => {
               this.isShowSettings = true
               this.isEnableIndexForegroundBlur = true
@@ -335,8 +298,8 @@ struct Home {
               .fontWeight(FontWeight.Bold)
          //     .margin({ left: this.gridMargin })
               .fontColor(this.font_primary)
-              .transition(TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 100 })
-                .combine(TransitionEffect.SLIDE))
+              .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+                .combine(TransitionEffect.SLIDE):null)
             Blank()
             //添加按钮
             Button({ type: ButtonType.Circle, stateEffect: true }) {
@@ -348,8 +311,8 @@ struct Home {
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
-            .transition(TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 100 })
-              .combine(TransitionEffect.SLIDE))
+            .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+              .combine(TransitionEffect.SLIDE):null)
             .onClick(() => {
               this.isShowCardEdit = true
               this.isEnableIndexForegroundBlur = true
@@ -365,8 +328,8 @@ struct Home {
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
-            .transition(TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 50 })
-              .combine(TransitionEffect.SLIDE))
+            .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+              .combine(TransitionEffect.SLIDE):null)
             .onClick(() => {
               this.saveHomeLayout()
             })
@@ -381,8 +344,8 @@ struct Home {
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
-            .transition(TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
-              .combine(TransitionEffect.SLIDE))
+            .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+              .combine(TransitionEffect.SLIDE):null)
             .onClick(() => {
               if (this.SaveDialogController != null) {
                 this.SaveDialogController.open()
@@ -399,7 +362,7 @@ struct Home {
           right: this.breakPointStateTabContentTitleMargin.value,
         })
         // transition保证组件离场不被立即析构，可设置其他转场效果
-        .transition(TransitionEffect.OPACITY)
+        .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
       }
 
 Stack({ alignContent: this.stackAlignContentAlignment }) {
@@ -427,9 +390,9 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                         }
                         this.pixmapSpeed = pixmap //截图效果为后效果
                       })
-                      animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-                        this.isShowSpeed = false
-                      })
+                        animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                          this.isShowSpeed = false
+                        })
                     })
                 }
               }
@@ -438,9 +401,8 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
             .borderRadius(20)
             .backgroundColor($r('app.color.container_background'))
             .clickEffect({ level: ClickEffectLevel.MIDDLE })
-            .transition(TransitionEffect.scale({ x: 0, y: 0 }).animation({ duration: ANIMATION_DURATION_300 }))
+            .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
             .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-            //    .margin({ right: this.isLandscapePhone ? this.containerMargin.value : this.containerRightMargin.value })
             .onDetach(() => {
             }) //消失触发回调
             .onAttach(() => {
@@ -467,9 +429,9 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                         }
                         this.pixmapSwitchMode = pixmap //截图效果为后效果
                       })
-                      animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-                        this.isShowSwitchMode = false
-                      })
+                        animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                          this.isShowSwitchMode = false
+                        })
                     })
                 }
               }
@@ -477,6 +439,7 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
             // .margin({ right: this.containerMargin.value })
             .GridColStyle()
             .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
+            .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
           }
 
           //流量统计小卡片
@@ -499,9 +462,9 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                         }
                         this.pixmapCellularData = pixmap //截图效果为后效果
                       })
-                      animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-                        this.isShowCellularData = false
-                      })
+                        animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                          this.isShowCellularData = false
+                        })
                     })
                 }
               }
@@ -509,6 +472,7 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
             //   .margin({ left: this.containerMargin.value })
             .GridColStyle()
             .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
+            .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
           }
 
           //当前节点小卡片
@@ -531,15 +495,16 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                         }
                         this.pixmapCurrentNode = pixmap //截图效果为后效果
                       })
-                      animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-                        this.isShowCurrentNode = false
-                      })
+                        animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                          this.isShowCurrentNode = false
+                        })
                     })
                 }
               }
             }
             .GridColStyle()
             .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
+            .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
           }
 
           //IP地址小卡片
@@ -562,15 +527,16 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                         }
                         this.pixmapPublicNetwork = pixmap //截图效果为后效果
                       })
-                      animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-                        this.isShowPublicNetwork = false
-                      })
+                        animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                          this.isShowPublicNetwork = false
+                        })
                     })
                 }
               }
             }
             .GridColStyle()
             .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
+            .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
           }
 
           //收藏节点小卡片
@@ -593,15 +559,16 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                         }
                         this.pixmapFavoriteProxy = pixmap //截图效果为后效果
                       })
-                      animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-                        this.isShowFavoriteProxy = false
-                      })
+                        animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                          this.isShowFavoriteProxy = false
+                        })
                     })
                 }
               }
             }
             .GridColStyle()
             .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
+            .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
           }
 
           //收藏配置小卡片
@@ -624,15 +591,16 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                         }
                         this.pixmapFavoriteConfiguration = pixmap //截图效果为后效果
                       })
-                      animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-                        this.isShowFavoriteConfiguration = false
-                      })
+                        animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                          this.isShowFavoriteConfiguration = false
+                        })
                     })
                 }
               }
             }
             .GridColStyle()
             .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
+            .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
           }
 
           //节点信息小卡片
@@ -655,9 +623,9 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                         }
                         this.pixmapProxyINFO = pixmap //截图效果为后效果
                       })
-                      animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-                        this.isShowProxyINFO = false
-                      })
+                        animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                          this.isShowProxyINFO = false
+                        })
                     })
                 }
               }
@@ -666,9 +634,8 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
             .borderRadius(20)
             .backgroundColor($r('app.color.container_background'))
             .clickEffect({ level: ClickEffectLevel.MIDDLE })
-            .transition(TransitionEffect.scale({ x: 0, y: 0 }).animation({ duration: ANIMATION_DURATION_300 }))
+            .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
             .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-            //    .margin({ right: this.isLandscapePhone ? this.containerMargin.value : this.containerRightMargin.value })
           }
 
           //当前配置小卡片
@@ -691,15 +658,16 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                         }
                         this.pixmapCurrentConfiguration = pixmap //截图效果为后效果
                       })
-                      animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-                        this.isShowCurrentConfiguration = false
-                      })
+                        animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear}, () => {
+                          this.isShowCurrentConfiguration = false
+                        })
                     })
                 }
               }
             }
             .GridColStyle()
             .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
+            .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
           }
 
           //快捷方式小卡片
@@ -722,20 +690,21 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
                         }
                         this.pixmapShortcuts = pixmap //截图效果为后效果
                       })
-                      animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-                        this.isShowShortcuts = false
-                      })
+                        animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                          this.isShowShortcuts = false
+                        })
                     })
                 }
               }
             }
             .GridColStyle()
             .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
+            .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
           }
         } //GridRow的尾括号
         .width('100%')
         .padding(this.isLandscapePhone ? { top: 4, left: 25, right: 25 } : this.HomeCardAreaPadding.value)
-        .margin({ top: this.isLandscapePhone ? 18 : 0 })
+       .margin({ top: this.isLandscapePhone ? 7 : 0 })
       }
     }
     .width('100%')
@@ -903,7 +872,6 @@ function GridColStyle() {
   .borderRadius(20)
   .backgroundColor($r('app.color.container_background'))
   .clickEffect({ level: ClickEffectLevel.MIDDLE })
-  .transition(TransitionEffect.scale({ x: 0, y: 0 }).animation({ duration: ANIMATION_DURATION_300 }))
 }
 
 //网络测速大卡片里的删除按钮
@@ -915,6 +883,8 @@ struct DeleteButton1 {
   @Consume deleteButtonSize: BreakpointState<number>
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+  /* 是否开启全局动画判定 */
+  @Consume ('isAnimation') isAnimation: boolean
 
   build() {
     Button() {
@@ -926,7 +896,7 @@ struct DeleteButton1 {
     .width(this.isLandscapePhone ? 24 : this.deleteButtonSize.value)
     .height(this.isLandscapePhone ? 24 : this.deleteButtonSize.value)
     .backgroundColor('#ffe84026')
-    .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
+    .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
   }
 }
 
@@ -939,6 +909,8 @@ struct DeleteButton2 {
   @Consume deleteButtonSize: BreakpointState<number>
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+  /* 是否开启全局动画判定 */
+  @Consume ('isAnimation') isAnimation: boolean
 
   build() {
     Button() {
@@ -950,7 +922,7 @@ struct DeleteButton2 {
     .width(this.isLandscapePhone ? 24 : this.deleteButtonSize.value)
     .height(this.isLandscapePhone ? 24 : this.deleteButtonSize.value)
     .backgroundColor('#ffe84026')
-    .transition(TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }))
+    .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
     // .position({ x:20,y:0 })设置在此处会不生效 因此写在了每个删除按钮下方
   }
 }

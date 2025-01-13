@@ -39,7 +39,8 @@ import {
   HomeCardEditHeight,
   CardTitleFontSize_18_20_22_22,
   HomeProxyFontSize_24_26_26_27,
-  SpeedfontSize12_14_14_16
+  SpeedfontSize12_14_14_16,
+  HomeCardCellularDataPadding
 } from '../common/Constants'
 import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
@@ -230,6 +231,12 @@ struct Index {
   @Provide('HomeCardTitleButtonPadding')
   private HomeCardTitleButtonPadding: BreakpointState<number> = HomeCardTitleButtonPadding
   /**
+   * 主页流量统计卡片padding高度
+   */
+  @Provide('HomeCardCellularDataPadding')
+  private HomeCardCellularDataPadding: BreakpointState<number> = HomeCardCellularDataPadding
+
+  /**
    * 主页卡片标题按钮间距
    */
   @Provide('HomeCardEditHeight')
@@ -258,6 +265,12 @@ struct Index {
   @Provide ('pixmapCurrentConfiguration')pixmapCurrentConfiguration: image.PixelMap | undefined = undefined
   @Provide ('pixmapProxyINFO')pixmapProxyINFO: image.PixelMap | undefined = undefined
   @Provide ('pixmapShortcuts')pixmapShortcuts: image.PixelMap | undefined = undefined
+
+  // 所有子组件在容器内的对齐方式
+  @Provide ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment = Alignment.BottomEnd
+
+  /* 是否开启全局动画判定 */
+  @Provide ('isAnimation') isAnimation: boolean = true
 
   @Builder
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
@@ -358,6 +371,7 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.HomeCardAreaPadding)
     BreakpointSystem.getInstance().attach(this.HomeCardTitleButtonPadding)
     BreakpointSystem.getInstance().attach(this.HomeCardEditHeight)
+    BreakpointSystem.getInstance().attach(this.HomeCardCellularDataPadding)
     BreakpointSystem.getInstance().start()
   }
 
@@ -431,6 +445,6 @@ struct Index {
       { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
     )
     .padding({ top:px2vp(this.topRectHeight) , bottom: this.isLandscapePhone ? 0 :px2vp(this.bottomRectHeight) -15})
-    .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
+    .animation(this.isAnimation ? { duration: ANIMATION_DURATION_300, curve: Curve.Ease }:null)
   }
 }

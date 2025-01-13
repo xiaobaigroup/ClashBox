@@ -1226,7 +1226,7 @@
     },
     {
       "name": "null_title_tips",
-      "value": "!!!You need to enter a title and ensure that your website contains the prefix 'https://' before opening the website"
+      "value": "Please enter the website address and ensure that it contains' http (s)://' prefix!!!"
     },
     {
       "name": "sound_feedback",
