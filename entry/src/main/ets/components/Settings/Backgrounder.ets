@@ -1,7 +1,7 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
-import { theRowCustomDialog } from "../Common"
+import { ExperimentalFunction, theRowCustomDialog } from "../Common"
 
 
 @Component
@@ -242,7 +242,7 @@ struct Backgrounder {
 export default Backgrounder
 
 /**
- * 列表行通用组件
+ * 开关列表行通用组件
  */
 @Component
 struct RowList {
@@ -275,24 +275,13 @@ struct RowList {
             .fontSize(16)
           // 实验功能提示框
           if(this.subtitle2) {
-            Column() {
-              Text(this.subtitle2)
-                .fontColor(Color.White)
-                .fontSize(10)
-            }
-            .alignItems(HorizontalAlign.Center)
-            .justifyContent(FlexAlign.Center)
-            .width(50)
-            .height(18)
-            .borderRadius(4)
-            .margin({left: 2})
-            .backgroundColor(this.icon_emphasize)
+            ExperimentalFunction()
           }
 
         }
         Text(this.subtitle)
           .fontWeight(FontWeight.Normal)
-          .textOverflow({ overflow: TextOverflow.MARQUEE })
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
           .maxLines(1)
           .margin({top: 2})
           .fontSize(14)

@@ -394,3 +394,251 @@ export struct theRowCustomDialog {
     .width('100%')
   }
 }
+
+/**
+ * 实验功能提示框
+ */
+@Component
+export struct ExperimentalFunction {
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+
+  build() {
+    Column() {
+      Text($r('app.string.experimental_function'))
+        .fontColor(Color.White)
+        .fontSize(10)
+    }
+    .alignItems(HorizontalAlign.Center)
+    .justifyContent(FlexAlign.Center)
+    .width(50)
+    .height(18)
+    .borderRadius(4)
+    .margin({left: 2})
+    .backgroundColor(this.icon_emphasize)
+  }
+}
+
+/**
+ * 列表Row共有样式
+ */
+@Extend(Row)
+function RowStyle() {
+  .width('100%')
+  .height(53)
+  .borderRadius(20)
+  .clickEffect({ level: ClickEffectLevel.MIDDLE })
+  .backgroundColor($r('app.color.container_background'))
+}
+
+/**
+ * 跳转列表行通用组件
+ * @param icons SymbolGlyph对应的系统资源文件地址-Resource
+ * @param title 标题文本-ResourceStr
+ * @param subtitle 副标题文本-ResourceStr
+ * @param tips 传入自定义提示文本-Builder
+ * @param isExperimentalFunction 是否为实验功能-boolean
+ */
+@Component
+export struct skipRowList {
+  @State icons: Resource = $r('sys.symbol.icloud')
+  @State title: ResourceStr = ''
+  @State subtitle: ResourceStr = ''
+  @State isExperimentalFunction: boolean = false
+  // 一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  // 跳转行提示文本项
+  @BuilderParam tips: () => void = this.defaultTipsBuilder
+  // 默认跳转行提示文本
+  @Builder
+  defaultTipsBuilder() {
+    Text('默认')
+      .fontWeight(FontWeight.Normal)
+      .textOverflow({ overflow: TextOverflow.Ellipsis })
+      .maxLines(1)
+      .margin({top: 2 })
+      .fontSize(14)
+  }
+
+  build() {
+    Row() {
+      SymbolGlyph(this.icons)
+        .fontSize(24)
+        .margin({left: 12})
+        .fontColor([this.icon_emphasize])
+      Column() {
+        Row() {
+          Text(this.title)
+            .fontWeight(FontWeight.Medium)
+            .fontSize(16)
+          if(this.isExperimentalFunction) {
+            ExperimentalFunction()
+          }
+        }
+        Text(this.subtitle)
+          .fontWeight(FontWeight.Normal)
+          .textOverflow({ overflow: TextOverflow.MARQUEE })
+          .maxLines(1)
+          .margin({top: 2})
+          .fontSize(14)
+          .width('65%')
+      }
+      .alignItems(HorizontalAlign.Start)
+      .margin({ left: 12 })
+      Blank()
+      this.tips()
+      SymbolGlyph($r('sys.symbol.chevron_right'))
+        .fontSize(28)
+        .margin({right: 12})
+        .fontColor([this.icon_primary])
+    }
+    .RowStyle()
+  }
+}
+
+/**
+ * 开关列表行通用组件
+ * @param icons SymbolGlyph对应的系统资源文件地址-Resource
+ * @param title 标题文本-ResourceStr
+ * @param subtitle 副标题文本-ResourceStr
+ * @param toggle 尾随闭包内传入自定义开关
+ */
+@Component
+export struct toggleRowList {
+  // 标题
+  @State title: ResourceStr = ''
+  // 图标
+  @State icons: Resource = $r('sys.symbol.stopwatch_2')
+  // 副标题
+  @State subtitle: ResourceStr = ''
+  // 实验功能标识
+  @State isExperimentalFunction: boolean = false
+  // 主题色
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  // 开关
+  @BuilderParam toggle: () => void = this.defaultBuilder
+  // 默认开关
+  @Builder
+  defaultBuilder() {
+    Toggle({ type: ToggleType.Switch, isOn: false })
+      .selectedColor(this.icon_emphasize)
+      .margin({right: 12})
+  }
+
+  build() {
+    Row() {
+      if(this.icons) {
+        SymbolGlyph(this.icons)
+          .fontSize(24)
+          .margin({left: 12})
+          .fontColor([this.icon_emphasize])
+      }
+      Column() {
+        Row() {
+          Text(this.title)
+            .fontWeight(FontWeight.Medium)
+            .fontSize(16)
+          // 实验功能提示框
+          if(this.isExperimentalFunction) {
+            ExperimentalFunction()
+          }
+        }
+        Text(this.subtitle)
+          .fontWeight(FontWeight.Normal)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .maxLines(1)
+          .margin({top: 2})
+          .fontSize(14)
+      }
+      .alignItems(HorizontalAlign.Start)
+      .margin({ left: this.icons != null ? 12 : 14 })
+      Blank()
+      this.toggle()
+    }
+    .RowStyle()
+  }
+}
+
+/**
+ * 菜单列表行通用组件
+ * @param icons SymbolGlyph对应的系统资源文件地址-Resource
+ * @param title 标题文本-ResourceStr
+ * @param subtitle 副标题文本-ResourceStr
+ * @param menu 传入自定义菜单入口组件-Builder
+ * @param tips 传入自定义菜单提示文本组件-Builder
+ */
+@Component
+export struct menuRowList {
+  // 标题
+  @State title: ResourceStr = ''
+  // 图标
+  @State icons: Resource = $r('sys.symbol.stopwatch_2')
+  // 副标题
+  @State subtitle: ResourceStr = ''
+  // 实验功能标识
+  @State isExperimentalFunction: boolean = false
+  // 主题色
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  // 一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  // 菜单
+  @BuilderParam menu: () => void = this.defaultMenuBuilder
+  // 默认菜单
+  @Builder
+  defaultMenuBuilder() {
+    Menu()
+  }
+  // 菜单提示文本项
+  @BuilderParam tips: () => void = this.defaultTipsBuilder
+  // 默认菜单提示文本
+  @Builder
+  defaultTipsBuilder() {
+    Text('默认')
+      .fontWeight(FontWeight.Normal)
+      .textOverflow({ overflow: TextOverflow.Ellipsis })
+      .maxLines(1)
+      .margin({top: 2 })
+      .fontSize(14)
+  }
+
+  build() {
+    Row() {
+      SymbolGlyph(this.icons)
+        .fontSize(24)
+        .margin({left: 12})
+        .fontColor([this.icon_emphasize])
+      Column() {
+        Row() {
+          Text(this.title)
+            .fontWeight(FontWeight.Medium)
+            .fontSize(16)
+          // 实验功能提示框
+          if(this.isExperimentalFunction) {
+            ExperimentalFunction()
+          }
+        }
+        if(this.subtitle) {
+          Text(this.subtitle)
+            .fontWeight(FontWeight.Normal)
+            .textOverflow({ overflow: TextOverflow.MARQUEE })
+            .maxLines(1)
+            .margin({ top: 2 })
+            .fontSize(14)
+            .width('70%')
+        }
+      }
+      .margin({ left: 12 })
+      .alignItems(HorizontalAlign.Start)
+      Blank()
+      // 菜单
+      Row() {
+        this.tips()
+        SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
+          .fontSize(14)
+          .margin({left: 7, right: 20})
+          .fontColor([this.icon_primary])
+      }.bindMenu(this.menu())
+    }
+    .RowStyle()
+  }
+}

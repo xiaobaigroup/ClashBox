@@ -193,7 +193,7 @@
       "value": "Set application lock, Fingerprint/Face unlock"
     },
     {
-      "name": "NoticeSubtitle",
+      "name": "subtitle",
       "value": "Resident notifications and CellularData reminders"
     },
     {
@@ -1227,6 +1227,22 @@
     {
       "name": "null_title_tips",
       "value": "!!!You need to enter a title and ensure that your website contains the prefix 'https://' before opening the website"
+    },
+    {
+      "name": "sound_feedback",
+      "value": "Sound Feedback"
+    },
+    {
+      "name": "option1",
+      "value": "Option1"
+    },
+    {
+      "name": "option2",
+      "value": "Option2"
+    },
+    {
+      "name": "option3",
+      "value": "Option3"
     }
   ]
 }

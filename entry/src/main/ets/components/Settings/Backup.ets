@@ -1,10 +1,11 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { ANIMATION_DURATION_300, BackupList, BackupListItemProp } from "../../common/Constants"
+import { ANIMATION_DURATION_300 } from "../../common/Constants"
+import { ExperimentalFunction, skipRowList } from "../Common"
 import TopBuilder from "./TopBuilder"
+import { hilog } from "@kit.PerformanceAnalysisKit"
 
 @Component
 struct Backup {
-  @State backupList: BackupListItemProp[] = BackupList
   // 设置 -> 备份与恢复 -> 是否启用云备份配置
   @Consume isShowCloudconfig: boolean
   // 一级图标色，黑色
@@ -12,80 +13,90 @@ struct Backup {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 设置页路由表
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
+  // 实验功能提示框展示变量
+  @Consume isShowExperimentalFunction: boolean
   // 页面内边距
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
-
-  handleClick(index: number) {
-    if(index === 0) {
-      // 跳转至云备份
-      this.SettingsPageInfos.pushPathByName('CloudBackup', false)
-    } else if(index === 1) {
-      // 备份数据
-      this.onBackupData()
-    } else if(index === 2) {
-      // 恢复数据
-      this.onRestoreData()
-    }
-  }
 
   /**
    * 备份应用数据
    */
   onBackupData() {
+    hilog.info(0xFF00, "BackupTag", "开始备份应用数据")
 
   }
   /**
    * 从备份文件恢复应用数据
    */
   onRestoreData() {
+    hilog.info(0xFF00, "BackupTag", "开始从备份文件恢复应用数据")
 
   }
 
+  @Builder
+  CloudBackupTipsText() {
+    Text(this.isShowCloudconfig ? $r('app.string.enabled') : $r('app.string.not_enabled'))
+      .fontWeight(FontWeight.Normal)
+      .textOverflow({ overflow: TextOverflow.Ellipsis })
+      .maxLines(1)
+      .margin({top: 2 })
+      .fontSize(14)
+  }
+  @Builder
+  BackupTipsText() {
+  }
+  @Builder
+  RestoreTipsText() {
+  }
 
   build() {
     NavDestination() {
       TopBuilder({title: $r('app.string.Backup_Recovery')})
       // 功能区
-      Column() {
-        ForEach(this.backupList, (item: BackupListItemProp, index: number) => {
-          Row() {
-            SymbolGlyph(item.icons)
-              .fontSize(24)
-              .margin({left: 12})
-              .fontColor([this.icon_emphasize])
-            Column() {
-              Text(item.title)
-                .fontWeight(FontWeight.Medium)
-                .fontSize(16)
-              Text(item.subtitle)
-                .fontWeight(FontWeight.Normal)
-                .textOverflow({ overflow: TextOverflow.MARQUEE })
-                .maxLines(1)
-                .margin({top: 2})
-                .fontSize(14)
-                .width('65%')
-            }
-            .alignItems(HorizontalAlign.Start)
-            .margin({ left: 12 })
-            Blank()
-            Text(item.subtitle3)
-              .fontWeight(FontWeight.Normal)
-              .margin({right: 4 })
-              .fontSize(14)
-            SymbolGlyph($r('sys.symbol.chevron_right'))
-              .fontSize(28)
-              .margin({right: 12})
-              .fontColor([this.icon_primary])
-          }
-          .width('100%')
-          .height(53)
-          .borderRadius(20)
-          .margin({bottom: 10})
-          .backgroundColor($r('app.color.container_background'))
-          .onClick(() => {
-            this.handleClick(index)
+      Column({space: 10}) {
+        // 云备份
+        if(this.isShowExperimentalFunction) {
+          skipRowList({
+            title: $r('app.string.cloud_backup'),
+            subtitle: $r('app.string.cloud_backup_subtitle'),
+            tips: (): void => { this.CloudBackupTipsText() },
+            isExperimentalFunction: true
           })
-        })
+            .onClick(() => {
+              // 跳转至云备份
+              this.SettingsPageInfos.pushPathByName('CloudBackup', false)
+            })
+        }
+        Column({space: 10}) {
+          // 备份
+          skipRowList({
+            icons: $r('sys.symbol.arrowshape_up_to_line_fill'),
+            title: $r('app.string.backup'),
+            subtitle: $r('app.string.backup_subtitle'),
+            tips: (): void => { this.BackupTipsText() },
+            isExperimentalFunction: false
+          })
+            .onClick(() => {
+              // 备份数据
+              this.onBackupData()
+            })
+          // 恢复
+          skipRowList({
+            icons: $r('sys.symbol.arrowshape_down_to_line_fill'),
+            title: $r('app.string.restore'),
+            subtitle: $r('app.string.restore_subtitle'),
+            tips: (): void => { this.RestoreTipsText() },
+            isExperimentalFunction: false
+          })
+            .onClick(() => {
+              // 恢复数据
+              this.onRestoreData()
+            })
+        }
+        .width('100%')
+        .borderRadius(20)
+        .clickEffect({ level: ClickEffectLevel.MIDDLE })
+        .backgroundColor($r('app.color.container_background'))
       }
       .width('100%')
       .alignItems(HorizontalAlign.Center)
@@ -97,33 +108,20 @@ struct Backup {
       this.SettingsPageInfos.clear();
       return true;
     })
-    // 当备份与恢复页即将弹出至栈顶时触发 TODO 【用户首选项】保存备份与恢复页的数组 即云备份启用状态 Ya@2024-12-24
-    .onWillShow(() => {
-      if(this.isShowCloudconfig) {
-        // 更新备份页数组 -> 已启用
-        const ItemData = this.backupList[0]
-        ItemData.subtitle3 = $r('app.string.enabled')
-        this.backupList.splice(0, 1, ItemData)
-      } else {
-        // 更新备份页数组 -> 未启用
-        const ItemData = this.backupList[0]
-        ItemData.subtitle3 = $r('app.string.not_enabled')
-        this.backupList.splice(0, 1, ItemData)
-      }
-    })
-
   }
 }
 export default Backup
 
+
+
 @Component
 export struct CloudBackup {
-  @Consume isShowCloudconfig: boolean
+  @Consume isShowCloudconfig: boolean // TODO 【用户首选项】保存云备份启用状态 Ya@2025-01-12
   // 实验功能提示框展示变量
   @Consume isShowExperimentalFunction: boolean
   @State isLogon: boolean = false
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  //一级图标色，黑色
+  // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 页面内边距

@@ -193,7 +193,7 @@
       "value": "设置应用锁、指纹/人脸解锁"
     },
     {
-      "name": "NoticeSubtitle",
+      "name": "subtitle",
       "value": "常驻通知、流量提醒、震动反馈"
     },
     {
@@ -1111,6 +1111,10 @@
     {
       "name": "vibrate_feedback",
       "value": "震动反馈"
+    },
+    {
+      "name": "sound_feedback",
+      "value": "声音反馈"
     },
     {
       "name": "background_notice_tips",

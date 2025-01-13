@@ -126,8 +126,6 @@ struct Settings {
   }
 
   aboutToAppear(): void {
-    BreakpointSystem.getInstance().attach(this.listBottom)
-    BreakpointSystem.getInstance().start()
   }
 
   // 在自定义组件即将析构销毁时将dialogController置空
