@@ -42,7 +42,6 @@ struct SwitchMode {
   build() {
     Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.SpaceBetween }) {
       CardTitle({ title: $r('app.string.Mode') })
-      Blank(5)
 
       Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
         Text($r('app.string.Rule'))
@@ -76,6 +75,7 @@ struct SwitchMode {
             })
         }
       .width('100%')
+      .height('82%')
       .backgroundColor($r('app.color.home_card_background'))
       .borderRadius(20)
       .padding({ top:2,bottom:2,left:3,right:3 })

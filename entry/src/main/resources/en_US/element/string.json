@@ -1221,8 +1221,8 @@
       "value": "Shortcuts"
     },
     {
-      "name": "click_modify",
-      "value": "Click Me Modify"
+      "name": "long_press_modify",
+      "value": "LongPress Me Modify"
     },
     {
       "name": "null_title_tips",

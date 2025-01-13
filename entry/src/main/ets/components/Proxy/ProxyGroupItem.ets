@@ -1,6 +1,8 @@
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem'
-import { BIND_SHEET_CONTAINER_HEIGHT, LIST_ITEM_HEIGHT,
+import {
+  ANIMATION_DURATION_300,
+  BIND_SHEET_CONTAINER_HEIGHT, LIST_ITEM_HEIGHT,
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE } from '../../common/Constants'
 import { LengthMetrics, SymbolGlyphModifier,PromptAction } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';

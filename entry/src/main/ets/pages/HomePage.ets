@@ -675,7 +675,7 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
           if (this.isShowShortcuts) {
             GridCol({
               span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : 6, lg: 3 },
-              order: 8
+              order: 2
             }) {
               Stack({ alignContent: Alignment.TopEnd }) {
                 Shortcuts()

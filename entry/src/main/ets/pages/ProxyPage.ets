@@ -520,13 +520,12 @@ struct ProxyPage {
               .onChange((index: number) => {
                 this.currentIndex = index;
               })
+
             }
             .padding({
               left: this.breakPointStateTabContentTitleMargin.value,
             })
             .width('100%')
-            // transition保证组件离场不被立即析构，可设置其他转场效果
-            .transition(TransitionEffect.OPACITY)
             .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
             .foregroundBlurStyle(
               this.isEnableIndexForegroundBlur ? BlurStyle.Thin : BlurStyle.NONE,

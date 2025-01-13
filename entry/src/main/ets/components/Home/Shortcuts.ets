@@ -55,93 +55,72 @@ struct Shortcuts {
       console.info(`explicit start ability failed with ${error.code}`)
     }
   }
-  //收藏与ping延迟即时动作
+  //无填写标题和网址即时动作
   private ShortcutsPromptAction:PromptAction = this.getUIContext()?.getPromptAction()
 
   build() {
     //快捷小卡片主体 start
     Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.Center }) {
-      if (this.inputTitleValue1 != '' && this.inputTitleValue2 != '' && this.inputTitleValue3 != '' ) {
-        Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween}) {
-          CardTitle({ title: $r('app.string.shortcuts') })
-          Text($r('app.string.click_modify')).fontSize(12).fontColor($r('sys.color.font_fourth')).textOverflow({overflow: TextOverflow.MARQUEE})
-        }.width('100%')
+      CardTitle({ title: $r('app.string.shortcuts') })
+
+      Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.SpaceBetween }) {
+        Text(this.inputTitleValue1 != '' ? `${this.inputTitleValue1}`:$r('app.string.long_press_modify'))
+          .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+          .ShortcutsTextStyle()
           .onClick(() => {
-            if (this.inputTitleValue1 != '' && this.inputTitleValue2 != '' && this.inputTitleValue3 != '') {
-              this.isShowShortcutsEdit = true
-              this.isEnableIndexForegroundBlur = true
+            if (this.inputWebValue1 != '') {
+              this.implicitStartAbility(this.inputWebValue1)
+            }else {
+              this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
             }
           })
-      }else {CardTitle({ title: $r('app.string.shortcuts') })}
-      Blank(5)
-      Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.SpaceBetween }) {
-        if (this.inputTitleValue1 != ''){
-            Text(`${this.inputTitleValue1}`)
-              .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-              .ShortcutsTextStyle()
-              .onClick(() => {
-                if (this.inputWebValue1 != '') {
-                  this.implicitStartAbility(this.inputWebValue1)
-                }else {
-                  this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
-                }
+          .gesture(
+            LongPressGesture()
+              .onAction(() => {
+                this.isShowShortcutsEdit = true
+                this.isEnableIndexForegroundBlur=true
               })
-        } else {
-          Text($r('app.string.click_modify'))
-            .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-            .ShortcutsTextStyle()
-            .onClick(() => {
-              this.isShowShortcutsEdit = true
-              this.isEnableIndexForegroundBlur=true
-            })
-        }
+          )
 
         Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
 
-        if (this.inputTitleValue2 != '') {
-          Text(`${this.inputTitleValue2}`)
-            .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-            .ShortcutsTextStyle()
-            .onClick(() => {
-              if (this.inputWebValue2 != '') {
+        Text(this.inputTitleValue2 != '' ? `${this.inputTitleValue2}`:$r('app.string.long_press_modify'))
+          .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+          .ShortcutsTextStyle()
+          .onClick(() => {
+            if (this.inputWebValue2 != '') {
               this.implicitStartAbility(this.inputWebValue2)
-              }else {
-                this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
-              }
-            })
-        }else {
-          Text($r('app.string.click_modify'))
-            .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-            .ShortcutsTextStyle()
-            .onClick(() => {
-              this.isShowShortcutsEdit = true
-              this.isEnableIndexForegroundBlur=true
-            })
-        }
+            }else {
+              this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
+            }
+          })
+          .gesture(
+            LongPressGesture()
+              .onAction(() => {
+                this.isShowShortcutsEdit = true
+                this.isEnableIndexForegroundBlur=true
+              })
+          )
 
         Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
 
-        if (this.inputTitleValue3 != '') {
-          Text(`${this.inputTitleValue3}`)
-            .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-            .ShortcutsTextStyle()
-            .onClick(() => {
-              if (this.inputWebValue3 != '') {
-                this.implicitStartAbility(this.inputWebValue3)
-              }else {
-                this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
-              }
-            })
-        }else {
-          Text($r('app.string.click_modify'))
-            .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-            .ShortcutsTextStyle()
-            .onClick(() => {
-              this.isShowShortcutsEdit = true
-              this.isEnableIndexForegroundBlur=true
-            })
-        }
-
+        Text(this.inputTitleValue3 != '' ? `${this.inputTitleValue3}`:$r('app.string.long_press_modify'))
+          .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+          .ShortcutsTextStyle()
+          .onClick(() => {
+            if (this.inputWebValue3 != '') {
+              this.implicitStartAbility(this.inputWebValue3)
+            }else {
+              this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
+            }
+          })
+          .gesture(
+            LongPressGesture()
+              .onAction(() => {
+                this.isShowShortcutsEdit = true
+                this.isEnableIndexForegroundBlur=true
+              })
+          )
       }
       .width('100%')
       .height('82%')
@@ -670,7 +649,7 @@ function WebTextAreaStyle() {
   .borderRadius(BORDER_RADIUS_20)
   .placeholderFont({ size:16})
   .textAlign(TextAlign.Start)
-  .fontColor($r('sys.color.font_secondary'))
+  .fontColor($r('sys.color.font_primary'))
   .type(TextAreaType.URL)
   .wordBreak(WordBreak.BREAK_ALL)
   .maxLength(TEXT_AREA_MAX_LENGTH)

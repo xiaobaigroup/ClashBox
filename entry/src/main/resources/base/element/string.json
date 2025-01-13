@@ -1225,8 +1225,8 @@
       "value": "快捷方式"
     },
     {
-      "name": "click_modify",
-      "value": "点我修改"
+      "name": "long_press_modify",
+      "value": "长按我修改"
     },
     {
       "name": "option1",
@@ -1242,7 +1242,7 @@
     },
     {
       "name": "null_title_tips",
-      "value": "!!!需要输入标题，并确保你的网址含有‘https://’前缀，才可打开网址"
+      "value": "请输入标题和网址，并确保你的网址含有‘https://’前缀!!!"
     }
   ]
 }
