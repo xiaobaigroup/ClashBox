@@ -1,6 +1,8 @@
 import { BreakpointState } from '../../common/breakpointsystem'
 import { BIND_SHEET_CONTAINER_HEIGHT,
   BORDER_RADIUS_20,
+  FONT_SIZE_14,
+  FONT_SIZE_16,
   MarginGenerate, TEXT_AREA_MAX_LENGTH,
   TEXT_INPUT_HEIGHT,
 } from '../../common/Constants'
@@ -249,122 +251,165 @@ struct Shortcuts {
   //半模态窗口
   @Builder
   ShortcutsEdit() {
-    Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.Center }) {
-      Blank(10)
+    List() {
+      ListItem() {
+        Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.Center }) {
+          Blank(10)
+          Text($r('app.string.option1')).TitleTextStyle()
+          Blank(10)
+          Column({ space: 16 }) {
+            Flex({
+              direction: FlexDirection.Row,
+              alignItems: ItemAlign.Center,
+              justifyContent: FlexAlign.SpaceBetween
+            }) {
+              Text($r('app.string.title')).TextStyle()
 
-     Text($r('app.string.option1')).TitleTextStyle()
-      Blank(10)
-      Column({space:16}){
-        Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-          Text($r('app.string.title')).TextStyle()
+              Column({ space: 2 }) {
+                TextInput({
+                  placeholder: $r('app.string.text_input_placeholder'),
+                  text: this.inputTitleValue1,
+                  controller: this.controller
+                })
+                  .TextInputStyle()
+                  .caretColor(this.icon_emphasize)//   .underlineColor(this.icon_emphasize)
+                  .onSubmit((enterKey: EnterKeyType) => {
+                    enterKey.toString()
+                    this.inputTitleValue1 != ''
+                  })
+                  .onChange((value: string) => {
+                    this.inputTitleValue1 = value
+                    this.inputTitleValue1 != ''
+                  })
+                Divider().strokeWidth(1).color(this.icon_emphasize)
+              }.width('32%')
+            }
 
-          Column({space:2}) {
-            TextInput({ placeholder: $r('app.string.text_input_placeholder'), text: this.inputTitleValue1, controller: this.controller })
-              .TextInputStyle()
-              .caretColor(this.icon_emphasize)//   .underlineColor(this.icon_emphasize)
-              .onSubmit((enterKey: EnterKeyType) => {
-                enterKey.toString()
-                this.inputTitleValue1 != ''
-              })
-              .onChange((value: string) => {
-                this.inputTitleValue1 = value
-                this.inputTitleValue1 != ''
-              })
-            Divider().strokeWidth(1).color(this.icon_emphasize)
-          }.width('32%')
-        }
-        Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
-        Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-          Text('URL').TextStyle()
-          Button($r('app.string.write_url'))
-            .ButtonStyle()
-            .fontColor(this.icon_emphasize)
-            .onClick(() => {
-              if (this.WebDialogController1 != null) {
-                this.WebDialogController1.open()
-        //        this.isEnableIndexForegroundBlur=true
-              }
-            })
-        }
-      }.ColumnStyle()
-      Blank(10)
+            Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
+            Flex({
+              direction: FlexDirection.Row,
+              alignItems: ItemAlign.Center,
+              justifyContent: FlexAlign.SpaceBetween
+            }) {
+              Text('URL').TextStyle()
+              Button($r('app.string.write_url'))
+                .ButtonStyle()
+                .fontColor(this.icon_emphasize)
+                .onClick(() => {
+                  if (this.WebDialogController1 != null) {
+                    this.WebDialogController1.open()
+                    //        this.isEnableIndexForegroundBlur=true
+                  }
+                })
+            }
+          }.ColumnStyle()
 
-      Text($r('app.string.option2')).TitleTextStyle()
-      Blank(10)
-      Column({space:16}){
-        Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-          Text($r('app.string.title')).TextStyle()
+          Blank(10)
 
-          Column({space:2}) {
-          TextInput({ placeholder: $r('app.string.text_input_placeholder'),text:this.inputTitleValue2,controller: this.controller})
-            .TextInputStyle()
-            .caretColor(this.icon_emphasize)
-           // .underlineColor(this.icon_emphasize)
-            .onSubmit((enterKey: EnterKeyType) => {
-              enterKey.toString()
-              this.inputTitleValue2 != ''
-            })
-            .onChange((value: string) => {
-              this.inputTitleValue2 = value
-              this.inputTitleValue2 != ''
-            })
-            Divider().strokeWidth(1).color(this.icon_emphasize)
-          }.width('32%')
-        }
-        Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
-        Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-          Text('URL').TextStyle()
-          Button($r('app.string.write_url'))
-            .ButtonStyle()
-            .fontColor(this.icon_emphasize)
-            .onClick(() => {
-              if (this.WebDialogController2 != null) {
-                this.WebDialogController2.open()
-        //        this.isEnableIndexForegroundBlur=true
-              }
-            })
-        }
-      }.ColumnStyle()
-      Blank(10)
+          Text($r('app.string.option2')).TitleTextStyle()
+          Blank(10)
+          Column({ space: 16 }) {
+            Flex({
+              direction: FlexDirection.Row,
+              alignItems: ItemAlign.Center,
+              justifyContent: FlexAlign.SpaceBetween
+            }) {
+              Text($r('app.string.title')).TextStyle()
 
-      Text($r('app.string.option3')).TitleTextStyle()
-      Blank(10)
-      Column({space:16}){
-        Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-          Text($r('app.string.title')).TextStyle()
+              Column({ space: 2 }) {
+                TextInput({
+                  placeholder: $r('app.string.text_input_placeholder'),
+                  text: this.inputTitleValue2,
+                  controller: this.controller
+                })
+                  .TextInputStyle()
+                  .caretColor(this.icon_emphasize)// .underlineColor(this.icon_emphasize)
+                  .onSubmit((enterKey: EnterKeyType) => {
+                    enterKey.toString()
+                    this.inputTitleValue2 != ''
+                  })
+                  .onChange((value: string) => {
+                    this.inputTitleValue2 = value
+                    this.inputTitleValue2 != ''
+                  })
+                Divider().strokeWidth(1).color(this.icon_emphasize)
+              }.width('32%')
+            }
 
-          Column({space:2}) {
-          TextInput({ placeholder: $r('app.string.text_input_placeholder'),text:this.inputTitleValue3,controller: this.controller})
-            .TextInputStyle()
-            .caretColor(this.icon_emphasize)
-            //.underlineColor(this.icon_emphasize)
-            .onSubmit((enterKey: EnterKeyType) => {
-              enterKey.toString()
-              this.inputTitleValue3 != ''
-            })
-            .onChange((value: string) => {
-              this.inputTitleValue3 = value
-              this.inputTitleValue3 != ''
-            })
-            Divider().strokeWidth(1).color(this.icon_emphasize)
-          }.width('32%')
+            Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
+            Flex({
+              direction: FlexDirection.Row,
+              alignItems: ItemAlign.Center,
+              justifyContent: FlexAlign.SpaceBetween
+            }) {
+              Text('URL').TextStyle()
+              Button($r('app.string.write_url'))
+                .ButtonStyle()
+                .fontColor(this.icon_emphasize)
+                .onClick(() => {
+                  if (this.WebDialogController2 != null) {
+                    this.WebDialogController2.open()
+                    //        this.isEnableIndexForegroundBlur=true
+                  }
+                })
+            }
+          }.ColumnStyle()
+
+          Blank(10)
+
+          Text($r('app.string.option3')).TitleTextStyle()
+          Blank(10)
+          Column({ space: 16 }) {
+            Flex({
+              direction: FlexDirection.Row,
+              alignItems: ItemAlign.Center,
+              justifyContent: FlexAlign.SpaceBetween
+            }) {
+              Text($r('app.string.title')).TextStyle()
+
+              Column({ space: 2 }) {
+                TextInput({
+                  placeholder: $r('app.string.text_input_placeholder'),
+                  text: this.inputTitleValue3,
+                  controller: this.controller
+                })
+                  .TextInputStyle()
+                  .caretColor(this.icon_emphasize)//.underlineColor(this.icon_emphasize)
+                  .onSubmit((enterKey: EnterKeyType) => {
+                    enterKey.toString()
+                    this.inputTitleValue3 != ''
+                  })
+                  .onChange((value: string) => {
+                    this.inputTitleValue3 = value
+                    this.inputTitleValue3 != ''
+                  })
+                Divider().strokeWidth(1).color(this.icon_emphasize)
+              }.width('32%')
+            }
+
+            Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
+            Flex({
+              direction: FlexDirection.Row,
+              alignItems: ItemAlign.Center,
+              justifyContent: FlexAlign.SpaceBetween
+            }) {
+              Text('URL').TextStyle()
+              Button($r('app.string.write_url'))
+                .ButtonStyle()
+                .fontColor(this.icon_emphasize)
+                .onClick(() => {
+                  if (this.WebDialogController3 != null) {
+                    this.WebDialogController3.open()
+                    //           this.isEnableIndexForegroundBlur=true
+                  }
+                })
+            }
+          }.ColumnStyle()
         }
-        Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
-        Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-          Text('URL').TextStyle()
-          Button($r('app.string.write_url'))
-            .ButtonStyle()
-            .fontColor(this.icon_emphasize)
-            .onClick(() => {
-              if (this.WebDialogController3 != null) {
-                this.WebDialogController3.open()
-     //           this.isEnableIndexForegroundBlur=true
-              }
-            })
-        }
-      }.ColumnStyle()
+      }
     }
     .width('100%')
+   // .contentEndOffset(50)
     .padding({
       left: this.breakPointStateTabContentTitleMargin.value,
       right: this.breakPointStateTabContentTitleMargin.value,
@@ -595,14 +640,14 @@ function ColumnStyle() {
 @Extend(Text)
 function TextStyle() {
   .width("100%")
-  .fontSize(16)
+  .fontSize(FONT_SIZE_16)
   .fontColor($r('sys.color.font_primary'))
 }
 //半模拟态小标题文本样式
 @Extend(Text)
 function TitleTextStyle() {
   .width("100%")
-  .fontSize(16)
+  .fontSize(FONT_SIZE_16)
   .fontColor($r('sys.color.font_secondary'))
   .padding({left:3})
 }
@@ -612,7 +657,7 @@ function TitleTextStyle() {
 function ButtonStyle() {
   .width('35%')
   .height(26)
-  .fontSize(14)
+  .fontSize(FONT_SIZE_14)
   .backgroundColor($r('app.color.home_card_background'))
   .clickEffect({ level: ClickEffectLevel.MIDDLE })
 }
@@ -623,7 +668,7 @@ function ButtonStyle() {
 function TextInputStyle() {
   .padding(0)
   .borderRadius(0)
-  .placeholderFont({ size:14})
+  .placeholderFont({ size:FONT_SIZE_14})
   .textAlign(TextAlign.Center)
   .fontColor($r('sys.color.font_secondary'))
   .showUnderline(false)
@@ -647,7 +692,7 @@ function WebTextAreaStyle() {
   .width('100%')
   .height(TEXT_INPUT_HEIGHT * 2)
   .borderRadius(BORDER_RADIUS_20)
-  .placeholderFont({ size:16})
+  .placeholderFont({ size:FONT_SIZE_16})
   .textAlign(TextAlign.Start)
   .fontColor($r('sys.color.font_primary'))
   .type(TextAreaType.URL)
@@ -660,5 +705,5 @@ function WebTextAreaStyle() {
 @Extend(Button)
 function WebButtonStyle() {
   .width(144)
-  .fontSize(16)
+  .fontSize(FONT_SIZE_16)
 }
