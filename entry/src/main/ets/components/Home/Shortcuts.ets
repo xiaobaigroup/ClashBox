@@ -62,10 +62,10 @@ struct Shortcuts {
 
   build() {
     //快捷小卡片主体 start
-    Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.Center }) {
+    Column() {
       CardTitle({ title: $r('app.string.shortcuts') })
 
-      Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.SpaceBetween }) {
+      Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceEvenly }) {
         Text(this.inputTitleValue1 != '' ? `${this.inputTitleValue1}`:$r('app.string.long_press_modify'))
           .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
           .ShortcutsTextStyle()

@@ -14,7 +14,7 @@ struct ProxyINFO{
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   //主页卡片内容当前节点字体大小
-  @Consume('ProxyFontSize_24_29_26_27') private ProxyFontSize_24_29_26_27: BreakpointState<number>
+  @Consume('ProxyFontSize') private ProxyFontSize: BreakpointState<number>
   @State address: string = '美国'
   @State IP: string = '255.255.255.255'
   @State DownloadSpeed: number = 0
@@ -26,7 +26,7 @@ struct ProxyINFO{
   //主页卡片内容当前延迟小字体大小（16,20,18,24）
   @Consume('HomeCardPrpxySmFontSize') private HomeCardPrpxySmFontSize: BreakpointState<number>
   //主页卡片内容网络测速字体大小
-  @Consume('SpeedfontSize12_16_14_16') private SpeedfontSize12_16_14_16: BreakpointState<number>
+  @Consume('SpeedfontSize12_14_14_16') private SpeedfontSize12_14_14_16: BreakpointState<number>
   // 内容文本字体大小
   @Consume('breakPointStateHomeCardSwitchModeFontSize') private fontSize: BreakpointState<number>
   // 当前代理节点单选框选择的配置
@@ -39,13 +39,13 @@ struct ProxyINFO{
           CardTitle({ title: $r('app.string.proxy_INFO') })
           if (this.ProxyRadioCheckedValue >= 0) {
             Text(`${this.items[this.ProxyRadioCheckedValue].text}`)
-              .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize_24_29_26_27.value)
+              .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('sys.color.font_primary'))
           }
           else if(this.ProxyRadioCheckedValue < 0){
             Text($r('app.string.proxy_name'))
-              .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize_24_29_26_27.value)
+              .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('sys.color.font_primary'))
           }
@@ -73,7 +73,7 @@ struct ProxyINFO{
         Column() {
           Row({space:5}) {
             Text(this.DownloadSpeed.toString() + ' B/s')
-              .fontSize(this.isLandscapePhone ? 12:this.SpeedfontSize12_16_14_16.value)
+              .fontSize(this.isLandscapePhone ? 12:this.SpeedfontSize12_14_14_16.value)
               .fontColor($r('sys.color.font_primary'))
               .textAlign(TextAlign.End)
 
@@ -83,7 +83,7 @@ struct ProxyINFO{
 
           Row({space:5}) {
             Text(this.UploadSpeed.toString() + ' B/s')
-              .fontSize(this.isLandscapePhone ? 12:this.SpeedfontSize12_16_14_16.value)
+              .fontSize(this.isLandscapePhone ? 12:this.SpeedfontSize12_14_14_16.value)
               .fontColor($r('sys.color.font_primary'))
               .textAlign(TextAlign.End)
 

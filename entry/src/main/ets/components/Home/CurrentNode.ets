@@ -17,7 +17,7 @@ struct CurrentNode {
   //主页卡片内容当前延迟小字体大小（16,20,18,24）
   @Consume('HomeCardPrpxySmFontSize') private HomeCardPrpxySmFontSize: BreakpointState<number>
   //主页卡片内容当前节点字体大小
-  @Consume('ProxyFontSize_24_29_26_27') private ProxyFontSize_24_29_26_27: BreakpointState<number>
+  @Consume('ProxyFontSize') private ProxyFontSize: BreakpointState<number>
   // 当前代理节点单选框选择的配置
   @Consume private ProxyRadioCheckedValue: number
 
@@ -29,7 +29,7 @@ struct CurrentNode {
       Column() {
         if (this.ProxyRadioCheckedValue >= 0) {
           Text(`${this.items[this.ProxyRadioCheckedValue].text}`)
-            .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize_24_29_26_27.value)
+            .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
             .fontWeight(FontWeight.Bold)
             .fontColor(this.font_primary)
 
@@ -39,7 +39,7 @@ struct CurrentNode {
         }
         else if(this.ProxyRadioCheckedValue < 0){
           Text($r('app.string.proxy_name'))
-            .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize_24_29_26_27.value)
+            .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
             .fontWeight(FontWeight.Bold)
             .fontColor(this.font_primary)
 

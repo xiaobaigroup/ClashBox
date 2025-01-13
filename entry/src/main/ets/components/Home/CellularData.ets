@@ -24,6 +24,7 @@ struct CellularDataStat {
   @Consume('breakPointStateCardCellularDatabarMargin') private barMargin: BreakpointState<MarginGenerate>
   // 卡片内边距
   @Consume('breakPointStateHomeCardPadding') private cardPadding: BreakpointState<MarginGenerate>
+  @Consume('breakPointStateHomeCardTitleBottomMargin') private titleBottomMargin: BreakpointState<number>
 //下部文字大小
   @Consume('HomeCardCellularDataSmFontSize') private HomeCardCellularDataSmFontSize: BreakpointState<number>
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
@@ -32,8 +33,8 @@ struct CellularDataStat {
   build() {
     Column() {
       CardTitle({title: $r('app.string.CellularData')})
-      Column() {
-        Row() {
+      Column({space:this.RowMargin.value}) {
+        Row({space:this.RowMargin.value}) {
           Column() {
             Text() {SymbolSpan($r('sys.symbol.chevron_down'))}
             .fontSize(this.isLandscapePhone ? 14:this.chevronSize.value)
@@ -42,8 +43,8 @@ struct CellularDataStat {
               .fontSize(this.isLandscapePhone ? 14:this.fontSize.value)
               .fontColor(this.icon_primary)
           }
-          .margin({top:this.RowMargin.value, right: this.RowMargin.value})
-         // .justifyContent(FlexAlign.Center)
+          //     .margin({top:this.RowMargin.value, right: this.RowMargin.value})
+          // .justifyContent(FlexAlign.Center)
           Column() {
             Text() {SymbolSpan($r('sys.symbol.chevron_up'))}
             .fontSize(this.isLandscapePhone ? 14:this.chevronSize.value)
@@ -52,12 +53,10 @@ struct CellularDataStat {
               .fontSize(this.isLandscapePhone ? 14:this.fontSize.value)
               .fontColor(this.icon_primary)
           }
-          .margin({top:this.RowMargin.value})
-       //   .justifyContent(FlexAlign.Center)
         }
         .width('100%')
-       // .alignItems(VerticalAlign.Center)
         .justifyContent(FlexAlign.Center)
+
         Column() {
           Progress({ value: 60,total: 100, type: ProgressType.Capsule  })//value为使用流量的值
             .style({enableSmoothEffect: true,borderColor:'#00ffffff'})
@@ -69,21 +68,23 @@ struct CellularDataStat {
         .backgroundColor('#4d46b1e3')
         .height(this.barHeight.value)
         .borderRadius(this.barHeight.value)
-        .margin(this.barMargin.value)
+        //   .margin(this.barMargin.value)
 
         Text(this.TotalDownloads.toString() + ' GB'+ '/'+ this.TotalCellular.toString() + ' GB')
           .fontSize(this.isLandscapePhone ? 10:this.HomeCardCellularDataSmFontSize.value)
           .fontColor($r('sys.color.font_secondary'))
-
       }
       .width('100%')
-      .alignItems(HorizontalAlign.Center)
+      .height('100%')
       .justifyContent(FlexAlign.Center)
-
+  //    .backgroundColor('#ba942020')
+      .padding({bottom:30})
+    //  .alignItems(HorizontalAlign.Center)
     }
     .padding(this.cardPadding.value)
     .width('100%')
     .height('100%')
+//.backgroundColor('#ff55b54e')
     .id('CellularDataId')
   }
 }

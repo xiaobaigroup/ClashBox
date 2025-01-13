@@ -498,7 +498,7 @@ export const HomeCardPadding_14_15_16_17: BreakpointState<MarginGenerate> = Brea
  */
 export const HomeCardAreaPadding: BreakpointState<MarginGenerate> = BreakpointState.of({
   sm: ({top: 4, left: 14, right: 14} as MarginGenerate),
-  md: ({top: 4, left: 80, right: 80} as MarginGenerate),
+  md: ({top: 4, left: 110, right: 110} as MarginGenerate),
   lg: ({top: 4, left: 14, right: 14} as MarginGenerate),
   xl: ({top: 4, left: 14, right: 14} as MarginGenerate)
 })
@@ -538,7 +538,7 @@ export const HomeCardSwitchModeRowMargin: BreakpointState<number> = BreakpointSt
  * 主页模式卡片字体大小（16，27，26，27）
  */
 export const HomeCardSwitchModeFontSize: BreakpointState<number> = BreakpointState.of({
-  sm: 16, md: 27, lg: 26, xl: 27
+  sm: 16, md: 20, lg: 20, xl: 22
 })
 /**
  * 主页模式卡片文本上下边距（6，7）
@@ -575,13 +575,13 @@ export const HomeCardCellularDataChevronSize: BreakpointState<number> = Breakpoi
  * 主页流量统计卡片上下行箭头组件部分间距（20,10）
  */
 export const HomeCardCellularDataChevronRowMargin: BreakpointState<number> = BreakpointState.of({
-  sm: 20, md: 10, lg: 10, xl: 20
+  sm: 10, md: 10, lg: 10, xl: 15
 })
 /**
  * 主页流量统计卡片内容文本字体大小（14,23,26,21）
  */
 export const HomeCardCellularDataFontSize: BreakpointState<number> = BreakpointState.of({
-  sm: 14, md: 23, lg: 26, xl: 21
+  sm: 14, md: 16, lg: 18, xl: 18
 })
 /**
  * 主页卡片内容流量统计下部小字体大小（10,16,14,16）
@@ -599,14 +599,14 @@ export const HomeCardPrpxySmFontSize: BreakpointState<number> = BreakpointState.
 /**
  * 主页卡片标题字体大小
  */
-export const CardTitleFontSize_18_29_26_27: BreakpointState<number> = BreakpointState.of({
-  sm: 18, md: 29, lg: 26, xl: 27
+export const CardTitleFontSize_18_20_22_22: BreakpointState<number> = BreakpointState.of({
+  sm: 18, md: 20, lg: 22, xl: 22
 })
 /**
  * 主页卡片当前节点字体大小
  */
-export const ProxyFontSize_24_29_26_27: BreakpointState<number> = BreakpointState.of({
-  sm: 24, md: 32, lg: 32, xl: 32
+export const HomeProxyFontSize_24_26_26_27: BreakpointState<number> = BreakpointState.of({
+  sm: 24, md: 26, lg: 26, xl: 27
 })
 
 /**
@@ -631,13 +631,13 @@ export const IPfontSize: BreakpointState<number> = BreakpointState.of({
 * 主页添加卡片半模拟态卡片高度
   */
   export const HomeCardEditHeight: BreakpointState<number> = BreakpointState.of({
-  sm: 160, md: 210, lg: 220, xl: 240
+  sm: 160, md: 160, lg: 180, xl: 180
 });
 /**
  * 主页卡片内容网络测速字体大小
  */
-export const SpeedfontSize12_16_14_16: BreakpointState<number> = BreakpointState.of({
-  sm: 12,  md: 16,  lg: 14,  xl: 16
+export const SpeedfontSize12_14_14_16: BreakpointState<number> = BreakpointState.of({
+  sm: 12,  md: 14,  lg: 14,  xl: 16
 });
 
 /* List 相关*/
