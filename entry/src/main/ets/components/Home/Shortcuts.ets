@@ -195,7 +195,8 @@ struct Shortcuts {
     alignment: DialogAlignment.Center,
     cornerRadius: 32,
     gridCount: 4,
-    backgroundBlurStyle:BlurStyle.NONE
+    backgroundBlurStyle:BlurStyle.NONE,
+    backgroundColor:$r('app.color.container_background')
   })
 
   //绑定第二个按钮弹窗
@@ -221,7 +222,8 @@ struct Shortcuts {
     alignment: DialogAlignment.Center,
     cornerRadius: 32,
     gridCount: 4,
-    backgroundBlurStyle:BlurStyle.NONE
+    backgroundBlurStyle:BlurStyle.NONE,
+    backgroundColor:$r('app.color.container_background')
   })
 
   //绑定第三个按钮弹窗
@@ -247,7 +249,8 @@ struct Shortcuts {
     alignment: DialogAlignment.Center,
     cornerRadius: 32,
     gridCount: 4,
-    backgroundBlurStyle:BlurStyle.NONE
+    backgroundBlurStyle:BlurStyle.NONE,
+    backgroundColor:$r('app.color.container_background')
   })
   // 在自定义组件即将析构销毁时将弹窗置空
   aboutToDisappear() {
@@ -506,7 +509,7 @@ struct WebCustomDialog1 {
           })
       }
 
-    } .width('100%').padding({top:15,bottom:15,left:24,right:24}).backgroundColor($r('app.color.container_background'))
+    } .width('100%').padding({top:15,bottom:15,left:24,right:24})
   }
 }
 
@@ -575,7 +578,7 @@ struct WebCustomDialog2 {
 
       }
 
-    } .width('100%').padding({top:15,bottom:15,left:24,right:24}).backgroundColor($r('app.color.container_background'))
+    } .width('100%').padding({top:15,bottom:15,left:24,right:24})
   }
 }
 
@@ -644,7 +647,7 @@ struct WebCustomDialog3 {
 
       }
 
-    } .width('100%').padding({top:15,bottom:15,left:24,right:24}).backgroundColor($r('app.color.container_background'))
+    } .width('100%').padding({top:15,bottom:15,left:24,right:24})
   }
 }
 
