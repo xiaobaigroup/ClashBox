@@ -100,10 +100,6 @@ export class Profile {
     return true
   }
   async save(bytes: Uint8Array): Promise<Profile>{
-    let profilePath =  getProfilesPath(this.context);
-    if(!await fs.access(profilePath, fs.AccessModeType.EXIST)){
-      fs.mkdir(profilePath)
-    }
     const filePath = await getProfilePath(this.context, this.id)
     const file = await fs.open(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE | fs.OpenMode.TRUNC)
     await fs.write(file.fd, bytes.buffer)
@@ -113,10 +109,8 @@ export class Profile {
     return this
   }
   async saveByUri(uri: string): Promise<Profile>{
-    let profilePath = getProfilesPath(this.context);
-    if(!await fs.access(profilePath, fs.AccessModeType.EXIST)){
-      fs.mkdir(profilePath)
-    }
+    let profilePath = await getProfilesPath(this.context);
+
     const filePath = await getProfilePath(this.context, this.id)
     await fs.copy(uri, fileUri.getUriFromPath(filePath))
     return this

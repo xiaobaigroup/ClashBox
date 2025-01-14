@@ -8,6 +8,7 @@ import { getProxies, getTraffic, initClash, updateConfig
 import { common } from '@kit.AbilityKit';
 import { OverrideSlot } from '../models/Common';
 import { ClashVpnService } from './ClashVpnService';
+import { getHome } from '../appPath';
 
 export class SocketStubService {
   server: socket.LocalSocketServer = socket.constructLocalSocketServerInstance();
@@ -128,7 +129,7 @@ export class SocketStubService {
   async startService(context: common.Context){
     try {
       this.vpnService.init(context)
-      initClash(context.filesDir, "1.0.0")
+      initClash(await getHome(context), "1.0.0")
       const socketPath = context.filesDir + '/flclash.sock'
       await this.server.listen({ address: socketPath})
       this.server.on('connect', (client: socket.LocalSocketConnection) => {

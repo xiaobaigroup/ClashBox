@@ -1,6 +1,6 @@
 import { ProfileRepo } from "proxy_core/src/main/ets/ProfileRepo";
 import { Context } from "@kit.AbilityKit";
-import { SocketProxyService, Profile, ProfileType, UpdateConfigParams, ClashConfig } from "proxy_core";
+import { SocketProxyService, Profile, ProfileType, UpdateConfigParams, ClashConfig, getHome } from "proxy_core";
 import { vpnExtension } from "@kit.NetworkKit";
 import { ConfigData } from "../common/PageArgumentEntity";
 import { promptAction } from "@kit.ArkUI";
@@ -8,6 +8,7 @@ import { ProxyGroup } from "proxy_core/src/main/ets/models/Common";
 import { ConfigExtendedParams } from "proxy_core/src/main/ets/models/ClashConfig";
 import { EventHub, EventKey } from "../common/EventHub";
 import { AppConfig } from "./AppState";
+import  fs from  "@ohos.file.fs"
 
 export class ClashViewModel{
   profileRepo = new ProfileRepo()
@@ -17,6 +18,7 @@ export class ClashViewModel{
     this.context = context
     await this.profileRepo.init(context)
     this.socketProxy.init(context)
+    await this.initGeoIp()
     try {
       await vpnExtension.startVpnExtensionAbility({
         deviceId: "",
@@ -132,6 +134,36 @@ export class ClashViewModel{
       this.loadProfileAndConfig(appConfig?.currentProfileId, clashConfig)
     }
   }
-}
+  async initGeoIp(){
+    let geoIp = await readFile(this.context?.resourceDir + "/geoip.metadb")
+    writeFile(await getHome(this.context) + "/geoip.metadb", geoIp)
+    let geoip = await readFile(this.context?.resourceDir + "/GeoIP.dat")
+    writeFile(await getHome(this.context) + "/GeoIP.dat", geoip)
 
+    let geoSite = await readFile(this.context?.resourceDir + "/GeoSite.dat")
+    writeFile(await getHome(this.context) + "/GeoSite.dat", geoSite)
+    let Country = await readFile(this.context?.resourceDir + "/ASN.mmdb")
+    writeFile(await getHome(this.context) + "/ASN.mmdb", Country)
+
+  }
+}
+export async  function readFile(filePath: string): Promise<Uint8Array | null> {
+  if(!await fs.access(filePath))
+    return null;
+  const file = await fs.open(filePath)
+  const stats = await fs.stat(filePath)
+  let bufSize = stats.size;
+  let buf = new ArrayBuffer(bufSize);
+  await fs.read(file.fd, buf, { offset: 0, length: bufSize });
+  await fs.close(file);
+  return new Uint8Array(buf);
+}
+export function writeFile(filePath: string, data: Uint8Array | null) {
+  if(data != null && data.byteLength > 0){
+    const file = fs.openSync(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE)
+    fs.writeSync(file.fd, data.buffer);
+    fs.fsyncSync(file.fd)
+    fs.closeSync(file);
+  }
+}
 export default new ClashViewModel()
