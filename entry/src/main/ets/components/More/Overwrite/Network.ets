@@ -3,6 +3,7 @@ import { BreakpointState } from "../../../common/breakpointsystem"
 import { ListOverwriteNetworkData, moreData } from "../../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import OverwriteTop from "./OverwriteTopBuilder"
+import { MoreTop } from "../MoreTopBuilder"
 
 /**
  * 通用弹窗组件（竖排按钮）
@@ -331,14 +332,36 @@ export struct NetworkRouterAddress {
 
   }
 
+  @Builder
+  RouterAddressSearch() {
+  }
+  @Builder
+  RouterAddressOther() {
+    Button({ type: ButtonType.Circle, stateEffect: true }) {
+      SymbolGlyph($r('sys.symbol.plus'))
+        .fontSize(24)
+        .fontColor([this.icon_primary])
+    }
+    .width(40)
+    .height(40)
+    .backgroundColor($r('app.color.settings_container_background'))
+    .onClick(() => {
+      // 启用背景模糊
+      this.isEnableIndexForegroundBlur = true
+      this.addDialogController.open()
+    })
+  }
 
   build() {
     NavDestination() {
       // 导航栏
-      OverwriteTop({
-        title: $r('app.string.Network'),
-        subtitle: $r('app.string.Routing_Address')
-      })
+      Row() {
+        MoreTop({
+          title: $r('app.string.Routing_Address'),
+          searchButton: this.RouterAddressSearch,
+          otherButton: () => { this.RouterAddressOther() }
+        })
+      }.width('100%')
 
       List() {
         ForEach(this.RouterAddressList, (item: RouterAddressData, index: number) => {
@@ -356,11 +379,11 @@ export struct NetworkRouterAddress {
                   .fontSize(28)
                   .margin({right: 12})
                   .onClick(() => {
-                    // 进去列表行删除
+                    // 进入列表行删除
                     this.handleDelete(index)
                   })
               }
-              .width('94%')
+              .width('100%')
               .height(53)
               .borderRadius(20)
               .backgroundColor($r('app.color.container_background'))
@@ -380,39 +403,16 @@ export struct NetworkRouterAddress {
           })
         })
 
-        // 添加栏
-        ListItem() {
-          Row() {
-            SymbolGlyph($r('sys.symbol.plus'))
-              .fontSize(28)
-              .margin({left: 12, right: 16})
-              .fontColor([this.icon_primary])
-            Text($r('app.string.Add'))
-              .fontWeight(FontWeight.Medium)
-              .fontSize(16)
-          }
-          .width('94%')
-          .height(53)
-          .borderRadius(20)
-          .backgroundColor($r('app.color.container_background'))
-        }
-        .onClick(() => {
-          // 启用背景模糊
-          this.isEnableIndexForegroundBlur = true
-          this.addDialogController.open()
-        })
-
       }
       .width('100%')
       .height(this.isLandscapePhone ? 275 : 650)
-      .margin({ top: 10, left: this.morePageMargin.value, right: this.morePageMargin.value })
+      .margin({ top: 10 })
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)
-
-
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
+    .padding({left: this.morePageMargin.value, right: this.morePageMargin.value})
     .onBackPressed(() => {
       this.pageInfos.pop(true);
       return true;
@@ -433,7 +433,7 @@ class RouterAddressData {
   }
 }
 
-// 数据
+// 临时数据
 const createRouterAddressData = (): RouterAddressData[] => {
   let result: RouterAddressData[] = new Array()
   result = [

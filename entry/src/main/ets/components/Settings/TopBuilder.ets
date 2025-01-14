@@ -7,7 +7,6 @@ struct TopBuilder {
   @State title: ResourceStr = '设置'
   @State subtitle: ResourceStr = ''
   @State showBackButton: boolean = true
-  // @Link isShowSettings: boolean
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
 

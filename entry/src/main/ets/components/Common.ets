@@ -440,7 +440,7 @@ function RowStyle() {
  */
 @Component
 export struct skipRowList {
-  @State icons: Resource = $r('sys.symbol.icloud')
+  @State icons?: Resource = undefined
   @State title: ResourceStr = ''
   @State subtitle: ResourceStr = ''
   @State isExperimentalFunction: boolean = false
@@ -462,10 +462,12 @@ export struct skipRowList {
 
   build() {
     Row() {
-      SymbolGlyph(this.icons)
-        .fontSize(24)
-        .margin({left: 12})
-        .fontColor([this.icon_emphasize])
+      if(this.icons) {
+        SymbolGlyph(this.icons)
+          .fontSize(24)
+          .margin({left: 12})
+          .fontColor([this.icon_emphasize])
+      }
       Column() {
         Row() {
           Text(this.title)
@@ -475,13 +477,15 @@ export struct skipRowList {
             ExperimentalFunction()
           }
         }
-        Text(this.subtitle)
-          .fontWeight(FontWeight.Normal)
-          .textOverflow({ overflow: TextOverflow.MARQUEE })
-          .maxLines(1)
-          .margin({top: 2})
-          .fontSize(14)
-          .width('65%')
+        if(this.subtitle) {
+          Text(this.subtitle)
+            .fontWeight(FontWeight.Normal)
+            .textOverflow({ overflow: TextOverflow.MARQUEE })
+            .maxLines(1)
+            .margin({top: 2})
+            .fontSize(14)
+            .width('65%')
+        }
       }
       .alignItems(HorizontalAlign.Start)
       .margin({ left: 12 })
@@ -508,7 +512,7 @@ export struct toggleRowList {
   // 标题
   @State title: ResourceStr = ''
   // 图标
-  @State icons: Resource = $r('sys.symbol.stopwatch_2')
+  @State icons?: Resource = undefined
   // 副标题
   @State subtitle: ResourceStr = ''
   // 实验功能标识

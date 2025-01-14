@@ -795,7 +795,7 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
         scrollSizeMode: ScrollSizeMode.CONTINUOUS,
         backgroundColor: $r('app.color.background'),
         dragBar: false,
-        // blurStyle: BlurStyle.BACKGROUND_REGULAR,
+        keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
         onWillDismiss: () => {
           this.isShowSettings = false
           this.isEnableIndexForegroundBlur = false

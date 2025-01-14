@@ -1243,6 +1243,62 @@
     {
       "name": "null_title_tips",
       "value": "请输入网址，并确保你的网址含有‘http(s)://’前缀!!!"
+    },
+    {
+      "name": "add_policy",
+      "value": "添加策略"
+    },
+    {
+      "name": "edit_policy",
+      "value": "编辑策略"
+    },
+    {
+      "name": "policy_name",
+      "value": "策略名"
+    },
+    {
+      "name": "resource_path",
+      "value": "资源路径"
+    },
+    {
+      "name": "insert_resource",
+      "value": "插入资源"
+    },
+    {
+      "name": "insert_resource_subtitle",
+      "value": "该资源内容在本地资源加载之前加载"
+    },
+    {
+      "name": "auto_update",
+      "value": "自动更新"
+    },
+    {
+      "name": "auto_update_interval",
+      "value": "自动更新间隔"
+    },
+    {
+      "name": "delete_resource",
+      "value": "删除资源"
+    },
+    {
+      "name": "policy_name_placeholder",
+      "value": "输入策略名..."
+    },
+    {
+      "name": "resource_path_placeholder",
+      "value": "输入URL..."
+    },
+    {
+      "name": "saved",
+      "value": "已保存"
+    },
+    {
+      "name": "update",
+      "value": "更新"
+    },
+    {
+      "name": "delete",
+      "value": "删除"
     }
   ]
 }

@@ -67,7 +67,7 @@ struct Backup {
               this.SettingsPageInfos.pushPathByName('CloudBackup', false)
             })
         }
-        Column({space: 10}) {
+        Column() {
           // 备份
           skipRowList({
             icons: $r('sys.symbol.arrowshape_up_to_line_fill'),
@@ -80,6 +80,8 @@ struct Backup {
               // 备份数据
               this.onBackupData()
             })
+          // 分割线
+          Row().height(0.5).backgroundColor('#0D000000').width('93%')
           // 恢复
           skipRowList({
             icons: $r('sys.symbol.arrowshape_down_to_line_fill'),

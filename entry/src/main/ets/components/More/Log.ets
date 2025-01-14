@@ -20,7 +20,7 @@ struct Log {
     Menu() {
       MenuItem({
         content: $r('app.string.EnableLogger'),
-        symbolEndIcon: this.EnableLogger ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+        symbolEndIcon: this.EnableLogger ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
       })
         .selected(this.EnableLogger)
         .onChange((selected) => {
@@ -40,7 +40,7 @@ struct Log {
         MenuItem({
           builder: ():void => this.FilterMenu(),
           content: $r('app.string.filter'),
-          symbolEndIcon: new SymbolGlyphModifier($r('sys.symbol.chevron_right')).fontColor([this.icon_emphasize])
+          symbolEndIcon: new SymbolGlyphModifier($r('sys.symbol.chevron_right'))
         })
       }
     }
@@ -53,28 +53,28 @@ struct Log {
         .contentFont({ weight: FontWeight.Bold })
       MenuItem({
         content: $r('app.string.not_filter'),
-        symbolEndIcon: this.filterChecked === 0 ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+        symbolEndIcon: this.filterChecked === 0 ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
       })
         .onClick(() => {
           this.filterChecked = 0
         })
       MenuItem({
         content: $r('app.string.information_only'),
-        symbolEndIcon: this.filterChecked === 1 ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+        symbolEndIcon: this.filterChecked === 1 ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
       })
         .onClick(() => {
           this.filterChecked = 1
         })
       MenuItem({
         content: $r('app.string.warning_only'),
-        symbolEndIcon: this.filterChecked === 2 ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+        symbolEndIcon: this.filterChecked === 2 ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
       })
         .onClick(() => {
           this.filterChecked = 2
         })
       MenuItem({
         content: $r('app.string.error_only'),
-        symbolEndIcon: this.filterChecked === 3 ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+        symbolEndIcon: this.filterChecked === 3 ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
       })
         .onClick(() => {
           this.filterChecked = 3
@@ -97,6 +97,15 @@ struct Log {
               title: $r('app.string.Log'),
               otherButton: this.logOther
             })
+            Button({ type: ButtonType.Circle, stateEffect: true }) {
+              SymbolGlyph($r('sys.symbol.magnifyingglass'))
+                .fontSize(24)
+                .fontColor([this.icon_primary])
+            }
+            .backgroundColor($r('app.color.settings_container_background'))
+            .margin({ right: 10 })
+            .width(40)
+            .height(40)
             Button({ type: ButtonType.Circle, stateEffect: true }) {
               SymbolGlyph($r('sys.symbol.dot_grid_2x2'))
                 .fontSize(24)

@@ -84,6 +84,8 @@ struct Kernel {
               this.currenKernel = 1
               hilog.info(0xFF00, "SettingsKerneltestTag", "当前内核1：%{public}d", this.currenKernel)
             })
+            // 分割线
+            Row().height(0.5).backgroundColor('#0D000000').width('93%')
             // FlClash
             Row() {
               Text('FlClash')

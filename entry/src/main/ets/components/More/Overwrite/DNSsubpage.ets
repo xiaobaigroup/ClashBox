@@ -1,4 +1,5 @@
 import { BreakpointState } from "../../../common/breakpointsystem"
+import { MoreTop } from "../MoreTopBuilder"
 import { theCustomDialog } from "./Network"
 import OverwriteTop from "./OverwriteTopBuilder"
 
@@ -107,14 +108,36 @@ export struct FakeIPfilter {
   handleDelete(index: number) {
     this.FakeIPfilterList.splice(index, 1)
   }
+  @Builder
+  FakeIPfilterSearch() {
+  }
+  @Builder
+  FakeIPfilterOther() {
+    Button({ type: ButtonType.Circle, stateEffect: true }) {
+      SymbolGlyph($r('sys.symbol.plus'))
+        .fontSize(24)
+        .fontColor([this.icon_primary])
+    }
+    .width(40)
+    .height(40)
+    .backgroundColor($r('app.color.settings_container_background'))
+    .onClick(() => {
+      // 启用背景模糊
+      this.isEnableIndexForegroundBlur = true
+      this.dialogController.open()
+    })
+  }
 
   build() {
     NavDestination() {
       // 导航栏
-      OverwriteTop({
-        title: $r('app.string.FakeIP_Filtering'),
-        subtitle: ''
-      })
+      Row() {
+        MoreTop({
+          title:  $r('app.string.FakeIP_Filtering'),
+          searchButton: this.FakeIPfilterSearch,
+          otherButton: () => { this.FakeIPfilterOther() }
+        })
+      }.width('100%')
 
       List() {
         ForEach(this.FakeIPfilterList, (item: FakeIPfilterData, index: number) => {
@@ -135,7 +158,7 @@ export struct FakeIPfilter {
                     this.handleDelete(index)
                   })
               }
-              .width('94%')
+              .width('100%')
               .height(53)
               .borderRadius(20)
               .backgroundColor($r('app.color.container_background'))
@@ -155,39 +178,16 @@ export struct FakeIPfilter {
           })
         })
 
-        // 添加栏
-        ListItem() {
-          Row() {
-            SymbolGlyph($r('sys.symbol.plus'))
-              .fontSize(28)
-              .margin({left: 12, right: 16})
-              .fontColor([this.icon_primary])
-            Text($r('app.string.Add'))
-              .fontWeight(FontWeight.Medium)
-              .fontSize(16)
-          }
-          .width('94%')
-          .height(53)
-          .borderRadius(20)
-          .backgroundColor($r('app.color.container_background'))
-        }
-        .onClick(() => {
-          // 启用背景模糊
-          this.isEnableIndexForegroundBlur = true
-          this.dialogController.open()
-        })
-
       }
       .width('100%')
       .height(this.isLandscapePhone ? 275 : 650)
-      .margin({ top: 10, left: this.morePageMargin.value, right: this.morePageMargin.value })
+      .margin({ top: 10 })
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)
-
-
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
+    .padding({left: this.morePageMargin.value, right: this.morePageMargin.value})
     .onBackPressed(() => {
       this.pageInfos.pop(true);
       return true;

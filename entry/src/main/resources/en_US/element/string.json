@@ -1243,6 +1243,62 @@
     {
       "name": "option3",
       "value": "Option3"
+    },
+    {
+      "name": "add_policy",
+      "value": "Add Policy"
+    },
+    {
+      "name": "edit_policy",
+      "value": "Edit Policy"
+    },
+    {
+      "name": "policy_name",
+      "value": "Policy Name"
+    },
+    {
+      "name": "resource_path",
+      "value": "Resource Path"
+    },
+    {
+      "name": "insert_resource",
+      "value": "Insert Resource"
+    },
+    {
+      "name": "insert_resource_subtitle",
+      "value": "The resource content is loaded before the local resource is loaded"
+    },
+    {
+      "name": "auto_update",
+      "value": "Auto Update"
+    },
+    {
+      "name": "auto_update_interval",
+      "value": "Automatic update interval"
+    },
+    {
+      "name": "delete_resource",
+      "value": "Delete Resource"
+    },
+    {
+      "name": "policy_name_placeholder",
+      "value": "Enter policy name ..."
+    },
+    {
+      "name": "resource_path_placeholder",
+      "value": "Enter URL ..."
+    },
+    {
+      "name": "saved",
+      "value": "Saved"
+    },
+    {
+      "name": "update",
+      "value": "Update"
+    },
+    {
+      "name": "delete",
+      "value": "Delete"
     }
   ]
 }

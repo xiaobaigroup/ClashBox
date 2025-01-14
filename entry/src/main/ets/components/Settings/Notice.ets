@@ -81,7 +81,7 @@ struct Notice {
       TopBuilder({title: $r('app.string.Notice')})
       Column({space: 10}) {
         // 反馈 Start
-        Column({space: 10}) {
+        Column() {
           // 震动反馈开关 Start
           Row() {
             toggleRowList({
@@ -113,6 +113,8 @@ struct Notice {
             })
           })
           // 震动反馈开关 End
+          // 分割线
+          Row().height(0.5).backgroundColor('#0D000000').width('93%')
           // 声音反馈开关 Start
           Row() {
             toggleRowList({
@@ -428,9 +430,9 @@ export struct CellularDataReminder {
   build() {
     NavDestination() {
       TopBuilder({title: $r('app.string.Notice'), subtitle: $r('app.string.cellular_data_reminder')})
-      Scroll() {
-        Column() {
-          // 流量提醒总开关行
+      List() {
+        // 流量提醒总开关行
+        ListItem() {
           Row() {
             toggleRowList({
               title: $r('app.string.cellular_data_reminder'),
@@ -462,8 +464,10 @@ export struct CellularDataReminder {
               this.EnableCellularDataReminder = !this.EnableCellularDataReminder
             })
           })
-          if(this.EnableCellularDataReminder) {
-            // 每小时通知
+        }
+        if(this.EnableCellularDataReminder) {
+          // 每小时通知
+          ListItem() {
             Column() {
               toggleRowList({
                 title: $r('app.string.per_hour_notice'),
@@ -510,7 +514,9 @@ export struct CellularDataReminder {
                 })
               }
             })
-            // 每日通知
+          }
+          // 每日通知
+          ListItem() {
             Column() {
               toggleRowList({
                 title: $r('app.string.per_day_notice'),
@@ -557,7 +563,9 @@ export struct CellularDataReminder {
                 })
               }
             })
-            // 每周通知
+          }
+          // 每周通知
+          ListItem() {
             Column() {
               toggleRowList({
                 title: $r('app.string.per_week_notice'),
@@ -604,7 +612,9 @@ export struct CellularDataReminder {
                 })
               }
             })
-            // 每月通知
+          }
+          // 每月通知
+          ListItem() {
             Column() {
               toggleRowList({
                 title: $r('app.string.per_month_notice'),
@@ -651,7 +661,9 @@ export struct CellularDataReminder {
                 })
               }
             })
-            // 总量通知
+          }
+          // 总量通知
+          ListItem() {
             Column() {
               toggleRowList({
                 title: $r('app.string.total_data_notice'),
@@ -679,6 +691,7 @@ export struct CellularDataReminder {
                   TextInput({placeholder: $r('app.string.text_input_placeholder'), text: $$this.theTotalNumber})
                     .TextInputStyle()
                     .borderColor(this.icon_emphasize)
+                    .expandSafeArea([SafeAreaType.KEYBOARD, SafeAreaType.SYSTEM])
                     .onChange(() => {
                       // 测试用
                       hilog.info(0xFF00, "NoticeReminderTag", "当前总量输入为: %{public}s", this.theTotalNumber)
@@ -698,17 +711,15 @@ export struct CellularDataReminder {
                 })
               }
             })
-
           }
         }
-        .width('100%')
-        .alignItems(HorizontalAlign.Start)
-        .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+
       }
       .width('100%')
       .align(Alignment.Top)
       .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
       .height(this.isLandscapePhone ? 300 : this.SettingslistHeight.value)
+      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
     }
     .width('100%')
     .hideTitleBar(true)
