@@ -697,7 +697,7 @@ function TextInputStyle() {
   .borderRadius(0)
   .placeholderFont({ size:FONT_SIZE_14})
   .textAlign(TextAlign.Center)
-  .fontColor($r('sys.color.font_secondary'))
+  .fontColor($r('sys.color.font_primary'))
   .showUnderline(false)
   .backgroundColor($r('app.color.container_background'))
 }
