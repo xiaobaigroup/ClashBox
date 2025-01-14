@@ -2,6 +2,7 @@ import fs from '@ohos.file.fs';
 import { getProfilePath, getProfilesPath } from './appPath';
 import { rcp } from '@kit.RemoteCommunicationKit';
 import { Context } from '@kit.AbilityKit';
+import { fileUri } from '@kit.CoreFileKit';
 
 export function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -52,6 +53,7 @@ export class Profile {
   lastUpdateDate: number
   autoUpdateDuration: number
   subscriptionInfo: SubscriptionInfo | null
+  proxySelected: Map<string, string> = new Map()
   context?: Context
   constructor(type = ProfileType.Url, url: string) {
     this.id = generateUUID()
@@ -108,6 +110,15 @@ export class Profile {
     await fs.fsync(file.fd)
     await fs.close(file.fd)
     this.lastUpdateDate = new Date().getTime()
+    return this
+  }
+  async saveByUri(uri: string): Promise<Profile>{
+    let profilePath = getProfilesPath(this.context);
+    if(!await fs.access(profilePath, fs.AccessModeType.EXIST)){
+      fs.mkdir(profilePath)
+    }
+    const filePath = await getProfilePath(this.context, this.id)
+    await fs.copy(uri, fileUri.getUriFromPath(filePath))
     return this
   }
 }

@@ -24,6 +24,8 @@ import { configShare } from '../utils/SystemShareUtil'
 // XXX 测试用 删除
 import { showFileNameListOfFileDir } from '../utils/FileUtil'
 import ClashViewModel from '../entryability/ClashViewModel'
+import { AppConfig } from '../entryability/AppState'
+import { EventHub, EventKey } from '../common/EventHub'
 
 
 /**
@@ -390,7 +392,7 @@ struct ConfigurationPage {
                 }.alignItems(HorizontalAlign.Start)
                 Blank()
                 Radio({ value: 'radio' + index, group: 'configGroup' })
-                  .checked(item.configId === this.currentConfigRadioCheckedConfigData.configId)
+                  .checked(item.configId === this.appConfig.currentProfileId)
                   .radioStyle({
                     checkedBackgroundColor: this.icon_emphasize,
                   })
@@ -417,6 +419,7 @@ struct ConfigurationPage {
             .onClick(async  () => {
               this.currentConfigRadioCheckedConfigData = item
               customVibrator.vibratorTriggerOfHapticClockTimer()
+              this.appConfig.currentProfileId = item.configId
               await ClashViewModel.loadProfileAndConfig(item.configId)
               hilog.info(0xC002, this.componentName, `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
             })
@@ -529,12 +532,16 @@ struct ConfigurationPage {
     .height('100%')
     .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Linear, delay: 0 })
   }
-
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @StorageLink('favoriteProfiles') favoriteProfiles: Map<string, string> = new Map<string, string>([])
   aboutToAppear(): void {
     hilog.info(0xC000, this.componentName, `#aboutToAppear executed`)
     // XXX 删除 这里模拟获取所有hap沙箱路径配置文件的文件名
     showFileNameListOfFileDir(this.context.filesDir)
     this.fetchProfiles()
+    EventHub.on(EventKey.FetchProfile, () => {
+      this.fetchProfiles()
+    })
   }
   // 获取配置列表
   async fetchProfiles(){
@@ -543,6 +550,7 @@ struct ConfigurationPage {
       return {
         configId: d.id,
         configName: d.name,
+        isFavorite: this.favoriteProfiles.has(d.id) ?? false,
         configUrl: d.url,
         isConfigAutoUpdate: d.autoUpdate,
         configAutoUpdateTimeGapValue: d.autoUpdateDuration
@@ -586,6 +594,7 @@ struct ConfigurationPage {
     this.promptAction.showToast({ message: $r('app.string.Collect_Tip') })
     hilog.info(0xC010, this.componentName, `#favoriteConfig#收藏配置: configName is [${this.currentTouchConfigData.configName}]`)
     this.currentTouchConfigData.isFavorite = true
+    this.favoriteProfiles.set(this.currentTouchConfigData.configId, this.currentTouchConfigData.configName)
   }
   /**
    * 取消收藏配置
@@ -595,6 +604,7 @@ struct ConfigurationPage {
     this.promptAction.showToast({ message: $r('app.string.uncollected_tip') })
     hilog.info(0xC010, this.componentName, `#favoriteConfig#取消收藏配置: configName is [${this.currentTouchConfigData.configName}]`)
     this.currentTouchConfigData.isFavorite = false
+    this.favoriteProfiles.delete(this.currentTouchConfigData.configId)
   }
   /**
    * 编辑配置
@@ -608,7 +618,7 @@ struct ConfigurationPage {
   /**
    * 更新配置
    */
-  private async  updateConfig(configId?: string): Promise<void> {
+  private async updateConfig(configId?: string): Promise<void> {
     // TODO 调用更新配置消息api
     this.promptAction.showToast({message: `配置更新中...`})
     if (configId){

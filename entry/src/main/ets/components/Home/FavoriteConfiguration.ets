@@ -2,6 +2,7 @@ import { BreakpointState } from '../../common/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI'
 import { MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
+import { AppConfig } from '../../entryability/AppState'
 
 
 @Component
@@ -28,65 +29,32 @@ struct FavoriteConfiguration {
 编辑模式下右上角删除按钮
  */
   @Consume deleteButtonSize: BreakpointState<number>
-
+  @StorageLink('favoriteProfiles') favoriteProfiles: Map<string, string> = new Map<string, string>([])
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   build() {
     Column() {
       CardTitle({ title: $r('app.string.FavoriteConfiguration') })
       //拥有收藏配置的布局 start
       if (this.isCheckFavoriteConfiguration) {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceEvenly }) {
-          Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-            Text(this.FavoriteConfiguration[0])
-              .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-              .fontColor($r('sys.color.font_primary'))
-            Radio({ value: 'FavoriteConfigurationRadio1', group: 'FavoriteConfigurationRadioGroup' })
-              .width(this.isLandscapePhone ? 16 : this.fontSize.value)
-              .checked(this.FavoriteConfigurationRadio === 1)
-              .radioStyle({
-                checkedBackgroundColor: this.icon_emphasize,
+          ForEach(Array.from(this.favoriteProfiles.entries()), (f:[string, string])=>{
+              Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
+                Text(f[1])
+                  .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+                  .fontColor($r('sys.color.font_primary'))
+                Radio({ value: 'FavoriteConfigurationRadio1', group: 'FavoriteConfigurationRadioGroup' })
+                  .width(this.isLandscapePhone ? 16 : this.fontSize.value)
+                  .checked(f[0] === this.appConfig.currentProfileId)
+                  .radioStyle({
+                    checkedBackgroundColor: this.icon_emphasize,
+                  })
+              }
+              .onClick(() => {
+                this.appConfig.currentProfileId = f[0]
               })
-          }
-          .onClick(() => {
-            this.FavoriteConfigurationRadio = 1
+              .clickEffect({ level: ClickEffectLevel.MIDDLE })
+              Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
           })
-          .clickEffect({ level: ClickEffectLevel.MIDDLE })
-
-          Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
-
-          Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-            Text(this.FavoriteConfiguration[1])
-              .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-              .fontColor($r('sys.color.font_primary'))
-            Radio({ value: 'FavoriteConfigurationRadio2', group: 'FavoriteConfigurationRadioGroup' })
-              .width(this.isLandscapePhone ? 16 : this.fontSize.value)
-              .checked(this.FavoriteConfigurationRadio === 2)
-              .radioStyle({
-                checkedBackgroundColor: this.icon_emphasize,
-              })
-          }
-          .onClick(() => {
-            this.FavoriteConfigurationRadio = 2
-          })
-          .clickEffect({ level: ClickEffectLevel.MIDDLE })
-
-          Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
-
-          Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-            Text(this.FavoriteConfiguration[2])
-              .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-              .fontColor($r('sys.color.font_primary'))
-            Radio({ value: 'FavoriteConfigurationRadio3', group: 'FavoriteConfigurationRadioGroup' })
-              .width(this.isLandscapePhone ? 16 : this.fontSize.value)
-              .checked(this.FavoriteConfigurationRadio === 3)
-              .radioStyle({
-                checkedBackgroundColor: this.icon_emphasize,
-              })
-          }
-          .onClick(() => {
-            this.FavoriteConfigurationRadio = 3
-            this.isCheckFavoriteConfiguration=false//为预览而设置的点击事件，后端接入修改或删除
-          })
-          .clickEffect({ level: ClickEffectLevel.MIDDLE })
         }
         .width('100%')
         .height('82%')

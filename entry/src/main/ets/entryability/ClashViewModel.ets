@@ -7,6 +7,7 @@ import { promptAction } from "@kit.ArkUI";
 import { ProxyGroup } from "proxy_core/src/main/ets/models/Common";
 import { ConfigExtendedParams } from "proxy_core/src/main/ets/models/ClashConfig";
 import { EventHub, EventKey } from "../common/EventHub";
+import { AppConfig } from "./AppState";
 
 export class ClashViewModel{
   profileRepo = new ProfileRepo()
@@ -28,7 +29,7 @@ export class ClashViewModel{
     }
   }
   // 添加配置 url
-  async addOrUpdateProfile(data: ConfigData, id: string | null){
+  async addOrUpdateProfileByUrl(data: ConfigData, id: string | null){
     let profile = new Profile(ProfileType.Url, data.configUrl)
     if(id){
       const old = await this.profileRepo.query(id)
@@ -48,6 +49,26 @@ export class ClashViewModel{
     }
     EventHub.sendEvent(EventKey.FetchProfile, null)
   }
+  async addOrUpdateProfileByFile(path: string, id: string | null){
+    let profile = new Profile(ProfileType.File, path)
+    if (id) {
+      const old = await this.profileRepo.query(id)
+      if (old)
+        profile = old
+    }
+    profile.loadContext(this.context)
+    profile.name = decodeURIComponent( path.substring(path.lastIndexOf('/') + 1))
+    await profile.saveByUri(path);
+    const isExists = await profile.check();
+    if (isExists) {
+      await this.profileRepo.addOrUpdate(profile)
+    }else{
+      promptAction.showToast({message: "文件保存失败！"})
+    }
+    EventHub.sendEvent(EventKey.FetchProfile, null)
+  }
+
+
   async updateProfileConfig(id: string | null): Promise<void>{
     if(id){
       const profile = await this.getProfile(id)
@@ -79,13 +100,16 @@ export class ClashViewModel{
     EventHub.sendEvent(EventKey.FetchProfile, null)
   }
   async getProxyGroups(): Promise<ProxyGroup[]>{
-      return this.socketProxy.queryProxyGroups()
+    console.log("FetchProxyGroup", )
+    let list =  await this.socketProxy.queryProxyGroups()
+    console.log("FetchProxyGroup", list)
+    return list
   }
-  async loadProfileAndConfig(id: string){
+  async loadProfileAndConfig(id: string, config: ClashConfig | null = null, params: ConfigExtendedParams | null= null){
     let result = await this.socketProxy.loadConfig({
       "profile-id": id,
-      config: new ClashConfig(),
-      params: {} as ConfigExtendedParams
+      config: config ?? new ClashConfig(),
+      params: params ?? {} as ConfigExtendedParams
     } as UpdateConfigParams)
     if (result != ""){
       promptAction.showToast({message: result, duration: 3000})
@@ -101,7 +125,13 @@ export class ClashViewModel{
     this.socketProxy.stopClash()
   }
 
-
+  initProfile(){
+    let appConfig = AppStorage.get<AppConfig>("appConfig")
+    let clashConfig = AppStorage.get<ClashConfig>("clashConfig")
+    if (appConfig?.currentProfileId){
+      this.loadProfileAndConfig(appConfig?.currentProfileId, clashConfig)
+    }
+  }
 }
 
 export default new ClashViewModel()

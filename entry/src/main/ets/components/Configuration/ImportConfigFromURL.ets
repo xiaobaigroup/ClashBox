@@ -233,7 +233,7 @@ export struct ImportConfigFromURL{
       this.customDownloadingDialogTitle = '正在下载配置文件'
       this.configCustomDownloadingDialogController?.open()
       try {
-        await ClashViewModel.addOrUpdateProfile(this.configData, null)
+        await ClashViewModel.addOrUpdateProfileByUrl(this.configData, null)
       } catch (e) {
         console.error("ClashNext", e.message, e.stack);
         this.promptAction.showToast({message:"下载失败: " + e.message || e})
@@ -243,7 +243,7 @@ export struct ImportConfigFromURL{
       this.customDownloadingDialogTitle = '正在更新配置文件'
       this.configCustomDownloadingDialogController?.open()
       try {
-        await ClashViewModel.addOrUpdateProfile(this.configData, this.configData.configId)
+        await ClashViewModel.addOrUpdateProfileByUrl(this.configData, this.configData.configId)
       } catch (e) {
         console.error("ClashNext", e.message, e.stack);
         this.promptAction.showToast({message:"下载失败: " + e.message || e})

@@ -1,6 +1,6 @@
 import { relationalStore, ValuesBucket } from '@kit.ArkData'
 import { common } from '@kit.AbilityKit';
-import { Profile } from './Profile';
+import { Profile, SubscriptionInfo } from './Profile';
 
 export class ProfileRepo {
   store: relationalStore.RdbStore | undefined
@@ -16,7 +16,7 @@ export class ProfileRepo {
   }
   initDb() {
     try {
-      const SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS Profiles(id TEXT PRIMARY KEY, name TEXT, type INTEGER NOT NULL, url TEXT, currentGroupName TEXT, isUpdating INTEGER,autoUpdate INTEGER, lastUpdateDate INTEGER, autoUpdateDuration INTEGER, subscriptionInfo TEXT)"
+      const SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS Profiles(id TEXT PRIMARY KEY, name TEXT, type INTEGER NOT NULL, url TEXT, currentGroupName TEXT, isUpdating INTEGER,autoUpdate INTEGER, lastUpdateDate INTEGER, autoUpdateDuration INTEGER, subscriptionInfo TEXT, proxySelected Text)"
       this.store?.executeSql(SQL_CREATE_TABLE); // 创建数据表
     } catch (e) {
       console.error("initDb failure", e)
@@ -67,7 +67,8 @@ export class ProfileRepo {
       autoUpdate: details.autoUpdate ? 1 : 0,
       lastUpdateDate: details.lastUpdateDate,
       autoUpdateDuration: details.autoUpdateDuration,
-      subscriptionInfo: JSON.stringify(details.subscriptionInfo)
+      subscriptionInfo: JSON.stringify(details.subscriptionInfo),
+      proxySelected: JSON.stringify(details.proxySelected)
     }
     if (old.rowCount > 0){
       await this.store!.update(input, predicates)
@@ -87,12 +88,14 @@ export class ProfileRepo {
     details.autoUpdate = c.getLong(6) == 1;
     details.lastUpdateDate = c.getLong(7);
     details.autoUpdateDuration = c.getLong(8);
+
     try {
-      details.subscriptionInfo = JSON.parse(c.getString(9));
+      details.subscriptionInfo = JSON.parse(c.getString(9)) as SubscriptionInfo;
+      details.proxySelected =  new Map(JSON.parse(c.getString(10)));
     } catch (e) {
       details.subscriptionInfo = null
+      details.proxySelected = new Map()
     }
-
     return details;
   }
 }

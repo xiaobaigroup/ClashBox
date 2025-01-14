@@ -4,6 +4,7 @@ import { window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import ClashViewModel from './ClashViewModel';
 import { KeyboardAvoidMode } from '@kit.ArkUI';
+import { AppState } from './AppState';
 
 export default class EntryAbility extends UIAbility {
  private currentLanguage: string | undefined = undefined
@@ -27,11 +28,13 @@ export default class EntryAbility extends UIAbility {
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onWindowStageCreate');
     let windowClass: window.Window = windowStage.getMainWindowSync(); // 获取应用主窗口
     await ClashViewModel.init(this.context)
+
     windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {
         hilog.error(0x0000, 'EntryAbility', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
         return;
       }
+      AppState.init()
       hilog.info(0x0000, 'EntryAbility', 'Succeeded in loading the content.');
     });
 
@@ -66,7 +69,6 @@ export default class EntryAbility extends UIAbility {
         AppStorage.setOrCreate('bottomRectHeight', bottomRectHeight);
       }
     });
-
   }
 
   /*onConfigurationUpdate(newConfig: Configuration): void {

@@ -1,6 +1,6 @@
 //Index 媒体查询
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
-import { mediaquery, window } from '@kit.ArkUI'
+import { App, mediaquery, window } from '@kit.ArkUI'
 import Home from './HomePage'
 import ProxyPage from './ProxyPage'
 import ConfigurationPage from './ConfigurationPage'
@@ -45,10 +45,11 @@ import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
 import { Item, ProxyData } from '../common/ProxyData'
 import { image } from '@kit.ImageKit'
-import { ProxyGroup } from 'proxy_core'
+import { Dns, ProxyGroup } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
-
+import { AppConfig } from '../entryability/AppState'
+PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 
 //
 interface marginGenerate {
@@ -261,6 +262,11 @@ struct Index {
   @Provide ('pixmapFavoriteProxy')pixmapFavoriteProxy: image.PixelMap | undefined = undefined
   @Provide ('pixmapFavoriteConfiguration')pixmapFavoriteConfiguration: image.PixelMap | undefined = undefined
 
+  @StorageLink("persistedMapString") persistedMapString: Map<number, string> = new Map<number, string>([]);
+
+  persistMapString() {
+    this.persistedMapString = new Map<number, string>([[3, "one"], [6, "two"], [9, "three"]]);
+  }
 
   @Builder
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
@@ -362,11 +368,16 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.HomeCardTitleButtonPadding)
     BreakpointSystem.getInstance().attach(this.HomeCardEditHeight)
     BreakpointSystem.getInstance().start()
-
+    setTimeout(()=>{
+      ClashViewModel.initProfile()
+    }, 500)
     EventHub.on(EventKey.FetchProxyGroup, async ()=>{
       this.proxyGroups = await ClashViewModel.getProxyGroups()
     })
+
   }
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+
 
   aboutToDisappear() {
     hilog.info(0x1000, this.componentName, `#aboutToDisappear executed`)
@@ -390,6 +401,7 @@ struct Index {
 
   build() {
     Column() {
+
       Tabs({
         barPosition: this.isLandscapePhone ? BarPosition.Start : this.compBarPose.value
       }) {

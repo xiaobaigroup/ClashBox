@@ -9,6 +9,8 @@ import {
 } from "../../common/Constants"
 import { BindSheetTitleCustomBuilder } from "../Common"
 import { hilog } from "@kit.PerformanceAnalysisKit"
+import { picker } from "@kit.CoreFileKit"
+import ClashViewModel from "../../entryability/ClashViewModel"
 
 
 // 关联：route_map.json
@@ -85,6 +87,12 @@ export struct ImportConfigFromFile{
   }
 
   aboutToAppear(): void {
+    let filePicker = new picker.DocumentViewPicker(getContext(this))
+    let options = new picker.DocumentSelectOptions()
+    filePicker.select(options).then((documentSelectResult)=>{
+      const url = documentSelectResult[0];
+      ClashViewModel.addOrUpdateProfileByFile(url, null)
+    })
     hilog.info(0xCC10, this.componentName, `#aboutToAppear executed`)
   }
 
