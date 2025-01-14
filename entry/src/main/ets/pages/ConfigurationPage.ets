@@ -52,6 +52,8 @@ struct ConfigurationPage {
   /* 主题色 */
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
+  // 所有子组件在容器内的对齐方式
+  @Consume ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
 
   private promptAction:PromptAction = this.getUIContext()?.getPromptAction()
 
@@ -319,9 +321,7 @@ struct ConfigurationPage {
   // 所有子组件在容器内的对齐方式 TODO 【用户首选项】在设置里可以更改 Alignment.BottomStart 和 Alignment.BottomEnd Enlin@2024-12-04
 
   /* 配置添加按钮bindSheet相关 */
-  // 按钮在Stack布局里的位置
-  @State
-  stackAlignContentAlignment: Alignment = Alignment.BottomEnd
+
   // 是否显示bindSheet
   @State
   private isShowConfigAddBindSheet: boolean = false

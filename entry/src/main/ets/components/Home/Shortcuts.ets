@@ -162,6 +162,7 @@ struct Shortcuts {
       preferType: SheetType.CENTER,
       backgroundColor: $r('app.color.background'),
       showClose: true,
+      dragBar: false,
       scrollSizeMode: ScrollSizeMode.CONTINUOUS,
       title: { title: $r('app.string.shortcuts_card') },
       onWillDismiss: () => {

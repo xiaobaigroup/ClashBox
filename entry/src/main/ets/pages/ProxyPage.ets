@@ -26,6 +26,8 @@ struct ProxyPage {
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
+  // 所有子组件在容器内的对齐方式
+  @Consume ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
   /* 是否开启全局动画判定 */
   @Consume ('isAnimation') isAnimation: boolean
   @State font_primary: ResourceColor = $r('sys.color.font_primary') //一级文本色，黑色
@@ -471,9 +473,24 @@ struct ProxyPage {
         .justifyContent(FlexAlign.Center) //.padding({top:TAB_CONTENT_TITLE_HEIGHT})
         // transition保证组件离场不被立即析构，可设置其他转场效果
         .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
+        .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
+          detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
+          backgroundColor: $r('app.color.background'),
+          //  blurStyle: BlurStyle.BACKGROUND_REGULAR,
+          showClose: true,
+          dragBar: false,
+          scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+          title: { title: $r('app.string.Edit') },
+          preferType: SheetType.CENTER,
+          //         maskColor: $r('app.color.dialog_maskcolor'),
+          onWillDismiss: () => {
+            this.isShowEdit = false
+            this.isEnableIndexForegroundBlur=false
+          }
+        })
       } else if (this.proxyGroups.length > 0) {
         // 代理页分组TAB+list主体
-        Stack({ alignContent: Alignment.BottomEnd }) {
+        Stack({ alignContent: this.stackAlignContentAlignment  }) {
           //根据ProxyArrangementSelected的状态决定是否显示
           if (this.ProxyArrangementSelected === 'ProxyArrangementSelected1') {
             Column() { //分组标签页 start
