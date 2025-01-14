@@ -141,6 +141,7 @@ struct ProxyPage {
   //半模态编辑菜单Start
   ProxyBindSheetEdit() {
     Column() {
+      //代理节点分组方式切换
       EditTitle({ title: $r('app.string.Packet_mode') })
       Column() {
         Row() {
@@ -208,6 +209,7 @@ struct ProxyPage {
       .height(94)
       .EditColumn()
 
+      //代理节点排列切换
       EditTitle({ title: $r('app.string.Arrangement') })
       Column() {
         Row() {
@@ -304,6 +306,7 @@ struct ProxyPage {
       .height(142)
       .EditColumn()
 
+      //代理节点卡片尺寸切换
       EditTitle({ title: $r('app.string.Card_Size') })
       Column() {
         Row() {
@@ -447,7 +450,8 @@ struct ProxyPage {
         })
       }
 
-      if (this.FristPage) { //为观看预览页的判定if/else，判定和更改后续可以删掉判定
+      /*  没有导入代理节点时候的页面  TODO 后端接入后，此处判定修改，目前不显示
+        if (this.FristPage) {
         Column({ space: 5 }) {
           SymbolGlyph($r('sys.symbol.doc')).fontSize(32).fontColor([this.icon_secondary])
           Text($r('app.string.None_Proxy')).fontSize(20).fontColor(this.font_secondary).textAlign(TextAlign.Center)
@@ -463,7 +467,9 @@ struct ProxyPage {
             this.FristPage = false
           })
         })
-      } else if (!this.FristPage) { //为观看的判定if/else后续可以删掉判定
+      } else if (!this.FristPage) { */
+
+
         // 代理页分组TAB+list主体
         Stack({ alignContent: Alignment.BottomEnd }) {
           //根据ProxyArrangementSelected的状态决定是否显示
@@ -481,10 +487,6 @@ struct ProxyPage {
                 .tabBar(this.TabBuilder('分组1', 0))
 
                 TabContent() {
-                  ProxyGroupItem() //list相关在components/ProxyGroupItem.ets文件里
-                    .padding({right: this.breakPointStateTabContentTitleMargin.value,})
-                    .width('100%')
-                    .height('100%')
                 }
                 .tabBar(this.TabBuilder('分组2', 1))
 
@@ -589,7 +591,7 @@ struct ProxyPage {
         .height(this.isLandscapePhone ? '100%' : `calc(100% - ${TAB_CONTENT_TITLE_HEIGHT}vp)`)
 
         // 主体 END
-      }
+  //有无代理导入的判定括号    }
     }
     .width('100%')
     .height('100%')

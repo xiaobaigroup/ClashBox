@@ -1,6 +1,6 @@
 //Index 媒体查询
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
-import { mediaquery, window } from '@kit.ArkUI'
+import { mediaquery, Position, window } from '@kit.ArkUI'
 import Home from './HomePage'
 import ProxyPage from './ProxyPage'
 import ConfigurationPage from './ConfigurationPage'
@@ -48,6 +48,7 @@ import { Item, ProxyData } from '../common/ProxyData'
 import { image } from '@kit.ImageKit'
 
 
+
 //
 interface marginGenerate {
   top: number,
@@ -60,10 +61,12 @@ interface marginGenerate {
 @Component
 struct Index {
   private componentName: string = 'Index'
-  // @StorageProp('theme')
+   @StorageProp('theme')
   // TODO 使用用户首选项之后 删掉`@State`，取消注释上面的`@StorageProp`
-  @State
+ // @State
   selectedTheme: CustomThemeName = 'blueAppTheme'
+
+
   /**
    * 主题色
    *    示例中主题配置里配置了一个颜色，所以只用`ResourceColor`类型的变量来接收色值，
@@ -81,6 +84,7 @@ struct Index {
   onWillApplyTheme(theme: Theme) {
     hilog.info(0x1000, this.componentName, `#onWillApplyTheme`)
     this.icon_emphasize = theme.colors.iconEmphasize;
+
   }
 
   //tabs图标文字颜色，修改resources/base(dark)/element/color.json中tabs_icon_text配置选中图标文字深浅模式颜色
@@ -310,6 +314,7 @@ struct Index {
   // 平板竖屏判断
   tabletHeightListener:mediaquery.MediaQueryListener =
     this.getUIContext().getMediaQuery().matchMediaSync('(1000vp< height)');
+
 
   aboutToAppear() {
     hilog.info(0x1000, this.componentName, `#aboutToAppear executed`)

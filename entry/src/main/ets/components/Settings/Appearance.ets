@@ -53,7 +53,7 @@ struct Appearance {
   // 按钮位置选中文本
   @State EnableButtonPositionText: ResourceStr = $r('app.string.right')
   // 按钮位置偏移量（默认在右侧的偏移量）
-  @State ButtonPositionOffset: number = 16
+  @State ButtonPositionOffset: number = 0
   // 所有子组件在容器内的对齐方式
   @Consume ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
   // 背景模糊启用变量

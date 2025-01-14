@@ -195,7 +195,7 @@ struct Shortcuts {
     alignment: DialogAlignment.Center,
     cornerRadius: 32,
     gridCount: 4,
-    backgroundColor: $r('app.color.container_background'),
+    backgroundBlurStyle:BlurStyle.NONE
   })
 
   //绑定第二个按钮弹窗
@@ -221,7 +221,7 @@ struct Shortcuts {
     alignment: DialogAlignment.Center,
     cornerRadius: 32,
     gridCount: 4,
-    backgroundColor: $r('app.color.container_background'),
+    backgroundBlurStyle:BlurStyle.NONE
   })
 
   //绑定第三个按钮弹窗
@@ -247,7 +247,7 @@ struct Shortcuts {
     alignment: DialogAlignment.Center,
     cornerRadius: 32,
     gridCount: 4,
-    backgroundColor: $r('app.color.container_background'),
+    backgroundBlurStyle:BlurStyle.NONE
   })
   // 在自定义组件即将析构销毁时将弹窗置空
   aboutToDisappear() {
