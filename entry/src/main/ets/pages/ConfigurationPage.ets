@@ -58,6 +58,8 @@ struct ConfigurationPage {
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
+  /* 是否开启全局动画判定 */
+  @Consume ('isAnimation') isAnimation: boolean
 
   /* 断点布局相关 相关作用看定义时候的注释 */
   @Consume('breakPointStateListLanes')
@@ -275,9 +277,9 @@ struct ConfigurationPage {
       .menuItemDivider({ strokeWidth: LengthMetrics.vp(.4), color: $r('sys.color.comp_divider') })
       .width(200)
       .height('auto')
-      .transition(TransitionEffect.asymmetric(TransitionEffect.move(TransitionEdge.END), TransitionEffect.move(TransitionEdge.START))
+      .transition(this.isAnimation ? TransitionEffect.asymmetric(TransitionEffect.move(TransitionEdge.END), TransitionEffect.move(TransitionEdge.START))
         .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
-        .combine(TransitionEffect.OPACITY)
+        .combine(TransitionEffect.OPACITY):null
       )
     }
     .nestedScroll({scrollForward: NestedScrollMode.SELF_FIRST, scrollBackward: NestedScrollMode.SELF_FIRST})

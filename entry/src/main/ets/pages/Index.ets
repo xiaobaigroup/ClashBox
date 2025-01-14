@@ -1,6 +1,6 @@
 //Index 媒体查询
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
-import { App, mediaquery, window } from '@kit.ArkUI'
+import { mediaquery, window } from '@kit.ArkUI'
 import Home from './HomePage'
 import ProxyPage from './ProxyPage'
 import ConfigurationPage from './ConfigurationPage'
@@ -39,7 +39,8 @@ import {
   HomeCardEditHeight,
   CardTitleFontSize_18_20_22_22,
   HomeProxyFontSize_24_26_26_27,
-  SpeedfontSize12_14_14_16
+  SpeedfontSize12_14_14_16,
+  HomeCardCellularDataPadding
 } from '../common/Constants'
 import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
@@ -50,6 +51,7 @@ import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig } from '../entryability/AppState'
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
+
 
 //
 interface marginGenerate {
@@ -63,10 +65,12 @@ interface marginGenerate {
 @Component
 struct Index {
   private componentName: string = 'Index'
-  // @StorageProp('theme')
+   @StorageProp('theme')
   // TODO 使用用户首选项之后 删掉`@State`，取消注释上面的`@StorageProp`
-  @State
+ // @State
   selectedTheme: CustomThemeName = 'blueAppTheme'
+
+
   /**
    * 主题色
    *    示例中主题配置里配置了一个颜色，所以只用`ResourceColor`类型的变量来接收色值，
@@ -84,6 +88,7 @@ struct Index {
   onWillApplyTheme(theme: Theme) {
     hilog.info(0x1000, this.componentName, `#onWillApplyTheme`)
     this.icon_emphasize = theme.colors.iconEmphasize;
+
   }
 
   //tabs图标文字颜色，修改resources/base(dark)/element/color.json中tabs_icon_text配置选中图标文字深浅模式颜色
@@ -234,6 +239,12 @@ struct Index {
   @Provide('HomeCardTitleButtonPadding')
   private HomeCardTitleButtonPadding: BreakpointState<number> = HomeCardTitleButtonPadding
   /**
+   * 主页流量统计卡片padding高度
+   */
+  @Provide('HomeCardCellularDataPadding')
+  private HomeCardCellularDataPadding: BreakpointState<number> = HomeCardCellularDataPadding
+
+  /**
    * 主页卡片标题按钮间距
    */
   @Provide('HomeCardEditHeight')
@@ -261,12 +272,15 @@ struct Index {
   @Provide ('pixmapPublicNetwork')pixmapPublicNetwork: image.PixelMap | undefined = undefined
   @Provide ('pixmapFavoriteProxy')pixmapFavoriteProxy: image.PixelMap | undefined = undefined
   @Provide ('pixmapFavoriteConfiguration')pixmapFavoriteConfiguration: image.PixelMap | undefined = undefined
+  @Provide ('pixmapCurrentConfiguration')pixmapCurrentConfiguration: image.PixelMap | undefined = undefined
+  @Provide ('pixmapProxyINFO')pixmapProxyINFO: image.PixelMap | undefined = undefined
+  @Provide ('pixmapShortcuts')pixmapShortcuts: image.PixelMap | undefined = undefined
 
-  @StorageLink("persistedMapString") persistedMapString: Map<number, string> = new Map<number, string>([]);
+  // 所有子组件在容器内的对齐方式
+  @Provide ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment = Alignment.BottomEnd
 
-  persistMapString() {
-    this.persistedMapString = new Map<number, string>([[3, "one"], [6, "two"], [9, "three"]]);
-  }
+  /* 是否开启全局动画判定 */
+  @Provide ('isAnimation') isAnimation: boolean = true
 
   @Builder
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
@@ -306,6 +320,7 @@ struct Index {
   // 平板竖屏判断
   tabletHeightListener:mediaquery.MediaQueryListener =
     this.getUIContext().getMediaQuery().matchMediaSync('(1000vp< height)');
+
 
   aboutToAppear() {
     hilog.info(0x1000, this.componentName, `#aboutToAppear executed`)
@@ -367,6 +382,7 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.HomeCardAreaPadding)
     BreakpointSystem.getInstance().attach(this.HomeCardTitleButtonPadding)
     BreakpointSystem.getInstance().attach(this.HomeCardEditHeight)
+    BreakpointSystem.getInstance().attach(this.HomeCardCellularDataPadding)
     BreakpointSystem.getInstance().start()
     setTimeout(()=>{
       ClashViewModel.initProfile()
@@ -450,6 +466,6 @@ struct Index {
       { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
     )
     .padding({ top:px2vp(this.topRectHeight) , bottom: this.isLandscapePhone ? 0 :px2vp(this.bottomRectHeight) -15})
-    .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
+    .animation(this.isAnimation ? { duration: ANIMATION_DURATION_300, curve: Curve.Ease }:null)
   }
 }

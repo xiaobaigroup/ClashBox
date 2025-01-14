@@ -1,6 +1,6 @@
 import { BreakpointState } from '../../common/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI'
-import { MarginGenerate } from '../../common/Constants'
+import {  MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
 
 @Component
@@ -28,7 +28,11 @@ struct CellularDataStat {
 //下部文字大小
   @Consume('HomeCardCellularDataSmFontSize') private HomeCardCellularDataSmFontSize: BreakpointState<number>
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
-
+  /**
+   * 主页流量统计卡片padding高度
+   */
+  @Consume('HomeCardCellularDataPadding')
+  private HomeCardCellularDataPadding: BreakpointState<number>
 
   build() {
     Column() {
@@ -78,7 +82,7 @@ struct CellularDataStat {
       .height('100%')
       .justifyContent(FlexAlign.Center)
   //    .backgroundColor('#ba942020')
-      .padding({bottom:30})
+      .padding({bottom:this.isLandscapePhone ? 30: this.HomeCardCellularDataPadding.value})
     //  .alignItems(HorizontalAlign.Center)
     }
     .padding(this.cardPadding.value)

@@ -23,7 +23,9 @@ struct Shortcuts {
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
-
+  @Consume('isShowShortcuts') isShowShortcuts: boolean
+  //编辑按钮点击后显示编辑状态判定
+  @Consume isShowHomeEdit: boolean
   @State isShowShortcutsEdit :boolean = false
   //标题输入文本内容
   @State inputTitleValue1: string = ""
@@ -38,6 +40,9 @@ struct Shortcuts {
   icon_emphasize: ResourceColor
   @Consume('breakPointStateTabContentTitleMargin')
   private breakPointStateTabContentTitleMargin: BreakpointState<number>
+  aboutToAppear() {
+    let uiContextShortcuts: UIContext = this.getUIContext();
+  }
 
   // 隐式 Want 跳转网站
   async implicitStartAbility(url: string) {
@@ -47,7 +52,7 @@ struct Shortcuts {
         // bundleName: "com.example.myapplication",
         "action": "ohos.want.action.viewData",
         // entities可以省略
-     //   "entities": [ "entity.system.browsable" ],
+        //   "entities": [ "entity.system.browsable" ],
         "uri": url,
       }
       let context = getContext(this) as common.UIAbilityContext;
@@ -70,17 +75,23 @@ struct Shortcuts {
           .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
           .ShortcutsTextStyle()
           .onClick(() => {
-            if (this.inputWebValue1 != '') {
-              this.implicitStartAbility(this.inputWebValue1)
-            }else {
-              this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
+            //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+            if (this.isShowShortcuts && this.isShowHomeEdit==false) {
+              if (this.inputWebValue1 != '') {
+                this.implicitStartAbility(this.inputWebValue1)
+              } else {
+                this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
+              }
             }
           })
           .gesture(
             LongPressGesture()
               .onAction(() => {
-                this.isShowShortcutsEdit = true
-                this.isEnableIndexForegroundBlur=true
+                //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+                if (this.isShowShortcuts && this.isShowHomeEdit==false) {
+                  this.isShowShortcutsEdit = true
+                  this.isEnableIndexForegroundBlur = true
+                }
               })
           )
 
@@ -90,17 +101,23 @@ struct Shortcuts {
           .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
           .ShortcutsTextStyle()
           .onClick(() => {
-            if (this.inputWebValue2 != '') {
-              this.implicitStartAbility(this.inputWebValue2)
-            }else {
-              this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
+            //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+            if (this.isShowShortcuts && this.isShowHomeEdit==false) {
+              if (this.inputWebValue2 != '') {
+                this.implicitStartAbility(this.inputWebValue2)
+              } else {
+                this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
+              }
             }
           })
           .gesture(
             LongPressGesture()
               .onAction(() => {
-                this.isShowShortcutsEdit = true
-                this.isEnableIndexForegroundBlur=true
+                //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+                if (this.isShowShortcuts && this.isShowHomeEdit==false) {
+                  this.isShowShortcutsEdit = true
+                  this.isEnableIndexForegroundBlur=true
+                }
               })
           )
 
@@ -110,17 +127,23 @@ struct Shortcuts {
           .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
           .ShortcutsTextStyle()
           .onClick(() => {
-            if (this.inputWebValue3 != '') {
-              this.implicitStartAbility(this.inputWebValue3)
-            }else {
-              this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
+            //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+            if (this.isShowShortcuts && this.isShowHomeEdit==false) {
+              if (this.inputWebValue3 != '') {
+                this.implicitStartAbility(this.inputWebValue3)
+              }else {
+                this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
+              }
             }
           })
           .gesture(
             LongPressGesture()
               .onAction(() => {
-                this.isShowShortcutsEdit = true
-                this.isEnableIndexForegroundBlur=true
+                //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+                if (this.isShowShortcuts && this.isShowHomeEdit==false) {
+                  this.isShowShortcutsEdit = true
+                  this.isEnableIndexForegroundBlur = true
+                }
               })
           )
       }
@@ -128,8 +151,9 @@ struct Shortcuts {
       .height('82%')
       .backgroundColor($r('app.color.home_card_background'))
       .borderRadius(10)
-      .padding({ top:8,bottom:8 ,left:5})
+      .padding({left:5,right:5})
     }
+    .id('ShortcutsId')
     .padding(this.cardPadding.value)
     .width('100%')
     .height('100%')
@@ -161,17 +185,18 @@ struct Shortcuts {
       console.log("dialog onWillDismiss")
       if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
         dismissDialogAction.dismiss()
-    //    this.isEnableIndexForegroundBlur=false
+        //    this.isEnableIndexForegroundBlur=false
       }
       if (dismissDialogAction.reason == DismissReason.TOUCH_OUTSIDE) {
         dismissDialogAction.dismiss()
-     //   this.isEnableIndexForegroundBlur=false
+        //   this.isEnableIndexForegroundBlur=false
       }
     },
     alignment: DialogAlignment.Center,
     cornerRadius: 32,
     gridCount: 4,
-    backgroundColor: Color.White,
+    backgroundBlurStyle:BlurStyle.NONE,
+    backgroundColor:$r('app.color.container_background')
   })
 
   //绑定第二个按钮弹窗
@@ -187,17 +212,18 @@ struct Shortcuts {
       console.log("dialog onWillDismiss")
       if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
         dismissDialogAction.dismiss()
-     //   this.isEnableIndexForegroundBlur=false
+        //   this.isEnableIndexForegroundBlur=false
       }
       if (dismissDialogAction.reason == DismissReason.TOUCH_OUTSIDE) {
         dismissDialogAction.dismiss()
-    //    this.isEnableIndexForegroundBlur=false
+        //    this.isEnableIndexForegroundBlur=false
       }
     },
     alignment: DialogAlignment.Center,
     cornerRadius: 32,
     gridCount: 4,
-    backgroundColor: Color.White,
+    backgroundBlurStyle:BlurStyle.NONE,
+    backgroundColor:$r('app.color.container_background')
   })
 
   //绑定第三个按钮弹窗
@@ -213,17 +239,18 @@ struct Shortcuts {
       console.log("dialog onWillDismiss")
       if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
         dismissDialogAction.dismiss()
-     //   this.isEnableIndexForegroundBlur=false
+        //   this.isEnableIndexForegroundBlur=false
       }
       if (dismissDialogAction.reason == DismissReason.TOUCH_OUTSIDE) {
         dismissDialogAction.dismiss()
-     //   this.isEnableIndexForegroundBlur=false
+        //   this.isEnableIndexForegroundBlur=false
       }
     },
     alignment: DialogAlignment.Center,
     cornerRadius: 32,
     gridCount: 4,
-    backgroundColor: Color.White,
+    backgroundBlurStyle:BlurStyle.NONE,
+    backgroundColor:$r('app.color.container_background')
   })
   // 在自定义组件即将析构销毁时将弹窗置空
   aboutToDisappear() {
@@ -409,7 +436,7 @@ struct Shortcuts {
       }
     }
     .width('100%')
-   // .contentEndOffset(50)
+    // .contentEndOffset(50)
     .padding({
       left: this.breakPointStateTabContentTitleMargin.value,
       right: this.breakPointStateTabContentTitleMargin.value,
@@ -465,7 +492,7 @@ struct WebCustomDialog1 {
           .onClick(() => {
             if (this.controller != undefined) {
               this.controller.close()
-          //    this.isEnableIndexForegroundBlur = false
+              //    this.isEnableIndexForegroundBlur = false
             }
           })
 
@@ -477,7 +504,7 @@ struct WebCustomDialog1 {
             this.inputWebValue1.toString()
             if (this.controller != undefined) {
               this.controller.close()
-           //   this.isEnableIndexForegroundBlur = false
+              //   this.isEnableIndexForegroundBlur = false
             }
           })
       }
@@ -532,7 +559,7 @@ struct WebCustomDialog2 {
           .onClick(() => {
             if (this.controller != undefined) {
               this.controller.close()
-          //    this.isEnableIndexForegroundBlur = false
+              //    this.isEnableIndexForegroundBlur = false
             }
           })
 
@@ -545,7 +572,7 @@ struct WebCustomDialog2 {
             this.inputWebValue2.toString()
             if (this.controller != undefined) {
               this.controller.close()
-          //    this.isEnableIndexForegroundBlur = false
+              //    this.isEnableIndexForegroundBlur = false
             }
           })
 
@@ -601,7 +628,7 @@ struct WebCustomDialog3 {
           .onClick(() => {
             if (this.controller != undefined) {
               this.controller.close()
-      //        this.isEnableIndexForegroundBlur = false
+              //        this.isEnableIndexForegroundBlur = false
             }
           })
 
@@ -614,7 +641,7 @@ struct WebCustomDialog3 {
             this.inputWebValue3.toString()
             if (this.controller != undefined) {
               this.controller.close()
-         //     this.isEnableIndexForegroundBlur = false
+              //     this.isEnableIndexForegroundBlur = false
             }
           })
 
@@ -670,7 +697,7 @@ function TextInputStyle() {
   .borderRadius(0)
   .placeholderFont({ size:FONT_SIZE_14})
   .textAlign(TextAlign.Center)
-  .fontColor($r('sys.color.font_secondary'))
+  .fontColor($r('sys.color.font_primary'))
   .showUnderline(false)
   .backgroundColor($r('app.color.container_background'))
 }
@@ -681,6 +708,7 @@ function TextInputStyle() {
 function ShortcutsTextStyle() {
   .fontColor($r('sys.color.font_primary'))
   .maxLines(1)
+  .textOverflow({ overflow: TextOverflow.Ellipsis })
   .width('100%')
   .clickEffect({ level: ClickEffectLevel.MIDDLE })
 }

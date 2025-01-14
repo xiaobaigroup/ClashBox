@@ -23,6 +23,8 @@ struct PublicNetwork {
   @Consume('IPfontSize') private IPfontSize: BreakpointState<number>
   // 内容文本字体大小
   @Consume('breakPointStateHomeCardSwitchModeFontSize') private fontSize: BreakpointState<number>
+  //编辑按钮点击后显示编辑状态判定
+  @Consume isShowHomeEdit: boolean
 
   build() {
     Column() {
@@ -49,6 +51,11 @@ struct PublicNetwork {
           .fontColor(this.icon_emphasize)
           .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
           .backgroundColor($r('app.color.home_card_background'))
+          .onClick(() => {
+            //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
+            if (!this.isShowHomeEdit) {
+            }
+          })
       }.width('100%').justifyContent(FlexAlign.End)
     }
     .padding(this.cardPadding.value)

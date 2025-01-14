@@ -20,8 +20,8 @@ struct FavoriteConfiguration {
   @State FavoriteConfigurationRadio :number =0
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  //有无收藏代理节点判定
-  @State isCheckFavoriteConfiguration:boolean=true
+  //有无收藏代理节点判定 TODO 后端接入后该判定可修改
+  @State isCheckFavoriteConfiguration:number=0
   //主页卡片内容IP地址小字体大小
   @Consume('HomeCardIPSmFontSize')
   private HomeCardIPSmFontSize: BreakpointState<number>
@@ -31,11 +31,14 @@ struct FavoriteConfiguration {
   @Consume deleteButtonSize: BreakpointState<number>
   @StorageLink('favoriteProfiles') favoriteProfiles: Map<string, string> = new Map<string, string>([])
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  //编辑按钮点击后显示编辑状态判定
+  @Consume isShowHomeEdit: boolean
+
   build() {
     Column() {
       CardTitle({ title: $r('app.string.FavoriteConfiguration') })
       //拥有收藏配置的布局 start
-      if (this.isCheckFavoriteConfiguration) {
+      if (this.isCheckFavoriteConfiguration>=0) {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceEvenly }) {
           ForEach(Array.from(this.favoriteProfiles.entries()), (f:[string, string])=>{
               Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
@@ -50,7 +53,9 @@ struct FavoriteConfiguration {
                   })
               }
               .onClick(() => {
-                this.appConfig.currentProfileId = f[0]
+                if (this.isShowHomeEdit) {
+                  this.appConfig.currentProfileId = f[0]
+                }
               })
               .clickEffect({ level: ClickEffectLevel.MIDDLE })
               Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
@@ -64,7 +69,7 @@ struct FavoriteConfiguration {
       }//拥有收藏配置的布局 end
 
      //没有收藏配置时的布局 start
-      else if (!this.isCheckFavoriteConfiguration)
+      else if (this.isCheckFavoriteConfiguration<0)
       {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
           SymbolGlyph($r('sys.symbol.star'))
@@ -80,7 +85,9 @@ struct FavoriteConfiguration {
         .width('100%')
         .height("78%")
         .onClick(() => {
-          this.isCheckFavoriteConfiguration=true
+          //在home页编辑状态时，无法操作
+          if (!this.isShowHomeEdit) {
+            }
         })//为预览而设置的点击事件，后端接入修改或删除
       }//没有收藏配置时的布局 end
     }

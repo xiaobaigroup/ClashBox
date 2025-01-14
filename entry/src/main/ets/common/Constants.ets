@@ -639,6 +639,12 @@ export const IPfontSize: BreakpointState<number> = BreakpointState.of({
 export const SpeedfontSize12_14_14_16: BreakpointState<number> = BreakpointState.of({
   sm: 12,  md: 14,  lg: 14,  xl: 16
 });
+/**
+ * 主页流量统计卡片padding高度
+ */
+export const HomeCardCellularDataPadding: BreakpointState<number> = BreakpointState.of({
+  sm: 30, md: 50, lg: 50, xl: 50
+});
 
 /* List 相关*/
 // List中子组件的间隔
