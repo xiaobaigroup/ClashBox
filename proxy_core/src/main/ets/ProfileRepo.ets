@@ -55,7 +55,6 @@ export class ProfileRepo {
   async addOrUpdate(details: Profile) {
     const predicates = new relationalStore.RdbPredicates('Profiles')
     predicates.equalTo('id', details.id);
-
     const old = await this.store!.query(predicates)
     const input: ValuesBucket = {
       id: details.id,

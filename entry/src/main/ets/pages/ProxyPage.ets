@@ -7,10 +7,9 @@ import {
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import ProxyGroupItem from '../components/Proxy/ProxyGroupItem'
 import ProxyArrangement from '../components/Proxy/ProxyArrangement'
-import { intl } from '@kit.LocalizationKit'
 import { Item } from '../common/ProxyData'
 import ClashViewModel from '../entryability/ClashViewModel'
-import { ProxyGroup, ProxySort } from 'proxy_core'
+import { Profile, ProxyGroup, ProxySort, ProxyType } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import { AppConfig, isEnd, ProxyCardSize, ProxyGroupType } from '../entryability/AppState'
 
@@ -92,13 +91,30 @@ struct ProxyPage {
   //定义组件名
   private componentName: string = 'ProxyPage'
 
-
+  @Consume('currentProfile')
+  private currentProfile: Profile | null
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
   //栅格点位配置
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     BreakpointSystem.getInstance().start()
+    if (this.currentProfile){
+      let tabIndexes = this.proxyGroups.findIndex((d)=>d.name == this.currentProfile?.currentGroupName)
+      setTimeout(() => {
+        if(tabIndexes > -1){
+          this.tabsController.changeIndex(tabIndexes)
+          this.currentIndex = tabIndexes
+        }
+      }, 200)
+    }
+  }
+  changeProxy(g: string, item: Item){
+    if(this.currentProfile){
+      this.currentProfile.proxySelected?.set(g, item.text)
+      ClashViewModel.updateProfile(this.currentProfile)
+    }
+
   }
 
 
@@ -345,7 +361,15 @@ struct ProxyPage {
               Tabs({ barPosition: BarPosition.Start, controller: this.tabsController }) {
                 ForEach(this.proxyGroups, (g:ProxyGroup, i: number)=>{
                   TabContent() {
-                    ProxyGroupItem({items: g.proxies as Item[]}) //list相关在components/ProxyGroupItem.ets文件里
+                    ProxyGroupItem({
+                      items: g.proxies as Item[],
+                      ProxyGroupItemSelected: this.appConfig.proxyCardSize,
+                      disabled: g.type !== ProxyType.Selector,
+                      selectedProxy: this.currentProfile?.getSelectedProxy(g),
+                      OnProxyChange: (item) => {
+                        this.changeProxy(g.name, item)
+                      }
+                    }) //list相关在components/ProxyGroupItem.ets文件里
                       .padding({right: this.breakPointStateTabContentTitleMargin.value,})
                       .width('100%')
                       .height('100%')
@@ -359,8 +383,11 @@ struct ProxyPage {
               .fadingEdge(false)
               .onChange((index: number) => {
                 this.currentIndex = index;
+                if(this.currentProfile){
+                  this.currentProfile.currentGroupName = this.proxyGroups[index].name
+                  ClashViewModel.updateProfile(this.currentProfile)
+                }
               })
-
             }
             .padding({
               left: this.breakPointStateTabContentTitleMargin.value,

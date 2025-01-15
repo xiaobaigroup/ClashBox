@@ -28,14 +28,14 @@ struct CurrentNode {
       CardTitle({title: $r('app.string.CurrentNode')})
       Column() {
         if (this.ProxyRadioCheckedValue >= 0) {
-          Text(`${this.items[this.ProxyRadioCheckedValue].text}`)
-            .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(this.font_primary)
-
-          Text('ping ' + `${this.items[this.ProxyRadioCheckedValue].latency}` + 'ms')
-            .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)
-            .fontColor(ProxyData.getColorForLatency(this.items[this.ProxyRadioCheckedValue].latency))
+          // Text(`${this.items[this.ProxyRadioCheckedValue].text}`)
+          //   .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
+          //   .fontWeight(FontWeight.Bold)
+          //   .fontColor(this.font_primary)
+          //
+          // Text('ping ' + `${this.items[this.ProxyRadioCheckedValue].latency}` + 'ms')
+          //   .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)
+          //   .fontColor(ProxyData.getColorForLatency(this.items[this.ProxyRadioCheckedValue].latency))
         }
         else if(this.ProxyRadioCheckedValue < 0){
           Text($r('app.string.proxy_name'))

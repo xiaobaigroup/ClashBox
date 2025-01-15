@@ -4,7 +4,7 @@ export interface Item {
   text: string
   latency: number
   type: string
-  id: number
+  id: string
   isShowFavoriteProxy: boolean
 }
 
@@ -12,76 +12,6 @@ export interface Item {
 export class ProxyData {
   private static items: Item[] = [
   // ...你的items数据...
-    {
-      text: '越南①',
-      latency: 20,
-      type: 'Vmess',
-      id: 1,
-      isShowFavoriteProxy:false
-    },
-    {
-      text: '越南②',
-      latency: 500,
-      type: 'Shadowsocks',
-      id: 2,
-      isShowFavoriteProxy:false
-    },
-    {
-      text: '北朝鲜①',
-      latency: 501,
-      type: 'Vmess',
-      id: 3,
-      isShowFavoriteProxy:false
-    },
-    {
-      text: '中国香港①',
-      latency: 20,
-      type: 'Trojan',
-      id: 4,
-      isShowFavoriteProxy:false
-    },
-    {
-      text: '中国香港②',
-      latency: 1001,
-      type: 'Vmess',
-      id: 5,
-      isShowFavoriteProxy:false
-    },
-    {
-      text: '中国台湾①',
-      latency: 501,
-      type: 'Shadowsocks',
-      id: 6,
-      isShowFavoriteProxy:false
-    },
-    {
-      text: '中国台湾②',
-      latency: 20,
-      type: 'Vmess',
-      id: 7,
-      isShowFavoriteProxy:false
-    },
-    {
-      text: '越南②',
-      latency: 500,
-      type: 'Trojan',
-      id: 8,
-      isShowFavoriteProxy:false
-    },
-    {
-      text: '美国①',
-      latency: 1001,
-      type: 'Shadowsocks',
-      id: 9,
-      isShowFavoriteProxy:false
-    },
-    {
-      text: '美国②',
-      latency: 102,
-      type: 'Shadowsocks',
-      id: 10,
-      isShowFavoriteProxy:false
-    },
   ]
 
 //延迟颜色设定

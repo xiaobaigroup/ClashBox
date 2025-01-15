@@ -10,6 +10,7 @@ import {  Item, ProxyData } from '../../common/ProxyData';
 import { EventHub, EventKey } from '../../common/EventHub';
 import { ProxySort } from 'proxy_core';
 import { intl } from '@kit.LocalizationKit';
+import { ProxyCardSize } from '../../entryability/AppState';
 
 
 //断点布局
@@ -138,7 +139,7 @@ struct ProxyGroupItem {
 
   /* 本页布局相关参数 */
   // 定义ProxyGroupItemSelectedWide的值便于切换布局方式
-  @Consume ProxyGroupItemSelected: string
+  @Prop ProxyGroupItemSelected: ProxyCardSize
   //是否显示网络测速半模拟态判定
   @State isShowNetworkSpeed: boolean = false
   //网络测速半模拟态web控制器
@@ -152,7 +153,8 @@ struct ProxyGroupItem {
   //节点假数据组后期可改可删
   @Prop items: Item[]
   // 当前代理节点单选选择的值
-  @Consume private ProxyRadioCheckedValue: number
+  @Prop selectedProxy: string
+  @Prop disabled: boolean
   // 当前代理节点长按选择的值
   @Consume private ProxyItemLongPressValue: number
   // 当前代理节点收藏的值
@@ -186,7 +188,7 @@ struct ProxyGroupItem {
 
   //默认排序
   DefaultSortItems() {
-    this.items.sort((a, b) => a.id - b.id);
+    this.items.sort((a, b) => ProxyCollator.compare(a.id, b.id));
   }
 
   //半模态窗口测速网站
@@ -224,7 +226,9 @@ struct ProxyGroupItem {
   //收藏与ping延迟即时动作
   private ProxyPromptAction:PromptAction = this.getUIContext()?.getPromptAction()
 
+  OnProxyChange: ((item: Item) => void) = () => {
 
+  }
 
   //长按菜单 start
   @Builder
@@ -278,9 +282,16 @@ struct ProxyGroupItem {
     .borderRadius(20)
   } //长按菜单end
 
+  selectProxy(item: Item){
+    if (!this.disabled){
+      this.selectedProxy = item.text
+      this.OnProxyChange(item)
+    }
+  }
+
   build() {
     //多列排列宽
-    if (this.ProxyGroupItemSelected === 'ProxyGroupItemSelectedWide') {
+    if (this.ProxyGroupItemSelected === ProxyCardSize.Small) {
       // 节点列表 START
       List({ space: 10, initialIndex: 0 }) {
         ForEach(this.items, (item: Item, index: number) => {
@@ -289,7 +300,6 @@ struct ProxyGroupItem {
               Column() {
                 Text(`${item.text}`).ItemTextStyle()
                 Text(`${item.type}`).ItemTypeStyle()
-
                 Blank(10)
                 Text(`${item.latency}` + 'ms')
                   .fontColor(ProxyData.getColorForLatency(item.latency))
@@ -297,20 +307,21 @@ struct ProxyGroupItem {
               }.alignItems(HorizontalAlign.Start)
               Blank()
               Radio({ value: 'ProxyRadio' + index, group: 'ProxyGroup' })
-                .checked(index === this.ProxyRadioCheckedValue)
+                .checked(item.text === this.selectedProxy)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
                 .onChange((isChecked: boolean) => {
                   if (isChecked) {
-                    this.ProxyRadioCheckedValue = index
+                    this.selectProxy(item)
                   }
                 })
             }
             .ListRowStyle()
           }
           .onClick(() => {
-            this.ProxyRadioCheckedValue = index
+            this.selectProxy(item)
+
             hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
           })
           .ListItemStyle()
@@ -347,7 +358,7 @@ struct ProxyGroupItem {
       })
     }
     //单列排列
-    else if (this.ProxyGroupItemSelected === 'ProxyGroupItemSelectedThin') {
+    else if (this.ProxyGroupItemSelected === ProxyCardSize.Large) {
       // 节点列表 START
       List({ space: 10, initialIndex: 0 }) {
         ForEach(this.items, (item: Item, index: number) => {
@@ -367,20 +378,20 @@ struct ProxyGroupItem {
 
               Blank()
               Radio({ value: 'ProxyRadio' + index, group: 'ProxyGroup' })
-                .checked(index === this.ProxyRadioCheckedValue)
+                .checked(item.text === this.selectedProxy)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
                 .onChange((isChecked: boolean) => {
                   if (isChecked) {
-                    this.ProxyRadioCheckedValue = index
+                    this.selectProxy(item)
                   }
                 })
             }
             .ListRowStyle()
           }
           .onClick(() => {
-            this.ProxyRadioCheckedValue = index
+            this.selectProxy(item)
             hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
           })
           .ListItemStyle()
@@ -415,9 +426,8 @@ struct ProxyGroupItem {
         }
       })
     }
-
     //迷你排列
-    else if (this.ProxyGroupItemSelected === 'ProxyGroupItemSelectedMini') {
+    else if (this.ProxyGroupItemSelected === ProxyCardSize.Mini) {
       // 节点列表 START
       List({ space: 10, initialIndex: 0 }) {
         ForEach(this.items, (item: Item, index: number) => {
@@ -436,20 +446,20 @@ struct ProxyGroupItem {
 
               Blank()
               Radio({ value: 'ProxyRadio' + index, group: 'ProxyGroup' })
-                .checked(index === this.ProxyRadioCheckedValue)
+                .checked(item.text === this.selectedProxy)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
                 .onChange((isChecked: boolean) => {
                   if (isChecked) {
-                    this.ProxyRadioCheckedValue = index
+                    this.selectProxy(item)
                   }
                 })
             }
             .ListRowStyle()
           }
           .onClick(() => {
-            this.ProxyRadioCheckedValue = index
+            this.selectProxy(item)
             hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
           })
           .ListItemStyle()

@@ -3,6 +3,7 @@ import { getProfilePath, getProfilesPath } from './appPath';
 import { rcp } from '@kit.RemoteCommunicationKit';
 import { Context } from '@kit.AbilityKit';
 import { fileUri } from '@kit.CoreFileKit';
+import { ProxyGroup, ProxyType } from './models/Common';
 
 export function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -114,6 +115,11 @@ export class Profile {
     const filePath = await getProfilePath(this.context, this.id)
     await fs.copy(uri, fileUri.getUriFromPath(filePath))
     return this
+  }
+  getSelectedProxy(g: ProxyGroup): string | undefined{
+    if (g.type !== ProxyType.Selector)
+      return g.now
+    return this.proxySelected.get(g.name)
   }
 }
 

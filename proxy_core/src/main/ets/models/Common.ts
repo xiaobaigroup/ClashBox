@@ -39,7 +39,7 @@ export interface Proxy {
   type: ProxyType;
   text: string
   latency: number
-  id: number
+  id: string
   isShowFavoriteProxy: boolean
 }
 

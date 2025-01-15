@@ -46,7 +46,7 @@ import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
 import { Item, ProxyData } from '../common/ProxyData'
 import { image } from '@kit.ImageKit'
-import { Dns, ProxyGroup } from 'proxy_core'
+import { Dns, Profile, ProxyGroup } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig } from '../entryability/AppState'
@@ -261,7 +261,7 @@ struct Index {
   //节点数据组
   @Provide items: Item[] = ProxyData.ProxyItems();
 
-  @Provide proxyGroups: ProxyGroup[] = []
+
   /**
    * 主页卡片组件截图
    */
@@ -384,14 +384,21 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.HomeCardEditHeight)
     BreakpointSystem.getInstance().attach(this.HomeCardCellularDataPadding)
     BreakpointSystem.getInstance().start()
-    setTimeout(()=>{
+    setTimeout(()=> {
       ClashViewModel.initProfile()
     }, 500)
     EventHub.on(EventKey.FetchProxyGroup, async ()=>{
-      this.proxyGroups = await ClashViewModel.getProxyGroups()
+      if(this.appConfig.currentProfileId){
+        this.currentProfile = await ClashViewModel.getProfile(this.appConfig.currentProfileId)
+        if (this.currentProfile) {
+          this.proxyGroups = await ClashViewModel.getProxyGroups()
+        }
+      }
     })
 
   }
+  @Provide proxyGroups: ProxyGroup[] = []
+  @Provide("currentProfile") currentProfile: Profile | null = null
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
 
 

@@ -10,7 +10,7 @@ import { EventHub, EventKey } from "../common/EventHub";
 import { AppConfig } from "./AppState";
 import  fs from  "@ohos.file.fs"
 
-export class ClashViewModel{
+export class ClashViewModel {
   profileRepo = new ProfileRepo()
   socketProxy = new SocketProxyService()
   context: Context | undefined
@@ -88,6 +88,9 @@ export class ClashViewModel{
       }
     }
     EventHub.sendEvent(EventKey.FetchProfile, null)
+  }
+  async updateProfile(profile: Profile){
+    await this.profileRepo.addOrUpdate(profile)
   }
   async getProfiles(): Promise<Profile[]>{
     return await this.profileRepo.queryAll()

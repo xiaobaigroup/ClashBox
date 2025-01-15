@@ -3,7 +3,8 @@ import { emitter } from "@kit.BasicServicesKit";
 export enum EventKey{
   FetchProxyGroup = 10000,
   FetchProfile = 10001,
-  ProxySort = 10002
+  ProxySort = 10002,
+  ChangeProxy = 10003
 }
 
 export class EventHub{
