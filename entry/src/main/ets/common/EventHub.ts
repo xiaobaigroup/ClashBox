@@ -2,7 +2,8 @@ import { emitter } from "@kit.BasicServicesKit";
 
 export enum EventKey{
   FetchProxyGroup = 10000,
-  FetchProfile = 10001
+  FetchProfile = 10001,
+  ProxySort = 10002
 }
 
 export class EventHub{
@@ -10,6 +11,7 @@ export class EventHub{
     emitter.emit({eventId: key}, {data: data})
   }
   static on(key: EventKey, callback: (data: any)=>void){
+    emitter.off(key)
     emitter.on({eventId: key},(data)=>{
       callback(data.data)
     })

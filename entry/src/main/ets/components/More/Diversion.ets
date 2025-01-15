@@ -168,7 +168,7 @@ struct Diversion {
             }),
             previewAnimationOptions: {
               scale: [0.95, 1.0],
-              transition: this.isAnimation ?TransitionEffect.prototype.animation({ tempo: 1.5 }):null
+              transition: this.isAnimation ?TransitionEffect.prototype.animation({ tempo: 1.5 }) : undefined
             }
           })
 
@@ -186,7 +186,7 @@ struct Diversion {
         detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],
         dragBar: false,
         backgroundColor: $r('app.color.background'),
-        keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
+        //keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
         preferType: SheetType.CENTER,
         onWillDismiss: () => {
           this.isShowPolicy = false

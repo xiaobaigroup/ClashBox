@@ -534,8 +534,10 @@ struct ConfigurationPage {
     .height('100%')
     .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Linear, delay: 0 })
   }
+
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('favoriteProfiles') favoriteProfiles: Map<string, string> = new Map<string, string>([])
+
   aboutToAppear(): void {
     hilog.info(0xC000, this.componentName, `#aboutToAppear executed`)
     // XXX 删除 这里模拟获取所有hap沙箱路径配置文件的文件名

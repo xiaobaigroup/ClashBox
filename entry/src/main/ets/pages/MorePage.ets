@@ -230,7 +230,7 @@ struct MorePage {
             detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],
             dragBar: false,
             backgroundColor: $r('app.color.background'),
-            keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
+           // keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
             preferType: SheetType.CENTER,
             onWillDismiss: () => {
               this.isShowSettings = false

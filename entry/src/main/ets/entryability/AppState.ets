@@ -1,10 +1,25 @@
-import { ClashConfig, Dns } from "proxy_core";
+import { ClashConfig, Dns, ProxySort } from "proxy_core";
+
+export enum ProxyGroupType{
+  Tabs,
+  List
+}
+export enum ProxyCardSize{
+  Mini,
+  Small,
+  Large
+}
 
 export class AppConfig{
   currentProfileId?: string
-  favoriteProxys: string[] = []
+  proxySort?: ProxySort = ProxySort.Default
+  proxyGroupType?: ProxyGroupType = ProxyGroupType.Tabs
+  proxyCardSize?: ProxyCardSize = ProxyCardSize.Mini
 }
 
+export function isEnd(length: number, i: number){
+  return length -1 == i
+}
 // use @StorageLink('appConfig')
 export class AppState {
 

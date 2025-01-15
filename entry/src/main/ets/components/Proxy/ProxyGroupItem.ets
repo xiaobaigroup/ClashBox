@@ -7,6 +7,9 @@ import {
 import { LengthMetrics, SymbolGlyphModifier,PromptAction } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
 import {  Item, ProxyData } from '../../common/ProxyData';
+import { EventHub, EventKey } from '../../common/EventHub';
+import { ProxySort } from 'proxy_core';
+import { intl } from '@kit.LocalizationKit';
 
 
 //断点布局
@@ -65,6 +68,9 @@ struct ProxyCustomDialog {
     })
   }
 }
+
+//中文排序
+let ProxyCollator = new intl.Collator("zh-CN");
 
 //自定义弹窗内容end
 
@@ -156,6 +162,31 @@ struct ProxyGroupItem {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     BreakpointSystem.getInstance().attach(this.breakPointStateListLanes)
     BreakpointSystem.getInstance().start()
+
+    EventHub.on(EventKey.ProxySort, (sort: ProxySort)=>{
+        console.log("ProxySort", sort)
+        switch (sort){
+          case ProxySort.Default: this.DefaultSortItems(); break;
+          case ProxySort.Title: this.NameSortItems(); break;
+          case ProxySort.Delay: this.LatencySortItems(); break;
+        }
+    })
+  }
+  // 延迟排序
+  LatencySortItems() {
+    this.items.sort((a, b) => (a.latency ?? 0) - (b.latency ?? 0));
+  }
+
+  //按名称排序
+  NameSortItems() {
+    this.items = this.items.sort((a, b) => {
+      return ProxyCollator.compare(a.text, b.text);
+    })
+  }
+
+  //默认排序
+  DefaultSortItems() {
+    this.items.sort((a, b) => a.id - b.id);
   }
 
   //半模态窗口测速网站

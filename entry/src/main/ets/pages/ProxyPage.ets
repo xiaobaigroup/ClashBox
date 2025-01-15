@@ -10,11 +10,11 @@ import ProxyArrangement from '../components/Proxy/ProxyArrangement'
 import { intl } from '@kit.LocalizationKit'
 import { Item } from '../common/ProxyData'
 import ClashViewModel from '../entryability/ClashViewModel'
-import { ProxyGroup } from 'proxy_core'
+import { ProxyGroup, ProxySort } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
+import { AppConfig, isEnd, ProxyCardSize, ProxyGroupType } from '../entryability/AppState'
 
-//中文排序
-let ProxyCollator = new intl.Collator("zh-CN");
+
 
 @Entry
 @Component
@@ -67,22 +67,7 @@ struct ProxyPage {
   hasGroups(){
     this.FristPage = this.proxyGroups.length == 0;
   }
-  // 延迟排序
-  LatencySortItems() {
-    this.items.sort((a, b) => a.latency - b.latency);
-  }
 
-  //按名称排序
-  NameSortItems() {
-    this.items.sort((a, b) => {
-      return ProxyCollator.compare(a.text, b.text);
-    })
-  }
-
-  //默认排序
-  DefaultSortItems() {
-    this.items.sort((a, b) => a.id - b.id);
-  }
 
   /* 断点布局相关 相关作用看定义时候的注释 */
   @Consume('breakPointStateListLanes')
@@ -108,7 +93,8 @@ struct ProxyPage {
   private componentName: string = 'ProxyPage'
 
 
-
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
   //栅格点位配置
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
@@ -155,67 +141,39 @@ struct ProxyPage {
     Column() {
       //代理节点分组方式切换
       EditTitle({ title: $r('app.string.Packet_mode') })
+
       Column() {
-        Row() {
-          Text($r('app.string.Tabs'))
-            .EditText()
-          Radio({
-            value: 'ProxyArrangementSelected1', group: 'ProxyArrangementSelectedRadioGroup',
-            indicatorType: RadioIndicatorType.TICK,
-          })
-            .checked(this.currentRadioValue1 === 0)
-            .onChange((isChecked: boolean) => {
-              if (isChecked) {
-                animateTo({ duration: 500 }, () => {
-                  this.currentRadioValue1 = 0
-                })
-                this.ProxyArrangementSelected = 'ProxyArrangementSelected1'
-              }
+        ForEach([{t: $r('app.string.Tabs'), v: ProxyGroupType.Tabs}, {t: $r('app.string.List'), v: ProxyGroupType.List}], (n: [Resource, number], i: number) => {
+          Row() {
+            Text(n["t"])
+              .EditText()
+            Radio({
+              value: 'ProxyArrangementSelected1', group: 'ProxyArrangementSelectedRadioGroup',
+              indicatorType: RadioIndicatorType.TICK,
             })
-            .radioStyle({
-              checkedBackgroundColor: this.icon_emphasize,
-              //   uncheckedBorderColor: this.icon_secondary
+              .checked(this.appConfig.proxyGroupType == n["v"])
+              .onChange((isChecked: boolean) => {
+                if (isChecked) {
+                  animateTo({ duration: 500 }, () => {
+                    this.appConfig.proxyGroupType = n["v"]
+                  })
+                }
+              })
+              .radioStyle({
+                checkedBackgroundColor: this.icon_emphasize,
+                //   uncheckedBorderColor: this.icon_secondary
+              })
+          }
+          .EditRow()
+          // 点击后改变ProxyArrangementSelected状态为 标签
+          .onClick(() => {
+            animateTo({ duration: 500 }, () => {
+              this.appConfig.proxyGroupType = n["v"]
             })
-        }
-        .EditRow()
-        // 点击后改变ProxyArrangementSelected状态为 标签
-        .onClick(() => {
-          animateTo({ duration: 500 }, () => {
-            this.currentRadioValue1 = 0
           })
-          this.ProxyArrangementSelected = 'ProxyArrangementSelected1'
-        })
-
-        Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
-
-        Row() {
-          Text($r('app.string.List'))
-            .EditText()
-          Radio({
-            value: 'ProxyArrangementSelected2', group: 'ProxyArrangementSelectedRadioGroup',
-            indicatorType: RadioIndicatorType.TICK
-          })
-            .checked(this.currentRadioValue1 === 1)
-            .onChange((isChecked: boolean) => {
-              if (isChecked) {
-                animateTo({ duration: 500 }, () => {
-                  this.currentRadioValue1 = 1
-                })
-                this.ProxyArrangementSelected = 'ProxyArrangementSelected2'
-              }
-            })
-            .radioStyle({
-              checkedBackgroundColor: this.icon_emphasize,
-              //   uncheckedBorderColor: this.icon_secondary
-            })
-        }
-        .EditRow()
-        // 点击后改变ProxyArrangementSelected状态为 列表
-        .onClick(() => {
-          animateTo({ duration: 500 }, () => {
-            this.currentRadioValue1 = 1
-          })
-          this.ProxyArrangementSelected = 'ProxyArrangementSelected2'
+          if(!isEnd(2, i)){
+            Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
+          }
         })
       }
       .height(94)
@@ -224,95 +182,41 @@ struct ProxyPage {
       //代理节点排列切换
       EditTitle({ title: $r('app.string.Arrangement') })
       Column() {
-        Row() {
-          Text($r('app.string.Default'))
-            .EditText()
-          Radio({
-            value: 'SortRadio1', group: 'SortRadioGroup',
-            indicatorType: RadioIndicatorType.TICK
-          })
-            .checked(this.currentRadioValue2 === 0)
-            .onChange((isChecked: boolean) => {
-              if (isChecked) {
-                this.DefaultSortItems()
-                animateTo({ duration: 500 }, () => {
-                  this.currentRadioValue2 = 0
-                })
-              }
+        ForEach([
+          {t: $r('app.string.Default'), v: ProxySort.Default},
+          {t: $r('app.string.Delay'), v: ProxySort.Delay},
+          {t: $r('app.string.Name'), v: ProxySort.Title}
+        ], (n: [Resource, number], i: number) => {
+          Row() {
+            Text(n["t"])
+              .EditText()
+            Radio({
+              value: 'SortRadio1', group: 'SortRadioGroup',
+              indicatorType: RadioIndicatorType.TICK
             })
-            .radioStyle({
-              checkedBackgroundColor: this.icon_emphasize,
-              //   uncheckedBorderColor: this.icon_secondary
+              .checked(this.appConfig.proxySort == n["v"])
+              .onChange((isChecked: boolean) => {
+                if (isChecked) {
+                  EventHub.sendEvent(EventKey.ProxySort, n["v"])
+                  animateTo({ duration: 500 }, () => {
+                    this.appConfig.proxySort = n["v"]
+                  })
+                }
+              })
+              .radioStyle({
+                checkedBackgroundColor: this.icon_emphasize,
+                //   uncheckedBorderColor: this.icon_secondary
+              })
+          }
+          .EditRow()
+          .onClick(() => {
+            EventHub.sendEvent(EventKey.ProxySort, n["v"])
+            animateTo({ duration: 500 }, () => {
+              this.appConfig.proxySort = n["v"]
             })
-        }
-        .EditRow()
-        .onClick(() => {
-          this.DefaultSortItems()
-          animateTo({ duration: 500 }, () => {
-            this.currentRadioValue2 = 0
           })
-        })
-
-        Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
-
-        Row() {
-          Text($r('app.string.Delay'))
-            .EditText()
-          Radio({
-            value: 'SortRadio2', group: 'SortRadioGroup',
-            indicatorType: RadioIndicatorType.TICK
-          })
-            .checked(this.currentRadioValue2 === 1)
-            .onChange((isChecked: boolean) => {
-              if (isChecked) {
-                this.LatencySortItems()
-                animateTo({ duration: 500 }, () => {
-                  this.currentRadioValue2 = 1
-                })
-              }
-            })
-            .radioStyle({
-              checkedBackgroundColor: this.icon_emphasize,
-              //   uncheckedBorderColor: this.icon_secondary
-            })
-        }
-        .EditRow()
-        .onClick(() => {
-          this.LatencySortItems() //按延迟排序
-          animateTo({ duration: 500 }, () => {
-            this.currentRadioValue2 = 1
-          })
-        })
-
-        Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
-
-        Row() {
-          Text($r('app.string.Name'))
-            .EditText()
-          Radio({
-            value: 'SortRadio3', group: 'SortRadioGroup',
-            indicatorType: RadioIndicatorType.TICK
-          })
-            .checked(this.currentRadioValue2 === 2)
-            .onChange((isChecked: boolean) => {
-              if (isChecked) {
-                this.NameSortItems()
-                animateTo({ duration: 500 }, () => {
-                  this.currentRadioValue2 = 2
-                })
-              }
-            })
-            .radioStyle({
-              checkedBackgroundColor: this.icon_emphasize,
-              //   uncheckedBorderColor: this.icon_secondary
-            })
-        }
-        .EditRow()
-        .onClick(() => {
-          this.NameSortItems()
-          animateTo({ duration: 500 }, () => {
-            this.currentRadioValue2 = 2
-          })
+          if (!isEnd(3, i))
+            Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
         })
       }
       .height(142)
@@ -321,98 +225,42 @@ struct ProxyPage {
       //代理节点卡片尺寸切换
       EditTitle({ title: $r('app.string.Card_Size') })
       Column() {
-        Row() {
-          Text($r('app.string.Thin'))
-            .EditText()
-          Radio({
-            value: 'ProxyGroupItemSelectedRadio1', group: 'ProxyGroupItemSelectedRadioGroup',
-            indicatorType: RadioIndicatorType.TICK
-          })
-            .checked(this.currentRadioValue3 === 0)
-            .onChange((isChecked: boolean) => {
-              if (isChecked) {
-                animateTo({ duration: 500 }, () => {
-                  this.currentRadioValue3 = 0
-                })
-                this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedWide'
-              }
+        ForEach([
+          {t: $r('app.string.Thin'), v: ProxyCardSize.Small},
+          {t: $r('app.string.Wide'), v: ProxyCardSize.Large},
+          {t: $r('app.string.Mini'), v: ProxyCardSize.Mini}
+        ], (n: [Resource, number], i: number) => {
+          Row() {
+            Text(n["t"])
+              .EditText()
+            Radio({
+              value: 'ProxyGroupItemSelectedRadio1', group: 'ProxyGroupItemSelectedRadioGroup',
+              indicatorType: RadioIndicatorType.TICK
             })
-            .radioStyle({
-              checkedBackgroundColor: this.icon_emphasize,
-              //   uncheckedBorderColor: this.icon_secondary
+              .checked(this.appConfig.proxyCardSize == n["v"])
+              .onChange((isChecked: boolean) => {
+                if (isChecked) {
+                  animateTo({ duration: 500 }, () => {
+                    this.currentRadioValue3 = 0
+                    this.appConfig.proxyCardSize = n["v"]
+                  })
+                }
+              })
+              .radioStyle({
+                checkedBackgroundColor: this.icon_emphasize,
+                //   uncheckedBorderColor: this.icon_secondary
+              })
+          }
+          .EditRow()
+          // 点击后改变ProxyGroupItemSelected状态为 多列
+          .onClick(() => {
+            animateTo({ duration: 500 }, () => {
+              this.appConfig.proxyCardSize = n["v"]
             })
-        }
-        .EditRow()
-        // 点击后改变ProxyGroupItemSelected状态为 多列
-        .onClick(() => {
-          animateTo({ duration: 500 }, () => {
-            this.currentRadioValue3 = 0
           })
-          this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedWide'
-        })
-
-        Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
-
-        Row() {
-          Text($r('app.string.Wide'))
-            .EditText()
-          Radio({
-            value: 'ProxyGroupItemSelectedRadio2', group: 'ProxyGroupItemSelectedRadioGroup',
-            indicatorType: RadioIndicatorType.TICK
-          })
-            .checked(this.currentRadioValue3 === 1)
-            .onChange((isChecked: boolean) => {
-              if (isChecked) {
-                animateTo({ duration: 500 }, () => {
-                  this.currentRadioValue3 = 1
-                })
-                this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedThin'
-              }
-            })
-            .radioStyle({
-              checkedBackgroundColor: this.icon_emphasize,
-              //   uncheckedBorderColor: this.icon_secondary
-            })
-        }
-        // 点击后改变ProxyGroupItemSelected状态为 单列
-        .onClick(() => {
-          animateTo({ duration: 500 }, () => {
-            this.currentRadioValue3 = 1
-          })
-          this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedThin'
-        })
-        .EditRow()
-
-        Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
-
-        Row() {
-          Text($r('app.string.Mini'))
-            .EditText()
-          Radio({
-            value: 'Radio8', group: 'radioGroup3',
-            indicatorType: RadioIndicatorType.TICK
-          })
-            .checked(this.currentRadioValue3 === 2)
-            .onChange((isChecked: boolean) => {
-              if (isChecked) {
-                animateTo({ duration: 500 }, () => {
-                  this.currentRadioValue3 = 2
-                })
-                this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedMini'
-              }
-            })
-            .radioStyle({
-              checkedBackgroundColor: this.icon_emphasize,
-              //   uncheckedBorderColor: this.icon_secondary
-            })
-        }
-        .EditRow()
-        // 点击后改变ProxyGroupItemSelected状态为 迷你
-        .onClick(() => {
-          animateTo({ duration: 500 }, () => {
-            this.currentRadioValue3 = 2
-          })
-          this.ProxyGroupItemSelected = 'ProxyGroupItemSelectedMini'
+          if (!isEnd(3,i)){
+            Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
+          }
         })
       }
       .height(142)
@@ -492,7 +340,7 @@ struct ProxyPage {
         // 代理页分组TAB+list主体
         Stack({ alignContent: this.stackAlignContentAlignment  }) {
           //根据ProxyArrangementSelected的状态决定是否显示
-          if (this.ProxyArrangementSelected === 'ProxyArrangementSelected1') {
+          if (this.appConfig.proxyGroupType === ProxyGroupType.Tabs) {
             Column() { //分组标签页 start
               Tabs({ barPosition: BarPosition.Start, controller: this.tabsController }) {
                 ForEach(this.proxyGroups, (g:ProxyGroup, i: number)=>{
@@ -527,7 +375,7 @@ struct ProxyPage {
           }
 
           // 列表排列
-          else if (this.ProxyArrangementSelected === 'ProxyArrangementSelected2') {
+          else if (this.appConfig.proxyGroupType === ProxyGroupType.List) {
             ProxyArrangement()// transition保证组件离场不被立即析构，可设置其他转场效果
               .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
           }
