@@ -6,7 +6,9 @@ import { ClashRpcType, IClashManager, ProviderType, Provider } from './IClashMan
 import { FetchInfo, OverrideSlot,
   Proxy,
   ProxyGroup,
-  ProxySort, Traffic,
+  ProxySort,
+  ProxyType,
+  Traffic,
   UsedProxy } from '../models/Common';
 import { promptAction, PromptAction } from '@kit.ArkUI';
 import { TunnelState, UpdateConfigParams } from '../models/ClashConfig';
@@ -66,6 +68,7 @@ export class SocketProxyService implements IClashManager{
       return {
         name: group["name"] as string,
         now: group["now"] as string,
+        type: group["type"] as ProxyType,
         hidden: group["hidden"] == true,
         icon: group["icon"] as string,
         proxies: group["proxies"]

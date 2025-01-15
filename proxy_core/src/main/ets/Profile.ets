@@ -4,6 +4,7 @@ import { rcp } from '@kit.RemoteCommunicationKit';
 import { Context } from '@kit.AbilityKit';
 import { fileUri } from '@kit.CoreFileKit';
 import { ProxyGroup, ProxyType } from './models/Common';
+import { JSON } from '@kit.ArkTS';
 
 export function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -119,7 +120,9 @@ export class Profile {
   getSelectedProxy(g: ProxyGroup): string | undefined{
     if (g.type !== ProxyType.Selector)
       return g.now
-    return this.proxySelected.get(g.name)
+    let dd = this.proxySelected.get(g.name) ?? g.now
+    console.log("getSelectedProxy", dd)
+    return dd
   }
 }
 

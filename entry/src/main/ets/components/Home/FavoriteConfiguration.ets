@@ -2,7 +2,7 @@ import { BreakpointState } from '../../common/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI'
 import { MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
-import { AppConfig } from '../../entryability/AppState'
+import { AppConfig, isEnd } from '../../entryability/AppState'
 
 
 @Component
@@ -38,9 +38,9 @@ struct FavoriteConfiguration {
     Column() {
       CardTitle({ title: $r('app.string.FavoriteConfiguration') })
       //拥有收藏配置的布局 start
-      if (this.isCheckFavoriteConfiguration>=0) {
+      if (this.favoriteProfiles.size > 0) {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceEvenly }) {
-          ForEach(Array.from(this.favoriteProfiles.entries()), (f:[string, string])=>{
+          ForEach(Array.from(this.favoriteProfiles.entries()), (f:[string, string], i: number)=>{
               Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
                 Text(f[1])
                   .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
@@ -58,7 +58,8 @@ struct FavoriteConfiguration {
                 }
               })
               .clickEffect({ level: ClickEffectLevel.MIDDLE })
-              Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
+              if(!isEnd(this.favoriteProfiles.size, i))
+                Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
           })
         }
         .width('100%')
@@ -67,9 +68,8 @@ struct FavoriteConfiguration {
         .borderRadius(10)
         .padding({ left: 8, right: 5 })
       }//拥有收藏配置的布局 end
-
      //没有收藏配置时的布局 start
-      else if (this.isCheckFavoriteConfiguration<0)
+      else
       {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
           SymbolGlyph($r('sys.symbol.star'))

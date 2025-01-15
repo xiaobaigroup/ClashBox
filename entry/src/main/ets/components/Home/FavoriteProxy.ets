@@ -3,7 +3,7 @@ import { mediaquery } from '@kit.ArkUI'
 import { MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
 import { Item, ProxyData } from '../../common/ProxyData'
-
+import { AppConfig, isEnd } from '../../entryability/AppState'
 
 
 @Component
@@ -36,102 +36,43 @@ struct FavoriteProxy {
   @Consume private ProxyItemLongPressValue: number
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
-
-
+  @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   build() {
     Column() {
       CardTitle({ title: $r('app.string.FavoriteProxy') })
       //拥有收藏节点的布局 start
-      if (this.FavoriteProxy>=0) {
+      if (this.favoriteProxys.size > 0) {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceEvenly }) {
-          Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-            Text(`${this.items[this.FavoriteProxy].text}`)
-              .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-              .fontColor($r('sys.color.font_primary'))
-            Radio({ value: 'FavoriteProxyRadio1', group: 'FavoriteProxyGroup' })
-              .width(this.isLandscapePhone ? 16 : this.fontSize.value)
-              .checked(this.FavoriteProxyRadio === 1)
-              .radioStyle({
-                checkedBackgroundColor: this.icon_emphasize,
-              })
-              .onChange(() => {
-                //在home页编辑状态时，无法操作
-                if (!this.isShowHomeEdit) {
-                this.FavoriteProxyRadio === 1
-                this.ProxyRadioCheckedValue = this.FavoriteProxy
+          ForEach(Array.from(this.favoriteProxys.entries()), (p:[string,string], i: number)=>{
+            Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
+              Text(`${p[1]}`)
+                .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+                .fontColor($r('sys.color.font_primary'))
+              Radio({ value: 'FavoriteProxyRadio1', group: 'FavoriteProxyGroup' })
+                .width(this.isLandscapePhone ? 16 : this.fontSize.value)
+                .checked(this.appConfig.currentProxyId === p[0])
+                .radioStyle({
+                  checkedBackgroundColor: this.icon_emphasize,
+                })
+                .onChange(() => {
+                  //在home页编辑状态时，无法操作
+                  if (this.isShowHomeEdit) {
+                    this.appConfig.currentProxyId = p[1]
                   }
-              })
-          }
-          .onClick(() => {
-            //在home页编辑状态时，无法操作
-            if (!this.isShowHomeEdit) {
-              this.FavoriteProxyRadio = 1
-              this.ProxyRadioCheckedValue = this.FavoriteProxy
+                })
             }
-          })
-          .clickEffect({ level: ClickEffectLevel.MIDDLE })
-
-          Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
-
-          Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-            //TODO 此处items[this.FavoriteProxy]中的this.FavoriteProxy为收藏点击一次取值的数值，后面需要更改（我不会需要大佬sos）
-            Text(`${this.items[this.FavoriteProxy].text}`)
-              .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-              .fontColor($r('sys.color.font_primary'))
-            Radio({ value: 'FavoriteProxyRadio2', group: 'FavoriteProxyGroup' })
-              .width(this.isLandscapePhone ? 16 : this.fontSize.value)
-              .checked(this.FavoriteProxyRadio === 2)
-              .radioStyle({
-                checkedBackgroundColor: this.icon_emphasize,
-              })
-              .onChange(() => {
-                //在home页编辑状态时，无法操作
-                if (!this.isShowHomeEdit) {
-                  this.FavoriteProxyRadio === 2
-                  //TODO 此处this.FavoriteProxy为收藏点击一次取值的数值，后面需要更改（我不会需要大佬sos）
-                  this.ProxyRadioCheckedValue = this.FavoriteProxy
-                }
-              })
-          }
-          .onClick(() => {
-            //在home页编辑状态时，无法操作
-            if (!this.isShowHomeEdit) {
-              this.FavoriteProxyRadio = 2
-              this.ProxyRadioCheckedValue = this.FavoriteProxy
-            }
-          })
-          .clickEffect({ level: ClickEffectLevel.MIDDLE })
-
-          Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
-
-          Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-            //TODO 此处items[this.FavoriteProxy]中的this.FavoriteProxy为收藏点击一次取值的数值，后面需要更改（我不会需要大佬sos）
-            Text(`${this.items[this.FavoriteProxy].text}`)
-              .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-              .fontColor($r('sys.color.font_primary'))
-            Radio({ value: 'FavoriteProxyRadio3', group: 'FavoriteProxyGroup' })
-              .width(this.isLandscapePhone ? 16 : this.fontSize.value)
-              .checked(this.FavoriteProxyRadio === 3)
-              .radioStyle({
-                checkedBackgroundColor: this.icon_emphasize,
-              })
-              .onChange(() => {
-                //在home页编辑状态时，无法操作
-                if (!this.isShowHomeEdit) {
-                  this.FavoriteProxyRadio === 3
-                  //TODO 此处this.FavoriteProxy为收藏点击一次取值的数值，后面需要更改（我不会需要大佬sos）
-                  this.ProxyRadioCheckedValue = this.FavoriteProxy
-                }
-              })
-          }
-          .onClick(() => {
-            //在home页编辑状态时，无法操作
-            if (!this.isShowHomeEdit) {
-            this.FavoriteProxyRadio = 3
-            this.ProxyRadioCheckedValue = this.FavoriteProxy
+            .onClick(() => {
+              //在home页编辑状态时，无法操作
+              if (this.isShowHomeEdit) {
+                this.appConfig.currentProxyId = p[1]
               }
+            })
+            .clickEffect({ level: ClickEffectLevel.MIDDLE })
+            if (!isEnd(this.favoriteProxys.size, i)){
+              Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
+            }
           })
-          .clickEffect({ level: ClickEffectLevel.MIDDLE })
         }
         .width('100%')
         .height('82%')
@@ -139,9 +80,8 @@ struct FavoriteProxy {
         .borderRadius(10)
         .padding({ left: 8, right: 5 })
       }//拥有收藏节点的布局 end
-
       //没有收藏节点的布局 start
-     else if (this.FavoriteProxy<0)
+      else
       {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
           SymbolGlyph($r('sys.symbol.star'))

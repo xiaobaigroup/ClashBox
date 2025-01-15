@@ -159,6 +159,7 @@ struct ProxyGroupItem {
   @Consume private ProxyItemLongPressValue: number
   // 当前代理节点收藏的值
   @Consume private FavoriteProxy: number
+  @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
 
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
@@ -246,7 +247,8 @@ struct ProxyGroupItem {
           .contentFontColor($r('sys.color.font_primary'))
           .onClick(() => {
             this.proxyListLongPressCtxMenuForFavorite.callback()
-            this.FavoriteProxy = this.ProxyItemLongPressValue
+            const p = this.items[this.ProxyItemLongPressValue]
+            this.favoriteProxys.set(p.id, p.text)
           })
       } else {
         MenuItem({
@@ -309,7 +311,8 @@ struct ProxyGroupItem {
                  // .width(this.isLandscapePhone ?'592px':'250px')
               }.alignItems(HorizontalAlign.Start)
               Blank()
-              Radio({ value: 'ProxyRadio' + index, group: 'ProxyGroup' })
+              Text(`${item.text === this.selectedProxy}`)
+              Radio({ value: item.id, group: item.id })
                 .checked(item.text === this.selectedProxy)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
@@ -324,7 +327,6 @@ struct ProxyGroupItem {
           }
           .onClick(() => {
             this.selectProxy(item)
-
             hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
           })
           .ListItemStyle()
@@ -373,7 +375,7 @@ struct ProxyGroupItem {
                   Text(`${item.type}`).ItemTypeStyle()
                 }.alignItems(HorizontalAlign.Start)
 
-                Text(`${item.latency}` + 'ms')
+                Text(`${item.latency ?? "-"}` + 'ms')
                   .fontColor(ProxyData.getColorForLatency(item.latency))
                   .fontSize(16)
                   .maxLines(1)

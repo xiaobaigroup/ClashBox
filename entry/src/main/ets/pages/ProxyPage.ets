@@ -108,13 +108,17 @@ struct ProxyPage {
         }
       }, 200)
     }
+    if(this.currentProfile && this.currentProfile?.proxySelected){
+      console.log("proxySelected",this.currentProfile?.proxySelected.size)
+      for(let d of this.currentProfile.proxySelected?.entries()){
+        console.log("proxySelected",d[0],d[1])
+      }
+    }
   }
   changeProxy(g: string, item: Item){
     if(this.currentProfile){
-      this.currentProfile.proxySelected?.set(g, item.text)
-      ClashViewModel.updateProfile(this.currentProfile)
+      ClashViewModel.changeProxy(this.currentProfile, g, item.text)
     }
-
   }
 
 

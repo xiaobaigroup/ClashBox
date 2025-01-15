@@ -56,6 +56,10 @@ export class ProfileRepo {
     const predicates = new relationalStore.RdbPredicates('Profiles')
     predicates.equalTo('id', details.id);
     const old = await this.store!.query(predicates)
+    const jsonObject: Record<string, string> = {};
+    details.proxySelected.forEach((value, key) => {
+      jsonObject[key] = value;
+    });
     const input: ValuesBucket = {
       id: details.id,
       name: details.name ,
@@ -67,7 +71,7 @@ export class ProfileRepo {
       lastUpdateDate: details.lastUpdateDate,
       autoUpdateDuration: details.autoUpdateDuration,
       subscriptionInfo: JSON.stringify(details.subscriptionInfo),
-      proxySelected: JSON.stringify(details.proxySelected)
+      proxySelected: JSON.stringify(jsonObject)
     }
     if (old.rowCount > 0){
       await this.store!.update(input, predicates)
@@ -90,7 +94,12 @@ export class ProfileRepo {
 
     try {
       details.subscriptionInfo = JSON.parse(c.getString(9)) as SubscriptionInfo;
-      details.proxySelected =  new Map(JSON.parse(c.getString(10)));
+      const map = new Map<string, string>();
+      let json = JSON.parse(c.getString(10)) as Record<string, string>
+      Object.keys(json).forEach((key) => {
+        map.set(key, json[key]);
+      });
+      details.proxySelected = map;
     } catch (e) {
       details.subscriptionInfo = null
       details.proxySelected = new Map()

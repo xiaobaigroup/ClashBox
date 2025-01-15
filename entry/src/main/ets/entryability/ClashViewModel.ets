@@ -89,6 +89,14 @@ export class ClashViewModel {
     }
     EventHub.sendEvent(EventKey.FetchProfile, null)
   }
+  async changeProxy(profile: Profile, g:string, p: string){
+    try {
+      profile.proxySelected?.set(g, p)
+      await this.profileRepo.addOrUpdate(profile)
+    } catch (e) {
+      promptAction.showToast({message: e.message, duration:3000})
+    }
+  }
   async updateProfile(profile: Profile){
     await this.profileRepo.addOrUpdate(profile)
   }

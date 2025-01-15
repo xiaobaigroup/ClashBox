@@ -1,4 +1,5 @@
 import { ClashConfig, Dns, ProxySort } from "proxy_core";
+import { Item } from "../common/ProxyData";
 
 export enum ProxyGroupType{
   Tabs,
@@ -12,6 +13,8 @@ export enum ProxyCardSize{
 
 export class AppConfig{
   currentProfileId?: string
+  currentProxyId?: string
+  currentProxyItem?: Item
   proxySort?: ProxySort = ProxySort.Default
   proxyGroupType?: ProxyGroupType = ProxyGroupType.Tabs
   proxyCardSize?: ProxyCardSize = ProxyCardSize.Mini

@@ -3,6 +3,7 @@ import { mediaquery } from '@kit.ArkUI'
 import { MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
 import { Item, ProxyData  } from '../../common/ProxyData'
+import { AppConfig } from '../../entryability/AppState'
 
 
 @Component
@@ -20,24 +21,24 @@ struct CurrentNode {
   @Consume('ProxyFontSize') private ProxyFontSize: BreakpointState<number>
   // 当前代理节点单选框选择的配置
   @Consume private ProxyRadioCheckedValue: number
-
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
 
   build() {
     Column() {
       CardTitle({title: $r('app.string.CurrentNode')})
       Column() {
-        if (this.ProxyRadioCheckedValue >= 0) {
-          // Text(`${this.items[this.ProxyRadioCheckedValue].text}`)
-          //   .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
-          //   .fontWeight(FontWeight.Bold)
-          //   .fontColor(this.font_primary)
-          //
-          // Text('ping ' + `${this.items[this.ProxyRadioCheckedValue].latency}` + 'ms')
-          //   .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)
-          //   .fontColor(ProxyData.getColorForLatency(this.items[this.ProxyRadioCheckedValue].latency))
+        if (this.appConfig.currentProxyItem) {
+          Text(`${this.appConfig.currentProxyItem.text}`)
+            .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(this.font_primary)
+
+          Text('ping ' + `${this.appConfig.currentProxyItem.latency ?? '-'}` + 'ms')
+            .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)
+            .fontColor(ProxyData.getColorForLatency(this.appConfig.currentProxyItem.latency))
         }
-        else if(this.ProxyRadioCheckedValue < 0){
+        else{
           Text($r('app.string.proxy_name'))
             .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
             .fontWeight(FontWeight.Bold)
