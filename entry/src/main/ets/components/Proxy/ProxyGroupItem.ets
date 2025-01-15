@@ -298,14 +298,15 @@ struct ProxyGroupItem {
           ListItem() {
             Row() {
               Column() {
-                Text(`${item.text}`).ItemTextStyle().width(this.isLandscapePhone ?'592px':'433px')
+                Text(`${item.text}`).ItemTextStyle()//.width(this.isLandscapePhone ?'592px':'433px')
                 Text(`${item.type}`).ItemTypeStyle()
                 Blank(10)
                 Text(`${item.latency}` + 'ms')
                   .fontColor(ProxyData.getColorForLatency(item.latency))
                   .fontSize(16)
                   .maxLines(1)
-                  .width(this.isLandscapePhone ?'592px':'250px')
+                  .width('50%')
+                 // .width(this.isLandscapePhone ?'592px':'250px')
               }.alignItems(HorizontalAlign.Start)
               Blank()
               Radio({ value: 'ProxyRadio' + index, group: 'ProxyGroup' })
@@ -437,14 +438,15 @@ struct ProxyGroupItem {
           ListItem() {
             Row() {
               Column() {
-                Text(`${item.text}`).ItemTextStyle().width(this.isLandscapePhone ?'592px':'433px')
+                Text(`${item.text}`).ItemTextStyle()//.width(this.isLandscapePhone ?'592px':'433px')
                 Row() {
-                  Text(`${item.type}`).ItemTypeStyle().maxLines(1).width(50).textOverflow({ overflow: TextOverflow.Clip})
+                  Text(`${item.type}`).ItemTypeStyle().maxLines(1).width('25%').textOverflow({ overflow: TextOverflow.Clip})
                   Text(`${item.latency}` + 'ms')
                     .fontColor(ProxyData.getColorForLatency(item.latency))
                     .fontSize(14)
                     .maxLines(1)
-                    .width(this.isLandscapePhone ?'592px':'250px')
+                   // .width(this.isLandscapePhone ?'429px':'250px')
+                    .width('55%')
                 }.justifyContent(FlexAlign.Start)
               }
               .alignItems(HorizontalAlign.Start)
@@ -572,6 +574,7 @@ interface LongPressContextMenuItem {
     .fontWeight(FontWeight.Medium)
     .maxLines(1)
     .textOverflow({ overflow: TextOverflow.Ellipsis })
+    .width('80%')
   }
 
   //Item中type（节点类型）公用样式
