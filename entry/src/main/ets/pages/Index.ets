@@ -98,7 +98,10 @@ struct Index {
   @State currentIndex: number = 0
   // 设备高度是否 (320vp< height <= 500vp) 媒体查询
   @State isLandscapePhone: boolean = false
+  // 平板竖屏判断变量
   @State istabletVertical: boolean = false
+  // 折叠展开状态判断变量
+  @State isFoldStatus: boolean = false
   @StorageProp('bottomRectHeight') bottomRectHeight: number = 0; // 读取导航条区域的高度
   @StorageProp('topRectHeight') topRectHeight: number = 0;
   /* 断点布局相关 相关作用看定义时候的注释 */
@@ -320,6 +323,9 @@ struct Index {
   // 平板竖屏判断
   tabletHeightListener:mediaquery.MediaQueryListener =
     this.getUIContext().getMediaQuery().matchMediaSync('(1000vp< height)');
+  // 折叠屏展开判断
+  foldPhoneOpenListener:mediaquery.MediaQueryListener =
+    this.getUIContext().getMediaQuery().matchMediaSync('(640vp< height <= 1000vp) and (640vp< width <= 1000vp)');
 
 
   aboutToAppear() {
@@ -341,6 +347,12 @@ struct Index {
       AppStorage.setOrCreate<boolean>('istabletVertical', this.istabletVertical)
       hilog.info(0xFF00, this.componentName,
         `#媒体查询#设备高度改变#(1000vp< height)平板竖屏结果: ${this.istabletVertical}`)
+    });
+    this.foldPhoneOpenListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
+      this.isFoldStatus = mediaQueryResult.matches
+      AppStorage.setOrCreate<boolean>('isFoldStatus', this.isFoldStatus)
+      hilog.info(0xFF00, this.componentName,
+        `#媒体查询#设备折叠状态改变#(640vp< height <= 1000vp) and (640vp< width <= 1000vp)折叠展开结果: ${this.isFoldStatus}`)
     });
 
     BreakpointSystem.getInstance().attach(this.compStr)

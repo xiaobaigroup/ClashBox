@@ -498,7 +498,7 @@ export const HomeCardPadding_14_15_16_17: BreakpointState<MarginGenerate> = Brea
  */
 export const HomeCardAreaPadding: BreakpointState<MarginGenerate> = BreakpointState.of({
   sm: ({top: 4, left: 14, right: 14} as MarginGenerate),
-  md: ({top: 4, left: 110, right: 110} as MarginGenerate),
+  md: ({top: 4, left: 100, right: 100} as MarginGenerate),
   lg: ({top: 4, left: 14, right: 14} as MarginGenerate),
   xl: ({top: 4, left: 14, right: 14} as MarginGenerate)
 })
@@ -512,7 +512,7 @@ export interface gutterHomeGridcol {
  */
 export const gutterHomeGridcol_12_15: BreakpointState<gutterHomeGridcol> = BreakpointState.of({
   sm: ({x: 12, y: 15} as gutterHomeGridcol),
-  md: ({x: 35, y: 22}  as gutterHomeGridcol),
+  md: ({x: 12, y: 15}  as gutterHomeGridcol),
   lg: ({x: 17.6, y: 22}  as gutterHomeGridcol),
   xl: ({x: 17.6, y: 22}  as gutterHomeGridcol)
 })

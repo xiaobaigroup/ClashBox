@@ -25,6 +25,8 @@ struct PublicNetwork {
   @Consume('breakPointStateHomeCardSwitchModeFontSize') private fontSize: BreakpointState<number>
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
+  // 折叠屏展开状态判定
+  @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
 
   build() {
     Column() {
@@ -35,7 +37,7 @@ struct PublicNetwork {
           .fontColor($r('sys.color.font_secondary'))
 
         Text(this.IP)
-          .fontSize(this.isLandscapePhone ? 18 : this.IPfontSize.value)
+          .fontSize(this.isLandscapePhone ? 18 :this.isFoldStatus ?22: this.IPfontSize.value)
           .textAlign(TextAlign.JUSTIFY)
           .fontColor($r('sys.color.font_primary'))
       }

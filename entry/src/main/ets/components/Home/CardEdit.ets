@@ -9,6 +9,7 @@ import Shortcuts from "./Shortcuts"
 //TODO 1.后续需要把各文件组件换为截图，以减少性能消耗。2.挂载和卸载无动画效果，后面需要加入
 @Component
 export struct CardEdit {
+
   /*
   grid网格组件相关数据,包含scroller控制器,regularSize参数指代组件布局大小为1:1,irregularIndexes参数指代0序号的组件占据整排
    */
@@ -44,6 +45,8 @@ export struct CardEdit {
   @Consume ('isAnimation') isAnimation: boolean
   /* 主页卡片高度*/
   @Consume('HomeCardEditHeight') private HomeCardEditHeight: BreakpointState<number>
+  // 折叠屏展开状态判定
+  @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
 
   build() {
     Flex({ wrap: FlexWrap.Wrap,justifyContent:FlexAlign.SpaceBetween, space: { main: LengthMetrics.vp(10), cross: LengthMetrics.vp(10) } }) { // 子组件多行布局
@@ -203,7 +206,7 @@ export struct CardEdit {
 
 
       //快捷方式小卡片
-      if (!this.isShowShortcuts) {
+      if (this.isFoldStatus? this.isShowShortcuts:!this.isShowShortcuts) {
         Shortcuts()
           .width('48.5%')
           .height(this.HomeCardEditHeight.value)
@@ -214,7 +217,7 @@ export struct CardEdit {
             //      .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-              this.isShowShortcuts=true
+              this.isShowShortcuts=this.isFoldStatus? false:true
             })
           })
       } else if(!this.isShowShortcuts) {
@@ -224,7 +227,7 @@ export struct CardEdit {
           .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-              this.isShowShortcuts = true
+              this.isShowShortcuts=this.isFoldStatus? false:true
             })
           })
       }
