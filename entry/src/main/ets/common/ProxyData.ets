@@ -1,11 +1,11 @@
 
 // 定义一个接口来描述列表项的数据结构
 export interface Item {
-  text: string
+  readonly text: string
   latency: number
   type: string
   id: string
-  isShowFavoriteProxy: boolean
+  isShowFavoriteProxy?: boolean
 }
 
 // todo 节点假数据组后期可改可删

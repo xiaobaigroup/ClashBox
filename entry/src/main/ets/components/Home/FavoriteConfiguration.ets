@@ -45,15 +45,24 @@ struct FavoriteConfiguration {
                 Text(f[1])
                   .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
                   .fontColor($r('sys.color.font_primary'))
+                  .maxLines(1)
+                  .width('80%')
+                  .textOverflow({ overflow: TextOverflow.Ellipsis })
                 Radio({ value: 'FavoriteConfigurationRadio1', group: 'FavoriteConfigurationRadioGroup' })
                   .width(this.isLandscapePhone ? 16 : this.fontSize.value)
                   .checked(f[0] === this.appConfig.currentProfileId)
                   .radioStyle({
                     checkedBackgroundColor: this.icon_emphasize,
                   })
+                  .onChange((isChecked: boolean) => {
+                    //在home页编辑状态时，无法操作
+                    if (!this.isShowHomeEdit &&isChecked) {
+                      this.appConfig.currentProfileId = f[0]
+                    }
+                  })
               }
               .onClick(() => {
-                if (this.isShowHomeEdit) {
+                if (!this.isShowHomeEdit) {
                   this.appConfig.currentProfileId = f[0]
                 }
               })

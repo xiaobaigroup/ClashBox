@@ -10,7 +10,8 @@ import {  Item, ProxyData } from '../../common/ProxyData';
 import { EventHub, EventKey } from '../../common/EventHub';
 import { ProxySort } from 'proxy_core';
 import { intl } from '@kit.LocalizationKit';
-import { ProxyCardSize } from '../../entryability/AppState';
+import { AppConfig, ProxyCardSize } from '../../entryability/AppState';
+
 
 
 //断点布局
@@ -160,6 +161,19 @@ struct ProxyGroupItem {
   // 当前代理节点收藏的值
   @Consume private FavoriteProxy: number
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  /**
+   * XXX 当前手指触摸的ListItem的对应 `this.configList` 中的 `configId`
+   *    List的长按菜单中的响应都是根据这个的对象中的属性来处理的，是个不稳定因素
+   */
+  private currentTouchProxyData: Item = {
+    text:'',
+    latency: 0,
+    type: '',
+    id: '',
+    isShowFavoriteProxy: false
+  }
+
 
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
@@ -167,12 +181,12 @@ struct ProxyGroupItem {
     BreakpointSystem.getInstance().start()
 
     EventHub.on(EventKey.ProxySort, (sort: ProxySort)=>{
-        console.log("ProxySort", sort)
-        switch (sort){
-          case ProxySort.Default: this.DefaultSortItems(); break;
-          case ProxySort.Title: this.NameSortItems(); break;
-          case ProxySort.Delay: this.LatencySortItems(); break;
-        }
+      console.log("ProxySort", sort)
+      switch (sort){
+        case ProxySort.Default: this.DefaultSortItems(); break;
+        case ProxySort.Title: this.NameSortItems(); break;
+        case ProxySort.Delay: this.LatencySortItems(); break;
+      }
     })
   }
   // 延迟排序
@@ -237,20 +251,7 @@ struct ProxyGroupItem {
   MyMenu(isShowFavoriteProxy:boolean) {
     Menu() {
       // 根据当前配置信息来判断显示[收藏 /取消收藏] 单独处理 START
-      if (!isShowFavoriteProxy) {
-        MenuItem({
-          symbolStartIcon: this.proxyListLongPressCtxMenuForFavorite.symbolStartIcon!
-            .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
-          content: this.proxyListLongPressCtxMenuForFavorite.content
-        })
-          .clickEffect({level: ClickEffectLevel.MIDDLE})
-          .contentFontColor($r('sys.color.font_primary'))
-          .onClick(() => {
-            this.proxyListLongPressCtxMenuForFavorite.callback()
-            const p = this.items[this.ProxyItemLongPressValue]
-            this.favoriteProxys.set(p.id, p.text)
-          })
-      } else {
+      if (isShowFavoriteProxy) {
         MenuItem({
           symbolStartIcon: this.proxyListLongPressCtxMenuForUnFavorite.symbolStartIcon!
             .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
@@ -260,7 +261,17 @@ struct ProxyGroupItem {
           .contentFontColor($r('sys.color.font_primary'))
           .onClick( () => {
             this.proxyListLongPressCtxMenuForUnFavorite.callback()
-            this.FavoriteProxy =-1
+          })
+      } else {
+          MenuItem({
+            symbolStartIcon: this.proxyListLongPressCtxMenuForFavorite.symbolStartIcon!
+              .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
+            content: this.proxyListLongPressCtxMenuForFavorite.content
+          })
+            .clickEffect({level: ClickEffectLevel.MIDDLE})
+            .contentFontColor($r('sys.color.font_primary'))
+            .onClick(() => {
+              this.proxyListLongPressCtxMenuForFavorite.callback()
           })
       }
       MenuItem({ symbolStartIcon: this.startIconModifier1, content: $r('app.string.Test_Delay') })
@@ -291,6 +302,7 @@ struct ProxyGroupItem {
     }
   }
 
+
   build() {
     //多列排列宽
     if (this.ProxyGroupItemSelected === ProxyCardSize.Small) {
@@ -303,30 +315,33 @@ struct ProxyGroupItem {
                 Text(`${item.text}`).ItemTextStyle()//.width(this.isLandscapePhone ?'592px':'433px')
                 Text(`${item.type}`).ItemTypeStyle()
                 Blank(10)
-                Text(`${item.latency}` + 'ms')
+               Text(`${item.latency}` + 'ms')
+              //  Text(`${item.id }`)
                   .fontColor(ProxyData.getColorForLatency(item.latency))
                   .fontSize(16)
                   .maxLines(1)
-                  .width('50%')
-                 // .width(this.isLandscapePhone ?'592px':'250px')
+                  .width('80%')
+                // .width(this.isLandscapePhone ?'592px':'250px')
               }.alignItems(HorizontalAlign.Start)
               Blank()
-              Text(`${item.text === this.selectedProxy}`)
-              Radio({ value: item.id, group: item.id })
-                .checked(item.text === this.selectedProxy)
+
+              Radio({ value: 'ProxyRadio' + index, group: 'ProxyGroup' })
+                .checked(item.text === this.appConfig.currentProxyId)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
                 .onChange((isChecked: boolean) => {
                   if (isChecked) {
-                    this.selectProxy(item)
+             //       this.selectProxy(item)
+                    this.appConfig.currentProxyId = item.text
                   }
                 })
             }
             .ListRowStyle()
           }
           .onClick(() => {
-            this.selectProxy(item)
+         //   this.selectProxy(item)
+            this.appConfig.currentProxyId = item.text
             hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
           })
           .ListItemStyle()
@@ -334,8 +349,8 @@ struct ProxyGroupItem {
           .bindContextMenu(this.MyMenu(item?.isShowFavoriteProxy ?? false), ResponseType.LongPress,
             {
               preview: MenuPreviewMode.IMAGE,
-              onAppear: (() => {
-                this.ProxyItemLongPressValue=index
+             onAppear: (() => {
+                this.currentTouchProxyData = item
               }),
               previewAnimationOptions: {
                 scale: [0.95, 1.0],
@@ -379,25 +394,28 @@ struct ProxyGroupItem {
                   .fontColor(ProxyData.getColorForLatency(item.latency))
                   .fontSize(16)
                   .maxLines(1)
+                  .width('60%')
               }.width('90%')
               .justifyContent(FlexAlign.SpaceBetween)
 
               Blank()
               Radio({ value: 'ProxyRadio' + index, group: 'ProxyGroup' })
-                .checked(item.text === this.selectedProxy)
+                .checked(item.text === this.appConfig.currentProxyId)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
                 .onChange((isChecked: boolean) => {
                   if (isChecked) {
-                    this.selectProxy(item)
+             //       this.selectProxy(item)
+                    this.appConfig.currentProxyId = item.text
                   }
                 })
             }
             .ListRowStyle()
           }
           .onClick(() => {
-            this.selectProxy(item)
+         //   this.selectProxy(item)
+            this.appConfig.currentProxyId = item.text
             hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
           })
           .ListItemStyle()
@@ -407,7 +425,7 @@ struct ProxyGroupItem {
               preview: MenuPreviewMode.IMAGE,
               placement: Placement.BottomRight,
               onAppear: (() => {
-                this.ProxyItemLongPressValue=index
+                this.currentTouchProxyData = item
               }),
               previewAnimationOptions: {
                 scale: [0.95, 1.0],
@@ -440,14 +458,14 @@ struct ProxyGroupItem {
           ListItem() {
             Row() {
               Column() {
-                Text(`${item.text}`).ItemTextStyle()//.width(this.isLandscapePhone ?'592px':'433px')
+                Text(`${item.text}`).ItemTextStyle()
                 Row() {
                   Text(`${item.type}`).ItemTypeStyle().maxLines(1).width('25%').textOverflow({ overflow: TextOverflow.Clip})
                   Text(`${item.latency}` + 'ms')
                     .fontColor(ProxyData.getColorForLatency(item.latency))
                     .fontSize(14)
                     .maxLines(1)
-                   // .width(this.isLandscapePhone ?'429px':'250px')
+                      // .width(this.isLandscapePhone ?'429px':'250px')
                     .width('55%')
                 }.justifyContent(FlexAlign.Start)
               }
@@ -455,20 +473,22 @@ struct ProxyGroupItem {
 
               Blank()
               Radio({ value: 'ProxyRadio' + index, group: 'ProxyGroup' })
-                .checked(item.text === this.selectedProxy)
+                .checked(item.text === this.appConfig.currentProxyId)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
                 .onChange((isChecked: boolean) => {
                   if (isChecked) {
-                    this.selectProxy(item)
+                  //  this.selectProxy(item)
+                    this.appConfig.currentProxyId = item.text
                   }
                 })
             }
             .ListRowStyle()
           }
           .onClick(() => {
-            this.selectProxy(item)
+          //  this.selectProxy(item)
+            this.appConfig.currentProxyId = item.text
             hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
           })
           .ListItemStyle()
@@ -477,7 +497,7 @@ struct ProxyGroupItem {
             {
               preview: MenuPreviewMode.IMAGE,
               onAppear: (() => {
-                this.ProxyItemLongPressValue=index
+                this.currentTouchProxyData = item
               }),
               previewAnimationOptions: {
                 scale: [0.95, 1.0],
@@ -518,10 +538,13 @@ struct ProxyGroupItem {
   /**
    * 收藏配置
    */
+  //TODO 已经不会重复收藏，但重启应用后，收藏状态还是无法判断
   private favoriteProxy(): void {
     // TODO 收藏节点 & 判断是否已经收藏
     this.ProxyPromptAction.showToast({ message: $r('app.string.Collect_Tip') })
-    this.items[this.ProxyItemLongPressValue].isShowFavoriteProxy = true
+    const p = this.currentTouchProxyData
+    p.isShowFavoriteProxy = true
+    this.favoriteProxys.set(p.text, p.text)
   }
   /**
    * 取消收藏配置
@@ -529,7 +552,9 @@ struct ProxyGroupItem {
   private cancelFavoriteProxy(): void {
     // TODO 取消收藏节点 & 判断是否已经收藏
     this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_tip') })
-    this.items[this.ProxyItemLongPressValue].isShowFavoriteProxy = false
+    const p = this.currentTouchProxyData
+    p.isShowFavoriteProxy = false
+    this.favoriteProxys.delete(p.text)
   }
 }
 /**
@@ -542,50 +567,50 @@ interface LongPressContextMenuItem {
   callback : Callback<void>
 }
 
-  //list公用样式
-  @Extend(List)
-  function ListStyle() {
-    // transition保证组件离场不被立即析构，可设置其他转场效果
-    .scrollBar(BarState.Off)
-    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
-    .contentEndOffset(110)
-  }
+//list公用样式
+@Extend(List)
+function ListStyle() {
+  // transition保证组件离场不被立即析构，可设置其他转场效果
+  .scrollBar(BarState.Off)
+  .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+  .contentEndOffset(110)
+}
 
-  //ListItem公用样式
-  @Extend(ListItem)
-  function ListItemStyle() {
-    .clickEffect({ level: ClickEffectLevel.MIDDLE })
-    .borderRadius(20)
-    .backgroundColor($r('app.color.container_background'))
-    .width('100%')
-  }
+//ListItem公用样式
+@Extend(ListItem)
+function ListItemStyle() {
+  .clickEffect({ level: ClickEffectLevel.MIDDLE })
+  .borderRadius(20)
+  .backgroundColor($r('app.color.container_background'))
+  .width('100%')
+}
 
-  //List中Row公用样式
-  @Extend(Row)
-  function ListRowStyle() {
-    .width('100%')
-    .padding({ left: 14, right:8})
-    .alignItems(VerticalAlign.Center)
-  }
+//List中Row公用样式
+@Extend(Row)
+function ListRowStyle() {
+  .width('100%')
+  .padding({ left: 14, right:8})
+  .alignItems(VerticalAlign.Center)
+}
 
-  //Item中text（节点国家）公用样式
-  @Extend(Text)
-  function ItemTextStyle() {
-    .fontColor(($r('sys.color.font_primary')))
-    .fontSize(18)
-    .fontWeight(FontWeight.Medium)
-    .maxLines(1)
-    .textOverflow({ overflow: TextOverflow.Ellipsis })
-    .width('80%')
-  }
+//Item中text（节点国家）公用样式
+@Extend(Text)
+function ItemTextStyle() {
+  .fontColor(($r('sys.color.font_primary')))
+  .fontSize(18)
+  .fontWeight(FontWeight.Medium)
+  .maxLines(1)
+  .textOverflow({ overflow: TextOverflow.Ellipsis })
+  .width('80%')
+}
 
-  //Item中type（节点类型）公用样式
-  @Extend(Text)
-  function ItemTypeStyle() {
-    .fontColor($r('sys.color.font_secondary'))
-    .fontSize(14)
-  }
+//Item中type（节点类型）公用样式
+@Extend(Text)
+function ItemTypeStyle() {
+  .fontColor($r('sys.color.font_secondary'))
+  .fontSize(14)
+}
 
 
 
-  export default ProxyGroupItem
+export default ProxyGroupItem
