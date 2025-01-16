@@ -7,6 +7,7 @@ import {
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE,
   FONT_SIZE_16
 } from "../common/Constants"
+import { getResourceString } from "../utils/ResourceStringUtil"
 
 /* 通用属性 START */
 @Styles
@@ -396,6 +397,67 @@ export struct theRowCustomDialog {
 }
 
 /**
+ * 通用保存&取消弹窗组件（竖排按钮）
+ * @param theDialogTitle 弹窗标题-ResourceStr
+ * @param theplaceholder 输入框默认文本-ResourceStr
+ * @param SaveInputValue 保存的输入值-string
+ * @param currentInputValue 实时的输入值-string
+ */
+@CustomDialog
+export struct theCustomDialog {
+  @Link SaveInputValue: string
+  @Link currentInputValue: string
+  @Link theplaceholder: string
+  @State theDialogTitle: ResourceStr = ''
+  cancel?: () => void
+  confirm?: () => void
+  controller: CustomDialogController
+  /* 主题色 */
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+
+  build() {
+    Column() {
+      Text(this.theDialogTitle)
+        .fontWeight(FontWeight.Medium)
+        .fontSize(20)
+        .margin({ top: 15, bottom: 15 })
+      TextArea({placeholder: this.theplaceholder, text: this.currentInputValue })
+        .onChange((value: string) => {
+          this.currentInputValue = value
+        })
+        .margin({bottom: 8 })
+      Button($r('app.string.Save'))
+        .width('100%')
+        .height(39)
+        .onClick(() => {
+          this.SaveInputValue = this.currentInputValue
+          this.currentInputValue = this.theplaceholder
+          this.controller.close()
+          if (this.confirm) {
+            this.confirm()
+          }
+        })
+        .backgroundColor(this.icon_emphasize)
+        .fontColor(Color.White)
+      Button($r('app.string.Cancel'))
+        .height(39)
+        .width('100%')
+        .fontColor(this.icon_emphasize)
+        .backgroundColor($r('app.color.container_background'))
+        .onClick(() => {
+          this.controller.close()
+          if (this.cancel) {
+            this.cancel()
+          }
+        })
+    }
+    .padding(16)
+    .backgroundColor($r('app.color.container_background'))
+    .width('100%')
+  }
+}
+
+/**
  * 实验功能提示框
  */
 @Component
@@ -415,6 +477,32 @@ export struct ExperimentalFunction {
     .borderRadius(4)
     .margin({left: 2})
     .backgroundColor(this.icon_emphasize)
+  }
+}
+
+/**
+ * 页面暂无XX
+ * @param name 页面标题(暂无XX)-Resource
+ */
+@Component
+export struct Nothing {
+  // 一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  // 页面标题
+  @State name: Resource = $r('app.string.none')
+
+  build() {
+    Column() {
+      SymbolGlyph($r('sys.symbol.doc'))
+        .fontSize(24)
+        .fontColor([this.icon_primary])
+        .margin({bottom: 4 })
+      Text(getResourceString($r('app.string.none'), this) + getResourceString(this.name, this))
+    }
+    .alignItems(HorizontalAlign.Center)
+    .justifyContent(FlexAlign.Center)
+    .width('100%')
+    .height('100%')
   }
 }
 

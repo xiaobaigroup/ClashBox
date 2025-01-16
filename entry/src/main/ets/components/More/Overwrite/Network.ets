@@ -4,65 +4,7 @@ import { ListOverwriteNetworkData, moreData } from "../../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import OverwriteTop from "./OverwriteTopBuilder"
 import { MoreTop } from "../MoreTopBuilder"
-
-/**
- * 通用弹窗组件（竖排按钮）
- */
-@CustomDialog
-export struct theCustomDialog {
-  @Link SaveInputValue: string
-  @Link currentInputValue: string
-  @Link theplaceholder: string
-  @Link theDialogTitle: ResourceStr
-  cancel?: () => void
-  confirm?: () => void
-  controller: CustomDialogController
-  /* 主题色 */
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
-
-  build() {
-    Column() {
-      Text(this.theDialogTitle)
-        .fontWeight(FontWeight.Medium)
-        .fontSize(20)
-        .margin({ top: 15, bottom: 15 })
-      TextInput({placeholder: this.theplaceholder, text: this.currentInputValue })
-        .onChange((value: string) => {
-          this.currentInputValue = value
-        })
-        .margin({bottom: 8 })
-      Button($r('app.string.Save'))
-        .width('100%')
-        .height(39)
-        .onClick(() => {
-          this.SaveInputValue = this.currentInputValue
-          this.currentInputValue = this.theplaceholder
-          this.controller.close()
-          if (this.confirm) {
-            this.confirm()
-          }
-        })
-        .backgroundColor(this.icon_emphasize)
-        .fontColor(Color.White)
-      Button($r('app.string.Cancel'))
-        .height(39)
-        .width('100%')
-        .fontColor(this.icon_emphasize)
-        .backgroundColor($r('app.color.container_background'))
-        .onClick(() => {
-          this.controller.close()
-          if (this.cancel) {
-            this.cancel()
-          }
-        })
-    }
-    .padding({left: 16, right: 16})
-    .backgroundColor($r('app.color.container_background'))
-    .width('100%')
-    .height(195)
-  }
-}
+import { theCustomDialog } from "../../Common"
 
 @Component
 struct Network {

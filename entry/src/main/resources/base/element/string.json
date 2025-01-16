@@ -125,8 +125,8 @@
       "value": "导出日志"
     },
     {
-      "name": "NoLogs",
-      "value": "暂无日志"
+      "name": "none",
+      "value": "暂无"
     },
     {
       "name": "AddConfig",
@@ -1299,6 +1299,38 @@
     {
       "name": "delete",
       "value": "删除"
+    },
+    {
+      "name": "edit_resource",
+      "value": "编辑资源"
+    },
+    {
+      "name": "now",
+      "value": "刚刚"
+    },
+    {
+      "name": "minutes_ago",
+      "value": "分钟前"
+    },
+    {
+      "name": "hours_ago",
+      "value": "小时前"
+    },
+    {
+      "name": "days_ago",
+      "value": "天前"
+    },
+    {
+      "name": "months_ago",
+      "value": "个月前"
+    },
+    {
+      "name": "weeks_ago",
+      "value": "周前"
+    },
+    {
+      "name": "years_ago",
+      "value": "年前"
     }
   ]
 }

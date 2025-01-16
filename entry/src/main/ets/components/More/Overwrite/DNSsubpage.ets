@@ -1,7 +1,6 @@
 import { BreakpointState } from "../../../common/breakpointsystem"
 import { MoreTop } from "../MoreTopBuilder"
-import { theCustomDialog } from "./Network"
-import OverwriteTop from "./OverwriteTopBuilder"
+import { theCustomDialog } from "../../Common"
 
 // DNS -> FakeIP过滤
 @Component

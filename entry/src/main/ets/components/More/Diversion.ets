@@ -47,20 +47,6 @@ struct Diversion {
   }
   @Builder
   diversionOther() {
-    Button({ type: ButtonType.Circle, stateEffect: true }) {
-      SymbolGlyph($r('sys.symbol.plus'))
-        .fontSize(24)
-        .fontColor([this.icon_primary])
-    }
-    .width(40)
-    .height(40)
-    .backgroundColor($r('app.color.settings_container_background'))
-    .onClick(() => {
-      this.isAdd = true
-      // 启用背景模糊
-      this.isEnableIndexForegroundBlur = true
-      this.isShowPolicy = true
-    })
   }
 
   /**
@@ -126,6 +112,20 @@ struct Diversion {
           title: $r('app.string.Diversion_Strategy'),
           searchButton: this.diversionSearch,
           otherButton: () => { this.diversionOther() }
+        })
+        Button({ type: ButtonType.Circle, stateEffect: true }) {
+          SymbolGlyph($r('sys.symbol.plus'))
+            .fontSize(24)
+            .fontColor([this.icon_primary])
+        }
+        .width(40)
+        .height(40)
+        .backgroundColor($r('app.color.settings_container_background'))
+        .onClick(() => {
+          this.isAdd = true
+          // 启用背景模糊
+          this.isEnableIndexForegroundBlur = true
+          this.isShowPolicy = true
         })
       }.width('100%')
       // 数据列表行

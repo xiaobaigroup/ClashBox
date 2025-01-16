@@ -1,6 +1,7 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import { Font, SymbolGlyphModifier } from "@kit.ArkUI"
 import { MoreTop } from "./MoreTopBuilder"
+import { Nothing } from "../Common"
 
 @Entry
 @Component
@@ -132,18 +133,7 @@ struct Log {
             .width('100%')
             .height('100%')
           } else if (this.isLogData === false) {
-            Column() {
-              SymbolGlyph($r('sys.symbol.doc'))
-                .fontSize(24)
-                .fontColor([this.icon_primary])
-                .margin({bottom: 4 })
-              Text($r('app.string.NoLogs'))
-            }
-            .zIndex(1)
-            .alignItems(HorizontalAlign.Center)
-            .justifyContent(FlexAlign.Center)
-            .width('100%')
-            .height('100%')
+            Nothing({ name: $r('app.string.Log') })
           } else {
 
 

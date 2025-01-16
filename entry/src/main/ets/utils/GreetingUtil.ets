@@ -1,4 +1,5 @@
-// 输出问候语
+// 问候语工具
+
 interface Holiday {
   month: number;
   day: number;

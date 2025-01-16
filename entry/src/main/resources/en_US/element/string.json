@@ -125,8 +125,8 @@
       "value": "ExportLog"
     },
     {
-      "name": "NoLogs",
-      "value": "NoLogs"
+      "name": "none",
+      "value": "No"
     },
     {
       "name": "AddConfig",
@@ -1299,6 +1299,38 @@
     {
       "name": "delete",
       "value": "Delete"
+    },
+    {
+      "name": "edit_resource",
+      "value": "Edit Resource"
+    },
+    {
+      "name": "now",
+      "value": "Now"
+    },
+    {
+      "name": "minutes_ago",
+      "value": "Minutes ago"
+    },
+    {
+      "name": "hours_ago",
+      "value": "Hours ago"
+    },
+    {
+      "name": "days_ago",
+      "value": "Days ago"
+    },
+    {
+      "name": "months_ago",
+      "value": "Months ago"
+    },
+    {
+      "name": "weeks_ago",
+      "value": "Weeks ago"
+    },
+    {
+      "name": "years_ago",
+      "value": "Years ago"
     }
   ]
 }
