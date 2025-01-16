@@ -11,6 +11,8 @@ export struct MoreTop {
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   // 标题
   @State title: ResourceStr = ''
+  // 副标题
+  @State subtitle: ResourceStr = ''
   // 搜索按钮
   @BuilderParam searchButton: () => void = this.searchDefaultButton
   // 其它按钮
@@ -54,11 +56,22 @@ export struct MoreTop {
       .onClick(() => {
         this.pageInfos.pop(true)
       })
-      Text(this.title)
-        .fontSize(30)
-        .fontWeight(FontWeight.Bold)
-        .textAlign(TextAlign.Start)
-        .margin({left: 8})
+      Column() {
+        Text(this.title)
+          .fontSize(30)
+          .fontWeight(FontWeight.Bold)
+          .textAlign(TextAlign.Start)
+          .margin({left: 8})
+        if(this.subtitle) {
+          Text(this.subtitle)
+            .fontWeight(FontWeight.Normal)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .margin({top: 2, left: 8})
+            .fontSize(14)
+            .maxLines(1)
+        }
+      }.layoutWeight(1)
+      .alignItems(HorizontalAlign.Start)
       Blank()
       this.searchButton()
       this.otherButton()
