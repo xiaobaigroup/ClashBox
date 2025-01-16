@@ -415,7 +415,9 @@ struct ProxyPage {
                 .fontColor([Color.White])
                 .symbolEffect(this.ReplaceSymbolEffect)
                 .align(Alignment.Center)
-            }
+            }.onClick(()=>{
+              EventHub.sendEvent(EventKey.TestDelayAll)
+            })
             .width('100%')
             .height('100%')
           }

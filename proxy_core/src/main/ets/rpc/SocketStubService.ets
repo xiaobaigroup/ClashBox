@@ -1,9 +1,11 @@
 import { socket } from '@kit.NetworkKit';
 import { RpcRequest } from './RpcRequest';
-import {  util } from '@kit.ArkTS';
+import { JSON, util } from '@kit.ArkTS';
 import json from '@ohos.util.json';
 import { ClashRpcType } from './IClashManager';
-import { getProxies, getTraffic, initClash, updateConfig
+import { asyncTestDelay,
+  changeProxy,
+  getExternalProviders, getProxies, getTraffic, initClash, updateConfig
 } from 'libflclash.so';
 import { common } from '@kit.AbilityKit';
 import { OverrideSlot } from '../models/Common';
@@ -60,14 +62,25 @@ export class SocketStubService {
           break;
         }
         case ClashRpcType.queryProviders:{
-          //resolve(nativeQueryProviders())
+          resolve(getExternalProviders())
           break;
         }
         case ClashRpcType.patchSelector:{
+          // resolve(changeProxy(JSON.stringify({
+          //   groupName: data[0] as string,
+          //   proxyName: data[1] as string,
+          // })))
           //resolve(nativePatchSelector(data[0] as string, data[1] as string))
           break;
         }
         case ClashRpcType.healthCheck:{
+          asyncTestDelay(JSON.stringify({
+            proxyName: data[0] as string,
+            timeout: data[1] as string,
+          })).then((v)=>{
+            resolve(v)
+          })
+
           // nativeHealthCheck(data[0] as string,(value: string)=>{
           //   resolve(value)
           // })

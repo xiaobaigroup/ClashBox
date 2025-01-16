@@ -94,9 +94,20 @@ export class ClashViewModel {
       console.log("changeProxy", g, p);
       profile.proxySelected?.set(g, p)
       await this.profileRepo.addOrUpdate(profile)
+      await this.socketProxy.patchSelector(g, p)
     } catch (e) {
       promptAction.showToast({message: e.message, duration:3000})
     }
+  }
+  async testDelay(proxyName: string): Promise<number>{
+    try {
+      let delay = await this.socketProxy.healthCheck(proxyName)
+      console.log("testDelay", delay);
+      return 1;
+    } catch (e) {
+      promptAction.showToast({message: e.message, duration:3000})
+    }
+    return -1;
   }
   async updateProfile(profile: Profile){
     await this.profileRepo.addOrUpdate(profile)

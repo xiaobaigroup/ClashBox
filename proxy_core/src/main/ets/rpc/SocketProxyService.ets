@@ -22,21 +22,10 @@ export class SocketProxyService implements IClashManager{
   async setLogObserver(observer: (message:string) => void): Promise<()=>void> {
     return this.callbackRequest(ClashRpcType.setLogObserver, [], observer)
   }
-  async fetchAndValid(configPath:string, url:string, force: boolean, callback: (type:string, value:string)=>void){
-   return this.callbackRequest(ClashRpcType.fetchAndValid, [configPath, url, force], async (message:string)=>{
-      console.debug("fetchAndValid", message)
-      const json = JSON.parse(message) as FetchInfo
-      callback(json.type, json.value)
-    })
-  }
+
   async loadConfig(path: UpdateConfigParams): Promise<string> {
     let result =  await this.sendMessageRequest(ClashRpcType.load, [JSON.stringify(path)])
     return result as string
-  }
-
-  async queryTunnelState(): Promise<TunnelState> {
-    let result = await this.sendMessageRequest(ClashRpcType.queryTunnelState, [])
-    return result as TunnelState;
   }
 
   async queryTrafficTotal(): Promise<Traffic> {
@@ -50,7 +39,6 @@ export class SocketProxyService implements IClashManager{
   async queryProxyGroups(): Promise<ProxyGroup[]> {
     let result = await this.sendMessageRequest(ClashRpcType.queryProxyGroup,[])
     let map = JSON.parse(result as string) as Record<string, string | Record<string, string[] | string>>
-    console.log("queryProxyGroups", result)
     let groupNames = map[UsedProxy.GLOBAL]["all"] as string[]
     groupNames = ["GLOBAL", ...groupNames]
     groupNames = groupNames.filter(e => {
@@ -58,7 +46,6 @@ export class SocketProxyService implements IClashManager{
       const indexes = ["Selector","URLTest", "Fallback", "LoadBalance", "Relay"].indexOf(proxy["type"])
       return indexes > -1
     })
-    console.log("queryProxyGroups", groupNames);
     const groupsRaw = groupNames.map((groupName) =>{
       const group = map[groupName];
       group["proxies"] = (group["all"] ?? []).map((n:string) =>{
@@ -93,14 +80,15 @@ export class SocketProxyService implements IClashManager{
     return result as boolean
   }
 
-  async healthCheck(group: string): Promise<void> {
-    await this.sendMessageRequest(ClashRpcType.healthCheck, [group])
+  async healthCheck(proxyName: string): Promise<void> {
+    await this.sendMessageRequest(ClashRpcType.healthCheck, [proxyName, 3000])
   }
 
   async updateProvider(type: ProviderType, name: string): Promise<void> {
     await this.sendMessageRequest(ClashRpcType.updateProvider,[type, name])
     return
   }
+
   async startClash():Promise<boolean>{
     let json = await this.sendMessageRequest(ClashRpcType.startClash, [])
     return json as boolean

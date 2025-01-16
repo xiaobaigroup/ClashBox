@@ -11,7 +11,7 @@ import { EventHub, EventKey } from '../../common/EventHub';
 import { ProxySort } from 'proxy_core';
 import { intl } from '@kit.LocalizationKit';
 import { AppConfig, ProxyCardSize } from '../../entryability/AppState';
-
+import ClashViewModel from '../../entryability/ClashViewModel';
 
 
 //断点布局
@@ -176,7 +176,6 @@ struct ProxyGroupItem {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     BreakpointSystem.getInstance().attach(this.breakPointStateListLanes)
     BreakpointSystem.getInstance().start()
-
     EventHub.on(EventKey.ProxySort, (sort: ProxySort)=>{
       console.log("ProxySort", sort)
       switch (sort){
@@ -184,6 +183,14 @@ struct ProxyGroupItem {
         case ProxySort.Title: this.NameSortItems(); break;
         case ProxySort.Delay: this.LatencySortItems(); break;
       }
+    })
+    EventHub.on(EventKey.TestDelayAll, async ()=>{
+      for (let p of this.items){
+        await ClashViewModel.testDelay(p.text).then(d=>{
+          p.latency = d
+        })
+      }
+
     })
   }
   // 延迟排序

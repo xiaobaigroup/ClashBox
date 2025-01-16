@@ -9,7 +9,7 @@ export const validateConfig: (paramsString: string) => Promise<string>;
 export const updateConfig: (paramsString: string) => Promise<string>;
 
 export const getProxies: () => string;
-export const changeProxy: () => Promise<string>;
+export const changeProxy: (params:string) => Promise<string>;
 export const getTraffic: () => string;
 export const getTotalTraffic: () => string;
 export const resetTraffic: () => void;

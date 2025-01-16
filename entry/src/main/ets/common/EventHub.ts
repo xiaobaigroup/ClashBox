@@ -4,7 +4,8 @@ export enum EventKey{
   FetchProxyGroup = 10000,
   FetchProfile = 10001,
   ProxySort = 10002,
-  ChangeProxy = 10003
+  ChangeProxy = 10003,
+  TestDelayAll = 10004
 }
 
 export class EventHub{
