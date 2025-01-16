@@ -821,12 +821,12 @@ Stack({ alignContent: this.stackAlignContentAlignment }) {
       .height(this.isLandscapePhone ? '100%' : `calc(100% - ${TAB_CONTENT_TITLE_HEIGHT}vp)`)
       .width("100%")
       .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
-        detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE],
+        detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],
         preferType: SheetType.CENTER,
         scrollSizeMode: ScrollSizeMode.CONTINUOUS,
         backgroundColor: $r('app.color.background'),
         dragBar: false,
-        //keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
+        keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
         onWillDismiss: () => {
           this.isShowSettings = false
           this.isEnableIndexForegroundBlur = false

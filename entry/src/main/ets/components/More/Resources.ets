@@ -123,7 +123,7 @@ struct Resources {
         MoreTop({
           title: $r('app.string.Resources'),
           searchButton: this.reaourceSearch,
-          otherButton: this.reaourceOther
+          otherButton: (): void => { this.reaourceOther() }
         })
       }.width('100%')
       // 页面

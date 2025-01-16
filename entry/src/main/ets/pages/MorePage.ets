@@ -7,6 +7,7 @@ import { BreakpointState, BreakpointSystem } from '../common/breakpointsystem'
 import { BIND_SHEET_CONTAINER_HEIGHT, ListMoreData, moreData } from '../common/Constants';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import Log from '../components/More/Log';
+import { LogDetils } from '../components/More/Log';
 import Resources from '../components/More/Resources';
 import RequestPage from '../components/More/Request';
 import Connect from '../components/More/Connect';
@@ -22,6 +23,18 @@ import { getResourceString } from '../utils/ResourceStringUtil';
 import { extractLocationInfo, getIpInfo, mapLocation } from '../utils/GetIpInfo';
 import { promptAction } from '@kit.ArkUI';
 
+// 日志数据（假设）
+interface LogData {
+  // 日志类型（0：Warning；1：Info）
+  logType: number
+  // 日志生成时间(展示的时间)
+  logTime: number
+  // 日志详情
+  LogDetails: string
+  // 是否跳转
+  logSkip: boolean
+}
+
 @Entry
 @Component
 struct MorePage {
@@ -32,7 +45,8 @@ struct MorePage {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   //一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
-
+  // 日志页详情页跳转角标
+  @Provide theLogSkipItem: number = 0
   // 查询IP地址弹窗默认文本
   @State QueryIPplaceholder: string = getResourceString($r('app.string.query_ip_region_placeholder'), this)
   // 添加路由地址弹窗标题
@@ -65,6 +79,38 @@ struct MorePage {
 
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+
+  // 日志页临时数据
+  @Provide
+  private logListData: Array<LogData> = [
+    {
+      logType: 1,
+      logTime: 1736996575781,
+      LogDetails: '[App] Local level: info',
+      logSkip: false
+    },
+    {
+      logType: 0,
+      logTime: 1736990476781,
+      LogDetails: '[App] Warning Test Message',
+      logSkip: false
+    },
+    {
+      logType: 1,
+      logTime: 1736980475781,
+      logSkip: true,
+      LogDetails: '[App] Hello World Hello World Hello World Hello World Hello World Hello World Hello World' +
+        ' Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World' +
+        ' Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World' +
+        ' Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World'
+    },
+    {
+      logType: 0,
+      logSkip: false,
+      logTime: 1736990375781,
+      LogDetails: '[App] Warning Test Message 2'
+    },
+  ]
 
   /**
    * 查询IP地址弹窗控制器
@@ -157,6 +203,9 @@ struct MorePage {
     } else
     if (name == 'FakeIP-Filtering') {
       FakeIPfilter()
+    } else
+    if (name == 'LogDetils') {
+      LogDetils()
     }
   }
 
@@ -230,7 +279,7 @@ struct MorePage {
             detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],
             dragBar: false,
             backgroundColor: $r('app.color.background'),
-           // keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
+            keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
             preferType: SheetType.CENTER,
             onWillDismiss: () => {
               this.isShowSettings = false

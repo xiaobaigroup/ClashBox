@@ -568,13 +568,12 @@ export struct skipRowList {
         if(this.subtitle) {
           Text(this.subtitle)
             .fontWeight(FontWeight.Normal)
-            .textOverflow({ overflow: TextOverflow.MARQUEE })
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
             .maxLines(1)
             .margin({top: 2})
             .fontSize(14)
-            .width('65%')
         }
-      }
+      }.layoutWeight(1)
       .alignItems(HorizontalAlign.Start)
       .margin({ left: 12 })
       Blank()
@@ -641,7 +640,7 @@ export struct toggleRowList {
           .maxLines(1)
           .margin({top: 2})
           .fontSize(14)
-      }
+      }.layoutWeight(1)
       .alignItems(HorizontalAlign.Start)
       .margin({ left: this.icons != null ? 12 : 14 })
       Blank()
