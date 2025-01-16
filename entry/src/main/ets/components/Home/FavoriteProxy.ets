@@ -3,7 +3,8 @@ import { mediaquery } from '@kit.ArkUI'
 import { MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
 import { Item, ProxyData } from '../../common/ProxyData'
-import { AppConfig, isEnd } from '../../entryability/AppState'
+import { AppConfig, AppState, isEnd } from '../../entryability/AppState'
+import { ProxyGroup } from 'proxy_core'
 
 
 @Component
@@ -38,13 +39,14 @@ struct FavoriteProxy {
   @Consume isShowHomeEdit: boolean
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @StorageProp("proxyGroups") proxyGroups: ProxyGroup[] = []
   build() {
     Column() {
       CardTitle({ title: $r('app.string.FavoriteProxy') })
       //拥有收藏节点的布局 start
       if (this.favoriteProxys.size > 0) {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceEvenly }) {
-          ForEach(Array.from(this.favoriteProxys.entries()), (p:[string,string], i: number)=>{
+          ForEach(AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups), (p:[string,string], i: number)=>{
             Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
               Text(`${p[1]}`)
                 .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
@@ -54,21 +56,22 @@ struct FavoriteProxy {
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
               Radio({ value: 'FavoriteProxyRadio', group: 'FavoriteProxyGroup' })
                 .width(this.isLandscapePhone ? 16 : this.fontSize.value)
-                .checked(this.appConfig.currentProxyId === p[0])
+                .checked(this.appConfig.currentProxyName === p[1])
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
                 .onChange((isChecked:boolean) => {
                   //在home页编辑状态时，无法操作
                   if (!this.isShowHomeEdit &&isChecked) {
-                    this.appConfig.currentProxyId = p[0]
+                    this.appConfig.currentProxyName = p[1]
                   }
                 })
             }
             .onClick(() => {
               //在home页编辑状态时，无法操作
               if (!this.isShowHomeEdit) {
-                this.appConfig.currentProxyId = p[0]
+                this.appConfig.currentProxyName = p[1]
+                this.appConfig.currentProxyItem = AppState.fetchProxyItem(this.proxyGroups, p[0], p[1])
               }
             })
             .clickEffect({ level: ClickEffectLevel.MIDDLE })

@@ -156,10 +156,6 @@ struct ProxyGroupItem {
   // 当前代理节点单选选择的值
   @Prop selectedProxy: string
   @Prop disabled: boolean
-  // 当前代理节点长按选择的值
-  @Consume private ProxyItemLongPressValue: number
-  // 当前代理节点收藏的值
-  @Consume private FavoriteProxy: number
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   /**
@@ -171,6 +167,7 @@ struct ProxyGroupItem {
     latency: 0,
     type: '',
     id: '',
+    g: '',
     isShowFavoriteProxy: false
   }
 
@@ -298,6 +295,7 @@ struct ProxyGroupItem {
   selectProxy(item: Item){
     if (!this.disabled){
       this.selectedProxy = item.text
+      this.appConfig.currentProxyName = item.text
       this.OnProxyChange(item)
     }
   }
@@ -324,24 +322,20 @@ struct ProxyGroupItem {
                 // .width(this.isLandscapePhone ?'592px':'250px')
               }.alignItems(HorizontalAlign.Start)
               Blank()
-
-              Radio({ value: 'ProxyRadio' + index, group: 'ProxyGroup' })
-                .checked(item.text === this.appConfig.currentProxyId)
+              Radio({ value: item.text, group: item.g + item.text }).enabled(!this.disabled)
+                .checked(item.text === this.selectedProxy)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
-                .onChange((isChecked: boolean) => {
-                  if (isChecked) {
-             //       this.selectProxy(item)
-                    this.appConfig.currentProxyId = item.text
-                  }
+                // 不要用chang
+                .onClick(() => {
+                  this.selectProxy(item)
                 })
             }
             .ListRowStyle()
           }
           .onClick(() => {
-         //   this.selectProxy(item)
-            this.appConfig.currentProxyId = item.text
+            this.selectProxy(item)
             hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
           })
           .ListItemStyle()
@@ -399,23 +393,22 @@ struct ProxyGroupItem {
               .justifyContent(FlexAlign.SpaceBetween)
 
               Blank()
-              Radio({ value: 'ProxyRadio' + index, group: 'ProxyGroup' })
-                .checked(item.text === this.appConfig.currentProxyId)
+              // group 不要写死, 会和其他tab页的生效，在一个组里唯一
+              // 使用.enabled(!this.disabled) 来禁用radio不让选
+              //Radio({ value: 'ProxyRadio' + index, group: 'ProxyGroup' }).enabled(!this.disabled)
+              Radio({ value: item.text, group: item.g + item.text}).enabled(!this.disabled)
+                .checked(item.text === this.selectedProxy)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
-                .onChange((isChecked: boolean) => {
-                  if (isChecked) {
-             //       this.selectProxy(item)
-                    this.appConfig.currentProxyId = item.text
-                  }
+                .onClick(() => {
+                  this.selectProxy(item)
                 })
             }
             .ListRowStyle()
           }
           .onClick(() => {
-         //   this.selectProxy(item)
-            this.appConfig.currentProxyId = item.text
+            this.selectProxy(item)
             hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
           })
           .ListItemStyle()
@@ -472,23 +465,19 @@ struct ProxyGroupItem {
               .alignItems(HorizontalAlign.Start)
 
               Blank()
-              Radio({ value: 'ProxyRadio' + index, group: 'ProxyGroup' })
-                .checked(item.text === this.appConfig.currentProxyId)
+              Radio({ value: item.text, group: item.g + item.text }).enabled(!this.disabled)
+                .checked(item.text === this.selectedProxy)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
-                .onChange((isChecked: boolean) => {
-                  if (isChecked) {
-                  //  this.selectProxy(item)
-                    this.appConfig.currentProxyId = item.text
-                  }
+                .onClick(() => {
+                  this.selectProxy(item)
                 })
             }
             .ListRowStyle()
           }
           .onClick(() => {
-          //  this.selectProxy(item)
-            this.appConfig.currentProxyId = item.text
+            this.selectProxy(item)
             hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
           })
           .ListItemStyle()
@@ -544,7 +533,7 @@ struct ProxyGroupItem {
     this.ProxyPromptAction.showToast({ message: $r('app.string.Collect_Tip') })
     const p = this.currentTouchProxyData
     p.isShowFavoriteProxy = true
-    this.favoriteProxys.set(p.text, p.text)
+    this.favoriteProxys.set(p.g + '|' + p.text, this.appConfig.currentProfileId ?? "")
   }
   /**
    * 取消收藏配置
@@ -554,7 +543,7 @@ struct ProxyGroupItem {
     this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_tip') })
     const p = this.currentTouchProxyData
     p.isShowFavoriteProxy = false
-    this.favoriteProxys.delete(p.text)
+    this.favoriteProxys.delete(p.g + '|' + p.text)
   }
 }
 /**

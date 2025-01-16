@@ -5,6 +5,7 @@ export interface Item {
   latency: number
   type: string
   id: string
+  g?: string
   isShowFavoriteProxy?: boolean
 }
 

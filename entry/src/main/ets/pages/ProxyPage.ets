@@ -108,12 +108,6 @@ struct ProxyPage {
         }
       }, 200)
     }
-    if(this.currentProfile && this.currentProfile?.proxySelected){
-      console.log("proxySelected",this.currentProfile?.proxySelected.size)
-      for(let d of this.currentProfile.proxySelected?.entries()){
-        console.log("proxySelected",d[0],d[1])
-      }
-    }
   }
   changeProxy(g: string, item: Item){
     if(this.currentProfile){
@@ -369,8 +363,9 @@ struct ProxyPage {
                       items: g.proxies as Item[],
                       ProxyGroupItemSelected: this.appConfig.proxyCardSize,
                       disabled: g.type !== ProxyType.Selector,
-                      selectedProxy: this.currentProfile?.getSelectedProxy(g),
+                      selectedProxy: this.currentProfile?.getSelectedProxy(g) ?? "",
                       OnProxyChange: (item) => {
+                        console.log("xxxxx", item)
                         this.changeProxy(g.name, item)
                       }
                     }) //list相关在components/ProxyGroupItem.ets文件里

@@ -91,6 +91,7 @@ export class ClashViewModel {
   }
   async changeProxy(profile: Profile, g:string, p: string){
     try {
+      console.log("changeProxy", g, p);
       profile.proxySelected?.set(g, p)
       await this.profileRepo.addOrUpdate(profile)
     } catch (e) {
@@ -115,9 +116,23 @@ export class ClashViewModel {
   async getProxyGroups(): Promise<ProxyGroup[]>{
     console.log("FetchProxyGroup", )
     let list =  await this.socketProxy.queryProxyGroups()
-    console.log("FetchProxyGroup", list)
-    return list
+    let dd = AppStorage.get<AppConfig>("appConfig")
+    let favoriteProxys = AppStorage.get<Map<string, string>>("favoriteProxys")
+    const groups = list.map((g)=>{
+      g.proxies = g.proxies.map((p) => {
+        p.isShowFavoriteProxy = favoriteProxys?.get(g.name + "|" + p.text) != null
+        p.latency = -1
+        p.g = g.name
+        return p
+      })
+      return g
+    })
+    AppStorage.setOrCreate("proxyGroups", groups)
+    console.log("FetchProxyGroup", groups)
+    return groups
   }
+
+
   async loadProfileAndConfig(id: string, config: ClashConfig | null = null, params: ConfigExtendedParams | null= null){
     let result = await this.socketProxy.loadConfig({
       "profile-id": id,

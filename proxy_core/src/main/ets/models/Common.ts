@@ -39,8 +39,9 @@ export interface Proxy {
   type: ProxyType;
   text: string
   latency: number
-  id: string
-  isShowFavoriteProxy: boolean
+  id?: string
+  g?: string
+  isShowFavoriteProxy?: boolean
 }
 
 export interface ProxyGroup{
