@@ -303,6 +303,7 @@ struct ProxyGroupItem {
     if (!this.disabled){
       this.selectedProxy = item.text
       this.appConfig.currentProxyName = item.text
+      this.appConfig.currentProxyItem!.latency = item.latency
       this.OnProxyChange(item)
     }
   }

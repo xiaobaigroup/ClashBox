@@ -1,6 +1,7 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import { MarginGenerate } from "../../common/Constants"
 import { Item, ProxyData } from "../../common/ProxyData"
+import { AppConfig } from "../../entryability/AppState"
 import { CardTitle } from "./CardTitleBuilder"
 
 @Component
@@ -30,23 +31,24 @@ struct ProxyINFO{
   // 内容文本字体大小
   @Consume('breakPointStateHomeCardSwitchModeFontSize') private fontSize: BreakpointState<number>
   // 当前代理节点单选框选择的配置
-  @Consume private ProxyRadioCheckedValue: number
+ // @Consume private ProxyRadioCheckedValue: number
   @Consume('isShowProxyINFO') isShowProxyINFO: boolean
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
 
   build() {
     Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Start, justifyContent: FlexAlign.SpaceBetween}) {
       Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.SpaceBetween }) {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.Start }) {
           CardTitle({ title: $r('app.string.proxy_INFO') })
-          if (this.ProxyRadioCheckedValue >= 0) {
-            Text(`${this.items[this.ProxyRadioCheckedValue].text}`)
+          if (this.appConfig.currentProxyItem) {
+            Text(`${this.appConfig.currentProxyName}`)
               .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('sys.color.font_primary'))
           }
-          else if(this.ProxyRadioCheckedValue < 0){
+          else {
             Text($r('app.string.proxy_name'))
               .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
               .fontWeight(FontWeight.Bold)
@@ -56,12 +58,12 @@ struct ProxyINFO{
             .fontSize(this.isLandscapePhone ? 12 : this.HomeCardIPSmFontSize.value)
             .fontColor($r('sys.color.font_secondary'))
         }
-        if (this.ProxyRadioCheckedValue >= 0) {
-        Text('ping ' + `${this.items[this.ProxyRadioCheckedValue].latency}` + 'ms')
+        if (this.appConfig.currentProxyItem) {
+        Text('ping ' + `${this.appConfig.currentProxyItem.latency}` + 'ms')
           .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)
-          .fontColor(ProxyData.getColorForLatency(this.items[this.ProxyRadioCheckedValue].latency))
+          .fontColor(ProxyData.getColorForLatency(this.appConfig.currentProxyItem.latency))
         }
-        else if(this.ProxyRadioCheckedValue < 0){
+        else {
           Row(){
             Text('ping ')
               .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)

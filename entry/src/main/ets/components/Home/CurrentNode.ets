@@ -20,7 +20,7 @@ struct CurrentNode {
   //主页卡片内容当前节点字体大小
   @Consume('ProxyFontSize') private ProxyFontSize: BreakpointState<number>
   // 当前代理节点单选框选择的配置
-  @Consume private ProxyRadioCheckedValue: number
+ // @Consume private ProxyRadioCheckedValue: number
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
 
@@ -29,7 +29,7 @@ struct CurrentNode {
       CardTitle({title: $r('app.string.CurrentNode')})
       Column() {
         if (this.appConfig.currentProxyItem) {
-          Text(`${this.appConfig.currentProxyItem.text}`)
+          Text(`${this.appConfig.currentProxyName}`)
             .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
             .fontWeight(FontWeight.Bold)
             .fontColor(this.font_primary)

@@ -32,7 +32,7 @@ struct FavoriteProxy {
   // 当前代理节点长按选择的值
   @Consume private FavoriteProxy: number
   // 当前代理节点单选选择的值
-  @Consume private ProxyRadioCheckedValue: number
+ // @Consume private ProxyRadioCheckedValue: number
   // 当前代理节点长按选择的值
   @Consume private ProxyItemLongPressValue: number
   //编辑按钮点击后显示编辑状态判定

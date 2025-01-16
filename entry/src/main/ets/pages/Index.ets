@@ -256,7 +256,7 @@ struct Index {
 代理页Provide相关数据
  */
   // 当前代理节点单选选择的值
-  @Provide private ProxyRadioCheckedValue: number =-1
+ // @Provide private ProxyRadioCheckedValue: number =-1
   // 当前代理节点长按选择的值
   @Provide private ProxyItemLongPressValue: number = -1
   // 当前代理节点收藏的值
