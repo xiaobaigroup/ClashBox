@@ -52,3 +52,7 @@ export class AppState {
     return group?.proxies.find((ps)=> ps.text == p) as Item
   }
 }
+// PersistentStorage 不支持嵌套对象，修改属性需要copy 更新引用来触发持久化更新
+export function copy<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj));
+}

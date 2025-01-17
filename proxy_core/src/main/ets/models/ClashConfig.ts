@@ -1,3 +1,4 @@
+import { LogLevel } from "./Common"
 
 export interface  UpdateConfigParams{
   "profile-id": string
@@ -11,14 +12,7 @@ export interface  ConfigExtendedParams{
   "override-dns": boolean
   "test-url": string
 }
-export enum LogMessageLevel {
-  Debug = "debug",
-  Info = "info",
-  Warning = "warning",
-  Error = "error",
-  Silent = "silent",
-  Unknown = "unknown"
-}
+
 export enum TunnelState {
   Direct = "direct", Global = "global", Rule = "rule", Script = "script", None = "None"
 }
@@ -30,6 +24,7 @@ const defaultGeoXMap = {
   "geoip": "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat",
   "geosite": "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat"
 } as GeoXUrl
+
 const defaultMixedPort = 7890;
 const defaultKeepAliveInterval = 30;
 
@@ -128,7 +123,7 @@ export class  ClashConfig {
   "allow-lan"?: boolean;
   "bind-address"?: string;
   mode?: TunnelState;
-  "log-level"?: LogMessageLevel= LogMessageLevel.Info;
+  "log-level"?: LogLevel = LogLevel.Info;
   ipv6?: boolean;
   "external-controller"?: string;
   "external-controller-tls"?: string;
@@ -206,4 +201,7 @@ export interface GeoXUrl {
   geoip?: string;
   mmdb?: string;
   geosite?: string;
+  asn?: string
 }
+
+export { LogLevel }

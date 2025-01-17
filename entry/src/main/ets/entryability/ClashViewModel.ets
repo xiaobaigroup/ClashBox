@@ -109,6 +109,11 @@ export class ClashViewModel {
     }
     return -1;
   }
+  async updateGeoData (geoName: string, geoType: string): Promise<string>{
+    return ""
+  }
+
+
   async updateProfile(profile: Profile){
     await this.profileRepo.addOrUpdate(profile)
   }
@@ -203,4 +208,5 @@ export function writeFile(filePath: string, data: Uint8Array | null) {
     fs.closeSync(file);
   }
 }
+
 export default new ClashViewModel()

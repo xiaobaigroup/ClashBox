@@ -4,17 +4,21 @@ import { Nothing, theCustomDialog } from "../Common"
 import { MoreTop } from "./MoreTopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { convertTime } from "../../utils/TimeConvertUtil"
+import { ClashConfig } from 'proxy_core'
+import { promptAction } from '@kit.ArkUI'
+import { copy } from '../../entryability/AppState'
+import ClashViewModel from '../../entryability/ClashViewModel'
 
 // 资源数据（假设）
 interface ResourcesData {
   // 资源名
   resourceName: string
+  key: string
+  fileName: string
   // 资源大小（KB）
   resourceSize: number
   // 更新时间(展示的时间)
   updateTime: number
-  // 资源链接
-  resourceUrl: string
 }
 
 /**
@@ -35,6 +39,7 @@ function switchResourceSize(size: number) {
 }
 
 
+
 @Component
 struct Resources {
   @Consume('NavPathStack') pageInfos: NavPathStack
@@ -51,21 +56,37 @@ struct Resources {
   @State currentEditInputValue: string = ''
   // 编辑路由地址弹窗标题
   @State theEditDialogTitle: ResourceStr = $r('app.string.edit_resource')
-
+  @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   // 临时数据
   @State
   private resourceListData: Array<ResourcesData> = [
     {
-      resourceName: 'GeoIP',
+      key: "geoip",
+      resourceName: 'GeoIp',
+      fileName: "GeoIP.dat",
       resourceSize: 6543,
       updateTime: 1736990475781,
-      resourceUrl: 'https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat'
     },
     {
-      resourceName: '资源名',
+      key: "geosite",
+      resourceName: 'GeoSite',
+      fileName: "GeoSite.dat",
       resourceSize: 8654,
       updateTime: 1736990575781,
-      resourceUrl: 'https://xxx'
+    },
+    {
+      key: "mmdb",
+      resourceName: 'MMDB',
+      fileName: "geoip.metadb",
+      resourceSize: 8654,
+      updateTime: 1736990575781,
+    },
+    {
+      key: "asn",
+      resourceName: 'ASN',
+      fileName: "ASN.mmdb",
+      resourceSize: 8654,
+      updateTime: 1736990575781,
     }
   ]
 
@@ -112,10 +133,31 @@ struct Resources {
     this.isEnableIndexForegroundBlur = false
     // 更新资源数组中对应元素
     const editItem = this.resourceListData[this.theEditIndex]
-    editItem.resourceUrl = this.SaveEditInputValue
+    this.updateUrl(editItem.resourceName, this.SaveEditInputValue)
     this.resourceListData.splice(this.theEditIndex, 1, editItem)
   }
+  updateUrl(name: string, url: string){
+    let geoMap = this.clashConfig?.['geox-url']
+    if(geoMap){
+      geoMap[name] = url
+      this.clashConfig['geox-url'] = copy(geoMap)
+    }
+  }
 
+  async updateGeoDateItem(item: ResourcesData){
+    //TODO 添加loading
+    try {
+      const message = await ClashViewModel.updateGeoData(
+         item.fileName,
+         item.resourceName,
+      );
+      if (message != ""){
+        promptAction.showToast({message: "更新失败: " +message})
+      }
+    } catch (e) {
+      promptAction.showToast({message: "更新失败: " + (e.message | e)})
+    }
+  }
 
   build() {
     NavDestination() {
@@ -149,7 +191,7 @@ struct Resources {
                       Text(convertTime(item.updateTime))
                         .smallText()
                     }.justifyContent(FlexAlign.Start)
-                    Text(item.resourceUrl)
+                    Text(this.clashConfig?.['geox-url']?.[item.key] ?? "")
                       .smallText()
                   }
                   .alignItems(HorizontalAlign.Start)
@@ -169,7 +211,7 @@ struct Resources {
                   // 启用背景模糊
                   this.isEnableIndexForegroundBlur = true
                   // 进入列表行数据编辑
-                  this.currentEditInputValue = item.resourceUrl
+                  this.currentEditInputValue = this.clashConfig?.['geox-url']?.[item.key] ?? ""
                   this.theEditIndex = index
                   hilog.info(0xFF00, "ResourcestestTag", "编辑中的序号：%{public}d", this.theEditIndex)
                   hilog.info(0xFF00, "ResourcestestTag", "编辑中的链接：%{public}s", this.currentEditInputValue)
@@ -183,7 +225,7 @@ struct Resources {
                 }.ButtonStyle()
                 .onClick(() => {
                   // 资源更新处理
-
+                  this.updateGeoDateItem(item)
                 })
               }.width('100%')
               .padding(12)

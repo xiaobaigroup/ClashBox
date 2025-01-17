@@ -56,13 +56,25 @@ export enum OverrideSlot{
   Persist, Session
 }
 
-
-
-
 export interface FetchInfo{
   type: string
   value: string
 }
+
+export enum LogLevel {
+  Debug = "debug",
+  Info = "info",
+  Warning = "warning",
+  Error = "error",
+  Silent = "silent",
+  Unknown = "unknown"
+}
+export class Log{
+  logLevel: LogLevel
+  payload : string
+}
+
+
 export class Traffic{
   private value: number;
 
