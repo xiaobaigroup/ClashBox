@@ -1,8 +1,7 @@
 import { BreakpointState } from "../../../common/breakpointsystem"
 import { ListOverwriteData, moreData } from "../../../common/Constants"
-import moreListItem from "../MoreListItem"
 import { hilog } from "@kit.PerformanceAnalysisKit"
-import { theRowCustomDialog } from "../../Common"
+import { skipRowList, theRowCustomDialog } from "../../Common"
 import { MoreTop } from "../MoreTopBuilder"
 
 @Component
@@ -94,35 +93,39 @@ struct Overwrite {
         })
       }
       .width('100%')
-      .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
 
-      List() {
+      List({space: 10}) {
         ForEach(this.overwriteList, (item: moreData, index: number) => {
           ListItem() {
-            moreListItem({
-              index: index,
-              itemObj: item,
-              onCheck: (index: number) => {
-                this.handleCheck(index)
-              }
+            skipRowList({
+              icons: item.icons,
+              title: item.title,
+              subtitle: item.subtitle,
+              isPrimaryIcons: true
             })
-          }
-          .margin({bottom: this.listBottom.value })
+          }.onClick(() => {
+            this.handleCheck(index)
+          })
         })
 
       }
       .width('100%')
       .height(500)
-      .margin({ top: 10, left: this.morePageMargin.value, right: this.morePageMargin.value })
+      .margin({ top: 10 })
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)
 
     }
     .hideTitleBar(true)
+    .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
-      this.pageInfos.clear();
-      return true;
+      if(this.pageInfos.size() === 1) {
+        this.pageInfos.clear()
+      } else {
+        this.pageInfos.pop(true)
+      }
+      return true
     })
   }
 }

@@ -464,7 +464,7 @@ export const morePageMargin_12_14_16: BreakpointState<number> = BreakpointState.
 
 // 更多页列表底边距
 export const morePagelistBottom_10_14: BreakpointState<number> = BreakpointState.of({
-  xs: 10, sm: 10, md: 14, lg: 14, xl: 14
+  xs: 10, sm: 10, md: 12, lg: 12, xl: 12
 })
 
 // 列表高度（主要是更多相关页面使用）

@@ -1,8 +1,9 @@
 
 import { BreakpointState } from "../../../common/breakpointsystem"
-import { ListOverwriteDNSData,  moreData } from "../../../common/Constants"
+import { ANIMATION_DURATION_300, ListOverwriteDNSData,  moreData } from "../../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import OverwriteTop from "./OverwriteTopBuilder"
+import { menuRowList, skipRowList, toggleRowList } from "../../Common"
 
 // 编辑FakeIP范围弹窗
 @CustomDialog
@@ -176,6 +177,32 @@ struct DNS {
 
   }
 
+  @Builder
+  dnsMenuTipsBuilder(tips: ResourceStr) {
+    Text(tips)
+      .fontWeight(FontWeight.Normal)
+      .textOverflow({ overflow: TextOverflow.Ellipsis })
+      .maxLines(1)
+      .margin({top: 2 })
+      .fontSize(14)
+  }
+  @Builder
+  dnsSkipTipsBuilder(tips: ResourceStr) {
+    Text(tips)
+      .fontWeight(FontWeight.Normal)
+      .textOverflow({ overflow: TextOverflow.Ellipsis })
+      .maxLines(1)
+      .margin({top: 2, right: 2 })
+      .fontSize(14)
+  }
+  @Builder
+  dnsToggleBuilder(isON: boolean) {
+    Toggle({ type: ToggleType.Switch, isOn: isON })
+      .margin({right: 12})
+      .hitTestBehavior(HitTestMode.None)
+      .selectedColor(this.icon_emphasize)
+  }
+
   build() {
     NavDestination() {
       // 导航栏
@@ -184,137 +211,70 @@ struct DNS {
         subtitle: ''
       })
 
-      List() {
+      List({space: this.listBottom.value}) {
         ForEach(this.overwriteDNSList, (item: moreData, index: number) => {
           if (item.sign === 0 ) {
             // 展开型
             ListItem() {
-              Row() {
-                Row() {
-                  Text(item.title)
-                    .fontWeight(FontWeight.Medium)
-                    .fontSize(16)
-                    .padding({ left: 12 })
-                  Blank()
-                  Text(item.subtitle)
-                    .fontWeight(FontWeight.Normal)
-                    .margin({top: 2 })
-                    .fontSize(14)
-                  SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
-                    .fontSize(14)
-                    .fontColor([this.icon_primary])
-                    .margin({left: 7, right: 20})
-                }
-                .width('94%')
-                .height(53)
-                .borderRadius(20)
-                .backgroundColor($r('app.color.container_background'))
-                Row()
-                  .height(10)
-              }
-              .onClick(() => {
-                this.handleCheck(index)
+              menuRowList({
+                title: item.title,
+                tips: () => { this.dnsMenuTipsBuilder(item.subtitle) }
+                // 后续绑定菜单
               })
             }
-            .margin({bottom: this.listBottom.value })
           } else
             if (item.sign === 1 ) {
               // 跳转型
               ListItem() {
-                Row() {
-                  Row() {
-                    Column() {
-                      Text(item.title)
-                        .fontWeight(FontWeight.Medium)
-                        .fontSize(16)
-                      if(index != 9 && index != 18 && item.subtitle) {
-                        Text(item.subtitle)
-                          .fontWeight(FontWeight.Normal)
-                          .textOverflow({ overflow: TextOverflow.MARQUEE })
-                          .maxLines(1)
-                          .width('85%')
-                          .margin({ top: 2 })
-                          .fontSize(14)
-                      }
-                    }
-                    .alignItems(HorizontalAlign.Start)
-                    .margin({ left: 12 })
-                    Blank()
-                    if(index === 9 || index === 18) {
-                      Text(item.subtitle)
-                        .fontWeight(FontWeight.Normal)
-                        .margin({right: 4 })
-                        .fontSize(14)
-                    }
-                    SymbolGlyph($r('sys.symbol.chevron_right'))
-                      .fontSize(28)
-                      .margin({right: 12})
-                      .fontColor([this.icon_primary])
-                  }
-                  .width('94%')
-                  .height(53)
-                  .borderRadius(20)
-                  .backgroundColor($r('app.color.container_background'))
-                  Row()
-                    .height(10)
+                if(index != 9 && index != 18 && item.subtitle) {
+                  skipRowList({
+                    title: item.title,
+                    subtitle: item.subtitle
+                  })
+                } else {
+                  skipRowList({
+                    title: item.title,
+                    tips: () => { this.dnsSkipTipsBuilder(item.subtitle) }
+                  })
                 }
-                .onClick(() => {
-                  this.handleCheck(index)
-                })
-              }
-              .margin({bottom: this.listBottom.value })
+              }.onClick(() => {
+                this.handleCheck(index)
+              })
             } else
             if (item.sign === 2 ) {
               // 开关型
               ListItem() {
-                Row() {
-                  Row() {
-                    Text(item.title)
-                      .fontWeight(FontWeight.Medium)
-                      .textOverflow({ overflow: TextOverflow.Ellipsis })
-                      .width('86%')
-                      .maxLines(1)
-                      .fontSize(16)
-                      .padding({ left: 12 })
-                    Blank()
-                    Toggle({ type: ToggleType.Switch, isOn: item.isCheck })
-                      .margin({right: 12})
-                      .selectedColor(this.icon_emphasize)
-                      .onChange((isOn: boolean) => {
-                        if(isOn) {
-                          this.handleToggle(index)
-                        }
-                      })
-                  }
-                  .width('94%')
-                  .height(53)
-                  .borderRadius(20)
-                  .backgroundColor($r('app.color.container_background'))
-                  Row()
-                    .height(10)
-                }
-                .onClick(() => {
-                  this.handleCheck(index)
+                toggleRowList({
+                  title: item.title,
+                  subtitle: item.subtitle,
+                  toggle: () => { this.dnsToggleBuilder(item.isCheck) }
                 })
-              }
-              .margin({bottom: this.listBottom.value })
+              }.onClick(() => {
+                hilog.info(0xFF00, "DNStestTag", "开关状态1:  %{public}s", item.isCheck)
+                this.getUIContext()?.animateTo({
+                  duration: ANIMATION_DURATION_300
+                }, () => {
+                  const toggleItem = this.overwriteDNSList[index]
+                  toggleItem.isCheck = !toggleItem.isCheck
+                  this.overwriteDNSList.splice(index, 1, toggleItem)
+                  hilog.info(0xFF00, "DNStestTag", "开关状态2:  %{public}s", toggleItem.isCheck)
+                  if(toggleItem.isCheck) {
+                    hilog.info(0xFF00, "DNStestTag", "开关已打开")
+                    this.handleToggle(index)
+                  }
+                })
+              })
             } else
             if (item.sign === 3) {
               // 标题栏
               ListItem() {
                Row() {
-                 Row() {
-                   Text(item.title)
-                     .fontWeight(FontWeight.Normal)
-                     .fontSize(16)
-                   //.padding({ left: 12 })
-                   Blank()
-                 }
-                 .width('94%')
-                 .height(29)
-                 Row()
-                   .height(10)
-               }
+                 Text(item.title)
+                   .fontWeight(FontWeight.Normal)
+                   .fontSize(15)
+                 Blank()
+               }.width('100%')
+                .justifyContent(FlexAlign.Start)
              }
             }
 
@@ -322,8 +282,9 @@ struct DNS {
 
       }
       .width('100%')
-      .height(this.isLandscapePhone ? 275 : (this.istabletVertical ? 900 : this.listHeight.value))
-      .margin({ top: 10, left: this.morePageMargin.value, right: this.morePageMargin.value })
+      .height(this.isLandscapePhone ? 275 : (this.istabletVertical ? 945 : this.listHeight.value))
+      .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
+      .margin({ top: 10 })
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)
 
@@ -331,8 +292,12 @@ struct DNS {
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
-      this.pageInfos.clear();
-      return true;
+      if(this.pageInfos.size() === 1) {
+        this.pageInfos.clear()
+      } else {
+        this.pageInfos.pop(true)
+      }
+      return true
     })
   }
 }

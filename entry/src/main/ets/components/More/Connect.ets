@@ -62,6 +62,7 @@ struct Connect {
     }
     .width(40)
     .height(40)
+    .margin({ left: 10 })
     .backgroundColor($r('app.color.settings_container_background'))
   }
 

@@ -26,7 +26,6 @@ export struct MoreTop {
         .fontColor([this.icon_primary])
     }
     .backgroundColor($r('app.color.settings_container_background'))
-    .margin({ right: 10 })
     .width(40)
     .height(40)
   }
@@ -39,6 +38,7 @@ export struct MoreTop {
     }
     .width(40)
     .height(40)
+    .margin({ left: 10 })
     .backgroundColor($r('app.color.settings_container_background'))
   }
 

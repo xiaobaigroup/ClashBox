@@ -14,7 +14,6 @@ import Connect from '../components/More/Connect';
 import Overwrite from '../components/More/Overwrite/Overwrite';
 import Diversion from '../components/More/Diversion';
 import Settings from '../components/Settings/Settings';
-import moreListItem from '../components/More/MoreListItem';
 import Basic from '../components/More/Overwrite/Basic';
 import DNS from '../components/More/Overwrite/DNS';
 import Network, { NetworkRouterAddress } from '../components/More/Overwrite/Network';
@@ -22,6 +21,7 @@ import { FakeIPfilter } from '../components/More/Overwrite/DNSsubpage';
 import { getResourceString } from '../utils/ResourceStringUtil';
 import { extractLocationInfo, getIpInfo, mapLocation } from '../utils/GetIpInfo';
 import { promptAction } from '@kit.ArkUI';
+import { skipRowList } from '../components/Common';
 
 // 日志数据（假设）
 interface LogData {
@@ -234,42 +234,28 @@ struct MorePage {
         .margin({left: this.morePageMargin.value})
         .width('100%')
 
-        List() {
+        List({space: 10}) {
           ForEach(this.moreList, (item: moreData, index: number) => {
             ListItem() {
-              moreListItem({
-                index: index,
-                itemObj: item,
-                onCheck: (index: number) => {
-                  this.handleCheck(index)
-                }
+              skipRowList({
+                icons: item.icons,
+                title: item.title,
+                subtitle: item.subtitle,
+                isPrimaryIcons: true
               })
-            }
-            .margin({bottom: this.listBottom.value })
+            }.margin({left: this.morePageMargin.value, right: this.morePageMargin.value})
+            .onClick(() => {
+              this.handleCheck(index)
+            })
           })
           // 设置行
           ListItem() {
-            Row() {
-              SymbolGlyph($r('sys.symbol.gearshape'))
-                .fontSize(24)
-                .margin({left: 12})
-                .fontColor([this.icon_primary])
-              Text($r('app.string.Settings'))
-                .height(48)
-                .fontWeight(FontWeight.Medium)
-                .padding({ left: 12 })
-                .fontSize(16)
-              Blank()
-              SymbolGlyph($r('sys.symbol.chevron_right'))
-                .fontSize(28)
-                .margin({right: 12})
-                .fontColor([this.icon_primary])
-            }
-            .width('94%')
-            .height(53)
-            .borderRadius(20)
-            .backgroundColor($r('app.color.container_background'))
-          }
+            skipRowList({
+              icons: $r('sys.symbol.gearshape'),
+              title: $r('app.string.Settings'),
+              isPrimaryIcons: true
+            })
+          }.margin({left: this.morePageMargin.value, right: this.morePageMargin.value})
           .onClick(() => {
             this.isShowSettings = true
             this.isEnableIndexForegroundBlur = true
@@ -289,13 +275,11 @@ struct MorePage {
           })
         }
         .width('100%')
-        // .layoutWeight(1) // 自适应占满剩余空间
         .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
         .height(this.isLandscapePhone ? 275 : this.listHeight.value)
-        .margin({ top: 10, left: this.morePageMargin.value, right: this.morePageMargin.value })
+        .margin({ top: 10 })
         .borderRadius(18)
         .alignListItem(ListItemAlign.Center)
-
       }
       .hideToolBar(true)
       .mode(this.isLandscapePhone ? NavigationMode.Stack : NavigationMode.Auto)

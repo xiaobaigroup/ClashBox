@@ -1,4 +1,4 @@
-import { getResourceString } from "./ResourceStringUtil"
+
 
 /**
  * 时间戳转化计算间隔工具

@@ -1,10 +1,9 @@
 
 import { BreakpointState } from "../../../common/breakpointsystem"
-import { ListOverwriteNetworkData, moreData } from "../../../common/Constants"
+import { ANIMATION_DURATION_300, ListOverwriteNetworkData, moreData } from "../../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import OverwriteTop from "./OverwriteTopBuilder"
-import { MoreTop } from "../MoreTopBuilder"
-import { theCustomDialog } from "../../Common"
+import { menuRowList, skipRowList, theCustomDialog, toggleRowList } from "../../Common"
 
 @Component
 struct Network {
@@ -40,7 +39,23 @@ struct Network {
 
         break
     }
+  }
 
+  @Builder
+  networkMenuTipsBuilder(tips: ResourceStr) {
+    Text(tips)
+      .fontWeight(FontWeight.Normal)
+      .textOverflow({ overflow: TextOverflow.Ellipsis })
+      .maxLines(1)
+      .margin({top: 2 })
+      .fontSize(14)
+  }
+  @Builder
+  networkToggleBuilder(isON: boolean) {
+    Toggle({ type: ToggleType.Switch, isOn: isON })
+      .margin({right: 12})
+      .hitTestBehavior(HitTestMode.None)
+      .selectedColor(this.icon_emphasize)
   }
 
   build() {
@@ -51,100 +66,73 @@ struct Network {
         subtitle: ''
       })
 
-      List() {
+      List({space: this.listBottom.value}) {
         ForEach(this.overwriteNetworkList, (item: moreData, index: number) => {
-          ListItem() {
-            Row() {
-              Row() {
-                SymbolGlyph(item.icons)
-                  .fontSize(24)
-                  .margin({left: 12})
-                  .fontColor([this.icon_primary])
-                Column() {
-                  Text(item.title)
-                    .fontWeight(FontWeight.Medium)
-                    .fontSize(16)
-                  if (item.sign === 1) {
-                    if(index != 9 && index != 18 ) {
-                      Text(item.subtitle)
-                        .fontWeight(FontWeight.Normal)
-                        .margin({ top: 2 })
-                        .fontSize(14)
-                    }
-                  }
-                }
-                .alignItems(HorizontalAlign.Start)
-                .margin({ left: 12 })
-                Blank()
-                if (item.sign === 0 ) {
-                  // 展开型
-                  Text(item.subtitle)
-                    .fontWeight(FontWeight.Normal)
-                    .margin({top: 2 })
-                    .fontSize(14)
-                  SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
-                    .fontSize(14)
-                    .margin({left: 7, right: 20})
-                    .fontColor([this.icon_primary])
-                } else if (item.sign === 1) {
-                  // 跳转型
-                  if(index === 9 || index === 18) {
-                    Text(item.subtitle)
-                      .fontWeight(FontWeight.Normal)
-                      .margin({right: 4 })
-                      .fontSize(14)
-                  }
-                  SymbolGlyph($r('sys.symbol.chevron_right'))
-                    .fontSize(28)
-                    .margin({right: 12})
-                    .fontColor([this.icon_primary])
-                } else if (item.sign === 2 ) {
-                  // 开关型
-                  Toggle({ type: ToggleType.Switch, isOn: item.isCheck })
-                    .selectedColor(this.icon_emphasize)
-                    .margin({right: 12})
-                    .onChange((isOn: boolean) => {
-                      if(isOn) {
-                        this.handleToggle(index)
-                      }
-                    })
-                }
-              }
-              .width('94%')
-              .height(53)
-              .borderRadius(20)
-              .backgroundColor($r('app.color.container_background'))
-            }
-            .onClick(() => {
-              if(item.sign === 1) {
-                this.handleCheck(index)
-              }
-            })
-          }
-          .margin({bottom: this.listBottom.value })
-          if (item.sign === 3) {
-            // 标题栏
+          if (item.sign === 0 ) {
+            // 展开型
             ListItem() {
-              Row() {
+              menuRowList({
+                title: item.title,
+                tips: () => { this.networkMenuTipsBuilder(item.subtitle) }
+                // 后续绑定菜单
+              })
+            }
+          } else
+            if (item.sign === 1 ) {
+              // 跳转型
+              ListItem() {
+                skipRowList({
+                  title: item.title,
+                  subtitle: item.subtitle,
+                })
+              }.onClick(() => {
+                this.handleCheck(index)
+              })
+            } else
+            if (item.sign === 2 ) {
+              // 开关型
+              ListItem() {
+                toggleRowList({
+                  title: item.title,
+                  subtitle: item.subtitle,
+                  toggle: () => { this.networkToggleBuilder(item.isCheck) }
+                })
+              }.onClick(() => {
+                hilog.info(0xFF00, "NetworkTestTag", "开关状态1:  %{public}s", item.isCheck)
+                this.getUIContext()?.animateTo({
+                  duration: ANIMATION_DURATION_300
+                }, () => {
+                  const toggleItem = this.overwriteNetworkList[index]
+                  toggleItem.isCheck = !toggleItem.isCheck
+                  this.overwriteNetworkList.splice(index, 1, toggleItem)
+                  hilog.info(0xFF00, "NetworkTestTag", "开关状态2:  %{public}s", toggleItem.isCheck)
+                  if(toggleItem.isCheck) {
+                    hilog.info(0xFF00, "NetworkTestTag", "开关已打开")
+                    this.handleToggle(index)
+                  }
+                })
+              })
+            } else
+            if (item.sign === 3) {
+              // 标题栏
+              ListItem() {
                 Row() {
                   Text(item.title)
                     .fontWeight(FontWeight.Normal)
-                    .fontSize(16)
-                }
-                .width('94%')
-                .height(29)
-                Row()
-                  .height(10)
+                    .fontSize(15)
+                  Blank()
+                }.width('100%')
+                .justifyContent(FlexAlign.Start)
               }
             }
-          }
 
         })
 
       }
       .width('100%')
       .height(this.isLandscapePhone ? 275 : 650)
-      .margin({ top: 10, left: this.morePageMargin.value, right: this.morePageMargin.value })
+      .margin({ top: 10 })
+      .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value  })
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)
 
@@ -152,8 +140,12 @@ struct Network {
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
-      this.pageInfos.clear();
-      return true;
+      if(this.pageInfos.size() === 1) {
+        this.pageInfos.clear()
+      } else {
+        this.pageInfos.pop(true)
+      }
+      return true
     })
   }
 }
@@ -187,6 +179,7 @@ export struct NetworkRouterAddress {
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+
   /**
    * 添加路由地址弹窗控制器
    */
@@ -274,38 +267,16 @@ export struct NetworkRouterAddress {
 
   }
 
-  @Builder
-  RouterAddressSearch() {
-  }
-  @Builder
-  RouterAddressOther() {
-    Button({ type: ButtonType.Circle, stateEffect: true }) {
-      SymbolGlyph($r('sys.symbol.plus'))
-        .fontSize(24)
-        .fontColor([this.icon_primary])
-    }
-    .width(40)
-    .height(40)
-    .backgroundColor($r('app.color.settings_container_background'))
-    .onClick(() => {
-      // 启用背景模糊
-      this.isEnableIndexForegroundBlur = true
-      this.addDialogController.open()
-    })
-  }
 
   build() {
     NavDestination() {
       // 导航栏
-      Row() {
-        MoreTop({
-          title: $r('app.string.Routing_Address'),
-          searchButton: this.RouterAddressSearch,
-          otherButton: () => { this.RouterAddressOther() }
-        })
-      }.width('100%')
+      OverwriteTop({
+        title: $r('app.string.Network'),
+        subtitle: $r('app.string.Routing_Address')
+      })
 
-      List() {
+      List({space: this.listBottom.value}) {
         ForEach(this.RouterAddressList, (item: RouterAddressData, index: number) => {
           // 数据列表行
           ListItem() {
@@ -321,7 +292,7 @@ export struct NetworkRouterAddress {
                   .fontSize(28)
                   .margin({right: 12})
                   .onClick(() => {
-                    // 进入列表行删除
+                    // 进去列表行删除
                     this.handleDelete(index)
                   })
               }
@@ -329,12 +300,9 @@ export struct NetworkRouterAddress {
               .height(53)
               .borderRadius(20)
               .backgroundColor($r('app.color.container_background'))
-              Row()
-                .height(10)
             }
 
           }
-          .margin({bottom: this.listBottom.value })
           .onClick(() => {
             // 启用背景模糊
             this.isEnableIndexForegroundBlur = true
@@ -345,19 +313,47 @@ export struct NetworkRouterAddress {
           })
         })
 
+        // 添加栏
+        ListItem() {
+          Row() {
+            SymbolGlyph($r('sys.symbol.plus'))
+              .fontSize(28)
+              .margin({left: 12, right: 16})
+              .fontColor([this.icon_primary])
+            Text($r('app.string.Add'))
+              .fontWeight(FontWeight.Medium)
+              .fontSize(16)
+          }
+          .width('100%')
+          .height(53)
+          .borderRadius(20)
+          .backgroundColor($r('app.color.container_background'))
+        }
+        .onClick(() => {
+          // 启用背景模糊
+          this.isEnableIndexForegroundBlur = true
+          this.addDialogController.open()
+        })
+
       }
       .width('100%')
       .height(this.isLandscapePhone ? 275 : 650)
+      .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
       .margin({ top: 10 })
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)
+
+
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
-    .padding({left: this.morePageMargin.value, right: this.morePageMargin.value})
     .onBackPressed(() => {
-      this.pageInfos.pop(true);
-      return true;
+      if(this.pageInfos.size() === 1) {
+        this.pageInfos.clear()
+      } else {
+        this.pageInfos.pop(true)
+      }
+      return true
     })
   }
 }
@@ -375,7 +371,7 @@ class RouterAddressData {
   }
 }
 
-// 临时数据
+// 数据
 const createRouterAddressData = (): RouterAddressData[] => {
   let result: RouterAddressData[] = new Array()
   result = [

@@ -1,7 +1,8 @@
 import { BreakpointState } from "../../../common/breakpointsystem"
-import { ListOverwriteBasicData,  moreData } from "../../../common/Constants"
+import { ANIMATION_DURATION_300, ListOverwriteBasicData,  moreData } from "../../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import OverwriteTop from "./OverwriteTopBuilder"
+import { menuRowList, skipRowList, toggleRowList } from "../../Common"
 
 @Component
 struct Basic {
@@ -52,82 +53,88 @@ struct Basic {
 
   }
 
+  @Builder
+  basicMenuTipsBuilder(tips: ResourceStr) {
+    Text(tips)
+      .fontWeight(FontWeight.Normal)
+      .textOverflow({ overflow: TextOverflow.Ellipsis })
+      .maxLines(1)
+      .margin({top: 2 })
+      .fontSize(14)
+  }
+  @Builder
+  basicSkipTipsBuilder(tips: ResourceStr) {
+    Text(tips)
+      .fontWeight(FontWeight.Normal)
+      .textOverflow({ overflow: TextOverflow.Ellipsis })
+      .maxLines(1)
+      .margin({top: 2, right: 2 })
+      .fontSize(14)
+  }
+  @Builder
+  basicToggleBuilder(isON: boolean) {
+    Toggle({ type: ToggleType.Switch, isOn: isON })
+      .margin({right: 12})
+      .hitTestBehavior(HitTestMode.None)
+      .selectedColor(this.icon_emphasize)
+  }
   build() {
     NavDestination() {
       OverwriteTop({
         title: $r('app.string.Basic'),
         subtitle: ''
       })
-
-      List() {
+      // 列表
+      List({space: this.listBottom.value}) {
         ForEach(this.overwriteBasicList, (item: moreData, index: number) => {
-          ListItem() {
-            Row() {
-              Row() {
-                SymbolGlyph(item.icons)
-                  .fontSize(24)
-                  .margin({left: 12})
-                  .fontColor([this.icon_primary])
-                Column() {
-                  Text(item.title)
-                    .fontWeight(FontWeight.Medium)
-                    .fontSize(16)
-                  if(index === 7 || index === 9 ) {
-                    Text(item.subtitle)
-                      .fontWeight(FontWeight.Normal)
-                      .margin({ top: 2 })
-                      .fontSize(14)
-                  }
-                }
-                .alignItems(HorizontalAlign.Start)
-                .margin({ left: 12 })
-                Blank()
-                if (item.sign === 0 ) {
-                  // 展开型
-                  Text(item.subtitle)
-                    .fontWeight(FontWeight.Normal)
-                    .margin({top: 2 })
-                    .fontSize(14)
-                  SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
-                    .fontSize(14)
-                    .margin({left: 7, right: 20})
-                    .fontColor([this.icon_primary])
-                } else if (item.sign === 1) {
-                  // 跳转型
-                  if(index != 5) {
-                    Text(item.subtitle)
-                      .fontWeight(FontWeight.Normal)
-                      .margin({right: 4 })
-                      .fontSize(14)
-                  }
-                  SymbolGlyph($r('sys.symbol.chevron_right'))
-                    .fontSize(28)
-                    .margin({right: 12})
-                    .fontColor([this.icon_primary])
-                } else if (item.sign === 2 ) {
-                  // 开关型
-                  Toggle({ type: ToggleType.Switch, isOn: item.isCheck })
-                    .selectedColor(this.icon_emphasize)
-                    .margin({right: 12})
-                    .onChange((isOn: boolean) => {
-                      if(isOn) {
-                        this.handleToggle(index)
-                      }
-                    })
-                }
-              }
-              .width('94%')
-              .height(53)
-              .borderRadius(20)
-              .backgroundColor($r('app.color.container_background'))
+          if (item.sign === 0 ) {
+            ListItem() {
+              // 展开型
+              menuRowList({
+                icons: item.icons,
+                title: item.title,
+                isPrimaryIcons: true,
+                tips: () => { this.basicMenuTipsBuilder(item.subtitle) }
+              })
             }
-            .onClick(() => {
-              if(item.sign === 1) {
-                this.handleCheck(index)
-              }
+          } else if (item.sign === 1) {
+            ListItem() {
+              // 跳转型
+              skipRowList({
+                icons: item.icons,
+                title: item.title,
+                isPrimaryIcons: true,
+                tips: () => { this.basicSkipTipsBuilder(item.subtitle) }
+              })
+            }.onClick(() => {
+              this.handleCheck(index)
+            })
+          } else if (item.sign === 2 ) {
+            ListItem() {
+              // 开关型
+              toggleRowList({
+                icons: item.icons,
+                title: item.title,
+                subtitle: item.subtitle,
+                isPrimaryIcons: true,
+                toggle:  () => { this.basicToggleBuilder(item.isCheck) }
+              })
+            }.onClick(() => {
+              hilog.info(0xFF00, "BasictestTag", "开关状态1:  %{public}s", item.isCheck)
+              this.getUIContext()?.animateTo({
+                duration: ANIMATION_DURATION_300
+              }, () => {
+                const toggleItem = this.overwriteBasicList[index]
+                toggleItem.isCheck = !toggleItem.isCheck
+                this.overwriteBasicList.splice(index, 1, toggleItem)
+                hilog.info(0xFF00, "BasictestTag", "开关状态2:  %{public}s", toggleItem.isCheck)
+                if(toggleItem.isCheck) {
+                  hilog.info(0xFF00, "BasictestTag", "开关已打开")
+                  this.handleToggle(index)
+                }
+              })
             })
           }
-          .margin({bottom: this.listBottom.value })
 
         })
 
@@ -135,7 +142,8 @@ struct Basic {
       .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
       .width('100%')
       .height(this.isLandscapePhone ? 275 : (this.istabletVertical ? 900 : this.listHeight.value))
-      .margin({ top: 10, left: this.morePageMargin.value, right: this.morePageMargin.value })
+      .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
+      .margin({ top: 10 })
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)
 
@@ -143,8 +151,12 @@ struct Basic {
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
-      this.pageInfos.clear();
-      return true;
+      if(this.pageInfos.size() === 1) {
+        this.pageInfos.clear()
+      } else {
+        this.pageInfos.pop(true)
+      }
+      return true
     })
   }
 }

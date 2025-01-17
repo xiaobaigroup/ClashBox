@@ -531,6 +531,7 @@ export struct skipRowList {
   @State icons?: Resource = undefined
   @State title: ResourceStr = ''
   @State subtitle: ResourceStr = ''
+  @State isPrimaryIcons: boolean = false
   @State isExperimentalFunction: boolean = false
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
@@ -540,7 +541,7 @@ export struct skipRowList {
   // 默认跳转行提示文本
   @Builder
   defaultTipsBuilder() {
-    Text('默认')
+    Text('')
       .fontWeight(FontWeight.Normal)
       .textOverflow({ overflow: TextOverflow.Ellipsis })
       .maxLines(1)
@@ -554,7 +555,7 @@ export struct skipRowList {
         SymbolGlyph(this.icons)
           .fontSize(24)
           .margin({left: 12})
-          .fontColor([this.icon_emphasize])
+          .fontColor([this.isPrimaryIcons ? this.icon_primary : this.icon_emphasize])
       }
       Column() {
         Row() {
@@ -602,6 +603,9 @@ export struct toggleRowList {
   @State icons?: Resource = undefined
   // 副标题
   @State subtitle: ResourceStr = ''
+  @State isPrimaryIcons: boolean = false
+  // 一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   // 实验功能标识
   @State isExperimentalFunction: boolean = false
   // 主题色
@@ -622,7 +626,7 @@ export struct toggleRowList {
         SymbolGlyph(this.icons)
           .fontSize(24)
           .margin({left: 12})
-          .fontColor([this.icon_emphasize])
+          .fontColor([this.isPrimaryIcons ? this.icon_primary : this.icon_emphasize])
       }
       Column() {
         Row() {
@@ -634,12 +638,14 @@ export struct toggleRowList {
             ExperimentalFunction()
           }
         }
-        Text(this.subtitle)
-          .fontWeight(FontWeight.Normal)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .maxLines(1)
-          .margin({top: 2})
-          .fontSize(14)
+        if(this.subtitle) {
+          Text(this.subtitle)
+            .fontWeight(FontWeight.Normal)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .maxLines(1)
+            .margin({top: 2})
+            .fontSize(14)
+        }
       }.layoutWeight(1)
       .alignItems(HorizontalAlign.Start)
       .margin({ left: this.icons != null ? 12 : 14 })
@@ -663,9 +669,10 @@ export struct menuRowList {
   // 标题
   @State title: ResourceStr = ''
   // 图标
-  @State icons: Resource = $r('sys.symbol.stopwatch_2')
+  @State icons?: Resource = undefined
   // 副标题
   @State subtitle: ResourceStr = ''
+  @State isPrimaryIcons: boolean = false
   // 实验功能标识
   @State isExperimentalFunction: boolean = false
   // 主题色
@@ -684,7 +691,7 @@ export struct menuRowList {
   // 默认菜单提示文本
   @Builder
   defaultTipsBuilder() {
-    Text('默认')
+    Text('')
       .fontWeight(FontWeight.Normal)
       .textOverflow({ overflow: TextOverflow.Ellipsis })
       .maxLines(1)
@@ -694,10 +701,12 @@ export struct menuRowList {
 
   build() {
     Row() {
-      SymbolGlyph(this.icons)
-        .fontSize(24)
-        .margin({left: 12})
-        .fontColor([this.icon_emphasize])
+      if(this.icons) {
+        SymbolGlyph(this.icons)
+          .fontSize(24)
+          .margin({left: 12})
+          .fontColor([this.isPrimaryIcons ? this.icon_primary : this.icon_emphasize])
+      }
       Column() {
         Row() {
           Text(this.title)
@@ -711,11 +720,11 @@ export struct menuRowList {
         if(this.subtitle) {
           Text(this.subtitle)
             .fontWeight(FontWeight.Normal)
+            .layoutWeight(1)
             .textOverflow({ overflow: TextOverflow.MARQUEE })
             .maxLines(1)
             .margin({ top: 2 })
             .fontSize(14)
-            .width('70%')
         }
       }
       .margin({ left: 12 })
