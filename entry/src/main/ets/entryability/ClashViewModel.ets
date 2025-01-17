@@ -1,6 +1,7 @@
 import { ProfileRepo } from "proxy_core/src/main/ets/ProfileRepo";
 import { Context } from "@kit.AbilityKit";
-import { SocketProxyService, Profile, ProfileType, UpdateConfigParams, ClashConfig, getHome } from "proxy_core";
+import { SocketProxyService, Profile, ProfileType, UpdateConfigParams, ClashConfig, getHome,
+  LogInfo } from "proxy_core";
 import { vpnExtension } from "@kit.NetworkKit";
 import { ConfigData } from "../common/PageArgumentEntity";
 import { promptAction } from "@kit.ArkUI";
@@ -112,7 +113,16 @@ export class ClashViewModel {
   async updateGeoData (geoName: string, geoType: string): Promise<string>{
     return ""
   }
-
+  job?: (()=>void)
+  async startLog(enable: boolean, callback: (d: LogInfo) => void){
+      if(enable){
+        this.job = await this.socketProxy.setLogObserver((message)=>{
+          callback(JSON.parse(message) as LogInfo)
+        })
+      }else{
+        this.job?.()
+      }
+  }
 
   async updateProfile(profile: Profile){
     await this.profileRepo.addOrUpdate(profile)
@@ -174,6 +184,9 @@ export class ClashViewModel {
     let clashConfig = AppStorage.get<ClashConfig>("clashConfig")
     if (appConfig?.currentProfileId){
       this.loadProfileAndConfig(appConfig?.currentProfileId, clashConfig)
+    }
+    if(appConfig?.enableLogger){
+      EventHub.sendEvent(EventKey.StartLog)
     }
   }
   async initGeoIp(){

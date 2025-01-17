@@ -22,18 +22,10 @@ import { getResourceString } from '../utils/ResourceStringUtil';
 import { extractLocationInfo, getIpInfo, mapLocation } from '../utils/GetIpInfo';
 import { promptAction } from '@kit.ArkUI';
 import { skipRowList } from '../components/Common';
+import { AppConfig } from '../entryability/AppState';
+import ClashViewModel from '../entryability/ClashViewModel';
 
-// 日志数据（假设）
-interface LogData {
-  // 日志类型（0：Warning；1：Info）
-  logType: number
-  // 日志生成时间(展示的时间)
-  logTime: number
-  // 日志详情
-  LogDetails: string
-  // 是否跳转
-  logSkip: boolean
-}
+
 
 @Entry
 @Component
@@ -79,38 +71,7 @@ struct MorePage {
 
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
-
-  // 日志页临时数据
-  @Provide
-  private logListData: Array<LogData> = [
-    {
-      logType: 1,
-      logTime: 1736996575781,
-      LogDetails: '[App] Local level: info',
-      logSkip: false
-    },
-    {
-      logType: 0,
-      logTime: 1736990476781,
-      LogDetails: '[App] Warning Test Message',
-      logSkip: false
-    },
-    {
-      logType: 1,
-      logTime: 1736980475781,
-      logSkip: true,
-      LogDetails: '[App] Hello World Hello World Hello World Hello World Hello World Hello World Hello World' +
-        ' Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World' +
-        ' Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World' +
-        ' Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World'
-    },
-    {
-      logType: 0,
-      logSkip: false,
-      logTime: 1736990375781,
-      LogDetails: '[App] Warning Test Message 2'
-    },
-  ]
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
 
   /**
    * 查询IP地址弹窗控制器

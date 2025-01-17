@@ -4,6 +4,8 @@ import { ANIMATION_DURATION_300, ListOverwriteDNSData,  moreData } from "../../.
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import OverwriteTop from "./OverwriteTopBuilder"
 import { menuRowList, skipRowList, toggleRowList } from "../../Common"
+import { ClashConfig, Dns } from 'proxy_core'
+import { AppConfig, copy } from '../../../entryability/AppState'
 
 // 编辑FakeIP范围弹窗
 @CustomDialog
@@ -68,7 +70,7 @@ struct DNS {
   @Consume('NavPathStack') pageInfos: NavPathStack
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
-  @State overwriteDNSList: moreData[] = ListOverwriteDNSData()
+  @State overwriteDNSList: moreData[] = []
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
   // 列表高度
   @Consume('breakPointStateListHeight') listHeight: BreakpointState<number>
@@ -79,6 +81,9 @@ struct DNS {
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
+
+  @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   // 弹窗控制器
   dialogController: CustomDialogController = new CustomDialogController({
     builder: FakeIPCustomDialog({
@@ -116,6 +121,12 @@ struct DNS {
     // 处理FakeIP范围变更
 
   }
+  aboutToAppear(): void {
+    this.overwriteDNSList = ListOverwriteDNSData(this.clashConfig, this.appConfig)
+  }
+  changeDns(dns: Dns){
+    this.clashConfig.dns = copy(dns)
+  }
 
   // 列表行点击事件处理
   handleCheck(index: number) {
@@ -131,47 +142,55 @@ struct DNS {
   }
 
   // DNS页面开关处理
-  handleToggle(index: number) {
+  handleToggle(index: number, checked: boolean) {
+    let dns = this.clashConfig.dns ?? {} as Dns
     switch (index) {
       case 0:
         // 覆写DNS
         hilog.info(0xFF00, "DNStestTag", "覆写DNS")
-
+        this.appConfig.overrideDns = checked
         break
       case 2:
         // 状态
         hilog.info(0xFF00, "DNStestTag", "状态")
-
+        dns.enable = checked
+        this.changeDns(dns)
         break
       case 3:
         // 使用Hosts
         hilog.info(0xFF00, "DNStestTag", "使用Hosts")
-
+        dns['use-hosts'] = checked
+        this.changeDns(dns)
         break
       case 4:
         // 使用系统Hosts
         hilog.info(0xFF00, "DNStestTag", "使用系统Hosts")
-
+        dns['use-system-hosts'] = checked
+        this.changeDns(dns)
         break
       case 5:
         // Ipv6
         hilog.info(0xFF00, "DNStestTag", "Ipv6")
-
+        dns.ipv6 = checked
+        this.changeDns(dns)
         break
       case 6:
         // 遵守规则
         hilog.info(0xFF00, "DNStestTag", "遵守规则")
-
+        dns['respect-rules'] = checked
+        this.changeDns(dns)
         break
       case 7:
         // 优先使用H3
         hilog.info(0xFF00, "DNStestTag", "优先使用H3")
-
+        dns['prefer-h3'] = checked
+        this.changeDns(dns)
         break
       case 17:
         // GeoIP
         hilog.info(0xFF00, "DNStestTag", "GeoIP")
-
+        dns['fallback-filter']["geoIp"] = checked
+        this.changeDns(dns)
         break
     }
 
@@ -258,10 +277,8 @@ struct DNS {
                   toggleItem.isCheck = !toggleItem.isCheck
                   this.overwriteDNSList.splice(index, 1, toggleItem)
                   hilog.info(0xFF00, "DNStestTag", "开关状态2:  %{public}s", toggleItem.isCheck)
-                  if(toggleItem.isCheck) {
-                    hilog.info(0xFF00, "DNStestTag", "开关已打开")
-                    this.handleToggle(index)
-                  }
+                  hilog.info(0xFF00, "DNStestTag", "开关已打开")
+                  this.handleToggle(index, toggleItem.isCheck)
                 })
               })
             } else

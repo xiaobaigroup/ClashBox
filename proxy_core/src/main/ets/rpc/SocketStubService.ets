@@ -5,7 +5,9 @@ import json from '@ohos.util.json';
 import { ClashRpcType } from './IClashManager';
 import { asyncTestDelay,
   changeProxy,
-  getExternalProviders, getProxies, getTraffic, initClash, updateConfig
+  getExternalProviders, getProxies, getTraffic, initClash,
+  startLog,
+  updateConfig
 } from 'libflclash.so';
 import { common } from '@kit.AbilityKit';
 import { OverrideSlot } from '../models/Common';
@@ -30,6 +32,9 @@ export class SocketStubService {
       // nativeSubscribeLogcat((value: string)=>{
       //   this.sendClient(client, value)
       // })
+      startLog((message: string)=>{
+        this.sendClient(client, message)
+      })
     } else {
       try {
         let result = await this.onRemoteMessage(code, params)

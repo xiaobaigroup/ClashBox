@@ -18,7 +18,9 @@ export class AppConfig{
   proxySort?: ProxySort = ProxySort.Default
   proxyGroupType?: ProxyGroupType = ProxyGroupType.Tabs
   proxyCardSize?: ProxyCardSize = ProxyCardSize.Mini
-
+  enableLogger?: boolean = false
+  testUrl?: string = ""
+  overrideDns?: boolean = false
   constructor() {
   }
 }
@@ -26,6 +28,7 @@ export class AppConfig{
 export function isEnd(length: number, i: number){
   return length -1 == i
 }
+
 // use @StorageLink('appConfig')
 export class AppState {
 

@@ -46,7 +46,7 @@ import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
 import { Item, ProxyData } from '../common/ProxyData'
 import { image } from '@kit.ImageKit'
-import { Dns, Profile, ProxyGroup } from 'proxy_core'
+import { Dns, LogLevel, Profile, ProxyGroup } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig } from '../entryability/AppState'
@@ -59,6 +59,18 @@ interface marginGenerate {
   bottom: number,
   left: number,
   right: number
+}
+
+// 日志数据（假设）
+interface LogData {
+  // 日志类型（0：Warning；1：Info）
+  logType: LogLevel
+  // 日志生成时间(展示的时间)
+  logTime: number
+  // 日志详情
+  LogDetails: string
+  // 是否跳转
+  logSkip: boolean
 }
 
 @Entry
@@ -263,6 +275,25 @@ struct Index {
   @Provide private FavoriteProxy: number =-1
   //节点数据组
   @Provide items: Item[] = ProxyData.ProxyItems();
+  // 日志页临时数据
+  @Provide
+  private logListData: Array<LogData> = [
+    {
+      logType: LogLevel.Info,
+      logTime: 1736996575781,
+      LogDetails: '[App] Local level: info',
+      logSkip: false
+    },
+    {
+      logType: LogLevel.Debug,
+      logTime: 1736980475781,
+      logSkip: true,
+      LogDetails: '[App] Hello World Hello World Hello World Hello World Hello World Hello World Hello World' +
+        ' Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World' +
+        ' Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World' +
+        ' Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World'
+    },
+  ]
 
 
   /**
@@ -407,7 +438,16 @@ struct Index {
         }
       }
     })
-
+    EventHub.on(EventKey.StartLog, async (enable: boolean)=>{
+      ClashViewModel.startLog(enable, (log)=>{
+        this.logListData.push({
+          logType: log.logLevel,
+          logTime: 0,
+          LogDetails: log.payload,
+          logSkip: false
+        })
+      })
+    })
   }
   @Provide proxyGroups: ProxyGroup[] = []
   @Provide("currentProfile") currentProfile: Profile | null = null

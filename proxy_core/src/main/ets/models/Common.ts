@@ -69,7 +69,7 @@ export enum LogLevel {
   Silent = "silent",
   Unknown = "unknown"
 }
-export class Log{
+export class LogInfo{
   logLevel: LogLevel
   payload : string
 }

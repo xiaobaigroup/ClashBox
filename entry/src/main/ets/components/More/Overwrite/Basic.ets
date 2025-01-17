@@ -3,6 +3,8 @@ import { ANIMATION_DURATION_300, ListOverwriteBasicData,  moreData } from "../..
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import OverwriteTop from "./OverwriteTopBuilder"
 import { menuRowList, skipRowList, toggleRowList } from "../../Common"
+import { ClashConfig, LogLevel } from 'proxy_core'
+import { AppConfig, copy } from '../../../entryability/AppState'
 
 @Component
 struct Basic {
@@ -14,17 +16,45 @@ struct Basic {
   @Consume('NavPathStack') pageInfos: NavPathStack
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
-  @State overwriteBasicList: moreData[] = ListOverwriteBasicData()
+  @State overwriteBasicList: moreData[] = []
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
   // 列表高度
   @Consume('breakPointStateListHeight') listHeight: BreakpointState<number>
   // 平板竖屏判断
   @StorageProp('istabletVertical')  private istabletVertical: boolean = false
-
+  @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  aboutToAppear(): void {
+    this.overwriteBasicList = ListOverwriteBasicData(this.clashConfig, this.appConfig)
+  }
+  changeChange(name: string, value: string | boolean | number | Record<string, string>){
+    if (this.clashConfig){
+      if (name == "LogLevel"){
+        this.clashConfig["log-level"] = value as LogLevel
+      }
+      if (name == "ProxyPort"){
+        this.clashConfig["mixed-port"] = value as number
+      }
+      if (name == "UnifiedLatency"){
+        this.clashConfig["unified-delay"] = value as boolean
+      }
+      if(name == "Ipv6"){
+        this.clashConfig.ipv6 = value as boolean
+      }
+      if(name == "TCP-Concurrency"){
+        this.clashConfig['tcp-concurrent'] = value as boolean
+      }
+      if(name == "Hosts"){
+        // 非基础类型需要copy，才能持久化
+        this.clashConfig["hosts"] = copy(value as Record<string, string>)
+      }
+    }
+  }
   handleCheck(index: number) {
     // 跳转
     let itemData = this.overwriteBasicList[index]
     this.pageInfos.pushPathByName(itemData.name, false)
+
   }
   // 开关处理
   handleToggle(index: number) {
@@ -128,6 +158,7 @@ struct Basic {
                 toggleItem.isCheck = !toggleItem.isCheck
                 this.overwriteBasicList.splice(index, 1, toggleItem)
                 hilog.info(0xFF00, "BasictestTag", "开关状态2:  %{public}s", toggleItem.isCheck)
+                this.changeChange(toggleItem.name as string, toggleItem.isCheck)
                 if(toggleItem.isCheck) {
                   hilog.info(0xFF00, "BasictestTag", "开关已打开")
                   this.handleToggle(index)

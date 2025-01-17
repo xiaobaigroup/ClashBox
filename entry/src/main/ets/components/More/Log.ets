@@ -3,11 +3,14 @@ import { SymbolGlyphModifier } from "@kit.ArkUI"
 import { MoreTop } from "./MoreTopBuilder"
 import { Nothing, skipRowList, toggleRowList } from "../Common"
 import { timestampToDateTime } from "../../utils/TimeConvertUtil"
+import { ClashConfig, LogLevel } from "proxy_core"
+import { AppConfig } from "../../entryability/AppState"
+import { EventHub, EventKey } from "../../common/EventHub"
 
 // 日志数据（假设）
 interface LogData {
   // 日志类型（0：Warning；1：Info）
-  logType: number
+  logType: LogLevel
   // 日志生成时间(展示的时间)
   logTime: number
   // 日志详情
@@ -31,22 +34,25 @@ struct Log {
   // 临时数据（数据本体在MorePage）
   @Consume logListData: Array<LogData>
 
+  @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+
   @Builder
   MoreMenu() {
     Menu() {
       MenuItem({
         content: $r('app.string.EnableLogger'),
-        symbolEndIcon: this.EnableLogger ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+        symbolEndIcon: this.appConfig.enableLogger ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
       })
-        .selected(this.EnableLogger)
+        .selected(this.appConfig.enableLogger ?? false)
         .onChange((selected) => {
-          this.EnableLogger = !this.EnableLogger
+          this.appConfig.enableLogger = !this.appConfig.enableLogger
+          EventHub.sendEvent(EventKey.StartLog, this.appConfig.enableLogger)
         })
-      if (this.EnableLogger) {
+      if (this.appConfig.enableLogger) {
         MenuItem({ content: $r('app.string.ClearLogs')})
           .onClick(() => {
             // 清空日志操作
-
           })
         MenuItem({ content: $r('app.string.ExportLog')})
           .onClick(() => {
@@ -69,31 +75,31 @@ struct Log {
         .contentFont({ weight: FontWeight.Bold })
       MenuItem({
         content: $r('app.string.not_filter'),
-        symbolEndIcon: this.filterChecked === 0 ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+        symbolEndIcon: this.clashConfig["log-level"] === LogLevel.Debug ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
       })
         .onClick(() => {
-          this.filterChecked = 0
+          this.clashConfig["log-level"] = LogLevel.Debug
         })
       MenuItem({
         content: $r('app.string.information_only'),
-        symbolEndIcon: this.filterChecked === 1 ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+        symbolEndIcon: this.clashConfig["log-level"] === LogLevel.Info  ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
       })
         .onClick(() => {
-          this.filterChecked = 1
+          this.clashConfig["log-level"] = LogLevel.Info
         })
       MenuItem({
         content: $r('app.string.warning_only'),
-        symbolEndIcon: this.filterChecked === 2 ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+        symbolEndIcon: this.clashConfig["log-level"] === LogLevel.Warning ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
       })
         .onClick(() => {
-          this.filterChecked = 2
+          this.clashConfig["log-level"] = LogLevel.Warning
         })
       MenuItem({
         content: $r('app.string.error_only'),
-        symbolEndIcon: this.filterChecked === 3 ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+        symbolEndIcon: this.clashConfig["log-level"] === LogLevel.Error ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
       })
         .onClick(() => {
-          this.filterChecked = 3
+          this.clashConfig["log-level"] = LogLevel.Error
         })
     }
   }
@@ -143,7 +149,7 @@ struct Log {
           }.width('100%')
 
           // 主体
-          if (this.EnableLogger === false) {
+          if (this.appConfig.enableLogger === false) {
             Column() {
               SymbolGlyph($r('sys.symbol.checkmark_circle'))
                 .fontSize(24)
@@ -177,9 +183,9 @@ struct Log {
                     // 无跳转
                     Row() {
                       Column() {
-                        Text(`${item.logType === 0 ? 'Warning' : 'Info'} ${timestampToDateTime(item.logTime)}`)
+                        Text(`${item.logType} ${timestampToDateTime(item.logTime)}`)
                           .fontWeight(FontWeight.Medium)
-                          .fontColor(item.logType === 0 ? Color.Red : this.icon_primary)
+                          .fontColor(item.logType === LogLevel.Error ? Color.Red : this.icon_primary)
                           .fontSize(16)
                         Text(`${item.LogDetails}`)
                           .fontWeight(FontWeight.Normal)
@@ -256,7 +262,7 @@ export struct LogDetils {
       Row() {
         MoreTop({
           title: $r('app.string.Log'),
-          subtitle: `${this.logListData[this.theLogSkipItem].logType === 0 ? 'Warning' : 'Info'} ${timestampToDateTime(this.logListData[this.theLogSkipItem].logTime)}`,
+          subtitle: `${this.logListData[this.theLogSkipItem].logType} ${timestampToDateTime(this.logListData[this.theLogSkipItem].logTime)}`,
           searchButton: (): void => { this.logDetilsSearch() },
           otherButton: (): void => { this.logDetilsOther() }
         })

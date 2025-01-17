@@ -118,13 +118,13 @@ export class  ClashConfig {
   "socks-port"?: number;
   "redir-port"?: number;
   "tproxy-port"?: number;
-  "mixed-port"?: number;
+  "mixed-port"?: number = defaultMixedPort;
   authentication?: string[];
   "allow-lan"?: boolean;
   "bind-address"?: string;
   mode?: TunnelState;
   "log-level"?: LogLevel = LogLevel.Info;
-  ipv6?: boolean;
+  ipv6?: boolean = false;
   "external-controller"?: string;
   "external-controller-tls"?: string;
   "external-controller-cors"?: string;
@@ -134,7 +134,7 @@ export class  ClashConfig {
   "geodata-mode"?: boolean;
   "tcp-concurrent"?: boolean;
   "find-process-mode"?: FindProcessMode;
-  dns?: Dns;
+  dns?: Dns = { "fallback-filter": {} } as Dns;
   app?: App;
   sniffer?: Sniffer;
   "geox-url"?: GeoXUrl = defaultGeoXMap;
@@ -148,13 +148,15 @@ export interface Dns {
   listen?: string;
   ipv6?: boolean;
   "use-hosts"?: boolean;
+  "use-system-hosts"?: boolean;
+  "respect-rules"?: boolean;
   "enhanced-mode"?: DnsEnhancedMode;
   nameserver?: string[];
   fallback?: string[];
   "default-nameserver"?: string[];
   "fake-ip-filter"?: string[];
   "fake-ip-filter-mode"?: string[];
-  "fallback-filter"?: DnsFallbackFilter;
+  "fallback-filter": DnsFallbackFilter;
   "nameserver-policy"?: Record<string, string>;
 }
 

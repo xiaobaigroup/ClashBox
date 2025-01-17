@@ -1,3 +1,5 @@
+import { ClashConfig } from "proxy_core";
+import { AppConfig } from "../entryability/AppState";
 import { CustomThemeName } from "./AppTheme";
 import { BreakpointState } from "./breakpointsystem";
 
@@ -106,36 +108,36 @@ export  const ListOverwriteData = (): moreData[] => {
 }
 
 // 更多 -> 覆写 -> 基础Listitem
-export  const ListOverwriteBasicData = (): moreData[] => {
+export  const ListOverwriteBasicData = (clashConfig: ClashConfig, appConfig: AppConfig): moreData[] => {
   let result: moreData[] = new Array()
   result = [
-    new moreData($r('sys.symbol.info_circle'), 'LogLevel', $r('app.string.LogLevel'), $r('app.string.Info'), 0,  false),
+    new moreData($r('sys.symbol.info_circle'), 'LogLevel', $r('app.string.LogLevel'), clashConfig?.["log-level"] ?? $r('app.string.Info'), 0,  false),
     new moreData($r('sys.symbol.person_shield_fill'), 'UA', $r('app.string.UA'), $r('app.string.Default_UA'), 0, false),
     new moreData($r('sys.symbol.stopwatch_2'), 'TCP_Active', $r('app.string.TCP_Active'), $r('app.string.TCP_interval'), 1, false),
-    new moreData($r('sys.symbol.bolt_filled_on_circle'), 'Test-Link', $r('app.string.Test_Latency_Link'), $r('app.string.Default_test_latency_link'), 1, false),
-    new moreData($r('sys.symbol.record_circle'), 'ProxyPort', $r('app.string.Proxy_Port'), '7890', 1,  false),
+    new moreData($r('sys.symbol.bolt_filled_on_circle'), 'Test-Link', $r('app.string.Test_Latency_Link'), appConfig.testUrl ?? $r('app.string.Default_test_latency_link'), 1, false),
+    new moreData($r('sys.symbol.record_circle'), 'ProxyPort', $r('app.string.Proxy_Port'), clashConfig?.["mixed-port"]?.toString() ?? '7890', 1,  false),
     new moreData($r('sys.symbol.list_bullet_square_fill'), 'Hosts', $r('app.string.Hosts'), '', 1, false),
-    new moreData($r('sys.symbol.mobiledata'), 'Ipv6', $r('app.string.IPv6'), '', 2, false),
-    new moreData($r('sys.symbol.line_arrowtriangle_2_inward'), 'UnifiedLatency', $r('app.string.UnifiedLatency'), $r('app.string.Unified_Latency_Subtitle'), 2, false),
-    new moreData($r('sys.symbol.order_play'), 'TCP-Concurrency', $r('app.string.TCP_Concurrency'), '', 2,  false),
+    new moreData($r('sys.symbol.mobiledata'), 'Ipv6', $r('app.string.IPv6'), '', 2, clashConfig?.ipv6 ?? false),
+    new moreData($r('sys.symbol.line_arrowtriangle_2_inward'), 'UnifiedLatency', $r('app.string.UnifiedLatency'), $r('app.string.Unified_Latency_Subtitle'), 2, clashConfig?.["unified-delay"] ?? false),
+    new moreData($r('sys.symbol.order_play'), 'TCP-Concurrency', $r('app.string.TCP_Concurrency'), '', 2,  clashConfig?.["tcp-concurrent"] ?? false),
     new moreData($r('sys.symbol.selector'), 'External-Control', $r('app.string.External_Control'), $r('app.string.External_Control_Subtitle'), 2, false),
   ]
   return result
 }
 
 // 更多 -> 覆写 -> DNSListitem
-export  const ListOverwriteDNSData = (): moreData[] => {
+export  const ListOverwriteDNSData = (clashConfig: ClashConfig, appConfig: AppConfig): moreData[] => {
   let result: moreData[] = new Array()
   result = [
-    new moreData($r('sys.symbol.selector'), 'OverwriteDNS', $r('app.string.OverwriteDNS'), '', 2,  false),
+    new moreData($r('sys.symbol.selector'), 'OverwriteDNS', $r('app.string.OverwriteDNS'), '', 2,  appConfig.overrideDns ?? false),
     new moreData($r('sys.symbol.selector'), 'Option', $r('app.string.option'), '', 3, false),
-    new moreData($r('sys.symbol.selector'), 'State', $r('app.string.State'), $r('app.string.State_subtitle'), 2, false),
-    new moreData($r('sys.symbol.selector'), 'UseHosts', $r('app.string.UseHosts'), '', 2,  false),
-    new moreData($r('sys.symbol.selector'), 'Use-System-Hosts', $r('app.string.Use_System_Hosts'), '', 2, false),
-    new moreData($r('sys.symbol.selector'), 'IPv6', $r('app.string.IPv6'), $r('app.string.Info'), 2,  false),
-    new moreData($r('sys.symbol.selector'), 'Follow-The-Rules', $r('app.string.Follow_The_Rules'), $r('app.string.Follow_The_Rules_Subtitle'), 2, false),
-    new moreData($r('sys.symbol.selector'), 'Priority-Use-H3', $r('app.string.Priority_Use_H3'), $r('app.string.Priority_Use_H3_Subtitle'), 2, false),
-    new moreData($r('sys.symbol.selector'), 'DNS-Mode', $r('app.string.DNS_Mode'), $r('app.string.DNS_Mode_Subtitle'), 0,  false),
+    new moreData($r('sys.symbol.selector'), 'State', $r('app.string.State'), $r('app.string.State_subtitle'), 2, clashConfig.dns?.enable ?? false),
+    new moreData($r('sys.symbol.selector'), 'UseHosts', $r('app.string.UseHosts'), '', 2,  clashConfig.dns?.["use-hosts"] ?? false),
+    new moreData($r('sys.symbol.selector'), 'Use-System-Hosts', $r('app.string.Use_System_Hosts'), '', 2, clashConfig.dns?.["use-system-hosts"] ?? false),
+    new moreData($r('sys.symbol.selector'), 'IPv6', $r('app.string.IPv6'), $r('app.string.Info'), 2,  clashConfig.dns?.ipv6 ?? false),
+    new moreData($r('sys.symbol.selector'), 'Follow-The-Rules', $r('app.string.Follow_The_Rules'), $r('app.string.Follow_The_Rules_Subtitle'), 2,  clashConfig.dns?.["respect-rules"] ?? false),
+    new moreData($r('sys.symbol.selector'), 'Priority-Use-H3', $r('app.string.Priority_Use_H3'), $r('app.string.Priority_Use_H3_Subtitle'), 2, clashConfig.dns?.["prefer-h3"] ?? false),
+    new moreData($r('sys.symbol.selector'), 'DNS-Mode', $r('app.string.DNS_Mode'), clashConfig.dns?.["enhanced-mode"] ?? $r('app.string.DNS_Mode_Subtitle'), 0, false),
     new moreData($r('sys.symbol.selector'), 'FakeIP-Range', $r('app.string.FakeIP_Range'), $r('app.string.FakeIP_Range_Subtitle_1'), 1, false),
     new moreData($r('sys.symbol.selector'), 'FakeIP-Filtering', $r('app.string.FakeIP_Filtering'), '', 1,  false),
     new moreData($r('sys.symbol.selector'), 'Default-Domain-Name-Server', $r('app.string.Default_Domain_Name_Server'), $r('app.string.Default_Domain_Name_Server_Subtitle'), 1, false),
@@ -144,11 +146,10 @@ export  const ListOverwriteDNSData = (): moreData[] => {
     new moreData($r('sys.symbol.selector'), 'FallBack', $r('app.string.FallBack'), $r('app.string.FallBack_Subtitle'), 1, false),
     new moreData($r('sys.symbol.selector'), 'Proxy-Domain-Name-Server', $r('app.string.Proxy_Domain_Name_Server'), $r('app.string.Proxy_Domain_Name_Server_Subtitle'), 1,  false),
     new moreData($r('sys.symbol.selector'), 'FallBack-Filtering', $r('app.string.FallBack_Filtering'), '', 3, false),
-    new moreData($r('sys.symbol.selector'), 'GeoIP', $r('app.string.GeoIP'), '', 2, false),
-    new moreData($r('sys.symbol.selector'), 'GeoIP-Code', $r('app.string.GeoIP_Code'), $r('app.string.GeoIP_Code_Subtitle_1'), 1,  false),
-    new moreData($r('sys.symbol.selector'), 'IP/Mask', $r('app.string.IP_Mask'), '', 1, false),
-    new moreData($r('sys.symbol.selector'), 'LogLevel', $r('app.string.LogLevel'), '', 1,  false),
-    new moreData($r('sys.symbol.selector'), 'Domain', $r('app.string.Domain_Name'), '', 1, false),
+    new moreData($r('sys.symbol.selector'), 'GeoIP', $r('app.string.GeoIP'), '', 2, clashConfig.dns?.["fallback-filter"]?.geoIp ?? false),
+    new moreData($r('sys.symbol.selector'), 'GeoIP-Code', $r('app.string.GeoIP_Code'), clashConfig.dns?.["fallback-filter"]?.geoIpCode ?? $r('app.string.GeoIP_Code_Subtitle_1'), 1, false),
+    new moreData($r('sys.symbol.selector'), 'IP/Mask', $r('app.string.IP_Mask'), clashConfig.dns?.["fallback-filter"]?.ipcidr?.toString() ?? '', 1, false),
+    new moreData($r('sys.symbol.selector'), 'Domain', $r('app.string.Domain_Name'), clashConfig.dns?.["fallback-filter"]?.domain?.toString() ?? '', 1, false),
   ]
   return result
 }
