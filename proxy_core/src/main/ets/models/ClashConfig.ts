@@ -1,4 +1,5 @@
 import { LogLevel } from "./Common"
+import { call } from "@kit.TelephonyKit"
 
 export interface  UpdateConfigParams{
   "profile-id": string
@@ -28,7 +29,7 @@ const defaultGeoXMap = {
 const defaultMixedPort = 7890;
 const defaultKeepAliveInterval = 30;
 
-const defaultBypassPrivateRouteAddress = [
+export const defaultBypassPrivateRouteAddress = [
   "1.0.0.0/8",
   "2.0.0.0/7",
   "4.0.0.0/6",
@@ -130,41 +131,80 @@ export class  ClashConfig {
   "external-controller-cors"?: string;
   secret?: string;
   hosts?: Record<string, string>;
-  "unified-delay"?: boolean;
+  "keep-alive-interval"?: number = defaultKeepAliveInterval
+  "unified-delay"?: boolean = false;
   "geodata-mode"?: boolean;
   "tcp-concurrent"?: boolean;
-  "find-process-mode"?: FindProcessMode;
-  dns?: Dns = { "fallback-filter": {} } as Dns;
+  "find-process-mode"?: FindProcessMode = FindProcessMode.Off;
+  "route-address"?: string[]
+  "route-mode"?: RouteMode = RouteMode.Config
+  "global-ua"?: string
+  dns?: Dns = new Dns();
   app?: App;
+  tun?: Tun = new Tun();
   sniffer?: Sniffer;
   "geox-url"?: GeoXUrl = defaultGeoXMap;
   constructor() {
   }
 }
+enum TunStack { Gvisor, System, Mixed }
 
-export interface Dns {
-  enable?: boolean;
-  "prefer-h3"?: boolean;
-  listen?: string;
-  ipv6?: boolean;
-  "use-hosts"?: boolean;
-  "use-system-hosts"?: boolean;
-  "respect-rules"?: boolean;
-  "enhanced-mode"?: DnsEnhancedMode;
-  nameserver?: string[];
-  fallback?: string[];
-  "default-nameserver"?: string[];
-  "fake-ip-filter"?: string[];
-  "fake-ip-filter-mode"?: string[];
-  "fallback-filter": DnsFallbackFilter;
-  "nameserver-policy"?: Record<string, string>;
+export class Tun {
+  enable: boolean = true
+  device: string = ""
+  stack: TunStack.Gvisor
+  "dns-hijack": string[] = ["any:53"]
 }
 
-export interface DnsFallbackFilter {
-  geoIp?: boolean;
-  geoIpCode?: string;
-  ipcidr?: string[];
-  domain?: string[];
+export enum  RouteMode{
+  Config,
+  BypassPrivate, // route-address is defaultBypassPrivateRouteAddress
+}
+export class Dns {
+  enable?: boolean = true;
+  "prefer-h3"?: boolean = false;
+  listen?: string;
+  ipv6?: boolean = false;
+  "use-hosts"?: boolean = true;
+  "use-system-hosts"?: boolean = true;
+  "respect-rules"?: boolean = false;
+  "enhanced-mode"?: DnsEnhancedMode = DnsEnhancedMode.FakeIp;
+  "default-nameserver"?: string[] = ["223.5.5.5"]
+  nameserver?: string[] = [
+    "https://doh.pub/dns-query",
+    "https://dns.alidns.com/dns-query",
+  ];
+  fallback?: string[] = [
+    "tls://8.8.4.4",
+    "tls://1.1.1.1",
+  ];
+  "fake-ip-range"?: string = "198.18.0.1/16"
+  "fake-ip-filter"?: string[] = [
+    "*.lan",
+    "localhost.ptlogin2.qq.com",
+  ];
+  "fake-ip-filter-mode"?: string[];
+  "proxy-server-nameserver"?:string[]=[
+    "https://doh.pub/dns-query",
+  ]
+  "fallback-filter": DnsFallbackFilter =  new DnsFallbackFilter();
+  "nameserver-policy"?: Record<string, string> = {
+    "www.baidu.com": "114.114.114.114",
+    "+.internal.crop.com": "10.0.0.1",
+    "geosite:cn": "https://doh.pub/dns-query"
+  };
+}
+
+export class DnsFallbackFilter {
+  geoIp?: boolean = true;
+  geoIpCode?: string = "CN";
+  geosite?: string[] = ["gfw"]
+  ipcidr?: string[] = ["240.0.0.0/4"];
+  domain?: string[] = [
+    "+.google.com",
+    "+.facebook.com",
+    "+.youtube.com",
+  ];
 }
 
 export interface App {
