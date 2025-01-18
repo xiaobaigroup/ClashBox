@@ -64,11 +64,11 @@ struct FakeIPCustomDialog {
 @Component
 struct DNS {
   /* 主题色 */
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  //一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @Consume('NavPathStack') pageInfos: NavPathStack
-  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @State overwriteDNSList: moreData[] = []
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
@@ -79,9 +79,7 @@ struct DNS {
   @State SaveInputValue: string = ''
   @State currentInputValue: string = ''
   /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur')
-  private isEnableIndexForegroundBlur: boolean
-
+  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   // 弹窗控制器

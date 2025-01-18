@@ -9,6 +9,7 @@ import { hilog } from "@kit.PerformanceAnalysisKit"
 import { common, Want } from "@kit.AbilityKit"
 import { BusinessError } from "@kit.BasicServicesKit"
 import { promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
+import { AppConfig } from "../../entryability/AppState"
 
 @Component
 struct About {
@@ -24,7 +25,7 @@ struct About {
   @State aboutList: AboutListItemProp[] = AboutList
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
-
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   // 列表高度
   @Consume('breakPointStateSettingslistHeight') private SettingslistHeight: BreakpointState<number>
@@ -86,9 +87,11 @@ struct About {
 
   // 列表行开关事件处理
   handleToggle(isOn: boolean, name: string) {
+    // 持久化实验功能开关状态
+    this.appConfig.isShowExperimentalFunction = isOn
     switch (name) {
       case 'ExperimentalFunction':
-        // 实验功能开关 TODO 【用户首选项】保存实验功能开关的启用状态 Ya@2024-12-26
+        // 实验功能开关
         hilog.info(0xFF00, "AboutestTag", "实验功能")
         if(isOn) {
           this.isShowExperimentalFunction = true
@@ -137,6 +140,15 @@ struct About {
       this.aboutList.splice(4, 1, childItem)
     }
   }
+  // 刷新实验功能启用开关状态
+  refreshShowExperimentalFunction(isOn: boolean) {
+    const showItem = this.aboutList[1]
+    if (showItem && showItem.children) {
+      showItem.children[0].isOn = isOn
+      // 使用splice来更新父组件数组
+      this.aboutList.splice(1, 1, showItem)
+    }
+  }
 
   // 更新渠道菜单
   @Builder
@@ -156,6 +168,11 @@ struct About {
           })
       }, (menuItem: AboutListItemProp) => JSON.stringify(menuItem))
     }
+  }
+
+  aboutToAppear(): void {
+    // 页面加载时初始化实验功能启用状态
+    this.refreshShowExperimentalFunction(this.appConfig.isShowExperimentalFunction)
   }
 
   build() {

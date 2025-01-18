@@ -374,8 +374,7 @@ struct Policy {
       Column() {
         Row() {
           toggleRowList({
-            title: $r('app.string.auto_update'),
-            subtitle: $r('app.string.auto_update_interval')
+            title: $r('app.string.auto_update')
           }) {
             // 自动更新开关
             Toggle({ type: ToggleType.Switch, isOn: $$this.EnabledAutoUpdate })

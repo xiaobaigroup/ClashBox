@@ -50,6 +50,10 @@ import { Dns, LogLevel, Profile, ProxyGroup } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig } from '../entryability/AppState'
+import { changeThemeColor } from '../utils/ChangeThemeColor'
+import { common } from '@kit.AbilityKit'
+import { setAutoColorMode, setDarkColorMode, setLightColorMode } from '../utils/ColorModeChangeFunctions'
+
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 
 
@@ -77,20 +81,14 @@ interface LogData {
 @Component
 struct Index {
   private componentName: string = 'Index'
-   @StorageProp('theme')
-  // TODO 使用用户首选项之后 删掉`@State`，取消注释上面的`@StorageProp`
- // @State
-  selectedTheme: CustomThemeName = 'blueAppTheme'
-
-
   /**
    * 主题色
    *    示例中主题配置里配置了一个颜色，所以只用`ResourceColor`类型的变量来接收色值，
    *    如果有多个颜色，就把这个变量换成`CustomTheme`类型的变量）
    */
-  @Provide('icon_emphasize')
-  icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize')
-  @State icon_tertiary: ResourceColor = $r('sys.color.icon_tertiary') //三级图标色，浅灰色
+  @Provide('icon_emphasize') icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize')
+  //三级图标色，浅灰色
+  @State icon_tertiary: ResourceColor = $r('sys.color.icon_tertiary')
 
   // 预留自定义主题，颜色在AppTheme里面修改
   /**
@@ -114,7 +112,8 @@ struct Index {
   @State istabletVertical: boolean = false
   // 折叠展开状态判断变量
   @State isFoldStatus: boolean = false
-  @StorageProp('bottomRectHeight') bottomRectHeight: number = 0; // 读取导航条区域的高度
+  // 读取导航条区域的高度
+  @StorageProp('bottomRectHeight') bottomRectHeight: number = 0;
   @StorageProp('topRectHeight') topRectHeight: number = 0;
   /* 断点布局相关 相关作用看定义时候的注释 */
   @State compStr: BreakpointState<string> = BreakpointState.of({
@@ -310,8 +309,25 @@ struct Index {
   @Provide ('pixmapProxyINFO')pixmapProxyINFO: image.PixelMap | undefined = undefined
   @Provide ('pixmapShortcuts')pixmapShortcuts: image.PixelMap | undefined = undefined
 
+  private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
   // 所有子组件在容器内的对齐方式
   @Provide ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment = Alignment.BottomEnd
+
+// 设置页变量
+  // 设置页面栈
+  @Provide('NavSettingsPathStack') SettingsPageInfos: NavPathStack = new NavPathStack()
+  // 设置 -> 备份与恢复 -> 是否启用云备份配置
+  @Provide isShowCloudconfig: boolean = false
+  // 设置页语言选中暂存变量
+  @Provide currentLanguage: ResourceStr = $r('app.string.Language_Subtitle')
+  // 设置 -> 通知 -> 流量提醒启用状态变量
+  @Provide EnableCellularDataReminder: boolean = false
+  // 设置页实验功能提示框显示变量
+  @Provide isShowExperimentalFunction: boolean = true
+  // 设置 -> 后台运行 -> 流量提醒启用状态变量
+  @Provide Enablebackgrounder: boolean = false
+  // 设置 -> 外观 -> 按钮位置变量
+  @Provide ButtonPositionOffset: number = 0
 
   /* 是否开启全局动画判定 */
   @Provide ('isAnimation') isAnimation: boolean = true
@@ -362,9 +378,15 @@ struct Index {
   aboutToAppear() {
     hilog.info(0x1000, this.componentName, `#aboutToAppear executed`)
 
-    // 在页面build前执行ThemeControl，就可以改变主题颜色
-    ThemeControl.setDefaultTheme(CUSTOM_THEME_MAP.get(this.selectedTheme))
-    hilog.info(0x1000, this.componentName, `#aboutToAppear#ThemeControl.setDefaultTheme(${this.selectedTheme})`)
+    // 在页面build前改变主题颜色
+    changeThemeColor(this.appConfig.themeColor)
+    hilog.info(0x1000, this.componentName, `#aboutToAppear#ThemeControl.setDefaultTheme(${this.appConfig.themeColor})`)
+    // 切换颜色模式(深色模式)
+    this.switchColorMode(this.appConfig.darkModeIndex)
+    // 切换按钮位置
+    this.switchButtonPosition(this.appConfig.buttonPositionIndex)
+    // 初始化实验功能显示状态
+    this.isShowExperimentalFunction = this.appConfig.isShowExperimentalFunction
 
     // 开启change监听
     this.deviceHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
@@ -462,17 +484,52 @@ struct Index {
     // 解绑listener中注册的回调函数
     this.deviceHeightListener.off('change');
     this.tabletHeightListener.off('change')
+    this.foldPhoneOpenListener.off('change')
   }
 
-  // 改变设备横竖屏状态函数
-  /*private changeOrientation(isLandscapePhone: boolean) {
-    // 获取UIAbility实例的上下文信息
-    let context:common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
-    // 调用该接口手动改变设备横竖屏状态
-    window.getLastWindow(context).then((lastWindow) => {
-      lastWindow.setPreferredOrientation(isLandscapePhone ? window.Orientation.LANDSCAPE : window.Orientation.PORTRAIT)
-    });
-  }*/
+  /**
+   * 切换颜色模式
+   * @param index 颜色模式序号
+   */
+  switchColorMode(index: number) {
+    switch (index) {
+      case 0:
+        // 跟随系统
+        setAutoColorMode(this.context)
+        break;
+      case 1:
+        // 始终浅色
+        setLightColorMode(this.context)
+        break
+      case 2:
+        // 始终深色
+        setDarkColorMode(this.context)
+        break
+    }
+  }
+
+  /**
+   * 切换按钮位置
+   */
+  switchButtonPosition(index:number) {
+    switch (index) {
+      case 0:
+        // 右侧
+        this.ButtonPositionOffset = 16
+        this.stackAlignContentAlignment = Alignment.BottomEnd
+        break
+      case 1:
+        // 中间
+        this.ButtonPositionOffset = 0
+        this.stackAlignContentAlignment = Alignment.Bottom
+        break
+      case 2:
+        // 左侧
+        this.ButtonPositionOffset = -16
+        this.stackAlignContentAlignment = Alignment.BottomStart
+        break
+    }
+  }
 
   build() {
     Column() {
@@ -521,7 +578,7 @@ struct Index {
     .height('100%')
     .backgroundColor($r('app.color.background'))
     .foregroundBlurStyle(
-      this.isEnableIndexForegroundBlur ? BlurStyle.Thin : BlurStyle.NONE,
+      this.isEnableIndexForegroundBlur && this.appConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
       { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
     )
     .padding({ top:px2vp(this.topRectHeight) , bottom: this.isLandscapePhone ? 0 :px2vp(this.bottomRectHeight) -15})

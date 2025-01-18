@@ -27,7 +27,7 @@ import ProxyINFO from '../components/Home/ProxyINFO'
 import CurrentConfiguration from '../components/Home/CurrentConfiguration'
 import ClashViewModel from '../entryability/ClashViewModel'
 import Shortcuts from '../components/Home/Shortcuts'
-import { display } from '@kit.ArkUI';
+import { AppConfig } from '../entryability/AppState'
 
 
 @Entry
@@ -35,23 +35,11 @@ import { display } from '@kit.ArkUI';
 struct Home {
 
   /* 主题色 */
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
-
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 设置模态页控制变量
   @State isShowSettings: boolean = false
-  // 设置按钮导航
-  @Provide('NavSettingsPathStack') SettingsPageInfos: NavPathStack = new NavPathStack()
-  // 设置 -> 备份与恢复 -> 是否启用云备份配置
-  @Provide isShowCloudconfig: boolean = false
-  // 设置页语言选中暂存变量
-  @Provide currentLanguage: ResourceStr = $r('app.string.Language_Subtitle')
-  // 设置 -> 通知 -> 流量提醒启用状态变量
-  @Provide EnableCellularDataReminder: boolean = false
-  // 设置页实验功能提示框显示变量
-  @Provide isShowExperimentalFunction: boolean = true
-  // 设置 -> 后台运行 -> 流量提醒启用状态变量
-  @Provide Enablebackgrounder: boolean = false
+  // 设置页面栈
+  @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   // 所有子组件在容器内的对齐方式
   @Consume ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
   //一级图标色，黑色
@@ -159,9 +147,11 @@ struct Home {
   // 折叠屏展开状态判定
   @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
 
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+
   aboutToAppear() {
     this.greetings = getGreeting()
-    console.log('问候语:' + this.greetings)
+
   }
 
   aboutToDisappear() {
@@ -230,16 +220,13 @@ struct Home {
     }
     .width('100%')
     .height('100%')
-    //.backgroundColor(Color.White)
   }
 
-  //卡片编辑半模拟态
+  //卡片编辑半模态
   @Builder
   CardEdit() {
     CardEdit()
   }
-
-
 
 
   build() {
@@ -248,15 +235,16 @@ struct Home {
         Row({space: this.HomeCardTitleButtonPadding.value}) {
           if (!this.isShowHomeEdit) {
             //编辑布局按钮判定：非编辑状态
-            Text(this.greetings)
-              .fontSize(32)
-              .fontWeight(FontWeight.Bold)
-       //       .margin({ left: this.gridMargin })
-              .fontColor(this.font_primary)
-              .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
-                .combine(TransitionEffect.SLIDE):null)
+            if (this.appConfig.isGreeting) {
+              Text(this.greetings)
+                .fontSize(32)
+                .fontWeight(FontWeight.Bold)
+                .fontColor(this.font_primary)
+                .transition(this.isAnimation ?TransitionEffect.OPACITY
+                  .animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+                  .combine(TransitionEffect.SLIDE):null)
+            }
             Blank()
-
             //编辑按钮
             Button({ type: ButtonType.Circle, stateEffect: true }) {
               SymbolGlyph($r('sys.symbol.square_and_pencil'))

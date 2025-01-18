@@ -50,17 +50,7 @@ struct MorePage {
   // 更多页面栈
   @Provide('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   // 设置页面栈
-  @Provide('NavSettingsPathStack') SettingsPageInfos: NavPathStack = new NavPathStack()
-  // 设置 -> 备份与恢复 -> 是否启用云备份配置
-  @Provide isShowCloudconfig: boolean = false
-  // 设置页语言选中暂存变量
-  @Provide currentLanguage: ResourceStr = $r('app.string.Language_Subtitle')
-  // 设置页实验功能提示框显示变量
-  @Provide isShowExperimentalFunction: boolean = true
-  // 设置 -> 通知 -> 流量提醒启用状态变量
-  @Provide EnableCellularDataReminder: boolean = false
-  // 设置 -> 后台运行 -> 流量提醒启用状态变量
-  @Provide Enablebackgrounder: boolean = false
+  @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   /* 断点布局相关 相关作用看定义时候的注释 */
   // 整体外边距
   @Consume('breakPointStatemorePageMargin')  private morePageMargin: BreakpointState<number>

@@ -1,4 +1,5 @@
 import { ClashConfig, Dns, ProxyGroup, ProxySort } from "proxy_core";
+import { CustomThemeName } from "../common/AppTheme";
 import { Item } from "../common/ProxyData";
 
 export enum ProxyGroupType{
@@ -21,6 +22,20 @@ export class AppConfig{
   enableLogger?: boolean = false
   testUrl?: string = ""
   overrideDns?: boolean = false
+  // 主页问候语
+  isGreeting?: boolean = true
+  // 主题色
+  themeColor: CustomThemeName = 'blueAppTheme'
+  // 主题色序号
+  themeColorIndex: number = 0
+  // 深色模式序号
+  darkModeIndex: number = 0
+  // 按钮位置序号
+  buttonPositionIndex: number = 0
+  // 背景模糊变量
+  isBlurr: boolean = true
+  // 实验功能显示变量
+  isShowExperimentalFunction: boolean = true
   constructor() {
   }
 }

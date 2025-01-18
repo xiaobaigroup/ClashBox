@@ -19,13 +19,11 @@ interface LogData {
   logSkip: boolean
 }
 
-@Entry
 @Component
 struct Log {
   @Consume('NavPathStack') pageInfos: NavPathStack
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  @State isShowMenu: boolean = false
   @State EnableLogger: boolean = false
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
@@ -228,11 +226,7 @@ struct Log {
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
-      if (this.isShowMenu) {
-        this.isShowMenu = false
-      } else {
-        this.pageInfos.clear()
-      }
+      this.pageInfos.clear()
       return true
     })
   }

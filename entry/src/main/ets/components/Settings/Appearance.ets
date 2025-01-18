@@ -8,9 +8,11 @@ import TopBuilder from "./TopBuilder"
 import { SymbolGlyphModifier, ThemeControl } from "@kit.ArkUI"
 import { CustomThemeName, CUSTOM_THEME_MAP } from "../../common/AppTheme"
 import { common } from "@kit.AbilityKit"
-import { setAutoColorMode, setDarkColorMode, setLightColorMode } from "../../common/ColorModeChangeFunctions"
+import { setAutoColorMode, setDarkColorMode, setLightColorMode } from "../../utils/ColorModeChangeFunctions"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { menuRowList, toggleRowList } from "../Common"
+import { AppConfig } from "../../entryability/AppState"
+import { changeThemeColor } from "../../utils/ChangeThemeColor"
 
 @Component
 struct Appearance {
@@ -23,12 +25,7 @@ struct Appearance {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   //一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
-  // 深色模式选中
-  @StorageProp('enableDarkMode') enableDarkMode: boolean = false;
-  // 是否跟随系统
-  @StorageProp('isFollowSystemSetting') isFollowSystemSetting: boolean = true;
-  // 当前主题颜色模式
-  @StorageProp('currentColorMode') currentColorMode: number = 0;
+  // 应用上下文
   private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
   // 断点系统
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
@@ -40,29 +37,19 @@ struct Appearance {
   @State private proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
   // 按钮高度
   @State private proxyStartButtonHeight: Length = $r('app.integer.vp_proxy_not_start_button_height')
-  // 深色模式选中序号
-  @State EnableDarkMode: number = 0
   // 深色模式选中文本
   @State EnableDarkModeText: ResourceStr = $r('app.string.follow_system')
-  // 主题色选中序号
-  @State EnableThemeColor: number = 0
   // 主题色选中文本
   @State EnableThemeColorText: ResourceStr = $r('app.string.star_river_blue')
-  // 按钮位置选中序号
-  @State EnableButtonPosition: number = 0
   // 按钮位置选中文本
   @State EnableButtonPositionText: ResourceStr = $r('app.string.right')
   // 按钮位置偏移量（默认在右侧的偏移量）
-  @State ButtonPositionOffset: number = 0
+  @Consume ButtonPositionOffset: number
   // 所有子组件在容器内的对齐方式
   @Consume ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
-  // 背景模糊启用变量
-//  @State isBlurr: boolean= false
-  @Consume ('isEnableIndexForegroundBlur') private isBlurr: boolean
   /* 是否开启全局动画判定 */
   @Consume ('isAnimation') isAnimation: boolean
-  // 主页问候启用变量
-  @State isGreeting: boolean= false
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
 
   // 切换菜单
   @Builder
@@ -73,11 +60,12 @@ struct Appearance {
         ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
           MenuItem({
             content: menuItem.title,
-            symbolEndIcon: this.EnableDarkMode === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+            symbolEndIcon: this.appConfig.darkModeIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
           })
-          .selected(this.EnableDarkMode === index)
+          .selected(this.appConfig.darkModeIndex === index)
           .onChange((selected) => {
-            this.EnableDarkMode = index
+            // 持久化深色模式
+            this.appConfig.darkModeIndex = index
             this.switchColorMode(index)
             // UI刷新
             this.EnableDarkModeText = menuItem.title
@@ -91,27 +79,31 @@ struct Appearance {
           MenuItem({
             content: menuItem.title,
             symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.paintpalette_fill')).fontColor(menuItem.startSymbolFontColor),
-            symbolEndIcon: this.EnableThemeColor === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+            symbolEndIcon: this.appConfig.themeColorIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
           })
-          .selected(this.EnableThemeColor === index)
+          .selected(this.appConfig.themeColorIndex === index)
           .onChange((selected) => {
-            this.EnableThemeColor = index
-            this.changeThemeColor(menuItem?.customThemeName ?? 'blueAppTheme')
+            this.appConfig.themeColorIndex = index
+            // 持久化主题色
+            this.appConfig.themeColor = menuItem?.customThemeName ?? 'blueAppTheme'
+            changeThemeColor(this.appConfig.themeColor)
             // UI刷新
             this.EnableThemeColorText = menuItem.title
           })
         }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
       }
     } else if (index === 2) {
+      // 切换按钮位置
       Menu() {
         ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
           MenuItem({
             content: menuItem.title,
-            symbolEndIcon: this.EnableButtonPosition === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+            symbolEndIcon: this.appConfig.buttonPositionIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
           })
-            .selected(this.EnableButtonPosition === index)
+            .selected(this.appConfig.buttonPositionIndex === index)
             .onChange((selected) => {
-              this.EnableButtonPosition = index
+              // 持久化按钮位置
+              this.appConfig.buttonPositionIndex = index
               this.switchButtonPosition(index)
               // UI刷新
               this.EnableButtonPositionText = menuItem.title
@@ -126,31 +118,19 @@ struct Appearance {
     switch (index) {
       case 0:
         // 跟随系统
-        this.isFollowSystemSetting = true
-        this.enableDarkMode = false
         setAutoColorMode(this.context)
         break;
       case 1:
         // 始终浅色
-        this.isFollowSystemSetting = false
         setLightColorMode(this.context)
         break
       case 2:
         // 始终深色
-        this.isFollowSystemSetting = false
-        this.enableDarkMode = true
         setDarkColorMode(this.context)
         break
     }
   }
 
-  /**
-   * 更改主题配置
-   * @param customThemeName 自定义主题的名字
-   */
-  changeThemeColor(customThemeName: CustomThemeName) {
-    ThemeControl.setDefaultTheme(CUSTOM_THEME_MAP.get(customThemeName))
-  }
 
   // 切换按钮位置
   switchButtonPosition(index:number) {
@@ -159,33 +139,37 @@ struct Appearance {
         // 右侧
         this.ButtonPositionOffset = 16
         this.stackAlignContentAlignment = Alignment.BottomEnd
-        // 需接入全局按钮位置控制
-
       break
       case 1:
         // 中间
         this.ButtonPositionOffset = 0
         this.stackAlignContentAlignment = Alignment.Bottom
-        // 需接入全局按钮位置控制
-
       break
       case 2:
         // 左侧
         this.ButtonPositionOffset = -16
         this.stackAlignContentAlignment = Alignment.BottomStart
-        // 需接入全局按钮位置控制
-
       break
     }
   }
 
   aboutToAppear(): void {
-    hilog.info(0xFF00, "AppearanceTag", "实验功能显示: %{public}s", this.isShowExperimentalFunction)
+    // 初始化主题色显示文本
+    if (this.appearanceList && this.appearanceList[1].children) {
+      this.EnableThemeColorText = this.appearanceList[1].children[this.appConfig.themeColorIndex].title
+    }
+    // 初始化深色模式显示文本
+    if (this.appearanceList && this.appearanceList[0].children) {
+      this.EnableDarkModeText = this.appearanceList[0].children[this.appConfig.darkModeIndex].title
+    }
+    // 初始化按钮位置显示文本
+    if (this.appearanceList && this.appearanceList[2].children) {
+      this.EnableButtonPositionText = this.appearanceList[2].children[this.appConfig.buttonPositionIndex].title
+    }
   }
 
   aboutToDisappear(): void {
-    AppStorage.setOrCreate('enableDarkMode', this.enableDarkMode)
-    AppStorage.setOrCreate('isFollowSystemSetting', this.isFollowSystemSetting)
+
   }
 
   @Builder
@@ -360,7 +344,7 @@ struct Appearance {
                 subtitle: $r('app.string.blurred_background_subtitle'),
               }) {
                 // 背景模糊开关
-                Toggle({ type: ToggleType.Switch, isOn: $$this.isBlurr })
+                Toggle({ type: ToggleType.Switch, isOn: $$this.appConfig.isBlurr })
                   .selectedColor(this.icon_emphasize)
                   .margin({right: 12})
                   .onChange((isOn: boolean) => {
@@ -369,7 +353,7 @@ struct Appearance {
                       duration: ANIMATION_DURATION_300,
                       curve: Curve.Ease
                     }, () => {
-                      this.isBlurr = isOn
+                      this.appConfig.isBlurr = isOn
                     })
                   })
               }
@@ -378,7 +362,7 @@ struct Appearance {
               this.getUIContext()?.animateTo({
                 duration: ANIMATION_DURATION_300
               }, () => {
-                this.isBlurr = !this.isBlurr
+                this.appConfig.isBlurr = !this.appConfig.isBlurr
               })
             })
             if(this.isShowExperimentalFunction) {
@@ -431,7 +415,7 @@ struct Appearance {
                 subtitle: $r('app.string.homepage_greetings_subtitle'),
               }) {
                 // 主页问候开关
-                Toggle({ type: ToggleType.Switch, isOn: $$this.isGreeting })
+                Toggle({ type: ToggleType.Switch, isOn: $$this.appConfig.isGreeting })
                   .selectedColor(this.icon_emphasize)
                   .margin({right: 12})
                   .onChange((isOn: boolean) => {
@@ -440,7 +424,7 @@ struct Appearance {
                       duration: ANIMATION_DURATION_300,
                       curve: Curve.Ease
                     }, () => {
-                      this.isGreeting = isOn
+                      this.appConfig.isGreeting = isOn
                     })
                   })
               }
@@ -449,7 +433,7 @@ struct Appearance {
               this.getUIContext()?.animateTo({
                 duration: ANIMATION_DURATION_300
               }, () => {
-                this.isGreeting = !this.isGreeting
+                this.appConfig.isGreeting = !this.appConfig.isGreeting
               })
             })
             // 分割线
