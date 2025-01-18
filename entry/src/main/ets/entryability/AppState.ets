@@ -1,5 +1,6 @@
 import { ClashConfig, Dns, ProxyGroup, ProxySort } from "proxy_core";
 import { CustomThemeName } from "../common/AppTheme";
+import { isShowHomeCardConfig } from "../common/HomeCardEditData";
 import { Item } from "../common/ProxyData";
 
 export enum ProxyGroupType{
@@ -52,6 +53,7 @@ export class AppState {
     PersistentStorage.persistProp("favoriteProfiles", new Map<string, string>([]))
     PersistentStorage.persistProp("favoriteProxys", new Map<string, string[][]>([]))
     PersistentStorage.persistProp("clashConfig", new ClashConfig())
+    PersistentStorage.persistProp("isShowHomeCardConfig", new isShowHomeCardConfig())
   }
 
   static fetchFavoriteProxys(favoriteProxys: Map<string, string>, proxyGroups: ProxyGroup[]):string[][] {

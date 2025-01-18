@@ -23,7 +23,7 @@ struct Shortcuts {
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
-  @Consume('isShowShortcuts') isShowShortcuts: boolean
+
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
   @State isShowShortcutsEdit :boolean = false
@@ -79,7 +79,7 @@ struct Shortcuts {
           .ShortcutsTextStyle()
           .onClick(() => {
             //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
-            if (this.isFoldStatus? !this.isShowShortcuts&& this.isShowHomeEdit==false:this.isShowShortcuts && this.isShowHomeEdit==false) {
+            if (this.isShowHomeEdit===false) {
               if (this.inputWebValue1 != '') {
                 this.implicitStartAbility(this.inputWebValue1)
               } else {
@@ -91,7 +91,7 @@ struct Shortcuts {
             LongPressGesture()
               .onAction(() => {
                 //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
-                if (this.isFoldStatus? !this.isShowShortcuts&& this.isShowHomeEdit==false:this.isShowShortcuts && this.isShowHomeEdit==false) {
+                if ( this.isShowHomeEdit===false) {
                   this.isShowShortcutsEdit = true
                   this.isEnableIndexForegroundBlur = true
                 }
@@ -105,7 +105,7 @@ struct Shortcuts {
           .ShortcutsTextStyle()
           .onClick(() => {
             //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
-            if (this.isFoldStatus? !this.isShowShortcuts&& this.isShowHomeEdit==false:this.isShowShortcuts && this.isShowHomeEdit==false) {
+            if (this.isShowHomeEdit===false) {
               if (this.inputWebValue2 != '') {
                 this.implicitStartAbility(this.inputWebValue2)
               } else {
@@ -117,7 +117,7 @@ struct Shortcuts {
             LongPressGesture()
               .onAction(() => {
                 //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
-                if (this.isFoldStatus? !this.isShowShortcuts&& this.isShowHomeEdit==false:this.isShowShortcuts && this.isShowHomeEdit==false) {
+                if (this.isShowHomeEdit===false) {
                   this.isShowShortcutsEdit = true
                   this.isEnableIndexForegroundBlur=true
                 }
@@ -131,7 +131,7 @@ struct Shortcuts {
           .ShortcutsTextStyle()
           .onClick(() => {
             //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
-            if (this.isFoldStatus? !this.isShowShortcuts&& this.isShowHomeEdit==false:this.isShowShortcuts && this.isShowHomeEdit==false) {
+            if ( this.isShowHomeEdit===false) {
               if (this.inputWebValue3 != '') {
                 this.implicitStartAbility(this.inputWebValue3)
               }else {
@@ -143,7 +143,7 @@ struct Shortcuts {
             LongPressGesture()
               .onAction(() => {
                 //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
-                if (this.isFoldStatus? !this.isShowShortcuts&& this.isShowHomeEdit==false:this.isShowShortcuts && this.isShowHomeEdit==false) {
+                if (this.isShowHomeEdit===false) {
                   this.isShowShortcutsEdit = true
                   this.isEnableIndexForegroundBlur = true
                 }

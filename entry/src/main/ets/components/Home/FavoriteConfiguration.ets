@@ -41,34 +41,34 @@ struct FavoriteConfiguration {
       if (this.favoriteProfiles.size > 0) {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceEvenly }) {
           ForEach(Array.from(this.favoriteProfiles.entries()), (f:[string, string], i: number)=>{
-              Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-                Text(f[1])
-                  .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-                  .fontColor($r('sys.color.font_primary'))
-                  .maxLines(1)
-                  .width('80%')
-                  .textOverflow({ overflow: TextOverflow.Ellipsis })
-                Radio({ value: 'FavoriteConfigurationRadio1', group: 'FavoriteConfigurationRadioGroup' })
-                  .width(this.isLandscapePhone ? 16 : this.fontSize.value)
-                  .checked(f[0] === this.appConfig.currentProfileId)
-                  .radioStyle({
-                    checkedBackgroundColor: this.icon_emphasize,
-                  })
-                  .onChange((isChecked: boolean) => {
-                    //在home页编辑状态时，无法操作
-                    if (!this.isShowHomeEdit &&isChecked) {
-                      this.appConfig.currentProfileId = f[0]
-                    }
-                  })
+            Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
+              Text(f[1])
+                .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+                .fontColor($r('sys.color.font_primary'))
+                .maxLines(1)
+                .width('80%')
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
+              Radio({ value: 'FavoriteConfigurationRadio1', group: 'FavoriteConfigurationRadioGroup' })
+                .width(this.isLandscapePhone ? 16 : this.fontSize.value)
+                .checked(f[0] === this.appConfig.currentProfileId)
+                .radioStyle({
+                  checkedBackgroundColor: this.icon_emphasize,
+                })
+                .onChange((isChecked: boolean) => {
+                  //在home页编辑状态时，无法操作
+                  if (this.isShowHomeEdit===false && isChecked) {
+                    this.appConfig.currentProfileId = f[0]
+                  }
+                })
+            }
+            .onClick(() => {
+              if (this.isShowHomeEdit===false) {
+                this.appConfig.currentProfileId = f[0]
               }
-              .onClick(() => {
-                if (!this.isShowHomeEdit) {
-                  this.appConfig.currentProfileId = f[0]
-                }
-              })
-              .clickEffect({ level: ClickEffectLevel.MIDDLE })
-              if(!isEnd(this.favoriteProfiles.size, i))
-                Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
+            })
+            .clickEffect({ level: ClickEffectLevel.MIDDLE })
+            if(!isEnd(this.favoriteProfiles.size, i))
+              Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
           })
         }
         .width('100%')
@@ -77,7 +77,7 @@ struct FavoriteConfiguration {
         .borderRadius(10)
         .padding({ left: 8, right: 5 })
       }//拥有收藏配置的布局 end
-     //没有收藏配置时的布局 start
+      //没有收藏配置时的布局 start
       else
       {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
@@ -95,8 +95,8 @@ struct FavoriteConfiguration {
         .height("78%")
         .onClick(() => {
           //在home页编辑状态时，无法操作
-          if (!this.isShowHomeEdit) {
-            }
+          if (this.isShowHomeEdit===false) {
+          }
         })//为预览而设置的点击事件，后端接入修改或删除
       }//没有收藏配置时的布局 end
     }

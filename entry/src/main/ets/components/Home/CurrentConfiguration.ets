@@ -14,7 +14,6 @@ struct CurrentConfiguration {
   @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
-  @Consume('isShowCurrentConfiguration') isShowCurrentConfiguration: boolean
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
 
@@ -28,17 +27,17 @@ struct CurrentConfiguration {
           .fontColor($r('sys.color.font_primary'))
       }
 
-        Button($r('app.string.refresh_IP'))
-          .width('55%')
-          .height('34%')
-          .fontColor(this.icon_emphasize)
-          .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-          .backgroundColor($r('app.color.home_card_background'))
-          .onClick(() => {
-            //在home页添加按钮的半模拟态里和在编辑卡片状态时，无法操作，点击回调写在if判定里
-            if (this.isShowCurrentConfiguration && this.isShowHomeEdit==false) {
-            }
-          })
+      Button($r('app.string.refresh_IP'))
+        .width('55%')
+        .height('34%')
+        .fontColor(this.icon_emphasize)
+        .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+        .backgroundColor($r('app.color.home_card_background'))
+        .onClick(() => {
+          //在home页添加按钮的半模拟态里和在编辑卡片状态时，无法操作，点击回调写在if判定里
+          if (this.isShowHomeEdit==false) {
+          }
+        })
     }
     .padding(this.cardPadding.value)
     .width('100%')

@@ -32,7 +32,7 @@ struct FavoriteProxy {
   // 当前代理节点长按选择的值
   @Consume private FavoriteProxy: number
   // 当前代理节点单选选择的值
- // @Consume private ProxyRadioCheckedValue: number
+  // @Consume private ProxyRadioCheckedValue: number
   // 当前代理节点长按选择的值
   @Consume private ProxyItemLongPressValue: number
   //编辑按钮点击后显示编辑状态判定
@@ -62,14 +62,14 @@ struct FavoriteProxy {
                 })
                 .onChange((isChecked:boolean) => {
                   //在home页编辑状态时，无法操作
-                  if (!this.isShowHomeEdit &&isChecked) {
+                  if (this.isShowHomeEdit===false &&isChecked) {
                     this.appConfig.currentProxyName = p[1]
                   }
                 })
             }
             .onClick(() => {
               //在home页编辑状态时，无法操作
-              if (!this.isShowHomeEdit) {
+              if (this.isShowHomeEdit===false) {
                 this.appConfig.currentProxyName = p[1]
                 this.appConfig.currentProxyItem = AppState.fetchProxyItem(this.proxyGroups, p[0], p[1])
               }

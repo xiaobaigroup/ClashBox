@@ -1,5 +1,6 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import { MarginGenerate } from "../../common/Constants"
+import { isShowHomeCardConfig } from "../../common/HomeCardEditData"
 import { Item, ProxyData } from "../../common/ProxyData"
 import { AppConfig } from "../../entryability/AppState"
 import { CardTitle } from "./CardTitleBuilder"
@@ -30,9 +31,7 @@ struct ProxyINFO{
   @Consume('SpeedfontSize12_14_14_16') private SpeedfontSize12_14_14_16: BreakpointState<number>
   // 内容文本字体大小
   @Consume('breakPointStateHomeCardSwitchModeFontSize') private fontSize: BreakpointState<number>
-  // 当前代理节点单选框选择的配置
- // @Consume private ProxyRadioCheckedValue: number
-  @Consume('isShowProxyINFO') isShowProxyINFO: boolean
+
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
@@ -59,9 +58,9 @@ struct ProxyINFO{
             .fontColor($r('sys.color.font_secondary'))
         }
         if (this.appConfig.currentProxyItem) {
-        Text('ping ' + `${this.appConfig.currentProxyItem.latency}` + 'ms')
-          .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)
-          .fontColor(ProxyData.getColorForLatency(this.appConfig.currentProxyItem.latency))
+          Text('ping ' + `${this.appConfig.currentProxyItem.latency}` + 'ms')
+            .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)
+            .fontColor(ProxyData.getColorForLatency(this.appConfig.currentProxyItem.latency))
         }
         else {
           Row(){
@@ -104,8 +103,8 @@ struct ProxyINFO{
           .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
           .backgroundColor($r('app.color.home_card_background'))
           .onClick(() => {
-            //在home页添加按钮的半模拟态里和在编辑卡片状态时，无法操作，点击回调写在if判定里
-            if (this.isShowProxyINFO && this.isShowHomeEdit==false) {
+            //在home页在编辑卡片状态时，无法操作，点击回调写在if判定里
+            if ( this.isShowHomeEdit===false) {
             }
           })
       }

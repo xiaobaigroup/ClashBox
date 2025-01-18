@@ -1,6 +1,5 @@
-import { BreakpointSystem, BreakpointState } from '../../common/breakpointsystem'
+import {  BreakpointState } from '../../common/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI';
-import { hilog } from '@kit.PerformanceAnalysisKit'
 import { ANIMATION_DURATION_300, MarginGenerate } from '../../common/Constants';
 import { CardTitle } from './CardTitleBuilder';
 
@@ -51,10 +50,10 @@ struct SwitchMode {
           .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
           .fontColor(this.currentChecked === 1 ? this.font_primary : $r('sys.color.font_secondary'))
           .backgroundColor(this.currentChecked === 1 ? $r('app.color.container_background'):'#00ffffff')
-     //     .shadow(this.currentChecked === 1 ? { radius: 3,color:$r('app.color.shadow')} : { } )
+            //     .shadow(this.currentChecked === 1 ? { radius: 3,color:$r('app.color.shadow')} : { } )
           .onClick(() => {
             //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
-            if (!this.isShowHomeEdit) {
+            if (this.isShowHomeEdit===false) {
               this.currentChecked = 1
             }
           })
@@ -64,27 +63,27 @@ struct SwitchMode {
           .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
           .fontColor(this.currentChecked === 2 ? this.font_primary : $r('sys.color.font_secondary'))
           .backgroundColor(this.currentChecked === 2 ? $r('app.color.container_background'):'#00ffffff')
-    //      .shadow(this.currentChecked === 2 ? { radius: 3, color:$r('app.color.shadow')} : { } )
+            //      .shadow(this.currentChecked === 2 ? { radius: 3, color:$r('app.color.shadow')} : { } )
           .onClick(() => {
             //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
-            if (!this.isShowHomeEdit) {
+            if (this.isShowHomeEdit===false) {
               this.currentChecked = 2
             }
-            })
+          })
 
         Text($r('app.string.Direct'))
           .TextStyle()
           .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
           .fontColor(this.currentChecked === 3 ? this.font_primary : $r('sys.color.font_secondary'))
           .backgroundColor(this.currentChecked === 3 ? $r('app.color.container_background'):'#00ffffff')
-    //      .shadow(this.currentChecked === 3 ? { radius: 3, color:$r('app.color.shadow')} : { } )
+            //      .shadow(this.currentChecked === 3 ? { radius: 3, color:$r('app.color.shadow')} : { } )
           .onClick(() => {
             //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
-            if (!this.isShowHomeEdit) {
+            if (this.isShowHomeEdit===false) {
               this.currentChecked = 3
             }
-            })
-        }
+          })
+      }
       .width('100%')
       .height('82%')
       .backgroundColor($r('app.color.home_card_background'))
@@ -108,7 +107,7 @@ function TextStyle() {
   .borderRadius(18)
   .fontWeight(FontWeight.Bold)
   .textAlign(TextAlign.Center)
- // .transition(TransitionEffect.translate({y:10}).animation({ duration: 300, curve: Curve.Ease }))
+  // .transition(TransitionEffect.translate({y:10}).animation({ duration: 300, curve: Curve.Ease }))
   .clickEffect({ level: ClickEffectLevel.MIDDLE,scale:0.8})
 }
 

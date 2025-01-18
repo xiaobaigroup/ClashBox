@@ -55,7 +55,7 @@ struct PublicNetwork {
           .backgroundColor($r('app.color.home_card_background'))
           .onClick(() => {
             //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
-            if (!this.isShowHomeEdit) {
+            if (this.isShowHomeEdit===false) {
             }
           })
       }.width('100%').justifyContent(FlexAlign.End)

@@ -294,21 +294,6 @@ struct Index {
     },
   ]
 
-
-  /**
-   * 主页卡片组件截图
-   */
-  @Provide ('pixmapSpeed')pixmapSpeed: image.PixelMap | undefined = undefined
-  @Provide ('pixmapSwitchMode')pixmapSwitchMode: image.PixelMap | undefined = undefined
-  @Provide ('pixmapCellularData')pixmapCellularData: image.PixelMap | undefined = undefined
-  @Provide ('pixmapCurrentNode')pixmapCurrentNode: image.PixelMap | undefined = undefined
-  @Provide ('pixmapPublicNetwork')pixmapPublicNetwork: image.PixelMap | undefined = undefined
-  @Provide ('pixmapFavoriteProxy')pixmapFavoriteProxy: image.PixelMap | undefined = undefined
-  @Provide ('pixmapFavoriteConfiguration')pixmapFavoriteConfiguration: image.PixelMap | undefined = undefined
-  @Provide ('pixmapCurrentConfiguration')pixmapCurrentConfiguration: image.PixelMap | undefined = undefined
-  @Provide ('pixmapProxyINFO')pixmapProxyINFO: image.PixelMap | undefined = undefined
-  @Provide ('pixmapShortcuts')pixmapShortcuts: image.PixelMap | undefined = undefined
-
   private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
   // 所有子组件在容器内的对齐方式
   @Provide ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment = Alignment.BottomEnd
