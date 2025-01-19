@@ -1331,6 +1331,10 @@
     {
       "name": "years_ago",
       "value": "年前"
+    },
+    {
+      "name": "layout_saved",
+      "value": "布局已保存"
     }
   ]
 }

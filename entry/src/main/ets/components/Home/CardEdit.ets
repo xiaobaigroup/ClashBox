@@ -2,6 +2,7 @@ import { LengthMetrics } from "@kit.ArkUI"
 import { ANIMATION_DURATION_300 } from "../../common/Constants"
 import { BreakpointState } from "../../common/breakpointsystem"
 import { IsShowHomeCard, isShowHomeCardConfig } from "../../common/HomeCardEditData"
+import { AppConfig } from "../../entryability/AppState"
 
 
 //TODO 1.后续需要把各文件组件换为截图，以减少性能消耗。2.挂载和卸载无动画效果，后面需要加入
@@ -22,32 +23,33 @@ export struct CardEdit {
   // 折叠屏展开状态判定
   @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
   @StorageLink("isShowHomeCardConfig")isShowHomeCardConfig:IsShowHomeCard= new isShowHomeCardConfig()
-
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  // 当前主页布局
+  @Consume theCurrentHomeCard: boolean[]
 
   build() {
     Flex({ wrap: FlexWrap.Wrap,justifyContent:FlexAlign.SpaceBetween, space: { main: LengthMetrics.vp(10), cross: LengthMetrics.vp(10) } }) { // 子组件多行布局
       //网络速率小卡片
-      if (this.isShowHomeCardConfig.isShowSpeed === false) {
+      if (this.theCurrentHomeCard[0] === false) {
         Image($rawfile('Speed.png'))
           .width('100%')
           .aspectRatio(2.07)
           .height(this.HomeCardEditHeight.value)
           .ImageItemStyle()
           .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
-            //     .height(this.isLandscapePhone ? 200: this.HomeCardEditHeight.value)
           .onAttach(() => {
           })//挂载回调
           .onDetach(() => {
           })//卸载回调
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-              this.isShowHomeCardConfig.isShowSpeed = true
+              this.theCurrentHomeCard.splice(0, 1, true)
             })
           })
       }
 
       //节点信息小卡片
-      if (this.isShowHomeCardConfig.isShowProxyINFO === false) {
+      if (this.theCurrentHomeCard[7] === false) {
         Image($rawfile('ProxyINFO.png'))
           .width('100%')
           .height(this.HomeCardEditHeight.value)
@@ -56,13 +58,13 @@ export struct CardEdit {
           .transition(this.isAnimation ? TransitionEffect.scale({ x: 0, y: 0 }).animation({ duration: ANIMATION_DURATION_300 }) : null)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-              this.isShowHomeCardConfig.isShowProxyINFO = true
+              this.theCurrentHomeCard.splice(7, 1, true)
             })
           })
       }
 
       //分流模式小卡片
-      if (this.isShowHomeCardConfig.isShowSwitchMode === false) {
+      if (this.theCurrentHomeCard[1] === false) {
         Image($rawfile('SwitchMode.png'))
           .width('48.5%')
           .ImageItemStyle()
@@ -70,13 +72,13 @@ export struct CardEdit {
             //        .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-              this.isShowHomeCardConfig.isShowSwitchMode = true
+              this.theCurrentHomeCard.splice(1, 1, true)
             })
           })
       }
 
       //流量统计小卡片
-      if (this.isShowHomeCardConfig.isShowCellularData === false) {
+      if (this.theCurrentHomeCard[2] === false) {
         Image($rawfile('CellularData.png'))
           .width('48.5%')
           .ImageItemStyle()
@@ -84,26 +86,26 @@ export struct CardEdit {
             //      .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-              this.isShowHomeCardConfig.isShowCellularData=true
+              this.theCurrentHomeCard.splice(2, 1, true)
             })
           })
       }
 
       //当前节点小卡片
-      if (this.isShowHomeCardConfig.isShowCurrentNode === false) {
+      if (this.theCurrentHomeCard[3] === false) {
         Image($rawfile('CurrentNode.png'))
           .width('48.5%')
           .ImageItemStyle()
           .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-              this.isShowHomeCardConfig.isShowCurrentNode=true
+              this.theCurrentHomeCard.splice(3, 1, true)
             })
           })
       }
 
       //IP地址小卡片
-      if (this.isShowHomeCardConfig.isShowPublicNetwork === false) {
+      if (this.theCurrentHomeCard[4] === false) {
         Image($rawfile('PublicNetwork.png'))
           .width('48.5%')
           .ImageItemStyle()
@@ -111,13 +113,13 @@ export struct CardEdit {
             //       .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-              this.isShowHomeCardConfig.isShowPublicNetwork=true
+              this.theCurrentHomeCard.splice(4, 1, true)
             })
           })
       }
 
       //收藏节点小卡片
-      if (this.isShowHomeCardConfig.isShowFavoriteProxy === false) {
+      if (this.theCurrentHomeCard[5] === false) {
         Image($rawfile('FavoriteProxy.png'))
           .width('48.5%')
           .ImageItemStyle()
@@ -125,13 +127,13 @@ export struct CardEdit {
             //      .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-              this.isShowHomeCardConfig.isShowFavoriteProxy=true
+              this.theCurrentHomeCard.splice(5, 1, true)
             })
           })
       }
 
       //收藏配置小卡片
-      if (this.isShowHomeCardConfig.isShowFavoriteConfiguration === false) {
+      if (this.theCurrentHomeCard[6] === false) {
         Image($rawfile('FavoriteConfiguration.png'))
           .width('48.5%')
           .ImageItemStyle()
@@ -139,13 +141,13 @@ export struct CardEdit {
             //      .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-              this.isShowHomeCardConfig.isShowFavoriteConfiguration=true
+              this.theCurrentHomeCard.splice(6, 1, true)
             })
           })
       }
 
       //当前配置小卡片
-      if (this.isShowHomeCardConfig.isShowCurrentConfiguration === false) {
+      if (this.theCurrentHomeCard[8] === false) {
         Image($rawfile('CurrentConfiguration.png'))
           .width('48.5%')
           .height(this.HomeCardEditHeight.value)
@@ -155,24 +157,22 @@ export struct CardEdit {
             //      .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-              this.isShowHomeCardConfig.isShowCurrentConfiguration=true
+              this.theCurrentHomeCard.splice(8, 1, true)
             })
           })
       }
 
-
       //快捷方式小卡片
-      if ( this.isShowHomeCardConfig.isShowShortcuts===this.isFoldStatus? true:false) {
+      if (this.theCurrentHomeCard[9] === this.isFoldStatus ? true : false) {
         Image($rawfile('Shortcuts.png'))
           .width('48.5%')
           .height(this.HomeCardEditHeight.value)
           .aspectRatio(1)
           .ImageItemStyle()
           .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
-            //      .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
             animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-              this.isShowHomeCardConfig.isShowShortcuts=this.isFoldStatus? false:true
+              this.theCurrentHomeCard.splice(9, 1, this.isFoldStatus ? false : true)
             })
           })
       }

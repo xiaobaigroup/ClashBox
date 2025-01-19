@@ -61,6 +61,22 @@ export enum RouteName {
   CREATE_NEW_CONFIG = 'CreateNewConfig',
 }
 
+/**
+ * 主页卡片显示变量
+ */
+export let showHomeCard = [
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  false,
+  false,
+  false
+]
+
 // 更多列表类
 export class moreData {
   icons: Resource;
@@ -279,20 +295,6 @@ export const AppearanceList: AppearanceListItemProp[] = [
       { title: $r('app.string.left') },
     ]
   }
-  // { title: 'Theme',
-  //   subtitle: '',
-  //   children:[
-  //     { icon: $r('sys.symbol.rectangle_on_rectangle_fill'), title: $r('app.string.blurred_background'), subtitle: $r('app.string.blurred_background_subtitle'), isOn: false},
-  //     { icon: $r('sys.symbol.livephoto'), title: $r('app.string.animation_effects'), subtitle: $r('app.string.animation_effects_subtitle'), subtitle2: $r('app.string.experimental_function'), isOn: false},
-  //   ]
-  // },
-  // { title: 'Ability',
-  //   subtitle: '',
-  //   children: [
-  //     { icon: $r('sys.symbol.message'), title: $r('app.string.homepage_greetings'), subtitle: $r('app.string.homepage_greetings_subtitle'), isOn: false},
-  //
-  //   ]
-  // }
 ]
 
 /**

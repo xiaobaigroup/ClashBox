@@ -1,5 +1,6 @@
 import { ClashConfig, Dns, ProxyGroup, ProxySort } from "proxy_core";
 import { CustomThemeName } from "../common/AppTheme";
+import { showHomeCard } from "../common/Constants";
 import { isShowHomeCardConfig } from "../common/HomeCardEditData";
 import { Item } from "../common/ProxyData";
 
@@ -37,6 +38,9 @@ export class AppConfig{
   isBlurr: boolean = true
   // 实验功能显示变量
   isShowExperimentalFunction: boolean = true
+  // 主页卡片显示变量
+  isShowHomeCard: string = JSON.stringify(showHomeCard)
+  isShowSpeed? :boolean = true
   constructor() {
   }
 }

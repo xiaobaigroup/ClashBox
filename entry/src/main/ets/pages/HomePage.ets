@@ -16,6 +16,7 @@ import {
   TAB_CONTENT_TITLE_HEIGHT,
   gutterHomeGridcol,
   MarginGenerate,
+  showHomeCard,
 } from '../common/Constants'
 import Settings from '../components/Settings/Settings'
 import CurrentNode from '../components/Home/CurrentNode'
@@ -120,8 +121,7 @@ struct Home {
   // 按钮宽度
   @State private proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
   // 按钮高度
-  @State
-  private proxyStartButtonHeight: Length = $r('app.integer.vp_proxy_not_start_button_height')
+  @State private proxyStartButtonHeight: Length = $r('app.integer.vp_proxy_not_start_button_height')
   // 按钮前Symbol动效
   private ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE // 按钮前Symbol动效
   // 定时器Controller
@@ -137,16 +137,23 @@ struct Home {
   @Consume('breakPointStateTabContentTitleMargin') private breakPointStateTabContentTitleMargin: BreakpointState<number>
   /**主页卡片标题按钮间距*/
   @Consume('HomeCardTitleButtonPadding') private HomeCardTitleButtonPadding: BreakpointState<number>
+  // 当前主页布局
+  @Provide theCurrentHomeCard: boolean[] = showHomeCard
+  // 上一次主页布局
+  @State theLastHomeCard: boolean[] = showHomeCard
 
 
-
-  async aboutToAppear() {
+  aboutToAppear(): void {
     this.greetings = getGreeting()
+    // 初始化主页卡片布局
+    this.theCurrentHomeCard = JSON.parse(this.appConfig.isShowHomeCard)
+    hilog.info(0xFF00, "HometestTag", "布局初始化为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
   }
 
 
   aboutToDisappear() {
-    this.SaveDialogController = null // 将dialogController置空
+    // 将dialogController置空
+    this.SaveDialogController = null
   }
 
   // 在自定义组件即将析构销毁时将dialogController置空
@@ -172,12 +179,15 @@ struct Home {
    */
   restoreLayout() {
     // TODO 国际化
+    // 还原布局
+    this.theCurrentHomeCard = this.theLastHomeCard
+    this.appConfig.isShowHomeCard = JSON.stringify(this.theLastHomeCard)
+    hilog.info(0xFF00, "HometestTag", "布局还原为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
     this.promptAction.showToast({ message: `布局已还原🫡` })
     this.isShowHomeEdit = false
     animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
       this.isShowDeleteButton = false
     })
-    this.isShowHomeCardConfig = this.isShowHomeCard
   }
 
   /**
@@ -185,13 +195,16 @@ struct Home {
    */
   saveHomeLayout() {
     // TODO 国际化
+    // 保存布局
+    this.appConfig.isShowHomeCard = JSON.stringify(this.theCurrentHomeCard)
+    hilog.info(0xFF00, "HometestTag", "保存的布局： %{public}s", this.appConfig.isShowHomeCard)
     this.promptAction.showToast({ message: `布局已保存💾` })
     this.isShowHomeEdit = false
     if (this.isAnimation) {
       animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
         this.isShowDeleteButton = false
       })
-    }else {this.isShowDeleteButton = false}
+    } else { this.isShowDeleteButton = false }
   }
 
   // 通过@Builder构建设置模态展示界面
@@ -217,7 +230,7 @@ struct Home {
         Row({space: this.HomeCardTitleButtonPadding.value}) {
           if (!this.isShowHomeEdit) {
             //编辑布局按钮判定：非编辑状态
-            if (this.appConfig.isGreeting===true) {
+            if (this.appConfig.isGreeting === true) {
               Text(this.greetings)
                 .fontSize(32)
                 .fontWeight(FontWeight.Bold)
@@ -227,7 +240,6 @@ struct Home {
                   .combine(TransitionEffect.SLIDE):null)
             }
             Blank()
-
             //编辑按钮
             Button({ type: ButtonType.Circle, stateEffect: true }) {
               SymbolGlyph($r('sys.symbol.square_and_pencil'))
@@ -238,13 +250,16 @@ struct Home {
               .combine(TransitionEffect.SLIDE):null)
             .onClick(() => {
               this.isShowHomeEdit = true
+              // 编辑布局前储存之前的布局变量
+              hilog.info(0xFF00, "HometestTag", "上一次布局1： %{public}s", JSON.stringify(this.theLastHomeCard))
+              this.theLastHomeCard = JSON.parse(this.appConfig.isShowHomeCard)
+              hilog.info(0xFF00, "HometestTag", "上一次布局2： %{public}s", JSON.stringify(this.theLastHomeCard))
               if (this.isAnimation) {
                 animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
                   this.isShowDeleteButton = true
                 })
               }else {this.isShowDeleteButton = true}
             })
-            //     .margin({ right: this.gridMargin })
             .width(40)
             .height(40)
             .backgroundColor($r('app.color.settings_container_background'))
@@ -255,7 +270,6 @@ struct Home {
                 .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
                 .fontColor([this.icon_primary]) //设置图标无法分层设为单色
             }
-            //   .margin({ right: this.gridMargin })
             .width(40)
             .height(40)
             .backgroundColor($r('app.color.settings_container_background'))
@@ -270,7 +284,6 @@ struct Home {
             Text($r('app.string.home_edit'))
               .fontSize(32)
               .fontWeight(FontWeight.Bold)
-                //     .margin({ left: this.gridMargin })
               .fontColor(this.font_primary)
               .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
                 .combine(TransitionEffect.SLIDE):null)
@@ -281,7 +294,6 @@ struct Home {
                 .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
                 .fontColor([Color.White])
             }
-            //   .margin({ right: this.gridMargin })
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
@@ -298,7 +310,6 @@ struct Home {
                 .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
                 .fontColor([Color.White])
             }
-            //   .margin({ right: this.gridMargin })
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
@@ -314,7 +325,6 @@ struct Home {
                 .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
                 .fontColor([Color.White])
             }
-            //   .margin({ right: this.gridMargin })
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
@@ -345,7 +355,7 @@ struct Home {
           ListItem() {
             GridRow({ gutter: this.isLandscapePhone ? { x: 12, y: 15 } : this.gutterHomeGridcol.value }) {
               //网络速度小卡片
-              if (this.isShowHomeCardConfig.isShowSpeed===true) {
+              if (this.theCurrentHomeCard[0]) {
                 GridCol({
                   span: { xs: this.isLandscapePhone ? 6 : 12, md: this.isLandscapePhone ? 6 :this.isFoldStatus ? 8 : 12, lg: 6 },
                   order: 1
@@ -357,8 +367,10 @@ struct Home {
                         .position({ x: '95%', y: -4 })
                         .onClick(() => {
                           animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-                            this.isShowHomeCardConfig.isShowSpeed=false
+                            // 将序号0变为false
+                            this.theCurrentHomeCard.splice(0, 1, false)
                           })
+                          hilog.info(0xFF00, "HometestTag", "网络速率卡片： %{public}s", this.appConfig.isShowHomeCard[0])
                         })
                     }
                   }
@@ -378,7 +390,7 @@ struct Home {
               }
 
               //分流模式小卡片
-              if (this.isShowHomeCardConfig.isShowSwitchMode===true ) {
+              if (this.theCurrentHomeCard[1]) {
                 GridCol({
                   span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6, lg: 3 },
                   order: 2
@@ -390,8 +402,10 @@ struct Home {
                         .position({ x: '90%', y: -4 })
                         .onClick(() => {
                           animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-                            this.isShowHomeCardConfig.isShowSwitchMode = false
+                            // 将序号1变为false
+                            this.theCurrentHomeCard.splice(1, 1, false)
                           })
+                          hilog.info(0xFF00, "HometestTag", "分流模式卡片： %{public}s", this.appConfig.isShowHomeCard[1])
                         })
                     }
                   }
@@ -402,7 +416,7 @@ struct Home {
               }
 
               //流量统计小卡片
-              if (this.isShowHomeCardConfig.isShowCellularData===true) {
+              if (this.theCurrentHomeCard[2]) {
                 GridCol({
                   span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6, lg: 3 },
                   order: 3
@@ -414,7 +428,8 @@ struct Home {
                         .position({ x: '90%', y: -4 })
                         .onClick(() => {
                           animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-                            this.isShowHomeCardConfig.isShowCellularData = false
+                            // 将序号2变为false
+                            this.theCurrentHomeCard.splice(2, 1, false)
                           })
                         })
                     }
@@ -427,7 +442,7 @@ struct Home {
               }
 
               //当前节点小卡片
-              if (this.isShowHomeCardConfig.isShowCurrentNode===true) {
+              if (this.theCurrentHomeCard[3]) {
                 GridCol({
                   span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6, lg: 3 },
                   order: 4
@@ -439,7 +454,8 @@ struct Home {
                         .position({ x: '90%', y: -4 })
                         .onClick(() => {
                           animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-                            this.isShowHomeCardConfig.isShowCurrentNode = false
+                            // 将序号3变为false
+                            this.theCurrentHomeCard.splice(3, 1, false)
                           })
                         })
                     }
@@ -451,7 +467,7 @@ struct Home {
               }
 
               //IP地址小卡片
-              if (this.isShowHomeCardConfig.isShowPublicNetwork===true) {
+              if (this.theCurrentHomeCard[4]) {
                 GridCol({
                   span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6, lg: 3 },
                   order: 5
@@ -463,7 +479,8 @@ struct Home {
                         .position({ x: '90%', y: -4 })
                         .onClick(() => {
                           animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-                            this.isShowHomeCardConfig.isShowPublicNetwork = false
+                            // 将序号4变为false
+                            this.theCurrentHomeCard.splice(4, 1, false)
                           })
                         })
                     }
@@ -475,7 +492,7 @@ struct Home {
               }
 
               //收藏节点小卡片
-              if (this.isShowHomeCardConfig.isShowFavoriteProxy  ===true) {
+              if (this.theCurrentHomeCard[5]) {
                 GridCol({
                   span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6, lg: 3 },
                   order: 6
@@ -487,7 +504,8 @@ struct Home {
                         .position({ x: '90%', y: -4 })
                         .onClick(() => {
                           animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-                            this.isShowHomeCardConfig.isShowFavoriteProxy = false
+                            // 将序号5变为false
+                            this.theCurrentHomeCard.splice(5, 1, false)
                           })
                         })
                     }
@@ -499,7 +517,7 @@ struct Home {
               }
 
               //收藏配置小卡片
-              if (this.isShowHomeCardConfig.isShowFavoriteConfiguration ===true) {
+              if (this.theCurrentHomeCard[6]) {
                 GridCol({
                   span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6, lg: 3 },
                   order: 7
@@ -511,7 +529,8 @@ struct Home {
                         .position({ x: '90%', y: -4 })
                         .onClick(() => {
                           animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-                            this.isShowHomeCardConfig.isShowFavoriteConfiguration = false
+                            // 将序号6变为false
+                            this.theCurrentHomeCard.splice(6, 1, false)
                           })
                         })
                     }
@@ -523,7 +542,7 @@ struct Home {
               }
 
               //节点信息小卡片
-              if (this.isShowHomeCardConfig.isShowProxyINFO ===true) {
+              if (this.theCurrentHomeCard[7]) {
                 GridCol({
                   span: { xs: this.isLandscapePhone ? 6 : 12, md: this.isLandscapePhone ? 6 : this.isFoldStatus ? 8 :12, lg: 6 },
                   order: 1
@@ -535,7 +554,8 @@ struct Home {
                         .position({ x: '95%', y: -4 })
                         .onClick(() => {
                           animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-                            this.isShowHomeCardConfig.isShowProxyINFO = false
+                            // 将序号7变为false
+                            this.theCurrentHomeCard.splice(7, 1, false)
                           })
                         })
                     }
@@ -550,7 +570,7 @@ struct Home {
               }
 
               //当前配置小卡片
-              if (this.isShowHomeCardConfig.isShowCurrentConfiguration ===true) {
+              if (this.theCurrentHomeCard[8]) {
                 GridCol({
                   span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6, lg: 3 },
                   order: 4
@@ -562,7 +582,8 @@ struct Home {
                         .position({ x: '90%', y: -4 })
                         .onClick(() => {
                           animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear}, () => {
-                            this.isShowHomeCardConfig.isShowCurrentConfiguration = false
+                            // 将序号8变为false
+                            this.theCurrentHomeCard.splice(8, 1, false)
                           })
                         })
                     }
@@ -574,7 +595,7 @@ struct Home {
               }
 
               //快捷方式小卡片
-              if ( this.isShowHomeCardConfig.isShowShortcuts ===this.isFoldStatus? false:true) {
+              if (this.theCurrentHomeCard[9] === this.isFoldStatus ? false : true) {
                 GridCol({
                   span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6, lg: 3 },
                   order: 8
@@ -586,7 +607,8 @@ struct Home {
                         .position({ x: '90%', y: -4 })
                         .onClick(() => {
                           animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
-                            this.isShowHomeCardConfig.isShowShortcuts =this.isFoldStatus? true : false
+                            // 将序号9变为false
+                            this.theCurrentHomeCard.splice(9, 1, this.isFoldStatus ? true : false)
                           })
                         })
                     }

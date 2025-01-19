@@ -366,9 +366,9 @@ struct Index {
     // 在页面build前改变主题颜色
     changeThemeColor(this.appConfig.themeColor)
     hilog.info(0x1000, this.componentName, `#aboutToAppear#ThemeControl.setDefaultTheme(${this.appConfig.themeColor})`)
-    // 切换颜色模式(深色模式)
+    // 初始化切换颜色模式(深色模式)
     this.switchColorMode(this.appConfig.darkModeIndex)
-    // 切换按钮位置
+    // 初始化切换按钮位置
     this.switchButtonPosition(this.appConfig.buttonPositionIndex)
     // 初始化实验功能显示状态
     this.isShowExperimentalFunction = this.appConfig.isShowExperimentalFunction
