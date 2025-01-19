@@ -84,9 +84,8 @@ export struct ConfigInfo{
   build() {
     Column({ space: 10 }) {
       // 配置名input
-      // TODO 国际化
-      Text('配置名').fontColor($r('sys.color.font_secondary')).fontSize(FONT_SIZE_16)
-      TextInput({ text: $$this.configData.configName, placeholder: '输入配置名' }).width('100%').height(TEXT_INPUT_HEIGHT).borderRadius(BORDER_RADIUS_20)
+      Text($r('app.string.config_name')).fontColor($r('sys.color.font_secondary')).fontSize(FONT_SIZE_16)
+      TextInput({ text: $$this.configData.configName, placeholder: $r('app.string.enter_configuration_name') }).width('100%').height(TEXT_INPUT_HEIGHT).borderRadius(BORDER_RADIUS_20)
         .id('text_input_config_name')
         .caretColor(this.icon_emphasize)
         .maxLength(TEXT_AREA_MAX_LENGTH)
@@ -104,10 +103,8 @@ export struct ConfigInfo{
 
 
       // 配置 URL
-      // TODO 国际化
       Text('URL').fontColor($r('sys.color.font_secondary')).fontSize(FONT_SIZE_16)
-      // TODO 国际化
-      TextArea({ text: $$this.configData.configUrl, placeholder: '输入链接...' }).width('100%').height(TEXT_INPUT_HEIGHT * 2).borderRadius(BORDER_RADIUS_20)
+      TextArea({ text: $$this.configData.configUrl, placeholder: $r('app.string.resource_path_placeholder') }).width('100%').height(TEXT_INPUT_HEIGHT * 2).borderRadius(BORDER_RADIUS_20)
         .id('text_area_config_url')
         .caretColor(this.icon_emphasize)
         .maxLength(TEXT_AREA_MAX_LENGTH)
@@ -130,8 +127,7 @@ export struct ConfigInfo{
           // 自动更新开关 START
           ListItem({ style:ListItemStyle.CARD }){
             Row(){
-              // TODO 国际化
-              Text('自动更新').fontColor($r('sys.color.font_primary')).fontSize(FONT_SIZE_16)
+              Text($r('app.string.auto_update')).fontColor($r('sys.color.font_primary')).fontSize(FONT_SIZE_16)
               Blank()
               Toggle({ type: ToggleType.Switch, isOn: this.configData.isConfigAutoUpdate })
                 .selectedColor(this.icon_emphasize)
@@ -173,12 +169,10 @@ export struct ConfigInfo{
           if (this.configData.isConfigAutoUpdate) {
             ListItem({ style:ListItemStyle.CARD }){
               Row(){
-                // TODO 国际化
-                Text('自动更新间隔').fontColor($r('sys.color.font_primary')).fontSize(FONT_SIZE_16)
+                Text($r('app.string.auto_update_interval')).fontColor($r('sys.color.font_primary')).fontSize(FONT_SIZE_16)
                 Blank()
                 Row(){
-                  // TODO 国际化
-                  TextInput({ text: $$this.configAutoUpdateTimeGapInputValue, placeholder: '请输入' })
+                  TextInput({ text: $$this.configAutoUpdateTimeGapInputValue, placeholder: $r('app.string.text_input_placeholder') })
                     .width(50)
                     .height(30)
                     .padding(0)

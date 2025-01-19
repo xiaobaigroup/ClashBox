@@ -1339,6 +1339,70 @@
     {
       "name": "refresh_tips",
       "value": "Refreshing，Please wait a moment..."
+    },
+    {
+      "name": "layout_restored",
+      "value": "Layout restored"
+    },
+    {
+      "name": "Import_from_url",
+      "value": "Import from URL"
+    },
+    {
+      "name": "update_success",
+      "value": "Update success: "
+    },
+    {
+      "name": "update_failed",
+      "value": "Update failed: "
+    },
+    {
+      "name": "import_from_QR_code",
+      "value": "Import from QR code"
+    },
+    {
+      "name": "import_from_file",
+      "value": "Import from file"
+    },
+    {
+      "name": "new_blank_configuration",
+      "value": "New blank configuration"
+    },
+    {
+      "name": "add_config",
+      "value": "Add Configuration"
+    },
+    {
+      "name": "config_name",
+      "value": "Configuration Name"
+    },
+    {
+      "name": "enter_configuration_name",
+      "value": "Enter configuration name"
+    },
+    {
+      "name": "save_current_configuration",
+      "value": "Save current configuration?"
+    },
+    {
+      "name": "downloading_configuration_file",
+      "value": "Downloading configuration file"
+    },
+    {
+      "name": "cancel_download",
+      "value": "Cancel Download"
+    },
+    {
+      "name": "configuration_download_canceled",
+      "value": "Configuration download canceled"
+    },
+    {
+      "name": "updating_configuration_file",
+      "value": "Updating configuration file"
+    },
+    {
+      "name": "download_failed",
+      "value": "Download failed:"
     }
   ]
 }

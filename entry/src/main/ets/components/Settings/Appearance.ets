@@ -5,14 +5,12 @@ import {
   AppearanceListItemProp,
 } from "../../common/Constants"
 import TopBuilder from "./TopBuilder"
-import { SymbolGlyphModifier, ThemeControl } from "@kit.ArkUI"
-import { CustomThemeName, CUSTOM_THEME_MAP } from "../../common/AppTheme"
+import { SymbolGlyphModifier } from "@kit.ArkUI"
 import { common } from "@kit.AbilityKit"
-import { setAutoColorMode, setDarkColorMode, setLightColorMode } from "../../utils/ColorModeChangeFunctions"
-import { hilog } from "@kit.PerformanceAnalysisKit"
+import { setAutoColorMode, setDarkColorMode, setLightColorMode } from "../../utils/ChangeColorModeUtils"
 import { menuRowList, toggleRowList } from "../Common"
 import { AppConfig } from "../../entryability/AppState"
-import { changeThemeColor } from "../../utils/ChangeThemeColor"
+import { changeThemeColor } from "../../utils/ChangeThemeColorUtil"
 
 @Component
 struct Appearance {

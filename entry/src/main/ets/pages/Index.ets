@@ -50,9 +50,10 @@ import { Dns, LogLevel, Profile, ProxyGroup } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig } from '../entryability/AppState'
-import { changeThemeColor } from '../utils/ChangeThemeColor'
+import { changeThemeColor } from '../utils/ChangeThemeColorUtil'
 import { common } from '@kit.AbilityKit'
-import { setAutoColorMode, setDarkColorMode, setLightColorMode } from '../utils/ColorModeChangeFunctions'
+import { setAutoColorMode, setDarkColorMode, setLightColorMode } from '../utils/ChangeColorModeUtils'
+import { ChangeLanguage } from '../utils/ChangeLanguageUtil'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 
@@ -372,6 +373,8 @@ struct Index {
     this.switchButtonPosition(this.appConfig.buttonPositionIndex)
     // 初始化实验功能显示状态
     this.isShowExperimentalFunction = this.appConfig.isShowExperimentalFunction
+    // 初始化用户语言
+    ChangeLanguage(this.appConfig.userLanguage)
 
     // 开启change监听
     this.deviceHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {

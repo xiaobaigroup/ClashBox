@@ -43,11 +43,10 @@ export struct ConfigAdd {
 
   /* List 相关 */
   private configAddTypeArray: Array<ConfigAddType> = [
-    // TODO 国际化
-    { symbolStart: $r('sys.symbol.paperclip'), text: '从URL(链接)导入', navPathStackName: RouteName.IMPORT_CONFIG_FROM_URL, symbolEnd: $r('sys.symbol.chevron_right')},
-    { symbolStart: $r('sys.symbol.qrcode'), text: '从二维码导入', navPathStackName: RouteName.IMPORT_CONFIG_FROM_QR_CODE, symbolEnd: $r('sys.symbol.chevron_right')},
-    { symbolStart: $r('sys.symbol.doc_text_fill'), text: '从文件导入', navPathStackName: RouteName.IMPORT_CONFIG_FROM_FILE, symbolEnd: $r('sys.symbol.chevron_right')},
-    { symbolStart: $r('sys.symbol.doc'), text: '新建空白配置', navPathStackName: RouteName.CREATE_NEW_CONFIG, symbolEnd: $r('sys.symbol.chevron_right')},
+    { symbolStart: $r('sys.symbol.paperclip'), text: $r('app.string.Import_from_url'), navPathStackName: RouteName.IMPORT_CONFIG_FROM_URL, symbolEnd: $r('sys.symbol.chevron_right')},
+    { symbolStart: $r('sys.symbol.qrcode'), text: $r('app.string.import_from_QR_code'), navPathStackName: RouteName.IMPORT_CONFIG_FROM_QR_CODE, symbolEnd: $r('sys.symbol.chevron_right')},
+    { symbolStart: $r('sys.symbol.doc_text_fill'), text: $r('app.string.import_from_file'), navPathStackName: RouteName.IMPORT_CONFIG_FROM_FILE, symbolEnd: $r('sys.symbol.chevron_right')},
+    { symbolStart: $r('sys.symbol.doc'), text: $r('app.string.new_blank_configuration'), navPathStackName: RouteName.CREATE_NEW_CONFIG, symbolEnd: $r('sys.symbol.chevron_right')},
   ]
 
   /* NV路由 相关 */
@@ -102,15 +101,14 @@ export struct ConfigAdd {
         .edgeEffect(EdgeEffect.Spring)
         // 添加配置几种方式的ListItem END
       }
-      // TODO 国际化
-      // .title({ main: '添加配置', sub: ' '})
+      // .title({ main: $r('app.string.add_config'), sub: ' '})
       // .titleMode(NavigationTitleMode.Mini)
       .title(
         {
           builder: BindSheetTitleCustomBuilder({
             pageInfos: this.configAddPageInfos,
             isSubPage: false,
-            mainTitle: '添加配置',
+            mainTitle: $r('app.string.add_config'),
             // subTitle: '',
             mainTitleFontWeight: BIND_SHEET_MAIN_FONT_WEIGHT,
             mainTitleFontSize: BIND_SHEET_MAIN_FONTSIZE,

@@ -8,6 +8,7 @@ import { ClashConfig } from 'proxy_core'
 import { promptAction } from '@kit.ArkUI'
 import { copy } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
+import { getResourceString } from "../../utils/ResourceStringUtil"
 
 // 资源数据（假设）
 interface ResourcesData {
@@ -156,11 +157,11 @@ struct Resources {
       this.isLoading = true
       if (message != ""){
         this.isLoading = false
-        promptAction.showToast({message: "更新成功: " +message})
+        promptAction.showToast({message: getResourceString($r('app.string.update_success'), this) + message})
       }
     } catch (e) {
       this.isLoading = false
-      promptAction.showToast({message: "更新失败: " + (e.message | e)})
+      promptAction.showToast({message: getResourceString($r('app.string.update_failed'), this) + (e.message | e)})
     }
   }
 
@@ -175,7 +176,7 @@ struct Resources {
               .width(80).height(80)
             Text('资源更新中..')
               .fontSize(16)
-          }
+          }.zIndex(2)
           .width('100%')
           .height('100%')
           .justifyContent(FlexAlign.Center)

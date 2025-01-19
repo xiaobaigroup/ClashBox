@@ -9,6 +9,7 @@ import {
 } from "../../common/Constants"
 import { BindSheetTitleCustomBuilder } from "../Common"
 import { hilog } from "@kit.PerformanceAnalysisKit"
+import { getResourceString } from "../../utils/ResourceStringUtil"
 
 
 // 关联：route_map.json
@@ -34,11 +35,10 @@ export struct CreateNewConfig{
   breakPointStateNavigationListPadding: BreakpointState<number>
 
   // NV title Builder
-  // TODO 国际化
   @State
-  private mainTitle: string = '添加配置'
+  private mainTitle: string = getResourceString($r('app.string.add_config'), this)
   @State
-  private subTitle: string = '新建空白配置'
+  private subTitle: string = getResourceString($r('app.string.new_blank_configuration'), this)
 
 
   build() {

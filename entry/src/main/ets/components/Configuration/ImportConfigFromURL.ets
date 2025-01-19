@@ -17,6 +17,7 @@ import { CustomConfirmDialog } from '../Common'
 import { BusinessError } from "@kit.BasicServicesKit"
 import { common } from "@kit.AbilityKit"
 import ClashViewModel from "../../entryability/ClashViewModel"
+import { getResourceString } from "../../utils/ResourceStringUtil"
 
 
 // 关联：route_map.json
@@ -62,11 +63,10 @@ export struct ImportConfigFromURL{
   // breakPointStateNavigationListPadding: BreakpointState<number>
 
   /* NV title Builder */
-  // TODO 国际化
   @State
-  private mainTitle: string = '添加配置'
+  private mainTitle: string = getResourceString($r('app.string.add_config'), this)
   @State
-  private subTitle: string = '从URL(链接)导入'
+  private subTitle: string = getResourceString($r('app.string.Import_from_url'), this)
   // 标题栏工具菜单
   // { symbol: $r('sys.symbol.star'), action: () => { this.menus.pop() } },
   // 保存按钮
@@ -95,10 +95,9 @@ export struct ImportConfigFromURL{
   // 配置是否保存弹框 Controller定义
   private configCustomConfirmDialogController: CustomDialogController | null= new CustomDialogController({
     builder: CustomConfirmDialog({
-      // TODO 国际化
-      title: '是否保存当前配置？',
-      cancelText: '取消',
-      confirmText: '保存',
+      title: $r('app.string.save_current_configuration'),
+      cancelText: $r('app.string.Cancel'),
+      confirmText: $r('app.string.Save'),
       cancelButtonBackgroundColor: Color.Transparent,
       // 不可以使用`@Consume`注解的变量
       // confirmButtonBackgroundColor: this.icon_emphasize,
@@ -120,20 +119,17 @@ export struct ImportConfigFromURL{
     backgroundColor: $r('app.color.list_item_background_color'),
   })
   // 配置下载弹框 title动态值
-  // TODO 国际化
   @State
-  private customDownloadingDialogTitle: ResourceStr = '正在下载配置文件'
+  private customDownloadingDialogTitle: ResourceStr = $r('app.string.downloading_configuration_file')
   // 配置下载弹框 Controller定义
   private configCustomDownloadingDialogController: CustomDialogController | null= new CustomDialogController({
     builder: CustomDownloadingDialog({
-      // TODO 国际化
       title: this.customDownloadingDialogTitle,
-      cancelText: '取消下载',
+      cancelText: $r('app.string.cancel_download'),
       cancel: () => {
         // TODO 取消下载文件 若已下载部分将此删除
         // ...
-        // TODO 国际化
-        this.promptAction.showToast({ message: `已取消下载配置😵` })
+        this.promptAction.showToast({ message: `${getResourceString($r('app.string.configuration_download_canceled'), this)}😵` })
       },
     }),
     // cancel: () => {},
@@ -228,25 +224,24 @@ export struct ImportConfigFromURL{
    * TODO 保存配置
    */
   async saveConfig(isNewConfig: boolean){
-    // TODO 国际化
     if (isNewConfig) {
-      this.customDownloadingDialogTitle = '正在下载配置文件'
+      this.customDownloadingDialogTitle = $r('app.string.downloading_configuration_file')
       this.configCustomDownloadingDialogController?.open()
       try {
         await ClashViewModel.addOrUpdateProfileByUrl(this.configData, null)
       } catch (e) {
         console.error("ClashNext", e.message, e.stack);
-        this.promptAction.showToast({message:"下载失败: " + e.message || e})
+        this.promptAction.showToast({message: getResourceString($r('app.string.download_failed'), this) + e.message || e})
       }
       this.configCustomDownloadingDialogController?.close()
     } else {
-      this.customDownloadingDialogTitle = '正在更新配置文件'
+      this.customDownloadingDialogTitle = $r('app.string.updating_configuration_file')
       this.configCustomDownloadingDialogController?.open()
       try {
         await ClashViewModel.addOrUpdateProfileByUrl(this.configData, this.configData.configId)
       } catch (e) {
         console.error("ClashNext", e.message, e.stack);
-        this.promptAction.showToast({message:"下载失败: " + e.message || e})
+        this.promptAction.showToast({message: getResourceString($r('app.string.download_failed'), this) + e.message || e})
       }
       this.configCustomDownloadingDialogController?.close()
     }

@@ -162,12 +162,11 @@ struct Home {
    * 还原主页卡片布局
    */
   restoreLayout() {
-    // TODO 国际化
     // 还原布局
     this.theCurrentHomeCard = this.theLastHomeCard
     this.appConfig.isShowHomeCard = JSON.stringify(this.theLastHomeCard)
     hilog.info(0xFF00, "HometestTag", "布局还原为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
-    this.promptAction.showToast({ message: `布局已还原🫡` })
+    this.promptAction.showToast({ message: `${getContext().resourceManager.getStringSync($r('app.string.layout_restored'))}🫡` })
     this.isShowHomeEdit = false
     animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
       this.isShowDeleteButton = false
@@ -178,11 +177,10 @@ struct Home {
    * 保存主页卡片布局
    */
   saveHomeLayout() {
-    // TODO 国际化
     // 保存布局
     this.appConfig.isShowHomeCard = JSON.stringify(this.theCurrentHomeCard)
     hilog.info(0xFF00, "HometestTag", "保存的布局： %{public}s", this.appConfig.isShowHomeCard)
-    this.promptAction.showToast({ message: `布局已保存💾` })
+    this.promptAction.showToast({ message: `${getContext().resourceManager.getStringSync($r('app.string.layout_saved'))}💾` })
     this.isShowHomeEdit = false
     if (this.isAnimation) {
       animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {

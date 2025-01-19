@@ -11,6 +11,7 @@ import { BindSheetTitleCustomBuilder } from "../Common"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { picker } from "@kit.CoreFileKit"
 import ClashViewModel from "../../entryability/ClashViewModel"
+import { getResourceString } from "../../utils/ResourceStringUtil"
 
 
 // 关联：route_map.json
@@ -36,11 +37,10 @@ export struct ImportConfigFromFile{
   breakPointStateNavigationListPadding: BreakpointState<number>
 
   // NV title Builder
-  // TODO 国际化
   @State
-  private mainTitle: string = '添加配置'
+  private mainTitle: string = getResourceString($r('app.string.add_config'), this)
   @State
-  private subTitle: string = '从文件导入'
+  private subTitle: string = getResourceString($r('app.string.import_from_file'), this)
 
 
   build() {

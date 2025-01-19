@@ -45,7 +45,8 @@ export class AppConfig{
   isShowExperimentalFunction: boolean = true
   // 主页卡片显示变量
   isShowHomeCard: string = JSON.stringify(showHomeCard)
-  isShowSpeed? :boolean = true
+  // 用户选择的语言
+  userLanguage: string = "default"
 
   /*主页小卡片相关 */
   //快捷方式小卡片

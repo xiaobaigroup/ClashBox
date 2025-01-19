@@ -1286,7 +1286,7 @@
     },
     {
       "name": "resource_path_placeholder",
-      "value": "输入URL..."
+      "value": "输入链接..."
     },
     {
       "name": "saved",
@@ -1339,6 +1339,70 @@
     {
       "name": "refresh_tips",
       "value": "刷新中，请稍后..."
+    },
+    {
+      "name": "layout_restored",
+      "value": "布局已还原"
+    },
+    {
+      "name": "Import_from_url",
+      "value": "从URL(链接)导入"
+    },
+    {
+      "name": "update_success",
+      "value": "更新成功："
+    },
+    {
+      "name": "update_failed",
+      "value": "更新失败："
+    },
+    {
+      "name": "import_from_QR_code",
+      "value": "从二维码导入"
+    },
+    {
+      "name": "import_from_file",
+      "value": "从文件导入"
+    },
+    {
+      "name": "new_blank_configuration",
+      "value": "新建空白配置"
+    },
+    {
+      "name": "add_config",
+      "value": "添加配置"
+    },
+    {
+      "name": "config_name",
+      "value": "配置名"
+    },
+    {
+      "name": "enter_configuration_name",
+      "value": "输入配置名"
+    },
+    {
+      "name": "save_current_configuration",
+      "value": "是否保存当前配置？"
+    },
+    {
+      "name": "downloading_configuration_file",
+      "value": "正在下载配置文件"
+    },
+    {
+      "name": "cancel_download",
+      "value": "取消下载"
+    },
+    {
+      "name": "configuration_download_canceled",
+      "value": "已取消下载配置"
+    },
+    {
+      "name": "updating_configuration_file",
+      "value": "正在更新配置文件"
+    },
+    {
+      "name": "download_failed",
+      "value": "下载失败:"
     }
   ]
 }
