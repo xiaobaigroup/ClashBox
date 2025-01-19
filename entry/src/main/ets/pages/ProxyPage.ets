@@ -12,7 +12,7 @@ import ClashViewModel from '../entryability/ClashViewModel'
 import { Profile, ProxyGroup, ProxySort, ProxyType } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import { AppConfig, isEnd, ProxyCardSize, ProxyGroupType } from '../entryability/AppState'
-
+import { PromptAction } from '@kit.ArkUI'
 
 
 @Entry
@@ -66,7 +66,8 @@ struct ProxyPage {
   hasGroups(){
     this.FristPage = this.proxyGroups.length == 0;
   }
-
+  //收藏与ping延迟即时动作
+  private ProxyPromptAction:PromptAction = this.getUIContext()?.getPromptAction()
 
   /* 断点布局相关 相关作用看定义时候的注释 */
   @Consume('breakPointStateListLanes')
@@ -417,6 +418,7 @@ struct ProxyPage {
                 .align(Alignment.Center)
             }.onClick(()=>{
               EventHub.sendEvent(EventKey.TestDelayAll)
+              this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
             })
             .width('100%')
             .height('100%')

@@ -13,6 +13,12 @@ export enum ProxyCardSize{
   Large
 }
 
+export enum SwitchModeCard{
+  Rule,
+  Overall,
+  Direct
+}
+
 export class AppConfig{
   currentProfileId?: string
   currentProxyName?: string
@@ -49,7 +55,9 @@ export class AppConfig{
   inputWeb1?:string
   inputWeb2?:string
   inputWeb3?:string
-
+//分流模式小卡片
+  switchMode?:SwitchModeCard = SwitchModeCard.Rule
+ // currentCheckedMode?:number =0
   constructor() {
   }
 }

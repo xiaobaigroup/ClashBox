@@ -2,6 +2,8 @@ import {  BreakpointState } from '../../common/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI';
 import { ANIMATION_DURATION_300, MarginGenerate } from '../../common/Constants';
 import { CardTitle } from './CardTitleBuilder';
+import { AppConfig, SwitchModeCard } from '../../entryability/AppState';
+import { EventHub, EventKey } from '../../common/EventHub';
 
 @Component
 struct SwitchMode {
@@ -39,50 +41,32 @@ struct SwitchMode {
   aboutToDisappear() {
 
   }
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
 
   build() {
     Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.SpaceBetween }) {
       CardTitle({ title: $r('app.string.Mode') })
 
       Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-        Text($r('app.string.Rule'))
-          .TextStyle()
-          .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-          .fontColor(this.currentChecked === 1 ? this.font_primary : $r('sys.color.font_secondary'))
-          .backgroundColor(this.currentChecked === 1 ? $r('app.color.container_background'):'#00ffffff')
-            //     .shadow(this.currentChecked === 1 ? { radius: 3,color:$r('app.color.shadow')} : { } )
-          .onClick(() => {
-            //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
-            if (this.isShowHomeEdit===false) {
-              this.currentChecked = 1
-            }
-          })
-
-        Text($r('app.string.Overall'))
-          .TextStyle()
-          .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-          .fontColor(this.currentChecked === 2 ? this.font_primary : $r('sys.color.font_secondary'))
-          .backgroundColor(this.currentChecked === 2 ? $r('app.color.container_background'):'#00ffffff')
-            //      .shadow(this.currentChecked === 2 ? { radius: 3, color:$r('app.color.shadow')} : { } )
-          .onClick(() => {
-            //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
-            if (this.isShowHomeEdit===false) {
-              this.currentChecked = 2
-            }
-          })
-
-        Text($r('app.string.Direct'))
-          .TextStyle()
-          .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-          .fontColor(this.currentChecked === 3 ? this.font_primary : $r('sys.color.font_secondary'))
-          .backgroundColor(this.currentChecked === 3 ? $r('app.color.container_background'):'#00ffffff')
-            //      .shadow(this.currentChecked === 3 ? { radius: 3, color:$r('app.color.shadow')} : { } )
-          .onClick(() => {
-            //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
-            if (this.isShowHomeEdit===false) {
-              this.currentChecked = 3
-            }
-          })
+        ForEach([
+          {t: $r('app.string.Rule'), v: SwitchModeCard.Rule},
+          {t: $r('app.string.Overall'), v: SwitchModeCard.Overall},
+          {t: $r('app.string.Direct'), v: SwitchModeCard.Direct}
+        ], (n: [Resource, number], i: number) => {
+          Button(n["t"], { buttonStyle: ButtonStyleMode.TEXTUAL,stateEffect:false })
+            .ButtonStyle()
+            .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+            .fontColor(this.appConfig.switchMode==n["v"] ? this.font_primary : $r('sys.color.font_secondary'))
+            .backgroundColor(this.appConfig.switchMode==n["v"] ? $r('app.color.container_background') : '#00ffffff')
+       //     .shadow(this.appConfig.switchMode==n["v"] ? { radius: 3,color:$r('app.color.shadow')} : { } )
+            .onClick(() => {
+              //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
+              if (this.isShowHomeEdit === false) {
+                  this.appConfig.switchMode = n["v"]
+                  EventHub.sendEvent(EventKey.SwitchModeCard, n["v"])
+              }
+            })
+        })
       }
       .width('100%')
       .height('82%')
@@ -100,14 +84,12 @@ export default SwitchMode
 
 
 //按钮公用样式
-@Extend(Text)
-function TextStyle() {
+@Extend(Button)
+function ButtonStyle() {
   .width('100%')
   .height(vp2px(32.67))
   .borderRadius(18)
   .fontWeight(FontWeight.Bold)
-  .textAlign(TextAlign.Center)
-  // .transition(TransitionEffect.translate({y:10}).animation({ duration: 300, curve: Curve.Ease }))
   .clickEffect({ level: ClickEffectLevel.MIDDLE,scale:0.8})
 }
 

@@ -78,7 +78,7 @@ struct Shortcuts {
             .onClick(() => {
               //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
               if (this.isShowHomeEdit === false) {
-                if (m["w"] != undefined ) {
+                if (m["w"] != '' ) {
                   this.implicitStartAbility(m["w"])
                 } else {
                   this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })

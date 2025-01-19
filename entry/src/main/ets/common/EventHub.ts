@@ -6,7 +6,8 @@ export enum EventKey{
   ProxySort = 10002,
   ChangeProxy = 10003,
   TestDelayAll = 10004,
-  StartLog = 10005
+  StartLog = 10005,
+  SwitchModeCard = 10006
 }
 
 export class EventHub{
