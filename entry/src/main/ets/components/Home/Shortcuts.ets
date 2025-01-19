@@ -9,6 +9,7 @@ import { BIND_SHEET_CONTAINER_HEIGHT,
 import { CardTitle } from './CardTitleBuilder'
 import { common, Want } from '@kit.AbilityKit'
 import { PromptAction } from '@kit.ArkUI'
+import { AppConfig, isEnd } from '../../entryability/AppState'
 
 @Component
 struct Shortcuts {
@@ -16,25 +17,14 @@ struct Shortcuts {
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
   // 内容文本字体大小
   @Consume('breakPointStateHomeCardSwitchModeFontSize') private fontSize: BreakpointState<number>
-  // 内容文本字体大小
-  @Consume('breakPointStateCardCellularDataFontSize') private fontSize1: BreakpointState<number>
   // 卡片内边距
-  @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
+  @Consume('breakPointStateHomeCardPadding') private cardPadding: BreakpointState<MarginGenerate>
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
-
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
-  @State isShowShortcutsEdit :boolean = false
-  //标题输入文本内容
-  @State inputTitleValue1: string = ""
-  @State inputTitleValue2: string = ""
-  @State inputTitleValue3: string = ""
-  //web输入文本内容
-  @Provide inputWebValue1: string = ""
-  @Provide inputWebValue2: string = ""
-  @Provide inputWebValue3: string = ""
+  @State isShowShortcutsEdit: boolean = false
   /* 主题色 */
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
@@ -42,6 +32,8 @@ struct Shortcuts {
   private breakPointStateTabContentTitleMargin: BreakpointState<number>
   // 折叠屏展开状态判定
   @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+
 
   aboutToAppear() {
     let uiContextShortcuts: UIContext = this.getUIContext();
@@ -65,8 +57,9 @@ struct Shortcuts {
       console.info(`explicit start ability failed with ${error.code}`)
     }
   }
+
   //无填写标题和网址即时动作
-  private ShortcutsPromptAction:PromptAction = this.getUIContext()?.getPromptAction()
+  private ShortcutsPromptAction: PromptAction = this.getUIContext()?.getPromptAction()
 
   build() {
     //快捷小卡片主体 start
@@ -74,87 +67,44 @@ struct Shortcuts {
       CardTitle({ title: $r('app.string.shortcuts') })
 
       Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceEvenly }) {
-        Text(this.inputTitleValue1 != '' ? `${this.inputTitleValue1}`:$r('app.string.long_press_modify'))
-          .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-          .ShortcutsTextStyle()
-          .onClick(() => {
-            //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
-            if (this.isShowHomeEdit===false) {
-              if (this.inputWebValue1 != '') {
-                this.implicitStartAbility(this.inputWebValue1)
-              } else {
-                this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
-              }
-            }
-          })
-          .gesture(
-            LongPressGesture()
-              .onAction(() => {
-                //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
-                if ( this.isShowHomeEdit===false) {
-                  this.isShowShortcutsEdit = true
-                  this.isEnableIndexForegroundBlur = true
+        ForEach([
+          { t: this.appConfig.inputTitle1, w: this.appConfig.inputWeb1 },
+          { t: this.appConfig.inputTitle2, w: this.appConfig.inputWeb2 },
+          { t: this.appConfig.inputTitle3, w: this.appConfig.inputWeb3 }
+        ], (m: [Resource, number], i: number) => {
+          Text(m["t"] != undefined ? m["t"]: $r('app.string.long_press_modify') )
+            .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+            .ShortcutsTextStyle()
+            .onClick(() => {
+              //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+              if (this.isShowHomeEdit === false) {
+                if (m["w"] != undefined ) {
+                  this.implicitStartAbility(m["w"])
+                } else {
+                  this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
                 }
-              })
-          )
-
-        Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
-
-        Text(this.inputTitleValue2 != '' ? `${this.inputTitleValue2}`:$r('app.string.long_press_modify'))
-          .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-          .ShortcutsTextStyle()
-          .onClick(() => {
-            //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
-            if (this.isShowHomeEdit===false) {
-              if (this.inputWebValue2 != '') {
-                this.implicitStartAbility(this.inputWebValue2)
-              } else {
-                this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
               }
-            }
-          })
-          .gesture(
-            LongPressGesture()
-              .onAction(() => {
-                //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
-                if (this.isShowHomeEdit===false) {
-                  this.isShowShortcutsEdit = true
-                  this.isEnableIndexForegroundBlur=true
-                }
-              })
-          )
-
-        Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
-
-        Text(this.inputTitleValue3 != '' ? `${this.inputTitleValue3}`:$r('app.string.long_press_modify'))
-          .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-          .ShortcutsTextStyle()
-          .onClick(() => {
-            //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
-            if ( this.isShowHomeEdit===false) {
-              if (this.inputWebValue3 != '') {
-                this.implicitStartAbility(this.inputWebValue3)
-              }else {
-                this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
-              }
-            }
-          })
-          .gesture(
-            LongPressGesture()
-              .onAction(() => {
-                //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
-                if (this.isShowHomeEdit===false) {
-                  this.isShowShortcutsEdit = true
-                  this.isEnableIndexForegroundBlur = true
-                }
-              })
-          )
+            })
+            .gesture(
+              LongPressGesture()
+                .onAction(() => {
+                  //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+                  if (this.isShowHomeEdit === false) {
+                    this.isShowShortcutsEdit = true
+                    this.isEnableIndexForegroundBlur = true
+                  }
+                })
+            )
+          if (!isEnd(3, i)) {
+            Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
+          }
+        })
       }
       .width('100%')
       .height('82%')
       .backgroundColor($r('app.color.home_card_background'))
       .borderRadius(10)
-      .padding({left:5,right:5})
+      .padding({ left: 5, right: 5 })
     }
     .id('ShortcutsId')
     .padding(this.cardPadding.value)
@@ -179,12 +129,16 @@ struct Shortcuts {
   //绑定第一个按钮弹窗
   WebDialogController1: CustomDialogController | null = new CustomDialogController({
     builder: WebCustomDialog1({
-      cancel: ()=> { this.onCancel() },
-      confirm: ()=> { this.onAccept() }
+      cancel: () => {
+        this.onCancel()
+      },
+      confirm: () => {
+        this.onAccept()
+      }
     }),
     cancel: this.existApp,
     autoCancel: true,
-    onWillDismiss:(dismissDialogAction: DismissDialogAction)=> {
+    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
       console.info("reason=" + JSON.stringify(dismissDialogAction.reason))
       console.log("dialog onWillDismiss")
       if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
@@ -199,19 +153,22 @@ struct Shortcuts {
     alignment: DialogAlignment.Center,
     cornerRadius: 32,
     gridCount: 4,
-    backgroundBlurStyle:BlurStyle.NONE,
-    backgroundColor:$r('app.color.container_background')
+    backgroundBlurStyle: BlurStyle.NONE,
+    backgroundColor: $r('app.color.container_background')
   })
-
   //绑定第二个按钮弹窗
   WebDialogController2: CustomDialogController | null = new CustomDialogController({
     builder: WebCustomDialog2({
-      cancel: ()=> { this.onCancel() },
-      confirm: ()=> { this.onAccept() }
+      cancel: () => {
+        this.onCancel()
+      },
+      confirm: () => {
+        this.onAccept()
+      }
     }),
     cancel: this.existApp,
     autoCancel: true,
-    onWillDismiss:(dismissDialogAction: DismissDialogAction)=> {
+    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
       console.info("reason=" + JSON.stringify(dismissDialogAction.reason))
       console.log("dialog onWillDismiss")
       if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
@@ -226,19 +183,22 @@ struct Shortcuts {
     alignment: DialogAlignment.Center,
     cornerRadius: 32,
     gridCount: 4,
-    backgroundBlurStyle:BlurStyle.NONE,
-    backgroundColor:$r('app.color.container_background')
+    backgroundBlurStyle: BlurStyle.NONE,
+    backgroundColor: $r('app.color.container_background')
   })
-
   //绑定第三个按钮弹窗
   WebDialogController3: CustomDialogController | null = new CustomDialogController({
     builder: WebCustomDialog3({
-      cancel: ()=> { this.onCancel() },
-      confirm: ()=> { this.onAccept() }
+      cancel: () => {
+        this.onCancel()
+      },
+      confirm: () => {
+        this.onAccept()
+      }
     }),
     cancel: this.existApp,
     autoCancel: true,
-    onWillDismiss:(dismissDialogAction: DismissDialogAction)=> {
+    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
       console.info("reason=" + JSON.stringify(dismissDialogAction.reason))
       console.log("dialog onWillDismiss")
       if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
@@ -253,9 +213,10 @@ struct Shortcuts {
     alignment: DialogAlignment.Center,
     cornerRadius: 32,
     gridCount: 4,
-    backgroundBlurStyle:BlurStyle.NONE,
-    backgroundColor:$r('app.color.container_background')
+    backgroundBlurStyle: BlurStyle.NONE,
+    backgroundColor: $r('app.color.container_background')
   })
+
   // 在自定义组件即将析构销毁时将弹窗置空
   aboutToDisappear() {
     this.WebDialogController1 = null // 将dialogController置空
@@ -299,24 +260,25 @@ struct Shortcuts {
               Column({ space: 2 }) {
                 TextInput({
                   placeholder: $r('app.string.text_input_placeholder'),
-                  text: this.inputTitleValue1,
+                  text: this.appConfig.inputTitle1,
                   controller: this.controller
                 })
                   .TextInputStyle()
                   .caretColor(this.icon_emphasize)//   .underlineColor(this.icon_emphasize)
                   .onSubmit((enterKey: EnterKeyType) => {
                     enterKey.toString()
-                    this.inputTitleValue1 != ''
+                //    this.appConfig.inputTitle1 != undefined
                   })
                   .onChange((value: string) => {
-                    this.inputTitleValue1 = value
-                    this.inputTitleValue1 != ''
+                    this.appConfig.inputTitle1 = value
+              //      this.appConfig.inputTitle1 != undefined
                   })
                 Divider().strokeWidth(1).color(this.icon_emphasize)
               }.width('32%')
             }
 
-            Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
+              Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
+
             Flex({
               direction: FlexDirection.Row,
               alignItems: ItemAlign.Center,
@@ -350,18 +312,18 @@ struct Shortcuts {
               Column({ space: 2 }) {
                 TextInput({
                   placeholder: $r('app.string.text_input_placeholder'),
-                  text: this.inputTitleValue2,
+                  text: this.appConfig.inputTitle2,
                   controller: this.controller
                 })
                   .TextInputStyle()
                   .caretColor(this.icon_emphasize)// .underlineColor(this.icon_emphasize)
                   .onSubmit((enterKey: EnterKeyType) => {
                     enterKey.toString()
-                    this.inputTitleValue2 != ''
+             //       this.appConfig.inputTitle2 != undefined
                   })
                   .onChange((value: string) => {
-                    this.inputTitleValue2 = value
-                    this.inputTitleValue2 != ''
+                    this.appConfig.inputTitle2 = value
+             //       this.appConfig.inputTitle2 != undefined
                   })
                 Divider().strokeWidth(1).color(this.icon_emphasize)
               }.width('32%')
@@ -401,18 +363,18 @@ struct Shortcuts {
               Column({ space: 2 }) {
                 TextInput({
                   placeholder: $r('app.string.text_input_placeholder'),
-                  text: this.inputTitleValue3,
+                  text: this.appConfig.inputTitle3,
                   controller: this.controller
                 })
                   .TextInputStyle()
                   .caretColor(this.icon_emphasize)//.underlineColor(this.icon_emphasize)
                   .onSubmit((enterKey: EnterKeyType) => {
                     enterKey.toString()
-                    this.inputTitleValue3 != ''
+              //      this.appConfig.inputWeb3 != undefined
                   })
                   .onChange((value: string) => {
-                    this.inputTitleValue3 = value
-                    this.inputTitleValue3 != ''
+                    this.appConfig.inputTitle3 = value
+                //    this.appConfig.inputTitle3 != undefined
                   })
                 Divider().strokeWidth(1).color(this.icon_emphasize)
               }.width('32%')
@@ -438,13 +400,13 @@ struct Shortcuts {
           }.ColumnStyle()
         }
       }
+      .width('100%')
+      // .contentEndOffset(50)
+      .padding({
+        left: this.breakPointStateTabContentTitleMargin.value,
+        right: this.breakPointStateTabContentTitleMargin.value,
+      })
     }
-    .width('100%')
-    // .contentEndOffset(50)
-    .padding({
-      left: this.breakPointStateTabContentTitleMargin.value,
-      right: this.breakPointStateTabContentTitleMargin.value,
-    })
   }
 }
 export default Shortcuts
@@ -453,15 +415,14 @@ export default Shortcuts
 //第一个网址按钮打开的自定义弹窗
 @CustomDialog
 struct WebCustomDialog1 {
-  //web输入文本内容
-  @Consume inputWebValue1: string
-
   /* 主题色 */
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @State  inputWeb1:string =''
 
   controller?: CustomDialogController
   cancel: () => void = () => {
@@ -470,64 +431,69 @@ struct WebCustomDialog1 {
   }
 
   build() {
-    Column() {
-      Text($r('app.string.write_url'))
-        .fontSize(20)
-        .fontWeight(FontWeight.Bold)
-      Blank(15)
+      Column() {
 
-      TextArea({ placeholder: 'https://www.google.com',text:this.inputWebValue1})
-        .WebTextAreaStyle()
-        .caretColor(this.icon_emphasize)
-        .onSubmit( (enterKey: EnterKeyType) => {
-          enterKey.toString()
-          this.inputWebValue1 != ''
-        })
-        .onChange((value: string) => {
-          this.inputWebValue1 = value
-        })
-      Blank(8)
+          Text($r('app.string.write_url'))
+            .fontSize(20)
+            .fontWeight(FontWeight.Bold)
+          Blank(15)
 
-      Row({space:8}) {
-        Button($r('app.string.Cancel'))
-          .WebButtonStyle()
-          .fontColor(this.icon_emphasize)
-          .backgroundColor('#00ffffff')
-          .onClick(() => {
-            if (this.controller != undefined) {
-              this.controller.close()
-              //    this.isEnableIndexForegroundBlur = false
-            }
-          })
+          TextArea({ placeholder: 'https://www.google.com', text: this.appConfig.inputWeb1 })
+            .WebTextAreaStyle()
+            .caretColor(this.icon_emphasize)
+            .onChange((value: string) => {
+              this.inputWeb1 = value
+            })
+          Blank(8)
 
-        Button($r('app.string.Save'))
-          .WebButtonStyle()
-          .fontColor($r('sys.color.font_on_primary'))
-          .backgroundColor(this.icon_emphasize)
-          .onClick(() => {
-            this.inputWebValue1.toString()
-            if (this.controller != undefined) {
-              this.controller.close()
-              //   this.isEnableIndexForegroundBlur = false
-            }
-          })
+          Row({ space: 8 }) {
+            Button($r('app.string.Cancel'))
+              .WebButtonStyle()
+              .fontColor(this.icon_emphasize)
+              .backgroundColor('#00ffffff')
+              .onClick(() => {
+                if (this.controller != undefined) {
+                  this.controller.close()
+                  //    this.isEnableIndexForegroundBlur = false
+                }
+              })
+
+            Button($r('app.string.Save'))
+              .WebButtonStyle()
+              .fontColor($r('sys.color.font_on_primary'))
+              .backgroundColor(this.icon_emphasize)
+              .onClick(() => {
+                this.appConfig.inputWeb1=this.inputWeb1
+                if (this.controller != undefined) {
+                  this.controller.close()
+                  this.inputWeb1 = ''
+                  //   this.isEnableIndexForegroundBlur = false
+                }
+              })
+          }
       }
-
-    } .width('100%').padding({top:15,bottom:15,left:24,right:24})
+      .width('100%')
+      .padding({
+        top: 15,
+        bottom: 15,
+        left: 24,
+        right: 24
+      })
   }
 }
+
 
 //第二个网址按钮打开的自定义弹窗
 @CustomDialog
 struct WebCustomDialog2 {
-  //web输入文本内容
-  @Consume inputWebValue2: string
   /* 主题色 */
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @State  inputWeb2:string =''
 
   controller?: CustomDialogController
   cancel: () => void = () => {
@@ -537,51 +503,46 @@ struct WebCustomDialog2 {
 
   build() {
     Column() {
-      Text($r('app.string.write_url'))
-        .fontSize(20)
-        .fontWeight(FontWeight.Bold)
-      Blank(15)
+        Text($r('app.string.write_url'))
+          .fontSize(20)
+          .fontWeight(FontWeight.Bold)
+        Blank(15)
 
-      TextArea({ placeholder: 'https://www.google.com',text:this.inputWebValue2})
-        .WebTextAreaStyle()
-        .caretColor(this.icon_emphasize)
-        .onSubmit( (enterKey: EnterKeyType) => {
-          enterKey.toString()
-          this.inputWebValue2 != ''
-        })
-        .onChange((value: string) => {
-          this.inputWebValue2 = value
-        })
-
-      Blank(8)
-
-      Row({space:8}) {
-        Button($r('app.string.Cancel'))
-          .WebButtonStyle()
-          .fontColor(this.icon_emphasize)
-          .backgroundColor('#00ffffff')
-          .onClick(() => {
-            if (this.controller != undefined) {
-              this.controller.close()
-              //    this.isEnableIndexForegroundBlur = false
-            }
+        TextArea({ placeholder: 'https://www.google.com', text: this.appConfig.inputWeb2 })
+          .WebTextAreaStyle()
+          .caretColor(this.icon_emphasize)
+         .onChange((value: string) => {
+            this.inputWeb2 = value
           })
 
+        Blank(8)
 
-        Button($r('app.string.Save'))
-          .WebButtonStyle()
-          .fontColor($r('sys.color.font_on_primary'))
-          .backgroundColor(this.icon_emphasize)
-          .onClick(() => {
-            this.inputWebValue2.toString()
-            if (this.controller != undefined) {
-              this.controller.close()
-              //    this.isEnableIndexForegroundBlur = false
-            }
-          })
+        Row({ space: 8 }) {
+          Button($r('app.string.Cancel'))
+            .WebButtonStyle()
+            .fontColor(this.icon_emphasize)
+            .backgroundColor('#00ffffff')
+            .onClick(() => {
+              if (this.controller != undefined) {
+                this.controller.close()
+                this.inputWeb2=''
+                //    this.isEnableIndexForegroundBlur = false
+              }
+            })
 
-      }
 
+          Button($r('app.string.Save'))
+            .WebButtonStyle()
+            .fontColor($r('sys.color.font_on_primary'))
+            .backgroundColor(this.icon_emphasize)
+            .onClick(() => {
+              this.appConfig.inputWeb2=this.inputWeb2
+              if (this.controller != undefined) {
+                this.controller.close()
+                //    this.isEnableIndexForegroundBlur = false
+              }
+            })
+        }
     } .width('100%').padding({top:15,bottom:15,left:24,right:24})
   }
 }
@@ -589,14 +550,14 @@ struct WebCustomDialog2 {
 //第三个网址按钮打开的自定义弹窗
 @CustomDialog
 struct WebCustomDialog3 {
-  //web输入文本内容
-  @Consume inputWebValue3: string
   /* 主题色 */
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @State  inputWeb3:string =''
 
   controller?: CustomDialogController
   cancel: () => void = () => {
@@ -606,51 +567,46 @@ struct WebCustomDialog3 {
 
   build() {
     Column() {
-      Text($r('app.string.write_url'))
-        .fontSize(20)
-        .fontWeight(FontWeight.Bold)
-      Blank(15)
+        Text($r('app.string.write_url'))
+          .fontSize(20)
+          .fontWeight(FontWeight.Bold)
+        Blank(15)
 
-      TextArea({ placeholder: 'https://www.google.com',text:this.inputWebValue3})
-        .WebTextAreaStyle()
-        .caretColor(this.icon_emphasize)
-        .onSubmit( (enterKey: EnterKeyType) => {
-          enterKey.toString()
-          this.inputWebValue3 != ''
-        })
-        .onChange((value: string) => {
-          this.inputWebValue3 = value
-        })
-
-      Blank(8)
-
-      Row({space:8}) {
-        Button($r('app.string.Cancel'))
-          .WebButtonStyle()
-          .fontColor(this.icon_emphasize)
-          .backgroundColor('#00ffffff')
-          .onClick(() => {
-            if (this.controller != undefined) {
-              this.controller.close()
-              //        this.isEnableIndexForegroundBlur = false
-            }
+        TextArea({ placeholder: 'https://www.google.com', text: this.appConfig.inputWeb3 })
+          .WebTextAreaStyle()
+          .caretColor(this.icon_emphasize)
+          .onChange((value: string) => {
+            this.inputWeb3 = value
           })
 
+        Blank(8)
 
-        Button($r('app.string.Save'))
-          .WebButtonStyle()
-          .fontColor($r('sys.color.font_on_primary'))
-          .backgroundColor(this.icon_emphasize)
-          .onClick(() => {
-            this.inputWebValue3.toString()
-            if (this.controller != undefined) {
-              this.controller.close()
-              //     this.isEnableIndexForegroundBlur = false
-            }
-          })
+        Row({ space: 8 }) {
+          Button($r('app.string.Cancel'))
+            .WebButtonStyle()
+            .fontColor(this.icon_emphasize)
+            .backgroundColor('#00ffffff')
+            .onClick(() => {
+              if (this.controller != undefined) {
+                this.controller.close()
+                this.inputWeb3 = ''
+                //    this.isEnableIndexForegroundBlur = false
+              }
+            })
 
-      }
 
+          Button($r('app.string.Save'))
+            .WebButtonStyle()
+            .fontColor($r('sys.color.font_on_primary'))
+            .backgroundColor(this.icon_emphasize)
+            .onClick(() => {
+              this.appConfig.inputWeb3= this.inputWeb3
+              if (this.controller != undefined) {
+                this.controller.close()
+                //    this.isEnableIndexForegroundBlur = false
+              }
+            })
+        }
     } .width('100%').padding({top:15,bottom:15,left:24,right:24})
   }
 }

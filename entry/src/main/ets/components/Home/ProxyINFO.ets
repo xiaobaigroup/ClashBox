@@ -1,6 +1,5 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import { MarginGenerate } from "../../common/Constants"
-import { isShowHomeCardConfig } from "../../common/HomeCardEditData"
 import { Item, ProxyData } from "../../common/ProxyData"
 import { AppConfig } from "../../entryability/AppState"
 import { CardTitle } from "./CardTitleBuilder"

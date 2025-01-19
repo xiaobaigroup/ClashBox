@@ -1,7 +1,6 @@
 import { LengthMetrics } from "@kit.ArkUI"
 import { ANIMATION_DURATION_300 } from "../../common/Constants"
 import { BreakpointState } from "../../common/breakpointsystem"
-import { IsShowHomeCard, isShowHomeCardConfig } from "../../common/HomeCardEditData"
 import { AppConfig } from "../../entryability/AppState"
 
 
@@ -22,7 +21,7 @@ export struct CardEdit {
   @Consume('HomeCardEditHeight') private HomeCardEditHeight: BreakpointState<number>
   // 折叠屏展开状态判定
   @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
-  @StorageLink("isShowHomeCardConfig")isShowHomeCardConfig:IsShowHomeCard= new isShowHomeCardConfig()
+
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   // 当前主页布局
   @Consume theCurrentHomeCard: boolean[]

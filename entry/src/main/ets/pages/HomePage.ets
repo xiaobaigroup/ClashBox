@@ -1,6 +1,6 @@
 //主页 栅格布局、媒体查询
 import { BreakpointState } from '../common/breakpointsystem'
-import { componentSnapshot, promptAction, PromptAction, window } from '@kit.ArkUI'
+import { PromptAction, window } from '@kit.ArkUI'
 import SwitchMode from '../components/Home/SwitchMode'
 import CellularData from '../components/Home/CellularData'
 import PublicNetwork from '../components/Home/PublicNetwork'
@@ -23,12 +23,10 @@ import CurrentNode from '../components/Home/CurrentNode'
 import FavoriteProxy from '../components/Home/FavoriteProxy'
 import FavoriteConfiguration from '../components/Home/FavoriteConfiguration'
 import { CardEdit } from '../components/Home/CardEdit'
-import { image } from '@kit.ImageKit'
 import ProxyINFO from '../components/Home/ProxyINFO'
 import CurrentConfiguration from '../components/Home/CurrentConfiguration'
 import ClashViewModel from '../entryability/ClashViewModel'
 import Shortcuts from '../components/Home/Shortcuts'
-import { IsShowHomeCard, isShowHomeCardConfig } from '../common/HomeCardEditData'
 import { AppConfig } from '../entryability/AppState'
 
 
@@ -90,21 +88,7 @@ struct Home {
   @State isShowCardEdit: boolean = false
   // 折叠屏展开状态判定
   @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
-  /* 卡片卸载添加判定及卡片 */
-  @Provide ('isShowHomeCard') isShowHomeCard :IsShowHomeCard = {
-    isShowSpeed:true,
-    isShowSwitchMode :true,
-    isShowCellularData :true,
-    isShowCurrentNode:true,
-    isShowPublicNetwork :true,
-    isShowFavoriteProxy :true,
-    isShowFavoriteConfiguration :true,
-    isShowProxyINFO :false,
-    isShowCurrentConfiguration :false,
-    isShowShortcuts : this.isFoldStatus ? true:false,
-  }
 
-  @StorageLink ('isShowHomeCardConfig') isShowHomeCardConfig:IsShowHomeCard = new isShowHomeCardConfig()
   // 页面名称 主页
   private componentName: string = 'HomePage'
   /* 是否开启 `Index` 页面的前景模糊 */

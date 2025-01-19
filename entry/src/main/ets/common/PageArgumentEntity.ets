@@ -13,7 +13,14 @@ export interface UserPreferences{
 
 
 /* 主页 */
-
+export interface Shortcuts {
+  readonly text: string
+  latency: number
+  type: string
+  id: string
+  g?: string
+  isShowFavoriteProxy?: boolean
+}
 
 /* 代理 */
 
@@ -60,14 +67,9 @@ export interface ConfigData{
   copySourceConfigId?: string
 
 
-  // 代理列表 TODO 还用不到 先设为可选属性
-  proxyList?: Array<ProxyData>
 }
 
-// 代理 -> 新增代理
-export interface ProxyData{
 
-}
 
 
 /* 更多 */

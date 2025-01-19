@@ -1,7 +1,6 @@
 import { ClashConfig, Dns, ProxyGroup, ProxySort } from "proxy_core";
 import { CustomThemeName } from "../common/AppTheme";
 import { showHomeCard } from "../common/Constants";
-import { isShowHomeCardConfig } from "../common/HomeCardEditData";
 import { Item } from "../common/ProxyData";
 
 export enum ProxyGroupType{
@@ -41,6 +40,16 @@ export class AppConfig{
   // 主页卡片显示变量
   isShowHomeCard: string = JSON.stringify(showHomeCard)
   isShowSpeed? :boolean = true
+
+  /*主页小卡片相关 */
+  //快捷方式小卡片
+  inputTitle1?:string
+  inputTitle2?:string
+  inputTitle3?:string
+  inputWeb1?:string
+  inputWeb2?:string
+  inputWeb3?:string
+
   constructor() {
   }
 }
@@ -57,7 +66,6 @@ export class AppState {
     PersistentStorage.persistProp("favoriteProfiles", new Map<string, string>([]))
     PersistentStorage.persistProp("favoriteProxys", new Map<string, string[][]>([]))
     PersistentStorage.persistProp("clashConfig", new ClashConfig())
-    PersistentStorage.persistProp("isShowHomeCardConfig", new isShowHomeCardConfig())
   }
 
   static fetchFavoriteProxys(favoriteProxys: Map<string, string>, proxyGroups: ProxyGroup[]):string[][] {
