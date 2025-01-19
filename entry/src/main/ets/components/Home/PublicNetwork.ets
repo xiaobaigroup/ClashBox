@@ -1,5 +1,5 @@
-import { BreakpointSystem, BreakpointState } from '../../common/breakpointsystem'
-import { mediaquery } from '@kit.ArkUI'
+import { BreakpointState } from '../../common/breakpointsystem'
+import { mediaquery, PromptAction } from '@kit.ArkUI'
 import { MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
 
@@ -27,6 +27,8 @@ struct PublicNetwork {
   @Consume isShowHomeEdit: boolean
   // 折叠屏展开状态判定
   @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
+  //收藏与ping延迟即时动作
+  private PromptAction:PromptAction = this.getUIContext()?.getPromptAction()
 
   build() {
     Column() {
@@ -56,6 +58,7 @@ struct PublicNetwork {
           .onClick(() => {
             //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
             if (this.isShowHomeEdit===false) {
+              this.PromptAction.showToast({ message: $r('app.string.refresh_tips') })
             }
           })
       }.width('100%').justifyContent(FlexAlign.End)

@@ -3,6 +3,7 @@ import { MarginGenerate } from "../../common/Constants"
 import { Item, ProxyData } from "../../common/ProxyData"
 import { AppConfig } from "../../entryability/AppState"
 import { CardTitle } from "./CardTitleBuilder"
+import { PromptAction } from "@kit.ArkUI"
 
 @Component
 struct ProxyINFO{
@@ -34,6 +35,8 @@ struct ProxyINFO{
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  //收藏与ping延迟即时动作
+  private PromptAction:PromptAction = this.getUIContext()?.getPromptAction()
 
   build() {
     Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Start, justifyContent: FlexAlign.SpaceBetween}) {
@@ -104,6 +107,7 @@ struct ProxyINFO{
           .onClick(() => {
             //在home页在编辑卡片状态时，无法操作，点击回调写在if判定里
             if ( this.isShowHomeEdit===false) {
+              this.PromptAction.showToast({ message: $r('app.string.refresh_tips') })
             }
           })
       }

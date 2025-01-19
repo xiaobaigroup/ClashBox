@@ -1335,6 +1335,10 @@
     {
       "name": "layout_saved",
       "value": "布局已保存"
+    },
+    {
+      "name": "refresh_tips",
+      "value": "刷新中，请稍后..."
     }
   ]
 }

@@ -1,6 +1,7 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import { MarginGenerate } from "../../common/Constants"
 import { CardTitle } from "./CardTitleBuilder"
+import { PromptAction } from "@kit.ArkUI"
 
 @Component
 struct CurrentConfiguration {
@@ -16,6 +17,8 @@ struct CurrentConfiguration {
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
+  //收藏与ping延迟即时动作
+  private PromptAction:PromptAction = this.getUIContext()?.getPromptAction()
 
   build() {
     Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.End, justifyContent: FlexAlign.SpaceBetween}) {
@@ -36,6 +39,7 @@ struct CurrentConfiguration {
         .onClick(() => {
           //在home页添加按钮的半模拟态里和在编辑卡片状态时，无法操作，点击回调写在if判定里
           if (this.isShowHomeEdit==false) {
+            this.PromptAction.showToast({ message: $r('app.string.refresh_tips') })
           }
         })
     }

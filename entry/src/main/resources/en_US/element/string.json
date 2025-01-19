@@ -1335,6 +1335,10 @@
     {
       "name": "layout_saved",
       "value": "Layout saved"
+    },
+    {
+      "name": "refresh_tips",
+      "value": "Refreshing，Please wait a moment..."
     }
   ]
 }
