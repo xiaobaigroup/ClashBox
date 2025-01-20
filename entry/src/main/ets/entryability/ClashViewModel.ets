@@ -1,35 +1,28 @@
 import { ProfileRepo } from "proxy_core/src/main/ets/ProfileRepo";
-import { Context } from "@kit.AbilityKit";
+import { Context, Want } from "@kit.AbilityKit";
 import { SocketProxyService, Profile, ProfileType, UpdateConfigParams, ClashConfig, getHome,
-  LogInfo } from "proxy_core";
+  LogInfo,
+  Provider,
+  ProxyMode} from "proxy_core";
 import { vpnExtension } from "@kit.NetworkKit";
 import { ConfigData } from "../common/PageArgumentEntity";
 import { promptAction } from "@kit.ArkUI";
 import { ProxyGroup } from "proxy_core/src/main/ets/models/Common";
 import { ConfigExtendedParams } from "proxy_core/src/main/ets/models/ClashConfig";
 import { EventHub, EventKey } from "../common/EventHub";
-import { AppConfig } from "./AppState";
+import { AppConfig, ClashCore } from "./AppState";
 import  fs from  "@ohos.file.fs"
 
 export class ClashViewModel {
   profileRepo = new ProfileRepo()
   socketProxy = new SocketProxyService()
   context: Context | undefined
-  async init(context: Context) {
+  async init(context: Context, core: ClashCore) {
     this.context = context
     await this.profileRepo.init(context)
     this.socketProxy.init(context)
     await this.initGeoIp()
-    try {
-      await vpnExtension.startVpnExtensionAbility({
-        deviceId: "",
-        bundleName: "org.xbgroup.clashnext",
-        abilityName: "ClashVpnAbility",
-      });
-    } catch (e) {
-      // TODO 用户点取消
-      // 是否退出程序
-    }
+    await this.ChangeCore(core)
   }
   // 添加配置 url
   async addOrUpdateProfileByUrl(data: ConfigData, id: string | null){
@@ -47,7 +40,7 @@ export class ClashViewModel {
     const isExists = await profile.check();
     if (isExists) {
       await this.profileRepo.addOrUpdate(profile)
-    }else{
+    } else{
       promptAction.showToast({message: "文件保存失败！"})
     }
     EventHub.sendEvent(EventKey.FetchProfile, null)
@@ -103,16 +96,28 @@ export class ClashViewModel {
   async testDelay(proxyName: string): Promise<number>{
     try {
       let delay = await this.socketProxy.healthCheck(proxyName)
-      console.log("testDelay", delay);
-      return 1;
+      return delay;
     } catch (e) {
-      promptAction.showToast({message: e.message, duration:3000})
+      promptAction.showToast({message: e.message, duration: 3000})
     }
     return -1;
   }
-  async updateGeoData (geoName: string, geoType: string): Promise<string>{
-    return ""
+  async updateGeoData(geoName: string, geoType: string): Promise<string>{
+    return this.socketProxy.updateGeoData(geoName, geoType)
   }
+  async getTraffic(){
+    return await this.socketProxy.queryTrafficNow()
+  }
+  async getTotalTraffic(){
+    return await this.socketProxy.queryTrafficTotal()
+  }
+  async queryProviders(){
+    return this.socketProxy.queryProviders()
+  }
+  async updateProvider(provider: Provider){
+    return this.socketProxy.updateProvider(provider.type, provider.name)
+  }
+
   job?: (()=>void)
   async startLog(enable: boolean, callback: (d: LogInfo) => void){
       if(enable){
@@ -139,10 +144,9 @@ export class ClashViewModel {
     await this.profileRepo.delete(id)
     EventHub.sendEvent(EventKey.FetchProfile, null)
   }
-  async getProxyGroups(): Promise<ProxyGroup[]>{
-    console.log("FetchProxyGroup", )
-    let list =  await this.socketProxy.queryProxyGroups()
-    let dd = AppStorage.get<AppConfig>("appConfig")
+  async getProxyGroups(model: ProxyMode): Promise<ProxyGroup[]>{
+    console.log("FetchProxyGroup", model)
+    let list = await this.socketProxy.queryProxyGroups(model)
     let favoriteProxys = AppStorage.get<Map<string, string>>("favoriteProxys")
     const groups = list.map((g)=>{
       g.proxies = g.proxies.map((p) => {
@@ -157,7 +161,22 @@ export class ClashViewModel {
     console.log("FetchProxyGroup", groups)
     return groups
   }
-
+  async ChangeCore(coreType: ClashCore){
+    try {
+      const vpnWant = {
+        deviceId: "",
+        bundleName: "org.xbgroup.clashnext",
+        abilityName: "ClashVpnAbility",
+        parameters: { "ClashCore" : coreType}
+      } as Want
+      vpnExtension.stopVpnExtensionAbility(vpnWant)
+      await vpnExtension.startVpnExtensionAbility(vpnWant);
+    } catch (e) {
+      // TODO 用户点取消
+      // 是否退出程序
+      this.context?.getApplicationContext().killAllProcesses()
+    }
+  }
 
   async loadProfileAndConfig(id: string, config: ClashConfig | null = null, params: ConfigExtendedParams | null= null){
     let result = await this.socketProxy.loadConfig({

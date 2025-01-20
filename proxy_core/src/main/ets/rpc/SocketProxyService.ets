@@ -2,16 +2,11 @@ import { socket } from '@kit.NetworkKit';
 import {  RpcResult } from './RpcRequest';
 import { JSON, util } from '@kit.ArkTS';
 import { common } from '@kit.AbilityKit';
-import { ClashRpcType, IClashManager, ProviderType, Provider } from './IClashManager';
-import { FetchInfo, OverrideSlot,
-  Proxy,
-  ProxyGroup,
-  ProxySort,
-  ProxyType,
-  Traffic,
-  UsedProxy } from '../models/Common';
-import { promptAction, PromptAction } from '@kit.ArkUI';
-import { TunnelState, UpdateConfigParams } from '../models/ClashConfig';
+import { ClashRpcType, IClashManager } from './IClashManager';
+import { Provider, ProviderType, ProxyGroup, ProxyMode, ProxyType,
+  Traffic } from '../models/Common';
+import { promptAction } from '@kit.ArkUI';
+import { UpdateConfigParams } from '../models/ClashConfig';
 
 
 export class SocketProxyService implements IClashManager{
@@ -27,7 +22,6 @@ export class SocketProxyService implements IClashManager{
     let result =  await this.sendMessageRequest(ClashRpcType.load, [JSON.stringify(path)])
     return result as string
   }
-
   async queryTrafficTotal(): Promise<Traffic> {
     let result = await this.sendMessageRequest(ClashRpcType.queryTrafficTotal)
     return new Traffic(result as number);
@@ -36,10 +30,10 @@ export class SocketProxyService implements IClashManager{
     let result = await this.sendMessageRequest(ClashRpcType.queryTrafficNow)
     return new Traffic(result as number);
   }
-  async queryProxyGroups(): Promise<ProxyGroup[]> {
-    let result = await this.sendMessageRequest(ClashRpcType.queryProxyGroup,[])
+  async queryProxyGroups(model: ProxyMode): Promise<ProxyGroup[]> {
+    let result = await this.sendMessageRequest(ClashRpcType.queryProxyGroup,[model])
     let map = JSON.parse(result as string) as Record<string, string | Record<string, string[] | string>>
-    let groupNames = map[UsedProxy.GLOBAL]["all"] as string[]
+    let groupNames = map[ProxyMode.Global]["all"] as string[]
     groupNames = ["GLOBAL", ...groupNames]
     groupNames = groupNames.filter(e => {
       const proxy = map[e] as Record<string, string>
@@ -64,30 +58,26 @@ export class SocketProxyService implements IClashManager{
     console.log("queryProxyGroups", JSON.stringify(groupsRaw[1]));
     return groupsRaw
   }
-
-  async queryConfiguration(): Promise<string> {
-    let result = await this.sendMessageRequest(ClashRpcType.queryConfiguration)
-    return result as string
-  }
-
   async queryProviders(): Promise<Provider[]> {
     let result = await this.sendMessageRequest(ClashRpcType.queryProviders)
     return JSON.parse(result as string) as Provider[]
   }
-
-  async patchSelector(group: string, name: string): Promise<boolean> {
+  async updateProvider(type: ProviderType, name: string): Promise<string> {
+    return  (await this.sendMessageRequest(ClashRpcType.updateProvider,[type, name])) as string
+  }
+  async updateGeoData(geoName: string, geoType: string): Promise<string>{
+    return await (this.sendMessageRequest(ClashRpcType.updateGeoData,[geoName, geoType])) as string
+  }
+  async patchSelector(group: string, name: string): Promise<string> {
     let result = await this.sendMessageRequest(ClashRpcType.patchSelector,[group, name])
-    return result as boolean
+    return result as string
   }
 
-  async healthCheck(proxyName: string): Promise<void> {
-    await this.sendMessageRequest(ClashRpcType.healthCheck, [proxyName, 3000])
+  async healthCheck(proxyName: string): Promise<number> {
+    return (await this.sendMessageRequest(ClashRpcType.healthCheck, [proxyName, 3000])) as number
   }
 
-  async updateProvider(type: ProviderType, name: string): Promise<void> {
-    await this.sendMessageRequest(ClashRpcType.updateProvider,[type, name])
-    return
-  }
+
 
   async startClash():Promise<boolean>{
     let json = await this.sendMessageRequest(ClashRpcType.startClash, [])

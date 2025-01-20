@@ -3,7 +3,7 @@ import { getProfilePath, getProfilesPath } from './appPath';
 import { rcp } from '@kit.RemoteCommunicationKit';
 import { Context } from '@kit.AbilityKit';
 import { fileUri } from '@kit.CoreFileKit';
-import { ProxyGroup, ProxyType } from './models/Common';
+import { ProxyGroup, ProxyType, SubscriptionInfo } from './models/Common';
 import { JSON } from '@kit.ArkTS';
 
 export function generateUUID() {
@@ -18,28 +18,6 @@ export enum ProfileType {
   File,
   Url,
   External
-}
-export class SubscriptionInfo{
-  upload = 0
-  download = 0
-  total = 0
-  expire = 0
-  static formHString(info: string | undefined): SubscriptionInfo{
-    const si = new SubscriptionInfo()
-    if (!info)
-      return si
-    const list = info.split(";");
-    const map = {} as  Record<string, number>;
-    for (let i of list) {
-      const keyValue = i.trim().split("=");
-      map[keyValue[0]] = parseInt(keyValue[1]);
-    }
-    si.upload = map["upload"] ?? 0
-    si.download = map["download"] ?? 0
-    si.total = map["total"] ?? 0
-    si.expire = map["expire"] ?? 0
-    return si
-  }
 }
 
 

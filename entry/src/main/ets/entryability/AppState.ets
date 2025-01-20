@@ -1,4 +1,4 @@
-import { ClashConfig, Dns, ProxyGroup, ProxySort } from "proxy_core";
+import { ClashConfig, Dns, ProxyGroup, ProxyMode, ProxySort } from "proxy_core";
 import { CustomThemeName } from "../common/AppTheme";
 import { showHomeCard } from "../common/Constants";
 import { Item } from "../common/ProxyData";
@@ -14,9 +14,14 @@ export enum ProxyCardSize{
 }
 
 export enum SwitchModeCard{
-  Rule,
-  Overall,
-  Direct
+  Global ="GLOBAL",
+  Rule = "RULE",
+  Direct = "DIRECT"
+}
+export enum ClashCore{
+  ClashMeta,
+  FlClash,
+  ClashRs,
 }
 
 export class AppConfig{
@@ -29,6 +34,7 @@ export class AppConfig{
   enableLogger?: boolean = false
   testUrl?: string = ""
   overrideDns?: boolean = false
+  clashCore?: ClashCore = ClashCore.ClashMeta
   // 主页问候语
   isGreeting?: boolean = true
   // 主题色
@@ -57,7 +63,7 @@ export class AppConfig{
   inputWeb2?:string
   inputWeb3?:string
 //分流模式小卡片
-  switchMode?:SwitchModeCard = SwitchModeCard.Rule
+  switchMode?:ProxyMode = ProxyMode.Rule
  // currentCheckedMode?:number =0
   constructor() {
   }

@@ -4,6 +4,7 @@ import { ANIMATION_DURATION_300, MarginGenerate } from '../../common/Constants';
 import { CardTitle } from './CardTitleBuilder';
 import { AppConfig, SwitchModeCard } from '../../entryability/AppState';
 import { EventHub, EventKey } from '../../common/EventHub';
+import { ProxyMode } from 'proxy_core';
 
 @Component
 struct SwitchMode {
@@ -40,9 +41,9 @@ struct SwitchMode {
 
       Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
         ForEach([
-          {t: $r('app.string.Rule'), v: SwitchModeCard.Rule},
-          {t: $r('app.string.Overall'), v: SwitchModeCard.Overall},
-          {t: $r('app.string.Direct'), v: SwitchModeCard.Direct}
+          {t: $r('app.string.Rule'), v: ProxyMode.Rule},
+          {t: $r('app.string.Overall'), v: ProxyMode.Global},
+          {t: $r('app.string.Direct'), v: ProxyMode.Direct}
         ], (n: [Resource, number], i: number) => {
           Button(n["t"], { buttonStyle: ButtonStyleMode.TEXTUAL,stateEffect:false })
             .ButtonStyle()

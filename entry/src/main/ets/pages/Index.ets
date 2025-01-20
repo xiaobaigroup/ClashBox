@@ -46,7 +46,7 @@ import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
 import { Item, ProxyData } from '../common/ProxyData'
 import { image } from '@kit.ImageKit'
-import { Dns, LogLevel, Profile, ProxyGroup } from 'proxy_core'
+import { Dns, LogLevel, Profile, ProxyGroup, ProxyMode } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig } from '../entryability/AppState'
@@ -374,7 +374,9 @@ struct Index {
     // 初始化实验功能显示状态
     this.isShowExperimentalFunction = this.appConfig.isShowExperimentalFunction
     // 初始化用户语言
-    ChangeLanguage(this.appConfig.userLanguage)
+    if (this.appConfig.userLanguage){
+      ChangeLanguage(this.appConfig.userLanguage)
+    }
 
     // 开启change监听
     this.deviceHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
@@ -437,15 +439,20 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.HomeCardEditHeight)
     BreakpointSystem.getInstance().attach(this.HomeCardCellularDataPadding)
     BreakpointSystem.getInstance().start()
-    setTimeout(()=> {
+    setTimeout(async ()=> {
       ClashViewModel.initProfile()
     }, 500)
     EventHub.on(EventKey.FetchProxyGroup, async ()=>{
       if(this.appConfig.currentProfileId){
         this.currentProfile = await ClashViewModel.getProfile(this.appConfig.currentProfileId)
         if (this.currentProfile) {
-          this.proxyGroups = await ClashViewModel.getProxyGroups()
+          this.proxyGroups = await ClashViewModel.getProxyGroups(this.appConfig.switchMode ?? ProxyMode.Rule)
         }
+      }
+    })
+    EventHub.on(EventKey.SwitchModeCard, async ()=>{
+      if (this.currentProfile) {
+        this.proxyGroups = await ClashViewModel.getProxyGroups(this.appConfig.switchMode ?? ProxyMode.Rule)
       }
     })
     EventHub.on(EventKey.StartLog, async (enable: boolean)=>{

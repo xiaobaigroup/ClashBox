@@ -2,6 +2,8 @@ import { BreakpointState } from "../../common/breakpointsystem"
 import { ANIMATION_DURATION_300, BORDER_RADIUS_20 } from "../../common/Constants"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
+import { AppConfig, ClashCore } from '../../entryability/AppState'
+import ClashViewModel from '../../entryability/ClashViewModel'
 
 @Component
 struct Kernel {
@@ -16,6 +18,7 @@ struct Kernel {
   @State currenKernel: number = 0
   // 页面内边距
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+  @StorageLink('appConfig') appConfig:AppConfig = new AppConfig()
 
   build() {
     NavDestination() {
@@ -71,7 +74,7 @@ struct Kernel {
               Text($r('app.string.default_kernel'))
               Blank()
               Radio({ value: 'kernel1', group: 'kernelGroup' })
-                .checked(1 === this.currenKernel)
+                .checked(ClashCore.ClashMeta === this.appConfig.clashCore)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
@@ -82,6 +85,9 @@ struct Kernel {
             .padding({left: 12, right: 12})
             .onClick(() => {
               this.currenKernel = 1
+              this.appConfig.clashCore = ClashCore.ClashMeta
+              // TODO 添加弹窗提示需要重启vpn服务
+              ClashViewModel.ChangeCore(ClashCore.ClashMeta)
               hilog.info(0xFF00, "SettingsKerneltestTag", "当前内核1：%{public}d", this.currenKernel)
             })
             // 分割线
@@ -91,7 +97,7 @@ struct Kernel {
               Text('FlClash')
               Blank()
               Radio({ value: 'kernel2', group: 'kernelGroup' })
-                .checked(2 === this.currenKernel)
+                .checked(ClashCore.FlClash === this.appConfig.clashCore)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
@@ -102,6 +108,8 @@ struct Kernel {
             .padding({left: 12, right: 12})
             .onClick(() => {
               this.currenKernel = 2
+              this.appConfig.clashCore = ClashCore.FlClash
+              ClashViewModel.ChangeCore(ClashCore.FlClash)
               hilog.info(0xFF00, "SettingsKerneltestTag", "当前内核2：%{public}d", this.currenKernel)
             })
           }

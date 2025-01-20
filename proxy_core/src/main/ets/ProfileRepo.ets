@@ -1,6 +1,7 @@
 import { relationalStore, ValuesBucket } from '@kit.ArkData'
 import { common } from '@kit.AbilityKit';
-import { Profile, SubscriptionInfo } from './Profile';
+import { Profile } from './Profile';
+import { SubscriptionInfo } from './models/Common';
 
 export class ProfileRepo {
   store: relationalStore.RdbStore | undefined

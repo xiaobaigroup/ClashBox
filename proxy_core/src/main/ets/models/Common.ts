@@ -1,9 +1,51 @@
 
+export interface Provider {
+  name: string;
+  type: ProviderType;
+  path: string
+  "subscription-info": SubscriptionInfo,
+  "vehicle-type": VehicleType;
+  "update-at": number;
+}
+export enum ProviderType {
+  Proxy = "Proxy",
+  Rule = "Rule"
+}
+export enum VehicleType {
+  HTTP = "HTTP",
+  File = "File",
+  Compatible = "Compatible"
+}
+
+
+export class SubscriptionInfo{
+  upload = 0
+  download = 0
+  total = 0
+  expire = 0
+  static formHString(info: string | undefined): SubscriptionInfo{
+    const si = new SubscriptionInfo()
+    if (!info)
+      return si
+    const list = info.split(";");
+    const map = {} as  Record<string, number>;
+    for (let i of list) {
+      const keyValue = i.trim().split("=");
+      map[keyValue[0]] = parseInt(keyValue[1]);
+    }
+    si.upload = map["upload"] ?? 0
+    si.download = map["download"] ?? 0
+    si.total = map["total"] ?? 0
+    si.expire = map["expire"] ?? 0
+    return si
+  }
+}
+
 export enum ProxySort {
   Default = "Default", Title = "Title", Delay = "Delay"
 }
 
-export enum UsedProxy { GLOBAL = "GLOBAL", DIRECT = "DIRECT", REJECT = "REJECT" }
+export enum ProxyMode { Global ="GLOBAL", Rule = "RULE", Direct = "DIRECT" }
 export enum ProxyType {
   Direct = "Direct",
   Reject = "Reject",
@@ -73,10 +115,22 @@ export class LogInfo{
   logLevel: LogLevel
   payload : string
 }
-
+export enum TrafficUnit{
+  KB,
+  MB,
+  GB,
+  TB
+}
+export class TrafficValue{
+  value: string
+  unit: TrafficUnit
+}
 
 export class Traffic{
+
   private value: number;
+  up: TrafficValue
+  down: TrafficValue
 
   constructor(value: number) {
     this.value = value;

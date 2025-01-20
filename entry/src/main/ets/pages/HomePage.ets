@@ -130,7 +130,8 @@ struct Home {
   aboutToAppear(): void {
     this.greetings = getGreeting()
     // 初始化主页卡片布局
-    this.theCurrentHomeCard = JSON.parse(this.appConfig.isShowHomeCard)
+    if (this.appConfig.isShowHomeCard)
+      this.theCurrentHomeCard = JSON.parse(this.appConfig.isShowHomeCard)
     hilog.info(0xFF00, "HometestTag", "布局初始化为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
   }
 

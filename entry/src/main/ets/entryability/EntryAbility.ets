@@ -4,7 +4,7 @@ import { window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import ClashViewModel from './ClashViewModel';
 import { KeyboardAvoidMode } from '@kit.ArkUI';
-import { AppState } from './AppState';
+import { AppConfig, AppState, ClashCore } from './AppState';
 
 export default class EntryAbility extends UIAbility {
  private currentLanguage: string | undefined = undefined
@@ -27,7 +27,7 @@ export default class EntryAbility extends UIAbility {
     // Main window is created, set main page for this ability
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onWindowStageCreate');
     let windowClass: window.Window = windowStage.getMainWindowSync(); // 获取应用主窗口
-    await ClashViewModel.init(this.context)
+    await ClashViewModel.init(this.context, AppStorage.get<AppConfig>("appConfig") ?.clashCore ?? ClashCore.ClashMeta)
 
     windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {

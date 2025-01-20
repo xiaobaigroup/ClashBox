@@ -1,51 +1,39 @@
 import { TunnelState, UpdateConfigParams } from "../models/ClashConfig";
-import {  OverrideSlot, ProxyGroup, ProxySort} from "../models/Common";
+import {  OverrideSlot, Provider, ProviderType, ProxyGroup,
+  ProxyMode,
+  ProxySort, SubscriptionInfo} from "../models/Common";
 
-export interface Provider {
-  name: string;
-  type: ProviderType;
-  vehicleType: VehicleType;
-  updatedAt: number;
-}
-export enum ProviderType {
-  Proxy = "Proxy",
-  Rule = "Rule"
-}
-export enum VehicleType {
-  HTTP = "HTTP",
-  File = "File",
-  Compatible = "Compatible"
-}
 export enum ClashRpcType{
-  queryTrafficNow = 0,
-  queryTunnelState = 1,
-  queryTrafficTotal = 2,
-  queryProxyGroup = 4,
-  queryProviders = 5,
-  patchSelector = 6,
-  healthCheck = 7,
-  updateProvider = 8,
-  queryOverride = 9,
-  patchOverride = 10,
-  clearOverride = 11,
-  setLogObserver = 12,
-  queryConfiguration = 13,
-  load = 14,
-  startClash = 15,
-  stopClash = 16,
-  fetchAndValid = 17,
-  reset = 18,
+  queryTrafficNow,
+  queryTunnelState,
+  queryTrafficTotal,
+  queryProxyGroup,
+  queryProviders,
+  patchSelector,
+  healthCheck,
+  updateProvider,
+  queryOverride,
+  patchOverride,
+  clearOverride,
+  setLogObserver,
+  queryConfiguration,
+  load,
+  startClash,
+  stopClash,
+  fetchAndValid,
+  reset,
+  updateGeoData,
 }
 
 export interface IClashManager {
 
-  queryProxyGroups(): Promise<ProxyGroup[]>;
-  queryConfiguration(): Promise<string>;
-  queryProviders(): Promise<Provider[]>;
-  patchSelector(group: string, name: string): Promise<boolean>;
+  queryProxyGroups(model: ProxyMode): Promise<ProxyGroup[]>;
+  patchSelector(group: string, name: string): Promise<string>;
 
-  healthCheck(group: string): Promise<void>;
-  updateProvider(type: ProviderType, name: string): Promise<void>;
+  queryProviders(): Promise<Provider[]>;
+  updateProvider(type: ProviderType, name: string): Promise<string>;
+
+  healthCheck(group: string): Promise<number>;
   loadConfig(path: UpdateConfigParams): Promise<string>;
   setLogObserver(observer: (string: string) => void): Promise<() => void>;
 }
