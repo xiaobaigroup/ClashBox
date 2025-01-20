@@ -529,6 +529,7 @@ function RowStyle() {
 @Component
 export struct skipRowList {
   @State icons?: Resource = undefined
+  @State name: string = ''
   @State title: ResourceStr = ''
   @State subtitle: ResourceStr = ''
   @State isPrimaryIcons: boolean = false
@@ -561,6 +562,7 @@ export struct skipRowList {
         Row() {
           Text(this.title)
             .fontWeight(FontWeight.Medium)
+            .geometryTransition(this.name)
             .fontSize(16)
           if(this.isExperimentalFunction) {
             ExperimentalFunction()
@@ -720,13 +722,12 @@ export struct menuRowList {
         if(this.subtitle) {
           Text(this.subtitle)
             .fontWeight(FontWeight.Normal)
-            .layoutWeight(1)
             .textOverflow({ overflow: TextOverflow.MARQUEE })
             .maxLines(1)
             .margin({ top: 2 })
             .fontSize(14)
         }
-      }
+      }.layoutWeight(1)
       .margin({ left: 12 })
       .alignItems(HorizontalAlign.Start)
       Blank()

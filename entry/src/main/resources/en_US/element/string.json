@@ -785,8 +785,8 @@
       "value": "Blurred Background"
     },
     {
-      "name": "animation_effects",
-      "value": "Animation Effects"
+      "name": "animation_speed",
+      "value": "Animation Speed"
     },
     {
       "name": "homepage_greetings_subtitle",
@@ -797,8 +797,8 @@
       "value": "Close to alleviate lag issues within the app"
     },
     {
-      "name": "animation_effects_subtitle",
-      "value": "Not recommended to close"
+      "name": "animation_speed_subtitle",
+      "value": "Adjust animation speed or turn off animation"
     },
     {
       "name": "star_river_blue",
@@ -1403,6 +1403,50 @@
     {
       "name": "download_failed",
       "value": "Download failed:"
+    },
+    {
+      "name": "switch_clashcore_tips",
+      "value": "Need to restart VPN service"
+    },
+    {
+      "name": "share",
+      "value": "Share"
+    },
+    {
+      "name": "generate_QR_code",
+      "value": "Generate QR code"
+    },
+    {
+      "name": "create_copy",
+      "value": "Create a copy"
+    },
+    {
+      "name": "delete_current_configuration",
+      "value": "Delete current configuration?"
+    },
+    {
+      "name": "click_error_prompt",
+      "value": "I knew you were wrong~"
+    },
+    {
+      "name": "config_share_prompt",
+      "value": "This configuration only supports sharing profiles"
+    },
+    {
+      "name": "configuration_deleted",
+      "value": "Configuration deleted"
+    },
+    {
+      "name": "fast",
+      "value": "Fast Speed"
+    },
+    {
+      "name": "normal",
+      "value": " Normal Speed"
+    },
+    {
+      "name": "low",
+      "value": "Low Speed"
     }
   ]
 }

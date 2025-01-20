@@ -10,7 +10,9 @@ export struct MoreTop {
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   // 标题
-  @State title: ResourceStr = ''
+  @State title?: Resource = undefined
+  // 元素名称标识
+  @State name: string = ''
   // 副标题
   @State subtitle: ResourceStr = ''
   // 搜索按钮
@@ -59,6 +61,7 @@ export struct MoreTop {
       Column() {
         Text(this.title)
           .fontSize(30)
+          .geometryTransition(this.name)
           .fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Start)
           .margin({left: 8})

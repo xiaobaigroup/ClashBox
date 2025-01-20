@@ -785,8 +785,8 @@
       "value": "背景模糊"
     },
     {
-      "name": "animation_effects",
-      "value": "动画效果"
+      "name": "animation_speed",
+      "value": "动画速度"
     },
     {
       "name": "homepage_greetings_subtitle",
@@ -797,8 +797,8 @@
       "value": "关闭以缓解APP内的卡顿问题"
     },
     {
-      "name": "animation_effects_subtitle",
-      "value": "不建议关闭"
+      "name": "animation_speed_subtitle",
+      "value": "调整动画速度或关闭动画"
     },
     {
       "name": "star_river_blue",
@@ -1403,6 +1403,50 @@
     {
       "name": "download_failed",
       "value": "下载失败:"
+    },
+    {
+      "name": "switch_clashcore_tips",
+      "value": "需要重启VPN服务哦"
+    },
+    {
+      "name": "share",
+      "value": "分享"
+    },
+    {
+      "name": "generate_QR_code",
+      "value": "生成二维码"
+    },
+    {
+      "name": "create_copy",
+      "value": "创建副本"
+    },
+    {
+      "name": "delete_current_configuration",
+      "value": "是否删除当前配置？"
+    },
+    {
+      "name": "click_error_prompt",
+      "value": "就知道是你点错喽~"
+    },
+    {
+      "name": "config_share_prompt",
+      "value": "此配置仅支持分享配置文件"
+    },
+    {
+      "name": "configuration_deleted",
+      "value": "已删除配置"
+    },
+    {
+      "name": "fast",
+      "value": "快速"
+    },
+    {
+      "name": "normal",
+      "value": "正常"
+    },
+    {
+      "name": "low",
+      "value": "慢速"
     }
   ]
 }

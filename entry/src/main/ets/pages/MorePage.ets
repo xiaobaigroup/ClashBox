@@ -3,7 +3,7 @@
  * 2024.12.04
  *
  */
-import { BreakpointState, BreakpointSystem } from '../common/breakpointsystem'
+import { BreakpointState } from '../common/breakpointsystem'
 import { BIND_SHEET_CONTAINER_HEIGHT, ListMoreData, moreData } from '../common/Constants';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import Log from '../components/More/Log';
@@ -23,7 +23,6 @@ import { extractLocationInfo, getIpInfo, mapLocation } from '../utils/GetIpInfo'
 import { promptAction } from '@kit.ArkUI';
 import { skipRowList } from '../components/Common';
 import { AppConfig } from '../entryability/AppState';
-import ClashViewModel from '../entryability/ClashViewModel';
 
 
 
@@ -114,7 +113,6 @@ struct MorePage {
       hilog.isLoggable(0xFF00, "MoretestTag", hilog.LogLevel.INFO);
       hilog.info(0xFF00, "MoretestTag", itemData.name)
       hilog.info(0xFF00, "MoretestTag", "isCheck状态: %{public}s", itemData.isCheck)
-      this.pageInfos.clear()
       this.pageInfos.pushPathByName(itemData.name, false)
     }
   }
@@ -190,6 +188,7 @@ struct MorePage {
             ListItem() {
               skipRowList({
                 icons: item.icons,
+                name: item.name,
                 title: item.title,
                 subtitle: item.subtitle,
                 isPrimaryIcons: true

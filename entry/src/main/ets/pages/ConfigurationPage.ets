@@ -26,6 +26,7 @@ import { showFileNameListOfFileDir } from '../utils/FileUtil'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig } from '../entryability/AppState'
 import { EventHub, EventKey } from '../common/EventHub'
+import { getResourceString } from '../utils/ResourceStringUtil'
 
 
 /**
@@ -181,7 +182,7 @@ struct ConfigurationPage {
       .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
     content: '收藏', callback: ()=>{ this.favoriteConfig() }
   }
-  // ContextMenu列表项集合 TODO 国际化
+  // ContextMenu列表项集合
   private configListLongPressCtxMenus: Array<LongPressContextMenuItem> = [
     // { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.star'))
     //     .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
@@ -189,19 +190,19 @@ struct ConfigurationPage {
     // },
     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.square_and_pencil'))
         .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-      content: '编辑', callback: ()=>{ this.editConfig() }
+      content: $r('app.string.Edit'), callback: ()=>{ this.editConfig() }
     },
     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.arrow_clockwise'))
         .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-      content: '更新', callback: ()=>{ this.updateConfig(this.currentTouchConfigData.configId) }
+      content: $r('app.string.update'), callback: ()=>{ this.updateConfig(this.currentTouchConfigData.configId) }
     },
     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.share'))
         .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-      content: '分享', callback: ()=>{ this.shareConfigUrl() }
+      content: $r('app.string.share'), callback: ()=>{ this.shareConfigUrl() }
     },
     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.qrcode'))
         .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-      content: '生成二维码', callback: ()=>{ this.generateQRcode() }
+      content: $r('app.string.generate_QR_code'), callback: ()=>{ this.generateQRcode() }
     },
     // XXX 分享链接和导出配置文件都已经集成到了“分享”菜单里
 /*    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.doc_text'))
@@ -210,7 +211,7 @@ struct ConfigurationPage {
     },*/
     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.plus_square_on_square'))
       .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-      content: '创建副本', callback: ()=>{ this.generateQRcode() }
+      content: $r('app.string.create_copy'), callback: ()=>{ this.generateQRcode() }
     },
   ]
   // 配置页面ListItem的长按ContextMenu的Builder
@@ -263,8 +264,7 @@ struct ConfigurationPage {
           symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.trash_fill'))
             .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
             .fontColor(['#E6E54E36']),
-          // TODO 国际化
-          content: '删除'
+          content: $r('app.string.delete')
         })
           .clickEffect({level: ClickEffectLevel.MIDDLE})
           .contentFontColor('#E6E54E36')
@@ -291,17 +291,15 @@ struct ConfigurationPage {
   // 配置是否保存弹框 Controller定义
   private configCustomDialogController: CustomDialogController | null= new CustomDialogController({
     builder: CustomConfirmDialog({
-      // TODO 国际化
-      title: '是否删除当前配置？',
-      cancelText: '删除',
-      confirmText: '取消',
+      title: $r('app.string.delete_current_configuration'),
+      cancelText: $r('app.string.delete'),
+      confirmText: $r('app.string.Cancel'),
       cancelButtonBackgroundColor: Color.Transparent,
       // 不可以使用`@Consume`注解的变量
       // confirmButtonBackgroundColor: this.icon_emphasize,
       cancel: () => {
         this.isEnableIndexForegroundBlur = false
-        // TODO 国际化
-        this.promptAction.showToast({ message: `就知道是你点错喽~` })
+        this.promptAction.showToast({ message: $r('app.string.click_error_prompt') })
       },
       confirm: ()=> {
         this.isEnableIndexForegroundBlur = false
@@ -659,8 +657,7 @@ struct ConfigurationPage {
     // TODO 弹框CustomDialog，在其中实现“配置url”生成二维码的功能
     if (this.currentTouchConfigData.sourceType !== ConfigDataSourceType.URL &&
       this.currentTouchConfigData.sourceType !== ConfigDataSourceType.QR_CODE ) {
-      // TODO 国际化
-      this.promptAction.showToast({ message: `此配置仅支持分享配置文件~🫡` })
+      this.promptAction.showToast({ message: `${getResourceString($r('app.string.config_share_prompt'), this)}~🫡` })
     }
     hilog.info(0xC014, this.componentName, `#generateQRcode#生成二维码: configName is [${this.currentTouchConfigData.configName}]`)
   }
@@ -676,7 +673,7 @@ struct ConfigurationPage {
    */
   private async  deleteConfig(): Promise<void> {
     // TODO 删除用户首选项里的此配置
-    this.promptAction.showToast({ message: `已删除配置💔` })
+    this.promptAction.showToast({ message: `${getResourceString($r('app.string.configuration_deleted'), this)}💔` })
     hilog.info(0xC016, this.componentName, `#deleteConfig#删除配置: configName is [${this.currentTouchConfigData.configName}]`)
     await ClashViewModel.deleteProfile(this.currentTouchConfigData.configId)
     this.fetchProfiles()

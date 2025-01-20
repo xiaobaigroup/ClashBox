@@ -4,6 +4,7 @@ import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { AppConfig, ClashCore } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
+import { promptAction } from "@kit.ArkUI"
 
 @Component
 struct Kernel {
@@ -12,10 +13,6 @@ struct Kernel {
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  // 开启测试内核
-  @State isBetaKernel: boolean = false
-  // 内核指代
-  @State currenKernel: number = 0
   // 页面内边距
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
   @StorageLink('appConfig') appConfig:AppConfig = new AppConfig()
@@ -40,16 +37,16 @@ struct Kernel {
           .alignItems(HorizontalAlign.Start)
           .margin({ left: 12 })
           Blank()
-          Toggle({ type: ToggleType.Switch, isOn: $$this.isBetaKernel })
+          Toggle({ type: ToggleType.Switch, isOn: $$this.appConfig.isBetaKernel })
             .selectedColor(this.icon_emphasize)
             .margin({right: 12})
             .onChange((isOn: boolean) => {
-              // 开关测试版内核 显式动画 TODO 【用户首选项】保存测试版内核启用状态 Ya@2025-01-10
+              // 开关测试版内核 显式动画
               this.getUIContext()?.animateTo({
                 duration: ANIMATION_DURATION_300,
                 curve: Curve.Ease
               }, () => {
-                this.isBetaKernel = isOn
+                this.appConfig.isBetaKernel = isOn
               })
             })
         }
@@ -63,11 +60,11 @@ struct Kernel {
           this.getUIContext()?.animateTo({
             duration: ANIMATION_DURATION_300
           }, () => {
-            this.isBetaKernel = !this.isBetaKernel
+            this.appConfig.isBetaKernel = !this.appConfig.isBetaKernel
           })
         })
         // 内核
-        if(this.isBetaKernel) {
+        if(this.appConfig.isBetaKernel) {
           Column() {
             // ClashMeta
             Row() {
@@ -84,11 +81,10 @@ struct Kernel {
             .width('100%')
             .padding({left: 12, right: 12})
             .onClick(() => {
-              this.currenKernel = 1
               this.appConfig.clashCore = ClashCore.ClashMeta
-              // TODO 添加弹窗提示需要重启vpn服务
               ClashViewModel.ChangeCore(ClashCore.ClashMeta)
-              hilog.info(0xFF00, "SettingsKerneltestTag", "当前内核1：%{public}d", this.currenKernel)
+              promptAction.showToast({message: $r('app.string.switch_clashcore_tips'), duration: 2000 })
+              hilog.info(0xFF00, "SettingsKerneltestTag", "当前内核1：%{public}d", this.appConfig.clashCore)
             })
             // 分割线
             Row().height(0.5).backgroundColor('#0D000000').width('93%')
@@ -107,10 +103,10 @@ struct Kernel {
             .width('100%')
             .padding({left: 12, right: 12})
             .onClick(() => {
-              this.currenKernel = 2
               this.appConfig.clashCore = ClashCore.FlClash
               ClashViewModel.ChangeCore(ClashCore.FlClash)
-              hilog.info(0xFF00, "SettingsKerneltestTag", "当前内核2：%{public}d", this.currenKernel)
+              promptAction.showToast({message: $r('app.string.switch_clashcore_tips'), duration: 2000 })
+              hilog.info(0xFF00, "SettingsKerneltestTag", "当前内核2：%{public}d", this.appConfig.clashCore)
             })
           }
           .backgroundColor($r('app.color.container_background'))

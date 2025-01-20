@@ -41,6 +41,8 @@ struct Appearance {
   @State EnableThemeColorText: ResourceStr = $r('app.string.star_river_blue')
   // 按钮位置选中文本
   @State EnableButtonPositionText: ResourceStr = $r('app.string.right')
+  // 动画速度选中文本
+  @State EnableAnimationSpeedText: ResourceStr = $r('app.string.normal')
   // 按钮位置偏移量（默认在右侧的偏移量）
   @Consume ButtonPositionOffset: number
   // 所有子组件在容器内的对齐方式
@@ -108,6 +110,24 @@ struct Appearance {
             })
         }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
       }
+    } else if (index === 3) {
+      // 切换动画速度
+      Menu() {
+        ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
+          MenuItem({
+            content: menuItem.title,
+            symbolEndIcon: this.appConfig.animationSpeedIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+          })
+            .selected(this.appConfig.animationSpeedIndex === index)
+            .onChange((selected) => {
+              // 持久化按钮位置
+              this.appConfig.animationSpeedIndex = index
+              this.switchButtonPosition(index)
+              // UI刷新
+              this.EnableAnimationSpeedText = menuItem.title
+            })
+        }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
+      }
     }
   }
 
@@ -164,6 +184,10 @@ struct Appearance {
     if (this.appearanceList && this.appearanceList[2].children) {
       this.EnableButtonPositionText = this.appearanceList[2].children[this.appConfig.buttonPositionIndex].title
     }
+    // 初始化动画速度显示文本
+    if (this.appearanceList && this.appearanceList[3].children) {
+      this.EnableAnimationSpeedText = this.appearanceList[3].children[this.appConfig.animationSpeedIndex].title
+    }
   }
 
   aboutToDisappear(): void {
@@ -216,6 +240,22 @@ struct Appearance {
     // 确保children存在
     if(this.appearanceList && this.appearanceList[2].children) {
       this.switchMenu(this.appearanceList[2].children, 2)
+    }
+  }
+  @Builder
+  AnimationSpeedTipsText() {
+    Text(this.EnableAnimationSpeedText)
+      .fontWeight(FontWeight.Normal)
+      .textOverflow({ overflow: TextOverflow.Ellipsis })
+      .maxLines(1)
+      .margin({top: 2 })
+      .fontSize(14)
+  }
+  @Builder
+  AnimationSpeedMenuEntrance() {
+    // 确保children存在
+    if(this.appearanceList && this.appearanceList[3].children) {
+      this.switchMenu(this.appearanceList[3].children, 3)
     }
   }
 
@@ -366,35 +406,15 @@ struct Appearance {
             if(this.isShowExperimentalFunction) {
               // 分割线
               Row().height(0.5).backgroundColor('#0D000000').width('93%')
-              // 动画效果
-              Row() {
-                toggleRowList({
-                  icons: $r('sys.symbol.livephoto'),
-                  title: $r('app.string.animation_effects'),
-                  subtitle: $r('app.string.animation_effects_subtitle'),
-                  isExperimentalFunction: true
-                }) {
-                  // 动画效果开关
-                  Toggle({ type: ToggleType.Switch, isOn: $$this.isAnimation })
-                    .selectedColor(this.icon_emphasize)
-                    .margin({right: 12})
-                    .onChange((isOn: boolean) => {
-                      // 打开动画效果 显式动画
-                      this.getUIContext()?.animateTo({
-                        duration: ANIMATION_DURATION_300,
-                        curve: Curve.Ease
-                      }, () => {
-                        this.isAnimation = isOn
-                      })
-                    })
-                }
-              }.onClick(()=> {
-                // 打开动画效果 显式动画
-                this.getUIContext()?.animateTo({
-                  duration: ANIMATION_DURATION_300
-                }, () => {
-                  this.isAnimation = !this.isAnimation
-                })
+              // 动画速度
+              menuRowList({
+                icons: $r('sys.symbol.livephoto'),
+                title: $r('app.string.animation_speed'),
+                subtitle: $r('app.string.animation_speed_subtitle'),
+                isExperimentalFunction: true,
+                // 确保this指向父组件
+                tips: (): void => { this.AnimationSpeedTipsText() },
+                menu: (): void => { this.AnimationSpeedMenuEntrance() }
               })
             }
           }

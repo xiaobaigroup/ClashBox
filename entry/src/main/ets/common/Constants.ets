@@ -294,6 +294,14 @@ export const AppearanceList: AppearanceListItemProp[] = [
       { title: $r('app.string.middle') },
       { title: $r('app.string.left') },
     ]
+  },
+  { title: $r('app.string.animation_speed'),
+    children: [
+      { title: $r('app.string.fast') },
+      { title: $r('app.string.normal') },
+      { title: $r('app.string.low') },
+      { title: $r('app.string.close') }
+    ]
   }
 ]
 

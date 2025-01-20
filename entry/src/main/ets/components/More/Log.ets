@@ -132,6 +132,7 @@ struct Log {
           Row() {
             MoreTop({
               title: $r('app.string.Log'),
+              name: 'Log',
               searchButton: (): void => { this.logSearch() },
               otherButton: (): void => { this.logOther() }
             })
