@@ -1,5 +1,7 @@
 import { TunnelState, UpdateConfigParams } from "../models/ClashConfig";
-import {  OverrideSlot, Provider, ProviderType, ProxyGroup,
+import {
+  LogInfo,
+  OverrideSlot, Provider, ProviderType, ProxyGroup,
   ProxyMode,
   ProxySort, SubscriptionInfo} from "../models/Common";
 
@@ -9,7 +11,7 @@ export enum ClashRpcType{
   queryTrafficTotal,
   queryProxyGroup,
   queryProviders,
-  patchSelector,
+  changeProxy,
   healthCheck,
   updateProvider,
   queryOverride,
@@ -28,12 +30,12 @@ export enum ClashRpcType{
 export interface IClashManager {
 
   queryProxyGroups(model: ProxyMode): Promise<ProxyGroup[]>;
-  patchSelector(group: string, name: string): Promise<string>;
+  changeProxy(group: string, name: string): Promise<string>;
 
   queryProviders(): Promise<Provider[]>;
   updateProvider(type: ProviderType, name: string): Promise<string>;
 
   healthCheck(group: string): Promise<number>;
   loadConfig(path: UpdateConfigParams): Promise<string>;
-  setLogObserver(observer: (string: string) => void): Promise<() => void>;
+  setLogObserver(observer: (log: LogInfo) => void): Promise<() => void>;
 }

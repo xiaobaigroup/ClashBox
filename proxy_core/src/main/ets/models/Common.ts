@@ -112,7 +112,8 @@ export enum LogLevel {
 }
 export class LogInfo{
   logLevel: LogLevel
-  payload : string
+  payload: string
+  time: number
 }
 export enum TrafficUnit{
   KB,

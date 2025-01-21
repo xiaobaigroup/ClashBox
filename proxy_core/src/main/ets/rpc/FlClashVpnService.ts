@@ -11,7 +11,7 @@ import { Address, CommonVpnService, isIpv4, isIpv6, VpnConfig } from './CommonVp
 import { JSON, util } from '@kit.ArkTS';
 import { RpcRequest } from './RpcRequest';
 import { ClashRpcType } from './IClashManager';
-import { ProxyGroup, ProxyMode, ProxyType } from '../models/Common';
+import { LogInfo, ProxyGroup, ProxyMode, ProxyType } from '../models/Common';
 import { getHome } from '../appPath';
 import { UpdateConfigParams } from '../models/ClashConfig';
 
@@ -50,8 +50,15 @@ export class FlClashVpnService extends CommonVpnService{
     console.debug("socketService stub request", JSON.stringify(request))
     if(code == ClashRpcType.setLogObserver){
       // 订阅日志，需要持续输出
-      startLog((message: string)=>{
-        this.sendClient(client, message)
+      startLog((message: string, value: string)=>{
+        if (typeof value === "string"){
+          const log = JSON.parse(value)
+          this.sendClient(client, JSON.stringify({
+            logLevel: log["data"]["LogLevel"],
+            payload: log["data"]["Payload"],
+            time: new Date().getTime(),
+          } as LogInfo))
+        }
       })
     } else {
       try {
@@ -115,7 +122,7 @@ export class FlClashVpnService extends CommonVpnService{
           resolve(getExternalProviders())
           break;
         }
-        case ClashRpcType.patchSelector:{
+        case ClashRpcType.changeProxy:{
           // resolve(changeProxy(JSON.stringify({
           //   groupName: data[0] as string,
           //   proxyName: data[1] as string,

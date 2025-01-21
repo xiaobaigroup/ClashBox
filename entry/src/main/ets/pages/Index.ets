@@ -278,21 +278,6 @@ struct Index {
   // 日志页临时数据
   @Provide
   private logListData: Array<LogData> = [
-    {
-      logType: LogLevel.Info,
-      logTime: 1736996575781,
-      LogDetails: '[App] Local level: info',
-      logSkip: false
-    },
-    {
-      logType: LogLevel.Debug,
-      logTime: 1736980475781,
-      logSkip: true,
-      LogDetails: '[App] Hello World Hello World Hello World Hello World Hello World Hello World Hello World' +
-        ' Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World' +
-        ' Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World' +
-        ' Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World'
-    },
   ]
 
   private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
@@ -459,9 +444,10 @@ struct Index {
       ClashViewModel.startLog(enable, (log)=>{
         this.logListData.push({
           logType: log.logLevel,
-          logTime: 0,
+          logTime: log.time,
           LogDetails: log.payload,
-          logSkip: false
+          // TODO
+          logSkip: log.payload.length > 30
         })
       })
     })

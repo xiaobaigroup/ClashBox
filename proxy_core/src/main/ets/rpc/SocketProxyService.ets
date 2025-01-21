@@ -3,7 +3,7 @@ import {  RpcResult } from './RpcRequest';
 import { JSON, util } from '@kit.ArkTS';
 import { common } from '@kit.AbilityKit';
 import { ClashRpcType, IClashManager } from './IClashManager';
-import { Provider, ProviderType, ProxyGroup, ProxyMode, ProxyType,
+import { LogInfo, Provider, ProviderType, ProxyGroup, ProxyMode, ProxyType,
   Traffic } from '../models/Common';
 import { promptAction } from '@kit.ArkUI';
 import { UpdateConfigParams } from '../models/ClashConfig';
@@ -14,7 +14,7 @@ export class SocketProxyService implements IClashManager{
   init(context: common.Context) {
     this.context = context
   }
-  async setLogObserver(observer: (message:string) => void): Promise<()=>void> {
+  async setLogObserver(observer: (message: LogInfo) => void): Promise<()=>void> {
     return this.callbackRequest(ClashRpcType.setLogObserver, [], observer)
   }
 
@@ -45,15 +45,14 @@ export class SocketProxyService implements IClashManager{
   async updateGeoData(geoName: string, geoType: string): Promise<string>{
     return await (this.sendMessageRequest(ClashRpcType.updateGeoData,[geoName, geoType])) as string
   }
-  async patchSelector(group: string, name: string): Promise<string> {
-    let result = await this.sendMessageRequest(ClashRpcType.patchSelector,[group, name])
+  async changeProxy(group: string, name: string): Promise<string> {
+    let result = await this.sendMessageRequest(ClashRpcType.changeProxy,[group, name])
     return result as string
   }
 
   async healthCheck(proxyName: string): Promise<number> {
     return (await this.sendMessageRequest(ClashRpcType.healthCheck, [proxyName, 3000])) as number
   }
-
 
 
   async startClash():Promise<boolean>{
@@ -88,7 +87,7 @@ export class SocketProxyService implements IClashManager{
         }
       })
       client.on("error", ()=>{
-        console.log("socketService proxy error" )
+        console.log("socketProxy on error" )
         reject("失败")
       })
       const socketPath = this.context?.filesDir + '/clashNext.sock'
@@ -96,7 +95,7 @@ export class SocketProxyService implements IClashManager{
       client.connect({address: { address: socketPath }, timeout:1000}).then(async ()=>{
         client.send({ data: JSON.stringify({method, params}) });
       }).catch((e:Error)=>{
-        console.log("socketService error", e.message)
+        console.log("socketProxy error", e.message)
         promptAction.showToast({message: "rpc失败: " + e.message})
         reject(e)
       });
@@ -105,26 +104,31 @@ export class SocketProxyService implements IClashManager{
   async callbackRequest(
     method: number,
     params: (string | number | boolean) [] = [],
-    callBack: (message: string) => void
+    callBack: (message: LogInfo) => void
   ): Promise<() => void> {
     return new Promise(async (resolve, reject)=>{
       let tcp: socket.LocalSocket = socket.constructLocalSocketInstance();
       tcp.on('message', (value: socket.LocalSocketMessageInfo) => {
         let text = new util.TextDecoder()
-        callBack(text.decodeToString(new Uint8Array(value.message)))
+        let dd = text.decodeToString(new Uint8Array(value.message))
+        try {
+          callBack(JSON.parse(dd) as LogInfo)
+        } catch (e) {
+          console.log("socketProxy error", e, dd)
+        }
       })
       tcp.on('error', (e: Error) => {
-        console.log("socketService error", e.message)
+        console.log("socketProxy error", e.message)
         reject("失败")
       });
-      const socketPath = this.context?.filesDir + '/ipc_socket'
+      const socketPath = this.context?.filesDir + '/clashNext.sock'
       tcp.connect({address: { address: socketPath }, timeout:3000}).then(()=>{
         tcp.send({ data: JSON.stringify({method, params}) });
         resolve(()=>{
           tcp.close()
         })
       }).catch((e: Error)=>{
-        console.log("socketService error", e.message)
+        console.log("socketProxy error", e.message)
         reject(e)
       });
     })

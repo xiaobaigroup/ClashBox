@@ -25,7 +25,7 @@ import { RpcRequest } from './RpcRequest';
 import { ClashRpcType } from './IClashManager';
 import { getHome, getProfileDir, getProfilePath } from '../appPath';
 import { UpdateConfigParams } from '../models/ClashConfig';
-import { OverrideSlot, Proxy, ProxyGroup, ProxyMode } from '../models/Common';
+import { LogInfo, OverrideSlot, Proxy, ProxyGroup, ProxyMode } from '../models/Common';
 
 
 export class ClashMetaVpnService extends CommonVpnService{
@@ -44,13 +44,19 @@ export class ClashMetaVpnService extends CommonVpnService{
     if(code == ClashRpcType.setLogObserver){
       // 订阅日志，需要持续输出
       nativeSubscribeLogcat((value)=>{
-        this.sendClient(client, value)
+        console.log("startLog", value);
+        const log = JSON.parse(value)
+        this.sendClient(client, JSON.stringify({
+          logLevel: log["level"],
+          payload: log["message"],
+          time: log["time"]
+        } as LogInfo))
       })
     } else {
       try {
         let result = await this.onRemoteMessage(code, params)
         console.debug("socketService stub result", result)
-        this.sendClient(client, JSON.stringify({ result: result}))
+        this.sendClient(client, JSON.stringify({ result: result }))
       } catch (e) {
         console.error("socketService stub error", e.message, e.stack)
         this.sendClient(client, JSON.stringify({ result: e.message}))
@@ -101,7 +107,7 @@ export class ClashMetaVpnService extends CommonVpnService{
           resolve(nativeQueryProviders())
           break;
         }
-        case ClashRpcType.patchSelector:{
+        case ClashRpcType.changeProxy:{
           resolve(nativePatchSelector(data[0] as string, data[1] as string))
           break;
         }

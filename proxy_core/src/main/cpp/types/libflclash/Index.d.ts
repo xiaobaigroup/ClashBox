@@ -23,6 +23,6 @@ export const getConnections: () => Promise<string>;
 export const closeConnections: () => string;
 export const closeConnection: (connectionId: string) => string;
 
-export const startLog: (callback: (message: string) => void) => string;
+export const startLog: (callback: (message: string, value: string) => void) => string;
 
 export const stopLog: () => void;
