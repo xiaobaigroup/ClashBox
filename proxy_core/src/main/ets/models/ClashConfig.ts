@@ -1,5 +1,4 @@
 import { LogLevel } from "./Common"
-import { call } from "@kit.TelephonyKit"
 
 export interface  UpdateConfigParams{
   "profile-id": string

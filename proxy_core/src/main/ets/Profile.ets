@@ -4,7 +4,7 @@ import { rcp } from '@kit.RemoteCommunicationKit';
 import { Context } from '@kit.AbilityKit';
 import { fileUri } from '@kit.CoreFileKit';
 import { ProxyGroup, ProxyType, SubscriptionInfo } from './models/Common';
-import { JSON } from '@kit.ArkTS';
+import { JSON, uri } from '@kit.ArkTS';
 
 export function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -70,7 +70,7 @@ export class Profile {
     const resp = await session.get(this.url)
     const disposition = resp.headers["content-disposition"] as string
     const userinfo = resp.headers["subscription-userinfo"] as string
-    if (!this.name) {
+    if (!this.name || this.name == "") {
       this.name = getFileNameForDisposition(disposition) ?? this.id
       this.subscriptionInfo = SubscriptionInfo.formHString(userinfo)
     }
@@ -89,8 +89,6 @@ export class Profile {
     return this
   }
   async saveByUri(uri: string): Promise<Profile>{
-    let profilePath = await getProfilesPath(this.context);
-
     const filePath = await getProfilePath(this.context, this.id)
     await fs.copy(uri, fileUri.getUriFromPath(filePath))
     return this
@@ -107,8 +105,14 @@ export class Profile {
 
 function getFileNameForDisposition(disposition: string | undefined): string | null {
   if (disposition == null) return null;
-  const parseValue = JSON.parse(disposition) as Record<string, string>;
-  const parameters = parseValue["parameters"];
+  console.log("disposition", disposition)
+  const match = disposition.match(/filename="?(.+)"?/)
+  if(match){
+    const filename = decodeURIComponent(match[1]);
+    return filename
+  }else{
+    return null;
+  }
   // const fileNamePointKey = parameters.
   //   .firstWhere((key) => key == "filename*", orElse: () => "");
   // if (fileNamePointKey.isNotEmpty) {

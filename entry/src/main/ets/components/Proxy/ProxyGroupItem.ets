@@ -163,7 +163,7 @@ struct ProxyGroupItem {
    *    List的长按菜单中的响应都是根据这个的对象中的属性来处理的，是个不稳定因素
    */
   private currentTouchProxyData: Item = {
-    text:'',
+    name:'',
     latency: 0,
     type: '',
     id: '',
@@ -186,7 +186,7 @@ struct ProxyGroupItem {
     })
     EventHub.on(EventKey.TestDelayAll, async ()=>{
       for (let p of this.items){
-        await ClashViewModel.testDelay(p.text).then(d=>{
+        await ClashViewModel.testDelay(p.name).then(d=>{
           p.latency = d
         })
       }
@@ -201,7 +201,7 @@ struct ProxyGroupItem {
   //按名称排序
   NameSortItems() {
     this.items = this.items.sort((a, b) => {
-      return ProxyCollator.compare(a.text, b.text);
+      return ProxyCollator.compare(a.name, b.name);
     })
   }
 
@@ -301,9 +301,9 @@ struct ProxyGroupItem {
 
   selectProxy(item: Item){
     if (!this.disabled){
-      this.selectedProxy = item.text
-      this.appConfig.currentProxyName = item.text
-      this.appConfig.currentProxyItem!.latency = item.latency
+      this.selectedProxy = item.name
+      this.appConfig.currentProxyName = item.name
+      this.appConfig.currentProxyItem = item
       this.OnProxyChange(item)
     }
   }
@@ -318,7 +318,7 @@ struct ProxyGroupItem {
           ListItem() {
             Row() {
               Column() {
-                Text(`${item.text}`).ItemTextStyle()//.width(this.isLandscapePhone ?'592px':'433px')
+                Text(`${item.name}`).ItemTextStyle()//.width(this.isLandscapePhone ?'592px':'433px')
                 Text(`${item.type}`).ItemTypeStyle()
                 Blank(10)
                Text(`${item.latency}` + 'ms')
@@ -330,8 +330,8 @@ struct ProxyGroupItem {
                 // .width(this.isLandscapePhone ?'592px':'250px')
               }.alignItems(HorizontalAlign.Start)
               Blank()
-              Radio({ value: item.text, group: item.g + item.text }).enabled(!this.disabled)
-                .checked(item.text === this.selectedProxy)
+              Radio({ value: item.name, group: item.g + item.name }).enabled(!this.disabled)
+                .checked(item.name === this.selectedProxy)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
@@ -388,7 +388,7 @@ struct ProxyGroupItem {
             Row() {
               Row() {
                 Column() {
-                  Text(`${item.text}`).ItemTextStyle()
+                  Text(`${item.name}`).ItemTextStyle()
                   Text(`${item.type}`).ItemTypeStyle()
                 }.alignItems(HorizontalAlign.Start)
 
@@ -404,8 +404,8 @@ struct ProxyGroupItem {
               // group 不要写死, 会和其他tab页的生效，在一个组里唯一
               // 使用.enabled(!this.disabled) 来禁用radio不让选
               //Radio({ value: 'ProxyRadio' + index, group: 'ProxyGroup' }).enabled(!this.disabled)
-              Radio({ value: item.text, group: item.g + item.text}).enabled(!this.disabled)
-                .checked(item.text === this.selectedProxy)
+              Radio({ value: item.name, group: item.g + item.name}).enabled(!this.disabled)
+                .checked(item.name === this.selectedProxy)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
@@ -459,7 +459,7 @@ struct ProxyGroupItem {
           ListItem() {
             Row() {
               Column() {
-                Text(`${item.text}`).ItemTextStyle()
+                Text(`${item.name}`).ItemTextStyle()
                 Row() {
                   Text(`${item.type}`).ItemTypeStyle().maxLines(1).width('25%').textOverflow({ overflow: TextOverflow.Clip})
                   Text(`${item.latency}` + 'ms')
@@ -473,8 +473,8 @@ struct ProxyGroupItem {
               .alignItems(HorizontalAlign.Start)
 
               Blank()
-              Radio({ value: item.text, group: item.g + item.text }).enabled(!this.disabled)
-                .checked(item.text === this.selectedProxy)
+              Radio({ value: item.name, group: item.g + item.name }).enabled(!this.disabled)
+                .checked(item.name === this.selectedProxy)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
@@ -541,7 +541,7 @@ struct ProxyGroupItem {
     this.ProxyPromptAction.showToast({ message: $r('app.string.Collect_Tip') })
     const p = this.currentTouchProxyData
     p.isShowFavoriteProxy = true
-    this.favoriteProxys.set(p.g + '|' + p.text, this.appConfig.currentProfileId ?? "")
+    this.favoriteProxys.set(p.g + '|' + p.name, this.appConfig.currentProfileId ?? "")
   }
   /**
    * 取消收藏配置
@@ -551,7 +551,7 @@ struct ProxyGroupItem {
     this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_tip') })
     const p = this.currentTouchProxyData
     p.isShowFavoriteProxy = false
-    this.favoriteProxys.delete(p.g + '|' + p.text)
+    this.favoriteProxys.delete(p.g + '|' + p.name)
   }
 }
 /**

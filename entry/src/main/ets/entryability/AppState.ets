@@ -91,8 +91,8 @@ export class AppState {
     let favoriteList: string[][] = []
     for(let g of proxyGroups){
       for (let p of g.proxies){
-        if(favoriteProxys.has(g.name + "|" + p.text)){
-          favoriteList.push([g.name, p.text])
+        if(favoriteProxys.has(g.name + "|" + p.name)){
+          favoriteList.push([g.name, p.name])
         }
       }
     }
@@ -100,7 +100,7 @@ export class AppState {
   }
   static fetchProxyItem(proxyGroups: ProxyGroup[], g: string, p: string): Item {
     let group = proxyGroups.find((p: ProxyGroup) => p.name == g)
-    return group?.proxies.find((ps)=> ps.text == p) as Item
+    return group?.proxies.find((ps)=> ps.name == p) as Item
   }
 }
 // PersistentStorage 不支持嵌套对象，修改属性需要copy 更新引用来触发持久化更新

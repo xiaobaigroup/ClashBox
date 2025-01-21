@@ -49,7 +49,7 @@ import { image } from '@kit.ImageKit'
 import { Dns, LogLevel, Profile, ProxyGroup, ProxyMode } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
-import { AppConfig } from '../entryability/AppState'
+import { AppConfig, ClashCore } from '../entryability/AppState'
 import { changeThemeColor } from '../utils/ChangeThemeColorUtil'
 import { common } from '@kit.AbilityKit'
 import { setAutoColorMode, setDarkColorMode, setLightColorMode } from '../utils/ChangeColorModeUtils'
@@ -361,7 +361,7 @@ struct Index {
     this.getUIContext().getMediaQuery().matchMediaSync('(640vp< height <= 1000vp) and (640vp< width <= 1000vp)');
 
 
-  aboutToAppear() {
+  async aboutToAppear(): Promise<void>{
     hilog.info(0x1000, this.componentName, `#aboutToAppear executed`)
 
     // 在页面build前改变主题颜色
@@ -439,9 +439,9 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.HomeCardEditHeight)
     BreakpointSystem.getInstance().attach(this.HomeCardCellularDataPadding)
     BreakpointSystem.getInstance().start()
-    setTimeout(async ()=> {
-      ClashViewModel.initProfile()
-    }, 500)
+    // TODO
+
+
     EventHub.on(EventKey.FetchProxyGroup, async ()=>{
       if(this.appConfig.currentProfileId){
         this.currentProfile = await ClashViewModel.getProfile(this.appConfig.currentProfileId)
@@ -450,9 +450,9 @@ struct Index {
         }
       }
     })
-    EventHub.on(EventKey.SwitchModeCard, async ()=>{
+    EventHub.on(EventKey.SwitchModeCard, async (mode: ProxyMode)=>{
       if (this.currentProfile) {
-        this.proxyGroups = await ClashViewModel.getProxyGroups(this.appConfig.switchMode ?? ProxyMode.Rule)
+        this.proxyGroups = await ClashViewModel.getProxyGroups(mode)
       }
     })
     EventHub.on(EventKey.StartLog, async (enable: boolean)=>{

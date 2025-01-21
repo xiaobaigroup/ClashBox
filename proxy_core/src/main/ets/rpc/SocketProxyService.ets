@@ -32,31 +32,8 @@ export class SocketProxyService implements IClashManager{
   }
   async queryProxyGroups(model: ProxyMode): Promise<ProxyGroup[]> {
     let result = await this.sendMessageRequest(ClashRpcType.queryProxyGroup,[model])
-    let map = JSON.parse(result as string) as Record<string, string | Record<string, string[] | string>>
-    let groupNames = map[ProxyMode.Global]["all"] as string[]
-    groupNames = ["GLOBAL", ...groupNames]
-    groupNames = groupNames.filter(e => {
-      const proxy = map[e] as Record<string, string>
-      const indexes = ["Selector","URLTest", "Fallback", "LoadBalance", "Relay"].indexOf(proxy["type"])
-      return indexes > -1
-    })
-    const groupsRaw = groupNames.map((groupName) =>{
-      const group = map[groupName];
-      group["proxies"] = (group["all"] ?? []).map((n:string) =>{
-          map[n]["text"] = map[n]["name"]
-          return map[n]
-      }).filter((d: string) => d != null && d != undefined)
-      return {
-        name: group["name"] as string,
-        now: group["now"] as string,
-        type: group["type"] as ProxyType,
-        hidden: group["hidden"] == true,
-        icon: group["icon"] as string,
-        proxies: group["proxies"]
-      } as ProxyGroup
-    })
-    console.log("queryProxyGroups", JSON.stringify(groupsRaw[1]));
-    return groupsRaw
+    console.log("queryProxyGroups",model, result)
+    return JSON.parse(result as string) as ProxyGroup[]
   }
   async queryProviders(): Promise<Provider[]> {
     let result = await this.sendMessageRequest(ClashRpcType.queryProviders)
@@ -114,7 +91,7 @@ export class SocketProxyService implements IClashManager{
         console.log("socketService proxy error" )
         reject("失败")
       })
-      const socketPath = this.context?.filesDir + '/flclash.sock'
+      const socketPath = this.context?.filesDir + '/clashNext.sock'
 
       client.connect({address: { address: socketPath }, timeout:1000}).then(async ()=>{
         client.send({ data: JSON.stringify({method, params}) });

@@ -1,16 +1,20 @@
 import {  VpnExtensionAbility } from '@kit.NetworkKit';
 import { Want } from '@kit.AbilityKit';
 import { SocketStubService } from 'proxy_core';
+import { ClashCore } from './AppState';
 
 
 export default class ClashVpnAbility extends VpnExtensionAbility {
-  clashStubService = new SocketStubService()
+  clashStubService: SocketStubService | undefined
   constructor() {
     super();
   }
   async onCreate(want: Want) {
     try {
-      await this.clashStubService.startService(this.context)
+      console.log("ClashNext", `启用核心 ${JSON.stringify(want.parameters)}`);
+      let core = want.parameters?.["ClashCore"] as ClashCore ?? ClashCore.ClashMeta
+      this.clashStubService = new SocketStubService(core, this.context)
+      await this.clashStubService.startService()
     } catch (e) {
       console.log("ClashNext", `启用VPN失败 ${e.message} ${e.stack}`);
     }

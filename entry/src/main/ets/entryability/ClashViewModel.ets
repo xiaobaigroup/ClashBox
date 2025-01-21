@@ -17,12 +17,12 @@ export class ClashViewModel {
   profileRepo = new ProfileRepo()
   socketProxy = new SocketProxyService()
   context: Context | undefined
-  async init(context: Context, core: ClashCore) {
+  async init(context: Context) {
     this.context = context
     await this.profileRepo.init(context)
     this.socketProxy.init(context)
     await this.initGeoIp()
-    await this.ChangeCore(core)
+    await this.ChangeCore()
   }
   // 添加配置 url
   async addOrUpdateProfileByUrl(data: ConfigData, id: string | null){
@@ -85,7 +85,6 @@ export class ClashViewModel {
   }
   async changeProxy(profile: Profile, g:string, p: string){
     try {
-      console.log("changeProxy", g, p);
       profile.proxySelected?.set(g, p)
       await this.profileRepo.addOrUpdate(profile)
       await this.socketProxy.patchSelector(g, p)
@@ -150,7 +149,7 @@ export class ClashViewModel {
     let favoriteProxys = AppStorage.get<Map<string, string>>("favoriteProxys")
     const groups = list.map((g)=>{
       g.proxies = g.proxies.map((p) => {
-        p.isShowFavoriteProxy = favoriteProxys?.get(g.name + "|" + p.text) != null
+        p.isShowFavoriteProxy = favoriteProxys?.get(g.name + "|" + p.name) != null
         p.latency = -1
         p.g = g.name
         return p
@@ -161,7 +160,9 @@ export class ClashViewModel {
     console.log("FetchProxyGroup", groups)
     return groups
   }
-  async ChangeCore(coreType: ClashCore){
+  //BUG 第一次启动，参数传不过去
+  // 第一次要权限弹窗
+  async ChangeCore(coreType: ClashCore | undefined = undefined){
     try {
       const vpnWant = {
         deviceId: "",
@@ -169,7 +170,7 @@ export class ClashViewModel {
         abilityName: "ClashVpnAbility",
         parameters: { "ClashCore" : coreType}
       } as Want
-      vpnExtension.stopVpnExtensionAbility(vpnWant)
+      await vpnExtension.stopVpnExtensionAbility(vpnWant)
       await vpnExtension.startVpnExtensionAbility(vpnWant);
     } catch (e) {
       // TODO 用户点取消
@@ -179,6 +180,7 @@ export class ClashViewModel {
   }
 
   async loadProfileAndConfig(id: string, config: ClashConfig | null = null, params: ConfigExtendedParams | null= null){
+
     let result = await this.socketProxy.loadConfig({
       "profile-id": id,
       config: config ?? new ClashConfig(),

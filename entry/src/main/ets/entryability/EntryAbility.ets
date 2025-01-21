@@ -1,6 +1,6 @@
 import { AbilityConstant, Configuration, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { window } from '@kit.ArkUI';
+import { promptAction, window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import ClashViewModel from './ClashViewModel';
 import { KeyboardAvoidMode } from '@kit.ArkUI';
@@ -27,14 +27,22 @@ export default class EntryAbility extends UIAbility {
     // Main window is created, set main page for this ability
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onWindowStageCreate');
     let windowClass: window.Window = windowStage.getMainWindowSync(); // 获取应用主窗口
-    await ClashViewModel.init(this.context, AppStorage.get<AppConfig>("appConfig") ?.clashCore ?? ClashCore.ClashMeta)
 
-    windowStage.loadContent('pages/Index', (err) => {
+    await ClashViewModel.init(this.context)
+    windowStage.loadContent('pages/Index', async (err) => {
       if (err.code) {
         hilog.error(0x0000, 'EntryAbility', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
         return;
       }
       AppState.init()
+      let appConfig = AppStorage.get<AppConfig>("appConfig")?.clashCore
+      // 切换核心
+      promptAction.showToast({message: "核心启动中..."})
+      await ClashViewModel.ChangeCore(appConfig)
+      setTimeout(async ()=>{
+        ClashViewModel.initProfile()
+      }, 300)
+
       hilog.info(0x0000, 'EntryAbility', 'Succeeded in loading the content.');
     });
 

@@ -112,7 +112,7 @@ struct ProxyPage {
   }
   changeProxy(g: string, item: Item){
     if(this.currentProfile){
-      ClashViewModel.changeProxy(this.currentProfile, g, item.text)
+      ClashViewModel.changeProxy(this.currentProfile, g, item.name)
     }
   }
 

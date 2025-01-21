@@ -1,10 +1,10 @@
 
 // 定义一个接口来描述列表项的数据结构
 export interface Item {
-  readonly text: string
+  readonly name: string
   latency: number
   type: string
-  id: string
+  id?: string
   g?: string
   isShowFavoriteProxy?: boolean
 }

@@ -77,10 +77,9 @@ export enum ProxyType {
   Unknown = "Unknown"
 }
 export interface Proxy {
-  name: string;
+  name: string
   type: ProxyType;
-  text: string
-  latency: number
+  latency?: number
   id?: string
   g?: string
   isShowFavoriteProxy?: boolean
