@@ -87,7 +87,7 @@ export class ClashViewModel {
     try {
       profile.proxySelected?.set(g, p)
       await this.profileRepo.addOrUpdate(profile)
-      await this.socketProxy.patchSelector(g, p)
+      await this.socketProxy.changeProxy(g, p)
     } catch (e) {
       promptAction.showToast({message: e.message, duration:3000})
     }
@@ -121,7 +121,7 @@ export class ClashViewModel {
   async startLog(enable: boolean, callback: (d: LogInfo) => void){
       if(enable){
         this.job = await this.socketProxy.setLogObserver((message)=>{
-          callback(JSON.parse(message) as LogInfo)
+          callback(message)
         })
       }else{
         this.job?.()
