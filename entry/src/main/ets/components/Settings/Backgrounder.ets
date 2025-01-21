@@ -14,7 +14,7 @@ struct Backgrounder {
   @State isRecord: boolean = false
   // 设置 -> 后台运行 -> 流量提醒启用状态变量
   @Consume Enablebackgrounder: boolean
-  // 实验功能提示框展示变量
+  // 实验功能展示变量
   @Consume isShowExperimentalFunction: boolean
   // 模拟下载关闭提示弹窗标题
   @State theColsedDialogTitle: ResourceStr = $r('app.string.simulate_download_closed_tips')

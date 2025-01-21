@@ -31,10 +31,14 @@ struct Log {
   @Consume theLogSkipItem: number
   // 临时数据（数据本体在MorePage）
   @Consume logListData: Array<LogData>
-
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-
+  // 临时排序变量
+  @State theSort: number = 0
+  // 临时时间正序变量
+  @State theSortTimeUp: boolean = false
+  // 临时名称正序变量
+  @State theSortNameUp: boolean = false
   @Builder
   MoreMenu() {
     Menu() {
@@ -58,11 +62,40 @@ struct Log {
 
           })
         MenuItem({
+          builder: ():void => this.SortMenu(),
+          content: $r('app.string.sort'),
+          symbolEndIcon: new SymbolGlyphModifier($r('sys.symbol.chevron_right'))
+        })
+        MenuItem({
           builder: ():void => this.FilterMenu(),
           content: $r('app.string.filter'),
           symbolEndIcon: new SymbolGlyphModifier($r('sys.symbol.chevron_right'))
         })
       }
+    }
+  }
+
+  @Builder
+  SortMenu() {
+    Menu() {
+      MenuItem({ content: $r('app.string.sort') })
+        .contentFont({ weight: FontWeight.Bold })
+      MenuItem({
+        content: $r('app.string.sort_name'),
+        symbolEndIcon: this.theSort === 0 ? new SymbolGlyphModifier(this.theSortNameUp ? $r('sys.symbol.arrow_up') : $r('sys.symbol.arrow_down')) : undefined
+      })
+        .onClick(() => {
+          this.theSort = 0
+          this.theSortNameUp = !this.theSortNameUp
+        })
+      MenuItem({
+        content: $r('app.string.sort_time'),
+        symbolEndIcon: this.theSort === 1 ? new SymbolGlyphModifier(this.theSortTimeUp ? $r('sys.symbol.arrow_up') : $r('sys.symbol.arrow_down')) : undefined
+      })
+        .onClick(() => {
+          this.theSort = 1
+          this.theSortTimeUp = !this.theSortTimeUp
+        })
     }
   }
 

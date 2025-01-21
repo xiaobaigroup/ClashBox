@@ -1447,6 +1447,34 @@
     {
       "name": "low",
       "value": "Low Speed"
+    },
+    {
+      "name": "sort",
+      "value": "Sort"
+    },
+    {
+      "name": "sort_name",
+      "value": "By name"
+    },
+    {
+      "name": "sort_time",
+      "value": "By time"
+    },
+    {
+      "name": "old_kernel",
+      "value": "Old Kernel"
+    },
+    {
+      "name": "new_kernel",
+      "value": "New Kernel"
+    },
+    {
+      "name": "open_core_prompt",
+      "value": "For more kernel options, please go to settings - about opening the \"experiment function\" option"
+    },
+    {
+      "name": "switch_core_prompt",
+      "value": "Note: after switching the kernel, you need to restart the VPN service"
     }
   ]
 }

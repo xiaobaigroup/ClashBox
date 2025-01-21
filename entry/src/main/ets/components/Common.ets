@@ -722,7 +722,7 @@ export struct menuRowList {
         if(this.subtitle) {
           Text(this.subtitle)
             .fontWeight(FontWeight.Normal)
-            .textOverflow({ overflow: TextOverflow.MARQUEE })
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
             .maxLines(1)
             .margin({ top: 2 })
             .fontSize(14)

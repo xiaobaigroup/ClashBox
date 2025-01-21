@@ -1447,6 +1447,34 @@
     {
       "name": "low",
       "value": "慢速"
+    },
+    {
+      "name": "sort",
+      "value": "排序"
+    },
+    {
+      "name": "sort_name",
+      "value": "按名称"
+    },
+    {
+      "name": "sort_time",
+      "value": "按时间"
+    },
+    {
+      "name": "old_kernel",
+      "value": "老版本内核"
+    },
+    {
+      "name": "new_kernel",
+      "value": "新内核"
+    },
+    {
+      "name": "open_core_prompt",
+      "value": "如需查看更多内核选项，请前往设置-关于，开启“实验功能”选项"
+    },
+    {
+      "name": "switch_core_prompt",
+      "value": "注：切换内核后需要重启VPN服务"
     }
   ]
 }
