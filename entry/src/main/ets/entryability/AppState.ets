@@ -27,6 +27,7 @@ export enum ClashCore{
 export class AppConfig{
   currentProfileId?: string
   currentProxyName?: string
+  currentProfileName?: string
   currentProxyItem?: Item
   proxySort?: ProxySort = ProxySort.Default
   proxyGroupType?: ProxyGroupType = ProxyGroupType.Tabs
@@ -57,12 +58,12 @@ export class AppConfig{
   userLanguage: string = "default"
   /*主页小卡片相关 */
   //快捷方式小卡片
-  inputTitle1?: string
-  inputTitle2?: string
-  inputTitle3?: string
-  inputWeb1?: string
-  inputWeb2?: string
-  inputWeb3?: string
+  inputTitle1: string=''
+  inputTitle2: string=''
+  inputTitle3: string=''
+  inputWeb1: string=''
+  inputWeb2: string=''
+  inputWeb3: string=''
   // 分流模式小卡片
   switchMode?:ProxyMode = ProxyMode.Rule
   // 测试内核启用状态

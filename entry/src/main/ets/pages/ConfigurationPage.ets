@@ -396,6 +396,14 @@ struct ConfigurationPage {
                   .radioStyle({
                     checkedBackgroundColor: this.icon_emphasize,
                   })
+                  .onClick(async  () => {
+                    this.currentConfigRadioCheckedConfigData = item
+                    this.appConfig.currentProfileName = item.configName
+                    customVibrator.vibratorTriggerOfHapticClockTimer()
+                    this.appConfig.currentProfileId = item.configId
+                    await ClashViewModel.loadProfileAndConfig(item.configId)
+                    hilog.info(0xC002, this.componentName, `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
+                  })
               }
               .width('100%')
               .padding(LIST_ITEM_PADDING)
@@ -418,6 +426,7 @@ struct ConfigurationPage {
               })
             .onClick(async  () => {
               this.currentConfigRadioCheckedConfigData = item
+              this.appConfig.currentProfileName = item.configName
               customVibrator.vibratorTriggerOfHapticClockTimer()
               this.appConfig.currentProfileId = item.configId
               await ClashViewModel.loadProfileAndConfig(item.configId)

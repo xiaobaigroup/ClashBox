@@ -50,12 +50,12 @@ struct SwitchMode {
             .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
             .fontColor(this.appConfig.switchMode==n["v"] ? this.font_primary : $r('sys.color.font_secondary'))
             .backgroundColor(this.appConfig.switchMode==n["v"] ? $r('app.color.container_background') : '#00ffffff')
-       //     .shadow(this.appConfig.switchMode==n["v"] ? { radius: 3,color:$r('app.color.shadow')} : { } )
+              //     .shadow(this.appConfig.switchMode==n["v"] ? { radius: 3,color:$r('app.color.shadow')} : { } )
             .onClick(() => {
               //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
               if (this.isShowHomeEdit === false) {
-                  this.appConfig.switchMode = n["v"]
-                  EventHub.sendEvent(EventKey.SwitchModeCard, n["v"])
+                this.appConfig.switchMode = n["v"]
+                EventHub.sendEvent(EventKey.SwitchModeCard, n["v"])
               }
             })
         })

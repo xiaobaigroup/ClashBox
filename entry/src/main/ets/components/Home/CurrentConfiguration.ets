@@ -2,6 +2,7 @@ import { BreakpointState } from "../../common/breakpointsystem"
 import { MarginGenerate } from "../../common/Constants"
 import { CardTitle } from "./CardTitleBuilder"
 import { PromptAction } from "@kit.ArkUI"
+import { AppConfig } from "../../entryability/AppState"
 
 @Component
 struct CurrentConfiguration {
@@ -19,14 +20,16 @@ struct CurrentConfiguration {
   @Consume isShowHomeEdit: boolean
   //收藏与ping延迟即时动作
   private PromptAction:PromptAction = this.getUIContext()?.getPromptAction()
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
 
   build() {
     Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.End, justifyContent: FlexAlign.SpaceBetween}) {
       Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.Start }) {
         CardTitle({ title: $r('app.string.CurrentConfiguration') })
-        Text('配置名')
+        Text(this.appConfig.currentProfileName)
           .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
           .fontWeight(FontWeight.Bold)
+          .maxLines(2)
           .fontColor($r('sys.color.font_primary'))
       }
 

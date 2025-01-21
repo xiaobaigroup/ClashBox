@@ -2,7 +2,7 @@ import { BreakpointState } from '../../common/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI'
 import { MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
-import { Item, ProxyData } from '../../common/ProxyData'
+import { Item } from '../../common/ProxyData'
 import { AppConfig, AppState, isEnd } from '../../entryability/AppState'
 import { ProxyGroup } from 'proxy_core'
 
@@ -40,6 +40,7 @@ struct FavoriteProxy {
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageProp("proxyGroups") proxyGroups: ProxyGroup[] = []
+
   build() {
     Column() {
       CardTitle({ title: $r('app.string.FavoriteProxy') })
@@ -60,9 +61,9 @@ struct FavoriteProxy {
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
                 })
-                .onChange((isChecked:boolean) => {
+                .onClick(() => {
                   //在home页编辑状态时，无法操作
-                  if (this.isShowHomeEdit===false &&isChecked) {
+                  if (this.isShowHomeEdit===false ) {
                     this.appConfig.currentProxyName = p[1]
                   }
                 })

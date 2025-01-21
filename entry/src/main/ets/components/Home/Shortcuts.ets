@@ -72,29 +72,29 @@ struct Shortcuts {
           { t: this.appConfig.inputTitle2, w: this.appConfig.inputWeb2 },
           { t: this.appConfig.inputTitle3, w: this.appConfig.inputWeb3 }
         ], (m: [Resource, number], i: number) => {
-          Text(m["t"] != undefined ? m["t"]: $r('app.string.long_press_modify') )
-            .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-            .ShortcutsTextStyle()
-            .onClick(() => {
-              //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
-              if (this.isShowHomeEdit === false) {
-                if (m["w"] != '' ) {
-                  this.implicitStartAbility(m["w"])
-                } else {
-                  this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
-                }
-              }
-            })
-            .gesture(
-              LongPressGesture()
-                .onAction(() => {
-                  //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
-                  if (this.isShowHomeEdit === false) {
-                    this.isShowShortcutsEdit = true
-                    this.isEnableIndexForegroundBlur = true
+            Text(`${m["t"]}` != '' ? `${m["t"]}` : $r('app.string.long_press_modify'))
+              .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+              .ShortcutsTextStyle()
+              .onClick(() => {
+                //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+                if (this.isShowHomeEdit === false) {
+                  if (`${m["w"]}` != '') {
+                    this.implicitStartAbility(`${m["w"]}`)
+                  } else {
+                    this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
                   }
-                })
-            )
+                }
+              })
+              .gesture(
+                LongPressGesture()
+                  .onAction(() => {
+                    //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+                    if (this.isShowHomeEdit === false) {
+                      this.isShowShortcutsEdit = true
+                      this.isEnableIndexForegroundBlur = true
+                    }
+                  })
+              )
           if (!isEnd(3, i)) {
             Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
           }
