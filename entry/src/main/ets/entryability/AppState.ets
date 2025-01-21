@@ -1,4 +1,4 @@
-import { ClashConfig, Dns, ProxyGroup, ProxyMode, ProxySort } from "proxy_core";
+import { ClashConfig, Dns, IpInfo, ProxyGroup, ProxyMode, ProxySort, Traffic } from "proxy_core";
 import { CustomThemeName } from "../common/AppTheme";
 import { showHomeCard } from "../common/Constants";
 import { Item } from "../common/ProxyData";
@@ -23,7 +23,12 @@ export enum ClashCore{
   FlClash,
   ClashRs,
 }
-
+export class AppFlowingState{
+  traffics: TrafficQueue = new TrafficQueue(12)
+  totalTraffic: Traffic = new Traffic(0, 0)
+  localIp: string = ""
+  removeIp?: IpInfo
+}
 export class AppConfig{
   currentProfileId?: string
   currentProxyName?: string
@@ -36,6 +41,7 @@ export class AppConfig{
   testUrl?: string = ""
   overrideDns?: boolean = false
   clashCore?: ClashCore = ClashCore.ClashMeta
+  // TODO 提取出来别放在这里 例如uiConfig
   // 主页问候语
   isGreeting?: boolean = true
   // 主题色
@@ -85,6 +91,7 @@ export class AppState {
     PersistentStorage.persistProp("favoriteProfiles", new Map<string, string>([]))
     PersistentStorage.persistProp("favoriteProxys", new Map<string, string[][]>([]))
     PersistentStorage.persistProp("clashConfig", new ClashConfig())
+    AppStorage.setOrCreate<AppFlowingState>("appFlowingState", new AppFlowingState())
   }
 
   static fetchFavoriteProxys(favoriteProxys: Map<string, string>, proxyGroups: ProxyGroup[]):string[][] {
@@ -106,4 +113,33 @@ export class AppState {
 // PersistentStorage 不支持嵌套对象，修改属性需要copy 更新引用来触发持久化更新
 export function copy<T>(obj: T): T {
   return JSON.parse(JSON.stringify(obj));
+}
+
+
+export function getLast<T>(list: T[]): T{
+  return list[list.length -1]
+}
+
+export class TrafficQueue{
+  queue: Traffic[]
+  maxSize: number
+  constructor(maxSize = 12) {
+    this.queue = Array(maxSize).fill(new Traffic(0, 0)); // 初始化一个全是 0 的队列
+    this.maxSize = maxSize;
+  }
+  // 入队操作
+  enqueue(item: Traffic) {
+    // 将新元素添加到队列的最后一个位置，并循环更新队列
+    if (this.queue.length >= this.maxSize){
+      this.queue.shift()
+    }
+    this.queue.push(item)
+  }
+  getLast(): Traffic{
+    return getLast(this.queue)
+  }
+  // 获取当前队列内容
+  getData() {
+    return this.queue.map((q) => q.upRaw + q.downRaw);
+  }
 }

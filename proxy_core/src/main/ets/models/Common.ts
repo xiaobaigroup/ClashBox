@@ -116,55 +116,61 @@ export class LogInfo{
   time: number
 }
 export enum TrafficUnit{
-  KB,
-  MB,
-  GB,
-  TB
+  KB = "kb",
+  MB= "m",
+  GB= "g",
+  TB= "t",
+  B = "b"
 }
 export class TrafficValue{
-  value: string
+  value: number
+  show: number
   unit: TrafficUnit
+  constructor(value: number) {
+    this.value = value ?? 0
+    if (this.value > Math.pow(1024, 4)) {
+      this.show = (this.value / Math.pow(1024, 4))
+      this.unit = TrafficUnit.TB
+    }else if (this.value > Math.pow(1024, 3)) {
+      this.show = (this.value / Math.pow(1024, 3))
+      this.unit = TrafficUnit.GB
+    }else if (this.value > Math.pow(1024, 2)) {
+      this.show = (this.value / Math.pow(1024, 2))
+      this.unit = TrafficUnit.MB
+    }else if (this.value > Math.pow(1024, 1)) {
+      this.show = (this.value / Math.pow(1024, 1))
+      this.unit = TrafficUnit.KB
+    } else{
+      this.show = this.value
+      this.unit = TrafficUnit.B
+    }
+  }
+  toString(){
+    return this.show.toFixed(2)  + " " + this.unit
+  }
+
 }
 
 export class Traffic{
-
-  private value: number;
+  upRaw: number;
+  downRaw: number;
   up: TrafficValue
   down: TrafficValue
 
-  constructor(value: number) {
-    this.value = value;
+  constructor(up: number, down: number) {
+    this.upRaw = up ?? 0;
+    this.downRaw = down ?? 0;
+    this.up = new TrafficValue(up)
+    this.down = new TrafficValue(down)
   }
 
-  trafficUpload(): string {
-    return this.trafficString(this.scaleTraffic(this.value >>> 32));
-  }
+  // trafficTotal(): string {
+  //   const upload = this.scaleTraffic(this.value >>> 32);
+  //   const download = this.scaleTraffic(this.value & 0xFFFFFFFF);
+  //
+  // }
 
-  trafficDownload(): string {
-    return this.trafficString(this.scaleTraffic(this.value & 0xFFFFFFFF));
-  }
 
-  trafficTotal(): string {
-    const upload = this.scaleTraffic(this.value >>> 32);
-    const download = this.scaleTraffic(this.value & 0xFFFFFFFF);
-
-    return this.trafficString(upload + download);
-  }
-
-  private trafficString(scaled: number): string {
-    if (scaled > 1024 * 1024 * 1024 * 100) {
-      const data = scaled / 1024 / 1024 / 1024;
-      return `${(data / 100).toFixed(2)} GiB`;
-    } else if (scaled > 1024 * 1024 * 100) {
-      const data = scaled / 1024 / 1024;
-      return `${(data / 100).toFixed(2)} MiB`;
-    } else if (scaled > 1024 * 100) {
-      const data = scaled / 1024;
-      return `${(data / 100).toFixed(2)} KiB`;
-    } else {
-      return `${scaled} Bytes`;
-    }
-  }
 
   private scaleTraffic(value: number): number {
     const type = (value >>> 30) & 0x3;
@@ -184,4 +190,14 @@ export class Traffic{
     }
   }
 }
+export class IpInfo {
+  ip: string
+  country: string
+}
+export const ipInfoSources = [
+  "https://ipwho.is/?fields=ip&output=csv",
+  "https://ipinfo.io/ip",
+  "https://ifconfig.me/ip/",
+];
+
 

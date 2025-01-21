@@ -2,6 +2,7 @@ import { BreakpointState } from '../../common/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI'
 import {  MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
+import { AppFlowingState } from '../../entryability/AppState'
 
 @Component
 struct CellularDataStat {
@@ -25,6 +26,8 @@ struct CellularDataStat {
   // 卡片内边距
   @Consume('breakPointStateHomeCardPadding') private cardPadding: BreakpointState<MarginGenerate>
   @Consume('breakPointStateHomeCardTitleBottomMargin') private titleBottomMargin: BreakpointState<number>
+
+  @StorageProp("appFlowingState") appFlowingState: AppFlowingState = new AppFlowingState()
 //下部文字大小
   @Consume('HomeCardCellularDataSmFontSize') private HomeCardCellularDataSmFontSize: BreakpointState<number>
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
@@ -43,7 +46,7 @@ struct CellularDataStat {
             Text() {SymbolSpan($r('sys.symbol.chevron_down'))}
             .fontSize(this.isLandscapePhone ? 14:this.chevronSize.value)
             .fontColor(this.icon_primary)
-            Text(this.TotalDownloads.toString() + ' GB')
+            Text(this.appFlowingState.totalTraffic.down.toString())
               .fontSize(this.isLandscapePhone ? 14:this.fontSize.value)
               .fontColor(this.icon_primary)
           }
@@ -53,7 +56,7 @@ struct CellularDataStat {
             Text() {SymbolSpan($r('sys.symbol.chevron_up'))}
             .fontSize(this.isLandscapePhone ? 14:this.chevronSize.value)
             .fontColor(this.icon_primary)
-            Text(this.TotalUpload.toString() + ' GB')
+            Text(this.appFlowingState.totalTraffic.up.toString())
               .fontSize(this.isLandscapePhone ? 14:this.fontSize.value)
               .fontColor(this.icon_primary)
           }

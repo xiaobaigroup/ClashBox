@@ -4,7 +4,7 @@ import { promptAction, window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import ClashViewModel from './ClashViewModel';
 import { KeyboardAvoidMode } from '@kit.ArkUI';
-import { AppConfig, AppState, ClashCore } from './AppState';
+import { AppConfig, AppFlowingState, AppState, ClashCore } from './AppState';
 
 export default class EntryAbility extends UIAbility {
  private currentLanguage: string | undefined = undefined
@@ -36,12 +36,19 @@ export default class EntryAbility extends UIAbility {
       }
       AppState.init()
       let appConfig = AppStorage.get<AppConfig>("appConfig")?.clashCore
+      let appFlowingState = AppStorage.get<AppFlowingState>("appFlowingState") ?? new AppFlowingState()
       // 切换核心
       promptAction.showToast({message: "核心启动中..."})
       await ClashViewModel.ChangeCore(appConfig)
-      setTimeout(async ()=>{
-        ClashViewModel.initProfile()
-      }, 300)
+      appFlowingState.removeIp = await ClashViewModel.checkIpInfo()
+      await sleep(300)
+      ClashViewModel.initProfile()
+      setInterval(async ()=>{
+          let now = await ClashViewModel.getTraffic()
+          let total = await ClashViewModel.getTotalTraffic()
+          appFlowingState.traffics.enqueue(now)
+          appFlowingState.totalTraffic = total
+      },1000)
 
       hilog.info(0x0000, 'EntryAbility', 'Succeeded in loading the content.');
     });
@@ -53,6 +60,7 @@ export default class EntryAbility extends UIAbility {
     }).catch((err: BusinessError) => {
       console.error('Failed to set the window layout to full-screen mode. Cause:' + JSON.stringify(err));
     });
+
     // 缓存window窗口对象
     AppStorage.setOrCreate('windowClass', windowClass);
 
@@ -102,4 +110,12 @@ export default class EntryAbility extends UIAbility {
     // Ability has back to background
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onBackground');
   }
+}
+
+function sleep(timeout: number): Promise<void>{
+  return new Promise((resolve, reject)=>{
+      setTimeout(()=>{
+        resolve()
+      }, timeout)
+  })
 }

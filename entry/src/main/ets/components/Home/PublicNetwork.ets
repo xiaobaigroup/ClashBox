@@ -2,6 +2,8 @@ import { BreakpointState } from '../../common/breakpointsystem'
 import { mediaquery, PromptAction } from '@kit.ArkUI'
 import { MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
+import { AppFlowingState } from '../../entryability/AppState'
+import ClashViewModel from '../../entryability/ClashViewModel'
 
 @Component
 struct PublicNetwork {
@@ -29,16 +31,17 @@ struct PublicNetwork {
   @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
   //收藏与ping延迟即时动作
   private PromptAction:PromptAction = this.getUIContext()?.getPromptAction()
+  @StorageProp("appFlowingState") appFlowingState: AppFlowingState = new AppFlowingState()
 
   build() {
     Column() {
       CardTitle({ title: $r('app.string.PublicNetwork') })
       Column() {
-        Text(this.address)
+        Text(this.appFlowingState.removeIp?.country ?? "")
           .fontSize(this.isLandscapePhone ? 12 : this.HomeCardIPSmFontSize.value)
           .fontColor($r('sys.color.font_secondary'))
 
-        Text(this.IP)
+        Text(this.appFlowingState.removeIp?.ip ?? "加载中")
           .fontSize(this.isLandscapePhone ? 18 :this.isFoldStatus ?22: this.IPfontSize.value)
           .textAlign(TextAlign.JUSTIFY)
           .fontColor($r('sys.color.font_primary'))
@@ -55,10 +58,12 @@ struct PublicNetwork {
           .fontColor(this.icon_emphasize)
           .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
           .backgroundColor($r('app.color.home_card_background'))
-          .onClick(() => {
+          .onClick(async () => {
             //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
             if (this.isShowHomeEdit===false) {
+              this.appFlowingState.removeIp = undefined
               this.PromptAction.showToast({ message: $r('app.string.refresh_tips') })
+              this.appFlowingState.removeIp = await ClashViewModel.checkIpInfo()
             }
           })
       }.width('100%').justifyContent(FlexAlign.End)

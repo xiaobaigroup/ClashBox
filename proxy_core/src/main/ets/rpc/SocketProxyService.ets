@@ -3,10 +3,11 @@ import {  RpcResult } from './RpcRequest';
 import { JSON, util } from '@kit.ArkTS';
 import { common } from '@kit.AbilityKit';
 import { ClashRpcType, IClashManager } from './IClashManager';
-import { LogInfo, Provider, ProviderType, ProxyGroup, ProxyMode, ProxyType,
+import { IpInfo, LogInfo, Provider, ProviderType, ProxyGroup, ProxyMode, ProxyType,
   Traffic } from '../models/Common';
 import { promptAction } from '@kit.ArkUI';
 import { UpdateConfigParams } from '../models/ClashConfig';
+import { checkIp } from '../Request';
 
 
 export class SocketProxyService implements IClashManager{
@@ -24,11 +25,20 @@ export class SocketProxyService implements IClashManager{
   }
   async queryTrafficTotal(): Promise<Traffic> {
     let result = await this.sendMessageRequest(ClashRpcType.queryTrafficTotal)
-    return new Traffic(result as number);
+    const json = JSON.parse(result as string) as Traffic
+    return new Traffic(json.upRaw ?? 1024, json.downRaw ?? 10024);
+  }
+  async checkIpInfo(): Promise<IpInfo> {
+    let result = await checkIp()
+    return {
+      ip: result,
+      country: ""
+    } as IpInfo
   }
   async queryTrafficNow(): Promise<Traffic> {
     let result = await this.sendMessageRequest(ClashRpcType.queryTrafficNow)
-    return new Traffic(result as number);
+    const json = JSON.parse(result as string) as Traffic
+    return new Traffic(json.upRaw, json.downRaw);
   }
   async queryProxyGroups(model: ProxyMode): Promise<ProxyGroup[]> {
     let result = await this.sendMessageRequest(ClashRpcType.queryProxyGroup,[model])

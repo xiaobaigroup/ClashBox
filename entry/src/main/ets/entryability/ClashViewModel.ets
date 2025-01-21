@@ -110,6 +110,9 @@ export class ClashViewModel {
   async getTotalTraffic(){
     return await this.socketProxy.queryTrafficTotal()
   }
+  async checkIpInfo(){
+    return await this.socketProxy.checkIpInfo()
+  }
   async queryProviders(){
     return this.socketProxy.queryProviders()
   }
