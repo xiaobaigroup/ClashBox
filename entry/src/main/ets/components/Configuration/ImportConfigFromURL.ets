@@ -33,7 +33,10 @@ export struct ImportConfigFromURL{
   private componentName: string = 'ImportConfigFromURL'
   private context = getContext() as common.UIAbilityContext
   private promptAction:PromptAction = this.getUIContext()?.getPromptAction()
-
+  /* 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+  // 模态弹窗显示变量
+  @Consume isShowConfigAddBindSheet: boolean
   /* 主题色 */
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
@@ -77,6 +80,9 @@ export struct ImportConfigFromURL{
     symbolBackgroundColor: '#FF0A59F7',
     action: () => {
       this.saveConfig(this.configData.isNewConfig)
+      // 保存配置后关闭半模态窗口
+      this.isShowConfigAddBindSheet = false
+      this.isEnableIndexForegroundBlur = false
     }
   }
   // 当前显示的工具集合 默认为空 待两个input都有值之后才加入保存按钮菜单
@@ -102,10 +108,14 @@ export struct ImportConfigFromURL{
       // 不可以使用`@Consume`注解的变量
       // confirmButtonBackgroundColor: this.icon_emphasize,
       cancel: () => {
+        // 取消保存配置后关闭半模态窗口
+        this.isShowConfigAddBindSheet = false
         this.isEnableConfigPageBindSheetForegroundBlur = false
         this.configAddPageInfos.pop(true)
       },
       confirm: ()=> {
+        // 保存配置后关闭半模态窗口
+        this.isShowConfigAddBindSheet = false
         this.isEnableConfigPageBindSheetForegroundBlur = false
         this.saveConfig(this.configData.isNewConfig)
       }
@@ -113,7 +123,7 @@ export struct ImportConfigFromURL{
     cancel: () => {
       this.isEnableConfigPageBindSheetForegroundBlur = false
     },
-    autoCancel: true,
+    // autoCancel: true,
     alignment: DialogAlignment.Center,
     width: 328,
     backgroundColor: $r('app.color.list_item_background_color'),
@@ -132,7 +142,6 @@ export struct ImportConfigFromURL{
         this.promptAction.showToast({ message: `${getResourceString($r('app.string.configuration_download_canceled'), this)}😵` })
       },
     }),
-    // cancel: () => {},
     autoCancel: false,
     alignment: DialogAlignment.Center,
     width: 328,
@@ -151,7 +160,7 @@ export struct ImportConfigFromURL{
         // isSubPage: true,
         isSubPage: this.configData.isNewConfig,
         titlePaddingLeft: BIND_SHEET_DRAG_BAR_HEIGHT / 2,
-        mainTitle: this.configData.isNewConfig ? this.mainTitle : '编辑配置',
+        mainTitle: this.configData.isNewConfig ? this.mainTitle : getResourceString($r('app.string.edit_config'), this),
         subTitle: this.configData.isNewConfig ? this.subTitle : '',
         mainTitleFontWeight: BIND_SHEET_MAIN_FONT_WEIGHT,
         mainTitleFontSize: BIND_SHEET_MAIN_FONTSIZE,
@@ -231,6 +240,7 @@ export struct ImportConfigFromURL{
         await ClashViewModel.addOrUpdateProfileByUrl(this.configData, null)
       } catch (e) {
         console.error("ClashNext", e.message, e.stack);
+        this.configCustomDownloadingDialogController?.close()
         this.promptAction.showToast({message: getResourceString($r('app.string.download_failed'), this) + e.message || e})
       }
       this.configCustomDownloadingDialogController?.close()
@@ -241,6 +251,7 @@ export struct ImportConfigFromURL{
         await ClashViewModel.addOrUpdateProfileByUrl(this.configData, this.configData.configId)
       } catch (e) {
         console.error("ClashNext", e.message, e.stack);
+        this.configCustomDownloadingDialogController?.close()
         this.promptAction.showToast({message: getResourceString($r('app.string.download_failed'), this) + e.message || e})
       }
       this.configCustomDownloadingDialogController?.close()

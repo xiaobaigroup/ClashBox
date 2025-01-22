@@ -1479,6 +1479,18 @@
     {
       "name": "loading",
       "value": "加载中"
+    },
+    {
+      "name": "developing",
+      "value": "开发中"
+    },
+    {
+      "name": "edit_config",
+      "value": "编辑配置"
+    },
+    {
+      "name": "browse_local_files",
+      "value": "浏览本地文件"
     }
   ]
 }

@@ -1479,6 +1479,18 @@
     {
       "name": "loading",
       "value": "Loading"
+    },
+    {
+      "name": "developing",
+      "value": "Developing"
+    },
+    {
+      "name": "edit_config",
+      "value": "Edit Config"
+    },
+    {
+      "name": "browse_local_files",
+      "value": "Browse local files"
     }
   ]
 }

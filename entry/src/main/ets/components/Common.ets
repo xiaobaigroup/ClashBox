@@ -488,16 +488,20 @@ export struct ExperimentalFunction {
 export struct Nothing {
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  //二级文本色，深灰色
+  @State font_secondary: ResourceColor = $r('sys.color.font_secondary')
   // 页面标题
   @State name: Resource = $r('app.string.none')
 
   build() {
     Column() {
       SymbolGlyph($r('sys.symbol.doc'))
-        .fontSize(24)
+        .fontSize(32)
         .fontColor([this.icon_primary])
         .margin({bottom: 4 })
       Text(getResourceString($r('app.string.none'), this) + getResourceString(this.name, this))
+        .fontSize(20)
+        .fontColor(this.font_secondary)
     }
     .alignItems(HorizontalAlign.Center)
     .justifyContent(FlexAlign.Center)

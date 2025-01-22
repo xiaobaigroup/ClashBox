@@ -72,8 +72,6 @@ export class AppConfig{
   inputWeb3: string=''
   // 分流模式小卡片
   switchMode?:ProxyMode = ProxyMode.Rule
-  // 测试内核启用状态
-  isBetaKernel: boolean = false
 
   constructor() {
   }

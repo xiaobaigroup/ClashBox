@@ -17,7 +17,7 @@ import { ConfigAdd } from '../components/Configuration/ConfigAdd'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
 import { ConfigData, ConfigDataSourceType } from '../common/PageArgumentEntity'
-import { CustomConfirmDialog } from '../components/Common'
+import { CustomConfirmDialog, Nothing } from '../components/Common'
 import { customVibrator } from "../utils/VibratorUtil"
 import { common } from '@kit.AbilityKit'
 import { configShare } from '../utils/SystemShareUtil'
@@ -299,11 +299,11 @@ struct ConfigurationPage {
       // confirmButtonBackgroundColor: this.icon_emphasize,
       cancel: () => {
         this.isEnableIndexForegroundBlur = false
-        this.promptAction.showToast({ message: $r('app.string.click_error_prompt') })
+        this.deleteConfig()
       },
       confirm: ()=> {
         this.isEnableIndexForegroundBlur = false
-        this.deleteConfig()
+        this.promptAction.showToast({ message: $r('app.string.click_error_prompt') })
       }
     }),
     cancel: () => {
@@ -321,7 +321,7 @@ struct ConfigurationPage {
   /* 配置添加按钮bindSheet相关 */
 
   // 是否显示bindSheet
-  @State
+  @Provide
   private isShowConfigAddBindSheet: boolean = false
   // 是否需要往`bindSheet`里`push`路由页面
   private isPushRoute2BindSheet: boolean = false
@@ -381,83 +381,86 @@ struct ConfigurationPage {
 
       // 主体 START
       Stack({ alignContent: this.stackAlignContentAlignment }) {
-        // 配置列表 START
-        List({ space: LIST_SPACE }) {
-          ForEach(this.configList, (item: ConfigData, index: number) => {
-            ListItem() {
-              Row() {
-                Column() {
-                  Text(item.configName).fontColor(($r('sys.color.font_primary')))
-                  Text(`index:${index}`).fontColor($r('sys.color.font_secondary'))
-                }.alignItems(HorizontalAlign.Start)
-                Blank()
-                Radio({ value: 'radio' + index, group: 'configGroup' })
-                  .checked(item.configId === this.appConfig.currentProfileId)
-                  .radioStyle({
-                    checkedBackgroundColor: this.icon_emphasize,
-                  })
-                  .onClick(async  () => {
-                    this.currentConfigRadioCheckedConfigData = item
-                    this.appConfig.currentProfileName = item.configName
-                    customVibrator.vibratorTriggerOfHapticClockTimer()
-                    this.appConfig.currentProfileId = item.configId
-                    await ClashViewModel.loadProfileAndConfig(item.configId)
-                    hilog.info(0xC002, this.componentName, `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
-                  })
+        if (this.configList.length === 0) {
+          Nothing({ name: $r('app.string.Configuration') })
+        } else {
+          // 配置列表 START
+          List({ space: LIST_SPACE }) {
+            ForEach(this.configList, (item: ConfigData, index: number) => {
+              ListItem() {
+                Row() {
+                  Column() {
+                    Text(item.configName).fontColor(($r('sys.color.font_primary')))
+                    Text(`index:${index}`).fontColor($r('sys.color.font_secondary'))
+                  }.alignItems(HorizontalAlign.Start)
+                  Blank()
+                  Radio({ value: 'radio' + index, group: 'configGroup' })
+                    .checked(item.configId === this.appConfig.currentProfileId)
+                    .radioStyle({
+                      checkedBackgroundColor: this.icon_emphasize,
+                    })
+                    .onClick(async  () => {
+                      this.currentConfigRadioCheckedConfigData = item
+                      this.appConfig.currentProfileName = item.configName
+                      customVibrator.vibratorTriggerOfHapticClockTimer()
+                      this.appConfig.currentProfileId = item.configId
+                      await ClashViewModel.loadProfileAndConfig(item.configId)
+                      hilog.info(0xC002, this.componentName, `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
+                    })
+                }
+                .width('100%')
+                .padding(LIST_ITEM_PADDING)
+                .alignItems(VerticalAlign.Center)
               }
+              .backgroundColor($r('app.color.container_background'))
               .width('100%')
-              .padding(LIST_ITEM_PADDING)
-              .alignItems(VerticalAlign.Center)
-            }
-            .backgroundColor($r('app.color.container_background'))
-            .width('100%')
-            .height(LIST_ITEM_HEIGHT)
-            .clickEffect({ level: ClickEffectLevel.MIDDLE })
-            .borderRadius(BORDER_RADIUS_20)
-            .hoverEffect(HoverEffect.Scale)
-            .bindContextMenu(this.configListLongPressCtxMenuBuilder(item?.isFavorite ?? false), ResponseType.LongPress | ResponseType.RightClick,
-              {
-                preview: MenuPreviewMode.IMAGE,
-                previewAnimationOptions: { scale: [1.0, 1.1] },
-                placement: Placement.BottomRight,
-                aboutToAppear: () => {
-                  customVibrator.vibratorTriggerOfHapticClockTimer()
+              .height(LIST_ITEM_HEIGHT)
+              .clickEffect({ level: ClickEffectLevel.MIDDLE })
+              .borderRadius(BORDER_RADIUS_20)
+              .hoverEffect(HoverEffect.Scale)
+              .bindContextMenu(this.configListLongPressCtxMenuBuilder(item?.isFavorite ?? false), ResponseType.LongPress | ResponseType.RightClick,
+                {
+                  preview: MenuPreviewMode.IMAGE,
+                  previewAnimationOptions: { scale: [1.0, 1.1] },
+                  placement: Placement.BottomRight,
+                  aboutToAppear: () => {
+                    customVibrator.vibratorTriggerOfHapticClockTimer()
+                  }
+                })
+              .onClick(async  () => {
+                this.currentConfigRadioCheckedConfigData = item
+                this.appConfig.currentProfileName = item.configName
+                customVibrator.vibratorTriggerOfHapticClockTimer()
+                this.appConfig.currentProfileId = item.configId
+                await ClashViewModel.loadProfileAndConfig(item.configId)
+                hilog.info(0xC002, this.componentName, `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
+              })
+              .onTouch((event: TouchEvent) => {
+                if (event.type === TouchType.Down) {
+                  // TODO 现在用来代替获取长按的是哪一个ListItem，目前用`configName`作为每一个item的唯一性属性
+                  this.currentTouchConfigData = item
+                  hilog.info(0xC002, this.componentName, `#ListItem#onTouch(TouchType.Down): configName is [${this.currentTouchConfigData.configName}]`)
                 }
               })
-            .onClick(async  () => {
-              this.currentConfigRadioCheckedConfigData = item
-              this.appConfig.currentProfileName = item.configName
-              customVibrator.vibratorTriggerOfHapticClockTimer()
-              this.appConfig.currentProfileId = item.configId
-              await ClashViewModel.loadProfileAndConfig(item.configId)
-              hilog.info(0xC002, this.componentName, `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
+              // .gesture(LongPressGesture({ repeat: false }).onAction(() => {
+              //   this.isShownConfigListCtxMenu = !this.isShownConfigListCtxMenu
+              //   hilog.info(0xC002, this.componentName, `#gesture#LongPressGesture:`)
+              // }))
             })
-            .onTouch((event: TouchEvent) => {
-              if (event.type === TouchType.Down) {
-                // TODO 现在用来代替获取长按的是哪一个ListItem，目前用`configName`作为每一个item的唯一性属性
-                this.currentTouchConfigData = item
-                hilog.info(0xC002, this.componentName, `#ListItem#onTouch(TouchType.Down): configName is [${this.currentTouchConfigData.configName}]`)
-              }
-            })
-            // .gesture(LongPressGesture({ repeat: false }).onAction(() => {
-            //   this.isShownConfigListCtxMenu = !this.isShownConfigListCtxMenu
-            //   hilog.info(0xC002, this.componentName, `#gesture#LongPressGesture:`)
-            // }))
+          }
+          .width('100%')
+          .height('100%')
+          .padding({
+            left: this.breakPointStateTabContentTitleMargin.value,
+            right: this.breakPointStateTabContentTitleMargin.value,
           })
+          // 110 = app.integer.vp_proxy_start_button_margin *2 + app.integer.vp_proxy_not_start_button_width
+          .contentEndOffset(110)
+          .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
+          .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+          .chainAnimation(true)
+          // 配置列表 END
         }
-        .width('100%')
-        .height('100%')
-        .padding({
-          left: this.breakPointStateTabContentTitleMargin.value,
-          right: this.breakPointStateTabContentTitleMargin.value,
-        })
-        // 110 = app.integer.vp_proxy_start_button_margin *2 + app.integer.vp_proxy_not_start_button_width
-        .contentEndOffset(110)
-        .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
-        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
-        .chainAnimation(true)
-        // 配置列表 END
-
         // 悬浮新增配置按钮 START
         Column() {
           Stack({ alignContent: Alignment.Center }) {
@@ -466,7 +469,7 @@ struct ConfigurationPage {
               .fontColor([Color.White])
               .symbolEffect(this.ReplaceSymbolEffect)
               .align(Alignment.Center)
-          }
+          }.zIndex(3)
           .width('100%')
           .height('100%')
         }

@@ -284,9 +284,9 @@ export struct ConfigInfo{
       .height('auto')
       .borderRadius(BORDER_RADIUS_20)
       .backgroundColor($r('app.color.container_background'))
-      // 配置自动更新 END
-      Text(`breakPointStateNavigationListPadding.value is [${this.breakPointStateNavigationListPadding.value?.toString()}]`)
-      Text(`isNewConfig: ${this.configData.isNewConfig}`).fontSize(35)
+      // // 配置自动更新 END
+      // Text(`breakPointStateNavigationListPadding.value is [${this.breakPointStateNavigationListPadding.value?.toString()}]`)
+      // Text(`isNewConfig: ${this.configData.isNewConfig}`).fontSize(35)
     }
     .width('100%')
     .height('100%')

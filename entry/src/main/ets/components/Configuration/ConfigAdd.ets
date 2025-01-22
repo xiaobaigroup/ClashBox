@@ -14,6 +14,8 @@ import {
 } from "../../common/Constants";
 import { hilog } from "@kit.PerformanceAnalysisKit";
 import { BindSheetTitleCustomBuilder } from "../Common";
+import { promptAction } from "@kit.ArkUI";
+import { getResourceString } from "../../utils/ResourceStringUtil";
 
 interface ConfigAddType {
   symbolStart? : Resource,
@@ -85,7 +87,11 @@ export struct ConfigAdd {
             .borderRadius(BORDER_RADIUS_20)
             .onClick( () => {
               hilog.info(0xC020, this.componentName, `#ListItem#onClick(): NavPathStack.pushDestinationByName(${item?.navPathStackName}, null})`)
-              this.configAddPageInfos.pushDestinationByName(item?.navPathStackName, null)
+              if (index === 1 || index === 3) {
+                promptAction.showToast({message: getResourceString($r('app.string.developing'), this)})
+              } else {
+                this.configAddPageInfos.pushDestinationByName(item?.navPathStackName, null)
+              }
             })
           })
         }

@@ -93,7 +93,7 @@ struct Speed {
     //图表
     // 使用Option实例对象的setVal方法来实现，修改什么属性就传什么
     // Tip 如果是一条曲线 合成一个 up + down
-    let data =  this.appFlowingState.traffics.getData()
+    let data =  this.appFlowingState.traffics.getData().map(num => num / 10)
     console.log("xxxx", JSON.stringify(data))
     this.defOption.setVal({
       series: [
