@@ -120,9 +120,9 @@ struct Appearance {
           })
             .selected(this.appConfig.animationSpeedIndex === index)
             .onChange((selected) => {
-              // 持久化按钮位置
+              // 持久化动画速度
               this.appConfig.animationSpeedIndex = index
-              this.switchButtonPosition(index)
+              this.switchAnimationSpeed(index)
               // UI刷新
               this.EnableAnimationSpeedText = menuItem.title
             })
@@ -169,6 +169,11 @@ struct Appearance {
         this.stackAlignContentAlignment = Alignment.BottomStart
       break
     }
+  }
+
+  // 切换动画速度
+  switchAnimationSpeed(index: number) {
+
   }
 
   aboutToAppear(): void {
