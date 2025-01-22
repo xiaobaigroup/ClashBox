@@ -41,7 +41,7 @@ struct PublicNetwork {
           .fontSize(this.isLandscapePhone ? 12 : this.HomeCardIPSmFontSize.value)
           .fontColor($r('sys.color.font_secondary'))
 
-        Text(this.appFlowingState.removeIp?.ip ?? "加载中")
+        Text(this.appFlowingState.removeIp?.ip ?? $r('app.string.loading'))
           .fontSize(this.isLandscapePhone ? 18 :this.isFoldStatus ?22: this.IPfontSize.value)
           .textAlign(TextAlign.JUSTIFY)
           .fontColor($r('sys.color.font_primary'))

@@ -12,7 +12,7 @@ import ClashViewModel from '../entryability/ClashViewModel'
 import { Profile, ProxyGroup, ProxySort, ProxyType } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import { AppConfig, isEnd, ProxyCardSize, ProxyGroupType } from '../entryability/AppState'
-import { PromptAction } from '@kit.ArkUI'
+import {  PromptAction } from '@kit.ArkUI'
 
 
 @Entry
@@ -375,19 +375,27 @@ struct ProxyPage {
                       .height('100%')
                   }
                   .tabBar(this.TabBuilder(g.name, i))
+                  //用onWillShow能减少滑动tab时产生的延迟
+                  .onWillShow(() => {
+                    this.currentIndex = i;
+                    if(this.currentProfile){
+                      this.currentProfile.currentGroupName = this.proxyGroups[i].name
+                      ClashViewModel.updateProfile(this.currentProfile)
+                    }
+                  })
                 })
               }
-              .animationDuration(200)
+             // .animationDuration(200)
               .barMode(BarMode.Scrollable)
               .barHeight(55)
               .fadingEdge(false)
-              .onChange((index: number) => {
-                this.currentIndex = index;
-                if(this.currentProfile){
-                  this.currentProfile.currentGroupName = this.proxyGroups[index].name
-                  ClashViewModel.updateProfile(this.currentProfile)
-                }
-              })
+        //      .onChange((index: number) => {
+        //        this.currentIndex = index;
+         //       if(this.currentProfile){
+         //         this.currentProfile.currentGroupName = this.proxyGroups[index].name
+         //         ClashViewModel.updateProfile(this.currentProfile)
+        //        }
+        //      })
             }
             .padding({
               left: this.breakPointStateTabContentTitleMargin.value,
@@ -465,8 +473,6 @@ struct ProxyPage {
     .width('100%')
     .height('100%')
   }
-
-
 }
 
 export default ProxyPage

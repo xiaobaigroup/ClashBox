@@ -1,9 +1,10 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import { MarginGenerate } from "../../common/Constants"
 import { Item, ProxyData } from "../../common/ProxyData"
-import { AppConfig } from "../../entryability/AppState"
+import { AppConfig, AppFlowingState } from "../../entryability/AppState"
 import { CardTitle } from "./CardTitleBuilder"
 import { PromptAction } from "@kit.ArkUI"
+import ClashViewModel from "../../entryability/ClashViewModel"
 
 @Component
 struct ProxyINFO{
@@ -17,8 +18,7 @@ struct ProxyINFO{
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   //主页卡片内容当前节点字体大小
   @Consume('ProxyFontSize') private ProxyFontSize: BreakpointState<number>
-  @State address: string = '美国'
-  @State IP: string = '255.255.255.255'
+
   @State DownloadSpeed: number = 0
   @State UploadSpeed: number = 0
 
@@ -35,6 +35,7 @@ struct ProxyINFO{
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @StorageProp("appFlowingState") appFlowingState: AppFlowingState = new AppFlowingState()
   //收藏与ping延迟即时动作
   private PromptAction:PromptAction = this.getUIContext()?.getPromptAction()
 
@@ -55,9 +56,16 @@ struct ProxyINFO{
               .fontWeight(FontWeight.Bold)
               .fontColor($r('sys.color.font_primary'))
           }
-          Text(this.address +'-'+ this.IP)
-            .fontSize(this.isLandscapePhone ? 12 : this.HomeCardIPSmFontSize.value)
-            .fontColor($r('sys.color.font_secondary'))
+          Row(){
+            Text(this.appFlowingState.removeIp?.country ?? "" )
+              .fontSize(this.isLandscapePhone ? 12 : this.HomeCardIPSmFontSize.value)
+              .fontColor($r('sys.color.font_secondary'))
+
+            Text( this.appFlowingState.removeIp?.ip ?? $r('app.string.loading'))
+              .fontSize(this.isLandscapePhone ? 12 : this.HomeCardIPSmFontSize.value)
+              .fontColor($r('sys.color.font_secondary'))
+          }
+
         }
         if (this.appConfig.currentProxyItem) {
           Text('ping ' + `${this.appConfig.currentProxyItem.latency}` + 'ms')
@@ -104,10 +112,12 @@ struct ProxyINFO{
           .fontColor(this.icon_emphasize)
           .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
           .backgroundColor($r('app.color.home_card_background'))
-          .onClick(() => {
+          .onClick(async () => {
             //在home页在编辑卡片状态时，无法操作，点击回调写在if判定里
             if ( this.isShowHomeEdit===false) {
+              this.appFlowingState.removeIp = undefined
               this.PromptAction.showToast({ message: $r('app.string.refresh_tips') })
+              this.appFlowingState.removeIp = await ClashViewModel.checkIpInfo()
             }
           })
       }

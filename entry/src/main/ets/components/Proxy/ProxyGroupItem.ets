@@ -385,35 +385,34 @@ struct ProxyGroupItem {
       List({ space: 10, initialIndex: 0 }) {
         ForEach(this.items, (item: Item, index: number) => {
           ListItem() {
-            Row() {
-              Row() {
-                Column() {
-                  Text(`${item.name}`).ItemTextStyle()
-                  Text(`${item.type}`).ItemTypeStyle()
-                }.alignItems(HorizontalAlign.Start)
-
+            Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween}) {
+              Column() {
+                Text(`${item.name}`).ItemTextStyle()
+                Text(`${item.type}`).ItemTypeStyle()
+              }.alignItems(HorizontalAlign.Start)
+              Row({space:10}){
                 Text(`${item.latency ?? "-"}` + 'ms')
                   .fontColor(ProxyData.getColorForLatency(item.latency))
                   .fontSize(16)
                   .maxLines(1)
-                  .width('60%')
-              }.width('90%')
-              .justifyContent(FlexAlign.SpaceBetween)
+                  .textAlign(TextAlign.End)
+                //  .width('60%')
 
-              Blank()
-              // group 不要写死, 会和其他tab页的生效，在一个组里唯一
-              // 使用.enabled(!this.disabled) 来禁用radio不让选
-              //Radio({ value: 'ProxyRadio' + index, group: 'ProxyGroup' }).enabled(!this.disabled)
-              Radio({ value: item.name, group: item.g + item.name}).enabled(!this.disabled)
-                .checked(item.name === this.selectedProxy)
-                .radioStyle({
-                  checkedBackgroundColor: this.icon_emphasize,
-                })
-                .onClick(() => {
-                  this.selectProxy(item)
-                })
+                // group 不要写死, 会和其他tab页的生效，在一个组里唯一
+                // 使用.enabled(!this.disabled) 来禁用radio不让选
+                //Radio({ value: 'ProxyRadio' + index, group: 'ProxyGroup' }).enabled(!this.disabled)
+                Radio({ value: item.name, group: item.g + item.name}).enabled(!this.disabled)
+                  .checked(item.name === this.selectedProxy)
+                  .radioStyle({
+                    checkedBackgroundColor: this.icon_emphasize,
+                  })
+                  .onClick(() => {
+                    this.selectProxy(item)
+                  })
+              }
             }
-            .ListRowStyle()
+            .width('100%')
+            .padding({left:14,right:16})
           }
           .onClick(() => {
             this.selectProxy(item)
@@ -535,9 +534,9 @@ struct ProxyGroupItem {
   /**
    * 收藏配置
    */
-  //TODO 已经不会重复收藏，但重启应用后，收藏状态还是无法判断
+
   private favoriteProxy(): void {
-    // TODO 收藏节点 & 判断是否已经收藏
+    //  收藏节点 & 判断是否已经收藏
     this.ProxyPromptAction.showToast({ message: $r('app.string.Collect_Tip') })
     const p = this.currentTouchProxyData
     p.isShowFavoriteProxy = true
@@ -547,7 +546,7 @@ struct ProxyGroupItem {
    * 取消收藏配置
    */
   private cancelFavoriteProxy(): void {
-    // TODO 取消收藏节点 & 判断是否已经收藏
+    //  取消收藏节点 & 判断是否已经收藏
     this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_tip') })
     const p = this.currentTouchProxyData
     p.isShowFavoriteProxy = false

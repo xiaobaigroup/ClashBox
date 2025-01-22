@@ -327,6 +327,14 @@ struct Index {
       }
       .margin(this.isLandscapePhone ? { left: 39 } : '0vp')
     }
+    .animation(
+      {
+        duration: ANIMATION_DURATION_300,
+        tempo:0.3,
+        curve: Curve.Ease,
+        iterations: 1,
+        playMode: PlayMode.Normal
+      })
     .width('100%')
     .height('100%')
   }
@@ -522,21 +530,33 @@ struct Index {
           Home()
         }
         .tabBar(this.TabBarBuilder($r('app.string.Home'), 0, $r('sys.symbol.house_fill')))
+        .onWillShow(() => {
+          this.currentIndex = 0
+        })
 
         TabContent() {
           ProxyPage()
         }
         .tabBar(this.TabBarBuilder($r('app.string.Proxy'), 1, $r('sys.symbol.list_bullet_square_fill')))
+        .onWillShow(() => {
+          this.currentIndex = 1
+        })
 
         TabContent() {
           ConfigurationPage()
         }
         .tabBar(this.TabBarBuilder($r('app.string.Configuration'), 2, $r('sys.symbol.folder_fill')))
+        .onWillShow(() => {
+          this.currentIndex = 2
+        })
 
         TabContent() {
           MorePage()
         }
         .tabBar(this.TabBarBuilder($r('app.string.More'), 3, $r('sys.symbol.square_fill_grid_2x2')))
+        .onWillShow(() => {
+          this.currentIndex = 3
+        })
       }
       //.barOverlap(true)
       /*.backgroundBrightness({

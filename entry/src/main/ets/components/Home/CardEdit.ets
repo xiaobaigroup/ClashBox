@@ -4,7 +4,7 @@ import { BreakpointState } from "../../common/breakpointsystem"
 import { AppConfig } from "../../entryability/AppState"
 
 
-//TODO 1.后续需要把各文件组件换为截图，以减少性能消耗。2.挂载和卸载无动画效果，后面需要加入
+
 @Component
 export struct CardEdit {
 

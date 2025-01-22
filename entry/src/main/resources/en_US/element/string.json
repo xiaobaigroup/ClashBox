@@ -1475,6 +1475,10 @@
     {
       "name": "switch_core_prompt",
       "value": "Note: after switching the kernel, you need to restart the VPN service"
+    },
+    {
+      "name": "loading",
+      "value": "Loading"
     }
   ]
 }

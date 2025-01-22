@@ -20,7 +20,7 @@ struct FavoriteConfiguration {
   @State FavoriteConfigurationRadio :number =0
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  //有无收藏代理节点判定 TODO 后端接入后该判定可修改
+  //有无收藏代理节点判定
   @State isCheckFavoriteConfiguration:number=-1
   //主页卡片内容IP地址小字体大小
   @Consume('HomeCardIPSmFontSize')

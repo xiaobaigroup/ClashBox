@@ -1475,6 +1475,10 @@
     {
       "name": "switch_core_prompt",
       "value": "注：切换内核后需要重启VPN服务"
+    },
+    {
+      "name": "loading",
+      "value": "加载中"
     }
   ]
 }
