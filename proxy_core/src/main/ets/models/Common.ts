@@ -146,7 +146,7 @@ export class TrafficValue{
     }
   }
   toString(){
-    return this.show.toFixed(2)  + " " + this.unit
+    return this.show.toFixed(0)  + " " + this.unit
   }
 
 }
@@ -164,15 +164,13 @@ export class Traffic{
     this.down = new TrafficValue(down)
   }
 
-  // trafficTotal(): string {
-  //   const upload = this.scaleTraffic(this.value >>> 32);
-  //   const download = this.scaleTraffic(this.value & 0xFFFFFFFF);
-  //
-  // }
-
-
-
-  private scaleTraffic(value: number): number {
+  static FetchUp(value: number){
+      return Traffic.ScaleTraffic(value >>> 32)
+  }
+  static FetchDown(value: number){
+    return Traffic.ScaleTraffic(value & 0xFFFFFFFF)
+  }
+  static ScaleTraffic(value: number): number {
     const type = (value >>> 30) & 0x3;
     const data = value & 0x3FFFFFFF;
 

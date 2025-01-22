@@ -1,13 +1,9 @@
 import { vpnExtension, socket } from '@kit.NetworkKit';
 import {
-  nativeClearOverride,
-  nativeFetchAndValid,
-  nativeForceGc,
   nativeHealthCheck,
   nativeInit,
   nativeLoad,
   nativePatchSelector,
-  nativeQueryConfiguration,
   nativeQueryGroup, nativeQueryGroupNames,
   nativeQueryProviders,
   nativeQueryTrafficNow,
@@ -25,7 +21,7 @@ import { RpcRequest } from './RpcRequest';
 import { ClashRpcType } from './IClashManager';
 import { getHome, getProfileDir, getProfilePath } from '../appPath';
 import { UpdateConfigParams } from '../models/ClashConfig';
-import { LogInfo, OverrideSlot, Proxy, ProxyGroup, ProxyMode } from '../models/Common';
+import { LogInfo, OverrideSlot, Proxy, ProxyGroup, ProxyMode, Traffic } from '../models/Common';
 
 
 export class ClashMetaVpnService extends CommonVpnService{
@@ -45,12 +41,18 @@ export class ClashMetaVpnService extends CommonVpnService{
       // 订阅日志，需要持续输出
       nativeSubscribeLogcat((value)=>{
         console.log("startLog", value);
-        const log = JSON.parse(value)
-        this.sendClient(client, JSON.stringify({
-          logLevel: log["level"],
-          payload: log["message"],
-          time: log["time"]
-        } as LogInfo))
+        try {
+          if (!value.endsWith("}")){
+            value += "}"
+          }
+          const log = JSON.parse(value)
+          this.sendClient(client, JSON.stringify({
+            logLevel: log["level"],
+            payload: log["message"],
+            time: log["time"]
+          } as LogInfo))
+        } catch (e) {
+        }
       })
     } else {
       try {
@@ -73,11 +75,15 @@ export class ClashMetaVpnService extends CommonVpnService{
           break;
         }
         case ClashRpcType.queryTrafficTotal:{
-          resolve(nativeQueryTrafficTotal())
+          const data = nativeQueryTrafficTotal()
+          console.debug("queryTrafficTotal", data)
+          resolve(JSON.stringify({ upRaw: Traffic.FetchUp(data), downRaw: Traffic.FetchDown(data)} as Traffic))
           break;
         }
         case ClashRpcType.queryTrafficNow:{
-          resolve(nativeQueryTrafficNow())
+          const data = nativeQueryTrafficNow()
+          console.debug("nativeQueryTrafficNow", data)
+          resolve(JSON.stringify({ upRaw: Traffic.FetchUp(data), downRaw: Traffic.FetchDown(data) } as Traffic))
           break;
         }
         case ClashRpcType.queryProxyGroup:{

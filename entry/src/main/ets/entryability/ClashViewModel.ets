@@ -209,9 +209,7 @@ export class ClashViewModel {
     if (appConfig?.currentProfileId){
       this.loadProfileAndConfig(appConfig?.currentProfileId, clashConfig)
     }
-    if(appConfig?.enableLogger){
-      EventHub.sendEvent(EventKey.StartLog)
-    }
+    EventHub.sendEvent(EventKey.StartLog, appConfig?.enableLogger)
   }
   async initGeoIp(){
     let geoIp = await readFile(this.context?.resourceDir + "/geoip.metadb")

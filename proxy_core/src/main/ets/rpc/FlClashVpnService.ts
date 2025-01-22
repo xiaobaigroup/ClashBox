@@ -11,7 +11,7 @@ import { Address, CommonVpnService, isIpv4, isIpv6, VpnConfig } from './CommonVp
 import { JSON, util } from '@kit.ArkTS';
 import { RpcRequest } from './RpcRequest';
 import { ClashRpcType } from './IClashManager';
-import { LogInfo, ProxyGroup, ProxyMode, ProxyType } from '../models/Common';
+import { LogInfo, ProxyGroup, ProxyMode, ProxyType, Traffic } from '../models/Common';
 import { getHome } from '../appPath';
 import { UpdateConfigParams } from '../models/ClashConfig';
 
@@ -81,11 +81,14 @@ export class FlClashVpnService extends CommonVpnService{
           break;
         }
         case ClashRpcType.queryTrafficTotal:{
-          resolve(getTotalTraffic())
+          const data = JSON.parse(getTotalTraffic())
+          console.debug("queryTrafficTotal", JSON.stringify(data))
+          resolve(JSON.stringify({ upRaw: data["up"], downRaw: data["down"]} as Traffic))
           break;
         }
         case ClashRpcType.queryTrafficNow:{
-          resolve( getTraffic())
+          const data = JSON.parse(getTraffic())
+          resolve(JSON.stringify({ upRaw: data["up"], downRaw: data["down"]} as Traffic))
           break;
         }
         case ClashRpcType.queryProxyGroup:{
