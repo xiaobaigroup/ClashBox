@@ -33,6 +33,7 @@ interface LocationInfo {
 export function getIpInfo(ip: string): Promise<IpInfo> {
   return new Promise<IpInfo>((resolve, reject) => {
     let httpRequest = http.createHttp()
+    // TODO try use queryIpInfo
     httpRequest.request(`http://ip-api.com/json/${ip}`, (err: Error, data: http.HttpResponse) => {
       if (!err) {
         hilog.info(0xFF00, "MoreIPtestTag", "HTTP返回值: %{public}s", JSON.stringify(data))

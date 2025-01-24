@@ -192,10 +192,6 @@ export class IpInfo {
   ip: string
   country: string
 }
-export const ipInfoSources = [
-  "https://ipwho.is/?fields=ip&output=csv",
-  "https://ipinfo.io/ip",
-  "https://ifconfig.me/ip/",
-];
+
 
 

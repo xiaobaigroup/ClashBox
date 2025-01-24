@@ -7,7 +7,7 @@ import { IpInfo, LogInfo, Provider, ProviderType, ProxyGroup, ProxyMode, ProxyTy
   Traffic } from '../models/Common';
 import { promptAction } from '@kit.ArkUI';
 import { UpdateConfigParams } from '../models/ClashConfig';
-import { checkIp } from '../Request';
+import { checkIp, queryIpInfo } from '../Request';
 
 
 export class SocketProxyService implements IClashManager{
@@ -30,9 +30,10 @@ export class SocketProxyService implements IClashManager{
   }
   async checkIpInfo(): Promise<IpInfo> {
     let result = await checkIp()
+    let country = await queryIpInfo(result)
     return {
       ip: result,
-      country: ""
+      country: country
     } as IpInfo
   }
   async queryTrafficNow(): Promise<Traffic> {
