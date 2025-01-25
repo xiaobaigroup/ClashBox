@@ -54,12 +54,13 @@ struct Log {
       if (this.appConfig.enableLogger) {
         MenuItem({ content: $r('app.string.ClearLogs')})
           .onClick(() => {
+            EventHub.sendEvent(EventKey.ClearLog)
             // 清空日志操作
           })
         MenuItem({ content: $r('app.string.ExportLog')})
           .onClick(() => {
             // 导出日志操作
-
+            EventHub.sendEvent(EventKey.ExportLog)
           })
         MenuItem({
           builder: ():void => this.SortMenu(),

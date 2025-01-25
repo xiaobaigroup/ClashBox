@@ -13,6 +13,7 @@ import { Profile, ProxyGroup, ProxySort, ProxyType } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import { AppConfig, isEnd, ProxyCardSize, ProxyGroupType } from '../entryability/AppState'
 import {  PromptAction } from '@kit.ArkUI'
+import { ProviderPage } from '../components/Proxy/Provider'
 
 
 @Entry
@@ -40,6 +41,8 @@ struct ProxyPage {
   /* Stack层叠布局 */
   //编辑按钮点击
   @State isShowEdit: boolean = false
+
+  @State isProviderEdit: boolean = false
   //分组tabs相关
   @State currentIndex: number = 0;
 
@@ -289,6 +292,16 @@ struct ProxyPage {
     .width('100%')
   }//半模态编辑菜单end
 
+  @Builder
+  ProviderBindSheetEdit() {
+    ProviderPage()
+    .padding({
+      left: this.breakPointStateTabContentTitleMargin.value,
+      right: this.breakPointStateTabContentTitleMargin.value,
+    })
+    .width('100%')
+  }
+
   build() {
     Column() {
       // 标题栏
@@ -298,8 +311,33 @@ struct ProxyPage {
             .fontSize(32)
             .fontWeight(FontWeight.Bold)
             .textAlign(TextAlign.Center)
-
           Blank()
+          Button({ type: ButtonType.Circle, stateEffect: true }) {
+            SymbolGlyph($r('sys.symbol.eraser_line'))
+              .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+              .fontColor([this.icon_primary])
+          }
+          .width(40)
+          .height(40)
+          .backgroundColor($r('app.color.settings_container_background'))
+          .clickEffect({ level: ClickEffectLevel.MIDDLE })
+          .onClick(() => {
+            this.isProviderEdit = true
+          })
+          .bindSheet($$this.isProviderEdit, this.ProviderBindSheetEdit(), {
+            detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
+            backgroundColor: $r('app.color.background'),
+            //  blurStyle: BlurStyle.BACKGROUND_REGULAR,
+            showClose: true,
+            dragBar: false,
+            scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+            title: { title: $r('app.string.Edit') },
+            preferType: SheetType.CENTER,
+            //         maskColor: $r('app.color.dialog_maskcolor'),
+            onWillDismiss: () => {
+              this.isProviderEdit = false
+            }
+          })
           //编辑图标
           Button({ type: ButtonType.Circle, stateEffect: true }) {
             SymbolGlyph($r('sys.symbol.square_and_pencil'))
@@ -336,6 +374,7 @@ struct ProxyPage {
         .justifyContent(FlexAlign.Center) //.padding({top:TAB_CONTENT_TITLE_HEIGHT})
         // transition保证组件离场不被立即析构，可设置其他转场效果
         .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
+
         .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
           detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
           backgroundColor: $r('app.color.background'),

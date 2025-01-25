@@ -3,7 +3,7 @@ import {  RpcResult } from './RpcRequest';
 import { JSON, util } from '@kit.ArkTS';
 import { common } from '@kit.AbilityKit';
 import { ClashRpcType, IClashManager } from './IClashManager';
-import { IpInfo, LogInfo, Provider, ProviderType, ProxyGroup, ProxyMode, ProxyType,
+import { IpInfo, LogInfo, Provider, ProxyGroup, ProxyMode,
   Traffic } from '../models/Common';
 import { promptAction } from '@kit.ArkUI';
 import { UpdateConfigParams } from '../models/ClashConfig';
@@ -50,8 +50,8 @@ export class SocketProxyService implements IClashManager{
     let result = await this.sendMessageRequest(ClashRpcType.queryProviders)
     return JSON.parse(result as string) as Provider[]
   }
-  async updateProvider(type: ProviderType, name: string): Promise<string> {
-    return  (await this.sendMessageRequest(ClashRpcType.updateProvider,[type, name])) as string
+  async updateProvider(provider: Provider): Promise<string> {
+    return  (await this.sendMessageRequest(ClashRpcType.updateProvider,[JSON.stringify(provider)])) as string
   }
   async updateGeoData(geoName: string, geoType: string): Promise<string>{
     return await (this.sendMessageRequest(ClashRpcType.updateGeoData,[geoName, geoType])) as string

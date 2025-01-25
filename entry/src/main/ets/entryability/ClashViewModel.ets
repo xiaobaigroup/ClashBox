@@ -110,6 +110,9 @@ export class ClashViewModel {
   async getTotalTraffic(){
     return await this.socketProxy.queryTrafficTotal()
   }
+  async getProviders(): Promise<Provider[]>{
+    return await this.socketProxy.queryProviders()
+  }
   async checkIpInfo(){
     return await this.socketProxy.checkIpInfo()
   }
@@ -117,7 +120,7 @@ export class ClashViewModel {
     return this.socketProxy.queryProviders()
   }
   async updateProvider(provider: Provider){
-    return this.socketProxy.updateProvider(provider.type, provider.name)
+    return this.socketProxy.updateProvider(provider)
   }
 
   job?: (()=>void)

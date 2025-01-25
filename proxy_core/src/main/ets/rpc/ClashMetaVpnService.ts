@@ -21,7 +21,7 @@ import { RpcRequest } from './RpcRequest';
 import { ClashRpcType } from './IClashManager';
 import { getHome, getProfileDir, getProfilePath } from '../appPath';
 import { UpdateConfigParams } from '../models/ClashConfig';
-import { LogInfo, OverrideSlot, Proxy, ProxyGroup, ProxyMode, Traffic } from '../models/Common';
+import { LogInfo, OverrideSlot, Provider, Proxy, ProxyGroup, ProxyMode, Traffic } from '../models/Common';
 
 
 export class ClashMetaVpnService extends CommonVpnService{
@@ -110,7 +110,16 @@ export class ClashMetaVpnService extends CommonVpnService{
           break;
         }
         case ClashRpcType.queryProviders:{
-          resolve(nativeQueryProviders())
+          const result = nativeQueryProviders()
+          const list = JSON.parse(result) as Provider[]
+          console.log("queryProviders", result)
+          resolve(JSON.stringify(list.map(d=> ({
+            name: d.name,
+            type: d.type,
+            path: "",
+            "update-at": d["updatedAt"],
+            "vehicle-type": d["vehicleType"]
+          } as Provider))))
           break;
         }
         case ClashRpcType.changeProxy:{
@@ -124,7 +133,8 @@ export class ClashMetaVpnService extends CommonVpnService{
           break;
         }
         case ClashRpcType.updateProvider:{
-          nativeUpdateProvider(data[0] as string, data[1] as string,()=>{
+          let provider = JSON.parse(data[0] as string) as Provider
+          nativeUpdateProvider(provider.type, provider.name,()=>{
             resolve(true)
           })
           break;

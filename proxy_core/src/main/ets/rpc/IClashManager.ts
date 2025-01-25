@@ -33,7 +33,7 @@ export interface IClashManager {
   changeProxy(group: string, name: string): Promise<string>;
 
   queryProviders(): Promise<Provider[]>;
-  updateProvider(type: ProviderType, name: string): Promise<string>;
+  updateProvider(provider: Provider): Promise<string>;
 
   healthCheck(group: string): Promise<number>;
   loadConfig(path: UpdateConfigParams): Promise<string>;

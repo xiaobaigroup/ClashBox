@@ -1,4 +1,5 @@
 // 单次点击后不消失菜单，已弃用
+import { EventHub, EventKey } from "../../common/EventHub"
 
 @Component
 struct MoreMenu {
@@ -70,6 +71,7 @@ struct MoreMenu {
                   }
                   .onClick(() => {
                     // 清除日志
+                    EventHub.sendEvent(EventKey.ClearLog)
                   })
                   .justifyContent(FlexAlign.Start)
                   .width(152)
@@ -81,6 +83,7 @@ struct MoreMenu {
                   }
                   .onClick(() => {
                     // 导出日志
+                    EventHub.sendEvent(EventKey.ExportLog)
                   })
                   .width(152)
                   .height(48)

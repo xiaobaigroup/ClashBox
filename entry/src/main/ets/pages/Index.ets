@@ -459,6 +459,12 @@ struct Index {
         })
       })
     })
+    EventHub.on(EventKey.ClearLog, ()=>{
+      this.logListData = []
+    })
+    EventHub.on(EventKey.ExportLog, ()=>{
+      // TODO 导出日志
+    })
   }
   @Provide proxyGroups: ProxyGroup[] = []
   @Provide("currentProfile") currentProfile: Profile | null = null
@@ -523,7 +529,6 @@ struct Index {
 
   build() {
     Column() {
-
       Tabs({
         barPosition: this.isLandscapePhone ? BarPosition.Start : this.compBarPose.value
       }) {
