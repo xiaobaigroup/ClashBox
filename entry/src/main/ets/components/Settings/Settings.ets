@@ -117,12 +117,8 @@ struct Settings {
     hilog.info(0xFF00, "menutestTag", "%{public}s", menuItemData.isCheck)
   }*/
 
-  onPageShow(): void {
-    hilog.info(0xFF00, "SettingstestTag", "进入页面刷新", )
-    // 刷新语言行的语言提示
-    const itemData = this.settingsList[0]
-    itemData.hint = this.currentLanguage
-    this.settingsList.splice(0, 1, itemData)
+  onLanguageChanged() {
+    hilog.info(0xFF00, "SettingsTestTag", "设置页页面栈：%{public}d", this.SettingsPageInfos.size())
   }
 
   aboutToAppear(): void {
@@ -206,7 +202,10 @@ struct Settings {
     .width('100%')
     .height('100%')
     .onAppear(() => {
-
+      // 刷新语言行的语言提示
+      const itemData = this.settingsList[0]
+      itemData.hint = this.currentLanguage
+      this.settingsList.splice(0, 1, itemData)
     })
   }
 }

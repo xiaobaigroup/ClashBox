@@ -9,7 +9,7 @@ import { hilog } from "@kit.PerformanceAnalysisKit"
 import { common, Want } from "@kit.AbilityKit"
 import { BusinessError } from "@kit.BasicServicesKit"
 import { promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
-import { AppConfig } from "../../entryability/AppState"
+import { AppConfig, UIConfig } from "../../entryability/AppState"
 
 @Component
 struct About {
@@ -25,6 +25,7 @@ struct About {
   @State aboutList: AboutListItemProp[] = AboutList
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   // 列表高度
@@ -88,7 +89,7 @@ struct About {
   // 列表行开关事件处理
   handleToggle(isOn: boolean, name: string) {
     // 持久化实验功能开关状态
-    this.appConfig.isShowExperimentalFunction = isOn
+    this.uiConfig.isShowExperimentalFunction = isOn
     switch (name) {
       case 'ExperimentalFunction':
         // 实验功能开关
@@ -172,7 +173,7 @@ struct About {
 
   aboutToAppear(): void {
     // 页面加载时初始化实验功能启用状态
-    this.refreshShowExperimentalFunction(this.appConfig.isShowExperimentalFunction)
+    this.refreshShowExperimentalFunction(this.uiConfig.isShowExperimentalFunction)
   }
 
   build() {

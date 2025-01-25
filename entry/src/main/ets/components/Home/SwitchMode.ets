@@ -2,7 +2,7 @@ import {  BreakpointState } from '../../common/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI';
 import { ANIMATION_DURATION_300, MarginGenerate } from '../../common/Constants';
 import { CardTitle } from './CardTitleBuilder';
-import { AppConfig, SwitchModeCard } from '../../entryability/AppState';
+import { AppConfig, SwitchModeCard, UIConfig } from '../../entryability/AppState';
 import { EventHub, EventKey } from '../../common/EventHub';
 import { ProxyMode } from 'proxy_core';
 
@@ -25,6 +25,7 @@ struct SwitchMode {
   @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
 
   // 手机横屏高度条件

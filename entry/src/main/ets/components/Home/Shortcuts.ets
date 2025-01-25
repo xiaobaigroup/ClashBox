@@ -9,7 +9,7 @@ import { BIND_SHEET_CONTAINER_HEIGHT,
 import { CardTitle } from './CardTitleBuilder'
 import { common, Want } from '@kit.AbilityKit'
 import { PromptAction } from '@kit.ArkUI'
-import { AppConfig, isEnd } from '../../entryability/AppState'
+import { AppConfig, isEnd, UIConfig } from '../../entryability/AppState'
 
 @Component
 struct Shortcuts {
@@ -33,7 +33,7 @@ struct Shortcuts {
   // 折叠屏展开状态判定
   @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   aboutToAppear() {
     let uiContextShortcuts: UIContext = this.getUIContext();
@@ -68,9 +68,9 @@ struct Shortcuts {
 
       Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceEvenly }) {
         ForEach([
-          { t: this.appConfig.inputTitle1, w: this.appConfig.inputWeb1 },
-          { t: this.appConfig.inputTitle2, w: this.appConfig.inputWeb2 },
-          { t: this.appConfig.inputTitle3, w: this.appConfig.inputWeb3 }
+          { t: this.uiConfig.inputTitle1, w: this.uiConfig.inputWeb1 },
+          { t: this.uiConfig.inputTitle2, w: this.uiConfig.inputWeb2 },
+          { t: this.uiConfig.inputTitle3, w: this.uiConfig.inputWeb3 }
         ], (m: [Resource, number], i: number) => {
             Text(`${m["t"]}` != '' ? `${m["t"]}` : $r('app.string.long_press_modify'))
               .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
@@ -236,8 +236,8 @@ struct Shortcuts {
     console.info('Click the callback in the blank area')
   }
 
-  /* 半模拟态相关数据  */
-  //半模拟态文本输入控制器及文本内容
+  /* 半模态相关数据  */
+  //半模态文本输入控制器及文本内容
   controller: TextInputController = new TextInputController()
 
   //半模态窗口
@@ -260,18 +260,16 @@ struct Shortcuts {
               Column({ space: 2 }) {
                 TextInput({
                   placeholder: $r('app.string.text_input_placeholder'),
-                  text: this.appConfig.inputTitle1,
+                  text: this.uiConfig.inputTitle1,
                   controller: this.controller
                 })
                   .TextInputStyle()
-                  .caretColor(this.icon_emphasize)//   .underlineColor(this.icon_emphasize)
+                  .caretColor(this.icon_emphasize)
                   .onSubmit((enterKey: EnterKeyType) => {
                     enterKey.toString()
-                //    this.appConfig.inputTitle1 != undefined
                   })
                   .onChange((value: string) => {
-                    this.appConfig.inputTitle1 = value
-              //      this.appConfig.inputTitle1 != undefined
+                    this.uiConfig.inputTitle1 = value
                   })
                 Divider().strokeWidth(1).color(this.icon_emphasize)
               }.width('32%')
@@ -312,7 +310,7 @@ struct Shortcuts {
               Column({ space: 2 }) {
                 TextInput({
                   placeholder: $r('app.string.text_input_placeholder'),
-                  text: this.appConfig.inputTitle2,
+                  text: this.uiConfig.inputTitle2,
                   controller: this.controller
                 })
                   .TextInputStyle()
@@ -322,7 +320,7 @@ struct Shortcuts {
              //       this.appConfig.inputTitle2 != undefined
                   })
                   .onChange((value: string) => {
-                    this.appConfig.inputTitle2 = value
+                    this.uiConfig.inputTitle2 = value
              //       this.appConfig.inputTitle2 != undefined
                   })
                 Divider().strokeWidth(1).color(this.icon_emphasize)
@@ -363,7 +361,7 @@ struct Shortcuts {
               Column({ space: 2 }) {
                 TextInput({
                   placeholder: $r('app.string.text_input_placeholder'),
-                  text: this.appConfig.inputTitle3,
+                  text: this.uiConfig.inputTitle3,
                   controller: this.controller
                 })
                   .TextInputStyle()
@@ -373,7 +371,7 @@ struct Shortcuts {
               //      this.appConfig.inputWeb3 != undefined
                   })
                   .onChange((value: string) => {
-                    this.appConfig.inputTitle3 = value
+                    this.uiConfig.inputTitle3 = value
                 //    this.appConfig.inputTitle3 != undefined
                   })
                 Divider().strokeWidth(1).color(this.icon_emphasize)
@@ -416,12 +414,12 @@ export default Shortcuts
 @CustomDialog
 struct WebCustomDialog1 {
   /* 主题色 */
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @State  inputWeb1:string =''
 
   controller?: CustomDialogController
@@ -438,7 +436,7 @@ struct WebCustomDialog1 {
             .fontWeight(FontWeight.Bold)
           Blank(15)
 
-          TextArea({ placeholder: 'https://www.google.com', text: this.appConfig.inputWeb1 })
+          TextArea({ placeholder: 'https://www.google.com', text: this.uiConfig.inputWeb1 })
             .WebTextAreaStyle()
             .caretColor(this.icon_emphasize)
             .onChange((value: string) => {
@@ -463,7 +461,7 @@ struct WebCustomDialog1 {
               .fontColor($r('sys.color.font_on_primary'))
               .backgroundColor(this.icon_emphasize)
               .onClick(() => {
-                this.appConfig.inputWeb1=this.inputWeb1
+                this.uiConfig.inputWeb1=this.inputWeb1
                 if (this.controller != undefined) {
                   this.controller.close()
                   this.inputWeb1 = ''
@@ -493,6 +491,7 @@ struct WebCustomDialog2 {
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @State  inputWeb2:string =''
 
   controller?: CustomDialogController
@@ -508,7 +507,7 @@ struct WebCustomDialog2 {
           .fontWeight(FontWeight.Bold)
         Blank(15)
 
-        TextArea({ placeholder: 'https://www.google.com', text: this.appConfig.inputWeb2 })
+        TextArea({ placeholder: 'https://www.google.com', text: this.uiConfig.inputWeb2 })
           .WebTextAreaStyle()
           .caretColor(this.icon_emphasize)
          .onChange((value: string) => {
@@ -536,7 +535,7 @@ struct WebCustomDialog2 {
             .fontColor($r('sys.color.font_on_primary'))
             .backgroundColor(this.icon_emphasize)
             .onClick(() => {
-              this.appConfig.inputWeb2=this.inputWeb2
+              this.uiConfig.inputWeb2=this.inputWeb2
               if (this.controller != undefined) {
                 this.controller.close()
                 //    this.isEnableIndexForegroundBlur = false
@@ -557,6 +556,7 @@ struct WebCustomDialog3 {
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @State  inputWeb3:string =''
 
   controller?: CustomDialogController
@@ -572,7 +572,7 @@ struct WebCustomDialog3 {
           .fontWeight(FontWeight.Bold)
         Blank(15)
 
-        TextArea({ placeholder: 'https://www.google.com', text: this.appConfig.inputWeb3 })
+        TextArea({ placeholder: 'https://www.google.com', text: this.uiConfig.inputWeb3 })
           .WebTextAreaStyle()
           .caretColor(this.icon_emphasize)
           .onChange((value: string) => {
@@ -600,7 +600,7 @@ struct WebCustomDialog3 {
             .fontColor($r('sys.color.font_on_primary'))
             .backgroundColor(this.icon_emphasize)
             .onClick(() => {
-              this.appConfig.inputWeb3= this.inputWeb3
+              this.uiConfig.inputWeb3= this.inputWeb3
               if (this.controller != undefined) {
                 this.controller.close()
                 //    this.isEnableIndexForegroundBlur = false

@@ -9,7 +9,7 @@ import { SymbolGlyphModifier } from "@kit.ArkUI"
 import { common } from "@kit.AbilityKit"
 import { setAutoColorMode, setDarkColorMode, setLightColorMode } from "../../utils/ChangeColorModeUtils"
 import { menuRowList, toggleRowList } from "../Common"
-import { AppConfig } from "../../entryability/AppState"
+import { AppConfig, UIConfig } from "../../entryability/AppState"
 import { changeThemeColor } from "../../utils/ChangeThemeColorUtil"
 
 @Component
@@ -49,6 +49,7 @@ struct Appearance {
   @Consume ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
   /* 是否开启全局动画判定 */
   @Consume ('isAnimation') isAnimation: boolean
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
 
   // 切换菜单
@@ -60,12 +61,12 @@ struct Appearance {
         ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
           MenuItem({
             content: menuItem.title,
-            symbolEndIcon: this.appConfig.darkModeIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+            symbolEndIcon: this.uiConfig.darkModeIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
           })
-          .selected(this.appConfig.darkModeIndex === index)
+          .selected(this.uiConfig.darkModeIndex === index)
           .onChange((selected) => {
             // 持久化深色模式
-            this.appConfig.darkModeIndex = index
+            this.uiConfig.darkModeIndex = index
             this.switchColorMode(index)
             // UI刷新
             this.EnableDarkModeText = menuItem.title
@@ -79,14 +80,14 @@ struct Appearance {
           MenuItem({
             content: menuItem.title,
             symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.paintpalette_fill')).fontColor(menuItem.startSymbolFontColor),
-            symbolEndIcon: this.appConfig.themeColorIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+            symbolEndIcon: this.uiConfig.themeColorIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
           })
-          .selected(this.appConfig.themeColorIndex === index)
+          .selected(this.uiConfig.themeColorIndex === index)
           .onChange((selected) => {
-            this.appConfig.themeColorIndex = index
+            this.uiConfig.themeColorIndex = index
             // 持久化主题色
-            this.appConfig.themeColor = menuItem?.customThemeName ?? 'blueAppTheme'
-            changeThemeColor(this.appConfig.themeColor)
+            this.uiConfig.themeColor = menuItem?.customThemeName ?? 'blueAppTheme'
+            changeThemeColor(this.uiConfig.themeColor)
             // UI刷新
             this.EnableThemeColorText = menuItem.title
           })
@@ -98,12 +99,12 @@ struct Appearance {
         ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
           MenuItem({
             content: menuItem.title,
-            symbolEndIcon: this.appConfig.buttonPositionIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+            symbolEndIcon: this.uiConfig.buttonPositionIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
           })
-            .selected(this.appConfig.buttonPositionIndex === index)
+            .selected(this.uiConfig.buttonPositionIndex === index)
             .onChange((selected) => {
               // 持久化按钮位置
-              this.appConfig.buttonPositionIndex = index
+              this.uiConfig.buttonPositionIndex = index
               this.switchButtonPosition(index)
               // UI刷新
               this.EnableButtonPositionText = menuItem.title
@@ -116,12 +117,12 @@ struct Appearance {
         ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
           MenuItem({
             content: menuItem.title,
-            symbolEndIcon: this.appConfig.animationSpeedIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+            symbolEndIcon: this.uiConfig.animationSpeedIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
           })
-            .selected(this.appConfig.animationSpeedIndex === index)
+            .selected(this.uiConfig.animationSpeedIndex === index)
             .onChange((selected) => {
               // 持久化动画速度
-              this.appConfig.animationSpeedIndex = index
+              this.uiConfig.animationSpeedIndex = index
               this.switchAnimationSpeed(index)
               // UI刷新
               this.EnableAnimationSpeedText = menuItem.title
@@ -179,19 +180,19 @@ struct Appearance {
   aboutToAppear(): void {
     // 初始化主题色显示文本
     if (this.appearanceList && this.appearanceList[1].children) {
-      this.EnableThemeColorText = this.appearanceList[1].children[this.appConfig.themeColorIndex].title
+      this.EnableThemeColorText = this.appearanceList[1].children[this.uiConfig.themeColorIndex].title
     }
     // 初始化深色模式显示文本
     if (this.appearanceList && this.appearanceList[0].children) {
-      this.EnableDarkModeText = this.appearanceList[0].children[this.appConfig.darkModeIndex].title
+      this.EnableDarkModeText = this.appearanceList[0].children[this.uiConfig.darkModeIndex].title
     }
     // 初始化按钮位置显示文本
     if (this.appearanceList && this.appearanceList[2].children) {
-      this.EnableButtonPositionText = this.appearanceList[2].children[this.appConfig.buttonPositionIndex].title
+      this.EnableButtonPositionText = this.appearanceList[2].children[this.uiConfig.buttonPositionIndex].title
     }
     // 初始化动画速度显示文本
     if (this.appearanceList && this.appearanceList[3].children) {
-      this.EnableAnimationSpeedText = this.appearanceList[3].children[this.appConfig.animationSpeedIndex].title
+      this.EnableAnimationSpeedText = this.appearanceList[3].children[this.uiConfig.animationSpeedIndex].title
     }
   }
 
@@ -396,7 +397,7 @@ struct Appearance {
                       duration: ANIMATION_DURATION_300,
                       curve: Curve.Ease
                     }, () => {
-                      this.appConfig.isBlurr = isOn
+                      this.uiConfig.isBlurr = isOn
                     })
                   })
               }
@@ -405,7 +406,7 @@ struct Appearance {
               this.getUIContext()?.animateTo({
                 duration: ANIMATION_DURATION_300
               }, () => {
-                this.appConfig.isBlurr = !this.appConfig.isBlurr
+                this.uiConfig.isBlurr = !this.uiConfig.isBlurr
               })
             })
             if(this.isShowExperimentalFunction) {
@@ -447,7 +448,7 @@ struct Appearance {
                       duration: ANIMATION_DURATION_300,
                       curve: Curve.Ease
                     }, () => {
-                      this.appConfig.isGreeting = isOn
+                      this.uiConfig.isGreeting = isOn
                     })
                   })
               }
@@ -456,7 +457,7 @@ struct Appearance {
               this.getUIContext()?.animateTo({
                 duration: ANIMATION_DURATION_300
               }, () => {
-                this.appConfig.isGreeting = !this.appConfig.isGreeting
+                this.uiConfig.isGreeting = !this.uiConfig.isGreeting
               })
             })
             // 分割线

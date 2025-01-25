@@ -41,7 +41,13 @@ export class AppConfig{
   testUrl?: string = ""
   overrideDns?: boolean = false
   clashCore?: ClashCore = ClashCore.ClashMeta
-  // TODO 提取出来别放在这里 例如uiConfig
+  switchMode?: ProxyMode = ProxyMode.Rule
+
+  constructor() {
+  }
+}
+
+export class UIConfig{
   // 主页问候语
   isGreeting?: boolean = true
   // 主题色
@@ -62,16 +68,14 @@ export class AppConfig{
   isShowHomeCard: string = JSON.stringify(showHomeCard)
   // 用户选择的语言
   userLanguage: string = "default"
-  /*主页小卡片相关 */
+  /* 主页小卡片相关 */
   //快捷方式小卡片
-  inputTitle1: string=''
-  inputTitle2: string=''
-  inputTitle3: string=''
-  inputWeb1: string=''
-  inputWeb2: string=''
-  inputWeb3: string=''
-  // 分流模式小卡片
-  switchMode?:ProxyMode = ProxyMode.Rule
+  inputTitle1: string = ''
+  inputTitle2: string = ''
+  inputTitle3: string = ''
+  inputWeb1: string = ''
+  inputWeb2: string = ''
+  inputWeb3: string = ''
 
   constructor() {
   }
@@ -89,6 +93,7 @@ export class AppState {
     PersistentStorage.persistProp("favoriteProfiles", new Map<string, string>([]))
     PersistentStorage.persistProp("favoriteProxys", new Map<string, string[][]>([]))
     PersistentStorage.persistProp("clashConfig", new ClashConfig())
+    PersistentStorage.persistProp("uiConfig", new UIConfig())
     AppStorage.setOrCreate<AppFlowingState>("appFlowingState", new AppFlowingState())
   }
 

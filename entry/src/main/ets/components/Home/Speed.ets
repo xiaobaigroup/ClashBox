@@ -4,6 +4,7 @@ import { CardTitle } from './CardTitleBuilder';
 import { MarginGenerate } from '../../common/Constants';
 import { AppFlowingState, getLast } from '../../entryability/AppState';
 import { JSON } from '@kit.ArkTS';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 
 
 @Component
@@ -17,6 +18,8 @@ struct Speed {
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
   @StorageProp("appFlowingState") appFlowingState: AppFlowingState = new AppFlowingState()
+  @Consume
+  @Watch('proxyEnabledChanged') proxyEnabled: boolean
   //初始化图表数据
   @State defOption: Options = new Options({
     //图例
@@ -87,41 +90,63 @@ struct Speed {
   // 定时器ID，用于清除定时器
   private timerId: number = 0;
 
+  /**
+   * 缩放数值（0 ~ 1000）
+   */
+  scaleArrayValues(arr: number[]): number[] {
+    const maxVal = Math.max(...arr)
+    if (maxVal <= 0) {
+      return arr.map(() => 0)
+    }
+
+    // 计算缩放因子
+    const scaleFactor = 1000 / maxVal
+    const scaledArray = arr.map(value => {
+      const scaledValue = value * scaleFactor
+      // 保留3位小数
+      const roundedValue = Number(scaledValue.toFixed(3))
+      // 缩放后的值大于1000则为1000，小于0则为0
+      return Math.min(Math.max(roundedValue, 0), 1000)
+    })
+
+    return scaledArray
+  }
+
   onSpeedData() {
     this.DownloadSpeed = this.appFlowingState.traffics.getLast()?.down?.toString() ?? "0 kb"
     this.UploadSpeed = this.appFlowingState.traffics.getLast()?.up?.toString() ?? "0 kb"
     //图表
     // 使用Option实例对象的setVal方法来实现，修改什么属性就传什么
     // Tip 如果是一条曲线 合成一个 up + down
-    let data =  this.appFlowingState.traffics.getData().map(num => num / 10)
-    console.log("xxxx", JSON.stringify(data))
+    let data = this.proxyEnabled ? this.scaleArrayValues(this.appFlowingState.traffics.getData()) : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    hilog.info(0xFF00, "HomeSpeedTestTag", "data: %{public}s", JSON.stringify(data))
     this.defOption.setVal({
       series: [
-          // {
-          //    smooth: false, //平滑曲线
-          //    name: '上行速度(Kb/s)',
-          //    data: this.appFlowingState.traffics.map((d) => d.up.value),
-          //    label: {
-          //      show: false,
-          //      color: '#FFF7980A',
-          //      offset: [-10, -10]//线条标签偏移量
-          //    },
-          //    //折线拐点配置
-          //    itemStyle: {
-          //      symbol: 'solidCircle',
-          //      symbolSize: 2,
-          //      borderWidth: 1
-          //    },
-          //    lineStyle: {
-          //      width: 3,
-          //      color: '#FFF7980A'
-          //    },
-          //    // 区域颜色，线性渐变
-          //    areaStyle: {
-          //      show: true,
-          //      gradient: ['#99f7980a']
-          //    },
-          //  },
+          /*{
+             smooth: false, //平滑曲线
+             name: '上行速度(Kb/s)',
+             data: this.appFlowingState.traffics.map((d) => d.up.value),
+             label: {
+               show: false,
+               color: '#FFF7980A',
+               offset: [-10, -10]//线条标签偏移量
+             },
+             //折线拐点配置
+             itemStyle: {
+               symbol: 'solidCircle',
+               symbolSize: 2,
+               borderWidth: 1
+             },
+             lineStyle: {
+               width: 3,
+               color: '#FFF7980A'
+             },
+             // 区域颜色，线性渐变
+             areaStyle: {
+               show: true,
+               gradient: ['#99f7980a']
+             },
+           },*/
         {
           smooth: true, //平滑曲线
           name: '速度(Kb/s)',
@@ -151,20 +176,29 @@ struct Speed {
     })
   }
 
-  aboutToAppear() {
-    // 设置定时器，每秒调用一次 onSpeedData 函数
-    this.timerId = setInterval(() => {
-      this.onSpeedData();
-    }, 1000);
-
+  /**
+   * @Watch监听事件：开启代理时启动定时器
+   */
+  proxyEnabledChanged() {
+    if(this.proxyEnabled) {
+      // 设置定时器，每秒调用一次 onSpeedData 函数
+      this.timerId = setInterval(() => {
+        this.onSpeedData();
+      }, 1000);
+    } else {
+      // 清除定时器
+      clearInterval(this.timerId);
+    }
   }
 
-  //系统颜色调用
+  aboutToAppear() {
+
+  }
 
   aboutToDisappear() {
     // 清除定时器
     clearInterval(this.timerId);
-    //this.phonelistener.off('change');
+
   }
 
   build() {

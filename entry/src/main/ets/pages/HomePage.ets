@@ -27,7 +27,7 @@ import ProxyINFO from '../components/Home/ProxyINFO'
 import CurrentConfiguration from '../components/Home/CurrentConfiguration'
 import ClashViewModel from '../entryability/ClashViewModel'
 import Shortcuts from '../components/Home/Shortcuts'
-import { AppConfig } from '../entryability/AppState'
+import { AppConfig, UIConfig } from '../entryability/AppState'
 
 
 @Entry
@@ -55,6 +55,7 @@ struct Home {
   @State TopHeight: string = ''
   /* 主页卡片高度*/
   @Consume('HomeCardEditHeight') private HomeCardEditHeight: BreakpointState<number>
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   windowClass = AppStorage.get<window.Window>('windowClass') as window.Window;
   //编辑按钮点击后显示编辑状态判定
@@ -99,7 +100,7 @@ struct Home {
   /* 代理启动按钮 */
   private promptAction: PromptAction = this.getUIContext()?.getPromptAction()
   // 代理启动按钮状态
-  @State private proxyEnabled: boolean = false
+  @Provide private proxyEnabled: boolean = false
   // 代理启动持续的时间
   @State private proxyStartingDuration: string = PROXY_STARTED_DURATION_INIT_VALUE
   // 按钮宽度
@@ -130,8 +131,8 @@ struct Home {
   aboutToAppear(): void {
     this.greetings = getGreeting()
     // 初始化主页卡片布局
-    if (this.appConfig.isShowHomeCard)
-      this.theCurrentHomeCard = JSON.parse(this.appConfig.isShowHomeCard)
+    if (this.uiConfig.isShowHomeCard)
+      this.theCurrentHomeCard = JSON.parse(this.uiConfig.isShowHomeCard)
     hilog.info(0xFF00, "HometestTag", "布局初始化为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
   }
 
@@ -165,7 +166,7 @@ struct Home {
   restoreLayout() {
     // 还原布局
     this.theCurrentHomeCard = this.theLastHomeCard
-    this.appConfig.isShowHomeCard = JSON.stringify(this.theLastHomeCard)
+    this.uiConfig.isShowHomeCard = JSON.stringify(this.theLastHomeCard)
     hilog.info(0xFF00, "HometestTag", "布局还原为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
     this.promptAction.showToast({ message: `${getContext().resourceManager.getStringSync($r('app.string.layout_restored'))}🫡` })
     this.isShowHomeEdit = false
@@ -179,8 +180,8 @@ struct Home {
    */
   saveHomeLayout() {
     // 保存布局
-    this.appConfig.isShowHomeCard = JSON.stringify(this.theCurrentHomeCard)
-    hilog.info(0xFF00, "HometestTag", "保存的布局： %{public}s", this.appConfig.isShowHomeCard)
+    this.uiConfig.isShowHomeCard = JSON.stringify(this.theCurrentHomeCard)
+    hilog.info(0xFF00, "HometestTag", "保存的布局： %{public}s", this.uiConfig.isShowHomeCard)
     this.promptAction.showToast({ message: `${getContext().resourceManager.getStringSync($r('app.string.layout_saved'))}💾` })
     this.isShowHomeEdit = false
     if (this.isAnimation) {
@@ -213,12 +214,13 @@ struct Home {
         Row({space: this.HomeCardTitleButtonPadding.value}) {
           if (!this.isShowHomeEdit) {
             //编辑布局按钮判定：非编辑状态
-            if (this.appConfig.isGreeting === true) {
+            if (this.uiConfig.isGreeting === true) {
               Text(this.greetings)
-                .fontSize(32)
+                .fontSize(this.uiConfig.userLanguage != 'en-Latn' ? 32 : 27)
+                .layoutWeight(1)
                 .fontWeight(FontWeight.Bold)
                 .fontColor(this.font_primary)
-                .transition(this.isAnimation ?TransitionEffect.OPACITY
+                .transition(this.isAnimation ? TransitionEffect.OPACITY
                   .animation({ duration: ANIMATION_DURATION_300, delay: 0 })
                   .combine(TransitionEffect.SLIDE):null)
             }
@@ -235,7 +237,7 @@ struct Home {
               this.isShowHomeEdit = true
               // 编辑布局前储存之前的布局变量
               hilog.info(0xFF00, "HometestTag", "上一次布局1： %{public}s", JSON.stringify(this.theLastHomeCard))
-              this.theLastHomeCard = JSON.parse(this.appConfig.isShowHomeCard)
+              this.theLastHomeCard = JSON.parse(this.uiConfig.isShowHomeCard)
               hilog.info(0xFF00, "HometestTag", "上一次布局2： %{public}s", JSON.stringify(this.theLastHomeCard))
               if (this.isAnimation) {
                 animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
@@ -353,7 +355,7 @@ struct Home {
                             // 将序号0变为false
                             this.theCurrentHomeCard.splice(0, 1, false)
                           })
-                          hilog.info(0xFF00, "HometestTag", "网络速率卡片： %{public}s", this.appConfig.isShowHomeCard[0])
+                          hilog.info(0xFF00, "HometestTag", "网络速率卡片： %{public}s", this.uiConfig.isShowHomeCard[0])
                         })
                     }
                   }
@@ -388,7 +390,7 @@ struct Home {
                             // 将序号1变为false
                             this.theCurrentHomeCard.splice(1, 1, false)
                           })
-                          hilog.info(0xFF00, "HometestTag", "分流模式卡片： %{public}s", this.appConfig.isShowHomeCard[1])
+                          hilog.info(0xFF00, "HometestTag", "分流模式卡片： %{public}s", this.uiConfig.isShowHomeCard[1])
                         })
                     }
                   }

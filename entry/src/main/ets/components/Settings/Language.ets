@@ -5,7 +5,7 @@ import { BreakpointState } from "../../common/breakpointsystem"
 import { promptAction } from "@kit.ArkUI"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { ChangeLanguage } from "../../utils/ChangeLanguageUtil"
-import { AppConfig } from "../../entryability/AppState"
+import { AppConfig, UIConfig } from "../../entryability/AppState"
 
 @Component
 struct Language {
@@ -20,12 +20,12 @@ struct Language {
   //一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
-  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   aboutToAppear(): void {
     // 初始化选择的Radio
     for (let i = 0; i < this.SettingsLanguageList.length; i++) {
-      if (this.SettingsLanguageList[i].areaID === this.appConfig.userLanguage) {
+      if (this.SettingsLanguageList[i].areaID === this.uiConfig.userLanguage) {
         this.currentRadioCheck = i
         break
       }
@@ -73,7 +73,7 @@ struct Language {
            this.currentRadioCheck = -1
           // 恢复默认
           ChangeLanguage("default")
-          this.appConfig.userLanguage = "default"
+          this.uiConfig.userLanguage = "default"
           promptAction.showToast({message: $r('app.string.restart_app_tips'), duration: 2000 })
         })
         ForEach(this.SettingsLanguageList, (item: LanguageData, index: number) => {
@@ -115,7 +115,7 @@ struct Language {
             hilog.info(0xFF00, "SettingsLanguagetestTag", "当前选中：%{public}d", this.currentRadioCheck)
             // 改变语言
             ChangeLanguage(item.areaID)
-            this.appConfig.userLanguage = item.areaID
+            this.uiConfig.userLanguage = item.areaID
             if(index === 0) {
               this.currentLanguage = $r('app.string.Language_Subtitle')
             } else {

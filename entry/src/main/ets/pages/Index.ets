@@ -49,7 +49,7 @@ import { image } from '@kit.ImageKit'
 import { Dns, LogLevel, Profile, ProxyGroup, ProxyMode } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
-import { AppConfig, ClashCore } from '../entryability/AppState'
+import { AppConfig, ClashCore, UIConfig } from '../entryability/AppState'
 import { changeThemeColor } from '../utils/ChangeThemeColorUtil'
 import { common } from '@kit.AbilityKit'
 import { setAutoColorMode, setDarkColorMode, setLightColorMode } from '../utils/ChangeColorModeUtils'
@@ -358,17 +358,17 @@ struct Index {
     hilog.info(0x1000, this.componentName, `#aboutToAppear executed`)
 
     // 在页面build前改变主题颜色
-    changeThemeColor(this.appConfig.themeColor)
-    hilog.info(0x1000, this.componentName, `#aboutToAppear#ThemeControl.setDefaultTheme(${this.appConfig.themeColor})`)
+    changeThemeColor(this.uiConfig.themeColor)
+    hilog.info(0x1000, this.componentName, `#aboutToAppear#ThemeControl.setDefaultTheme(${this.uiConfig.themeColor})`)
     // 初始化切换颜色模式(深色模式)
-    this.switchColorMode(this.appConfig.darkModeIndex)
+    this.switchColorMode(this.uiConfig.darkModeIndex)
     // 初始化切换按钮位置
-    this.switchButtonPosition(this.appConfig.buttonPositionIndex)
+    this.switchButtonPosition(this.uiConfig.buttonPositionIndex)
     // 初始化实验功能显示状态
-    this.isShowExperimentalFunction = this.appConfig.isShowExperimentalFunction
+    this.isShowExperimentalFunction = this.uiConfig.isShowExperimentalFunction
     // 初始化用户语言
-    if (this.appConfig.userLanguage){
-      ChangeLanguage(this.appConfig.userLanguage)
+    if (this.uiConfig.userLanguage){
+      ChangeLanguage(this.uiConfig.userLanguage)
     }
 
     // 开启change监听
@@ -463,6 +463,7 @@ struct Index {
   @Provide proxyGroups: ProxyGroup[] = []
   @Provide("currentProfile") currentProfile: Profile | null = null
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
 
   aboutToDisappear() {
@@ -579,7 +580,7 @@ struct Index {
     .height('100%')
     .backgroundColor($r('app.color.background'))
     .foregroundBlurStyle(
-      this.isEnableIndexForegroundBlur && this.appConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
+      this.isEnableIndexForegroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
       { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
     )
     .padding({ top:px2vp(this.topRectHeight) , bottom: this.isLandscapePhone ? 0 :px2vp(this.bottomRectHeight) -15})
