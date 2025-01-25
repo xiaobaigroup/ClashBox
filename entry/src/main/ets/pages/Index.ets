@@ -343,9 +343,9 @@ struct Index {
   @Provide('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean = false
 
-  // 当设备横屏时条件成立 ps:现在用于判定是否手机(大折叠除外)横屏
+  // 当手机横屏时条件成立
   deviceHeightListener: mediaquery.MediaQueryListener =
-    this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
+    this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp) and (640vp< width <= 1000vp)');
   // 平板竖屏判断
   tabletHeightListener:mediaquery.MediaQueryListener =
     this.getUIContext().getMediaQuery().matchMediaSync('(1000vp< height)');
@@ -376,7 +376,7 @@ struct Index {
       this.isLandscapePhone = mediaQueryResult.matches
       AppStorage.setOrCreate<boolean>('isLandscapePhone', this.isLandscapePhone)
       hilog.info(0x1000, this.componentName,
-        `#媒体查询#设备高度改变#(320vp< height <= 500vp)结果: ${this.isLandscapePhone}`)
+        `#媒体查询#设备高度改变#(320vp< height <= 500vp) and (640vp< width <= 1000vp)手机横屏结果: ${this.isLandscapePhone}`)
     });
     this.tabletHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
       this.istabletVertical = mediaQueryResult.matches
