@@ -58,6 +58,7 @@ export struct ImportConfigFromURL{
     configName: '',
     configUrl: '',
     isConfigAutoUpdate: false,
+    updateTime: 0
   }
 
   /* 断点相关 */

@@ -1,11 +1,11 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import {  BORDER_RADIUS_20 } from "../../common/Constants"
+import { ANIMATION_DURATION_300, BORDER_RADIUS_20 } from "../../common/Constants"
 import { Nothing, theCustomDialog } from "../Common"
-import { hilog } from "@kit.PerformanceAnalysisKit"
 import { convertTime } from "../../utils/TimeConvertUtil"
 import { ClashConfig } from 'proxy_core'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { Provider } from "proxy_core"
+
 
 // 资源数据（假设）
 interface ResourcesData {
@@ -55,17 +55,25 @@ export struct ProviderPage {
   @State currentEditInputValue: string = ''
   // 编辑路由地址弹窗标题
   @State theEditDialogTitle: ResourceStr = $r('app.string.edit_resource')
-  @State isLoading: boolean = false
+  @State isLoading: number = -1
+  @State isLoadingAll: number = -1
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   // 临时数据
   @State
   private resourceListData: Array<Provider> = [ ]
+  @Consume isProviderEdit: boolean
+  //fl clash条目数量判定
+  @State entriesNumber:number =0
+  /* 是否开启全局动画判定 */
+  @Consume ('isAnimation') isAnimation: boolean
+
 
   async aboutToAppear(): Promise<void> {
     const list = await ClashViewModel.getProviders()
     this.resourceListData = list
     console.debug("getProviders", JSON.stringify(list))
   }
+
   /**
    * 资源编辑弹窗控制器
    */
@@ -107,92 +115,304 @@ export struct ProviderPage {
   }
   build() {
     NavDestination() {
-      Stack() {
-        if(this.isLoading) {
-          // 加载动画
-          Column() {
-            LoadingProgress()
-              .color(this.icon_emphasize)
-              .width(80).height(80)
-            Text('资源更新中..')
-              .fontSize(16)
-          }.zIndex(2)
-          .width('100%')
-          .height('100%')
-          .justifyContent(FlexAlign.Center)
-          .backgroundColor(Color.Transparent)
-        }
-        Column() {
-          // 页面
-          if(this.resourceListData.length === 0) {
-            Nothing({ name: $r('app.string.Resources') })
-          } else {
-            List({ space: 10 }) {
-              ForEach(this.resourceListData, (item: Provider, index: number) => {
-                ListItem() {
-                  Row() {
-                    // 文本显示区
-                    Column() {
-                      Text(item.name)
-                        .fontWeight(FontWeight.Bold)
-                        .margin({ bottom: 2 })
-                        .fontSize(17)
-                      Column() {
-                        Row({ space: 2 }) {
-                          Text(item.type + "/" + item["vehicle-type"])
-                            .smallText()
-                          Text()
-                            .smallText()
-                          Text(convertTime(item["update-at"]))
-                            .smallText()
-                        }.justifyContent(FlexAlign.Start)
-                        Text(item.path)
-                          .smallText()
-                      }
-                      .alignItems(HorizontalAlign.Start)
-                    }
-                    .alignItems(HorizontalAlign.Start)
-                    .layoutWeight(1)
-                    Blank()
-                    // 功能按钮区
-                    // 编辑按钮
-                    Button({ type: ButtonType.Circle, stateEffect: true }) {
-                      SymbolGlyph($r('sys.symbol.square_and_pencil'))
-                        .fontSize(24)
-                        .fontColor([this.icon_primary])
-                    }.ButtonStyle().margin({ right: 12 })
-                    .onClick(() => {
-                      this.theEditIndex = index
-                      this.editDialogController.open()
-                    })
-                    // 更新按钮
-                    Button({ type: ButtonType.Circle, stateEffect: true }) {
-                      SymbolGlyph($r('sys.symbol.arrow_clockwise'))
-                        .fontSize(24)
-                        .fontColor([this.icon_primary])
-                    }.ButtonStyle()
-                    .onClick(() => {
-                      // 资源更新处理
-                      // TODO  添加 loading
-                      ClashViewModel.updateProvider(item)
-                    })
-                  }.width('100%')
-                  .padding(12)
-                  .justifyContent(FlexAlign.Center)
-                  .width('100%')
-                  .backgroundColor($r('app.color.container_background'))
-                  .borderRadius(BORDER_RADIUS_20)
-                }.width('100%')
+      Column(){
+        //顶部标题区域
+        Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
+          Text($r('app.string.provider'))
+            .fontSize(20)
+            .fontWeight(FontWeight.Bold)
+            .maxLines(1)
+            .fontColor($r('sys.color.font_primary'))
+
+          Row({space:10}){
+            //全部更新按钮
+            Button({ type: ButtonType.Circle, stateEffect: true }) {
+              SymbolGlyph($r('sys.symbol.arrow_clockwise'))
+                .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+                .fontColor([this.icon_primary])
+            }
+            .width(40)
+            .height(40)
+            .backgroundColor($r('app.color.settings_container_background'))
+            .clickEffect({ level: ClickEffectLevel.MIDDLE })
+            .onClick(() => {
+              this.resourceListData.forEach((item: Provider) => {
+                convertTime(item["update-at"])
+                this.isLoadingAll =this.resourceListData.length
+                ClashViewModel.updateProvider(item).then((result) => {
+                  this.isLoadingAll = -1
+                }).catch((error: Error) => {
+                  this.isLoadingAll = -1
+                })
               })
-            }.width('100%')
-            .height('100%')
+            })
+
+            //关闭按钮
+            Button({ type: ButtonType.Circle, stateEffect: true }) {
+              SymbolGlyph($r('sys.symbol.xmark'))
+                .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+                .fontColor([this.icon_primary])
+            }
+            .width(40)
+            .height(40)
+            .backgroundColor($r('app.color.settings_container_background'))
+            .clickEffect({ level: ClickEffectLevel.MIDDLE })
+            .onClick(() => {
+              this.isProviderEdit = false
+              this.isEnableIndexForegroundBlur=false
+            })
+          }
+        }.width('100%').height(56).margin({top:8})
+
+        List() {
+          ListItem(){
+            // 代理提供者相关
+            if (this.resourceListData.length === 0) {
+              Nothing({ name: $r('app.string.Resources') })
+            } else {
+              Column({ space: 8 }) {
+                //副标题
+                Text( $r('app.string.proxy_provider') )
+                  .subtitleText()
+
+                List({ space: 8 }) {
+                  ForEach(this.resourceListData, (item: Provider, index: number) => {
+                    if (item.type === "Proxy") {
+                      ListItem() {
+                        Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.Start }) {
+                          // 文本显示区
+                          Column({ space: 2 }) {
+                            Text(item.name)
+                              .nameText()
+
+                            Row() {
+                              Text($r('app.string.update_by'))
+                                .smallText()
+                              Text(convertTime(item["update-at"]))
+                                .smallText()
+                              //clash meta 暂无此数据，TODO 后期fl clash接入后可改
+                              if (this.entriesNumber>0) {
+                                Text('.')
+                                  .smallText()
+                                Text($r('app.string.list_item_number'))
+                                  .smallText()
+                              }
+                            }
+
+                            Row(){
+                              if (item["subscription-info"]?.download != undefined) {
+                                Text(item["subscription-info"]?.download+'/')
+                                  .smallText()
+                              }else {
+                                Text($r('app.string.usd_cellular_data'))
+                                  .smallText()
+                              }
+                              if (item["subscription-info"]?.total != undefined) {
+                                Text(item["subscription-info"]?.total.toString())
+                                  .smallText()
+                              }else {
+                                Text($r('app.string.total_cellular_data'))
+                                  .smallText()
+                              }
+                            }.padding({bottom:4})
+
+                            //
+                            Column() {
+                              Progress({ value: item["subscription-info"]?.download,total: item["subscription-info"]?.total, type: ProgressType.Capsule  })//value为使用流量的值
+                                .style({enableSmoothEffect: true,borderColor:'#00ffffff'})
+                                .color('#ff46b1e3')
+                                .width('100%')
+                                .height('100%')
+                            }
+                            .width('100%')
+                            .backgroundColor('#4d46b1e3')
+                            .height(6)
+                            .borderRadius(6)
+
+                            //       Text(item.path)
+                            //        .smallText()
+                          }.height(87).textColumn()
+
+                          Divider().strokeWidth(1).color($r('app.color.divider'))
+
+                          Row({space:8}) {
+                            // 功能按钮区
+                            // 上传按钮
+                            Button({ type: ButtonType.Normal, stateEffect: true }) {
+                              Row({space:4.67}) {
+                                SymbolGlyph($r('sys.symbol.arrowshape_up_frame_fill'))
+                                  .fontSize(14.67)
+                                  .fontColor([this.icon_emphasize])
+                                Text($r('app.string.upload')).fontSize(12).fontColor(this.icon_emphasize)
+                              }
+                            }.ButtonStyle()
+                            .width(76)
+                            .height(28)
+                            .onClick(() => {
+                              this.theEditIndex = index
+                              //  this.editDialogController.open()   //改为了上传按钮 TODO 上传按钮暂无后端相关参数
+                            })
+
+                            // 更新按钮
+                            Button({ type: ButtonType.Normal, stateEffect: true }) {
+                              if (this.isLoading ===index ||this.isLoadingAll ===this.resourceListData.length) {
+                                Row({ space: 4.67 }) {
+                                  LoadingProgress()
+                                    .color(this.icon_emphasize)
+                                    .width(20).height(20)
+                                  Text($r('app.string.updating')).fontSize(12).fontColor(this.icon_emphasize)
+                                }
+                                .width(100)
+                                .height(28)
+                                .justifyContent(FlexAlign.Center)
+                              } else{
+                                Row({ space: 4.67 }) {
+                                  SymbolGlyph($r('sys.symbol.arrow_clockwise'))
+                                    .fontSize(14.67)
+                                    .fontColor([this.icon_emphasize])
+                                  Text($r('app.string.update')).fontSize(12).fontColor(this.icon_emphasize)
+                                }
+                                .width(76)
+                                .height(28)
+                                .justifyContent(FlexAlign.Center)
+                              }
+                            }.ButtonStyle()
+                            .onClick(() => {
+                              // 资源更新处理
+                              this.isLoading = index
+                              ClashViewModel.updateProvider(item).then((result) => {
+                                this.isLoading = -1
+                              }).catch((error: Error) => {
+                                this.isLoading = -1
+                              })
+                            })
+                          }.buttonColumn()
+                        }
+                        .listFlex()
+                      }
+                      .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+                        .combine(TransitionEffect.SLIDE):null)
+                    }
+                  })
+                }.providerList()
+
+
+                //规则提供者相关
+                //副标题
+                Text($r('app.string.rule_provider'))
+                  .subtitleText()
+
+                List({ space: 8 }) {
+                  ForEach(this.resourceListData, (item: Provider, index: number) => {
+                    if (item.type === "Rule") {
+                      ListItem() {
+                        Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.Start }) {
+                          // 文本显示区
+                          Column({space:2}){
+                            Text(item.name)
+                              .nameText()
+
+                            Row({ space: 2 }) {
+                              Text($r('app.string.update_by'))
+                                .smallText()
+                              Text(convertTime(item["update-at"]))
+                                .smallText()
+                              //clash meta 暂无此数据，TODO 后期fl clash接入后可改
+                              if (this.entriesNumber>0) {
+                                Text('.')
+                                  .smallText()
+                                Text(''+ $r('app.string.list_item_number'))
+                                  .smallText()
+                              }
+                            }
+                          }.height(53).textColumn()
+
+                          Divider().strokeWidth(1).color($r('app.color.divider'))
+                          //      Text(item.path)
+                          //        .smallText().margin({ bottom: 8 })
+
+                          Row({space:8}) {
+                            // 功能按钮区
+                            // 上传按钮
+                            Button({ type: ButtonType.Normal, stateEffect: true }) {
+                              Row({space:4.67}) {
+                                SymbolGlyph($r('sys.symbol.arrowshape_up_frame_fill'))
+                                  .fontSize(14.67)
+                                  .fontColor([this.icon_emphasize])
+                                Text($r('app.string.upload')).fontSize(12).fontColor(this.icon_emphasize)
+                              }
+                            }.ButtonStyle()
+                            .width(76)
+                            .height(28)
+                            .onClick(() => {
+                              this.theEditIndex = index
+                              //  this.editDialogController.open()   //改为了上传按钮 TODO 上传按钮暂无后端相关参数
+                            })
+
+                            // 更新按钮
+                            Button({ type: ButtonType.Normal, stateEffect: true }) {
+                              if (this.isLoading ===index || this.isLoadingAll ===this.resourceListData.length) {
+                                Row({ space: 4.67 }) {
+                                  LoadingProgress()
+                                    .color(this.icon_emphasize)
+                                    .width(20).height(20)
+                                  Text($r('app.string.updating')).fontSize(12).fontColor(this.icon_emphasize)
+                                }
+                                .width(100)
+                                .height(28)
+                                .justifyContent(FlexAlign.Center)
+                              } else{
+                                  Row({ space: 4.67 }) {
+                                  SymbolGlyph($r('sys.symbol.arrow_clockwise'))
+                                    .fontSize(14.67)
+                                    .fontColor([this.icon_emphasize])
+                                  Text($r('app.string.update')).fontSize(12).fontColor(this.icon_emphasize)
+                                }
+                                  .width(76)
+                                  .height(28)
+                                  .justifyContent(FlexAlign.Center)
+                              }
+                            }.ButtonStyle()
+                            .onClick(() => {
+                              // 资源更新处理
+                              this.isLoading = index
+                              ClashViewModel.updateProvider(item).then((result) => {
+                                this.isLoading = -1
+                              }).catch((error: Error) => {
+                                this.isLoading = -1
+                              })
+
+                              // 建议使用this.getUIContext()?.animateTo()
+                              animateTo({
+                                duration: 1200,
+                                curve: Curve.Friction,
+                                delay: 500,
+                                iterations: 1, // 设置-1表示动画无限循环
+                                playMode: PlayMode.Alternate,
+                              }, () => {
+                              })
+                            })
+                          }.buttonColumn()
+                        }
+                        .listFlex()
+                      }
+                      .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+                        .combine(TransitionEffect.SLIDE):null)
+                    }
+                  })
+                }
+                .providerList()
+              }
+              .width('100%')
+              .alignItems(HorizontalAlign.Start)
+            }
           }
         }.width('100%')
-        .height('100%')
-        .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
-      }.width('100%')
-      .height('100%')
-    }
+        .contentEndOffset(150)
+        .scrollBar(BarState.Off)
+      }
+    }.width('100%')
+    .height('100%')
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
@@ -201,18 +421,76 @@ export struct ProviderPage {
   }
 }
 
+//副文本样式
 @Extend(Text)
 function smallText() {
   .textOverflow({ overflow: TextOverflow.Ellipsis })
   .fontWeight(FontWeight.Normal)
-  .fontSize(15)
+  .fontSize(14)
+  .maxLines(1)
+  .fontColor($r('sys.color.font_secondary'))
+}
+
+//副标题文本样式
+@Extend(Text)
+function subtitleText() {
+  .textOverflow({ overflow: TextOverflow.Ellipsis })
+  .fontWeight(FontWeight.Normal)
+  .fontSize(16)
+  .fontColor($r('sys.color.font_secondary'))
   .maxLines(1)
 }
 
+//名字文本样式
+@Extend(Text)
+function nameText() {
+  .textOverflow({ overflow: TextOverflow.Ellipsis })
+  .fontWeight(FontWeight.Bold)
+  .fontSize(16)
+  .fontColor($r('sys.color.font_primary'))
+  .maxLines(1)
+}
+
+//列表样式
+@Extend(List)
+function providerList() {
+  .scrollBar(BarState.Off)
+  .width('100%')
+  .enableScrollInteraction(false)
+}
+
+//右上角按钮样式
 @Extend(Button)
 function ButtonStyle() {
-  .width(40)
-  .height(40)
+  .borderRadius(14)
   .clickEffect({ level: ClickEffectLevel.LIGHT })
-  .backgroundColor($r('app.color.settings_container_background'))
+  .backgroundColor($r('app.color.button_container_background'))
+  .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
 }
+
+//文本竖排组件样式
+@Extend(Column)
+function textColumn() {
+  .width('100%')
+  .alignItems(HorizontalAlign.Start)
+  .justifyContent(FlexAlign.Center)
+}
+
+//按钮横排组件样式
+@Extend(Row)
+function buttonColumn() {
+  .width('100%')
+  .height(44)
+  .alignItems(VerticalAlign.Center)
+  .justifyContent(FlexAlign.Start)
+}
+
+//flex组件样式
+@Extend(Flex)
+function listFlex() {
+  .width('100%')
+  .padding({ left: 12, right: 12 })
+  .backgroundColor($r('app.color.container_background'))
+  .borderRadius(BORDER_RADIUS_20)
+}
+

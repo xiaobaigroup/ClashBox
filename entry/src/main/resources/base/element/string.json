@@ -1491,6 +1491,42 @@
     {
       "name": "browse_local_files",
       "value": "浏览本地文件"
+    },
+    {
+      "name": "provider",
+      "value": "提供者"
+    },
+    {
+      "name": "proxy_provider",
+      "value": "代理提供者"
+    },
+    {
+      "name": "update_by",
+      "value": "更新于"
+    },
+    {
+      "name": "usd_cellular_data",
+      "value": "已使用流量/"
+    },
+    {
+      "name": "total_cellular_data",
+      "value": "总流量"
+    },
+    {
+      "name": "upload",
+      "value": "上传"
+    },
+    {
+      "name": "updating",
+      "value": "更新中···"
+    },
+    {
+      "name": "rule_provider",
+      "value": "规则提供者"
+    },
+    {
+      "name": "list_item_number",
+      "value": "个条目数"
     }
   ]
 }

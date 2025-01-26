@@ -1491,6 +1491,42 @@
     {
       "name": "browse_local_files",
       "value": "Browse local files"
+    },
+    {
+      "name": "provider",
+      "value": "Provider"
+    },
+    {
+      "name": "proxy_provider",
+      "value": "Proxy Provider"
+    },
+    {
+      "name": "update_by",
+      "value": "Update by"
+    },
+    {
+      "name": "usd_cellular_data",
+      "value": "Usd Cellular Data/"
+    },
+    {
+      "name": "total_cellular_data",
+      "value": "Total Cellular Data"
+    },
+    {
+      "name": "upload",
+      "value": "Upload"
+    },
+    {
+      "name": "updating",
+      "value": "Updating···"
+    },
+    {
+      "name": "rule_provider",
+      "value": "Rule Provider"
+    },
+    {
+      "name": "list_item_number",
+      "value": "List Item Number"
     }
   ]
 }

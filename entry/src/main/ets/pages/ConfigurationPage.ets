@@ -27,6 +27,7 @@ import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig } from '../entryability/AppState'
 import { EventHub, EventKey } from '../common/EventHub'
 import { getResourceString } from '../utils/ResourceStringUtil'
+import { convertTime } from '../utils/TimeConvertUtil'
 
 
 /**
@@ -90,7 +91,8 @@ struct ConfigurationPage {
     isNewConfig: false,
     configName: '',
     configUrl: '',
-    isConfigAutoUpdate: false
+    isConfigAutoUpdate: false,
+    updateTime: 0
   }
   /**
    * XXX 当前手指触摸的ListItem的对应 `this.configList` 中的 `configId`
@@ -101,7 +103,8 @@ struct ConfigurationPage {
     isNewConfig: false,
     configName: '',
     configUrl: '',
-    isConfigAutoUpdate: false
+    isConfigAutoUpdate: false,
+    updateTime: 0
   }
 
   /* 配置页面内ListItem长按ContextMenu相关 */
@@ -122,6 +125,7 @@ struct ConfigurationPage {
       trafficTotal: '5000GB',
       isFavorite: false,
       sourceType: ConfigDataSourceType.URL,
+      "updateTime":0
     },
     {
       configId: 'd30612ae-369b-4515-bf60-67873fc1bc4a',
@@ -137,6 +141,7 @@ struct ConfigurationPage {
       trafficTotal: '700GB',
       isFavorite: true,
       sourceType: ConfigDataSourceType.QR_CODE,
+      "updateTime":0
     },
     {
       configId: 'e91a4efc-cf14-467d-90c2-fec156806bfa',
@@ -151,6 +156,7 @@ struct ConfigurationPage {
       isFavorite: true,
       sourceType: ConfigDataSourceType.COPY,
       copySourceConfigId: 'a4e2593d-9927-4f57-8868-f316190657a1',
+      "updateTime":0
     },
     {
       configId: '027617f1-5dea-4322-9836-e4187073d328',
@@ -166,6 +172,7 @@ struct ConfigurationPage {
       trafficTotal: '800GB',
       isFavorite: false,
       sourceType: ConfigDataSourceType.QR_CODE,
+      "updateTime":0
     },
   ]
 
@@ -389,9 +396,16 @@ struct ConfigurationPage {
             ForEach(this.configList, (item: ConfigData, index: number) => {
               ListItem() {
                 Row() {
-                  Column() {
+                  Column({space:2}) {
                     Text(item.configName).fontColor(($r('sys.color.font_primary')))
-                    Text(`index:${index}`).fontColor($r('sys.color.font_secondary'))
+                    Row(){
+                      Text($r('app.string.update_by'))
+                        .fontColor($r('sys.color.font_secondary'))
+                      //TODO 这块没看懂更新接口怎么使用
+                      Text(convertTime(item.updateTime))
+                        .fontColor($r('sys.color.font_secondary'))
+                    }
+                  //  Text(item.createdDate)
                   }.alignItems(HorizontalAlign.Start)
                   Blank()
                   Radio({ value: 'radio' + index, group: 'configGroup' })
@@ -400,6 +414,7 @@ struct ConfigurationPage {
                       checkedBackgroundColor: this.icon_emphasize,
                     })
                     .onClick(async  () => {
+                      ClashViewModel.updateProfileConfig(item.configId)
                       this.currentConfigRadioCheckedConfigData = item
                       this.appConfig.currentProfileName = item.configName
                       customVibrator.vibratorTriggerOfHapticClockTimer()

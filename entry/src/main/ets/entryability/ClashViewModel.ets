@@ -82,6 +82,7 @@ export class ClashViewModel {
       }
     }
     EventHub.sendEvent(EventKey.FetchProfile, null)
+
   }
   async changeProxy(profile: Profile, g:string, p: string){
     try {

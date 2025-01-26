@@ -150,7 +150,7 @@ struct Speed {
         {
           smooth: true, //平滑曲线
           name: '速度(Kb/s)',
-          data:  data,
+          data: data,
           label: {
             show: false,
             color: '#ff759bf5',

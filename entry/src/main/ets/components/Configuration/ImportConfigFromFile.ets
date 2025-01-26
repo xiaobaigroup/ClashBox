@@ -72,6 +72,7 @@ export struct ImportConfigFromFile{
     configName: '',
     configUrl: '',
     isConfigAutoUpdate: false,
+    updateTime: 0
   }
   // 保存按钮
   private saveMenus: BindSheetTitleCustomBuilderMenu = {

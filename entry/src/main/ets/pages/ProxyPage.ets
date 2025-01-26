@@ -42,7 +42,7 @@ struct ProxyPage {
   //编辑按钮点击
   @State isShowEdit: boolean = false
 
-  @State isProviderEdit: boolean = false
+  @Provide isProviderEdit: boolean = false
   //分组tabs相关
   @State currentIndex: number = 0;
 
@@ -99,6 +99,8 @@ struct ProxyPage {
   private currentProfile: Profile | null
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
+  /**主页卡片标题按钮间距*/
+  @Consume('HomeCardTitleButtonPadding') private HomeCardTitleButtonPadding: BreakpointState<number>
   //栅格点位配置
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
@@ -306,14 +308,16 @@ struct ProxyPage {
     Column() {
       // 标题栏
       if (!this.isLandscapePhone) {
-        Row() {
+        Row({space: this.HomeCardTitleButtonPadding.value}) {
           Text($r('app.string.Proxy'))
             .fontSize(32)
             .fontWeight(FontWeight.Bold)
             .textAlign(TextAlign.Center)
           Blank()
+
+          //提供者按钮
           Button({ type: ButtonType.Circle, stateEffect: true }) {
-            SymbolGlyph($r('sys.symbol.eraser_line'))
+            SymbolGlyph($r('sys.symbol.puzzle'))
               .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
               .fontColor([this.icon_primary])
           }
@@ -323,19 +327,19 @@ struct ProxyPage {
           .clickEffect({ level: ClickEffectLevel.MIDDLE })
           .onClick(() => {
             this.isProviderEdit = true
+            this.isEnableIndexForegroundBlur=true
           })
           .bindSheet($$this.isProviderEdit, this.ProviderBindSheetEdit(), {
             detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
             backgroundColor: $r('app.color.background'),
-            //  blurStyle: BlurStyle.BACKGROUND_REGULAR,
-            showClose: true,
+            showClose: false,
             dragBar: false,
             scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-            title: { title: $r('app.string.Edit') },
+         //   title: { title: $r('app.string.provider') },
             preferType: SheetType.CENTER,
-            //         maskColor: $r('app.color.dialog_maskcolor'),
             onWillDismiss: () => {
               this.isProviderEdit = false
+              this.isEnableIndexForegroundBlur=false
             }
           })
           //编辑图标
