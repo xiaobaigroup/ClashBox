@@ -53,8 +53,8 @@ export interface ConfigData{
   configAutoUpdateTimeGapTextPickerIndex?: number
   // 创建日期 yyyy-MM-dd hh:mm:ss
   createdDate?: string
-  // 最后更新/编辑日期 yyyy-MM-dd hh:mm:ss
-  lastUpdateDateTime?: string
+  // 最后更新/编辑日期 时间戳格式
+  lastUpdateDateTime: number
   // 套餐已用流量
   trafficUsed?: string
   // 套餐所有流量
@@ -65,7 +65,7 @@ export interface ConfigData{
   sourceType?: ConfigDataSourceType
   // 如果是副本配置，对应源配置id
   copySourceConfigId?: string
-  "updateTime" :number
+  updateTime: number
 }
 
 

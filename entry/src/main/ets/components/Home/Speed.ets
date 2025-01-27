@@ -7,6 +7,12 @@ import { JSON } from '@kit.ArkTS';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 
 
+interface GeneratedUnitInterface {
+  TB: number;
+  GB: number;
+  MB: number;
+}
+
 @Component
 struct Speed {
   @State DownloadSpeed: string = ""
@@ -20,6 +26,7 @@ struct Speed {
   @StorageProp("appFlowingState") appFlowingState: AppFlowingState = new AppFlowingState()
   @Consume
   @Watch('proxyEnabledChanged') proxyEnabled: boolean
+  @State chartdata: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   //初始化图表数据
   @State defOption: Options = new Options({
     //图例
@@ -91,25 +98,29 @@ struct Speed {
   private timerId: number = 0;
 
   /**
-   * 缩放数值（0 ~ 1000）
+   * 转换数值（0 ~ 1024）
    */
-  scaleArrayValues(arr: number[]): number[] {
-    const maxVal = Math.max(...arr)
-    if (maxVal <= 0) {
-      return arr.map(() => 0)
+  convertDataUnit(kbArray: number[]): number[] {
+    const conversionFactors: GeneratedUnitInterface = {
+      TB: 1024 ** 3,
+      GB: 1024 ** 2,
+      MB: 1024,
     }
 
-    // 计算缩放因子
-    const scaleFactor = 1000 / maxVal
-    const scaledArray = arr.map(value => {
-      const scaledValue = value * scaleFactor
-      // 保留3位小数
-      const roundedValue = Number(scaledValue.toFixed(3))
-      // 缩放后的值大于1000则为1000，小于0则为0
-      return Math.min(Math.max(roundedValue, 0), 1000)
+    const convertedArray: number[] = kbArray.map(kb => {
+      if (kb >= conversionFactors.TB) {
+        return kb / conversionFactors.TB
+      } else if (kb >= conversionFactors.GB) {
+        return kb / conversionFactors.GB
+      } else if (kb >= conversionFactors.MB) {
+        return kb / conversionFactors.MB
+      } else {
+        // 如果小于1MB，则保持为KB
+        return kb
+      }
     })
 
-    return scaledArray
+    return convertedArray
   }
 
   onSpeedData() {
@@ -118,7 +129,7 @@ struct Speed {
     //图表
     // 使用Option实例对象的setVal方法来实现，修改什么属性就传什么
     // Tip 如果是一条曲线 合成一个 up + down
-    let data = this.proxyEnabled ? this.scaleArrayValues(this.appFlowingState.traffics.getData()) : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    let data = this.proxyEnabled ? this.convertDataUnit(this.appFlowingState.traffics.getData()) : this.chartdata
     hilog.info(0xFF00, "HomeSpeedTestTag", "data: %{public}s", JSON.stringify(data))
     this.defOption.setVal({
       series: [
@@ -149,7 +160,7 @@ struct Speed {
            },*/
         {
           smooth: true, //平滑曲线
-          name: '速度(Kb/s)',
+          name: '',
           data: data,
           label: {
             show: false,
@@ -183,11 +194,11 @@ struct Speed {
     if(this.proxyEnabled) {
       // 设置定时器，每秒调用一次 onSpeedData 函数
       this.timerId = setInterval(() => {
-        this.onSpeedData();
-      }, 1000);
+        this.onSpeedData()
+      }, 1000)
     } else {
       // 清除定时器
-      clearInterval(this.timerId);
+      clearInterval(this.timerId)
     }
   }
 

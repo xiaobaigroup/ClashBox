@@ -92,7 +92,8 @@ struct ConfigurationPage {
     configName: '',
     configUrl: '',
     isConfigAutoUpdate: false,
-    updateTime: 0
+    lastUpdateDateTime: 0,
+    updateTime: 0,
   }
   /**
    * XXX 当前手指触摸的ListItem的对应 `this.configList` 中的 `configId`
@@ -104,7 +105,8 @@ struct ConfigurationPage {
     configName: '',
     configUrl: '',
     isConfigAutoUpdate: false,
-    updateTime: 0
+    updateTime: 0,
+    lastUpdateDateTime: 0
   }
 
   /* 配置页面内ListItem长按ContextMenu相关 */
@@ -120,12 +122,12 @@ struct ConfigurationPage {
       configAutoUpdateTimeGapValue: 10,
       configAutoUpdateTimeGapTextPickerIndex: 1,
       createdDate: '2024-05-21 21:21:21',
-      lastUpdateDateTime: '2024-12-18 17:51:00',
+      lastUpdateDateTime: 0,
+      updateTime: 0,
       trafficUsed: '1329.43GB',
       trafficTotal: '5000GB',
       isFavorite: false,
       sourceType: ConfigDataSourceType.URL,
-      "updateTime":0
     },
     {
       configId: 'd30612ae-369b-4515-bf60-67873fc1bc4a',
@@ -136,12 +138,12 @@ struct ConfigurationPage {
       configAutoUpdateTimeGapValue: 233,
       configAutoUpdateTimeGapTextPickerIndex: 0,
       createdDate: '2023-12-20 04:14:35',
-      lastUpdateDateTime: '2024-12-18 15:00:00',
+      lastUpdateDateTime: 0,
+      updateTime: 0,
       trafficUsed: '234.42GB',
       trafficTotal: '700GB',
       isFavorite: true,
       sourceType: ConfigDataSourceType.QR_CODE,
-      "updateTime":0
     },
     {
       configId: 'e91a4efc-cf14-467d-90c2-fec156806bfa',
@@ -150,13 +152,13 @@ struct ConfigurationPage {
       configUrl: 'https://enlin.com:2333',
       isConfigAutoUpdate: false,
       createdDate: '2024-06-16 12:34:56',
-      lastUpdateDateTime: '2024-12-18 12:00:00',
+      lastUpdateDateTime: 0,
+      updateTime: 0,
       trafficUsed: '874.04GB',
       trafficTotal: '2000GB',
       isFavorite: true,
       sourceType: ConfigDataSourceType.COPY,
       copySourceConfigId: 'a4e2593d-9927-4f57-8868-f316190657a1',
-      "updateTime":0
     },
     {
       configId: '027617f1-5dea-4322-9836-e4187073d328',
@@ -167,12 +169,12 @@ struct ConfigurationPage {
       configAutoUpdateTimeGapValue: 7,
       configAutoUpdateTimeGapTextPickerIndex: 2,
       createdDate: '2024-01-01 12:24:34',
-      lastUpdateDateTime: '2024-12-19 08:00:00',
+      lastUpdateDateTime: 0,
+      updateTime: 0,
       trafficUsed: '34.05GB',
       trafficTotal: '800GB',
       isFavorite: false,
       sourceType: ConfigDataSourceType.QR_CODE,
-      "updateTime":0
     },
   ]
 
@@ -401,8 +403,7 @@ struct ConfigurationPage {
                     Row(){
                       Text($r('app.string.update_by'))
                         .fontColor($r('sys.color.font_secondary'))
-                      //TODO 这块没看懂更新接口怎么使用
-                      Text(convertTime(item.updateTime))
+                      Text(convertTime(item.lastUpdateDateTime))
                         .fontColor($r('sys.color.font_secondary'))
                     }
                   //  Text(item.createdDate)
@@ -582,7 +583,8 @@ struct ConfigurationPage {
         isFavorite: this.favoriteProfiles.has(d.id) ?? false,
         configUrl: d.url,
         isConfigAutoUpdate: d.autoUpdate,
-        configAutoUpdateTimeGapValue: d.autoUpdateDuration
+        configAutoUpdateTimeGapValue: d.autoUpdateDuration,
+        lastUpdateDateTime: d.lastUpdateDate
       } as ConfigData
     })
   }

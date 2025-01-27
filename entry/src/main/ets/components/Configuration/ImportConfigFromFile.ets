@@ -72,6 +72,7 @@ export struct ImportConfigFromFile{
     configName: '',
     configUrl: '',
     isConfigAutoUpdate: false,
+    lastUpdateDateTime: 0,
     updateTime: 0
   }
   // 保存按钮

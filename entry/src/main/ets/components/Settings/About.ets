@@ -319,7 +319,7 @@ struct About {
                     }
                   })
                 }
-              })
+              }, (itemChild: AboutListItemProp) => itemChild.name )
             }
             .backgroundColor($r('app.color.container_background'))
             .borderRadius(BORDER_RADIUS_20)

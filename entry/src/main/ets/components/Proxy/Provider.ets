@@ -5,6 +5,7 @@ import { convertTime } from "../../utils/TimeConvertUtil"
 import { ClashConfig } from 'proxy_core'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { Provider } from "proxy_core"
+import { hilog } from "@kit.PerformanceAnalysisKit"
 
 
 // 资源数据（假设）
@@ -55,8 +56,10 @@ export struct ProviderPage {
   @State currentEditInputValue: string = ''
   // 编辑路由地址弹窗标题
   @State theEditDialogTitle: ResourceStr = $r('app.string.edit_resource')
-  @State isLoading: number = -1
-  @State isLoadingAll: number = -1
+  @Watch('loadingChange')
+  @State isLoading: number = -1;
+  @Watch('loadingChange')
+  @State isLoadingAll: number = -1;
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   // 临时数据
   @State
@@ -67,7 +70,17 @@ export struct ProviderPage {
   /* 是否开启全局动画判定 */
   @Consume ('isAnimation') isAnimation: boolean
 
-
+  /**
+   * 监听加载状态改变执行UI数组更新
+   */
+  async loadingChange(): Promise<void> {
+    if(this.isLoading === -1) {
+      hilog.debug(0xFF00, "ProvidertestTag", "进入loadingChange状态改变执行 %{public}s")
+      const newlist = await ClashViewModel.getProviders()
+      this.resourceListData = newlist
+      hilog.debug(0xFF00, "ProvidertestTag", "getProviders: %{public}s", JSON.stringify(newlist))
+    }
+  }
   async aboutToAppear(): Promise<void> {
     const list = await ClashViewModel.getProviders()
     this.resourceListData = list
