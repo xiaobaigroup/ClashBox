@@ -130,6 +130,8 @@ struct ProxyPage {
         Text(title)
           .fontSize(14)
           .fontColor(this.currentIndex === targetIndex ? this.font_on_primary : this.font_secondary)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
       }
       .borderRadius(21)
       .height(this.currentIndex === targetIndex ? 36 : 32)
@@ -185,6 +187,8 @@ struct ProxyPage {
               })
           }
           .EditRow()
+          .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+            .combine(TransitionEffect.SLIDE):null)
           // 点击后改变ProxyArrangementSelected状态为 标签
           .onClick(() => {
             animateTo({ duration: 500 }, () => {
@@ -241,6 +245,8 @@ struct ProxyPage {
       }
       .height(142)
       .EditColumn()
+      .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+        .combine(TransitionEffect.SLIDE):null)
 
       //代理节点卡片尺寸切换
       EditTitle({ title: $r('app.string.Card_Size') })
@@ -285,6 +291,8 @@ struct ProxyPage {
       }
       .height(142)
       .EditColumn()
+      .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+        .combine(TransitionEffect.SLIDE):null)
 
     }
     .padding({
@@ -329,19 +337,7 @@ struct ProxyPage {
             this.isProviderEdit = true
             this.isEnableIndexForegroundBlur=true
           })
-          .bindSheet($$this.isProviderEdit, this.ProviderBindSheetEdit(), {
-            detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
-            backgroundColor: $r('app.color.background'),
-            showClose: false,
-            dragBar: false,
-            scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-         //   title: { title: $r('app.string.provider') },
-            preferType: SheetType.CENTER,
-            onWillDismiss: () => {
-              this.isProviderEdit = false
-              this.isEnableIndexForegroundBlur=false
-            }
-          })
+
           //编辑图标
           Button({ type: ButtonType.Circle, stateEffect: true }) {
             SymbolGlyph($r('sys.symbol.square_and_pencil'))
@@ -371,6 +367,19 @@ struct ProxyPage {
         Column({ space: 5 }) {
           SymbolGlyph($r('sys.symbol.doc')).fontSize(32).fontColor([this.icon_secondary])
           Text($r('app.string.None_Proxy')).fontSize(20).fontColor(this.font_secondary).textAlign(TextAlign.Center)
+            .bindSheet($$this.isProviderEdit, this.ProviderBindSheetEdit(), {
+              detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
+              backgroundColor: $r('app.color.background'),
+              showClose: false,
+              dragBar: false,
+              scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+              //   title: { title: $r('app.string.provider') },
+              preferType: SheetType.CENTER,
+              onWillDismiss: () => {
+                this.isProviderEdit = false
+                this.isEnableIndexForegroundBlur=false
+              }
+            })
         }
         .width('100%')
         .height('90%')
@@ -382,18 +391,17 @@ struct ProxyPage {
         .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
           detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
           backgroundColor: $r('app.color.background'),
-          //  blurStyle: BlurStyle.BACKGROUND_REGULAR,
           showClose: true,
           dragBar: false,
           scrollSizeMode: ScrollSizeMode.CONTINUOUS,
           title: { title: $r('app.string.Edit') },
           preferType: SheetType.CENTER,
-          //         maskColor: $r('app.color.dialog_maskcolor'),
           onWillDismiss: () => {
             this.isShowEdit = false
             this.isEnableIndexForegroundBlur=false
           }
         })
+
       } else if (this.proxyGroups.length > 0) {
         // 代理页分组TAB+list主体
         Stack({ alignContent: this.stackAlignContentAlignment  }) {
@@ -428,17 +436,9 @@ struct ProxyPage {
                   })
                 })
               }
-             // .animationDuration(200)
               .barMode(BarMode.Scrollable)
               .barHeight(55)
               .fadingEdge(false)
-        //      .onChange((index: number) => {
-        //        this.currentIndex = index;
-         //       if(this.currentProfile){
-         //         this.currentProfile.currentGroupName = this.proxyGroups[index].name
-         //         ClashViewModel.updateProfile(this.currentProfile)
-        //        }
-        //      })
             }
             .padding({
               left: this.breakPointStateTabContentTitleMargin.value,
@@ -509,6 +509,19 @@ struct ProxyPage {
        // .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
         .width('100%')
         .height(this.isLandscapePhone ? '100%' : `calc(100% - ${TAB_CONTENT_TITLE_HEIGHT}vp)`)
+        .bindSheet($$this.isProviderEdit, this.ProviderBindSheetEdit(), {
+          detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
+          backgroundColor: $r('app.color.background'),
+          showClose: false,
+          dragBar: false,
+          scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+          //   title: { title: $r('app.string.provider') },
+          preferType: SheetType.CENTER,
+          onWillDismiss: () => {
+            this.isProviderEdit = false
+            this.isEnableIndexForegroundBlur=false
+          }
+        })
 
         // 主体 END
       }

@@ -37,8 +37,6 @@ function switchResourceSize(size: number) {
   }
 }
 
-
-
 @Component
 export struct ProviderPage {
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
@@ -126,56 +124,13 @@ export struct ProviderPage {
     editItem.path = this.SaveEditInputValue
     this.resourceListData.splice(this.theEditIndex, 1, editItem)
   }
+
+
   build() {
     NavDestination() {
       Column(){
-        //顶部标题区域
-        Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-          Text($r('app.string.provider'))
-            .fontSize(20)
-            .fontWeight(FontWeight.Bold)
-            .maxLines(1)
-            .fontColor($r('sys.color.font_primary'))
-
-          Row({space:10}){
-            //全部更新按钮
-            Button({ type: ButtonType.Circle, stateEffect: true }) {
-              SymbolGlyph($r('sys.symbol.arrow_clockwise'))
-                .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-                .fontColor([this.icon_primary])
-            }
-            .width(40)
-            .height(40)
-            .backgroundColor($r('app.color.settings_container_background'))
-            .clickEffect({ level: ClickEffectLevel.MIDDLE })
-            .onClick(() => {
-              this.resourceListData.forEach((item: Provider) => {
-                convertTime(item["update-at"])
-                this.isLoadingAll =this.resourceListData.length
-                ClashViewModel.updateProvider(item).then((result) => {
-                  this.isLoadingAll = -1
-                }).catch((error: Error) => {
-                  this.isLoadingAll = -1
-                })
-              })
-            })
-
-            //关闭按钮
-            Button({ type: ButtonType.Circle, stateEffect: true }) {
-              SymbolGlyph($r('sys.symbol.xmark'))
-                .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-                .fontColor([this.icon_primary])
-            }
-            .width(40)
-            .height(40)
-            .backgroundColor($r('app.color.settings_container_background'))
-            .clickEffect({ level: ClickEffectLevel.MIDDLE })
-            .onClick(() => {
-              this.isProviderEdit = false
-              this.isEnableIndexForegroundBlur=false
-            })
-          }
-        }.width('100%').height(56).margin({top:8})
+        //顶部半模拟态标题及按钮
+        this.titleStyle()
 
         List() {
           ListItem(){
@@ -253,7 +208,7 @@ export struct ProviderPage {
                             // 上传按钮
                             Button({ type: ButtonType.Normal, stateEffect: true }) {
                               Row({space:4.67}) {
-                                SymbolGlyph($r('sys.symbol.arrowshape_up_frame_fill'))
+                                SymbolGlyph($r('sys.symbol.arrowshape_up_to_line_fill'))
                                   .fontSize(14.67)
                                   .fontColor([this.icon_emphasize])
                                 Text($r('app.string.upload')).fontSize(12).fontColor(this.icon_emphasize)
@@ -349,7 +304,7 @@ export struct ProviderPage {
                             // 上传按钮
                             Button({ type: ButtonType.Normal, stateEffect: true }) {
                               Row({space:4.67}) {
-                                SymbolGlyph($r('sys.symbol.arrowshape_up_frame_fill'))
+                                SymbolGlyph($r('sys.symbol.arrowshape_up_to_line_fill'))
                                   .fontSize(14.67)
                                   .fontColor([this.icon_emphasize])
                                 Text($r('app.string.upload')).fontSize(12).fontColor(this.icon_emphasize)
@@ -431,6 +386,58 @@ export struct ProviderPage {
     .onBackPressed(() => {
       return true;
     })
+  }
+
+  //顶部半模拟态标题及按钮
+  @Builder
+  titleStyle(){
+    //顶部标题区域
+    Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
+      Text($r('app.string.provider'))
+        .fontSize(20)
+        .fontWeight(FontWeight.Bold)
+        .maxLines(1)
+        .fontColor($r('sys.color.font_primary'))
+
+      Row({space:10}){
+        //全部更新按钮
+        Button({ type: ButtonType.Circle, stateEffect: true }) {
+          SymbolGlyph($r('sys.symbol.arrow_clockwise'))
+            .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+            .fontColor([this.icon_primary])
+        }
+        .width(40)
+        .height(40)
+        .backgroundColor($r('app.color.settings_container_background'))
+        .clickEffect({ level: ClickEffectLevel.MIDDLE })
+        .onClick(() => {
+          this.resourceListData.forEach((item: Provider) => {
+            convertTime(item["update-at"])
+            this.isLoadingAll =this.resourceListData.length
+            ClashViewModel.updateProvider(item).then((result) => {
+              this.isLoadingAll = -1
+            }).catch((error: Error) => {
+              this.isLoadingAll = -1
+            })
+          })
+        })
+
+        //关闭按钮
+        Button({ type: ButtonType.Circle, stateEffect: true }) {
+          SymbolGlyph($r('sys.symbol.xmark'))
+            .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+            .fontColor([this.icon_primary])
+        }
+        .width(40)
+        .height(40)
+        .backgroundColor($r('app.color.settings_container_background'))
+        .clickEffect({ level: ClickEffectLevel.MIDDLE })
+        .onClick(() => {
+          this.isProviderEdit = false
+          this.isEnableIndexForegroundBlur=false
+        })
+      }
+    }.width('100%').height(56).margin({top:8})
   }
 }
 
