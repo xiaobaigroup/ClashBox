@@ -79,6 +79,7 @@ export struct ProviderPage {
       hilog.debug(0xFF00, "ProvidertestTag", "getProviders: %{public}s", JSON.stringify(newlist))
     }
   }
+
   async aboutToAppear(): Promise<void> {
     const list = await ClashViewModel.getProviders()
     this.resourceListData = list
@@ -186,7 +187,11 @@ export struct ProviderPage {
 
                             //
                             Column() {
-                              Progress({ value: item["subscription-info"]?.download,total: item["subscription-info"]?.total, type: ProgressType.Capsule  })//value为使用流量的值
+                              Progress({
+                                value: item["subscription-info"]?.download,
+                                total: item["subscription-info"]?.total,
+                                type: ProgressType.Capsule
+                              })//value为使用流量的值
                                 .style({enableSmoothEffect: true,borderColor:'#00ffffff'})
                                 .color('#ff46b1e3')
                                 .width('100%')
@@ -247,19 +252,25 @@ export struct ProviderPage {
                             }.ButtonStyle()
                             .onClick(() => {
                               // 资源更新处理
-                              this.isLoading = index
                               ClashViewModel.updateProvider(item).then((result) => {
                                 this.isLoading = -1
                               }).catch((error: Error) => {
                                 this.isLoading = -1
+                              })
+                              animateTo({
+                                duration: ANIMATION_DURATION_300,
+                                curve: Curve.Friction,
+                                iterations: 1, // 设置-1表示动画无限循环
+                              }, () => {
+                                this.isLoading = index
                               })
                             })
                           }.buttonColumn()
                         }
                         .listFlex()
                       }
-                      .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
-                        .combine(TransitionEffect.SLIDE):null)
+                //      .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+                 //       .combine(TransitionEffect.SLIDE):null)
                     }
                   })
                 }.providerList()
@@ -343,29 +354,26 @@ export struct ProviderPage {
                             }.ButtonStyle()
                             .onClick(() => {
                               // 资源更新处理
-                              this.isLoading = index
                               ClashViewModel.updateProvider(item).then((result) => {
                                 this.isLoading = -1
                               }).catch((error: Error) => {
                                 this.isLoading = -1
                               })
-
                               // 建议使用this.getUIContext()?.animateTo()
                               animateTo({
-                                duration: 1200,
+                                duration: ANIMATION_DURATION_300,
                                 curve: Curve.Friction,
-                                delay: 500,
                                 iterations: 1, // 设置-1表示动画无限循环
-                                playMode: PlayMode.Alternate,
                               }, () => {
+                                this.isLoading = index
                               })
                             })
                           }.buttonColumn()
                         }
                         .listFlex()
                       }
-                      .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
-                        .combine(TransitionEffect.SLIDE):null)
+                   //   .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+                  //      .combine(TransitionEffect.SLIDE):null)
                     }
                   })
                 }
@@ -411,15 +419,22 @@ export struct ProviderPage {
         .backgroundColor($r('app.color.settings_container_background'))
         .clickEffect({ level: ClickEffectLevel.MIDDLE })
         .onClick(() => {
-          this.resourceListData.forEach((item: Provider) => {
-            convertTime(item["update-at"])
-            this.isLoadingAll =this.resourceListData.length
-            ClashViewModel.updateProvider(item).then((result) => {
-              this.isLoadingAll = -1
-            }).catch((error: Error) => {
-              this.isLoadingAll = -1
+          animateTo({
+            duration: ANIMATION_DURATION_300,
+            curve: Curve.Friction,
+            iterations: 1, // 设置-1表示动画无限循环
+          }, () => {
+            this.resourceListData.forEach((item: Provider) => {
+              convertTime(item["update-at"])
+              this.isLoadingAll =this.resourceListData.length
+              ClashViewModel.updateProvider(item).then((result) => {
+                this.isLoadingAll = -1
+              }).catch((error: Error) => {
+                this.isLoadingAll = -1
+              })
             })
           })
+
         })
 
         //关闭按钮

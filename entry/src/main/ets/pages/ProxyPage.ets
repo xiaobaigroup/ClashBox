@@ -187,8 +187,8 @@ struct ProxyPage {
               })
           }
           .EditRow()
-          .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
-            .combine(TransitionEffect.SLIDE):null)
+      //    .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+     //       .combine(TransitionEffect.SLIDE):null)
           // 点击后改变ProxyArrangementSelected状态为 标签
           .onClick(() => {
             animateTo({ duration: 500 }, () => {
@@ -245,8 +245,8 @@ struct ProxyPage {
       }
       .height(142)
       .EditColumn()
-      .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
-        .combine(TransitionEffect.SLIDE):null)
+  //    .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+   //     .combine(TransitionEffect.SLIDE):null)
 
       //代理节点卡片尺寸切换
       EditTitle({ title: $r('app.string.Card_Size') })
@@ -291,8 +291,8 @@ struct ProxyPage {
       }
       .height(142)
       .EditColumn()
-      .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
-        .combine(TransitionEffect.SLIDE):null)
+  //    .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+  //      .combine(TransitionEffect.SLIDE):null)
 
     }
     .padding({
