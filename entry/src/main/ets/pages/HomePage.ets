@@ -102,7 +102,7 @@ struct Home {
   // 代理启动按钮状态
   @Provide private proxyEnabled: boolean = false
   // 代理启动持续的时间
-  @State private proxyStartingDuration: string = PROXY_STARTED_DURATION_INIT_VALUE
+  @Consume private proxyStartingDuration: string
   // 按钮宽度
   @State private proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
   // 按钮高度

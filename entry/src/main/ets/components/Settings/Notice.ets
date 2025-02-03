@@ -12,7 +12,14 @@ import { hilog } from "@kit.PerformanceAnalysisKit"
 import { customVibrator } from "../../utils/VibratorUtil"
 import { customSound } from "../../utils/SoundPoolUtil"
 import { promptAction } from "@kit.ArkUI"
-import { toggleRowList } from "../Common"
+import { theRowCustomDialog, toggleRowList } from "../Common"
+import { UIConfig } from "../../entryability/AppState"
+import { notificationManager } from '@kit.NotificationKit'
+import { BusinessError } from '@kit.BasicServicesKit'
+import { common } from '@kit.AbilityKit'
+
+const TAG: string = '[通知页]';
+const DOMAIN_NUMBER: number = 0xFF00;
 
 /**
  * 通知页
@@ -30,16 +37,20 @@ struct Notice {
   // 流量提醒启用状态变量
   @Consume EnableCellularDataReminder: boolean
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
-  // 震动反馈开关变量
-  @State Enabledvibrate: boolean = false
-  // 震动反馈开关变量
-  @State Enabledsound: boolean = false
+  // UI控制变量
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 通知总开关变量
   @State Enablednotice: boolean = false
   // 常驻通知开关变量
   @State EnabledPermanentnotice: boolean = true
   // 时间提醒开关变量
   @State EnabledTimenotice: boolean = false
+  // 模拟下载关闭提示弹窗标题
+  @State theToDialogTitle: ResourceStr = $r('app.string.simulate_download_closed_tips')
+  // 模拟下载关闭提示弹窗内容文本
+  @State toContentText: ResourceStr = $r('app.string.simulate_download_closed_content_text')
+  // 通知总开关点击计数器
+  @State noticeToggle: number = 0
   @State currentNumber: number = 0
   private TimeUnitSelect: number = 1
   private TimeUnitFruits: string[] = [
@@ -64,17 +75,113 @@ struct Notice {
   // ListItem里自动更新间隔`TextPicker`组件的渐隐效果
   @State
   private gradientHeightOfTextPickerInTheListItem: number = FONT_SIZE_16
+  private context = getContext(this) as common.UIAbilityContext
 
 
-  aboutToAppear(): void {
+  toDialogController: CustomDialogController = new CustomDialogController({
+    builder: theRowCustomDialog({
+      theDialogTitle: this.theToDialogTitle,
+      contentText: this.toContentText,
+      cancel: ()=> { this.onCancel() },
+      confirm: ()=> { this.onAccept() },
+      leftButton: this.toBuilder
+    }),
+  })
+
+  @Builder
+  toBuilder() {
+    Button($r('app.string.to'))
+      .backgroundColor($r('app.color.container_background'))
+      .width('100%')
+      .height(39)
+      .fontColor(this.icon_emphasize)
+  }
+
+  aboutToAppear() {
     hilog.info(0xFF00, this.componentName, `#aboutToAppear executed`)
-    customSound.initSoundPool(3, 'beat_short.wav')
+    if(this.uiConfig.isSound) {
+      customSound.initSoundPool(3, 'beat_short.wav')
+    }
   }
 
   aboutToDisappear(): void {
     hilog.info(0xFF00, this.componentName, `#aboutToDisappear executed`)
     customSound.destroySoundPool()
   }
+
+  onPageShow(): void {
+    hilog.debug(DOMAIN_NUMBER, TAG, '页面显示')
+  }
+
+  onCancel() {
+    this.uiConfig.Enablednotice = false
+  }
+  onAccept() {
+    this.handleToSettings()
+  }
+
+  /**
+   * 通知启用操作
+   */
+  async EnabledNotification() {
+    try {
+      // 先获取最新权限状态
+      const currentStatus = await notificationManager.isNotificationEnabled()
+      if (currentStatus) {
+        // 已有权限时通知开关启用或关闭
+        // 显示通知设置 显式动画
+        this.getUIContext()?.animateTo({
+          duration: ANIMATION_DURATION_300,
+        }, () => {
+          this.uiConfig.Enablednotice = !this.uiConfig.Enablednotice
+        })
+
+      } else {
+        // 没有授权时
+        if (!this.uiConfig.isRequestNotification) {
+          // 首次请求权限
+          try {
+            await notificationManager.requestEnableNotification(this.context)
+            this.uiConfig.isRequestNotification = true
+            // 显示通知设置 显式动画
+            this.getUIContext()?.animateTo({
+              duration: ANIMATION_DURATION_300,
+            }, () => {
+              this.uiConfig.Enablednotice = true
+            })
+          } catch (err) {
+            if ((err as BusinessError).code === 1600004) {
+              hilog.error(DOMAIN_NUMBER, TAG, '用户拒绝授权')
+              this.uiConfig.Enablednotice = false
+              this.uiConfig.isRequestNotification = true
+            }
+          }
+        } else {
+          // 已请求过权限且通知开关未启用，进入跳转设置
+          if(!this.uiConfig.Enablednotice) {
+            this.toDialogController.open()
+          }
+        }
+      }
+    } catch (err) {
+      hilog.error(DOMAIN_NUMBER, TAG, `Toggle Error: ${(err as BusinessError).code}, ${(err as BusinessError).message}`);
+    }
+  }
+
+  /**
+   *  跳转至设置界面开启通知权限
+   */
+  handleToSettings() {
+    this.context.startAbility({
+      bundleName: 'com.huawei.hmos.settings', // 系统设置界面的包名 （固定）
+      abilityName: 'com.huawei.hmos.settings.MainAbility', // 系统设置的Ability的名字（固定）
+      uri: "application_info_entry", // 系统设置的界面 （固定）
+      parameters: {
+        pushParams: 'org.xbgroup.clashnext' // 包名
+      }
+    })
+  }
+
 
   build() {
     NavDestination() {
@@ -89,18 +196,10 @@ struct Notice {
               icons: $r('sys.symbol.rectangle_portrait_wave_2')
             }) {
               // 震动反馈开关
-              Toggle({ type: ToggleType.Switch, isOn: $$this.Enabledvibrate })
+              Toggle({ type: ToggleType.Switch, isOn: $$this.uiConfig.isVibrate })
                 .selectedColor(this.icon_emphasize)
                 .margin({right: 12})
-                .onChange((isOn: boolean) => {
-                  // 显示后台通知设置 显式动画
-                  this.getUIContext()?.animateTo({
-                    duration: ANIMATION_DURATION_300,
-                    curve: Curve.Ease
-                  }, () => {
-                    this.Enabledvibrate = isOn
-                  })
-                })
+                .hitTestBehavior(HitTestMode.None)
             }
           }
           .RowStyle()
@@ -109,7 +208,7 @@ struct Notice {
             this.getUIContext()?.animateTo({
               duration: ANIMATION_DURATION_300,
             }, () => {
-              this.Enabledvibrate = !this.Enabledvibrate
+              this.uiConfig.isVibrate = !this.uiConfig.isVibrate
             })
           })
           // 震动反馈开关 End
@@ -121,19 +220,11 @@ struct Notice {
               title: $r('app.string.sound_feedback'),
               icons: $r('sys.symbol.bell_fill')
             }) {
-              // 震动反馈开关
-              Toggle({ type: ToggleType.Switch, isOn: $$this.Enabledsound })
+              // 声音反馈开关
+              Toggle({ type: ToggleType.Switch, isOn: $$this.uiConfig.isSound })
                 .selectedColor(this.icon_emphasize)
                 .margin({right: 12})
-                .onChange((isOn: boolean) => {
-                  // 显示后台通知设置 显式动画
-                  this.getUIContext()?.animateTo({
-                    duration: ANIMATION_DURATION_300,
-                    curve: Curve.Ease
-                  }, () => {
-                    this.Enabledsound = isOn
-                  })
-                })
+                .hitTestBehavior(HitTestMode.None)
             }
           }
           .RowStyle()
@@ -142,7 +233,7 @@ struct Notice {
             this.getUIContext()?.animateTo({
               duration: ANIMATION_DURATION_300,
             }, () => {
-              this.Enabledsound = !this.Enabledsound
+              this.uiConfig.isSound = !this.uiConfig.isSound
             })
           })
           // 声音反馈开关 End
@@ -156,19 +247,15 @@ struct Notice {
               title: $r('app.string.notice_main_switch'),
               icons: $r('sys.symbol.message_on_message_fill')
             }) {
-              // 通知总开关
-              Toggle({ type: ToggleType.Switch, isOn: $$this.Enablednotice })
-                .selectedColor(this.icon_emphasize)
-                .margin({right: 12})
-                .onChange((isOn: boolean) => {
-                  // 显示后台通知设置 显式动画
-                  this.getUIContext()?.animateTo({
-                    duration: 1200,
-                    curve: Curve.Ease
-                  }, () => {
-                    this.Enablednotice = isOn
-                  })
-                })
+              Row() {
+                // 通知总开关
+                Toggle({ type: ToggleType.Switch, isOn: $$this.uiConfig.Enablednotice })
+                  .selectedColor(this.icon_emphasize)
+                  .margin({right: 12})
+                  .hitTestBehavior(HitTestMode.None)
+              }.onClick(() => {
+                this.EnabledNotification()
+              })
             }
           }
           .RowStyle()
@@ -177,7 +264,7 @@ struct Notice {
             promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
           })
           // 通知总开关 End
-          if (this.Enablednotice) {
+          if (this.uiConfig.Enablednotice) {
             // 常驻通知 Start
             Row() {
               toggleRowList({
@@ -215,12 +302,11 @@ struct Notice {
           }
         }.ColumnStyle()
         // 通知 End
-        if(this.Enablednotice) {
+        if(this.uiConfig.Enablednotice) {
           // 常驻通知提醒 Start
           if(this.Enablebackgrounder) {
             Text($r('app.string.background_notice_tips'))
               .fontWeight(FontWeight.Normal)
-              .margin({ bottom: 10})
               .fontSize(15)
           }
           // 常驻通知提醒 End
@@ -295,7 +381,9 @@ struct Notice {
                   .caretColor(this.icon_emphasize)
                   .borderColor({bottom: this.icon_emphasize})
                   .onSubmit( (enterKey: EnterKeyType, event: SubmitEvent) => {
-                    customVibrator.vibratorTriggerOfHapticClockTimer()
+                    if (this.uiConfig.isVibrate) {
+                      customVibrator.vibratorTriggerOfHapticClockTimer()
+                    }
                   })
                 TextPicker({range: this.TimeUnitFruits, selected: $$this.TimeUnitSelect})
                   .canLoop(false)
@@ -347,8 +435,12 @@ struct Notice {
                   })
                   .onChange((value: string | string[], index: number | number[]) => {
                     // 震动和声音反馈
-                    customVibrator.vibratorTriggerOfHapticClockTimer()
-                    customSound.playAudioForSoundPool()
+                    if (this.uiConfig.isVibrate) {
+                      customVibrator.vibratorTriggerOfHapticClockTimer()
+                    }
+                    if(this.uiConfig.isSound) {
+                      customSound.playAudioForSoundPool()
+                    }
                     hilog.info(0xFF00, "NoticetestTag", "选择的时间单位为: %{public}s", JSON.stringify(value))
                     hilog.info(0xFF00, "NoticetestTag", "选择的时间单位index: %{public}s", JSON.stringify(index))
                     hilog.info(0xFF00, "NoticetestTag", "当前输入为: %{public}s", this.currentNumber)

@@ -68,6 +68,14 @@ export class UIConfig{
   isShowHomeCard: string = JSON.stringify(showHomeCard)
   // 用户选择的语言
   userLanguage: string = "default"
+  // 震动反馈变量
+  isVibrate: boolean = true
+  // 声音反馈变量
+  isSound: boolean = true
+  // 通知总开关
+  Enablednotice: boolean = false
+  // 是否进行过通知授权
+  isRequestNotification: boolean = false
   /* 主页小卡片相关 */
   //快捷方式小卡片
   inputTitle1: string = ''

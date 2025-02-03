@@ -240,23 +240,25 @@ export struct ImportConfigFromURL{
       this.configCustomDownloadingDialogController?.open()
       try {
         await ClashViewModel.addOrUpdateProfileByUrl(this.configData, null)
+        this.configCustomDownloadingDialogController?.close()
       } catch (e) {
         console.error("ClashNext", e.message, e.stack);
         this.configCustomDownloadingDialogController?.close()
         this.promptAction.showToast({message: getResourceString($r('app.string.download_failed'), this) + e.message || e})
       }
-      this.configCustomDownloadingDialogController?.close()
+
     } else {
       this.customDownloadingDialogTitle = $r('app.string.updating_configuration_file')
       this.configCustomDownloadingDialogController?.open()
       try {
         await ClashViewModel.addOrUpdateProfileByUrl(this.configData, this.configData.configId)
+        this.configCustomDownloadingDialogController?.close()
       } catch (e) {
         console.error("ClashNext", e.message, e.stack);
         this.configCustomDownloadingDialogController?.close()
         this.promptAction.showToast({message: getResourceString($r('app.string.download_failed'), this) + e.message || e})
       }
-      this.configCustomDownloadingDialogController?.close()
+
     }
   }
 

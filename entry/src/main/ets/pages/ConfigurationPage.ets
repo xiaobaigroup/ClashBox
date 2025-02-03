@@ -24,7 +24,7 @@ import { configShare } from '../utils/SystemShareUtil'
 // XXX 测试用 删除
 import { showFileNameListOfFileDir } from '../utils/FileUtil'
 import ClashViewModel from '../entryability/ClashViewModel'
-import { AppConfig } from '../entryability/AppState'
+import { AppConfig, UIConfig } from '../entryability/AppState'
 import { EventHub, EventKey } from '../common/EventHub'
 import { getResourceString } from '../utils/ResourceStringUtil'
 import { convertTime } from '../utils/TimeConvertUtil'
@@ -76,6 +76,8 @@ struct ConfigurationPage {
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone')
   private isLandscapePhone: boolean = false
+
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   /* NV路由 相关 */
   // 路由栈
@@ -415,10 +417,12 @@ struct ConfigurationPage {
                       checkedBackgroundColor: this.icon_emphasize,
                     })
                     .onClick(async  () => {
+                      if (this.uiConfig.isVibrate) {
+                        customVibrator.vibratorTriggerOfHapticClockTimer()
+                      }
                       ClashViewModel.updateProfileConfig(item.configId)
                       this.currentConfigRadioCheckedConfigData = item
                       this.appConfig.currentProfileName = item.configName
-                      customVibrator.vibratorTriggerOfHapticClockTimer()
                       this.appConfig.currentProfileId = item.configId
                       await ClashViewModel.loadProfileAndConfig(item.configId)
                       hilog.info(0xC002, this.componentName, `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
@@ -440,13 +444,17 @@ struct ConfigurationPage {
                   previewAnimationOptions: { scale: [1.0, 1.1] },
                   placement: Placement.BottomRight,
                   aboutToAppear: () => {
-                    customVibrator.vibratorTriggerOfHapticClockTimer()
+                    if (this.uiConfig.isVibrate) {
+                      customVibrator.vibratorTriggerOfHapticClockTimer()
+                    }
                   }
                 })
               .onClick(async  () => {
                 this.currentConfigRadioCheckedConfigData = item
                 this.appConfig.currentProfileName = item.configName
-                customVibrator.vibratorTriggerOfHapticClockTimer()
+                if (this.uiConfig.isVibrate) {
+                  customVibrator.vibratorTriggerOfHapticClockTimer()
+                }
                 this.appConfig.currentProfileId = item.configId
                 await ClashViewModel.loadProfileAndConfig(item.configId)
                 hilog.info(0xC002, this.componentName, `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)

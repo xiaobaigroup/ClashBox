@@ -40,7 +40,8 @@ import {
   CardTitleFontSize_18_20_22_22,
   HomeProxyFontSize_24_26_26_27,
   SpeedfontSize12_14_14_16,
-  HomeCardCellularDataPadding
+  HomeCardCellularDataPadding,
+  PROXY_STARTED_DURATION_INIT_VALUE
 } from '../common/Constants'
 import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
@@ -299,6 +300,9 @@ struct Index {
   @Provide Enablebackgrounder: boolean = false
   // 设置 -> 外观 -> 按钮位置变量
   @Provide ButtonPositionOffset: number = 0
+
+  // 代理启动的计时文本
+  @Provide private proxyStartingDuration: string = PROXY_STARTED_DURATION_INIT_VALUE
 
   /* 是否开启全局动画判定 */
   @Provide ('isAnimation') isAnimation: boolean = true

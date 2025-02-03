@@ -1,4 +1,4 @@
-import { BreakpointState, BreakpointSystem } from "../../common/breakpointsystem"
+import { BreakpointState } from "../../common/breakpointsystem"
 import { FONT_SIZE_16, settingsData, SettingsListItem } from "../../common/Constants"
 import settingsListItem from "./settingsListItem"
 import { hilog } from "@kit.PerformanceAnalysisKit"
