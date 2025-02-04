@@ -30,26 +30,29 @@ const ipInfoSources: IpResolver[]  = [
 ];
 
 export async function CallIpResolver(ip: string | undefined, resolver: IpResolver | string): Promise<string | null>{
-  const session = rcp.createSession({requestConfiguration: {transfer: {timeout: { connectMs: 2000, transferMs: 2000, inactivityMs: 2000 }}}});
+  const session = rcp.createSession({requestConfiguration: {transfer: {timeout: { connectMs: 3000, transferMs: 3000, inactivityMs: 3000 }}}});
   const url = typeof resolver == "string" ? resolver as string : resolver.url
-  const resp = await session.get(url + ip ?? "")
-  if(resp.statusCode !== 200)
-    return null;
-  if (typeof resolver == "string" ){
-    return resp.toString()
-  }
   let json = null
   try {
+    const resp = await session.get(url + ip ?? "")
+    if(resp.statusCode !== 200)
+      return null;
+    if (typeof resolver == "string" ){
+      return resp.toString()
+    }
     json = resp.toJSON()
-  }catch (e) {}
-  let result = resolver.resolve(json, resp.toString())
-  session.close()
-  return result
+    let result = resolver.resolve(json, resp.toString())
+    session.close()
+    return result;
+  } catch (e) {
+    console.error("CallIpResolver error: ",url,ip, e)
+    return null
+  }
 }
 export async function queryIpInfo(ip: string){
   for (let resolver of IpCountryList) {
     const result = await CallIpResolver(ip, resolver)
-    if(!result)
+    if (!result)
       continue
     return result
   }
