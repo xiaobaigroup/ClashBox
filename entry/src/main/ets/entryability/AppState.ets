@@ -76,6 +76,10 @@ export class UIConfig{
   Enablednotice: boolean = false
   // 是否进行过通知授权
   isRequestNotification: boolean = false
+  // 后台运行启用变量
+  Enablebackgrounder: boolean = false
+  // 模拟下载启用变量
+  backgroundDownModel: boolean = false
   /* 主页小卡片相关 */
   //快捷方式小卡片
   inputTitle1: string = ''

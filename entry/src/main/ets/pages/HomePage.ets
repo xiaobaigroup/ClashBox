@@ -28,6 +28,7 @@ import CurrentConfiguration from '../components/Home/CurrentConfiguration'
 import ClashViewModel from '../entryability/ClashViewModel'
 import Shortcuts from '../components/Home/Shortcuts'
 import { AppConfig, UIConfig } from '../entryability/AppState'
+import BackgroundDownService from '../utils/BackgroundDownService'
 
 
 @Entry
@@ -672,11 +673,18 @@ struct Home {
             this.proxyStartedTimer.start((formatTime) => {
               this.proxyStartingDuration = formatTime
             })
+            // 当模拟下载和通知均启用时
+            if(this.uiConfig.backgroundDownModel && this.uiConfig.Enablednotice){
+              BackgroundDownService.start(getContext(this))
+            }
             await ClashViewModel.StartVpn()
           } else {
             this.proxyStartedTimer.reset()
             // 如果`reset()`就取消注释这句，如果是`pause()`就注释这句
             this.proxyStartingDuration = PROXY_STARTED_DURATION_INIT_VALUE
+            if(this.uiConfig.backgroundDownModel){
+              BackgroundDownService.stop(getContext(this))
+            }
             await ClashViewModel.StopVpn()
           }
 

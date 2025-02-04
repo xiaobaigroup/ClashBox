@@ -27,8 +27,6 @@ const DOMAIN_NUMBER: number = 0xFF00;
 @Component
 struct Notice {
   private componentName: string = 'Notice'
-  // 设置 -> 后台运行 -> 流量提醒启用状态变量
-  @Consume Enablebackgrounder: boolean
   // 设置页路由栈
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   //一级图标色，黑色
@@ -45,12 +43,10 @@ struct Notice {
   @State EnabledPermanentnotice: boolean = true
   // 时间提醒开关变量
   @State EnabledTimenotice: boolean = false
-  // 模拟下载关闭提示弹窗标题
-  @State theToDialogTitle: ResourceStr = $r('app.string.simulate_download_closed_tips')
-  // 模拟下载关闭提示弹窗内容文本
-  @State toContentText: ResourceStr = $r('app.string.simulate_download_closed_content_text')
-  // 通知总开关点击计数器
-  @State noticeToggle: number = 0
+  // 通知权限跳转授权弹窗提示弹窗标题
+  @State theToDialogTitle: ResourceStr = $r('app.string.notice_request_to_settings')
+  // 通知权限跳转授权弹窗提示弹窗内容文本
+  @State toContentText: ResourceStr = $r('app.string.notice_request_to_settings_text')
   @State currentNumber: number = 0
   private TimeUnitSelect: number = 1
   private TimeUnitFruits: string[] = [
@@ -76,7 +72,6 @@ struct Notice {
   @State
   private gradientHeightOfTextPickerInTheListItem: number = FONT_SIZE_16
   private context = getContext(this) as common.UIAbilityContext
-
 
   toDialogController: CustomDialogController = new CustomDialogController({
     builder: theRowCustomDialog({
@@ -276,10 +271,10 @@ struct Notice {
                 Toggle({ type: ToggleType.Switch, isOn: $$this.EnabledPermanentnotice })
                   .selectedColor(this.icon_emphasize)
                   .margin({right: 12})
-                  .opacity(this.Enablebackgrounder ? 0.5 : 1)
-                  .hitTestBehavior(this.Enablebackgrounder ? HitTestMode.None : HitTestMode.Default)
+                  .opacity(this.uiConfig.Enablebackgrounder ? 0.5 : 1)
+                  .hitTestBehavior(this.uiConfig.Enablebackgrounder ? HitTestMode.None : HitTestMode.Default)
                   .onChange((isOn: boolean) => {
-                    if(!this.Enablebackgrounder) {
+                    if(!this.uiConfig.Enablebackgrounder) {
                       // 显示后台通知设置 显式动画
                       this.getUIContext()?.animateTo({
                         duration: ANIMATION_DURATION_300,
@@ -293,7 +288,7 @@ struct Notice {
             }
             .RowStyle()
             .onClick( ()=> {
-              if(!this.Enablebackgrounder) {
+              if(!this.uiConfig.Enablebackgrounder) {
                 // 点击提示
                 promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
               }
@@ -304,7 +299,7 @@ struct Notice {
         // 通知 End
         if(this.uiConfig.Enablednotice) {
           // 常驻通知提醒 Start
-          if(this.Enablebackgrounder) {
+          if(this.uiConfig.Enablebackgrounder) {
             Text($r('app.string.background_notice_tips'))
               .fontWeight(FontWeight.Normal)
               .fontSize(15)

@@ -974,7 +974,7 @@
     },
     {
       "name": "backgrounder_tips",
-      "value": "Tips: You can only choose to turn on one of the options, which may result in an increase in power consumption"
+      "value": "Tips: You can only choose to enable one of the options, which may result in an increase in power consumption; At present, it is known that tablet devices do not support download progress notification bars when using simulated downloads, and their background keep alive function is pending verification. The support for other devices is pending verification."
     },
     {
       "name": "notice_main_switch",
@@ -1531,6 +1531,18 @@
     {
       "name": "to",
       "value": "Jump"
+    },
+    {
+      "name": "notice_request_to_settings",
+      "value": "Authorization jump pop-up window"
+    },
+    {
+      "name": "notice_request_to_settings_text",
+      "value": "You have cancelled the notification permission grant. Would you like to go to the settings page to grant notification permission for using reminder and other related functions."
+    },
+    {
+      "name": "runing_download_background",
+      "value": "Running simulation download"
     }
   ]
 }

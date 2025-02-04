@@ -5,13 +5,8 @@ import { MarginGenerate } from '../../common/Constants';
 import { AppFlowingState, getLast } from '../../entryability/AppState';
 import { JSON } from '@kit.ArkTS';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { convertDataArray } from '../../utils/DataUnitConvertUtils';
 
-
-interface GeneratedUnitInterface {
-  TB: number;
-  GB: number;
-  MB: number;
-}
 
 @Component
 struct Speed {
@@ -97,39 +92,13 @@ struct Speed {
   // 定时器ID，用于清除定时器
   private timerId: number = 0;
 
-  /**
-   * 转换数值（0 ~ 1024）
-   */
-  convertDataUnit(kbArray: number[]): number[] {
-    const conversionFactors: GeneratedUnitInterface = {
-      TB: 1024 ** 3,
-      GB: 1024 ** 2,
-      MB: 1024,
-    }
-
-    const convertedArray: number[] = kbArray.map(kb => {
-      if (kb >= conversionFactors.TB) {
-        return kb / conversionFactors.TB
-      } else if (kb >= conversionFactors.GB) {
-        return kb / conversionFactors.GB
-      } else if (kb >= conversionFactors.MB) {
-        return kb / conversionFactors.MB
-      } else {
-        // 如果小于1MB，则保持为KB
-        return kb
-      }
-    })
-
-    return convertedArray
-  }
-
   onSpeedData() {
     this.DownloadSpeed = this.appFlowingState.traffics.getLast()?.down?.toString() ?? "0 kb"
     this.UploadSpeed = this.appFlowingState.traffics.getLast()?.up?.toString() ?? "0 kb"
     //图表
     // 使用Option实例对象的setVal方法来实现，修改什么属性就传什么
     // Tip 如果是一条曲线 合成一个 up + down
-    let data = this.proxyEnabled ? this.convertDataUnit(this.appFlowingState.traffics.getData()) : this.chartdata
+    let data = this.proxyEnabled ? convertDataArray(this.appFlowingState.traffics.getData()) : this.chartdata
     hilog.info(0xFF00, "HomeSpeedTestTag", "data: %{public}s", JSON.stringify(data))
     this.defOption.setVal({
       series: [

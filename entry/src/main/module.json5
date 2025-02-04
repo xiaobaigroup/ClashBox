@@ -24,6 +24,10 @@
         "orientation": "auto_rotation_restricted",
         "supportWindowMode": ["floating","split","fullscreen"],
         "exported": true,
+        "backgroundModes": [ // 长时任务类型的配置项
+          // 数据传输
+          "dataTransfer"
+        ],
         "skills": [
           {
             "entities": [
@@ -43,6 +47,10 @@
       {
         // 振动器
         "name": "ohos.permission.VIBRATE"
+      },
+      {
+        // 长时后台
+        "name": "ohos.permission.KEEP_BACKGROUND_RUNNING"
       }
     ],
     "extensionAbilities": [

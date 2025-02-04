@@ -296,8 +296,6 @@ struct Index {
   @Provide EnableCellularDataReminder: boolean = false
   // 设置页实验功能提示框显示变量
   @Provide isShowExperimentalFunction: boolean = true
-  // 设置 -> 后台运行 -> 流量提醒启用状态变量
-  @Provide Enablebackgrounder: boolean = false
   // 设置 -> 外观 -> 按钮位置变量
   @Provide ButtonPositionOffset: number = 0
 

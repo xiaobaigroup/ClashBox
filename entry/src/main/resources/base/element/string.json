@@ -974,7 +974,7 @@
     },
     {
       "name": "backgrounder_tips",
-      "value": "Tips：您只能选择开启其中的一个选项，开启后可能会导致耗电量增加"
+      "value": "Tips：您只能选择开启其中的一个选项，开启后可能会导致耗电量增加；目前已知平板设备使用模拟下载时不支持下载进度通知条且其后台保活功能待验证，其它设备的支持情况待验证"
     },
     {
       "name": "notice_main_switch",
@@ -1531,6 +1531,18 @@
     {
       "name": "to",
       "value": "跳转"
+    },
+    {
+      "name": "notice_request_to_settings",
+      "value": "授权跳转弹窗"
+    },
+    {
+      "name": "notice_request_to_settings_text",
+      "value": "您已取消通知权限授予，是否跳转至设置页进行通知权限授予以使用提醒等相关功能。"
+    },
+    {
+      "name": "runing_download_background",
+      "value": "正在运行模拟下载"
     }
   ]
 }

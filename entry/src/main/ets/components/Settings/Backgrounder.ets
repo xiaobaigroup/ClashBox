@@ -2,18 +2,17 @@ import { BreakpointState } from "../../common/breakpointsystem"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { ExperimentalFunction, theRowCustomDialog } from "../Common"
+import { UIConfig } from "../../entryability/AppState"
 
 
 @Component
 struct Backgrounder {
-  // 模拟下载控制变量
-  @State isDown: boolean = false
+  // UI控制变量
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 模拟播放控制变量
   @State isPlay: boolean = false
   // 模拟录音控制变量
   @State isRecord: boolean = false
-  // 设置 -> 后台运行 -> 流量提醒启用状态变量
-  @Consume Enablebackgrounder: boolean
   // 实验功能展示变量
   @Consume isShowExperimentalFunction: boolean
   // 模拟下载关闭提示弹窗标题
@@ -56,13 +55,13 @@ struct Backgrounder {
   // 模拟下载关闭提示弹窗-取消
   oncloseCancel() {
     // 将模拟下载设置为 true
-    this.isDown = true
+    this.uiConfig.backgroundDownModel = true
   }
   // 模拟下载关闭提示弹窗-关闭
   oncloseAccept() {
     // 将模拟下载设置为 false
-    this.isDown = false
-    hilog.info(0xFF00, "BackgrounderSwitchtestTag", "模拟下载设置为: %{public}s", this.isDown)
+    this.uiConfig.backgroundDownModel = false
+    hilog.info(0xFF00, "BackgrounderSwitchtestTag", "模拟下载设置为: %{public}s", this.uiConfig.backgroundDownModel)
     // 关闭模拟下载逻辑处理
     hilog.info(0xFF00, "BackgroundertestTag", "模拟下载正在关闭")
     this.onCloseDown()
@@ -90,7 +89,7 @@ struct Backgrounder {
     // 将模拟录音设置为 true
     this.isRecord = true
     // 关闭其它两个模拟
-    if(this.isDown) {
+    if(this.uiConfig.backgroundDownModel) {
       // 关闭模拟下载
       this.oncloseAccept()
     } else if (this.isPlay) {
@@ -106,13 +105,13 @@ struct Backgrounder {
    * 启用模拟下载
    */
   onOpenDown() {
-
+    this.uiConfig.backgroundDownModel = true
   }
   /**
    * 关闭模拟下载
    */
   onCloseDown() {
-
+    this.uiConfig.backgroundDownModel = false
   }
   /**
    * 启用模拟播放
@@ -144,73 +143,78 @@ struct Backgrounder {
       TopBuilder({title: $r('app.string.Backgrounder')})
       Column() {
         // 模拟下载
-        RowList({
-          icons: $r('sys.symbol.arrow_down_circle'),
-          title: $r('app.string.simulate_download'),
-          subtitle: $r('app.string.simulate_download_subtitle')
-        }) {
-          Toggle({ type: ToggleType.Switch, isOn: $$this.isDown })
-            .selectedColor(this.icon_emphasize)
-            .margin({right: 12})
-            .onChange((isOn: boolean) => {
-              if(isOn) {
-                // 关闭其它两个模拟并开启模拟下载
-                this.isPlay = false
-                this.isRecord = false
-                // 模拟下载开启逻辑处理
-                this.onOpenDown()
-              } else {
-                // 打开模拟下载关闭提示弹窗
-                if(!this.isPlay && !this.isRecord) {
-                  this.closeDialogController.open()
-                }
-              }
-            })
-        }
+        Row() {
+          RowList({
+            icons: $r('sys.symbol.arrow_down_circle'),
+            title: $r('app.string.simulate_download'),
+            subtitle: $r('app.string.simulate_download_subtitle')
+          }) {
+            Toggle({ type: ToggleType.Switch, isOn: $$this.uiConfig.backgroundDownModel })
+              .selectedColor(this.icon_emphasize)
+              .margin({right: 12})
+              .hitTestBehavior(HitTestMode.None)
+          }
+        }.onClick(() => {
+          if(this.uiConfig.backgroundDownModel) {
+            // 打开模拟下载关闭提示弹窗
+            if(!this.isPlay && !this.isRecord) {
+              this.closeDialogController.open()
+            }
+          } else {
+            // 关闭其它两个模拟并开启模拟下载
+            this.isPlay = false
+            this.isRecord = false
+            this.uiConfig.backgroundDownModel = true
+          }
+        })
         if(this.isShowExperimentalFunction) {
           // 模拟播放
-          RowList({
-            icons: $r('sys.symbol.media_center'),
-            title: $r('app.string.simulate_player'),
-            subtitle: $r('app.string.simulate_player_subtitle'),
-            subtitle2: $r('app.string.experimental_function')
-          }) {
-            Toggle({ type: ToggleType.Switch, isOn: $$this.isPlay })
-              .selectedColor(this.icon_emphasize)
-              .margin({right: 12})
-              .onChange((isOn: boolean) => {
-                if(isOn) {
-                  // 关闭其它两个模拟并开启模拟播放
-                  this.isDown = false
-                  this.isRecord = false
-                  // 开启
-                  this.onOpenPlay()
-                } else {
-                  // 关闭模拟播放
-                  this.onClosePlay()
-                }
-              })
-          }
+          Row() {
+            RowList({
+              icons: $r('sys.symbol.media_center'),
+              title: $r('app.string.simulate_player'),
+              subtitle: $r('app.string.simulate_player_subtitle'),
+              subtitle2: $r('app.string.experimental_function')
+            }) {
+              Toggle({ type: ToggleType.Switch, isOn: $$this.isPlay })
+                .selectedColor(this.icon_emphasize)
+                .margin({right: 12})
+                .hitTestBehavior(HitTestMode.None)
+            }
+          }.onClick(() => {
+            if(this.isPlay) {
+              // 关闭模拟播放
+              this.isPlay = false
+            } else {
+              // 关闭其它两个模拟并开启模拟播放
+              this.uiConfig.backgroundDownModel = false
+              this.isRecord = false
+              // 开启
+              this.isPlay = true
+            }
+          })
           // 模拟录音
-          RowList({
-            icons: $r('sys.symbol.mic_circle'),
-            title: $r('app.string.simulate_record'),
-            subtitle: $r('app.string.simulate_record_subtitle'),
-            subtitle2: $r('app.string.experimental_function')
-          }) {
-            Toggle({ type: ToggleType.Switch, isOn: $$this.isRecord })
-              .selectedColor(this.icon_emphasize)
-              .margin({right: 12})
-              .onChange((isOn: boolean) => {
-                if(isOn) {
-                  // 打开模拟录音启用提示弹窗
-                  this.openDialogController.open()
-                } else {
-                  // 模拟录音关闭逻辑处理
-                  this.onCloseRecord()
-                }
-              })
-          }
+          Row() {
+            RowList({
+              icons: $r('sys.symbol.mic_circle'),
+              title: $r('app.string.simulate_record'),
+              subtitle: $r('app.string.simulate_record_subtitle'),
+              subtitle2: $r('app.string.experimental_function')
+            }) {
+              Toggle({ type: ToggleType.Switch, isOn: $$this.isRecord })
+                .selectedColor(this.icon_emphasize)
+                .margin({right: 12})
+                .hitTestBehavior(HitTestMode.None)
+            }
+          }.onClick(() => {
+            if(this.isRecord) {
+              // 模拟录音关闭
+              this.isRecord = false
+            } else {
+              // 打开模拟录音启用提示弹窗
+              this.openDialogController.open()
+            }
+          })
           // 提示
           Text($r('app.string.backgrounder_tips'))
             .fontWeight(FontWeight.Normal)
@@ -231,10 +235,10 @@ struct Backgrounder {
 
   aboutToDisappear(): void {
     // 改变后台运行全局变量的状态
-    if(this.isDown || this.isPlay || this.isRecord) {
-      this.Enablebackgrounder = true
+    if(this.uiConfig.backgroundDownModel || this.isPlay || this.isRecord) {
+      this.uiConfig.Enablebackgrounder = true
     } else {
-      this.Enablebackgrounder = false
+      this.uiConfig.Enablebackgrounder = false
     }
   }
 
