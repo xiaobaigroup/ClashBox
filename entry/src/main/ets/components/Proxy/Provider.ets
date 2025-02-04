@@ -169,8 +169,8 @@ export struct ProviderPage {
                             }
 
                             Row(){
-                              if (item["subscription-info"]?.download != undefined) {
-                                Text(item["subscription-info"]?.download+'/')
+                              if (item["subscription-info"]?.expire != undefined) {
+                                Text(item["subscription-info"]?.expire+'/')
                                   .smallText()
                               }else {
                                 Text($r('app.string.usd_cellular_data'))
@@ -188,7 +188,7 @@ export struct ProviderPage {
                             //
                             Column() {
                               Progress({
-                                value: item["subscription-info"]?.download,
+                                value: item["subscription-info"]?.expire,
                                 total: item["subscription-info"]?.total,
                                 type: ProgressType.Capsule
                               })//value为使用流量的值

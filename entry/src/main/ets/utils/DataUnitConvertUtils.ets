@@ -35,7 +35,7 @@ export function convertDataArray(bNumber: number[]): number[]  {
 /**
  * 转换数值（Number）（0 ~ 1024）
  */
-export function convertDataNumber(bNumber: number, conversionFactors: GeneratedUnitInterface): number {
+export function convertDataNumber(bNumber: number): number {
 
   if (bNumber >= conversionFactors.TB) {
     return bNumber / conversionFactors.TB;
@@ -48,5 +48,26 @@ export function convertDataNumber(bNumber: number, conversionFactors: GeneratedU
   } else {
     // 如果小于1KB，则保持为B
     return bNumber;
+  }
+}
+
+/**
+ * 将给定的数值从指定的大单位转换为字节（B）
+ * @param value - 要转换的数值
+ * @param unit - 单位（'TB'、'GB'、'MB'、'KB'）
+ * @returns 转换后的字节数值
+ */
+export function convertToBytes(value: number, unit: keyof GeneratedUnitInterface): number {
+  switch (unit) {
+    case 'TB':
+      return value * conversionFactors.TB;
+    case 'GB':
+      return value * conversionFactors.GB;
+    case 'MB':
+      return value * conversionFactors.MB;
+    case 'KB':
+      return value * conversionFactors.KB;
+    default:
+      throw new Error(`Unsupported unit: ${unit}`);
   }
 }

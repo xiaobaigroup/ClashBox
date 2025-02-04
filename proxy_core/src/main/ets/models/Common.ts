@@ -191,6 +191,7 @@ export class Traffic{
         throw new Error("Invalid value type");
     }
   }
+
 }
 export class IpInfo {
   ip: string

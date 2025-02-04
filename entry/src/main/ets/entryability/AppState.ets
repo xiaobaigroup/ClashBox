@@ -1,4 +1,4 @@
-import { ClashConfig, Dns, IpInfo, ProxyGroup, ProxyMode, ProxySort, Traffic } from "proxy_core";
+import { ClashConfig, Dns, IpInfo, ProxyGroup, ProxyMode, ProxySort, Traffic, } from "proxy_core";
 import { CustomThemeName } from "../common/AppTheme";
 import { showHomeCard } from "../common/Constants";
 import { Item } from "../common/ProxyData";
@@ -46,6 +46,12 @@ export class AppConfig{
   constructor() {
   }
 }
+export enum TrafficUnit{
+  KB = "KB",
+  MB = "MB",
+  GB = "GB",
+  TB = "TB",
+}
 
 export class UIConfig{
   // 主页问候语
@@ -88,6 +94,9 @@ export class UIConfig{
   inputWeb1: string = ''
   inputWeb2: string = ''
   inputWeb3: string = ''
+  //流量统计小卡片
+  inputTotal: number = 0
+  switchUnit: TrafficUnit = TrafficUnit.MB
 
   constructor() {
   }
