@@ -17,13 +17,12 @@ import Settings from '../components/Settings/Settings';
 import Basic from '../components/More/Overwrite/Basic';
 import DNS from '../components/More/Overwrite/DNS';
 import Network, { NetworkRouterAddress } from '../components/More/Overwrite/Network';
-import { FakeIPfilter } from '../components/More/Overwrite/DNSsubpage';
 import { getResourceString } from '../utils/ResourceStringUtil';
 import { extractLocationInfo, getIpInfo, mapLocation } from '../utils/GetIpInfo';
 import { promptAction } from '@kit.ArkUI';
 import { skipRowList } from '../components/Common';
 import { AppConfig } from '../entryability/AppState';
-
+import { ArrayConfigEditor, ArrayConfigParam } from '../components/More/Overwrite/EditArrayConfig';
 
 
 @Entry
@@ -119,7 +118,7 @@ struct MorePage {
 
   // 更多页路由表
   @Builder
-  PagesMap(name: string) {
+  PagesMap(name: string, params: string | ArrayConfigParam) {
     if (name == 'Log') {
       Log()
     } else
@@ -150,8 +149,8 @@ struct MorePage {
     if (name == 'Route-Address') {
       NetworkRouterAddress()
     } else
-    if (name == 'FakeIP-Filtering') {
-      FakeIPfilter()
+    if (name == 'EditArrayConfig') {
+        ArrayConfigEditor({params: params as ArrayConfigParam})
     } else
     if (name == 'LogDetils') {
       LogDetils()

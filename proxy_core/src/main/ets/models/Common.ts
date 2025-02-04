@@ -164,6 +164,10 @@ export class Traffic{
     this.down = new TrafficValue(down)
   }
 
+  total(): TrafficValue{
+    return new TrafficValue(this.upRaw + this.downRaw)
+  }
+
   static FetchUp(value: number){
       return Traffic.ScaleTraffic(value >>> 32)
   }

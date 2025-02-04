@@ -9,7 +9,8 @@ export enum EventKey{
   StartLog = 10005,
   SwitchModeCard = 10006,
   ClearLog = 10007,
-  ExportLog = 10008
+  ExportLog = 10008,
+  ArrayConfigChanged = 10009
 }
 
 export class EventHub{

@@ -1,10 +1,18 @@
 import { BreakpointState } from "../../../common/breakpointsystem"
 import { MoreTop } from "../MoreTopBuilder"
 import { theCustomDialog } from "../../Common"
+import { promptAction } from "@kit.ArkUI"
+import { EventHub, EventKey } from "../../../common/EventHub"
 
-// DNS -> FakeIP过滤
+export interface ArrayConfigParam{
+    label?: string | ResourceStr
+    key: string
+    value?: string[] | Record<string, string>
+}
+
+// 提取公共组件，复用
 @Component
-export struct FakeIPfilter {
+export struct ArrayConfigEditor {
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
   @State SaveInputValue: string = ''
   @State currentInputValue: string = ''
@@ -17,14 +25,52 @@ export struct FakeIPfilter {
   // 编辑路由地址弹窗当前输入文本
   @State currentEditInputValue: string = ''
   // 编辑路由地址弹窗标题
-  @State theEditDialogTitle: ResourceStr = $r('app.string.edit_fakeIP_filter')
-  @State FakeIPfilterList: FakeIPfilterData[] = createFakeIPfilterData()
+  @State FakeIPfilterList: KeyValueData[] = []
   @Consume('NavPathStack') pageInfos: NavPathStack
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+  @Prop params: ArrayConfigParam
+
+  aboutToAppear(): void {
+    // string []
+    if(Array.isArray(this.params.value)){
+      const list = this.params.value as string []
+      if(list){
+        this.FakeIPfilterList = list.map((v: string)=>{
+          return new KeyValueData(v)
+        }) ?? []
+      }
+    }else{ // Record<string, string>
+      const list = this.params.value as Record<string, string>
+      if(list){
+        this.FakeIPfilterList =  Object.entries(list).map((arr)=> new KeyValueData(arr[0], arr[1]))
+      }
+    }
+
+
+  }
+  aboutToDisappear(): void {
+    this.updateArrayConfig()
+  }
+  updateArrayConfig(){
+    // string[]
+    if(Array.isArray(this.params.value)){
+      EventHub.sendEvent(EventKey.ArrayConfigChanged, {key: this.params.key, value: this.FakeIPfilterList.map((d)=>{
+        return d.key
+      })})
+    }else{
+      // record<string, string>
+      const record = {} as Record<string, string>;
+      for (let kv of this.FakeIPfilterList){
+        record[kv.key] = kv.value as string
+      }
+      EventHub.sendEvent(EventKey.ArrayConfigChanged, {key: this.params.key, value: record})
+    }
+  }
+
   /**
    * FakeIP添加过滤弹窗控制器
    */
@@ -60,9 +106,8 @@ export struct FakeIPfilter {
     // 关闭背景模糊
     this.isEnableIndexForegroundBlur = false
     // 更新UI数组中对应元素
-    const newItem: FakeIPfilterData = new FakeIPfilterData(this.SaveInputValue, false)
+    const newItem: KeyValueData = new KeyValueData(this.SaveInputValue)
     this.FakeIPfilterList = [...this.FakeIPfilterList, newItem]
-
   }
 
   /**
@@ -73,7 +118,7 @@ export struct FakeIPfilter {
       theplaceholder: $theEditPlaceholder,
       currentInputValue: $currentEditInputValue,
       SaveInputValue: $SaveEditInputValue,
-      theDialogTitle: this.theEditDialogTitle,
+      theDialogTitle: this.params.label,
       cancel: ()=> { this.oneditCancel() },
       confirm: ()=> { this.oneditAccept() },
     }),
@@ -99,7 +144,7 @@ export struct FakeIPfilter {
     // 关闭背景模糊
     this.isEnableIndexForegroundBlur = false
     // 更新UI数组中对应元素
-    const editItem: FakeIPfilterData = new FakeIPfilterData(this.SaveEditInputValue, false)
+    const editItem: KeyValueData = new KeyValueData(this.SaveEditInputValue)
     this.FakeIPfilterList.splice(this.theEditPlaceholder, 1, editItem)
   }
 
@@ -132,19 +177,19 @@ export struct FakeIPfilter {
       // 导航栏
       Row() {
         MoreTop({
-          title:  $r('app.string.FakeIP_Filtering'),
+          title: this.params.label as Resource,
           searchButton: this.FakeIPfilterSearch,
           otherButton: () => { this.FakeIPfilterOther() }
         })
       }.width('100%')
 
       List() {
-        ForEach(this.FakeIPfilterList, (item: FakeIPfilterData, index: number) => {
+        ForEach(this.FakeIPfilterList, (item: KeyValueData, index: number) => {
           // 数据列表行
           ListItem() {
             Row() {
               Row() {
-                Text(item.name)
+                Text(item.key)
                   .fontWeight(FontWeight.Medium)
                   .fontSize(16)
                   .margin({left: 12})
@@ -171,7 +216,7 @@ export struct FakeIPfilter {
             // 启用背景模糊
             this.isEnableIndexForegroundBlur = true
             // 进入列表行数据编辑
-            this.currentEditInputValue = item.name
+            this.currentEditInputValue = item.key
             this.theEditPlaceholder = index
             this.editDialogController.open()
           })
@@ -195,25 +240,12 @@ export struct FakeIPfilter {
 }
 
 // FakeIP过滤列表数据类
-class FakeIPfilterData {
-  name: string
-  isCheck: boolean
-
-  constructor(name: string, isCheck:boolean) {
-    this.name = name
-    this.isCheck = isCheck
+class KeyValueData {
+  key: string
+  value: string | null
+  constructor(name: string, value: string | null = null) {
+    this.key = name
+    this.value = value
   }
 }
 
-// 数据
-const createFakeIPfilterData = (): FakeIPfilterData[] => {
-  let result: FakeIPfilterData[] = new Array()
-  result = [
-    new FakeIPfilterData('lens.l.google.com', false),
-    new FakeIPfilterData('+stun.*.*.*', false),
-    new FakeIPfilterData('*.*.xboxlive.com', false),
-    new FakeIPfilterData('值', false),
-
-  ]
-  return result
-}

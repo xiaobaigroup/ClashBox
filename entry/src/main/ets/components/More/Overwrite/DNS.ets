@@ -6,6 +6,9 @@ import OverwriteTop from "./OverwriteTopBuilder"
 import { menuRowList, skipRowList, toggleRowList } from "../../Common"
 import { ClashConfig, Dns } from 'proxy_core'
 import { AppConfig, copy } from '../../../entryability/AppState'
+import { ArrayConfigParam } from "./EditArrayConfig"
+import { EventHub, EventKey } from "../../../common/EventHub"
+import { JSON } from "@kit.ArkTS"
 
 // 编辑FakeIP范围弹窗
 @CustomDialog
@@ -121,6 +124,12 @@ struct DNS {
   }
   aboutToAppear(): void {
     this.overwriteDNSList = ListOverwriteDNSData(this.clashConfig, this.appConfig)
+    let dns = this.clashConfig.dns ?? {} as Dns
+    EventHub.on(EventKey.ArrayConfigChanged, (d: ArrayConfigParam) => {
+      dns[d.key] = d.value
+      this.changeDns(dns)
+      this.overwriteDNSList = ListOverwriteDNSData(this.clashConfig, this.appConfig)
+    })
   }
   changeDns(dns: Dns){
     this.clashConfig.dns = copy(dns)
@@ -128,14 +137,25 @@ struct DNS {
 
   // 列表行点击事件处理
   handleCheck(index: number) {
-    if(index === 9) {
-      // 启用背景模糊
+    // if(index === 9) {
+    //   // 启用背景模糊
+    //   this.isEnableIndexForegroundBlur = true
+    //   this.dialogController.open()
+    // } else {
+    //   // 跳转
+    //   let itemData = this.overwriteDNSList[index]
+    //   this.pageInfos.pushPathByName(itemData.name, itemData.subtitle, false)
+    // }
+    let itemData = this.overwriteDNSList[index]
+    if(typeof itemData.value == "string"){
       this.isEnableIndexForegroundBlur = true
       this.dialogController.open()
-    } else {
-      // 跳转
-      let itemData = this.overwriteDNSList[index]
-      this.pageInfos.pushPathByName(itemData.name, false)
+    }else{
+      this.pageInfos.pushPathByName("EditArrayConfig", {
+        key: itemData.name,
+        label: itemData.title,
+        value: itemData.value
+      } as ArrayConfigParam, false)
     }
   }
 
