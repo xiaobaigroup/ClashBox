@@ -388,7 +388,7 @@ struct Appearance {
                 subtitle: $r('app.string.blurred_background_subtitle'),
               }) {
                 // 背景模糊开关
-                Toggle({ type: ToggleType.Switch, isOn: $$this.appConfig.isBlurr })
+                Toggle({ type: ToggleType.Switch, isOn: this.uiConfig.isBlurr })
                   .selectedColor(this.icon_emphasize)
                   .margin({right: 12})
                   .onChange((isOn: boolean) => {

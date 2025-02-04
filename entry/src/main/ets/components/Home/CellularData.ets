@@ -60,7 +60,7 @@ struct totalCustomDialog {
       .optionFont({ size: FONT_SIZE_16, weight: 400 })
       .backgroundColor(Color.Transparent)
       .onSelect((index: number) => {
-        this.switchUnit(index)
+        this.index=index
         console.info('Select:' + index+this.uiConfig.switchUnit);
       })
   }
@@ -97,7 +97,7 @@ struct totalCustomDialog {
           .onClick(() => {
             if (this.controller != undefined) {
               this.controller.close()
-              //    this.isEnableIndexForegroundBlur = false
+              this.isEnableIndexForegroundBlur = false
             }
           })
 
@@ -108,10 +108,11 @@ struct totalCustomDialog {
           .backgroundColor(this.icon_emphasize)
           .onClick(() => {
            this.uiConfig.inputTotal= this.TotalCellular
+            this.switchUnit(this.index)
        //     console.info('inputTotal1', this.uiConfig.inputTotal)
             if (this.controller != undefined) {
               this.controller.close()
-              //   this.isEnableIndexForegroundBlur = false
+              this.isEnableIndexForegroundBlur = false
             }
           })
       }
@@ -158,6 +159,8 @@ struct CellularDataStat {
    */
   @Consume('HomeCardCellularDataPadding')
   private HomeCardCellularDataPadding: BreakpointState<number>
+  /* 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
 
   /* 总流量输入弹窗数据  */
   dialogController: CustomDialogController | null = new CustomDialogController({
@@ -176,11 +179,11 @@ struct CellularDataStat {
       console.log("dialog onWillDismiss")
       if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
         dismissDialogAction.dismiss()
-        //    this.isEnableIndexForegroundBlur=false
+            this.isEnableIndexForegroundBlur=false
       }
       if (dismissDialogAction.reason == DismissReason.TOUCH_OUTSIDE) {
         dismissDialogAction.dismiss()
-        //   this.isEnableIndexForegroundBlur=false
+           this.isEnableIndexForegroundBlur=false
       }
     },
     alignment: DialogAlignment.Center,
@@ -286,7 +289,7 @@ struct CellularDataStat {
       .onClick(()=>{
         if (this.dialogController != null) {
           this.dialogController.open()
-          //           this.isEnableIndexForegroundBlur=true
+          this.isEnableIndexForegroundBlur=true
           console.info('Total', this.appFlowingState.totalTraffic.upRaw+this.appFlowingState.totalTraffic.downRaw,convertToBytes(this.uiConfig.inputTotal,this.uiConfig.switchUnit))
         }
       })
