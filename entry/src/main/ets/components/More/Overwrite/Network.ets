@@ -1,9 +1,12 @@
 
 import { BreakpointState } from "../../../common/breakpointsystem"
-import { ANIMATION_DURATION_300, ListOverwriteNetworkData, moreData } from "../../../common/Constants"
+import { ANIMATION_DURATION_300, ListOverwriteNetworkData,
+  MenuListItemProp,
+  moreData, NetworkMenu } from "../../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import OverwriteTop from "./OverwriteTopBuilder"
 import { menuRowList, skipRowList, theCustomDialog, toggleRowList } from "../../Common"
+import { SymbolGlyphModifier } from "@kit.ArkUI"
 
 @Component
 struct Network {
@@ -15,8 +18,10 @@ struct Network {
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @State overwriteNetworkList: moreData[] = ListOverwriteNetworkData()
+  @State networkMenuList: MenuListItemProp[] = NetworkMenu
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
-
+  // 栈模式临时选择项
+  @State stackModeIndex: number = 0
   // 列表行点击事件处理
   handleCheck(index: number) {
       // 跳转
@@ -42,6 +47,31 @@ struct Network {
   }
 
   @Builder
+  switchMenu(item: MenuListItemProp[],index: number) {
+    if (index === 3) {
+      // 栈模式菜单
+      Menu() {
+        MenuItem({ content: $r('app.string.stack_mode') }).contentFont({ weight: FontWeight.Bold })
+        ForEach(item, (menuItem: MenuListItemProp, index: number) => {
+          MenuItem({
+            content: menuItem.title,
+            symbolEndIcon: this.stackModeIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+          })
+            .selected(this.stackModeIndex === index)
+            .onChange(() => {
+              this.stackModeIndex = index
+              if (this.networkMenuList[0].children) {
+                let Item = this.overwriteNetworkList[3]
+                Item.subtitle = menuItem.title
+                this.overwriteNetworkList.splice(3, 1, Item)
+              }
+            })
+        }, (menuItem: MenuListItemProp) => JSON.stringify(menuItem))
+      }
+    }
+  }
+
+  @Builder
   networkMenuTipsBuilder(tips: ResourceStr) {
     Text(tips)
       .fontWeight(FontWeight.Normal)
@@ -57,6 +87,14 @@ struct Network {
       .hitTestBehavior(HitTestMode.None)
       .selectedColor(this.icon_emphasize)
   }
+  @Builder
+  MenuEntrance(index: number) {
+    // 确保children存在
+    if(this.networkMenuList && this.networkMenuList[0].children) {
+      this.switchMenu(this.networkMenuList[0].children, index)
+    }
+  }
+
 
   build() {
     NavDestination() {
@@ -73,8 +111,8 @@ struct Network {
             ListItem() {
               menuRowList({
                 title: item.title,
-                tips: () => { this.networkMenuTipsBuilder(item.subtitle) }
-                // 后续绑定菜单
+                tips: () => { this.networkMenuTipsBuilder(item.subtitle) },
+                menu: (): void => { this.MenuEntrance(index) }
               })
             }
           } else

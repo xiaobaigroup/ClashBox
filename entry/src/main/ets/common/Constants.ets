@@ -184,12 +184,33 @@ export  const ListOverwriteNetworkData = (): moreData[] => {
     new moreData($r('sys.symbol.key_shield_fill'), 'VPN', 'VPN', '', 2,  false),
     new moreData($r('sys.symbol.selector'), 'Option', $r('app.string.option'), '', 3, false),
     new moreData($r('sys.symbol.selector'), 'IPv6', $r('app.string.IPv6'), $r('app.string.Info'), 2,  false),
-    new moreData($r('sys.symbol.satellite_map_fill'), 'Stack-Mode', $r('app.string.Stack_Mode'), 'gvisor', 0, false),
+    new moreData($r('sys.symbol.satellite_map_fill'), 'Stack-Mode', $r('app.string.stack_mode'), 'gvisor', 0, false),
     new moreData($r('sys.symbol.slider_horizontal_2'), 'Route-Mode', $r('app.string.Route_Mode'), $r('app.string.Using_Configuration'), 0,  false),
     new moreData($r('sys.symbol.local_fill'), 'Route-Address', $r('app.string.Routing_Address'), $r('app.string.Routing_Address_Subtitle'), 1, false),
   ]
   return result
 }
+
+/**
+ * 菜单
+ */
+export interface MenuListItemProp {
+  title: string | Resource
+  children?: Array<MenuListItemProp>
+}
+
+/**
+ * 更多 -> 覆写 -> 网络 -> 菜单
+ */
+export const NetworkMenu: MenuListItemProp[] = [
+  { title: $r('app.string.stack_mode'),
+    children: [
+      {title: 'gvisor'},
+      {title: 'system'},
+      {title: 'mixed'},
+    ]
+  }
+]
 
 /**
  * 设置列表参数

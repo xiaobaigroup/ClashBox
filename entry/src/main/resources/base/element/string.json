@@ -489,7 +489,7 @@
       "value": "取消"
     },
     {
-      "name": "Stack_Mode",
+      "name": "stack_mode",
       "value": "栈模式"
     },
     {
@@ -1543,6 +1543,14 @@
     {
       "name": "runing_download_background",
       "value": "正在运行模拟下载"
+    },
+    {
+      "name": "key",
+      "value": "键"
+    },
+    {
+      "name": "the_value",
+      "value": "值"
     }
   ]
 }

@@ -35,8 +35,8 @@ export class BackgroundDownService{
     let appFlowingState: AppFlowingState = new AppFlowingState()
     let now = appFlowingState.traffics.getLast()?.down?.toString()
     let result = appFlowingState.traffics.getLast()?.up?.toString()
-    let message = `${now} kb↑\t${result} kb↓`
-    hilog.info(0xFF00, 'BackgroundDownService', "updateProcess ", message)
+    let message = `${result} ↑\t${now} ↓`
+    hilog.info(0xFF00, 'BackgroundDownService', "updateProcess %{public}s", message)
     this.updateProcess(this.notificationId ?? 0, message )
   }
 
@@ -77,7 +77,7 @@ export class BackgroundDownService{
       // 发布通知
       try {
         notificationManager.publish(request).then(() => {
-          hilog.info(0xFF00, 'BackgroundDownService', "publish success, id= " + id)
+          hilog.info(0xFF00, 'BackgroundDownService', "publish success, id = %{public}d", id)
         }).catch((err: BusinessError) => {
           hilog.error(0xFF00, 'BackgroundDownService', `publish fail: ${JSON.stringify(err)}`)
         })

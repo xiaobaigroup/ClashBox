@@ -1,7 +1,7 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
-import { ExperimentalFunction, theRowCustomDialog } from "../Common"
+import { ExperimentalFunction, theRowCustomDialog, toggleRowList } from "../Common"
 import { UIConfig } from "../../entryability/AppState"
 
 
@@ -141,10 +141,10 @@ struct Backgrounder {
   build() {
     NavDestination() {
       TopBuilder({title: $r('app.string.Backgrounder')})
-      Column() {
+      Column({space: 10}) {
         // 模拟下载
         Row() {
-          RowList({
+          toggleRowList({
             icons: $r('sys.symbol.arrow_down_circle'),
             title: $r('app.string.simulate_download'),
             subtitle: $r('app.string.simulate_download_subtitle')
@@ -170,11 +170,11 @@ struct Backgrounder {
         if(this.isShowExperimentalFunction) {
           // 模拟播放
           Row() {
-            RowList({
+            toggleRowList({
               icons: $r('sys.symbol.media_center'),
               title: $r('app.string.simulate_player'),
               subtitle: $r('app.string.simulate_player_subtitle'),
-              subtitle2: $r('app.string.experimental_function')
+              isExperimentalFunction: true
             }) {
               Toggle({ type: ToggleType.Switch, isOn: $$this.isPlay })
                 .selectedColor(this.icon_emphasize)
@@ -195,11 +195,11 @@ struct Backgrounder {
           })
           // 模拟录音
           Row() {
-            RowList({
+            toggleRowList({
               icons: $r('sys.symbol.mic_circle'),
               title: $r('app.string.simulate_record'),
               subtitle: $r('app.string.simulate_record_subtitle'),
-              subtitle2: $r('app.string.experimental_function')
+              isExperimentalFunction: true
             }) {
               Toggle({ type: ToggleType.Switch, isOn: $$this.isRecord })
                 .selectedColor(this.icon_emphasize)

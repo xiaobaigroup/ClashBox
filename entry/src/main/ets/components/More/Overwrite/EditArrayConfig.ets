@@ -27,7 +27,11 @@ export struct ArrayConfigEditor {
   // 编辑路由地址弹窗标题
   @State FakeIPfilterList: KeyValueData[] = []
   @Consume('NavPathStack') pageInfos: NavPathStack
+  // 列表高度
+  @Consume('breakPointStateListHeight') listHeight: BreakpointState<number>
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  // 平板竖屏判断
+  @StorageProp('istabletVertical')  private istabletVertical: boolean = false
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
@@ -224,7 +228,7 @@ export struct ArrayConfigEditor {
 
       }
       .width('100%')
-      .height(this.isLandscapePhone ? 275 : 650)
+      .height(this.isLandscapePhone ? 275 : (this.istabletVertical ? 945 : this.listHeight.value))
       .margin({ top: 10 })
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)

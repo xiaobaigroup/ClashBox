@@ -397,6 +397,73 @@ export struct theRowCustomDialog {
 }
 
 /**
+ * key & value 输入弹窗组件（横排按钮）
+ */
+@Preview
+@CustomDialog
+export struct KVCustomDialog {
+  @State theDialogTitle: ResourceStr = ''
+  @Link SaveKeyInputValue: string
+  @Link currentKeyInputValue: string
+  @Link SaveValueInputValue: string
+  @Link currentValueInputValue: string
+  cancel?: () => void
+  confirm?: () => void
+  controller: CustomDialogController
+  // 主题色
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+
+  build() {
+    Column({space: 8}) {
+      // 标题
+      Text(this.theDialogTitle)
+        .fontWeight(FontWeight.Medium)
+        .fontSize(20)
+        .margin({ bottom: 7 })
+      TextInput({placeholder: $r('app.string.key'), text: this.currentKeyInputValue })
+        .onChange((value: string) => {
+          this.currentKeyInputValue = value
+        })
+      TextInput({placeholder: $r('app.string.the_value'), text: this.currentValueInputValue })
+        .onChange((value: string) => {
+          this.currentValueInputValue = value
+        })
+      Row() {
+        Button($r('app.string.Save'))
+          .width('100%')
+          .height(39)
+          .fontColor(this.icon_emphasize)
+          .backgroundColor($r('app.color.container_background'))
+          .onClick(() => {
+            this.SaveKeyInputValue = this.currentKeyInputValue
+            this.SaveValueInputValue = this.currentValueInputValue
+            this.currentKeyInputValue = ''
+            this.currentValueInputValue = ''
+            this.controller.close()
+            if (this.confirm) {
+              this.confirm()
+            }
+          })
+        Button($r('app.string.Cancel'))
+          .height(39)
+          .width('50%')
+          .fontColor(Color.White)
+          .backgroundColor(this.icon_emphasize)
+          .onClick(() => {
+            this.controller.close()
+            if (this.cancel) {
+              this.cancel()
+            }
+          })
+      }.width('100%')
+    }
+    .padding({left: 16, right: 16, top: 15, bottom: 15})
+    .backgroundColor($r('app.color.container_background'))
+    .width('100%')
+  }
+}
+
+/**
  * 通用保存&取消弹窗组件（竖排按钮）
  * @param theDialogTitle 弹窗标题-ResourceStr
  * @param theplaceholder 输入框默认文本-ResourceStr
