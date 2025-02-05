@@ -67,16 +67,16 @@ export function convertDataNumber(bNumber: number): number {
  * @param unit - 单位（'TB'、'GB'、'MB'、'KB'）
  * @returns 转换后的GB数值
  */
-export function convertToGB(value: number, unit: keyof GeneratedUnitInterface): number {
+export function convertToSwitchNub(value: number, unit: keyof GeneratedUnitInterface): number {
   switch (unit) {
     case 'TB':
-      return value / 1024**3;
+      return value / conversionFactors.TB;
     case 'GB':
-      return value / 1024**3;
+      return value / conversionFactors.GB;
     case 'MB':
-      return value / 1024**2;
+      return value / conversionFactors.MB;
     case 'KB':
-      return value / 1024;
+      return value /conversionFactors.KB;
     default:
       throw new Error(`Unsupported unit: ${unit}`);
   }

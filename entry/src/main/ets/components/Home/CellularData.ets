@@ -3,7 +3,7 @@ import { mediaquery } from '@kit.ArkUI'
 import { FONT_SIZE_16, MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
 import { AppFlowingState, TrafficUnit, UIConfig } from '../../entryability/AppState'
-import {  convertToBytes } from '../../utils/DataUnitConvertUtils'
+import {  convertToSwitchNub } from '../../utils/DataUnitConvertUtils'
 
 /* 输入总流量自定义弹窗相关 */
 @CustomDialog
@@ -15,7 +15,7 @@ struct totalCustomDialog {
   private isEnableIndexForegroundBlur: boolean
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @State TotalCellular: number = 0
-
+@State index : number = 2
 
   controller?: CustomDialogController
   cancel: () => void = () => {
@@ -27,15 +27,15 @@ struct totalCustomDialog {
   switchUnit(index: number) {
     switch (index) {
       case 0:
-       // TrafficUnit.KB
+        //TrafficUnit.KB
         this.uiConfig.switchUnit=TrafficUnit.KB
         break;
       case 1:
-       // TrafficUnit.MB
+        //TrafficUnit.MB
         this.uiConfig.switchUnit=TrafficUnit.MB
         break
       case 2:
-      //  TrafficUnit.GB
+        //TrafficUnit.GB
         this.uiConfig.switchUnit=TrafficUnit.GB
         break
       case 3:
@@ -54,21 +54,21 @@ struct totalCustomDialog {
       .width(80)
       .align(Alignment.Center)
       .selected(this.uiConfig.cellularDataIndex)
-      .value(this.uiConfig.switchUnit.length>0 ?this.uiConfig.switchUnit : TrafficUnit.MB )
+      .value(this.uiConfig.switchUnit)
       .font({ size: FONT_SIZE_16, weight: 500 })
       .fontColor($r('sys.color.font_primary'))
       .selectedOptionFont({ size: FONT_SIZE_16, weight: 400 })
       .optionFont({ size: FONT_SIZE_16, weight: 400 })
       .backgroundColor(Color.Transparent)
       .onSelect((index: number) => {
-        this.uiConfig.cellularDataIndex=index
+        this.index=index
         console.info('Select:' + index+this.uiConfig.switchUnit);
       })
   }
 
   build() {
     Column() {
-      Text('输入总流量数值')
+      Text($r('app.string.input_cellular_data'))
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
       Blank(15)
@@ -109,6 +109,7 @@ struct totalCustomDialog {
           .backgroundColor(this.icon_emphasize)
           .onClick(() => {
            this.uiConfig.inputTotal= this.TotalCellular
+            this.uiConfig.cellularDataIndex=this.index
             this.switchUnit(this.uiConfig.cellularDataIndex)
        //     console.info('inputTotal1', this.uiConfig.inputTotal)
             if (this.controller != undefined) {
@@ -258,7 +259,7 @@ struct CellularDataStat {
         //使用流量进度条
         Column() {
           Progress({
-            value: convertToBytes(this.appFlowingState.totalTraffic.upRaw+this.appFlowingState.totalTraffic.downRaw,this.uiConfig.switchUnit),
+            value: convertToSwitchNub(this.appFlowingState.totalTraffic.upRaw+this.appFlowingState.totalTraffic.downRaw,this.uiConfig.switchUnit),
             total: this.uiConfig.inputTotal,
             type: ProgressType.Capsule
           })//value为使用流量的值
@@ -283,17 +284,22 @@ struct CellularDataStat {
             .fontSize(this.isLandscapePhone ? 10 : this.HomeCardCellularDataSmFontSize.value)
             .fontColor($r('sys.color.font_secondary'))
       }
+
+      if( this.uiConfig.inputTotal === 0 ||this.uiConfig.inputTotal === undefined){
+      Text($r('app.string.cellular_data_tips'))
+        .fontSize(this.isLandscapePhone ? 10 : this.HomeCardCellularDataSmFontSize.value)
+        .fontColor($r('sys.color.font_secondary'))
+        }
       }
       .width('100%')
       .height('100%')
       .justifyContent(FlexAlign.Center)
-  //    .backgroundColor('#ba942020')
       .padding({bottom:this.isLandscapePhone ? 30: this.HomeCardCellularDataPadding.value})
       .onClick(()=>{
         if (this.dialogController != null) {
           this.dialogController.open()
           this.isEnableIndexForegroundBlur=true
-          console.info('Total',convertToBytes(this.appFlowingState.totalTraffic.upRaw+this.appFlowingState.totalTraffic.downRaw,this.uiConfig.switchUnit),this.uiConfig.inputTotal)
+          console.info('Total',convertToSwitchNub(this.appFlowingState.totalTraffic.upRaw+this.appFlowingState.totalTraffic.downRaw,this.uiConfig.switchUnit),this.uiConfig.inputTotal)
         }
       })
     //  .alignItems(HorizontalAlign.Center)
@@ -301,7 +307,6 @@ struct CellularDataStat {
     .padding(this.cardPadding.value)
     .width('100%')
     .height('100%')
-//.backgroundColor('#ff55b54e')
     .id('CellularDataId')
   }
 }

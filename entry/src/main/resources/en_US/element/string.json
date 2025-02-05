@@ -1551,6 +1551,14 @@
     {
       "name": "the_value",
       "value": "Value"
+    },
+    {
+      "name": "cellular_data_tips",
+      "value": "(Click to enter the total traffic)"
+    },
+    {
+      "name": "input_cellular_data",
+      "value": "Enter total traffic"
     }
   ]
 }

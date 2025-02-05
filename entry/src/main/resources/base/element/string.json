@@ -1551,6 +1551,14 @@
     {
       "name": "the_value",
       "value": "值"
+    },
+    {
+      "name": "cellular_data_tips",
+      "value": "(点击输入总流量)"
+    },
+    {
+      "name": "input_cellular_data",
+      "value": "输入总流量数值"
     }
   ]
 }
