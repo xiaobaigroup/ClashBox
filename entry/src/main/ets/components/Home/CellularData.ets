@@ -3,7 +3,7 @@ import { mediaquery } from '@kit.ArkUI'
 import { FONT_SIZE_16, MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
 import { AppFlowingState, TrafficUnit, UIConfig } from '../../entryability/AppState'
-import { convertDataNumberGB, convertToBytes } from '../../utils/DataUnitConvertUtils'
+import {  convertToBytes } from '../../utils/DataUnitConvertUtils'
 
 /* 输入总流量自定义弹窗相关 */
 @CustomDialog
@@ -15,7 +15,7 @@ struct totalCustomDialog {
   private isEnableIndexForegroundBlur: boolean
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @State TotalCellular: number = 0
-  @State index: number = 2
+
 
   controller?: CustomDialogController
   cancel: () => void = () => {
@@ -27,19 +27,19 @@ struct totalCustomDialog {
   switchUnit(index: number) {
     switch (index) {
       case 0:
-        TrafficUnit.KB
+       // TrafficUnit.KB
         this.uiConfig.switchUnit=TrafficUnit.KB
         break;
       case 1:
-        TrafficUnit.MB
+       // TrafficUnit.MB
         this.uiConfig.switchUnit=TrafficUnit.MB
         break
       case 2:
-        TrafficUnit.GB
+      //  TrafficUnit.GB
         this.uiConfig.switchUnit=TrafficUnit.GB
         break
       case 3:
-        TrafficUnit.TB
+        //TrafficUnit.TB
         this.uiConfig.switchUnit=TrafficUnit.TB
         break
     }
@@ -53,6 +53,7 @@ struct totalCustomDialog {
       { value: TrafficUnit.TB }])
       .width(80)
       .align(Alignment.Center)
+      .selected(this.uiConfig.cellularDataIndex)
       .value(this.uiConfig.switchUnit.length>0 ?this.uiConfig.switchUnit : TrafficUnit.MB )
       .font({ size: FONT_SIZE_16, weight: 500 })
       .fontColor($r('sys.color.font_primary'))
@@ -60,7 +61,7 @@ struct totalCustomDialog {
       .optionFont({ size: FONT_SIZE_16, weight: 400 })
       .backgroundColor(Color.Transparent)
       .onSelect((index: number) => {
-        this.index=index
+        this.uiConfig.cellularDataIndex=index
         console.info('Select:' + index+this.uiConfig.switchUnit);
       })
   }
@@ -108,7 +109,7 @@ struct totalCustomDialog {
           .backgroundColor(this.icon_emphasize)
           .onClick(() => {
            this.uiConfig.inputTotal= this.TotalCellular
-            this.switchUnit(this.index)
+            this.switchUnit(this.uiConfig.cellularDataIndex)
        //     console.info('inputTotal1', this.uiConfig.inputTotal)
             if (this.controller != undefined) {
               this.controller.close()
@@ -257,8 +258,8 @@ struct CellularDataStat {
         //使用流量进度条
         Column() {
           Progress({
-            value: convertDataNumberGB(this.appFlowingState.totalTraffic.upRaw+this.appFlowingState.totalTraffic.downRaw),
-            total: convertToBytes(this.uiConfig.inputTotal,this.uiConfig.switchUnit),
+            value: convertToBytes(this.appFlowingState.totalTraffic.upRaw+this.appFlowingState.totalTraffic.downRaw,this.uiConfig.switchUnit),
+            total: this.uiConfig.inputTotal,
             type: ProgressType.Capsule
           })//value为使用流量的值
             .style({ enableSmoothEffect: true, borderColor: '#00ffffff' })
@@ -292,7 +293,7 @@ struct CellularDataStat {
         if (this.dialogController != null) {
           this.dialogController.open()
           this.isEnableIndexForegroundBlur=true
-          console.info('Total', convertDataNumberGB(this.appFlowingState.totalTraffic.upRaw+this.appFlowingState.totalTraffic.downRaw),convertToBytes(this.uiConfig.inputTotal,this.uiConfig.switchUnit))
+          console.info('Total',convertToBytes(this.appFlowingState.totalTraffic.upRaw+this.appFlowingState.totalTraffic.downRaw,this.uiConfig.switchUnit),this.uiConfig.inputTotal)
         }
       })
     //  .alignItems(HorizontalAlign.Center)

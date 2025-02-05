@@ -98,6 +98,7 @@ export class UIConfig{
   //流量统计小卡片
   inputTotal: number = 0
   switchUnit: TrafficUnit = TrafficUnit.MB
+  cellularDataIndex:number=2
 
 
   constructor() {

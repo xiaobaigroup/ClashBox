@@ -60,24 +60,15 @@ export function convertDataNumber(bNumber: number): number {
 export function convertToBytes(value: number, unit: keyof GeneratedUnitInterface): number {
   switch (unit) {
     case 'TB':
-      return value * 1024;
+      return value / 1024**3;
     case 'GB':
-      return value ;
+      return value / 1024**3;
     case 'MB':
+      return value / 1024**2;
+    case 'KB':
       return value / 1024;
-    case 'KB':
-      return value / 1024**2;
-    case 'KB':
-      return value / 1024**2;
     default:
       throw new Error(`Unsupported unit: ${unit}`);
   }
 }
 
-/**
- * B转换为GB
- */
-export function convertDataNumberGB(bNumber: number): number {
-
-  return bNumber / conversionFactors.GB ;
-}

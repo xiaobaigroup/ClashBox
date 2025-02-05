@@ -116,11 +116,11 @@ export class LogInfo{
   time: number
 }
 export enum TrafficUnit{
-  KB = "kb",
-  MB= "m",
-  GB= "g",
-  TB= "t",
-  B = "b"
+  KB = "KB",
+  MB= "MB",
+  GB= "GB",
+  TB= "TB",
+  B = "B"
 }
 export class TrafficValue{
   value: number
