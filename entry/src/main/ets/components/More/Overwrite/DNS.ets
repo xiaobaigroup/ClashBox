@@ -137,17 +137,8 @@ struct DNS {
 
   // 列表行点击事件处理
   handleCheck(index: number) {
-    // if(index === 9) {
-    //   // 启用背景模糊
-    //   this.isEnableIndexForegroundBlur = true
-    //   this.dialogController.open()
-    // } else {
-    //   // 跳转
-    //   let itemData = this.overwriteDNSList[index]
-    //   this.pageInfos.pushPathByName(itemData.name, itemData.subtitle, false)
-    // }
     let itemData = this.overwriteDNSList[index]
-    if(typeof itemData.value == "string"){
+    if(typeof itemData.value == "string" && index === 9){
       this.isEnableIndexForegroundBlur = true
       this.dialogController.open()
     }else{

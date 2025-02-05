@@ -3,7 +3,7 @@ import { mediaquery } from '@kit.ArkUI'
 import { FONT_SIZE_16, MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
 import { AppFlowingState, TrafficUnit, UIConfig } from '../../entryability/AppState'
-import { convertDataNumberGB, convertToBytes } from '../../utils/DataUnitConvertUtils'
+import { convertDataNumberGB, convertToGB } from '../../utils/DataUnitConvertUtils'
 
 /* 输入总流量自定义弹窗相关 */
 @CustomDialog
@@ -28,19 +28,19 @@ struct totalCustomDialog {
     switch (index) {
       case 0:
         TrafficUnit.KB
-        this.uiConfig.switchUnit=TrafficUnit.KB
+        this.uiConfig.switchUnit = TrafficUnit.KB
         break;
       case 1:
         TrafficUnit.MB
-        this.uiConfig.switchUnit=TrafficUnit.MB
+        this.uiConfig.switchUnit = TrafficUnit.MB
         break
       case 2:
         TrafficUnit.GB
-        this.uiConfig.switchUnit=TrafficUnit.GB
+        this.uiConfig.switchUnit = TrafficUnit.GB
         break
       case 3:
         TrafficUnit.TB
-        this.uiConfig.switchUnit=TrafficUnit.TB
+        this.uiConfig.switchUnit = TrafficUnit.TB
         break
     }
   }
@@ -53,7 +53,7 @@ struct totalCustomDialog {
       { value: TrafficUnit.TB }])
       .width(80)
       .align(Alignment.Center)
-      .value(this.uiConfig.switchUnit.length>0 ?this.uiConfig.switchUnit : TrafficUnit.MB )
+      .value(this.uiConfig.switchUnit.length > 0 ? this.uiConfig.switchUnit : TrafficUnit.MB )
       .font({ size: FONT_SIZE_16, weight: 500 })
       .fontColor($r('sys.color.font_primary'))
       .selectedOptionFont({ size: FONT_SIZE_16, weight: 400 })
@@ -151,7 +151,7 @@ struct CellularDataStat {
   @Consume('breakPointStateHomeCardPadding') private cardPadding: BreakpointState<MarginGenerate>
   @Consume('breakPointStateHomeCardTitleBottomMargin') private titleBottomMargin: BreakpointState<number>
 
-//下部文字大小
+  // 下部文字大小
   @Consume('HomeCardCellularDataSmFontSize') private HomeCardCellularDataSmFontSize: BreakpointState<number>
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
   /**
@@ -199,7 +199,6 @@ struct CellularDataStat {
   // 在自定义组件即将析构销毁时将弹窗置空
   aboutToDisappear() {
     this.dialogController = null // 将dialogController置空
-
   }
 
   onCancel() {
@@ -254,11 +253,11 @@ struct CellularDataStat {
         .width('100%')
         .justifyContent(FlexAlign.Center)
 
-        //使用流量进度条
+        // 使用流量进度条
         Column() {
           Progress({
-            value: convertDataNumberGB(this.appFlowingState.totalTraffic.upRaw+this.appFlowingState.totalTraffic.downRaw),
-            total: convertToBytes(this.uiConfig.inputTotal,this.uiConfig.switchUnit),
+            value: convertDataNumberGB(this.appFlowingState.totalTraffic.upRaw + this.appFlowingState.totalTraffic.downRaw),
+            total: convertToGB(this.uiConfig.inputTotal,this.uiConfig.switchUnit),
             type: ProgressType.Capsule
           })//value为使用流量的值
             .style({ enableSmoothEffect: true, borderColor: '#00ffffff' })
@@ -292,7 +291,7 @@ struct CellularDataStat {
         if (this.dialogController != null) {
           this.dialogController.open()
           this.isEnableIndexForegroundBlur=true
-          console.info('Total', convertDataNumberGB(this.appFlowingState.totalTraffic.upRaw+this.appFlowingState.totalTraffic.downRaw),convertToBytes(this.uiConfig.inputTotal,this.uiConfig.switchUnit))
+          console.info('Total', convertDataNumberGB(this.appFlowingState.totalTraffic.upRaw+this.appFlowingState.totalTraffic.downRaw),convertToGB(this.uiConfig.inputTotal,this.uiConfig.switchUnit))
         }
       })
     //  .alignItems(HorizontalAlign.Center)

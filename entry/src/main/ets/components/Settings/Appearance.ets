@@ -61,7 +61,7 @@ struct Appearance {
         ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
           MenuItem({
             content: menuItem.title,
-            symbolEndIcon: this.uiConfig.darkModeIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+            symbolEndIcon: this.uiConfig.darkModeIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
           })
           .selected(this.uiConfig.darkModeIndex === index)
           .onChange((selected) => {
@@ -80,7 +80,7 @@ struct Appearance {
           MenuItem({
             content: menuItem.title,
             symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.paintpalette_fill')).fontColor(menuItem.startSymbolFontColor),
-            symbolEndIcon: this.uiConfig.themeColorIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+            symbolEndIcon: this.uiConfig.themeColorIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
           })
           .selected(this.uiConfig.themeColorIndex === index)
           .onChange((selected) => {
@@ -99,7 +99,7 @@ struct Appearance {
         ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
           MenuItem({
             content: menuItem.title,
-            symbolEndIcon: this.uiConfig.buttonPositionIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+            symbolEndIcon: this.uiConfig.buttonPositionIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
           })
             .selected(this.uiConfig.buttonPositionIndex === index)
             .onChange((selected) => {
@@ -117,7 +117,7 @@ struct Appearance {
         ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
           MenuItem({
             content: menuItem.title,
-            symbolEndIcon: this.uiConfig.animationSpeedIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+            symbolEndIcon: this.uiConfig.animationSpeedIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
           })
             .selected(this.uiConfig.animationSpeedIndex === index)
             .onChange((selected) => {

@@ -489,7 +489,7 @@
       "value": "Cancel"
     },
     {
-      "name": "Stack_Mode",
+      "name": "stack_mode",
       "value": "Stack Mode"
     },
     {
@@ -1543,6 +1543,14 @@
     {
       "name": "runing_download_background",
       "value": "Running simulation download"
+    },
+    {
+      "name": "key",
+      "value": "Key"
+    },
+    {
+      "name": "the_value",
+      "value": "Value"
     }
   ]
 }
