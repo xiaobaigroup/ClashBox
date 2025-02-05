@@ -26,7 +26,7 @@ export class SocketProxyService implements IClashManager{
   async queryTrafficTotal(): Promise<Traffic> {
     let result = await this.sendMessageRequest(ClashRpcType.queryTrafficTotal)
     const json = JSON.parse(result as string) as Traffic
-    return new Traffic(json.upRaw ?? 1024, json.downRaw ?? 10024);
+    return new Traffic(json.upRaw ?? 1024, json.downRaw ?? 1024);
   }
   async checkIpInfo(): Promise<IpInfo> {
     let result = await checkIp()

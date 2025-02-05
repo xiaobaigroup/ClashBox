@@ -53,7 +53,7 @@ struct Speed {
     yAxis:
     {
       min: 0,
-      max: 5000,
+      max: 3000,
       //刻度线
       axisTick: {
         show: false

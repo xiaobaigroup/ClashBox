@@ -3,7 +3,7 @@ import { mediaquery } from '@kit.ArkUI'
 import { FONT_SIZE_16, MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
 import { AppFlowingState, TrafficUnit, UIConfig } from '../../entryability/AppState'
-import { convertDataNumber, convertToBytes } from '../../utils/DataUnitConvertUtils'
+import { convertDataNumberGB, convertToBytes } from '../../utils/DataUnitConvertUtils'
 
 /* 输入总流量自定义弹窗相关 */
 @CustomDialog
@@ -193,10 +193,13 @@ struct CellularDataStat {
    // backgroundColor: $r('app.color.container_background')
   })
 
+  aboutToAppear(): void {
 
+  }
   // 在自定义组件即将析构销毁时将弹窗置空
   aboutToDisappear() {
     this.dialogController = null // 将dialogController置空
+
   }
 
   onCancel() {
@@ -210,7 +213,6 @@ struct CellularDataStat {
   existApp() {
     console.info('Click the callback in the blank area')
   }
-
 
 
   build() {
@@ -255,7 +257,7 @@ struct CellularDataStat {
         //使用流量进度条
         Column() {
           Progress({
-            value: this.appFlowingState.totalTraffic.upRaw+this.appFlowingState.totalTraffic.downRaw,
+            value: convertDataNumberGB(this.appFlowingState.totalTraffic.upRaw+this.appFlowingState.totalTraffic.downRaw),
             total: convertToBytes(this.uiConfig.inputTotal,this.uiConfig.switchUnit),
             type: ProgressType.Capsule
           })//value为使用流量的值
@@ -290,7 +292,7 @@ struct CellularDataStat {
         if (this.dialogController != null) {
           this.dialogController.open()
           this.isEnableIndexForegroundBlur=true
-          console.info('Total', this.appFlowingState.totalTraffic.upRaw+this.appFlowingState.totalTraffic.downRaw,convertToBytes(this.uiConfig.inputTotal,this.uiConfig.switchUnit))
+          console.info('Total', convertDataNumberGB(this.appFlowingState.totalTraffic.upRaw+this.appFlowingState.totalTraffic.downRaw),convertToBytes(this.uiConfig.inputTotal,this.uiConfig.switchUnit))
         }
       })
     //  .alignItems(HorizontalAlign.Center)

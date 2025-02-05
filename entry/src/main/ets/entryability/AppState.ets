@@ -28,6 +28,7 @@ export class AppFlowingState{
   totalTraffic: Traffic = new Traffic(0, 0)
   localIp: string = ""
   removeIp?: IpInfo
+
 }
 export class AppConfig{
   currentProfileId?: string
@@ -97,6 +98,7 @@ export class UIConfig{
   //流量统计小卡片
   inputTotal: number = 0
   switchUnit: TrafficUnit = TrafficUnit.MB
+
 
   constructor() {
   }
