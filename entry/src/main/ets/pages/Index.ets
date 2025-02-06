@@ -45,7 +45,7 @@ import {
 } from '../common/Constants'
 import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
-import { Item, ProxyData } from '../common/ProxyData'
+import { ProxyItem, ProxyData } from '../common/ProxyData'
 import { image } from '@kit.ImageKit'
 import { ClashConfig, Dns, LogLevel, Profile, ProxyGroup, ProxyMode } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
@@ -275,7 +275,7 @@ struct Index {
   // 当前代理节点收藏的值
   @Provide private FavoriteProxy: number =-1
   //节点数据组
-  @Provide items: Item[] = ProxyData.ProxyItems();
+  @Provide items: ProxyItem[] = ProxyData.ProxyItems();
   // 日志页临时数据
   @Provide
   private logListData: Array<LogData> = [

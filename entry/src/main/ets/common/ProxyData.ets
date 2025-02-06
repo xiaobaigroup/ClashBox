@@ -1,6 +1,6 @@
 
 // 定义一个接口来描述列表项的数据结构
-export interface Item {
+export interface ProxyItem {
   readonly name: string
   latency: number
   type: string
@@ -11,12 +11,12 @@ export interface Item {
 
 // todo 节点假数据组后期可改可删
 export class ProxyData {
-  private static items: Item[] = [
+  private static items: ProxyItem[] = [
   // ...你的items数据...
   ]
 
 //延迟颜色设定
-  public static ProxyItems(): Item[] {
+  public static ProxyItems(): ProxyItem[] {
     return ProxyData.items;
   }
 

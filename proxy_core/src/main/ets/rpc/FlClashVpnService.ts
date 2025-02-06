@@ -6,7 +6,8 @@ import {
   asyncTestDelay,
   updateConfig,
   initClash,
-  changeProxy
+  changeProxy,
+  forceGc
 } from 'libflclash.so';
 import { Address, CommonVpnService, isIpv4, isIpv6, VpnConfig } from './CommonVpnService';
 import { JSON, util } from '@kit.ArkTS';
@@ -143,9 +144,15 @@ export class FlClashVpnService extends CommonVpnService{
             "proxy-name": data[0] as string,
             timeout: data[1] as string,
           })).then((v)=>{
-            resolve(v)
+            if (v != ""){
+              resolve(JSON.parse(v)["value"])
+            }else{
+              resolve(-1)
+            }
+          }).catch((e)=> {
+            console.error("healthCheck error", e)
+            resolve(0)
           })
-
           break;
         }
         case ClashRpcType.updateProvider:{
@@ -182,6 +189,7 @@ export class FlClashVpnService extends CommonVpnService{
           break;
         }
         case ClashRpcType.reset:{
+          forceGc()
           resolve(true)
           break;
         }

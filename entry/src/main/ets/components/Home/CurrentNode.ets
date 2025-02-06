@@ -2,7 +2,7 @@ import {  BreakpointState } from '../../common/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI'
 import { MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
-import { Item, ProxyData  } from '../../common/ProxyData'
+import { ProxyItem, ProxyData  } from '../../common/ProxyData'
 import { AppConfig } from '../../entryability/AppState'
 
 
@@ -10,7 +10,7 @@ import { AppConfig } from '../../entryability/AppState'
 struct CurrentNode {
   @State font_primary: ResourceColor = $r('sys.color.font_primary')
   //节点假数据组后期可改可删
-  @Consume items: Item[]
+  @Consume items: ProxyItem[]
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   // 卡片内边距

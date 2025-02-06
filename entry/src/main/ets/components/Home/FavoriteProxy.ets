@@ -2,7 +2,7 @@ import { BreakpointState } from '../../common/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI'
 import { MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
-import { Item } from '../../common/ProxyData'
+import { ProxyItem } from '../../common/ProxyData'
 import { AppConfig, AppState, isEnd } from '../../entryability/AppState'
 import { ProxyGroup } from 'proxy_core'
 
@@ -10,7 +10,7 @@ import { ProxyGroup } from 'proxy_core'
 @Component
 struct FavoriteProxy {
   //节点假数据组后期可改可删
-  @Consume items: Item[]
+  @Consume items: ProxyItem[]
   @Prop selectedProxy: string
   @Prop disabled: boolean
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
@@ -43,11 +43,11 @@ struct FavoriteProxy {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageProp("proxyGroups") proxyGroups: ProxyGroup[] = []
 
-  OnProxyChange: ((item: Item) => void) = () => {
+  OnProxyChange: ((item: ProxyItem) => void) = () => {
 
   }
 
-  selectProxy(item: Item){
+  selectProxy(item: ProxyItem){
     if (!this.disabled){
       this.appConfig.currentProxyItem = item
       this.OnProxyChange(item)
