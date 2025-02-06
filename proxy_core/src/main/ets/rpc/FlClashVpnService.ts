@@ -52,12 +52,17 @@ export class FlClashVpnService extends CommonVpnService{
       // 订阅日志，需要持续输出
       startLog((message: string, value: string)=>{
         if (typeof value === "string"){
-          const log = JSON.parse(value)
-          this.sendClient(client, JSON.stringify({
-            logLevel: log["data"]["LogLevel"],
-            payload: log["data"]["Payload"],
-            time: new Date().getTime(),
-          } as LogInfo))
+          try {
+            const log = JSON.parse(value)
+            this.sendClient(client, JSON.stringify({
+              logLevel: log["data"]["LogLevel"],
+              payload: log["data"]["Payload"],
+              time: new Date().getTime(),
+            } as LogInfo))
+          }catch (e) {
+            console.error("log error", value)
+          }
+
         }
       })
     } else {

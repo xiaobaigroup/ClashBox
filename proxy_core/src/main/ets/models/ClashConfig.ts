@@ -122,7 +122,7 @@ export class  ClashConfig {
   authentication?: string[];
   "allow-lan"?: boolean;
   "bind-address"?: string;
-  mode?: TunnelState;
+  mode?: TunnelState = TunnelState.Rule;
   "log-level"?: LogLevel = LogLevel.Info;
   ipv6?: boolean = false;
   "external-controller"?: string;

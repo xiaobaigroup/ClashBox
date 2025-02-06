@@ -3,6 +3,7 @@ import { Context, Want } from "@kit.AbilityKit";
 import { SocketProxyService, Profile, ProfileType, UpdateConfigParams, ClashConfig, getHome,
   LogInfo,
   Provider,
+  TunnelState,
   ProxyMode} from "proxy_core";
 import { vpnExtension } from "@kit.NetworkKit";
 import { ConfigData } from "../common/PageArgumentEntity";
@@ -187,7 +188,8 @@ export class ClashViewModel {
   }
 
   async loadProfileAndConfig(id: string, config: ClashConfig | null = null, params: ConfigExtendedParams | null= null){
-
+    if(config)
+      config.mode = TunnelState.Rule
     let result = await this.socketProxy.loadConfig({
       "profile-id": id,
       config: config ?? new ClashConfig(),
