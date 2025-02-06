@@ -10,7 +10,6 @@ import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Timer } from '../common/HHmmssTimer'
 import {
   PROXY_STARTED_DURATION_INIT_VALUE,
-  ANIMATION_DURATION_300,
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE,
   BIND_SHEET_CONTAINER_HEIGHT,
   TAB_CONTENT_TITLE_HEIGHT,
@@ -93,7 +92,7 @@ struct Home {
   //删除按钮是否出现判定
   @State isShowDeleteButton: boolean = false
   //卡片编辑半模拟态判定
-  @State isShowCardEdit: boolean = false
+  @State @Watch('ShowHomeEditChange') isShowCardEdit: boolean = false
   // 折叠屏展开状态判定
   @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
 
@@ -101,8 +100,6 @@ struct Home {
   private componentName: string = 'HomePage'
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
-  /* 是否开启全局动画判定 */
-  @Consume ('isAnimation') isAnimation: boolean
   /* Stack层叠布局 */
   /* 代理启动按钮 */
   private promptAction: PromptAction = this.getUIContext()?.getPromptAction()
@@ -133,6 +130,7 @@ struct Home {
   @Provide theCurrentHomeCard: boolean[] = showHomeCard
   // 上一次主页布局
   @State theLastHomeCard: boolean[] = showHomeCard
+
 
 
   aboutToAppear(): void {
@@ -177,7 +175,7 @@ struct Home {
     hilog.info(0xFF00, "HometestTag", "布局还原为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
     this.promptAction.showToast({ message: `${getContext().resourceManager.getStringSync($r('app.string.layout_restored'))}🫡` })
     this.isShowHomeEdit = false
-    animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+    animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
       this.isShowDeleteButton = false
     })
     //关闭卡片旋转动画
@@ -195,8 +193,8 @@ struct Home {
     hilog.info(0xFF00, "HometestTag", "保存的布局： %{public}s", this.uiConfig.isShowHomeCard)
     this.promptAction.showToast({ message: `${getContext().resourceManager.getStringSync($r('app.string.layout_saved'))}💾` })
     this.isShowHomeEdit = false
-    if (this.isAnimation) {
-      animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+    if (this.uiConfig.isAnimation) {
+      animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
         this.isShowDeleteButton = false
       })
       //关闭卡片旋转动画
@@ -225,7 +223,19 @@ struct Home {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @State rotateAngle : number =0
 
-
+  /**
+   * 卡片编辑页面显示监听
+   */
+  ShowHomeEditChange() {
+    hilog.info(0xFF00, "HometestTag", "进入卡片编辑页面显示监听  %{public}s")
+    // 当编辑页面由 true -> false 时触发抖动动画刷新
+    if(!this.isShowCardEdit) {
+      hilog.info(0xFF00, "HometestTag", "进入卡片编辑页面显示监听，true -> false  %{public}s")
+      animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear,iterations:-1,playMode:PlayMode.Alternate }, () => {
+        this.rotateAngle = 1
+      })
+    }
+  }
 
   build() {
     Column() {
@@ -239,8 +249,8 @@ struct Home {
                 .layoutWeight(1)
                 .fontWeight(FontWeight.Bold)
                 .fontColor(this.font_primary)
-                .transition(this.isAnimation ? TransitionEffect.OPACITY
-                  .animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+                .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
+                  .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
                   .combine(TransitionEffect.SLIDE):null)
             }
             Blank()
@@ -250,7 +260,7 @@ struct Home {
                 .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
                 .fontColor([this.icon_primary])
             }
-            .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
               .combine(TransitionEffect.SLIDE):null)
             .onClick(() => {
               this.isShowHomeEdit = true
@@ -258,12 +268,12 @@ struct Home {
               hilog.info(0xFF00, "HometestTag", "上一次布局1： %{public}s", JSON.stringify(this.theLastHomeCard))
               this.theLastHomeCard = JSON.parse(this.uiConfig.isShowHomeCard)
               hilog.info(0xFF00, "HometestTag", "上一次布局2： %{public}s", JSON.stringify(this.theLastHomeCard))
-              if (this.isAnimation) {
-                animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+              if (this.uiConfig.isAnimation) {
+                animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
                   this.isShowDeleteButton = true
                 })
                 //编辑模式下开启卡片旋转动画
-                  animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear,iterations:-1,playMode:PlayMode.Alternate }, () => {
+                  animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear,iterations:-1,playMode:PlayMode.Alternate }, () => {
                     this.rotateAngle=1
                   })
               }else {this.isShowDeleteButton = true}
@@ -281,7 +291,7 @@ struct Home {
             .width(40)
             .height(40)
             .backgroundColor($r('app.color.settings_container_background'))
-            .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
               .combine(TransitionEffect.SLIDE):null)
             .onClick(() => {
               this.isShowSettings = true
@@ -293,7 +303,7 @@ struct Home {
               .fontSize(32)
               .fontWeight(FontWeight.Bold)
               .fontColor(this.font_primary)
-              .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+              .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
                 .combine(TransitionEffect.SLIDE):null)
             Blank()
             //添加按钮
@@ -305,7 +315,7 @@ struct Home {
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
-            .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
               .combine(TransitionEffect.SLIDE):null)
             .onClick(() => {
               this.isShowCardEdit = true
@@ -321,7 +331,7 @@ struct Home {
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
-            .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
               .combine(TransitionEffect.SLIDE):null)
             .onClick(() => {
               this.saveHomeLayout()
@@ -336,7 +346,7 @@ struct Home {
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
-            .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
               .combine(TransitionEffect.SLIDE):null)
             .onClick(() => {
               if (this.SaveDialogController != null) {
@@ -354,7 +364,7 @@ struct Home {
           right: this.breakPointStateTabContentTitleMargin.value,
         })
         // transition保证组件离场不被立即析构，可设置其他转场效果
-     //   .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
+     //   .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY:null)
       }
 
       Stack({ alignContent: this.stackAlignContentAlignment }) {
@@ -374,7 +384,7 @@ struct Home {
                       DeleteButton1()
                         .position({ x: '95%', y: -4 })
                         .onClick(() => {
-                          animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
                             // 将序号0变为false
                             this.theCurrentHomeCard.splice(0, 1, false)
                           })
@@ -387,16 +397,18 @@ struct Home {
                 .borderRadius(20)
                 .backgroundColor($r('app.color.container_background'))
                 .clickEffect({ level: ClickEffectLevel.MIDDLE })
-                .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                //消失触发回调
+                // 消失触发回调
                 .onDetach(() => {
+                  this.rotateAngle = 0
                 })
                 //显示时触发回调
                 .onAttach(() => {
+
                 })
                 //编辑模式下跳动动画
-                .rotate({ angle: this.isAnimation? this.rotateAngle : null })
+                .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
               }
 
               //分流模式小卡片
@@ -411,7 +423,7 @@ struct Home {
                       DeleteButton2()
                         .position({ x: '90%', y: -4 })
                         .onClick(() => {
-                          animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
                             // 将序号1变为false
                             this.theCurrentHomeCard.splice(1, 1, false)
                           })
@@ -422,9 +434,13 @@ struct Home {
                 }
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
                 //编辑模式下跳动动画
-                .rotate({ angle: this.isAnimation? this.rotateAngle : null })
+                .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
+                // 消失触发回调
+                .onDetach(() => {
+                  this.rotateAngle = 0
+                })
               }
 
               //流量统计小卡片
@@ -439,7 +455,7 @@ struct Home {
                       DeleteButton2()
                         .position({ x: '90%', y: -4 })
                         .onClick(() => {
-                          animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
                             // 将序号2变为false
                             this.theCurrentHomeCard.splice(2, 1, false)
                           })
@@ -450,9 +466,13 @@ struct Home {
                 //   .margin({ left: this.containerMargin.value })
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
                 //编辑模式下跳动动画
-                .rotate({ angle: this.isAnimation? this.rotateAngle : null })
+                .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
+                // 消失触发回调
+                .onDetach(() => {
+                  this.rotateAngle = 0
+                })
               }
 
               //当前节点小卡片
@@ -467,7 +487,7 @@ struct Home {
                       DeleteButton2()
                         .position({ x: '90%', y: -4 })
                         .onClick(() => {
-                          animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
                             // 将序号3变为false
                             this.theCurrentHomeCard.splice(3, 1, false)
                           })
@@ -477,9 +497,13 @@ struct Home {
                 }
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
                 //编辑模式下跳动动画
-                .rotate({ angle: this.isAnimation? this.rotateAngle : null })
+                .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
+                // 消失触发回调
+                .onDetach(() => {
+                  this.rotateAngle = 0
+                })
               }
 
               //IP地址小卡片
@@ -494,7 +518,7 @@ struct Home {
                       DeleteButton2()
                         .position({ x: '90%', y: -4 })
                         .onClick(() => {
-                          animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
                             // 将序号4变为false
                             this.theCurrentHomeCard.splice(4, 1, false)
                           })
@@ -504,9 +528,13 @@ struct Home {
                 }
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
                 //编辑模式下跳动动画
-                .rotate({ angle: this.isAnimation? this.rotateAngle : null })
+                .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
+                // 消失触发回调
+                .onDetach(() => {
+                  this.rotateAngle = 0
+                })
               }
 
               //收藏节点小卡片
@@ -521,7 +549,7 @@ struct Home {
                       DeleteButton2()
                         .position({ x: '90%', y: -4 })
                         .onClick(() => {
-                          animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
                             // 将序号5变为false
                             this.theCurrentHomeCard.splice(5, 1, false)
                           })
@@ -531,9 +559,13 @@ struct Home {
                 }
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
                 //编辑模式下跳动动画
-                .rotate({ angle: this.isAnimation? this.rotateAngle : null })
+                .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
+                // 消失触发回调
+                .onDetach(() => {
+                  this.rotateAngle = 0
+                })
               }
 
               //收藏配置小卡片
@@ -548,7 +580,7 @@ struct Home {
                       DeleteButton2()
                         .position({ x: '90%', y: -4 })
                         .onClick(() => {
-                          animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
                             // 将序号6变为false
                             this.theCurrentHomeCard.splice(6, 1, false)
                           })
@@ -558,9 +590,13 @@ struct Home {
                 }
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
                 //编辑模式下跳动动画
-                .rotate({ angle: this.isAnimation? this.rotateAngle : null })
+                .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
+                // 消失触发回调
+                .onDetach(() => {
+                  this.rotateAngle = 0
+                })
               }
 
               //节点信息小卡片
@@ -575,7 +611,7 @@ struct Home {
                       DeleteButton1()
                         .position({ x: '95%', y: -4 })
                         .onClick(() => {
-                          animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
                             // 将序号7变为false
                             this.theCurrentHomeCard.splice(7, 1, false)
                           })
@@ -587,10 +623,14 @@ struct Home {
                 .borderRadius(20)
                 .backgroundColor($r('app.color.container_background'))
                 .clickEffect({ level: ClickEffectLevel.MIDDLE })
-                .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 //编辑模式下跳动动画
-                .rotate({ angle: this.isAnimation? this.rotateAngle : null })
+                .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
+                // 消失触发回调
+                .onDetach(() => {
+                  this.rotateAngle = 0
+                })
               }
 
               //当前配置小卡片
@@ -605,7 +645,7 @@ struct Home {
                       DeleteButton2()
                         .position({ x: '90%', y: -4 })
                         .onClick(() => {
-                          animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear}, () => {
+                          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear}, () => {
                             // 将序号8变为false
                             this.theCurrentHomeCard.splice(8, 1, false)
                           })
@@ -615,9 +655,13 @@ struct Home {
                 }
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
                 //编辑模式下跳动动画
-                .rotate({ angle: this.isAnimation? this.rotateAngle : null })
+                .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
+                // 消失触发回调
+                .onDetach(() => {
+                  this.rotateAngle = 0
+                })
               }
 
               //快捷方式小卡片
@@ -632,7 +676,7 @@ struct Home {
                       DeleteButton2()
                         .position({ x: '90%', y: -4 })
                         .onClick(() => {
-                          animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
                             // 将序号9变为false
                             this.theCurrentHomeCard.splice(9, 1, this.isFoldStatus ? true : false)
                           })
@@ -642,9 +686,13 @@ struct Home {
                 }
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
                 //编辑模式下跳动动画
-                .rotate({ angle: this.isAnimation? this.rotateAngle : null })
+                .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
+                // 消失触发回调
+                .onDetach(() => {
+                  this.rotateAngle = 0
+                })
               }
             } //GridRow的尾括号
             .width('100%')
@@ -657,7 +705,7 @@ struct Home {
         .scrollBar(BarState.Off)
         .contentEndOffset(70)
         .edgeEffect(EdgeEffect.Spring)
-        .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
+        .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
         .bindSheet($$this.isShowCardEdit, this.CardEdit(), {
           detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
           preferType: SheetType.CENTER,
@@ -733,7 +781,7 @@ struct Home {
           this.proxyStartButtonWidth = this.proxyEnabled ? $r('app.integer.vp_proxy_started_button_width') :
           $r('app.integer.vp_proxy_not_start_button_width')
         })
-        .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
+        .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
         .clickEffect({ level: ClickEffectLevel.LIGHT })
 
       }
@@ -842,6 +890,7 @@ struct DeleteButton1 {
   @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
   /* 是否开启全局动画判定 */
   @Consume ('isAnimation') isAnimation: boolean
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   build() {
     Button() {
@@ -853,7 +902,7 @@ struct DeleteButton1 {
     .width(this.isLandscapePhone ? 24 :this.isFoldStatus?24: this.deleteButtonSize.value)
     .height(this.isLandscapePhone ? 24 :this.isFoldStatus?24: this.deleteButtonSize.value)
     .backgroundColor('#ffe84026')
-    .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+    .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
   }
 }
 
@@ -870,6 +919,7 @@ struct DeleteButton2 {
   @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
   /* 是否开启全局动画判定 */
   @Consume ('isAnimation') isAnimation: boolean
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   build() {
     Button() {
@@ -881,7 +931,7 @@ struct DeleteButton2 {
     .width(this.isLandscapePhone ? 24 :this.isFoldStatus?24: this.deleteButtonSize.value)
     .height(this.isLandscapePhone ? 24 :this.isFoldStatus?24: this.deleteButtonSize.value)
     .backgroundColor('#ffe84026')
-    .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+    .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
   }
 }
 

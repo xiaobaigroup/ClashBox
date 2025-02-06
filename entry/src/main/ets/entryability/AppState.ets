@@ -1,6 +1,8 @@
 import { ClashConfig, Dns, IpInfo, ProxyGroup, ProxyMode, ProxySort, Traffic, } from "proxy_core";
 import { CustomThemeName } from "../common/AppTheme";
-import { showHomeCard } from "../common/Constants";
+import { ANIMATION_DURATION_100, ANIMATION_DURATION_300,
+  ANIMATION_DURATION_500,
+  showHomeCard } from "../common/Constants";
 import { Item } from "../common/ProxyData";
 
 export enum ProxyGroupType{
@@ -54,6 +56,8 @@ export enum TrafficUnit{
   TB = "TB",
 }
 
+
+
 export class UIConfig{
   // 主页问候语
   isGreeting?: boolean = true
@@ -99,7 +103,9 @@ export class UIConfig{
   inputTotal: number = 0
   switchUnit: TrafficUnit = TrafficUnit.MB
   cellularDataIndex: number = 1
-
+//动画速度
+  animationSpeed:number = ANIMATION_DURATION_300
+  isAnimation:boolean=true
 
   constructor() {
   }

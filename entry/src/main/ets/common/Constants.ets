@@ -53,6 +53,8 @@ export const PROXY_STARTED_DURATION_INIT_VALUE: string = '00:00:00'
 
 // 组件animation duration值: 300
 export const ANIMATION_DURATION_300: number = 300
+export const ANIMATION_DURATION_100: number = 100
+export const ANIMATION_DURATION_500: number = 500
 
 // enum：routeName
 export enum RouteName {

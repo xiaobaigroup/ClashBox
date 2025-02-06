@@ -18,10 +18,6 @@ struct ProxyINFO{
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   //主页卡片内容当前节点字体大小
   @Consume('ProxyFontSize') private ProxyFontSize: BreakpointState<number>
-
-  @State DownloadSpeed: number = 0
-  @State UploadSpeed: number = 0
-
   //主页卡片内容IP地址小字体大小
   @Consume('HomeCardIPSmFontSize')
   private HomeCardIPSmFontSize: BreakpointState<number>
@@ -36,6 +32,7 @@ struct ProxyINFO{
   @Consume isShowHomeEdit: boolean
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageProp("appFlowingState") appFlowingState: AppFlowingState = new AppFlowingState()
+
   //收藏与ping延迟即时动作
   private PromptAction:PromptAction = this.getUIContext()?.getPromptAction()
 
@@ -86,7 +83,7 @@ struct ProxyINFO{
       Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.End, justifyContent: FlexAlign.SpaceBetween }) {
         Column() {
           Row({space:5}) {
-            Text(this.DownloadSpeed.toString() + ' B/s')
+            Text(this.appFlowingState.traffics.getLast()?.up?.toString() ?? "0 kb")
               .fontSize(this.isLandscapePhone ? 12:this.SpeedfontSize12_14_14_16.value)
               .fontColor($r('sys.color.font_primary'))
               .textAlign(TextAlign.End)
@@ -96,7 +93,7 @@ struct ProxyINFO{
           }.width('100%').justifyContent(FlexAlign.End)
 
           Row({space:5}) {
-            Text(this.UploadSpeed.toString() + ' B/s')
+            Text(this.appFlowingState.traffics.getLast()?.down?.toString() ?? "0 kb")
               .fontSize(this.isLandscapePhone ? 12:this.SpeedfontSize12_14_14_16.value)
               .fontColor($r('sys.color.font_primary'))
               .textAlign(TextAlign.End)

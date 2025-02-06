@@ -188,7 +188,7 @@ struct Speed {
 
         Column() {
           Row({space:5}) {
-            Text(this.DownloadSpeed.toString())
+            Text(this.UploadSpeed.toString())
               .fontSize(this.isLandscapePhone ? 12:this.SpeedfontSize12_14_14_16.value)
               .fontColor($r('sys.color.font_primary'))
               .textAlign(TextAlign.End)
@@ -199,7 +199,7 @@ struct Speed {
           }.width('100%').justifyContent(FlexAlign.End)
 
           Row({space:5}) {
-            Text(this.UploadSpeed.toString())
+            Text(this.DownloadSpeed.toString())
               .fontSize(this.isLandscapePhone ? 12:this.SpeedfontSize12_14_14_16.value)
               .fontColor($r('sys.color.font_primary'))
               .textAlign(TextAlign.End)

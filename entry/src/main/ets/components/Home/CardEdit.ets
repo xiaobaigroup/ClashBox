@@ -1,7 +1,6 @@
 import { LengthMetrics } from "@kit.ArkUI"
-import { ANIMATION_DURATION_300 } from "../../common/Constants"
 import { BreakpointState } from "../../common/breakpointsystem"
-import { AppConfig } from "../../entryability/AppState"
+import { AppConfig, UIConfig } from "../../entryability/AppState"
 
 
 
@@ -15,8 +14,6 @@ export struct CardEdit {
 
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
-  /* 是否开启全局动画判定 */
-  @Consume ('isAnimation') isAnimation: boolean
   /* 主页卡片高度*/
   @Consume('HomeCardEditHeight') private HomeCardEditHeight: BreakpointState<number>
   // 折叠屏展开状态判定
@@ -25,6 +22,7 @@ export struct CardEdit {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   // 当前主页布局
   @Consume theCurrentHomeCard: boolean[]
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
 
   build() {
@@ -36,13 +34,13 @@ export struct CardEdit {
           .aspectRatio(2.07)
           .height(this.HomeCardEditHeight.value)
           .ImageItemStyle()
-          .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+          .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
           .onAttach(() => {
           })//挂载回调
           .onDetach(() => {
           })//卸载回调
           .onClick(() => {
-            animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+            animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
               this.theCurrentHomeCard.splice(0, 1, true)
             })
           })
@@ -55,9 +53,9 @@ export struct CardEdit {
           .height(this.HomeCardEditHeight.value)
           .aspectRatio(2.07)
           .ImageItemStyle()
-          .transition(this.isAnimation ? TransitionEffect.scale({ x: 0, y: 0 }).animation({ duration: ANIMATION_DURATION_300 }) : null)
+          .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({ x: 0, y: 0 }).animation({ duration: this.uiConfig.animationSpeed }) : null)
           .onClick(() => {
-            animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+            animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
               this.theCurrentHomeCard.splice(7, 1, true)
             })
           })
@@ -68,10 +66,10 @@ export struct CardEdit {
         Image($rawfile('SwitchMode.png'))
           .width('48.5%')
           .ImageItemStyle()
-          .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+          .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
             //        .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
-            animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+            animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
               this.theCurrentHomeCard.splice(1, 1, true)
             })
           })
@@ -82,10 +80,10 @@ export struct CardEdit {
         Image($rawfile('CellularData.png'))
           .width('48.5%')
           .ImageItemStyle()
-          .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+          .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
             //      .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
-            animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+            animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
               this.theCurrentHomeCard.splice(2, 1, true)
             })
           })
@@ -96,9 +94,9 @@ export struct CardEdit {
         Image($rawfile('CurrentNode.png'))
           .width('48.5%')
           .ImageItemStyle()
-          .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+          .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
           .onClick(() => {
-            animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+            animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
               this.theCurrentHomeCard.splice(3, 1, true)
             })
           })
@@ -109,10 +107,10 @@ export struct CardEdit {
         Image($rawfile('PublicNetwork.png'))
           .width('48.5%')
           .ImageItemStyle()
-          .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+          .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
             //       .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
-            animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+            animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
               this.theCurrentHomeCard.splice(4, 1, true)
             })
           })
@@ -123,10 +121,10 @@ export struct CardEdit {
         Image($rawfile('FavoriteProxy.png'))
           .width('48.5%')
           .ImageItemStyle()
-          .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+          .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
             //      .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
-            animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+            animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
               this.theCurrentHomeCard.splice(5, 1, true)
             })
           })
@@ -137,10 +135,10 @@ export struct CardEdit {
         Image($rawfile('FavoriteConfiguration.png'))
           .width('48.5%')
           .ImageItemStyle()
-          .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+          .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
             //      .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
-            animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+            animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
               this.theCurrentHomeCard.splice(6, 1, true)
             })
           })
@@ -153,10 +151,10 @@ export struct CardEdit {
           .height(this.HomeCardEditHeight.value)
           .aspectRatio(1)
           .ImageItemStyle()
-          .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+          .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
             //      .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
-            animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+            animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
               this.theCurrentHomeCard.splice(8, 1, true)
             })
           })
@@ -169,9 +167,9 @@ export struct CardEdit {
           .height(this.HomeCardEditHeight.value)
           .aspectRatio(1)
           .ImageItemStyle()
-          .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+          .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
           .onClick(() => {
-            animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+            animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
               this.theCurrentHomeCard.splice(9, 1, this.isFoldStatus ? false : true)
             })
           })

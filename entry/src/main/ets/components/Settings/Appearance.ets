@@ -1,6 +1,8 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import {
+  ANIMATION_DURATION_100,
   ANIMATION_DURATION_300,
+  ANIMATION_DURATION_500,
   AppearanceList,
   AppearanceListItemProp,
 } from "../../common/Constants"
@@ -9,7 +11,7 @@ import { SymbolGlyphModifier } from "@kit.ArkUI"
 import { common } from "@kit.AbilityKit"
 import { setAutoColorMode, setDarkColorMode, setLightColorMode } from "../../utils/ChangeColorModeUtils"
 import { menuRowList, toggleRowList } from "../Common"
-import { AppConfig, UIConfig } from "../../entryability/AppState"
+import {  AppConfig, UIConfig } from "../../entryability/AppState"
 import { changeThemeColor } from "../../utils/ChangeThemeColorUtil"
 
 @Component
@@ -47,8 +49,6 @@ struct Appearance {
   @Consume ButtonPositionOffset: number
   // 所有子组件在容器内的对齐方式
   @Consume ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
-  /* 是否开启全局动画判定 */
-  @Consume ('isAnimation') isAnimation: boolean
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
 
@@ -174,7 +174,28 @@ struct Appearance {
 
   // 切换动画速度
   switchAnimationSpeed(index: number) {
-
+    switch (index) {
+      case 0:
+        //快速
+        this.uiConfig.isAnimation=true
+        this.uiConfig.animationSpeed=ANIMATION_DURATION_100
+        break
+      case 1:
+        //正常
+        this.uiConfig.isAnimation=true
+        this.uiConfig.animationSpeed=ANIMATION_DURATION_300
+        break
+      case 2:
+        //慢速
+        this.uiConfig.isAnimation=true
+        this.uiConfig.animationSpeed=ANIMATION_DURATION_500
+        break
+      case 3:
+        //关闭
+        this.uiConfig.isAnimation=false
+        this.uiConfig.animationSpeed=0
+        break
+    }
   }
 
   aboutToAppear(): void {

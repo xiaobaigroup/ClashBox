@@ -15,7 +15,6 @@ import {
   morePagelistBottom_10_14,
   listHeight_610_590,
   SettingslistHeight_590_500,
-  ANIMATION_DURATION_300,
   MarginGenerate,
   HomeCardPadding_14_15_16_17,
   HomeCardCellularDatabarMargin,
@@ -43,10 +42,7 @@ import {
   HomeCardCellularDataPadding,
   PROXY_STARTED_DURATION_INIT_VALUE
 } from '../common/Constants'
-import { ThemeControl } from '@ohos.arkui.theme'
-import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
 import { Item, ProxyData } from '../common/ProxyData'
-import { image } from '@kit.ImageKit'
 import { ClashConfig, Dns, LogLevel, Profile, ProxyGroup, ProxyMode } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
@@ -331,7 +327,7 @@ struct Index {
     }
     .animation(
       {
-        duration: ANIMATION_DURATION_300,
+        duration: this.uiConfig.animationSpeed,
         tempo:0.3,
         curve: Curve.Ease,
         iterations: 1,
@@ -592,6 +588,6 @@ struct Index {
       { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
     )
     .padding({ top:px2vp(this.topRectHeight) , bottom: this.isLandscapePhone ? 0 :px2vp(this.bottomRectHeight) -15})
-    .animation(this.isAnimation ? { duration: ANIMATION_DURATION_300, curve: Curve.Ease }:null)
+    .animation(this.uiConfig.isAnimation ? { duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
   }
 }
