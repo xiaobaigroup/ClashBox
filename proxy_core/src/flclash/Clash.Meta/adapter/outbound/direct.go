@@ -27,7 +27,7 @@ type DirectOption struct {
 
 // DialContext implements C.ProxyAdapter
 func (d *Direct) DialContext(ctx context.Context, metadata *C.Metadata, opts ...dialer.Option) (C.Conn, error) {
-	if !features.Android && !DisableLoopBackDetector {
+	if !features.Android && !features.OHOS && !DisableLoopBackDetector {
 		if err := d.loopBack.CheckConn(metadata); err != nil {
 			return nil, err
 		}
@@ -42,7 +42,7 @@ func (d *Direct) DialContext(ctx context.Context, metadata *C.Metadata, opts ...
 
 // ListenPacketContext implements C.ProxyAdapter
 func (d *Direct) ListenPacketContext(ctx context.Context, metadata *C.Metadata, opts ...dialer.Option) (C.PacketConn, error) {
-	if !features.Android && !DisableLoopBackDetector {
+	if !features.Android && !features.OHOS && !DisableLoopBackDetector {
 		if err := d.loopBack.CheckPacketConn(metadata); err != nil {
 			return nil, err
 		}

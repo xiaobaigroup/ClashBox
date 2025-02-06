@@ -74,7 +74,7 @@ func (p *path) Resolve(path string) string {
 
 // IsSafePath return true if path is a subpath of homedir
 func (p *path) IsSafePath(path string) bool {
-	if p.allowUnsafePath || features.Android {
+	if p.allowUnsafePath || features.Android || features.OHOS {
 		return true
 	}
 	homedir := p.HomeDir()

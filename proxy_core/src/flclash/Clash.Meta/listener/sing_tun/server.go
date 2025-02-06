@@ -404,7 +404,6 @@ func New(options LC.Tun, tunnel C.Tunnel, additions ...inbound.Addition) (l *Lis
 	if err != nil {
 		return
 	}
-	fmt.Println("debug2")
 	err = tunStack.Start()
 	if err != nil {
 		return

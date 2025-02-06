@@ -351,7 +351,7 @@ func resolveMetadata(metadata *C.Metadata) (proxy C.Proxy, rule C.Rule, err erro
 }
 
 func findPackageName(metadata *C.Metadata) {
-	if !features.Android {
+	if !features.Android && !features.OHOS {
 		uid, path, err := P.FindProcessName(metadata.NetWork.String(), metadata.SrcIP, int(metadata.SrcPort))
 		if err != nil {
 			log.Debugln("[Process] find process %s error: %v", metadata.String(), err)
