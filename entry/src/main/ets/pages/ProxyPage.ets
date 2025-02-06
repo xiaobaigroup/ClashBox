@@ -7,7 +7,7 @@ import {
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import ProxyGroupItem from '../components/Proxy/ProxyGroupItem'
 import ProxyArrangement from '../components/Proxy/ProxyArrangement'
-import { Item } from '../common/ProxyData'
+import { ProxyItem } from '../common/ProxyData'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { Profile, ProxyGroup, ProxySort, ProxyType } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
@@ -61,7 +61,7 @@ struct ProxyPage {
   @State FristPage: boolean = true
   /*节点相关数据以及排序 */
   //节点假数据组后期可改可删
-  @Consume items: Item[]
+  @Consume items: ProxyItem[]
 
   @Consume
   proxyGroups: ProxyGroup[]
@@ -115,7 +115,7 @@ struct ProxyPage {
       }, 200)
     }
   }
-  changeProxy(g: string, item: Item){
+  changeProxy(g: string, item: ProxyItem){
     if(this.currentProfile){
       ClashViewModel.changeProxy(this.currentProfile, g, item.name)
     }
@@ -412,7 +412,7 @@ struct ProxyPage {
                   TabContent() {
                     if ( this.currentIndex === i) {//为实现listltem转场动画的的if
                       ProxyGroupItem({
-                        items: g.proxies as Item[],
+                        items: g.proxies as ProxyItem[],
                         ProxyGroupItemSelected: this.appConfig.proxyCardSize,
                         disabled: g.type !== ProxyType.Selector,
                         selectedProxy: this.currentProfile?.getSelectedProxy(g) ?? "",

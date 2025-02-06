@@ -1,6 +1,6 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import { MarginGenerate } from "../../common/Constants"
-import { Item, ProxyData } from "../../common/ProxyData"
+import { ProxyItem, ProxyData } from "../../common/ProxyData"
 import { AppConfig, AppFlowingState } from "../../entryability/AppState"
 import { CardTitle } from "./CardTitleBuilder"
 import { PromptAction } from "@kit.ArkUI"
@@ -13,7 +13,7 @@ struct ProxyINFO{
   // 卡片内边距
   @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
   //节点假数据组后期可改可删
-  @Consume items: Item[]
+  @Consume items: ProxyItem[]
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   //主页卡片内容当前节点字体大小

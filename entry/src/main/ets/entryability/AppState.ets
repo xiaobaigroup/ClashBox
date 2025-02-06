@@ -1,9 +1,7 @@
 import { ClashConfig, Dns, IpInfo, ProxyGroup, ProxyMode, ProxySort, Traffic, } from "proxy_core";
 import { CustomThemeName } from "../common/AppTheme";
-import { ANIMATION_DURATION_100, ANIMATION_DURATION_300,
-  ANIMATION_DURATION_500,
-  showHomeCard } from "../common/Constants";
-import { Item } from "../common/ProxyData";
+import { showHomeCard } from "../common/Constants";
+import { ProxyItem } from "../common/ProxyData";
 
 export enum ProxyGroupType{
   Tabs,
@@ -36,7 +34,7 @@ export class AppConfig{
   currentProfileId?: string
   currentProxyName?: string
   currentProfileName?: string
-  currentProxyItem?: Item
+  currentProxyItem?: ProxyItem
   proxySort?: ProxySort = ProxySort.Default
   proxyGroupType?: ProxyGroupType = ProxyGroupType.Tabs
   proxyCardSize?: ProxyCardSize = ProxyCardSize.Mini
@@ -55,8 +53,6 @@ export enum TrafficUnit{
   GB = "GB",
   TB = "TB",
 }
-
-
 
 export class UIConfig{
   // 主页问候语
@@ -103,9 +99,7 @@ export class UIConfig{
   inputTotal: number = 0
   switchUnit: TrafficUnit = TrafficUnit.MB
   cellularDataIndex: number = 1
-//动画速度
-  animationSpeed:number = ANIMATION_DURATION_300
-  isAnimation:boolean=true
+
 
   constructor() {
   }
@@ -138,9 +132,9 @@ export class AppState {
     }
     return favoriteList
   }
-  static fetchProxyItem(proxyGroups: ProxyGroup[], g: string, p: string): Item {
+  static fetchProxyItem(proxyGroups: ProxyGroup[], g: string, p: string): ProxyItem {
     let group = proxyGroups.find((p: ProxyGroup) => p.name == g)
-    return group?.proxies.find((ps)=> ps.name == p) as Item
+    return group?.proxies.find((ps)=> ps.name == p) as ProxyItem
   }
 }
 // PersistentStorage 不支持嵌套对象，修改属性需要copy 更新引用来触发持久化更新

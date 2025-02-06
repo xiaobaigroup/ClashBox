@@ -4,7 +4,7 @@ import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import ProxyGroupItem from './ProxyGroupItem'
 import { Profile, ProxyGroup,ProxyType } from 'proxy_core'
-import { Item } from '../../common/ProxyData'
+import { ProxyItem } from '../../common/ProxyData'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { AppConfig } from '../../entryability/AppState'
 
@@ -51,7 +51,7 @@ struct ProxyArrangement {
   @Consume
   proxyGroups: ProxyGroup[]
 
-  changeProxy(g: string, item: Item){
+  changeProxy(g: string, item: ProxyItem){
     if(this.currentProfile){
       ClashViewModel.changeProxy(this.currentProfile, g, item.name)
     }
@@ -97,7 +97,7 @@ struct ProxyArrangement {
               //展开后内容显示区域
               if (this.isContentShow && this.selectItem === i) {
                 ProxyGroupItem({
-                  items: g.proxies as Item[],
+                  items: g.proxies as ProxyItem[],
                   ProxyGroupItemSelected: this.appConfig.proxyCardSize,
                   disabled: g.type !== ProxyType.Selector,
                   selectedProxy: this.currentProfile?.getSelectedProxy(g),
@@ -111,7 +111,6 @@ struct ProxyArrangement {
                   .padding({ top:10, bottom: 10 })
               }
             }
-       //     .backgroundColor($r('app.color.container_background'))
             .width('100%')
           }
         })
