@@ -2,7 +2,6 @@ import { BreakpointState } from '../common/breakpointsystem'
 import {
   TAB_CONTENT_TITLE_FONT_SIZE,
   TAB_CONTENT_TITLE_FONT_WEIGHT,
-  ANIMATION_DURATION_300,
   TAB_CONTENT_TITLE_HEIGHT,
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE,
   LIST_ITEM_HEIGHT,
@@ -62,8 +61,7 @@ struct ConfigurationPage {
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
-  /* 是否开启全局动画判定 */
-  @Consume ('isAnimation') isAnimation: boolean
+
 
   /* 断点布局相关 相关作用看定义时候的注释 */
   @Consume('breakPointStateListLanes')
@@ -290,8 +288,8 @@ struct ConfigurationPage {
       .menuItemDivider({ strokeWidth: LengthMetrics.vp(.4), color: $r('sys.color.comp_divider') })
       .width(200)
       .height('auto')
-      .transition(this.isAnimation ? TransitionEffect.asymmetric(TransitionEffect.move(TransitionEdge.END), TransitionEffect.move(TransitionEdge.START))
-        .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
+      .transition(this.uiConfig.isAnimation ? TransitionEffect.asymmetric(TransitionEffect.move(TransitionEdge.END), TransitionEffect.move(TransitionEdge.START))
+        .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
         .combine(TransitionEffect.OPACITY):null
       )
     }
@@ -510,7 +508,7 @@ struct ConfigurationPage {
         .height(this.proxyStartButtonHeight)
         .backgroundColor(this.icon_emphasize)
         .clip(true)
-        .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
+        .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
         .clickEffect({ level: ClickEffectLevel.LIGHT })
         .hoverEffect(HoverEffect.Scale)
         .bindSheet( this.isShowConfigAddBindSheet, this.ConfigAddBindSheetBuilder, {
@@ -566,7 +564,7 @@ struct ConfigurationPage {
     }
     .width('100%')
     .height('100%')
-    .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Linear, delay: 0 })
+    .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear, delay: 0 })
   }
 
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()

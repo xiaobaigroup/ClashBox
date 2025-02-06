@@ -1,12 +1,12 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import {
-  ANIMATION_DURATION_300,
   BIND_SHEET_CONTAINER_HEIGHT,
   BIND_SHEET_DRAG_BAR_HEIGHT, BIND_SHEET_TITLE_CONTAINER_HEIGHT } from "../../common/Constants"
 import { skipRowList, toggleRowList } from "../Common"
 import { MoreTop } from "./MoreTopBuilder"
 import { promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 import { hilog } from "@kit.PerformanceAnalysisKit"
+import { UIConfig } from "../../entryability/AppState"
 
 @Component
 struct Diversion {
@@ -39,8 +39,7 @@ struct Diversion {
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
   // 是否开启 `Index` 页面的前景模糊
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
-  /* 是否开启全局动画判定 */
-  @Consume ('isAnimation') isAnimation: boolean
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   @Builder
   diversionSearch() {
@@ -168,7 +167,7 @@ struct Diversion {
             }),
             previewAnimationOptions: {
               scale: [0.95, 1.0],
-              transition: this.isAnimation ?TransitionEffect.prototype.animation({ tempo: 1.5 }) : undefined
+              transition: this.uiConfig.isAnimation ?TransitionEffect.prototype.animation({ tempo: 1.5 }) : undefined
             }
           })
 
@@ -180,7 +179,7 @@ struct Diversion {
       .margin({ top: 10 })
       .alignListItem(ListItemAlign.Center)
       .height(this.isLandscapePhone ? 275 : 650)
-      .transition(this.isAnimation ? TransitionEffect.OPACITY : null)
+      .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY : null)
       .bindSheet($$this.isShowPolicy, this.PolicySheet(),
       {
         detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],
@@ -245,6 +244,7 @@ struct Policy {
   // 是否开启 `Index` 页面的前景模糊
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   @Builder
   AutoTipsText() {
@@ -356,7 +356,7 @@ struct Policy {
             .onChange((isOn: boolean) => {
               // 启用插入资源 显式动画
               this.getUIContext()?.animateTo({
-                duration: ANIMATION_DURATION_300,
+                duration: this.uiConfig.animationSpeed ,
                 curve: Curve.Ease
               }, () => {
                 this.EnabledInsertResource = isOn
@@ -365,7 +365,7 @@ struct Policy {
         }
       }.onClick(() => {
         this.getUIContext()?.animateTo({
-          duration: ANIMATION_DURATION_300,
+          duration: this.uiConfig.animationSpeed ,
         }, () => {
           this.EnabledInsertResource = !this.EnabledInsertResource
         })
@@ -384,7 +384,7 @@ struct Policy {
               .onChange((isOn: boolean) => {
                 // 启用自动更新 显式动画
                 this.getUIContext()?.animateTo({
-                  duration: ANIMATION_DURATION_300,
+                  duration: this.uiConfig.animationSpeed ,
                   curve: Curve.Ease
                 }, () => {
                   this.EnabledAutoUpdate = isOn
@@ -393,7 +393,7 @@ struct Policy {
           }
         }.onClick(() => {
           this.getUIContext()?.animateTo({
-            duration: ANIMATION_DURATION_300,
+            duration: this.uiConfig.animationSpeed ,
           }, () => {
             this.EnabledAutoUpdate = !this.EnabledAutoUpdate
           })

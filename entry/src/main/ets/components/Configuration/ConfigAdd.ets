@@ -1,6 +1,5 @@
 import { BreakpointState } from "../../common/breakpointsystem";
 import {
-  ANIMATION_DURATION_300,
   BIND_SHEET_CONTAINER_HEIGHT,
   BIND_SHEET_DRAG_BAR_HEIGHT,
   BIND_SHEET_MAIN_FONTSIZE,
@@ -16,6 +15,7 @@ import { hilog } from "@kit.PerformanceAnalysisKit";
 import { BindSheetTitleCustomBuilder } from "../Common";
 import { promptAction } from "@kit.ArkUI";
 import { getResourceString } from "../../utils/ResourceStringUtil";
+import { UIConfig } from "../../entryability/AppState";
 
 interface ConfigAddType {
   symbolStart? : Resource,
@@ -42,6 +42,7 @@ export struct ConfigAdd {
   /* 主题色 */
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   /* List 相关 */
   private configAddTypeArray: Array<ConfigAddType> = [
@@ -136,7 +137,7 @@ export struct ConfigAdd {
       .hideBackButton(true)
       .navBarWidthRange([255, '100%'])
       .foregroundBlurStyle(this.isEnableConfigPageBindSheetForegroundBlur ? BlurStyle.Thin : BlurStyle.NONE,{ colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 })
-      .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
+      .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
       // NV路由 END
     }
     .height('auto')

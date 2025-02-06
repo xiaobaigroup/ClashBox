@@ -1,11 +1,12 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { ANIMATION_DURATION_300, BORDER_RADIUS_20 } from "../../common/Constants"
+import {  BORDER_RADIUS_20 } from "../../common/Constants"
 import { Nothing, theCustomDialog } from "../Common"
 import { convertTime } from "../../utils/TimeConvertUtil"
 import { ClashConfig } from 'proxy_core'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { Provider } from "proxy_core"
 import { hilog } from "@kit.PerformanceAnalysisKit"
+import { UIConfig } from "../../entryability/AppState"
 
 
 // 资源数据（假设）
@@ -59,14 +60,14 @@ export struct ProviderPage {
   @Watch('loadingChange')
   @State isLoadingAll: number = -1;
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 临时数据
   @State
   private resourceListData: Array<Provider> = [ ]
   @Consume isProviderEdit: boolean
   //fl clash条目数量判定
   @State entriesNumber:number =0
-  /* 是否开启全局动画判定 */
-  @Consume ('isAnimation') isAnimation: boolean
+
 
   /**
    * 监听加载状态改变执行UI数组更新
@@ -219,6 +220,7 @@ export struct ProviderPage {
                                 Text($r('app.string.upload')).fontSize(12).fontColor(this.icon_emphasize)
                               }
                             }.ButtonStyle()
+                            .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
                             .width(76)
                             .height(28)
                             .onClick(() => {
@@ -250,6 +252,7 @@ export struct ProviderPage {
                                 .justifyContent(FlexAlign.Center)
                               }
                             }.ButtonStyle()
+                            .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
                             .onClick(() => {
                               // 资源更新处理
                               ClashViewModel.updateProvider(item).then((result) => {
@@ -258,7 +261,7 @@ export struct ProviderPage {
                                 this.isLoading = -1
                               })
                               animateTo({
-                                duration: ANIMATION_DURATION_300,
+                                duration: this.uiConfig.animationSpeed,
                                 curve: Curve.Friction,
                                 iterations: 1, // 设置-1表示动画无限循环
                               }, () => {
@@ -269,7 +272,7 @@ export struct ProviderPage {
                         }
                         .listFlex()
                       }
-                //      .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+                //      .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
                  //       .combine(TransitionEffect.SLIDE):null)
                     }
                   })
@@ -321,6 +324,7 @@ export struct ProviderPage {
                                 Text($r('app.string.upload')).fontSize(12).fontColor(this.icon_emphasize)
                               }
                             }.ButtonStyle()
+                            .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
                             .width(76)
                             .height(28)
                             .onClick(() => {
@@ -352,6 +356,7 @@ export struct ProviderPage {
                                   .justifyContent(FlexAlign.Center)
                               }
                             }.ButtonStyle()
+                            .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
                             .onClick(() => {
                               // 资源更新处理
                               ClashViewModel.updateProvider(item).then((result) => {
@@ -361,7 +366,7 @@ export struct ProviderPage {
                               })
                               // 建议使用this.getUIContext()?.animateTo()
                               animateTo({
-                                duration: ANIMATION_DURATION_300,
+                                duration: this.uiConfig.animationSpeed,
                                 curve: Curve.Friction,
                                 iterations: 1, // 设置-1表示动画无限循环
                               }, () => {
@@ -372,7 +377,7 @@ export struct ProviderPage {
                         }
                         .listFlex()
                       }
-                   //   .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+                   //   .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
                   //      .combine(TransitionEffect.SLIDE):null)
                     }
                   })
@@ -420,7 +425,7 @@ export struct ProviderPage {
         .clickEffect({ level: ClickEffectLevel.MIDDLE })
         .onClick(() => {
           animateTo({
-            duration: ANIMATION_DURATION_300,
+            duration: this.uiConfig.animationSpeed,
             curve: Curve.Friction,
             iterations: 1, // 设置-1表示动画无限循环
           }, () => {
@@ -500,7 +505,6 @@ function ButtonStyle() {
   .borderRadius(14)
   .clickEffect({ level: ClickEffectLevel.LIGHT })
   .backgroundColor($r('app.color.button_container_background'))
-  .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
 }
 
 //文本竖排组件样式

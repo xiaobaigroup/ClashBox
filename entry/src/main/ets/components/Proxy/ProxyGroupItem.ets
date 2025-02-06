@@ -1,7 +1,6 @@
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem'
 import {
-  ANIMATION_DURATION_300,
   BIND_SHEET_CONTAINER_HEIGHT, LIST_ITEM_HEIGHT,
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE } from '../../common/Constants'
 import { LengthMetrics, SymbolGlyphModifier,PromptAction } from '@kit.ArkUI';
@@ -10,7 +9,7 @@ import {  ProxyItem, ProxyData } from '../../common/ProxyData';
 import { EventHub, EventKey } from '../../common/EventHub';
 import { ProxySort } from 'proxy_core';
 import { intl } from '@kit.LocalizationKit';
-import { AppConfig, ProxyCardSize } from '../../entryability/AppState';
+import { AppConfig, ProxyCardSize, UIConfig } from '../../entryability/AppState';
 import ClashViewModel from '../../entryability/ClashViewModel';
 import { ProxyNode } from './ProxyItem';
 
@@ -130,8 +129,6 @@ struct ProxyGroupItem {
 
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
-  /* 是否开启全局动画判定 */
-  @Consume ('isAnimation') isAnimation: boolean
 
   /* 断点布局相关 */
   @State
@@ -159,6 +156,7 @@ struct ProxyGroupItem {
   @Prop disabled: boolean
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   /**
    * XXX 当前手指触摸的ListItem的对应 `this.configList` 中的 `configId`
    *    List的长按菜单中的响应都是根据这个的对象中的属性来处理的，是个不稳定因素
@@ -312,7 +310,7 @@ struct ProxyGroupItem {
           }
           })
         }
-        .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+        .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
           .combine(TransitionEffect.scale({x: 0, y: 0})):null)
         .onClick(() => {
           this.selectProxy(item)
@@ -327,7 +325,7 @@ struct ProxyGroupItem {
             }),
             previewAnimationOptions: {
               scale: [0.95, 1.0],
-              transition: this.isAnimation ?TransitionEffect.prototype.animation({ tempo: 1.5 }):undefined
+              transition: this.uiConfig.isAnimation ?TransitionEffect.prototype.animation({ tempo: 1.5 }):undefined
             },
           })
       })

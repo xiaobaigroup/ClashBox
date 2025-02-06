@@ -888,8 +888,6 @@ struct DeleteButton1 {
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
   // 折叠屏展开状态判定
   @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
-  /* 是否开启全局动画判定 */
-  @Consume ('isAnimation') isAnimation: boolean
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   build() {
@@ -917,8 +915,6 @@ struct DeleteButton2 {
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
   // 折叠屏展开状态判定
   @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
-  /* 是否开启全局动画判定 */
-  @Consume ('isAnimation') isAnimation: boolean
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   build() {

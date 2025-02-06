@@ -10,7 +10,6 @@ import {
   FONT_SIZE_16,
   TEXT_INPUT_HEIGHT,
   RouteName,
-  ANIMATION_DURATION_300,
   BORDER_RADIUS_20
 } from "../../common/Constants"
 import { BindSheetTitleCustomBuilder, BindSheetTitleCustomBuilderMenu, CustomConfirmDialog } from "../Common"
@@ -22,6 +21,7 @@ import { customVibrator } from "../../utils/VibratorUtil"
 import { util } from "@kit.ArkTS"
 import { ConfigData } from "../../common/PageArgumentEntity"
 import { BusinessError } from "@kit.BasicServicesKit"
+import { UIConfig } from "../../entryability/AppState"
 
 
 // 关联：route_map.json
@@ -62,6 +62,7 @@ export struct ImportConfigFromFile{
   private mainTitle: string = getResourceString($r('app.string.add_config'), this)
   @State
   private subTitle: string = getResourceString($r('app.string.import_from_file'), this)
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   // 配置详情（要添加到用户首选项里的数据）
   @State
@@ -214,7 +215,7 @@ export struct ImportConfigFromFile{
         return false
       }
     })
-    .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
+    .animation({ duration:  this.uiConfig.animationSpeed , curve: Curve.Ease })
 
   }
 

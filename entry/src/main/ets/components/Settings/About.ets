@@ -3,7 +3,7 @@ import { AboutListItemProp, AboutList, BORDER_RADIUS_20, ContributorsListItemPro
   ContributorsList,
   CheckUpdateList,
   CheckUpdateListItemProp,
-  ANIMATION_DURATION_300} from "../../common/Constants"
+} from "../../common/Constants"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { common, Want } from "@kit.AbilityKit"
@@ -300,7 +300,7 @@ struct About {
                       } else {
                         // 改变自动检查更新开关状态 显式动画
                         this.getUIContext()?.animateTo({
-                          duration: ANIMATION_DURATION_300,
+                          duration: this.uiConfig.animationSpeed,
                           curve: Curve.Ease
                         }, () => {
                           const childItem = this.aboutList[4]

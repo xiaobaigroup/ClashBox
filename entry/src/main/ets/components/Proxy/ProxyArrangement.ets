@@ -1,12 +1,11 @@
-import { ANIMATION_DURATION_300, LIST_ITEM_HEIGHT,
-} from '../../common/Constants'
+import {   LIST_ITEM_HEIGHT} from '../../common/Constants'
 import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem'
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import ProxyGroupItem from './ProxyGroupItem'
 import { Profile, ProxyGroup,ProxyType } from 'proxy_core'
 import { ProxyItem } from '../../common/ProxyData'
 import ClashViewModel from '../../entryability/ClashViewModel'
-import { AppConfig } from '../../entryability/AppState'
+import { AppConfig, UIConfig } from '../../entryability/AppState'
 
 
 @Entry
@@ -25,6 +24,7 @@ struct ProxyArrangement {
   private currentProfile: Profile | null
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
@@ -79,7 +79,7 @@ struct ProxyArrangement {
               .padding({ left: 10, right: 10 })
               .onClick(() => {
                 animateTo({
-                  duration: ANIMATION_DURATION_300,
+                  duration: this.uiConfig.animationSpeed,
                   onFinish: () => {
                     console.info('animation end');
                   }

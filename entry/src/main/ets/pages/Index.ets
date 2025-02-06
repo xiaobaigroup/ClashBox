@@ -15,7 +15,6 @@ import {
   morePagelistBottom_10_14,
   listHeight_610_590,
   SettingslistHeight_590_500,
-  ANIMATION_DURATION_300,
   MarginGenerate,
   HomeCardPadding_14_15_16_17,
   HomeCardCellularDatabarMargin,
@@ -302,8 +301,6 @@ struct Index {
   // 代理启动的计时文本
   @Provide private proxyStartingDuration: string = PROXY_STARTED_DURATION_INIT_VALUE
 
-  /* 是否开启全局动画判定 */
-  @Provide ('isAnimation') isAnimation: boolean = true
 
   @Builder
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
@@ -331,7 +328,7 @@ struct Index {
     }
     .animation(
       {
-        duration: ANIMATION_DURATION_300,
+        duration: this.uiConfig.animationSpeed,
         tempo:0.3,
         curve: Curve.Ease,
         iterations: 1,
@@ -592,6 +589,6 @@ struct Index {
       { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
     )
     .padding({ top:px2vp(this.topRectHeight) , bottom: this.isLandscapePhone ? 0 :px2vp(this.bottomRectHeight) -15})
-    .animation(this.isAnimation ? { duration: ANIMATION_DURATION_300, curve: Curve.Ease }:null)
+    .animation(this.uiConfig.isAnimation ? { duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
   }
 }

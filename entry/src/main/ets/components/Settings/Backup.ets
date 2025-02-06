@@ -1,8 +1,8 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { ANIMATION_DURATION_300 } from "../../common/Constants"
 import { ExperimentalFunction, skipRowList } from "../Common"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
+import {  UIConfig } from "../../entryability/AppState"
 
 @Component
 struct Backup {
@@ -17,7 +17,6 @@ struct Backup {
   @Consume isShowExperimentalFunction: boolean
   // 页面内边距
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
-
   /**
    * 备份应用数据
    */
@@ -128,6 +127,7 @@ export struct CloudBackup {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 页面内边距
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   build() {
     NavDestination() {
@@ -177,7 +177,7 @@ export struct CloudBackup {
             .onChange((isOn: boolean) => {
               // 开关云备份 显式动画 TODO 【用户首选项】保存云备份启用状态 Ya@2024-12-24
               this.getUIContext()?.animateTo({
-                duration: ANIMATION_DURATION_300,
+                duration: this.uiConfig.animationSpeed,
                 curve: Curve.Ease
               }, () => {
                 this.isShowCloudconfig = isOn
@@ -193,7 +193,7 @@ export struct CloudBackup {
         .onClick( ()=> {
           // 展开流量提醒设置列表行 显式动画
           this.getUIContext()?.animateTo({
-            duration: ANIMATION_DURATION_300
+            duration: this.uiConfig.animationSpeed
           }, () => {
             this.isShowCloudconfig = !this.isShowCloudconfig
           })

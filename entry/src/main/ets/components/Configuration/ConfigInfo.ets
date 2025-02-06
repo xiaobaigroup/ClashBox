@@ -10,7 +10,6 @@ import {
   FONT_SIZE_14,
   CONFIG_AUTO_UPDATE_TIME_GAT_STRING_ARR,
   LIST_ITEM_HEIGHT,
-  ANIMATION_DURATION_300,
 } from "../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { PromptAction } from "@kit.ArkUI"
@@ -145,7 +144,7 @@ export struct ConfigInfo{
                   }
                   // 自动更新间隔 显式动画
                   this.getUIContext()?.animateTo({
-                    duration: ANIMATION_DURATION_300,
+                    duration: this.uiConfig.animationSpeed ,
                     curve: Curve.Ease
                   }, () => {
                     this.configData.isConfigAutoUpdate = isOn
@@ -165,7 +164,7 @@ export struct ConfigInfo{
           .onClick( ()=> {
             // 自动更新间隔 显式动画
             this.getUIContext()?.animateTo({
-              duration: ANIMATION_DURATION_300
+              duration: this.uiConfig.animationSpeed
             }, () => {
               this.configData.isConfigAutoUpdate = !this.configData.isConfigAutoUpdate
             })
@@ -242,7 +241,7 @@ export struct ConfigInfo{
                       let ctx = this.getUIContext()
                       if (event.type === TouchType.Down) {
                         ctx.animateTo({
-                          duration: ANIMATION_DURATION_300,
+                          duration: this.uiConfig.animationSpeed ,
                           curve: Curve.Ease
                         }, () => {
                           this.heightOfTextPickerInTheListItem = 100
@@ -259,7 +258,7 @@ export struct ConfigInfo{
                         })
                       } else if (event.type === TouchType.Up){
                         ctx.animateTo({
-                          duration: ANIMATION_DURATION_300,
+                          duration: this.uiConfig.animationSpeed ,
                           curve: Curve.Ease
                         }, () => {
                           this.heightOfTextPickerInTheListItem = LIST_ITEM_HEIGHT
@@ -271,7 +270,7 @@ export struct ConfigInfo{
                         })
                       }
                     })
-                    // .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
+                    // .animation({ duration: this.uiConfig.animationSpeed , curve: Curve.Ease })
                 }
                 .width('auto')
               }.width('100%').alignItems(VerticalAlign.Center)
@@ -280,7 +279,7 @@ export struct ConfigInfo{
             .padding(LIST_ITEM_PADDING)
             .borderRadius(BORDER_RADIUS_20)
             .clickEffect({ level: ClickEffectLevel.MIDDLE })
-            .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
+            .animation({ duration: this.uiConfig.animationSpeed , curve: Curve.Ease })
           }
           // 自动更新间隔 END
 

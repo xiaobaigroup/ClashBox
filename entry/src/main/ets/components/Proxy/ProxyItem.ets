@@ -2,7 +2,7 @@ import { EventHub, EventKey } from '../../common/EventHub'
 import { ProxyItem as ProxyItem, ProxyData } from '../../common/ProxyData'
 import { ProxyCardSize } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
-import promptAction from '@ohos.promptAction'
+
 
 @Extend(Text)
 function ItemTextStyle() {

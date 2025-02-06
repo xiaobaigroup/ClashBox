@@ -5,7 +5,6 @@ import {
   BIND_SHEET_DRAG_BAR_HEIGHT,
   BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT,
   RouteName,
-  ANIMATION_DURATION_300,
 } from "../../common/Constants"
 import { BindSheetTitleCustomBuilder, BindSheetTitleCustomBuilderMenu, CustomDownloadingDialog } from "../Common"
 import { hilog } from "@kit.PerformanceAnalysisKit"
@@ -18,6 +17,7 @@ import { BusinessError } from "@kit.BasicServicesKit"
 import { common } from "@kit.AbilityKit"
 import ClashViewModel from "../../entryability/ClashViewModel"
 import { getResourceString } from "../../utils/ResourceStringUtil"
+import { UIConfig } from "../../entryability/AppState"
 
 
 // 关联：route_map.json
@@ -72,6 +72,7 @@ export struct ImportConfigFromURL{
   private mainTitle: string = getResourceString($r('app.string.add_config'), this)
   @State
   private subTitle: string = getResourceString($r('app.string.Import_from_url'), this)
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 标题栏工具菜单
   // { symbol: $r('sys.symbol.star'), action: () => { this.menus.pop() } },
   // 保存按钮
@@ -212,7 +213,7 @@ export struct ImportConfigFromURL{
         }
       }
     })
-    .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
+    .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
 
   }
 

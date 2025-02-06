@@ -415,7 +415,7 @@ struct Appearance {
                   .onChange((isOn: boolean) => {
                     // 打开背景模糊 显式动画
                     this.getUIContext()?.animateTo({
-                      duration: ANIMATION_DURATION_300,
+                      duration: this.uiConfig.animationSpeed,
                       curve: Curve.Ease
                     }, () => {
                       this.uiConfig.isBlurr = isOn
@@ -425,7 +425,7 @@ struct Appearance {
             }.onClick(()=> {
               // 打开背景模糊 显式动画
               this.getUIContext()?.animateTo({
-                duration: ANIMATION_DURATION_300
+                duration: this.uiConfig.animationSpeed
               }, () => {
                 this.uiConfig.isBlurr = !this.uiConfig.isBlurr
               })

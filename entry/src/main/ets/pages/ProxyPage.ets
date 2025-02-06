@@ -11,7 +11,7 @@ import { ProxyItem } from '../common/ProxyData'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { Profile, ProxyGroup, ProxySort, ProxyType } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
-import { AppConfig, isEnd, ProxyCardSize, ProxyGroupType } from '../entryability/AppState'
+import { AppConfig, isEnd, ProxyCardSize, ProxyGroupType, UIConfig } from '../entryability/AppState'
 import {  PromptAction } from '@kit.ArkUI'
 import { ProviderPage } from '../components/Proxy/Provider'
 
@@ -28,8 +28,6 @@ struct ProxyPage {
   private isEnableIndexForegroundBlur: boolean
   // 所有子组件在容器内的对齐方式
   @Consume ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
-  /* 是否开启全局动画判定 */
-  @Consume ('isAnimation') isAnimation: boolean
   @State font_primary: ResourceColor = $r('sys.color.font_primary') //一级文本色，黑色
   @State font_secondary: ResourceColor = $r('sys.color.font_secondary') //二级文本色，深灰色
   @State container_background: ResourceColor = ($r('app.color.container_background')); //卡片颜色
@@ -99,6 +97,7 @@ struct ProxyPage {
   private currentProfile: Profile | null
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   /**主页卡片标题按钮间距*/
   @Consume('HomeCardTitleButtonPadding') private HomeCardTitleButtonPadding: BreakpointState<number>
   //栅格点位配置
@@ -175,7 +174,7 @@ struct ProxyPage {
               .checked(this.appConfig.proxyGroupType == n["v"])
               .onChange((isChecked: boolean) => {
                 if (isChecked) {
-                  animateTo({ duration: 500 }, () => {
+                  animateTo({ duration: this.uiConfig.animationSpeed }, () => {
                     this.appConfig.proxyGroupType = n["v"]
                   })
                 }
@@ -190,7 +189,7 @@ struct ProxyPage {
      //       .combine(TransitionEffect.SLIDE):null)
           // 点击后改变ProxyArrangementSelected状态为 标签
           .onClick(() => {
-            animateTo({ duration: 500 }, () => {
+            animateTo({ duration: this.uiConfig.animationSpeed }, () => {
               this.appConfig.proxyGroupType = n["v"]
             })
           })
@@ -221,7 +220,7 @@ struct ProxyPage {
               .onChange((isChecked: boolean) => {
                 if (isChecked) {
                   EventHub.sendEvent(EventKey.ProxySort, n["v"])
-                  animateTo({ duration: 500 }, () => {
+                  animateTo({ duration: this.uiConfig.animationSpeed }, () => {
                     this.appConfig.proxySort = n["v"]
                   })
                 }
@@ -234,7 +233,7 @@ struct ProxyPage {
           .EditRow()
           .onClick(() => {
             EventHub.sendEvent(EventKey.ProxySort, n["v"])
-            animateTo({ duration: 500 }, () => {
+            animateTo({ duration: this.uiConfig.animationSpeed }, () => {
               this.appConfig.proxySort = n["v"]
             })
           })
@@ -265,7 +264,7 @@ struct ProxyPage {
               .checked(this.appConfig.proxyCardSize == n["v"])
               .onChange((isChecked: boolean) => {
                 if (isChecked) {
-                  animateTo({ duration: 500 }, () => {
+                  animateTo({ duration: this.uiConfig.animationSpeed }, () => {
                     this.currentRadioValue3 = 0
                     this.appConfig.proxyCardSize = n["v"]
                   })
@@ -279,7 +278,7 @@ struct ProxyPage {
           .EditRow()
           // 点击后改变ProxyGroupItemSelected状态为 多列
           .onClick(() => {
-            animateTo({ duration: 500 }, () => {
+            animateTo({ duration: this.uiConfig.animationSpeed }, () => {
               this.appConfig.proxyCardSize = n["v"]
             })
           })

@@ -1,10 +1,10 @@
 import { BreakpointState } from "../../../common/breakpointsystem"
-import { ANIMATION_DURATION_300, ListOverwriteBasicData,  moreData } from "../../../common/Constants"
+import { ListOverwriteBasicData,  moreData } from "../../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import OverwriteTop from "./OverwriteTopBuilder"
 import { menuRowList, skipRowList, toggleRowList } from "../../Common"
 import { ClashConfig, LogLevel } from 'proxy_core'
-import { AppConfig, copy } from '../../../entryability/AppState'
+import { AppConfig, copy, UIConfig } from '../../../entryability/AppState'
 
 @Component
 struct Basic {
@@ -24,6 +24,7 @@ struct Basic {
   @StorageProp('istabletVertical')  private istabletVertical: boolean = false
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   aboutToAppear(): void {
     this.overwriteBasicList = ListOverwriteBasicData(this.clashConfig, this.appConfig)
   }
@@ -152,7 +153,7 @@ struct Basic {
             }.onClick(() => {
               hilog.info(0xFF00, "BasictestTag", "开关状态1:  %{public}s", item.isCheck)
               this.getUIContext()?.animateTo({
-                duration: ANIMATION_DURATION_300
+                duration: this.uiConfig.animationSpeed
               }, () => {
                 const toggleItem = this.overwriteBasicList[index]
                 toggleItem.isCheck = !toggleItem.isCheck

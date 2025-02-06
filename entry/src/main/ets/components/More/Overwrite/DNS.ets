@@ -1,11 +1,11 @@
 
 import { BreakpointState } from "../../../common/breakpointsystem"
-import { ANIMATION_DURATION_300, ListOverwriteDNSData,  moreData } from "../../../common/Constants"
+import { ListOverwriteDNSData,  moreData } from "../../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import OverwriteTop from "./OverwriteTopBuilder"
 import { menuRowList, skipRowList, toggleRowList } from "../../Common"
 import { ClashConfig, Dns } from 'proxy_core'
-import { AppConfig, copy } from '../../../entryability/AppState'
+import { AppConfig, copy, UIConfig } from '../../../entryability/AppState'
 import { ArrayConfigParam } from "./EditArrayConfig"
 import { EventHub, EventKey } from "../../../common/EventHub"
 import { JSON } from "@kit.ArkTS"
@@ -230,6 +230,7 @@ struct DNS {
       .hitTestBehavior(HitTestMode.None)
       .selectedColor(this.icon_emphasize)
   }
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   build() {
     NavDestination() {
@@ -280,7 +281,7 @@ struct DNS {
               }.onClick(() => {
                 hilog.info(0xFF00, "DNStestTag", "开关状态1:  %{public}s", item.isCheck)
                 this.getUIContext()?.animateTo({
-                  duration: ANIMATION_DURATION_300
+                  duration: this.uiConfig.animationSpeed
                 }, () => {
                   const toggleItem = this.overwriteDNSList[index]
                   toggleItem.isCheck = !toggleItem.isCheck

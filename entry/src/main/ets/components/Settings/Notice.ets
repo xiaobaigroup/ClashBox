@@ -1,6 +1,5 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import {
-  ANIMATION_DURATION_300,
   FONT_SIZE_14,
   FONT_SIZE_16,
   LIST_ITEM_HEIGHT_45,
@@ -126,7 +125,7 @@ struct Notice {
         // 已有权限时通知开关启用或关闭
         // 显示通知设置 显式动画
         this.getUIContext()?.animateTo({
-          duration: ANIMATION_DURATION_300,
+          duration: this.uiConfig.animationSpeed,
         }, () => {
           this.uiConfig.Enablednotice = !this.uiConfig.Enablednotice
         })
@@ -140,7 +139,7 @@ struct Notice {
             this.uiConfig.isRequestNotification = true
             // 显示通知设置 显式动画
             this.getUIContext()?.animateTo({
-              duration: ANIMATION_DURATION_300,
+              duration: this.uiConfig.animationSpeed,
             }, () => {
               this.uiConfig.Enablednotice = true
             })
@@ -201,7 +200,7 @@ struct Notice {
           .onClick( ()=> {
             // 显示后台通知设置 显式动画
             this.getUIContext()?.animateTo({
-              duration: ANIMATION_DURATION_300,
+              duration: this.uiConfig.animationSpeed,
             }, () => {
               this.uiConfig.isVibrate = !this.uiConfig.isVibrate
             })
@@ -226,7 +225,7 @@ struct Notice {
           .onClick( ()=> {
             // 显示后台通知设置 显式动画
             this.getUIContext()?.animateTo({
-              duration: ANIMATION_DURATION_300,
+              duration: this.uiConfig.animationSpeed,
             }, () => {
               this.uiConfig.isSound = !this.uiConfig.isSound
             })
@@ -277,7 +276,7 @@ struct Notice {
                     if(!this.uiConfig.Enablebackgrounder) {
                       // 显示后台通知设置 显式动画
                       this.getUIContext()?.animateTo({
-                        duration: ANIMATION_DURATION_300,
+                        duration: this.uiConfig.animationSpeed,
                         curve: Curve.Ease
                       }, () => {
                         this.EnabledPermanentnotice = isOn
@@ -346,7 +345,7 @@ struct Notice {
                     // 逻辑处理 TODO 【用户首选项】保存时间提醒开关的启用状态 Ya@2024-12-26
                     // 展开提醒时间设置行 显式动画
                     this.getUIContext()?.animateTo({
-                      duration: ANIMATION_DURATION_300,
+                      duration: this.uiConfig.animationSpeed,
                       curve: Curve.Ease
                     }, () => {
                       this.EnabledTimenotice = isOn
@@ -399,7 +398,7 @@ struct Notice {
                     let ctx = this.getUIContext()
                     if (event.type === TouchType.Down) {
                       ctx.animateTo({
-                        duration: ANIMATION_DURATION_300,
+                        duration: this.uiConfig.animationSpeed,
                         curve: Curve.Ease
                       }, () => {
                         this.heightOfTextPickerInTheListItem = 100
@@ -416,7 +415,7 @@ struct Notice {
                       })
                     } else if (event.type === TouchType.Up){
                       ctx.animateTo({
-                        duration: ANIMATION_DURATION_300,
+                        duration: this.uiConfig.animationSpeed,
                         curve: Curve.Ease
                       }, () => {
                         this.heightOfTextPickerInTheListItem = LIST_ITEM_HEIGHT
@@ -447,7 +446,7 @@ struct Notice {
               .height(this.heightOfTextPickerInTheListItem)
               .borderRadius(BORDER_RADIUS_20)
               .clickEffect({ level: ClickEffectLevel.MIDDLE })
-              .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
+              .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
             }
             // 提醒时间设置行 End
           }
@@ -456,7 +455,7 @@ struct Notice {
             if (!this.EnabledTimenotice) {
               // 展开提醒时间设置行 显式动画
               this.getUIContext()?.animateTo({
-                duration: ANIMATION_DURATION_300
+                duration: this.uiConfig.animationSpeed
               }, () => {
                 this.EnabledTimenotice = !this.EnabledTimenotice
               })
@@ -513,6 +512,7 @@ export struct CellularDataReminder {
   // 总量通知控制变量
   @State totalDataNotice: boolean = false
   @State theTotalNumber: number = 0
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   build() {
     NavDestination() {
@@ -533,7 +533,7 @@ export struct CellularDataReminder {
                 .onChange((isOn: boolean) => {
                   // 展开流量提醒设置列表行 显式动画
                   this.getUIContext()?.animateTo({
-                    duration: ANIMATION_DURATION_300,
+                    duration: this.uiConfig.animationSpeed,
                     curve: Curve.Ease
                   }, () => {
                     this.EnableCellularDataReminder = isOn
@@ -546,7 +546,7 @@ export struct CellularDataReminder {
           .onClick( ()=> {
             // 展开流量提醒设置列表行 显式动画
             this.getUIContext()?.animateTo({
-              duration: ANIMATION_DURATION_300
+              duration: this.uiConfig.animationSpeed
             }, () => {
               this.EnableCellularDataReminder = !this.EnableCellularDataReminder
             })
@@ -567,7 +567,7 @@ export struct CellularDataReminder {
                   .onChange((isOn: boolean) => {
                     // 展开每小时通知流量设置行 显式动画
                     this.getUIContext()?.animateTo({
-                      duration: ANIMATION_DURATION_300,
+                      duration: this.uiConfig.animationSpeed,
                       curve: Curve.Ease
                     }, () => {
                       this.perHourNotice = isOn
@@ -595,7 +595,7 @@ export struct CellularDataReminder {
               if (!this.perHourNotice) {
                 // 展开每小时通知流量设置行 显式动画
                 this.getUIContext()?.animateTo({
-                  duration: ANIMATION_DURATION_300
+                  duration: this.uiConfig.animationSpeed
                 }, () => {
                   this.perHourNotice = !this.perHourNotice
                 })
@@ -616,7 +616,7 @@ export struct CellularDataReminder {
                   .onChange((isOn: boolean) => {
                     // 展开每日通知流量设置行 显式动画
                     this.getUIContext()?.animateTo({
-                      duration: ANIMATION_DURATION_300,
+                      duration: this.uiConfig.animationSpeed,
                       curve: Curve.Ease
                     }, () => {
                       this.perDayNotice = isOn
@@ -644,7 +644,7 @@ export struct CellularDataReminder {
               if (!this.perDayNotice) {
                 // 展开每日通知流量设置行 显式动画
                 this.getUIContext()?.animateTo({
-                  duration: ANIMATION_DURATION_300
+                  duration: this.uiConfig.animationSpeed
                 }, () => {
                   this.perDayNotice = !this.perDayNotice
                 })
@@ -665,7 +665,7 @@ export struct CellularDataReminder {
                   .onChange((isOn: boolean) => {
                     // 展开每周通知流量设置行 显式动画
                     this.getUIContext()?.animateTo({
-                      duration: ANIMATION_DURATION_300,
+                      duration: this.uiConfig.animationSpeed,
                       curve: Curve.Ease
                     }, () => {
                       this.perWeekNotice = isOn
@@ -693,7 +693,7 @@ export struct CellularDataReminder {
               if (!this.perWeekNotice) {
                 // 展开每周通知流量设置行 显式动画
                 this.getUIContext()?.animateTo({
-                  duration: ANIMATION_DURATION_300
+                  duration: this.uiConfig.animationSpeed
                 }, () => {
                   this.perWeekNotice = !this.perWeekNotice
                 })
@@ -714,7 +714,7 @@ export struct CellularDataReminder {
                   .onChange((isOn: boolean) => {
                     // 展开每月通知流量设置行 显式动画
                     this.getUIContext()?.animateTo({
-                      duration: ANIMATION_DURATION_300,
+                      duration: this.uiConfig.animationSpeed,
                       curve: Curve.Ease
                     }, () => {
                       this.perMonthNotice = isOn
@@ -742,7 +742,7 @@ export struct CellularDataReminder {
               if (!this.perMonthNotice) {
                 // 展开每月通知流量设置行 显式动画
                 this.getUIContext()?.animateTo({
-                  duration: ANIMATION_DURATION_300
+                  duration: this.uiConfig.animationSpeed
                 }, () => {
                   this.perMonthNotice = !this.perMonthNotice
                 })
@@ -763,7 +763,7 @@ export struct CellularDataReminder {
                   .onChange((isOn: boolean) => {
                     // 展开总量通知流量设置行 显式动画
                     this.getUIContext()?.animateTo({
-                      duration: ANIMATION_DURATION_300,
+                      duration: this.uiConfig.animationSpeed,
                       curve: Curve.Ease
                     }, () => {
                       this.totalDataNotice = isOn
@@ -792,7 +792,7 @@ export struct CellularDataReminder {
               if (!this.totalDataNotice) {
                 // 展开总量通知流量设置行 显式动画
                 this.getUIContext()?.animateTo({
-                  duration: ANIMATION_DURATION_300
+                  duration: this.uiConfig.animationSpeed
                 }, () => {
                   this.totalDataNotice = !this.totalDataNotice
                 })
