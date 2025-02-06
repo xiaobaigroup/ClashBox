@@ -342,6 +342,8 @@ struct ProxyGroupItem {
             }
             .ListRowStyle()
           }
+          .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+            .combine(TransitionEffect.scale({x: 0, y: 0})):null)
           .onClick(() => {
             this.selectProxy(item)
             hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
@@ -362,7 +364,7 @@ struct ProxyGroupItem {
         })
       }
       .ListStyle()
-      .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
+     // .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
       .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
       // .divider({ strokeWidth: 1,color:$r('app.color.divider'),startMargin:16,endMargin:16})
       .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
@@ -419,6 +421,8 @@ struct ProxyGroupItem {
             hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
           })
           .ListItemStyle()
+          .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+            .combine(TransitionEffect.scale({x: 0, y: 0})):null)
           .height(LIST_ITEM_HEIGHT)
           .bindContextMenu(this.MyMenu(item?.isShowFavoriteProxy ?? false), ResponseType.LongPress,
             {
@@ -435,7 +439,6 @@ struct ProxyGroupItem {
         })
       }
       .ListStyle()
-      .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
       .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
         detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
         preferType: SheetType.CENTER,
@@ -483,6 +486,8 @@ struct ProxyGroupItem {
             }
             .ListRowStyle()
           }
+          .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+            .combine(TransitionEffect.scale({x: 0, y: 0})):null)
           .onClick(() => {
             this.selectProxy(item)
             hilog.info(0xB002, this.componentName, `#ListItem#onClick: `)
@@ -504,7 +509,7 @@ struct ProxyGroupItem {
       }
       .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
       .ListStyle()
-      .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
+     // .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
       .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
         detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT, ],
         preferType: SheetType.CENTER,

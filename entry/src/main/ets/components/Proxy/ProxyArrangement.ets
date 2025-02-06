@@ -96,7 +96,6 @@ struct ProxyArrangement {
 
               //展开后内容显示区域
               if (this.isContentShow && this.selectItem === i) {
-
                 ProxyGroupItem({
                   items: g.proxies as Item[],
                   ProxyGroupItemSelected: this.appConfig.proxyCardSize,

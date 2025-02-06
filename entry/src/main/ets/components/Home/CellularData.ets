@@ -1,9 +1,11 @@
 import { BreakpointState } from '../../common/breakpointsystem'
-import { mediaquery } from '@kit.ArkUI'
+import { ColorMetrics, mediaquery, SymbolGlyphModifier } from '@kit.ArkUI'
 import { FONT_SIZE_16, MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
 import { AppFlowingState, TrafficUnit, UIConfig } from '../../entryability/AppState'
 import {  convertToSwitchNub } from '../../utils/DataUnitConvertUtils'
+
+
 
 /* 输入总流量自定义弹窗相关 */
 @CustomDialog
@@ -15,7 +17,7 @@ struct totalCustomDialog {
   private isEnableIndexForegroundBlur: boolean
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @State TotalCellular: number = 0
-@State index : number = 2
+  @State index : number = 1
 
   controller?: CustomDialogController
   cancel: () => void = () => {
@@ -27,19 +29,15 @@ struct totalCustomDialog {
   switchUnit(index: number) {
     switch (index) {
       case 0:
-        //TrafficUnit.KB
         this.uiConfig.switchUnit=TrafficUnit.KB
         break;
       case 1:
-        //TrafficUnit.MB
         this.uiConfig.switchUnit=TrafficUnit.MB
         break
       case 2:
-        //TrafficUnit.GB
         this.uiConfig.switchUnit=TrafficUnit.GB
         break
       case 3:
-        //TrafficUnit.TB
         this.uiConfig.switchUnit=TrafficUnit.TB
         break
     }
@@ -48,9 +46,9 @@ struct totalCustomDialog {
   @Builder
   itemEnd() {
     Select([{ value: TrafficUnit.KB},
-      { value: TrafficUnit.MB },
-      { value: TrafficUnit.GB },
-      { value: TrafficUnit.TB }])
+      { value: TrafficUnit.MB},
+      { value: TrafficUnit.GB},
+      { value: TrafficUnit.TB}])
       .width(80)
       .align(Alignment.Center)
       .selected(this.uiConfig.cellularDataIndex)
@@ -64,6 +62,11 @@ struct totalCustomDialog {
         this.index=index
         console.info('Select:' + index+this.uiConfig.switchUnit);
       })
+      .selectedOptionBgColor(this.icon_emphasize)
+      .selectedOptionFontColor($r('sys.color.font_on_primary'))
+      .optionBgColor($r('app.color.container_background'))
+      .menuBackgroundColor($r('app.color.container_background'))
+      .menuBackgroundBlurStyle(BlurStyle.NONE)
   }
 
   build() {

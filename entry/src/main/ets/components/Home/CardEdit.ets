@@ -26,6 +26,7 @@ export struct CardEdit {
   // 当前主页布局
   @Consume theCurrentHomeCard: boolean[]
 
+
   build() {
     Flex({ wrap: FlexWrap.Wrap,justifyContent:FlexAlign.SpaceBetween, space: { main: LengthMetrics.vp(10), cross: LengthMetrics.vp(10) } }) { // 子组件多行布局
       //网络速率小卡片

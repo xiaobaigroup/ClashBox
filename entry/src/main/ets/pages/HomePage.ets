@@ -68,9 +68,15 @@ struct Home {
     builder: SaveCustomDialog({
       cancel: () => {
         this.onCancel()
+        animateTo({ duration: 0,iterations:0 }, () => {
+          this.rotateAngle=0
+        })
       },
       confirm: () => {
         this.onAccept()
+        animateTo({ duration: 0,iterations:0 }, () => {
+          this.rotateAngle=0
+        })
       }
     }),
     cancel: this.existApp,
@@ -174,6 +180,10 @@ struct Home {
     animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
       this.isShowDeleteButton = false
     })
+    //关闭卡片旋转动画
+    animateTo({ duration: 0,iterations:0 }, () => {
+      this.rotateAngle=0
+    })
   }
 
   /**
@@ -188,6 +198,10 @@ struct Home {
     if (this.isAnimation) {
       animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
         this.isShowDeleteButton = false
+      })
+      //关闭卡片旋转动画
+      animateTo({ duration: 0,iterations:0 }, () => {
+        this.rotateAngle=0
       })
     } else { this.isShowDeleteButton = false }
   }
@@ -209,6 +223,10 @@ struct Home {
   }
 
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @State rotateAngle : number =0
+
+
+
   build() {
     Column() {
       if (!this.isLandscapePhone) {
@@ -244,6 +262,10 @@ struct Home {
                 animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
                   this.isShowDeleteButton = true
                 })
+                //编辑模式下开启卡片旋转动画
+                  animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear,iterations:-1,playMode:PlayMode.Alternate }, () => {
+                    this.rotateAngle=1
+                  })
               }else {this.isShowDeleteButton = true}
             })
             .width(40)
@@ -332,7 +354,7 @@ struct Home {
           right: this.breakPointStateTabContentTitleMargin.value,
         })
         // transition保证组件离场不被立即析构，可设置其他转场效果
-        .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
+     //   .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
       }
 
       Stack({ alignContent: this.stackAlignContentAlignment }) {
@@ -373,6 +395,8 @@ struct Home {
                 //显示时触发回调
                 .onAttach(() => {
                 })
+                //编辑模式下跳动动画
+                .rotate({ angle: this.isAnimation? this.rotateAngle : null })
               }
 
               //分流模式小卡片
@@ -399,6 +423,8 @@ struct Home {
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+                //编辑模式下跳动动画
+                .rotate({ angle: this.isAnimation? this.rotateAngle : null })
               }
 
               //流量统计小卡片
@@ -425,6 +451,8 @@ struct Home {
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+                //编辑模式下跳动动画
+                .rotate({ angle: this.isAnimation? this.rotateAngle : null })
               }
 
               //当前节点小卡片
@@ -450,6 +478,8 @@ struct Home {
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+                //编辑模式下跳动动画
+                .rotate({ angle: this.isAnimation? this.rotateAngle : null })
               }
 
               //IP地址小卡片
@@ -475,6 +505,8 @@ struct Home {
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+                //编辑模式下跳动动画
+                .rotate({ angle: this.isAnimation? this.rotateAngle : null })
               }
 
               //收藏节点小卡片
@@ -500,6 +532,8 @@ struct Home {
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+                //编辑模式下跳动动画
+                .rotate({ angle: this.isAnimation? this.rotateAngle : null })
               }
 
               //收藏配置小卡片
@@ -525,6 +559,8 @@ struct Home {
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+                //编辑模式下跳动动画
+                .rotate({ angle: this.isAnimation? this.rotateAngle : null })
               }
 
               //节点信息小卡片
@@ -553,6 +589,8 @@ struct Home {
                 .clickEffect({ level: ClickEffectLevel.MIDDLE })
                 .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
+                //编辑模式下跳动动画
+                .rotate({ angle: this.isAnimation? this.rotateAngle : null })
               }
 
               //当前配置小卡片
@@ -578,6 +616,8 @@ struct Home {
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+                //编辑模式下跳动动画
+                .rotate({ angle: this.isAnimation? this.rotateAngle : null })
               }
 
               //快捷方式小卡片
@@ -603,6 +643,8 @@ struct Home {
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: ANIMATION_DURATION_300 }):null)
+                //编辑模式下跳动动画
+                .rotate({ angle: this.isAnimation? this.rotateAngle : null })
               }
             } //GridRow的尾括号
             .width('100%')

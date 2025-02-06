@@ -121,7 +121,6 @@ struct ProxyPage {
     }
   }
 
-
   //分组tabs内容
   @Builder
   TabBuilder(title: ResourceStr, targetIndex: number) {
@@ -386,7 +385,7 @@ struct ProxyPage {
         .alignItems(HorizontalAlign.Center)
         .justifyContent(FlexAlign.Center) //.padding({top:TAB_CONTENT_TITLE_HEIGHT})
         // transition保证组件离场不被立即析构，可设置其他转场效果
-        .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
+       // .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
 
         .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
           detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
@@ -411,28 +410,32 @@ struct ProxyPage {
               Tabs({ barPosition: BarPosition.Start, controller: this.tabsController }) {
                 ForEach(this.proxyGroups, (g:ProxyGroup, i: number)=>{
                   TabContent() {
-                    ProxyGroupItem({
-                      items: g.proxies as Item[],
-                      ProxyGroupItemSelected: this.appConfig.proxyCardSize,
-                      disabled: g.type !== ProxyType.Selector,
-                      selectedProxy: this.currentProfile?.getSelectedProxy(g) ?? "",
-                      OnProxyChange: (item) => {
-                        console.log("xxxxx", item)
-                        this.changeProxy(g.name, item)
-                      }
-                    }) //list相关在components/ProxyGroupItem.ets文件里
-                      .padding({right: this.breakPointStateTabContentTitleMargin.value,})
-                      .width('100%')
-                      .height('100%')
+                    if ( this.currentIndex === i) {//为实现listltem转场动画的的if
+                      ProxyGroupItem({
+                        items: g.proxies as Item[],
+                        ProxyGroupItemSelected: this.appConfig.proxyCardSize,
+                        disabled: g.type !== ProxyType.Selector,
+                        selectedProxy: this.currentProfile?.getSelectedProxy(g) ?? "",
+                        OnProxyChange: (item) => {
+                          console.log("xxxxx", item)
+                          this.changeProxy(g.name, item)
+                        }
+                      })//list相关在components/ProxyGroupItem.ets文件里
+                        .padding({ right: this.breakPointStateTabContentTitleMargin.value, })
+                        .width('100%')
+                        .height('100%')
+                    }
                   }
                   .tabBar(this.TabBuilder(g.name, i))
                   //用onWillShow能减少滑动tab时产生的延迟
                   .onWillShow(() => {
+                    animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
                     this.currentIndex = i;
                     if(this.currentProfile){
                       this.currentProfile.currentGroupName = this.proxyGroups[i].name
                       ClashViewModel.updateProfile(this.currentProfile)
                     }
+                    })
                   })
                 })
               }
@@ -444,7 +447,6 @@ struct ProxyPage {
               left: this.breakPointStateTabContentTitleMargin.value,
             })
             .width('100%')
-            .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
             .foregroundBlurStyle(
               this.isEnableIndexForegroundBlur ? BlurStyle.Thin : BlurStyle.NONE,
               { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
@@ -455,7 +457,7 @@ struct ProxyPage {
           // 列表排列
           else if (this.appConfig.proxyGroupType === ProxyGroupType.List) {
             ProxyArrangement()// transition保证组件离场不被立即析构，可设置其他转场效果
-              .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
+           //   .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
           }
           //列表排列end
 
