@@ -11,6 +11,8 @@ import { ProxyGroup } from 'proxy_core'
 struct FavoriteProxy {
   //节点假数据组后期可改可删
   @Consume items: Item[]
+  @Prop selectedProxy: string
+  @Prop disabled: boolean
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   // 卡片内边距
@@ -41,6 +43,17 @@ struct FavoriteProxy {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageProp("proxyGroups") proxyGroups: ProxyGroup[] = []
 
+  OnProxyChange: ((item: Item) => void) = () => {
+
+  }
+
+  selectProxy(item: Item){
+    if (!this.disabled){
+      this.appConfig.currentProxyItem = item
+      this.OnProxyChange(item)
+    }
+  }
+
   build() {
     Column() {
       CardTitle({ title: $r('app.string.FavoriteProxy') })
@@ -65,6 +78,7 @@ struct FavoriteProxy {
                   //在home页编辑状态时，无法操作
                   if (this.isShowHomeEdit===false ) {
                     this.appConfig.currentProxyName = p[1]
+                    this.appConfig.currentProxyItem = AppState.fetchProxyItem(this.proxyGroups, p[0], p[1])
                   }
                 })
             }

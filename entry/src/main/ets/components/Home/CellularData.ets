@@ -163,6 +163,8 @@ struct CellularDataStat {
   private HomeCardCellularDataPadding: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+  //编辑按钮点击后显示编辑状态判定
+  @Consume isShowHomeEdit: boolean
 
   /* 总流量输入弹窗数据  */
   dialogController: CustomDialogController | null = new CustomDialogController({
@@ -297,8 +299,11 @@ struct CellularDataStat {
       .padding({bottom:this.isLandscapePhone ? 30: this.HomeCardCellularDataPadding.value})
       .onClick(()=>{
         if (this.dialogController != null) {
-          this.dialogController.open()
-          this.isEnableIndexForegroundBlur=true
+          //在home页编辑状态时，无法操作
+          if (this.isShowHomeEdit===false ) {
+            this.dialogController.open()
+            this.isEnableIndexForegroundBlur=true
+          }
           console.info('Total',convertToSwitchNub(this.appFlowingState.totalTraffic.upRaw+this.appFlowingState.totalTraffic.downRaw,this.uiConfig.switchUnit),this.uiConfig.inputTotal)
         }
       })

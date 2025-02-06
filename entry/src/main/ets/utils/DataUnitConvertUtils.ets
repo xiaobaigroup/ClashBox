@@ -62,10 +62,9 @@ export function convertDataNumber(bNumber: number): number {
 }
 
 /**
- * 将给定的数值从指定的大单位转换为GB
+ * 将B单位数值转换为选择的单位值
  * @param value - 要转换的数值
  * @param unit - 单位（'TB'、'GB'、'MB'、'KB'）
- * @returns 转换后的GB数值
  */
 export function convertToSwitchNub(value: number, unit: keyof GeneratedUnitInterface): number {
   switch (unit) {
