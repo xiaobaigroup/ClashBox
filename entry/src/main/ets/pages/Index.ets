@@ -47,7 +47,7 @@ import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
 import { Item, ProxyData } from '../common/ProxyData'
 import { image } from '@kit.ImageKit'
-import { Dns, LogLevel, Profile, ProxyGroup, ProxyMode } from 'proxy_core'
+import { ClashConfig, Dns, LogLevel, Profile, ProxyGroup, ProxyMode } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig, ClashCore, UIConfig } from '../entryability/AppState'
@@ -441,7 +441,7 @@ struct Index {
       if(this.appConfig.currentProfileId){
         this.currentProfile = await ClashViewModel.getProfile(this.appConfig.currentProfileId)
         if (this.currentProfile) {
-          this.proxyGroups = await ClashViewModel.getProxyGroups(this.appConfig.switchMode ?? ProxyMode.Rule)
+          this.proxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode ?? ProxyMode.Rule)
         }
       }
     })
@@ -471,6 +471,7 @@ struct Index {
   @Provide proxyGroups: ProxyGroup[] = []
   @Provide("currentProfile") currentProfile: Profile | null = null
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
 

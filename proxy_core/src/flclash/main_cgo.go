@@ -62,6 +62,7 @@ func getProxies(env js.Env, this js.Value, args []js.Value) any {
 func changeProxy(env js.Env, this js.Value, args []js.Value) any {
 	paramsString, _ := napi.GetValueStringUtf8(env.Env, args[0].Value)
 	promise := env.NewPromise()
+	fmt.Println("changeProxy", paramsString)
 	handleChangeProxy(paramsString, func(value string) {
 		promise.Resolve(value)
 	})

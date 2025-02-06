@@ -5,7 +5,8 @@ import {
   getExternalProviders,
   asyncTestDelay,
   updateConfig,
-  initClash
+  initClash,
+  changeProxy
 } from 'libflclash.so';
 import { Address, CommonVpnService, isIpv4, isIpv6, VpnConfig } from './CommonVpnService';
 import { JSON, util } from '@kit.ArkTS';
@@ -131,10 +132,10 @@ export class FlClashVpnService extends CommonVpnService{
           break;
         }
         case ClashRpcType.changeProxy:{
-          // resolve(changeProxy(JSON.stringify({
-          //   groupName: data[0] as string,
-          //   proxyName: data[1] as string,
-          // })))
+          resolve(changeProxy(JSON.stringify({
+            groupName: data[0] as string,
+            proxyName: data[1] as string,
+          })))
           break;
         }
         case ClashRpcType.healthCheck:{

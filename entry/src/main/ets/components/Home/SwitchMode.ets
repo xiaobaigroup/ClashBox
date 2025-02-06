@@ -4,7 +4,7 @@ import { ANIMATION_DURATION_300, MarginGenerate } from '../../common/Constants';
 import { CardTitle } from './CardTitleBuilder';
 import { AppConfig, SwitchModeCard, UIConfig } from '../../entryability/AppState';
 import { EventHub, EventKey } from '../../common/EventHub';
-import { ProxyMode } from 'proxy_core';
+import { ClashConfig, ProxyMode } from 'proxy_core';
 
 @Component
 struct SwitchMode {
@@ -27,7 +27,7 @@ struct SwitchMode {
   @Consume isShowHomeEdit: boolean
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-
+  @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   // 手机横屏高度条件
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
 
@@ -49,13 +49,13 @@ struct SwitchMode {
           Button(n["t"], { buttonStyle: ButtonStyleMode.TEXTUAL,stateEffect:false })
             .ButtonStyle()
             .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-            .fontColor(this.appConfig.switchMode==n["v"] ? this.font_primary : $r('sys.color.font_secondary'))
-            .backgroundColor(this.appConfig.switchMode==n["v"] ? $r('app.color.container_background') : '#00ffffff')
-              //     .shadow(this.appConfig.switchMode==n["v"] ? { radius: 3,color:$r('app.color.shadow')} : { } )
+            .fontColor(this.clashConfig.mode==n["v"] ? this.font_primary : $r('sys.color.font_secondary'))
+            .backgroundColor(this.clashConfig.mode==n["v"] ? $r('app.color.container_background') : '#00ffffff')
+              //     .shadow(this.clashConfig.mode==n["v"] ? { radius: 3,color:$r('app.color.shadow')} : { } )
             .onClick(() => {
               //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
               if (this.isShowHomeEdit === false) {
-                this.appConfig.switchMode = n["v"]
+                this.clashConfig.mode = n["v"]
                 EventHub.sendEvent(EventKey.SwitchModeCard, n["v"])
               }
             })

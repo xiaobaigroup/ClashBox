@@ -1,4 +1,4 @@
-import { LogLevel } from "./Common"
+import { LogLevel, ProxyMode } from "./Common"
 
 export interface  UpdateConfigParams{
   "profile-id": string
@@ -122,7 +122,7 @@ export class  ClashConfig {
   authentication?: string[];
   "allow-lan"?: boolean;
   "bind-address"?: string;
-  mode?: TunnelState = TunnelState.Rule;
+  mode?: ProxyMode = ProxyMode.Rule;
   "log-level"?: LogLevel = LogLevel.Info;
   ipv6?: boolean = false;
   "external-controller"?: string;

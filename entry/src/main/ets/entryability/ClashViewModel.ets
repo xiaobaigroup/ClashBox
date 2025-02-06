@@ -188,8 +188,6 @@ export class ClashViewModel {
   }
 
   async loadProfileAndConfig(id: string, config: ClashConfig | null = null, params: ConfigExtendedParams | null= null){
-    if(config)
-      config.mode = TunnelState.Rule
     let result = await this.socketProxy.loadConfig({
       "profile-id": id,
       config: config ?? new ClashConfig(),
