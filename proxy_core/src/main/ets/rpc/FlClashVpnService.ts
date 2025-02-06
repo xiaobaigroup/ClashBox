@@ -133,14 +133,14 @@ export class FlClashVpnService extends CommonVpnService{
         }
         case ClashRpcType.changeProxy:{
           resolve(changeProxy(JSON.stringify({
-            groupName: data[0] as string,
-            proxyName: data[1] as string,
+            "group-name": data[0] as string,
+            "proxy-name": data[1] as string,
           })))
           break;
         }
         case ClashRpcType.healthCheck:{
           asyncTestDelay(JSON.stringify({
-            proxyName: data[0] as string,
+            "proxy-name": data[0] as string,
             timeout: data[1] as string,
           })).then((v)=>{
             resolve(v)
