@@ -1,6 +1,5 @@
 import { BreakpointState, BreakpointSystem } from '../common/breakpointsystem'
 import {
-  ANIMATION_DURATION_300,
   TAB_CONTENT_TITLE_HEIGHT,
   BIND_SHEET_CONTAINER_HEIGHT,
 } from '../common/Constants'
@@ -138,7 +137,7 @@ struct ProxyPage {
       .backgroundColor(this.currentIndex === targetIndex ? this.icon_emphasize : this.container_background)
       .animation(
         {
-          duration: ANIMATION_DURATION_300,
+          duration: this.uiConfig.animationSpeed,
           tempo:0.3,
           curve: Curve.Ease,
           iterations: 1,
@@ -185,7 +184,7 @@ struct ProxyPage {
               })
           }
           .EditRow()
-      //    .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+      //    .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
      //       .combine(TransitionEffect.SLIDE):null)
           // 点击后改变ProxyArrangementSelected状态为 标签
           .onClick(() => {
@@ -243,7 +242,7 @@ struct ProxyPage {
       }
       .height(142)
       .EditColumn()
-  //    .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+  //    .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
    //     .combine(TransitionEffect.SLIDE):null)
 
       //代理节点卡片尺寸切换
@@ -289,7 +288,7 @@ struct ProxyPage {
       }
       .height(142)
       .EditColumn()
-  //    .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300, delay: 0 })
+  //    .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
   //      .combine(TransitionEffect.SLIDE):null)
 
     }
@@ -319,6 +318,8 @@ struct ProxyPage {
             .fontSize(32)
             .fontWeight(FontWeight.Bold)
             .textAlign(TextAlign.Center)
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 100 })
+              .combine(TransitionEffect.SLIDE):null)
           Blank()
 
           //提供者按钮
@@ -335,6 +336,8 @@ struct ProxyPage {
             this.isProviderEdit = true
             this.isEnableIndexForegroundBlur=true
           })
+          .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 50 })
+            .combine(TransitionEffect.SLIDE):null)
 
           //编辑图标
           Button({ type: ButtonType.Circle, stateEffect: true }) {
@@ -359,6 +362,8 @@ struct ProxyPage {
           left: this.breakPointStateTabContentTitleMargin.value,
           right: this.breakPointStateTabContentTitleMargin.value,
         })
+        .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+          .combine(TransitionEffect.SLIDE):null)
       }
 
       if (this.proxyGroups.length == 0) {
@@ -382,10 +387,10 @@ struct ProxyPage {
         .width('100%')
         .height('90%')
         .alignItems(HorizontalAlign.Center)
-        .justifyContent(FlexAlign.Center) //.padding({top:TAB_CONTENT_TITLE_HEIGHT})
-        // transition保证组件离场不被立即析构，可设置其他转场效果
-       // .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
-
+        .justifyContent(FlexAlign.Center)
+        .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+          .combine(TransitionEffect.scale({x: 0, y: 0})):null)
+        //.padding({top:TAB_CONTENT_TITLE_HEIGHT})
         .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
           detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
           backgroundColor: $r('app.color.background'),
@@ -428,7 +433,7 @@ struct ProxyPage {
                   .tabBar(this.TabBuilder(g.name, i))
                   //用onWillShow能减少滑动tab时产生的延迟
                   .onWillShow(() => {
-                    animateTo({ duration: ANIMATION_DURATION_300, curve: Curve.Linear }, () => {
+                    animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
                     this.currentIndex = i;
                     if(this.currentProfile){
                       this.currentProfile.currentGroupName = this.proxyGroups[i].name
@@ -487,8 +492,11 @@ struct ProxyPage {
           .width(this.proxyStartButtonWidth)
           .height(this.proxyStartButtonHeight)
           .clip(true)
-          .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
+          .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
           .clickEffect({ level: ClickEffectLevel.LIGHT })
+          .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
+            .animation({ duration: this.uiConfig.animationSpeed, delay: 50 })
+            .combine(TransitionEffect.SLIDE_SWITCH):null)
           .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
             detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
             backgroundColor: $r('app.color.background'),

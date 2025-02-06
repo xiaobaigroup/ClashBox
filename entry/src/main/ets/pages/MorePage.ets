@@ -21,7 +21,7 @@ import { getResourceString } from '../utils/ResourceStringUtil';
 import { extractLocationInfo, getIpInfo, mapLocation } from '../utils/GetIpInfo';
 import { promptAction } from '@kit.ArkUI';
 import { skipRowList } from '../components/Common';
-import { AppConfig } from '../entryability/AppState';
+import { AppConfig, UIConfig } from '../entryability/AppState';
 import { ArrayConfigEditor, ArrayConfigParam } from '../components/More/Overwrite/EditArrayConfig';
 
 
@@ -60,7 +60,7 @@ struct MorePage {
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   /**
    * 查询IP地址弹窗控制器
    */
@@ -181,6 +181,9 @@ struct MorePage {
         }
         .margin({left: this.morePageMargin.value})
         .width('100%')
+        .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
+          .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+          .combine(TransitionEffect.SLIDE):null)
 
         List({space: 10}) {
           ForEach(this.moreList, (item: moreData, index: number) => {
@@ -196,6 +199,7 @@ struct MorePage {
             .onClick(() => {
               this.handleCheck(index)
             })
+            .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay: index*10+10 }):null)
           })
           // 设置行
           ListItem() {
@@ -209,6 +213,7 @@ struct MorePage {
             this.isShowSettings = true
             this.isEnableIndexForegroundBlur = true
           })
+          .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay: 90 }):null)
           // 设置页半模态窗口
           .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
             detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],

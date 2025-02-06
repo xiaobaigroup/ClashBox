@@ -310,7 +310,7 @@ struct ProxyGroupItem {
           }
           })
         }
-        .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+        .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
           .combine(TransitionEffect.scale({x: 0, y: 0})):null)
         .onClick(() => {
           this.selectProxy(item)

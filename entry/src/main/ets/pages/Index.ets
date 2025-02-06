@@ -316,7 +316,7 @@ struct Index {
           .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)//分层颜色
           .fontSize(this.isLandscapePhone ? 24 : this.TabIconfontSize.value)
           .margin({ top: 5 })
-          .effectStrategy(SymbolEffectStrategy.SCALE)
+          .effectStrategy(this.uiConfig.isAnimation?SymbolEffectStrategy.SCALE:null)
 
         Text(title)
           .fontColor(this.currentIndex === index ? this.icon_emphasize : this.icon_tertiary)
@@ -533,7 +533,9 @@ struct Index {
         barPosition: this.isLandscapePhone ? BarPosition.Start : this.compBarPose.value
       }) {
         TabContent() {
+          if (this.currentIndex===0){
           Home()
+          }
         }
         .tabBar(this.TabBarBuilder($r('app.string.Home'), 0, $r('sys.symbol.house_fill')))
         .onWillShow(() => {
@@ -541,7 +543,9 @@ struct Index {
         })
 
         TabContent() {
-          ProxyPage()
+          if (this.currentIndex===1) {
+            ProxyPage()
+          }
         }
         .tabBar(this.TabBarBuilder($r('app.string.Proxy'), 1, $r('sys.symbol.list_bullet_square_fill')))
         .onWillShow(() => {
@@ -549,7 +553,9 @@ struct Index {
         })
 
         TabContent() {
-          ConfigurationPage()
+          if (this.currentIndex===2) {
+            ConfigurationPage()
+          }
         }
         .tabBar(this.TabBarBuilder($r('app.string.Configuration'), 2, $r('sys.symbol.folder_fill')))
         .onWillShow(() => {
@@ -557,7 +563,9 @@ struct Index {
         })
 
         TabContent() {
-          MorePage()
+          if (this.currentIndex===3) {
+            MorePage()
+          }
         }
         .tabBar(this.TabBarBuilder($r('app.string.More'), 3, $r('sys.symbol.square_fill_grid_2x2')))
         .onWillShow(() => {
@@ -575,7 +583,7 @@ struct Index {
       .barWidth(this.isLandscapePhone ? '63vp' : this.compBarWidth.value) /**/
       .barHeight(this.isLandscapePhone ? '100%' : this.compBarHeight.value) /**/
       .padding(this.compMargin.value)
-      .animationDuration(200)
+      .animationDuration(this.uiConfig.animationSpeed)
       .onChange((index: number) => {
         this.currentIndex = index
       })

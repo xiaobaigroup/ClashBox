@@ -29,6 +29,7 @@ import { getResourceString } from '../utils/ResourceStringUtil'
 import { convertTime } from '../utils/TimeConvertUtil'
 
 
+
 /**
  * 长按菜单参数
  */
@@ -360,6 +361,9 @@ struct ConfigurationPage {
             .fontSize(TAB_CONTENT_TITLE_FONT_SIZE)
             .fontWeight(TAB_CONTENT_TITLE_FONT_WEIGHT)
             .fontColor($r('sys.color.font_primary'))
+            .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
+              .animation({ duration: this.uiConfig.animationSpeed, delay: 50 })
+              .combine(TransitionEffect.SLIDE):null)
           Blank()
           // 刷新图标
           Button({ type: ButtonType.Circle, stateEffect: true }) {
@@ -376,6 +380,9 @@ struct ConfigurationPage {
             hilog.info(0xC001, this.componentName, `#button#onClick()#更新配置`)
             this.updateConfig()
           })
+          .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
+            .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+            .combine(TransitionEffect.SLIDE):null)
         }
         .alignItems(VerticalAlign.Center)
         .width('100%')
@@ -436,6 +443,7 @@ struct ConfigurationPage {
               .clickEffect({ level: ClickEffectLevel.MIDDLE })
               .borderRadius(BORDER_RADIUS_20)
               .hoverEffect(HoverEffect.Scale)
+              .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:index*10+10 }):null)
               .bindContextMenu(this.configListLongPressCtxMenuBuilder(item?.isFavorite ?? false), ResponseType.LongPress | ResponseType.RightClick,
                 {
                   preview: MenuPreviewMode.IMAGE,
@@ -554,6 +562,9 @@ struct ConfigurationPage {
           this.isShowConfigAddBindSheet = true
           this.isEnableIndexForegroundBlur = true
         })
+        .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
+          .animation({ duration: this.uiConfig.animationSpeed, delay: 50 })
+          .combine(TransitionEffect.SLIDE_SWITCH):null)
         // 悬浮新增配置按钮 END
       }
       .backgroundColor($r('app.color.background'))
@@ -600,7 +611,6 @@ struct ConfigurationPage {
 
     this.configCustomDialogController = null
     this.isEnableIndexForegroundBlur = false
-
     hilog.info(0xC000, this.componentName, `#aboutToDisappear#置空[配置页\`bindSheet\`内提示是否删除配置信息的自定义弹框]`)
   }
 

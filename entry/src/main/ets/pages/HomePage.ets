@@ -221,7 +221,7 @@ struct Home {
   }
 
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-  @State rotateAngle : number =0
+  @Provide rotateAngle : number  = 0
 
   /**
    * 卡片编辑页面显示监听
@@ -260,7 +260,7 @@ struct Home {
                 .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
                 .fontColor([this.icon_primary])
             }
-            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 50 })
               .combine(TransitionEffect.SLIDE):null)
             .onClick(() => {
               this.isShowHomeEdit = true
@@ -273,9 +273,9 @@ struct Home {
                   this.isShowDeleteButton = true
                 })
                 //编辑模式下开启卡片旋转动画
-                  animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear,iterations:-1,playMode:PlayMode.Alternate }, () => {
-                    this.rotateAngle=1
-                  })
+                this.getUIContext()?.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear,iterations:-1,playMode:PlayMode.Alternate }, () => {
+                  this.rotateAngle=1
+                })
               }else {this.isShowDeleteButton = true}
             })
             .width(40)
@@ -291,7 +291,7 @@ struct Home {
             .width(40)
             .height(40)
             .backgroundColor($r('app.color.settings_container_background'))
-            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 100 })
               .combine(TransitionEffect.SLIDE):null)
             .onClick(() => {
               this.isShowSettings = true
@@ -303,7 +303,7 @@ struct Home {
               .fontSize(32)
               .fontWeight(FontWeight.Bold)
               .fontColor(this.font_primary)
-              .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+              .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 150 })
                 .combine(TransitionEffect.SLIDE):null)
             Blank()
             //添加按钮
@@ -315,7 +315,7 @@ struct Home {
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
-            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 100 })
               .combine(TransitionEffect.SLIDE):null)
             .onClick(() => {
               this.isShowCardEdit = true
@@ -331,7 +331,7 @@ struct Home {
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
-            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 50 })
               .combine(TransitionEffect.SLIDE):null)
             .onClick(() => {
               this.saveHomeLayout()
@@ -397,11 +397,11 @@ struct Home {
                 .borderRadius(20)
                 .backgroundColor($r('app.color.container_background'))
                 .clickEffect({ level: ClickEffectLevel.MIDDLE })
-                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
+                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:0}):null)
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 // 消失触发回调
                 .onDetach(() => {
-                  this.rotateAngle = 0
+
                 })
                 //显示时触发回调
                 .onAttach(() => {
@@ -434,12 +434,12 @@ struct Home {
                 }
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
+                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:20 }):null)
                 //编辑模式下跳动动画
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
                 .onDetach(() => {
-                  this.rotateAngle = 0
+
                 })
               }
 
@@ -466,12 +466,12 @@ struct Home {
                 //   .margin({ left: this.containerMargin.value })
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
+                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:30 }):null)
                 //编辑模式下跳动动画
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
                 .onDetach(() => {
-                  this.rotateAngle = 0
+
                 })
               }
 
@@ -497,12 +497,12 @@ struct Home {
                 }
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
+                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:40 }):null)
                 //编辑模式下跳动动画
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
                 .onDetach(() => {
-                  this.rotateAngle = 0
+
                 })
               }
 
@@ -528,12 +528,12 @@ struct Home {
                 }
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
+                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:60 }):null)
                 //编辑模式下跳动动画
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
                 .onDetach(() => {
-                  this.rotateAngle = 0
+
                 })
               }
 
@@ -559,12 +559,12 @@ struct Home {
                 }
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
+                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:70 }):null)
                 //编辑模式下跳动动画
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
                 .onDetach(() => {
-                  this.rotateAngle = 0
+
                 })
               }
 
@@ -590,12 +590,12 @@ struct Home {
                 }
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
+                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:80 }):null)
                 //编辑模式下跳动动画
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
                 .onDetach(() => {
-                  this.rotateAngle = 0
+
                 })
               }
 
@@ -623,13 +623,13 @@ struct Home {
                 .borderRadius(20)
                 .backgroundColor($r('app.color.container_background'))
                 .clickEffect({ level: ClickEffectLevel.MIDDLE })
-                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
+                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:20}):null)
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 //编辑模式下跳动动画
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
                 .onDetach(() => {
-                  this.rotateAngle = 0
+
                 })
               }
 
@@ -655,12 +655,12 @@ struct Home {
                 }
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
+                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:50}):null)
                 //编辑模式下跳动动画
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
                 .onDetach(() => {
-                  this.rotateAngle = 0
+
                 })
               }
 
@@ -686,12 +686,12 @@ struct Home {
                 }
                 .GridColStyle()
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
+                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:90}):null)
                 //编辑模式下跳动动画
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
                 .onDetach(() => {
-                  this.rotateAngle = 0
+
                 })
               }
             } //GridRow的尾括号
@@ -743,6 +743,9 @@ struct Home {
           }.width('100%')
         }
         .borderRadius(100)
+        .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
+          .animation({ duration: this.uiConfig.animationSpeed, delay: 50 })
+          .combine(TransitionEffect.SLIDE_SWITCH):null)
         .backgroundColor(this.icon_emphasize)
         .shadow({
           radius: 10,
