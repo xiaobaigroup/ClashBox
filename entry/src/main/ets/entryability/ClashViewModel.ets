@@ -103,8 +103,8 @@ export class ClashViewModel {
     }
     return -1;
   }
-  async updateGeoData(geoName: string, geoType: string): Promise<string>{
-    return this.socketProxy.updateGeoData(geoName, geoType)
+  async updateGeoData( geoType: string, geoName: string): Promise<string>{
+    return this.socketProxy.updateGeoData(geoType, geoName)
   }
   async getTraffic(){
     return await this.socketProxy.queryTrafficNow()

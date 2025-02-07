@@ -9,6 +9,7 @@ import { promptAction } from '@kit.ArkUI'
 import { copy, UIConfig } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { getResourceString } from "../../utils/ResourceStringUtil"
+import { EventHub, EventKey } from "../../common/EventHub"
 
 // 资源数据（假设）
 interface ResourcesData {
@@ -149,18 +150,22 @@ struct Resources {
       geoMap[name] = url
       this.clashConfig['geox-url'] = copy(geoMap)
     }
+    EventHub.sendEvent(EventKey.LoadClashConfig)
   }
 
   async updateGeoDateItem(item: ResourcesData){
     this.isLoading = true
     try {
       const message = await ClashViewModel.updateGeoData(
-         item.fileName,
          item.resourceName,
+         item.fileName,
       );
-      if (message != ""){
-        this.isLoading = false
-        promptAction.showToast({message: getResourceString($r('app.string.update_success'), this) + message})
+      this.isLoading = false
+      if (message != "") {
+        promptAction.showToast({ message: getResourceString($r('app.string.update_failed'), this) +" " + message })
+      }
+      else {
+        promptAction.showToast({ message: getResourceString($r('app.string.update_success'), this) })
       }
     } catch (e) {
       this.isLoading = false

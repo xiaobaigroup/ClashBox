@@ -232,6 +232,8 @@ func init() {
 	entry.Export("getVpnOptions", js.AsCallback(getVpnOptions))
 	entry.Export("getCurrentProfileName", js.AsCallback(getCurrentProfileName))
 	entry.Export("setProcessMap", js.AsCallback(setProcessMap))
+	entry.Export("updateGeoData", js.AsCallback(updateGeoData))
+
 	entry.Export("updateDns", js.AsCallback(updateDns))
 	entry.Export("startLog", js.AsCallback(startLog))
 	entry.Export("stopLog", js.AsCallback(stopLog))

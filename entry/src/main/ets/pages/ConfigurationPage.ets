@@ -362,7 +362,7 @@ struct ConfigurationPage {
                       this.currentConfigRadioCheckedConfigData = item
                       this.appConfig.currentProfileName = item.configName
                       this.appConfig.currentProfileId = item.configId
-                      await ClashViewModel.loadProfileAndConfig(item.configId)
+                      EventHub.sendEvent(EventKey.LoadClashConfig)
                       hilog.info(0xC002, this.componentName, `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
                     })
                 }
@@ -395,7 +395,7 @@ struct ConfigurationPage {
                   customVibrator.vibratorTriggerOfHapticClockTimer()
                 }
                 this.appConfig.currentProfileId = item.configId
-                await ClashViewModel.loadProfileAndConfig(item.configId)
+                EventHub.sendEvent(EventKey.LoadClashConfig)
                 hilog.info(0xC002, this.componentName, `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
               })
               .onTouch((event: TouchEvent) => {
