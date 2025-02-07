@@ -24,6 +24,8 @@ struct Network {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 栈模式临时选择项
   @State stackModeIndex: number = 0
+  // 路由模式临时选择项
+  @State routeModeIndex: number = 0
   // 列表行点击事件处理
   handleCheck(index: number) {
       // 跳转
@@ -70,6 +72,26 @@ struct Network {
             })
         }, (menuItem: MenuListItemProp) => JSON.stringify(menuItem))
       }
+    } else {
+      // 路由模式菜单
+      Menu() {
+        MenuItem({ content: $r('app.string.route_mode') }).contentFont({ weight: FontWeight.Bold })
+        ForEach(item, (menuItem: MenuListItemProp, index: number) => {
+          MenuItem({
+            content: menuItem.title,
+            symbolEndIcon: this.routeModeIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+          })
+            .selected(this.routeModeIndex === index)
+            .onChange(() => {
+              this.routeModeIndex = index
+              if (this.networkMenuList[1].children) {
+                let Item = this.overwriteNetworkList[4]
+                Item.subtitle = menuItem.title
+                this.overwriteNetworkList.splice(4, 1, Item)
+              }
+            })
+        }, (menuItem: MenuListItemProp) => JSON.stringify(menuItem))
+      }
     }
   }
 
@@ -92,8 +114,10 @@ struct Network {
   @Builder
   MenuEntrance(index: number) {
     // 确保children存在
-    if(this.networkMenuList && this.networkMenuList[0].children) {
+    if(this.networkMenuList && this.networkMenuList[0].children && index === 3) {
       this.switchMenu(this.networkMenuList[0].children, index)
+    } else if (this.networkMenuList && this.networkMenuList[1].children && index === 4) {
+      this.switchMenu(this.networkMenuList[1].children, index)
     }
   }
 

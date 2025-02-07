@@ -493,11 +493,11 @@
       "value": "Stack Mode"
     },
     {
-      "name": "Route_Mode",
+      "name": "route_mode",
       "value": "Route Mode"
     },
     {
-      "name": "Using_Configuration",
+      "name": "using_configuration",
       "value": "Using Configuration"
     },
     {
@@ -1571,6 +1571,14 @@
     {
       "name": "permission_reason_MICROPHONE",
       "value": "Long term task audio recording"
+    },
+    {
+      "name": "bypass_private_route_address",
+      "value": "Bypass private routing address"
+    },
+    {
+      "name": "example",
+      "value": "Example"
     }
   ]
 }

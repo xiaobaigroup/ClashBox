@@ -493,11 +493,11 @@
       "value": "栈模式"
     },
     {
-      "name": "Route_Mode",
+      "name": "route_mode",
       "value": "路由模式"
     },
     {
-      "name": "Using_Configuration",
+      "name": "using_configuration",
       "value": "使用配置"
     },
     {
@@ -1571,6 +1571,14 @@
     {
       "name": "permission_reason_MICROPHONE",
       "value": "长时任务音频录制"
+    },
+    {
+      "name": "bypass_private_route_address",
+      "value": "绕过私有路由地址"
+    },
+    {
+      "name": "example",
+      "value": "例如"
     }
   ]
 }

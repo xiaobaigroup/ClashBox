@@ -192,7 +192,7 @@ struct Settings {
 
       }
       .width('100%')
-  //   .height(this.isLandscapePhone ? 300 : this.SettingslistHeight.value)
+      .height(this.isLandscapePhone ? 300 : this.SettingslistHeight.value)
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)
     }

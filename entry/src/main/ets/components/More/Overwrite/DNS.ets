@@ -3,72 +3,21 @@ import { BreakpointState } from "../../../common/breakpointsystem"
 import { DNSMenu, ListOverwriteDNSData, MenuListItemProp, moreData } from "../../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import OverwriteTop from "./OverwriteTopBuilder"
-import { menuRowList, skipRowList, toggleRowList } from "../../Common"
+import { menuRowList, skipRowList, theCustomDialog, toggleRowList } from "../../Common"
 import { ClashConfig, Dns } from 'proxy_core'
 import { AppConfig, copy, UIConfig } from '../../../entryability/AppState'
 import { ArrayConfigParam } from "./EditArrayConfig"
 import { EventHub, EventKey } from "../../../common/EventHub"
 import { JSON } from "@kit.ArkTS"
 import { SymbolGlyphModifier } from "@kit.ArkUI"
+import { getResourceString } from "../../../utils/ResourceStringUtil"
 
-// 编辑FakeIP范围弹窗
-@CustomDialog
-struct FakeIPCustomDialog {
-  @Link SaveInputValue: string
-  @Link currentInputValue: string
-  cancel?: () => void
-  confirm?: () => void
-  controller: CustomDialogController
-  /* 主题色 */
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
-
-  build() {
-    Column() {
-      Text($r('app.string.Edit_FakeIP_Range'))
-        .fontWeight(FontWeight.Medium)
-        .fontSize(20)
-        .margin({ top: 15, bottom: 15 })
-      TextInput({placeholder: '例如：198.18.0.1/16', text: this.currentInputValue })
-        .onChange((value: string) => {
-          this.currentInputValue = value
-        })
-        .margin({bottom: 8 })
-      Button($r('app.string.Save'))
-        .width('100%')
-        .height(39)
-        .onClick(() => {
-          this.SaveInputValue = this.currentInputValue
-          this.controller.close()
-          if (this.confirm) {
-            this.confirm()
-          }
-        })
-        .backgroundColor(this.icon_emphasize)
-        .fontColor(Color.White)
-      Button($r('app.string.Cancel'))
-        .height(39)
-        .width('100%')
-        .fontColor(this.icon_emphasize)
-        .backgroundColor($r('app.color.container_background'))
-        .onClick(() => {
-          this.controller.close()
-          if (this.cancel) {
-            this.cancel()
-          }
-        })
-    }
-    .padding({left: 16, right: 16})
-    .backgroundColor($r('app.color.container_background'))
-    .width('100%')
-    .height(195)
-  }
-}
 
 @Component
 struct DNS {
   // 是否进入二级界面
   @Consume isSecondary: boolean
+  @State isFakeIP: boolean = false
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   //一级图标色，黑色
@@ -85,6 +34,7 @@ struct DNS {
   @StorageProp('istabletVertical')  private istabletVertical: boolean = false
   @State SaveInputValue: string = ''
   @State currentInputValue: string = ''
+  @State theplaceholder: string = 'CN'
   // DNS模式临时选择项
   @State DNSModeIndex: number = 0
   /* 是否开启 `Index` 页面的前景模糊 */
@@ -92,9 +42,11 @@ struct DNS {
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  // 弹窗控制器
+  // 编辑FakeIP范围弹窗控制器
   dialogController: CustomDialogController = new CustomDialogController({
-    builder: FakeIPCustomDialog({
+    builder: theCustomDialog({
+      theDialogTitle: this.isFakeIP ? $r('app.string.Edit_FakeIP_Range') : $r('app.string.GeoIP_Code'),
+      theplaceholder: this.theplaceholder,
       currentInputValue: $currentInputValue,
       SaveInputValue: $SaveInputValue,
       cancel: ()=> { this.onCancel() },
@@ -118,16 +70,34 @@ struct DNS {
   onCancel() {
     // 关闭背景模糊
     this.isEnableIndexForegroundBlur = false
+    // 重置FakeIP判断及提示词和当前文本状态
+    this.isFakeIP = false
+    this.theplaceholder = 'CN'
+    this.currentInputValue = ''
   }
   onAccept() {
     // 关闭背景模糊
     this.isEnableIndexForegroundBlur = false
     // 更新UI数组中对应元素
-    let FakeIPRangeData = this.overwriteDNSList[9]
-    FakeIPRangeData.subtitle = this.SaveInputValue
-    this.overwriteDNSList.splice(9,1,FakeIPRangeData)
-    // 处理FakeIP范围变更
+    if(this.isFakeIP) {
+      // FakeIP范围
+      let FakeIPRangeData = this.overwriteDNSList[9]
+      FakeIPRangeData.subtitle = this.SaveInputValue
+      this.overwriteDNSList.splice(9, 1, FakeIPRangeData)
+      // 处理FakeIP范围变更
 
+    } else {
+      // GeoIP代码
+      let GeoIPData = this.overwriteDNSList[18]
+      GeoIPData.subtitle = this.SaveInputValue
+      this.overwriteDNSList.splice(18, 1, GeoIPData)
+      // 处理GeoIP代码变更
+
+    }
+    // 重置FakeIP判断及提示词和当前文本状态
+    this.isFakeIP = false
+    this.theplaceholder = 'CN'
+    this.currentInputValue = ''
   }
   aboutToAppear(): void {
     this.overwriteDNSList = ListOverwriteDNSData(this.clashConfig, this.appConfig)
@@ -145,8 +115,12 @@ struct DNS {
   // 列表行点击事件处理
   handleCheck(index: number) {
     let itemData = this.overwriteDNSList[index]
-    if(typeof itemData.value == "string" && index === 9){
+    if(typeof itemData.value == "string" && (index === 9 || index === 18)){
       this.isEnableIndexForegroundBlur = true
+      if(index === 9) {
+        this.isFakeIP = true
+        this.theplaceholder = `${getResourceString($r('app.string.example'), this)}: 198.18.0.1/16`
+      }
       this.dialogController.open()
     }else{
       this.pageInfos.pushPathByName("EditArrayConfig", {

@@ -176,6 +176,7 @@ export  const ListOverwriteDNSData = (clashConfig: ClashConfig, appConfig: AppCo
     new moreData($r('sys.symbol.selector'), 'FallBack-Filtering', $r('app.string.FallBack_Filtering'), '', 3, false),
     new moreData($r('sys.symbol.selector'), 'GeoIP', $r('app.string.GeoIP'), '', 2, clashConfig.dns?.["fallback-filter"]?.geoIp ?? false),
     new moreData($r('sys.symbol.selector'), 'GeoIP-Code', $r('app.string.GeoIP_Code'),  $r('app.string.GeoIP_Code_Subtitle_1'), 1, clashConfig.dns?.["fallback-filter"]?.geoIpCode),
+    new moreData($r('sys.symbol.selector'), 'IP/Mask', 'Geosite',  '', 1, clashConfig.dns?.["fallback-filter"]?.geosite?.toString()),
     new moreData($r('sys.symbol.selector'), 'IP/Mask', $r('app.string.IP_Mask'),  '', 1, clashConfig.dns?.["fallback-filter"]?.ipcidr?.toString()),
     new moreData($r('sys.symbol.selector'), 'Domain', $r('app.string.Domain_Name'), '', 1, clashConfig.dns?.["fallback-filter"]?.ipcidr?.toString()),
   ]
@@ -190,7 +191,7 @@ export  const ListOverwriteNetworkData = (): moreData[] => {
     new moreData($r('sys.symbol.selector'), 'Option', $r('app.string.option'), '', 3, false),
     new moreData($r('sys.symbol.selector'), 'IPv6', $r('app.string.IPv6'), $r('app.string.Info'), 2,  false),
     new moreData($r('sys.symbol.satellite_map_fill'), 'Stack-Mode', $r('app.string.stack_mode'), 'gvisor', 0, false),
-    new moreData($r('sys.symbol.slider_horizontal_2'), 'Route-Mode', $r('app.string.Route_Mode'), $r('app.string.Using_Configuration'), 0,  false),
+    new moreData($r('sys.symbol.slider_horizontal_2'), 'Route-Mode', $r('app.string.route_mode'), $r('app.string.using_configuration'), 0,  false),
     new moreData($r('sys.symbol.local_fill'), 'Route-Address', $r('app.string.Routing_Address'), $r('app.string.Routing_Address_Subtitle'), 1, false),
   ]
   return result
@@ -213,6 +214,12 @@ export const NetworkMenu: MenuListItemProp[] = [
       {title: 'gvisor'},
       {title: 'system'},
       {title: 'mixed'},
+    ]
+  },
+  { title: $r('app.string.route_mode'),
+    children: [
+      {title: $r('app.string.bypass_private_route_address')},
+      {title: $r('app.string.using_configuration')},
     ]
   }
 ]

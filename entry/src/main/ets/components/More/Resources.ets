@@ -113,6 +113,7 @@ struct Resources {
       theplaceholder: $theEditIndex,
       currentInputValue: $currentEditInputValue,
       SaveInputValue: $SaveEditInputValue,
+      isArea: true,
       theDialogTitle: this.theEditDialogTitle,
       cancel: ()=> { this.onCancel() },
       confirm: ()=> { this.onAccept() },

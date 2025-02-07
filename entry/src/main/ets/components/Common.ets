@@ -465,7 +465,7 @@ export struct KVCustomDialog {
 }
 
 /**
- * 通用保存&取消弹窗组件（竖排按钮）
+ * 通用单Value多行文本输入弹窗组件（保存&取消竖排按钮）
  * @param theDialogTitle 弹窗标题-ResourceStr
  * @param theplaceholder 输入框默认文本-ResourceStr
  * @param SaveInputValue 保存的输入值-string
@@ -477,6 +477,8 @@ export struct theCustomDialog {
   @Link currentInputValue: string
   @Link theplaceholder: string
   @State theDialogTitle: ResourceStr = ''
+  @State isArea: boolean = false
+  @State Unit: string = ''
   cancel?: () => void
   confirm?: () => void
   controller: CustomDialogController
@@ -489,11 +491,24 @@ export struct theCustomDialog {
         .fontWeight(FontWeight.Medium)
         .fontSize(20)
         .margin({ top: 15, bottom: 15 })
-      TextArea({placeholder: this.theplaceholder, text: this.currentInputValue })
-        .onChange((value: string) => {
-          this.currentInputValue = value
-        })
-        .margin({bottom: 8 })
+      Row({space: 2}) {
+        if(this.isArea) {
+          TextArea({placeholder: this.theplaceholder, text: this.currentInputValue })
+            .onChange((value: string) => {
+              this.currentInputValue = value
+            })
+            .margin({bottom: 8 })
+        } else {
+          TextInput({placeholder: this.theplaceholder, text: this.currentInputValue })
+            .onChange((value: string) => {
+              this.currentInputValue = value
+            })
+            .margin({bottom: 8 })
+        }
+        if(this.Unit) {
+          Text(this.Unit)
+        }
+      }
       Button($r('app.string.Save'))
         .width('100%')
         .height(39)
