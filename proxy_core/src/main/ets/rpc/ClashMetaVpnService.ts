@@ -134,9 +134,15 @@ export class ClashMetaVpnService extends CommonVpnService{
         }
         case ClashRpcType.updateProvider:{
           let provider = JSON.parse(data[0] as string) as Provider
-          nativeUpdateProvider(provider.type, provider.name,()=>{
-            resolve(true)
+          nativeUpdateProvider(provider.type, provider.name,(v)=>{
+            resolve(v)
           })
+          break;
+        }
+        case ClashRpcType.uploadProvider:{
+          let provider = data[0] as string
+          let path = data[1] as string
+          resolve("暂不支持")
           break;
         }
         case ClashRpcType.queryOverride:{

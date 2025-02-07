@@ -14,6 +14,7 @@ export enum ClashRpcType{
   changeProxy,
   healthCheck,
   updateProvider,
+  uploadProvider,
   queryOverride,
   patchOverride,
   clearOverride,

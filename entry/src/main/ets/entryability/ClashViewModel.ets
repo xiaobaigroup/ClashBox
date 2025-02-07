@@ -122,7 +122,10 @@ export class ClashViewModel {
     return this.socketProxy.queryProviders()
   }
   async updateProvider(provider: Provider){
-    return this.socketProxy.updateProvider(provider)
+    let result = await this.socketProxy.updateProvider(provider)
+    if(result != ""){
+      promptAction.showToast({message: result})
+    }
   }
 
   job?: (()=>void)

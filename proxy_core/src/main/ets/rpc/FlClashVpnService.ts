@@ -10,7 +10,8 @@ import {
   forceGc,
   updateExternalProvider,
   getCountryCode,
-  updateGeoData
+  updateGeoData,
+  sideLoadExternalProvider
 } from 'libflclash.so';
 import { Address, CommonVpnService, isIpv4, isIpv6, VpnConfig } from './CommonVpnService';
 import { JSON, util } from '@kit.ArkTS';
@@ -53,7 +54,7 @@ export class FlClashVpnService extends CommonVpnService{
     let request = JSON.parse(decoder.decodeToString(new Uint8Array(message.message))) as RpcRequest
     let code = request.method
     let params = request.params
-    console.debug(`socket stub ${code} request: `, params)
+    console.debug(`socket stub ${code as ClashRpcType} request: `, params)
     if(code == ClashRpcType.setLogObserver){
       // 订阅日志，需要持续输出
       startLog((message: string, value: string)=>{
@@ -161,13 +162,20 @@ export class FlClashVpnService extends CommonVpnService{
           break;
         }
         case ClashRpcType.updateProvider:{
-          updateExternalProvider(data[0] as string).then(()=>{
-            resolve(true)
+          const params = JSON.parse(data[0] as string)
+          updateExternalProvider(params["name"]).then((v)=>{
+            resolve(v)
           })
           break;
         }
-        case ClashRpcType.queryOverride:{
+        case ClashRpcType.uploadProvider:{
           //resolve(nativeReadOverride(data[0] as number))
+          let provider = data[0] as string
+          let path = data[1] as string
+          const buffer = new Uint8Array()
+          sideLoadExternalProvider(data[0] as string, buffer).then((v)=>{
+            resolve(v)
+          })
           break;
         }
         case ClashRpcType.patchOverride:{

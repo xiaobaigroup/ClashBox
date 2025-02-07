@@ -55,6 +55,9 @@ export class SocketProxyService implements IClashManager{
   async updateProvider(provider: Provider): Promise<string> {
     return  (await this.sendMessageRequest(ClashRpcType.updateProvider,[JSON.stringify(provider)])) as string
   }
+  async upLoadProvider(provider: Provider, filePath: string): Promise<string> {
+    return  (await this.sendMessageRequest(ClashRpcType.uploadProvider,[provider.name, filePath])) as string
+  }
   async updateGeoData(geoName: string, geoType: string): Promise<string>{
     return await (this.sendMessageRequest(ClashRpcType.updateGeoData,[geoName, geoType])) as string
   }
@@ -101,7 +104,8 @@ export class SocketProxyService implements IClashManager{
       })
       client.on("error", ()=>{
         console.log("socketProxy on error" )
-        reject("失败")
+        promptAction.showToast({message: "socketProxy error"})
+        reject("rpc 中断")
       })
       const socketPath = this.context?.filesDir + '/clashNext.sock'
 
