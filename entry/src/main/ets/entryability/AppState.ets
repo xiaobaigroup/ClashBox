@@ -27,7 +27,7 @@ export class AppFlowingState{
   traffics: TrafficQueue = new TrafficQueue(12)
   totalTraffic: Traffic = new Traffic(0, 0)
   localIp: string = ""
-  removeIp?: IpInfo
+  removeIp: IpInfo | null = null
 
 }
 export class AppConfig{

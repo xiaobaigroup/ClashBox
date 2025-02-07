@@ -13,6 +13,7 @@ export enum EventKey{
   ArrayConfigChanged = 10009,
   StartedClash = 10010,
   StopedClash = 10011,
+  checkIpInfo = 10012,
 }
 
 export class EventHub{

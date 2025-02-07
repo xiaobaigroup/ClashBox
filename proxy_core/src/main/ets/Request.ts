@@ -1,4 +1,6 @@
 import { rcp } from "@kit.RemoteCommunicationKit";
+import { JSON } from "@kit.ArkTS";
+import { http } from "@kit.NetworkKit";
 
 // TODO 可添加其他来源
 const IpCountryList: IpResolver[] = [{
@@ -30,22 +32,25 @@ const ipInfoSources: IpResolver[]  = [
 ];
 
 export async function CallIpResolver(ip: string | undefined, resolver: IpResolver | string): Promise<string | null>{
-  const session = rcp.createSession({requestConfiguration: {transfer: {timeout: { connectMs: 3000, transferMs: 3000, inactivityMs: 3000 }}}});
+  let httpRequest = http.createHttp()
   const url = typeof resolver == "string" ? resolver as string : resolver.url
   let json = null
   try {
-    const resp = await session.get(url + ip ?? "")
-    if(resp.statusCode !== 200)
+    const resp = await httpRequest.request(url + ip ?? "", {connectTimeout: 5000, readTimeout: 2000})
+    if(resp.responseCode !== 200)
       return null;
     if (typeof resolver == "string" ){
-      return resp.toString()
+      console.error("CallIpResolver result ", url, resp)
+      return resp.result.toString()
     }
-    json = resp.toJSON()
-    let result = resolver.resolve(json, resp.toString())
-    session.close()
+    json = resp.result
+    console.error("CallIpResolver result ", url, json)
+    let result = resolver.resolve(JSON.parse(json), json.toString())
+    httpRequest.destroy()
     return result;
   } catch (e) {
-    console.error("CallIpResolver error: ",url,ip, e)
+    console.error("CallIpResolver error: ", url, e.message, JSON.stringify(e))
+    httpRequest.destroy()
     return null
   }
 }
@@ -61,11 +66,11 @@ export async function queryIpInfo(ip: string){
 export async function checkIp() {
   for (let source of ipInfoSources) {
     const result = await CallIpResolver(undefined, source)
-    if (!result)
+    if (!result || result == "")
       continue
     return result
   }
-  return ""
+  return "unkown"
 }
 
 export interface IpResolver{

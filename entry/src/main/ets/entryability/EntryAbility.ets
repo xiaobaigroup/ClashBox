@@ -6,6 +6,7 @@ import ClashViewModel from './ClashViewModel';
 import { KeyboardAvoidMode } from '@kit.ArkUI';
 import { AppConfig, AppFlowingState, AppState, ClashCore } from './AppState';
 import { EventHub, EventKey } from '../common/EventHub';
+import { http } from '@kit.NetworkKit';
 
 export default class EntryAbility extends UIAbility {
  private currentLanguage: string | undefined = undefined
@@ -30,6 +31,13 @@ export default class EntryAbility extends UIAbility {
     let windowClass: window.Window = windowStage.getMainWindowSync(); // 获取应用主窗口
 
     await ClashViewModel.init(this.context)
+    const httpRequest = http.createHttp()
+    httpRequest.request("https://ipwho.is/?fields=ip&output=csv").then((r)=>{
+      console.log("requet", r.responseCode)
+    }).catch((e:Error)=>{
+      console.log("requet err", e)
+    })
+
     windowStage.loadContent('pages/Index', async (err) => {
       if (err.code) {
         hilog.error(0x0000, 'EntryAbility', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
@@ -56,7 +64,7 @@ export default class EntryAbility extends UIAbility {
       EventHub.on(EventKey.StopedClash, ()=>{
         clearInterval(this.trafficJob)
       })
-      appFlowingState.removeIp = await ClashViewModel.checkIpInfo()
+      EventHub.sendEvent(EventKey.checkIpInfo)
       hilog.info(0x0000, 'EntryAbility', 'Succeeded in loading the content.');
     });
 

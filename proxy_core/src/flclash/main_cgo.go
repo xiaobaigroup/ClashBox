@@ -152,6 +152,21 @@ func stopLog(env js.Env, this js.Value, args []js.Value) any {
 	handleStopLog()
 	return nil
 }
+func getCountryCode(env js.Env, this js.Value, args []js.Value) any {
+	ip, _ := napi.GetValueStringUtf8(env.Env, args[0].Value)
+	promise := env.NewPromise()
+	handleGetCountryCode(ip, func(value string) {
+		promise.Resolve(value)
+	})
+	return promise
+}
+func getMemory(env js.Env, this js.Value, args []js.Value) any {
+	promise := env.NewPromise()
+	handleGetMemory(func(value string) {
+		promise.Resolve(value)
+	})
+	return promise
+}
 func updateDns(env js.Env, this js.Value, args []js.Value) any {
 	dnsList, _ := napi.GetValueStringUtf8(env.Env, args[0].Value)
 	promise := env.NewPromise()
@@ -185,6 +200,7 @@ func getCurrentProfileName(env js.Env, this js.Value, args []js.Value) any {
 	}
 	return state.CurrentState.CurrentProfileName
 }
+
 func setFdMap(env js.Env, this js.Value, args []js.Value) any {
 	fdInt, _ := napi.GetValueInt32(env.Env, args[0].Value)
 	go func() {
@@ -219,6 +235,8 @@ func init() {
 	entry.Export("updateDns", js.AsCallback(updateDns))
 	entry.Export("startLog", js.AsCallback(startLog))
 	entry.Export("stopLog", js.AsCallback(stopLog))
+	entry.Export("getCountryCode", js.AsCallback(getCountryCode))
+	entry.Export("getMemory", js.AsCallback(getMemory))
 }
 func main() {
 }

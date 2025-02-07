@@ -5,6 +5,7 @@ import { AppConfig, AppFlowingState } from "../../entryability/AppState"
 import { CardTitle } from "./CardTitleBuilder"
 import { PromptAction } from "@kit.ArkUI"
 import ClashViewModel from "../../entryability/ClashViewModel"
+import { JSON } from "@kit.ArkTS"
 
 @Component
 struct ProxyINFO{
@@ -112,9 +113,9 @@ struct ProxyINFO{
           .onClick(async () => {
             //在home页在编辑卡片状态时，无法操作，点击回调写在if判定里
             if ( this.isShowHomeEdit===false) {
-              this.appFlowingState.removeIp = undefined
-              this.PromptAction.showToast({ message: $r('app.string.refresh_tips') })
+              this.appFlowingState.removeIp = null
               this.appFlowingState.removeIp = await ClashViewModel.checkIpInfo()
+              console.log("checkIpInfo", JSON.stringify( this.appFlowingState.removeIp))
             }
           })
       }

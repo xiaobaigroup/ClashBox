@@ -4,14 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net"
 	"runtime"
 	"sort"
+	"strconv"
 	"time"
 
 	"github.com/metacubex/mihomo/adapter"
 	"github.com/metacubex/mihomo/adapter/outboundgroup"
 	"github.com/metacubex/mihomo/common/observable"
 	"github.com/metacubex/mihomo/common/utils"
+	"github.com/metacubex/mihomo/component/mmdb"
 	"github.com/metacubex/mihomo/component/updater"
 	"github.com/metacubex/mihomo/config"
 	"github.com/metacubex/mihomo/constant"
@@ -404,6 +407,24 @@ func handleStopLog() {
 		log.UnSubscribe(logSubscriber)
 		logSubscriber = nil
 	}
+}
+func handleGetCountryCode(ip string, fn func(value string)) {
+	go func() {
+		runLock.Lock()
+		defer runLock.Unlock()
+		codes := mmdb.IPInstance().LookupCode(net.ParseIP(ip))
+		if len(codes) == 0 {
+			fn("")
+			return
+		}
+		fn(codes[0])
+	}()
+}
+
+func handleGetMemory(fn func(value string)) {
+	go func() {
+		fn(strconv.FormatUint(statistic.DefaultManager.Memory(), 10))
+	}()
 }
 
 func init() {

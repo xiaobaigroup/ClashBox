@@ -24,6 +24,7 @@ export enum ClashRpcType{
   stopClash,
   fetchAndValid,
   reset,
+  getCountryCode,
   updateGeoData,
 }
 

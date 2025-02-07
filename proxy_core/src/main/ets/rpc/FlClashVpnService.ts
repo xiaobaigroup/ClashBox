@@ -8,7 +8,9 @@ import {
   initClash,
   changeProxy,
   forceGc,
-  updateExternalProvider
+  updateExternalProvider,
+  getCountryCode,
+  updateGeoData
 } from 'libflclash.so';
 import { Address, CommonVpnService, isIpv4, isIpv6, VpnConfig } from './CommonVpnService';
 import { JSON, util } from '@kit.ArkTS';
@@ -178,9 +180,16 @@ export class FlClashVpnService extends CommonVpnService{
           resolve(true)
           break;
         }
-        case ClashRpcType.queryConfiguration:{
-          //resolve(nativeQueryConfiguration())
+        case ClashRpcType.updateGeoData:{
+          updateGeoData(data[0] as string, data[1] as string).then((v)=>{
+            resolve(v)
+          })
           break;
+        }
+        case ClashRpcType.getCountryCode: {
+          getCountryCode(data[0] as string).then((v)=>{
+            resolve(v)
+          })
         }
         case ClashRpcType.load:{
           const parms = JSON.parse(data[0] as string) as UpdateConfigParams

@@ -153,8 +153,8 @@ export class ClashMetaVpnService extends CommonVpnService{
           resolve(true)
           break;
         }
-        case ClashRpcType.queryConfiguration:{
-          //resolve(nativeQueryConfiguration())
+        case ClashRpcType.getCountryCode:{
+          resolve("")
           break;
         }
         case ClashRpcType.load:{
