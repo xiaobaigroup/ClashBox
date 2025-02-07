@@ -527,15 +527,16 @@ struct Index {
     }
   }
 
+
   build() {
     Column() {
       Tabs({
         barPosition: this.isLandscapePhone ? BarPosition.Start : this.compBarPose.value
       }) {
         TabContent() {
-          if (this.currentIndex===0){
+       //   if (this.currentIndex===0){
           Home()
-          }
+      //    }
         }
         .tabBar(this.TabBarBuilder($r('app.string.Home'), 0, $r('sys.symbol.house_fill')))
         .onWillShow(() => {
@@ -543,9 +544,9 @@ struct Index {
         })
 
         TabContent() {
-          if (this.currentIndex===1) {
+         // if (this.currentIndex===1) {
             ProxyPage()
-          }
+        //  }
         }
         .tabBar(this.TabBarBuilder($r('app.string.Proxy'), 1, $r('sys.symbol.list_bullet_square_fill')))
         .onWillShow(() => {
@@ -553,9 +554,9 @@ struct Index {
         })
 
         TabContent() {
-          if (this.currentIndex===2) {
+        //  if (this.currentIndex===2) {
             ConfigurationPage()
-          }
+        //  }
         }
         .tabBar(this.TabBarBuilder($r('app.string.Configuration'), 2, $r('sys.symbol.folder_fill')))
         .onWillShow(() => {
@@ -563,9 +564,9 @@ struct Index {
         })
 
         TabContent() {
-          if (this.currentIndex===3) {
+       //   if (this.currentIndex===3) {
             MorePage()
-          }
+       //   }
         }
         .tabBar(this.TabBarBuilder($r('app.string.More'), 3, $r('sys.symbol.square_fill_grid_2x2')))
         .onWillShow(() => {

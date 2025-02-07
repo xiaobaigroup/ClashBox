@@ -178,9 +178,7 @@ struct Home {
       this.isShowDeleteButton = false
     })
     // 关闭卡片旋转动画
-    animateTo({ duration: 0,iterations:0 }, () => {
-      this.rotateAngle = 0
-    })
+    this.stopAnim()
   }
 
   /**
@@ -197,9 +195,7 @@ struct Home {
         this.isShowDeleteButton = false
       })
       // 关闭卡片旋转动画
-      animateTo({ duration: 0,iterations:0 }, () => {
-        this.rotateAngle = 0
-      })
+      this.stopAnim()
     } else { this.isShowDeleteButton = false }
   }
 
@@ -220,8 +216,32 @@ struct Home {
   }
 
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-  @Provide rotateAngle : number  = 0
+  @State rotateAngle : number  = 0
 
+
+  //卡片摇摆动画
+  startAnim() {
+    this.rotateAngle = 0
+    animateTo({
+      duration: this.uiConfig.animationSpeed,
+      curve: Curve.Linear,
+      iterations:-1,
+      playMode:PlayMode.Alternate
+    }, () => {
+      this.rotateAngle = 1
+    })
+  }
+
+  stopAnim() {
+    animateTo({
+      delay: 0,
+      duration: 0,
+      iterations: 0,
+      curve: Curve.Linear,
+    }, () => {
+      this.rotateAngle = 0
+    })
+  }
   /**
    * 卡片编辑页面显示监听
    */
@@ -230,9 +250,8 @@ struct Home {
     // 当编辑页面由 true -> false 时触发抖动动画刷新
     if(!this.isShowCardEdit) {
       hilog.info(0xFF00, "HometestTag", "进入卡片编辑页面显示监听，true -> false  %{public}s")
-      animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear,iterations:-1,playMode:PlayMode.Alternate }, () => {
-        this.rotateAngle = 1
-      })
+      this.stopAnim()
+      this.startAnim()
     }
   }
 
@@ -272,9 +291,8 @@ struct Home {
                   this.isShowDeleteButton = true
                 })
                 //编辑模式下开启卡片旋转动画
-                this.getUIContext()?.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear,iterations:-1,playMode:PlayMode.Alternate }, () => {
-                  this.rotateAngle=1
-                })
+                this.stopAnim()
+                this.startAnim()
               }else {this.isShowDeleteButton = true}
             })
             .width(40)
@@ -403,6 +421,7 @@ struct Home {
                 })
                 // 显示时触发回调
                 .onAttach(() => {
+
                 })
                 //编辑模式下跳动动画
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })

@@ -102,6 +102,8 @@ export class UIConfig{
   //动画速度
   animationSpeed:number = ANIMATION_DURATION_300
   isAnimation:boolean=true
+  // 代理启动按钮状态
+ proxyEnabled: boolean = false
 
   constructor() {
   }

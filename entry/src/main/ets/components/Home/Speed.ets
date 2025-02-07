@@ -2,7 +2,7 @@ import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem
 import { McLineChart, Options } from '@mcui/mccharts'
 import { CardTitle } from './CardTitleBuilder';
 import { MarginGenerate } from '../../common/Constants';
-import { AppFlowingState, getLast } from '../../entryability/AppState';
+import { AppFlowingState, getLast, UIConfig } from '../../entryability/AppState';
 import { JSON } from '@kit.ArkTS';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { convertDataArray } from '../../utils/DataUnitConvertUtils';
@@ -21,6 +21,7 @@ struct Speed {
   @StorageProp("appFlowingState") appFlowingState: AppFlowingState = new AppFlowingState()
   @Consume
   @Watch('proxyEnabledChanged') proxyEnabled: boolean
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @State chartdata: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   //初始化图表数据
   @State defOption: Options = new Options({
@@ -172,13 +173,11 @@ struct Speed {
   }
 
   aboutToAppear() {
-
   }
 
   aboutToDisappear() {
     // 清除定时器
     clearInterval(this.timerId);
-
   }
 
   build() {
