@@ -5,6 +5,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import ClashViewModel from './ClashViewModel';
 import { KeyboardAvoidMode } from '@kit.ArkUI';
 import { AppConfig, AppFlowingState, AppState, ClashCore } from './AppState';
+import { EventHub, EventKey } from '../common/EventHub';
 
 export default class EntryAbility extends UIAbility {
  private currentLanguage: string | undefined = undefined
@@ -22,7 +23,7 @@ export default class EntryAbility extends UIAbility {
   onDestroy(): void {
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onDestroy');
   }
-
+  trafficJob = 0
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     // Main window is created, set main page for this ability
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onWindowStageCreate');
@@ -40,16 +41,22 @@ export default class EntryAbility extends UIAbility {
       // 切换核心
       promptAction.showToast({message: "核心启动中..."})
       await ClashViewModel.ChangeCore(appConfig)
-      appFlowingState.removeIp = await ClashViewModel.checkIpInfo()
       await sleep(300)
       ClashViewModel.initProfile()
-      setInterval(async ()=>{
+      EventHub.on(EventKey.StartedClash, ()=>{
+        const job = async ()=>{
           let now = await ClashViewModel.getTraffic()
           let total = await ClashViewModel.getTotalTraffic()
           appFlowingState.traffics.enqueue(now)
           appFlowingState.totalTraffic = total
-      },1000)
-
+        }
+        job()
+        this.trafficJob = setInterval(job, 1000)
+      })
+      EventHub.on(EventKey.StopedClash, ()=>{
+        clearInterval(this.trafficJob)
+      })
+      appFlowingState.removeIp = await ClashViewModel.checkIpInfo()
       hilog.info(0x0000, 'EntryAbility', 'Succeeded in loading the content.');
     });
 

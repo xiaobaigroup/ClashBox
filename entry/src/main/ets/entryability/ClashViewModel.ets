@@ -200,11 +200,13 @@ export class ClashViewModel {
   }
 
   async StartVpn(){
-    this.socketProxy.startClash()
+    await this.socketProxy.startClash()
+    EventHub.sendEvent(EventKey.StartedClash)
   }
 
   async StopVpn(){
     this.socketProxy.stopClash()
+    EventHub.sendEvent(EventKey.StopedClash)
   }
 
   initProfile(){
