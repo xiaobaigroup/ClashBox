@@ -735,7 +735,7 @@ struct Home {
           }
         })
 
-
+      if (!this.isShowHomeEdit){
         // 代理启动按钮层
         Column() {
           Row() {
@@ -799,9 +799,9 @@ struct Home {
           this.proxyStartButtonWidth = this.proxyEnabled ? $r('app.integer.vp_proxy_started_button_width') :
           $r('app.integer.vp_proxy_not_start_button_width')
         })
-        .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
-        .clickEffect({ level: ClickEffectLevel.LIGHT })
-
+        .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
+        .clickEffect(this.uiConfig.isAnimation?{ level: ClickEffectLevel.MIDDLE,scale:0.8}:null)
+      }
       }
       .backgroundColor($r('app.color.background'))
       //    .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })

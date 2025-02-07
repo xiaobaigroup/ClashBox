@@ -410,7 +410,7 @@ struct ProxyPage {
               Tabs({ barPosition: BarPosition.Start, controller: this.tabsController }) {
                 ForEach(this.proxyGroups, (g:ProxyGroup, i: number)=>{
                   TabContent() {
-                    if ( this.currentIndex === i) {//为实现listltem转场动画的的if
+                //    if ( this.currentIndex === i) {//为实现listltem转场动画的的if
                       ProxyGroupItem({
                         items: g.proxies as ProxyItem[],
                         ProxyGroupItemSelected: this.appConfig.proxyCardSize,
@@ -424,7 +424,7 @@ struct ProxyPage {
                         .padding({ right: this.breakPointStateTabContentTitleMargin.value, })
                         .width('100%')
                         .height('100%')
-                    }
+               //     }
                   }
                   .tabBar(this.TabBuilder(g.name, i))
                   //用onWillShow能减少滑动tab时产生的延迟
