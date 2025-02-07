@@ -48,6 +48,7 @@ struct SwitchMode {
         ], (n: [Resource, number], i: number) => {
           Button(n["t"], { buttonStyle: ButtonStyleMode.TEXTUAL,stateEffect:false })
             .ButtonStyle()
+            .clickEffect(this.uiConfig.isAnimation?{ level: ClickEffectLevel.MIDDLE,scale:0.8}:null)
             .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
             .fontColor(this.clashConfig.mode==n["v"] ? this.font_primary : $r('sys.color.font_secondary'))
             .backgroundColor(this.clashConfig.mode==n["v"] ? $r('app.color.container_background') : '#00ffffff')
@@ -83,7 +84,7 @@ function ButtonStyle() {
   .height(vp2px(32.67))
   .borderRadius(18)
   .fontWeight(FontWeight.Bold)
-  .clickEffect({ level: ClickEffectLevel.MIDDLE,scale:0.8})
+
 }
 
 

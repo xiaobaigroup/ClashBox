@@ -88,7 +88,7 @@ struct ProxyArrangement {
                   this.selectItem = i;
                 })
               })
-              .clickEffect({ level: ClickEffectLevel.MIDDLE })
+              .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
               .width('100%')
               .height(LIST_ITEM_HEIGHT)
               .justifyContent(FlexAlign.SpaceBetween)

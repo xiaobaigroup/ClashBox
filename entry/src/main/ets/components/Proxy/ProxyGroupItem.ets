@@ -252,7 +252,7 @@ struct ProxyGroupItem {
             .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
           content: this.proxyListLongPressCtxMenuForUnFavorite.content
         })
-          .clickEffect({level: ClickEffectLevel.MIDDLE})
+          .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
           .contentFontColor($r('sys.color.font_primary'))
           .onClick( () => {
             this.proxyListLongPressCtxMenuForUnFavorite.callback()
@@ -263,7 +263,7 @@ struct ProxyGroupItem {
               .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
             content: this.proxyListLongPressCtxMenuForFavorite.content
           })
-            .clickEffect({level: ClickEffectLevel.MIDDLE})
+            .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
             .contentFontColor($r('sys.color.font_primary'))
             .onClick(() => {
               this.proxyListLongPressCtxMenuForFavorite.callback()
@@ -316,6 +316,7 @@ struct ProxyGroupItem {
           this.selectProxy(item)
         })
         .ListItemStyle()
+        .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
         .height(LIST_ITEM_HEIGHT + (this.ProxyGroupItemSelected === ProxyCardSize.Small ? 32 : 0))
         .bindContextMenu(this.MyMenu(item?.isShowFavoriteProxy ?? false, item.name), ResponseType.LongPress,
           {
@@ -401,7 +402,6 @@ function ListStyle() {
 //ListItem公用样式
 @Extend(ListItem)
 function ListItemStyle() {
-  .clickEffect({ level: ClickEffectLevel.MIDDLE })
   .borderRadius(20)
   .backgroundColor($r('app.color.container_background'))
   .width('100%')

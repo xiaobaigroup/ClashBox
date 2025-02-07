@@ -75,6 +75,7 @@ struct Shortcuts {
             Text(`${m["t"]}` != '' ? `${m["t"]}` : $r('app.string.long_press_modify'))
               .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
               .ShortcutsTextStyle()
+              .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
               .onClick(() => {
                 //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
                 if (this.isShowHomeEdit === false) {
@@ -285,6 +286,7 @@ struct Shortcuts {
               Text('URL').TextStyle()
               Button($r('app.string.write_url'))
                 .ButtonStyle()
+                .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
                 .fontColor(this.icon_emphasize)
                 .onClick(() => {
                   if (this.WebDialogController1 != null) {
@@ -336,6 +338,7 @@ struct Shortcuts {
               Text('URL').TextStyle()
               Button($r('app.string.write_url'))
                 .ButtonStyle()
+                .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
                 .fontColor(this.icon_emphasize)
                 .onClick(() => {
                   if (this.WebDialogController2 != null) {
@@ -387,6 +390,7 @@ struct Shortcuts {
               Text('URL').TextStyle()
               Button($r('app.string.write_url'))
                 .ButtonStyle()
+                .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
                 .fontColor(this.icon_emphasize)
                 .onClick(() => {
                   if (this.WebDialogController3 != null) {
@@ -646,7 +650,6 @@ function ButtonStyle() {
   .height(26)
   .fontSize(FONT_SIZE_14)
   .backgroundColor($r('app.color.home_card_background'))
-  .clickEffect({ level: ClickEffectLevel.MIDDLE })
 }
 
 
@@ -670,7 +673,6 @@ function ShortcutsTextStyle() {
   .maxLines(1)
   .textOverflow({ overflow: TextOverflow.Ellipsis })
   .width('100%')
-  .clickEffect({ level: ClickEffectLevel.MIDDLE })
 }
 
 /* 网址输入弹窗参数 */

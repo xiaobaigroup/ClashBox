@@ -135,15 +135,8 @@ struct ProxyPage {
       .width(this.currentIndex === targetIndex ? 96 : 87)
       .justifyContent(FlexAlign.Center)
       .backgroundColor(this.currentIndex === targetIndex ? this.icon_emphasize : this.container_background)
-      .animation(
-        {
-          duration: this.uiConfig.animationSpeed,
-          tempo:0.3,
-          curve: Curve.Ease,
-          iterations: 1,
-          playMode: PlayMode.Normal
-        })
     }
+    .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
     .height(55)
     .margin({ right: 8, bottom: 10 })
     .onClick(() => {
@@ -184,6 +177,7 @@ struct ProxyPage {
               })
           }
           .EditRow()
+          .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
       //    .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
      //       .combine(TransitionEffect.SLIDE):null)
           // 点击后改变ProxyArrangementSelected状态为 标签
@@ -230,6 +224,7 @@ struct ProxyPage {
               })
           }
           .EditRow()
+          .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
           .onClick(() => {
             EventHub.sendEvent(EventKey.ProxySort, n["v"])
             animateTo({ duration: this.uiConfig.animationSpeed }, () => {
@@ -275,6 +270,7 @@ struct ProxyPage {
               })
           }
           .EditRow()
+          .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
           // 点击后改变ProxyGroupItemSelected状态为 多列
           .onClick(() => {
             animateTo({ duration: this.uiConfig.animationSpeed }, () => {
@@ -331,7 +327,7 @@ struct ProxyPage {
           .width(40)
           .height(40)
           .backgroundColor($r('app.color.settings_container_background'))
-          .clickEffect({ level: ClickEffectLevel.MIDDLE })
+          .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
           .onClick(() => {
             this.isProviderEdit = true
             this.isEnableIndexForegroundBlur=true
@@ -348,7 +344,7 @@ struct ProxyPage {
           .width(40)
           .height(40)
           .backgroundColor($r('app.color.settings_container_background'))
-          .clickEffect({ level: ClickEffectLevel.MIDDLE })
+          .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
           .onClick(() => {
             this.isShowEdit = true
             this.isEnableIndexForegroundBlur=true
@@ -461,7 +457,6 @@ struct ProxyPage {
           // 列表排列
           else if (this.appConfig.proxyGroupType === ProxyGroupType.List) {
             ProxyArrangement()// transition保证组件离场不被立即析构，可设置其他转场效果
-           //   .transition(this.isAnimation ? TransitionEffect.OPACITY:null)
           }
           //列表排列end
 
@@ -493,7 +488,7 @@ struct ProxyPage {
           .height(this.proxyStartButtonHeight)
           .clip(true)
           .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
-          .clickEffect({ level: ClickEffectLevel.LIGHT })
+          .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
           .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
             .animation({ duration: this.uiConfig.animationSpeed, delay: 50 })
             .combine(TransitionEffect.SLIDE_SWITCH):null)
@@ -559,7 +554,6 @@ function EditColumn() {
 function EditRow() {
   .width('100%')
   .justifyContent(FlexAlign.SpaceBetween) // 非通用公共属性
-  .clickEffect({ level: ClickEffectLevel.MIDDLE }) // 非通用公共属性
 }
 
 // 半模态编辑页Text共同属性（Text独有属性采用Extend继承的方式抽取）

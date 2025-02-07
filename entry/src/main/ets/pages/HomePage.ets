@@ -449,6 +449,7 @@ struct Home {
                   }
                 }
                 .GridColStyle()
+                .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:20 }):null)
                 //编辑模式下跳动动画
@@ -480,6 +481,7 @@ struct Home {
                 }
                 //   .margin({ left: this.containerMargin.value })
                 .GridColStyle()
+                .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:30 }):null)
                 //编辑模式下跳动动画
@@ -510,6 +512,7 @@ struct Home {
                   }
                 }
                 .GridColStyle()
+                .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:40 }):null)
                 //编辑模式下跳动动画
@@ -540,6 +543,7 @@ struct Home {
                   }
                 }
                 .GridColStyle()
+                .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:60 }):null)
                 //编辑模式下跳动动画
@@ -570,6 +574,7 @@ struct Home {
                   }
                 }
                 .GridColStyle()
+                .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:70 }):null)
                 //编辑模式下跳动动画
@@ -600,6 +605,7 @@ struct Home {
                   }
                 }
                 .GridColStyle()
+                .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:80 }):null)
                 //编辑模式下跳动动画
@@ -663,6 +669,7 @@ struct Home {
                   }
                 }
                 .GridColStyle()
+                .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:50}):null)
                 //编辑模式下跳动动画
@@ -693,6 +700,7 @@ struct Home {
                   }
                 }
                 .GridColStyle()
+                .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:90}):null)
                 //编辑模式下跳动动画
@@ -884,7 +892,6 @@ function GridColStyle() {
   .aspectRatio(1)
   .borderRadius(20)
   .backgroundColor($r('app.color.container_background'))
-  .clickEffect({ level: ClickEffectLevel.MIDDLE })
 }
 
 //网络测速大卡片里的删除按钮

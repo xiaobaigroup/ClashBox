@@ -167,7 +167,7 @@ export struct ImportConfigFromFile{
           .maxLength(TEXT_AREA_MAX_LENGTH)
           .enterKeyType(EnterKeyType.Next)
           .defaultFocus(true)
-          .clickEffect({ level: ClickEffectLevel.MIDDLE })
+          .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
 
         // 导入文件
         Row() {
@@ -183,7 +183,7 @@ export struct ImportConfigFromFile{
         }.width('100%')
         .height(53)
         .borderRadius(20)
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
+        .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
         .backgroundColor($r('app.color.container_background'))
         .onClick(() => {
           let filePicker = new picker.DocumentViewPicker(getContext(this))

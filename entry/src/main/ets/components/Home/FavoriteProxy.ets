@@ -3,7 +3,7 @@ import { mediaquery } from '@kit.ArkUI'
 import { MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
 import { ProxyItem } from '../../common/ProxyData'
-import { AppConfig, AppState, isEnd } from '../../entryability/AppState'
+import { AppConfig, AppState, isEnd, UIConfig } from '../../entryability/AppState'
 import { ProxyGroup } from 'proxy_core'
 
 
@@ -42,7 +42,7 @@ struct FavoriteProxy {
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageProp("proxyGroups") proxyGroups: ProxyGroup[] = []
-
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   OnProxyChange: ((item: ProxyItem) => void) = () => {
 
   }
@@ -89,7 +89,7 @@ struct FavoriteProxy {
                 this.appConfig.currentProxyItem = AppState.fetchProxyItem(this.proxyGroups, p[0], p[1])
               }
             })
-            .clickEffect({ level: ClickEffectLevel.MIDDLE })
+            .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
             if (!isEnd(this.favoriteProxys.size, i)){
               Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
             }

@@ -237,7 +237,7 @@ struct ConfigurationPage {
               .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
             content: this.configListLongPressCtxMenuForUnFavorite.content
           })
-            .clickEffect({level: ClickEffectLevel.MIDDLE})
+            .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
             .contentFontColor($r('sys.color.font_primary'))
             .onClick( () => {
               this.configListLongPressCtxMenuForUnFavorite.callback()
@@ -248,7 +248,7 @@ struct ConfigurationPage {
               .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
             content: this.configListLongPressCtxMenuForFavorite.content
           })
-            .clickEffect({level: ClickEffectLevel.MIDDLE})
+            .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
             .contentFontColor($r('sys.color.font_primary'))
             .onClick( () => {
               this.configListLongPressCtxMenuForFavorite.callback()
@@ -259,7 +259,7 @@ struct ConfigurationPage {
         // 遍历其他菜单 START
         ForEach(this.configListLongPressCtxMenus, (item: LongPressContextMenuItem, index: number) => {
           MenuItem({ symbolStartIcon: item?.symbolStartIcon, content: item?.content })
-            .clickEffect({level: ClickEffectLevel.MIDDLE})
+            .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
             .contentFontColor($r('sys.color.font_primary'))
             .onClick( () => {
               // hilog.info(0xC002, this.componentName, `#configListLongPressCtxMenuBuilder#onClick():`)
@@ -276,7 +276,7 @@ struct ConfigurationPage {
             .fontColor(['#E6E54E36']),
           content: $r('app.string.delete')
         })
-          .clickEffect({level: ClickEffectLevel.MIDDLE})
+          .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
           .contentFontColor('#E6E54E36')
           .onClick( () => {
             this.configCustomDialogController?.open()
@@ -374,7 +374,7 @@ struct ConfigurationPage {
           .width(40)
           .height(40)
           .backgroundColor($r('app.color.settings_container_background'))
-          .clickEffect({ level: ClickEffectLevel.LIGHT })
+          .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
           .onClick(() => {
             // TODO 国际化适配 更新配置中... 更新配置成功、
             hilog.info(0xC001, this.componentName, `#button#onClick()#更新配置`)
@@ -440,7 +440,7 @@ struct ConfigurationPage {
               .backgroundColor($r('app.color.container_background'))
               .width('100%')
               .height(LIST_ITEM_HEIGHT)
-              .clickEffect({ level: ClickEffectLevel.MIDDLE })
+              .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
               .borderRadius(BORDER_RADIUS_20)
               .hoverEffect(HoverEffect.Scale)
               .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:index*10+10 }):null)
@@ -517,7 +517,7 @@ struct ConfigurationPage {
         .backgroundColor(this.icon_emphasize)
         .clip(true)
         .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
-        .clickEffect({ level: ClickEffectLevel.LIGHT })
+        .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
         .hoverEffect(HoverEffect.Scale)
         .bindSheet( this.isShowConfigAddBindSheet, this.ConfigAddBindSheetBuilder, {
           // title: { title: $r('app.string.AddConfig') },

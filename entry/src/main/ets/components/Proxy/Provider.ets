@@ -220,7 +220,8 @@ export struct ProviderPage {
                                 Text($r('app.string.upload')).fontSize(12).fontColor(this.icon_emphasize)
                               }
                             }.ButtonStyle()
-                            .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
+                            .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+                            .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
                             .width(76)
                             .height(28)
                             .onClick(() => {
@@ -252,7 +253,8 @@ export struct ProviderPage {
                                 .justifyContent(FlexAlign.Center)
                               }
                             }.ButtonStyle()
-                            .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
+                            .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+                            .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
                             .onClick(() => {
                               // 资源更新处理
                               ClashViewModel.updateProvider(item).then((result) => {
@@ -324,7 +326,8 @@ export struct ProviderPage {
                                 Text($r('app.string.upload')).fontSize(12).fontColor(this.icon_emphasize)
                               }
                             }.ButtonStyle()
-                            .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
+                            .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+                            .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
                             .width(76)
                             .height(28)
                             .onClick(() => {
@@ -356,7 +359,8 @@ export struct ProviderPage {
                                   .justifyContent(FlexAlign.Center)
                               }
                             }.ButtonStyle()
-                            .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
+                            .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+                            .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
                             .onClick(() => {
                               // 资源更新处理
                               ClashViewModel.updateProvider(item).then((result) => {
@@ -422,7 +426,7 @@ export struct ProviderPage {
         .width(40)
         .height(40)
         .backgroundColor($r('app.color.settings_container_background'))
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
+        .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
         .onClick(() => {
           animateTo({
             duration: this.uiConfig.animationSpeed,
@@ -451,7 +455,7 @@ export struct ProviderPage {
         .width(40)
         .height(40)
         .backgroundColor($r('app.color.settings_container_background'))
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
+        .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
         .onClick(() => {
           this.isProviderEdit = false
           this.isEnableIndexForegroundBlur=false
@@ -503,7 +507,6 @@ function providerList() {
 @Extend(Button)
 function ButtonStyle() {
   .borderRadius(14)
-  .clickEffect({ level: ClickEffectLevel.LIGHT })
   .backgroundColor($r('app.color.button_container_background'))
 }
 

@@ -2,7 +2,7 @@ import { BreakpointState } from '../../common/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI'
 import { MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
-import { AppConfig, isEnd } from '../../entryability/AppState'
+import { AppConfig, isEnd, UIConfig } from '../../entryability/AppState'
 
 
 @Component
@@ -33,6 +33,7 @@ struct FavoriteConfiguration {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   build() {
     Column() {
@@ -66,7 +67,7 @@ struct FavoriteConfiguration {
                 this.appConfig.currentProfileId = f[0]
               }
             })
-            .clickEffect({ level: ClickEffectLevel.MIDDLE })
+            .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
             if(!isEnd(this.favoriteProfiles.size, i))
               Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
           })
