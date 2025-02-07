@@ -14,9 +14,10 @@ import { Address, CommonVpnService, isIpv4, isIpv6, VpnConfig } from './CommonVp
 import { JSON, util } from '@kit.ArkTS';
 import { RpcRequest } from './RpcRequest';
 import { ClashRpcType } from './IClashManager';
-import { LogInfo, ProxyGroup, ProxyMode, ProxyType, Traffic } from '../models/Common';
+import { LogInfo, Provider, ProxyGroup, ProxyMode, ProxyType, Traffic } from '../models/Common';
 import { getHome } from '../appPath';
 import { UpdateConfigParams } from '../models/ClashConfig';
+import { pointer } from '@kit.InputKit';
 
 export interface AccessControl{
   mode:              string
@@ -50,7 +51,7 @@ export class FlClashVpnService extends CommonVpnService{
     let request = JSON.parse(decoder.decodeToString(new Uint8Array(message.message))) as RpcRequest
     let code = request.method
     let params = request.params
-    console.debug("socket stub request", JSON.stringify(request))
+    console.debug(`socket stub ${code} request: `, params)
     if(code == ClashRpcType.setLogObserver){
       // 订阅日志，需要持续输出
       startLog((message: string, value: string)=>{
@@ -70,10 +71,10 @@ export class FlClashVpnService extends CommonVpnService{
     } else {
       try {
         let result = await this.onRemoteMessage(code, params)
-        console.debug("socket stub result ", result)
+        console.debug(`socket stub ${code} result: `, result)
         this.sendClient(client, JSON.stringify({ result: result}))
       } catch (e) {
-        console.error("socket stub error", e.message, e.stack)
+        console.error(`socket stub ${code} result: `, e.message, e.stack)
         this.sendClient(client, JSON.stringify({ result: e.message}))
       }
     }
@@ -83,10 +84,7 @@ export class FlClashVpnService extends CommonVpnService{
     // 根据code处理客户端的请求
     return new Promise(async (resolve, reject) => {
       switch (code){
-        case ClashRpcType.queryTunnelState: {
-          //resolve(nativeQueryTunnelState())
-          break;
-        }
+
         case ClashRpcType.queryTrafficTotal:{
           const data = JSON.parse(getTotalTraffic())
           resolve(JSON.stringify({ upRaw: data["up"], downRaw: data["down"]} as Traffic))
@@ -156,13 +154,11 @@ export class FlClashVpnService extends CommonVpnService{
           break;
         }
         case ClashRpcType.queryProviders:{
-          resolve(getExternalProviders())
+          const provider = getExternalProviders()
+          resolve(provider)
           break;
         }
         case ClashRpcType.updateProvider:{
-          // nativeUpdateProvider(data[0] as string, data[1] as string,()=>{
-          //   resolve(true)
-          // })
           updateExternalProvider(data[0] as string).then(()=>{
             resolve(true)
           })

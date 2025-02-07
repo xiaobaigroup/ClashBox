@@ -4,7 +4,9 @@
  * 时间戳转化计算间隔工具
  * @param timeStamp 传入的时间戳
  */
-export function convertTime(timeStamp: number): string {
+export function convertTime(timeStamp: number| string): string {
+ if(typeof timeStamp == "string")
+    timeStamp =  new Date(timeStamp).getTime()
  if(timeStamp <= 0) {
    // 如果时间戳小于等于0
    return `${getContext().resourceManager.getStringSync($r('app.string.now'))}`

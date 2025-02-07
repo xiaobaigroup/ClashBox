@@ -41,7 +41,7 @@ export default class EntryAbility extends UIAbility {
       // 切换核心
       promptAction.showToast({message: "核心启动中..."})
       await ClashViewModel.ChangeCore(appConfig)
-      await sleep(300)
+      await sleep(500)
       ClashViewModel.initProfile()
       EventHub.on(EventKey.StartedClash, ()=>{
         const job = async ()=>{

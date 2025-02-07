@@ -211,6 +211,7 @@ func init() {
 	entry.Export("closeConnections", js.AsCallback(closeConnections))
 	entry.Export("closeConnection", js.AsCallback(closeConnection))
 	entry.Export("updateExternalProvider", js.AsCallback(updateExternalProvider))
+	entry.Export("getExternalProviders", js.AsCallback(getExternalProviders))
 	entry.Export("sideLoadExternalProvider", js.AsCallback(updateExternalProvider))
 	entry.Export("getVpnOptions", js.AsCallback(getVpnOptions))
 	entry.Export("getCurrentProfileName", js.AsCallback(getCurrentProfileName))

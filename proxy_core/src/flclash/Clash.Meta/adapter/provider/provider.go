@@ -312,6 +312,7 @@ func proxiesParseAndFilter(filter string, excludeFilter string, excludeTypeArray
 		schema := &ProxySchema{}
 
 		if err := yaml.Unmarshal(buf, schema); err != nil {
+			// panic: interface conversion: interface {} is nil, not string
 			proxies, err1 := convert.ConvertsV2Ray(buf)
 			if err1 != nil {
 				return nil, fmt.Errorf("%w, %w", err, err1)
