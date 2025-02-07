@@ -6,6 +6,7 @@ import { AppConfig, ClashCore } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { promptAction } from "@kit.ArkUI"
 import { ExperimentalFunction } from "../Common"
+import { removeItemsByIndex } from "../../utils/RemoveItemsUtils"
 
 interface KernelListItem {
   icons: Resource
@@ -26,10 +27,10 @@ struct Kernel {
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
   // 实验功能展示变量
   @Consume isShowExperimentalFunction: boolean
-  @StorageLink('appConfig') appConfig:AppConfig = new AppConfig()
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @State private kernel: KernelListItem[] = [
+    {icons: $rawfile('FlClash.svg'), title: 'FlClash', subtitle: $r('app.string.new_kernel'), isExperimental: false, ClashCore: ClashCore.FlClash},
     {icons: $rawfile('ClashMeta.svg'), title: $r('app.string.default_kernel'), subtitle: $r('app.string.old_kernel'), isExperimental: false, ClashCore: ClashCore.ClashMeta},
-    {icons: $rawfile('FlClash.svg'), title: 'FlClash', subtitle: $r('app.string.new_kernel'), isExperimental: true, ClashCore: ClashCore.FlClash},
     {icons: $rawfile('ClashRS.svg'), title: 'ClashRS', subtitle: $r('app.string.new_kernel'), isExperimental: true, ClashCore: ClashCore.ClashRs}
   ]
 
@@ -58,9 +59,12 @@ struct Kernel {
 
   aboutToAppear(): void {
     if(!this.isShowExperimentalFunction) {
-      this.kernel = [{icons: $rawfile('ClashMeta.svg'), title: $r('app.string.default_kernel'), subtitle: $r('app.string.old_kernel'), isExperimental: false, ClashCore: ClashCore.ClashMeta}]
+      // 话说好像我只用删除一个用splice好像也行
+      this.kernel = removeItemsByIndex(this.kernel, [2])
     }
   }
+
+
 
   build() {
     NavDestination() {
@@ -104,7 +108,7 @@ struct Kernel {
               this.handleClick(index)
               promptAction.showToast({message: $r('app.string.switch_clashcore_tips'), duration: 2000 })
             })
-            if (this.isShowExperimentalFunction && (index === 0 || index === 1)) {
+            if ((this.isShowExperimentalFunction && (index === 0 || index === 1) || (index === 0 && this.isShowExperimentalFunction === false) )) {
               // 分割线
               Row().height(0.5).backgroundColor('#0D000000').width('93%').margin({top: 12, bottom: 12})
             }

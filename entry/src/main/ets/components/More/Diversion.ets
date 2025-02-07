@@ -353,15 +353,15 @@ struct Policy {
             .selectedColor(this.icon_emphasize)
             .margin({right: 12})
             .hitTestBehavior(HitTestMode.None)
-            .onChange((isOn: boolean) => {
-              // 启用插入资源 显式动画
-              this.getUIContext()?.animateTo({
-                duration: this.uiConfig.animationSpeed ,
-                curve: Curve.Ease
-              }, () => {
-                this.EnabledInsertResource = isOn
-              })
-            })
+            // .onChange((isOn: boolean) => {
+            //   // 启用插入资源 显式动画
+            //   this.getUIContext()?.animateTo({
+            //     duration: this.uiConfig.animationSpeed ,
+            //     curve: Curve.Ease
+            //   }, () => {
+            //     this.EnabledInsertResource = isOn
+            //   })
+            // })
         }
       }.onClick(() => {
         this.getUIContext()?.animateTo({
@@ -381,15 +381,15 @@ struct Policy {
               .selectedColor(this.icon_emphasize)
               .margin({right: 12})
               .hitTestBehavior(HitTestMode.None)
-              .onChange((isOn: boolean) => {
-                // 启用自动更新 显式动画
-                this.getUIContext()?.animateTo({
-                  duration: this.uiConfig.animationSpeed ,
-                  curve: Curve.Ease
-                }, () => {
-                  this.EnabledAutoUpdate = isOn
-                })
-              })
+              // .onChange((isOn: boolean) => {
+              //   // 启用自动更新 显式动画
+              //   this.getUIContext()?.animateTo({
+              //     duration: this.uiConfig.animationSpeed ,
+              //     curve: Curve.Ease
+              //   }, () => {
+              //     this.EnabledAutoUpdate = isOn
+              //   })
+              // })
           }
         }.onClick(() => {
           this.getUIContext()?.animateTo({

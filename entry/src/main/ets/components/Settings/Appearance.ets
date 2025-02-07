@@ -50,7 +50,6 @@ struct Appearance {
   // 所有子组件在容器内的对齐方式
   @Consume ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
 
   // 切换菜单
   @Builder
@@ -411,16 +410,8 @@ struct Appearance {
                 // 背景模糊开关
                 Toggle({ type: ToggleType.Switch, isOn: this.uiConfig.isBlurr })
                   .selectedColor(this.icon_emphasize)
+                  .hitTestBehavior(HitTestMode.None)
                   .margin({right: 12})
-                  .onChange((isOn: boolean) => {
-                    // 打开背景模糊 显式动画
-                    this.getUIContext()?.animateTo({
-                      duration: this.uiConfig.animationSpeed,
-                      curve: Curve.Ease
-                    }, () => {
-                      this.uiConfig.isBlurr = isOn
-                    })
-                  })
               }
             }.onClick(()=> {
               // 打开背景模糊 显式动画
@@ -460,18 +451,10 @@ struct Appearance {
                 subtitle: $r('app.string.homepage_greetings_subtitle'),
               }) {
                 // 主页问候开关
-                Toggle({ type: ToggleType.Switch, isOn: $$this.appConfig.isGreeting })
+                Toggle({ type: ToggleType.Switch, isOn: $$this.uiConfig.isGreeting })
                   .selectedColor(this.icon_emphasize)
+                  .hitTestBehavior(HitTestMode.None)
                   .margin({right: 12})
-                  .onChange((isOn: boolean) => {
-                    // 打开主页问候 显式动画
-                    this.getUIContext()?.animateTo({
-                      duration: ANIMATION_DURATION_300,
-                      curve: Curve.Ease
-                    }, () => {
-                      this.uiConfig.isGreeting = isOn
-                    })
-                  })
               }
             }.onClick(()=> {
               // 打开主页问候 显式动画

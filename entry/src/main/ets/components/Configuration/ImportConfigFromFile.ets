@@ -50,7 +50,7 @@ export struct ImportConfigFromFile{
   @Consume('configAddPageInfos')
   // 页面栈
   private configAddPageInfos: NavPathStack
-  @State fileurl: string = ''
+  @State @Watch('configDataChanged') fileurl: string = ''
 
   /* 断点相关 */
   // NV容器的padding
@@ -190,9 +190,13 @@ export struct ImportConfigFromFile{
           let options = new picker.DocumentSelectOptions()
           filePicker.select(options).then((documentSelectResult)=>{
             this.fileurl = documentSelectResult[0];
+            hilog.debug(0xFF00, this.componentName, 'FileUrl: %{public}s', this.fileurl)
           })
         })
-
+        // 提示
+        Text($r('app.string.import_config_file_tips'))
+          .fontWeight(FontWeight.Normal)
+          .fontSize(15)
         // Text(this.componentName).fontSize(50)
         // Text(`breakPointStateNavigationListPadding.value is [${this.breakPointStateNavigationListPadding.value?.toString()}]`)
 
@@ -232,8 +236,6 @@ export struct ImportConfigFromFile{
 
       ClashViewModel.addOrUpdateProfileByFile(this.fileurl, null)
 
-    } else {
-
     }
   }
 
@@ -263,9 +265,7 @@ export struct ImportConfigFromFile{
    * 检查配置名 Input && 配置 文件 是否都有值
    */
   checkTheInputHaveValue() {
-    this.allInputHaveValue = (this.configData.configName.length > 0)
-    // 文件检查不会写
-
+    this.allInputHaveValue = (this.configData.configName.length > 0) && (this.fileurl !== '')
   }
 
 }

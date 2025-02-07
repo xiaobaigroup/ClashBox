@@ -58,7 +58,7 @@ struct Home {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   windowClass = AppStorage.get<window.Window>('windowClass') as window.Window;
-  //编辑按钮点击后显示编辑状态判定
+  // 编辑按钮点击后显示编辑状态判定
   @Provide isShowHomeEdit: boolean = false
   /**
    * 是否保存布局弹窗
@@ -68,13 +68,13 @@ struct Home {
       cancel: () => {
         this.onCancel()
         animateTo({ duration: 0,iterations:0 }, () => {
-          this.rotateAngle=0
+          this.rotateAngle = 0
         })
       },
       confirm: () => {
         this.onAccept()
         animateTo({ duration: 0,iterations:0 }, () => {
-          this.rotateAngle=0
+          this.rotateAngle = 0
         })
       }
     }),
@@ -89,7 +89,7 @@ struct Home {
   编辑模式下右上角删除按钮
    */
   @Consume deleteButtonSize: BreakpointState<number>
-  //删除按钮是否出现判定
+  // 删除按钮是否出现判定
   @State isShowDeleteButton: boolean = false
   //卡片编辑半模拟态判定
   @State @Watch('ShowHomeEditChange') isShowCardEdit: boolean = false
@@ -132,7 +132,6 @@ struct Home {
   @State theLastHomeCard: boolean[] = showHomeCard
 
 
-
   aboutToAppear(): void {
     this.greetings = getGreeting()
     // 初始化主页卡片布局
@@ -150,18 +149,18 @@ struct Home {
   // 在自定义组件即将析构销毁时将dialogController置空
   onCancel() {
     this.restoreLayout()
-    this.isEnableIndexForegroundBlur=false
+    this.isEnableIndexForegroundBlur = false
     hilog.info(0xA000, this.componentName, '#onCancel: Callback when the first button is clicked')
   }
 
   onAccept() {
     this.saveHomeLayout()
-    this.isEnableIndexForegroundBlur=false
+    this.isEnableIndexForegroundBlur = false
     hilog.info(0xA000, this.componentName, '#onAccept: Callback when the second button is clicked')
   }
 
   existApp() {
-    this.isEnableIndexForegroundBlur=false
+    this.isEnableIndexForegroundBlur = false
     hilog.info(0xA000, this.componentName, '#existApp: Click the callback in the blank area')
   }
 
@@ -178,9 +177,9 @@ struct Home {
     animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
       this.isShowDeleteButton = false
     })
-    //关闭卡片旋转动画
+    // 关闭卡片旋转动画
     animateTo({ duration: 0,iterations:0 }, () => {
-      this.rotateAngle=0
+      this.rotateAngle = 0
     })
   }
 
@@ -197,9 +196,9 @@ struct Home {
       animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
         this.isShowDeleteButton = false
       })
-      //关闭卡片旋转动画
+      // 关闭卡片旋转动画
       animateTo({ duration: 0,iterations:0 }, () => {
-        this.rotateAngle=0
+        this.rotateAngle = 0
       })
     } else { this.isShowDeleteButton = false }
   }
@@ -260,7 +259,7 @@ struct Home {
                 .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
                 .fontColor([this.icon_primary])
             }
-            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 50 })
+            .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 50 })
               .combine(TransitionEffect.SLIDE):null)
             .onClick(() => {
               this.isShowHomeEdit = true
@@ -401,11 +400,9 @@ struct Home {
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 // 消失触发回调
                 .onDetach(() => {
-
                 })
-                //显示时触发回调
+                // 显示时触发回调
                 .onAttach(() => {
-
                 })
                 //编辑模式下跳动动画
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
@@ -439,7 +436,6 @@ struct Home {
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
                 .onDetach(() => {
-
                 })
               }
 
@@ -471,7 +467,6 @@ struct Home {
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
                 .onDetach(() => {
-
                 })
               }
 
@@ -502,7 +497,6 @@ struct Home {
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
                 .onDetach(() => {
-
                 })
               }
 
@@ -533,7 +527,6 @@ struct Home {
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
                 .onDetach(() => {
-
                 })
               }
 
@@ -564,7 +557,6 @@ struct Home {
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
                 .onDetach(() => {
-
                 })
               }
 
@@ -595,7 +587,6 @@ struct Home {
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
                 .onDetach(() => {
-
                 })
               }
 
@@ -629,7 +620,6 @@ struct Home {
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
                 .onDetach(() => {
-
                 })
               }
 
@@ -660,7 +650,6 @@ struct Home {
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
                 .onDetach(() => {
-
                 })
               }
 
@@ -691,7 +680,6 @@ struct Home {
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
                 .onDetach(() => {
-
                 })
               }
             } //GridRow的尾括号

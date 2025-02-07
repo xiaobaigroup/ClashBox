@@ -1178,7 +1178,7 @@
     },
     {
       "name": "default_kernel",
-      "value": "ClashMeta(默认)"
+      "value": "ClashMeta"
     },
     {
       "name": "filter",
@@ -1559,6 +1559,10 @@
     {
       "name": "input_cellular_data",
       "value": "输入总流量数值"
+    },
+    {
+      "name": "import_config_file_tips",
+      "value": "Tips：输入名称并选择文件后显示保存按钮"
     }
   ]
 }

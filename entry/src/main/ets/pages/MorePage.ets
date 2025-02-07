@@ -112,7 +112,7 @@ struct MorePage {
       hilog.isLoggable(0xFF00, "MoretestTag", hilog.LogLevel.INFO);
       hilog.info(0xFF00, "MoretestTag", itemData.name)
       hilog.info(0xFF00, "MoretestTag", "isCheck状态: %{public}s", itemData.isCheck)
-      this.pageInfos.pushPathByName(itemData.name, false)
+      this.pageInfos.replacePathByName(itemData.name, false)
     }
   }
 
@@ -158,18 +158,16 @@ struct MorePage {
   }
 
   // 通过@Builder构建设置模态展示界面
-  @Builder  SettingsSheet() {
-
-  Column() {
-    Settings()
+  @Builder
+  SettingsSheet() {
+    Column() {
+      Settings()
+    }
+    .width('100%')
+    .height('100%')
   }
-  .width('100%')
-  .height('100%')
-
-}
 
   build() {
-    // Column() {
       Navigation(this.pageInfos) {
         // 顶部导航栏
         Row() {

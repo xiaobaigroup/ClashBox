@@ -41,7 +41,7 @@ export class AppConfig{
   enableLogger?: boolean = false
   testUrl?: string = ""
   overrideDns?: boolean = false
-  clashCore?: ClashCore = ClashCore.ClashMeta
+  clashCore?: ClashCore = ClashCore.FlClash
   switchMode?: ProxyMode = ProxyMode.Rule
 
   constructor() {
@@ -102,7 +102,6 @@ export class UIConfig{
   //动画速度
   animationSpeed:number = ANIMATION_DURATION_300
   isAnimation:boolean=true
-
 
   constructor() {
   }

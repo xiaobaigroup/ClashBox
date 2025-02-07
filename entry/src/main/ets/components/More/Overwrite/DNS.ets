@@ -146,7 +146,7 @@ struct DNS {
         key: itemData.name,
         label: itemData.title,
         value: itemData.value
-      } as ArrayConfigParam, false)
+      } as ArrayConfigParam, true)
     }
   }
 

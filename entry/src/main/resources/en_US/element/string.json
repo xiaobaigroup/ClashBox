@@ -1174,7 +1174,7 @@
     },
     {
       "name": "default_kernel",
-      "value": "ClashMeta(Default)"
+      "value": "ClashMeta"
     },
     {
       "name": "filter",
@@ -1559,6 +1559,10 @@
     {
       "name": "input_cellular_data",
       "value": "Enter total traffic"
+    },
+    {
+      "name": "import_config_file_tips",
+      "value": "Tips： After entering the name and selecting the file, display the save button."
     }
   ]
 }
