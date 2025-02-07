@@ -113,16 +113,4 @@ function getFileNameForDisposition(disposition: string | undefined): string | nu
   }else{
     return null;
   }
-  // const fileNamePointKey = parameters.
-  //   .firstWhere((key) => key == "filename*", orElse: () => "");
-  // if (fileNamePointKey.isNotEmpty) {
-  //   const res = parameters[fileNamePointKey]?.split("''") ?? [];
-  //   if (res.length >= 2) {
-  //     return Uri.decodeComponent(res[1]);
-  //   }
-  // }
-  // const fileNameKey = parameters.keys
-  //   .firstWhere((key) => key == "filename", orElse: () => "");
-  // if (fileNameKey.isEmpty) return null;
-  return null;
 }

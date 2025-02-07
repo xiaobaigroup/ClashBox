@@ -21,6 +21,7 @@ import { LogInfo, Provider, ProxyGroup, ProxyMode, ProxyType, Traffic } from '..
 import { getHome } from '../appPath';
 import { UpdateConfigParams } from '../models/ClashConfig';
 import { pointer } from '@kit.InputKit';
+import { readFile, readFileUri } from '../fileUtils';
 
 export interface AccessControl{
   mode:              string
@@ -169,11 +170,11 @@ export class FlClashVpnService extends CommonVpnService{
           break;
         }
         case ClashRpcType.uploadProvider:{
-          //resolve(nativeReadOverride(data[0] as number))
           let provider = data[0] as string
-          let path = data[1] as string
-          const buffer = new Uint8Array()
-          sideLoadExternalProvider(data[0] as string, buffer).then((v)=>{
+          let pathUri = data[1] as string
+          const temp = this.context.filesDir + "/temp_provider"
+          const buffer = await readFileUri(pathUri, temp)
+          sideLoadExternalProvider(provider, buffer).then((v)=>{
             resolve(v)
           })
           break;

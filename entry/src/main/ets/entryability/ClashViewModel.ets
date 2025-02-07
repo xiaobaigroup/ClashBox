@@ -124,7 +124,16 @@ export class ClashViewModel {
   async updateProvider(provider: Provider){
     let result = await this.socketProxy.updateProvider(provider)
     if(result != ""){
-      promptAction.showToast({message: result})
+      promptAction.showToast({message: provider.name + ":" + result})
+    }
+  }
+  async upLoadProvider(provider: Provider, fileUri: string) {
+    if(!fileUri){
+      return
+    }
+    let result = await this.socketProxy.upLoadProvider(provider, fileUri)
+    if (result != ""){
+      promptAction.showToast({message: provider.name + ":" + result})
     }
   }
 

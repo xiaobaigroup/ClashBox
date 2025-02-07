@@ -7,6 +7,7 @@ import ClashViewModel from '../../entryability/ClashViewModel'
 import { Provider } from "proxy_core"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { UIConfig } from "../../entryability/AppState"
+import { picker } from "@kit.CoreFileKit"
 
 
 // 资源数据（假设）
@@ -126,7 +127,18 @@ export struct ProviderPage {
     editItem.path = this.SaveEditInputValue
     this.resourceListData.splice(this.theEditIndex, 1, editItem)
   }
-
+  uploadProvider(item: Provider){
+    let filePicker = new picker.DocumentViewPicker(getContext(this))
+    let options = new picker.DocumentSelectOptions()
+    filePicker.select(options).then((documentSelectResult)=>{
+      const fileUrl = documentSelectResult[0];
+      ClashViewModel.upLoadProvider(item, fileUrl).then(() => {
+        this.isLoading = -1
+      }).catch((error: Error) => {
+        this.isLoading = -1
+      })
+    })
+  }
 
   build() {
     NavDestination() {
@@ -226,7 +238,7 @@ export struct ProviderPage {
                             .height(28)
                             .onClick(() => {
                               this.theEditIndex = index
-                              //  this.editDialogController.open()   //改为了上传按钮 TODO 上传按钮暂无后端相关参数
+                              this.uploadProvider(item)
                             })
 
                             // 更新按钮
@@ -332,7 +344,7 @@ export struct ProviderPage {
                             .height(28)
                             .onClick(() => {
                               this.theEditIndex = index
-                              //  this.editDialogController.open()   //改为了上传按钮 TODO 上传按钮暂无后端相关参数
+                              this.uploadProvider(item)
                             })
 
                             // 更新按钮
