@@ -190,6 +190,7 @@ export struct ImportConfigFromFile{
           let options = new picker.DocumentSelectOptions()
           filePicker.select(options).then((documentSelectResult)=>{
             this.fileurl = documentSelectResult[0];
+            this.configData.configName =  decodeURIComponent(this.fileurl.substring(this.fileurl.lastIndexOf('/') + 1))
             hilog.debug(0xFF00, this.componentName, 'FileUrl: %{public}s', this.fileurl)
           })
         })
@@ -233,9 +234,7 @@ export struct ImportConfigFromFile{
 
   async saveConfig(isNewConfig: boolean){
     if (isNewConfig) {
-
       ClashViewModel.addOrUpdateProfileByFile(this.fileurl, null)
-
     }
   }
 

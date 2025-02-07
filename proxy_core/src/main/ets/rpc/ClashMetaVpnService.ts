@@ -14,7 +14,7 @@ import {
   nativeStopTun,
   nativeSubscribeLogcat,
   nativeUpdateProvider,
-  nativeWriteOverride} from 'libclashmeta.so';
+  nativeWriteOverride } from 'libclashmeta.so';
 import { Address, CommonVpnService, VpnConfig } from './CommonVpnService';
 import { JSON, util } from '@kit.ArkTS';
 import { RpcRequest } from './RpcRequest';

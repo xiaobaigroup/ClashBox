@@ -54,7 +54,7 @@ export class ClashViewModel {
         profile = old
     }
     profile.loadContext(this.context)
-    profile.name = decodeURIComponent( path.substring(path.lastIndexOf('/') + 1))
+    profile.name = decodeURIComponent(path.substring(path.lastIndexOf('/') + 1))
     await profile.saveByUri(path);
     const isExists = await profile.check();
     if (isExists) {
