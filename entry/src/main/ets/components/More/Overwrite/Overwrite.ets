@@ -3,6 +3,7 @@ import { ListOverwriteData, moreData } from "../../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { skipRowList, theRowCustomDialog } from "../../Common"
 import { MoreTop } from "../MoreTopBuilder"
+import { UIConfig } from "../../../entryability/AppState"
 
 @Component
 struct Overwrite {
@@ -10,6 +11,7 @@ struct Overwrite {
   @Consume isSecondary: boolean
   @Consume('NavPathStack') pageInfos: NavPathStack
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @State overwriteList: moreData[] = ListOverwriteData()
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
@@ -95,6 +97,9 @@ struct Overwrite {
         })
       }
       .width('100%')
+      .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
+        .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+        .combine(TransitionEffect.SLIDE) : null)
 
       List({space: 10}) {
         ForEach(this.overwriteList, (item: moreData, index: number) => {

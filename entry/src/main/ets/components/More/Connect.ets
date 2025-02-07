@@ -79,6 +79,9 @@ struct Connect {
             otherButton: (): void => { this.connectOther() }
           })
         }.width('100%')
+        .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
+          .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+          .combine(TransitionEffect.SLIDE) : null)
         // 页面
         if(this.connectListData.length === 0) {
           Nothing({ name: $r('app.string.Request') })

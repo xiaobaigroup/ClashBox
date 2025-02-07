@@ -91,7 +91,7 @@ export class BackgroundDownService{
 
   }
 
-  async startContinuousTask(context:Context): Promise<number>{
+  async startContinuousTask(context: Context): Promise<number>{
     let wantAgentInfo: wantAgent.WantAgentInfo = {
       // 点击通知后，将要执行的动作列表
       // 添加需要被拉起应用的bundleName和abilityName

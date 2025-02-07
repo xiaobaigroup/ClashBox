@@ -1567,6 +1567,10 @@
     {
       "name": "start_prompt",
       "value": "请导入配置后再尝试启用代理"
+    },
+    {
+      "name": "permission_reason_MICROPHONE",
+      "value": "长时任务音频录制"
     }
   ]
 }

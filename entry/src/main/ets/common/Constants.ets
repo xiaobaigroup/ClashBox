@@ -218,6 +218,20 @@ export const NetworkMenu: MenuListItemProp[] = [
 ]
 
 /**
+ * 更多 -> 覆写 -> DNS -> 菜单
+ */
+export const DNSMenu: MenuListItemProp[] = [
+  { title: $r('app.string.DNS_Mode'),
+    children: [
+      {title: 'normal'},
+      {title: 'fakeIp'},
+      {title: 'redirHost'},
+      {title: 'hosts'},
+    ]
+  }
+]
+
+/**
  * 设置列表参数
  */
 export class settingsData {

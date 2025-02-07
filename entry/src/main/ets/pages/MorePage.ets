@@ -200,7 +200,10 @@ struct MorePage {
             .onClick(() => {
               this.handleCheck(index)
             })
-            .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay: index*10+10 }):null)
+            .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index * 10 + 10 })
+              .combine(TransitionEffect.scale({x: 0, y: 0})):null)
+            // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0})
+            //   .animation({ duration: this.uiConfig.animationSpeed,delay: index*10+10 }):null)
           })
           // 设置行
           ListItem() {

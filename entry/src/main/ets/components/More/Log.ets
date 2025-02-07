@@ -183,6 +183,9 @@ struct Log {
             .bindMenu(this.MoreMenu())
             .backgroundColor($r('app.color.settings_container_background'))
           }.width('100%')
+          .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
+            .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+            .combine(TransitionEffect.SLIDE) : null)
 
           // 主体
           if (this.appConfig.enableLogger === false) {

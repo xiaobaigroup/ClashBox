@@ -47,7 +47,7 @@ struct Network {
   }
 
   @Builder
-  switchMenu(item: MenuListItemProp[],index: number) {
+  switchMenu(item: MenuListItemProp[], index: number) {
     if (index === 3) {
       // 栈模式菜单
       Menu() {

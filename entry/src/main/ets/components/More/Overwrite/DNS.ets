@@ -1,6 +1,6 @@
 
 import { BreakpointState } from "../../../common/breakpointsystem"
-import { ListOverwriteDNSData,  moreData } from "../../../common/Constants"
+import { DNSMenu, ListOverwriteDNSData, MenuListItemProp, moreData } from "../../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import OverwriteTop from "./OverwriteTopBuilder"
 import { menuRowList, skipRowList, toggleRowList } from "../../Common"
@@ -9,6 +9,7 @@ import { AppConfig, copy, UIConfig } from '../../../entryability/AppState'
 import { ArrayConfigParam } from "./EditArrayConfig"
 import { EventHub, EventKey } from "../../../common/EventHub"
 import { JSON } from "@kit.ArkTS"
+import { SymbolGlyphModifier } from "@kit.ArkUI"
 
 // 编辑FakeIP范围弹窗
 @CustomDialog
@@ -66,6 +67,8 @@ struct FakeIPCustomDialog {
 
 @Component
 struct DNS {
+  // 是否进入二级界面
+  @Consume isSecondary: boolean
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   //一级图标色，黑色
@@ -74,6 +77,7 @@ struct DNS {
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @State overwriteDNSList: moreData[] = []
+  @State DNSMenuList: MenuListItemProp[] = DNSMenu
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
   // 列表高度
   @Consume('breakPointStateListHeight') listHeight: BreakpointState<number>
@@ -81,10 +85,13 @@ struct DNS {
   @StorageProp('istabletVertical')  private istabletVertical: boolean = false
   @State SaveInputValue: string = ''
   @State currentInputValue: string = ''
+  // DNS模式临时选择项
+  @State DNSModeIndex: number = 0
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 弹窗控制器
   dialogController: CustomDialogController = new CustomDialogController({
     builder: FakeIPCustomDialog({
@@ -206,6 +213,29 @@ struct DNS {
   }
 
   @Builder
+  switchMenu(item: MenuListItemProp[], index: number) {
+    // 栈模式菜单
+    Menu() {
+      MenuItem({ content: $r('app.string.DNS_Mode') }).contentFont({ weight: FontWeight.Bold })
+      ForEach(item, (menuItem: MenuListItemProp, index: number) => {
+        MenuItem({
+          content: menuItem.title,
+          symbolEndIcon: this.DNSModeIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+        })
+          .selected(this.DNSModeIndex === index)
+          .onChange(() => {
+            this.DNSModeIndex = index
+            if (this.DNSMenuList[0].children) {
+              let Item = this.overwriteDNSList[8]
+              Item.subtitle = menuItem.title
+              this.overwriteDNSList.splice(8, 1, Item)
+            }
+          })
+      }, (menuItem: MenuListItemProp) => JSON.stringify(menuItem))
+    }
+  }
+
+  @Builder
   dnsMenuTipsBuilder(tips: ResourceStr) {
     Text(tips)
       .fontWeight(FontWeight.Normal)
@@ -230,7 +260,14 @@ struct DNS {
       .hitTestBehavior(HitTestMode.None)
       .selectedColor(this.icon_emphasize)
   }
-  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @Builder
+  MenuEntrance(index: number) {
+    // 确保children存在
+    if(this.DNSMenuList && this.DNSMenuList[0].children) {
+      this.switchMenu(this.DNSMenuList[0].children, index)
+    }
+  }
+
 
   build() {
     NavDestination() {
@@ -247,8 +284,8 @@ struct DNS {
             ListItem() {
               menuRowList({
                 title: item.title,
-                tips: () => { this.dnsMenuTipsBuilder(item.subtitle) }
-                // 后续绑定菜单
+                tips: () => { this.dnsMenuTipsBuilder(item.subtitle) },
+                menu: (): void => { this.MenuEntrance(index) }
               })
             }
           } else

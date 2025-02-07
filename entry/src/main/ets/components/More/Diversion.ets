@@ -129,6 +129,9 @@ struct Diversion {
           this.isShowPolicy = true
         })
       }.width('100%')
+      .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
+        .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+        .combine(TransitionEffect.SLIDE) : null)
       // 数据列表行
       List() {
         ForEach(this.DiversionList, (item: DiversionData, index: number) => {

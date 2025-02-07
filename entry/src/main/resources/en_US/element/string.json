@@ -1567,6 +1567,10 @@
     {
       "name": "start_prompt",
       "value": "Please import the configuration before attempting to enable the proxy."
+    },
+    {
+      "name": "permission_reason_MICROPHONE",
+      "value": "Long term task audio recording"
     }
   ]
 }

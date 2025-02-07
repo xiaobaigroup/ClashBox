@@ -4,6 +4,7 @@ import { MoreTop } from "./MoreTopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { convertTime } from "../../utils/TimeConvertUtil"
 import { Nothing } from "../Common"
+import { UIConfig } from "../../entryability/AppState"
 
 // 资源数据（假设）
 interface RequestData {
@@ -26,6 +27,7 @@ struct RequestPage {
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
 
@@ -67,6 +69,9 @@ struct RequestPage {
           otherButton: (): void => { this.requestOther() }
         })
       }.width('100%')
+      .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
+        .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+        .combine(TransitionEffect.SLIDE) : null)
       // 页面
       if(this.requestListData.length === 0) {
         Nothing({ name: $r('app.string.Request') })
