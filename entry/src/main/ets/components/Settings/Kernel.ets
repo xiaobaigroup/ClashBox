@@ -2,7 +2,7 @@ import { BreakpointState } from "../../common/breakpointsystem"
 import { BORDER_RADIUS_20 } from "../../common/Constants"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
-import { AppConfig, ClashCore } from '../../entryability/AppState'
+import { AppConfig, ClashCore, UIConfig } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { promptAction } from "@kit.ArkUI"
 import { ExperimentalFunction } from "../Common"
@@ -25,6 +25,7 @@ struct Kernel {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 页面内边距
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 实验功能展示变量
   @Consume isShowExperimentalFunction: boolean
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
@@ -118,7 +119,7 @@ struct Kernel {
         }.padding(12)
         .backgroundColor($r('app.color.container_background'))
         .borderRadius(BORDER_RADIUS_20)
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
+        .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
 
         if(!this.isShowExperimentalFunction) {
           // 启用提示

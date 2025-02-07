@@ -1562,7 +1562,11 @@
     },
     {
       "name": "import_config_file_tips",
-      "value": "Tips：输入名称并选择文件后显示保存按钮"
+      "value": "Tips：选择文件后会自动填入名称并显示保存按钮"
+    },
+    {
+      "name": "start_prompt",
+      "value": "请导入配置后再尝试启用代理"
     }
   ]
 }

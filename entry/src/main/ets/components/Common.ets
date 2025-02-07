@@ -7,6 +7,7 @@ import {
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE,
   FONT_SIZE_16
 } from "../common/Constants"
+import { UIConfig } from "../entryability/AppState"
 import { getResourceString } from "../utils/ResourceStringUtil"
 
 /* 通用属性 START */
@@ -585,7 +586,6 @@ function RowStyle() {
   .width('100%')
   .height(53)
   .borderRadius(20)
-  .clickEffect({ level: ClickEffectLevel.MIDDLE })
   .backgroundColor($r('app.color.container_background'))
 }
 
@@ -607,6 +607,7 @@ export struct skipRowList {
   @State isExperimentalFunction: boolean = false
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 跳转行提示文本项
   @BuilderParam tips: () => void = this.defaultTipsBuilder
@@ -658,6 +659,7 @@ export struct skipRowList {
         .fontColor([this.icon_primary])
     }
     .RowStyle()
+    .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
   }
 }
 
@@ -679,6 +681,7 @@ export struct toggleRowList {
   @State isPrimaryIcons: boolean = false
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 实验功能标识
   @State isExperimentalFunction: boolean = false
   // 主题色
@@ -726,6 +729,7 @@ export struct toggleRowList {
       this.toggle()
     }
     .RowStyle()
+    .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
   }
 }
 
@@ -752,6 +756,7 @@ export struct menuRowList {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 菜单
   @BuilderParam menu: () => void = this.defaultMenuBuilder
   // 默认菜单
@@ -812,5 +817,6 @@ export struct menuRowList {
       }.bindMenu(this.menu())
     }
     .RowStyle()
+    .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
   }
 }

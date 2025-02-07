@@ -151,12 +151,12 @@ struct Resources {
   }
 
   async updateGeoDateItem(item: ResourcesData){
+    this.isLoading = true
     try {
       const message = await ClashViewModel.updateGeoData(
          item.fileName,
          item.resourceName,
       );
-      this.isLoading = true
       if (message != ""){
         this.isLoading = false
         promptAction.showToast({message: getResourceString($r('app.string.update_success'), this) + message})

@@ -67,7 +67,7 @@ struct Language {
           .backgroundColor($r('app.color.container_background'))
         }
         .margin({bottom: 10})
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
+          .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
         .onClick(() => {
           // 点击整行对应单选框选中
            this.currentRadioCheck = -1
@@ -108,7 +108,7 @@ struct Language {
             .backgroundColor($r('app.color.container_background'))
           }
           .margin({bottom: 10})
-          .clickEffect({ level: ClickEffectLevel.MIDDLE })
+            .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
           .onClick(() => {
             // 点击整行对应单选框选中
             this.currentRadioCheck = index

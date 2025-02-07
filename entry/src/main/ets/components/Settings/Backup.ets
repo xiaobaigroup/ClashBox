@@ -15,6 +15,7 @@ struct Backup {
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   // 实验功能提示框展示变量
   @Consume isShowExperimentalFunction: boolean
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 页面内边距
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
   /**
@@ -96,7 +97,7 @@ struct Backup {
         }
         .width('100%')
         .borderRadius(20)
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
+        .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
         .backgroundColor($r('app.color.container_background'))
       }
       .width('100%')
@@ -188,7 +189,7 @@ export struct CloudBackup {
         .height(53)
         .borderRadius(20)
         .margin({bottom: 10})
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
+          .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
         .backgroundColor($r('app.color.container_background'))
         .onClick( ()=> {
           // 展开流量提醒设置列表行 显式动画
@@ -223,7 +224,7 @@ export struct CloudBackup {
                 .height(40)
                 .borderRadius(20)
                 .backgroundColor(this.icon_emphasize)
-                .clickEffect({ level: ClickEffectLevel.MIDDLE })
+                  .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
                 .onClick(() => {
                   // 暂时写成点击后赋值为true，后续需要根据登录状态来赋值
                   this.isLogon = true
@@ -236,7 +237,7 @@ export struct CloudBackup {
                 .borderRadius(20)
                 .margin({left: 10})
                 .backgroundColor(this.icon_emphasize)
-                .clickEffect({ level: ClickEffectLevel.MIDDLE })
+                  .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
                 .enabled(this.isLogon ? true : false)
                 .onClick(() => {
                   // 连接测试
@@ -249,7 +250,7 @@ export struct CloudBackup {
           .width('100%')
           .padding(10)
           .borderRadius(20)
-          .clickEffect({ level: ClickEffectLevel.MIDDLE })
+            .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
           .backgroundColor($r('app.color.container_background'))
         }
       }

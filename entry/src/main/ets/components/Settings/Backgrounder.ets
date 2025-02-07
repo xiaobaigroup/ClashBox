@@ -254,6 +254,7 @@ struct RowList {
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State icons: Resource = $r('sys.symbol.arrow_down_circle')
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @State title: ResourceStr = ''
   @State subtitle: ResourceStr = ''
   @State subtitle2: ResourceStr = ''
@@ -301,6 +302,6 @@ struct RowList {
     .borderRadius(20)
     .margin({bottom: 10})
     .backgroundColor($r('app.color.container_background'))
-    .clickEffect({ level: ClickEffectLevel.MIDDLE })
+      .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
   }
 }

@@ -4,7 +4,7 @@ import { MoreTop } from "./MoreTopBuilder"
 import { Nothing, skipRowList, toggleRowList } from "../Common"
 import { timestampToDateTime } from "../../utils/TimeConvertUtil"
 import { ClashConfig, LogLevel } from "proxy_core"
-import { AppConfig } from "../../entryability/AppState"
+import { AppConfig, UIConfig } from "../../entryability/AppState"
 import { EventHub, EventKey } from "../../common/EventHub"
 
 // 日志数据（假设）
@@ -35,6 +35,7 @@ struct Log {
   @Consume logListData: Array<LogData>
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 临时排序变量
   @State theSort: number = 0
   // 临时时间正序变量
@@ -232,7 +233,7 @@ struct Log {
                       .alignItems(HorizontalAlign.Start)
                     }.width('100%')
                     .borderRadius(20)
-                    .clickEffect({ level: ClickEffectLevel.MIDDLE })
+                    .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
                     .backgroundColor($r('app.color.container_background'))
                     .padding(12)
                   }

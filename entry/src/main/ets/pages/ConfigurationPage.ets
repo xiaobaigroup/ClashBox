@@ -111,73 +111,7 @@ struct ConfigurationPage {
   }
 
   /* 配置页面内ListItem长按ContextMenu相关 */
-  // TODO 删除 临时模拟数据配置列表数据
-  @State
-  private configList: Array<ConfigData> = [
-    {
-      configId: 'a4e2593d-9927-4f57-8868-f316190657a1',
-      isNewConfig: false,
-      configName: 'SS-Youtube速度快',
-      configUrl: 'https://aaa.com:8344',
-      isConfigAutoUpdate: true,
-      configAutoUpdateTimeGapValue: 10,
-      configAutoUpdateTimeGapTextPickerIndex: 1,
-      createdDate: '2024-05-21 21:21:21',
-      lastUpdateDateTime: 0,
-      updateTime: 0,
-      trafficUsed: '1329.43GB',
-      trafficTotal: '5000GB',
-      isFavorite: false,
-      sourceType: ConfigDataSourceType.URL,
-    },
-    {
-      configId: 'd30612ae-369b-4515-bf60-67873fc1bc4a',
-      isNewConfig: false,
-      configName: 'Trojan-INS专用',
-      configUrl: 'http://ealion.com/ins-test',
-      isConfigAutoUpdate: true,
-      configAutoUpdateTimeGapValue: 233,
-      configAutoUpdateTimeGapTextPickerIndex: 0,
-      createdDate: '2023-12-20 04:14:35',
-      lastUpdateDateTime: 0,
-      updateTime: 0,
-      trafficUsed: '234.42GB',
-      trafficTotal: '700GB',
-      isFavorite: true,
-      sourceType: ConfigDataSourceType.QR_CODE,
-    },
-    {
-      configId: 'e91a4efc-cf14-467d-90c2-fec156806bfa',
-      isNewConfig: false,
-      configName: 'VMess-TikTok专用',
-      configUrl: 'https://enlin.com:2333',
-      isConfigAutoUpdate: false,
-      createdDate: '2024-06-16 12:34:56',
-      lastUpdateDateTime: 0,
-      updateTime: 0,
-      trafficUsed: '874.04GB',
-      trafficTotal: '2000GB',
-      isFavorite: true,
-      sourceType: ConfigDataSourceType.COPY,
-      copySourceConfigId: 'a4e2593d-9927-4f57-8868-f316190657a1',
-    },
-    {
-      configId: '027617f1-5dea-4322-9836-e4187073d328',
-      isNewConfig: false,
-      configName: 'VMess-TG专用',
-      configUrl: 'https://telegram-vmess.enlin.com',
-      isConfigAutoUpdate: true,
-      configAutoUpdateTimeGapValue: 7,
-      configAutoUpdateTimeGapTextPickerIndex: 2,
-      createdDate: '2024-01-01 12:24:34',
-      lastUpdateDateTime: 0,
-      updateTime: 0,
-      trafficUsed: '34.05GB',
-      trafficTotal: '800GB',
-      isFavorite: false,
-      sourceType: ConfigDataSourceType.QR_CODE,
-    },
-  ]
+  @Consume configList: Array<ConfigData>
 
   // ContextMenu 收藏&取消收藏列表项集合
   // private configListLongPressCtxMenusForFavorite: Array<LongPressContextMenuItem> = []
@@ -585,10 +519,7 @@ struct ConfigurationPage {
     hilog.info(0xC000, this.componentName, `#aboutToAppear executed`)
     // XXX 删除 这里模拟获取所有hap沙箱路径配置文件的文件名
     showFileNameListOfFileDir(this.context.filesDir)
-    this.fetchProfiles()
-    EventHub.on(EventKey.FetchProfile, () => {
-      this.fetchProfiles()
-    })
+
   }
   // 获取配置列表
   async fetchProfiles(){

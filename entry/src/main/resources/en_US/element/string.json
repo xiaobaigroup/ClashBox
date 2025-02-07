@@ -1562,7 +1562,11 @@
     },
     {
       "name": "import_config_file_tips",
-      "value": "Tips： After entering the name and selecting the file, display the save button."
+      "value": "Tips： After selecting the file, the name will be automatically filled in and a save button will be displayed."
+    },
+    {
+      "name": "start_prompt",
+      "value": "Please import the configuration before attempting to enable the proxy."
     }
   ]
 }

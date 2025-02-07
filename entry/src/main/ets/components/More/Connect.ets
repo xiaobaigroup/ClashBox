@@ -1,5 +1,6 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import { BIND_SHEET_TITLE_CONTAINER_HEIGHT, BORDER_RADIUS_20 } from "../../common/Constants"
+import { UIConfig } from "../../entryability/AppState"
 import { convertTime } from "../../utils/TimeConvertUtil"
 import { Nothing } from "../Common"
 import { MoreTop } from "./MoreTopBuilder"
@@ -26,6 +27,7 @@ struct Connect {
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
 
@@ -115,7 +117,7 @@ struct Connect {
                       .fontColor([this.icon_primary])
                   }.width(40)
                   .height(40)
-                  .clickEffect({ level: ClickEffectLevel.LIGHT })
+                  .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
                   .backgroundColor($r('app.color.settings_container_background'))
                 }.width('100%')
                 .padding(12)

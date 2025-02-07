@@ -28,6 +28,7 @@ import ClashViewModel from '../entryability/ClashViewModel'
 import Shortcuts from '../components/Home/Shortcuts'
 import { AppConfig, UIConfig } from '../entryability/AppState'
 import BackgroundDownService from '../utils/BackgroundDownService'
+import { ConfigData } from '../common/PageArgumentEntity'
 
 
 @Entry
@@ -95,7 +96,8 @@ struct Home {
   @State @Watch('ShowHomeEditChange') isShowCardEdit: boolean = false
   // 折叠屏展开状态判定
   @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
-
+  // 配置页数据表
+  @Consume configList: Array<ConfigData>
   // 页面名称 主页
   private componentName: string = 'HomePage'
   /* 是否开启 `Index` 页面的前景模糊 */
@@ -261,16 +263,14 @@ struct Home {
         Row({space: this.HomeCardTitleButtonPadding.value}) {
           if (!this.isShowHomeEdit) {
             //编辑布局按钮判定：非编辑状态
-            if (this.uiConfig.isGreeting === true) {
-              Text(this.greetings)
-                .fontSize(this.uiConfig.userLanguage != 'en-Latn' ? 32 : 27)
-                .layoutWeight(1)
-                .fontWeight(FontWeight.Bold)
-                .fontColor(this.font_primary)
-                .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-                  .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
-                  .combine(TransitionEffect.SLIDE):null)
-            }
+            Text(this.uiConfig.isGreeting ? this.greetings : 'ClashNext')
+              .fontSize((this.uiConfig.userLanguage != 'en-Latn') || !this.uiConfig.isGreeting ? 32 : 27)
+              .layoutWeight(1)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(this.font_primary)
+              .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
+                .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+                .combine(TransitionEffect.SLIDE):null)
             Blank()
             //编辑按钮
             Button({ type: ButtonType.Circle, stateEffect: true }) {
@@ -413,7 +413,7 @@ struct Home {
                 .aspectRatio(2.07)
                 .borderRadius(20)
                 .backgroundColor($r('app.color.container_background'))
-                .clickEffect({ level: ClickEffectLevel.MIDDLE })
+                  .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
                 .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:0}):null)
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 // 消失触发回调
@@ -638,7 +638,7 @@ struct Home {
                 .aspectRatio(2.07)
                 .borderRadius(20)
                 .backgroundColor($r('app.color.container_background'))
-                .clickEffect({ level: ClickEffectLevel.MIDDLE })
+                  .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
                 .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:20}):null)
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 //编辑模式下跳动动画
@@ -773,34 +773,38 @@ struct Home {
         .height(this.proxyStartButtonHeight)
         .clip(true)
         .onClick(async (event: ClickEvent) => {
-          // TODO 调用启动代理方法 等待结果响应之后 再切换按钮状态开始计时
-          this.proxyEnabled = !this.proxyEnabled
-          hilog.info(0xA002, this.componentName, `代理启动按钮状态：${this.proxyEnabled}`)
-          // 开始计时器
-          if (this.proxyEnabled) {
-            this.proxyStartedTimer.start((formatTime) => {
-              this.proxyStartingDuration = formatTime
-            })
-            // 当模拟下载和通知均启用时
-            if(this.uiConfig.backgroundDownModel && this.uiConfig.Enablednotice){
-              BackgroundDownService.start(getContext(this))
-            }
-            await ClashViewModel.StartVpn()
+          if(this.configList.length === 0) {
+            // 配置页没有数据
+            this.promptAction.showToast({ message: `${getContext().resourceManager.getStringSync($r('app.string.start_prompt'))}` })
           } else {
-            this.proxyStartedTimer.reset()
-            // 如果`reset()`就取消注释这句，如果是`pause()`就注释这句
-            this.proxyStartingDuration = PROXY_STARTED_DURATION_INIT_VALUE
-            if(this.uiConfig.backgroundDownModel){
-              BackgroundDownService.stop(getContext(this))
+            this.proxyEnabled = !this.proxyEnabled
+            hilog.info(0xA002, this.componentName, `代理启动按钮状态：${this.proxyEnabled}`)
+            // 开始计时器
+            if (this.proxyEnabled) {
+              this.proxyStartedTimer.start((formatTime) => {
+                this.proxyStartingDuration = formatTime
+              })
+              // 当模拟下载和通知均启用时
+              if(this.uiConfig.backgroundDownModel && this.uiConfig.Enablednotice){
+                BackgroundDownService.start(getContext(this))
+              }
+              await ClashViewModel.StartVpn()
+            } else {
+              this.proxyStartedTimer.reset()
+              // 如果`reset()`就取消注释这句，如果是`pause()`就注释这句
+              this.proxyStartingDuration = PROXY_STARTED_DURATION_INIT_VALUE
+              if(this.uiConfig.backgroundDownModel){
+                BackgroundDownService.stop(getContext(this))
+              }
+              await ClashViewModel.StopVpn()
             }
-            await ClashViewModel.StopVpn()
+
+            this.proxyStartButtonWidth = this.proxyEnabled ? $r('app.integer.vp_proxy_started_button_width') : $r('app.integer.vp_proxy_not_start_button_width')
           }
 
-          this.proxyStartButtonWidth = this.proxyEnabled ? $r('app.integer.vp_proxy_started_button_width') :
-          $r('app.integer.vp_proxy_not_start_button_width')
         })
         .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
-        .clickEffect(this.uiConfig.isAnimation?{ level: ClickEffectLevel.MIDDLE,scale:0.8}:null)
+        .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
       }
       }
       .backgroundColor($r('app.color.background'))

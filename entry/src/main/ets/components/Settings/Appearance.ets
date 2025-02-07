@@ -375,7 +375,7 @@ struct Appearance {
           }
           .width('100%')
           .height(220)
-          .clickEffect({ level: ClickEffectLevel.MIDDLE })
+            .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
         }
         // 列表区 Start
         ListItem() {
@@ -438,7 +438,7 @@ struct Appearance {
           }
           .width('100%')
           .borderRadius(20)
-          .clickEffect({ level: ClickEffectLevel.MIDDLE })
+            .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
           .backgroundColor($r('app.color.container_background'))
         }
         ListItem() {
@@ -477,7 +477,7 @@ struct Appearance {
           }
           .width('100%')
           .borderRadius(20)
-          .clickEffect({ level: ClickEffectLevel.MIDDLE })
+            .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
           .backgroundColor($r('app.color.container_background'))
         }
         // 列表区 End

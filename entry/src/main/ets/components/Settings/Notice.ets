@@ -445,7 +445,7 @@ struct Notice {
               .width('100%')
               .height(this.heightOfTextPickerInTheListItem)
               .borderRadius(BORDER_RADIUS_20)
-              .clickEffect({ level: ClickEffectLevel.MIDDLE })
+                .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
               .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
             }
             // 提醒时间设置行 End
@@ -827,7 +827,6 @@ function RowStyle() {
   .width('100%')
   .height(53)
   .borderRadius(20)
-  .clickEffect({ level: ClickEffectLevel.MIDDLE })
   .backgroundColor($r('app.color.container_background'))
 }
 /**
@@ -837,7 +836,6 @@ function RowStyle() {
 function ColumnStyle() {
   .width('100%')
   .borderRadius(20)
-  .clickEffect({ level: ClickEffectLevel.MIDDLE })
   .backgroundColor($r('app.color.container_background'))
 }
 /**

@@ -54,6 +54,7 @@ import { changeThemeColor } from '../utils/ChangeThemeColorUtil'
 import { common } from '@kit.AbilityKit'
 import { setAutoColorMode, setDarkColorMode, setLightColorMode } from '../utils/ChangeColorModeUtils'
 import { ChangeLanguage } from '../utils/ChangeLanguageUtil'
+import { ConfigData, ConfigDataSourceType } from '../common/PageArgumentEntity'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 
@@ -280,10 +281,29 @@ struct Index {
   private logListData: Array<LogData> = [
   ]
 
+  @Provide configList: Array<ConfigData> = [
+    {
+      configId: 'a4e2593d-9927-4f57-8868-f316190657a1',
+      isNewConfig: false,
+      configName: 'SS-Youtube速度快',
+      configUrl: 'https://aaa.com:8344',
+      isConfigAutoUpdate: true,
+      configAutoUpdateTimeGapValue: 10,
+      configAutoUpdateTimeGapTextPickerIndex: 1,
+      createdDate: '2024-05-21 21:21:21',
+      lastUpdateDateTime: 0,
+      updateTime: 0,
+      trafficUsed: '1329.43GB',
+      trafficTotal: '5000GB',
+      isFavorite: false,
+      sourceType: ConfigDataSourceType.URL,
+    },
+  ]
+
   private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
   // 所有子组件在容器内的对齐方式
   @Provide ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment = Alignment.BottomEnd
-
+  @StorageLink('favoriteProfiles') favoriteProfiles: Map<string, string> = new Map<string, string>([])
   @Provide('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
 // 设置页变量
   // 设置页面栈
@@ -355,9 +375,29 @@ struct Index {
   foldPhoneOpenListener:mediaquery.MediaQueryListener =
     this.getUIContext().getMediaQuery().matchMediaSync('(640vp< height <= 1000vp) and (640vp< width <= 1000vp)');
 
+  // 获取配置列表
+  async fetchProfiles(){
+    const profiles = await ClashViewModel.getProfiles()
+    this.configList = profiles.map((d)=>{
+      return {
+        configId: d.id,
+        configName: d.name,
+        isFavorite: this.favoriteProfiles.has(d.id) ?? false,
+        configUrl: d.url,
+        isConfigAutoUpdate: d.autoUpdate,
+        configAutoUpdateTimeGapValue: d.autoUpdateDuration,
+        lastUpdateDateTime: d.lastUpdateDate
+      } as ConfigData
+    })
+  }
 
   async aboutToAppear(): Promise<void>{
     hilog.info(0x1000, this.componentName, `#aboutToAppear executed`)
+
+    this.fetchProfiles()
+    EventHub.on(EventKey.FetchProfile, () => {
+      this.fetchProfiles()
+    })
 
     // 在页面build前改变主题颜色
     changeThemeColor(this.uiConfig.themeColor)

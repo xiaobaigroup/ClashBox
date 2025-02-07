@@ -9,7 +9,7 @@ import { hilog } from "@kit.PerformanceAnalysisKit"
 import { common, Want } from "@kit.AbilityKit"
 import { BusinessError } from "@kit.BasicServicesKit"
 import { promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
-import { AppConfig, UIConfig } from "../../entryability/AppState"
+import { AppConfig, ClashCore, UIConfig } from "../../entryability/AppState"
 
 @Component
 struct About {
@@ -150,6 +150,26 @@ struct About {
       this.aboutList.splice(1, 1, showItem)
     }
   }
+  // 刷新内核版本信息显示
+  refreshShowKernelVersion(kernel?: ClashCore) {
+    hilog.info(0xFF00, "SettingsKerneltestTag", "当前显示内核：%{public}d", this.appConfig.clashCore)
+    const showItem = this.aboutList[0]
+    if (showItem && showItem.children) {
+      switch (kernel) {
+        case 0:
+          showItem.children[1].subtitle = 'ClashMeta'
+          break
+        case 1:
+          showItem.children[1].subtitle = 'FlClash'
+          break
+        case 2:
+          showItem.children[1].subtitle = 'ClashRS'
+          break
+      }
+      // 使用splice来更新父组件数组
+      this.aboutList.splice(0, 1, showItem)
+    }
+  }
 
   // 更新渠道菜单
   @Builder
@@ -174,6 +194,8 @@ struct About {
   aboutToAppear(): void {
     // 页面加载时初始化实验功能启用状态
     this.refreshShowExperimentalFunction(this.uiConfig.isShowExperimentalFunction)
+    // 加载时初始化内核版本显示
+    this.refreshShowKernelVersion(this.appConfig.clashCore)
   }
 
   build() {
@@ -208,7 +230,7 @@ struct About {
           .height(220)
         }
         .margin({bottom: 10 })
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
+        .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
 
         ForEach(this.aboutList, (item: AboutListItemProp, index: number) => {
           ListItem() {
@@ -239,7 +261,7 @@ struct About {
                     // 分割线
                     Row().height(0.5).backgroundColor('#0D000000').width('93%')
                   }
-                  .clickEffect({ level: ClickEffectLevel.MIDDLE })
+                  .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
                   .onClick(() => {
                     // 这里什么都没有
                   })
@@ -288,7 +310,7 @@ struct About {
                     // 分割线
                     Row().height(0.5).backgroundColor('#0D000000').width('93%')
                   }
-                  .clickEffect({ level: ClickEffectLevel.MIDDLE })
+                  .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
                   .onClick(() => {
                     if(itemChild.sign === 0) {
                       // 似乎可以留个彩蛋
@@ -357,6 +379,7 @@ export struct AboutContributors {
   @State ContributorsList: ContributorsListItemProp[] = ContributorsList
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 列表高度
   @Consume('breakPointStateSettingslistHeight') private SettingslistHeight: BreakpointState<number>
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
@@ -451,7 +474,7 @@ export struct AboutContributors {
               if(item.contact) {
                 Row() {
                   Button(item.contact, { type: ButtonType.Capsule, stateEffect: true })
-                    .clickEffect({ level: ClickEffectLevel.MIDDLE })
+                      .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
                     .backgroundColor($r('app.color.button_container_background'))
                     .fontColor(this.icon_emphasize)
                     .width(90)
@@ -461,7 +484,7 @@ export struct AboutContributors {
                     })
                   if(item.contact2) {
                     Button(item.contact2, { type: ButtonType.Capsule, stateEffect: true })
-                      .clickEffect({ level: ClickEffectLevel.MIDDLE })
+                        .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
                       .backgroundColor($r('app.color.button_container_background'))
                       .fontColor(this.icon_emphasize)
                       .margin({left: 6})
@@ -479,7 +502,7 @@ export struct AboutContributors {
               }
             }
           }
-          .clickEffect({ level: ClickEffectLevel.MIDDLE })
+            .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
           .backgroundColor($r('app.color.container_background'))
           .borderRadius(BORDER_RADIUS_20)
           .margin({bottom: 10 })
@@ -511,6 +534,7 @@ export struct CheckUpdate {
   @State updateList: CheckUpdateListItemProp[] = CheckUpdateList
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   //一级图标色，黑色
@@ -586,7 +610,7 @@ export struct CheckUpdate {
                 Row().height(0.5).backgroundColor('#0D000000').width('93%')
               }
               .width('100%')
-              .clickEffect({ level: ClickEffectLevel.MIDDLE })
+                .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
               .onClick(() => {
                 if(index === 1) {
                   // 前往下载网页

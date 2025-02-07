@@ -414,7 +414,7 @@ struct Policy {
           })
       }.width('100%')
       .borderRadius(20)
-      .clickEffect({ level: ClickEffectLevel.MIDDLE })
+        .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
       .backgroundColor($r('app.color.container_background'))
       // 删除资源
       if (!this.isAdd) {
@@ -427,7 +427,7 @@ struct Policy {
         }.width('100%')
         .height(53)
         .borderRadius(20)
-        .clickEffect({ level: ClickEffectLevel.MIDDLE })
+          .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
         .backgroundColor($r('app.color.container_background'))
         .onClick(() => {
           // 删除资源，在半模态窗口关闭后删除数组元素

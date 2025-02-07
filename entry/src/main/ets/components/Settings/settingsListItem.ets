@@ -1,4 +1,5 @@
 import { settingsData } from "../../common/Constants"
+import { UIConfig } from "../../entryability/AppState"
 
 @Component
 struct settingsListItem {
@@ -6,6 +7,7 @@ struct settingsListItem {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   //一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @Prop itemObj: settingsData
   @Prop index: number
   onCheck = (index: number) => {}
@@ -48,7 +50,7 @@ struct settingsListItem {
       Row()
         .height(10)
     }
-    .clickEffect({ level: ClickEffectLevel.MIDDLE })
+    .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
     .onClick(() => {
       this.onCheck(this.index)
     })
