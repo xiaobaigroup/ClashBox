@@ -77,6 +77,7 @@ struct Kernel {
               Image(item.icons)
                 .width(48)
                 .height(48)
+                .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
               Column() {
                 Row() {
                   Text(item.title)
@@ -95,6 +96,7 @@ struct Kernel {
                   .fontSize(14)
               }.margin({ left: 12 })
               .alignItems(HorizontalAlign.Start)
+              .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
               Blank()
               Radio({ value: 'kernel' + index, group: 'kernelGroup' })
                 .checked(item.ClashCore === this.appConfig.clashCore)

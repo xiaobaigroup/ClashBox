@@ -157,6 +157,8 @@ struct Diversion {
             }
 
           }
+          .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
+            .combine(TransitionEffect.scale({x: 0, y: 0})):null)
           .margin({bottom: this.listBottom.value })
           .onClick(() => {
             // 启用背景模糊
@@ -190,6 +192,7 @@ struct Diversion {
         detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],
         dragBar: false,
         backgroundColor: $r('app.color.background'),
+        scrollSizeMode: ScrollSizeMode.CONTINUOUS,
         //keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
         preferType: SheetType.CENTER,
         onWillDismiss: () => {

@@ -455,7 +455,7 @@ struct ConfigurationPage {
         .hoverEffect(HoverEffect.Scale)
         .bindSheet( this.isShowConfigAddBindSheet, this.ConfigAddBindSheetBuilder, {
           // title: { title: $r('app.string.AddConfig') },
-          detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT, ],// SheetSize.LARGE
+          detents: [BIND_SHEET_CONTAINER_HEIGHT, 300, ],// SheetSize.LARGE
           // backgroundColor: $r('app.color.container_background'),
           backgroundColor: $r('app.color.background'),
           showClose: true,

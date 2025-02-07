@@ -288,6 +288,8 @@ struct DNS {
                 menu: (): void => { this.MenuEntrance(index) }
               })
             }
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
+              .combine(TransitionEffect.scale({x: 0, y: 0})):null)
           } else
             if (item.sign === 1 ) {
               // 跳转型
@@ -306,6 +308,8 @@ struct DNS {
               }.onClick(() => {
                 this.handleCheck(index)
               })
+              .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
+                .combine(TransitionEffect.scale({x: 0, y: 0})):null)
             } else
             if (item.sign === 2 ) {
               // 开关型
@@ -328,6 +332,8 @@ struct DNS {
                   this.handleToggle(index, toggleItem.isCheck)
                 })
               })
+              .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
+                .combine(TransitionEffect.scale({x: 0, y: 0})):null)
             } else
             if (item.sign === 3) {
               // 标题栏
@@ -340,6 +346,8 @@ struct DNS {
                }.width('100%')
                 .justifyContent(FlexAlign.Start)
              }
+              .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
+                .combine(TransitionEffect.scale({x: 0, y: 0})):null)
             }
 
         })

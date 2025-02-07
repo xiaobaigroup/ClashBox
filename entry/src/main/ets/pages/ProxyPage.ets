@@ -366,7 +366,7 @@ struct ProxyPage {
           SymbolGlyph($r('sys.symbol.doc')).fontSize(32).fontColor([this.icon_secondary])
           Text($r('app.string.None_Proxy')).fontSize(20).fontColor(this.font_secondary).textAlign(TextAlign.Center)
             .bindSheet($$this.isProviderEdit, this.ProviderBindSheetEdit(), {
-              detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
+              detents: [BIND_SHEET_CONTAINER_HEIGHT, 300,],
               backgroundColor: $r('app.color.background'),
               showClose: false,
               dragBar: false,
@@ -387,7 +387,7 @@ struct ProxyPage {
           .combine(TransitionEffect.scale({x: 0, y: 0})):null)
         //.padding({top:TAB_CONTENT_TITLE_HEIGHT})
         .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
-          detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
+          detents: [BIND_SHEET_CONTAINER_HEIGHT, 300,],
           backgroundColor: $r('app.color.background'),
           showClose: true,
           dragBar: false,
@@ -493,7 +493,7 @@ struct ProxyPage {
             .animation({ duration: this.uiConfig.animationSpeed, delay: 50 })
             .combine(TransitionEffect.SLIDE_SWITCH):null)
           .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
-            detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
+            detents: [BIND_SHEET_CONTAINER_HEIGHT, 300,],
             backgroundColor: $r('app.color.background'),
             //  blurStyle: BlurStyle.BACKGROUND_REGULAR,
             showClose: true,
@@ -514,7 +514,7 @@ struct ProxyPage {
         .width('100%')
         .height(this.isLandscapePhone ? '100%' : `calc(100% - ${TAB_CONTENT_TITLE_HEIGHT}vp)`)
         .bindSheet($$this.isProviderEdit, this.ProviderBindSheetEdit(), {
-          detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
+          detents: [BIND_SHEET_CONTAINER_HEIGHT, 300,],
           backgroundColor: $r('app.color.background'),
           showClose: false,
           dragBar: false,

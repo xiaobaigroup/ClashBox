@@ -128,6 +128,8 @@ struct Basic {
                 tips: () => { this.basicMenuTipsBuilder(item.subtitle) }
               })
             }
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
+              .combine(TransitionEffect.scale({x: 0, y: 0})):null)
           } else if (item.sign === 1) {
             ListItem() {
               // 跳转型
@@ -140,6 +142,8 @@ struct Basic {
             }.onClick(() => {
               this.handleCheck(index)
             })
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
+              .combine(TransitionEffect.scale({x: 0, y: 0})):null)
           } else if (item.sign === 2 ) {
             ListItem() {
               // 开关型
@@ -166,14 +170,17 @@ struct Basic {
                 }
               })
             })
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
+              .combine(TransitionEffect.scale({x: 0, y: 0})):null)
           }
 
         })
 
       }
-      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+      .edgeEffect(EdgeEffect.Spring)
       .width('100%')
-      .height(this.isLandscapePhone ? 275 : (this.istabletVertical ? 900 : this.listHeight.value))
+      .height('100%')
+    //  .height(this.isLandscapePhone ? 275 : (this.istabletVertical ? 900 : this.listHeight.value))
       .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
       .margin({ top: 10 })
       .borderRadius(18)

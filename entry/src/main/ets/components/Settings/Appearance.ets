@@ -484,8 +484,8 @@ struct Appearance {
       }
       .width('100%')
       .align(Alignment.Top)
-      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
-      .height(this.isLandscapePhone ? 300 : this.SettingslistHeight.value)
+      .edgeEffect(EdgeEffect.Spring)
+     // .height(this.isLandscapePhone ? 300 : this.SettingslistHeight.value)
       .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value, bottom: this.breakPointStatemorePageMargin.value })
 
     }

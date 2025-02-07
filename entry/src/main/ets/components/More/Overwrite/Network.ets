@@ -7,6 +7,7 @@ import { hilog } from "@kit.PerformanceAnalysisKit"
 import OverwriteTop from "./OverwriteTopBuilder"
 import { menuRowList, skipRowList, theCustomDialog, toggleRowList } from "../../Common"
 import { SymbolGlyphModifier } from "@kit.ArkUI"
+import { UIConfig } from "../../../entryability/AppState"
 
 @Component
 struct Network {
@@ -20,6 +21,7 @@ struct Network {
   @State overwriteNetworkList: moreData[] = ListOverwriteNetworkData()
   @State networkMenuList: MenuListItemProp[] = NetworkMenu
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 栈模式临时选择项
   @State stackModeIndex: number = 0
   // 列表行点击事件处理
@@ -115,6 +117,8 @@ struct Network {
                 menu: (): void => { this.MenuEntrance(index) }
               })
             }
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
+              .combine(TransitionEffect.scale({x: 0, y: 0})):null)
           } else
             if (item.sign === 1 ) {
               // 跳转型
@@ -126,6 +130,8 @@ struct Network {
               }.onClick(() => {
                 this.handleCheck(index)
               })
+              .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
+                .combine(TransitionEffect.scale({x: 0, y: 0})):null)
             } else
             if (item.sign === 2 ) {
               // 开关型
@@ -150,6 +156,8 @@ struct Network {
                   }
                 })
               })
+              .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
+                .combine(TransitionEffect.scale({x: 0, y: 0})):null)
             } else
             if (item.sign === 3) {
               // 标题栏
@@ -162,6 +170,8 @@ struct Network {
                 }.width('100%')
                 .justifyContent(FlexAlign.Start)
               }
+              .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
+                .combine(TransitionEffect.scale({x: 0, y: 0})):null)
             }
 
         })
@@ -217,7 +227,7 @@ export struct NetworkRouterAddress {
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
-
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   /**
    * 添加路由地址弹窗控制器
    */
@@ -341,6 +351,8 @@ export struct NetworkRouterAddress {
             }
 
           }
+          .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
+            .combine(TransitionEffect.scale({x: 0, y: 0})):null)
           .onClick(() => {
             // 启用背景模糊
             this.isEnableIndexForegroundBlur = true
@@ -367,6 +379,8 @@ export struct NetworkRouterAddress {
           .borderRadius(20)
           .backgroundColor($r('app.color.container_background'))
         }
+        .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+          .combine(TransitionEffect.scale({x: 0, y: 0})):null)
         .onClick(() => {
           // 启用背景模糊
           this.isEnableIndexForegroundBlur = true

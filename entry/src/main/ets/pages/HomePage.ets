@@ -723,7 +723,7 @@ struct Home {
         .edgeEffect(EdgeEffect.Spring)
         .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
         .bindSheet($$this.isShowCardEdit, this.CardEdit(), {
-          detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
+          detents: [BIND_SHEET_CONTAINER_HEIGHT, 300,],
           preferType: SheetType.CENTER,
           backgroundColor: $r('app.color.background'),
           showClose: true,

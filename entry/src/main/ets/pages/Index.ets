@@ -340,25 +340,30 @@ struct Index {
           .fontSize(this.isLandscapePhone ? 24 : this.TabIconfontSize.value)
           .margin({ top: 5 })
           .effectStrategy(this.uiConfig.isAnimation?SymbolEffectStrategy.SCALE:null)
+          .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
+            .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+           .combine(TransitionEffect.translate({y:50})):null)
 
         Text(title)
           .fontColor(this.currentIndex === index ? this.icon_emphasize : this.icon_tertiary)
           .fontWeight(FontWeight.Medium)
           .margin(this.compMargin.value)
           .fontSize(this.isLandscapePhone ? 12 : this.TabTitlefontSize.value)
+          .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
+           .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+           .combine(TransitionEffect.translate({y:50})):null)
       }
       .margin(this.isLandscapePhone ? { left: 39 } : '0vp')
     }
-    .animation(
-      {
-        duration: this.uiConfig.animationSpeed,
-        tempo:0.3,
-        curve: Curve.Ease,
-        iterations: 1,
-        playMode: PlayMode.Normal
-      })
     .width('100%')
     .height('100%')
+    .animation(this.isSecondary===true ?{
+      duration: this.uiConfig.animationSpeed,
+      tempo:0.3,
+      curve: Curve.Linear,
+      iterations: 1,
+      playMode: PlayMode.Normal
+    }:null)
   }
 
   /* 是否开启 `Index` 页面的前景模糊 */
@@ -629,12 +634,6 @@ struct Index {
       .barWidth(this.isSecondary === false ? (this.isLandscapePhone ? '63vp' : this.compBarWidth.value) : 0) /**/
       .barHeight(this.isSecondary === false ? (this.isLandscapePhone ? '100%' : this.compBarHeight.value) : 0) /**/
       .padding(this.compMargin.value)
-      .animation(this.isSecondary===true ?{
-        duration: this.uiConfig.animationSpeed,
-        curve: Curve.Linear,
-        iterations: 1,
-        playMode: PlayMode.Normal
-      }:null)
       .onChange((index: number) => {
         this.currentIndex = index
       })

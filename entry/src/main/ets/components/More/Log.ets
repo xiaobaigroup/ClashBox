@@ -196,6 +196,8 @@ struct Log {
                 .margin({bottom: 4 })
               Text($r('app.string.EnableLoggerPrompt'))
             }
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+              .combine(TransitionEffect.scale({x: 0, y: 0})):null)
             .zIndex(1)
             .alignItems(HorizontalAlign.Center)
             .justifyContent(FlexAlign.Center)
@@ -241,6 +243,8 @@ struct Log {
                     .padding(12)
                   }
                 }.width('100%')
+                .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
+                  .combine(TransitionEffect.scale({x: 0, y: 0})):null)
               })
             }.width('100%')
             .height('100%')

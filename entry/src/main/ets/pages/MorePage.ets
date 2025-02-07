@@ -224,6 +224,7 @@ struct MorePage {
             dragBar: false,
             backgroundColor: $r('app.color.background'),
             keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
+            scrollSizeMode: ScrollSizeMode.CONTINUOUS,
             preferType: SheetType.CENTER,
             onWillDismiss: () => {
               this.isShowSettings = false

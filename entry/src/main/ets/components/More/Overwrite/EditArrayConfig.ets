@@ -3,6 +3,7 @@ import { MoreTop } from "../MoreTopBuilder"
 import { theCustomDialog } from "../../Common"
 import { promptAction } from "@kit.ArkUI"
 import { EventHub, EventKey } from "../../../common/EventHub"
+import { UIConfig } from "../../../entryability/AppState"
 
 export interface ArrayConfigParam{
     label?: string | ResourceStr
@@ -37,6 +38,7 @@ export struct ArrayConfigEditor {
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
   @Prop params: ArrayConfigParam
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   aboutToAppear(): void {
     // string []
@@ -215,6 +217,8 @@ export struct ArrayConfigEditor {
             }
 
           }
+          .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
+            .combine(TransitionEffect.scale({x: 0, y: 0})):null)
           .margin({bottom: this.listBottom.value })
           .onClick(() => {
             // 启用背景模糊

@@ -352,7 +352,7 @@ struct About {
       }
       .width('100%')
       .alignListItem(ListItemAlign.Center)
-      .height(this.isLandscapePhone ? 300 : this.SettingslistHeight.value)
+    //  .height(this.isLandscapePhone ? 300 : this.SettingslistHeight.value)
       .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
     }
     .width('100%')

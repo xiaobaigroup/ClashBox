@@ -183,14 +183,14 @@ export struct ProviderPage {
 
                             Row(){
                               if (item["subscription-info"]?.expire != undefined) {
-                                Text(item["subscription-info"]?.expire+'/')
+                                Text(`${item["subscription-info"]?.expire}+'/'`)
                                   .smallText()
                               }else {
                                 Text($r('app.string.usd_cellular_data'))
                                   .smallText()
                               }
-                              if (item["subscription-info"]?.total != undefined) {
-                                Text(item["subscription-info"]?.total.toString())
+                              if (item["subscription-info"]?.total!= undefined) {
+                                Text(`${item["subscription-info"]?.total}`)
                                   .smallText()
                               }else {
                                 Text($r('app.string.total_cellular_data'))

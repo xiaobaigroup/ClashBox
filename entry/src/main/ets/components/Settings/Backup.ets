@@ -250,8 +250,10 @@ export struct CloudBackup {
           .width('100%')
           .padding(10)
           .borderRadius(20)
-            .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+          .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
           .backgroundColor($r('app.color.container_background'))
+          .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+            .combine(TransitionEffect.scale({x: 0, y: 0})):null)
         }
       }
       .width('100%')
