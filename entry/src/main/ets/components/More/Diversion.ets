@@ -189,7 +189,7 @@ struct Diversion {
       .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY : null)
       .bindSheet($$this.isShowPolicy, this.PolicySheet(),
       {
-        detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],
+        detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE],
         dragBar: false,
         backgroundColor: $r('app.color.background'),
         scrollSizeMode: ScrollSizeMode.CONTINUOUS,

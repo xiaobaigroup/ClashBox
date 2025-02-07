@@ -128,7 +128,7 @@ struct Basic {
                 tips: () => { this.basicMenuTipsBuilder(item.subtitle) }
               })
             }
-            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
               .combine(TransitionEffect.scale({x: 0, y: 0})):null)
           } else if (item.sign === 1) {
             ListItem() {
@@ -142,7 +142,7 @@ struct Basic {
             }.onClick(() => {
               this.handleCheck(index)
             })
-            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
               .combine(TransitionEffect.scale({x: 0, y: 0})):null)
           } else if (item.sign === 2 ) {
             ListItem() {
@@ -154,7 +154,10 @@ struct Basic {
                 isPrimaryIcons: true,
                 toggle:  () => { this.basicToggleBuilder(item.isCheck) }
               })
-            }.onClick(() => {
+            }
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+              .combine(TransitionEffect.scale({x: 0, y: 0})):null)
+            .onClick(() => {
               hilog.info(0xFF00, "BasictestTag", "开关状态1:  %{public}s", item.isCheck)
               this.getUIContext()?.animateTo({
                 duration: this.uiConfig.animationSpeed
@@ -170,12 +173,8 @@ struct Basic {
                 }
               })
             })
-            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
-              .combine(TransitionEffect.scale({x: 0, y: 0})):null)
           }
-
         })
-
       }
       .edgeEffect(EdgeEffect.Spring)
       .width('100%')

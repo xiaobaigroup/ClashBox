@@ -220,7 +220,7 @@ struct MorePage {
           .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay: 90 }):null)
           // 设置页半模态窗口
           .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
-            detents: [BIND_SHEET_CONTAINER_HEIGHT, 300],
+            detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE],
             dragBar: false,
             backgroundColor: $r('app.color.background'),
             keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
