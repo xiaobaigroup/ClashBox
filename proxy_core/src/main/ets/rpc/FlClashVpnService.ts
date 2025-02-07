@@ -179,7 +179,7 @@ export class FlClashVpnService extends CommonVpnService{
           })
           break;
         }
-        case ClashRpcType.patchOverride:{
+        case ClashRpcType.updateProvider:{
           //nativeWriteOverride(data[0] as number, data[1] as string)
           resolve(true)
           break;
@@ -226,6 +226,9 @@ export class FlClashVpnService extends CommonVpnService{
           this.stopVpn()
           resolve(true)
           break;
+        }
+        default :{
+          resolve("不支持当前操作")
         }
       }
     })

@@ -51,6 +51,9 @@ export default class EntryAbility extends UIAbility {
       await ClashViewModel.ChangeCore(appConfig)
       await sleep(500)
       ClashViewModel.initProfile()
+      EventHub.on(EventKey.LoadClashConfig, ()=>{
+        ClashViewModel.initProfile()
+      })
       EventHub.on(EventKey.StartedClash, ()=>{
         const job = async ()=>{
           let now = await ClashViewModel.getTraffic()
