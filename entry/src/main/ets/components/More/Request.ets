@@ -21,6 +21,7 @@ interface RequestData {
 
 @Component
 struct RequestPage {
+  @Consume isSecondary: boolean
   @Consume('NavPathStack') pageInfos: NavPathStack
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
@@ -116,7 +117,8 @@ struct RequestPage {
     .backgroundColor($r('app.color.background'))
     .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
     .onBackPressed(() => {
-      this.pageInfos.clear();
+      this.pageInfos.clear()
+      this.isSecondary = false
       return true;
     })
   }

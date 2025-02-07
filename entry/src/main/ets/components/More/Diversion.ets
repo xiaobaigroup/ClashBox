@@ -10,6 +10,8 @@ import { UIConfig } from "../../entryability/AppState"
 
 @Component
 struct Diversion {
+  // 是否进入二级界面
+  @Consume isSecondary: boolean
   // 添加or编辑策略判断变量
   @State isAdd: boolean = false
   // 资源删除判断变量
@@ -212,6 +214,7 @@ struct Diversion {
     .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
     .onBackPressed(() => {
       this.pageInfos.clear();
+      this.isSecondary = false
       return true;
     })
   }

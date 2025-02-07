@@ -20,6 +20,8 @@ interface ConnectData {
 
 @Component
 struct Connect {
+  // 是否进入二级界面
+  @Consume isSecondary: boolean
   @Consume('NavPathStack') pageInfos: NavPathStack
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
@@ -138,6 +140,7 @@ struct Connect {
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
       this.pageInfos.clear();
+      this.isSecondary = false
       return true;
     })
   }

@@ -21,6 +21,8 @@ interface LogData {
 
 @Component
 struct Log {
+  // 是否进入二级界面
+  @Consume isSecondary: boolean
   @Consume('NavPathStack') pageInfos: NavPathStack
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
@@ -262,6 +264,7 @@ struct Log {
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
       this.pageInfos.clear()
+      this.isSecondary = false
       return true
     })
   }

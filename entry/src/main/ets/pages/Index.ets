@@ -284,6 +284,7 @@ struct Index {
   // 所有子组件在容器内的对齐方式
   @Provide ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment = Alignment.BottomEnd
 
+  @Provide('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
 // 设置页变量
   // 设置页面栈
   @Provide('NavSettingsPathStack') SettingsPageInfos: NavPathStack = new NavPathStack()
@@ -301,6 +302,8 @@ struct Index {
   // 代理启动的计时文本
   @Provide private proxyStartingDuration: string = PROXY_STARTED_DURATION_INIT_VALUE
 
+  // 是否进入二级界面(Tab区)
+  @Provide isSecondary: boolean = false
 
   @Builder
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
@@ -580,9 +583,10 @@ struct Index {
       .backgroundColor($r('app.color.background'))
       //.backdropBlur(60)
     //  .barOverlap(true)  //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
+      .scrollable(this.isSecondary ? false : true)
       .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
-      .barWidth(this.isLandscapePhone ? '63vp' : this.compBarWidth.value) /**/
-      .barHeight(this.isLandscapePhone ? '100%' : this.compBarHeight.value) /**/
+      .barWidth(this.isSecondary === false ? (this.isLandscapePhone ? '63vp' : this.compBarWidth.value) : 0) /**/
+      .barHeight(this.isSecondary === false ? (this.isLandscapePhone ? '100%' : this.compBarHeight.value) : 0) /**/
       .padding(this.compMargin.value)
       .animationDuration(this.uiConfig.animationSpeed)
       .onChange((index: number) => {

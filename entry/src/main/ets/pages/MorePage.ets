@@ -31,6 +31,8 @@ struct MorePage {
   private componentName: string = 'MorePage'
   // 设置页显示变量
   @State isShowSettings: boolean = false
+  // 是否进入二级界面
+  @Consume isSecondary: boolean
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   //一级图标色，黑色
@@ -45,8 +47,8 @@ struct MorePage {
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   // 更多页列表数组
   @State moreList: moreData[] = ListMoreData()
-  // 更多页面栈
-  @Provide('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
+  // 主页面栈
+  @Consume('NavPathStack') pageInfos: NavPathStack
   // 设置页面栈
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   /* 断点布局相关 相关作用看定义时候的注释 */
@@ -113,6 +115,7 @@ struct MorePage {
       hilog.info(0xFF00, "MoretestTag", itemData.name)
       hilog.info(0xFF00, "MoretestTag", "isCheck状态: %{public}s", itemData.isCheck)
       this.pageInfos.replacePathByName(itemData.name, false)
+      this.isSecondary = true
     }
   }
 

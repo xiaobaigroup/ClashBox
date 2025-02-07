@@ -6,6 +6,9 @@
  */
 @Component
 export struct MoreTop {
+  // 是否进入二级界面
+  @Consume isSecondary: boolean
+  // 更多页路由表
   @Consume('NavPathStack') pageInfos: NavPathStack
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
@@ -57,6 +60,9 @@ export struct MoreTop {
       .backgroundColor($r('app.color.settings_container_background'))
       .onClick(() => {
         this.pageInfos.pop(true)
+        if (this.pageInfos.size() <= 1) {
+          this.isSecondary = false
+        }
       })
       Column() {
         Text(this.title)

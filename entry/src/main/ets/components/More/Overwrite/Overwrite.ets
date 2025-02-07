@@ -6,6 +6,8 @@ import { MoreTop } from "../MoreTopBuilder"
 
 @Component
 struct Overwrite {
+  // 是否进入二级界面
+  @Consume isSecondary: boolean
   @Consume('NavPathStack') pageInfos: NavPathStack
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @State overwriteList: moreData[] = ListOverwriteData()
@@ -122,6 +124,7 @@ struct Overwrite {
     .onBackPressed(() => {
       if(this.pageInfos.size() === 1) {
         this.pageInfos.clear()
+        this.isSecondary = false
       } else {
         this.pageInfos.pop(true)
       }
