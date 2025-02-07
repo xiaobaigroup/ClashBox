@@ -36,13 +36,13 @@ struct Kernel {
 
   handleClick(index: number) {
     switch (index) {
-      case 0:
+      case 1:
         // ClashMeta
         this.appConfig.clashCore = ClashCore.ClashMeta
         ClashViewModel.ChangeCore(ClashCore.ClashMeta)
         hilog.info(0xFF00, "SettingsKerneltestTag", "当前内核：%{public}d", this.appConfig.clashCore)
         break
-      case 1:
+      case 0:
         // FlClash
         this.appConfig.clashCore = ClashCore.FlClash
         ClashViewModel.ChangeCore(ClashCore.FlClash)
