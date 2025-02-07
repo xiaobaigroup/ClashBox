@@ -323,7 +323,7 @@ struct Index {
   @Provide private proxyStartingDuration: string = PROXY_STARTED_DURATION_INIT_VALUE
 
   // 是否进入二级界面(Tab区)
-  @Provide isSecondary: boolean = false
+  @Provide @Watch('isSecondaryChange') isSecondary: boolean = false
 
   @Builder
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
@@ -575,11 +575,47 @@ struct Index {
     }
   }
 
+  // tab控制为新控制
+  public indexController: TabsController = new TabsController()
+  // tab移动动画
+  startAnim() {
+    this.indexController.setTabBarTranslate({y: 0 })
+    animateTo({
+      duration: this.uiConfig.animationSpeed,
+      curve: Curve.Linear,
+      iterations:1,
+      playMode:PlayMode.Alternate
+    }, () => {
+      this.indexController.setTabBarTranslate(this.isLandscapePhone ? {x:'-100%'} :{y: this.compBarHeight.value })
+    })
+  }
+
+  stopAnim() {
+    animateTo({
+      duration: this.uiConfig.animationSpeed,
+      curve: Curve.Linear,
+      iterations:1,
+      playMode:PlayMode.Alternate
+    }, () => {
+      this.indexController.setTabBarTranslate(this.isLandscapePhone ? {x:0} :{y: 0 })
+    })
+  }
+
+  isSecondaryChange() {
+    // 监听二级页面布尔判定动画是否执行
+    if(this.isSecondary) {
+      this.stopAnim()
+      this.startAnim()
+    }else{
+      this.stopAnim()
+    }
+  }
+
 
   build() {
     Column() {
       Tabs({
-        barPosition: this.isLandscapePhone ? BarPosition.Start : this.compBarPose.value
+        barPosition: this.isLandscapePhone ? BarPosition.Start : this.compBarPose.value,controller: this.indexController
       }) {
         TabContent() {
        //   if (this.currentIndex===0){
@@ -588,7 +624,9 @@ struct Index {
         }
         .tabBar(this.TabBarBuilder($r('app.string.Home'), 0, $r('sys.symbol.house_fill')))
         .onWillShow(() => {
-          this.currentIndex = 0
+          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+            this.currentIndex = 0
+          })
         })
 
         TabContent() {
@@ -598,7 +636,9 @@ struct Index {
         }
         .tabBar(this.TabBarBuilder($r('app.string.Proxy'), 1, $r('sys.symbol.list_bullet_square_fill')))
         .onWillShow(() => {
-          this.currentIndex = 1
+          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+            this.currentIndex = 1
+          })
         })
 
         TabContent() {
@@ -608,7 +648,9 @@ struct Index {
         }
         .tabBar(this.TabBarBuilder($r('app.string.Configuration'), 2, $r('sys.symbol.folder_fill')))
         .onWillShow(() => {
-          this.currentIndex = 2
+          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+            this.currentIndex = 2
+          })
         })
 
         TabContent() {
@@ -618,7 +660,9 @@ struct Index {
         }
         .tabBar(this.TabBarBuilder($r('app.string.More'), 3, $r('sys.symbol.square_fill_grid_2x2')))
         .onWillShow(() => {
-          this.currentIndex = 3
+          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+            this.currentIndex = 3
+          })
         })
       }
       //.barOverlap(true)
@@ -631,8 +675,8 @@ struct Index {
       .barOverlap(this.uiConfig.isBlurr ?  (this.isLandscapePhone ? false:true):false)  //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
       .scrollable(this.isSecondary ? false : true)
       .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
-      .barWidth(this.isSecondary === false ? (this.isLandscapePhone ? '63vp' : this.compBarWidth.value) : 0) /**/
-      .barHeight(this.isSecondary === false ? (this.isLandscapePhone ? '100%' : this.compBarHeight.value) : 0) /**/
+      .barWidth(this.isLandscapePhone ? '63vp' : this.compBarWidth.value) /**/
+      .barHeight(this.isLandscapePhone ? '100%' : this.compBarHeight.value) /**/
       .padding(this.compMargin.value)
       .onChange((index: number) => {
         this.currentIndex = index
@@ -646,6 +690,6 @@ struct Index {
       { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
     )
     .padding({ top:px2vp(this.topRectHeight)}) //, bottom: this.isLandscapePhone ? 0 :px2vp(this.bottomRectHeight) -15})
-    .animation(this.uiConfig.isAnimation ? { duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
+  //  .animation(this.uiConfig.isAnimation ? { duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
   }
 }

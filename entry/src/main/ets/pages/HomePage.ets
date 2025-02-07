@@ -61,7 +61,7 @@ struct Home {
 
   windowClass = AppStorage.get<window.Window>('windowClass') as window.Window;
   // 编辑按钮点击后显示编辑状态判定
-  @Provide isShowHomeEdit: boolean = false
+  @Provide @Watch('ShowHomeEditChange')isShowHomeEdit: boolean = false
   /**
    * 是否保存布局弹窗
    */
@@ -94,7 +94,7 @@ struct Home {
   // 删除按钮是否出现判定
   @State isShowDeleteButton: boolean = false
   //卡片编辑半模拟态判定
-  @State @Watch('ShowHomeEditChange') isShowCardEdit: boolean = false
+  @State @Watch('ShowHomeEditChange')isShowCardEdit: boolean = false
   // 折叠屏展开状态判定
   @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
   // 配置页数据表
@@ -180,8 +180,6 @@ struct Home {
     animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
       this.isShowDeleteButton = false
     })
-    // 关闭卡片旋转动画
-    this.stopAnim()
   }
 
   /**
@@ -197,8 +195,6 @@ struct Home {
       animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
         this.isShowDeleteButton = false
       })
-      // 关闭卡片旋转动画
-      this.stopAnim()
     } else { this.isShowDeleteButton = false }
   }
 
@@ -251,10 +247,12 @@ struct Home {
   ShowHomeEditChange() {
     hilog.info(0xFF00, "HometestTag", "进入卡片编辑页面显示监听  %{public}s")
     // 当编辑页面由 true -> false 时触发抖动动画刷新
-    if(!this.isShowCardEdit) {
+    if(this.isShowHomeEdit && !this.isShowCardEdit) {
       hilog.info(0xFF00, "HometestTag", "进入卡片编辑页面显示监听，true -> false  %{public}s")
       this.stopAnim()
       this.startAnim()
+    }else{
+      this.stopAnim()
     }
   }
 
@@ -291,9 +289,6 @@ struct Home {
                 animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
                   this.isShowDeleteButton = true
                 })
-                //编辑模式下开启卡片旋转动画
-                this.stopAnim()
-                this.startAnim()
               }else {this.isShowDeleteButton = true}
             })
             .width(40)

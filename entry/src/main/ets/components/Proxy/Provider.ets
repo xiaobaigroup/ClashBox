@@ -151,6 +151,9 @@ export struct ProviderPage {
             // 代理提供者相关
             if (this.resourceListData.length === 0) {
               Nothing({ name: $r('app.string.Resources') })
+                .width('100%')
+                .height('100%')
+
             } else {
               Column({ space: 8 }) {
                 //副标题

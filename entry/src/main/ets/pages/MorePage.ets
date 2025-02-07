@@ -4,7 +4,8 @@
  *
  */
 import { BreakpointState } from '../common/breakpointsystem'
-import { BIND_SHEET_CONTAINER_HEIGHT, CONTENT_END_OFFSET, ListMoreData, moreData } from '../common/Constants';
+import { BIND_SHEET_CONTAINER_HEIGHT, CONTENT_END_OFFSET, ListMoreData, moreData,
+  TAB_CONTENT_TITLE_HEIGHT } from '../common/Constants';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import Log from '../components/More/Log';
 import { LogDetils } from '../components/More/Log';
@@ -63,6 +64,8 @@ struct MorePage {
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @Consume('breakPointStateTabContentTitleMargin')
+  private breakPointStateTabContentTitleMargin: BreakpointState<number>
   /**
    * 查询IP地址弹窗控制器
    */
@@ -180,11 +183,16 @@ struct MorePage {
             .width('83%')
             .textAlign(TextAlign.Start)
         }
-        .margin({left: this.morePageMargin.value})
+       // .margin({left: this.morePageMargin.value})
         .width('100%')
+        .height(TAB_CONTENT_TITLE_HEIGHT)
         .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
           .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
           .combine(TransitionEffect.SLIDE):null)
+        .padding({
+          left: this.breakPointStateTabContentTitleMargin.value,
+          right: this.breakPointStateTabContentTitleMargin.value,
+        })
 
         List({space: 10}) {
           ForEach(this.moreList, (item: moreData, index: number) => {
@@ -198,7 +206,7 @@ struct MorePage {
               })
             }.margin({left: this.morePageMargin.value, right: this.morePageMargin.value})
             .onClick(() => {
-              this.handleCheck(index)
+                this.handleCheck(index)
             })
             .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index * 10 + 10 })
               .combine(TransitionEffect.scale({x: 0, y: 0})):null)
@@ -234,9 +242,9 @@ struct MorePage {
           })
         }
         .width('100%')
-        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+        .edgeEffect(EdgeEffect.Spring)
      //   .height(this.isLandscapePhone ? 275 : this.listHeight.value)
-        .margin({ top: 10 })
+       // .margin({ top: 10 })
         .borderRadius(18)
         .alignListItem(ListItemAlign.Center)
         .contentEndOffset(CONTENT_END_OFFSET)
