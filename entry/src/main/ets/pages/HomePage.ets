@@ -16,6 +16,7 @@ import {
   gutterHomeGridcol,
   MarginGenerate,
   showHomeCard,
+  CONTENT_END_OFFSET,
 } from '../common/Constants'
 import Settings from '../components/Settings/Settings'
 import CurrentNode from '../components/Home/CurrentNode'
@@ -718,7 +719,7 @@ struct Home {
         .width('100%')
         .height('100%')
         .scrollBar(BarState.Off)
-        .contentEndOffset(70)
+        .contentEndOffset(CONTENT_END_OFFSET)
         .edgeEffect(EdgeEffect.Spring)
         .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
         .bindSheet($$this.isShowCardEdit, this.CardEdit(), {
@@ -768,7 +769,8 @@ struct Home {
           offsetY: 4,
           type: ShadowType.BLUR
         })
-        .margin($r('app.integer.vp_proxy_start_button_margin'))
+        .margin(this.uiConfig.isBlurr?{bottom:this.isLandscapePhone ?30: $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')}:
+          $r('app.integer.vp_proxy_start_button_left_right_margin'))
         .width(this.proxyStartButtonWidth)
         .height(this.proxyStartButtonHeight)
         .clip(true)

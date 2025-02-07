@@ -10,6 +10,7 @@ import {
   BIND_SHEET_CONTAINER_HEIGHT,
   LIST_ITEM_PADDING,
   RouteName,
+  CONTENT_END_OFFSET,
 } from '../common/Constants'
 import { LengthMetrics, PromptAction, SymbolGlyphModifier } from '@kit.ArkUI'
 import { ConfigAdd } from '../components/Configuration/ConfigAdd'
@@ -280,8 +281,6 @@ struct ConfigurationPage {
   private proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
   // 配置添加按钮高度
   private proxyStartButtonHeight: Length = $r('app.integer.vp_proxy_not_start_button_height')
-  // 配置添加按钮Margin
-  private proxyStartButtonMargin: Length = $r('app.integer.vp_proxy_start_button_margin')
   // 配置添加按钮前Symbol动效
   private ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE
 
@@ -289,7 +288,7 @@ struct ConfigurationPage {
   build() {
     Column() {
       // 标题栏 START
-      if (!this.isLandscapePhone) {
+    //  if (!this.isLandscapePhone) {
         Row() {
           Text($r('app.string.Configuration'))
             .fontSize(TAB_CONTENT_TITLE_FONT_SIZE)
@@ -326,7 +325,7 @@ struct ConfigurationPage {
           right: this.breakPointStateTabContentTitleMargin.value,
         })
         // .margin({ bottom: 15 })
-      }
+     // }
       // 标题栏 END
 
       // 主体 START
@@ -419,7 +418,7 @@ struct ConfigurationPage {
             right: this.breakPointStateTabContentTitleMargin.value,
           })
           // 110 = app.integer.vp_proxy_start_button_margin *2 + app.integer.vp_proxy_not_start_button_width
-          .contentEndOffset(110)
+          .contentEndOffset(CONTENT_END_OFFSET)
           .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
           .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
           .chainAnimation(true)
@@ -445,7 +444,8 @@ struct ConfigurationPage {
           type: ShadowType.BLUR
         })
         .borderRadius(100)
-        .margin(this.proxyStartButtonMargin)
+        .margin(this.uiConfig.isBlurr?{bottom:this.isLandscapePhone ? 86: $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')}:
+          {bottom:this.isLandscapePhone ? 86: $r('app.integer.vp_proxy_start_button_left_right_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
         .width(this.proxyStartButtonWidth)
         .height(this.proxyStartButtonHeight)
         .backgroundColor(this.icon_emphasize)

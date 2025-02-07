@@ -4,7 +4,7 @@
  *
  */
 import { BreakpointState } from '../common/breakpointsystem'
-import { BIND_SHEET_CONTAINER_HEIGHT, ListMoreData, moreData } from '../common/Constants';
+import { BIND_SHEET_CONTAINER_HEIGHT, CONTENT_END_OFFSET, ListMoreData, moreData } from '../common/Constants';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import Log from '../components/More/Log';
 import { LogDetils } from '../components/More/Log';
@@ -231,10 +231,11 @@ struct MorePage {
         }
         .width('100%')
         .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
-        .height(this.isLandscapePhone ? 275 : this.listHeight.value)
+     //   .height(this.isLandscapePhone ? 275 : this.listHeight.value)
         .margin({ top: 10 })
         .borderRadius(18)
         .alignListItem(ListItemAlign.Center)
+        .contentEndOffset(CONTENT_END_OFFSET)
       }
       .hideToolBar(true)
       .mode(this.isLandscapePhone ? NavigationMode.Stack : NavigationMode.Auto)

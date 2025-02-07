@@ -1,5 +1,5 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import {  BORDER_RADIUS_20 } from "../../common/Constants"
+import {  BORDER_RADIUS_20, CONTENT_END_OFFSET } from "../../common/Constants"
 import { Nothing, theCustomDialog } from "../Common"
 import { convertTime } from "../../utils/TimeConvertUtil"
 import { ClashConfig } from 'proxy_core'
@@ -393,7 +393,7 @@ export struct ProviderPage {
             }
           }
         }.width('100%')
-        .contentEndOffset(150)
+        .contentEndOffset(CONTENT_END_OFFSET+40)
         .scrollBar(BarState.Off)
       }
     }.width('100%')

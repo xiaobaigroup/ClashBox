@@ -85,8 +85,7 @@ struct ProxyPage {
   private proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
   // 按钮高度
   private proxyStartButtonHeight: Length = $r('app.integer.vp_proxy_not_start_button_height')
-  // 按钮Margin
-  private proxyStartButtonMargin: Length = $r('app.integer.vp_proxy_start_button_margin')
+
   // 按钮前Symbol动效
   private ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE
   //定义组件名
@@ -483,7 +482,8 @@ struct ProxyPage {
           })
           .borderRadius(100)
           .backgroundColor(this.icon_emphasize)
-          .margin(this.proxyStartButtonMargin)
+          .margin(this.uiConfig.isBlurr?{bottom:this.isLandscapePhone ?30: $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')}:
+          $r('app.integer.vp_proxy_start_button_left_right_margin'))
           .width(this.proxyStartButtonWidth)
           .height(this.proxyStartButtonHeight)
           .clip(true)

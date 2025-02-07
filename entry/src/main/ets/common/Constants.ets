@@ -56,6 +56,9 @@ export const ANIMATION_DURATION_300: number = 300
 export const ANIMATION_DURATION_100: number = 100
 export const ANIMATION_DURATION_500: number = 500
 
+// list偏移数值：110
+export const CONTENT_END_OFFSET: number = 110
+
 // enum：routeName
 export enum RouteName {
   IMPORT_CONFIG_FROM_URL = 'ImportConfigFromURL',

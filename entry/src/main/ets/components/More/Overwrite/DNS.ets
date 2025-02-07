@@ -309,12 +309,12 @@ struct DNS {
 
       }
       .width('100%')
-      .height(this.isLandscapePhone ? 275 : (this.istabletVertical ? 945 : this.listHeight.value))
+     // .height(this.isLandscapePhone ? 275 : (this.istabletVertical ? 945 : this.listHeight.value))
       .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
       .margin({ top: 10 })
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)
-
+      .contentEndOffset(70)
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))

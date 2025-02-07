@@ -149,10 +149,10 @@ struct Index {
     xl: '60vp'
   });
   @State compBarHeight: BreakpointState<string> = BreakpointState.of({
-    sm: '55vp',
-    md: '55vp',
-    lg: '55vp',
-    xl: '100%'
+    sm: '60vp',
+    md: '60vp',
+    lg: '60vp',
+    xl: '80vp'
   });
   @State TabIconfontSize: BreakpointState<number> = BreakpointState.of({
     sm: 24,
@@ -620,19 +620,24 @@ struct Index {
       /*.backgroundBrightness({
         rate: 0.5,
         lightUpDegree: 0.5 })*/
-      .backgroundColor($r('app.color.background'))
-      //.backdropBlur(60)
-    //  .barOverlap(true)  //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
+      .backgroundColor(this.uiConfig.isBlurr ? '#00ffffff':$r('app.color.background'))
+      .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Thick:null)
+      .backdropBlur(this.uiConfig.isBlurr ?0.3:0)
+      .barOverlap(this.uiConfig.isBlurr ?  (this.isLandscapePhone ? false:true):false)  //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
       .scrollable(this.isSecondary ? false : true)
       .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
       .barWidth(this.isSecondary === false ? (this.isLandscapePhone ? '63vp' : this.compBarWidth.value) : 0) /**/
       .barHeight(this.isSecondary === false ? (this.isLandscapePhone ? '100%' : this.compBarHeight.value) : 0) /**/
       .padding(this.compMargin.value)
-      .animationDuration(this.uiConfig.animationSpeed)
+      .animation(this.isSecondary===true ?{
+        duration: this.uiConfig.animationSpeed,
+        curve: Curve.Linear,
+        iterations: 1,
+        playMode: PlayMode.Normal
+      }:null)
       .onChange((index: number) => {
         this.currentIndex = index
       })
-
     }
     .width('100%')
     .height('100%')
@@ -641,7 +646,7 @@ struct Index {
       this.isEnableIndexForegroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
       { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
     )
-    .padding({ top:px2vp(this.topRectHeight) , bottom: this.isLandscapePhone ? 0 :px2vp(this.bottomRectHeight) -15})
+    .padding({ top:px2vp(this.topRectHeight)}) //, bottom: this.isLandscapePhone ? 0 :px2vp(this.bottomRectHeight) -15})
     .animation(this.uiConfig.isAnimation ? { duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
   }
 }
