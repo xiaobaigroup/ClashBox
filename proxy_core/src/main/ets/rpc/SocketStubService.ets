@@ -37,6 +37,9 @@ export class SocketStubService {
       console.error("socketService failure", e.message)
     }
   }
+  startVpn(){
+    this.vpnService.startVpn()
+  }
   stopVpn(){
     this.vpnService.stopVpn()
   }

@@ -20,7 +20,6 @@ import { ClashRpcType } from './IClashManager';
 import { LogInfo, Provider, ProxyGroup, ProxyMode, ProxyType, Traffic } from '../models/Common';
 import { getHome } from '../appPath';
 import { UpdateConfigParams } from '../models/ClashConfig';
-import { pointer } from '@kit.InputKit';
 import { readFile, readFileUri } from '../fileUtils';
 
 export interface AccessControl{
@@ -215,7 +214,7 @@ export class FlClashVpnService extends CommonVpnService{
           break;
         }
         case ClashRpcType.startClash: {
-          this.startTun().then((r)=>{
+          this.startVpn().then((r)=>{
             resolve(r)
           }).catch((e:Error)=>{
             reject(e)
@@ -246,7 +245,6 @@ export class FlClashVpnService extends CommonVpnService{
       vpnConfig.addresses[0].address = new Address(option.ipv6Address.split("/")[0], 2)
       option.routeAddress?.filter(a => isIpv6(a)).map(f=>f.split("/")[0])
     }
-    let packageName = ""
     if(option.accessControl?.mode){
       if(option.accessControl?.mode == "AcceptSelected"){
         vpnConfig.trustedApplications = option.accessControl?.acceptList
@@ -261,18 +259,18 @@ export class FlClashVpnService extends CommonVpnService{
     console.debug("vpnConfig", JSON.stringify(vpnConfig))
     return vpnConfig;
   }
-  async startTun(): Promise<boolean> {
+  override async startVpn(): Promise<boolean> {
     let config = this.ParseConfig();
     let tunFd = -1
     try {
-      tunFd = await super.startVpn(config)
+      tunFd = await super.getTunFd(config)
       if(tunFd > -1){
         startTun(tunFd, async (id: number, fd: number) => {
           await this.protect(fd)
           setFdMap(id)
         })
       }
-      return true;
+      return tunFd > -1;
     } catch (error) {
       return false
     }

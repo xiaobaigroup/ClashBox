@@ -1,10 +1,9 @@
-import { AbilityConstant, Configuration, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
+import { AbilityConstant,  ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { promptAction, window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import ClashViewModel from './ClashViewModel';
-import { KeyboardAvoidMode } from '@kit.ArkUI';
-import { AppConfig, AppFlowingState, AppState, ClashCore } from './AppState';
+import { AppConfig, AppFlowingState, AppState } from './AppState';
 import { EventHub, EventKey } from '../common/EventHub';
 import { http } from '@kit.NetworkKit';
 
@@ -44,16 +43,25 @@ export default class EntryAbility extends UIAbility {
         return;
       }
       AppState.init()
-      let appConfig = AppStorage.get<AppConfig>("appConfig")?.clashCore
+      let clashCore = AppStorage.get<AppConfig>("appConfig")?.clashCore
       let appFlowingState = AppStorage.get<AppFlowingState>("appFlowingState") ?? new AppFlowingState()
       // 切换核心
       promptAction.showToast({message: "核心启动中..."})
-      await ClashViewModel.ChangeCore(appConfig)
-      await sleep(500)
+      await ClashViewModel.ChangeCore(clashCore)
       ClashViewModel.initProfile()
       EventHub.on(EventKey.LoadClashConfig, ()=>{
         ClashViewModel.initProfile()
       })
+      // 监测vpn服务是否被回收，并且重新启动
+      setInterval(async ()=>{
+        if(!ClashViewModel.socketProxy.active){
+          ClashViewModel.socketProxy.active = true
+          promptAction.showToast({message: "恢复核心中..."})
+          let clashCore = AppStorage.get<AppConfig>("appConfig")?.clashCore
+          await ClashViewModel.ChangeCore(clashCore)
+          await ClashViewModel.ReStartVpn()
+        }
+      }, 100)
       EventHub.on(EventKey.StartedClash, ()=>{
         const job = async ()=>{
           let now = await ClashViewModel.getTraffic()
@@ -130,7 +138,7 @@ export default class EntryAbility extends UIAbility {
   }
 }
 
-function sleep(timeout: number): Promise<void>{
+export function sleep(timeout: number): Promise<void>{
   return new Promise((resolve, reject)=>{
       setTimeout(()=>{
         resolve()

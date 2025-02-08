@@ -12,6 +12,8 @@ import { checkIp, queryIpInfo } from '../Request';
 
 export class SocketProxyService implements IClashManager{
   context?: common.Context
+  active: boolean = false
+  offlineCount: number = 0
   init(context: common.Context) {
     this.context = context
   }
@@ -105,15 +107,22 @@ export class SocketProxyService implements IClashManager{
       client.on("error", ()=>{
         console.log("socketProxy on error" )
         promptAction.showToast({message: "socketProxy error"})
-        reject("rpc 中断")
+        reject("vpn 中断")
       })
       const socketPath = this.context?.filesDir + '/clashNext.sock'
 
       client.connect({address: { address: socketPath }, timeout:1000}).then(async ()=>{
+        this.active = true
         client.send({ data: JSON.stringify({method, params}) });
       }).catch((e:Error)=>{
+        this.active = false
+        this.offlineCount++
         console.log("socketProxy error", e.message)
-        promptAction.showToast({message: "rpc失败: " + e.message})
+        if(e.message == "Connection refused"){
+          promptAction.showToast({message: "vpn服务系统被回收!"})
+        }else{
+          promptAction.showToast({message: "vpn服务失败: " + e.message})
+        }
         reject(e)
       });
     })

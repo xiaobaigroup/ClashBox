@@ -47,7 +47,7 @@ export abstract class CommonVpnService{
   }
   abstract onRemoteMessageRequest(client: socket.LocalSocketConnection, message: socket.LocalSocketMessageInfo): Promise<void>
   abstract init()
-  async startVpn(config: VpnConfig): Promise<number> {
+  async getTunFd(config: VpnConfig): Promise<number> {
     let tunFd = -1
     try {
       this.vpnConnection = vpnExtension.createVpnConnection(this.context as common.VpnExtensionContext);
@@ -63,6 +63,7 @@ export abstract class CommonVpnService{
   async protect(fd: number){
     await this.vpnConnection?.protect(fd)
   }
+  abstract startVpn(): Promise<boolean>
   stopVpn(){
     this.vpnConnection?.destroy()
   }

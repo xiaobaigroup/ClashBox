@@ -13,6 +13,7 @@ import { ConfigExtendedParams } from "proxy_core/src/main/ets/models/ClashConfig
 import { EventHub, EventKey } from "../common/EventHub";
 import { AppConfig, ClashCore } from "./AppState";
 import  fs from  "@ohos.file.fs"
+import { sleep } from "./EntryAbility";
 
 export class ClashViewModel {
   profileRepo = new ProfileRepo()
@@ -192,6 +193,8 @@ export class ClashViewModel {
       } as Want
       await vpnExtension.stopVpnExtensionAbility(vpnWant)
       await vpnExtension.startVpnExtensionAbility(vpnWant);
+      //
+      await sleep(500)
     } catch (e) {
       // TODO 用户点取消
       // 是否退出程序
@@ -210,10 +213,23 @@ export class ClashViewModel {
     }
     EventHub.sendEvent(EventKey.FetchProxyGroup, null)
   }
+  async ReStartVpn(){
+    await this.loadConfig()
+    let result = await this.socketProxy.startClash()
+    // 核心崩溃 小钥匙一直在，要重启两量变
+    if (!result){
+      result = await this.socketProxy.startClash()
+    }
+  }
 
   async StartVpn(){
-    await this.socketProxy.startClash()
-    EventHub.sendEvent(EventKey.StartedClash)
+    let result = await this.socketProxy.startClash()
+    // 核心崩溃 小钥匙一直在，要重启两量变
+    if (!result){
+      result = await this.socketProxy.startClash()
+    }
+    if (result)
+      EventHub.sendEvent(EventKey.StartedClash)
   }
 
   async StopVpn(){
@@ -223,12 +239,17 @@ export class ClashViewModel {
 
   initProfile(){
     let appConfig = AppStorage.get<AppConfig>("appConfig")
-    let clashConfig = AppStorage.get<ClashConfig>("clashConfig")
-    if (appConfig?.currentProfileId){
-      this.loadProfileAndConfig(appConfig?.currentProfileId, clashConfig)
-    }
+    this.loadConfig()
     EventHub.sendEvent(EventKey.StartLog, appConfig?.enableLogger)
   }
+  async loadConfig(){
+    let appConfig = AppStorage.get<AppConfig>("appConfig")
+    let clashConfig = AppStorage.get<ClashConfig>("clashConfig")
+    if (appConfig?.currentProfileId){
+      await this.loadProfileAndConfig(appConfig?.currentProfileId, clashConfig)
+    }
+  }
+
   async initGeoIp(){
     let geoIp = await readFile(this.context?.resourceDir + "/geoip.metadb")
     writeFile(await getHome(this.context) + "/geoip.metadb", geoIp)

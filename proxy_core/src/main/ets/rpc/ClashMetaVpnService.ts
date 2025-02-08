@@ -177,7 +177,7 @@ export class ClashMetaVpnService extends CommonVpnService{
           break;
         }
         case ClashRpcType.startClash: {
-          this.startTun().then((r)=>{
+          this.startVpn().then((r)=>{
             resolve(r)
           }).catch((e:Error)=>{
             reject(e)
@@ -193,17 +193,17 @@ export class ClashMetaVpnService extends CommonVpnService{
       }
     })
   }
-  async startTun(): Promise<boolean> {
+  override async startVpn(): Promise<boolean> {
     let config = new VpnConfig(new Address("172.19.0.1", 1), ["172.19.0.2"]);
     let tunFd = -1
     try {
-      tunFd = await super.startVpn(config)
+      tunFd = await super.getTunFd(config)
       if(tunFd > -1){
         nativeStartTun(tunFd, (fd)=>{
           this.vpnConnection?.protect(fd)
         })
       }
-      return true;
+      return tunFd > -1;
     } catch (error) {
       return false
     }
