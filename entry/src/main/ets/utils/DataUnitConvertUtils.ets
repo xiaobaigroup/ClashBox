@@ -112,6 +112,8 @@ export function convertDataNumberT(bNumber: number): string {
     show = bNumber
     unit = TrafficUnit.B
   }
+  if(!show)
+    return "--"
     // 如果小于1KB，则保持为B
-      return (show.toFixed(0)  + " " + unit).toString()
+  return (show.toFixed(0)  + " " + unit).toString()
 }

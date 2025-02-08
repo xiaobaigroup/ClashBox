@@ -1,11 +1,12 @@
 import { ClashConfig } from 'proxy_core'
 import { BreakpointState } from '../../../common/breakpointsystem'
-import { ConfigItemData, moreData } from '../../../common/Constants'
+import { ConfigItemData, CONTENT_END_OFFSET, MenuListItemProp, moreData } from '../../../common/Constants'
 import { EventHub, EventKey } from '../../../common/EventHub'
 import { AppConfig, UIConfig } from '../../../entryability/AppState'
 import { getResourceString } from '../../../utils/ResourceStringUtil'
 import { menuRowList, skipRowList, theCustomDialog, toggleRowList } from '../../Common'
 import { ArrayConfigParam } from './EditArrayConfig'
+import { SymbolGlyphModifier } from '@kit.ArkUI'
 
 
 @Component
@@ -24,9 +25,10 @@ export struct ConfigList {
   @State currentItemIndex: number = 0
   // 添加路由地址弹窗保存的输入文本
   @State SaveInputValue: string = ''
+  @State theDialogTitle: ResourceStr = $r('app.string.GeoIP_Code')
   dialogController: CustomDialogController = new CustomDialogController({
     builder: theCustomDialog({
-      theDialogTitle: $r('app.string.GeoIP_Code'),
+      theDialogTitle: this.theDialogTitle,
       theplaceholder: this.theplaceholder,
       currentInputValue: $currentInputValue,
       SaveInputValue: $SaveInputValue,
@@ -49,26 +51,24 @@ export struct ConfigList {
   })
 
   onCancel() {
-    // 关闭背景模糊
     this.isEnableIndexForegroundBlur = false
-    // 重置FakeIP判断及提示词和当前文本状态
-    this.theplaceholder = 'CN'
     this.currentInputValue = ''
   }
 
   onAccept() {
     this.isEnableIndexForegroundBlur = false
-    const item = this.configList[ this.currentItemIndex]
+    const item = this.configList[this.currentItemIndex]
+    item.value = this.SaveInputValue
     item.onChange(this.SaveInputValue)
-    console.debug("currentInputValue", this.SaveInputValue, item.value)
     this.configList.splice(this.currentItemIndex, 1, item)
-    this.currentInputValue = ''
   }
   handleCheck(index: number) {
     this.currentItemIndex = index
     let itemData = this.configList[index]
-    if(typeof itemData.value == "string"){
-      this.theplaceholder = `${getResourceString($r('app.string.example'), this)}: ${itemData.subtitle}`
+    console.log("handleCheck", itemData.value, itemData.isStringType());
+    if(itemData.isStringType()){
+      this.theplaceholder = `${getResourceString($r('app.string.example'), this)}: ${itemData.tips()}`
+      this.theDialogTitle = itemData.title
       this.isEnableIndexForegroundBlur = true
       this.dialogController.open()
     }else{
@@ -79,12 +79,16 @@ export struct ConfigList {
       } as ArrayConfigParam, true)
     }
   }
-  handleToggle(item: ConfigItemData, checked: boolean) {
-    item.onChange(checked)
+  handleToggle(index: number) {
+    const toggleItem = this.configList[index]
+    toggleItem.isCheck = !toggleItem.isCheck
+    this.configList.splice(index, 1, toggleItem)
+    toggleItem.onChange(toggleItem.isCheck)
   }
   aboutToAppear(): void {
     EventHub.on(EventKey.ArrayConfigChanged, (d: ArrayConfigParam) => {
       let item = this.configList[this.currentItemIndex]
+      item.value = d.value
       item.onChange(d.value)
       this.configList.splice(this.currentItemIndex, 1, item)
     })
@@ -114,6 +118,32 @@ export struct ConfigList {
       .hitTestBehavior(HitTestMode.None)
       .selectedColor(this.icon_emphasize)
   }
+  @Builder
+  MenuEntrance(item: ConfigItemData, index: number) {
+    // 确保children存在
+    this.switchMenu([], index)
+  }
+
+  @Builder
+  switchMenu(item: MenuListItemProp[], index: number) {
+    // 栈模式菜单
+    Menu() {
+      MenuItem({ content: $r('app.string.DNS_Mode') }).contentFont({ weight: FontWeight.Bold })
+      ForEach(item, (menuItem: MenuListItemProp, index: number) => {
+        MenuItem({
+          content: menuItem.title,
+          symbolEndIcon: true ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+        })
+          .selected(true)
+          .onChange(() => {
+            let Item = this.configList[this.currentItemIndex]
+            Item.subtitle = menuItem.title
+            this.configList.splice(this.currentItemIndex, 1, Item)
+          })
+      }, (menuItem: MenuListItemProp) => JSON.stringify(menuItem))
+    }
+  }
+
   build() {
     List({space: this.listBottom.value}) {
       ForEach(this.configList, (item: ConfigItemData, index: number) => {
@@ -124,7 +154,8 @@ export struct ConfigList {
               icons: item.icons,
               title: item.title,
               isPrimaryIcons: true,
-              tips: () => { this.menuTipsBuilder(item.subtitle) }
+              tips: () => { this.menuTipsBuilder(item.tips()) },
+              menu: (): void => { this.MenuEntrance(item, index) }
             })
           }
           .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
@@ -136,7 +167,7 @@ export struct ConfigList {
               icons: item.icons,
               title: item.title,
               isPrimaryIcons: true,
-              tips: () => { this.skipTipsBuilder(item.subtitle) }
+              tips: () => { this.skipTipsBuilder(item.tips()) }
             })
           }.onClick(() => {
             this.handleCheck(index)
@@ -160,12 +191,23 @@ export struct ConfigList {
             this.getUIContext()?.animateTo({
               duration: this.uiConfig.animationSpeed
             }, () => {
-              const toggleItem = this.configList[index]
-              toggleItem.isCheck = !toggleItem.isCheck
-              this.configList.splice(index, 1, toggleItem)
-              this.handleToggle(toggleItem, toggleItem.isCheck)
+              this.currentItemIndex = index
+              this.handleToggle(index)
             })
           })
+        } else  {
+          // 标题栏
+          ListItem() {
+            Row() {
+              Text(item.title)
+                .fontWeight(FontWeight.Normal)
+                .fontSize(15)
+              Blank()
+            }.width('100%')
+            .justifyContent(FlexAlign.Start)
+          }
+          .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
+            .combine(TransitionEffect.scale({x: 0, y: 0})) : null)
         }
       })
     }
@@ -173,6 +215,6 @@ export struct ConfigList {
     .margin({ top: 10 })
     .borderRadius(18)
     .alignListItem(ListItemAlign.Center)
-    .contentEndOffset(70)
+    .contentEndOffset(CONTENT_END_OFFSET - 40)
   }
 }

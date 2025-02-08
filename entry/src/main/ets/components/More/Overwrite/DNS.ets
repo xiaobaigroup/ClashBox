@@ -1,6 +1,7 @@
 
 import { BreakpointState } from "../../../common/breakpointsystem"
 import {
+  ConfigItemData,
   CONTENT_END_OFFSET,
   DNSMenu, ListOverwriteDNSData, MenuListItemProp, moreData } from "../../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
@@ -13,6 +14,7 @@ import { EventHub, EventKey } from "../../../common/EventHub"
 import { JSON } from "@kit.ArkTS"
 import { SymbolGlyphModifier } from "@kit.ArkUI"
 import { getResourceString } from "../../../utils/ResourceStringUtil"
+import { ConfigList } from "./Common"
 
 
 @Component
@@ -27,7 +29,7 @@ struct DNS {
   @Consume('NavPathStack') pageInfos: NavPathStack
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
-  @State overwriteDNSList: moreData[] = []
+  @State overwriteDNSList: ConfigItemData[] = []
   @State DNSMenuList: MenuListItemProp[] = DNSMenu
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
   // 列表高度
@@ -44,174 +46,13 @@ struct DNS {
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  // 编辑FakeIP范围 & GeoIP代码弹窗控制器
-  dialogController: CustomDialogController = new CustomDialogController({
-    builder: theCustomDialog({
-      theDialogTitle: this.isFakeIP ? $r('app.string.Edit_FakeIP_Range') : $r('app.string.GeoIP_Code'),
-      theplaceholder: this.theplaceholder,
-      currentInputValue: $currentInputValue,
-      SaveInputValue: $SaveInputValue,
-      cancel: ()=> { this.onCancel() },
-      confirm: ()=> { this.onAccept() },
-    }),
-    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-      // 1、PRESS_BACK    点击三键back、左滑/右滑、键盘ESC。
-      // 2、TOUCH_OUTSIDE    点击遮障层时
-      // 3、CLOSE_BUTTON    点击关闭按钮
-      if (dismissDialogAction.reason === DismissReason.TOUCH_OUTSIDE) {
-        // 点击遮蔽层不响应，防误触
-      } else {
-        // 完成IP地址查询后主动通过dismiss主动关闭对话框
-        dismissDialogAction.dismiss()
-        // 关闭背景模糊
-        this.isEnableIndexForegroundBlur = false
-      }
-    },
-  })
-
-  onCancel() {
-    // 关闭背景模糊
-    this.isEnableIndexForegroundBlur = false
-    // 重置FakeIP判断及提示词和当前文本状态
-    this.isFakeIP = false
-    this.theplaceholder = 'CN'
-    this.currentInputValue = ''
-  }
-  onAccept() {
-    // 关闭背景模糊
-    this.isEnableIndexForegroundBlur = false
-    // 更新UI数组中对应元素
-    if(this.isFakeIP) {
-      // FakeIP范围
-      let FakeIPRangeData = this.overwriteDNSList[9]
-      FakeIPRangeData.subtitle = this.SaveInputValue
-      this.overwriteDNSList.splice(9, 1, FakeIPRangeData)
-      // 处理FakeIP范围变更
-
-    } else {
-      // GeoIP代码
-      let GeoIPData = this.overwriteDNSList[18]
-      GeoIPData.subtitle = this.SaveInputValue
-      this.overwriteDNSList.splice(18, 1, GeoIPData)
-      // 处理GeoIP代码变更
-
-    }
-    // 重置FakeIP判断及提示词和当前文本状态
-    this.isFakeIP = false
-    this.theplaceholder = 'CN'
-    this.currentInputValue = ''
-  }
 
   aboutToAppear(): void {
     this.overwriteDNSList = ListOverwriteDNSData(this.clashConfig, this.appConfig)
-    let dns = this.clashConfig.dns ?? {} as Dns
-    EventHub.on(EventKey.ArrayConfigChanged, (d: ArrayConfigParam) => {
-      dns[d.key] = d.value
-      this.changeDns(dns)
-      this.overwriteDNSList = ListOverwriteDNSData(this.clashConfig, this.appConfig)
-    })
   }
   changeDns(dns: Dns){
     this.clashConfig.dns = copy(dns)
   }
-
-  // 列表行点击事件处理
-  handleCheck(index: number) {
-    let itemData = this.overwriteDNSList[index]
-    if(typeof itemData.value == "string" && (index === 9 || index === 18)){
-      this.isEnableIndexForegroundBlur = true
-      if(index === 9) {
-        this.isFakeIP = true
-        this.theplaceholder = `${getResourceString($r('app.string.example'), this)}: 198.18.0.1/16`
-      }
-      this.dialogController.open()
-    }else{
-      this.pageInfos.pushPathByName("EditArrayConfig", {
-        key: itemData.name,
-        label: itemData.title,
-        value: itemData.value
-      } as ArrayConfigParam, true)
-    }
-  }
-
-  // DNS页面开关处理
-  handleToggle(index: number, checked: boolean) {
-    let dns = this.clashConfig.dns ?? {} as Dns
-    switch (index) {
-      case 0:
-        // 覆写DNS
-        hilog.info(0xFF00, "DNStestTag", "覆写DNS")
-        this.appConfig.overrideDns = checked
-        break
-      case 2:
-        // 状态
-        hilog.info(0xFF00, "DNStestTag", "状态")
-        dns.enable = checked
-        this.changeDns(dns)
-        break
-      case 3:
-        // 使用Hosts
-        hilog.info(0xFF00, "DNStestTag", "使用Hosts")
-        dns['use-hosts'] = checked
-        this.changeDns(dns)
-        break
-      case 4:
-        // 使用系统Hosts
-        hilog.info(0xFF00, "DNStestTag", "使用系统Hosts")
-        dns['use-system-hosts'] = checked
-        this.changeDns(dns)
-        break
-      case 5:
-        // Ipv6
-        hilog.info(0xFF00, "DNStestTag", "Ipv6")
-        dns.ipv6 = checked
-        this.changeDns(dns)
-        break
-      case 6:
-        // 遵守规则
-        hilog.info(0xFF00, "DNStestTag", "遵守规则")
-        dns['respect-rules'] = checked
-        this.changeDns(dns)
-        break
-      case 7:
-        // 优先使用H3
-        hilog.info(0xFF00, "DNStestTag", "优先使用H3")
-        dns['prefer-h3'] = checked
-        this.changeDns(dns)
-        break
-      case 17:
-        // GeoIP
-        hilog.info(0xFF00, "DNStestTag", "GeoIP")
-        dns['fallback-filter']["geoIp"] = checked
-        this.changeDns(dns)
-        break
-    }
-
-  }
-
-  @Builder
-  switchMenu(item: MenuListItemProp[], index: number) {
-    // 栈模式菜单
-    Menu() {
-      MenuItem({ content: $r('app.string.DNS_Mode') }).contentFont({ weight: FontWeight.Bold })
-      ForEach(item, (menuItem: MenuListItemProp, index: number) => {
-        MenuItem({
-          content: menuItem.title,
-          symbolEndIcon: this.DNSModeIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
-        })
-          .selected(this.DNSModeIndex === index)
-          .onChange(() => {
-            this.DNSModeIndex = index
-            if (this.DNSMenuList[0].children) {
-              let Item = this.overwriteDNSList[8]
-              Item.subtitle = menuItem.title
-              this.overwriteDNSList.splice(8, 1, Item)
-            }
-          })
-      }, (menuItem: MenuListItemProp) => JSON.stringify(menuItem))
-    }
-  }
-
   @Builder
   dnsMenuTipsBuilder(tips: ResourceStr) {
     Text(tips)
@@ -237,14 +78,6 @@ struct DNS {
       .hitTestBehavior(HitTestMode.None)
       .selectedColor(this.icon_emphasize)
   }
-  @Builder
-  MenuEntrance(index: number) {
-    // 确保children存在
-    if(this.DNSMenuList && this.DNSMenuList[0].children) {
-      this.switchMenu(this.DNSMenuList[0].children, index)
-    }
-  }
-
 
   build() {
     NavDestination() {
@@ -253,90 +86,7 @@ struct DNS {
         title: $r('app.string.DNS'),
         subtitle: ''
       })
-
-      List({space: this.listBottom.value}) {
-        ForEach(this.overwriteDNSList, (item: moreData, index: number) => {
-          if (item.sign === 0 ) {
-            // 展开型
-            ListItem() {
-              menuRowList({
-                title: item.title,
-                tips: () => { this.dnsMenuTipsBuilder(item.subtitle) },
-                menu: (): void => { this.MenuEntrance(index) }
-              })
-            }
-            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
-              .combine(TransitionEffect.scale({x: 0, y: 0})):null)
-          } else
-            if (item.sign === 1 ) {
-              // 跳转型
-              ListItem() {
-                if(index != 9 && index != 18 && item.subtitle) {
-                  skipRowList({
-                    title: item.title,
-                    subtitle: item.subtitle
-                  })
-                } else {
-                  skipRowList({
-                    title: item.title,
-                    tips: () => { this.dnsSkipTipsBuilder(item.subtitle) }
-                  })
-                }
-              }.onClick(() => {
-                this.handleCheck(index)
-              })
-              .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
-                .combine(TransitionEffect.scale({x: 0, y: 0})):null)
-            } else
-            if (item.sign === 2 ) {
-              // 开关型
-              ListItem() {
-                toggleRowList({
-                  title: item.title,
-                  subtitle: item.subtitle,
-                  toggle: () => { this.dnsToggleBuilder(item.isCheck) }
-                })
-              }.onClick(() => {
-                hilog.info(0xFF00, "DNStestTag", "开关状态1:  %{public}s", item.isCheck)
-                this.getUIContext()?.animateTo({
-                  duration: this.uiConfig.animationSpeed
-                }, () => {
-                  const toggleItem = this.overwriteDNSList[index]
-                  toggleItem.isCheck = !toggleItem.isCheck
-                  this.overwriteDNSList.splice(index, 1, toggleItem)
-                  hilog.info(0xFF00, "DNStestTag", "开关状态2:  %{public}s", toggleItem.isCheck)
-                  hilog.info(0xFF00, "DNStestTag", "开关已打开")
-                  this.handleToggle(index, toggleItem.isCheck)
-                })
-              })
-              .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
-                .combine(TransitionEffect.scale({x: 0, y: 0})) : null)
-            } else
-            if (item.sign === 3) {
-              // 标题栏
-              ListItem() {
-               Row() {
-                 Text(item.title)
-                   .fontWeight(FontWeight.Normal)
-                   .fontSize(15)
-                 Blank()
-               }.width('100%')
-                .justifyContent(FlexAlign.Start)
-             }
-              .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
-                .combine(TransitionEffect.scale({x: 0, y: 0})) : null)
-            }
-
-        })
-
-      }
-      .width('100%')
-     // .height(this.isLandscapePhone ? 275 : (this.istabletVertical ? 945 : this.listHeight.value))
-      .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
-      .margin({ top: 10 })
-      .borderRadius(18)
-      .alignListItem(ListItemAlign.Center)
-      .contentEndOffset(CONTENT_END_OFFSET - 40)
+      ConfigList({configList: this.overwriteDNSList})
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))

@@ -94,6 +94,7 @@ export class ConfigItemData{
   isCheck: boolean = false
   value: boolean | string[] | Record<string, string> | string | number = false
   onChange: (value: boolean | string [] | Record<string, string> | string | number ) => void = ()=> {}
+
   constructor(
     icons: Resource,
     name: string,
@@ -111,6 +112,16 @@ export class ConfigItemData{
   handeCheck(){
     if(typeof this.value == "boolean"){
       this.isCheck = this.value as boolean
+    }
+  }
+  isStringType(){
+    return typeof this.value == "string"
+  }
+  tips(): string | Resource{
+    if(this.isStringType()){
+      return this.value as string
+    } else {
+      return this.subtitle
     }
   }
   bind<T>(
@@ -137,16 +148,18 @@ export class ConfigItemData{
   ){
     if (key){
       let obj = config[key] as object
+      const self = this
       this.value = obj[this.name]
       this.onChange = (value: boolean | string [] | Record<string, string> | string | number )=>{
-        this.value = value
+        self.value = value
         obj[this.name] = value
         config[key] = copy(obj)
       }
     } else {
       this.value = config[this.name]
+      const self = this
       this.onChange = (value: boolean | string [] | Record<string, string> | string | number )=>{
-        this.value = value
+        self.value = value
         config[this.name] = value
       }
     }
@@ -159,8 +172,9 @@ export class ConfigItemData{
     key: string
   ){
     this.value = dns[this.name]
+    const self = this
     this.onChange = (value: boolean | string [] | Record<string, string> | string | number )=>{
-      this.value = value
+      self.value = value
       dns[key][this.name] = value
       config.dns = copy(dns)
     }
@@ -276,10 +290,10 @@ export  const ListOverwriteDNSData = (clashConfig: ClashConfig, appConfig: AppCo
     new ConfigItemData($r('sys.symbol.selector'), 'fallback', $r('app.string.FallBack'), $r('app.string.FallBack_Subtitle'), 1,).bindClashConfig(clashConfig, "dns"),
     new ConfigItemData($r('sys.symbol.selector'), 'proxy-server-nameserver', $r('app.string.Proxy_Domain_Name_Server'), $r('app.string.Proxy_Domain_Name_Server_Subtitle'), 1,).bindClashConfig(clashConfig, "dns"),
     new ConfigItemData($r('sys.symbol.selector'), 'FallBack-Filtering', $r('app.string.FallBack_Filtering'), '', 3, ),
-    new ConfigItemData($r('sys.symbol.selector'), 'geoIp', $r('app.string.GeoIP'), '', 2, ).bindDnsConfig(clashConfig, dns, "fallback-filter"),
-    new ConfigItemData($r('sys.symbol.selector'), 'geoIpCode', $r('app.string.GeoIP_Code'),  $r('app.string.GeoIP_Code_Subtitle_1'), 1,).bindDnsConfig(clashConfig, dns, "fallback-filter"),
-    new ConfigItemData($r('sys.symbol.selector'), 'geosite', 'Geosite',  '', 1).bindDnsConfig(clashConfig, dns, "fallback-filter"),
-    new ConfigItemData($r('sys.symbol.selector'), 'ipcidr', $r('app.string.IP_Mask'),  '', 1).bindDnsConfig(clashConfig, dns, "fallback-filter"),
+    new ConfigItemData($r('sys.symbol.selector'), 'geoIp', $r('app.string.GeoIP'), '',  2, ).bindDnsConfig(clashConfig, dns, "fallback-filter"),
+    new ConfigItemData($r('sys.symbol.selector'), 'geoIpCode', $r('app.string.GeoIP_Code'), $r('app.string.GeoIP_Code_Subtitle_1'), 1,).bindDnsConfig(clashConfig, dns, "fallback-filter"),
+    new ConfigItemData($r('sys.symbol.selector'), 'geosite', 'Geosite', '', 1).bindDnsConfig(clashConfig, dns, "fallback-filter"),
+    new ConfigItemData($r('sys.symbol.selector'), 'ipcidr', $r('app.string.IP_Mask'), '', 1).bindDnsConfig(clashConfig, dns, "fallback-filter"),
     new ConfigItemData($r('sys.symbol.selector'), 'domain', $r('app.string.Domain_Name'), '', 1,).bindDnsConfig(clashConfig, dns, "fallback-filter"),
   ]
   return result
