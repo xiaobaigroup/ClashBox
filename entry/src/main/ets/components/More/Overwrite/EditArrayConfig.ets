@@ -9,7 +9,7 @@ import { CONTENT_END_OFFSET } from "../../../common/Constants"
 export interface ArrayConfigParam{
     label?: string | ResourceStr
     key: string
-    value?: string[] | Record<string, string>
+    value: string[] | Record<string, string>
 }
 
 // 提取公共组件，复用

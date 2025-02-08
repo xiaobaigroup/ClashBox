@@ -4,6 +4,7 @@ import { hilog } from "@kit.PerformanceAnalysisKit"
 import { skipRowList, theRowCustomDialog } from "../../Common"
 import { MoreTop } from "../MoreTopBuilder"
 import { UIConfig } from "../../../entryability/AppState"
+import { ClashConfig } from "proxy_core"
 
 @Component
 struct Overwrite {
@@ -63,6 +64,10 @@ struct Overwrite {
     // 关闭背景模糊
     this.isEnableIndexForegroundBlur = false
     // 重置覆写操作
+    const newConfig = new ClashConfig()
+
+    AppStorage.delete("clashConfig")
+    AppStorage.setAndProp("clashConfig", newConfig)
 
   }
 

@@ -1,6 +1,6 @@
-import { ClashConfig } from "proxy_core";
+import { ClashConfig, Dns } from "proxy_core";
 import { ArrayConfigParam } from "../components/More/Overwrite/EditArrayConfig";
-import { AppConfig } from "../entryability/AppState";
+import { AppConfig, copy } from "../entryability/AppState";
 import { CustomThemeName } from "./AppTheme";
 import { BreakpointState } from "./breakpointsystem";
 
@@ -84,6 +84,91 @@ export let showHomeCard = [
   false,
   false
 ]
+// 更多列表类
+export class ConfigItemData{
+  icons: Resource;
+  name: string;
+  title: string | Resource;
+  subtitle: string | Resource;
+  sign: number;
+  isCheck: boolean = false
+  value: boolean | string[] | Record<string, string> | string | number = false
+  onChange: (value: boolean | string [] | Record<string, string> | string | number ) => void = ()=> {}
+  constructor(
+    icons: Resource,
+    name: string,
+    title: ResourceStr,
+    subtitle: ResourceStr,
+    sign: number,
+
+  ) {
+    this.icons = icons
+    this.name = name
+    this.title = title
+    this.subtitle = subtitle
+    this.sign = sign // 1 input 2 array
+  }
+  handeCheck(){
+    if(typeof this.value == "boolean"){
+      this.isCheck = this.value as boolean
+    }
+  }
+  bind<T>(
+    value: boolean | string[] | Record<string, string> | string | number,
+    onUpdate:(value: T ) => void
+  ){
+    this.value = value
+    this.onChange = (v: boolean | string [] | Record<string, string> | string | number )=>{
+      this.value = v
+      onUpdate(v as T)
+    }
+    this.handeCheck()
+    return this
+  }
+  default<T>(value: T){
+    if (!this.value){
+      this.value == value
+    }
+    return this
+  }
+  bindClashConfig(
+    config: ClashConfig,
+    key: string | undefined = undefined,
+  ){
+    if (key){
+      let obj = config[key] as object
+      this.value = obj[this.name]
+      this.onChange = (value: boolean | string [] | Record<string, string> | string | number )=>{
+        this.value = value
+        obj[this.name] = value
+        config[key] = copy(obj)
+      }
+    } else {
+      this.value = config[this.name]
+      this.onChange = (value: boolean | string [] | Record<string, string> | string | number )=>{
+        this.value = value
+        config[this.name] = value
+      }
+    }
+    this.handeCheck()
+    return this
+  }
+  bindDnsConfig(
+    config: ClashConfig,
+    dns: Dns,
+    key: string
+  ){
+    this.value = dns[this.name]
+    this.onChange = (value: boolean | string [] | Record<string, string> | string | number )=>{
+      this.value = value
+      dns[key][this.name] = value
+      config.dns = copy(dns)
+    }
+    this.handeCheck()
+    return this
+  }
+}
+
 
 // 更多列表类
 export class moreData {
@@ -93,14 +178,26 @@ export class moreData {
   subtitle: string | Resource;
   sign: number;
   isCheck: boolean
-  value: boolean | string [] | Record<string, string> | string
-
-  constructor( icons: Resource, name: string, title: ResourceStr, subtitle: ResourceStr, sign: number, value: boolean | string [] | Record<string, string> | string = false) {
+  value: boolean | string[] | Record<string, string> | string
+  onChange: (value: boolean | string [] | Record<string, string> | string | undefined) => void
+  constructor(
+    icons: Resource,
+    name: string,
+    title: ResourceStr,
+    subtitle: ResourceStr,
+    sign: number,
+    value: boolean | string [] | Record<string, string> | string = false,
+    onChange: (name: string, value: boolean | string [] | Record<string, string> | string) => void =
+    (name: string, value: boolean | string [] | Record<string, string> | string) => {}
+  ) {
     this.icons = icons
     this.name = name
     this.title = title
     this.subtitle = subtitle
     this.sign = sign // 1 input 2 array
+    this.onChange = ()=>{
+      onChange(this.name, value)
+    }
     if(typeof value == "boolean"){
       this.isCheck = value as boolean
     }else {
@@ -156,31 +253,34 @@ export  const ListOverwriteBasicData = (clashConfig: ClashConfig, appConfig: App
 }
 
 // 更多 -> 覆写 -> DNSListitem
-export  const ListOverwriteDNSData = (clashConfig: ClashConfig, appConfig: AppConfig): moreData[] => {
-  let result: moreData[] = new Array()
+export  const ListOverwriteDNSData = (clashConfig: ClashConfig, appConfig: AppConfig): ConfigItemData[] => {
+  let result: ConfigItemData[] = new Array()
+  let dns = clashConfig.dns ?? new Dns()
   result = [
-    new moreData($r('sys.symbol.selector'), 'OverwriteDNS', $r('app.string.OverwriteDNS'), '', 2,  appConfig.overrideDns ?? false),
-    new moreData($r('sys.symbol.selector'), 'Option', $r('app.string.option'), '', 3, false),
-    new moreData($r('sys.symbol.selector'), 'State', $r('app.string.State'), $r('app.string.State_subtitle'), 2, clashConfig.dns?.enable ?? false),
-    new moreData($r('sys.symbol.selector'), 'UseHosts', $r('app.string.UseHosts'), '', 2,  clashConfig.dns?.["use-hosts"] ?? false),
-    new moreData($r('sys.symbol.selector'), 'Use-System-Hosts', $r('app.string.Use_System_Hosts'), '', 2, clashConfig.dns?.["use-system-hosts"] ?? false),
-    new moreData($r('sys.symbol.selector'), 'IPv6', $r('app.string.IPv6'), $r('app.string.Info'), 2,  clashConfig.dns?.ipv6 ?? false),
-    new moreData($r('sys.symbol.selector'), 'Follow-The-Rules', $r('app.string.Follow_The_Rules'), $r('app.string.Follow_The_Rules_Subtitle'), 2,  clashConfig.dns?.["respect-rules"] ?? false),
-    new moreData($r('sys.symbol.selector'), 'Priority-Use-H3', $r('app.string.Priority_Use_H3'), $r('app.string.Priority_Use_H3_Subtitle'), 2, clashConfig.dns?.["prefer-h3"] ?? false),
-    new moreData($r('sys.symbol.selector'), 'DNS-Mode', $r('app.string.DNS_Mode'), clashConfig.dns?.["enhanced-mode"] ?? $r('app.string.DNS_Mode_Subtitle'), 0, false, ),
-    new moreData($r('sys.symbol.selector'), 'fake-ip-range', $r('app.string.FakeIP_Range'), $r('app.string.FakeIP_Range_Subtitle_1'), 1, clashConfig.dns?.["fake-ip-range"]),
-    new moreData($r('sys.symbol.selector'), 'fake-ip-filter', $r('app.string.FakeIP_Filtering'), '', 1,   clashConfig.dns?.["fake-ip-filter"]),
-    new moreData($r('sys.symbol.selector'), 'default-nameserver', $r('app.string.Default_Domain_Name_Server'), $r('app.string.Default_Domain_Name_Server_Subtitle'), 1, clashConfig.dns?.["default-nameserver"]),
-    new moreData($r('sys.symbol.selector'), 'Domain-Name-Server-Strategy', $r('app.string.Domain_Name_Server_Strategy'), $r('app.string.Domain_Name_Server_Strategy_Subtitle'), 1, false),
-    new moreData($r('sys.symbol.selector'), 'nameserver', $r('app.string.Domain_Name_Server'), $r('app.string.Domain_Name_Server_Subtitle'), 1,  clashConfig.dns?.nameserver),
-    new moreData($r('sys.symbol.selector'), 'fallback', $r('app.string.FallBack'), $r('app.string.FallBack_Subtitle'), 1, clashConfig.dns?.fallback),
-    new moreData($r('sys.symbol.selector'), 'proxy-server-nameserver', $r('app.string.Proxy_Domain_Name_Server'), $r('app.string.Proxy_Domain_Name_Server_Subtitle'), 1, clashConfig.dns?.["proxy-server-nameserver"]),
-    new moreData($r('sys.symbol.selector'), 'FallBack-Filtering', $r('app.string.FallBack_Filtering'), '', 3, false),
-    new moreData($r('sys.symbol.selector'), 'GeoIP', $r('app.string.GeoIP'), '', 2, clashConfig.dns?.["fallback-filter"]?.geoIp ?? false),
-    new moreData($r('sys.symbol.selector'), 'GeoIP-Code', $r('app.string.GeoIP_Code'),  $r('app.string.GeoIP_Code_Subtitle_1'), 1, clashConfig.dns?.["fallback-filter"]?.geoIpCode),
-    new moreData($r('sys.symbol.selector'), 'IP/Mask', 'Geosite',  '', 1, clashConfig.dns?.["fallback-filter"]?.geosite?.toString()),
-    new moreData($r('sys.symbol.selector'), 'IP/Mask', $r('app.string.IP_Mask'),  '', 1, clashConfig.dns?.["fallback-filter"]?.ipcidr?.toString()),
-    new moreData($r('sys.symbol.selector'), 'Domain', $r('app.string.Domain_Name'), '', 1, clashConfig.dns?.["fallback-filter"]?.ipcidr?.toString()),
+    new ConfigItemData($r('sys.symbol.selector'), 'overrideDns', $r('app.string.OverwriteDNS'), '', 2).bind<boolean>(appConfig.overrideDns, (v)=>{
+      appConfig.overrideDns = v
+    }),
+    new ConfigItemData($r('sys.symbol.selector'), 'Option', $r('app.string.option'), '', 3),
+    new ConfigItemData($r('sys.symbol.selector'), 'enable', $r('app.string.State'), $r('app.string.State_subtitle'), 2).bindClashConfig(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'use-hosts', $r('app.string.UseHosts'), '', 2).bindClashConfig(clashConfig,"dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'use-system-hosts', $r('app.string.Use_System_Hosts'), '', 2).bindClashConfig(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'ipv6', $r('app.string.IPv6'), $r('app.string.Info'), 2).bindClashConfig(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'respect-rules', $r('app.string.Follow_The_Rules'), $r('app.string.Follow_The_Rules_Subtitle'), 2).bindClashConfig(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'prefer-h3"', $r('app.string.Priority_Use_H3'), $r('app.string.Priority_Use_H3_Subtitle'), 2,).bindClashConfig(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'enhanced-mode', $r('app.string.DNS_Mode'), dns?.["enhanced-mode"] ?? $r('app.string.DNS_Mode_Subtitle'), 0).bindClashConfig(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'fake-ip-range', $r('app.string.FakeIP_Range'), $r('app.string.FakeIP_Range_Subtitle_1'), 1).bindClashConfig(clashConfig, "dns").default(""),
+    new ConfigItemData($r('sys.symbol.selector'), 'fake-ip-filter', $r('app.string.FakeIP_Filtering'), '', 1,).bindClashConfig(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'default-nameserver', $r('app.string.Default_Domain_Name_Server'), $r('app.string.Default_Domain_Name_Server_Subtitle'), 1).bindClashConfig(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'Domain-Name-Server-Strategy', $r('app.string.Domain_Name_Server_Strategy'), $r('app.string.Domain_Name_Server_Strategy_Subtitle'), 1,).bindClashConfig(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'nameserver', $r('app.string.Domain_Name_Server'), $r('app.string.Domain_Name_Server_Subtitle'), 1,).bindClashConfig(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'fallback', $r('app.string.FallBack'), $r('app.string.FallBack_Subtitle'), 1,).bindClashConfig(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'proxy-server-nameserver', $r('app.string.Proxy_Domain_Name_Server'), $r('app.string.Proxy_Domain_Name_Server_Subtitle'), 1,).bindClashConfig(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'FallBack-Filtering', $r('app.string.FallBack_Filtering'), '', 3, ),
+    new ConfigItemData($r('sys.symbol.selector'), 'geoIp', $r('app.string.GeoIP'), '', 2, ).bindDnsConfig(clashConfig, dns, "fallback-filter"),
+    new ConfigItemData($r('sys.symbol.selector'), 'geoIpCode', $r('app.string.GeoIP_Code'),  $r('app.string.GeoIP_Code_Subtitle_1'), 1,).bindDnsConfig(clashConfig, dns, "fallback-filter"),
+    new ConfigItemData($r('sys.symbol.selector'), 'geosite', 'Geosite',  '', 1).bindDnsConfig(clashConfig, dns, "fallback-filter"),
+    new ConfigItemData($r('sys.symbol.selector'), 'ipcidr', $r('app.string.IP_Mask'),  '', 1).bindDnsConfig(clashConfig, dns, "fallback-filter"),
+    new ConfigItemData($r('sys.symbol.selector'), 'domain', $r('app.string.Domain_Name'), '', 1,).bindDnsConfig(clashConfig, dns, "fallback-filter"),
   ]
   return result
 }

@@ -56,7 +56,7 @@ export default class EntryAbility extends UIAbility {
       setInterval(async ()=>{
         if(!ClashViewModel.socketProxy.active){
           ClashViewModel.socketProxy.active = true
-          promptAction.showToast({message: "恢复核心中..."})
+          promptAction.showToast({message: `核心恢复中(${ClashViewModel.socketProxy.offlineCount})...`})
           let clashCore = AppStorage.get<AppConfig>("appConfig")?.clashCore
           await ClashViewModel.ChangeCore(clashCore)
           await ClashViewModel.ReStartVpn()

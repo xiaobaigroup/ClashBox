@@ -35,14 +35,14 @@ export class AppConfig{
   currentProxyName?: string
   currentProfileName?: string
   currentProxyItem?: ProxyItem
-  proxySort?: ProxySort = ProxySort.Default
-  proxyGroupType?: ProxyGroupType = ProxyGroupType.Tabs
-  proxyCardSize?: ProxyCardSize = ProxyCardSize.Mini
-  enableLogger?: boolean = false
-  testUrl?: string = ""
-  overrideDns?: boolean = false
-  clashCore?: ClashCore = ClashCore.FlClash
-  switchMode?: ProxyMode = ProxyMode.Rule
+  proxySort: ProxySort = ProxySort.Default
+  proxyGroupType: ProxyGroupType = ProxyGroupType.Tabs
+  proxyCardSize: ProxyCardSize = ProxyCardSize.Mini
+  enableLogger: boolean = false
+  testUrl: string = ""
+  overrideDns: boolean = false
+  clashCore: ClashCore = ClashCore.FlClash
+  switchMode: ProxyMode = ProxyMode.Rule
 
   constructor() {
   }
