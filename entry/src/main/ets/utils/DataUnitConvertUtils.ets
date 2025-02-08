@@ -1,3 +1,4 @@
+
 interface GeneratedUnitInterface {
   TB: number
   GB: number
@@ -69,15 +70,48 @@ export function convertDataNumber(bNumber: number): number {
 export function convertToSwitchNub(value: number, unit: keyof GeneratedUnitInterface): number {
   switch (unit) {
     case 'TB':
-      return value / conversionFactors.TB;
+      return value / Math.pow(1024, 4);
     case 'GB':
-      return value / conversionFactors.GB;
+      return value / Math.pow(1024, 3);
     case 'MB':
-      return value / conversionFactors.MB;
+      return value / Math.pow(1024, 2);
     case 'KB':
-      return value /conversionFactors.KB;
+      return value / Math.pow(1024, 1);
     default:
       throw new Error(`Unsupported unit: ${unit}`);
   }
 }
 
+/*
+根据数值带单位取最大单位整数
+ */
+export enum TrafficUnit{
+  KB = "KB",
+  MB = "MB",
+  GB = "GB",
+  TB = "TB",
+  B = "B",
+}
+
+export function convertDataNumberT(bNumber: number): string {
+  let show: number
+  let unit: TrafficUnit
+  if (bNumber > Math.pow(1024, 4)) {
+    show = (bNumber / Math.pow(1024, 4))
+    unit = TrafficUnit.TB
+  }else if (bNumber > Math.pow(1024, 3)) {
+    show = (bNumber / Math.pow(1024, 3))
+    unit = TrafficUnit.GB
+  }else if (bNumber > Math.pow(1024, 2)) {
+    show = (bNumber / Math.pow(1024, 2))
+    unit = TrafficUnit.MB
+  }else if (bNumber > Math.pow(1024, 1)) {
+    show = (bNumber / Math.pow(1024, 1))
+    unit = TrafficUnit.KB
+  } else{
+    show = bNumber
+    unit = TrafficUnit.B
+  }
+    // 如果小于1KB，则保持为B
+      return (show.toFixed(0)  + " " + unit).toString()
+}

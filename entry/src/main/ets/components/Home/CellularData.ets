@@ -1,9 +1,9 @@
 import { BreakpointState } from '../../common/breakpointsystem'
 import { ColorMetrics, mediaquery, SymbolGlyphModifier } from '@kit.ArkUI'
-import { FONT_SIZE_16, MarginGenerate } from '../../common/Constants'
+import { FONT_SIZE_14, FONT_SIZE_16, MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
 import { AppFlowingState, TrafficUnit, UIConfig } from '../../entryability/AppState'
-import {  convertToSwitchNub } from '../../utils/DataUnitConvertUtils'
+import { convertDataNumberT, convertToSwitchNub } from '../../utils/DataUnitConvertUtils'
 
 
 
@@ -135,8 +135,9 @@ struct totalCustomDialog {
 
 @Component
 struct CellularDataStat {
-  @StorageProp("appFlowingState") appFlowingState: AppFlowingState = new AppFlowingState()
+  @StorageProp("appFlowingState") @Watch('dataTotalChange') appFlowingState: AppFlowingState = new AppFlowingState()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @State totalData:number =0
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
   @State font_primary: ResourceColor = $r('sys.color.font_primary')
 
@@ -168,6 +169,7 @@ struct CellularDataStat {
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
+
 
   /* 总流量输入弹窗数据  */
   dialogController: CustomDialogController | null = new CustomDialogController({
@@ -201,12 +203,14 @@ struct CellularDataStat {
   })
 
   aboutToAppear(): void {
-
+    this.uiConfig.dataTotalLast=this.uiConfig.dataTotal
+    console.info('dataTotal',this.totalData,this.uiConfig.dataTotalLast,this.uiConfig.dataTotal)
   }
   // 在自定义组件即将析构销毁时将弹窗置空
   aboutToDisappear() {
     this.dialogController = null // 将dialogController置空
-
+    this.uiConfig.dataTotalLast=this.uiConfig.dataTotal
+    console.info('dataTotal',this.totalData,this.uiConfig.dataTotalLast,this.uiConfig.dataTotal)
   }
 
   onCancel() {
@@ -222,37 +226,45 @@ struct CellularDataStat {
   }
 
 
+  dataTotalChange() {
+    console.info('dataTotal',this.totalData,this.uiConfig.dataTotalLast,this.uiConfig.dataTotal)
+    if (this.appFlowingState.totalTraffic.downRaw>=0) {
+      this.totalData=this.appFlowingState.totalTraffic.upRaw+this.appFlowingState.totalTraffic.downRaw
+    }
+    return this.uiConfig.dataTotal=this.uiConfig.dataTotalLast+this.totalData
+  }
+
   build() {
     Column() {
       CardTitle({title: $r('app.string.CellularData')})
 
       Column({space:this.RowMargin.value}) {
         Row({ space: 10 }) {
-          //已使用下载流量
-          Column() {
-            Text() {
-              SymbolSpan($r('sys.symbol.chevron_down'))
-            }
-            .fontSize(this.isLandscapePhone ? 14 : this.chevronSize.value)
-            .fontColor(this.icon_primary)
-
-            Text(this.appFlowingState.totalTraffic.down.toString())
-              .fontSize(this.isLandscapePhone ? 14 : this.fontSize.value)
-              .fontColor(this.icon_primary)
-              .maxLines(1)
-              .textAlign(TextAlign.End)
-          }
-
           //已使用上传流量
           Column() {
             Text() {
               SymbolSpan($r('sys.symbol.chevron_up'))
             }
-            .fontSize(this.isLandscapePhone ? 14 : this.chevronSize.value)
+            .fontSize(this.isLandscapePhone ? FONT_SIZE_14 : this.chevronSize.value)
             .fontColor(this.icon_primary)
 
             Text(this.appFlowingState.totalTraffic.up.toString())
-              .fontSize(this.isLandscapePhone ? 14 : this.fontSize.value)
+              .fontSize(this.isLandscapePhone ? FONT_SIZE_14 : this.fontSize.value)
+              .fontColor(this.icon_primary)
+              .maxLines(1)
+              .textAlign(TextAlign.End)
+          }
+
+          //已使用下载流量
+          Column() {
+            Text() {
+              SymbolSpan($r('sys.symbol.chevron_down'))
+            }
+            .fontSize(this.isLandscapePhone ? FONT_SIZE_14 : this.chevronSize.value)
+            .fontColor(this.icon_primary)
+
+            Text(this.appFlowingState.totalTraffic.down.toString())
+              .fontSize(this.isLandscapePhone ? FONT_SIZE_14 : this.fontSize.value)
               .fontColor(this.icon_primary)
               .maxLines(1)
               .textAlign(TextAlign.End)
@@ -264,7 +276,7 @@ struct CellularDataStat {
         //使用流量进度条
         Column() {
           Progress({
-            value: convertToSwitchNub(this.appFlowingState.totalTraffic.upRaw+this.appFlowingState.totalTraffic.downRaw,this.uiConfig.switchUnit),
+            value: convertToSwitchNub(this.uiConfig.dataTotal,this.uiConfig.switchUnit),
             total: this.uiConfig.inputTotal,
             type: ProgressType.Capsule
           })//value为使用流量的值
@@ -280,7 +292,7 @@ struct CellularDataStat {
 
         Row({space:2}) {
           //使用流量/总流量
-          Text(this.appFlowingState.totalTraffic.total().toString() + ' / ' + this.uiConfig.inputTotal.toString())
+          Text(convertDataNumberT(this.uiConfig.dataTotal) + ' / ' + this.uiConfig.inputTotal.toString())
             .fontSize(this.isLandscapePhone ? 10 : this.HomeCardCellularDataSmFontSize.value)
             .fontColor($r('sys.color.font_secondary'))
 

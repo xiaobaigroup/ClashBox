@@ -5,6 +5,7 @@
  */
 import { BreakpointState } from '../common/breakpointsystem'
 import { BIND_SHEET_CONTAINER_HEIGHT, CONTENT_END_OFFSET, ListMoreData, moreData,
+  TAB_CONTENT_TITLE_FONT_SIZE,
   TAB_CONTENT_TITLE_HEIGHT } from '../common/Constants';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import Log from '../components/More/Log';
@@ -178,7 +179,7 @@ struct MorePage {
         // 顶部导航栏
         Row() {
           Text($r('app.string.More'))
-            .fontSize(32)
+            .fontSize(TAB_CONTENT_TITLE_FONT_SIZE)
             .fontWeight(FontWeight.Bold)
             .width('83%')
             .textAlign(TextAlign.Start)

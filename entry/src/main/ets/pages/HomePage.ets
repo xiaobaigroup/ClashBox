@@ -17,6 +17,7 @@ import {
   MarginGenerate,
   showHomeCard,
   CONTENT_END_OFFSET,
+  TAB_CONTENT_TITLE_FONT_SIZE,
 } from '../common/Constants'
 import Settings from '../components/Settings/Settings'
 import CurrentNode from '../components/Home/CurrentNode'
@@ -263,7 +264,7 @@ struct Home {
           if (!this.isShowHomeEdit) {
             //编辑布局按钮判定：非编辑状态
             Text(this.uiConfig.isGreeting ? this.greetings : 'ClashNext')
-              .fontSize((this.uiConfig.userLanguage != 'en-Latn') || !this.uiConfig.isGreeting ? 32 : 27)
+              .fontSize((this.uiConfig.userLanguage != 'en-Latn') || !this.uiConfig.isGreeting ? TAB_CONTENT_TITLE_FONT_SIZE : 27)
               .layoutWeight(1)
               .fontWeight(FontWeight.Bold)
               .fontColor(this.font_primary)

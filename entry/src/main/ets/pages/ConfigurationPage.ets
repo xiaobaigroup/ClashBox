@@ -332,6 +332,8 @@ struct ConfigurationPage {
       Stack({ alignContent: this.stackAlignContentAlignment }) {
         if (this.configList.length === 0) {
           Nothing({ name: $r('app.string.Configuration') })
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+              .combine(TransitionEffect.scale({x: 0, y: 0})):null)
         } else {
           // 配置列表 START
           List({ space: LIST_SPACE }) {

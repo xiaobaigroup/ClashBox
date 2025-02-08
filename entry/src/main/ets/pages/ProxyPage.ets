@@ -2,6 +2,7 @@ import { BreakpointState, BreakpointSystem } from '../common/breakpointsystem'
 import {
   TAB_CONTENT_TITLE_HEIGHT,
   BIND_SHEET_CONTAINER_HEIGHT,
+  TAB_CONTENT_TITLE_FONT_SIZE,
 } from '../common/Constants'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import ProxyGroupItem from '../components/Proxy/ProxyGroupItem'
@@ -310,7 +311,7 @@ struct ProxyPage {
       if (!this.isLandscapePhone) {
         Row({space: this.HomeCardTitleButtonPadding.value}) {
           Text($r('app.string.Proxy'))
-            .fontSize(32)
+            .fontSize(TAB_CONTENT_TITLE_FONT_SIZE)
             .fontWeight(FontWeight.Bold)
             .textAlign(TextAlign.Center)
             .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 100 })

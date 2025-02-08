@@ -408,7 +408,7 @@ export struct ProviderPage {
             }
           }
         }.width('100%')
-        .contentEndOffset(CONTENT_END_OFFSET+40)
+        .contentEndOffset(this.resourceListData.length === 0?null:CONTENT_END_OFFSET+40)
         .scrollBar(BarState.Off)
       }
     }.width('100%')

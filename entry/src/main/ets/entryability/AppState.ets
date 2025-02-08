@@ -99,6 +99,8 @@ export class UIConfig{
   inputTotal: number = 0
   switchUnit: TrafficUnit = TrafficUnit.MB
   cellularDataIndex: number = 1
+  dataTotal: number = 0
+  dataTotalLast: number = 0
   //动画速度
   animationSpeed:number = ANIMATION_DURATION_300
   isAnimation:boolean=true
