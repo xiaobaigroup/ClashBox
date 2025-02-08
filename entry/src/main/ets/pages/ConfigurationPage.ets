@@ -422,7 +422,7 @@ struct ConfigurationPage {
           // 110 = app.integer.vp_proxy_start_button_margin *2 + app.integer.vp_proxy_not_start_button_width
           .contentEndOffset(CONTENT_END_OFFSET)
           .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
-          .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+          .edgeEffect(EdgeEffect.Spring)
           .chainAnimation(true)
           // 配置列表 END
         }

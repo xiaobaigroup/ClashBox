@@ -397,7 +397,7 @@ interface LongPressContextMenuItem {
 function ListStyle() {
   // transition保证组件离场不被立即析构，可设置其他转场效果
   .scrollBar(BarState.Off)
-  .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
+  .edgeEffect(EdgeEffect.Spring)
   .contentEndOffset(CONTENT_END_OFFSET)
 }
 

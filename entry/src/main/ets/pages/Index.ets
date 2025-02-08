@@ -149,9 +149,9 @@ struct Index {
     xl: '60vp'
   });
   @State compBarHeight: BreakpointState<string> = BreakpointState.of({
-    sm: '60vp',
-    md: '60vp',
-    lg: '60vp',
+    sm: '65vp',
+    md: '65vp',
+    lg: '65vp',
     xl: '80vp'
   });
   @State TabIconfontSize: BreakpointState<number> = BreakpointState.of({
@@ -353,7 +353,7 @@ struct Index {
            .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
            .combine(TransitionEffect.translate({y:50})):null)
       }
-      .margin(this.isLandscapePhone ? { left: 39 } : '0vp')
+      .padding(this.isLandscapePhone ? { left: 39 } : { bottom:5 })
     }
     .width('100%')
     .height('100%')
@@ -586,7 +586,8 @@ struct Index {
       iterations:1,
       playMode:PlayMode.Alternate
     }, () => {
-      this.indexController.setTabBarTranslate(this.isLandscapePhone ? {x:'-100%'} :{y: this.compBarHeight.value })
+      this.indexController.setTabBarTranslate(this.isLandscapePhone ? {x:'-100%'} :{y:'100%'})
+      this.indexController.setTabBarOpacity(0)
     })
   }
 
@@ -598,6 +599,7 @@ struct Index {
       playMode:PlayMode.Alternate
     }, () => {
       this.indexController.setTabBarTranslate(this.isLandscapePhone ? {x:0} :{y: 0 })
+      this.indexController.setTabBarOpacity(1)
     })
   }
 
