@@ -478,7 +478,7 @@ export struct theCustomDialog {
   @Link theplaceholder: string
   @State theDialogTitle: ResourceStr = ''
   @State isArea: boolean = false
-  @State Unit: string = ''
+  @State Unit: ResourceStr = ''
   cancel?: () => void
   confirm?: () => void
   controller: CustomDialogController
@@ -491,24 +491,26 @@ export struct theCustomDialog {
         .fontWeight(FontWeight.Medium)
         .fontSize(20)
         .margin({ top: 15, bottom: 15 })
-      Row({space: 2}) {
+      Flex({
+        direction: FlexDirection.Row,
+        alignItems: ItemAlign.Center
+      }) {
         if(this.isArea) {
           TextArea({placeholder: this.theplaceholder, text: this.currentInputValue })
             .onChange((value: string) => {
               this.currentInputValue = value
             })
-            .margin({bottom: 8 })
         } else {
           TextInput({placeholder: this.theplaceholder, text: this.currentInputValue })
             .onChange((value: string) => {
               this.currentInputValue = value
             })
-            .margin({bottom: 8 })
         }
         if(this.Unit) {
           Text(this.Unit)
+            .margin({left: 5})
         }
-      }
+      }.margin({bottom: 8 })
       Button($r('app.string.Save'))
         .width('100%')
         .height(39)

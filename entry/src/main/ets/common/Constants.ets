@@ -56,7 +56,9 @@ export const ANIMATION_DURATION_300: number = 300
 export const ANIMATION_DURATION_100: number = 100
 export const ANIMATION_DURATION_500: number = 500
 
-// list偏移数值：110
+/**
+ * list偏移数值：110
+ */
 export const CONTENT_END_OFFSET: number = 110
 
 // enum：routeName
@@ -86,7 +88,7 @@ export let showHomeCard = [
 // 更多列表类
 export class moreData {
   icons: Resource;
-  name?: string;
+  name: string;
   title: string | Resource;
   subtitle: string | Resource;
   sign: number;
@@ -204,6 +206,28 @@ export interface MenuListItemProp {
   title: string | Resource
   children?: Array<MenuListItemProp>
 }
+
+/**
+ * 更多 -> 覆写 -> 基础 -> 菜单
+ */
+export const BasicMenu: MenuListItemProp[] = [
+  { title: $r('app.string.LogLevel'),
+    children: [
+      {title: 'debug'},
+      {title: 'info'},
+      {title: 'warning'},
+      {title: 'error'},
+      {title: 'silent'},
+    ]
+  },
+  { title: 'UA',
+    children: [
+      {title: $r('app.string.Default_UA')},
+      {title: 'clash-verge/v1.6.6'},
+      {title: 'ClashforWindows/0.19.23'},
+    ]
+  }
+]
 
 /**
  * 更多 -> 覆写 -> 网络 -> 菜单

@@ -105,7 +105,9 @@ export class UIConfig{
   animationSpeed:number = ANIMATION_DURATION_300
   isAnimation:boolean=true
   // 代理启动按钮状态
- proxyEnabled: boolean = false
+  proxyEnabled: boolean = false
+  // 高级功能启用状态
+  enabledADvanced: boolean = false
 
   constructor() {
   }

@@ -25,6 +25,7 @@ import { promptAction } from '@kit.ArkUI';
 import { skipRowList } from '../components/Common';
 import { AppConfig, UIConfig } from '../entryability/AppState';
 import { ArrayConfigEditor, ArrayConfigParam } from '../components/More/Overwrite/EditArrayConfig';
+import { removeItemsByIndex } from '../utils/RemoveItemsUtils';
 
 
 @Entry
@@ -99,7 +100,10 @@ struct MorePage {
   }
 
   aboutToAppear() {
-
+    if(!this.uiConfig.enabledADvanced) {
+      // 屏蔽分流策略
+      this.moreList = removeItemsByIndex(this.moreList, [5])
+    }
   }
 
   aboutToDisappear() {
@@ -244,8 +248,6 @@ struct MorePage {
         }
         .width('100%')
         .edgeEffect(EdgeEffect.Spring)
-     //   .height(this.isLandscapePhone ? 275 : this.listHeight.value)
-       // .margin({ top: 10 })
         .borderRadius(18)
         .alignListItem(ListItemAlign.Center)
         .contentEndOffset(CONTENT_END_OFFSET)

@@ -1,5 +1,5 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { FONT_SIZE_16, settingsData, SettingsListItem } from "../../common/Constants"
+import { CONTENT_END_OFFSET, FONT_SIZE_16, settingsData, SettingsListItem } from "../../common/Constants"
 import settingsListItem from "./settingsListItem"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import Appearance from "./Appearance"
@@ -192,7 +192,7 @@ struct Settings {
 
       }
       .width('100%')
-      .height(this.isLandscapePhone ? 300 : this.SettingslistHeight.value)
+      .contentEndOffset(CONTENT_END_OFFSET - 45)
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)
     }

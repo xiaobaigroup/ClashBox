@@ -1,22 +1,31 @@
 import { BreakpointState } from "../../../common/breakpointsystem"
-import { ListOverwriteBasicData,  moreData } from "../../../common/Constants"
+import { BasicMenu, ListOverwriteBasicData, MenuListItemProp, moreData } from "../../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import OverwriteTop from "./OverwriteTopBuilder"
-import { menuRowList, skipRowList, toggleRowList } from "../../Common"
+import { menuRowList, skipRowList, theCustomDialog, toggleRowList } from "../../Common"
 import { ClashConfig, LogLevel } from 'proxy_core'
 import { AppConfig, copy, UIConfig } from '../../../entryability/AppState'
+import { SymbolGlyphModifier } from "@kit.ArkUI"
+import { getResourceString } from "../../../utils/ResourceStringUtil"
 
 @Component
 struct Basic {
+  @State theMenuIndex: number = 0
+  @State theDialogIndex: number = 0
+  @State theInputUnit: ResourceStr = ''
+  @State SaveInputValue: string = ''
+  @State currentInputValue: string = ''
+  @State theplaceholder: string = ''
+  @State theDialogTitle: string = ''
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   //一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
-
   @Consume('NavPathStack') pageInfos: NavPathStack
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @State overwriteBasicList: moreData[] = []
+  @State basicMenuList: MenuListItemProp[] = BasicMenu
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
   // 列表高度
   @Consume('breakPointStateListHeight') listHeight: BreakpointState<number>
@@ -25,9 +34,13 @@ struct Basic {
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  /* 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+
   aboutToAppear(): void {
     this.overwriteBasicList = ListOverwriteBasicData(this.clashConfig, this.appConfig)
   }
+
   changeChange(name: string, value: string | boolean | number | Record<string, string>){
     if (this.clashConfig){
       if (name == "LogLevel"){
@@ -51,35 +64,92 @@ struct Basic {
       }
     }
   }
+
+  // 编辑FakeIP范围 & GeoIP代码弹窗控制器
+  dialogController: CustomDialogController = new CustomDialogController({
+    builder: theCustomDialog({
+      Unit: this.theInputUnit,
+      theDialogTitle: this.theDialogTitle,
+      theplaceholder: this.theplaceholder,
+      currentInputValue: $currentInputValue,
+      SaveInputValue: $SaveInputValue,
+      cancel: ()=> { this.onCancel() },
+      confirm: ()=> { this.onAccept() },
+    }),
+    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+      // 1、PRESS_BACK    点击三键back、左滑/右滑、键盘ESC。
+      // 2、TOUCH_OUTSIDE    点击遮障层时
+      // 3、CLOSE_BUTTON    点击关闭按钮
+      if (dismissDialogAction.reason === DismissReason.TOUCH_OUTSIDE) {
+        // 点击遮蔽层不响应，防误触
+      } else {
+        // 完成IP地址查询后主动通过dismiss主动关闭对话框
+        dismissDialogAction.dismiss()
+        // 关闭背景模糊
+        this.isEnableIndexForegroundBlur = false
+      }
+    },
+  })
+
+  onCancel() {
+    // 关闭背景模糊
+    this.isEnableIndexForegroundBlur = false
+    this.theInputUnit = ''
+    this.theplaceholder = ''
+    this.currentInputValue = ''
+  }
+  onAccept() {
+    // 关闭背景模糊
+    this.isEnableIndexForegroundBlur = false
+    if(this.SaveInputValue === '') {
+      // 如果没有输入则为默认值
+      this.SaveInputValue = this.theplaceholder
+    }
+    switch (this.theDialogIndex) {
+      case 2:
+        // TCP保持活动间隔
+        let TCPData = this.overwriteBasicList[2]
+        TCPData.subtitle = `${this.SaveInputValue}${getResourceString($r('app.string.s'), this)}`
+        this.overwriteBasicList.splice(2, 1, TCPData)
+        // 逻辑处理
+
+        break
+      case 3:
+        // 测试延迟链接逻辑处理
+
+        break
+      case 4:
+        // 代理端口
+        let proxyData = this.overwriteBasicList[4]
+        proxyData.subtitle = this.SaveInputValue
+        this.overwriteBasicList.splice(4, 1, proxyData)
+        // 逻辑处理
+
+        break
+    }
+    this.theInputUnit = ''
+    this.theplaceholder = ''
+    this.currentInputValue = ''
+  }
+
   handleCheck(index: number) {
     // 跳转
     let itemData = this.overwriteBasicList[index]
-    this.pageInfos.pushPathByName(itemData.name, false)
-
-  }
-  // 开关处理
-  handleToggle(index: number) {
-    switch (index) {
-      case 6:
-        // IPv6状态切换
-        hilog.info(0xFF00, "BasictestTag", "IPv6")
-
-        break
-      case 7:
-        // 统一延迟实现
-        hilog.info(0xFF00, "BasictestTag", "统一延迟")
-
-        break
-      case 8:
-        // TCP并发切换
-        hilog.info(0xFF00, "BasictestTag", "TCP并发")
-
-        break
-      case 9:
-        // 外部控制实现
-        hilog.info(0xFF00, "BasictestTag", "外部控制")
-
-        break
+    if(index === 5) {
+      this.pageInfos.pushPathByName(itemData.name, false)
+    } else {
+      this.theDialogIndex = index
+      this.theDialogTitle = typeof itemData.title == "string" ? itemData.title : getResourceString(itemData.title, this)
+      if(index === 2) {
+        this.theInputUnit = $r('app.string.s')
+        this.theplaceholder = '30'
+      } else if (index === 4){
+        this.theplaceholder = '7890'
+      } else {
+        this.theplaceholder = ''
+      }
+      this.isEnableIndexForegroundBlur = true
+      this.dialogController.open()
     }
 
   }
@@ -109,6 +179,60 @@ struct Basic {
       .hitTestBehavior(HitTestMode.None)
       .selectedColor(this.icon_emphasize)
   }
+  @Builder
+  MenuEntrance(index: number) {
+    // 确保children存在
+    if(this.basicMenuList && this.basicMenuList[0].children && index === 0) {
+      this.switchMenu(this.basicMenuList[0].children, index)
+    } else if (this.basicMenuList && this.basicMenuList[1].children && index === 1) {
+      this.switchMenu(this.basicMenuList[1].children, index)
+    }
+  }
+  @Builder
+  switchMenu(item: MenuListItemProp[], index: number) {
+    if(index === 0) {
+      // 日志等级菜单
+      Menu() {
+        MenuItem({ content: $r('app.string.LogLevel') }).contentFont({ weight: FontWeight.Bold })
+        ForEach(item, (menuItem: MenuListItemProp, index: number) => {
+          MenuItem({
+            content: menuItem.title,
+            symbolEndIcon: this.theMenuIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+          })
+            .selected(this.theMenuIndex === index)
+            .onChange(() => {
+              this.theMenuIndex = index
+              if (this.basicMenuList[0].children) {
+                let Item = this.overwriteBasicList[0]
+                Item.subtitle = menuItem.title
+                this.overwriteBasicList.splice(0, 1, Item)
+              }
+            })
+        }, (menuItem: MenuListItemProp) => JSON.stringify(menuItem))
+      }
+    } else {
+      // UA菜单
+      Menu() {
+        MenuItem({ content: 'UA' }).contentFont({ weight: FontWeight.Bold })
+        ForEach(item, (menuItem: MenuListItemProp, index: number) => {
+          MenuItem({
+            content: menuItem.title,
+            symbolEndIcon: this.theMenuIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+          })
+            .selected(this.theMenuIndex === index)
+            .onChange(() => {
+              this.theMenuIndex = index
+              if (this.basicMenuList[0].children) {
+                let Item = this.overwriteBasicList[1]
+                Item.subtitle = menuItem.title
+                this.overwriteBasicList.splice(1, 1, Item)
+              }
+            })
+        }, (menuItem: MenuListItemProp) => JSON.stringify(menuItem))
+      }
+    }
+  }
+
   build() {
     NavDestination() {
       OverwriteTop({
@@ -125,7 +249,8 @@ struct Basic {
                 icons: item.icons,
                 title: item.title,
                 isPrimaryIcons: true,
-                tips: () => { this.basicMenuTipsBuilder(item.subtitle) }
+                tips: () => { this.basicMenuTipsBuilder(item.subtitle) },
+                menu: (): void => { this.MenuEntrance(index) }
               })
             }
             .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
@@ -167,10 +292,7 @@ struct Basic {
                 this.overwriteBasicList.splice(index, 1, toggleItem)
                 hilog.info(0xFF00, "BasictestTag", "开关状态2:  %{public}s", toggleItem.isCheck)
                 this.changeChange(toggleItem.name as string, toggleItem.isCheck)
-                if(toggleItem.isCheck) {
-                  hilog.info(0xFF00, "BasictestTag", "开关已打开")
-                  this.handleToggle(index)
-                }
+
               })
             })
           }

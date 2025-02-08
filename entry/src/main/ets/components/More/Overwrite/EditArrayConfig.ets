@@ -4,6 +4,7 @@ import { theCustomDialog } from "../../Common"
 import { promptAction } from "@kit.ArkUI"
 import { EventHub, EventKey } from "../../../common/EventHub"
 import { UIConfig } from "../../../entryability/AppState"
+import { CONTENT_END_OFFSET } from "../../../common/Constants"
 
 export interface ArrayConfigParam{
     label?: string | ResourceStr
@@ -188,6 +189,7 @@ export struct ArrayConfigEditor {
           otherButton: () => { this.FakeIPfilterOther() }
         })
       }.width('100%')
+      .padding({left: this.morePageMargin.value, right: this.morePageMargin.value})
 
       List() {
         ForEach(this.FakeIPfilterList, (item: KeyValueData, index: number) => {
@@ -232,14 +234,14 @@ export struct ArrayConfigEditor {
 
       }
       .width('100%')
-      .height(this.isLandscapePhone ? 275 : (this.istabletVertical ? 945 : this.listHeight.value))
+      .contentEndOffset(CONTENT_END_OFFSET - 40)
       .margin({ top: 10 })
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)
+      .padding({left: this.morePageMargin.value, right: this.morePageMargin.value})
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
-    .padding({left: this.morePageMargin.value, right: this.morePageMargin.value})
     .onBackPressed(() => {
       this.pageInfos.pop(true);
       return true;

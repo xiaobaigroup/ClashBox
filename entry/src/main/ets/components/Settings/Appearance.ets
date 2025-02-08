@@ -5,6 +5,7 @@ import {
   ANIMATION_DURATION_500,
   AppearanceList,
   AppearanceListItemProp,
+  CONTENT_END_OFFSET,
 } from "../../common/Constants"
 import TopBuilder from "./TopBuilder"
 import { SymbolGlyphModifier } from "@kit.ArkUI"
@@ -485,7 +486,7 @@ struct Appearance {
       .width('100%')
       .align(Alignment.Top)
       .edgeEffect(EdgeEffect.Spring)
-     // .height(this.isLandscapePhone ? 300 : this.SettingslistHeight.value)
+      .contentEndOffset(CONTENT_END_OFFSET - 45)
       .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value, bottom: this.breakPointStatemorePageMargin.value })
 
     }

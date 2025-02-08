@@ -690,7 +690,7 @@
     },
     {
       "name": "XiaoBai_Subtitle",
-      "value": "ClashMeta内核移植"
+      "value": "内核移植及核心功能开发"
     },
     {
       "name": "FrondEnd_Development",
@@ -1579,6 +1579,10 @@
     {
       "name": "example",
       "value": "例如"
+    },
+    {
+      "name": "s",
+      "value": "秒"
     }
   ]
 }

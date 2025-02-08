@@ -26,6 +26,7 @@ struct Network {
   @State stackModeIndex: number = 0
   // 路由模式临时选择项
   @State routeModeIndex: number = 0
+
   // 列表行点击事件处理
   handleCheck(index: number) {
       // 跳转

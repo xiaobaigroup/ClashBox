@@ -4,7 +4,8 @@ import {
   FONT_SIZE_16,
   LIST_ITEM_HEIGHT_45,
   LIST_ITEM_HEIGHT,
-  BORDER_RADIUS_20} from "../../common/Constants"
+  BORDER_RADIUS_20,
+  CONTENT_END_OFFSET} from "../../common/Constants"
 import { getResourceString } from "../../utils/ResourceStringUtil"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
@@ -804,8 +805,8 @@ export struct CellularDataReminder {
       }
       .width('100%')
       .align(Alignment.Top)
-      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: true })
-      .height(this.isLandscapePhone ? 300 : this.SettingslistHeight.value)
+      .edgeEffect(EdgeEffect.Spring)
+      .contentEndOffset(CONTENT_END_OFFSET - 45)
       .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
     }
     .width('100%')

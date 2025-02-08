@@ -26,7 +26,9 @@
         "exported": true,
         "backgroundModes": [ // 长时任务类型的配置项
           // 数据传输
-          "dataTransfer"
+          "dataTransfer",
+          // 音频录制
+          "audioRecording"
         ],
         "skills": [
           {
@@ -51,6 +53,12 @@
       {
         // 长时后台
         "name": "ohos.permission.KEEP_BACKGROUND_RUNNING"
+      },
+      {
+        "name": "ohos.permission.MICROPHONE",
+        "reason": "$string:permission_reason_MICROPHONE",
+        "usedScene": {}
+
       }
     ],
     "extensionAbilities": [

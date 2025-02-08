@@ -1,6 +1,8 @@
 
 import { BreakpointState } from "../../../common/breakpointsystem"
-import { DNSMenu, ListOverwriteDNSData, MenuListItemProp, moreData } from "../../../common/Constants"
+import {
+  CONTENT_END_OFFSET,
+  DNSMenu, ListOverwriteDNSData, MenuListItemProp, moreData } from "../../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import OverwriteTop from "./OverwriteTopBuilder"
 import { menuRowList, skipRowList, theCustomDialog, toggleRowList } from "../../Common"
@@ -42,7 +44,7 @@ struct DNS {
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  // 编辑FakeIP范围弹窗控制器
+  // 编辑FakeIP范围 & GeoIP代码弹窗控制器
   dialogController: CustomDialogController = new CustomDialogController({
     builder: theCustomDialog({
       theDialogTitle: this.isFakeIP ? $r('app.string.Edit_FakeIP_Range') : $r('app.string.GeoIP_Code'),
@@ -99,6 +101,7 @@ struct DNS {
     this.theplaceholder = 'CN'
     this.currentInputValue = ''
   }
+
   aboutToAppear(): void {
     this.overwriteDNSList = ListOverwriteDNSData(this.clashConfig, this.appConfig)
     let dns = this.clashConfig.dns ?? {} as Dns
@@ -306,8 +309,8 @@ struct DNS {
                   this.handleToggle(index, toggleItem.isCheck)
                 })
               })
-              .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
-                .combine(TransitionEffect.scale({x: 0, y: 0})):null)
+              .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
+                .combine(TransitionEffect.scale({x: 0, y: 0})) : null)
             } else
             if (item.sign === 3) {
               // 标题栏
@@ -320,8 +323,8 @@ struct DNS {
                }.width('100%')
                 .justifyContent(FlexAlign.Start)
              }
-              .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
-                .combine(TransitionEffect.scale({x: 0, y: 0})):null)
+              .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
+                .combine(TransitionEffect.scale({x: 0, y: 0})) : null)
             }
 
         })
@@ -333,7 +336,7 @@ struct DNS {
       .margin({ top: 10 })
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)
-      .contentEndOffset(70)
+      .contentEndOffset(CONTENT_END_OFFSET - 40)
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))

@@ -690,7 +690,7 @@
     },
     {
       "name": "XiaoBai_Subtitle",
-      "value": "ClashMeta Kernel Porting"
+      "value": "Kernel porting and core function development"
     },
     {
       "name": "FrondEnd_Development",
@@ -1579,6 +1579,10 @@
     {
       "name": "example",
       "value": "Example"
+    },
+    {
+      "name": "s",
+      "value": "s"
     }
   ]
 }
