@@ -111,7 +111,7 @@ struct Index {
   // 设备高度是否 (320vp< height <= 500vp) 媒体查询
   @State isLandscapePhone: boolean = false
   // 平板竖屏判断变量
-  @State istabletVertical: boolean = false
+  @State istabletLandscape: boolean = false
   // 折叠展开状态判断变量
   @State isFoldStatus: boolean = false
   // 读取导航条区域的高度
@@ -146,13 +146,13 @@ struct Index {
     sm: '100%',
     md: '100%',
     lg: '100%',
-    xl: '60vp'
+    xl: '65vp'
   });
   @State compBarHeight: BreakpointState<string> = BreakpointState.of({
     sm: '65vp',
     md: '65vp',
     lg: '65vp',
-    xl: '80vp'
+    xl: '100%'
   });
   @State TabIconfontSize: BreakpointState<number> = BreakpointState.of({
     sm: 24,
@@ -336,13 +336,13 @@ struct Index {
       Column() {
         SymbolGlyph(TabIcon)
           .fontColor([this.currentIndex === index ? this.icon_emphasize : this.icon_tertiary])
-          .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)//分层颜色
+          .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY) //分层颜色
           .fontSize(this.isLandscapePhone ? 24 : this.TabIconfontSize.value)
           .margin({ top: 5 })
-          .effectStrategy(this.uiConfig.isAnimation?SymbolEffectStrategy.SCALE:null)
+          .effectStrategy(this.uiConfig.isAnimation ? SymbolEffectStrategy.SCALE : null)
           .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
             .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
-           .combine(TransitionEffect.translate({y:50})):null)
+           .combine(TransitionEffect.translate({y: 50})) : null)
 
         Text(title)
           .fontColor(this.currentIndex === index ? this.icon_emphasize : this.icon_tertiary)
@@ -351,19 +351,19 @@ struct Index {
           .fontSize(this.isLandscapePhone ? 12 : this.TabTitlefontSize.value)
           .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
            .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
-           .combine(TransitionEffect.translate({y:50})):null)
+           .combine(TransitionEffect.translate({y: 50})) : null)
       }
       .padding(this.isLandscapePhone ? { left: 39 } : { bottom:5 })
     }
     .width('100%')
     .height('100%')
-    .animation(this.isSecondary===true ?{
+    .animation(this.isSecondary === true ?{
       duration: this.uiConfig.animationSpeed,
       tempo:0.3,
       curve:curves.springMotion(),
       iterations: 1,
       playMode: PlayMode.Normal
-    }:null)
+    } : null)
   }
 
   /* 是否开启 `Index` 页面的前景模糊 */
@@ -373,9 +373,9 @@ struct Index {
   // 当手机横屏时条件成立
   deviceHeightListener: mediaquery.MediaQueryListener =
     this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp) and (640vp< width <= 1000vp)');
-  // 平板竖屏判断
+  // 平板横屏判断
   tabletHeightListener:mediaquery.MediaQueryListener =
-    this.getUIContext().getMediaQuery().matchMediaSync('(1000vp< height)');
+    this.getUIContext().getMediaQuery().matchMediaSync('(1000vp< width)');
   // 折叠屏展开判断
   foldPhoneOpenListener:mediaquery.MediaQueryListener =
     this.getUIContext().getMediaQuery().matchMediaSync('(640vp< height <= 1000vp) and (640vp< width <= 1000vp)');
@@ -426,10 +426,10 @@ struct Index {
         `#媒体查询#设备高度改变#(320vp< height <= 500vp) and (640vp< width <= 1000vp)手机横屏结果: ${this.isLandscapePhone}`)
     });
     this.tabletHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
-      this.istabletVertical = mediaQueryResult.matches
-      AppStorage.setOrCreate<boolean>('istabletVertical', this.istabletVertical)
+      this.istabletLandscape = mediaQueryResult.matches
+      AppStorage.setOrCreate<boolean>('istabletLandscape', this.istabletLandscape )
       hilog.info(0xFF00, this.componentName,
-        `#媒体查询#设备高度改变#(1000vp< height)平板竖屏结果: ${this.istabletVertical}`)
+        `#媒体查询#设备高度改变#(1000vp< width)平板横屏结果: ${this.istabletLandscape }`)
     });
     this.foldPhoneOpenListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
       this.isFoldStatus = mediaQueryResult.matches
@@ -617,7 +617,8 @@ struct Index {
   build() {
     Column() {
       Tabs({
-        barPosition: this.isLandscapePhone ? BarPosition.Start : this.compBarPose.value,controller: this.indexController
+        barPosition: this.isLandscapePhone ? BarPosition.Start : this.compBarPose.value,
+        controller: this.indexController
       }) {
         TabContent() {
        //   if (this.currentIndex===0){
@@ -671,10 +672,10 @@ struct Index {
       /*.backgroundBrightness({
         rate: 0.5,
         lightUpDegree: 0.5 })*/
-      .backgroundColor(this.uiConfig.isBlurr ? '#00ffffff':$r('app.color.background'))
-      .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Thick:null)
-      .backdropBlur(this.uiConfig.isBlurr ?0.3:0)
-      .barOverlap(this.uiConfig.isBlurr ?  (this.isLandscapePhone ? false:true):false)  //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
+      .backgroundColor(this.uiConfig.isBlurr ? '#00ffffff' : $r('app.color.background'))
+      .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Thick : null)
+      .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
+      .barOverlap(this.uiConfig.isBlurr ?  (this.isLandscapePhone || this.istabletLandscape ? false : true ) : false)  //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
       .scrollable(this.isSecondary ? false : true)
       .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
       .barWidth(this.isLandscapePhone ? '63vp' : this.compBarWidth.value) /**/

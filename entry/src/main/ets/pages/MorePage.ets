@@ -113,7 +113,7 @@ struct MorePage {
   }
 
   handleCheck(index: number) {
-    if(index === 6) {
+    if(index === this.moreList.length - 1) {
       // 模糊背景
       this.isEnableIndexForegroundBlur = true
       // 召唤查询IP弹窗
@@ -190,7 +190,6 @@ struct MorePage {
             .width('83%')
             .textAlign(TextAlign.Start)
         }
-       // .margin({left: this.morePageMargin.value})
         .width('100%')
         .height(TAB_CONTENT_TITLE_HEIGHT)
         .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
@@ -217,8 +216,6 @@ struct MorePage {
             })
             .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: index * 10 + 10 })
               .combine(TransitionEffect.scale({x: 0, y: 0})):null)
-            // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0})
-            //   .animation({ duration: this.uiConfig.animationSpeed,delay: index*10+10 }):null)
           })
           // 设置行
           ListItem() {

@@ -21,15 +21,17 @@ export struct ConfigList {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
-  @State theplaceholder: string = 'CN'
+  @State isShowIcons: boolean = true
+  @State theplaceholder: string = ''
   @State currentInputValue: string = ''
   @State currentItemIndex: number = 0
-  // 添加路由地址弹窗保存的输入文本
   @State SaveInputValue: string = ''
-  @State theDialogTitle: ResourceStr = $r('app.string.GeoIP_Code')
-  @State isKeyValue: boolean = false
+  @State theDialogTitle: ResourceStr = ''
+  @State theUnit: ResourceStr = ''
+
   dialogController: CustomDialogController = new CustomDialogController({
     builder: theCustomDialog({
+      Unit: this.theUnit,
       theDialogTitle: this.theDialogTitle,
       theplaceholder: this.theplaceholder,
       currentInputValue: $currentInputValue,
@@ -62,31 +64,35 @@ export struct ConfigList {
     let value = this.SaveInputValue
     if(item.valueType == ValueType.Number){
       item.onChange(parseInt(this.currentInputValue))
-    }else{
+    } else {
       item.onChange(this.currentInputValue)
     }
     item.value = value
     this.configList.splice(this.currentItemIndex, 1, item)
   }
+
   handleCheck(index: number) {
     this.currentItemIndex = index
     let itemData = this.configList[index]
     if(itemData.isEditType()){
+      this.theUnit = itemData.name === 'keep-alive-interval' ? getResourceString($r('app.string.s'), this) : ''
       this.theplaceholder = `${getResourceString($r('app.string.example'), this)}: ${getResourceString(itemData.tips(), this)}`
       this.currentInputValue = itemData.value as string
-      this.theDialogTitle = itemData.title
+      this.theDialogTitle =  getResourceString($r('app.string.Edit'), this) +  getResourceString(itemData.title, this)
       this.isEnableIndexForegroundBlur = true
       this.dialogController.open()
-    }else{
+    } else {
       this.pageInfos.pushPathByName("EditArrayConfig", itemData, true)
     }
   }
+
   handleToggle(index: number) {
     const toggleItem = this.configList[index]
     toggleItem.isCheck = !toggleItem.isCheck
     this.configList.splice(index, 1, toggleItem)
     toggleItem.onChange(toggleItem.isCheck)
   }
+
   aboutToAppear(): void {
     EventHub.on(EventKey.ArrayConfigChanged, (d: ArrayConfigParam) => {
       let item = this.configList[this.currentItemIndex]
@@ -94,11 +100,17 @@ export struct ConfigList {
       item.onChange(d.value)
       this.configList.splice(this.currentItemIndex, 1, item)
     })
+    // 设置DNS页无图标
+    if(this.configList[0].name === 'overrideDns') {
+      this.isShowIcons = false
+    }
   }
+
   @Builder
   menuTipsBuilder(tips: ResourceStr) {
     Text(tips)
       .fontWeight(FontWeight.Normal)
+      .fontColor($r('sys.color.font_secondary'))
       .textOverflow({ overflow: TextOverflow.Ellipsis })
       .maxLines(1)
       .margin({top: 2 })
@@ -108,6 +120,7 @@ export struct ConfigList {
   skipTipsBuilder(tips: ResourceStr) {
     Text(tips)
       .fontWeight(FontWeight.Normal)
+      .fontColor($r('sys.color.font_secondary'))
       .textOverflow({ overflow: TextOverflow.Ellipsis })
       .maxLines(1)
       .margin({top: 2, right: 2 })
@@ -123,7 +136,7 @@ export struct ConfigList {
 
   @Builder
   switchMenu(item: ConfigItemData, itemIndex: number) {
-    // 栈模式菜单
+    // 菜单
     Menu() {
       MenuItem({ content: item.title}).contentFont({ weight: FontWeight.Bold })
       ForEach(item.options ?? [], (option: OptionItem) => {
@@ -150,21 +163,22 @@ export struct ConfigList {
           ListItem() {
             // 展开型
             menuRowList({
-              icons: item.icons,
+              icons: this.isShowIcons ? item.icons : undefined,
               title: item.title,
               isPrimaryIcons: true,
               tips: () => { this.menuTipsBuilder(item.tips()) },
               menu: (): void => { this.switchMenu(item, index) }
             })
           }
-          .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
-            .combine(TransitionEffect.scale({x: 0, y: 0})):null)
+          .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+            .combine(TransitionEffect.scale({x: 0, y: 0})) : null)
         } else if (item.sign === 1) {
           ListItem() {
             // 跳转型
             skipRowList({
-              icons: item.icons,
+              icons: this.isShowIcons ? item.icons : undefined,
               title: item.title,
+              subtitle: item.subtitle,
               isPrimaryIcons: true,
               tips: () => { this.skipTipsBuilder(item.tips()) }
             })
@@ -172,12 +186,12 @@ export struct ConfigList {
             this.handleCheck(index)
           })
           .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
-            .combine(TransitionEffect.scale({x: 0, y: 0})):null)
+            .combine(TransitionEffect.scale({x: 0, y: 0})) : null)
         } else if (item.sign === 2 ) {
           ListItem() {
             // 开关型
             toggleRowList({
-              icons: item.icons,
+              icons: this.isShowIcons ? item.icons : undefined,
               title: item.title,
               subtitle: item.subtitle,
               isPrimaryIcons: true,
@@ -185,7 +199,7 @@ export struct ConfigList {
             })
           }
           .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
-            .combine(TransitionEffect.scale({x: 0, y: 0})):null)
+            .combine(TransitionEffect.scale({x: 0, y: 0})) : null)
           .onClick(() => {
             this.getUIContext()?.animateTo({
               duration: this.uiConfig.animationSpeed

@@ -20,13 +20,14 @@ export struct ArrayConfigEditor {
   @State SaveInputValue: string = ''
   @State currentInputValue: string = ''
   @State theplaceholder: string = '请输入内容'
-  @State addDialogTitle: ResourceStr = $r('app.string.Add_FakeIPfilter')
-  @State editDialogTitle: ResourceStr = $r('app.string.Add_FakeIPfilter')
-  // 编辑路由地址弹窗默认输入框文本值
+  @State kvDialogTitle: ResourceStr = ''
+  @State addDialogTitle: ResourceStr = ''
+  @State editDialogTitle: ResourceStr = ''
+  // 编辑弹窗默认输入框文本值
   @State theEditPlaceholder: number = 0
-  // 编辑路由地址弹窗保存的输入文本
+  // 编辑弹窗保存的输入文本
   @State SaveEditInputValue: string = ''
-  // 编辑路由地址弹窗当前输入文本
+  // 编辑弹窗当前输入文本
   @State currentEditInputValue: string = ''
   @State keyValueData: KeyValueData = new KeyValueData("")
   // 编辑路由地址弹窗标题
@@ -45,8 +46,8 @@ export struct ArrayConfigEditor {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   aboutToAppear(): void {
-    this.addDialogTitle = "添加" + getResourceString(this.params.title, this)
-    this.editDialogTitle = this.params.title
+    this.addDialogTitle = getResourceString($r('app.string.Add'), this) + getResourceString(this.params.title, this)
+    this.editDialogTitle = getResourceString($r('app.string.Edit'), this) + getResourceString(this.params.title, this)
     // string []
     if(this.params.valueType == ValueType.StringArray){
       const list = this.params.value as string []
@@ -80,19 +81,39 @@ export struct ArrayConfigEditor {
       EventHub.sendEvent(EventKey.ArrayConfigChanged, {key: this.params.name, value: record})
     }
   }
+
+  /**
+   * KV弹窗控制器
+   */
   kvDialogController = new CustomDialogController({
     builder: KVCustomDialog({
       value: $keyValueData,
-      theDialogTitle: this.addDialogTitle,
+      theDialogTitle: this.kvDialogTitle,
       confirm: (value)=>{
         this.onCancel()
         this.ArrayConfigList = [...this.ArrayConfigList, value]
+        // 保存后重置数据
+        this.keyValueData = new KeyValueData("")
       },
       cancel: ()=> { this.onCancel() },
-    })
+    }),
+    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+      // 1、PRESS_BACK    点击三键back、左滑/右滑、键盘ESC。
+      // 2、TOUCH_OUTSIDE    点击遮障层时
+      // 3、CLOSE_BUTTON    点击关闭按钮
+      if (dismissDialogAction.reason === DismissReason.TOUCH_OUTSIDE) {
+        // 点击遮蔽层不响应，防误触
+      } else {
+        // 完成任务后主动通过dismiss主动关闭对话框
+        dismissDialogAction.dismiss()
+        // 关闭背景模糊
+        this.isEnableIndexForegroundBlur = false
+      }
+    }
   })
+
   /**
-   * FakeIP添加过滤弹窗控制器
+   * 添加弹窗控制器
    */
   dialogController: CustomDialogController = new CustomDialogController({
     builder: theCustomDialog({
@@ -110,7 +131,7 @@ export struct ArrayConfigEditor {
       if (dismissDialogAction.reason === DismissReason.TOUCH_OUTSIDE) {
         // 点击遮蔽层不响应，防误触
       } else {
-        // 完成IP地址查询后主动通过dismiss主动关闭对话框
+        // 完成任务后主动通过dismiss主动关闭对话框
         dismissDialogAction.dismiss()
         // 关闭背景模糊
         this.isEnableIndexForegroundBlur = false
@@ -132,10 +153,11 @@ export struct ArrayConfigEditor {
       item = new KeyValueData(arr[0], arr[1])
     }
     this.ArrayConfigList = [...this.ArrayConfigList, item]
+    this.currentInputValue = ''
   }
 
   /**
-   * FakeIP编辑过滤弹窗控制器
+   * 编辑弹窗控制器
    */
   editDialogController: CustomDialogController = new CustomDialogController({
     builder: theCustomDialog({
@@ -143,7 +165,7 @@ export struct ArrayConfigEditor {
       currentInputValue: $currentEditInputValue,
       SaveInputValue: $SaveEditInputValue,
       theDialogTitle: this.editDialogTitle,
-      cancel: ()=> { this.oneditCancel() },
+      cancel: ()=> { this.onCancel() },
       confirm: ()=> { this.oneditAccept() },
     }),
     onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
@@ -153,17 +175,14 @@ export struct ArrayConfigEditor {
       if (dismissDialogAction.reason === DismissReason.TOUCH_OUTSIDE) {
         // 点击遮蔽层不响应，防误触
       } else {
-        // 完成IP地址查询后主动通过dismiss主动关闭对话框
+        // 完成任务后主动通过dismiss主动关闭对话框
         dismissDialogAction.dismiss()
         // 关闭背景模糊
         this.isEnableIndexForegroundBlur = false
       }
     },
   })
-  oneditCancel() {
-    // 关闭背景模糊
-    this.isEnableIndexForegroundBlur = false
-  }
+
   oneditAccept() {
     // 关闭背景模糊
     this.isEnableIndexForegroundBlur = false
@@ -174,6 +193,7 @@ export struct ArrayConfigEditor {
       item = new KeyValueData(arr[0], arr[1])
     }
     this.ArrayConfigList.splice(this.theEditPlaceholder, 1, item)
+    this.currentInputValue = ''
   }
 
   // 列表行删除
@@ -184,7 +204,7 @@ export struct ArrayConfigEditor {
   FakeIPfilterSearch() {
   }
   @Builder
-  FakeIPfilterOther() {
+  TopOtherButton() {
     Button({ type: ButtonType.Circle, stateEffect: true }) {
       SymbolGlyph($r('sys.symbol.plus'))
         .fontSize(24)
@@ -196,7 +216,9 @@ export struct ArrayConfigEditor {
     .onClick(() => {
       // 启用背景模糊
       this.isEnableIndexForegroundBlur = true
-      if(this.params.valueType == ValueType.Record){
+      if(this.params.valueType == ValueType.Record) {
+        // 替换为添加标题
+        this.kvDialogTitle = getResourceString($r('app.string.Add'), this) + getResourceString(this.params.title, this)
         this.kvDialogController.open()
       }else{
         this.dialogController.open()
@@ -211,7 +233,7 @@ export struct ArrayConfigEditor {
         MoreTop({
           title: this.params.title as Resource,
           searchButton: this.FakeIPfilterSearch,
-          otherButton: () => { this.FakeIPfilterOther() }
+          otherButton: () => { this.TopOtherButton() }
         })
       }.width('100%')
       .padding({left: this.morePageMargin.value, right: this.morePageMargin.value})
@@ -250,8 +272,8 @@ export struct ArrayConfigEditor {
             }
 
           }
-          .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
-            .combine(TransitionEffect.scale({x: 0, y: 0})):null)
+          .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index * 10 + 10 })
+            .combine(TransitionEffect.scale({x: 0, y: 0})) : null)
           .margin({bottom: this.listBottom.value })
           .onClick(() => {
             // 启用背景模糊
@@ -260,8 +282,10 @@ export struct ArrayConfigEditor {
             if(this.params.valueType != ValueType.Record){
               this.currentEditInputValue = item.key
               this.editDialogController.open()
-            }else{
+            } else {
               this.keyValueData = item
+              // 替换为编辑标题
+              this.kvDialogTitle = getResourceString($r('app.string.Edit'), this) + getResourceString(this.params.title, this)
               this.kvDialogController.open()
             }
             this.theEditPlaceholder = index

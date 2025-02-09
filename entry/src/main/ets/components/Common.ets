@@ -407,16 +407,21 @@ export struct KVCustomDialog {
   @Link theDialogTitle: ResourceStr
   @Link value: KeyValueData
   @State currentKeyInputValue: string = ""
+  @State keyValue: string = ""
   @State currentValueInputValue: string = ""
+  @State valueValue: string = ""
   cancel?: () => void
   confirm?: (value: KeyValueData) => void
   controller: CustomDialogController
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+
   aboutToAppear(): void {
     this.currentKeyInputValue = this.value.key
     this.currentValueInputValue = this.value.value ?? ""
   }
+
   build() {
     Column({space: 8}) {
       // 标题
@@ -434,7 +439,7 @@ export struct KVCustomDialog {
         })
       Row() {
         Button($r('app.string.Save'))
-          .width('100%')
+          .width('50%')
           .height(39)
           .fontColor(this.icon_emphasize)
           .backgroundColor($r('app.color.container_background'))
@@ -443,8 +448,7 @@ export struct KVCustomDialog {
             if (this.confirm) {
               this.confirm(new KeyValueData(this.currentKeyInputValue, this.currentValueInputValue))
             }
-            this.currentKeyInputValue = ''
-            this.currentValueInputValue = ''
+            this.isEnableIndexForegroundBlur = false
           })
         Button($r('app.string.Cancel'))
           .height(39)
@@ -466,7 +470,7 @@ export struct KVCustomDialog {
 }
 
 /**
- * 通用单Value多行文本输入弹窗组件（保存&取消竖排按钮）
+ * 通用单Value 多行&单行 文本输入弹窗组件（保存&取消竖排按钮）
  * @param theDialogTitle 弹窗标题-ResourceStr
  * @param theplaceholder 输入框默认文本-ResourceStr
  * @param SaveInputValue 保存的输入值-string
@@ -665,7 +669,7 @@ export struct skipRowList {
             .margin({top: 2})
             .fontSize(14)
         }
-      }.layoutWeight(1)
+      }.layoutWeight(2)
       .alignItems(HorizontalAlign.Start)
       .margin({ left: 12 })
       Blank()

@@ -1,33 +1,20 @@
-
 import { BreakpointState } from "../../../common/breakpointsystem"
-import {
-  ConfigItemData,
-  ListOverwriteNetworkData, } from "../../../common/Constants"
+import { ConfigItemData, ListOverwriteNetworkData } from "../../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import OverwriteTop from "./OverwriteTopBuilder"
-import { menuRowList, skipRowList, theCustomDialog, toggleRowList } from "../../Common"
+import { theCustomDialog } from "../../Common"
 import { AppConfig, UIConfig } from "../../../entryability/AppState"
 import { ConfigList } from "./Common"
 import { ClashConfig } from "proxy_core"
 
 @Component
 struct Network {
-  /* 主题色 */
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
+
   @Consume('NavPathStack') pageInfos: NavPathStack
-  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
-  @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @State overwriteNetworkList: ConfigItemData[] = []
-  @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
-  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  // 栈模式临时选择项
-  @State stackModeIndex: number = 0
-  // 路由模式临时选择项
-  @State routeModeIndex: number = 0
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+
   aboutToAppear(): void {
     this.overwriteNetworkList = ListOverwriteNetworkData(this.clashConfig, this.appConfig)
   }
