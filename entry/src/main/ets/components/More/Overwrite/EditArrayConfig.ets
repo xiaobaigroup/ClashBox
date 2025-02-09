@@ -1,7 +1,7 @@
 import { BreakpointState } from "../../../common/breakpointsystem"
 import { MoreTop } from "../MoreTopBuilder"
 import { KVCustomDialog, theCustomDialog } from "../../Common"
-import { promptAction } from "@kit.ArkUI"
+import { curves, promptAction } from "@kit.ArkUI"
 import { EventHub, EventKey } from "../../../common/EventHub"
 import { UIConfig } from "../../../entryability/AppState"
 import { ConfigItemData, CONTENT_END_OFFSET, ValueType } from "../../../common/Constants"
@@ -237,6 +237,9 @@ export struct ArrayConfigEditor {
         })
       }.width('100%')
       .padding({left: this.morePageMargin.value, right: this.morePageMargin.value})
+      .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
+        .animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 0 })
+        .combine(TransitionEffect.SLIDE) : null)
 
       List() {
         ForEach(this.ArrayConfigList, (item: KeyValueData, index: number) => {

@@ -5,7 +5,7 @@ import { MoreTop } from "./MoreTopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { convertTime } from "../../utils/TimeConvertUtil"
 import { ClashConfig } from 'proxy_core'
-import { promptAction } from '@kit.ArkUI'
+import { curves, promptAction } from '@kit.ArkUI'
 import { copy, UIConfig } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { getResourceString } from "../../utils/ResourceStringUtil"
@@ -201,7 +201,7 @@ struct Resources {
           }.width('100%')
           .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
           .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-            .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+            .animation({ duration: this.uiConfig.animationSpeed, curve:curves.springMotion(),delay: 0 })
             .combine(TransitionEffect.SLIDE) : null)
           // 页面
           if(this.resourceListData.length === 0) {

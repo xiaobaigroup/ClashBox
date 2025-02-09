@@ -5,6 +5,7 @@ import { hilog } from "@kit.PerformanceAnalysisKit"
 import { convertTime } from "../../utils/TimeConvertUtil"
 import { Nothing } from "../Common"
 import { UIConfig } from "../../entryability/AppState"
+import { curves } from "@kit.ArkUI"
 
 // 资源数据（假设）
 interface RequestData {
@@ -70,7 +71,7 @@ struct RequestPage {
         })
       }.width('100%')
       .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-        .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+        .animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 0 })
         .combine(TransitionEffect.SLIDE) : null)
       // 页面
       if(this.requestListData.length === 0) {

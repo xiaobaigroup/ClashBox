@@ -613,7 +613,6 @@ struct Index {
     }
   }
 
-
   build() {
     Column() {
       Tabs({

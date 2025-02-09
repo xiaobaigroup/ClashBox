@@ -4,7 +4,7 @@ import {
   BIND_SHEET_DRAG_BAR_HEIGHT, BIND_SHEET_TITLE_CONTAINER_HEIGHT } from "../../common/Constants"
 import { skipRowList, toggleRowList } from "../Common"
 import { MoreTop } from "./MoreTopBuilder"
-import { promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
+import { curves, promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { UIConfig } from "../../entryability/AppState"
 
@@ -130,7 +130,7 @@ struct Diversion {
         })
       }.width('100%')
       .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-        .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+        .animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 0 })
         .combine(TransitionEffect.SLIDE) : null)
       // 数据列表行
       List() {

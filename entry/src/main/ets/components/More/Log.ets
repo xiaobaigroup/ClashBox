@@ -1,5 +1,5 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { SymbolGlyphModifier } from "@kit.ArkUI"
+import { curves, SymbolGlyphModifier } from "@kit.ArkUI"
 import { MoreTop } from "./MoreTopBuilder"
 import { Nothing, skipRowList, toggleRowList } from "../Common"
 import { timestampToDateTime } from "../../utils/TimeConvertUtil"
@@ -186,7 +186,7 @@ struct Log {
           }.width('100%')
           .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
           .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-            .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+            .animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 0 })
             .combine(TransitionEffect.SLIDE) : null)
 
           // 主体

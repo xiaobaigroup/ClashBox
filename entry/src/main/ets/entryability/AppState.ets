@@ -88,6 +88,8 @@ export class UIConfig{
   // 模拟下载启用变量
   backgroundDownModel: boolean = false
   /* 主页小卡片相关 */
+  //分流模式小卡片  平移属性参数
+  translateY:number|string='-100%'
   //快捷方式小卡片
   inputTitle1: string = ''
   inputTitle2: string = ''

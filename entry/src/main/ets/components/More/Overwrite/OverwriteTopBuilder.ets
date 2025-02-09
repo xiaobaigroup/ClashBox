@@ -1,4 +1,6 @@
 import { BreakpointState } from "../../../common/breakpointsystem"
+import { curves } from "@kit.ArkUI"
+import { UIConfig } from "../../../entryability/AppState"
 
 @Component
 struct OverwriteTop {
@@ -8,6 +10,7 @@ struct OverwriteTop {
   @Consume('NavPathStack') pageInfos: NavPathStack
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   build() {
     Row() {
@@ -44,6 +47,9 @@ struct OverwriteTop {
     .width('100%')
     .height(56)
     .alignItems(VerticalAlign.Center)
+    .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
+      .animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 0 })
+      .combine(TransitionEffect.SLIDE) : null)
   }
 }
 

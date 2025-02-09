@@ -5,6 +5,7 @@ import { skipRowList, theRowCustomDialog } from "../../Common"
 import { MoreTop } from "../MoreTopBuilder"
 import { UIConfig } from "../../../entryability/AppState"
 import { ClashConfig } from "proxy_core"
+import { curves } from "@kit.ArkUI"
 
 @Component
 struct Overwrite {
@@ -101,7 +102,7 @@ struct Overwrite {
       }
       .width('100%')
       .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-        .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+        .animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 0 })
         .combine(TransitionEffect.SLIDE) : null)
 
       List({space: 10}) {

@@ -455,7 +455,7 @@ struct Home {
                   }
                 }
                 .GridColStyle()
-                .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+                .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.effectHomeCard)
                 //.transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:20 }):null)
@@ -488,7 +488,7 @@ struct Home {
                 }
                 //   .margin({ left: this.containerMargin.value })
                 .GridColStyle()
-                .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+                .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.effectHomeCard)
                 // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:30 }):null)
@@ -520,7 +520,7 @@ struct Home {
                   }
                 }
                 .GridColStyle()
-                .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+                .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.effectHomeCard)
                 //.transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:40 }):null)
@@ -552,7 +552,7 @@ struct Home {
                   }
                 }
                 .GridColStyle()
-                .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+                .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.effectHomeCard)
                 // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:60 }):null)
@@ -584,7 +584,7 @@ struct Home {
                   }
                 }
                 .GridColStyle()
-                .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+                .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.effectHomeCard)
                 //.transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:70 }):null)
@@ -616,7 +616,7 @@ struct Home {
                   }
                 }
                 .GridColStyle()
-                .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+                .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.effectHomeCard)
                 // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:80 }):null)
@@ -682,7 +682,7 @@ struct Home {
                   }
                 }
                 .GridColStyle()
-                .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+                .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:50}):null)
                 .transition(this.effectHomeCard)
@@ -714,7 +714,7 @@ struct Home {
                   }
                 }
                 .GridColStyle()
-                .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+                .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 .transition(this.effectHomeCard)
                 // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:90}):null)
@@ -736,7 +736,7 @@ struct Home {
         .contentEndOffset(CONTENT_END_OFFSET)
         .edgeEffect(EdgeEffect.Spring)
         .chainAnimation(true)
-        .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
+      //  .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
         .bindSheet($$this.isShowCardEdit, this.CardEdit(), {
           detents: [BIND_SHEET_CONTAINER_HEIGHT, 300,],
           preferType: SheetType.CENTER,

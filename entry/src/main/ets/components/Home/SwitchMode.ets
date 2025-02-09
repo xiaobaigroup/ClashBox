@@ -1,5 +1,5 @@
 import {  BreakpointState } from '../../common/breakpointsystem'
-import { mediaquery } from '@kit.ArkUI';
+import { curves, mediaquery } from '@kit.ArkUI';
 import { ANIMATION_DURATION_300, MarginGenerate } from '../../common/Constants';
 import { CardTitle } from './CardTitleBuilder';
 import { AppConfig, SwitchModeCard, UIConfig } from '../../entryability/AppState';
@@ -36,37 +36,68 @@ struct SwitchMode {
   aboutToDisappear() {
   }
 
+  //平移选择动画参数切换
+  switchTranslateY(index: number) {
+    switch (index) {
+      case 0:
+        this.uiConfig.translateY='-100%'
+        break;
+      case 1:
+        this.uiConfig.translateY=0
+        break
+      case 2:
+        this.uiConfig.translateY='100%'
+        break
+    }
+  }
+
   build() {
     Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.SpaceBetween }) {
       CardTitle({ title: $r('app.string.Mode') })
+      Stack() {
+        //平移动画使用的底色组件
+        Button()
+          .ButtonStyle()
+          .shadow({ radius:10,color:$r('app.color.shadow')})
+          .height('33.3%')
+          .translate({y:this.uiConfig.translateY})
+          .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8 } : null)
+          .backgroundColor($r('app.color.container_background'))
 
       Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-        ForEach([
-          {t: $r('app.string.Rule'), v: ProxyMode.Rule},
-          {t: $r('app.string.Overall'), v: ProxyMode.Global},
-          {t: $r('app.string.Direct'), v: ProxyMode.Direct}
-        ], (n: [Resource, number], i: number) => {
-          Button(n["t"], { buttonStyle: ButtonStyleMode.TEXTUAL,stateEffect:false })
-            .ButtonStyle()
-            .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
-            .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-            .fontColor(this.clashConfig.mode==n["v"] ? this.font_primary : $r('sys.color.font_secondary'))
-            .backgroundColor(this.clashConfig.mode==n["v"] ? $r('app.color.container_background') : '#00ffffff')
-              //     .shadow(this.clashConfig.mode==n["v"] ? { radius: 3,color:$r('app.color.shadow')} : { } )
-            .onClick(() => {
-              //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
-              if (this.isShowHomeEdit === false) {
-                this.clashConfig.mode = n["v"]
-                EventHub.sendEvent(EventKey.SwitchModeCard, n["v"])
-              }
-            })
-        })
+          ForEach([
+            { t: $r('app.string.Rule'), v: ProxyMode.Rule },
+            { t: $r('app.string.Overall'), v: ProxyMode.Global },
+            { t: $r('app.string.Direct'), v: ProxyMode.Direct }
+          ], (n: [Resource, number], i: number) => {
+            Button(n["t"], { buttonStyle: ButtonStyleMode.TEXTUAL, stateEffect: false })
+              .ButtonStyle()
+              .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8 } : null)
+              .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+              .fontColor(this.clashConfig.mode == n["v"] ? this.font_primary : $r('sys.color.font_secondary'))
+              .onClick(() => {
+                //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
+                if (this.isShowHomeEdit === false) {
+                  animateTo({
+                    duration: this.uiConfig.animationSpeed,
+                    iterations: 1,
+                    playMode: PlayMode.Normal,
+                    curve:Curve.Friction,
+                  }, () => {
+                    this.clashConfig.mode = n["v"]
+                    this.switchTranslateY(i)
+                    EventHub.sendEvent(EventKey.SwitchModeCard, n["v"])
+                  })
+                }
+              })
+          })
+        }
       }
       .width('100%')
       .height('82%')
+      .padding({ top:2,bottom:2,left:3,right:3 })
       .backgroundColor($r('app.color.home_card_background'))
       .borderRadius(20)
-      .padding({ top:2,bottom:2,left:3,right:3 })
     }
     .width('100%')
     .height('100%')
@@ -84,7 +115,7 @@ function ButtonStyle() {
   .height(vp2px(32.67))
   .borderRadius(18)
   .fontWeight(FontWeight.Bold)
-
+  .stateEffect(false)
 }
 
 
