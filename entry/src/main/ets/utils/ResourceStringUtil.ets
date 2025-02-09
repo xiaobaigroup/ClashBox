@@ -13,7 +13,14 @@
  * limitations under the License.
  */
 
-export function getResourceString(resource: Resource, __this: object): string {
+export function getResourceString(resource: Resource | string , __this: object): string {
+  if(!resource)
+    return ""
+  if(typeof resource == "string")
+    return resource
+  if (!resource.id){
+    return ""
+  }
   let resourceString = getContext(__this).resourceManager.getStringSync(resource.id);
   return resourceString;
 }

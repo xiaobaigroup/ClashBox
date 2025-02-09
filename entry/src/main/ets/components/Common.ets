@@ -9,6 +9,7 @@ import {
 } from "../common/Constants"
 import { UIConfig } from "../entryability/AppState"
 import { getResourceString } from "../utils/ResourceStringUtil"
+import { KeyValueData } from "./More/Overwrite/EditArrayConfig"
 
 /* 通用属性 START */
 @Styles
@@ -403,17 +404,19 @@ export struct theRowCustomDialog {
 @Preview
 @CustomDialog
 export struct KVCustomDialog {
-  @State theDialogTitle: ResourceStr = ''
-  @Link SaveKeyInputValue: string
-  @Link currentKeyInputValue: string
-  @Link SaveValueInputValue: string
-  @Link currentValueInputValue: string
+  @Link theDialogTitle: ResourceStr
+  @Link value: KeyValueData
+  @State currentKeyInputValue: string = ""
+  @State currentValueInputValue: string = ""
   cancel?: () => void
-  confirm?: () => void
+  confirm?: (value: KeyValueData) => void
   controller: CustomDialogController
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-
+  aboutToAppear(): void {
+    this.currentKeyInputValue = this.value.key
+    this.currentValueInputValue = this.value.value ?? ""
+  }
   build() {
     Column({space: 8}) {
       // 标题
@@ -436,14 +439,12 @@ export struct KVCustomDialog {
           .fontColor(this.icon_emphasize)
           .backgroundColor($r('app.color.container_background'))
           .onClick(() => {
-            this.SaveKeyInputValue = this.currentKeyInputValue
-            this.SaveValueInputValue = this.currentValueInputValue
-            this.currentKeyInputValue = ''
-            this.currentValueInputValue = ''
             this.controller.close()
             if (this.confirm) {
-              this.confirm()
+              this.confirm(new KeyValueData(this.currentKeyInputValue, this.currentValueInputValue))
             }
+            this.currentKeyInputValue = ''
+            this.currentValueInputValue = ''
           })
         Button($r('app.string.Cancel'))
           .height(39)
@@ -476,7 +477,7 @@ export struct theCustomDialog {
   @Link SaveInputValue: string
   @Link currentInputValue: string
   @Link theplaceholder: string
-  @State theDialogTitle: ResourceStr = ''
+  @Link theDialogTitle: ResourceStr
   @State isArea: boolean = false
   @State Unit: ResourceStr = ''
   cancel?: () => void
@@ -484,7 +485,7 @@ export struct theCustomDialog {
   controller: CustomDialogController
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-
+    
   build() {
     Column() {
       Text(this.theDialogTitle)
@@ -495,28 +496,27 @@ export struct theCustomDialog {
         direction: FlexDirection.Row,
         alignItems: ItemAlign.Center
       }) {
-        if(this.isArea) {
-          TextArea({placeholder: this.theplaceholder, text: this.currentInputValue })
-            .onChange((value: string) => {
-              this.currentInputValue = value
-            })
-        } else {
-          TextInput({placeholder: this.theplaceholder, text: this.currentInputValue })
-            .onChange((value: string) => {
-              this.currentInputValue = value
-            })
-        }
-        if(this.Unit) {
-          Text(this.Unit)
-            .margin({left: 5})
-        }
+          if(this.isArea) {
+            TextArea({placeholder: this.theplaceholder, text: this.currentInputValue })
+              .onChange((value: string) => {
+                this.currentInputValue = value
+              })
+          } else {
+            TextInput({placeholder: this.theplaceholder, text: this.currentInputValue })
+              .onChange((value: string) => {
+                this.currentInputValue = value
+              })
+          }
+          if(this.Unit) {
+            Text(this.Unit)
+              .margin({left: 5})
+          }
       }.margin({bottom: 8 })
       Button($r('app.string.Save'))
         .width('100%')
         .height(39)
         .onClick(() => {
           this.SaveInputValue = this.currentInputValue
-          this.currentInputValue = this.theplaceholder
           this.controller.close()
           if (this.confirm) {
             this.confirm()

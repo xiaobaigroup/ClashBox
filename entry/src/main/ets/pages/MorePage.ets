@@ -4,7 +4,9 @@
  *
  */
 import { BreakpointState } from '../common/breakpointsystem'
-import { BIND_SHEET_CONTAINER_HEIGHT, CONTENT_END_OFFSET, ListMoreData, moreData,
+import { BIND_SHEET_CONTAINER_HEIGHT,
+  ConfigItemData,
+  CONTENT_END_OFFSET, ListMoreData, moreData,
   TAB_CONTENT_TITLE_FONT_SIZE,
   TAB_CONTENT_TITLE_HEIGHT } from '../common/Constants';
 import { hilog } from '@kit.PerformanceAnalysisKit';
@@ -129,7 +131,7 @@ struct MorePage {
 
   // 更多页路由表
   @Builder
-  PagesMap(name: string, params: string | ArrayConfigParam) {
+  PagesMap(name: string, params: string | ConfigItemData) {
     if (name == 'Log') {
       Log()
     } else
@@ -161,7 +163,7 @@ struct MorePage {
       NetworkRouterAddress()
     } else
     if (name == 'EditArrayConfig') {
-        ArrayConfigEditor({params: params as ArrayConfigParam})
+        ArrayConfigEditor({params: params as ConfigItemData})
     } else
     if (name == 'LogDetils') {
       LogDetils()

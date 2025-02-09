@@ -50,35 +50,6 @@ struct DNS {
   aboutToAppear(): void {
     this.overwriteDNSList = ListOverwriteDNSData(this.clashConfig, this.appConfig)
   }
-  changeDns(dns: Dns){
-    this.clashConfig.dns = copy(dns)
-  }
-  @Builder
-  dnsMenuTipsBuilder(tips: ResourceStr) {
-    Text(tips)
-      .fontWeight(FontWeight.Normal)
-      .textOverflow({ overflow: TextOverflow.Ellipsis })
-      .maxLines(1)
-      .margin({top: 2 })
-      .fontSize(14)
-  }
-  @Builder
-  dnsSkipTipsBuilder(tips: ResourceStr) {
-    Text(tips)
-      .fontWeight(FontWeight.Normal)
-      .textOverflow({ overflow: TextOverflow.Ellipsis })
-      .maxLines(1)
-      .margin({top: 2, right: 2 })
-      .fontSize(14)
-  }
-  @Builder
-  dnsToggleBuilder(isON: boolean) {
-    Toggle({ type: ToggleType.Switch, isOn: isON })
-      .margin({right: 12})
-      .hitTestBehavior(HitTestMode.None)
-      .selectedColor(this.icon_emphasize)
-  }
-
   build() {
     NavDestination() {
       // 导航栏

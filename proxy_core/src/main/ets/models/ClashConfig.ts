@@ -146,7 +146,7 @@ export class  ClashConfig {
   constructor() {
   }
 }
-enum TunStack { Gvisor, System, Mixed }
+export enum TunStack { Gvisor, System, Mixed }
 
 export class Tun {
   enable: boolean = true

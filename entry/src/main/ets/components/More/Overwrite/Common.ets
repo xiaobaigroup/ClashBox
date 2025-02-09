@@ -1,6 +1,7 @@
 import { ClashConfig } from 'proxy_core'
 import { BreakpointState } from '../../../common/breakpointsystem'
-import { ConfigItemData, CONTENT_END_OFFSET, MenuListItemProp, moreData } from '../../../common/Constants'
+import { ConfigItemData, CONTENT_END_OFFSET, OptionItem,
+  ValueType } from '../../../common/Constants'
 import { EventHub, EventKey } from '../../../common/EventHub'
 import { AppConfig, UIConfig } from '../../../entryability/AppState'
 import { getResourceString } from '../../../utils/ResourceStringUtil'
@@ -26,6 +27,7 @@ export struct ConfigList {
   // 添加路由地址弹窗保存的输入文本
   @State SaveInputValue: string = ''
   @State theDialogTitle: ResourceStr = $r('app.string.GeoIP_Code')
+  @State isKeyValue: boolean = false
   dialogController: CustomDialogController = new CustomDialogController({
     builder: theCustomDialog({
       theDialogTitle: this.theDialogTitle,
@@ -52,31 +54,31 @@ export struct ConfigList {
 
   onCancel() {
     this.isEnableIndexForegroundBlur = false
-    this.currentInputValue = ''
   }
 
   onAccept() {
     this.isEnableIndexForegroundBlur = false
     const item = this.configList[this.currentItemIndex]
-    item.value = this.SaveInputValue
-    item.onChange(this.SaveInputValue)
+    let value = this.SaveInputValue
+    if(item.valueType == ValueType.Number){
+      item.onChange(parseInt(this.currentInputValue))
+    }else{
+      item.onChange(this.currentInputValue)
+    }
+    item.value = value
     this.configList.splice(this.currentItemIndex, 1, item)
   }
   handleCheck(index: number) {
     this.currentItemIndex = index
     let itemData = this.configList[index]
-    console.log("handleCheck", itemData.value, itemData.isStringType());
-    if(itemData.isStringType()){
-      this.theplaceholder = `${getResourceString($r('app.string.example'), this)}: ${itemData.tips()}`
+    if(itemData.isEditType()){
+      this.theplaceholder = `${getResourceString($r('app.string.example'), this)}: ${getResourceString(itemData.tips(), this)}`
+      this.currentInputValue = itemData.value as string
       this.theDialogTitle = itemData.title
       this.isEnableIndexForegroundBlur = true
       this.dialogController.open()
     }else{
-      this.pageInfos.pushPathByName("EditArrayConfig", {
-        key: itemData.name,
-        label: itemData.title,
-        value: itemData.value
-      } as ArrayConfigParam, true)
+      this.pageInfos.pushPathByName("EditArrayConfig", itemData, true)
     }
   }
   handleToggle(index: number) {
@@ -118,29 +120,26 @@ export struct ConfigList {
       .hitTestBehavior(HitTestMode.None)
       .selectedColor(this.icon_emphasize)
   }
-  @Builder
-  MenuEntrance(item: ConfigItemData, index: number) {
-    // 确保children存在
-    this.switchMenu([], index)
-  }
 
   @Builder
-  switchMenu(item: MenuListItemProp[], index: number) {
+  switchMenu(item: ConfigItemData, itemIndex: number) {
     // 栈模式菜单
     Menu() {
-      MenuItem({ content: $r('app.string.DNS_Mode') }).contentFont({ weight: FontWeight.Bold })
-      ForEach(item, (menuItem: MenuListItemProp, index: number) => {
+      MenuItem({ content: item.title}).contentFont({ weight: FontWeight.Bold })
+      ForEach(item.options ?? [], (option: OptionItem) => {
         MenuItem({
-          content: menuItem.title,
-          symbolEndIcon: true ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+          content: option.title,
+          symbolEndIcon: item.value == option.value ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
         })
-          .selected(true)
+          .selected(item.value == option.value)
           .onChange(() => {
-            let Item = this.configList[this.currentItemIndex]
-            Item.subtitle = menuItem.title
-            this.configList.splice(this.currentItemIndex, 1, Item)
+            let Item = this.configList[itemIndex]
+            Item.subtitle = option.title
+            Item.value = option.value
+            Item.onChange(option.value)
+            this.configList.splice(itemIndex, 1, Item)
           })
-      }, (menuItem: MenuListItemProp) => JSON.stringify(menuItem))
+      }, (menuItem: OptionItem) => JSON.stringify(menuItem))
     }
   }
 
@@ -155,7 +154,7 @@ export struct ConfigList {
               title: item.title,
               isPrimaryIcons: true,
               tips: () => { this.menuTipsBuilder(item.tips()) },
-              menu: (): void => { this.MenuEntrance(item, index) }
+              menu: (): void => { this.switchMenu(item, index) }
             })
           }
           .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })

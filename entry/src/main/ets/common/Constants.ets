@@ -1,8 +1,9 @@
-import { ClashConfig, Dns } from "proxy_core";
+import { ClashConfig, Dns, LogLevel, RouteMode, TunStack } from "proxy_core";
 import { ArrayConfigParam } from "../components/More/Overwrite/EditArrayConfig";
 import { AppConfig, copy } from "../entryability/AppState";
 import { CustomThemeName } from "./AppTheme";
 import { BreakpointState } from "./breakpointsystem";
+import { promptAction } from "@kit.ArkUI";
 
 
 /* 基础 */
@@ -84,6 +85,13 @@ export let showHomeCard = [
   false,
   false
 ]
+export enum ValueType {
+  Number,
+  Boolean,
+  String,
+  StringArray,
+  Record
+}
 // 更多列表类
 export class ConfigItemData{
   icons: Resource;
@@ -93,8 +101,9 @@ export class ConfigItemData{
   sign: number;
   isCheck: boolean = false
   value: boolean | string[] | Record<string, string> | string | number = false
+  options?: OptionItem[]
   onChange: (value: boolean | string [] | Record<string, string> | string | number ) => void = ()=> {}
-
+  valueType: ValueType = ValueType.Boolean
   constructor(
     icons: Resource,
     name: string,
@@ -109,20 +118,42 @@ export class ConfigItemData{
     this.subtitle = subtitle
     this.sign = sign // 1 input 2 array
   }
-  handeCheck(){
-    if(typeof this.value == "boolean"){
+  isEditType(){
+    return this.valueType == ValueType.String || this.valueType  == ValueType.Number
+  }
+  initValue(){
+    this.valueType = ValueType.Boolean
+    const type = typeof this.value
+    if(type == "string")
+      this.valueType = ValueType.String
+    if(type == "number")
+      this.valueType = ValueType.Number
+    if(type == "object")
+      this.value == ValueType.Record
+    if(Array.isArray(this.value))
+      this.valueType = ValueType.StringArray
+
+    if(this.valueType == ValueType.Boolean){
       this.isCheck = this.value as boolean
     }
   }
-  isStringType(){
-    return typeof this.value == "string"
-  }
   tips(): string | Resource{
-    if(this.isStringType()){
+    if (this.options){
+        return this.options.find((d)=>d.value == this.value)?.title ?? (this.value as string) ?? this.subtitle
+    }
+    if(this.isEditType()){
       return this.value as string
     } else {
       return this.subtitle
     }
+  }
+  bindOption(options: OptionItem[]){
+      this.options = options
+      return this
+  }
+  bindType(type: ValueType){
+    this.valueType = type
+    return this
   }
   bind<T>(
     value: boolean | string[] | Record<string, string> | string | number,
@@ -133,37 +164,43 @@ export class ConfigItemData{
       this.value = v
       onUpdate(v as T)
     }
-    this.handeCheck()
+    this.initValue()
     return this
   }
   default<T>(value: T){
     if (!this.value){
       this.value == value
     }
+
+    this.initValue()
     return this
   }
-  bindClashConfig(
+  bindClashConfig(config: ClashConfig){
+    this.value = config[this.name]
+    this.onChange = (value: boolean | string [] | Record<string, string> | string | number )=>{
+      config[this.name] = value
+    }
+    this.initValue()
+    return this
+  }
+  bindClashConfigBy(
     config: ClashConfig,
     key: string | undefined = undefined,
   ){
     if (key){
       let obj = config[key] as object
-      const self = this
       this.value = obj[this.name]
       this.onChange = (value: boolean | string [] | Record<string, string> | string | number )=>{
-        self.value = value
         obj[this.name] = value
         config[key] = copy(obj)
       }
     } else {
       this.value = config[this.name]
-      const self = this
       this.onChange = (value: boolean | string [] | Record<string, string> | string | number )=>{
-        self.value = value
         config[this.name] = value
       }
     }
-    this.handeCheck()
+    this.initValue()
     return this
   }
   bindDnsConfig(
@@ -171,14 +208,15 @@ export class ConfigItemData{
     dns: Dns,
     key: string
   ){
-    this.value = dns[this.name]
-    const self = this
+    if(!dns[key])
+      dns[key] = {}
+    this.value = dns[key][this.name]
     this.onChange = (value: boolean | string [] | Record<string, string> | string | number )=>{
-      self.value = value
       dns[key][this.name] = value
+      promptAction.showToast({message: "debug: " + value})
       config.dns = copy(dns)
     }
-    this.handeCheck()
+    this.initValue()
     return this
   }
 }
@@ -249,19 +287,19 @@ export  const ListOverwriteData = (): moreData[] => {
 }
 
 // 更多 -> 覆写 -> 基础Listitem
-export  const ListOverwriteBasicData = (clashConfig: ClashConfig, appConfig: AppConfig): moreData[] => {
-  let result: moreData[] = new Array()
+export  const ListOverwriteBasicData = (clashConfig: ClashConfig, appConfig: AppConfig): ConfigItemData[] => {
+  let result: ConfigItemData[] = new Array()
   result = [
-    new moreData($r('sys.symbol.info_circle'), 'LogLevel', $r('app.string.LogLevel'), clashConfig?.["log-level"] ?? $r('app.string.Info'), 0,  false),
-    new moreData($r('sys.symbol.person_shield_fill'), 'UA', $r('app.string.UA'), $r('app.string.Default_UA'), 0, false),
-    new moreData($r('sys.symbol.stopwatch_2'), 'TCP_Active', $r('app.string.TCP_Active'), $r('app.string.TCP_interval'), 1, false),
-    new moreData($r('sys.symbol.bolt_filled_on_circle'), 'Test-Link', $r('app.string.Test_Latency_Link'), appConfig.testUrl ?? $r('app.string.Default_test_latency_link'), 1, false),
-    new moreData($r('sys.symbol.record_circle'), 'ProxyPort', $r('app.string.Proxy_Port'), clashConfig?.["mixed-port"]?.toString() ?? '7890', 1,  false),
-    new moreData($r('sys.symbol.list_bullet_square_fill'), 'Hosts', $r('app.string.Hosts'), '', 1,  clashConfig?.["hosts"]),
-    new moreData($r('sys.symbol.mobiledata'), 'Ipv6', $r('app.string.IPv6'), '', 2, clashConfig?.ipv6 ?? false),
-    new moreData($r('sys.symbol.line_arrowtriangle_2_inward'), 'UnifiedLatency', $r('app.string.UnifiedLatency'), $r('app.string.Unified_Latency_Subtitle'), 2, clashConfig?.["unified-delay"] ?? false),
-    new moreData($r('sys.symbol.order_play'), 'TCP-Concurrency', $r('app.string.TCP_Concurrency'), '', 2,  clashConfig?.["tcp-concurrent"] ?? false),
-    new moreData($r('sys.symbol.selector'), 'External-Control', $r('app.string.External_Control'), $r('app.string.External_Control_Subtitle'), 2, false),
+    new ConfigItemData($r('sys.symbol.info_circle'), 'log-level', $r('app.string.LogLevel'), $r('app.string.Info'), 0).bindClashConfig(clashConfig).bindOption(LogMenu),
+    new ConfigItemData($r('sys.symbol.person_shield_fill'), 'global-ua', $r('app.string.UA'), $r('app.string.Default_UA'), 0).bindClashConfig(clashConfig).bindOption(UAMenu),
+    new ConfigItemData($r('sys.symbol.stopwatch_2'), 'keep-alive-interval', $r('app.string.TCP_Active'), $r('app.string.TCP_interval'), 1).bindClashConfig(clashConfig).bindType(ValueType.Number),
+    new ConfigItemData($r('sys.symbol.bolt_filled_on_circle'), 'Test-Link', $r('app.string.Test_Latency_Link'), appConfig.testUrl ?? $r('app.string.Default_test_latency_link'), 1).bindType(ValueType.String),
+    new ConfigItemData($r('sys.symbol.record_circle'), 'mixed-port', $r('app.string.Proxy_Port'),'7890', 1).bindClashConfig(clashConfig).bindType(ValueType.Number),
+    new ConfigItemData($r('sys.symbol.list_bullet_square_fill'), 'hosts', $r('app.string.Hosts'), '', 1).bindClashConfig(clashConfig).bindType(ValueType.Record),
+    new ConfigItemData($r('sys.symbol.mobiledata'), 'ipv6', $r('app.string.IPv6'), '', 2).bindClashConfig(clashConfig),
+    new ConfigItemData($r('sys.symbol.line_arrowtriangle_2_inward'), 'unified-delay', $r('app.string.UnifiedLatency'), $r('app.string.Unified_Latency_Subtitle'), 2).bindClashConfig(clashConfig),
+    new ConfigItemData($r('sys.symbol.order_play'), 'tcp-concurrent', $r('app.string.TCP_Concurrency'), '', 2, ).bindClashConfig(clashConfig),
+    new ConfigItemData($r('sys.symbol.selector'), 'External-Control', $r('app.string.External_Control'), $r('app.string.External_Control_Subtitle'), 2).bindClashConfig(clashConfig),
   ]
   return result
 }
@@ -275,23 +313,23 @@ export  const ListOverwriteDNSData = (clashConfig: ClashConfig, appConfig: AppCo
       appConfig.overrideDns = v
     }),
     new ConfigItemData($r('sys.symbol.selector'), 'Option', $r('app.string.option'), '', 3),
-    new ConfigItemData($r('sys.symbol.selector'), 'enable', $r('app.string.State'), $r('app.string.State_subtitle'), 2).bindClashConfig(clashConfig, "dns"),
-    new ConfigItemData($r('sys.symbol.selector'), 'use-hosts', $r('app.string.UseHosts'), '', 2).bindClashConfig(clashConfig,"dns"),
-    new ConfigItemData($r('sys.symbol.selector'), 'use-system-hosts', $r('app.string.Use_System_Hosts'), '', 2).bindClashConfig(clashConfig, "dns"),
-    new ConfigItemData($r('sys.symbol.selector'), 'ipv6', $r('app.string.IPv6'), $r('app.string.Info'), 2).bindClashConfig(clashConfig, "dns"),
-    new ConfigItemData($r('sys.symbol.selector'), 'respect-rules', $r('app.string.Follow_The_Rules'), $r('app.string.Follow_The_Rules_Subtitle'), 2).bindClashConfig(clashConfig, "dns"),
-    new ConfigItemData($r('sys.symbol.selector'), 'prefer-h3"', $r('app.string.Priority_Use_H3'), $r('app.string.Priority_Use_H3_Subtitle'), 2,).bindClashConfig(clashConfig, "dns"),
-    new ConfigItemData($r('sys.symbol.selector'), 'enhanced-mode', $r('app.string.DNS_Mode'), dns?.["enhanced-mode"] ?? $r('app.string.DNS_Mode_Subtitle'), 0).bindClashConfig(clashConfig, "dns"),
-    new ConfigItemData($r('sys.symbol.selector'), 'fake-ip-range', $r('app.string.FakeIP_Range'), $r('app.string.FakeIP_Range_Subtitle_1'), 1).bindClashConfig(clashConfig, "dns").default(""),
-    new ConfigItemData($r('sys.symbol.selector'), 'fake-ip-filter', $r('app.string.FakeIP_Filtering'), '', 1,).bindClashConfig(clashConfig, "dns"),
-    new ConfigItemData($r('sys.symbol.selector'), 'default-nameserver', $r('app.string.Default_Domain_Name_Server'), $r('app.string.Default_Domain_Name_Server_Subtitle'), 1).bindClashConfig(clashConfig, "dns"),
-    new ConfigItemData($r('sys.symbol.selector'), 'Domain-Name-Server-Strategy', $r('app.string.Domain_Name_Server_Strategy'), $r('app.string.Domain_Name_Server_Strategy_Subtitle'), 1,).bindClashConfig(clashConfig, "dns"),
-    new ConfigItemData($r('sys.symbol.selector'), 'nameserver', $r('app.string.Domain_Name_Server'), $r('app.string.Domain_Name_Server_Subtitle'), 1,).bindClashConfig(clashConfig, "dns"),
-    new ConfigItemData($r('sys.symbol.selector'), 'fallback', $r('app.string.FallBack'), $r('app.string.FallBack_Subtitle'), 1,).bindClashConfig(clashConfig, "dns"),
-    new ConfigItemData($r('sys.symbol.selector'), 'proxy-server-nameserver', $r('app.string.Proxy_Domain_Name_Server'), $r('app.string.Proxy_Domain_Name_Server_Subtitle'), 1,).bindClashConfig(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'enable', $r('app.string.State'), $r('app.string.State_subtitle'), 2).bindClashConfigBy(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'use-hosts', $r('app.string.UseHosts'), '', 2).bindClashConfigBy(clashConfig,"dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'use-system-hosts', $r('app.string.Use_System_Hosts'), '', 2).bindClashConfigBy(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'ipv6', $r('app.string.IPv6'), $r('app.string.Info'), 2).bindClashConfigBy(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'respect-rules', $r('app.string.Follow_The_Rules'), $r('app.string.Follow_The_Rules_Subtitle'), 2).bindClashConfigBy(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'prefer-h3"', $r('app.string.Priority_Use_H3'), $r('app.string.Priority_Use_H3_Subtitle'), 2,).bindClashConfigBy(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'enhanced-mode', $r('app.string.DNS_Mode'), dns?.["enhanced-mode"] ?? $r('app.string.DNS_Mode_Subtitle'), 0).bindClashConfigBy(clashConfig, "dns").bindOption(DNSMenu),
+    new ConfigItemData($r('sys.symbol.selector'), 'fake-ip-range', $r('app.string.FakeIP_Range'), $r('app.string.FakeIP_Range_Subtitle_1'), 1).bindClashConfigBy(clashConfig, "dns").bindType(ValueType.String),
+    new ConfigItemData($r('sys.symbol.selector'), 'fake-ip-filter', $r('app.string.FakeIP_Filtering'), '', 1,).bindClashConfigBy(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'default-nameserver', $r('app.string.Default_Domain_Name_Server'), $r('app.string.Default_Domain_Name_Server_Subtitle'), 1).bindClashConfigBy(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'nameserver-policy', $r('app.string.Domain_Name_Server_Strategy'), $r('app.string.Domain_Name_Server_Strategy_Subtitle'), 1,).bindClashConfigBy(clashConfig, "dns").bindType(ValueType.Record),
+    new ConfigItemData($r('sys.symbol.selector'), 'nameserver', $r('app.string.Domain_Name_Server'), $r('app.string.Domain_Name_Server_Subtitle'), 1,).bindClashConfigBy(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'fallback', $r('app.string.FallBack'), $r('app.string.FallBack_Subtitle'), 1,).bindClashConfigBy(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'proxy-server-nameserver', $r('app.string.Proxy_Domain_Name_Server'), $r('app.string.Proxy_Domain_Name_Server_Subtitle'), 1,).bindClashConfigBy(clashConfig, "dns"),
     new ConfigItemData($r('sys.symbol.selector'), 'FallBack-Filtering', $r('app.string.FallBack_Filtering'), '', 3, ),
     new ConfigItemData($r('sys.symbol.selector'), 'geoIp', $r('app.string.GeoIP'), '',  2, ).bindDnsConfig(clashConfig, dns, "fallback-filter"),
-    new ConfigItemData($r('sys.symbol.selector'), 'geoIpCode', $r('app.string.GeoIP_Code'), $r('app.string.GeoIP_Code_Subtitle_1'), 1,).bindDnsConfig(clashConfig, dns, "fallback-filter"),
+    new ConfigItemData($r('sys.symbol.selector'), 'geoIpCode', $r('app.string.GeoIP_Code'), $r('app.string.GeoIP_Code_Subtitle_1'), 1,).bindDnsConfig(clashConfig, dns, "fallback-filter").bindType(ValueType.String),
     new ConfigItemData($r('sys.symbol.selector'), 'geosite', 'Geosite', '', 1).bindDnsConfig(clashConfig, dns, "fallback-filter"),
     new ConfigItemData($r('sys.symbol.selector'), 'ipcidr', $r('app.string.IP_Mask'), '', 1).bindDnsConfig(clashConfig, dns, "fallback-filter"),
     new ConfigItemData($r('sys.symbol.selector'), 'domain', $r('app.string.Domain_Name'), '', 1,).bindDnsConfig(clashConfig, dns, "fallback-filter"),
@@ -300,15 +338,16 @@ export  const ListOverwriteDNSData = (clashConfig: ClashConfig, appConfig: AppCo
 }
 
 // 更多 -> 覆写 -> 网络Listitem
-export  const ListOverwriteNetworkData = (): moreData[] => {
-  let result: moreData[] = new Array()
+export  const ListOverwriteNetworkData = (clashConfig: ClashConfig, appConfig: AppConfig): ConfigItemData[] => {
+  let result: ConfigItemData[] = new Array()
   result = [
-    new moreData($r('sys.symbol.key_shield_fill'), 'VPN', 'VPN', '', 2,  false),
-    new moreData($r('sys.symbol.selector'), 'Option', $r('app.string.option'), '', 3, false),
-    new moreData($r('sys.symbol.selector'), 'IPv6', $r('app.string.IPv6'), $r('app.string.Info'), 2,  false),
-    new moreData($r('sys.symbol.satellite_map_fill'), 'Stack-Mode', $r('app.string.stack_mode'), 'gvisor', 0, false),
-    new moreData($r('sys.symbol.slider_horizontal_2'), 'Route-Mode', $r('app.string.route_mode'), $r('app.string.using_configuration'), 0,  false),
-    new moreData($r('sys.symbol.local_fill'), 'Route-Address', $r('app.string.Routing_Address'), $r('app.string.Routing_Address_Subtitle'), 1, false),
+    // new ConfigItemData($r('sys.symbol.key_shield_fill'), 'VPN', 'VPN', '', 2),
+    new ConfigItemData($r('sys.symbol.selector'), 'Option', $r('app.string.option'), '', 3),
+    new ConfigItemData($r('sys.symbol.selector'), 'ipv6', $r('app.string.IPv6'), $r('app.string.Info'), 2).bindClashConfig(clashConfig),
+    new ConfigItemData($r('sys.symbol.satellite_map_fill'), 'stack', $r('app.string.stack_mode'), 'gvisor', 0).bindClashConfigBy(clashConfig, "tun").bindOption(StackMenu),
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'route-mode', $r('app.string.route_mode'), $r('app.string.using_configuration'), 0)
+      .bindClashConfig(clashConfig).bindOption(RouteMenu),
+    new ConfigItemData($r('sys.symbol.local_fill'), 'route-address', $r('app.string.Routing_Address'), $r('app.string.Routing_Address_Subtitle'), 1).bindClashConfig(clashConfig),
   ]
   return result
 }
@@ -320,60 +359,44 @@ export interface MenuListItemProp {
   title: string | Resource
   children?: Array<MenuListItemProp>
 }
+export interface OptionItem{
+  title: string | Resource
+  value: string | number
+}
 
 /**
  * 更多 -> 覆写 -> 基础 -> 菜单
  */
-export const BasicMenu: MenuListItemProp[] = [
-  { title: $r('app.string.LogLevel'),
-    children: [
-      {title: 'debug'},
-      {title: 'info'},
-      {title: 'warning'},
-      {title: 'error'},
-      {title: 'silent'},
-    ]
-  },
-  { title: 'UA',
-    children: [
-      {title: $r('app.string.Default_UA')},
-      {title: 'clash-verge/v1.6.6'},
-      {title: 'ClashforWindows/0.19.23'},
-    ]
-  }
+export const LogMenu :OptionItem[] = [
+  {title: 'Debug', value: LogLevel.Debug},
+  {title: 'Info', value: LogLevel.Info},
+  {title: 'Warning', value: LogLevel.Warning},
+  {title: 'Error', value: LogLevel.Error},
+  {title: 'Silent', value: LogLevel.Silent},
 ]
-
-/**
- * 更多 -> 覆写 -> 网络 -> 菜单
- */
-export const NetworkMenu: MenuListItemProp[] = [
-  { title: $r('app.string.stack_mode'),
-    children: [
-      {title: 'gvisor'},
-      {title: 'system'},
-      {title: 'mixed'},
-    ]
-  },
-  { title: $r('app.string.route_mode'),
-    children: [
-      {title: $r('app.string.bypass_private_route_address')},
-      {title: $r('app.string.using_configuration')},
-    ]
-  }
+export const UAMenu: OptionItem[] = [
+  {title: $r('app.string.Default_UA'), value: "ClashNEXT/2.0.0Pre1"},
+  {title: 'clash-verge/v1.6.6', value:"clash-verge/v1.6.6"},
+  {title: 'ClashforWindows/0.19.23', value:"ClashforWindows/0.19.23"},
+]
+export const StackMenu: OptionItem[] = [
+  {title: 'Gvisor', value: TunStack.Gvisor},
+  {title: 'System', value: TunStack.System},
+  {title: 'Mixed',  value: TunStack.Mixed},
+]
+export const RouteMenu: OptionItem[] = [
+  {title: $r('app.string.bypass_private_route_address'),value: RouteMode.BypassPrivate},
+  {title: $r('app.string.using_configuration'), value: RouteMode.Config},
 ]
 
 /**
  * 更多 -> 覆写 -> DNS -> 菜单
  */
-export const DNSMenu: MenuListItemProp[] = [
-  { title: $r('app.string.DNS_Mode'),
-    children: [
-      {title: 'normal'},
-      {title: 'fakeIp'},
-      {title: 'redirHost'},
-      {title: 'hosts'},
-    ]
-  }
+export const DNSMenu: OptionItem[] = [
+  {title: 'normal', value:'normal'},
+  {title: 'fakeIp', value:'fakeIp'},
+  {title: 'redirHost', value:'redirHost'},
+  {title: 'hosts', value:'hosts'},
 ]
 
 /**

@@ -65,9 +65,7 @@ struct Overwrite {
     this.isEnableIndexForegroundBlur = false
     // 重置覆写操作
     const newConfig = new ClashConfig()
-
-    AppStorage.delete("clashConfig")
-    AppStorage.setAndProp("clashConfig", newConfig)
+    AppStorage.set("clashConfig", newConfig)
 
   }
 
