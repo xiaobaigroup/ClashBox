@@ -242,11 +242,11 @@
     },
     {
       "name": "Thin",
-      "value": "窄(默认多列)"
+      "value": "窄(多列)"
     },
     {
       "name": "Mini",
-      "value": "迷你(多列)"
+      "value": "迷你(默认多列)"
     },
     {
       "name": "Packet_mode",

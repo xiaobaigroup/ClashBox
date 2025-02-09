@@ -682,7 +682,9 @@ export struct skipRowList {
 
 /**
  * 开关列表行通用组件
- * @param icons SymbolGlyph对应的系统资源文件地址-Resource
+ * @param icons SymbolGlyph对应的
+ *
+ * 系统资源文件地址-Resource
  * @param title 标题文本-ResourceStr
  * @param subtitle 副标题文本-ResourceStr
  * @param toggle 尾随闭包内传入自定义开关

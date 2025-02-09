@@ -1,5 +1,5 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { BIND_SHEET_DRAG_BAR_HEIGHT, BORDER_RADIUS_20 } from "../../common/Constants"
+import { BIND_SHEET_DRAG_BAR_HEIGHT, BORDER_RADIUS_20, CONTENT_END_OFFSET } from "../../common/Constants"
 import { Nothing, theCustomDialog } from "../Common"
 import { MoreTop } from "./MoreTopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
@@ -199,6 +199,7 @@ struct Resources {
               otherButton: (): void => { this.reaourceOther() }
             })
           }.width('100%')
+          .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
           .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
             .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
             .combine(TransitionEffect.SLIDE) : null)
@@ -273,10 +274,11 @@ struct Resources {
               })
             }.width('100%')
             .height('100%')
+            .contentEndOffset(CONTENT_END_OFFSET)
+            .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
           }
         }.width('100%')
         .height('100%')
-        .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
       }.width('100%')
       .height('100%')
     }

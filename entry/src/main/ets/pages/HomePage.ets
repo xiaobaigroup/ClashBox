@@ -1,6 +1,6 @@
 //主页 栅格布局、媒体查询
 import { BreakpointState } from '../common/breakpointsystem'
-import { PromptAction, window } from '@kit.ArkUI'
+import { curves, PromptAction, window } from '@kit.ArkUI'
 import SwitchMode from '../components/Home/SwitchMode'
 import CellularData from '../components/Home/CellularData'
 import PublicNetwork from '../components/Home/PublicNetwork'
@@ -242,6 +242,7 @@ struct Home {
       this.rotateAngle = 0
     })
   }
+
   /**
    * 卡片编辑页面显示监听
    */
@@ -256,6 +257,13 @@ struct Home {
       this.stopAnim()
     }
   }
+  //卡片转场动画
+  public effectHomeCard: TransitionEffect | null =
+    // 创建默认透明度转场效果,并指定了springMotion(0.6, 0.8)曲线
+    this.uiConfig.isAnimation ?
+    TransitionEffect.OPACITY
+      .combine(TransitionEffect.scale({x: 0, y: 0}).combine(TransitionEffect.translate({y:150})))
+      .animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion()}):null
 
   build() {
     Column() {
@@ -269,7 +277,7 @@ struct Home {
               .fontWeight(FontWeight.Bold)
               .fontColor(this.font_primary)
               .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-                .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+                .animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 0 })
                 .combine(TransitionEffect.SLIDE):null)
             Blank()
             //编辑按钮
@@ -278,7 +286,7 @@ struct Home {
                 .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
                 .fontColor([this.icon_primary])
             }
-            .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 50 })
+            .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 50 })
               .combine(TransitionEffect.SLIDE):null)
             .onClick(() => {
               this.isShowHomeEdit = true
@@ -305,7 +313,7 @@ struct Home {
             .width(40)
             .height(40)
             .backgroundColor($r('app.color.settings_container_background'))
-            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 100 })
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, curve:curves.springMotion(),delay: 100 })
               .combine(TransitionEffect.SLIDE):null)
             .onClick(() => {
               this.isShowSettings = true
@@ -317,7 +325,7 @@ struct Home {
               .fontSize(32)
               .fontWeight(FontWeight.Bold)
               .fontColor(this.font_primary)
-              .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 150 })
+              .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 150 })
                 .combine(TransitionEffect.SLIDE):null)
             Blank()
             //添加按钮
@@ -329,7 +337,7 @@ struct Home {
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
-            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 100 })
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 100 })
               .combine(TransitionEffect.SLIDE):null)
             .onClick(() => {
               this.isShowCardEdit = true
@@ -345,7 +353,7 @@ struct Home {
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
-            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 50 })
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, curve:curves.springMotion(),delay: 50 })
               .combine(TransitionEffect.SLIDE):null)
             .onClick(() => {
               this.saveHomeLayout()
@@ -360,7 +368,7 @@ struct Home {
             .width(40)
             .height(40)
             .backgroundColor(this.icon_emphasize)
-            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, curve:curves.springMotion(),delay: 0 })
               .combine(TransitionEffect.SLIDE):null)
             .onClick(() => {
               if (this.SaveDialogController != null) {
@@ -410,8 +418,9 @@ struct Home {
                 .aspectRatio(2.07)
                 .borderRadius(20)
                 .backgroundColor($r('app.color.container_background'))
-                  .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
-                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:0}):null)
+                .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+                //.transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:0}):null)
+                .transition(this.effectHomeCard)
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 // 消失触发回调
                 .onDetach(() => {
@@ -448,7 +457,8 @@ struct Home {
                 .GridColStyle()
                 .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:20 }):null)
+                .transition(this.effectHomeCard)
+                //.transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:20 }):null)
                 //编辑模式下跳动动画
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
@@ -480,7 +490,8 @@ struct Home {
                 .GridColStyle()
                 .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:30 }):null)
+                .transition(this.effectHomeCard)
+                // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:30 }):null)
                 //编辑模式下跳动动画
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
@@ -511,7 +522,8 @@ struct Home {
                 .GridColStyle()
                 .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:40 }):null)
+                .transition(this.effectHomeCard)
+                //.transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:40 }):null)
                 //编辑模式下跳动动画
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
@@ -542,7 +554,8 @@ struct Home {
                 .GridColStyle()
                 .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:60 }):null)
+                .transition(this.effectHomeCard)
+                // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:60 }):null)
                 //编辑模式下跳动动画
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
@@ -573,7 +586,8 @@ struct Home {
                 .GridColStyle()
                 .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:70 }):null)
+                .transition(this.effectHomeCard)
+                //.transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:70 }):null)
                 //编辑模式下跳动动画
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
@@ -604,7 +618,8 @@ struct Home {
                 .GridColStyle()
                 .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:80 }):null)
+                .transition(this.effectHomeCard)
+                // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:80 }):null)
                 //编辑模式下跳动动画
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
@@ -636,7 +651,8 @@ struct Home {
                 .borderRadius(20)
                 .backgroundColor($r('app.color.container_background'))
                   .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
-                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:20}):null)
+                .transition(this.effectHomeCard)
+                // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:20}):null)
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                 //编辑模式下跳动动画
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
@@ -668,7 +684,8 @@ struct Home {
                 .GridColStyle()
                 .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:50}):null)
+               // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:50}):null)
+                .transition(this.effectHomeCard)
                 //编辑模式下跳动动画
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
@@ -699,7 +716,8 @@ struct Home {
                 .GridColStyle()
                 .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
                 .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:90}):null)
+                .transition(this.effectHomeCard)
+                // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:90}):null)
                 //编辑模式下跳动动画
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
@@ -717,6 +735,7 @@ struct Home {
         .scrollBar(BarState.Off)
         .contentEndOffset(CONTENT_END_OFFSET)
         .edgeEffect(EdgeEffect.Spring)
+        .chainAnimation(true)
         .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
         .bindSheet($$this.isShowCardEdit, this.CardEdit(), {
           detents: [BIND_SHEET_CONTAINER_HEIGHT, 300,],
@@ -801,7 +820,7 @@ struct Home {
           }
 
         })
-        .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
+        .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed,curve:curves.springMotion() }:null)
         .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
       }
       }
@@ -919,7 +938,7 @@ struct DeleteButton1 {
     .width(this.isLandscapePhone ? 24 :this.isFoldStatus?24: this.deleteButtonSize.value)
     .height(this.isLandscapePhone ? 24 :this.isFoldStatus?24: this.deleteButtonSize.value)
     .backgroundColor('#ffe84026')
-    .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
+    .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion() }):null)
   }
 }
 
@@ -946,7 +965,7 @@ struct DeleteButton2 {
     .width(this.isLandscapePhone ? 24 :this.isFoldStatus?24: this.deleteButtonSize.value)
     .height(this.isLandscapePhone ? 24 :this.isFoldStatus?24: this.deleteButtonSize.value)
     .backgroundColor('#ffe84026')
-    .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
+    .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion() }):null)
   }
 }
 

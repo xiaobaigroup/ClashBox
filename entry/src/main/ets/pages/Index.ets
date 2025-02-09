@@ -1,6 +1,6 @@
 //Index 媒体查询
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
-import { mediaquery, window } from '@kit.ArkUI'
+import { curves, mediaquery, window } from '@kit.ArkUI'
 import Home from './HomePage'
 import ProxyPage from './ProxyPage'
 import ConfigurationPage from './ConfigurationPage'
@@ -360,7 +360,7 @@ struct Index {
     .animation(this.isSecondary===true ?{
       duration: this.uiConfig.animationSpeed,
       tempo:0.3,
-      curve: Curve.Linear,
+      curve:curves.springMotion(),
       iterations: 1,
       playMode: PlayMode.Normal
     }:null)
@@ -582,7 +582,7 @@ struct Index {
     this.indexController.setTabBarTranslate({y: 0 })
     animateTo({
       duration: this.uiConfig.animationSpeed,
-      curve: Curve.Linear,
+      curve:curves.springMotion(),
       iterations:1,
       playMode:PlayMode.Alternate
     }, () => {
@@ -594,7 +594,7 @@ struct Index {
   stopAnim() {
     animateTo({
       duration: this.uiConfig.animationSpeed,
-      curve: Curve.Linear,
+      curve:curves.springMotion(),
       iterations:1,
       playMode:PlayMode.Alternate
     }, () => {
@@ -626,7 +626,7 @@ struct Index {
         }
         .tabBar(this.TabBarBuilder($r('app.string.Home'), 0, $r('sys.symbol.house_fill')))
         .onWillShow(() => {
-          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+          animateTo({ duration: this.uiConfig.animationSpeed, curve:curves.springMotion(), }, () => {
             this.currentIndex = 0
           })
         })
@@ -638,7 +638,7 @@ struct Index {
         }
         .tabBar(this.TabBarBuilder($r('app.string.Proxy'), 1, $r('sys.symbol.list_bullet_square_fill')))
         .onWillShow(() => {
-          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+          animateTo({ duration: this.uiConfig.animationSpeed, curve:curves.springMotion(), }, () => {
             this.currentIndex = 1
           })
         })
@@ -650,7 +650,7 @@ struct Index {
         }
         .tabBar(this.TabBarBuilder($r('app.string.Configuration'), 2, $r('sys.symbol.folder_fill')))
         .onWillShow(() => {
-          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+          animateTo({ duration: this.uiConfig.animationSpeed, curve:curves.springMotion(), }, () => {
             this.currentIndex = 2
           })
         })
@@ -662,7 +662,7 @@ struct Index {
         }
         .tabBar(this.TabBarBuilder($r('app.string.More'), 3, $r('sys.symbol.square_fill_grid_2x2')))
         .onWillShow(() => {
-          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+          animateTo({ duration: this.uiConfig.animationSpeed, curve:curves.springMotion(), }, () => {
             this.currentIndex = 3
           })
         })

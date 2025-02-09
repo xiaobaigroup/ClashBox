@@ -33,6 +33,7 @@ struct CurrentNode {
             .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
             .fontWeight(FontWeight.Bold)
             .fontColor(this.font_primary)
+            .maxLines(2)
 
           Text('ping ' + `${this.appConfig.currentProxyItem.latency ?? '-'}` + 'ms')
             .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)

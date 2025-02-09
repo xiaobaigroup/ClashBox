@@ -47,6 +47,8 @@ struct ProxyINFO{
               .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('sys.color.font_primary'))
+              .maxLines(1)
+              .textOverflow({ overflow: TextOverflow.MARQUEE })
           }
           else {
             Text($r('app.string.proxy_name'))
@@ -63,7 +65,6 @@ struct ProxyINFO{
               .fontSize(this.isLandscapePhone ? 12 : this.HomeCardIPSmFontSize.value)
               .fontColor($r('sys.color.font_secondary'))
           }
-
         }
         if (this.appConfig.currentProxyItem) {
           Text('ping ' + `${this.appConfig.currentProxyItem.latency}` + 'ms')

@@ -242,11 +242,11 @@
     },
     {
       "name": "Thin",
-      "value": "Thin(Multicolumn)"
+      "value": "Thin(Multi column)"
     },
     {
       "name": "Mini",
-      "value": "Mini(Multicolumn)"
+      "value": "Mini(Multi column)"
     },
     {
       "name": "Packet_mode",

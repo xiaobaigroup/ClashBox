@@ -12,7 +12,7 @@ import {
   RouteName,
   CONTENT_END_OFFSET,
 } from '../common/Constants'
-import { LengthMetrics, PromptAction, SymbolGlyphModifier } from '@kit.ArkUI'
+import { curves, LengthMetrics, PromptAction, SymbolGlyphModifier } from '@kit.ArkUI'
 import { ConfigAdd } from '../components/Configuration/ConfigAdd'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
@@ -295,7 +295,7 @@ struct ConfigurationPage {
             .fontWeight(TAB_CONTENT_TITLE_FONT_WEIGHT)
             .fontColor($r('sys.color.font_primary'))
             .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-              .animation({ duration: this.uiConfig.animationSpeed, delay: 50 })
+              .animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 50 })
               .combine(TransitionEffect.SLIDE):null)
           Blank()
           // 刷新图标
@@ -314,7 +314,7 @@ struct ConfigurationPage {
             this.updateConfig()
           })
           .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-            .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+            .animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 0 })
             .combine(TransitionEffect.SLIDE):null)
         }
         .alignItems(VerticalAlign.Center)
@@ -332,7 +332,7 @@ struct ConfigurationPage {
       Stack({ alignContent: this.stackAlignContentAlignment }) {
         if (this.configList.length === 0) {
           Nothing({ name: $r('app.string.Configuration') })
-            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 0 })
               .combine(TransitionEffect.scale({x: 0, y: 0})):null)
         } else {
           // 配置列表 START
@@ -375,10 +375,10 @@ struct ConfigurationPage {
               .backgroundColor($r('app.color.container_background'))
               .width('100%')
               .height(LIST_ITEM_HEIGHT)
-              .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+              .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
               .borderRadius(BORDER_RADIUS_20)
               .hoverEffect(HoverEffect.Scale)
-              .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:index*10+10 }):null)
+              .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(),delay:index*10+10 }):null)
               .bindContextMenu(this.configListLongPressCtxMenuBuilder(item?.isFavorite ?? false), ResponseType.LongPress | ResponseType.RightClick,
                 {
                   preview: MenuPreviewMode.IMAGE,
@@ -499,7 +499,7 @@ struct ConfigurationPage {
           this.isEnableIndexForegroundBlur = true
         })
         .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-          .animation({ duration: this.uiConfig.animationSpeed, delay: 50 })
+          .animation({ duration: this.uiConfig.animationSpeed, curve:curves.springMotion(),delay: 50 })
           .combine(TransitionEffect.SLIDE_SWITCH):null)
         // 悬浮新增配置按钮 END
       }

@@ -5,7 +5,7 @@ import {
   CONTENT_END_OFFSET,
   LIST_ITEM_HEIGHT,
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE } from '../../common/Constants'
-import { LengthMetrics, SymbolGlyphModifier,PromptAction } from '@kit.ArkUI';
+import { LengthMetrics, SymbolGlyphModifier,PromptAction, curves } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
 import {  ProxyItem, ProxyData } from '../../common/ProxyData';
 import { EventHub, EventKey } from '../../common/EventHub';
@@ -254,7 +254,7 @@ struct ProxyGroupItem {
             .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
           content: this.proxyListLongPressCtxMenuForUnFavorite.content
         })
-          .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+          .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
           .contentFontColor($r('sys.color.font_primary'))
           .onClick( () => {
             this.proxyListLongPressCtxMenuForUnFavorite.callback()
@@ -265,7 +265,7 @@ struct ProxyGroupItem {
               .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
             content: this.proxyListLongPressCtxMenuForFavorite.content
           })
-            .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+            .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
             .contentFontColor($r('sys.color.font_primary'))
             .onClick(() => {
               this.proxyListLongPressCtxMenuForFavorite.callback()
@@ -293,6 +293,7 @@ struct ProxyGroupItem {
     .menuItemDivider({ color: $r('app.color.divider'), strokeWidth: LengthMetrics.vp(1) })
     .backgroundColor($r('app.color.container_background'))
     .borderRadius(20)
+    .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
   } //长按菜单end
 
   selectProxy(item: ProxyItem){
@@ -312,13 +313,13 @@ struct ProxyGroupItem {
           }
           })
         }
-        .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
+        .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: index*10+10 })
           .combine(TransitionEffect.scale({x: 0, y: 0})):null)
         .onClick(() => {
           this.selectProxy(item)
         })
         .ListItemStyle()
-        .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+        .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
         .height(LIST_ITEM_HEIGHT + (this.ProxyGroupItemSelected === ProxyCardSize.Small ? 32 : 0))
         .bindContextMenu(this.MyMenu(item?.isShowFavoriteProxy ?? false, item.name), ResponseType.LongPress,
           {

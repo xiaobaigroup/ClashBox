@@ -12,7 +12,7 @@ import ClashViewModel from '../entryability/ClashViewModel'
 import { Profile, ProxyGroup, ProxySort, ProxyType } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import { AppConfig, isEnd, ProxyCardSize, ProxyGroupType, UIConfig } from '../entryability/AppState'
-import {  PromptAction } from '@kit.ArkUI'
+import { curves, PromptAction } from '@kit.ArkUI'
 import { ProviderPage } from '../components/Proxy/Provider'
 
 
@@ -244,9 +244,9 @@ struct ProxyPage {
       EditTitle({ title: $r('app.string.Card_Size') })
       Column() {
         ForEach([
+          {t: $r('app.string.Mini'), v: ProxyCardSize.Mini},
           {t: $r('app.string.Thin'), v: ProxyCardSize.Small},
           {t: $r('app.string.Wide'), v: ProxyCardSize.Large},
-          {t: $r('app.string.Mini'), v: ProxyCardSize.Mini}
         ], (n: [Resource, number], i: number) => {
           Row() {
             Text(n["t"])
@@ -332,7 +332,7 @@ struct ProxyPage {
             this.isProviderEdit = true
             this.isEnableIndexForegroundBlur=true
           })
-          .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 50 })
+          .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 50 })
             .combine(TransitionEffect.SLIDE):null)
 
           //编辑图标
@@ -358,7 +358,7 @@ struct ProxyPage {
           left: this.breakPointStateTabContentTitleMargin.value,
           right: this.breakPointStateTabContentTitleMargin.value,
         })
-        .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+        .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 0 })
           .combine(TransitionEffect.SLIDE):null)
       }
 
@@ -384,7 +384,7 @@ struct ProxyPage {
         .height('90%')
         .alignItems(HorizontalAlign.Center)
         .justifyContent(FlexAlign.Center)
-        .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+        .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 0 })
           .combine(TransitionEffect.scale({x: 0, y: 0})):null)
         //.padding({top:TAB_CONTENT_TITLE_HEIGHT})
         .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
@@ -429,7 +429,7 @@ struct ProxyPage {
                   .tabBar(this.TabBuilder(g.name, i))
                   //用onWillShow能减少滑动tab时产生的延迟
                   .onWillShow(() => {
-                    animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+                    animateTo({ duration: this.uiConfig.animationSpeed, curve:curves.springMotion() }, () => {
                     this.currentIndex = i;
                     if(this.currentProfile){
                       this.currentProfile.currentGroupName = this.proxyGroups[i].name
@@ -491,7 +491,7 @@ struct ProxyPage {
           .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
           .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
           .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-            .animation({ duration: this.uiConfig.animationSpeed, delay: 50 })
+            .animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 50 })
             .combine(TransitionEffect.SLIDE_SWITCH):null)
           .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
             detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],

@@ -23,7 +23,7 @@ import DNS from '../components/More/Overwrite/DNS';
 import Network, { NetworkRouterAddress } from '../components/More/Overwrite/Network';
 import { getResourceString } from '../utils/ResourceStringUtil';
 import { extractLocationInfo, getIpInfo, mapLocation } from '../utils/GetIpInfo';
-import { promptAction } from '@kit.ArkUI';
+import { curves, promptAction } from '@kit.ArkUI';
 import { skipRowList } from '../components/Common';
 import { AppConfig, UIConfig } from '../entryability/AppState';
 import { ArrayConfigEditor, ArrayConfigParam } from '../components/More/Overwrite/EditArrayConfig';
@@ -194,7 +194,7 @@ struct MorePage {
         .width('100%')
         .height(TAB_CONTENT_TITLE_HEIGHT)
         .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-          .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+          .animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 0 })
           .combine(TransitionEffect.SLIDE):null)
         .padding({
           left: this.breakPointStateTabContentTitleMargin.value,
@@ -215,7 +215,7 @@ struct MorePage {
             .onClick(() => {
                 this.handleCheck(index)
             })
-            .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index * 10 + 10 })
+            .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: index * 10 + 10 })
               .combine(TransitionEffect.scale({x: 0, y: 0})):null)
             // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0})
             //   .animation({ duration: this.uiConfig.animationSpeed,delay: index*10+10 }):null)
@@ -232,7 +232,7 @@ struct MorePage {
             this.isShowSettings = true
             this.isEnableIndexForegroundBlur = true
           })
-          .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay: 90 }):null)
+          .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(),delay: 90 }):null)
           // 设置页半模态窗口
           .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
             detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE],

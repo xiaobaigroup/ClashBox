@@ -1,4 +1,4 @@
-import {   LIST_ITEM_HEIGHT} from '../../common/Constants'
+import { CONTENT_END_OFFSET, LIST_ITEM_HEIGHT} from '../../common/Constants'
 import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem'
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import ProxyGroupItem from './ProxyGroupItem'
@@ -115,7 +115,10 @@ struct ProxyArrangement {
           }
         })
       }
+      .chainAnimation(true)
       .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring)
+      .contentEndOffset(CONTENT_END_OFFSET)
       .height('100%')
       .width('100%')
     }
