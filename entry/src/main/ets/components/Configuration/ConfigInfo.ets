@@ -17,6 +17,7 @@ import { ConfigData } from "../../common/PageArgumentEntity"
 import { customVibrator } from "../../utils/VibratorUtil"
 import { customSound } from "../../utils/SoundPoolUtil"
 import { UIConfig } from "../../entryability/AppState"
+import { customAnimationUtil } from "../../utils/Animation"
 
 @Component
 export struct ConfigInfo{
@@ -91,7 +92,7 @@ export struct ConfigInfo{
         .maxLength(TEXT_AREA_MAX_LENGTH)
         .enterKeyType(EnterKeyType.Next)
         .defaultFocus(true)
-        .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         // .onChange( (value: string, previewText: PreviewText) => {
         //   this.configData.configName = value.trim()
         // })
@@ -113,7 +114,7 @@ export struct ConfigInfo{
         .wordBreak(WordBreak.BREAK_ALL)
         .enterKeyType(this.configData.isConfigAutoUpdate ? EnterKeyType.Next : EnterKeyType.Done)
         .type(TextAreaType.URL)
-        .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         // .onChange( (value: string, previewText: PreviewText) => {
         //   this.configData.configUrl = value.trim()
         // })
@@ -160,7 +161,7 @@ export struct ConfigInfo{
           .height(LIST_ITEM_HEIGHT_45)
           .padding(LIST_ITEM_PADDING)
           .borderRadius(BORDER_RADIUS_20)
-          .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .onClick( ()=> {
             // 自动更新间隔 显式动画
             this.getUIContext()?.animateTo({
@@ -278,7 +279,7 @@ export struct ConfigInfo{
             .height(this.heightOfTextPickerInTheListItem)
             .padding(LIST_ITEM_PADDING)
             .borderRadius(BORDER_RADIUS_20)
-            .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+            .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
             .animation({ duration: this.uiConfig.animationSpeed , curve: Curve.Ease })
           }
           // 自动更新间隔 END

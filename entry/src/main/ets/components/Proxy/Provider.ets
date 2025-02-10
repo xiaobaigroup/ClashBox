@@ -8,6 +8,7 @@ import { Provider } from "proxy_core"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { UIConfig } from "../../entryability/AppState"
 import { picker } from "@kit.CoreFileKit"
+import { customAnimationUtil } from "../../utils/Animation"
 
 
 // 资源数据（假设）
@@ -235,7 +236,7 @@ export struct ProviderPage {
                                 Text($r('app.string.upload')).fontSize(12).fontColor(this.icon_emphasize)
                               }
                             }.ButtonStyle()
-                            .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+                            .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                             .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
                             .width(76)
                             .height(28)
@@ -268,7 +269,7 @@ export struct ProviderPage {
                                 .justifyContent(FlexAlign.Center)
                               }
                             }.ButtonStyle()
-                            .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+                            .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                             .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
                             .onClick(() => {
                               // 资源更新处理
@@ -341,7 +342,7 @@ export struct ProviderPage {
                                 Text($r('app.string.upload')).fontSize(12).fontColor(this.icon_emphasize)
                               }
                             }.ButtonStyle()
-                            .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+                            .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                             .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
                             .width(76)
                             .height(28)
@@ -374,7 +375,7 @@ export struct ProviderPage {
                                   .justifyContent(FlexAlign.Center)
                               }
                             }.ButtonStyle()
-                            .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+                            .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                             .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
                             .onClick(() => {
                               // 资源更新处理
@@ -441,7 +442,7 @@ export struct ProviderPage {
         .width(40)
         .height(40)
         .backgroundColor($r('app.color.settings_container_background'))
-        .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .onClick(() => {
           animateTo({
             duration: this.uiConfig.animationSpeed,
@@ -470,7 +471,7 @@ export struct ProviderPage {
         .width(40)
         .height(40)
         .backgroundColor($r('app.color.settings_container_background'))
-        .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .onClick(() => {
           this.isProviderEdit = false
           this.isEnableIndexForegroundBlur=false

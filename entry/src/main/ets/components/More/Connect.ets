@@ -7,6 +7,7 @@ import { MoreTop } from "./MoreTopBuilder"
 import { curves } from "@kit.ArkUI"
 import ClashViewModel from "../../entryability/ClashViewModel"
 import { ConnectionInfo, Metadata } from "proxy_core"
+import { customAnimationUtil } from "../../utils/Animation"
 
 // 资源数据（假设）
 interface ConnectData {
@@ -89,9 +90,7 @@ struct Connect {
             otherButton: (): void => { this.connectOther() }
           })
         }.width('100%')
-        .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-          .animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 0 })
-          .combine(TransitionEffect.SLIDE) : null)
+        .transition(customAnimationUtil.isSlide(200,this.uiConfig))
         // 页面
         if(this.connectListData.length === 0) {
           Nothing({ name: $r('app.string.Request') })
@@ -136,8 +135,7 @@ struct Connect {
                 .backgroundColor($r('app.color.container_background'))
                 .borderRadius(BORDER_RADIUS_20)
               }.width('100%')
-              .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
-                .combine(TransitionEffect.scale({x: 0, y: 0})):null)
+              .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
             })
           }.width('100%')
           .height('100%')

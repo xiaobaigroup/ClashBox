@@ -22,6 +22,7 @@ import { util } from "@kit.ArkTS"
 import { ConfigData } from "../../common/PageArgumentEntity"
 import { BusinessError } from "@kit.BasicServicesKit"
 import { UIConfig } from "../../entryability/AppState"
+import { customAnimationUtil } from "../../utils/Animation"
 
 
 // 关联：route_map.json
@@ -167,7 +168,7 @@ export struct ImportConfigFromFile{
           .maxLength(TEXT_AREA_MAX_LENGTH)
           .enterKeyType(EnterKeyType.Next)
           .defaultFocus(true)
-          .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
 
         // 导入文件
         Row() {
@@ -183,7 +184,7 @@ export struct ImportConfigFromFile{
         }.width('100%')
         .height(53)
         .borderRadius(20)
-        .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .backgroundColor($r('app.color.container_background'))
         .onClick(() => {
           let filePicker = new picker.DocumentViewPicker(getContext(this))

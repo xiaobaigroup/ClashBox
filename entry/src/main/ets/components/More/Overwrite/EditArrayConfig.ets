@@ -6,6 +6,7 @@ import { EventHub, EventKey } from "../../../common/EventHub"
 import { UIConfig } from "../../../entryability/AppState"
 import { ConfigItemData, CONTENT_END_OFFSET_110, ValueType } from "../../../common/Constants"
 import { getResourceString } from "../../../utils/ResourceStringUtil"
+import { customAnimationUtil } from "../../../utils/Animation"
 
 export interface ArrayConfigParam{
     label?: string | ResourceStr
@@ -237,9 +238,7 @@ export struct ArrayConfigEditor {
         })
       }.width('100%')
       .padding({left: this.morePageMargin.value, right: this.morePageMargin.value})
-      .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-        .animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 0 })
-        .combine(TransitionEffect.SLIDE) : null)
+      .transition(customAnimationUtil.isSlide(200,this.uiConfig))
 
       List() {
         ForEach(this.ArrayConfigList, (item: KeyValueData, index: number) => {
@@ -275,8 +274,7 @@ export struct ArrayConfigEditor {
             }
 
           }
-          .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index * 10 + 10 })
-            .combine(TransitionEffect.scale({x: 0, y: 0})) : null)
+          .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
           .margin({bottom: this.listBottom.value })
           .onClick(() => {
             // 启用背景模糊

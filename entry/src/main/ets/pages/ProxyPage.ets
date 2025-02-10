@@ -15,6 +15,8 @@ import { AppConfig, isEnd, ProxyCardSize, ProxyGroupType, UIConfig } from '../en
 import { curves, PromptAction } from '@kit.ArkUI'
 import { ProviderPage } from '../components/Proxy/Provider'
 import { indexController } from './Index'
+import { customVibrator } from '../utils/VibratorUtil'
+import { customAnimationUtil } from '../utils/Animation'
 
 
 @Entry
@@ -133,7 +135,7 @@ struct ProxyPage {
       .justifyContent(FlexAlign.Center)
       .backgroundColor(this.currentIndex === targetIndex ? this.icon_emphasize : this.container_background)
     }
-    .clickEffect({ level: this.uiConfig.isAnimation ? ClickEffectLevel.MIDDLE : null })
+    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
     .height(55)
     .margin({ right: 8, bottom: 10 })
     .onClick(() => {
@@ -175,7 +177,7 @@ struct ProxyPage {
               })
           }
           .EditRow()
-          .clickEffect({ level: this.uiConfig.isAnimation ? ClickEffectLevel.MIDDLE : null })
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           //    .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
           //       .combine(TransitionEffect.SLIDE):null)
           // 点击后改变ProxyArrangementSelected状态为 标签
@@ -223,7 +225,7 @@ struct ProxyPage {
               })
           }
           .EditRow()
-          .clickEffect({ level: this.uiConfig.isAnimation ? ClickEffectLevel.MIDDLE : null })
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .onClick(() => {
             EventHub.sendEvent(EventKey.ProxySort, n["v"])
             animateTo({ duration: this.uiConfig.animationSpeed }, () => {
@@ -271,7 +273,7 @@ struct ProxyPage {
               })
           }
           .EditRow()
-          .clickEffect({ level: this.uiConfig.isAnimation ? ClickEffectLevel.MIDDLE : null })
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           // 点击后改变ProxyGroupItemSelected状态为 多列
           .onClick(() => {
             animateTo({ duration: this.uiConfig.animationSpeed }, () => {
@@ -310,6 +312,7 @@ struct ProxyPage {
 
 
   build() {
+    Scroll(){
     Column() {
       // 标题栏
       if (!this.isLandscapePhone) {
@@ -318,9 +321,7 @@ struct ProxyPage {
             .fontSize(TAB_CONTENT_TITLE_FONT_SIZE)
             .fontWeight(FontWeight.Bold)
             .textAlign(TextAlign.Center)
-            .transition(this.uiConfig.isAnimation ?
-            TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 100 })
-              .combine(TransitionEffect.SLIDE) : null)
+            .transition(customAnimationUtil.isSlide(200,this.uiConfig))
           Blank()
 
           //提供者按钮
@@ -332,17 +333,12 @@ struct ProxyPage {
           .width(40)
           .height(40)
           .backgroundColor($r('app.color.settings_container_background'))
-          .clickEffect({ level: this.uiConfig.isAnimation ? ClickEffectLevel.MIDDLE : null })
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .onClick(() => {
             this.isProviderEdit = true
             this.isEnableIndexForegroundBlur = true
           })
-          .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY.animation({
-            duration: this.uiConfig.animationSpeed,
-            curve: curves.springMotion(),
-            delay: 50
-          })
-            .combine(TransitionEffect.SLIDE) : null)
+          .transition(customAnimationUtil.isSlide(100,this.uiConfig))
 
           //编辑图标
           Button({ type: ButtonType.Circle, stateEffect: true }) {
@@ -353,7 +349,7 @@ struct ProxyPage {
           .width(40)
           .height(40)
           .backgroundColor($r('app.color.settings_container_background'))
-          .clickEffect({ level: this.uiConfig.isAnimation ? ClickEffectLevel.MIDDLE : null })
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .onClick(() => {
             this.isShowEdit = true
             this.isEnableIndexForegroundBlur = true
@@ -367,12 +363,7 @@ struct ProxyPage {
           left: this.breakPointStateTabContentTitleMargin.value,
           right: this.breakPointStateTabContentTitleMargin.value,
         })
-        .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY.animation({
-          duration: this.uiConfig.animationSpeed,
-          curve: curves.springMotion(),
-          delay: 0
-        })
-          .combine(TransitionEffect.SLIDE) : null)
+        .transition(customAnimationUtil.isSlide(0,this.uiConfig))
       }
 
       if (this.proxyGroups.length == 0) {
@@ -397,12 +388,7 @@ struct ProxyPage {
         .height('90%')
         .alignItems(HorizontalAlign.Center)
         .justifyContent(FlexAlign.Center)
-        .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY.animation({
-          duration: this.uiConfig.animationSpeed,
-          curve: curves.springMotion(),
-          delay: 0
-        })
-          .combine(TransitionEffect.scale({ x: 0, y: 0 })) : null)
+        .transition(customAnimationUtil.isScaleTran(0,this.uiConfig))
         //.padding({top:TAB_CONTENT_TITLE_HEIGHT})
         .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
           detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
@@ -441,7 +427,6 @@ struct ProxyPage {
                       .padding({ right: this.breakPointStateTabContentTitleMargin.value, })
                       .width('100%')
                       .height('100%')
-                    //     }
                   }
                   .tabBar(this.TabBuilder(g.name, i))
                   .gesture(
@@ -491,7 +476,6 @@ struct ProxyPage {
               this.isEnableIndexForegroundBlur ? BlurStyle.Thin : BlurStyle.NONE,
               { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
             )
-
             //分组tabs end
           }
 
@@ -511,6 +495,7 @@ struct ProxyPage {
                 .align(Alignment.Center)
             }.onClick(() => {
               EventHub.sendEvent(EventKey.TestDelayAll)
+              customVibrator.vibratorTriggerOfHapticClockTimer()
               this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
             })
             .width('100%')
@@ -534,10 +519,8 @@ struct ProxyPage {
           .height(this.proxyStartButtonHeight)
           .clip(true)
           .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
-          .clickEffect({ level: this.uiConfig.isAnimation ? ClickEffectLevel.MIDDLE : null })
-          .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-            .animation({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion(), delay: 50 })
-            .combine(TransitionEffect.SLIDE_SWITCH) : null)
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+          .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
           .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
             detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
             backgroundColor: $r('app.color.background'),
@@ -579,6 +562,7 @@ struct ProxyPage {
     }
     .width('100%')
     .height('100%')
+    }
   }
 }
 

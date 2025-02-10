@@ -28,6 +28,7 @@ import { skipRowList } from '../components/Common';
 import { AppConfig, UIConfig } from '../entryability/AppState';
 import { ArrayConfigEditor, ArrayConfigParam } from '../components/More/Overwrite/EditArrayConfig';
 import { removeItemsByIndex } from '../utils/RemoveItemsUtils';
+import { customAnimationUtil } from '../utils/Animation';
 
 
 @Entry
@@ -192,9 +193,7 @@ struct MorePage {
         }
         .width('100%')
         .height(TAB_CONTENT_TITLE_HEIGHT)
-        .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-          .animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 0 })
-          .combine(TransitionEffect.SLIDE):null)
+        .transition(customAnimationUtil.isSlide(0,this.uiConfig))
         .padding({
           left: this.breakPointStateTabContentTitleMargin.value,
           right: this.breakPointStateTabContentTitleMargin.value,
@@ -214,8 +213,7 @@ struct MorePage {
             .onClick(() => {
                 this.handleCheck(index)
             })
-            .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: index * 10 + 10 })
-              .combine(TransitionEffect.scale({x: 0, y: 0})):null)
+            .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
           })
           // 设置行
           ListItem() {
@@ -229,7 +227,7 @@ struct MorePage {
             this.isShowSettings = true
             this.isEnableIndexForegroundBlur = true
           })
-          .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(),delay: 90 }):null)
+          .transition(customAnimationUtil.isScaleTran(6,this.uiConfig))
           // 设置页半模态窗口
           .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
             detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE],

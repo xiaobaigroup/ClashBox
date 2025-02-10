@@ -6,6 +6,7 @@ import { MoreTop } from "../MoreTopBuilder"
 import { UIConfig } from "../../../entryability/AppState"
 import { ClashConfig } from "proxy_core"
 import { curves } from "@kit.ArkUI"
+import { customAnimationUtil } from "../../../utils/Animation"
 
 @Component
 struct Overwrite {
@@ -101,9 +102,7 @@ struct Overwrite {
         })
       }
       .width('100%')
-      .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-        .animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 0 })
-        .combine(TransitionEffect.SLIDE) : null)
+      .transition(customAnimationUtil.isSlide(200,this.uiConfig))
 
       List({space: 10}) {
         ForEach(this.overwriteList, (item: moreData, index: number) => {
@@ -117,8 +116,7 @@ struct Overwrite {
           }.onClick(() => {
             this.handleCheck(index)
           })
-          .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
-            .combine(TransitionEffect.scale({x: 0, y: 0})):null)
+          .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
         })
 
       }

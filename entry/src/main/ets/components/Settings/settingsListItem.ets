@@ -1,5 +1,6 @@
 import { settingsData } from "../../common/Constants"
 import { UIConfig } from "../../entryability/AppState"
+import { customAnimationUtil } from "../../utils/Animation"
 
 @Component
 struct settingsListItem {
@@ -50,7 +51,7 @@ struct settingsListItem {
       Row()
         .height(10)
     }
-    .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
     .onClick(() => {
       this.onCheck(this.index)
     })

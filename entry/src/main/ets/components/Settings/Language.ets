@@ -6,6 +6,7 @@ import { promptAction } from "@kit.ArkUI"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { ChangeLanguage } from "../../utils/ChangeLanguageUtil"
 import { AppConfig, UIConfig } from "../../entryability/AppState"
+import { customAnimationUtil } from "../../utils/Animation"
 
 @Component
 struct Language {
@@ -67,7 +68,7 @@ struct Language {
           .backgroundColor($r('app.color.container_background'))
         }
         .margin({bottom: 10})
-          .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .onClick(() => {
           // 点击整行对应单选框选中
            this.currentRadioCheck = -1
@@ -108,7 +109,7 @@ struct Language {
             .backgroundColor($r('app.color.container_background'))
           }
           .margin({bottom: 10})
-            .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+             .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .onClick(() => {
             // 点击整行对应单选框选中
             this.currentRadioCheck = index

@@ -3,6 +3,7 @@ import { ExperimentalFunction, skipRowList } from "../Common"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import {  UIConfig } from "../../entryability/AppState"
+import { customAnimationUtil } from "../../utils/Animation"
 
 @Component
 struct Backup {
@@ -97,7 +98,7 @@ struct Backup {
         }
         .width('100%')
         .borderRadius(20)
-        .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .backgroundColor($r('app.color.container_background'))
       }
       .width('100%')
@@ -189,7 +190,7 @@ export struct CloudBackup {
         .height(53)
         .borderRadius(20)
         .margin({bottom: 10})
-          .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .backgroundColor($r('app.color.container_background'))
         .onClick( ()=> {
           // 展开流量提醒设置列表行 显式动画
@@ -224,7 +225,7 @@ export struct CloudBackup {
                 .height(40)
                 .borderRadius(20)
                 .backgroundColor(this.icon_emphasize)
-                  .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+                .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                 .onClick(() => {
                   // 暂时写成点击后赋值为true，后续需要根据登录状态来赋值
                   this.isLogon = true
@@ -237,7 +238,7 @@ export struct CloudBackup {
                 .borderRadius(20)
                 .margin({left: 10})
                 .backgroundColor(this.icon_emphasize)
-                  .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+                .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                 .enabled(this.isLogon ? true : false)
                 .onClick(() => {
                   // 连接测试
@@ -250,10 +251,9 @@ export struct CloudBackup {
           .width('100%')
           .padding(10)
           .borderRadius(20)
-          .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .backgroundColor($r('app.color.container_background'))
-          .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
-            .combine(TransitionEffect.scale({x: 0, y: 0})):null)
+          .transition(customAnimationUtil.isScaleTran(0,this.uiConfig))
         }
       }
       .width('100%')

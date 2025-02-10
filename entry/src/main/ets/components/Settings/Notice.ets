@@ -17,6 +17,7 @@ import { UIConfig } from "../../entryability/AppState"
 import { notificationManager } from '@kit.NotificationKit'
 import { BusinessError } from '@kit.BasicServicesKit'
 import { common } from '@kit.AbilityKit'
+import { customAnimationUtil } from "../../utils/Animation"
 
 const TAG: string = '[通知页]';
 const DOMAIN_NUMBER: number = 0xFF00;
@@ -449,7 +450,7 @@ struct Notice {
                .width('100%')
                .height(this.heightOfTextPickerInTheListItem)
                .borderRadius(BORDER_RADIUS_20)
-               .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+               .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
              }
              // 提醒时间设置行 End

@@ -28,7 +28,7 @@ import { AppConfig, UIConfig } from '../entryability/AppState'
 import { EventHub, EventKey } from '../common/EventHub'
 import { getResourceString } from '../utils/ResourceStringUtil'
 import { convertTime } from '../utils/TimeConvertUtil'
-
+import { customAnimationUtil } from '../utils/Animation'
 
 
 /**
@@ -172,7 +172,7 @@ struct ConfigurationPage {
               .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
             content: this.configListLongPressCtxMenuForUnFavorite.content
           })
-            .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+            .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
             .contentFontColor($r('sys.color.font_primary'))
             .onClick( () => {
               this.configListLongPressCtxMenuForUnFavorite.callback()
@@ -183,7 +183,7 @@ struct ConfigurationPage {
               .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
             content: this.configListLongPressCtxMenuForFavorite.content
           })
-            .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+            .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
             .contentFontColor($r('sys.color.font_primary'))
             .onClick( () => {
               this.configListLongPressCtxMenuForFavorite.callback()
@@ -194,7 +194,7 @@ struct ConfigurationPage {
         // 遍历其他菜单 START
         ForEach(this.configListLongPressCtxMenus, (item: LongPressContextMenuItem, index: number) => {
           MenuItem({ symbolStartIcon: item?.symbolStartIcon, content: item?.content })
-            .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+            .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
             .contentFontColor($r('sys.color.font_primary'))
             .onClick( () => {
               // hilog.info(0xC002, this.componentName, `#configListLongPressCtxMenuBuilder#onClick():`)
@@ -211,7 +211,7 @@ struct ConfigurationPage {
             .fontColor(['#E6E54E36']),
           content: $r('app.string.delete')
         })
-          .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .contentFontColor('#E6E54E36')
           .onClick( () => {
             this.configCustomDialogController?.open()
@@ -294,9 +294,7 @@ struct ConfigurationPage {
             .fontSize(TAB_CONTENT_TITLE_FONT_SIZE)
             .fontWeight(TAB_CONTENT_TITLE_FONT_WEIGHT)
             .fontColor($r('sys.color.font_primary'))
-            .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-              .animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 50 })
-              .combine(TransitionEffect.SLIDE):null)
+            .transition(customAnimationUtil.isSlide(200,this.uiConfig))
           Blank()
           // 刷新图标
           Button({ type: ButtonType.Circle, stateEffect: true }) {
@@ -307,15 +305,13 @@ struct ConfigurationPage {
           .width(40)
           .height(40)
           .backgroundColor($r('app.color.settings_container_background'))
-          .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .onClick(() => {
             // TODO 国际化适配 更新配置中... 更新配置成功、
             hilog.info(0xC001, this.componentName, `#button#onClick()#更新配置`)
             this.updateConfig()
           })
-          .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-            .animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 0 })
-            .combine(TransitionEffect.SLIDE):null)
+          .transition(customAnimationUtil.isSlide(0,this.uiConfig))
         }
         .alignItems(VerticalAlign.Center)
         .width('100%')
@@ -332,8 +328,7 @@ struct ConfigurationPage {
       Stack({ alignContent: this.stackAlignContentAlignment }) {
         if (this.configList.length === 0) {
           Nothing({ name: $r('app.string.Configuration') })
-            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 0 })
-              .combine(TransitionEffect.scale({x: 0, y: 0})):null)
+            .transition(customAnimationUtil.isScaleTran(0,this.uiConfig))
         } else {
           // 配置列表 START
           List({ space: LIST_SPACE }) {
@@ -378,7 +373,7 @@ struct ConfigurationPage {
               .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
               .borderRadius(BORDER_RADIUS_20)
               .hoverEffect(HoverEffect.Scale)
-              .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(),delay:index*10+10 }):null)
+              .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
               .bindContextMenu(this.configListLongPressCtxMenuBuilder(item?.isFavorite ?? false), ResponseType.LongPress | ResponseType.RightClick,
                 {
                   preview: MenuPreviewMode.IMAGE,
@@ -453,7 +448,7 @@ struct ConfigurationPage {
         .backgroundColor(this.icon_emphasize)
         .clip(true)
         .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
-        .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .hoverEffect(HoverEffect.Scale)
         .bindSheet( this.isShowConfigAddBindSheet, this.ConfigAddBindSheetBuilder, {
           // title: { title: $r('app.string.AddConfig') },
@@ -497,10 +492,9 @@ struct ConfigurationPage {
         .onClick( () => {
           this.isShowConfigAddBindSheet = true
           this.isEnableIndexForegroundBlur = true
+          customVibrator.vibratorTriggerOfHapticClockTimer()
         })
-        .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-          .animation({ duration: this.uiConfig.animationSpeed, curve:curves.springMotion(),delay: 50 })
-          .combine(TransitionEffect.SLIDE_SWITCH):null)
+        .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
         // 悬浮新增配置按钮 END
       }
       .backgroundColor($r('app.color.background'))

@@ -7,6 +7,7 @@ import { ClashConfig, LogLevel } from "proxy_core"
 import { AppConfig, UIConfig } from "../../entryability/AppState"
 import { EventHub, EventKey } from "../../common/EventHub"
 import { CONTENT_END_OFFSET_110 } from "../../common/Constants"
+import { customAnimationUtil } from "../../utils/Animation"
 
 // 日志数据（假设）
 interface LogData {
@@ -185,9 +186,7 @@ struct Log {
             .backgroundColor($r('app.color.settings_container_background'))
           }.width('100%')
           .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
-          .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-            .animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 0 })
-            .combine(TransitionEffect.SLIDE) : null)
+          .transition(customAnimationUtil.isSlide(200,this.uiConfig))
 
           // 主体
           if (this.appConfig.enableLogger === false) {
@@ -198,8 +197,7 @@ struct Log {
                 .margin({bottom: 4 })
               Text($r('app.string.EnableLoggerPrompt'))
             }
-            .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
-              .combine(TransitionEffect.scale({x: 0, y: 0})):null)
+            .transition(customAnimationUtil.isScaleTran(0,this.uiConfig))
             .zIndex(1)
             .alignItems(HorizontalAlign.Center)
             .justifyContent(FlexAlign.Center)
@@ -207,8 +205,7 @@ struct Log {
             .height('100%')
           } else if (this.logListData.length === 0) {
             Nothing({ name: $r('app.string.Log') })
-              .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
-                .combine(TransitionEffect.scale({x: 0, y: 0})):null)
+              .transition(customAnimationUtil.isScaleTran(0,this.uiConfig))
           } else {
             List({ space: 10 }) {
               ForEach(this.logListData, (item: LogData, index: number) => {
@@ -247,8 +244,7 @@ struct Log {
                     .padding(12)
                   }
                 }.width('100%')
-                .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
-                  .combine(TransitionEffect.scale({x: 0, y: 0})):null)
+                .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
               })
 
             }.width('100%')

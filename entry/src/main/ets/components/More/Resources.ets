@@ -10,6 +10,7 @@ import { copy, UIConfig } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { getResourceString } from "../../utils/ResourceStringUtil"
 import { EventHub, EventKey } from "../../common/EventHub"
+import { customAnimationUtil } from "../../utils/Animation"
 
 // 资源数据（假设）
 interface ResourcesData {
@@ -200,9 +201,7 @@ struct Resources {
             })
           }.width('100%')
           .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
-          .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-            .animation({ duration: this.uiConfig.animationSpeed, curve:curves.springMotion(),delay: 0 })
-            .combine(TransitionEffect.SLIDE) : null)
+          .transition(customAnimationUtil.isSlide(200,this.uiConfig))
           // 页面
           if(this.resourceListData.length === 0) {
             Nothing({ name: $r('app.string.Resources') })
@@ -269,8 +268,7 @@ struct Resources {
                   .backgroundColor($r('app.color.container_background'))
                   .borderRadius(BORDER_RADIUS_20)
                 }.width('100%')
-                .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
-                  .combine(TransitionEffect.scale({x: 0, y: 0})):null)
+                .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
               })
             }.width('100%')
             .height('100%')

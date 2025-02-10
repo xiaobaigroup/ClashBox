@@ -55,6 +55,7 @@ import { common } from '@kit.AbilityKit'
 import { setAutoColorMode, setDarkColorMode, setLightColorMode } from '../utils/ChangeColorModeUtils'
 import { ChangeLanguage } from '../utils/ChangeLanguageUtil'
 import { ConfigData, ConfigDataSourceType } from '../common/PageArgumentEntity'
+import { customAnimationUtil } from '../utils/Animation'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 
@@ -332,18 +333,14 @@ struct Index {
           .fontSize(this.isLandscapePhone ? 24 : this.TabIconfontSize.value)
           .margin({ top: 5 })
           .effectStrategy(this.uiConfig.isAnimation ? SymbolEffectStrategy.SCALE : null)
-          .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-            .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
-            .combine(TransitionEffect.translate({ y: 50 })) : null)
+          .transition(customAnimationUtil.isTranslate(this.uiConfig))
 
         Text(title)
           .fontColor(this.selectedIndex === index ? this.icon_emphasize : this.icon_tertiary)
           .fontWeight(FontWeight.Medium)
           .margin(this.compMargin.value)
           .fontSize(this.isLandscapePhone ? 12 : this.TabTitlefontSize.value)
-          .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-            .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
-            .combine(TransitionEffect.translate({ y: 50 })) : null)
+          .transition(customAnimationUtil.isTranslate(this.uiConfig))
       }
       .padding(this.isLandscapePhone ? { left: 39 } : { bottom: 5 })
     }
@@ -675,15 +672,10 @@ struct Index {
             })
           })
         }
-        //.barOverlap(true)
-        /*.backgroundBrightness({
-          rate: 0.5,
-          lightUpDegree: 0.5 })*/
         .backgroundColor(this.uiConfig.isBlurr ? '#00ffffff' : $r('app.color.background'))
         .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Thick : null)
         .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
-        .barOverlap(this.uiConfig.isBlurr ? (this.isLandscapePhone || this.istabletLandscape ? false : true) :
-          false) //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
+        .barOverlap(this.uiConfig.isBlurr ? (this.isLandscapePhone || this.istabletLandscape ? false : true) : false) //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
         .scrollable(this.isSecondary ? false : true)
         .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
         .barWidth(this.isLandscapePhone ? '63vp' : this.compBarWidth.value) /**/

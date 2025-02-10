@@ -7,6 +7,7 @@ import ClashViewModel from '../../entryability/ClashViewModel'
 import { promptAction } from "@kit.ArkUI"
 import { ExperimentalFunction } from "../Common"
 import { removeItemsByIndex } from "../../utils/RemoveItemsUtils"
+import { customAnimationUtil } from "../../utils/Animation"
 
 interface KernelListItem {
   icons: Resource
@@ -77,7 +78,7 @@ struct Kernel {
               Image(item.icons)
                 .width(48)
                 .height(48)
-                .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+                 .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
               Column() {
                 Row() {
                   Text(item.title)
@@ -96,7 +97,7 @@ struct Kernel {
                   .fontSize(14)
               }.margin({ left: 12 })
               .alignItems(HorizontalAlign.Start)
-              .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+               .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
               Blank()
               Radio({ value: 'kernel' + index, group: 'kernelGroup' })
                 .checked(item.ClashCore === this.appConfig.clashCore)
@@ -121,7 +122,7 @@ struct Kernel {
         }.padding(12)
         .backgroundColor($r('app.color.container_background'))
         .borderRadius(BORDER_RADIUS_20)
-        .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
 
         if(!this.isShowExperimentalFunction) {
           // 启用提示

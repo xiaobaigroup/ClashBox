@@ -6,6 +6,7 @@ import { theCustomDialog } from "../../Common"
 import { AppConfig, UIConfig } from "../../../entryability/AppState"
 import { ConfigList } from "./Common"
 import { ClashConfig } from "proxy_core"
+import { customAnimationUtil } from "../../../utils/Animation"
 
 @Component
 struct Network {
@@ -194,8 +195,7 @@ export struct NetworkRouterAddress {
             }
 
           }
-          .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
-            .combine(TransitionEffect.scale({x: 0, y: 0})):null)
+          .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
           .onClick(() => {
             // 启用背景模糊
             this.isEnableIndexForegroundBlur = true
@@ -222,8 +222,7 @@ export struct NetworkRouterAddress {
           .borderRadius(20)
           .backgroundColor($r('app.color.container_background'))
         }
-        .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
-          .combine(TransitionEffect.scale({x: 0, y: 0})):null)
+        .transition(customAnimationUtil.isScaleTran(3,this.uiConfig))
         .onClick(() => {
           // 启用背景模糊
           this.isEnableIndexForegroundBlur = true

@@ -14,6 +14,7 @@ import { intl } from '@kit.LocalizationKit';
 import { AppConfig, ProxyCardSize, UIConfig } from '../../entryability/AppState';
 import ClashViewModel from '../../entryability/ClashViewModel';
 import { ProxyNode } from './ProxyItem';
+import { customAnimationUtil } from '../../utils/Animation';
 
 
 //断点布局
@@ -254,7 +255,7 @@ struct ProxyGroupItem {
             .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
           content: this.proxyListLongPressCtxMenuForUnFavorite.content
         })
-          .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .contentFontColor($r('sys.color.font_primary'))
           .onClick( () => {
             this.proxyListLongPressCtxMenuForUnFavorite.callback()
@@ -265,7 +266,7 @@ struct ProxyGroupItem {
               .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
             content: this.proxyListLongPressCtxMenuForFavorite.content
           })
-            .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+            .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
             .contentFontColor($r('sys.color.font_primary'))
             .onClick(() => {
               this.proxyListLongPressCtxMenuForFavorite.callback()
@@ -293,7 +294,7 @@ struct ProxyGroupItem {
     .menuItemDivider({ color: $r('app.color.divider'), strokeWidth: LengthMetrics.vp(1) })
     .backgroundColor($r('app.color.container_background'))
     .borderRadius(20)
-    .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
   } //长按菜单end
 
   selectProxy(item: ProxyItem){
@@ -313,13 +314,12 @@ struct ProxyGroupItem {
           }
           })
         }
-        .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: index*10+10 })
-          .combine(TransitionEffect.scale({x: 0, y: 0})):null)
+        .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
         .onClick(() => {
           this.selectProxy(item)
         })
         .ListItemStyle()
-        .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .height(LIST_ITEM_HEIGHT + (this.ProxyGroupItemSelected === ProxyCardSize.Small ? 32 : 0))
         .bindContextMenu(this.MyMenu(item?.isShowFavoriteProxy ?? false, item.name), ResponseType.LongPress,
           {
@@ -333,7 +333,7 @@ struct ProxyGroupItem {
             },
           })
       })
-    } // TODO 不同大小显示不同的布局
+    }
     .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
     .ListStyle()
     .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {

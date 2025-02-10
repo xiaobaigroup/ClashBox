@@ -7,6 +7,7 @@ import { MoreTop } from "./MoreTopBuilder"
 import { curves, promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { UIConfig } from "../../entryability/AppState"
+import { customAnimationUtil } from "../../utils/Animation"
 
 @Component
 struct Diversion {
@@ -129,9 +130,7 @@ struct Diversion {
           this.isShowPolicy = true
         })
       }.width('100%')
-      .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-        .animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 0 })
-        .combine(TransitionEffect.SLIDE) : null)
+      .transition(customAnimationUtil.isSlide(200,this.uiConfig))
       // 数据列表行
       List() {
         ForEach(this.DiversionList, (item: DiversionData, index: number) => {
@@ -157,8 +156,7 @@ struct Diversion {
             }
 
           }
-          .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
-            .combine(TransitionEffect.scale({x: 0, y: 0})):null)
+          .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
           .margin({bottom: this.listBottom.value })
           .onClick(() => {
             // 启用背景模糊
@@ -186,7 +184,6 @@ struct Diversion {
       .margin({ top: 10 })
       .alignListItem(ListItemAlign.Center)
       .height(this.isLandscapePhone ? 275 : 650)
-      .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY : null)
       .bindSheet($$this.isShowPolicy, this.PolicySheet(),
       {
         detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE],
@@ -420,7 +417,7 @@ struct Policy {
           })
       }.width('100%')
       .borderRadius(20)
-        .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+      .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
       .backgroundColor($r('app.color.container_background'))
       // 删除资源
       if (!this.isAdd) {
@@ -433,7 +430,7 @@ struct Policy {
         }.width('100%')
         .height(53)
         .borderRadius(20)
-          .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .backgroundColor($r('app.color.container_background'))
         .onClick(() => {
           // 删除资源，在半模态窗口关闭后删除数组元素

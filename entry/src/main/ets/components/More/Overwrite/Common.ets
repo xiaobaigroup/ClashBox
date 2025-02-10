@@ -9,6 +9,7 @@ import { menuRowList, skipRowList, theCustomDialog, toggleRowList } from '../../
 import { ArrayConfigParam } from './EditArrayConfig'
 import { SymbolGlyphModifier } from '@kit.ArkUI'
 import { JSON } from '@kit.ArkTS'
+import { customAnimationUtil } from '../../../utils/Animation'
 
 
 @Component
@@ -172,8 +173,7 @@ export struct ConfigList {
               menu: (): void => { this.switchMenu(item, index) }
             })
           }
-          .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
-            .combine(TransitionEffect.scale({x: 0, y: 0})) : null)
+          .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
         } else if (item.sign === 1) {
           ListItem() {
             // 跳转型
@@ -187,8 +187,7 @@ export struct ConfigList {
           }.onClick(() => {
             this.handleCheck(index)
           })
-          .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
-            .combine(TransitionEffect.scale({x: 0, y: 0})) : null)
+          .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
         } else if (item.sign === 2 ) {
           ListItem() {
             // 开关型
@@ -200,8 +199,7 @@ export struct ConfigList {
               toggle:  () => { this.toggleBuilder(item.isCheck) }
             })
           }
-          .transition(this.uiConfig.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
-            .combine(TransitionEffect.scale({x: 0, y: 0})) : null)
+          .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
           .onClick(() => {
             this.getUIContext()?.animateTo({
               duration: this.uiConfig.animationSpeed
@@ -221,8 +219,7 @@ export struct ConfigList {
             }.width('100%')
             .justifyContent(FlexAlign.Start)
           }
-          .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: index*10+10 })
-            .combine(TransitionEffect.scale({x: 0, y: 0})) : null)
+          .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
         }
       })
     }

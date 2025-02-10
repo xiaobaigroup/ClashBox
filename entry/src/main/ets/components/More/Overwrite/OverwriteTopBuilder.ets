@@ -1,6 +1,7 @@
 import { BreakpointState } from "../../../common/breakpointsystem"
 import { curves } from "@kit.ArkUI"
 import { UIConfig } from "../../../entryability/AppState"
+import { customAnimationUtil } from "../../../utils/Animation"
 
 @Component
 struct OverwriteTop {
@@ -47,9 +48,7 @@ struct OverwriteTop {
     .width('100%')
     .height(56)
     .alignItems(VerticalAlign.Center)
-    .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-      .animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion(), delay: 0 })
-      .combine(TransitionEffect.SLIDE) : null)
+    .transition(customAnimationUtil.isSlide(200,this.uiConfig))
   }
 }
 

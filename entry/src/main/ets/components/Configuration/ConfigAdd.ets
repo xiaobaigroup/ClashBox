@@ -16,6 +16,7 @@ import { BindSheetTitleCustomBuilder } from "../Common";
 import { promptAction } from "@kit.ArkUI";
 import { getResourceString } from "../../utils/ResourceStringUtil";
 import { UIConfig } from "../../entryability/AppState";
+import { customAnimationUtil } from "../../utils/Animation";
 
 interface ConfigAddType {
   symbolStart? : Resource,
@@ -84,7 +85,7 @@ export struct ConfigAdd {
             .backgroundColor($r('app.color.list_item_background_color'))
             .width('100%')
             .height(LIST_ITEM_HEIGHT)
-              .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+            .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
             .borderRadius(BORDER_RADIUS_20)
             .onClick( () => {
               hilog.info(0xC020, this.componentName, `#ListItem#onClick(): NavPathStack.pushDestinationByName(${item?.navPathStackName}, null})`)

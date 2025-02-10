@@ -6,12 +6,13 @@ import { Profile, ProxyGroup,ProxyType } from 'proxy_core'
 import { ProxyItem } from '../../common/ProxyData'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { AppConfig, UIConfig } from '../../entryability/AppState'
+import { customAnimationUtil } from '../../utils/Animation'
 
 
 @Entry
 @Component
 struct ProxyArrangement {
-  @State isContentShow: boolean = true;
+  @State isContentShow: boolean |undefined = false;
   @State selectItem: number = 0;
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone')
@@ -56,6 +57,8 @@ struct ProxyArrangement {
       ClashViewModel.changeProxy(this.currentProfile, g, item.name)
     }
   }
+
+  //分组标签
   @Builder
   itemHead(text: string,icon:Resource) {
       Row() {
@@ -76,17 +79,18 @@ struct ProxyArrangement {
       .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8 } : null)
   }
 
+  proxyScroller: ListScroller = new ListScroller()
 
   build() {
     Column() {
-      List({ space: 10, initialIndex: 0 }) {
+      List({ space: 10, initialIndex: 0,scroller:this.proxyScroller}) {
         ForEach(this.proxyGroups, (g:ProxyGroup, i: number) => {
           ListItemGroup({ header: this.itemHead(g.name,
-            this.isContentShow && this.selectItem === i ? $r('sys.symbol.chevron_down')
+            !this.isContentShow && this.selectItem === i ? $r('sys.symbol.chevron_down')
               : $r('sys.symbol.chevron_right'))} ){
 
               //展开后内容显示区域
-              if (this.isContentShow && this.selectItem === i) {
+              if (!this.isContentShow && this.selectItem === i) {
                 ProxyGroupItem({
                   items: g.proxies as ProxyItem[],
                   ProxyGroupItemSelected: this.appConfig.proxyCardSize,
@@ -102,11 +106,18 @@ struct ProxyArrangement {
                   .padding({ top:10, bottom: 10 })
               }
           }
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+          .transition(customAnimationUtil.isScaleTran(i,this.uiConfig))
           .onClick(() => {
             animateTo({
               duration: this.uiConfig.animationSpeed,
+              onFinish: () => {
+              }
             }, () => {
-              this.isContentShow = !this.isContentShow;
+              if (!this.isContentShow) {
+                this.proxyScroller.scrollToItemInGroup(i,0,true,ScrollAlign.START)
+              }
+              this.isContentShow=!this.isContentShow
               this.selectItem = i;
             })
           })
@@ -119,8 +130,8 @@ struct ProxyArrangement {
       .scrollBar(BarState.Off)
       .edgeEffect(EdgeEffect.Spring)
       .contentEndOffset(CONTENT_END_OFFSET_110)
-      .height('100%')
-      .width('100%')
+      //.height('100%')
+    //  .width('100%')
       .sticky(StickyStyle.Header)
     }
     .height('100%')
