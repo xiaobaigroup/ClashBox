@@ -8,6 +8,7 @@ import { getResourceString } from '../../../utils/ResourceStringUtil'
 import { menuRowList, skipRowList, theCustomDialog, toggleRowList } from '../../Common'
 import { ArrayConfigParam } from './EditArrayConfig'
 import { SymbolGlyphModifier } from '@kit.ArkUI'
+import { JSON } from '@kit.ArkTS'
 
 
 @Component
@@ -75,9 +76,10 @@ export struct ConfigList {
     this.currentItemIndex = index
     let itemData = this.configList[index]
     if(itemData.isEditType()){
+      console.debug("debug itemData", JSON.stringify(itemData))
       this.theUnit = itemData.name === 'keep-alive-interval' ? getResourceString($r('app.string.s'), this) : ''
       this.theplaceholder = `${getResourceString($r('app.string.example'), this)}: ${getResourceString(itemData.tips(), this)}`
-      this.currentInputValue = itemData.value as string
+      this.currentInputValue = (itemData.value + "") as string
       this.theDialogTitle =  getResourceString($r('app.string.Edit'), this) +  getResourceString(itemData.title, this)
       this.isEnableIndexForegroundBlur = true
       this.dialogController.open()

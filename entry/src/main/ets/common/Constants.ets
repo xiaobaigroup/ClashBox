@@ -144,7 +144,7 @@ export class ConfigItemData{
         return this.options.find((d)=>d.value == this.value)?.title ?? (this.value as string) ?? this.theTips
     }
     if(this.isEditType()){
-      return this.value as string
+      return (this.value  + "") as string
     } else {
       return this.theTips
     }
@@ -296,7 +296,7 @@ export  const ListOverwriteBasicData = (clashConfig: ClashConfig, appConfig: App
     new ConfigItemData($r('sys.symbol.person_shield_fill'), 'global-ua', $r('app.string.UA'), '', $r('app.string.Default_UA'), 0).bindClashConfig(clashConfig).bindOption(UAMenu),
     new ConfigItemData($r('sys.symbol.stopwatch_2'), 'keep-alive-interval', $r('app.string.TCP_Active'), '', $r('app.string.TCP_interval'), 1).bindClashConfig(clashConfig).bindType(ValueType.Number),
     new ConfigItemData($r('sys.symbol.bolt_filled_on_circle'), "testUrl", $r('app.string.Test_Latency_Link'), 'https://www.gstatic.com/generate204', '', 1).bind<string>(appConfig.testUrl,(v)=>{ appConfig.testUrl = v}).bindType(ValueType.String),
-    new ConfigItemData($r('sys.symbol.bolt_filled_on_circle'),"allow-lan", "局域网", '', '允许局域网', 2).bindClashConfig(clashConfig),
+    new ConfigItemData($r('sys.symbol.bolt_filled_on_circle'),"allow-lan", "局域网", '允许局域网', '', 2).bindClashConfig(clashConfig),
     new ConfigItemData($r('sys.symbol.record_circle'), 'mixed-port', $r('app.string.Proxy_Port'), '', '7890', 1).bindClashConfig(clashConfig).bindType(ValueType.Number),
     new ConfigItemData($r('sys.symbol.list_bullet_square_fill'), 'hosts', $r('app.string.Hosts'), '', '', 1).bindClashConfig(clashConfig).bindType(ValueType.Record),
     new ConfigItemData($r('sys.symbol.mobiledata'), 'ipv6', $r('app.string.IPv6'), '', '', 2).bindClashConfig(clashConfig),

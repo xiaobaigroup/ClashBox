@@ -23,16 +23,17 @@ export class BackgroundDownService{
     clearInterval(this.ping)
     clearInterval(this.notice)
     this.ping = setInterval(async ()=>{
-      this.client.request("http://localhost")
-    },30000)
+      this.client.request("http://localhost:9090")
+    },20000)
     this.updateTraffic()
     this.notice = setInterval(async ()=> {
       this.updateTraffic()
-    }, 5000)
+    }, 2000)
   }
 
   async updateTraffic(): Promise<void>{
-    let appFlowingState: AppFlowingState = new AppFlowingState()
+
+    let appFlowingState: AppFlowingState = AppStorage.get<AppFlowingState>("appFlowingState") ?? new AppFlowingState()
     let now = appFlowingState.traffics.getLast()?.down?.toString()
     let result = appFlowingState.traffics.getLast()?.up?.toString()
     let message = `${result} ↑\t${now} ↓`
