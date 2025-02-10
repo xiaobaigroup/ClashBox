@@ -2,7 +2,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit'
 import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem'
 import {
   BIND_SHEET_CONTAINER_HEIGHT,
-  CONTENT_END_OFFSET,
+  CONTENT_END_OFFSET_110,
   LIST_ITEM_HEIGHT,
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE } from '../../common/Constants'
 import { LengthMetrics, SymbolGlyphModifier,PromptAction, curves } from '@kit.ArkUI';
@@ -399,7 +399,7 @@ function ListStyle() {
   // transition保证组件离场不被立即析构，可设置其他转场效果
   .scrollBar(BarState.Off)
   .edgeEffect(EdgeEffect.Spring)
-  .contentEndOffset(CONTENT_END_OFFSET)
+  .contentEndOffset(CONTENT_END_OFFSET_110)
 }
 
 //ListItem公用样式

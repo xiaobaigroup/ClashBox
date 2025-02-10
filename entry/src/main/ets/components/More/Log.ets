@@ -6,7 +6,7 @@ import { timestampToDateTime } from "../../utils/TimeConvertUtil"
 import { ClashConfig, LogLevel } from "proxy_core"
 import { AppConfig, UIConfig } from "../../entryability/AppState"
 import { EventHub, EventKey } from "../../common/EventHub"
-import { CONTENT_END_OFFSET } from "../../common/Constants"
+import { CONTENT_END_OFFSET_110 } from "../../common/Constants"
 
 // 日志数据（假设）
 interface LogData {
@@ -253,7 +253,7 @@ struct Log {
 
             }.width('100%')
             .height('100%')
-            .contentEndOffset(CONTENT_END_OFFSET)
+            .contentEndOffset(CONTENT_END_OFFSET_110)
             .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
           }
         }

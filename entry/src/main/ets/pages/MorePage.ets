@@ -6,7 +6,7 @@
 import { BreakpointState } from '../common/breakpointsystem'
 import { BIND_SHEET_CONTAINER_HEIGHT,
   ConfigItemData,
-  CONTENT_END_OFFSET, ListMoreData, moreData,
+  CONTENT_END_OFFSET_110, ListMoreData, moreData,
   TAB_CONTENT_TITLE_FONT_SIZE,
   TAB_CONTENT_TITLE_HEIGHT } from '../common/Constants';
 import { hilog } from '@kit.PerformanceAnalysisKit';
@@ -249,7 +249,7 @@ struct MorePage {
         .edgeEffect(EdgeEffect.Spring)
         .borderRadius(18)
         .alignListItem(ListItemAlign.Center)
-        .contentEndOffset(CONTENT_END_OFFSET)
+        .contentEndOffset(CONTENT_END_OFFSET_110)
       }
       .hideToolBar(true)
       .mode(this.isLandscapePhone ? NavigationMode.Stack : NavigationMode.Auto)

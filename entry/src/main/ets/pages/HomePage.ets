@@ -16,7 +16,7 @@ import {
   gutterHomeGridcol,
   MarginGenerate,
   showHomeCard,
-  CONTENT_END_OFFSET,
+  CONTENT_END_OFFSET_110,
   TAB_CONTENT_TITLE_FONT_SIZE,
 } from '../common/Constants'
 import Settings from '../components/Settings/Settings'
@@ -733,7 +733,7 @@ struct Home {
         .width('100%')
         .height('100%')
         .scrollBar(BarState.Off)
-        .contentEndOffset(CONTENT_END_OFFSET)
+        .contentEndOffset(CONTENT_END_OFFSET_110)
         .edgeEffect(EdgeEffect.Spring)
         .chainAnimation(true)
       //  .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })

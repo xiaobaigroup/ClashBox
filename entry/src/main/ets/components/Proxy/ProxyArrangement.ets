@@ -1,4 +1,4 @@
-import { CONTENT_END_OFFSET, LIST_ITEM_HEIGHT} from '../../common/Constants'
+import { BORDER_RADIUS_20, CONTENT_END_OFFSET_110, FONT_SIZE_16, LIST_ITEM_HEIGHT} from '../../common/Constants'
 import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem'
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import ProxyGroupItem from './ProxyGroupItem'
@@ -56,43 +56,34 @@ struct ProxyArrangement {
       ClashViewModel.changeProxy(this.currentProfile, g, item.name)
     }
   }
-
+  @Builder
+  itemHead(text: string,icon:Resource) {
+      Row() {
+        Text(text)
+          .fontSize(FONT_SIZE_16)
+          .fontColor($r('sys.color.font_primary'))
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+        SymbolGlyph(icon)
+          .fontSize(25).fontColor([$r('sys.color.icon_primary')])
+      }
+      .width('100%')
+      .justifyContent(FlexAlign.SpaceBetween)
+      .padding({ left: 10, right: 10 })
+      .borderRadius(BORDER_RADIUS_20)
+      .backgroundColor($r('app.color.container_background'))
+      .height(LIST_ITEM_HEIGHT)
+      .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8 } : null)
+  }
 
 
   build() {
     Column() {
       List({ space: 10, initialIndex: 0 }) {
         ForEach(this.proxyGroups, (g:ProxyGroup, i: number) => {
-          ListItem() {
-            Column() {
-              Row() {
-                Text(g.name).fontSize(16).fontColor($r('sys.color.font_primary')).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
-                SymbolGlyph(this.isContentShow && this.selectItem === i ? $r('sys.symbol.chevron_down') :
-                $r('sys.symbol.chevron_right'))
-                  .fontSize(25).fontColor([$r('sys.color.icon_primary')])
-              }
-              .onClick(() => {
-                this.selectItem = i;
-              })
-              .borderRadius(20)
-              .backgroundColor($r('app.color.container_background'))
-              .padding({ left: 10, right: 10 })
-              .onClick(() => {
-                animateTo({
-                  duration: this.uiConfig.animationSpeed,
-                  onFinish: () => {
-                    console.info('animation end');
-                  }
-                }, () => {
-                  this.isContentShow = !this.isContentShow;
-                  this.selectItem = i;
-                })
-              })
-              .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
-              .width('100%')
-              .height(LIST_ITEM_HEIGHT)
-              .justifyContent(FlexAlign.SpaceBetween)
-
+          ListItemGroup({ header: this.itemHead(g.name,
+            this.isContentShow && this.selectItem === i ? $r('sys.symbol.chevron_down')
+              : $r('sys.symbol.chevron_right'))} ){
 
               //展开后内容显示区域
               if (this.isContentShow && this.selectItem === i) {
@@ -105,22 +96,32 @@ struct ProxyArrangement {
                     this.changeProxy(g.name, item)
                   }
                 })
-                  .borderRadius(20)
+                  .borderRadius(BORDER_RADIUS_20)
                   .width('100%')
-                  .height(500) //展开后界面高度
+               //   .height(500) //展开后界面高度
                   .padding({ top:10, bottom: 10 })
               }
-            }
-            .width('100%')
           }
+          .onClick(() => {
+            animateTo({
+              duration: this.uiConfig.animationSpeed,
+            }, () => {
+              this.isContentShow = !this.isContentShow;
+              this.selectItem = i;
+            })
+          })
+          .width('100%')
+          .borderRadius(BORDER_RADIUS_20)
         })
       }
       .chainAnimation(true)
+      .borderRadius(BORDER_RADIUS_20)
       .scrollBar(BarState.Off)
       .edgeEffect(EdgeEffect.Spring)
-      .contentEndOffset(CONTENT_END_OFFSET)
+      .contentEndOffset(CONTENT_END_OFFSET_110)
       .height('100%')
       .width('100%')
+      .sticky(StickyStyle.Header)
     }
     .height('100%')
     .width('100%')

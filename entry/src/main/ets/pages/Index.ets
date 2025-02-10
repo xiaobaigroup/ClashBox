@@ -58,7 +58,7 @@ import { ConfigData, ConfigDataSourceType } from '../common/PageArgumentEntity'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 
-
+export const indexController: TabsController = new TabsController()
 //
 interface marginGenerate {
   top: number,
@@ -108,6 +108,7 @@ struct Index {
   //  @State fontColorValue:ResourceColor = ($r('app.color.tabs_icon_text'));
   //  @State fontColorValue1:ResourceColor = ($r('app.color.tabs_icon_text1'));
   @State currentIndex: number = 0
+  @State selectedIndex: number = 0
   // 设备高度是否 (320vp< height <= 500vp) 媒体查询
   @State isLandscapePhone: boolean = false
   // 平板竖屏判断变量
@@ -172,8 +173,6 @@ struct Index {
     lg: ({ top: 5 } as marginGenerate),
     xl: ({ top: 5 } as marginGenerate)
   });
-
-
   // 主页卡片内边距
   @Provide('breakPointStateHomeCardPadding')
   private breakPointStateHomeCardPadding: BreakpointState<MarginGenerate> = HomeCardPadding_14_15_16_17
@@ -239,7 +238,6 @@ struct Index {
   @Provide('HomeCardIPSmFontSize')
   private HomeCardIPSmFontSize: BreakpointState<number> = HomeCardIPSmFontSize
   @Provide('IPfontSize') IPfontSize: BreakpointState<number> = IPfontSize
-
   //主页卡片内容网络测速字体大小
   @Provide('SpeedfontSize12_14_14_16')
   private SpeedfontSize12_14_14_16: BreakpointState<number> = SpeedfontSize12_14_14_16
@@ -259,28 +257,25 @@ struct Index {
    */
   @Provide('HomeCardCellularDataPadding')
   private HomeCardCellularDataPadding: BreakpointState<number> = HomeCardCellularDataPadding
-
   /**
    * 主页卡片标题按钮间距
    */
   @Provide('HomeCardEditHeight')
   private HomeCardEditHeight: BreakpointState<number> = HomeCardEditHeight
-/*
-代理页Provide相关数据
- */
+  /*
+  代理页Provide相关数据
+   */
   // 当前代理节点单选选择的值
- // @Provide private ProxyRadioCheckedValue: number =-1
+  // @Provide private ProxyRadioCheckedValue: number =-1
   // 当前代理节点长按选择的值
   @Provide private ProxyItemLongPressValue: number = -1
   // 当前代理节点收藏的值
-  @Provide private FavoriteProxy: number =-1
+  @Provide private FavoriteProxy: number = -1
   //节点数据组
   @Provide items: ProxyItem[] = ProxyData.ProxyItems();
   // 日志页临时数据
   @Provide
-  private logListData: Array<LogData> = [
-  ]
-
+  private logListData: Array<LogData> = []
   @Provide configList: Array<ConfigData> = [
     {
       configId: 'a4e2593d-9927-4f57-8868-f316190657a1',
@@ -299,13 +294,12 @@ struct Index {
       sourceType: ConfigDataSourceType.URL,
     },
   ]
-
   private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
   // 所有子组件在容器内的对齐方式
-  @Provide ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment = Alignment.BottomEnd
+  @Provide('stackAlignContentAlignment') stackAlignContentAlignment: Alignment = Alignment.BottomEnd
   @StorageLink('favoriteProfiles') favoriteProfiles: Map<string, string> = new Map<string, string>([])
   @Provide('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
-// 设置页变量
+  // 设置页变量
   // 设置页面栈
   @Provide('NavSettingsPathStack') SettingsPageInfos: NavPathStack = new NavPathStack()
   // 设置 -> 备份与恢复 -> 是否启用云备份配置
@@ -318,10 +312,8 @@ struct Index {
   @Provide isShowExperimentalFunction: boolean = true
   // 设置 -> 外观 -> 按钮位置变量
   @Provide ButtonPositionOffset: number = 0
-
   // 代理启动的计时文本
   @Provide private proxyStartingDuration: string = PROXY_STARTED_DURATION_INIT_VALUE
-
   // 是否进入二级界面(Tab区)
   @Provide @Watch('isSecondaryChange') isSecondary: boolean = false
 
@@ -335,32 +327,32 @@ struct Index {
     }) {
       Column() {
         SymbolGlyph(TabIcon)
-          .fontColor([this.currentIndex === index ? this.icon_emphasize : this.icon_tertiary])
-          .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY) //分层颜色
+          .fontColor([this.selectedIndex === index ? this.icon_emphasize : this.icon_tertiary])
+          .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)//分层颜色
           .fontSize(this.isLandscapePhone ? 24 : this.TabIconfontSize.value)
           .margin({ top: 5 })
           .effectStrategy(this.uiConfig.isAnimation ? SymbolEffectStrategy.SCALE : null)
           .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
             .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
-           .combine(TransitionEffect.translate({y: 50})) : null)
+            .combine(TransitionEffect.translate({ y: 50 })) : null)
 
         Text(title)
-          .fontColor(this.currentIndex === index ? this.icon_emphasize : this.icon_tertiary)
+          .fontColor(this.selectedIndex === index ? this.icon_emphasize : this.icon_tertiary)
           .fontWeight(FontWeight.Medium)
           .margin(this.compMargin.value)
           .fontSize(this.isLandscapePhone ? 12 : this.TabTitlefontSize.value)
           .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY
-           .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
-           .combine(TransitionEffect.translate({y: 50})) : null)
+            .animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
+            .combine(TransitionEffect.translate({ y: 50 })) : null)
       }
-      .padding(this.isLandscapePhone ? { left: 39 } : { bottom:5 })
+      .padding(this.isLandscapePhone ? { left: 39 } : { bottom: 5 })
     }
     .width('100%')
     .height('100%')
-    .animation(this.isSecondary === true ?{
+    .animation(this.isSecondary === true ? {
       duration: this.uiConfig.animationSpeed,
-      tempo:0.3,
-      curve:curves.springMotion(),
+      tempo: 0.3,
+      curve: curves.springMotion(),
       iterations: 1,
       playMode: PlayMode.Normal
     } : null)
@@ -369,21 +361,20 @@ struct Index {
   /* 是否开启 `Index` 页面的前景模糊 */
   @Provide('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean = false
-
   // 当手机横屏时条件成立
   deviceHeightListener: mediaquery.MediaQueryListener =
     this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp) and (640vp< width <= 1000vp)');
   // 平板横屏判断
-  tabletHeightListener:mediaquery.MediaQueryListener =
+  tabletHeightListener: mediaquery.MediaQueryListener =
     this.getUIContext().getMediaQuery().matchMediaSync('(1000vp< width)');
   // 折叠屏展开判断
-  foldPhoneOpenListener:mediaquery.MediaQueryListener =
+  foldPhoneOpenListener: mediaquery.MediaQueryListener =
     this.getUIContext().getMediaQuery().matchMediaSync('(640vp< height <= 1000vp) and (640vp< width <= 1000vp)');
 
   // 获取配置列表
-  async fetchProfiles(){
+  async fetchProfiles() {
     const profiles = await ClashViewModel.getProfiles()
-    this.configList = profiles.map((d)=>{
+    this.configList = profiles.map((d) => {
       return {
         configId: d.id,
         configName: d.name,
@@ -396,7 +387,7 @@ struct Index {
     })
   }
 
-  async aboutToAppear(): Promise<void>{
+  async aboutToAppear(): Promise<void> {
     hilog.info(0x1000, this.componentName, `#aboutToAppear executed`)
 
     this.fetchProfiles()
@@ -414,7 +405,7 @@ struct Index {
     // 初始化实验功能显示状态
     this.isShowExperimentalFunction = this.uiConfig.isShowExperimentalFunction
     // 初始化用户语言
-    if (this.uiConfig.userLanguage){
+    if (this.uiConfig.userLanguage) {
       ChangeLanguage(this.uiConfig.userLanguage)
     }
 
@@ -427,9 +418,9 @@ struct Index {
     });
     this.tabletHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
       this.istabletLandscape = mediaQueryResult.matches
-      AppStorage.setOrCreate<boolean>('istabletLandscape', this.istabletLandscape )
+      AppStorage.setOrCreate<boolean>('istabletLandscape', this.istabletLandscape)
       hilog.info(0xFF00, this.componentName,
-        `#媒体查询#设备高度改变#(1000vp< width)平板横屏结果: ${this.istabletLandscape }`)
+        `#媒体查询#设备高度改变#(1000vp< width)平板横屏结果: ${this.istabletLandscape}`)
     });
     this.foldPhoneOpenListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
       this.isFoldStatus = mediaQueryResult.matches
@@ -482,21 +473,21 @@ struct Index {
     // TODO
 
 
-    EventHub.on(EventKey.FetchProxyGroup, async ()=>{
-      if(this.appConfig.currentProfileId){
+    EventHub.on(EventKey.FetchProxyGroup, async () => {
+      if (this.appConfig.currentProfileId) {
         this.currentProfile = await ClashViewModel.getProfile(this.appConfig.currentProfileId)
         if (this.currentProfile) {
           this.proxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode ?? ProxyMode.Rule)
         }
       }
     })
-    EventHub.on(EventKey.SwitchModeCard, async (mode: ProxyMode)=>{
+    EventHub.on(EventKey.SwitchModeCard, async (mode: ProxyMode) => {
       if (this.currentProfile) {
         this.proxyGroups = await ClashViewModel.getProxyGroups(mode)
       }
     })
-    EventHub.on(EventKey.StartLog, async (enable: boolean)=>{
-      ClashViewModel.startLog(enable, (log)=>{
+    EventHub.on(EventKey.StartLog, async (enable: boolean) => {
+      ClashViewModel.startLog(enable, (log) => {
         this.logListData.push({
           logType: log.logLevel,
           logTime: log.time,
@@ -506,19 +497,19 @@ struct Index {
         })
       })
     })
-    EventHub.on(EventKey.ClearLog, ()=>{
+    EventHub.on(EventKey.ClearLog, () => {
       this.logListData = []
     })
-    EventHub.on(EventKey.ExportLog, ()=>{
+    EventHub.on(EventKey.ExportLog, () => {
       // TODO 导出日志
     })
   }
+
   @Provide proxyGroups: ProxyGroup[] = []
   @Provide("currentProfile") currentProfile: Profile | null = null
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-
 
   aboutToDisappear() {
     hilog.info(0x1000, this.componentName, `#aboutToDisappear executed`)
@@ -555,7 +546,7 @@ struct Index {
   /**
    * 切换按钮位置
    */
-  switchButtonPosition(index:number) {
+  switchButtonPosition(index: number) {
     switch (index) {
       case 0:
         // 右侧
@@ -576,122 +567,149 @@ struct Index {
   }
 
   // tab控制为新控制
-  public indexController: TabsController = new TabsController()
+//public indexController: TabsController = new TabsController()
+
   // tab移动动画
   startAnim() {
-    this.indexController.setTabBarTranslate({y: 0 })
+    indexController.setTabBarTranslate({ y: 0 })
     animateTo({
       duration: this.uiConfig.animationSpeed,
-      curve:curves.springMotion(),
-      iterations:1,
-      playMode:PlayMode.Alternate
+      curve: curves.springMotion(),
+      iterations: 1,
+      playMode: PlayMode.Alternate
     }, () => {
-      this.indexController.setTabBarTranslate(this.isLandscapePhone ? {x:'-100%'} :{y:'100%'})
-      this.indexController.setTabBarOpacity(0)
+      indexController.setTabBarTranslate(this.isLandscapePhone ? { x: '-100%' } : { y: '100%' })
+      indexController.setTabBarOpacity(0)
     })
   }
 
   stopAnim() {
     animateTo({
       duration: this.uiConfig.animationSpeed,
-      curve:curves.springMotion(),
-      iterations:1,
-      playMode:PlayMode.Alternate
+      curve: curves.springMotion(),
+      iterations: 1,
+      playMode: PlayMode.Alternate
     }, () => {
-      this.indexController.setTabBarTranslate(this.isLandscapePhone ? {x:0} :{y: 0 })
-      this.indexController.setTabBarOpacity(1)
+      indexController.setTabBarTranslate(this.isLandscapePhone ? { x: 0 } : { y: 0 })
+      indexController.setTabBarOpacity(1)
     })
   }
 
   isSecondaryChange() {
     // 监听二级页面布尔判定动画是否执行
-    if(this.isSecondary) {
+    if (this.isSecondary) {
       this.stopAnim()
       this.startAnim()
-    }else{
+    } else {
       this.stopAnim()
     }
   }
 
   build() {
     Column() {
-      Tabs({
-        barPosition: this.isLandscapePhone ? BarPosition.Start : this.compBarPose.value,
-        controller: this.indexController
-      }) {
-        TabContent() {
-       //   if (this.currentIndex===0){
-          Home()
-      //    }
-        }
-        .tabBar(this.TabBarBuilder($r('app.string.Home'), 0, $r('sys.symbol.house_fill')))
-        .onWillShow(() => {
-          animateTo({ duration: this.uiConfig.animationSpeed, curve:curves.springMotion(), }, () => {
-            this.currentIndex = 0
+        Tabs({
+          barPosition: this.isLandscapePhone ? BarPosition.Start : this.compBarPose.value,
+          index: this.currentIndex,
+          controller: indexController
+        }) {
+          TabContent() {
+            //   if (this.currentIndex===0){
+            Home()
+            //    }
+          }
+          .tabBar(this.TabBarBuilder($r('app.string.Home'), 0, $r('sys.symbol.house_fill')))
+          .onWillShow(() => {
+            animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion(), }, () => {
+              this.selectedIndex = 0
+            })
           })
-        })
+          .gesture(
+            // 二级Tabs第一个页签向左拖动时，触发手势事件
+            PanGesture({direction:this.isLandscapePhone||this.istabletLandscape?PanDirection.Down:PanDirection.None})
+              .onActionStart((event?: GestureEvent) => {
+                console.info('Pan start')
+              })// 通过父组件的TabsController的实例，改变其index，达到跳转一级Tabs（首页）的效果
+              .onActionEnd(() => {
+                if (this.isLandscapePhone||this.istabletLandscape) {
+                  if (this.selectedIndex === 0) {
+                    indexController.changeIndex(1)
+                    console.info('Pan end')
+                  }
+                }
+              })
+          )
 
-        TabContent() {
-         // if (this.currentIndex===1) {
+          TabContent() {
+            // if (this.currentIndex===1) {
             ProxyPage()
-        //  }
-        }
-        .tabBar(this.TabBarBuilder($r('app.string.Proxy'), 1, $r('sys.symbol.list_bullet_square_fill')))
-        .onWillShow(() => {
-          animateTo({ duration: this.uiConfig.animationSpeed, curve:curves.springMotion(), }, () => {
-            this.currentIndex = 1
+            //  }
+          }
+          .tabBar(this.TabBarBuilder($r('app.string.Proxy'), 1, $r('sys.symbol.list_bullet_square_fill')))
+          .onWillShow(() => {
+            animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion(), }, () => {
+              this.selectedIndex = 1
+            })
           })
-        })
 
-        TabContent() {
-        //  if (this.currentIndex===2) {
+          TabContent() {
+            //  if (this.currentIndex===2) {
             ConfigurationPage()
-        //  }
-        }
-        .tabBar(this.TabBarBuilder($r('app.string.Configuration'), 2, $r('sys.symbol.folder_fill')))
-        .onWillShow(() => {
-          animateTo({ duration: this.uiConfig.animationSpeed, curve:curves.springMotion(), }, () => {
-            this.currentIndex = 2
+            //  }
+          }
+          .tabBar(this.TabBarBuilder($r('app.string.Configuration'), 2, $r('sys.symbol.folder_fill')))
+          .onWillShow(() => {
+            animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion(), }, () => {
+              this.selectedIndex = 2
+            })
           })
-        })
 
-        TabContent() {
-       //   if (this.currentIndex===3) {
+          TabContent() {
+            //   if (this.currentIndex===3) {
             MorePage()
-       //   }
-        }
-        .tabBar(this.TabBarBuilder($r('app.string.More'), 3, $r('sys.symbol.square_fill_grid_2x2')))
-        .onWillShow(() => {
-          animateTo({ duration: this.uiConfig.animationSpeed, curve:curves.springMotion(), }, () => {
-            this.currentIndex = 3
+            //   }
+          }
+          .tabBar(this.TabBarBuilder($r('app.string.More'), 3, $r('sys.symbol.square_fill_grid_2x2')))
+          .onWillShow(() => {
+            animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion(), }, () => {
+              this.selectedIndex = 3
+            })
           })
+        }
+        //.barOverlap(true)
+        /*.backgroundBrightness({
+          rate: 0.5,
+          lightUpDegree: 0.5 })*/
+        .backgroundColor(this.uiConfig.isBlurr ? '#00ffffff' : $r('app.color.background'))
+        .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Thick : null)
+        .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
+        .barOverlap(this.uiConfig.isBlurr ? (this.isLandscapePhone || this.istabletLandscape ? false : true) :
+          false) //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
+        .scrollable(this.isSecondary ? false : true)
+        .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
+        .barWidth(this.isLandscapePhone ? '63vp' : this.compBarWidth.value) /**/
+        .barHeight(this.isLandscapePhone ? '100%' : this.compBarHeight.value) /**/
+        .padding(this.compMargin.value)
+        .onChange((index: number) => {
+          this.currentIndex = index
         })
-      }
-      //.barOverlap(true)
-      /*.backgroundBrightness({
-        rate: 0.5,
-        lightUpDegree: 0.5 })*/
-      .backgroundColor(this.uiConfig.isBlurr ? '#00ffffff' : $r('app.color.background'))
-      .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Thick : null)
-      .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
-      .barOverlap(this.uiConfig.isBlurr ?  (this.isLandscapePhone || this.istabletLandscape ? false : true ) : false)  //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
-      .scrollable(this.isSecondary ? false : true)
-      .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
-      .barWidth(this.isLandscapePhone ? '63vp' : this.compBarWidth.value) /**/
-      .barHeight(this.isLandscapePhone ? '100%' : this.compBarHeight.value) /**/
-      .padding(this.compMargin.value)
-      .onChange((index: number) => {
-        this.currentIndex = index
-      })
+        .onAnimationStart((index: number, targetIndex: number) => {
+          if (index === targetIndex) {
+            return
+          }
+          // selectedIndex控制自定义TabBar内Image和Text颜色切换
+          this.selectedIndex = targetIndex;
+        })
+        .width('100%')
+        .height('100%')
+        .backgroundColor($r('app.color.background'))
+        .foregroundBlurStyle(
+          this.isEnableIndexForegroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
+          { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
+        )
+        .padding({
+          top: px2vp(this.topRectHeight)
+        }) //, bottom: this.isLandscapePhone ? 0 :px2vp(this.bottomRectHeight) -15})
+        //  .animation(this.uiConfig.isAnimation ? { duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
     }
-    .width('100%')
-    .height('100%')
-    .backgroundColor($r('app.color.background'))
-    .foregroundBlurStyle(
-      this.isEnableIndexForegroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
-      { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
-    )
-    .padding({ top:px2vp(this.topRectHeight)}) //, bottom: this.isLandscapePhone ? 0 :px2vp(this.bottomRectHeight) -15})
-  //  .animation(this.uiConfig.isAnimation ? { duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
   }
 }

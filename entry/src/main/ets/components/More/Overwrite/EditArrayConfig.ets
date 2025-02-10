@@ -4,7 +4,7 @@ import { KVCustomDialog, theCustomDialog } from "../../Common"
 import { curves, promptAction } from "@kit.ArkUI"
 import { EventHub, EventKey } from "../../../common/EventHub"
 import { UIConfig } from "../../../entryability/AppState"
-import { ConfigItemData, CONTENT_END_OFFSET, ValueType } from "../../../common/Constants"
+import { ConfigItemData, CONTENT_END_OFFSET_110, ValueType } from "../../../common/Constants"
 import { getResourceString } from "../../../utils/ResourceStringUtil"
 
 export interface ArrayConfigParam{
@@ -297,7 +297,7 @@ export struct ArrayConfigEditor {
 
       }
       .width('100%')
-      .contentEndOffset(CONTENT_END_OFFSET - 40)
+      .contentEndOffset(CONTENT_END_OFFSET_110 - 40)
       .margin({ top: 10 })
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)

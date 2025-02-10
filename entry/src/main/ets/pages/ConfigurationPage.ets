@@ -10,7 +10,7 @@ import {
   BIND_SHEET_CONTAINER_HEIGHT,
   LIST_ITEM_PADDING,
   RouteName,
-  CONTENT_END_OFFSET,
+  CONTENT_END_OFFSET_110,
 } from '../common/Constants'
 import { curves, LengthMetrics, PromptAction, SymbolGlyphModifier } from '@kit.ArkUI'
 import { ConfigAdd } from '../components/Configuration/ConfigAdd'
@@ -420,7 +420,7 @@ struct ConfigurationPage {
             right: this.breakPointStateTabContentTitleMargin.value,
           })
           // 110 = app.integer.vp_proxy_start_button_margin *2 + app.integer.vp_proxy_not_start_button_width
-          .contentEndOffset(CONTENT_END_OFFSET)
+          .contentEndOffset(CONTENT_END_OFFSET_110)
           .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
           .edgeEffect(EdgeEffect.Spring)
           .chainAnimation(true)

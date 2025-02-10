@@ -5,7 +5,7 @@ import {
   ANIMATION_DURATION_500,
   AppearanceList,
   AppearanceListItemProp,
-  CONTENT_END_OFFSET,
+  CONTENT_END_OFFSET_110,
 } from "../../common/Constants"
 import TopBuilder from "./TopBuilder"
 import { SymbolGlyphModifier } from "@kit.ArkUI"
@@ -486,7 +486,7 @@ struct Appearance {
       .width('100%')
       .align(Alignment.Top)
       .edgeEffect(EdgeEffect.Spring)
-      .contentEndOffset(CONTENT_END_OFFSET - 45)
+      .contentEndOffset(CONTENT_END_OFFSET_110 - 45)
       .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value, bottom: this.breakPointStatemorePageMargin.value })
 
     }

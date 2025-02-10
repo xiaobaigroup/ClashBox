@@ -60,7 +60,7 @@ export const ANIMATION_DURATION_500: number = 500
 /**
  * list偏移数值：110
  */
-export const CONTENT_END_OFFSET: number = 110
+export const CONTENT_END_OFFSET_110: number = 110
 
 // enum：routeName
 export enum RouteName {
