@@ -4,7 +4,7 @@ import { UIConfig } from "../../entryability/AppState"
 import { convertTime } from "../../utils/TimeConvertUtil"
 import { Nothing } from "../Common"
 import { MoreTop } from "./MoreTopBuilder"
-import { curves } from "@kit.ArkUI"
+import { curves, LengthMetrics } from "@kit.ArkUI"
 import ClashViewModel from "../../entryability/ClashViewModel"
 import { ConnectionInfo, Metadata } from "proxy_core"
 import { customAnimationUtil } from "../../utils/Animation"
@@ -35,7 +35,7 @@ struct Connect {
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
 
-  // 临时数据
+  // 数据
   @State
   private connectListData: Array<ConnectionInfo> = [
   ]
@@ -106,14 +106,19 @@ struct Connect {
                       .fontWeight(FontWeight.Bold)
                       .margin({ bottom: 2 })
                       .fontSize(17)
-                    Row({ space: 2 }) {
+                    Flex({
+                      alignContent: FlexAlign.Start,
+                      direction: FlexDirection.Row,
+                      wrap: FlexWrap.Wrap,
+                      space: {main: LengthMetrics.vp(2), cross: LengthMetrics.vp(2)}
+                    }) {
                       ForEach(item.chains, (c: string)=>{
                         Text(c)
                         .smallText()
                       })
                       Text(convertTime(this.getSourceText(item)))
                         .smallText()
-                    }.justifyContent(FlexAlign.Start)
+                    }
                   }
                   .alignItems(HorizontalAlign.Start)
                   .layoutWeight(1)

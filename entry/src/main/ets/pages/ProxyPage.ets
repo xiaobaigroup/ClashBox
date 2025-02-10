@@ -321,7 +321,7 @@ struct ProxyPage {
             .fontSize(TAB_CONTENT_TITLE_FONT_SIZE)
             .fontWeight(FontWeight.Bold)
             .textAlign(TextAlign.Center)
-            .transition(customAnimationUtil.isSlide(200,this.uiConfig))
+            .transition(customAnimationUtil.isSlide(200, this.uiConfig))
           Blank()
 
           //提供者按钮
@@ -338,7 +338,7 @@ struct ProxyPage {
             this.isProviderEdit = true
             this.isEnableIndexForegroundBlur = true
           })
-          .transition(customAnimationUtil.isSlide(100,this.uiConfig))
+          .transition(customAnimationUtil.isSlide(100, this.uiConfig))
 
           //编辑图标
           Button({ type: ButtonType.Circle, stateEffect: true }) {
@@ -363,7 +363,7 @@ struct ProxyPage {
           left: this.breakPointStateTabContentTitleMargin.value,
           right: this.breakPointStateTabContentTitleMargin.value,
         })
-        .transition(customAnimationUtil.isSlide(0,this.uiConfig))
+        .transition(customAnimationUtil.isSlide(0, this.uiConfig))
       }
 
       if (this.proxyGroups.length == 0) {
@@ -388,7 +388,7 @@ struct ProxyPage {
         .height('90%')
         .alignItems(HorizontalAlign.Center)
         .justifyContent(FlexAlign.Center)
-        .transition(customAnimationUtil.isScaleTran(0,this.uiConfig))
+        .transition(customAnimationUtil.isScaleTran(0, this.uiConfig))
         //.padding({top:TAB_CONTENT_TITLE_HEIGHT})
         .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
           detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
@@ -427,11 +427,12 @@ struct ProxyPage {
                       .padding({ right: this.breakPointStateTabContentTitleMargin.value, })
                       .width('100%')
                       .height('100%')
+
                   }
                   .tabBar(this.TabBuilder(g.name, i))
                   .gesture(
                     // 二级Tabs第一个页签向左拖动时，触发手势事件
-                    PanGesture({direction:this.currentIndex===0? PanDirection.Right:this.currentIndex === this.proxyGroups.length-1?PanDirection.Left:PanDirection.None})
+                    PanGesture({direction: this.currentIndex === 0 ? PanDirection.Right: this.currentIndex === this.proxyGroups.length - 1 ? PanDirection.Left:PanDirection.None})
                       .onActionStart((event?: GestureEvent) => {
                         console.info('Pan start')
                       })// 通过父组件的TabsController的实例，改变其index，达到跳转一级Tabs（首页）的效果

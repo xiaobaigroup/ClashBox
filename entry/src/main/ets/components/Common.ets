@@ -413,6 +413,11 @@ export struct KVCustomDialog {
   aboutToAppear(): void {
     this.currentKeyInputValue = this.value.key
     this.currentValueInputValue = this.value.value ?? ""
+    this.isEnableIndexForegroundBlur = true
+  }
+  aboutToDisappear(): void {
+    // 关闭背景模糊
+    this.isEnableIndexForegroundBlur = false
   }
 
   build() {
@@ -482,7 +487,16 @@ export struct theCustomDialog {
   controller: CustomDialogController
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-    
+  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+
+  aboutToAppear(): void {
+    // 开启背景模糊
+    this.isEnableIndexForegroundBlur = true
+  }
+  aboutToDisappear(): void {
+    // 关闭背景模糊
+    this.isEnableIndexForegroundBlur = false
+  }
   build() {
     Column() {
       Text(this.theDialogTitle)

@@ -41,6 +41,46 @@ function switchResourceSize(size: number) {
   }
 }
 
+export const theResouresData: Array<ResourcesData> = [
+  {
+    key: "geoip",
+    resourceName: 'GeoIp',
+    fileName: "GeoIP.dat",
+    resourceSize: 6543,
+    updateTime: 1736990475781,
+  },
+  {
+    key: "geosite",
+    resourceName: 'GeoSite',
+    fileName: "GeoSite.dat",
+    resourceSize: 8654,
+    updateTime: 1736990575781,
+  },
+  {
+    key: "mmdb",
+    resourceName: 'MMDB',
+    fileName: "geoip.metadb",
+    resourceSize: 8654,
+    updateTime: 1736990575781,
+  },
+  {
+    key: "asn",
+    resourceName: 'ASN',
+    fileName: "ASN.mmdb",
+    resourceSize: 8654,
+    updateTime: 1736990575781,
+  }
+]
+
+export const resourcesBlankData: Array<ResourcesData> = [
+  {
+    key: "NN",
+    resourceName: '',
+    fileName: "",
+    resourceSize: 0,
+    updateTime: 0,
+  }
+]
 
 
 @Component
@@ -65,45 +105,37 @@ struct Resources {
   // 编辑路由地址弹窗标题
   @State theEditDialogTitle: ResourceStr = $r('app.string.edit_resource')
   @State isLoading: boolean = false
+  @Provide isShowGroupSort: Boolean = false
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
-  // 临时数据
-  @State
-  private resourceListData: Array<ResourcesData> = [
-    {
-      key: "geoip",
-      resourceName: 'GeoIp',
-      fileName: "GeoIP.dat",
-      resourceSize: 6543,
-      updateTime: 1736990475781,
-    },
-    {
-      key: "geosite",
-      resourceName: 'GeoSite',
-      fileName: "GeoSite.dat",
-      resourceSize: 8654,
-      updateTime: 1736990575781,
-    },
-    {
-      key: "mmdb",
-      resourceName: 'MMDB',
-      fileName: "geoip.metadb",
-      resourceSize: 8654,
-      updateTime: 1736990575781,
-    },
-    {
-      key: "asn",
-      resourceName: 'ASN',
-      fileName: "ASN.mmdb",
-      resourceSize: 8654,
-      updateTime: 1736990575781,
-    }
-  ]
+  @Provide resourceListData: Array<ResourcesData> = theResouresData
 
   @Builder
   reaourceSearch() {
   }
   @Builder
   reaourceOther() {
+    // 排序按钮
+    Button({ type: ButtonType.Circle, stateEffect: true }) {
+      SymbolGlyph($r('sys.symbol.sort'))
+        .fontSize(24)
+        .fontColor([this.icon_primary])
+    }
+    .width(40)
+    .height(40)
+    .margin({ left: 10 })
+    .backgroundColor($r('app.color.settings_container_background'))
+    .onClick(() => {
+      this.isEnableIndexForegroundBlur = true
+      this.isShowGroupSort = true
+    })
+  }
+  @Builder
+  SortSheet() {
+    Column() {
+      Sort()
+    }
+    .width('100%')
+    .height('100%')
   }
 
   /**
@@ -128,8 +160,6 @@ struct Resources {
       } else {
         // 完成IP地址查询后主动通过dismiss主动关闭对话框
         dismissDialogAction.dismiss()
-        // 关闭背景模糊
-        this.isEnableIndexForegroundBlur = false
       }
     },
   })
@@ -145,6 +175,7 @@ struct Resources {
     const editItem = this.resourceListData[this.theEditIndex]
     this.updateUrl(editItem.resourceName, this.SaveEditInputValue)
     this.resourceListData.splice(this.theEditIndex, 1, editItem)
+    this.updateTime(this.theEditIndex)
   }
   updateUrl(name: string, url: string){
     let geoMap = this.clashConfig?.['geox-url']
@@ -153,6 +184,11 @@ struct Resources {
       this.clashConfig['geox-url'] = copy(geoMap)
     }
     EventHub.sendEvent(EventKey.LoadClashConfig)
+  }
+  updateTime(index: number) {
+    let ItemData = this.resourceListData[index]
+    ItemData.updateTime = new Date().getTime()
+    this.resourceListData.splice(index, 1, ItemData)
   }
 
   async updateGeoDateItem(item: ResourcesData){
@@ -173,6 +209,13 @@ struct Resources {
       this.isLoading = false
       promptAction.showToast({message: getResourceString($r('app.string.update_failed'), this) + (e.message | e)})
     }
+  }
+
+  aboutToAppear(): void {
+    this.resourceListData = JSON.parse(this.uiConfig.resourcesData)
+  }
+  aboutToDisappear(): void {
+    this.uiConfig.resourcesData = JSON.stringify(this.resourceListData)
   }
 
   build() {
@@ -201,7 +244,7 @@ struct Resources {
             })
           }.width('100%')
           .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
-          .transition(customAnimationUtil.isSlide(200,this.uiConfig))
+          .transition(customAnimationUtil.isSlide(200, this.uiConfig))
           // 页面
           if(this.resourceListData.length === 0) {
             Nothing({ name: $r('app.string.Resources') })
@@ -241,9 +284,6 @@ struct Resources {
                         .fontColor([this.icon_primary])
                     }.ButtonStyle().margin({ right: 12 })
                     .onClick(() => {
-                      hilog.info(0xFF00, "ResourcestestTag", "已点击")
-                      // 启用背景模糊
-                      this.isEnableIndexForegroundBlur = true
                       // 进入列表行数据编辑
                       this.currentEditInputValue = this.clashConfig?.['geox-url']?.[item.key] ?? ""
                       this.theEditIndex = index
@@ -258,6 +298,7 @@ struct Resources {
                         .fontColor([this.icon_primary])
                     }.ButtonStyle()
                     .onClick(() => {
+                      this.updateTime(index)
                       // 资源更新处理
                       this.updateGeoDateItem(item)
                     })
@@ -268,7 +309,7 @@ struct Resources {
                   .backgroundColor($r('app.color.container_background'))
                   .borderRadius(BORDER_RADIUS_20)
                 }.width('100%')
-                .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
+                .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
               })
             }.width('100%')
             .height('100%')
@@ -279,6 +320,20 @@ struct Resources {
         .height('100%')
       }.width('100%')
       .height('100%')
+      .bindSheet($$this.isShowGroupSort, this.SortSheet(),
+        {
+          detents: [684, 300],
+          dragBar: false,
+          backgroundColor: $r('app.color.background'),
+          preferType: SheetType.CENTER,
+          onWillDismiss: () => {
+            this.isShowGroupSort = false
+            this.isEnableIndexForegroundBlur = false
+          },
+          onDisappear: () => {
+          }
+        })
+
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
@@ -291,6 +346,230 @@ struct Resources {
 }
 
 export default Resources
+
+@Component
+struct Sort {
+  @Consume isShowGroupSort: Boolean
+  @Consume resourceListData: Array<ResourcesData>
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @State lastSortList: string = ''
+  @State SortHideList: Array<ResourcesData> = resourcesBlankData
+  @State save_icon: ResourceColor = $r('app.color.container_background')
+  // 拖拽项
+  @State dragItem: ResourcesData | null = null
+  // 被拖拽项的原始索引
+  @State dragItemIndex: number = -1
+  // 1表示GroupSortList，2表示GroupSortHideList
+  @State currentList: number = 0
+  @State isSave: boolean = false
+  /* 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+
+  // 定义一个空白的GroupSortListItemType作为占位符
+  private placeholderItem: ResourcesData = {
+    key: "NN",
+    resourceName: '',
+    fileName: "",
+    resourceSize: 0,
+    updateTime: 0,
+  }
+
+  aboutToAppear(): void {
+    const lastData = JSON.stringify(this.resourceListData)
+    this.lastSortList = lastData
+    hilog.info(0xFF00, "ResourcestestTag", "上一次布局：%{public}s", this.lastSortList)
+    this.SortHideList = JSON.parse(this.uiConfig.resourcesHideData)
+  }
+  aboutToDisappear(): void {
+    if(!this.isSave) {
+      hilog.info(0xFF00, "ResourcestestTag", "布局：%{public}s", this.lastSortList)
+      this.resourceListData = JSON.parse(this.lastSortList)
+      hilog.info(0xFF00, "ResourcestestTag", "布局：%{public}s", JSON.stringify(this.resourceListData))
+    }
+  }
+
+  // 列表项Builder
+  @Builder
+  listItemBuilder(item: ResourcesData) {
+    Row() {
+      Text(item.resourceName)
+        .fontWeight(FontWeight.Medium)
+      Blank()
+      SymbolGlyph(item.key=== 'NN' ? undefined : $r('sys.symbol.sort'))
+        .fontSize(24)
+    }
+    .width('100%')
+    .clickEffect({ level: ClickEffectLevel.MIDDLE })
+    .padding({left: 12, right: 12, top: 16, bottom: 16})
+  }
+
+  // 拖拽预览Builder（与列表项相同）
+  @Builder
+  dragPreviewBuilder(text: string) {
+    Row() {
+      Text(text)
+        .fontWeight(FontWeight.Medium)
+      Blank()
+      SymbolGlyph($r('sys.symbol.sort'))
+        .fontSize(24)
+    }
+    .width('100%')
+    .padding({left: 12, right: 12, top: 16, bottom: 16})
+  }
+
+
+  build() {
+    Column({space: 8}) {
+      // 标题栏
+      Row() {
+        // 保存按钮
+        Button({ type: ButtonType.Circle, stateEffect: true }) {
+          SymbolGlyph($r('sys.symbol.save'))
+            .fontSize(24)
+            .fontColor([this.save_icon])
+        }
+        .width(40)
+        .height(40)
+        .margin({ top: 16 })
+        .clickEffect({ level: ClickEffectLevel.LIGHT })
+        .backgroundColor(Color.Blue)
+        .onClick(() => {
+          this.isSave = true
+          this.uiConfig.resourcesHideData = JSON.stringify(this.SortHideList)
+          this.isShowGroupSort = false
+          this.isEnableIndexForegroundBlur = false
+          promptAction.showToast({message: $r('app.string.saved'), duration: 2000 })
+        })
+        Text(`${getResourceString($r('app.string.Resources'), this)}${getResourceString($r('app.string.sort'), this)}`)
+          .fontSize(20)
+          .fontWeight(FontWeight.Bold)
+          .margin({left: 8, top: 15 })
+      }
+      .alignItems(VerticalAlign.Center)
+      .width('100%')
+      .height(56)
+
+      // 展示中标题
+      Text('展示中')
+        .fontWeight(FontWeight.Normal)
+        .fontSize(15)
+
+      // 展示列表
+      List({ space: 10 }) {
+        if(this.resourceListData.length === 0) {
+          ListItem() {
+            Row().width('100%')
+          }.width('100%').height(56)
+        }
+        ForEach(this.resourceListData, (item: ResourcesData, index) => {
+          ListItem() {
+            this.listItemBuilder(item)
+          }
+        }, (item: ResourcesData) => item.key)
+      }.width('100%')
+      .borderRadius(24)
+      .backgroundColor(Color.White)
+      .onItemDragStart((event: ItemDragInfo, index: number) => {
+        this.dragItem = this.resourceListData[index]
+        this.currentList = 1
+        this.resourceListData.splice(index, 1)
+        return this.dragPreviewBuilder(this.dragItem.resourceName)
+      })
+      .onItemDrop((event: ItemDragInfo, itemIndex: number, insertIndex: number, isSuccess: boolean) => {
+        this.handleDrop(1, insertIndex)
+      })
+      .onItemDragMove((event: ItemDragInfo, itemIndex: number, insertIndex: number) => {
+        animateTo({
+          duration: 300,
+          curve: Curve.EaseInOut
+        }, () => {
+          this.updatePlaceholder(1, insertIndex)
+        })
+      })
+      .onItemDragLeave(() => {
+        this.removePlaceholderItem(1)
+      })
+
+      // 已隐藏标题
+      Text('已隐藏')
+        .fontWeight(FontWeight.Normal)
+        .fontSize(15)
+
+      // 隐藏列表
+      List({ space: 10 }) {
+        if(this.SortHideList.length === 0) {
+          ListItem() {
+            Row().width('100%')
+          }.width('100%').height(56)
+        }
+        ForEach(this.SortHideList, (item: ResourcesData, index) => {
+          ListItem() {
+            this.listItemBuilder(item)
+          }
+        }, (item: ResourcesData) => item.key)
+      }.width('100%')
+      .borderRadius(24)
+      .backgroundColor(Color.White)
+      .onItemDragStart((event: ItemDragInfo, index: number) => {
+        this.dragItem = this.SortHideList[index]
+        this.currentList = 2
+        this.SortHideList.splice(index, 1)
+        return this.dragPreviewBuilder(this.dragItem.resourceName)
+      })
+      .onItemDrop((event: ItemDragInfo, itemIndex: number, insertIndex: number, isSuccess: boolean) => {
+        this.handleDrop(2, insertIndex)
+      })
+      .onItemDragMove((event: ItemDragInfo, itemIndex: number, insertIndex: number) => {
+        animateTo({
+          duration: 300,
+          curve: Curve.Smooth
+        }, () => {
+          this.updatePlaceholder(2, insertIndex)
+        })
+      })
+      .onItemDragLeave(() => {
+        this.removePlaceholderItem(2)
+      })
+
+
+    }
+    .width('100%')
+    .height('100%')
+    .alignItems(HorizontalAlign.Start)
+    .padding({ left: 12, right: 12 })
+
+  }
+
+  // 移除占位符项
+  private removePlaceholderItem(currentList: number) {
+    const targetArray = currentList === 1 ? this.resourceListData : this.SortHideList
+    const placeholderIndex = targetArray.findIndex(item => item.key === 'NN')
+    if (placeholderIndex !== -1) {
+      targetArray.splice(placeholderIndex, 1)
+    }
+  }
+  // 更新占位符位置
+  private updatePlaceholder(currentList: number, insertIndex: number) {
+    // 首先移除旧的占位符
+    this.removePlaceholderItem(currentList)
+    const targetArray = currentList === 1 ? this.resourceListData : this.SortHideList
+    // 插入新的占位符
+    targetArray.splice(insertIndex, 0, this.placeholderItem)
+  }
+  // 处理拖拽释放的事件
+  private handleDrop(currentList: number, insertIndex: number) {
+    if (this.dragItem) {
+      // 移除占位符
+      this.removePlaceholderItem(currentList)
+      const targetArray = currentList === 1 ? this.resourceListData : this.SortHideList
+      // 实际插入拖拽的项
+      targetArray.splice(insertIndex, 0, this.dragItem)
+      // 重置拖拽项
+      this.dragItem = null
+    }
+  }
+
+}
 
 @Extend(Text)
 function smallText() {

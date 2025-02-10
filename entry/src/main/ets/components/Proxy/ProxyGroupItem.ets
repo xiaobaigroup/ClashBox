@@ -309,7 +309,12 @@ struct ProxyGroupItem {
     List({ space: 10, initialIndex: 0 }) {
       ForEach(this.items, (item: ProxyItem, index: number) => {
         ListItem() {
-          ProxyNode({itemSize: this.ProxyGroupItemSelected, item: item, disabled: this.disabled, selected: this.selectedProxy, selectProxy: (p: ProxyItem) => {
+          ProxyNode({
+            itemSize: this.ProxyGroupItemSelected,
+            item: item,
+            disabled: this.disabled,
+            selected: this.selectedProxy,
+            selectProxy: (p: ProxyItem) => {
             this.selectProxy(p)
           }
           })
@@ -329,7 +334,7 @@ struct ProxyGroupItem {
             }),
             previewAnimationOptions: {
               scale: [0.95, 1.0],
-              transition: this.uiConfig.isAnimation ?TransitionEffect.prototype.animation({ tempo: 1.5 }):undefined
+              transition: this.uiConfig.isAnimation ?TransitionEffect.prototype.animation({ tempo: 1.5 }) : undefined
             },
           })
       })
@@ -361,10 +366,10 @@ struct ProxyGroupItem {
       .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.multi_color_11')]),
     content: '取消收藏', callback: ()=>{ this.cancelFavoriteProxy() }
   }
+
   /**
    * 收藏配置
    */
-
   private favoriteProxy(): void {
     //  收藏节点 & 判断是否已经收藏
     this.ProxyPromptAction.showToast({ message: $r('app.string.Collect_Tip') })

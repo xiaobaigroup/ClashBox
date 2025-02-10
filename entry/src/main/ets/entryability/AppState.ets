@@ -2,6 +2,7 @@ import { ClashConfig, Dns, IpInfo, ProxyGroup, ProxyMode, ProxySort, Traffic, } 
 import { CustomThemeName } from "../common/AppTheme";
 import { ANIMATION_DURATION_300,ANIMATION_DURATION_100,ANIMATION_DURATION_500, showHomeCard } from "../common/Constants";
 import { ProxyItem } from "../common/ProxyData";
+import { resourcesBlankData, theResouresData } from "../components/More/Resources";
 
 export enum ProxyGroupType{
   Tabs,
@@ -110,7 +111,8 @@ export class UIConfig{
   proxyEnabled: boolean = false
   // 高级功能启用状态
   enabledADvanced: boolean = false
-
+  resourcesData: string = JSON.stringify(theResouresData)
+  resourcesHideData: string = JSON.stringify(resourcesBlankData)
   constructor() {
   }
 }

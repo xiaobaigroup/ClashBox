@@ -227,11 +227,6 @@ export struct ImportConfigFromURL{
    * TODO 保存配置
    */
   async saveConfig(isNewConfig: boolean){
-    // 5秒后关闭弹窗
-    // setTimeout(() => {
-    //   hilog.info(0xFF00, "ImporttestTag", "5秒后关闭弹窗")
-    //   this.configCustomDownloadingDialogController.close()
-    // }, 5000)
     if (isNewConfig) {
       this.customDownloadingDialogTitle = $r('app.string.downloading_configuration_file')
       this.configCustomDownloadingDialogController.open()

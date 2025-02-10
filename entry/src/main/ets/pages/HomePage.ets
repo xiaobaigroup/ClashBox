@@ -774,7 +774,7 @@ struct Home {
           type: ShadowType.BLUR
         })
         .margin(this.uiConfig.isBlurr ? {bottom:this.isLandscapePhone ? 30 : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')} : $r('app.integer.vp_proxy_start_button_left_right_margin'))
-        .width(this.proxyStartButtonWidth)
+        .width(this.proxyEnabled ? $r('app.integer.vp_proxy_started_button_width') : $r('app.integer.vp_proxy_not_start_button_width'))
         .height(this.proxyStartButtonHeight)
         .clip(true)
         .onClick(async (event: ClickEvent) => {
@@ -805,7 +805,7 @@ struct Home {
               await ClashViewModel.StopVpn()
             }
             customVibrator.vibratorTriggerOfHapticClockTimer()
-            this.proxyStartButtonWidth = this.proxyEnabled ? $r('app.integer.vp_proxy_started_button_width') : $r('app.integer.vp_proxy_not_start_button_width')
+
           }
 
         })
