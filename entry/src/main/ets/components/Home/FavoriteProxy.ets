@@ -5,6 +5,7 @@ import { CardTitle } from './CardTitleBuilder'
 import { ProxyItem } from '../../common/ProxyData'
 import { AppConfig, AppState, isEnd, UIConfig } from '../../entryability/AppState'
 import { ProxyGroup } from 'proxy_core'
+import { customVibrator } from '../../utils/VibratorUtil'
 
 
 @Component
@@ -79,6 +80,7 @@ struct FavoriteProxy {
                   if (this.isShowHomeEdit===false ) {
                     this.appConfig.currentProxyName = p[1]
                     this.appConfig.currentProxyItem = AppState.fetchProxyItem(this.proxyGroups, p[0], p[1])
+                    customVibrator.vibratorTriggerOfHapticClockTimer()
                   }
                 })
             }
@@ -87,6 +89,7 @@ struct FavoriteProxy {
               if (this.isShowHomeEdit===false) {
                 this.appConfig.currentProxyName = p[1]
                 this.appConfig.currentProxyItem = AppState.fetchProxyItem(this.proxyGroups, p[0], p[1])
+                customVibrator.vibratorTriggerOfHapticClockTimer()
               }
             })
             .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})

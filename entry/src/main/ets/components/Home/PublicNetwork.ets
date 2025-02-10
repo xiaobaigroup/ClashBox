@@ -6,6 +6,7 @@ import { AppFlowingState } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { IpInfo } from 'proxy_core'
 import { EventHub, EventKey } from '../../common/EventHub'
+import { customVibrator } from '../../utils/VibratorUtil'
 
 @Component
 struct PublicNetwork {
@@ -70,6 +71,7 @@ struct PublicNetwork {
             if (this.isShowHomeEdit===false) {
                 this.remoteIp = null
                 EventHub.sendEvent(EventKey.checkIpInfo)
+              customVibrator.vibratorTriggerOfHapticClockTimer()
             }
           })
       }.width('100%').justifyContent(FlexAlign.End)

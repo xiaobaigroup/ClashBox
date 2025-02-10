@@ -4,7 +4,7 @@ import { FONT_SIZE_14, FONT_SIZE_16, MarginGenerate } from '../../common/Constan
 import { CardTitle } from './CardTitleBuilder'
 import { AppFlowingState, TrafficUnit, UIConfig } from '../../entryability/AppState'
 import { convertDataNumberT, convertToSwitchNub } from '../../utils/DataUnitConvertUtils'
-
+import { customVibrator } from '../../utils/VibratorUtil'
 
 
 /* 输入总流量自定义弹窗相关 */
@@ -60,6 +60,7 @@ struct totalCustomDialog {
       .backgroundColor(Color.Transparent)
       .onSelect((index: number) => {
         this.index=index
+        customVibrator.vibratorTriggerOfHapticClockTimer()
         console.info('Select:' + index+this.uiConfig.switchUnit);
       })
       .selectedOptionBgColor(this.icon_emphasize)
@@ -67,6 +68,9 @@ struct totalCustomDialog {
       .optionBgColor($r('app.color.container_background'))
       .menuBackgroundColor($r('app.color.container_background'))
       .menuBackgroundBlurStyle(BlurStyle.NONE)
+      .onClick(() => {
+        customVibrator.vibratorTriggerOfHapticClockTimer()
+      })
   }
 
   build() {
@@ -90,6 +94,7 @@ struct totalCustomDialog {
         this.itemEnd()
       }.width('100%').alignItems(VerticalAlign.Center).justifyContent(FlexAlign.Center)
 
+
       Blank(15)
 
       Row({ space: 8 }) {
@@ -103,6 +108,7 @@ struct totalCustomDialog {
               this.controller.close()
               this.isEnableIndexForegroundBlur = false
             }
+            customVibrator.vibratorTriggerOfHapticClockTimer()
           })
 
         Button($r('app.string.Save'))
@@ -114,6 +120,7 @@ struct totalCustomDialog {
            this.uiConfig.inputTotal= this.TotalCellular
             this.uiConfig.cellularDataIndex=this.index
             this.switchUnit(this.uiConfig.cellularDataIndex)
+            customVibrator.vibratorTriggerOfHapticClockTimer()
        //     console.info('inputTotal1', this.uiConfig.inputTotal)
             if (this.controller != undefined) {
               this.controller.close()
@@ -319,6 +326,7 @@ struct CellularDataStat {
             this.dialogController.open()
             this.isEnableIndexForegroundBlur=true
           }
+          customVibrator.vibratorTriggerOfHapticClockTimer()
           console.info('Total',convertToSwitchNub(this.appFlowingState.totalTraffic.upRaw+this.appFlowingState.totalTraffic.downRaw,this.uiConfig.switchUnit),this.uiConfig.inputTotal)
         }
       })

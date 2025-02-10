@@ -6,6 +6,7 @@ import { CardTitle } from "./CardTitleBuilder"
 import { PromptAction } from "@kit.ArkUI"
 import ClashViewModel from "../../entryability/ClashViewModel"
 import { JSON } from "@kit.ArkTS"
+import { customVibrator } from "../../utils/VibratorUtil"
 
 @Component
 struct ProxyINFO{
@@ -117,6 +118,7 @@ struct ProxyINFO{
               this.appFlowingState.removeIp = null
               this.appFlowingState.removeIp = await ClashViewModel.checkIpInfo()
               console.log("checkIpInfo", JSON.stringify( this.appFlowingState.removeIp))
+              customVibrator.vibratorTriggerOfHapticClockTimer()
             }
           })
       }

@@ -5,6 +5,7 @@ import { CardTitle } from './CardTitleBuilder';
 import { AppConfig, SwitchModeCard, UIConfig } from '../../entryability/AppState';
 import { EventHub, EventKey } from '../../common/EventHub';
 import { ClashConfig, ProxyMode } from 'proxy_core';
+import { customVibrator } from '../../utils/VibratorUtil';
 
 @Component
 struct SwitchMode {
@@ -87,6 +88,7 @@ struct SwitchMode {
                     this.clashConfig.mode = n["v"]
                     this.switchTranslateY(i)
                     EventHub.sendEvent(EventKey.SwitchModeCard, n["v"])
+                    customVibrator.vibratorTriggerOfHapticClockTimer()
                   })
                 }
               })

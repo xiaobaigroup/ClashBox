@@ -10,6 +10,7 @@ import { CardTitle } from './CardTitleBuilder'
 import { common, Want } from '@kit.AbilityKit'
 import { PromptAction } from '@kit.ArkUI'
 import { AppConfig, isEnd, UIConfig } from '../../entryability/AppState'
+import { customVibrator } from '../../utils/VibratorUtil'
 
 @Component
 struct Shortcuts {
@@ -84,6 +85,7 @@ struct Shortcuts {
                   } else {
                     this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
                   }
+                  customVibrator.vibratorTriggerOfHapticClockTimer()
                 }
               })
               .gesture(
@@ -93,6 +95,7 @@ struct Shortcuts {
                     if (this.isShowHomeEdit === false) {
                       this.isShowShortcutsEdit = true
                       this.isEnableIndexForegroundBlur = true
+                      customVibrator.vibratorTriggerOfHapticClockTimer()
                     }
                   })
               )
