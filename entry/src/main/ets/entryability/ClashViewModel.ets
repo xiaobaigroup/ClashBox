@@ -222,15 +222,18 @@ export class ClashViewModel {
     EventHub.sendEvent(EventKey.FetchProxyGroup, null)
   }
   async ReStartVpn(){
-    await this.loadConfig()
-    let result = await this.socketProxy.startClash()
-    // 核心崩溃 小钥匙一直在，要重启两量变
-    if (!result){
-      result = await this.socketProxy.startClash()
+    if(this.vpnStarted){
+      await this.loadConfig()
+      let result = await this.socketProxy.startClash()
+      // 核心崩溃 小钥匙一直在，要重启两量变
+      if (!result){
+        result = await this.socketProxy.startClash()
+      }
     }
   }
-
+  vpnStarted = false
   async StartVpn(){
+    this.vpnStarted = true
     let result = await this.socketProxy.startClash()
     // 核心崩溃 小钥匙一直在，要重启两量变
     if (!result){
@@ -241,6 +244,7 @@ export class ClashViewModel {
   }
 
   async StopVpn(){
+    this.vpnStarted = false
     this.socketProxy.stopClash()
     EventHub.sendEvent(EventKey.StopedClash)
   }
@@ -254,7 +258,11 @@ export class ClashViewModel {
     let appConfig = AppStorage.get<AppConfig>("appConfig")
     let clashConfig = AppStorage.get<ClashConfig>("clashConfig")
     if (appConfig?.currentProfileId){
-      await this.loadProfileAndConfig(appConfig?.currentProfileId, clashConfig)
+      await this.loadProfileAndConfig(appConfig?.currentProfileId, clashConfig, {
+        "is-patch": false,
+        "is-compatible": true,
+        "override-dns": appConfig.overrideDns
+      } as ConfigExtendedParams)
     }
   }
 
