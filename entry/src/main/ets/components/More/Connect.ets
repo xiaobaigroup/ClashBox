@@ -1,5 +1,5 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { BIND_SHEET_TITLE_CONTAINER_HEIGHT, BORDER_RADIUS_20 } from "../../common/Constants"
+import { BIND_SHEET_TITLE_CONTAINER_HEIGHT, BORDER_RADIUS_20, CONTENT_END_OFFSET_110 } from "../../common/Constants"
 import { UIConfig } from "../../entryability/AppState"
 import { convertTime } from "../../utils/TimeConvertUtil"
 import { Nothing } from "../Common"
@@ -91,6 +91,7 @@ struct Connect {
           })
         }.width('100%')
         .transition(customAnimationUtil.isSlide(200,this.uiConfig))
+        .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
         // 页面
         if(this.connectListData.length === 0) {
           Nothing({ name: $r('app.string.Request') })
@@ -139,12 +140,14 @@ struct Connect {
             })
           }.width('100%')
           .height('100%')
+          .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
+          .contentEndOffset(CONTENT_END_OFFSET_110)
         }
       }
       .width('100%')
       .height('100%')
       .justifyContent(FlexAlign.Start)
-      .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
+
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))

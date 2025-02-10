@@ -1,5 +1,5 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { BORDER_RADIUS_20 } from "../../common/Constants"
+import { BORDER_RADIUS_20, CONTENT_END_OFFSET_110 } from "../../common/Constants"
 import { MoreTop } from "./MoreTopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { convertTime } from "../../utils/TimeConvertUtil"
@@ -71,6 +71,7 @@ struct RequestPage {
           otherButton: (): void => { this.requestOther() }
         })
       }.width('100%')
+      .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
       .transition(customAnimationUtil.isSlide(200,this.uiConfig))
       // 页面
       if(this.requestListData.length === 0) {
@@ -115,13 +116,13 @@ struct RequestPage {
           })
         }.width('100%')
         .height('100%')
-
+        .contentEndOffset(CONTENT_END_OFFSET_110)
+        .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
       }
 
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
-    .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
     .onBackPressed(() => {
       this.pageInfos.clear()
       this.isSecondary = false

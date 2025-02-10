@@ -1566,7 +1566,7 @@
     },
     {
       "name": "start_prompt",
-      "value": "Please import the configuration before attempting to enable the proxy."
+      "value": "Please check configuration and proxy."
     },
     {
       "name": "permission_reason_MICROPHONE",

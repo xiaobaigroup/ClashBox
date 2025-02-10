@@ -33,6 +33,7 @@ import BackgroundDownService from '../utils/BackgroundDownService'
 import { ConfigData } from '../common/PageArgumentEntity'
 import { customVibrator } from '../utils/VibratorUtil'
 import { customAnimationUtil } from '../utils/Animation'
+import { ProxyGroup } from 'proxy_core'
 
 
 @Entry
@@ -58,6 +59,9 @@ struct Home {
   @State greetings: Resource = $r('app.string.GoodMorning')
   @State ContainerHeight: string = ''
   @State TopHeight: string = ''
+  //节点假数据组后期可改可删
+  @Consume
+  proxyGroups: ProxyGroup[]
   /* 主页卡片高度*/
   @Consume('HomeCardEditHeight') private HomeCardEditHeight: BreakpointState<number>
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
@@ -774,10 +778,11 @@ struct Home {
         .height(this.proxyStartButtonHeight)
         .clip(true)
         .onClick(async (event: ClickEvent) => {
-          if(this.configList.length === 0) {
-            // 配置页没有数据
+          if(this.configList.length === 0 ||this.proxyGroups.length === 0) {
+            // 配置页没有数据，或者代理节点未加载
             this.promptAction.showToast({ message: `${getContext().resourceManager.getStringSync($r('app.string.start_prompt'))}` })
-          } else {
+          }
+          else {
             this.proxyEnabled = !this.proxyEnabled
             hilog.info(0xA002, this.componentName, `代理启动按钮状态：${this.proxyEnabled}`)
             // 开始计时器

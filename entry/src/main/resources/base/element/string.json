@@ -1566,7 +1566,7 @@
     },
     {
       "name": "start_prompt",
-      "value": "请导入配置后再尝试启用代理"
+      "value": "请检查是否导入配置，或代理节点是否加载，如已导入配置未加载节点，请去配置页点击该相应配置加载..."
     },
     {
       "name": "permission_reason_MICROPHONE",
