@@ -72,6 +72,7 @@ struct Notice {
   @State
   private gradientHeightOfTextPickerInTheListItem: number = FONT_SIZE_16
   private context = getContext(this) as common.UIAbilityContext
+  private isDeveloping: boolean = true
 
   toDialogController: CustomDialogController = new CustomDialogController({
     builder: theRowCustomDialog({
@@ -305,164 +306,168 @@ struct Notice {
               .fontSize(15)
           }
           // 常驻通知提醒 End
-          // 流量提醒 Start
-          Row() {
-            toggleRowList({
-              title: $r('app.string.cellular_data_reminder'),
-              icons: $r('sys.symbol.mobiledata'),
-              subtitle: $r('app.string.cellular_data_reminder_subtitle')
-            }) {
-              // 使用文本与箭头替换掉默认的开关
-              Text(this.EnableCellularDataReminder ? $r('app.string.enabled') : $r('app.string.not_enabled'))
-                .fontWeight(FontWeight.Normal)
-                .margin({right: 4 })
-                .fontSize(14)
-              SymbolGlyph($r('sys.symbol.chevron_right'))
-                .fontSize(28)
-                .fontColor([this.icon_primary])
-                .margin({right: 12})
-            }
-          }
-          .RowStyle()
-          .onClick( ()=> {
-            // 点击跳转至流量提醒设置
-            this.SettingsPageInfos.pushPathByName('CellularDataReminder', false)
-          })
-          // 流量提醒 End
-          // 时间提醒与时间设置Column Start
-          Column() {
-            // 时间提醒行 Start
-            Row() {
-              toggleRowList({
-                title: $r('app.string.time_reminder'),
-                icons: $r('sys.symbol.clock'),
-                subtitle: $r('app.string.time_reminder_subtitle')
-              }) {
-                // 时间提醒开关
-                Toggle({ type: ToggleType.Switch, isOn: $$this.EnabledTimenotice })
-                  .selectedColor(this.icon_emphasize)
-                  .margin({right: 12})
-                  .onChange((isOn: boolean) => {
-                    // 逻辑处理 TODO 【用户首选项】保存时间提醒开关的启用状态 Ya@2024-12-26
-                    // 展开提醒时间设置行 显式动画
-                    this.getUIContext()?.animateTo({
-                      duration: this.uiConfig.animationSpeed,
-                      curve: Curve.Ease
-                    }, () => {
-                      this.EnabledTimenotice = isOn
-                    })
-                  })
-              }
-            }
-            .RowStyle()
-            // 时间提醒行 End
-            // 提醒时间设置行 Start
-            if (this.EnabledTimenotice) {
-              // 分割线
-              Row().height(0.5).backgroundColor('#0D000000').width('93%')
-              // 提醒时间设置行
-              Row() {
-                SymbolGlyph($r('sys.symbol.stopwatch_2'))
-                  .fontSize(24)
-                  .margin({left: 12})
-                  .fontColor([this.icon_emphasize])
-                Text($r('app.string.reminder_time'))
-                  .fontWeight(FontWeight.Medium)
-                  .margin({ left: 12 })
-                  .fontSize(16)
-                Blank()
-                TextInput({placeholder: $r('app.string.text_input_placeholder'), text: $$this.currentNumber})
-                  .TextInputStyle()
-                  .caretColor(this.icon_emphasize)
-                  .borderColor({bottom: this.icon_emphasize})
-                  .onSubmit( (enterKey: EnterKeyType, event: SubmitEvent) => {
-                    if (this.uiConfig.isVibrate) {
-                      customVibrator.vibratorTriggerOfHapticClockTimer()
-                    }
-                  })
-                TextPicker({range: this.TimeUnitFruits, selected: $$this.TimeUnitSelect})
-                  .canLoop(false)
-                  .width(60)
-                  .height(this.heightOfTextPickerInTheListItem)
-                  .defaultPickerItemHeight(this.itemHeightOfTextPickerInTheListItem)
-                  .gradientHeight(this.gradientHeightOfTextPickerInTheListItem)
-                  .selectedTextStyle({
-                    color: this.icon_emphasize,
-                    font: {
-                      size: this.fontSizeOfTextPickerInTheListItem,
-                      weight: this.fontWeightOfTextPickerInTheListItem
-                    }
-                  })
-                  .divider(this.dividerOfTextPickerInTheListItem)
-                    // 手指触摸动态改变`TextPicker`和所在`Row`的样式
-                  .onTouch((event: TouchEvent) => {
-                    let ctx = this.getUIContext()
-                    if (event.type === TouchType.Down) {
-                      ctx.animateTo({
-                        duration: this.uiConfig.animationSpeed,
-                        curve: Curve.Ease
-                      }, () => {
-                        this.heightOfTextPickerInTheListItem = 100
-                        this.fontSizeOfTextPickerInTheListItem = FONT_SIZE_16 * 1.5
-                        this.fontWeightOfTextPickerInTheListItem = FontWeight.Bold
-                        this.dividerOfTextPickerInTheListItem = {
-                          strokeWidth: 1,
-                          startMargin: 5,
-                          endMargin: 5,
-                          color: this.icon_emphasize
-                        }
-                        this.itemHeightOfTextPickerInTheListItem = FONT_SIZE_16 * 2
-                        this.gradientHeightOfTextPickerInTheListItem = FONT_SIZE_16 * 2
-                      })
-                    } else if (event.type === TouchType.Up){
-                      ctx.animateTo({
-                        duration: this.uiConfig.animationSpeed,
-                        curve: Curve.Ease
-                      }, () => {
-                        this.heightOfTextPickerInTheListItem = LIST_ITEM_HEIGHT
-                        this.fontSizeOfTextPickerInTheListItem = FONT_SIZE_16
-                        this.fontWeightOfTextPickerInTheListItem = FontWeight.Medium
-                        this.dividerOfTextPickerInTheListItem = null
-                        this.itemHeightOfTextPickerInTheListItem = FONT_SIZE_16 * 1.5
-                        this.gradientHeightOfTextPickerInTheListItem = FONT_SIZE_16
-                      })
-                    }
-                  })
-                  .onChange((value: string | string[], index: number | number[]) => {
-                    // 震动和声音反馈
-                    if (this.uiConfig.isVibrate) {
-                      customVibrator.vibratorTriggerOfHapticClockTimer()
-                    }
-                    if(this.uiConfig.isSound) {
-                      customSound.playAudioForSoundPool()
-                    }
-                    hilog.info(0xFF00, "NoticetestTag", "选择的时间单位为: %{public}s", JSON.stringify(value))
-                    hilog.info(0xFF00, "NoticetestTag", "选择的时间单位index: %{public}s", JSON.stringify(index))
-                    hilog.info(0xFF00, "NoticetestTag", "当前输入为: %{public}s", this.currentNumber)
-                    // TODO 待实现时间提醒功能，this.currentNumber为输入框输入数字，index为单位选择器对应角标，具体对应单位参照this.TimeUnitFruits
 
-                  })
-              }
-              .width('100%')
-              .height(this.heightOfTextPickerInTheListItem)
-              .borderRadius(BORDER_RADIUS_20)
-                .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
-              .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
-            }
-            // 提醒时间设置行 End
-          }
-          .ColumnStyle()
-          .onClick( ()=> {
-            if (!this.EnabledTimenotice) {
-              // 展开提醒时间设置行 显式动画
-              this.getUIContext()?.animateTo({
-                duration: this.uiConfig.animationSpeed
-              }, () => {
-                this.EnabledTimenotice = !this.EnabledTimenotice
-              })
-            }
-          })
-          // 时间提醒与时间设置Column End
+         if(!this.isDeveloping) {
+           // 流量提醒 Start
+           Row() {
+             toggleRowList({
+               title: $r('app.string.cellular_data_reminder'),
+               icons: $r('sys.symbol.mobiledata'),
+               subtitle: $r('app.string.cellular_data_reminder_subtitle')
+             }) {
+               // 使用文本与箭头替换掉默认的开关
+               Text(this.EnableCellularDataReminder ? $r('app.string.enabled') : $r('app.string.not_enabled'))
+                 .fontWeight(FontWeight.Normal)
+                 .margin({right: 4 })
+                 .fontSize(14)
+               SymbolGlyph($r('sys.symbol.chevron_right'))
+                 .fontSize(28)
+                 .fontColor([this.icon_primary])
+                 .margin({right: 12})
+             }
+           }
+           .RowStyle()
+           .onClick( ()=> {
+             // 点击跳转至流量提醒设置
+             this.SettingsPageInfos.pushPathByName('CellularDataReminder', false)
+           })
+           // 流量提醒 End
+           // 时间提醒与时间设置Column Start
+           Column() {
+             // 时间提醒行 Start
+             Row() {
+               toggleRowList({
+                 title: $r('app.string.time_reminder'),
+                 icons: $r('sys.symbol.clock'),
+                 subtitle: $r('app.string.time_reminder_subtitle')
+               }) {
+                 // 时间提醒开关
+                 Toggle({ type: ToggleType.Switch, isOn: $$this.EnabledTimenotice })
+                   .selectedColor(this.icon_emphasize)
+                   .margin({right: 12})
+                   .onChange((isOn: boolean) => {
+                     // 逻辑处理 TODO 【用户首选项】保存时间提醒开关的启用状态 Ya@2024-12-26
+                     // 展开提醒时间设置行 显式动画
+                     this.getUIContext()?.animateTo({
+                       duration: this.uiConfig.animationSpeed,
+                       curve: Curve.Ease
+                     }, () => {
+                       this.EnabledTimenotice = isOn
+                     })
+                   })
+               }
+             }
+             .RowStyle()
+             // 时间提醒行 End
+             // 提醒时间设置行 Start
+             if (this.EnabledTimenotice) {
+               // 分割线
+               Row().height(0.5).backgroundColor('#0D000000').width('93%')
+               // 提醒时间设置行
+               Row() {
+                 SymbolGlyph($r('sys.symbol.stopwatch_2'))
+                   .fontSize(24)
+                   .margin({left: 12})
+                   .fontColor([this.icon_emphasize])
+                 Text($r('app.string.reminder_time'))
+                   .fontWeight(FontWeight.Medium)
+                   .margin({ left: 12 })
+                   .fontSize(16)
+                 Blank()
+                 TextInput({placeholder: $r('app.string.text_input_placeholder'), text: $$this.currentNumber})
+                   .TextInputStyle()
+                   .caretColor(this.icon_emphasize)
+                   .borderColor({bottom: this.icon_emphasize})
+                   .onSubmit( (enterKey: EnterKeyType, event: SubmitEvent) => {
+                     if (this.uiConfig.isVibrate) {
+                       customVibrator.vibratorTriggerOfHapticClockTimer()
+                     }
+                   })
+                 TextPicker({range: this.TimeUnitFruits, selected: $$this.TimeUnitSelect})
+                   .canLoop(false)
+                   .width(60)
+                   .height(this.heightOfTextPickerInTheListItem)
+                   .defaultPickerItemHeight(this.itemHeightOfTextPickerInTheListItem)
+                   .gradientHeight(this.gradientHeightOfTextPickerInTheListItem)
+                   .selectedTextStyle({
+                     color: this.icon_emphasize,
+                     font: {
+                       size: this.fontSizeOfTextPickerInTheListItem,
+                       weight: this.fontWeightOfTextPickerInTheListItem
+                     }
+                   })
+                   .divider(this.dividerOfTextPickerInTheListItem)
+                     // 手指触摸动态改变`TextPicker`和所在`Row`的样式
+                   .onTouch((event: TouchEvent) => {
+                     let ctx = this.getUIContext()
+                     if (event.type === TouchType.Down) {
+                       ctx.animateTo({
+                         duration: this.uiConfig.animationSpeed,
+                         curve: Curve.Ease
+                       }, () => {
+                         this.heightOfTextPickerInTheListItem = 100
+                         this.fontSizeOfTextPickerInTheListItem = FONT_SIZE_16 * 1.5
+                         this.fontWeightOfTextPickerInTheListItem = FontWeight.Bold
+                         this.dividerOfTextPickerInTheListItem = {
+                           strokeWidth: 1,
+                           startMargin: 5,
+                           endMargin: 5,
+                           color: this.icon_emphasize
+                         }
+                         this.itemHeightOfTextPickerInTheListItem = FONT_SIZE_16 * 2
+                         this.gradientHeightOfTextPickerInTheListItem = FONT_SIZE_16 * 2
+                       })
+                     } else if (event.type === TouchType.Up){
+                       ctx.animateTo({
+                         duration: this.uiConfig.animationSpeed,
+                         curve: Curve.Ease
+                       }, () => {
+                         this.heightOfTextPickerInTheListItem = LIST_ITEM_HEIGHT
+                         this.fontSizeOfTextPickerInTheListItem = FONT_SIZE_16
+                         this.fontWeightOfTextPickerInTheListItem = FontWeight.Medium
+                         this.dividerOfTextPickerInTheListItem = null
+                         this.itemHeightOfTextPickerInTheListItem = FONT_SIZE_16 * 1.5
+                         this.gradientHeightOfTextPickerInTheListItem = FONT_SIZE_16
+                       })
+                     }
+                   })
+                   .onChange((value: string | string[], index: number | number[]) => {
+                     // 震动和声音反馈
+                     if (this.uiConfig.isVibrate) {
+                       customVibrator.vibratorTriggerOfHapticClockTimer()
+                     }
+                     if(this.uiConfig.isSound) {
+                       customSound.playAudioForSoundPool()
+                     }
+                     hilog.info(0xFF00, "NoticetestTag", "选择的时间单位为: %{public}s", JSON.stringify(value))
+                     hilog.info(0xFF00, "NoticetestTag", "选择的时间单位index: %{public}s", JSON.stringify(index))
+                     hilog.info(0xFF00, "NoticetestTag", "当前输入为: %{public}s", this.currentNumber)
+                     // TODO 待实现时间提醒功能，this.currentNumber为输入框输入数字，index为单位选择器对应角标，具体对应单位参照this.TimeUnitFruits
+
+                   })
+               }
+               .width('100%')
+               .height(this.heightOfTextPickerInTheListItem)
+               .borderRadius(BORDER_RADIUS_20)
+               .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+               .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
+             }
+             // 提醒时间设置行 End
+           }
+           .ColumnStyle()
+           .onClick( ()=> {
+             if (!this.EnabledTimenotice) {
+               // 展开提醒时间设置行 显式动画
+               this.getUIContext()?.animateTo({
+                 duration: this.uiConfig.animationSpeed
+               }, () => {
+                 this.EnabledTimenotice = !this.EnabledTimenotice
+               })
+             }
+           })
+           // 时间提醒与时间设置Column End
+         }
+
         }
         // 常驻通知&流量提醒&时间提醒 End
       }

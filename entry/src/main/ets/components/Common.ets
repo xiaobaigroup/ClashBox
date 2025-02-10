@@ -271,9 +271,9 @@ export struct CustomConfirmDialog {
 /* 下载中`CustomDialog`小型弹框 START */
 @CustomDialog
 export struct CustomDownloadingDialog {
-
-  controller?: CustomDialogController
-
+  /* 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+  controller: CustomDialogController
   /* 主题色 */
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
@@ -288,6 +288,13 @@ export struct CustomDownloadingDialog {
   // 取消下载按钮 按钮背景颜色
   cancelButtonBackgroundColor?: ResourceColor = $r('sys.color.comp_background_tertiary')
 
+  aboutToAppear(): void {
+    // 模糊背景
+    this.isEnableIndexForegroundBlur = true
+  }
+  aboutToDisappear(): void {
+    this.isEnableIndexForegroundBlur = false
+  }
 
   build() {
     Column() {
@@ -310,21 +317,7 @@ export struct CustomDownloadingDialog {
       .height(72)
       // 加载动画 END
 
-      // 取消下载按钮 START
-      Button(this.cancelText)
-        .width('100%')
-        .height(40)
-        .fontSize(FONT_SIZE_16)
-        .fontColor(this.cancelFontColor)
-        .backgroundColor(this.cancelButtonBackgroundColor)
-        .onClick(() => {
-          if (this.controller != undefined) {
-            this.cancel()
-            this.controller.close()
-          }
-        })
     }
-    // 取消下载按钮 END
     .alignItems(HorizontalAlign.Center)
     .outerLayerContainerCommonStyles()
   }

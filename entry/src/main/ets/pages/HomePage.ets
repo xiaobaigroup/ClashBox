@@ -784,8 +784,7 @@ struct Home {
           offsetY: 4,
           type: ShadowType.BLUR
         })
-        .margin(this.uiConfig.isBlurr?{bottom:this.isLandscapePhone ?30: $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')}:
-          $r('app.integer.vp_proxy_start_button_left_right_margin'))
+        .margin(this.uiConfig.isBlurr ? {bottom:this.isLandscapePhone ? 30 : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')} : $r('app.integer.vp_proxy_start_button_left_right_margin'))
         .width(this.proxyStartButtonWidth)
         .height(this.proxyStartButtonHeight)
         .clip(true)

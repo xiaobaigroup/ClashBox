@@ -1,7 +1,7 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
-import { ExperimentalFunction, theRowCustomDialog, toggleRowList } from "../Common"
+import { theRowCustomDialog, toggleRowList } from "../Common"
 import { UIConfig } from "../../entryability/AppState"
 
 
@@ -168,7 +168,7 @@ struct Backgrounder {
           }
         })
         if(this.isShowExperimentalFunction) {
-          // 模拟播放
+         /* // 模拟播放
           Row() {
             toggleRowList({
               icons: $r('sys.symbol.media_center'),
@@ -214,12 +214,12 @@ struct Backgrounder {
               // 打开模拟录音启用提示弹窗
               this.openDialogController.open()
             }
-          })
+          })*/
           // 提示
-          Text($r('app.string.backgrounder_tips'))
-            .fontWeight(FontWeight.Normal)
-            .fontSize(15)
         }
+        Text($r('app.string.backgrounder_tips'))
+          .fontWeight(FontWeight.Normal)
+          .fontSize(15)
       }
       .width('100%')
       .alignItems(HorizontalAlign.Start)
@@ -244,64 +244,3 @@ struct Backgrounder {
 
 }
 export default Backgrounder
-
-/**
- * 开关列表行通用组件
- */
-@Component
-struct RowList {
-  //一级图标色，黑色
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
-  @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  @State icons: Resource = $r('sys.symbol.arrow_down_circle')
-  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  @State title: ResourceStr = ''
-  @State subtitle: ResourceStr = ''
-  @State subtitle2: ResourceStr = ''
-  @BuilderParam switchToggle: () => void = this.defaultBuilder
-  // 默认开关
-  @Builder
-  defaultBuilder() {
-    Toggle({ type: ToggleType.Switch, isOn: false })
-      .selectedColor(this.icon_emphasize)
-      .margin({right: 12})
-  }
-
-  build() {
-    Row() {
-      SymbolGlyph(this.icons)
-        .fontSize(24)
-        .margin({left: 12})
-        .fontColor([this.icon_emphasize])
-      Column() {
-        Row() {
-          Text(this.title)
-            .fontWeight(FontWeight.Medium)
-            .fontSize(16)
-          // 实验功能提示框
-          if(this.subtitle2) {
-            ExperimentalFunction()
-          }
-
-        }
-        Text(this.subtitle)
-          .fontWeight(FontWeight.Normal)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .maxLines(1)
-          .margin({top: 2})
-          .fontSize(14)
-          .width('65%')
-      }
-      .alignItems(HorizontalAlign.Start)
-      .margin({ left: 12 })
-      Blank()
-      this.switchToggle()
-    }
-    .width('100%')
-    .height(53)
-    .borderRadius(20)
-    .margin({bottom: 10})
-    .backgroundColor($r('app.color.container_background'))
-      .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
-  }
-}

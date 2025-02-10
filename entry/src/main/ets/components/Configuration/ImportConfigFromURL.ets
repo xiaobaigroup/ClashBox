@@ -135,24 +135,16 @@ export struct ImportConfigFromURL{
   @State
   private customDownloadingDialogTitle: ResourceStr = $r('app.string.downloading_configuration_file')
   // 配置下载弹框 Controller定义
-  private configCustomDownloadingDialogController: CustomDialogController | null= new CustomDialogController({
+  configCustomDownloadingDialogController: CustomDialogController = new CustomDialogController({
     builder: CustomDownloadingDialog({
       title: this.customDownloadingDialogTitle,
       cancelText: $r('app.string.cancel_download'),
-      cancel: () => {
-        // TODO 取消下载文件 若已下载部分将此删除
-        // ...
-        this.promptAction.showToast({ message: `${getResourceString($r('app.string.configuration_download_canceled'), this)}😵` })
-      },
+      cancel: () => {},
     }),
-    autoCancel: false,
     alignment: DialogAlignment.Center,
     width: 328,
     backgroundColor: $r('app.color.list_item_background_color'),
-    onWillDismiss: () => {}
   })
-
-
 
 
   build() {
@@ -227,7 +219,6 @@ export struct ImportConfigFromURL{
     hilog.info(0xCA10, this.componentName, `#aboutToDisappear executed`)
     // 自定义弹框 清空
     this.configCustomConfirmDialogController = null
-    this.configCustomDownloadingDialogController = null
     this.isEnableConfigPageBindSheetForegroundBlur = false
     hilog.info(0xCA10, this.componentName, `#aboutToDisappear#置空[配置页\`bindSheet\`内提示是否保存配置信息的自定义弹框]`)
   }
@@ -236,27 +227,32 @@ export struct ImportConfigFromURL{
    * TODO 保存配置
    */
   async saveConfig(isNewConfig: boolean){
+    // 5秒后关闭弹窗
+    // setTimeout(() => {
+    //   hilog.info(0xFF00, "ImporttestTag", "5秒后关闭弹窗")
+    //   this.configCustomDownloadingDialogController.close()
+    // }, 5000)
     if (isNewConfig) {
       this.customDownloadingDialogTitle = $r('app.string.downloading_configuration_file')
-      this.configCustomDownloadingDialogController?.open()
+      this.configCustomDownloadingDialogController.open()
       try {
         await ClashViewModel.addOrUpdateProfileByUrl(this.configData, null)
-        this.configCustomDownloadingDialogController?.close()
+        this.configCustomDownloadingDialogController.close()
       } catch (e) {
         console.error("ClashNext", e.message, e.stack);
-        this.configCustomDownloadingDialogController?.close()
+        this.configCustomDownloadingDialogController.close()
         this.promptAction.showToast({message: getResourceString($r('app.string.download_failed'), this) + e.message || e})
       }
 
     } else {
       this.customDownloadingDialogTitle = $r('app.string.updating_configuration_file')
-      this.configCustomDownloadingDialogController?.open()
+      this.configCustomDownloadingDialogController.open()
       try {
         await ClashViewModel.addOrUpdateProfileByUrl(this.configData, this.configData.configId)
-        this.configCustomDownloadingDialogController?.close()
+        this.configCustomDownloadingDialogController.close()
       } catch (e) {
         console.error("ClashNext", e.message, e.stack);
-        this.configCustomDownloadingDialogController?.close()
+        this.configCustomDownloadingDialogController.close()
         this.promptAction.showToast({message: getResourceString($r('app.string.download_failed'), this) + e.message || e})
       }
 

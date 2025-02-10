@@ -974,7 +974,7 @@
     },
     {
       "name": "backgrounder_tips",
-      "value": "Tips: You can only choose to enable one of the options, which may result in an increase in power consumption; At present, it is known that tablet devices do not support download progress notification bars when using simulated downloads, and their background keep alive function is pending verification. The support for other devices is pending verification."
+      "value": "Tips: Which may result in an increase in power consumption; At present, it is known that tablet devices do not support download progress notification bars when using simulated downloads, and their background keep alive function is pending verification. The support for other devices is pending verification."
     },
     {
       "name": "notice_main_switch",
