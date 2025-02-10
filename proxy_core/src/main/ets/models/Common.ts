@@ -150,7 +150,33 @@ export class TrafficValue{
   }
 
 }
-
+export interface Snapshot{
+  downloadTotal: number
+  uploadTotal: number
+  connections: ConnectionInfo
+  memory: number
+}
+export  interface Metadata{
+  uid: number
+  network: string
+  sourceIP: string
+  sourcePort: string
+  destinationIP: string
+  destinationPort: string
+  host: string
+  process: string
+  remoteDestination: string
+}
+export interface ConnectionInfo{
+  id: string
+  metadata : Metadata
+  upload : number
+  download : number
+  start: number
+  chains: string[]
+  rule : string
+  rulePayload : string
+}
 export class Traffic{
   upRaw: number;
   downRaw: number;

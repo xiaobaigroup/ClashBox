@@ -3,7 +3,6 @@ import { Context, Want } from "@kit.AbilityKit";
 import { SocketProxyService, Profile, ProfileType, UpdateConfigParams, ClashConfig, getHome,
   LogInfo,
   Provider,
-  TunnelState,
   ProxyMode} from "proxy_core";
 import { vpnExtension } from "@kit.NetworkKit";
 import { ConfigData } from "../common/PageArgumentEntity";
@@ -163,6 +162,15 @@ export class ClashViewModel {
     p?.delete()
     await this.profileRepo.delete(id)
     EventHub.sendEvent(EventKey.FetchProfile, null)
+  }
+  async getConnections(){
+     return await this.socketProxy.queryConnections()
+  }
+  async closeConnection(id:string){
+    return await this.socketProxy.closeConnection(id)
+  }
+  async  clearConnections(){
+    return await this.socketProxy.clearConnections()
   }
   async getProxyGroups(model: ProxyMode): Promise<ProxyGroup[]>{
     console.log("FetchProxyGroup", model)

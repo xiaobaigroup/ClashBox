@@ -145,17 +145,11 @@ export class ClashMetaVpnService extends CommonVpnService{
           resolve("暂不支持")
           break;
         }
-        case ClashRpcType.queryOverride:{
-          //resolve(nativeReadOverride(data[0] as number))
-          break;
-        }
-        case ClashRpcType.patchOverride:{
-          //nativeWriteOverride(data[0] as number, data[1] as string)
+        case ClashRpcType.queryConnections:{
           resolve(true)
           break;
         }
-        case ClashRpcType.clearOverride:{
-          //nativeClearOverride(data[0] as number)
+        case ClashRpcType.clearConnections:{
           resolve(true)
           break;
         }

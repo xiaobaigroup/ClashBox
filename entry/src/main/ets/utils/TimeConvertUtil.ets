@@ -1,12 +1,20 @@
 
 
+function toTimestamp(dateString: string): number {
+  const timestampMs = new Date(dateString.split("Z")[0].slice(0, -3) + "Z").getTime();
+
+  // 转换为秒级时间戳（如果需要）
+  const timestampSec = Math.floor(timestampMs / 1000);
+  return timestampMs
+}
+
 /**
  * 时间戳转化计算间隔工具
  * @param timeStamp 传入的时间戳
  */
-export function convertTime(timeStamp: number| string): string {
+export function convertTime(timeStamp: number | string): string {
  if(typeof timeStamp == "string")
-    timeStamp =  new Date(timeStamp).getTime()
+    timeStamp = toTimestamp(timeStamp)
  if(timeStamp <= 0) {
    // 如果时间戳小于等于0
    return `${getContext().resourceManager.getStringSync($r('app.string.now'))}`

@@ -11,13 +11,16 @@ import {
   updateExternalProvider,
   getCountryCode,
   updateGeoData,
-  sideLoadExternalProvider
+  sideLoadExternalProvider,
+  getConnections,
+  closeConnections,
+  closeConnection
 } from 'libflclash.so';
 import { Address, CommonVpnService, isIpv4, isIpv6, VpnConfig } from './CommonVpnService';
 import { JSON, util } from '@kit.ArkTS';
 import { RpcRequest } from './RpcRequest';
 import { ClashRpcType } from './IClashManager';
-import { LogInfo, Provider, ProxyGroup, ProxyMode, ProxyType, Traffic } from '../models/Common';
+import { ConnectionInfo, LogInfo, Provider, ProxyGroup, ProxyMode, ProxyType, Traffic } from '../models/Common';
 import { getHome } from '../appPath';
 import { UpdateConfigParams } from '../models/ClashConfig';
 import { readFile, readFileUri } from '../fileUtils';
@@ -168,7 +171,8 @@ export class FlClashVpnService extends CommonVpnService{
           })
           break;
         }
-        case ClashRpcType.uploadProvider:{
+
+        case ClashRpcType.uploadProvider: {
           let provider = data[0] as string
           let pathUri = data[1] as string
           const temp = this.context.filesDir + "/temp_provider"
@@ -178,16 +182,21 @@ export class FlClashVpnService extends CommonVpnService{
           })
           break;
         }
-        case ClashRpcType.updateProvider:{
-          //nativeWriteOverride(data[0] as number, data[1] as string)
-          resolve(true)
+        case ClashRpcType.queryConnections:{
+          let v = await getConnections()
+          let payload = JSON.parse(v)["connections"] as ConnectionInfo
+          resolve(payload ? JSON.stringify(payload) : "[]")
           break;
         }
-        case ClashRpcType.clearOverride:{
-          //nativeClearOverride(data[0] as number)
-          resolve(true)
+        case ClashRpcType.closeConnection:{
+          resolve(closeConnection(data[0] as string))
           break;
         }
+        case ClashRpcType.clearConnections:{
+          resolve(closeConnections())
+          break;
+        }
+
         case ClashRpcType.updateGeoData:{
           updateGeoData(data[0] as string, data[1] as string).then((v)=>{
             resolve(v)

@@ -5,6 +5,8 @@ import { convertTime } from "../../utils/TimeConvertUtil"
 import { Nothing } from "../Common"
 import { MoreTop } from "./MoreTopBuilder"
 import { curves } from "@kit.ArkUI"
+import ClashViewModel from "../../entryability/ClashViewModel"
+import { ConnectionInfo, Metadata } from "proxy_core"
 
 // 资源数据（假设）
 interface ConnectData {
@@ -34,29 +36,13 @@ struct Connect {
 
   // 临时数据
   @State
-  private connectListData: Array<ConnectData> = [
-    {
-      connectConfigName: '',
-      connectProxyName: '',
-      connectTime: 1736590325781,
-      connectUrl: 'tcp://upadte.huawei.com:443',
-      connectSign: 0
-    },
-    {
-      connectConfigName: '配置1',
-      connectProxyName: '中国香港①',
-      connectTime: 1736996575781,
-      connectUrl: 'tcp://google.com:443',
-      connectSign: 1
-    },
-    {
-      connectConfigName: '配置名',
-      connectProxyName: '代理名',
-      connectTime: 1749990425781,
-      connectUrl: '链接',
-      connectSign: 1
-    },
+  private connectListData: Array<ConnectionInfo> = [
   ]
+  async aboutToAppear(): Promise<void> {
+    let result = await ClashViewModel.getConnections()
+    this.connectListData = result
+    console.log("getConnections", JSON.stringify(result) )
+  }
   @Builder
   connectOther() {
     // 清理按钮
@@ -64,11 +50,34 @@ struct Connect {
       SymbolGlyph($r('sys.symbol.clean_fill'))
         .fontSize(24)
         .fontColor([this.icon_primary])
-    }
+    }.onClick(()=>{
+      this.connectListData = []
+      ClashViewModel.clearConnections()
+    })
     .width(40)
     .height(40)
     .margin({ left: 10 })
     .backgroundColor($r('app.color.settings_container_background'))
+  }
+  async getPackageIcon(connection: ConnectionInfo)  {
+    return connection.metadata.process;
+  }
+  getRequestText(metadata: Metadata ) {
+    let text = `${metadata.network}://`;
+      const ips = [
+        metadata.host,
+        metadata.destinationIP,
+      ].filter((ip: string) => ip && ip !== "");
+      text += ips.join("/");
+      text += `:${metadata.destinationPort}`;
+      return text;
+  }
+  getSourceText( connection: ConnectionInfo) {
+      const  metadata = connection.metadata;
+      if (metadata.process != "") {
+        return connection.start;
+      }
+    return `${metadata.process} · ${connection.start}`;
   }
 
   build() {
@@ -88,27 +97,21 @@ struct Connect {
           Nothing({ name: $r('app.string.Request') })
         } else {
           List({ space: 10 }) {
-            ForEach(this.connectListData, (item: ConnectData, index: number) => {
+            ForEach(this.connectListData, (item: ConnectionInfo, index: number) => {
               ListItem() {
                 Row() {
                   // 文本显示区
                   Column() {
-                    Text(item.connectUrl)
+                    Text(this.getRequestText(item.metadata))
                       .fontWeight(FontWeight.Bold)
                       .margin({ bottom: 2 })
                       .fontSize(17)
                     Row({ space: 2 }) {
-                      Text(item.connectSign === 0 ? $r('app.string.Direct') : item.connectConfigName)
+                      ForEach(item.chains, (c: string)=>{
+                        Text(c)
                         .smallText()
-                      Text('·')
-                        .smallText()
-                      if(item.connectSign === 1) {
-                        Text(item.connectProxyName)
-                          .smallText()
-                        Text('·')
-                          .smallText()
-                      }
-                      Text(convertTime(item.connectTime))
+                      })
+                      Text(convertTime(this.getSourceText(item)))
                         .smallText()
                     }.justifyContent(FlexAlign.Start)
                   }
@@ -122,7 +125,10 @@ struct Connect {
                   }.width(40)
                   .height(40)
                   .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
-                  .backgroundColor($r('app.color.settings_container_background'))
+                  .backgroundColor($r('app.color.settings_container_background')).onClick(()=>{
+                      this.connectListData.splice(index,1)
+                      ClashViewModel.closeConnection(item.id)
+                  })
                 }.width('100%')
                 .padding(12)
                 .justifyContent(FlexAlign.Center)
@@ -135,9 +141,7 @@ struct Connect {
             })
           }.width('100%')
           .height('100%')
-
         }
-
       }
       .width('100%')
       .height('100%')

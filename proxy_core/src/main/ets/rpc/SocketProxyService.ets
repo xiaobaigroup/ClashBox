@@ -3,7 +3,7 @@ import {  RpcResult } from './RpcRequest';
 import { JSON, util } from '@kit.ArkTS';
 import { common } from '@kit.AbilityKit';
 import { ClashRpcType, IClashManager } from './IClashManager';
-import { IpInfo, LogInfo, Provider, ProxyGroup, ProxyMode,
+import { ConnectionInfo, IpInfo, LogInfo, Provider, ProxyGroup, ProxyMode,
   Traffic } from '../models/Common';
 import { promptAction } from '@kit.ArkUI';
 import { UpdateConfigParams } from '../models/ClashConfig';
@@ -39,6 +39,20 @@ export class SocketProxyService implements IClashManager{
       ip: result,
       country: country
     } as IpInfo
+  }
+  async queryConnections(): Promise<ConnectionInfo[]> {
+    let result = await this.sendMessageRequest(ClashRpcType.queryConnections)
+    const json = JSON.parse(result as string) as ConnectionInfo[]
+    return json;
+  }
+  async closeConnection(id: string): Promise<string> {
+    let result = await this.sendMessageRequest(ClashRpcType.closeConnection, [id])
+    return result as string;
+  }
+  async clearConnections(): Promise<ConnectionInfo[]> {
+    let result = await this.sendMessageRequest(ClashRpcType.clearConnections)
+    const json = JSON.parse(result as string) as ConnectionInfo[]
+    return json;
   }
   async queryTrafficNow(): Promise<Traffic> {
     let result = await this.sendMessageRequest(ClashRpcType.queryTrafficNow)
