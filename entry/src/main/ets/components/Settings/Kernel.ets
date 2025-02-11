@@ -51,10 +51,11 @@ struct Kernel {
         hilog.info(0xFF00, "SettingsKerneltestTag", "当前内核：%{public}d", this.appConfig.clashCore)
         break
       case 2:
+        promptAction.showToast({message: $r('app.string.developing'), duration: 2000 })
         // ClashRS
-        this.appConfig.clashCore = ClashCore.ClashRs
-        ClashViewModel.ChangeCore(ClashCore.ClashRs)
-        hilog.info(0xFF00, "SettingsKerneltestTag", "当前内核：%{public}d", this.appConfig.clashCore)
+        // this.appConfig.clashCore = ClashCore.ClashRs
+        // ClashViewModel.ChangeCore(ClashCore.ClashRs)
+        // hilog.info(0xFF00, "SettingsKerneltestTag", "当前内核：%{public}d", this.appConfig.clashCore)
         break
     }
   }
@@ -78,7 +79,7 @@ struct Kernel {
               Image(item.icons)
                 .width(48)
                 .height(48)
-                 .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+                .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
               Column() {
                 Row() {
                   Text(item.title)
@@ -105,12 +106,14 @@ struct Kernel {
                   checkedBackgroundColor: this.icon_emphasize,
                 })
                 .hitTestBehavior(HitTestMode.None)
-            }
+            }.opacity(index !== 2 ? 1 : 0.5)
             .height(53)
             .width('100%')
             .onClick(() => {
               this.handleClick(index)
-              promptAction.showToast({message: $r('app.string.switch_clashcore_tips'), duration: 2000 })
+              if(index !== 2) {
+                promptAction.showToast({message: $r('app.string.switch_clashcore_tips'), duration: 2000 })
+              }
             })
             if ((this.isShowExperimentalFunction && (index === 0 || index === 1) || (index === 0 && this.isShowExperimentalFunction === false) )) {
               // 分割线

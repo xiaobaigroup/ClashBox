@@ -30,8 +30,6 @@ struct About {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
-  // 列表高度
-  @Consume('breakPointStateSettingslistHeight') private SettingslistHeight: BreakpointState<number>
 
   // 隐式 Want 跳转网站
   async implicitStartAbility(url: string) {
@@ -440,6 +438,10 @@ export struct AboutContributors {
         // 小雅
         this.implicitStartAbility('https://github.com/XHXYT')
       break
+      case 6:
+        // FlClash
+        this.implicitStartAbility('https://github.com/chen08209/FlClash')
+        break
     }
   }
 

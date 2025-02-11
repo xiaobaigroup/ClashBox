@@ -1583,6 +1583,10 @@
     {
       "name": "s",
       "value": "秒"
+    },
+    {
+      "name": "flclash_subtitle",
+      "value": "用于借鉴参考的优秀开源项目"
     }
   ]
 }
