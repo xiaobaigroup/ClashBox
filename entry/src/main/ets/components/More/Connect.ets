@@ -1,5 +1,5 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { BIND_SHEET_TITLE_CONTAINER_HEIGHT, BORDER_RADIUS_20, CONTENT_END_OFFSET_110 } from "../../common/Constants"
+import { BIND_SHEET_TITLE_CONTAINER_HEIGHT, BORDER_RADIUS_20, CONTENT_END_OFFSET_150 } from "../../common/Constants"
 import { UIConfig } from "../../entryability/AppState"
 import { convertTime, timestampToDateTime } from "../../utils/TimeConvertUtil"
 import { Nothing } from "../Common"
@@ -157,7 +157,7 @@ struct Connect {
           }.width('100%')
           .height('100%')
           .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
-          .contentEndOffset(CONTENT_END_OFFSET_110)
+          .contentEndOffset(CONTENT_END_OFFSET_150)
         }
       }
       .width('100%')

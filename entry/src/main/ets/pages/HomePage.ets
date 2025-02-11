@@ -16,7 +16,7 @@ import {
   gutterHomeGridcol,
   MarginGenerate,
   showHomeCard,
-  CONTENT_END_OFFSET_110,
+  CONTENT_END_OFFSET_150,
   TAB_CONTENT_TITLE_FONT_SIZE,
 } from '../common/Constants'
 import Settings from '../components/Settings/Settings'
@@ -147,6 +147,8 @@ struct Home {
   @Provide theCurrentHomeCard: boolean[] = showHomeCard
   // 上一次主页布局
   @State theLastHomeCard: boolean[] = showHomeCard
+  //page内顶部标题偏移量
+  @Consume curYOffset: number
 
   aboutToAppear(): void {
     this.greetings = getGreeting()
@@ -287,7 +289,7 @@ struct Home {
   }
 
   build() {
-    Column() {
+    Stack() {
       if (!this.isLandscapePhone) {
         Row({space: this.HomeCardTitleButtonPadding.value}) {
           if (!this.isShowHomeEdit) {
@@ -295,6 +297,7 @@ struct Home {
             Text(this.uiConfig.isGreeting ? this.greetings : 'ClashNext')
               .fontSize((this.uiConfig.userLanguage != 'en-Latn') || !this.uiConfig.isGreeting ? TAB_CONTENT_TITLE_FONT_SIZE : 27)
               .layoutWeight(1)
+              .fontSize(this.curYOffset<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset/100:TAB_CONTENT_TITLE_FONT_SIZE)
               .fontWeight(FontWeight.Bold)
               .fontColor(this.font_primary)
               .transition(customAnimationUtil.isSlide(200,this.uiConfig))
@@ -396,8 +399,10 @@ struct Home {
             })
           }
         }
+        .zIndex(1)
+        .height(this.curYOffset<0?TAB_CONTENT_TITLE_HEIGHT-this.curYOffset:TAB_CONTENT_TITLE_HEIGHT)
+        .position({x:0})
         .width('100%')
-        .height(TAB_CONTENT_TITLE_HEIGHT)
         .geometryTransition("Button")
         .padding({
           left: this.breakPointStateTabContentTitleMargin.value,
@@ -408,367 +413,426 @@ struct Home {
       }
 
       Stack({ alignContent: this.stackAlignContentAlignment }) {
-        // 主页卡片层
-        List() {
-          ListItem() {
-            GridRow({ gutter: this.isLandscapePhone ? { x: 12, y: 15 } : this.gutterHomeGridcol.value }) {
-              //网络速度小卡片
-              if (this.theCurrentHomeCard[0]) {
-                GridCol({
-                  span: { xs: this.isLandscapePhone ? 6 : 12, md: this.isLandscapePhone ? 6 :this.isFoldStatus ? 8 : 12, lg: 6 },
-                  order: 1
-                }) {
-                  Stack({ alignContent: Alignment.TopEnd }) {
-                    Speed()
-                    if (this.isShowDeleteButton) {
-                      DeleteButton1()
-                        .position({ x: '95%', y: -4 })
-                        .onClick(() => {
-                          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
-                            // 将序号0变为false
-                            this.theCurrentHomeCard.splice(0, 1, false)
-                          })
-                          hilog.info(0xFF00, "HometestTag", "网络速率卡片： %{public}s", this.uiConfig.isShowHomeCard[0])
-                        })
+        Column(){
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT)
+          Scroll() {
+            // 主页卡片层
+            List() {
+              ListItem() {
+                GridRow({ gutter: this.isLandscapePhone ? { x: 12, y: 15 } : this.gutterHomeGridcol.value }) {
+                  //网络速度小卡片
+                  if (this.theCurrentHomeCard[0]) {
+                    GridCol({
+                      span: {
+                        xs: this.isLandscapePhone ? 6 : 12,
+                        md: this.isLandscapePhone ? 6 : this.isFoldStatus ? 8 : 12,
+                        lg: 6
+                      },
+                      order: 1
+                    }) {
+                      Stack({ alignContent: Alignment.TopEnd }) {
+                        Speed()
+                        if (this.isShowDeleteButton) {
+                          DeleteButton1()
+                            .position({ x: '95%', y: -4 })
+                            .onClick(() => {
+                              animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+                                // 将序号0变为false
+                                this.theCurrentHomeCard.splice(0, 1, false)
+                              })
+                              hilog.info(0xFF00, "HometestTag", "网络速率卡片： %{public}s",
+                                this.uiConfig.isShowHomeCard[0])
+                            })
+                        }
+                      }
                     }
+                    .aspectRatio(2.07)
+                    .borderRadius(20)
+                    .backgroundColor($r('app.color.container_background'))
+                    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+                    //.transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:0}):null)
+                    .transition(customAnimationUtil.isScaleTran(1, this.uiConfig))
+                    .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
+                    // 消失触发回调
+                    .onDetach(() => {
+                    })
+                    // 显示时触发回调
+                    .onAttach(() => {
+
+                    })
+                    //编辑模式下跳动动画
+                    .rotate({ angle: this.uiConfig.isAnimation ? this.rotateAngle : null })
                   }
-                }
-                .aspectRatio(2.07)
-                .borderRadius(20)
-                .backgroundColor($r('app.color.container_background'))
-                .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                //.transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:0}):null)
-                .transition(customAnimationUtil.isScaleTran(1,this.uiConfig))
-                .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                // 消失触发回调
-                .onDetach(() => {
-                })
-                // 显示时触发回调
-                .onAttach(() => {
 
-                })
-                //编辑模式下跳动动画
-                .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
-              }
-
-              //分流模式小卡片
-              if (this.theCurrentHomeCard[1]) {
-                GridCol({
-                  span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6, lg: 3 },
-                  order: 2
-                }) {
-                  Stack({ alignContent: Alignment.TopEnd }) {
-                    SwitchMode()
-                    if (this.isShowDeleteButton) {
-                      DeleteButton2()
-                        .position({ x: '90%', y: -4 })
-                        .onClick(() => {
-                          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
-                            // 将序号1变为false
-                            this.theCurrentHomeCard.splice(1, 1, false)
-                          })
-                          hilog.info(0xFF00, "HometestTag", "分流模式卡片： %{public}s", this.uiConfig.isShowHomeCard[1])
-                        })
+                  //分流模式小卡片
+                  if (this.theCurrentHomeCard[1]) {
+                    GridCol({
+                      span: {
+                        xs: this.isLandscapePhone ? 3 : 6,
+                        md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
+                        lg: 3
+                      },
+                      order: 2
+                    }) {
+                      Stack({ alignContent: Alignment.TopEnd }) {
+                        SwitchMode()
+                        if (this.isShowDeleteButton) {
+                          DeleteButton2()
+                            .position({ x: '90%', y: -4 })
+                            .onClick(() => {
+                              animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+                                // 将序号1变为false
+                                this.theCurrentHomeCard.splice(1, 1, false)
+                              })
+                              hilog.info(0xFF00, "HometestTag", "分流模式卡片： %{public}s",
+                                this.uiConfig.isShowHomeCard[1])
+                            })
+                        }
+                      }
                     }
+                    .GridColStyle()
+                    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+                    .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
+                    .transition(customAnimationUtil.isScaleTran(2, this.uiConfig))
+                    //.transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:20 }):null)
+                    //编辑模式下跳动动画
+                    .rotate({ angle: this.uiConfig.isAnimation ? this.rotateAngle : null })
+                    // 消失触发回调
+                    .onDetach(() => {
+                    })
                   }
-                }
-                .GridColStyle()
-                .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(customAnimationUtil.isScaleTran(2,this.uiConfig))
-                //.transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:20 }):null)
-                //编辑模式下跳动动画
-                .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
-                // 消失触发回调
-                .onDetach(() => {
-                })
-              }
 
-              //流量统计小卡片
-              if (this.theCurrentHomeCard[2]) {
-                GridCol({
-                  span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6, lg: 3 },
-                  order: 3
-                }) {
-                  Stack({ alignContent: Alignment.TopEnd }) {
-                    CellularData()
-                    if (this.isShowDeleteButton) {
-                      DeleteButton2()
-                        .position({ x: '90%', y: -4 })
-                        .onClick(() => {
-                          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
-                            // 将序号2变为false
-                            this.theCurrentHomeCard.splice(2, 1, false)
-                          })
-                        })
+                  //流量统计小卡片
+                  if (this.theCurrentHomeCard[2]) {
+                    GridCol({
+                      span: {
+                        xs: this.isLandscapePhone ? 3 : 6,
+                        md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
+                        lg: 3
+                      },
+                      order: 3
+                    }) {
+                      Stack({ alignContent: Alignment.TopEnd }) {
+                        CellularData()
+                        if (this.isShowDeleteButton) {
+                          DeleteButton2()
+                            .position({ x: '90%', y: -4 })
+                            .onClick(() => {
+                              animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+                                // 将序号2变为false
+                                this.theCurrentHomeCard.splice(2, 1, false)
+                              })
+                            })
+                        }
+                      }
                     }
+                    //   .margin({ left: this.containerMargin.value })
+                    .GridColStyle()
+                    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+                    .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
+                    .transition(customAnimationUtil.isScaleTran(3, this.uiConfig))
+                    // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:30 }):null)
+                    //编辑模式下跳动动画
+                    .rotate({ angle: this.uiConfig.isAnimation ? this.rotateAngle : null })
+                    // 消失触发回调
+                    .onDetach(() => {
+                    })
                   }
-                }
-                //   .margin({ left: this.containerMargin.value })
-                .GridColStyle()
-                .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(customAnimationUtil.isScaleTran(3,this.uiConfig))
-                // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:30 }):null)
-                //编辑模式下跳动动画
-                .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
-                // 消失触发回调
-                .onDetach(() => {
-                })
-              }
 
-              //当前节点小卡片
-              if (this.theCurrentHomeCard[3]) {
-                GridCol({
-                  span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6, lg: 3 },
-                  order: 4
-                }) {
-                  Stack({ alignContent: Alignment.TopEnd }) {
-                    CurrentNode()
-                    if (this.isShowDeleteButton) {
-                      DeleteButton2()
-                        .position({ x: '90%', y: -4 })
-                        .onClick(() => {
-                          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
-                            // 将序号3变为false
-                            this.theCurrentHomeCard.splice(3, 1, false)
-                          })
-                        })
+                  //当前节点小卡片
+                  if (this.theCurrentHomeCard[3]) {
+                    GridCol({
+                      span: {
+                        xs: this.isLandscapePhone ? 3 : 6,
+                        md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
+                        lg: 3
+                      },
+                      order: 4
+                    }) {
+                      Stack({ alignContent: Alignment.TopEnd }) {
+                        CurrentNode()
+                        if (this.isShowDeleteButton) {
+                          DeleteButton2()
+                            .position({ x: '90%', y: -4 })
+                            .onClick(() => {
+                              animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+                                // 将序号3变为false
+                                this.theCurrentHomeCard.splice(3, 1, false)
+                              })
+                            })
+                        }
+                      }
                     }
+                    .GridColStyle()
+                    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+                    .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
+                    .transition(customAnimationUtil.isScaleTran(4, this.uiConfig))
+                    //.transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:40 }):null)
+                    //编辑模式下跳动动画
+                    .rotate({ angle: this.uiConfig.isAnimation ? this.rotateAngle : null })
+                    // 消失触发回调
+                    .onDetach(() => {
+
+                    })
                   }
-                }
-                .GridColStyle()
-                .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(customAnimationUtil.isScaleTran(4,this.uiConfig))
-                //.transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:40 }):null)
-                //编辑模式下跳动动画
-                .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
-                // 消失触发回调
-                .onDetach(() => {
 
-                })
-              }
-
-              //IP地址小卡片
-              if (this.theCurrentHomeCard[4]) {
-                GridCol({
-                  span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6, lg: 3 },
-                  order: 5
-                }) {
-                  Stack({ alignContent: Alignment.TopEnd }) {
-                    PublicNetwork()
-                    if (this.isShowDeleteButton) {
-                      DeleteButton2()
-                        .position({ x: '90%', y: -4 })
-                        .onClick(() => {
-                          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
-                            // 将序号4变为false
-                            this.theCurrentHomeCard.splice(4, 1, false)
-                          })
-                        })
+                  //IP地址小卡片
+                  if (this.theCurrentHomeCard[4]) {
+                    GridCol({
+                      span: {
+                        xs: this.isLandscapePhone ? 3 : 6,
+                        md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
+                        lg: 3
+                      },
+                      order: 5
+                    }) {
+                      Stack({ alignContent: Alignment.TopEnd }) {
+                        PublicNetwork()
+                        if (this.isShowDeleteButton) {
+                          DeleteButton2()
+                            .position({ x: '90%', y: -4 })
+                            .onClick(() => {
+                              animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+                                // 将序号4变为false
+                                this.theCurrentHomeCard.splice(4, 1, false)
+                              })
+                            })
+                        }
+                      }
                     }
+                    .GridColStyle()
+                    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+                    .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
+                    .transition(customAnimationUtil.isScaleTran(5, this.uiConfig))
+                    // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:60 }):null)
+                    //编辑模式下跳动动画
+                    .rotate({ angle: this.uiConfig.isAnimation ? this.rotateAngle : null })
+                    // 消失触发回调
+                    .onDetach(() => {
+                    })
                   }
-                }
-                .GridColStyle()
-                .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(customAnimationUtil.isScaleTran(5,this.uiConfig))
-                // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:60 }):null)
-                //编辑模式下跳动动画
-                .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
-                // 消失触发回调
-                .onDetach(() => {
-                })
-              }
 
-              //收藏节点小卡片
-              if (this.theCurrentHomeCard[5]) {
-                GridCol({
-                  span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6, lg: 3 },
-                  order: 6
-                }) {
-                  Stack({ alignContent: Alignment.TopEnd }) {
-                    FavoriteProxy()
-                    if (this.isShowDeleteButton) {
-                      DeleteButton2()
-                        .position({ x: '90%', y: -4 })
-                        .onClick(() => {
-                          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
-                            // 将序号5变为false
-                            this.theCurrentHomeCard.splice(5, 1, false)
-                          })
-                        })
+                  //收藏节点小卡片
+                  if (this.theCurrentHomeCard[5]) {
+                    GridCol({
+                      span: {
+                        xs: this.isLandscapePhone ? 3 : 6,
+                        md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
+                        lg: 3
+                      },
+                      order: 6
+                    }) {
+                      Stack({ alignContent: Alignment.TopEnd }) {
+                        FavoriteProxy()
+                        if (this.isShowDeleteButton) {
+                          DeleteButton2()
+                            .position({ x: '90%', y: -4 })
+                            .onClick(() => {
+                              animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+                                // 将序号5变为false
+                                this.theCurrentHomeCard.splice(5, 1, false)
+                              })
+                            })
+                        }
+                      }
                     }
+                    .GridColStyle()
+                    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+                    .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
+                    .transition(customAnimationUtil.isScaleTran(6, this.uiConfig))
+                    //.transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:70 }):null)
+                    //编辑模式下跳动动画
+                    .rotate({ angle: this.uiConfig.isAnimation ? this.rotateAngle : null })
+                    // 消失触发回调
+                    .onDetach(() => {
+                    })
                   }
-                }
-                .GridColStyle()
-                .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(customAnimationUtil.isScaleTran(6,this.uiConfig))
-                //.transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:70 }):null)
-                //编辑模式下跳动动画
-                .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
-                // 消失触发回调
-                .onDetach(() => {
-                })
-              }
 
-              //收藏配置小卡片
-              if (this.theCurrentHomeCard[6]) {
-                GridCol({
-                  span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6, lg: 3 },
-                  order: 7
-                }) {
-                  Stack({ alignContent: Alignment.TopEnd }) {
-                    FavoriteConfiguration()
-                    if (this.isShowDeleteButton) {
-                      DeleteButton2()
-                        .position({ x: '90%', y: -4 })
-                        .onClick(() => {
-                          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
-                            // 将序号6变为false
-                            this.theCurrentHomeCard.splice(6, 1, false)
-                          })
-                        })
+                  //收藏配置小卡片
+                  if (this.theCurrentHomeCard[6]) {
+                    GridCol({
+                      span: {
+                        xs: this.isLandscapePhone ? 3 : 6,
+                        md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
+                        lg: 3
+                      },
+                      order: 7
+                    }) {
+                      Stack({ alignContent: Alignment.TopEnd }) {
+                        FavoriteConfiguration()
+                        if (this.isShowDeleteButton) {
+                          DeleteButton2()
+                            .position({ x: '90%', y: -4 })
+                            .onClick(() => {
+                              animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+                                // 将序号6变为false
+                                this.theCurrentHomeCard.splice(6, 1, false)
+                              })
+                            })
+                        }
+                      }
                     }
+                    .GridColStyle()
+                    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+                    .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
+                    .transition(customAnimationUtil.isScaleTran(7, this.uiConfig))
+                    // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:80 }):null)
+                    //编辑模式下跳动动画
+                    .rotate({ angle: this.uiConfig.isAnimation ? this.rotateAngle : null })
+                    // 消失触发回调
+                    .onDetach(() => {
+                    })
                   }
-                }
-                .GridColStyle()
-                .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(customAnimationUtil.isScaleTran(7,this.uiConfig))
-                // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,delay:80 }):null)
-                //编辑模式下跳动动画
-                .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
-                // 消失触发回调
-                .onDetach(() => {
-                })
-              }
 
-              //节点信息小卡片
-              if (this.theCurrentHomeCard[7]) {
-                GridCol({
-                  span: { xs: this.isLandscapePhone ? 6 : 12, md: this.isLandscapePhone ? 6 : this.isFoldStatus ? 8 :12, lg: 6 },
-                  order: 1
-                }) {
-                  Stack({ alignContent: Alignment.TopEnd }) {
-                    ProxyINFO()
-                    if (this.isShowDeleteButton) {
-                      DeleteButton1()
-                        .position({ x: '95%', y: -4 })
-                        .onClick(() => {
-                          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
-                            // 将序号7变为false
-                            this.theCurrentHomeCard.splice(7, 1, false)
-                          })
-                        })
+                  //节点信息小卡片
+                  if (this.theCurrentHomeCard[7]) {
+                    GridCol({
+                      span: {
+                        xs: this.isLandscapePhone ? 6 : 12,
+                        md: this.isLandscapePhone ? 6 : this.isFoldStatus ? 8 : 12,
+                        lg: 6
+                      },
+                      order: 1
+                    }) {
+                      Stack({ alignContent: Alignment.TopEnd }) {
+                        ProxyINFO()
+                        if (this.isShowDeleteButton) {
+                          DeleteButton1()
+                            .position({ x: '95%', y: -4 })
+                            .onClick(() => {
+                              animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+                                // 将序号7变为false
+                                this.theCurrentHomeCard.splice(7, 1, false)
+                              })
+                            })
+                        }
+                      }
                     }
+                    .aspectRatio(2.07)
+                    .borderRadius(20)
+                    .backgroundColor($r('app.color.container_background'))
+                    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+                    .transition(customAnimationUtil.isScaleTran(8, this.uiConfig))
+                    // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:20}):null)
+                    .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
+                    //编辑模式下跳动动画
+                    .rotate({ angle: this.uiConfig.isAnimation ? this.rotateAngle : null })
+                    // 消失触发回调
+                    .onDetach(() => {
+                    })
                   }
-                }
-                .aspectRatio(2.07)
-                .borderRadius(20)
-                .backgroundColor($r('app.color.container_background'))
-                  .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                .transition(customAnimationUtil.isScaleTran(8,this.uiConfig))
-                // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:20}):null)
-                .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                //编辑模式下跳动动画
-                .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
-                // 消失触发回调
-                .onDetach(() => {
-                })
-              }
 
-              //当前配置小卡片
-              if (this.theCurrentHomeCard[8]) {
-                GridCol({
-                  span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6, lg: 3 },
-                  order: 4
-                }) {
-                  Stack({ alignContent: Alignment.TopEnd }) {
-                    CurrentConfiguration()
-                    if (this.isShowDeleteButton) {
-                      DeleteButton2()
-                        .position({ x: '90%', y: -4 })
-                        .onClick(() => {
-                          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear}, () => {
-                            // 将序号8变为false
-                            this.theCurrentHomeCard.splice(8, 1, false)
-                          })
-                        })
+                  //当前配置小卡片
+                  if (this.theCurrentHomeCard[8]) {
+                    GridCol({
+                      span: {
+                        xs: this.isLandscapePhone ? 3 : 6,
+                        md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
+                        lg: 3
+                      },
+                      order: 4
+                    }) {
+                      Stack({ alignContent: Alignment.TopEnd }) {
+                        CurrentConfiguration()
+                        if (this.isShowDeleteButton) {
+                          DeleteButton2()
+                            .position({ x: '90%', y: -4 })
+                            .onClick(() => {
+                              animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+                                // 将序号8变为false
+                                this.theCurrentHomeCard.splice(8, 1, false)
+                              })
+                            })
+                        }
+                      }
                     }
+                    .GridColStyle()
+                    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+                    .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
+                    // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:50}):null)
+                    .transition(customAnimationUtil.isScaleTran(9, this.uiConfig))
+                    //编辑模式下跳动动画
+                    .rotate({ angle: this.uiConfig.isAnimation ? this.rotateAngle : null })
+                    // 消失触发回调
+                    .onDetach(() => {
+                    })
                   }
-                }
-                .GridColStyle()
-                .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-               // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:50}):null)
-                .transition(customAnimationUtil.isScaleTran(9,this.uiConfig))
-                //编辑模式下跳动动画
-                .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
-                // 消失触发回调
-                .onDetach(() => {
-                })
-              }
 
-              //快捷方式小卡片
-              if (this.theCurrentHomeCard[9] === this.isFoldStatus ? false : true) {
-                GridCol({
-                  span: { xs: this.isLandscapePhone ? 3 : 6, md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6, lg: 3 },
-                  order: 8
-                }) {
-                  Stack({ alignContent: Alignment.TopEnd }) {
-                    Shortcuts()
-                    if (this.isShowDeleteButton) {
-                      DeleteButton2()
-                        .position({ x: '90%', y: -4 })
-                        .onClick(() => {
-                          animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
-                            // 将序号9变为false
-                            this.theCurrentHomeCard.splice(9, 1, this.isFoldStatus ? true : false)
-                          })
-                        })
+                  //快捷方式小卡片
+                  if (this.theCurrentHomeCard[9] === this.isFoldStatus ? false : true) {
+                    GridCol({
+                      span: {
+                        xs: this.isLandscapePhone ? 3 : 6,
+                        md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
+                        lg: 3
+                      },
+                      order: 8
+                    }) {
+                      Stack({ alignContent: Alignment.TopEnd }) {
+                        Shortcuts()
+                        if (this.isShowDeleteButton) {
+                          DeleteButton2()
+                            .position({ x: '90%', y: -4 })
+                            .onClick(() => {
+                              animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+                                // 将序号9变为false
+                                this.theCurrentHomeCard.splice(9, 1, this.isFoldStatus ? true : false)
+                              })
+                            })
+                        }
+                      }
                     }
+                    .GridColStyle()
+                    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+                    .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
+                    .transition(customAnimationUtil.isScaleTran(10, this.uiConfig))
+                    // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:90}):null)
+                    //编辑模式下跳动动画
+                    .rotate({ angle: this.uiConfig.isAnimation ? this.rotateAngle : null })
+                    // 消失触发回调
+                    .onDetach(() => {
+                    })
                   }
-                }
-                .GridColStyle()
-                .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
-                .transition(customAnimationUtil.isScaleTran(10,this.uiConfig))
-                // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:90}):null)
-                //编辑模式下跳动动画
-                .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
-                // 消失触发回调
-                .onDetach(() => {
-                })
+                } //GridRow的尾括号
+                .width('100%')
+                .padding(this.isLandscapePhone ? { top: 4, left: 25, right: 25 } :
+                  this.isFoldStatus ? { top: 4, left: 50, right: 50 } : this.HomeCardAreaPadding.value)
+                .margin({ top: this.isLandscapePhone ? 7 : 0 })
               }
-            } //GridRow的尾括号
+            }
+            .chainAnimation(true)
+            .nestedScroll({
+              scrollForward: NestedScrollMode.PARENT_FIRST,
+              scrollBackward: NestedScrollMode.SELF_FIRST
+            })
             .width('100%')
-            .padding(this.isLandscapePhone ? { top: 4, left: 25, right: 25 } :this.isFoldStatus ? { top: 4, left: 50, right: 50 } : this.HomeCardAreaPadding.value)
-            .margin({ top: this.isLandscapePhone ? 7 : 0 })
+            .height('100%')
+            .scrollBar(BarState.Off)
+            .contentEndOffset(CONTENT_END_OFFSET_150)
+            .edgeEffect(EdgeEffect.Spring)
+            .bindSheet($$this.isShowCardEdit, this.CardEdit(), {
+              detents: [BIND_SHEET_CONTAINER_HEIGHT, 300,],
+              preferType: SheetType.CENTER,
+              backgroundColor: $r('app.color.background'),
+              showClose: true,
+              dragBar: false,
+              scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+              title: { title: $r('app.string.add_home_card') },
+              onWillDismiss: () => {
+                this.isShowCardEdit = false
+                this.isEnableIndexForegroundBlur = false
+              }
+            })
           }
+          .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)
+          .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {
+            // 累计计算当前父组件滚动在Y轴方向的偏移量
+            if (this.uiConfig.isAnimation){
+              this.curYOffset += yOffset
+            }
+            console.info("yOffset" + this.curYOffset);
+          })
         }
-        .width('100%')
-        .height('100%')
-        .scrollBar(BarState.Off)
-        .contentEndOffset(CONTENT_END_OFFSET_110)
-        .edgeEffect(EdgeEffect.Spring)
-        .chainAnimation(true)
-      //  .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
-        .bindSheet($$this.isShowCardEdit, this.CardEdit(), {
-          detents: [BIND_SHEET_CONTAINER_HEIGHT, 300,],
-          preferType: SheetType.CENTER,
-          backgroundColor: $r('app.color.background'),
-          showClose: true,
-          dragBar: false,
-          scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-          title: { title: $r('app.string.add_home_card') },
-          onWillDismiss: () => {
-            this.isShowCardEdit = false
-            this.isEnableIndexForegroundBlur = false
-          }
-        })
 
       if (!this.isShowHomeEdit){
         // 代理启动按钮层
@@ -778,8 +842,9 @@ struct Home {
               SymbolGlyph(this.proxyEnabled ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
                 .fontSize(24)
                 .fontColor([Color.White])
-                .symbolEffect(this.ReplaceSymbolEffect)
+                //.symbolEffect(this.ReplaceSymbolEffect)
                 .align(Alignment.Center)
+                .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
             }
             .width(this.proxyStartButtonHeight)
             .height(this.proxyStartButtonHeight)
@@ -847,7 +912,7 @@ struct Home {
       }
       .backgroundColor($r('app.color.background'))
       //    .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
-      .height(this.isLandscapePhone ? '100%' : `calc(100% - ${TAB_CONTENT_TITLE_HEIGHT}vp)`)
+      .height('100%' )
       .width("100%")
       .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
         detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE],

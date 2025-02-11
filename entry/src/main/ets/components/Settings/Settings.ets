@@ -1,5 +1,5 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { CONTENT_END_OFFSET_110, FONT_SIZE_16, settingsData, SettingsListItem } from "../../common/Constants"
+import { CONTENT_END_OFFSET_150, FONT_SIZE_16, settingsData, SettingsListItem } from "../../common/Constants"
 import settingsListItem from "./settingsListItem"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import Appearance from "./Appearance"
@@ -192,7 +192,7 @@ struct Settings {
 
       }
       .width('100%')
-      .contentEndOffset(CONTENT_END_OFFSET_110 - 45)
+      .contentEndOffset(CONTENT_END_OFFSET_150 - 45)
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)
     }

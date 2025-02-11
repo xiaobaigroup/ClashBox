@@ -175,6 +175,8 @@ struct Index {
     lg: ({ top: 5 } as marginGenerate),
     xl: ({ top: 5 } as marginGenerate)
   });
+  //page内顶部标题偏移量
+  @Provide curYOffset: number = 0
   // 主页卡片内边距
   @Provide('breakPointStateHomeCardPadding')
   private breakPointStateHomeCardPadding: BreakpointState<MarginGenerate> = HomeCardPadding_14_15_16_17

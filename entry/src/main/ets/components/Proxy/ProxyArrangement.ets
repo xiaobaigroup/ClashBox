@@ -1,4 +1,4 @@
-import { BORDER_RADIUS_20, CONTENT_END_OFFSET_110, FONT_SIZE_16, LIST_ITEM_HEIGHT} from '../../common/Constants'
+import { BORDER_RADIUS_20, CONTENT_END_OFFSET_150, FONT_SIZE_16, LIST_ITEM_HEIGHT} from '../../common/Constants'
 import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem'
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import ProxyGroupItem from './ProxyGroupItem'
@@ -27,6 +27,8 @@ struct ProxyArrangement {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  //page内顶部标题偏移量
+  @Consume curYOffset: number
 
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
@@ -83,66 +85,65 @@ struct ProxyArrangement {
   proxyScroller: ListScroller = new ListScroller()
 
   build() {
-    Column() {
-      List({ space: 10, initialIndex: 0,scroller:this.proxyScroller}) {
-        ForEach(this.proxyGroups, (g:ProxyGroup, i: number) => {
-          ListItemGroup({ header: this.itemHead(g.name,
-            !this.isContentShow && this.selectItem === i ? $r('sys.symbol.chevron_down')
-              : $r('sys.symbol.chevron_right'))} ){
+    List({ space: 10, initialIndex: 0,scroller:this.proxyScroller}) {
+      ForEach(this.proxyGroups, (g:ProxyGroup, i: number) => {
+        ListItemGroup({ header: this.itemHead(g.name,
+          !this.isContentShow && this.selectItem === i ? $r('sys.symbol.chevron_down')
+            : $r('sys.symbol.chevron_right'))} ){
 
-              //展开后内容显示区域
-              if (!this.isContentShow && this.selectItem === i) {
-                ProxyGroupItem({
-                  items: g.proxies as ProxyItem[],
-                  ProxyGroupItemSelected: this.appConfig.proxyCardSize,
-                  disabled: g.type !== ProxyType.Selector,
-                  selectedProxy: this.currentProfile?.getSelectedProxy(g),
-                  OnProxyChange: (item) => {
-                    this.changeProxy(g.name, item)
-                  }
-                })
-                  .borderRadius(BORDER_RADIUS_20)
-                  .width('100%')
-               //   .height(500) //展开后界面高度
-                  .padding({ top:10, bottom: 10 })
+          //展开后内容显示区域
+          if (!this.isContentShow && this.selectItem === i) {
+            ProxyGroupItem({
+              items: g.proxies as ProxyItem[],
+              ProxyGroupItemSelected: this.appConfig.proxyCardSize,
+              disabled: g.type !== ProxyType.Selector,
+              selectedProxy: this.currentProfile?.getSelectedProxy(g),
+              OnProxyChange: (item) => {
+                this.changeProxy(g.name, item)
               }
-          }
-          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-          .transition(customAnimationUtil.isScaleTran(i,this.uiConfig))
-          .onClick(() => {
-            animateTo({
-              duration: this.uiConfig.animationSpeed,
-              onFinish: () => {
-              }
-            }, () => {
-              if (!this.isContentShow) {
-                this.proxyScroller.scrollToItemInGroup(i,0,true,ScrollAlign.START)
-              }
-              this.isContentShow=!this.isContentShow
-              this.selectItem = i;
             })
+              .borderRadius(BORDER_RADIUS_20)
+              .width('100%')
+                //   .height(500) //展开后界面高度
+              .padding({ top:10, bottom: 10 })
+          }
+        }
+        .clickEffect(this.isContentShow?customAnimationUtil.isClickEffect(this.uiConfig):null)
+        .transition(customAnimationUtil.isScaleTran(i,this.uiConfig))
+        .onClick(() => {
+          animateTo({
+            duration: this.uiConfig.animationSpeed,
+            onFinish: () => {
+            }
+          }, () => {
+            if (!this.isContentShow) {
+              this.proxyScroller.scrollToItemInGroup(i,0,true,ScrollAlign.START)
+            }
+            this.isContentShow=!this.isContentShow
+            this.selectItem = i;
           })
-          .width('100%')
-          .borderRadius(BORDER_RADIUS_20)
         })
-      }
-      .chainAnimation(true)
-      .borderRadius(BORDER_RADIUS_20)
-      .scrollBar(BarState.Off)
-      .edgeEffect(EdgeEffect.Spring)
-      .contentEndOffset(CONTENT_END_OFFSET_110)
-      //.height('100%')
-    //  .width('100%')
-      .sticky(StickyStyle.Header)
+        .width('100%')
+        .borderRadius(BORDER_RADIUS_20)
+      })
     }
+    .chainAnimation(true)
+    .borderRadius(BORDER_RADIUS_20)
+    .scrollBar(BarState.Off)
+    .edgeEffect(EdgeEffect.Spring)
+    .contentEndOffset(CONTENT_END_OFFSET_150)
+    .nestedScroll({
+      scrollForward: NestedScrollMode.PARENT_FIRST,
+      scrollBackward: NestedScrollMode.SELF_FIRST
+    })
+    .sticky(StickyStyle.Header)
     .height('100%')
     .width('100%')
     .padding({
       left: this.breakPointStateTabContentTitleMargin.value,
       right: this.breakPointStateTabContentTitleMargin.value,
     })
-    .backgroundColor($r('app.color.background'))
-    }
+  }
 }
 
 export default ProxyArrangement
