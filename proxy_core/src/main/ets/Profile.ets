@@ -81,14 +81,14 @@ export class Profile {
   }
   async save(bytes: Uint8Array, vailConfig:(config: string)=> Promise<string>): Promise<Profile>{
     let result = utf8.decodeToString(bytes)
-    try {
-      // 判断是否是json格式
-      JSON.parse(result)
-    } catch (e) {
-      // 配置可能是base64的
-      let base64 = new util.Base64Helper();
-      result = utf8.decodeToString(await base64.decode(result))
-    }
+    // try {
+    //   // 判断是否是json格式
+    //   JSON.parse(result)
+    // } catch (e) {
+    //   // 配置可能是base64的
+    //   let base64 = new util.Base64Helper();
+    //   result = utf8.decodeToString(await base64.decode(result))
+    // }
     console.log("save config", result)
     let message = await vailConfig(result);
     if (message != "") {

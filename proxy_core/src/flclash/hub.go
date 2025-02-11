@@ -428,7 +428,7 @@ func handleGetMemory(fn func(value string)) {
 }
 
 func init() {
-	adapter.UrlTestHook = func(name string, delay uint16) {
+	adapter.UrlTestHook = func(url string, name string, delay uint16) {
 		delayData := &Delay{
 			Name: name,
 		}
