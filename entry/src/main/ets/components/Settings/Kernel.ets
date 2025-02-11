@@ -80,6 +80,7 @@ struct Kernel {
                 .width(48)
                 .height(48)
                 .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+                .transition(customAnimationUtil.isScaleTranIcon(10,this.uiConfig))
               Column() {
                 Row() {
                   Text(item.title)

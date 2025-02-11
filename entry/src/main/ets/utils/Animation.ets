@@ -4,6 +4,7 @@ import { curves } from "@kit.ArkUI"
 let effectHomeCard: TransitionEffect | null
 let clickEffect: ClickEffect | null
 let iconEffect: SymbolEffectStrategy | null
+export class isON{ toggleAnim: boolean = false }
 
 class AnimationUtil{
 
@@ -92,13 +93,13 @@ class AnimationUtil{
     return iconEffect
   }
 
-  //更多页图标转场缩放动画，i为延迟，在list或者foreach中可以将i设为index，达到递增的动画效果，uiConfig为动画速度以及开关的切换
+  //配置添加，更多页，设置页图标转场缩放动画，i为延迟，在list或者foreach中可以将i设为index，达到递增的动画效果，uiConfig为动画速度以及开关的切换
   public isScaleTranIcon(i:number,uiConfig:UIConfig){
     effectHomeCard=
       uiConfig.isAnimation ?
       TransitionEffect.OPACITY
         .combine(TransitionEffect.scale({x: 0, y: 0}))
-        .combine(TransitionEffect.rotate({angle:90}))
+        .combine(TransitionEffect.rotate({angle:360}))
         .animation({ duration: uiConfig.animationSpeed,curve:curves.springMotion(),delay: i*10+50 })
         .combine(TransitionEffect.OPACITY)
         .animation({ duration: uiConfig.animationSpeed,curve:curves.springMotion(),delay: i*10+60 })

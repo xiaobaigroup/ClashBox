@@ -73,6 +73,7 @@ export struct ConfigAdd {
             ListItem(){
               Row(){
                 SymbolGlyph(item.symbolStart).fontSize(24).fontColor([this.icon_emphasize]).margin({ right: 20 })
+                  .transition(customAnimationUtil.isScaleTranIcon(10,this.uiConfig))
                 Text(item.text).fontSize(16).fontColor($r('sys.color.font_primary'))
                 Blank()
                 SymbolGlyph(item.symbolEnd).fontSize(24).fontColor([$r('sys.color.icon')])

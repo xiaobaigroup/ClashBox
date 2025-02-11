@@ -457,6 +457,7 @@ export struct AboutContributors {
                 Image(item.image)
                   .width(48)
                   .height(48)
+                  .transition(customAnimationUtil.isScaleTranIcon(10,this.uiConfig))
                 Column() {
                   // 名字
                   Text(item.title)

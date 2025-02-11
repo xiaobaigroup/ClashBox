@@ -45,7 +45,6 @@ import {
 import { ThemeControl } from '@ohos.arkui.theme'
 import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
 import { ProxyItem, ProxyData } from '../common/ProxyData'
-import { image } from '@kit.ImageKit'
 import { ClashConfig, Dns, LogLevel, Profile, ProxyGroup, ProxyMode } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
@@ -102,7 +101,6 @@ struct Index {
     this.icon_emphasize = theme.colors.iconEmphasize;
 
   }
-
   //tabs图标文字颜色，修改resources/base(dark)/element/color.json中tabs_icon_text配置选中图标文字深浅模式颜色
   // app.color.tabs_icon_text1配置非选中图标和文字深浅模式颜色
   //  @State fontColorValue:ResourceColor = ($r('app.color.tabs_icon_text'));

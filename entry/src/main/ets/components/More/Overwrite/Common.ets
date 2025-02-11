@@ -9,7 +9,7 @@ import { menuRowList, skipRowList, theCustomDialog, toggleRowList } from '../../
 import { ArrayConfigParam } from './EditArrayConfig'
 import { SymbolGlyphModifier } from '@kit.ArkUI'
 import { JSON } from '@kit.ArkTS'
-import { customAnimationUtil } from '../../../utils/Animation'
+import { customAnimationUtil, isON } from '../../../utils/Animation'
 
 
 @Component
@@ -30,6 +30,8 @@ export struct ConfigList {
   @State SaveInputValue: string = ''
   @State theDialogTitle: ResourceStr = ''
   @State theUnit: ResourceStr = ''
+  //开关不触发list转场动画判定
+  @State isON:isON = new isON()
 
   dialogController: CustomDialogController = new CustomDialogController({
     builder: theCustomDialog({
@@ -199,7 +201,7 @@ export struct ConfigList {
               toggle:  () => { this.toggleBuilder(item.isCheck) }
             })
           }
-          .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
+          .transition(this.isON.toggleAnim? null : customAnimationUtil.isScaleTran(index,this.uiConfig))
           .onClick(() => {
             this.getUIContext()?.animateTo({
               duration: this.uiConfig.animationSpeed
@@ -207,6 +209,8 @@ export struct ConfigList {
               this.currentItemIndex = index
               this.handleToggle(index)
             })
+            //使开关点击时不触发转场动画
+            this.isON.toggleAnim=true
           })
         } else  {
           // 标题栏

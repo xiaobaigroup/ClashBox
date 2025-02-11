@@ -20,6 +20,7 @@ struct settingsListItem {
           .fontSize(24)
           .margin({left: 12})
           .fontColor([this.icon_emphasize])
+          .transition(customAnimationUtil.isScaleTranIcon(10,this.uiConfig))
         Column() {
           Text(this.itemObj.title)
             .fontWeight(FontWeight.Medium)

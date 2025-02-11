@@ -176,6 +176,7 @@ export struct ImportConfigFromFile{
             .fontSize(24)
             .margin({left: 12})
             .fontColor([this.icon_emphasize])
+            .transition(customAnimationUtil.isScaleTranIcon(10,this.uiConfig))
           Text($r('app.string.browse_local_files'))
             .fontWeight(FontWeight.Medium)
             .fontSize(16)

@@ -8,7 +8,7 @@ import {
   FONT_SIZE_16
 } from "../common/Constants"
 import { UIConfig } from "../entryability/AppState"
-import { customAnimationUtil } from "../utils/Animation"
+import { customAnimationUtil, isON } from "../utils/Animation"
 import { getResourceString } from "../utils/ResourceStringUtil"
 import { KeyValueData } from "./More/Overwrite/EditArrayConfig"
 

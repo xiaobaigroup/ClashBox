@@ -8,7 +8,7 @@ import {
   CONTENT_END_OFFSET_110,
 } from "../../common/Constants"
 import TopBuilder from "./TopBuilder"
-import { SymbolGlyphModifier } from "@kit.ArkUI"
+import { curves, SymbolGlyphModifier } from "@kit.ArkUI"
 import { common } from "@kit.AbilityKit"
 import { setAutoColorMode, setDarkColorMode, setLightColorMode } from "../../utils/ChangeColorModeUtils"
 import { menuRowList, toggleRowList } from "../Common"
@@ -104,9 +104,11 @@ struct Appearance {
           })
             .selected(this.uiConfig.buttonPositionIndex === index)
             .onChange((selected) => {
-              // 持久化按钮位置
-              this.uiConfig.buttonPositionIndex = index
-              this.switchButtonPosition(index)
+              animateTo(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }:null, () => {
+                // 持久化按钮位置
+                this.uiConfig.buttonPositionIndex = index
+                this.switchButtonPosition(index)
+              })
               // UI刷新
               this.EnableButtonPositionText = menuItem.title
             })
