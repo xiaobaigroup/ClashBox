@@ -97,7 +97,8 @@ struct ProxyPage {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   /**主页卡片标题按钮间距*/
   @Consume('HomeCardTitleButtonPadding') private HomeCardTitleButtonPadding: BreakpointState<number>
-
+  //page内顶部标题偏移量
+  @Consume curYOffset: number
   //栅格点位配置
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
@@ -314,13 +315,12 @@ struct ProxyPage {
 
 
   build() {
-    Scroll(){
-    Column() {
+    Stack(){
       // 标题栏
      // if (!this.isLandscapePhone || this.appConfig.proxyGroupType === ProxyGroupType.List) {
         Row({ space: this.HomeCardTitleButtonPadding.value }) {
           Text($r('app.string.Proxy'))
-            .fontSize(TAB_CONTENT_TITLE_FONT_SIZE)
+            .fontSize(this.curYOffset<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset/100:TAB_CONTENT_TITLE_FONT_SIZE)
             .fontWeight(FontWeight.Bold)
             .textAlign(TextAlign.Center)
             .transition(customAnimationUtil.isSlide(200, this.uiConfig))
@@ -386,9 +386,11 @@ struct ProxyPage {
             hilog.info(0xB001, this.componentName, `#button#onClick()#编辑代理`)
           })
         }
+        .zIndex(1)
+        .height(this.curYOffset<0?TAB_CONTENT_TITLE_HEIGHT-this.curYOffset:TAB_CONTENT_TITLE_HEIGHT)
+        .position({x:0})
         .alignItems(VerticalAlign.Center)
         .width('100%')
-        .height(TAB_CONTENT_TITLE_HEIGHT)
         .padding({
           left: this.breakPointStateTabContentTitleMargin.value,
           right: this.breakPointStateTabContentTitleMargin.value,
@@ -404,6 +406,9 @@ struct ProxyPage {
       } else if (this.proxyGroups.length > 0) {
         // 代理页分组TAB+list主体
         Stack({ alignContent: this.stackAlignContentAlignment }) {
+                    Column(){
+            Blank().height(TAB_CONTENT_TITLE_HEIGHT)
+            Scroll() {
           //根据ProxyArrangementSelected的状态决定是否显示
           if (this.appConfig.proxyGroupType === ProxyGroupType.Tabs) {
             Column() { //分组标签页 start
@@ -480,6 +485,16 @@ struct ProxyPage {
             ProxyArrangement()
           }
           //列表排列end
+            }
+            .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)
+            .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {
+              // 累计计算当前父组件滚动在Y轴方向的偏移量
+              if (this.uiConfig.isAnimation){
+                this.curYOffset += yOffset
+              }
+              console.info("yOffset" + this.curYOffset);
+            })
+   }
 
           // ClashMeta内核时暂时无法测延迟
           if (this.appConfig.clashCore === ClashCore.FlClash) {
@@ -509,8 +524,8 @@ struct ProxyPage {
             })
             .borderRadius(100)
             .backgroundColor(this.icon_emphasize)
-            .margin(this.uiConfig.isBlurr?{bottom:this.isLandscapePhone ? 86: $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')}:
-              {bottom:this.isLandscapePhone ? 86: $r('app.integer.vp_proxy_start_button_left_right_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
+            .margin(this.uiConfig.isBlurr?{bottom:this.isLandscapePhone ?$r('app.integer.vp_proxy_start_button_left_right_margin'): $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')}:
+            $r('app.integer.vp_proxy_start_button_left_right_margin'))
             .width(this.proxyStartButtonWidth)
             .height(this.proxyStartButtonHeight)
             .clip(true)
@@ -524,14 +539,13 @@ struct ProxyPage {
         .backgroundColor($r('app.color.background'))
         // .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
         .width('100%')
-        .height(this.isLandscapePhone ? '100%' : `calc(100% - ${TAB_CONTENT_TITLE_HEIGHT}vp)`)
+        .height( '100%' )
         // 主体 END
       }
     }
     .width('100%')
     .height('100%')
     }
-  }
 }
 
 export default ProxyPage

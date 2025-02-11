@@ -1,6 +1,6 @@
 import { ClashConfig } from 'proxy_core'
 import { BreakpointState } from '../../../common/breakpointsystem'
-import { ConfigItemData, CONTENT_END_OFFSET_110, OptionItem,
+import { ConfigItemData, CONTENT_END_OFFSET_150, OptionItem,
   ValueType } from '../../../common/Constants'
 import { EventHub, EventKey } from '../../../common/EventHub'
 import { AppConfig, UIConfig } from '../../../entryability/AppState'
@@ -233,6 +233,6 @@ export struct ConfigList {
     .margin({ top: 10 })
     .borderRadius(18)
     .alignListItem(ListItemAlign.Center)
-    .contentEndOffset(CONTENT_END_OFFSET_110 - 40)
+    .contentEndOffset(CONTENT_END_OFFSET_150 - 40)
   }
 }

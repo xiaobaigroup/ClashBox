@@ -5,7 +5,7 @@ import {
   LIST_ITEM_HEIGHT_45,
   LIST_ITEM_HEIGHT,
   BORDER_RADIUS_20,
-  CONTENT_END_OFFSET_110} from "../../common/Constants"
+  CONTENT_END_OFFSET_150} from "../../common/Constants"
 import { getResourceString } from "../../utils/ResourceStringUtil"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
@@ -818,7 +818,7 @@ export struct CellularDataReminder {
       .width('100%')
       .align(Alignment.Top)
       .edgeEffect(EdgeEffect.Spring)
-      .contentEndOffset(CONTENT_END_OFFSET_110 - 45)
+      .contentEndOffset(CONTENT_END_OFFSET_150 - 45)
       .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
     }
     .width('100%')

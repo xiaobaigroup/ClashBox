@@ -1,5 +1,5 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { BIND_SHEET_DRAG_BAR_HEIGHT, BORDER_RADIUS_20, CONTENT_END_OFFSET_110 } from "../../common/Constants"
+import { BIND_SHEET_DRAG_BAR_HEIGHT, BORDER_RADIUS_20, CONTENT_END_OFFSET_150 } from "../../common/Constants"
 import { Nothing, theCustomDialog } from "../Common"
 import { MoreTop } from "./MoreTopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
@@ -315,7 +315,7 @@ struct Resources {
               })
             }.width('100%')
             .height('100%')
-            .contentEndOffset(CONTENT_END_OFFSET_110)
+            .contentEndOffset(CONTENT_END_OFFSET_150)
             .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
           }
         }.width('100%')

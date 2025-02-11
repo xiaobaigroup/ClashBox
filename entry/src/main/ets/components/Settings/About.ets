@@ -3,7 +3,7 @@ import { AboutListItemProp, AboutList, BORDER_RADIUS_20, ContributorsListItemPro
   ContributorsList,
   CheckUpdateList,
   CheckUpdateListItemProp,
-  CONTENT_END_OFFSET_110,
+  CONTENT_END_OFFSET_150,
   moreData,
   ListMoreData,
 } from "../../common/Constants"
@@ -393,7 +393,7 @@ struct About {
       }
       .width('100%')
       .alignListItem(ListItemAlign.Center)
-      .contentEndOffset(CONTENT_END_OFFSET_110 - 45)
+      .contentEndOffset(CONTENT_END_OFFSET_150 - 45)
       .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
     }
     .width('100%')
@@ -558,7 +558,7 @@ export struct AboutContributors {
       }
       .width('100%')
       .alignListItem(ListItemAlign.Center)
-      .contentEndOffset(CONTENT_END_OFFSET_110 - 45)
+      .contentEndOffset(CONTENT_END_OFFSET_150 - 45)
       .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
     }
     .width('100%')

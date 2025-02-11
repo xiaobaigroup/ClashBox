@@ -6,7 +6,7 @@
 import { BreakpointState } from '../common/breakpointsystem'
 import { BIND_SHEET_CONTAINER_HEIGHT,
   ConfigItemData,
-  CONTENT_END_OFFSET_110, ListMoreData, moreData,
+  CONTENT_END_OFFSET_150, ListMoreData, moreData,
   TAB_CONTENT_TITLE_FONT_SIZE,
   TAB_CONTENT_TITLE_HEIGHT } from '../common/Constants';
 import { hilog } from '@kit.PerformanceAnalysisKit';
@@ -71,7 +71,8 @@ struct MorePage {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @Consume('breakPointStateTabContentTitleMargin')
   private breakPointStateTabContentTitleMargin: BreakpointState<number>
-
+  //page内顶部标题偏移量
+  @Consume curYOffset: number
   /**
    * 查询IP地址弹窗控制器
    */
@@ -180,80 +181,102 @@ struct MorePage {
   }
 
   build() {
-      Navigation(this.pageInfos) {
+    Navigation(this.pageInfos) {
+      Stack() {
         // 顶部导航栏
         Row() {
           Text($r('app.string.More'))
-            .fontSize(TAB_CONTENT_TITLE_FONT_SIZE)
+            .fontSize(this.curYOffset<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset/100:TAB_CONTENT_TITLE_FONT_SIZE)
             .fontWeight(FontWeight.Bold)
             .width('83%')
             .textAlign(TextAlign.Start)
         }
         .width('100%')
-        .height(TAB_CONTENT_TITLE_HEIGHT)
-        .transition(customAnimationUtil.isSlide(0,this.uiConfig))
+        .zIndex(1)
+        .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
+        .position({ x: 0 })
+        .transition(customAnimationUtil.isSlide(0, this.uiConfig))
         .padding({
           left: this.breakPointStateTabContentTitleMargin.value,
           right: this.breakPointStateTabContentTitleMargin.value,
         })
 
-        List({space: 10}) {
-          ForEach(this.moreList, (item: moreData, index: number) => {
-            ListItem() {
-              skipRowList({
-                icons: item.icons,
-                name: item.name,
-                title: item.title,
-                subtitle: item.subtitle,
-                isPrimaryIcons: true,
-                isExperimentalFunction: item.sign === 5
+        Column() {
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT)
+          Scroll() {
+            List({ space: 10 }) {
+              ForEach(this.moreList, (item: moreData, index: number) => {
+                ListItem() {
+                  skipRowList({
+                    icons: item.icons,
+                    name: item.name,
+                    title: item.title,
+                    subtitle: item.subtitle,
+                    isPrimaryIcons: true
+                  })
+                }.margin({ left: this.morePageMargin.value, right: this.morePageMargin.value })
+                .onClick(() => {
+                  this.handleCheck(index)
+                })
+                .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
               })
-            }.margin({left: this.morePageMargin.value, right: this.morePageMargin.value})
-            .onClick(() => {
-                this.handleCheck(index)
-            })
-            .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
-          })
-          // 设置行
-          ListItem() {
-            skipRowList({
-              icons: $r('sys.symbol.gearshape'),
-              title: $r('app.string.Settings'),
-              isPrimaryIcons: true
-            })
-          }.margin({left: this.morePageMargin.value, right: this.morePageMargin.value})
-          .onClick(() => {
-            this.isShowSettings = true
-            this.isEnableIndexForegroundBlur = true
-          })
-          .transition(customAnimationUtil.isScaleTran(6,this.uiConfig))
-          // 设置页半模态窗口
-          .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
-            detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE],
-            dragBar: false,
-            backgroundColor: $r('app.color.background'),
-            keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
-            scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-            preferType: SheetType.CENTER,
-            onWillDismiss: () => {
-              this.isShowSettings = false
-              this.isEnableIndexForegroundBlur = false
-              this.SettingsPageInfos.clear()
+              // 设置行
+              ListItem() {
+                skipRowList({
+                  icons: $r('sys.symbol.gearshape'),
+                  title: $r('app.string.Settings'),
+                  isPrimaryIcons: true
+                })
+              }.margin({ left: this.morePageMargin.value, right: this.morePageMargin.value })
+              .onClick(() => {
+                this.isShowSettings = true
+                this.isEnableIndexForegroundBlur = true
+              })
+              .transition(customAnimationUtil.isScaleTran(6, this.uiConfig))
+              // 设置页半模态窗口
+              .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
+                detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE],
+                dragBar: false,
+                backgroundColor: $r('app.color.background'),
+                keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
+                scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+                preferType: SheetType.CENTER,
+                onWillDismiss: () => {
+                  this.isShowSettings = false
+                  this.isEnableIndexForegroundBlur = false
+                  this.SettingsPageInfos.clear()
+                }
+              })
             }
+            .width('100%')
+            .height('100%')
+            .edgeEffect(EdgeEffect.Spring)
+            .borderRadius(18)
+            .alignListItem(ListItemAlign.Center)
+            .contentEndOffset(CONTENT_END_OFFSET_150)
+            .chainAnimation(true)
+            .nestedScroll({
+              scrollForward: NestedScrollMode.PARENT_FIRST,
+              scrollBackward: NestedScrollMode.SELF_FIRST
+            })
+          }
+          .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)
+          .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {
+            // 累计计算当前父组件滚动在Y轴方向的偏移量
+            if (this.uiConfig.isAnimation){
+              this.curYOffset += yOffset
+            }
+            console.info("yOffset" + this.curYOffset);
           })
         }
-        .width('100%')
-        .edgeEffect(EdgeEffect.Spring)
-        .borderRadius(18)
-        .alignListItem(ListItemAlign.Center)
-        .contentEndOffset(CONTENT_END_OFFSET_110)
       }
-      .hideToolBar(true)
-      .mode(this.isLandscapePhone ? NavigationMode.Stack : NavigationMode.Auto)
-      .navBarWidth(330)
-      .navDestination(this.PagesMap)
-      .width('100%')
-      .height('100%')
+    }
+    .hideToolBar(true)
+    .mode(this.isLandscapePhone ? NavigationMode.Stack : NavigationMode.Auto)
+    .navBarWidth(330)
+    .navDestination(this.PagesMap)
+    .width('100%')
+    .height('100%')
   }
 }
 

@@ -10,7 +10,7 @@ import {
   BIND_SHEET_CONTAINER_HEIGHT,
   LIST_ITEM_PADDING,
   RouteName,
-  CONTENT_END_OFFSET_110,
+  CONTENT_END_OFFSET_150,
 } from '../common/Constants'
 import { curves, LengthMetrics, PromptAction, SymbolGlyphModifier } from '@kit.ArkUI'
 import { ConfigAdd } from '../components/Configuration/ConfigAdd'
@@ -83,6 +83,8 @@ struct ConfigurationPage {
   // 路由栈
   @Provide('configAddPageInfos')
   private configAddPageInfos: NavPathStack = new NavPathStack()
+  //page内顶部标题偏移量
+  @Consume curYOffset: number
 
   /* 配置列表List相关 */
   // 当前单选框选择的配置 TODO 待接入用户首选项，先写死 configName，单选框控制现在只用到configName所以先不给值
@@ -286,12 +288,12 @@ struct ConfigurationPage {
 
 
   build() {
-    Column() {
+    Stack() {
       // 标题栏 START
     //  if (!this.isLandscapePhone) {
         Row() {
           Text($r('app.string.Configuration'))
-            .fontSize(TAB_CONTENT_TITLE_FONT_SIZE)
+            .fontSize(this.curYOffset<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset/100:TAB_CONTENT_TITLE_FONT_SIZE)
             .fontWeight(TAB_CONTENT_TITLE_FONT_WEIGHT)
             .fontColor($r('sys.color.font_primary'))
             .transition(customAnimationUtil.isSlide(200,this.uiConfig))
@@ -301,6 +303,7 @@ struct ConfigurationPage {
             SymbolGlyph($r('sys.symbol.arrow_clockwise'))
               .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
               .fontColor([$r('sys.color.icon_primary')])
+              .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
           }
           .width(40)
           .height(40)
@@ -313,9 +316,11 @@ struct ConfigurationPage {
           })
           .transition(customAnimationUtil.isSlide(0,this.uiConfig))
         }
+        .zIndex(1)
+        .height(this.curYOffset<0?TAB_CONTENT_TITLE_HEIGHT-this.curYOffset:TAB_CONTENT_TITLE_HEIGHT)
+        .position({x:0})
         .alignItems(VerticalAlign.Center)
         .width('100%')
-        .height(TAB_CONTENT_TITLE_HEIGHT)
         .padding({
           left: this.breakPointStateTabContentTitleMargin.value,
           right: this.breakPointStateTabContentTitleMargin.value,
@@ -331,90 +336,114 @@ struct ConfigurationPage {
             .height('95%')
             .margin({bottom:10})
         } else {
-          // 配置列表 START
-          List({ space: LIST_SPACE }) {
-            ForEach(this.configList, (item: ConfigData, index: number) => {
-              ListItem() {
-                Row() {
-                  Column({space:2}) {
-                    Text(item.configName).fontColor(($r('sys.color.font_primary')))
-                    Row(){
-                      Text($r('app.string.update_by'))
-                        .fontColor($r('sys.color.font_secondary'))
-                      Text(convertTime(item.lastUpdateDateTime))
-                        .fontColor($r('sys.color.font_secondary'))
+          Column(){
+            Blank().height(TAB_CONTENT_TITLE_HEIGHT)
+            Scroll() {
+              // 配置列表 START
+              List({ space: LIST_SPACE }) {
+                ForEach(this.configList, (item: ConfigData, index: number) => {
+                  ListItem() {
+                    Row() {
+                      Column({ space: 2 }) {
+                        Text(item.configName).fontColor(($r('sys.color.font_primary')))
+                        Row() {
+                          Text($r('app.string.update_by'))
+                            .fontColor($r('sys.color.font_secondary'))
+                          Text(convertTime(item.lastUpdateDateTime))
+                            .fontColor($r('sys.color.font_secondary'))
+                        }
+
+                        //  Text(item.createdDate)
+                      }.alignItems(HorizontalAlign.Start)
+
+                      Blank()
+                      Radio({ value: 'radio' + index, group: 'configGroup' })
+                        .checked(item.configId === this.appConfig.currentProfileId)
+                        .radioStyle({
+                          checkedBackgroundColor: this.icon_emphasize,
+                        })
+                        .onClick(async () => {
+                          ClashViewModel.updateProfileConfig(item.configId)
+                          this.currentConfigRadioCheckedConfigData = item
+                          this.appConfig.currentProfileName = item.configName
+                          this.appConfig.currentProfileId = item.configId
+                          EventHub.sendEvent(EventKey.LoadClashConfig)
+                          hilog.info(0xC002, this.componentName,
+                            `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
+                        })
                     }
-                  //  Text(item.createdDate)
-                  }.alignItems(HorizontalAlign.Start)
-                  Blank()
-                  Radio({ value: 'radio' + index, group: 'configGroup' })
-                    .checked(item.configId === this.appConfig.currentProfileId)
-                    .radioStyle({
-                      checkedBackgroundColor: this.icon_emphasize,
-                    })
-                    .onClick(async  () => {
-                      ClashViewModel.updateProfileConfig(item.configId)
-                      this.currentConfigRadioCheckedConfigData = item
-                      this.appConfig.currentProfileName = item.configName
-                      this.appConfig.currentProfileId = item.configId
-                      EventHub.sendEvent(EventKey.LoadClashConfig)
-                      hilog.info(0xC002, this.componentName, `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
-                    })
-                }
-                .width('100%')
-                .padding(LIST_ITEM_PADDING)
-                .alignItems(VerticalAlign.Center)
-              }
-              .backgroundColor($r('app.color.container_background'))
-              .width('100%')
-              .height(LIST_ITEM_HEIGHT)
-              .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-              .borderRadius(BORDER_RADIUS_20)
-              .hoverEffect(HoverEffect.Scale)
-              .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
-              .bindContextMenu(this.configListLongPressCtxMenuBuilder(item?.isFavorite ?? false), ResponseType.LongPress | ResponseType.RightClick,
-                {
-                  preview: MenuPreviewMode.IMAGE,
-                  previewAnimationOptions: { scale: [1.0, 1.1] },
-                  placement: Placement.BottomRight,
-                  aboutToAppear: () => {
-                    if (this.uiConfig.isVibrate) {
-                      customVibrator.vibratorTriggerOfHapticClockTimer()
-                    }
+                    .width('100%')
+                    .padding(LIST_ITEM_PADDING)
+                    .alignItems(VerticalAlign.Center)
                   }
+                  .backgroundColor($r('app.color.container_background'))
+                  .width('100%')
+                  .height(LIST_ITEM_HEIGHT)
+                  .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+                  .borderRadius(BORDER_RADIUS_20)
+                  .hoverEffect(HoverEffect.Scale)
+                  .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
+                  .bindContextMenu(this.configListLongPressCtxMenuBuilder(item?.isFavorite ?? false),
+                    ResponseType.LongPress | ResponseType.RightClick,
+                    {
+                      preview: MenuPreviewMode.IMAGE,
+                      previewAnimationOptions: { scale: [1.0, 1.1] },
+                      placement: Placement.BottomRight,
+                      aboutToAppear: () => {
+                        if (this.uiConfig.isVibrate) {
+                          customVibrator.vibratorTriggerOfHapticClockTimer()
+                        }
+                      }
+                    })
+                  .onClick(async () => {
+                    this.currentConfigRadioCheckedConfigData = item
+                    this.appConfig.currentProfileName = item.configName
+                    this.appConfig.currentProfileId = item.configId
+                    EventHub.sendEvent(EventKey.LoadClashConfig)
+                    hilog.info(0xC002, this.componentName,
+                      `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
+                  })
+                  .onTouch((event: TouchEvent) => {
+                    if (event.type === TouchType.Down) {
+                      // TODO 现在用来代替获取长按的是哪一个ListItem，目前用`configName`作为每一个item的唯一性属性
+                      this.currentTouchConfigData = item
+                      hilog.info(0xC002, this.componentName,
+                        `#ListItem#onTouch(TouchType.Down): configName is [${this.currentTouchConfigData.configName}]`)
+                    }
+                  })
+
+                  // .gesture(LongPressGesture({ repeat: false }).onAction(() => {
+                  //   this.isShownConfigListCtxMenu = !this.isShownConfigListCtxMenu
+                  //   hilog.info(0xC002, this.componentName, `#gesture#LongPressGesture:`)
+                  // }))
                 })
-              .onClick(async  () => {
-                this.currentConfigRadioCheckedConfigData = item
-                this.appConfig.currentProfileName = item.configName
-                this.appConfig.currentProfileId = item.configId
-                EventHub.sendEvent(EventKey.LoadClashConfig)
-                hilog.info(0xC002, this.componentName, `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
+              }
+              .width('100%')
+              .height('100%')
+              .padding({
+                left: this.breakPointStateTabContentTitleMargin.value,
+                right: this.breakPointStateTabContentTitleMargin.value,
               })
-              .onTouch((event: TouchEvent) => {
-                if (event.type === TouchType.Down) {
-                  // TODO 现在用来代替获取长按的是哪一个ListItem，目前用`configName`作为每一个item的唯一性属性
-                  this.currentTouchConfigData = item
-                  hilog.info(0xC002, this.componentName, `#ListItem#onTouch(TouchType.Down): configName is [${this.currentTouchConfigData.configName}]`)
-                }
+              // 110 = app.integer.vp_proxy_start_button_margin *2 + app.integer.vp_proxy_not_start_button_width
+              .contentEndOffset(CONTENT_END_OFFSET_150)
+              .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
+              .edgeEffect(EdgeEffect.Spring)
+              .chainAnimation(true)
+              .nestedScroll({
+                scrollForward: NestedScrollMode.PARENT_FIRST,
+                scrollBackward: NestedScrollMode.SELF_FIRST
               })
-              // .gesture(LongPressGesture({ repeat: false }).onAction(() => {
-              //   this.isShownConfigListCtxMenu = !this.isShownConfigListCtxMenu
-              //   hilog.info(0xC002, this.componentName, `#gesture#LongPressGesture:`)
-              // }))
+              // 配置列表 END
+            }
+            .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)//,{alwaysEnabled:true})
+            .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {
+              // 累计计算当前父组件滚动在Y轴方向的偏移量
+              if (this.uiConfig.isAnimation){
+                this.curYOffset += yOffset
+              }
+              console.info("yOffset" + this.curYOffset);
             })
           }
-          .width('100%')
-          .height('100%')
-          .padding({
-            left: this.breakPointStateTabContentTitleMargin.value,
-            right: this.breakPointStateTabContentTitleMargin.value,
-          })
-          // 110 = app.integer.vp_proxy_start_button_margin *2 + app.integer.vp_proxy_not_start_button_width
-          .contentEndOffset(CONTENT_END_OFFSET_110)
-          .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
-          .edgeEffect(EdgeEffect.Spring)
-          .chainAnimation(true)
-          // 配置列表 END
         }
         // 悬浮新增配置按钮 START
         Column() {
@@ -424,6 +453,7 @@ struct ConfigurationPage {
               .fontColor([Color.White])
               .symbolEffect(this.ReplaceSymbolEffect)
               .align(Alignment.Center)
+              .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
           }.zIndex(3)
           .width('100%')
           .height('100%')
@@ -436,8 +466,8 @@ struct ConfigurationPage {
           type: ShadowType.BLUR
         })
         .borderRadius(100)
-        .margin(this.uiConfig.isBlurr?{bottom:this.isLandscapePhone ? 86: $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')}:
-          {bottom:this.isLandscapePhone ? 86: $r('app.integer.vp_proxy_start_button_left_right_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
+        .margin(this.uiConfig.isBlurr?{bottom:this.isLandscapePhone ?$r('app.integer.vp_proxy_start_button_left_right_margin'): $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')}:
+        $r('app.integer.vp_proxy_start_button_left_right_margin'))
         .width(this.proxyStartButtonWidth)
         .height(this.proxyStartButtonHeight)
         .backgroundColor(this.icon_emphasize)
@@ -497,7 +527,7 @@ struct ConfigurationPage {
       .backgroundColor($r('app.color.background'))
       // .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
       .width('100%')
-      .height(this.isLandscapePhone ? '100%' :`calc(100% - ${TAB_CONTENT_TITLE_HEIGHT}vp)`)
+      .height('100%')
       // 主体 END
     }
     .width('100%')
