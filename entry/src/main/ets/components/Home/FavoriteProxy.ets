@@ -6,6 +6,7 @@ import { ProxyItem } from '../../common/ProxyData'
 import { AppConfig, AppState, isEnd, UIConfig } from '../../entryability/AppState'
 import { ProxyGroup } from 'proxy_core'
 import { customVibrator } from '../../utils/VibratorUtil'
+import { customAnimationUtil } from '../../utils/Animation'
 
 
 @Component
@@ -80,7 +81,9 @@ struct FavoriteProxy {
                   if (this.isShowHomeEdit===false ) {
                     this.appConfig.currentProxyName = p[1]
                     this.appConfig.currentProxyItem = AppState.fetchProxyItem(this.proxyGroups, p[0], p[1])
-                    customVibrator.vibratorTriggerOfHapticClockTimer()
+                    if (this.uiConfig.isVibrate) {
+                      customVibrator.vibratorTriggerOfHapticClockTimer()
+                    }
                   }
                 })
             }
@@ -89,10 +92,12 @@ struct FavoriteProxy {
               if (this.isShowHomeEdit===false) {
                 this.appConfig.currentProxyName = p[1]
                 this.appConfig.currentProxyItem = AppState.fetchProxyItem(this.proxyGroups, p[0], p[1])
-                customVibrator.vibratorTriggerOfHapticClockTimer()
+                if (this.uiConfig.isVibrate) {
+                  customVibrator.vibratorTriggerOfHapticClockTimer()
+                }
               }
             })
-            .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+            .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
             if (!isEnd(this.favoriteProxys.size, i)){
               Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
             }

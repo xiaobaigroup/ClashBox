@@ -2,7 +2,7 @@ import { BreakpointState } from '../../common/breakpointsystem'
 import { mediaquery, PromptAction } from '@kit.ArkUI'
 import { MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
-import { AppFlowingState } from '../../entryability/AppState'
+import { AppFlowingState, UIConfig } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { IpInfo } from 'proxy_core'
 import { EventHub, EventKey } from '../../common/EventHub'
@@ -34,7 +34,7 @@ struct PublicNetwork {
   @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
   //收藏与ping延迟即时动作
   private PromptAction:PromptAction = this.getUIContext()?.getPromptAction()
-
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @State remoteIp: IpInfo | null = null
   aboutToAppear(): void {
     EventHub.on(EventKey.checkIpInfo, async ()=>{
@@ -71,7 +71,9 @@ struct PublicNetwork {
             if (this.isShowHomeEdit===false) {
                 this.remoteIp = null
                 EventHub.sendEvent(EventKey.checkIpInfo)
-              customVibrator.vibratorTriggerOfHapticClockTimer()
+              if (this.uiConfig.isVibrate) {
+                customVibrator.vibratorTriggerOfHapticClockTimer()
+              }
             }
           })
       }.width('100%').justifyContent(FlexAlign.End)

@@ -60,7 +60,9 @@ struct totalCustomDialog {
       .backgroundColor(Color.Transparent)
       .onSelect((index: number) => {
         this.index=index
-        customVibrator.vibratorTriggerOfHapticClockTimer()
+                      if (this.uiConfig.isVibrate) {
+                customVibrator.vibratorTriggerOfHapticClockTimer()
+              }
         console.info('Select:' + index+this.uiConfig.switchUnit);
       })
       .selectedOptionBgColor(this.icon_emphasize)
@@ -69,7 +71,9 @@ struct totalCustomDialog {
       .menuBackgroundColor($r('app.color.container_background'))
       .menuBackgroundBlurStyle(BlurStyle.NONE)
       .onClick(() => {
-        customVibrator.vibratorTriggerOfHapticClockTimer()
+                      if (this.uiConfig.isVibrate) {
+                customVibrator.vibratorTriggerOfHapticClockTimer()
+              }
       })
   }
 
@@ -108,7 +112,6 @@ struct totalCustomDialog {
               this.controller.close()
               this.isEnableIndexForegroundBlur = false
             }
-            customVibrator.vibratorTriggerOfHapticClockTimer()
           })
 
         Button($r('app.string.Save'))
@@ -120,7 +123,6 @@ struct totalCustomDialog {
            this.uiConfig.inputTotal= this.TotalCellular
             this.uiConfig.cellularDataIndex=this.index
             this.switchUnit(this.uiConfig.cellularDataIndex)
-            customVibrator.vibratorTriggerOfHapticClockTimer()
        //     console.info('inputTotal1', this.uiConfig.inputTotal)
             if (this.controller != undefined) {
               this.controller.close()
@@ -326,7 +328,9 @@ struct CellularDataStat {
             this.dialogController.open()
             this.isEnableIndexForegroundBlur=true
           }
-          customVibrator.vibratorTriggerOfHapticClockTimer()
+          if (this.uiConfig.isVibrate) {
+            customVibrator.vibratorTriggerOfHapticClockTimer()
+          }
           console.info('Total',convertToSwitchNub(this.appFlowingState.totalTraffic.upRaw+this.appFlowingState.totalTraffic.downRaw,this.uiConfig.switchUnit),this.uiConfig.inputTotal)
         }
       })

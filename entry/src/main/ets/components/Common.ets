@@ -8,6 +8,7 @@ import {
   FONT_SIZE_16
 } from "../common/Constants"
 import { UIConfig } from "../entryability/AppState"
+import { customAnimationUtil } from "../utils/Animation"
 import { getResourceString } from "../utils/ResourceStringUtil"
 import { KeyValueData } from "./More/Overwrite/EditArrayConfig"
 
@@ -588,6 +589,7 @@ export struct Nothing {
   @State font_secondary: ResourceColor = $r('sys.color.font_secondary')
   // 页面标题
   @State name: Resource = $r('app.string.none')
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   build() {
     Column() {
@@ -598,11 +600,13 @@ export struct Nothing {
       Text(getResourceString($r('app.string.none'), this) + getResourceString(this.name, this))
         .fontSize(20)
         .fontColor(this.font_secondary)
+        .textAlign(TextAlign.Center)
     }
     .alignItems(HorizontalAlign.Center)
     .justifyContent(FlexAlign.Center)
     .width('100%')
-    .height('100%')
+    .height('85%')
+    .transition(customAnimationUtil.isScaleTran(0,this.uiConfig))
   }
 }
 
@@ -687,7 +691,7 @@ export struct skipRowList {
         .fontColor([this.icon_primary])
     }
     .RowStyle()
-    .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
   }
 }
 
@@ -759,7 +763,7 @@ export struct toggleRowList {
       this.toggle()
     }
     .RowStyle()
-    .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+    .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE} : null)
   }
 }
 
@@ -847,6 +851,6 @@ export struct menuRowList {
       }.bindMenu(this.menu())
     }
     .RowStyle()
-    .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+    .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE} : null)
   }
 }

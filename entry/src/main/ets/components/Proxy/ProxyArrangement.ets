@@ -9,6 +9,7 @@ import { AppConfig, UIConfig } from '../../entryability/AppState'
 import { customAnimationUtil } from '../../utils/Animation'
 
 
+
 @Entry
 @Component
 struct ProxyArrangement {
@@ -76,7 +77,7 @@ struct ProxyArrangement {
       .borderRadius(BORDER_RADIUS_20)
       .backgroundColor($r('app.color.container_background'))
       .height(LIST_ITEM_HEIGHT)
-      .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8 } : null)
+      .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
   }
 
   proxyScroller: ListScroller = new ListScroller()

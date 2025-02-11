@@ -14,6 +14,7 @@ import { setAutoColorMode, setDarkColorMode, setLightColorMode } from "../../uti
 import { menuRowList, toggleRowList } from "../Common"
 import {  AppConfig, UIConfig } from "../../entryability/AppState"
 import { changeThemeColor } from "../../utils/ChangeThemeColorUtil"
+import { customAnimationUtil } from "../../utils/Animation"
 
 @Component
 struct Appearance {
@@ -376,7 +377,7 @@ struct Appearance {
           }
           .width('100%')
           .height(220)
-            .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+               .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         }
         // 列表区 Start
         ListItem() {
@@ -439,7 +440,7 @@ struct Appearance {
           }
           .width('100%')
           .borderRadius(20)
-            .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+               .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .backgroundColor($r('app.color.container_background'))
         }
         ListItem() {
@@ -478,7 +479,7 @@ struct Appearance {
           }
           .width('100%')
           .borderRadius(20)
-            .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+               .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .backgroundColor($r('app.color.container_background'))
         }
         // 列表区 End

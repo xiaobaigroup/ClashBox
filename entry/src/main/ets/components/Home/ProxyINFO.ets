@@ -1,7 +1,7 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import { MarginGenerate } from "../../common/Constants"
 import { ProxyItem, ProxyData } from "../../common/ProxyData"
-import { AppConfig, AppFlowingState } from "../../entryability/AppState"
+import { AppConfig, AppFlowingState, UIConfig } from "../../entryability/AppState"
 import { CardTitle } from "./CardTitleBuilder"
 import { PromptAction } from "@kit.ArkUI"
 import ClashViewModel from "../../entryability/ClashViewModel"
@@ -34,7 +34,7 @@ struct ProxyINFO{
   @Consume isShowHomeEdit: boolean
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageProp("appFlowingState") appFlowingState: AppFlowingState = new AppFlowingState()
-
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   //收藏与ping延迟即时动作
   private PromptAction:PromptAction = this.getUIContext()?.getPromptAction()
 
@@ -118,7 +118,9 @@ struct ProxyINFO{
               this.appFlowingState.removeIp = null
               this.appFlowingState.removeIp = await ClashViewModel.checkIpInfo()
               console.log("checkIpInfo", JSON.stringify( this.appFlowingState.removeIp))
-              customVibrator.vibratorTriggerOfHapticClockTimer()
+              if (this.uiConfig.isVibrate) {
+                customVibrator.vibratorTriggerOfHapticClockTimer()
+              }
             }
           })
       }

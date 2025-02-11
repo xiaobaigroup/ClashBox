@@ -11,6 +11,7 @@ import { common, Want } from "@kit.AbilityKit"
 import { BusinessError } from "@kit.BasicServicesKit"
 import { promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 import { AppConfig, ClashCore, UIConfig } from "../../entryability/AppState"
+import { customAnimationUtil } from "../../utils/Animation"
 
 @Component
 struct About {
@@ -231,7 +232,7 @@ struct About {
           .height(220)
         }
         .margin({bottom: 10 })
-        .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
 
         ForEach(this.aboutList, (item: AboutListItemProp, index: number) => {
           ListItem() {
@@ -262,7 +263,7 @@ struct About {
                     // 分割线
                     Row().height(0.5).backgroundColor('#0D000000').width('93%')
                   }
-                  .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+                     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                   .onClick(() => {
                     // 这里什么都没有
                   })
@@ -311,7 +312,7 @@ struct About {
                     // 分割线
                     Row().height(0.5).backgroundColor('#0D000000').width('93%')
                   }
-                  .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+                     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                   .onClick(() => {
                     if(itemChild.sign === 0) {
                       // 似乎可以留个彩蛋
@@ -475,7 +476,7 @@ export struct AboutContributors {
               if(item.contact) {
                 Row() {
                   Button(item.contact, { type: ButtonType.Capsule, stateEffect: true })
-                      .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+                         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                     .backgroundColor($r('app.color.button_container_background'))
                     .fontColor(this.icon_emphasize)
                     .width(90)
@@ -485,7 +486,7 @@ export struct AboutContributors {
                     })
                   if(item.contact2) {
                     Button(item.contact2, { type: ButtonType.Capsule, stateEffect: true })
-                        .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+                           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                       .backgroundColor($r('app.color.button_container_background'))
                       .fontColor(this.icon_emphasize)
                       .margin({left: 6})
@@ -503,7 +504,7 @@ export struct AboutContributors {
               }
             }
           }
-            .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+               .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .backgroundColor($r('app.color.container_background'))
           .borderRadius(BORDER_RADIUS_20)
           .margin({bottom: 10 })
@@ -611,7 +612,7 @@ export struct CheckUpdate {
                 Row().height(0.5).backgroundColor('#0D000000').width('93%')
               }
               .width('100%')
-                .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+                   .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
               .onClick(() => {
                 if(index === 1) {
                   // 前往下载网页

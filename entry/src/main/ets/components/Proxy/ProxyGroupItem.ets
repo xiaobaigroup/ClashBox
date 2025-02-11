@@ -15,6 +15,7 @@ import { AppConfig, ProxyCardSize, UIConfig } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel';
 import { ProxyNode } from './ProxyItem';
 import { customAnimationUtil } from '../../utils/Animation';
+import { customVibrator } from '../../utils/VibratorUtil';
 
 
 //断点布局
@@ -331,6 +332,9 @@ struct ProxyGroupItem {
             preview: MenuPreviewMode.IMAGE,
             onAppear: (() => {
               this.currentTouchProxyData = item
+              if (this.uiConfig.isVibrate) {
+                customVibrator.vibratorTriggerOfHapticClockTimer()
+              }
             }),
             previewAnimationOptions: {
               scale: [0.95, 1.0],

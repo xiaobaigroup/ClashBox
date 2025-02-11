@@ -4,6 +4,7 @@ import { MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
 import { AppConfig, isEnd, UIConfig } from '../../entryability/AppState'
 import { customVibrator } from '../../utils/VibratorUtil'
+import { customAnimationUtil } from '../../utils/Animation'
 
 
 @Component
@@ -60,17 +61,21 @@ struct FavoriteConfiguration {
                   //在home页编辑状态时，无法操作
                   if (this.isShowHomeEdit===false && isChecked) {
                     this.appConfig.currentProfileId = f[0]
-                    customVibrator.vibratorTriggerOfHapticClockTimer()
+                    if (this.uiConfig.isVibrate) {
+                      customVibrator.vibratorTriggerOfHapticClockTimer()
+                    }
                   }
                 })
             }
             .onClick(() => {
               if (this.isShowHomeEdit===false) {
                 this.appConfig.currentProfileId = f[0]
-                customVibrator.vibratorTriggerOfHapticClockTimer()
+                if (this.uiConfig.isVibrate) {
+                  customVibrator.vibratorTriggerOfHapticClockTimer()
+                }
               }
             })
-            .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+            .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
             if(!isEnd(this.favoriteProfiles.size, i))
               Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
           })

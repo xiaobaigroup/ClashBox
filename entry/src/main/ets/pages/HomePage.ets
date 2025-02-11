@@ -804,7 +804,9 @@ struct Home {
               }
               await ClashViewModel.StopVpn()
             }
-            customVibrator.vibratorTriggerOfHapticClockTimer()
+            if (this.uiConfig.isVibrate) {
+              customVibrator.vibratorTriggerOfHapticClockTimer()
+            }
 
           }
 

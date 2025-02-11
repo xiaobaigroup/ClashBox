@@ -205,7 +205,6 @@ struct Log {
             .height('100%')
           } else if (this.logListData.length === 0) {
             Nothing({ name: $r('app.string.Log') })
-              .transition(customAnimationUtil.isScaleTran(0,this.uiConfig))
           } else {
             List({ space: 10 }) {
               ForEach(this.logListData, (item: LogData, index: number) => {
@@ -239,7 +238,7 @@ struct Log {
                       .alignItems(HorizontalAlign.Start)
                     }.width('100%')
                     .borderRadius(20)
-                    .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+                    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                     .backgroundColor($r('app.color.container_background'))
                     .padding(12)
                   }

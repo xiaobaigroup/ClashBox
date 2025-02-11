@@ -626,7 +626,7 @@
     },
     {
       "name": "None_Proxy",
-      "value": "当前页面暂无代理\n请检查配置"
+      "value": "代理\n请检查配置"
     },
     {
       "name": "Application_Version",

@@ -129,7 +129,7 @@ struct Connect {
                       .fontColor([this.icon_primary])
                   }.width(40)
                   .height(40)
-                  .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+                  .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                   .backgroundColor($r('app.color.settings_container_background')).onClick(()=>{
                       this.connectListData.splice(index,1)
                       ClashViewModel.closeConnection(item.id)

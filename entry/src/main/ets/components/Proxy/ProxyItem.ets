@@ -1,7 +1,8 @@
 import { EventHub, EventKey } from '../../common/EventHub'
 import { ProxyItem as ProxyItem, ProxyData } from '../../common/ProxyData'
-import { ProxyCardSize } from '../../entryability/AppState'
+import { ProxyCardSize, UIConfig } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
+import { customVibrator } from '../../utils/VibratorUtil'
 
 
 @Extend(Text)
@@ -30,7 +31,7 @@ function ListRowStyle() {
 export struct ProxyNode {
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
-
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @Prop itemSize: ProxyCardSize
   @Prop item: ProxyItem
   @Prop disabled: boolean

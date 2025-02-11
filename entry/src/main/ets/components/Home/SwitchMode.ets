@@ -6,6 +6,7 @@ import { AppConfig, SwitchModeCard, UIConfig } from '../../entryability/AppState
 import { EventHub, EventKey } from '../../common/EventHub';
 import { ClashConfig, ProxyMode } from 'proxy_core';
 import { customVibrator } from '../../utils/VibratorUtil';
+import { customAnimationUtil } from '../../utils/Animation';
 
 @Component
 struct SwitchMode {
@@ -62,7 +63,7 @@ struct SwitchMode {
           .shadow({ radius:10,color:$r('app.color.shadow')})
           .height('33.3%')
           .translate({y:this.uiConfig.translateY})
-          .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8 } : null)
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .backgroundColor($r('app.color.container_background'))
 
       Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
@@ -73,7 +74,7 @@ struct SwitchMode {
           ], (n: [Resource, number], i: number) => {
             Button(n["t"], { buttonStyle: ButtonStyleMode.TEXTUAL, stateEffect: false })
               .ButtonStyle()
-              .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8 } : null)
+              .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
               .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
               .fontColor(this.clashConfig.mode == n["v"] ? this.font_primary : $r('sys.color.font_secondary'))
               .onClick(() => {
@@ -88,7 +89,9 @@ struct SwitchMode {
                     this.clashConfig.mode = n["v"]
                     this.switchTranslateY(i)
                     EventHub.sendEvent(EventKey.SwitchModeCard, n["v"])
-                    customVibrator.vibratorTriggerOfHapticClockTimer()
+                    if (this.uiConfig.isVibrate) {
+                      customVibrator.vibratorTriggerOfHapticClockTimer()
+                    }
                   })
                 }
               })

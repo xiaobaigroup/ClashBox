@@ -17,6 +17,7 @@ import { ProviderPage } from '../components/Proxy/Provider'
 import { indexController } from './Index'
 import { customVibrator } from '../utils/VibratorUtil'
 import { customAnimationUtil } from '../utils/Animation'
+import { Nothing } from '../components/Common'
 
 
 @Entry
@@ -111,6 +112,7 @@ struct ProxyPage {
       }, 200)
     }
   }
+
 
   changeProxy(g: string, item: ProxyItem) {
     if (this.currentProfile) {
@@ -315,13 +317,27 @@ struct ProxyPage {
     Scroll(){
     Column() {
       // 标题栏
-      if (!this.isLandscapePhone) {
+     // if (!this.isLandscapePhone || this.appConfig.proxyGroupType === ProxyGroupType.List) {
         Row({ space: this.HomeCardTitleButtonPadding.value }) {
           Text($r('app.string.Proxy'))
             .fontSize(TAB_CONTENT_TITLE_FONT_SIZE)
             .fontWeight(FontWeight.Bold)
             .textAlign(TextAlign.Center)
             .transition(customAnimationUtil.isSlide(200, this.uiConfig))
+            .transition(customAnimationUtil.isScaleTran(0, this.uiConfig))
+              //提供者半模拟态
+            .bindSheet($$this.isProviderEdit, this.ProviderBindSheetEdit(), {
+              detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
+              backgroundColor: $r('app.color.background'),
+              showClose: false,
+              dragBar: false,
+              scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+              preferType: SheetType.CENTER,
+              onWillDismiss: () => {
+                this.isProviderEdit = false
+                this.isEnableIndexForegroundBlur = false
+              }
+            })
           Blank()
 
           //提供者按钮
@@ -339,6 +355,20 @@ struct ProxyPage {
             this.isEnableIndexForegroundBlur = true
           })
           .transition(customAnimationUtil.isSlide(100, this.uiConfig))
+          //代理样式编辑半模拟态
+          .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
+            detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
+            backgroundColor: $r('app.color.background'),
+            showClose: true,
+            dragBar: false,
+            scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+            title: { title: $r('app.string.Edit') },
+            preferType: SheetType.CENTER,
+            onWillDismiss: () => {
+              this.isShowEdit = false
+              this.isEnableIndexForegroundBlur = false
+            }
+          })
 
           //编辑图标
           Button({ type: ButtonType.Circle, stateEffect: true }) {
@@ -364,45 +394,12 @@ struct ProxyPage {
           right: this.breakPointStateTabContentTitleMargin.value,
         })
         .transition(customAnimationUtil.isSlide(0, this.uiConfig))
-      }
+    //  }
 
       if (this.proxyGroups.length == 0) {
-        Column({ space: 5 }) {
-          SymbolGlyph($r('sys.symbol.doc')).fontSize(32).fontColor([this.icon_secondary])
-          Text($r('app.string.None_Proxy')).fontSize(20).fontColor(this.font_secondary).textAlign(TextAlign.Center)
-            .bindSheet($$this.isProviderEdit, this.ProviderBindSheetEdit(), {
-              detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
-              backgroundColor: $r('app.color.background'),
-              showClose: false,
-              dragBar: false,
-              scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-              //   title: { title: $r('app.string.provider') },
-              preferType: SheetType.CENTER,
-              onWillDismiss: () => {
-                this.isProviderEdit = false
-                this.isEnableIndexForegroundBlur = false
-              }
-            })
+        Column() {
+          Nothing({ name: $r('app.string.None_Proxy') })
         }
-        .width('100%')
-        .height('90%')
-        .alignItems(HorizontalAlign.Center)
-        .justifyContent(FlexAlign.Center)
-        .transition(customAnimationUtil.isScaleTran(0, this.uiConfig))
-        //.padding({top:TAB_CONTENT_TITLE_HEIGHT})
-        .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
-          detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
-          backgroundColor: $r('app.color.background'),
-          showClose: true,
-          dragBar: false,
-          scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-          title: { title: $r('app.string.Edit') },
-          preferType: SheetType.CENTER,
-          onWillDismiss: () => {
-            this.isShowEdit = false
-            this.isEnableIndexForegroundBlur = false
-          }
-        })
 
       } else if (this.proxyGroups.length > 0) {
         // 代理页分组TAB+list主体
@@ -482,7 +479,7 @@ struct ProxyPage {
 
           // 列表排列
           else if (this.appConfig.proxyGroupType === ProxyGroupType.List) {
-            ProxyArrangement() // transition保证组件离场不被立即析构，可设置其他转场效果
+            ProxyArrangement()
           }
           //列表排列end
 
@@ -496,7 +493,9 @@ struct ProxyPage {
                 .align(Alignment.Center)
             }.onClick(() => {
               EventHub.sendEvent(EventKey.TestDelayAll)
-              customVibrator.vibratorTriggerOfHapticClockTimer()
+              if (this.uiConfig.isVibrate) {
+                customVibrator.vibratorTriggerOfHapticClockTimer()
+              }
               this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
             })
             .width('100%')
@@ -510,33 +509,15 @@ struct ProxyPage {
           })
           .borderRadius(100)
           .backgroundColor(this.icon_emphasize)
-          .margin(this.uiConfig.isBlurr ? {
-            bottom: this.isLandscapePhone ? 30 : $r('app.integer.vp_proxy_start_button_bottom_margin'),
-            right: $r('app.integer.vp_proxy_start_button_left_right_margin'),
-            left: $r('app.integer.vp_proxy_start_button_left_right_margin')
-          } :
-          $r('app.integer.vp_proxy_start_button_left_right_margin'))
+          .margin(this.uiConfig.isBlurr?{bottom:this.isLandscapePhone ? 86: $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')}:
+            {bottom:this.isLandscapePhone ? 86: $r('app.integer.vp_proxy_start_button_left_right_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
           .width(this.proxyStartButtonWidth)
           .height(this.proxyStartButtonHeight)
           .clip(true)
           .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
-          .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
-            detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
-            backgroundColor: $r('app.color.background'),
-            //  blurStyle: BlurStyle.BACKGROUND_REGULAR,
-            showClose: true,
-            dragBar: false,
-            scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-            title: { title: $r('app.string.Edit') },
-            preferType: SheetType.CENTER,
-            //         maskColor: $r('app.color.dialog_maskcolor'),
-            onWillDismiss: () => {
-              this.isShowEdit = false
-              this.isEnableIndexForegroundBlur = false
-            }
-          })
+
 
           // 悬浮代理测速按钮 END
         }
@@ -544,20 +525,6 @@ struct ProxyPage {
         // .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
         .width('100%')
         .height(this.isLandscapePhone ? '100%' : `calc(100% - ${TAB_CONTENT_TITLE_HEIGHT}vp)`)
-        .bindSheet($$this.isProviderEdit, this.ProviderBindSheetEdit(), {
-          detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
-          backgroundColor: $r('app.color.background'),
-          showClose: false,
-          dragBar: false,
-          scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-          //   title: { title: $r('app.string.provider') },
-          preferType: SheetType.CENTER,
-          onWillDismiss: () => {
-            this.isProviderEdit = false
-            this.isEnableIndexForegroundBlur = false
-          }
-        })
-
         // 主体 END
       }
     }

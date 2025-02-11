@@ -328,7 +328,8 @@ struct ConfigurationPage {
       Stack({ alignContent: this.stackAlignContentAlignment }) {
         if (this.configList.length === 0) {
           Nothing({ name: $r('app.string.Configuration') })
-            .transition(customAnimationUtil.isScaleTran(0,this.uiConfig))
+            .height('95%')
+            .margin({bottom:10})
         } else {
           // 配置列表 START
           List({ space: LIST_SPACE }) {
@@ -352,9 +353,6 @@ struct ConfigurationPage {
                       checkedBackgroundColor: this.icon_emphasize,
                     })
                     .onClick(async  () => {
-                      if (this.uiConfig.isVibrate) {
-                        customVibrator.vibratorTriggerOfHapticClockTimer()
-                      }
                       ClashViewModel.updateProfileConfig(item.configId)
                       this.currentConfigRadioCheckedConfigData = item
                       this.appConfig.currentProfileName = item.configName
@@ -370,7 +368,7 @@ struct ConfigurationPage {
               .backgroundColor($r('app.color.container_background'))
               .width('100%')
               .height(LIST_ITEM_HEIGHT)
-              .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE, scale: 0.8} : null)
+              .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
               .borderRadius(BORDER_RADIUS_20)
               .hoverEffect(HoverEffect.Scale)
               .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
@@ -388,9 +386,6 @@ struct ConfigurationPage {
               .onClick(async  () => {
                 this.currentConfigRadioCheckedConfigData = item
                 this.appConfig.currentProfileName = item.configName
-                if (this.uiConfig.isVibrate) {
-                  customVibrator.vibratorTriggerOfHapticClockTimer()
-                }
                 this.appConfig.currentProfileId = item.configId
                 EventHub.sendEvent(EventKey.LoadClashConfig)
                 hilog.info(0xC002, this.componentName, `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
@@ -492,7 +487,9 @@ struct ConfigurationPage {
         .onClick( () => {
           this.isShowConfigAddBindSheet = true
           this.isEnableIndexForegroundBlur = true
-          customVibrator.vibratorTriggerOfHapticClockTimer()
+          if (this.uiConfig.isVibrate) {
+            customVibrator.vibratorTriggerOfHapticClockTimer()
+          }
         })
         .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
         // 悬浮新增配置按钮 END

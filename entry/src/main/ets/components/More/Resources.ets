@@ -283,6 +283,7 @@ struct Resources {
                         .fontSize(24)
                         .fontColor([this.icon_primary])
                     }.ButtonStyle().margin({ right: 12 })
+                    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                     .onClick(() => {
                       // 进入列表行数据编辑
                       this.currentEditInputValue = this.clashConfig?.['geox-url']?.[item.key] ?? ""
@@ -297,6 +298,7 @@ struct Resources {
                         .fontSize(24)
                         .fontColor([this.icon_primary])
                     }.ButtonStyle()
+                    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                     .onClick(() => {
                       this.updateTime(index)
                       // 资源更新处理
@@ -399,7 +401,7 @@ struct Sort {
         .fontSize(24)
     }
     .width('100%')
-    .clickEffect({ level: ClickEffectLevel.MIDDLE })
+    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
     .padding({left: 12, right: 12, top: 16, bottom: 16})
   }
 
@@ -431,7 +433,7 @@ struct Sort {
         .width(40)
         .height(40)
         .margin({ top: 16 })
-        .clickEffect({ level: ClickEffectLevel.LIGHT })
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .backgroundColor(Color.Blue)
         .onClick(() => {
           this.isSave = true
@@ -583,6 +585,5 @@ function smallText() {
 function ButtonStyle() {
   .width(40)
   .height(40)
-  .clickEffect({ level: ClickEffectLevel.LIGHT })
   .backgroundColor($r('app.color.settings_container_background'))
 }

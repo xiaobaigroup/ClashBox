@@ -1,4 +1,6 @@
 import { BIND_SHEET_DRAG_BAR_HEIGHT, BIND_SHEET_TITLE_CONTAINER_HEIGHT } from "../../common/Constants"
+import { UIConfig } from "../../entryability/AppState"
+import { customAnimationUtil } from "../../utils/Animation"
 
 @Preview
 @Component
@@ -9,7 +11,7 @@ struct TopBuilder {
   @State showBackButton: boolean = true
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
-
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   build() {
     Row() {
@@ -23,7 +25,7 @@ struct TopBuilder {
         .margin({left: 16, top: BIND_SHEET_DRAG_BAR_HEIGHT })
         .width(40)
         .height(40)
-        .clickEffect({ level: ClickEffectLevel.LIGHT })
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .backgroundColor($r('app.color.back'))
         .onClick(() => {
           this.SettingsPageInfos.pop(true)

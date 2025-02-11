@@ -11,6 +11,7 @@ import { common, Want } from '@kit.AbilityKit'
 import { PromptAction } from '@kit.ArkUI'
 import { AppConfig, isEnd, UIConfig } from '../../entryability/AppState'
 import { customVibrator } from '../../utils/VibratorUtil'
+import { customAnimationUtil } from '../../utils/Animation'
 
 @Component
 struct Shortcuts {
@@ -76,7 +77,7 @@ struct Shortcuts {
             Text(`${m["t"]}` != '' ? `${m["t"]}` : $r('app.string.long_press_modify'))
               .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
               .ShortcutsTextStyle()
-              .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+              .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
               .onClick(() => {
                 //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
                 if (this.isShowHomeEdit === false) {
@@ -85,7 +86,9 @@ struct Shortcuts {
                   } else {
                     this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
                   }
-                  customVibrator.vibratorTriggerOfHapticClockTimer()
+                  if (this.uiConfig.isVibrate) {
+                    customVibrator.vibratorTriggerOfHapticClockTimer()
+                  }
                 }
               })
               .gesture(
@@ -95,7 +98,9 @@ struct Shortcuts {
                     if (this.isShowHomeEdit === false) {
                       this.isShowShortcutsEdit = true
                       this.isEnableIndexForegroundBlur = true
-                      customVibrator.vibratorTriggerOfHapticClockTimer()
+                      if (this.uiConfig.isVibrate) {
+                        customVibrator.vibratorTriggerOfHapticClockTimer()
+                      }
                     }
                   })
               )
@@ -289,7 +294,7 @@ struct Shortcuts {
               Text('URL').TextStyle()
               Button($r('app.string.write_url'))
                 .ButtonStyle()
-                .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+                .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                 .fontColor(this.icon_emphasize)
                 .onClick(() => {
                   if (this.WebDialogController1 != null) {
@@ -341,7 +346,7 @@ struct Shortcuts {
               Text('URL').TextStyle()
               Button($r('app.string.write_url'))
                 .ButtonStyle()
-                .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+                .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                 .fontColor(this.icon_emphasize)
                 .onClick(() => {
                   if (this.WebDialogController2 != null) {
@@ -393,7 +398,7 @@ struct Shortcuts {
               Text('URL').TextStyle()
               Button($r('app.string.write_url'))
                 .ButtonStyle()
-                .clickEffect({level:this.uiConfig.isAnimation? ClickEffectLevel.MIDDLE:null})
+                .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                 .fontColor(this.icon_emphasize)
                 .onClick(() => {
                   if (this.WebDialogController3 != null) {
