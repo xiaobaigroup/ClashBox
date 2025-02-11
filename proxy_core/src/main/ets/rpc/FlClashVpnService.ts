@@ -14,7 +14,8 @@ import {
   sideLoadExternalProvider,
   getConnections,
   closeConnections,
-  closeConnection
+  closeConnection,
+  validateConfig
 } from 'libflclash.so';
 import { Address, CommonVpnService, isIpv4, isIpv6, VpnConfig } from './CommonVpnService';
 import { JSON, util } from '@kit.ArkTS';
@@ -78,10 +79,10 @@ export class FlClashVpnService extends CommonVpnService{
       try {
         let result = await this.onRemoteMessage(code, params)
         console.debug(`socket stub ${code} result: `, result)
-        this.sendClient(client, JSON.stringify({ result: result}))
+        this.sendClient(client, JSON.stringify({ result: result, error: undefined}))
       } catch (e) {
-        console.error(`socket stub ${code} result: `, e.message, e.stack)
-        this.sendClient(client, JSON.stringify({ result: e.message}))
+        console.error(`socket stub ${code} result: `, e.message ?? e, e.stack)
+        this.sendClient(client, JSON.stringify({ error: e.message ?? e}))
       }
     }
   }
@@ -90,7 +91,6 @@ export class FlClashVpnService extends CommonVpnService{
     // 根据code处理客户端的请求
     return new Promise(async (resolve, reject) => {
       switch (code){
-
         case ClashRpcType.queryTrafficTotal:{
           const data = JSON.parse(getTotalTraffic())
           resolve(JSON.stringify({ upRaw: data["up"], downRaw: data["down"]} as Traffic))
@@ -171,7 +171,6 @@ export class FlClashVpnService extends CommonVpnService{
           })
           break;
         }
-
         case ClashRpcType.uploadProvider: {
           let provider = data[0] as string
           let pathUri = data[1] as string
@@ -196,7 +195,6 @@ export class FlClashVpnService extends CommonVpnService{
           resolve(closeConnections())
           break;
         }
-
         case ClashRpcType.updateGeoData:{
           updateGeoData(data[0] as string, data[1] as string).then((v)=>{
             resolve(v)
@@ -207,6 +205,7 @@ export class FlClashVpnService extends CommonVpnService{
           getCountryCode(data[0] as string).then((v)=>{
             resolve(v)
           })
+          break;
         }
         case ClashRpcType.load:{
           const parms = JSON.parse(data[0] as string) as UpdateConfigParams
@@ -220,6 +219,10 @@ export class FlClashVpnService extends CommonVpnService{
         case ClashRpcType.reset:{
           forceGc()
           resolve(true)
+          break;
+        }
+        case ClashRpcType.ValidConfig: {
+          resolve(await validateConfig(JSON.stringify(data[0] as string)))
           break;
         }
         case ClashRpcType.startClash: {

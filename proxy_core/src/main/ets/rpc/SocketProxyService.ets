@@ -25,6 +25,10 @@ export class SocketProxyService implements IClashManager{
     let result =  await this.sendMessageRequest(ClashRpcType.load, [JSON.stringify(path)])
     return result as string
   }
+  async vailConfig(config: string){
+    let result = await this.sendMessageRequest(ClashRpcType.ValidConfig, [config])
+    return result as string;
+  }
   async queryTrafficTotal(): Promise<Traffic> {
     let result = await this.sendMessageRequest(ClashRpcType.queryTrafficTotal)
     const json = JSON.parse(result as string) as Traffic
@@ -112,7 +116,12 @@ export class SocketProxyService implements IClashManager{
         let result = text.decodeToString(new Uint8Array(value.message))
         try {
           let json = JSON.parse(messageBuffer + result) as RpcResult
-          resolve(json.result)
+          if (!json.error)
+            resolve(json.result)
+          else{
+            promptAction.showToast({message: json.error})
+            resolve(json.error)
+          }
           client.close();
         } catch (e) {
           messageBuffer += result

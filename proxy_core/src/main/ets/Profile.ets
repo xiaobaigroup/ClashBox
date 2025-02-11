@@ -4,7 +4,7 @@ import { rcp } from '@kit.RemoteCommunicationKit';
 import { Context } from '@kit.AbilityKit';
 import { fileUri } from '@kit.CoreFileKit';
 import { ProxyGroup, ProxyType, SubscriptionInfo } from './models/Common';
-import { JSON, uri } from '@kit.ArkTS';
+import { JSON, uri, util } from '@kit.ArkTS';
 
 export function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -20,7 +20,7 @@ export enum ProfileType {
   External
 }
 
-
+let utf8 = new util.TextDecoder()
 
 export class Profile {
   id: string
@@ -47,11 +47,11 @@ export class Profile {
   loadContext(context: Context | undefined){
     this.context = context
   }
-  async checkAndUpdate(): Promise<void>{
+  async checkAndUpdate(vailConfig: (config: string) =>Promise<string>): Promise<void>{
     const isExists = await this.check();
     if (!isExists) {
       if (this.url != "") {
-        await this.update();
+        await this.update(vailConfig);
       }
     }
   }
@@ -65,7 +65,7 @@ export class Profile {
     let profilePath = await getProfilePath(this.context, this.id);
     fs.unlink(profilePath)
   }
-  async update(): Promise<boolean>{
+  async update(vailConfig: (config: string) =>Promise<string>): Promise<boolean>{
     const session = rcp.createSession();
     const resp = await session.get(this.url)
     const disposition = resp.headers["content-disposition"] as string
@@ -75,11 +75,25 @@ export class Profile {
       this.subscriptionInfo = SubscriptionInfo.formHString(userinfo)
     }
     if (resp.body) {
-      await this.save(new Uint8Array(resp.body))
+      await this.save(new Uint8Array(resp.body), vailConfig)
     }
     return true
   }
-  async save(bytes: Uint8Array): Promise<Profile>{
+  async save(bytes: Uint8Array, vailConfig:(config: string)=> Promise<string>): Promise<Profile>{
+    let result = utf8.decodeToString(bytes)
+    try {
+      // 判断是否是json格式
+      JSON.parse(result)
+    } catch (e) {
+      // 配置可能是base64的
+      let base64 = new util.Base64Helper();
+      result = utf8.decodeToString(await base64.decode(result))
+    }
+    console.log("save config", result)
+    let message = await vailConfig(result);
+    if (message != "") {
+      throw new Error(message);
+    }
     const filePath = await getProfilePath(this.context, this.id)
     const file = await fs.open(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE | fs.OpenMode.TRUNC)
     await fs.write(file.fd, bytes.buffer)

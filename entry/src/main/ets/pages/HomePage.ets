@@ -786,11 +786,15 @@ struct Home {
         .clip(true)
         .onClick(async (event: ClickEvent) => {
           if(this.configList.length === 0 ||this.proxyGroups.length === 0) {
+
+
             if (this.uiConfig.isVibrate) {
               customVibrator.vibratorTriggerOfHapticClockTimer()
             }
             // 配置页没有数据，或者代理节点未加载
             this.promptAction.showToast({ message: `${getContext().resourceManager.getStringSync($r('app.string.start_prompt'))}` })
+            // vpn小钥匙可能卡死，关闭vpn小钥匙
+            await ClashViewModel.StopVpn()
           }
           else {
             this.proxyEnabled = !this.proxyEnabled

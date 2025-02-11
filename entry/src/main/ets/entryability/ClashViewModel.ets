@@ -37,7 +37,7 @@ export class ClashViewModel {
     profile.name = data.configName
     profile.autoUpdate = data.isConfigAutoUpdate
     profile.autoUpdateDuration = data.configAutoUpdateTimeGapValue ?? 10
-    await profile.checkAndUpdate()
+    await profile.checkAndUpdate((c)=>this.VailConfig(c))
     const isExists = await profile.check();
     if (isExists) {
       await this.profileRepo.addOrUpdate(profile)
@@ -71,19 +71,22 @@ export class ClashViewModel {
       const profile = await this.getProfile(id)
       if(profile){
         profile.loadContext(this.context)
-        await profile.update()
+        await profile.update((c)=>this.VailConfig(c))
         await this.profileRepo.addOrUpdate(profile)
       }
     } else {
       const list = (await this.getProfiles()).filter(d => d.type == ProfileType.Url)
       for(let p of list){
         p.loadContext(this.context)
-        await p.update()
+        await p.update((c)=>this.VailConfig(c))
         await this.profileRepo.addOrUpdate(p)
       }
     }
     EventHub.sendEvent(EventKey.FetchProfile, null)
 
+  }
+  async VailConfig(config: string): Promise<string>{
+    return this.socketProxy.vailConfig(config)
   }
   async changeProxy(profile: Profile, g:string, p: string){
     try {
@@ -257,13 +260,12 @@ export class ClashViewModel {
   async loadConfig(){
     let appConfig = AppStorage.get<AppConfig>("appConfig")
     let clashConfig = AppStorage.get<ClashConfig>("clashConfig")
-    if (appConfig?.currentProfileId){
-      await this.loadProfileAndConfig(appConfig?.currentProfileId, clashConfig, {
-        "is-patch": false,
-        "is-compatible": true,
-        "override-dns": appConfig.overrideDns
-      } as ConfigExtendedParams)
-    }
+    await this.loadProfileAndConfig(appConfig?.currentProfileId ?? "", clashConfig, {
+      "is-patch": false,
+      "is-compatible": true,
+      "override-dns": appConfig?.overrideDns
+    } as ConfigExtendedParams)
+
   }
 
   async initGeoIp(){
@@ -271,7 +273,6 @@ export class ClashViewModel {
     writeFile(await getHome(this.context) + "/geoip.metadb", geoIp)
     let geoip = await readFile(this.context?.resourceDir + "/GeoIP.dat")
     writeFile(await getHome(this.context) + "/GeoIP.dat", geoip)
-
     let geoSite = await readFile(this.context?.resourceDir + "/GeoSite.dat")
     writeFile(await getHome(this.context) + "/GeoSite.dat", geoSite)
     let Country = await readFile(this.context?.resourceDir + "/ASN.mmdb")

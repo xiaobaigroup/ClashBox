@@ -23,7 +23,7 @@ export enum ClashRpcType{
   load,
   startClash,
   stopClash,
-  fetchAndValid,
+  ValidConfig,
   reset,
   getCountryCode,
   updateGeoData,

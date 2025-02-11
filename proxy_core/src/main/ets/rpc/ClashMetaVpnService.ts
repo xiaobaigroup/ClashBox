@@ -57,11 +57,11 @@ export class ClashMetaVpnService extends CommonVpnService{
     } else {
       try {
         let result = await this.onRemoteMessage(code, params)
-        console.debug("socketService stub result", result)
-        this.sendClient(client, JSON.stringify({ result: result }))
+        console.debug(`socket stub ${code} result: `, result)
+        this.sendClient(client, JSON.stringify({ result: result, error: undefined}))
       } catch (e) {
-        console.error("socketService stub error", e.message, e.stack)
-        this.sendClient(client, JSON.stringify({ result: e.message}))
+        console.error(`socket stub ${code} result: `, e.message ?? e, e.stack)
+        this.sendClient(client, JSON.stringify({ error: e.message ?? e}))
       }
     }
   }
@@ -84,6 +84,10 @@ export class ClashMetaVpnService extends CommonVpnService{
           const data = nativeQueryTrafficNow()
           console.debug("nativeQueryTrafficNow", data)
           resolve(JSON.stringify({ upRaw: Traffic.FetchUp(data), downRaw: Traffic.FetchDown(data) } as Traffic))
+          break;
+        }
+        case ClashRpcType.ValidConfig:{
+          resolve("")
           break;
         }
         case ClashRpcType.queryProxyGroup:{
@@ -142,15 +146,15 @@ export class ClashMetaVpnService extends CommonVpnService{
         case ClashRpcType.uploadProvider:{
           let provider = data[0] as string
           let path = data[1] as string
-          resolve("暂不支持")
+          reject("暂不支持")
           break;
         }
         case ClashRpcType.queryConnections:{
-          resolve(true)
+          reject("暂不支持")
           break;
         }
         case ClashRpcType.clearConnections:{
-          resolve(true)
+          reject("暂不支持")
           break;
         }
         case ClashRpcType.getCountryCode:{
