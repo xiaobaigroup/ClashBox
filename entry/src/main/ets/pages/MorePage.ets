@@ -60,10 +60,6 @@ struct MorePage {
   /* 断点布局相关 相关作用看定义时候的注释 */
   // 整体外边距
   @Consume('breakPointStatemorePageMargin')  private morePageMargin: BreakpointState<number>
-  // 列表底边距
-  @Consume('breakPointStatemorePagelistBottom') private listBottom: BreakpointState<number>
-  // 列表高度
-  @Consume('breakPointStateListHeight') private listHeight: BreakpointState<number>
 
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
@@ -186,7 +182,7 @@ struct MorePage {
         // 顶部导航栏
         Row() {
           Text($r('app.string.More'))
-            .fontSize(this.curYOffset<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset/100:TAB_CONTENT_TITLE_FONT_SIZE)
+            .fontSize(this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE - this.curYOffset / 100 : TAB_CONTENT_TITLE_FONT_SIZE)
             .fontWeight(FontWeight.Bold)
            // .width('83%')
             .textAlign(TextAlign.Start)
@@ -261,10 +257,10 @@ struct MorePage {
             })
           }
           .height('100%')
-          .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)
+          .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring : null)
           .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {
             // 累计计算当前父组件滚动在Y轴方向的偏移量
-            if (this.uiConfig.isAnimation){
+            if (this.uiConfig.isAnimation) {
               this.curYOffset += yOffset
             }
             console.info("yOffset" + this.curYOffset);

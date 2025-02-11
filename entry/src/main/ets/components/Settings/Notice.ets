@@ -818,7 +818,7 @@ export struct CellularDataReminder {
       .width('100%')
       .align(Alignment.Top)
       .edgeEffect(EdgeEffect.Spring)
-      .contentEndOffset(CONTENT_END_OFFSET_150 - 45)
+      .contentEndOffset(CONTENT_END_OFFSET_150 - 85)
       .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
     }
     .width('100%')

@@ -192,7 +192,7 @@ struct Settings {
 
       }
       .width('100%')
-      .contentEndOffset(CONTENT_END_OFFSET_150 - 45)
+      .contentEndOffset(CONTENT_END_OFFSET_150 - 85)
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)
     }
