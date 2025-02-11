@@ -1,0 +1,3 @@
+[submodule "proxy_core/src/flclash/core"]
+	path = proxy_core/src/flclash/core
+	url = https://github.com/xfz347/Clash.Meta.git
