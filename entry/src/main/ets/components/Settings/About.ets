@@ -353,17 +353,15 @@ struct About {
                           .fontWeight(FontWeight.Normal)
                           .fontSize(14)
                           .margin({right: 12})
+                          .onClick(() => {
+
+                          })
                       }
                     }.width('100%')
-                    .onClick((event: ClickEvent) => {
-                      hilog.info(0xFF00, "AboutClickTag", "前: %{public}d", this.clickCount)
-                      this.onClickCount()
-                      hilog.info(0xFF00, "AboutClickTag", "后: %{public}d", this.clickCount)
-                    })
                     // 分割线
                     Row().height(0.5).backgroundColor('#0D000000').width('93%')
                   }
-                     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+                  .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                   .onClick(() => {
                    if(itemChild.sign === 1) {
                       if (itemChild.name === 'ExperimentalFunction') {
@@ -385,10 +383,16 @@ struct About {
 
                       }
 
-                    } else if(itemChild.sign === 2) {
+                    } else if (itemChild.sign === 2) {
                       // 进入列表行跳转处理
                       this.handleCheck(itemChild.name)
-                    }
+                    } else if (itemChild.sign === 0) {
+                     if (itemChild.name === 'ApplicationVersion') {
+                       hilog.info(0xFF00, "AboutClickTag", "前: %{public}d", this.clickCount)
+                       this.onClickCount()
+                       hilog.info(0xFF00, "AboutClickTag", "后: %{public}d", this.clickCount)
+                     }
+                   }
                   })
                 }
               }, (itemChild: AboutListItemProp) => itemChild.name )
@@ -402,7 +406,7 @@ struct About {
       }
       .width('100%')
       .alignListItem(ListItemAlign.Center)
-      .contentEndOffset(CONTENT_END_OFFSET_150 - 45)
+      .contentEndOffset(CONTENT_END_OFFSET_150 - 85)
       .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
     }
     .width('100%')
@@ -529,7 +533,7 @@ export struct AboutContributors {
               if(item.contact) {
                 Row() {
                   Button(item.contact, { type: ButtonType.Capsule, stateEffect: true })
-                         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+                    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                     .backgroundColor($r('app.color.button_container_background'))
                     .fontColor(this.icon_emphasize)
                     .width(90)
@@ -557,7 +561,7 @@ export struct AboutContributors {
               }
             }
           }
-               .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .backgroundColor($r('app.color.container_background'))
           .borderRadius(BORDER_RADIUS_20)
           .margin({bottom: 10 })
@@ -567,7 +571,7 @@ export struct AboutContributors {
       }
       .width('100%')
       .alignListItem(ListItemAlign.Center)
-      .contentEndOffset(CONTENT_END_OFFSET_150 - 45)
+      .contentEndOffset(CONTENT_END_OFFSET_150 - 85)
       .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
     }
     .width('100%')
