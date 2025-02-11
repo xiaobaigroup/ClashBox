@@ -1,5 +1,5 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { BORDER_RADIUS_20 } from "../../common/Constants"
+import { BORDER_RADIUS_20, ListMoreData, moreData } from "../../common/Constants"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { AppConfig, ClashCore, UIConfig } from '../../entryability/AppState'
@@ -29,6 +29,8 @@ struct Kernel {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 实验功能展示变量
   @Consume isShowExperimentalFunction: boolean
+  // 更多页列表数组
+  @Consume moreList: moreData[]
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @State private kernel: KernelListItem[] = [
     {icons: $rawfile('FlClash.svg'), title: 'FlClash', subtitle: $r('app.string.new_kernel'), isExperimental: false, ClashCore: ClashCore.FlClash},
@@ -43,12 +45,20 @@ struct Kernel {
         this.appConfig.clashCore = ClashCore.ClashMeta
         ClashViewModel.ChangeCore(ClashCore.ClashMeta)
         hilog.info(0xFF00, "SettingsKerneltestTag", "当前内核：%{public}d", this.appConfig.clashCore)
+        // 屏蔽请求与连接
+        this.moreList = removeItemsByIndex(this.moreList, [2,3])
         break
       case 0:
         // FlClash
         this.appConfig.clashCore = ClashCore.FlClash
         ClashViewModel.ChangeCore(ClashCore.FlClash)
         hilog.info(0xFF00, "SettingsKerneltestTag", "当前内核：%{public}d", this.appConfig.clashCore)
+        // 恢复更多页列表
+        this.moreList = ListMoreData()
+        if (!this.uiConfig.isShowExperimentalFunction) {
+          // 屏蔽分流策略
+          this.moreList = removeItemsByIndex(this.moreList, [5])
+        }
         break
       case 2:
         promptAction.showToast({message: $r('app.string.developing'), duration: 2000 })

@@ -11,7 +11,7 @@ import {  ProxyItem, ProxyData } from '../../common/ProxyData';
 import { EventHub, EventKey } from '../../common/EventHub';
 import { ProxySort } from 'proxy_core';
 import { intl } from '@kit.LocalizationKit';
-import { AppConfig, ProxyCardSize, UIConfig } from '../../entryability/AppState';
+import { AppConfig, ClashCore, ProxyCardSize, UIConfig } from '../../entryability/AppState';
 import ClashViewModel from '../../entryability/ClashViewModel';
 import { ProxyNode } from './ProxyItem';
 import { customAnimationUtil } from '../../utils/Animation';
@@ -223,7 +223,7 @@ struct ProxyGroupItem {
     .justifyContent(FlexAlign.Center)
     //   .padding({bottom:100})
     .backgroundColor(($r('app.color.container_background')))
-  } //半模拟态网络测速 end
+  } //半模态网络测速 end
 
   // 在自定义组件即将析构销毁时将dialogController置空
   onCancel() {
@@ -273,16 +273,19 @@ struct ProxyGroupItem {
               this.proxyListLongPressCtxMenuForFavorite.callback()
           })
       }
-      MenuItem({ symbolStartIcon: this.startIconModifier1, content: $r('app.string.Test_Delay') })
-        .onClick(()=>{
-          EventHub.sendEvent(EventKey.TestDelayAll, nodeName)
-          this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip')
-          })})
-      MenuItem({ symbolStartIcon: this.startIconModifier2, content: $r('app.string.Test_Speed') })
-        .onClick(() => {
-          this.isShowNetworkSpeed = true
-          this.isEnableIndexForegroundBlur=true
-        })
+      // ClashMeta内核时暂时不能测速及延迟
+      if (this.appConfig.clashCore === ClashCore.FlClash) {
+        MenuItem({ symbolStartIcon: this.startIconModifier1, content: $r('app.string.Test_Delay') })
+          .onClick(() => {
+            EventHub.sendEvent(EventKey.TestDelayAll, nodeName)
+            this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip')
+            })})
+        MenuItem({ symbolStartIcon: this.startIconModifier2, content: $r('app.string.Test_Speed') })
+          .onClick(() => {
+            this.isShowNetworkSpeed = true
+            this.isEnableIndexForegroundBlur = true
+          })
+      }
       MenuItem({ symbolStartIcon: this.startIconModifier3, content: $r('app.string.Delay_Speed') })
         .onClick(() => {
           if (this.ProxyDialogController != null) {

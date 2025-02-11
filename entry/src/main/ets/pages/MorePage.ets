@@ -104,10 +104,7 @@ struct MorePage {
   }
 
   aboutToAppear() {
-    if(!this.uiConfig.enabledADvanced) {
-      // 屏蔽分流策略
-      this.moreList = removeItemsByIndex(this.moreList, [5])
-    }
+
   }
 
   aboutToDisappear() {
@@ -208,7 +205,8 @@ struct MorePage {
                 name: item.name,
                 title: item.title,
                 subtitle: item.subtitle,
-                isPrimaryIcons: true
+                isPrimaryIcons: true,
+                isExperimentalFunction: item.sign === 5
               })
             }.margin({left: this.morePageMargin.value, right: this.morePageMargin.value})
             .onClick(() => {

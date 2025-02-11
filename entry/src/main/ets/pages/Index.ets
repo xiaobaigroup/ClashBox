@@ -42,7 +42,8 @@ import {
   HomeCardCellularDataPadding,
   PROXY_STARTED_DURATION_INIT_VALUE,
   ListMoreData,
-  moreData
+  moreData,
+  AboutListItemProp
 } from '../common/Constants'
 import { ProxyItem, ProxyData } from '../common/ProxyData'
 import { ClashConfig, Dns, LogLevel, Profile, ProxyGroup, ProxyMode } from 'proxy_core'
@@ -56,6 +57,7 @@ import { ChangeLanguage } from '../utils/ChangeLanguageUtil'
 import { ConfigData, ConfigDataSourceType } from '../common/PageArgumentEntity'
 import { customAnimationUtil } from '../utils/Animation'
 import { getGreeting } from '../utils/GreetingUtil'
+import { removeItemsByIndex } from '../utils/RemoveItemsUtils'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 
@@ -326,6 +328,15 @@ struct Index {
   @Provide @Watch('isSecondaryChange') isSecondary: boolean = false
   // 更多页数据
   @Provide moreList: moreData[] = ListMoreData()
+  // 实验功能开关列表行数据
+  @Provide ExperimentData: AboutListItemProp = {
+    title: 'Experiment',
+    subtitle: '',
+    name: '',
+    children: [
+      { title: $r('app.string.experimental_function'), subtitle: $r('app.string.experimental_function_Subtitle'), sign: 1, name: 'ExperimentalFunction', isOn: true },
+    ]
+  }
   @Builder
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
 
@@ -412,6 +423,14 @@ struct Index {
     // 初始化用户语言
     if (this.uiConfig.userLanguage) {
       ChangeLanguage(this.uiConfig.userLanguage)
+    }
+    if(!this.uiConfig.enabledADvanced || !this.uiConfig.isShowExperimentalFunction) {
+      // 屏蔽分流策略
+      this.moreList = removeItemsByIndex(this.moreList, [5])
+    }
+    if(this.appConfig.clashCore !== ClashCore.FlClash) {
+      // 屏蔽请求与连接
+      this.moreList = removeItemsByIndex(this.moreList, [2,3])
     }
 
     // 开启change监听
