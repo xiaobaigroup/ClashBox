@@ -615,11 +615,6 @@ struct Index {
             //    }
           }
           .tabBar(this.TabBarBuilder($r('app.string.Home'), 0, $r('sys.symbol.house_fill')))
-          .onWillShow(() => {
-            animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion(), }, () => {
-              this.selectedIndex = 0
-            })
-          })
           .gesture(
             // 二级Tabs第一个页签向左拖动时，触发手势事件
             PanGesture({direction:this.isLandscapePhone||this.istabletLandscape?PanDirection.Down:PanDirection.None})
@@ -642,11 +637,6 @@ struct Index {
             //  }
           }
           .tabBar(this.TabBarBuilder($r('app.string.Proxy'), 1, $r('sys.symbol.list_bullet_square_fill')))
-          .onWillShow(() => {
-            animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion(), }, () => {
-              this.selectedIndex = 1
-            })
-          })
 
           TabContent() {
             //  if (this.currentIndex===2) {
@@ -654,11 +644,6 @@ struct Index {
             //  }
           }
           .tabBar(this.TabBarBuilder($r('app.string.Configuration'), 2, $r('sys.symbol.folder_fill')))
-          .onWillShow(() => {
-            animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion(), }, () => {
-              this.selectedIndex = 2
-            })
-          })
 
           TabContent() {
             //   if (this.currentIndex===3) {
@@ -666,11 +651,6 @@ struct Index {
             //   }
           }
           .tabBar(this.TabBarBuilder($r('app.string.More'), 3, $r('sys.symbol.square_fill_grid_2x2')))
-          .onWillShow(() => {
-            animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion(), }, () => {
-              this.selectedIndex = 3
-            })
-          })
         }
         .backgroundColor(this.uiConfig.isBlurr ? '#00ffffff' : $r('app.color.background'))
         .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Thick : null)
@@ -685,11 +665,12 @@ struct Index {
           this.currentIndex = index
         })
         .onAnimationStart((index: number, targetIndex: number) => {
-          if (index === targetIndex) {
-            return
-          }
-          // selectedIndex控制自定义TabBar内Image和Text颜色切换
-          this.selectedIndex = targetIndex;
+          animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion(), }, () => {
+            if (index === targetIndex) {
+              return
+            }
+            this.selectedIndex = targetIndex;
+          })
         })
         .width('100%')
         .height('100%')

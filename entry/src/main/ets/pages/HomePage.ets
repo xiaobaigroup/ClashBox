@@ -779,6 +779,9 @@ struct Home {
         .clip(true)
         .onClick(async (event: ClickEvent) => {
           if(this.configList.length === 0 ||this.proxyGroups.length === 0) {
+            if (this.uiConfig.isVibrate) {
+              customVibrator.vibratorTriggerOfHapticClockTimer()
+            }
             // 配置页没有数据，或者代理节点未加载
             this.promptAction.showToast({ message: `${getContext().resourceManager.getStringSync($r('app.string.start_prompt'))}` })
           }
@@ -807,9 +810,7 @@ struct Home {
             if (this.uiConfig.isVibrate) {
               customVibrator.vibratorTriggerOfHapticClockTimer()
             }
-
           }
-
         })
         .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed,curve:curves.springMotion() }:null)
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))

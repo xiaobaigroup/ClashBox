@@ -23,10 +23,10 @@ import DNS from '../components/More/Overwrite/DNS';
 import Network, { NetworkRouterAddress } from '../components/More/Overwrite/Network';
 import { getResourceString } from '../utils/ResourceStringUtil';
 import { extractLocationInfo, getIpInfo, mapLocation } from '../utils/GetIpInfo';
-import { curves, promptAction } from '@kit.ArkUI';
+import {  promptAction } from '@kit.ArkUI';
 import { skipRowList } from '../components/Common';
 import { AppConfig, UIConfig } from '../entryability/AppState';
-import { ArrayConfigEditor, ArrayConfigParam } from '../components/More/Overwrite/EditArrayConfig';
+import { ArrayConfigEditor } from '../components/More/Overwrite/EditArrayConfig';
 import { removeItemsByIndex } from '../utils/RemoveItemsUtils';
 import { customAnimationUtil } from '../utils/Animation';
 
