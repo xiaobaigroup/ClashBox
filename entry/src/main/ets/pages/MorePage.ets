@@ -188,7 +188,7 @@ struct MorePage {
           Text($r('app.string.More'))
             .fontSize(this.curYOffset<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset/100:TAB_CONTENT_TITLE_FONT_SIZE)
             .fontWeight(FontWeight.Bold)
-            .width('83%')
+           // .width('83%')
             .textAlign(TextAlign.Start)
         }
         .width('100%')
@@ -250,16 +250,17 @@ struct MorePage {
             }
             .width('100%')
             .height('100%')
-            .edgeEffect(EdgeEffect.Spring)
+           // .edgeEffect(EdgeEffect.Spring)
             .borderRadius(18)
             .alignListItem(ListItemAlign.Center)
             .contentEndOffset(CONTENT_END_OFFSET_150)
-            .chainAnimation(true)
+           // .chainAnimation(true)
             .nestedScroll({
               scrollForward: NestedScrollMode.PARENT_FIRST,
               scrollBackward: NestedScrollMode.SELF_FIRST
             })
           }
+          .height('100%')
           .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)
           .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {
             // 累计计算当前父组件滚动在Y轴方向的偏移量
@@ -268,8 +269,8 @@ struct MorePage {
             }
             console.info("yOffset" + this.curYOffset);
           })
-        }
-      }
+        }.height('100%')
+      }.height('100%')
     }
     .hideToolBar(true)
     .mode(this.isLandscapePhone ? NavigationMode.Stack : NavigationMode.Auto)

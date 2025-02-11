@@ -15,6 +15,8 @@ import { promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 import { AppConfig, ClashCore, UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../utils/Animation"
 import { removeItemsByIndex } from "../../utils/RemoveItemsUtils"
+import { customVibrator } from "../../utils/VibratorUtil"
+import { customSound } from "../../utils/SoundPoolUtil"
 
 @Component
 struct About {
@@ -41,6 +43,8 @@ struct About {
   @Consume ExperimentData: AboutListItemProp
 
   onClickCount() {
+    //振动触发 TODO 可改在实验功能开启的判定里
+    customVibrator.vibratorTriggerOfHapticClockTimer()
     this.clickCount++
     if(this.uiConfig.enabledADvanced) {
       promptAction.showToast({message: '已处于高级模式' /*$r('app.string.click_prompt')*/, duration: 2000 })
@@ -53,6 +57,8 @@ struct About {
         // 刷新更多页面数据
         this.moreList = ListMoreData()
         promptAction.showToast({message: '高级模式已开启' /*$r('app.string.click_prompt')*/, duration: 2000 })
+        //音效触发 TODO 可改在实验功能开启成功的判定里
+        customSound.playAudioForSoundPool()
       } else if (this.clickCount === 3) {
         promptAction.showToast({message: '什么东西闪过去了' /*$r('app.string.click_prompt')*/, duration: 1000 })
       }
@@ -224,6 +230,8 @@ struct About {
   }
 
   aboutToAppear(): void {
+    //音效
+    customSound.initSoundPool(3, 'di.mp3')
     // 页面加载时初始化实验功能启用状态
     this.refreshShowExperimentalFunction(this.uiConfig.isShowExperimentalFunction)
     // 加载时初始化内核版本显示
@@ -235,6 +243,7 @@ struct About {
   }
   aboutToDisappear(): void {
     this.isShowExperimentalFunction = this.uiConfig.isShowExperimentalFunction
+    customSound.destroySoundPool()
   }
 
   build() {
