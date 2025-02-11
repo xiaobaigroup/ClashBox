@@ -3,6 +3,8 @@ import { BreakpointState } from "../../common/breakpointsystem"
 import { AppConfig, UIConfig } from "../../entryability/AppState"
 import HomePage from "../../pages/HomePage"
 import { customAnimationUtil } from "../../utils/Animation"
+import { image } from "@kit.ImageKit"
+import { ConfigurationConstant } from "@kit.AbilityKit"
 
 
 @Component
@@ -29,7 +31,7 @@ export struct CardEdit {
     Flex({ wrap: FlexWrap.Wrap,justifyContent:FlexAlign.SpaceBetween, space: { main: LengthMetrics.vp(10), cross: LengthMetrics.vp(10) } }) { // 子组件多行布局
       //网络速率小卡片
       if (this.theCurrentHomeCard[0] === false) {
-        Image($rawfile('Speed.png'))
+        Image($r('app.media.Speed'))
           .width('100%')
           .aspectRatio(2.07)
           .height(this.HomeCardEditHeight.value)
@@ -49,7 +51,7 @@ export struct CardEdit {
 
       //节点信息小卡片
       if (this.theCurrentHomeCard[7] === false) {
-        Image($rawfile('ProxyINFO.png'))
+        Image($r('app.media.ProxyINFO'))
           .width('100%')
           .height(this.HomeCardEditHeight.value)
           .aspectRatio(2.07)
@@ -65,11 +67,10 @@ export struct CardEdit {
 
       //分流模式小卡片
       if (this.theCurrentHomeCard[1] === false) {
-        Image($rawfile('SwitchMode.png'))
+        Image($r('app.media.SwitchMode'))
           .width('48.5%')
           .ImageItemStyle()
           .transition(customAnimationUtil.isScaleTran(2,this.uiConfig))
-         // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
           .onClick(() => {
             animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
               this.theCurrentHomeCard.splice(1, 1, true)
@@ -79,12 +80,10 @@ export struct CardEdit {
 
       //流量统计小卡片
       if (this.theCurrentHomeCard[2] === false) {
-        Image($rawfile('CellularData.png'))
+        Image($r('app.media.CellularData'))
           .width('48.5%')
           .ImageItemStyle()
           .transition(customAnimationUtil.isScaleTran(3,this.uiConfig))
-          //.transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed }):null)
-            //      .height(this.isLandscapePhone ? 160 :this.HomeCardEditHeight.value)
           .onClick(() => {
             animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
               this.theCurrentHomeCard.splice(2, 1, true)
@@ -94,7 +93,7 @@ export struct CardEdit {
 
       //当前节点小卡片
       if (this.theCurrentHomeCard[3] === false) {
-        Image($rawfile('CurrentNode.png'))
+        Image($r('app.media.CurrentNode'))
           .width('48.5%')
           .ImageItemStyle()
           .transition(customAnimationUtil.isScaleTran(4,this.uiConfig))
@@ -108,7 +107,7 @@ export struct CardEdit {
 
       //IP地址小卡片
       if (this.theCurrentHomeCard[4] === false) {
-        Image($rawfile('PublicNetwork.png'))
+        Image($r('app.media.PublicNetwork'))
           .width('48.5%')
           .ImageItemStyle()
           .transition(customAnimationUtil.isScaleTran(5,this.uiConfig))
@@ -123,7 +122,7 @@ export struct CardEdit {
 
       //收藏节点小卡片
       if (this.theCurrentHomeCard[5] === false) {
-        Image($rawfile('FavoriteProxy.png'))
+        Image($r('app.media.FavoriteProxy'))
           .width('48.5%')
           .ImageItemStyle()
           .transition(customAnimationUtil.isScaleTran(6,this.uiConfig))
@@ -138,7 +137,7 @@ export struct CardEdit {
 
       //收藏配置小卡片
       if (this.theCurrentHomeCard[6] === false) {
-        Image($rawfile('FavoriteConfiguration.png'))
+        Image($r('app.media.FavoriteConfiguration'))
           .width('48.5%')
           .ImageItemStyle()
           .transition(customAnimationUtil.isScaleTran(7,this.uiConfig))
@@ -153,7 +152,7 @@ export struct CardEdit {
 
       //当前配置小卡片
       if (this.theCurrentHomeCard[8] === false) {
-        Image($rawfile('CurrentConfiguration.png'))
+        Image($r('app.media.CurrentConfiguration'))
           .width('48.5%')
           .height(this.HomeCardEditHeight.value)
           .aspectRatio(1)
@@ -170,7 +169,7 @@ export struct CardEdit {
 
       //快捷方式小卡片
       if (this.theCurrentHomeCard[9] === this.isFoldStatus ? true : false) {
-        Image($rawfile('Shortcuts.png'))
+        Image($r('app.media.Shortcuts'))
           .width('48.5%')
           .height(this.HomeCardEditHeight.value)
           .aspectRatio(1)

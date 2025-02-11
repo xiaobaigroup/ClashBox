@@ -1,6 +1,6 @@
 //主页 栅格布局、媒体查询
 import { BreakpointState } from '../common/breakpointsystem'
-import { curves, PromptAction, window } from '@kit.ArkUI'
+import { componentSnapshot, curves, PromptAction, window } from '@kit.ArkUI'
 import SwitchMode from '../components/Home/SwitchMode'
 import CellularData from '../components/Home/CellularData'
 import PublicNetwork from '../components/Home/PublicNetwork'
@@ -34,6 +34,7 @@ import { ConfigData } from '../common/PageArgumentEntity'
 import { customVibrator } from '../utils/VibratorUtil'
 import { customAnimationUtil } from '../utils/Animation'
 import { ProxyGroup } from 'proxy_core'
+import { image } from '@kit.ImageKit'
 
 
 @Entry
@@ -524,6 +525,7 @@ struct Home {
                 .rotate({ angle: this.uiConfig.isAnimation? this.rotateAngle : null })
                 // 消失触发回调
                 .onDetach(() => {
+
                 })
               }
 

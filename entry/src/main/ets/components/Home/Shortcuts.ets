@@ -410,6 +410,7 @@ struct Shortcuts {
           }.ColumnStyle()
         }
       }
+      .id('ShortcutsId')
       .width('100%')
       // .contentEndOffset(50)
       .padding({

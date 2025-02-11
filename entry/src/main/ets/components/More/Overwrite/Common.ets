@@ -151,6 +151,7 @@ export struct ConfigList {
         })
           .selected(item.value == option.value)
           .onChange(() => {
+            this.isON.toggleAnim=true
             let Item = this.configList[itemIndex]
             Item.subtitle = option.title
             Item.value = option.value
@@ -175,7 +176,7 @@ export struct ConfigList {
               menu: (): void => { this.switchMenu(item, index) }
             })
           }
-          .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
+          .transition(this.isON.toggleAnim? null : customAnimationUtil.isScaleTran(index,this.uiConfig))
         } else if (item.sign === 1) {
           ListItem() {
             // 跳转型
@@ -188,8 +189,9 @@ export struct ConfigList {
             })
           }.onClick(() => {
             this.handleCheck(index)
+            this.isON.toggleAnim=true
           })
-          .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
+          .transition(this.isON.toggleAnim? null :customAnimationUtil.isScaleTran(index,this.uiConfig))
         } else if (item.sign === 2 ) {
           ListItem() {
             // 开关型

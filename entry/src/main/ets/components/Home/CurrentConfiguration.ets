@@ -28,7 +28,7 @@ struct CurrentConfiguration {
     Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.End, justifyContent: FlexAlign.SpaceBetween}) {
       Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.Start }) {
         CardTitle({ title: $r('app.string.CurrentConfiguration') })
-        Text(this.appConfig.currentProfileName)
+        Text(this.appConfig.currentProfileName??$r('app.string.config_name'))
           .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
           .fontWeight(FontWeight.Bold)
           .maxLines(2)
