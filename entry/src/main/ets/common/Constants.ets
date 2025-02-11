@@ -625,6 +625,7 @@ export const ContributorsList: ContributorsListItemProp[] = [
   { title: '恩临大帝', subtitle: $r('app.string.FrondEnd_Development'), contact: $r('app.string.Email'), image: $rawfile('enlin.png')},
   { title: 'crazypig321', subtitle: $r('app.string.FrondEnd_Development'), contact: 'Github', image: $rawfile('crazypig321.png')},
   { title: '小雅', subtitle: $r('app.string.FrondEnd_Development'), contact: 'Github', image: $rawfile('ya.png')},
+  { title: 'FlClash', subtitle: $r('app.string.flclash_subtitle'), contact: 'Github', image: $rawfile('FlClash.svg')},
   { title: '凛凛早露', subtitle: $r('app.string.LLZL_Subtitle'), image: $rawfile('llzl.png')},
   { title: $r('app.string.Dear_Group_Members'), subtitle: $r('app.string.Dear_Group_Members_Subtitle'), image: $rawfile('group.jpg')},
 ]
