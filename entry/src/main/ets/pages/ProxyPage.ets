@@ -324,7 +324,6 @@ struct ProxyPage {
             .fontWeight(FontWeight.Bold)
             .textAlign(TextAlign.Center)
             .transition(customAnimationUtil.isSlide(200, this.uiConfig))
-            .transition(customAnimationUtil.isScaleTran(0, this.uiConfig))
               //提供者半模拟态
             .bindSheet($$this.isProviderEdit, this.ProviderBindSheetEdit(), {
               detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
@@ -376,6 +375,7 @@ struct ProxyPage {
               .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
               .fontColor([this.icon_primary])
           }
+          .transition(customAnimationUtil.isSlide(0, this.uiConfig))
           .width(40)
           .height(40)
           .backgroundColor($r('app.color.settings_container_background'))
@@ -395,7 +395,6 @@ struct ProxyPage {
           left: this.breakPointStateTabContentTitleMargin.value,
           right: this.breakPointStateTabContentTitleMargin.value,
         })
-        .transition(customAnimationUtil.isSlide(0, this.uiConfig))
     //  }
 
       if (this.proxyGroups.length == 0) {
@@ -406,11 +405,11 @@ struct ProxyPage {
       } else if (this.proxyGroups.length > 0) {
         // 代理页分组TAB+list主体
         Stack({ alignContent: this.stackAlignContentAlignment }) {
-                    Column(){
+          Column(){
             Blank().height(TAB_CONTENT_TITLE_HEIGHT)
             Scroll() {
-          //根据ProxyArrangementSelected的状态决定是否显示
-          if (this.appConfig.proxyGroupType === ProxyGroupType.Tabs) {
+              //根据ProxyArrangementSelected的状态决定是否显示
+              if (this.appConfig.proxyGroupType === ProxyGroupType.Tabs) {
             Column() { //分组标签页 start
               Tabs({ barPosition: BarPosition.Start, controller: this.tabsController, index: this.currentIndex }) {
                 ForEach(this.proxyGroups, (g: ProxyGroup, i: number) => {
