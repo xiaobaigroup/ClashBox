@@ -182,7 +182,7 @@ struct MorePage {
         // 顶部导航栏
         Row() {
           Text($r('app.string.More'))
-            .fontSize(this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE - this.curYOffset / 100 : TAB_CONTENT_TITLE_FONT_SIZE)
+            .fontSize(this.curYOffset<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset/100:TAB_CONTENT_TITLE_FONT_SIZE)
             .fontWeight(FontWeight.Bold)
            // .width('83%')
             .textAlign(TextAlign.Start)
@@ -197,8 +197,6 @@ struct MorePage {
           right: this.breakPointStateTabContentTitleMargin.value,
         })
 
-        Column() {
-          Blank().height(TAB_CONTENT_TITLE_HEIGHT)
           Scroll() {
             List({ space: 10 }) {
               ForEach(this.moreList, (item: moreData, index: number) => {
@@ -246,27 +244,27 @@ struct MorePage {
             }
             .width('100%')
             .height('100%')
-           // .edgeEffect(EdgeEffect.Spring)
+            .edgeEffect(EdgeEffect.Spring)
             .borderRadius(18)
             .alignListItem(ListItemAlign.Center)
             .contentEndOffset(CONTENT_END_OFFSET_150)
-           // .chainAnimation(true)
+            .chainAnimation(true)
             .nestedScroll({
               scrollForward: NestedScrollMode.PARENT_FIRST,
               scrollBackward: NestedScrollMode.SELF_FIRST
             })
           }
+          .padding({top:TAB_CONTENT_TITLE_HEIGHT})
           .height('100%')
-          .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring : null)
+          .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)
           .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {
             // 累计计算当前父组件滚动在Y轴方向的偏移量
-            if (this.uiConfig.isAnimation) {
+            if (this.uiConfig.isAnimation){
               this.curYOffset += yOffset
             }
             console.info("yOffset" + this.curYOffset);
           })
-        }.height('100%')
-      }.height('100%')
+        }.height('100%').width('100%')
     }
     .hideToolBar(true)
     .mode(this.isLandscapePhone ? NavigationMode.Stack : NavigationMode.Auto)
