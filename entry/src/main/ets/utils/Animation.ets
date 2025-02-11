@@ -1,7 +1,7 @@
 import { UIConfig } from "../entryability/AppState"
 import { curves } from "@kit.ArkUI"
 
-let effectHomeCard: TransitionEffect | null
+let effectEvent: TransitionEffect | null
 let clickEffect: ClickEffect | null
 let iconEffect: SymbolEffectStrategy | null
 export class isON{ toggleAnim: boolean = false }
@@ -10,35 +10,30 @@ class AnimationUtil{
 
   //转场缩放动画，i为延迟，在list或者foreach中可以将i设为index，达到递增的动画效果，uiConfig为动画速度以及开关的切换
   public isScaleTran(i:number,uiConfig:UIConfig){
-    effectHomeCard=
+    effectEvent=
     uiConfig.isAnimation ?
-    TransitionEffect.asymmetric(
     TransitionEffect.OPACITY
       .combine(TransitionEffect.scale({x: 0, y: 0}))
-      .animation({ duration: uiConfig.animationSpeed,curve:curves.springMotion(),delay: i*10+30 }),
+      .animation({ duration: uiConfig.animationSpeed,curve:curves.springMotion(),delay: i*10+30 })
+      :null
 
-    TransitionEffect.OPACITY
-      .combine(TransitionEffect.SLIDE_SWITCH)
-      .animation({ duration: uiConfig.animationSpeed,curve:curves.springMotion(),delay: i*10+30-i*20 })
-    ):null
-
-    return effectHomeCard
+    return effectEvent
   }
 
   //转场滑动动画（从左到右），i为直接延迟数值，uiConfig为动画速度以及开关的切换
   public isSlide(i:number,uiConfig:UIConfig){
-    effectHomeCard=
+    effectEvent=
       uiConfig.isAnimation ?
       TransitionEffect.OPACITY
         .animation({ duration: uiConfig.animationSpeed, curve:curves.springMotion(),delay: i })
         .combine(TransitionEffect.SLIDE):null
 
-    return effectHomeCard
+    return effectEvent
   }
 
   //右下角按钮滑动动画（从右到左），uiConfig为动画速度以及开关的切换
   public isSlideSwitch(uiConfig:UIConfig){
-  effectHomeCard=
+  effectEvent=
     uiConfig.isAnimation ?
       uiConfig.buttonPositionIndex===0 ?
     TransitionEffect.asymmetric(
@@ -65,16 +60,16 @@ class AnimationUtil{
             .combine(TransitionEffect.SLIDE_SWITCH))
         :null
 
-    return effectHomeCard
+    return effectEvent
   }
 
   //底部tabs转场动画，uiConfig为动画速度以及开关的切换
   public isTranslate(uiConfig:UIConfig){
-    effectHomeCard=
+    effectEvent=
       uiConfig.isAnimation ? TransitionEffect.OPACITY
         .animation({ duration: uiConfig.animationSpeed, delay: 0 })
         .combine(TransitionEffect.translate({ y: 50 })) : null
-    return effectHomeCard
+    return effectEvent
   }
 
   //点击动效，uiConfig为开关的切换
@@ -95,16 +90,13 @@ class AnimationUtil{
 
   //配置添加，更多页，设置页图标转场缩放动画，i为延迟，在list或者foreach中可以将i设为index，达到递增的动画效果，uiConfig为动画速度以及开关的切换
   public isScaleTranIcon(i:number,uiConfig:UIConfig){
-    effectHomeCard=
+    effectEvent=
       uiConfig.isAnimation ?
-      TransitionEffect.OPACITY
-        .combine(TransitionEffect.scale({x: 0, y: 0}))
+      TransitionEffect.scale({x: 0, y: 0})
         .combine(TransitionEffect.rotate({angle:360}))
         .animation({ duration: uiConfig.animationSpeed,curve:curves.springMotion(),delay: i*10+50 })
-        .combine(TransitionEffect.OPACITY)
-        .animation({ duration: uiConfig.animationSpeed,curve:curves.springMotion(),delay: i*10+60 })
         :null
-    return effectHomeCard
+    return effectEvent
   }
 }
 

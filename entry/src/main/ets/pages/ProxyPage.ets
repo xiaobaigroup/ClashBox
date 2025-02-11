@@ -444,23 +444,24 @@ struct ProxyPage {
                         }else if (this.istabletLandscape){}
                       })
                   )
+                  .onWillShow(() => {
+                    animateTo(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }:null, () => {
+                      this.currentIndex = i;
+                      if(this.currentProfile){
+                        this.currentProfile.currentGroupName = this.proxyGroups[i].name
+                        ClashViewModel.updateProfile(this.currentProfile)
+                      }
+                    })
+                  })
                 })
               }
               .barMode(BarMode.Scrollable)
               .barHeight(55)
               .fadingEdge(false)
-              //用onAnimationStart能减少滑动tab时产生的延迟
               .onAnimationStart((index: number, targetIndex: number) => {
-                animateTo(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }:null, () => {
-                  if (index === targetIndex) {
-                    return
-                  }
+                if (this.uiConfig.animationSpeed===0) {
                   this.currentIndex = targetIndex;
-                  if (this.currentProfile) {
-                    this.currentProfile.currentGroupName = this.proxyGroups[targetIndex].name
-                    ClashViewModel.updateProfile(this.currentProfile)
-                  }
-                })
+                }
               })
             }
             .padding({
