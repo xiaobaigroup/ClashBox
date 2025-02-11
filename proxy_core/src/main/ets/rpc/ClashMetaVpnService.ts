@@ -86,7 +86,7 @@ export class ClashMetaVpnService extends CommonVpnService{
           resolve(JSON.stringify({ upRaw: Traffic.FetchUp(data), downRaw: Traffic.FetchDown(data) } as Traffic))
           break;
         }
-        case ClashRpcType.ValidConfig:{
+        case ClashRpcType.validConfig:{
           resolve("")
           break;
         }

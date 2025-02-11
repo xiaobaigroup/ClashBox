@@ -221,7 +221,7 @@ export class FlClashVpnService extends CommonVpnService{
           resolve(true)
           break;
         }
-        case ClashRpcType.ValidConfig: {
+        case ClashRpcType.validConfig: {
           resolve(await validateConfig(JSON.stringify(data[0] as string)))
           break;
         }

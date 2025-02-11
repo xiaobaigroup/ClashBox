@@ -80,20 +80,11 @@ export class Profile {
     return true
   }
   async save(bytes: Uint8Array, vailConfig:(config: string)=> Promise<string>): Promise<Profile>{
-    let result = utf8.decodeToString(bytes)
-    // try {
-    //   // 判断是否是json格式
-    //   JSON.parse(result)
-    // } catch (e) {
-    //   // 配置可能是base64的
-    //   let base64 = new util.Base64Helper();
-    //   result = utf8.decodeToString(await base64.decode(result))
+    // let result = utf8.decodeToString(bytes)
+    // let message = await vailConfig(result);
+    // if (message != "") {
+    //   throw new Error(message);
     // }
-    console.log("save config", result)
-    let message = await vailConfig(result);
-    if (message != "") {
-      throw new Error(message);
-    }
     const filePath = await getProfilePath(this.context, this.id)
     const file = await fs.open(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE | fs.OpenMode.TRUNC)
     await fs.write(file.fd, bytes.buffer)

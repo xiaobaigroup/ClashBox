@@ -71,7 +71,7 @@ export class ClashViewModel {
       const profile = await this.getProfile(id)
       if(profile){
         profile.loadContext(this.context)
-        await profile.update((c)=>this.VailConfig(c))
+        await profile.update((c)=> this.VailConfig(c))
         await this.profileRepo.addOrUpdate(profile)
       }
     } else {

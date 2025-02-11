@@ -26,7 +26,8 @@ export class SocketProxyService implements IClashManager{
     return result as string
   }
   async vailConfig(config: string){
-    let result = await this.sendMessageRequest(ClashRpcType.ValidConfig, [config])
+    let result = await this.sendMessageRequest(ClashRpcType.validConfig, [config])
+    console.log("vailConfig", result)
     return result as string;
   }
   async queryTrafficTotal(): Promise<Traffic> {
@@ -140,7 +141,7 @@ export class SocketProxyService implements IClashManager{
       }).catch((e:Error)=>{
         this.active = false
         this.offlineCount++
-        console.log("socketProxy error", e.message)
+        console.log("socketProxy error ", method, e.message)
         if(e.message == "Connection refused"){
           promptAction.showToast({message: "vpn服务系统被回收!"})
         }else{
