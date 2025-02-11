@@ -11,7 +11,7 @@ import { ProxyItem } from '../common/ProxyData'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { Profile, ProxyGroup, ProxySort, ProxyType } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
-import { AppConfig, isEnd, ProxyCardSize, ProxyGroupType, UIConfig } from '../entryability/AppState'
+import { AppConfig, ClashCore, isEnd, ProxyCardSize, ProxyGroupType, UIConfig } from '../entryability/AppState'
 import { curves, PromptAction } from '@kit.ArkUI'
 import { ProviderPage } from '../components/Proxy/Provider'
 import { indexController } from './Index'
@@ -481,43 +481,45 @@ struct ProxyPage {
           }
           //列表排列end
 
-          // 悬浮代理测速按钮 START
-          Column() {
-            Stack({ alignContent: Alignment.Center }) {
-              SymbolGlyph($r('sys.symbol.bolt_filled_on_circle'))
-                .fontSize(24)
-                .fontColor([Color.White])
-                .symbolEffect(this.ReplaceSymbolEffect)
-                .align(Alignment.Center)
-            }.onClick(() => {
-              EventHub.sendEvent(EventKey.TestDelayAll)
-              if (this.uiConfig.isVibrate) {
-                customVibrator.vibratorTriggerOfHapticClockTimer()
-              }
-              this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
+          // ClashMeta内核时暂时无法测延迟
+          if (this.appConfig.clashCore === ClashCore.FlClash) {
+            // 悬浮代理测速按钮 START
+            Column() {
+              Stack({ alignContent: Alignment.Center }) {
+                SymbolGlyph($r('sys.symbol.bolt_filled_on_circle'))
+                  .fontSize(24)
+                  .fontColor([Color.White])
+                  .symbolEffect(this.ReplaceSymbolEffect)
+                  .align(Alignment.Center)
+              }.onClick(() => {
+                EventHub.sendEvent(EventKey.TestDelayAll)
+                if (this.uiConfig.isVibrate) {
+                  customVibrator.vibratorTriggerOfHapticClockTimer()
+                }
+                this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
+              })
+              .width('100%')
+              .height('100%')
+            }
+            .shadow({
+              radius: 10,
+              color: this.icon_emphasize,
+              offsetY: 4,
+              type: ShadowType.BLUR
             })
-            .width('100%')
-            .height('100%')
+            .borderRadius(100)
+            .backgroundColor(this.icon_emphasize)
+            .margin(this.uiConfig.isBlurr?{bottom:this.isLandscapePhone ? 86: $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')}:
+              {bottom:this.isLandscapePhone ? 86: $r('app.integer.vp_proxy_start_button_left_right_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
+            .width(this.proxyStartButtonWidth)
+            .height(this.proxyStartButtonHeight)
+            .clip(true)
+            .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
+            .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+            .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
+            // 悬浮代理测速按钮 END
           }
-          .shadow({
-            radius: 10,
-            color: this.icon_emphasize,
-            offsetY: 4,
-            type: ShadowType.BLUR
-          })
-          .borderRadius(100)
-          .backgroundColor(this.icon_emphasize)
-          .margin(this.uiConfig.isBlurr?{bottom:this.isLandscapePhone ? 86: $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')}:
-            {bottom:this.isLandscapePhone ? 86: $r('app.integer.vp_proxy_start_button_left_right_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
-          .width(this.proxyStartButtonWidth)
-          .height(this.proxyStartButtonHeight)
-          .clip(true)
-          .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
-          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-          .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
 
-
-          // 悬浮代理测速按钮 END
         }
         .backgroundColor($r('app.color.background'))
         // .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })

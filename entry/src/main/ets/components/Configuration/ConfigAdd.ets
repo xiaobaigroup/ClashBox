@@ -12,11 +12,12 @@ import {
   RouteName
 } from "../../common/Constants";
 import { hilog } from "@kit.PerformanceAnalysisKit";
-import { BindSheetTitleCustomBuilder } from "../Common";
+import { BindSheetTitleCustomBuilder, ExperimentalFunction } from "../Common";
 import { promptAction } from "@kit.ArkUI";
 import { getResourceString } from "../../utils/ResourceStringUtil";
 import { UIConfig } from "../../entryability/AppState";
 import { customAnimationUtil } from "../../utils/Animation";
+import { removeItemsByIndex } from "../../utils/RemoveItemsUtils";
 
 interface ConfigAddType {
   symbolStart? : Resource,
@@ -24,6 +25,7 @@ interface ConfigAddType {
   text: ResourceStr,
   // NV路由栈name
   navPathStackName?: RouteName,
+  isExperimentalFunction: boolean,
   symbolEnd?: Resource
 }
 
@@ -47,10 +49,10 @@ export struct ConfigAdd {
 
   /* List 相关 */
   private configAddTypeArray: Array<ConfigAddType> = [
-    { symbolStart: $r('sys.symbol.paperclip'), text: $r('app.string.Import_from_url'), navPathStackName: RouteName.IMPORT_CONFIG_FROM_URL, symbolEnd: $r('sys.symbol.chevron_right')},
-    { symbolStart: $r('sys.symbol.qrcode'), text: $r('app.string.import_from_QR_code'), navPathStackName: RouteName.IMPORT_CONFIG_FROM_QR_CODE, symbolEnd: $r('sys.symbol.chevron_right')},
-    { symbolStart: $r('sys.symbol.doc_text_fill'), text: $r('app.string.import_from_file'), navPathStackName: RouteName.IMPORT_CONFIG_FROM_FILE, symbolEnd: $r('sys.symbol.chevron_right')},
-    { symbolStart: $r('sys.symbol.doc'), text: $r('app.string.new_blank_configuration'), navPathStackName: RouteName.CREATE_NEW_CONFIG, symbolEnd: $r('sys.symbol.chevron_right')},
+    { symbolStart: $r('sys.symbol.paperclip'), text: $r('app.string.Import_from_url'), navPathStackName: RouteName.IMPORT_CONFIG_FROM_URL, isExperimentalFunction: false,symbolEnd: $r('sys.symbol.chevron_right')},
+    { symbolStart: $r('sys.symbol.qrcode'), text: $r('app.string.import_from_QR_code'), navPathStackName: RouteName.IMPORT_CONFIG_FROM_QR_CODE, isExperimentalFunction: true, symbolEnd: $r('sys.symbol.chevron_right')},
+    { symbolStart: $r('sys.symbol.doc_text_fill'), text: $r('app.string.import_from_file'), navPathStackName: RouteName.IMPORT_CONFIG_FROM_FILE, isExperimentalFunction: false, symbolEnd: $r('sys.symbol.chevron_right')},
+    { symbolStart: $r('sys.symbol.doc'), text: $r('app.string.new_blank_configuration'), navPathStackName: RouteName.CREATE_NEW_CONFIG, isExperimentalFunction: true, symbolEnd: $r('sys.symbol.chevron_right')},
   ]
 
   /* NV路由 相关 */
@@ -61,7 +63,6 @@ export struct ConfigAdd {
   // NV title Builder
   @State
   private subTitle: string | Resource = 'subTitle'
-
 
   build() {
     Column(){
@@ -75,6 +76,9 @@ export struct ConfigAdd {
                 SymbolGlyph(item.symbolStart).fontSize(24).fontColor([this.icon_emphasize]).margin({ right: 20 })
                   .transition(customAnimationUtil.isScaleTranIcon(10,this.uiConfig))
                 Text(item.text).fontSize(16).fontColor($r('sys.color.font_primary'))
+                if (item.isExperimentalFunction) {
+                  ExperimentalFunction()
+                }
                 Blank()
                 SymbolGlyph(item.symbolEnd).fontSize(24).fontColor([$r('sys.color.icon')])
               }
@@ -90,7 +94,7 @@ export struct ConfigAdd {
             .borderRadius(BORDER_RADIUS_20)
             .onClick( () => {
               hilog.info(0xC020, this.componentName, `#ListItem#onClick(): NavPathStack.pushDestinationByName(${item?.navPathStackName}, null})`)
-              if (index === 1 || index === 3) {
+              if (this.uiConfig.isShowExperimentalFunction ? (index === 1 || index === 3) : index === 2) {
                 promptAction.showToast({message: getResourceString($r('app.string.developing'), this)})
               } else {
                 this.configAddPageInfos.pushDestinationByName(item?.navPathStackName, null)
@@ -149,6 +153,10 @@ export struct ConfigAdd {
 
   aboutToAppear(): void {
     hilog.info(0xC020, this.componentName, `#aboutToAppear executed`)
+    if(!this.uiConfig.enabledADvanced || !this.uiConfig.isShowExperimentalFunction) {
+      // 屏蔽分流策略
+      this.configAddTypeArray = removeItemsByIndex(this.configAddTypeArray, [1,3])
+    }
   }
 
   aboutToDisappear(): void {

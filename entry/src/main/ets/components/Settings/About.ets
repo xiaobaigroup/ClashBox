@@ -37,6 +37,8 @@ struct About {
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   // 点击次数
   @State clickCount: number = 0
+  // 实验功能开关列表行数据
+  @Consume ExperimentData: AboutListItemProp
 
   onClickCount() {
     this.clickCount++
@@ -47,15 +49,7 @@ struct About {
         this.uiConfig.enabledADvanced = true
         this.uiConfig.isShowExperimentalFunction = true
         // 刷新关于页面数据
-        const ExperimentData: AboutListItemProp = {
-          title: 'Experiment',
-          subtitle: '',
-          name: '',
-          children: [
-            { title: $r('app.string.experimental_function'), subtitle: $r('app.string.experimental_function_Subtitle'), sign: 1, name: 'ExperimentalFunction', isOn: true },
-          ]
-        }
-        this.aboutList.splice(1, 0, ExperimentData)
+        this.aboutList.splice(1, 0, this.ExperimentData)
         // 刷新更多页面数据
         this.moreList = ListMoreData()
         promptAction.showToast({message: '高级模式已开启' /*$r('app.string.click_prompt')*/, duration: 2000 })
@@ -130,8 +124,12 @@ struct About {
         hilog.info(0xFF00, "AboutestTag", "实验功能")
         if(isOn) {
           this.isShowExperimentalFunction = true
+          // 显示分流策略
+          this.moreList = ListMoreData()
         } else {
           this.isShowExperimentalFunction = false
+          // 屏蔽分流策略
+          this.moreList = removeItemsByIndex(this.moreList, [5])
         }
         break
       case 'Auto':
