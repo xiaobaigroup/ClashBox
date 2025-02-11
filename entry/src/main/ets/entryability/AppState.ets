@@ -71,7 +71,7 @@ export class UIConfig{
   // 背景模糊变量
   isBlurr: boolean = true
   // 实验功能显示变量
-  isShowExperimentalFunction: boolean = true
+  isShowExperimentalFunction: boolean = false
   // 主页卡片显示变量
   isShowHomeCard: string = JSON.stringify(showHomeCard)
   // 用户选择的语言

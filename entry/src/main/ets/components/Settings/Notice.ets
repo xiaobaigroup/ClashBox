@@ -12,7 +12,7 @@ import { hilog } from "@kit.PerformanceAnalysisKit"
 import { customVibrator } from "../../utils/VibratorUtil"
 import { customSound } from "../../utils/SoundPoolUtil"
 import { promptAction } from "@kit.ArkUI"
-import { theRowCustomDialog, toggleRowList } from "../Common"
+import { ExperimentalFunction, theRowCustomDialog, toggleRowList } from "../Common"
 import { UIConfig } from "../../entryability/AppState"
 import { notificationManager } from '@kit.NotificationKit'
 import { BusinessError } from '@kit.BasicServicesKit'
@@ -308,11 +308,12 @@ struct Notice {
           }
           // 常驻通知提醒 End
 
-         if(!this.isDeveloping) {
+         if (this.uiConfig.isShowExperimentalFunction) {
            // 流量提醒 Start
            Row() {
              toggleRowList({
                title: $r('app.string.cellular_data_reminder'),
+               isExperimentalFunction: true,
                icons: $r('sys.symbol.mobiledata'),
                subtitle: $r('app.string.cellular_data_reminder_subtitle')
              }) {
@@ -339,6 +340,7 @@ struct Notice {
              Row() {
                toggleRowList({
                  title: $r('app.string.time_reminder'),
+                 isExperimentalFunction: true,
                  icons: $r('sys.symbol.clock'),
                  subtitle: $r('app.string.time_reminder_subtitle')
                }) {
@@ -374,6 +376,10 @@ struct Notice {
                    .fontWeight(FontWeight.Medium)
                    .margin({ left: 12 })
                    .fontSize(16)
+                 // 实验功能提示框
+                 if(this.uiConfig.isShowExperimentalFunction) {
+                   ExperimentalFunction()
+                 }
                  Blank()
                  TextInput({placeholder: $r('app.string.text_input_placeholder'), text: $$this.currentNumber})
                    .TextInputStyle()
@@ -820,8 +826,8 @@ export struct CellularDataReminder {
     //.hideToolBar(true)
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
-      this.SettingsPageInfos.clear();
-      return true;
+      this.SettingsPageInfos.pop(true)
+      return true
     })
   }
 }

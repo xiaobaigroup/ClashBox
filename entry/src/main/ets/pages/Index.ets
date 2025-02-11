@@ -40,10 +40,10 @@ import {
   HomeProxyFontSize_24_26_26_27,
   SpeedfontSize12_14_14_16,
   HomeCardCellularDataPadding,
-  PROXY_STARTED_DURATION_INIT_VALUE
+  PROXY_STARTED_DURATION_INIT_VALUE,
+  ListMoreData,
+  moreData
 } from '../common/Constants'
-import { ThemeControl } from '@ohos.arkui.theme'
-import { CustomThemeName, CUSTOM_THEME_MAP } from '../common/AppTheme'
 import { ProxyItem, ProxyData } from '../common/ProxyData'
 import { ClashConfig, Dns, LogLevel, Profile, ProxyGroup, ProxyMode } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
@@ -55,6 +55,7 @@ import { setAutoColorMode, setDarkColorMode, setLightColorMode } from '../utils/
 import { ChangeLanguage } from '../utils/ChangeLanguageUtil'
 import { ConfigData, ConfigDataSourceType } from '../common/PageArgumentEntity'
 import { customAnimationUtil } from '../utils/Animation'
+import { getGreeting } from '../utils/GreetingUtil'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 
@@ -101,6 +102,7 @@ struct Index {
     this.icon_emphasize = theme.colors.iconEmphasize;
 
   }
+  @Provide greetings: Resource = $r('app.string.GoodMorning')
   //tabs图标文字颜色，修改resources/base(dark)/element/color.json中tabs_icon_text配置选中图标文字深浅模式颜色
   // app.color.tabs_icon_text1配置非选中图标和文字深浅模式颜色
   //  @State fontColorValue:ResourceColor = ($r('app.color.tabs_icon_text'));
@@ -260,6 +262,14 @@ struct Index {
    */
   @Provide('HomeCardEditHeight')
   private HomeCardEditHeight: BreakpointState<number> = HomeCardEditHeight
+  // 代理启动变量
+  @Provide proxyEnabled: boolean = false
+  // 前台判断变量
+  @Provide isForeward: boolean = false
+  // 暂停时刻
+  @Provide thePauseTime: number = 0
+  // 恢复时刻
+  @Provide theRestoreTime: number = 0
   /*
   代理页Provide相关数据
    */
@@ -271,7 +281,7 @@ struct Index {
   @Provide private FavoriteProxy: number = -1
   //节点数据组
   @Provide items: ProxyItem[] = ProxyData.ProxyItems();
-  // 日志页临时数据
+  // 日志页数据
   @Provide
   private logListData: Array<LogData> = []
   @Provide configList: Array<ConfigData> = [
@@ -314,7 +324,8 @@ struct Index {
   @Provide private proxyStartingDuration: string = PROXY_STARTED_DURATION_INIT_VALUE
   // 是否进入二级界面(Tab区)
   @Provide @Watch('isSecondaryChange') isSecondary: boolean = false
-
+  // 更多页数据
+  @Provide moreList: moreData[] = ListMoreData()
   @Builder
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
 
@@ -516,6 +527,25 @@ struct Index {
     this.foldPhoneOpenListener.off('change')
   }
 
+  onPageShow(): void {
+    hilog.info(0xFF00, "TimertestTag", "#onPageShow")
+    this.greetings = getGreeting()
+    if (this.proxyEnabled) {
+      this.theRestoreTime = new Date().getTime()
+      hilog.info(0xFF00, "TimertestTag", "恢复的时刻： %{private}d", this.theRestoreTime)
+    }
+    this.isForeward = true
+  }
+
+  onPageHide(): void {
+    hilog.info(0xFF00, "TimertestTag", "#onPageHide")
+    if (this.proxyEnabled) {
+      this.thePauseTime = new Date().getTime()
+      hilog.info(0xFF00, "TimertestTag", "暂停的时刻： %{private}d", this.thePauseTime)
+    }
+    this.isForeward = false
+  }
+
   /**
    * 切换颜色模式
    * @param index 颜色模式序号
@@ -652,7 +682,7 @@ struct Index {
         .backgroundColor(this.uiConfig.isBlurr ? '#00ffffff' : $r('app.color.background'))
         .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Thick : null)
         .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
-        .barOverlap(this.uiConfig.isBlurr ? (this.isLandscapePhone || this.istabletLandscape ? false : true) : false) //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
+        .barOverlap(this.uiConfig.isBlurr ? (this.isLandscapePhone || ( this.istabletLandscape && !this.isSecondary) ? false : true) : false) //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
         .scrollable(this.isSecondary ? false : true)
         .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
         .barWidth(this.isLandscapePhone ? '63vp' : this.compBarWidth.value) /**/

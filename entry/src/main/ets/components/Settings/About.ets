@@ -4,6 +4,8 @@ import { AboutListItemProp, AboutList, BORDER_RADIUS_20, ContributorsListItemPro
   CheckUpdateList,
   CheckUpdateListItemProp,
   CONTENT_END_OFFSET_110,
+  moreData,
+  ListMoreData,
 } from "../../common/Constants"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
@@ -12,6 +14,7 @@ import { BusinessError } from "@kit.BasicServicesKit"
 import { promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 import { AppConfig, ClashCore, UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../utils/Animation"
+import { removeItemsByIndex } from "../../utils/RemoveItemsUtils"
 
 @Component
 struct About {
@@ -25,11 +28,42 @@ struct About {
   @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary')
   @State EnableUpdateChenChannels: number = 0
   @State aboutList: AboutListItemProp[] = AboutList
+  // 更多页列表数组
+  @Consume moreList: moreData[]
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  // 点击次数
+  @State clickCount: number = 0
+
+  onClickCount() {
+    this.clickCount++
+    if(this.uiConfig.enabledADvanced) {
+      promptAction.showToast({message: '已处于高级模式' /*$r('app.string.click_prompt')*/, duration: 2000 })
+    } else {
+      if (this.clickCount >= 5) {
+        this.uiConfig.enabledADvanced = true
+        this.uiConfig.isShowExperimentalFunction = true
+        // 刷新关于页面数据
+        const ExperimentData: AboutListItemProp = {
+          title: 'Experiment',
+          subtitle: '',
+          name: '',
+          children: [
+            { title: $r('app.string.experimental_function'), subtitle: $r('app.string.experimental_function_Subtitle'), sign: 1, name: 'ExperimentalFunction', isOn: true },
+          ]
+        }
+        this.aboutList.splice(1, 0, ExperimentData)
+        // 刷新更多页面数据
+        this.moreList = ListMoreData()
+        promptAction.showToast({message: '高级模式已开启' /*$r('app.string.click_prompt')*/, duration: 2000 })
+      } else if (this.clickCount === 3) {
+        promptAction.showToast({message: '什么东西闪过去了' /*$r('app.string.click_prompt')*/, duration: 1000 })
+      }
+    }
+  }
 
   // 隐式 Want 跳转网站
   async implicitStartAbility(url: string) {
@@ -196,6 +230,13 @@ struct About {
     this.refreshShowExperimentalFunction(this.uiConfig.isShowExperimentalFunction)
     // 加载时初始化内核版本显示
     this.refreshShowKernelVersion(this.appConfig.clashCore)
+    hilog.info(0xFF00, "AboutClickTag", "高级功能: %{public}s", this.uiConfig.enabledADvanced)
+    if (this.uiConfig.enabledADvanced === false) {
+      this.aboutList = removeItemsByIndex(this.aboutList, [1])
+    }
+  }
+  aboutToDisappear(): void {
+    this.isShowExperimentalFunction = this.uiConfig.isShowExperimentalFunction
   }
 
   build() {
@@ -307,15 +348,17 @@ struct About {
                           .margin({right: 12})
                       }
                     }.width('100%')
+                    .onClick((event: ClickEvent) => {
+                      hilog.info(0xFF00, "AboutClickTag", "前: %{public}d", this.clickCount)
+                      this.onClickCount()
+                      hilog.info(0xFF00, "AboutClickTag", "后: %{public}d", this.clickCount)
+                    })
                     // 分割线
                     Row().height(0.5).backgroundColor('#0D000000').width('93%')
                   }
                      .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                   .onClick(() => {
-                    if(itemChild.sign === 0) {
-                      // 似乎可以留个彩蛋
-
-                    } else if(itemChild.sign === 1) {
+                   if(itemChild.sign === 1) {
                       if (itemChild.name === 'ExperimentalFunction') {
                         // 点击提示 防误触
                         promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })

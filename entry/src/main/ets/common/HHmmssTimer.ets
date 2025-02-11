@@ -3,77 +3,65 @@
  * 使用方式
  *  1. 启动：新建Timer对象之后，调用`start()`方法，参数是一个callback回调函数，函数参数值的范围为：[00:00:00 - 999:59:59]
  *  2. 暂停：调用`pause()`方法
- *  2. 停止：调用`start()`方法
+ *  3. 二次启动：调用`resumeWithExtraTime(需累加时间戳)`方法可传入需累加时间戳
+ *  4. 重置：调用`reset()`方法
  */
-import { hilog } from '@kit.PerformanceAnalysisKit'
-
 
 export class Timer {
-  private hours: number = 0
-  private minutes: number = 0
-  private seconds: number = 0
-  // 周期：超过 999:59:59之后值就 += 1，时分秒归零重新开始
-  private cycle: number = 0
-  private intervalId: number | null = null
+  private startTime: number
+  private elapsed: number
+  private timerId: number | undefined
+  private callback: ((time: string) => void) | undefined
 
-  // 格式化时间为 HH:mm:ss
-  private formatTime(): string {
-    const pad = (num: number) => num.toString().padStart(2, '0')
-    return `${pad(this.hours)}:${pad(this.minutes)}:${pad(this.seconds)}`
+  constructor() {
+    this.startTime = 0
+    this.elapsed = 0
+    this.timerId = undefined
   }
 
-  // 每秒更新时间
-  private tick(): void {
-    this.seconds++
-
-    if (this.seconds >= 60) {
-      this.seconds = 0
-      this.minutes++
-    }
-    if (this.minutes >= 60) {
-      this.minutes = 0
-      this.hours++
-    }
-    if (this.hours >= 999) {
-      this.hours = 0
-      this.minutes = 0
-      this.seconds = 0
-      this.cycle++
-    }
-
-    // hilog.info(0xA002, 'HHmmssTimer', `Time: ${this.formatTime()} | cycle: ${this.cycle}`)
+  public start(callback?: (time: string) => void): void {
+    this.callback = callback
+    this.startTime = Date.now() - this.elapsed
+    this.timerId = setInterval(() => this.updateTimer(), 1000)
   }
 
-  /**
-   * 启动计时器
-   * @param callback 参数为当前定时器的字符串类型的值
-   */
-  public start( callback: Callback<string> ): void {
-    if (this.intervalId === null) {
-      this.intervalId = setInterval(() => {
-        this.tick()
-        callback(this.formatTime())
-      }, 1000)
-      hilog.info(0xA002, 'HHmmssTimer', `Timer start. Time: ${this.formatTime()} | cycle: ${this.cycle} | Time range is [00:00:00 - 999:59:59]`)
-    }
-  }
-
-  // 暂停计时器
   public pause(): void {
-    if (this.intervalId !== null) {
-      clearInterval(this.intervalId)
-      this.intervalId = null
-      hilog.info(0xA002, 'HHmmssTimer', `Timer pause. Time: ${this.formatTime()} | cycle: ${this.cycle} | Time range is [00:00:00 - 999:59:59]`)
+    if (this.timerId) {
+      this.elapsed = Date.now() - this.startTime
+      clearInterval(this.timerId)
+      this.timerId = undefined
     }
   }
 
-  // 重置计时器
+  public resumeWithExtraTime(extraTime: number): void {
+    this.elapsed += extraTime
+    this.start(this.callback)
+  }
+
+  private updateTimer(): void {
+    if (this.callback) {
+      const timeString = this.getTime()
+      this.callback(timeString)
+    }
+  }
+
   public reset(): void {
-    this.pause()
-    hilog.info(0xA002, 'HHmmssTimer', `Timer reset. Time: ${this.formatTime()} | cycle: ${this.cycle} | Time range is [00:00:00 - 999:59:59]`)
-    this.hours = 0
-    this.minutes = 0
-    this.seconds = 0
-    this.cycle = 0
+    if (this.timerId) {
+      clearInterval(this.timerId);
+      this.timerId = undefined;
+    }
+    this.startTime = 0
+    this.elapsed = 0
+  }
+
+  private getTime(): string {
+    const totalMilliseconds = Date.now() - this.startTime
+    const hours = Math.floor(totalMilliseconds / 3600000)
+    const minutes = Math.floor((totalMilliseconds % 3600000) / 60000)
+    const seconds = Math.floor((totalMilliseconds % 60000) / 1000)
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
   }
 }
+
+
+

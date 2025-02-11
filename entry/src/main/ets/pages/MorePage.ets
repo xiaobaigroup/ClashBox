@@ -52,7 +52,7 @@ struct MorePage {
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   // 更多页列表数组
-  @State moreList: moreData[] = ListMoreData()
+  @Consume moreList: moreData[]
   // 主页面栈
   @Consume('NavPathStack') pageInfos: NavPathStack
   // 设置页面栈

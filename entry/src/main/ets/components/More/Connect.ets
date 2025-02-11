@@ -1,7 +1,7 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import { BIND_SHEET_TITLE_CONTAINER_HEIGHT, BORDER_RADIUS_20, CONTENT_END_OFFSET_110 } from "../../common/Constants"
 import { UIConfig } from "../../entryability/AppState"
-import { convertTime } from "../../utils/TimeConvertUtil"
+import { convertTime, timestampToDateTime } from "../../utils/TimeConvertUtil"
 import { Nothing } from "../Common"
 import { MoreTop } from "./MoreTopBuilder"
 import { curves, LengthMetrics } from "@kit.ArkUI"
@@ -78,7 +78,14 @@ struct Connect {
       if (metadata.process != "") {
         return connection.start;
       }
-    return `${metadata.process} · ${connection.start}`;
+    return `${connection.start}`;
+  }
+  getTheSourceText( connection: ConnectionInfo) {
+    const  metadata = connection.metadata;
+    if (metadata.process != "") {
+      return connection.start;
+    }
+    return `${metadata.process}`;
   }
 
   build() {
@@ -116,7 +123,11 @@ struct Connect {
                         Text(c)
                         .smallText()
                       })
-                      Text(convertTime(this.getSourceText(item)))
+                      Text(this.getTheSourceText(item).toString())
+                        .smallText()
+                      Text('·')
+                        .smallText()
+                      Text(timestampToDateTime(this.getSourceText(item)))
                         .smallText()
                     }
                   }

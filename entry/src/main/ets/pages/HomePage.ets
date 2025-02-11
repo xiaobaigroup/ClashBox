@@ -57,7 +57,7 @@ struct Home {
   //系统颜色调用
   @State currentBp: string = ''
   // 默认问候语
-  @State greetings: Resource = $r('app.string.GoodMorning')
+  @Consume greetings: Resource
   @State ContainerHeight: string = ''
   @State TopHeight: string = ''
   //节点假数据组后期可改可删
@@ -115,7 +115,13 @@ struct Home {
   /* 代理启动按钮 */
   private promptAction: PromptAction = this.getUIContext()?.getPromptAction()
   // 代理启动按钮状态
-  @Provide private proxyEnabled: boolean = false
+  @Consume proxyEnabled: boolean
+  // 前台判断变量
+  @Consume @Watch('onForeward') isForeward: boolean
+  // 暂停时刻
+  @Consume thePauseTime: number
+  // 恢复时刻
+  @Consume theRestoreTime: number
   // 代理启动持续的时间
   @Consume private proxyStartingDuration: string
   // 按钮宽度
@@ -142,7 +148,6 @@ struct Home {
   // 上一次主页布局
   @State theLastHomeCard: boolean[] = showHomeCard
 
-
   aboutToAppear(): void {
     this.greetings = getGreeting()
     // 初始化主页卡片布局
@@ -151,11 +156,12 @@ struct Home {
     hilog.info(0xFF00, "HometestTag", "布局初始化为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
   }
 
-
   aboutToDisappear() {
     // 将dialogController置空
     this.SaveDialogController = null
   }
+
+
 
   // 在自定义组件即将析构销毁时将dialogController置空
   onCancel() {
@@ -262,6 +268,21 @@ struct Home {
       this.startAnim()
     }else{
       this.stopAnim()
+    }
+  }
+
+  onForeward() {
+    if (this.proxyEnabled) {
+      if(!this.isForeward) {
+        // 页面不处于前台时暂停计时
+        this.proxyStartedTimer.pause()
+        hilog.info(0xFF00, "TimertestTag", "计时器暂停此时的时间：%{private}s", this.proxyStartingDuration)
+      } else {
+        // 二次启动计时
+        let gapTime = this.theRestoreTime - this.thePauseTime
+        hilog.info(0xFF00, "TimertestTag", "需要增加的时间： %{private}d", gapTime)
+        this.proxyStartedTimer.resumeWithExtraTime(gapTime)
+      }
     }
   }
 
@@ -785,7 +806,7 @@ struct Home {
         .height(this.proxyStartButtonHeight)
         .clip(true)
         .onClick(async (event: ClickEvent) => {
-          if(this.configList.length === 0 ||this.proxyGroups.length === 0) {
+          if(this.configList.length === 0 || this.proxyGroups.length === 0) {
 
 
             if (this.uiConfig.isVibrate) {
@@ -799,20 +820,17 @@ struct Home {
           else {
             this.proxyEnabled = !this.proxyEnabled
             hilog.info(0xA002, this.componentName, `代理启动按钮状态：${this.proxyEnabled}`)
-            // 开始计时器
             if (this.proxyEnabled) {
-              this.proxyStartedTimer.start((formatTime) => {
-                this.proxyStartingDuration = formatTime
-              })
+              // 初始启动计时
+              this.proxyStartedTimer.start(time => this.proxyStartingDuration = time)
               // 当模拟下载和通知均启用时
               if(this.uiConfig.backgroundDownModel && this.uiConfig.Enablednotice){
                 BackgroundDownService.start(getContext(this))
               }
               await ClashViewModel.StartVpn()
             } else {
+              // 计时器重置
               this.proxyStartedTimer.reset()
-              // 如果`reset()`就取消注释这句，如果是`pause()`就注释这句
-              this.proxyStartingDuration = PROXY_STARTED_DURATION_INIT_VALUE
               if(this.uiConfig.backgroundDownModel){
                 BackgroundDownService.stop(getContext(this))
               }

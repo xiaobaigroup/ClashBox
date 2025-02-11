@@ -201,7 +201,7 @@ struct Settings {
     .navDestination(this.SettingsPagesMap)
     .width('100%')
     .height('100%')
-    .onAppear(() => {
+    .onNavBarStateChange((isVisible: boolean) => {
       // 刷新语言行的语言提示
       const itemData = this.settingsList[0]
       itemData.hint = this.currentLanguage
