@@ -71,6 +71,7 @@ struct MorePage {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @Consume('breakPointStateTabContentTitleMargin')
   private breakPointStateTabContentTitleMargin: BreakpointState<number>
+
   /**
    * 查询IP地址弹窗控制器
    */

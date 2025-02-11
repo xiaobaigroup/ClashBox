@@ -202,7 +202,7 @@ struct Log {
             .alignItems(HorizontalAlign.Center)
             .justifyContent(FlexAlign.Center)
             .width('100%')
-            .height('100%')
+            .height('85%')
           } else if (this.logListData.length === 0) {
             Nothing({ name: $r('app.string.Log') })
           } else {

@@ -2,7 +2,8 @@ import { UIConfig } from "../entryability/AppState"
 import { curves } from "@kit.ArkUI"
 
 let effectHomeCard: TransitionEffect | null
-let clickEffect_8: ClickEffect | null
+let clickEffect: ClickEffect | null
+let iconEffect: SymbolEffectStrategy | null
 
 class AnimationUtil{
 
@@ -10,9 +11,16 @@ class AnimationUtil{
   public isScaleTran(i:number,uiConfig:UIConfig){
     effectHomeCard=
     uiConfig.isAnimation ?
+    TransitionEffect.asymmetric(
     TransitionEffect.OPACITY
       .combine(TransitionEffect.scale({x: 0, y: 0}))
-      .animation({ duration: uiConfig.animationSpeed,curve:curves.springMotion(),delay: i*10+30 }):null
+      .animation({ duration: uiConfig.animationSpeed,curve:curves.springMotion(),delay: i*10+30 }),
+
+    TransitionEffect.OPACITY
+      .combine(TransitionEffect.SLIDE_SWITCH)
+      .animation({ duration: uiConfig.animationSpeed,curve:curves.springMotion(),delay: i*10+30-i*20 })
+    ):null
+
     return effectHomeCard
   }
 
@@ -23,6 +31,7 @@ class AnimationUtil{
       TransitionEffect.OPACITY
         .animation({ duration: uiConfig.animationSpeed, curve:curves.springMotion(),delay: i })
         .combine(TransitionEffect.SLIDE):null
+
     return effectHomeCard
   }
 
@@ -30,9 +39,31 @@ class AnimationUtil{
   public isSlideSwitch(uiConfig:UIConfig){
   effectHomeCard=
     uiConfig.isAnimation ?
-  TransitionEffect.OPACITY
-  .animation({ duration: uiConfig.animationSpeed, curve: curves.springMotion(), delay: 50 })
-  .combine(TransitionEffect.SLIDE_SWITCH) : null
+      uiConfig.buttonPositionIndex===0 ?
+    TransitionEffect.asymmetric(
+        TransitionEffect.OPACITY
+        .animation({ duration: uiConfig.animationSpeed, curve: curves.springMotion(), delay: 50 })
+        .combine(TransitionEffect.SLIDE_SWITCH),
+
+      TransitionEffect.OPACITY
+        .animation({ duration: uiConfig.animationSpeed, curve: curves.springMotion(), delay: 50 })
+        .combine(TransitionEffect.SLIDE)
+    ):
+        uiConfig.buttonPositionIndex===2 ?
+      TransitionEffect.asymmetric(
+        TransitionEffect.OPACITY
+          .animation({ duration: uiConfig.animationSpeed, curve: curves.springMotion(), delay: 50 })
+          .combine(TransitionEffect.SLIDE),
+
+        TransitionEffect.OPACITY
+          .animation({ duration: uiConfig.animationSpeed, curve: curves.springMotion(), delay: 50 })
+          .combine(TransitionEffect.SLIDE_SWITCH)
+      ):
+          ( TransitionEffect.OPACITY
+            .animation({ duration: uiConfig.animationSpeed, curve: curves.springMotion(), delay: 50 })
+            .combine(TransitionEffect.SLIDE_SWITCH))
+        :null
+
     return effectHomeCard
   }
 
@@ -47,12 +78,33 @@ class AnimationUtil{
 
   //点击动效，uiConfig为开关的切换
   public isClickEffect(uiConfig:UIConfig){
-    clickEffect_8 =
+    clickEffect =
     uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE,scale:0.93} : null
 
-    return clickEffect_8
+    return clickEffect
   }
 
+  //图标动效，uiConfig为开关的切换
+  public isIconEffect(uiConfig:UIConfig){
+    iconEffect =
+      uiConfig.isAnimation ? SymbolEffectStrategy.SCALE : null
+
+    return iconEffect
+  }
+
+  //更多页图标转场缩放动画，i为延迟，在list或者foreach中可以将i设为index，达到递增的动画效果，uiConfig为动画速度以及开关的切换
+  public isScaleTranIcon(i:number,uiConfig:UIConfig){
+    effectHomeCard=
+      uiConfig.isAnimation ?
+      TransitionEffect.OPACITY
+        .combine(TransitionEffect.scale({x: 0, y: 0}))
+        .combine(TransitionEffect.rotate({angle:90}))
+        .animation({ duration: uiConfig.animationSpeed,curve:curves.springMotion(),delay: i*10+50 })
+        .combine(TransitionEffect.OPACITY)
+        .animation({ duration: uiConfig.animationSpeed,curve:curves.springMotion(),delay: i*10+60 })
+        :null
+    return effectHomeCard
+  }
 }
 
 //使用方法 customAnimationUtil.isScaleTran(延迟参数（最好是index，自带计算递增效果）,this.uiConfig)

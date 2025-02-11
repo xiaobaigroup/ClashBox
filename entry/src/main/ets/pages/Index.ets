@@ -92,7 +92,6 @@ struct Index {
   @Provide('icon_emphasize') icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize')
   //三级图标色，浅灰色
   @State icon_tertiary: ResourceColor = $r('sys.color.icon_tertiary')
-
   // 预留自定义主题，颜色在AppTheme里面修改
   /**
    *
@@ -332,7 +331,7 @@ struct Index {
           .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)//分层颜色
           .fontSize(this.isLandscapePhone ? 24 : this.TabIconfontSize.value)
           .margin({ top: 5 })
-          .effectStrategy(this.uiConfig.isAnimation ? SymbolEffectStrategy.SCALE : null)
+          .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
           .transition(customAnimationUtil.isTranslate(this.uiConfig))
 
         Text(title)

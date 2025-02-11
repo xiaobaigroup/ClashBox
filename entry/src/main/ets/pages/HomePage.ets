@@ -282,6 +282,7 @@ struct Home {
               SymbolGlyph($r('sys.symbol.square_and_pencil'))
                 .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
                 .fontColor([this.icon_primary])
+                .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
             }
             .transition(customAnimationUtil.isSlide(150,this.uiConfig))
             .onClick(() => {
@@ -305,6 +306,7 @@ struct Home {
               SymbolGlyph($r('sys.symbol.gearshape'))
                 .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
                 .fontColor([this.icon_primary]) //设置图标无法分层设为单色
+                .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
             }
             .width(40)
             .height(40)
@@ -327,6 +329,7 @@ struct Home {
               SymbolGlyph($r('sys.symbol.plus'))
                 .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
                 .fontColor([Color.White])
+                .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
             }
             .width(40)
             .height(40)
@@ -342,6 +345,7 @@ struct Home {
               SymbolGlyph($r('sys.symbol.save'))
                 .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
                 .fontColor([Color.White])
+                .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
             }
             .width(40)
             .height(40)
@@ -356,6 +360,7 @@ struct Home {
               SymbolGlyph($r('sys.symbol.xmark'))
                 .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
                 .fontColor([Color.White])
+                .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
             }
             .width(40)
             .height(40)

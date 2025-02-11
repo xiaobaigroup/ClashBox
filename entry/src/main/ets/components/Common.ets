@@ -661,6 +661,7 @@ export struct skipRowList {
           .fontSize(24)
           .margin({left: 12})
           .fontColor([this.isPrimaryIcons ? this.icon_primary : this.icon_emphasize])
+          .transition(customAnimationUtil.isScaleTranIcon(10,this.uiConfig))
       }
       Column() {
         Row() {
@@ -737,6 +738,7 @@ export struct toggleRowList {
           .fontSize(24)
           .margin({left: 12})
           .fontColor([this.isPrimaryIcons ? this.icon_primary : this.icon_emphasize])
+          .transition(customAnimationUtil.isScaleTranIcon(10,this.uiConfig))
       }
       Column() {
         Row() {
@@ -818,6 +820,7 @@ export struct menuRowList {
           .fontSize(24)
           .margin({left: 12})
           .fontColor([this.isPrimaryIcons ? this.icon_primary : this.icon_emphasize])
+          .transition(customAnimationUtil.isScaleTranIcon(10,this.uiConfig))
       }
       Column() {
         Row() {
