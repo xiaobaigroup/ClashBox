@@ -8,7 +8,7 @@ import { customVibrator } from '../../utils/VibratorUtil'
 @Extend(Text)
 function ItemTextStyle() {
   .fontColor(($r('sys.color.font_primary')))
-  .fontSize(18)
+  .fontSize(16)
   .fontWeight(FontWeight.Medium)
   .maxLines(1)
   .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -18,7 +18,7 @@ function ItemTextStyle() {
 @Extend(Text)
 function ItemTypeStyle() {
   .fontColor($r('sys.color.font_secondary'))
-  .fontSize(14)
+  .fontSize(12)
 }
 @Extend(Row)
 function ListRowStyle() {
@@ -55,14 +55,14 @@ export struct ProxyNode {
   build() {
     if (this.itemSize === ProxyCardSize.Large){
       Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween}) {
-        Column() {
+        Column({space:3}) {
           Text(`${this.item.name}`).ItemTextStyle()
           Text(`${this.item.type}`).ItemTypeStyle()
         }.alignItems(HorizontalAlign.Start)
         Row({space:10}){
           Text(`${this.item.latency ?? "-"}` + 'ms')
             .fontColor(ProxyData.getColorForLatency(this.item.latency))
-            .fontSize(16)
+            .fontSize(12)
             .maxLines(1)
             .textAlign(TextAlign.End)
           // group 不要写死, 会和其他tab页的生效，在一个组里唯一
@@ -81,15 +81,14 @@ export struct ProxyNode {
       .padding({left:14,right:16})
     }else if (this.itemSize === ProxyCardSize.Mini){
       Row() {
-        Column() {
+        Column({space:3}) {
           Text(`${this.item.name}`).ItemTextStyle()
-          Row() {
+          Row({space:3}) {
             Text(`${this.item.type}`).ItemTypeStyle().maxLines(1).width('25%').textOverflow({ overflow: TextOverflow.Clip})
             Text(`${this.item.latency}` + 'ms')
               .fontColor(ProxyData.getColorForLatency(this.item.latency))
-              .fontSize(14)
+              .fontSize(12)
               .maxLines(1)
-                // .width(this.isLandscapePhone ?'429px':'250px')
               .width('55%')
           }.justifyContent(FlexAlign.Start)
         }
@@ -108,18 +107,19 @@ export struct ProxyNode {
       .ListRowStyle()
     }else{
       Row() {
-        Column() {
-          Text(`${this.item.name}`).ItemTextStyle()//.width(this.isLandscapePhone ?'592px':'433px')
-          Text(`${this.item.type}`).ItemTypeStyle()
-          Blank(10)
-          Text(`${this.item.latency}` + 'ms')
-            //  Text(`${item.id }`)
-            .fontColor(ProxyData.getColorForLatency(this.item.latency))
-            .fontSize(16)
-            .maxLines(1)
-            .width('80%')
-          // .width(this.isLandscapePhone ?'592px':'250px')
-        }.alignItems(HorizontalAlign.Start)
+        Column({space:5}) {
+          Text(`${this.item.name}`).ItemTextStyle().maxLines(2)
+
+          Column() {
+            Text(`${this.item.type}`).ItemTypeStyle()
+            Text(`${this.item.latency}` + 'ms')//  Text(`${item.id }`)
+              .fontColor(ProxyData.getColorForLatency(this.item.latency))
+              .fontSize(12)
+              .maxLines(1)
+              .width('80%')
+          }.alignItems(HorizontalAlign.Start)
+        }.alignItems(HorizontalAlign.Start).justifyContent(FlexAlign.SpaceBetween).height('100%')
+        .padding({top:10,bottom:10})
         Blank()
         Radio({ value: this.item.name, group: this.item.g + this.item.name }).enabled(!this.disabled)
           .checked(this.item.name === this.selected)

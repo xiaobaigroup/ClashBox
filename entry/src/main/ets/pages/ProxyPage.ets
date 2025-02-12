@@ -524,8 +524,7 @@ struct ProxyPage {
             })
             .borderRadius(100)
             .backgroundColor(this.icon_emphasize)
-            .margin(this.uiConfig.isBlurr?{bottom:this.isLandscapePhone ?$r('app.integer.vp_proxy_start_button_left_right_margin'): $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')}:
-            $r('app.integer.vp_proxy_start_button_left_right_margin'))
+            .margin({bottom:this.isLandscapePhone ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
             .width(this.proxyStartButtonWidth)
             .height(this.proxyStartButtonHeight)
             .clip(true)

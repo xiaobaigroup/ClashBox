@@ -333,8 +333,8 @@ struct ConfigurationPage {
       Stack({ alignContent: this.stackAlignContentAlignment }) {
         if (this.configList.length === 0) {
           Nothing({ name: $r('app.string.Configuration') })
-            .height('95%')
-            .margin({bottom:10})
+            .height('90%')
+           // .margin({bottom:10})
         } else {
           Column(){
             Blank().height(TAB_CONTENT_TITLE_HEIGHT)
@@ -348,9 +348,9 @@ struct ConfigurationPage {
                         Text(item.configName).fontColor(($r('sys.color.font_primary')))
                         Row() {
                           Text($r('app.string.update_by'))
-                            .fontColor($r('sys.color.font_secondary'))
+                            .fontColor($r('sys.color.font_secondary')).fontSize(12)
                           Text(convertTime(item.lastUpdateDateTime))
-                            .fontColor($r('sys.color.font_secondary'))
+                            .fontColor($r('sys.color.font_secondary')).fontSize(12)
                         }
 
                         //  Text(item.createdDate)
@@ -466,8 +466,7 @@ struct ConfigurationPage {
           type: ShadowType.BLUR
         })
         .borderRadius(100)
-        .margin(this.uiConfig.isBlurr?{bottom:this.isLandscapePhone ?$r('app.integer.vp_proxy_start_button_left_right_margin'): $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')}:
-        $r('app.integer.vp_proxy_start_button_left_right_margin'))
+        .margin({bottom:this.isLandscapePhone ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
         .width(this.proxyStartButtonWidth)
         .height(this.proxyStartButtonHeight)
         .backgroundColor(this.icon_emphasize)
