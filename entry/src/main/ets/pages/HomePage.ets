@@ -414,7 +414,7 @@ struct Home {
 
       Stack({ alignContent: this.stackAlignContentAlignment }) {
         Column(){
-          Blank().height(TAB_CONTENT_TITLE_HEIGHT)
+          Blank().height(!this.isLandscapePhone?TAB_CONTENT_TITLE_HEIGHT:0)
           Scroll() {
             // 主页卡片层
             List() {
@@ -866,7 +866,7 @@ struct Home {
           offsetY: 4,
           type: ShadowType.BLUR
         })
-        .margin(this.uiConfig.isBlurr ? {bottom:this.isLandscapePhone ? 30 : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')} : $r('app.integer.vp_proxy_start_button_left_right_margin'))
+        .margin({bottom:this.isLandscapePhone ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
         .width(this.proxyEnabled ? $r('app.integer.vp_proxy_started_button_width') : $r('app.integer.vp_proxy_not_start_button_width'))
         .height(this.proxyStartButtonHeight)
         .clip(true)

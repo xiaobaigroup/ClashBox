@@ -149,12 +149,12 @@ struct Index {
     sm: '100%',
     md: '100%',
     lg: '100%',
-    xl: '65vp'
+    xl: '77vp'
   });
   @State compBarHeight: BreakpointState<string> = BreakpointState.of({
-    sm: '65vp',
-    md: '65vp',
-    lg: '65vp',
+    sm: '77vp',
+    md: '77vp',
+    lg: '77vp',
     xl: '100%'
   });
   @State TabIconfontSize: BreakpointState<number> = BreakpointState.of({
@@ -169,12 +169,7 @@ struct Index {
     lg: 16,
     xl: 16
   });
-  @State compMargin: BreakpointState<marginGenerate> = BreakpointState.of({
-    sm: ({ top: 4, bottom: 5 } as marginGenerate),
-    md: ({ top: 4, bottom: 5 } as marginGenerate),
-    lg: ({ top: 5 } as marginGenerate),
-    xl: ({ top: 5 } as marginGenerate)
-  });
+
   //page内顶部标题偏移量
   @Provide curYOffset: number = 0
   // 主页卡片内边距
@@ -344,26 +339,24 @@ struct Index {
 
     Flex({
       direction: this.compDirection.value,
-      justifyContent: FlexAlign.Center,
-      alignItems: ItemAlign.Center
+      justifyContent:this.isLandscapePhone|| this.istabletLandscape ? FlexAlign.Center: FlexAlign.Start,
+      alignItems:this.isLandscapePhone|| this.istabletLandscape ? ItemAlign.End:ItemAlign.Center
     }) {
-      Column() {
+      Column({ space:'4vp'}) {
         SymbolGlyph(TabIcon)
           .fontColor([this.selectedIndex === index ? this.icon_emphasize : this.icon_tertiary])
           .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)//分层颜色
           .fontSize(this.isLandscapePhone ? 24 : this.TabIconfontSize.value)
-          .margin({ top: 5 })
           .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
           .transition(customAnimationUtil.isTranslate(this.uiConfig))
 
         Text(title)
           .fontColor(this.selectedIndex === index ? this.icon_emphasize : this.icon_tertiary)
           .fontWeight(FontWeight.Medium)
-          .margin(this.compMargin.value)
           .fontSize(this.isLandscapePhone ? 12 : this.TabTitlefontSize.value)
           .transition(customAnimationUtil.isTranslate(this.uiConfig))
       }
-      .padding(this.isLandscapePhone ? { left: 39 } : { bottom: 5 })
+     .padding(this.isLandscapePhone|| this.istabletLandscape ? { right:5 } : { top: 5 })
     }
     .width('100%')
     .height('100%')
@@ -461,7 +454,6 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.compVertical)
     BreakpointSystem.getInstance().attach(this.compBarWidth)
     BreakpointSystem.getInstance().attach(this.compBarHeight)
-    BreakpointSystem.getInstance().attach(this.compMargin)
     BreakpointSystem.getInstance().attach(this.TabIconfontSize)
     BreakpointSystem.getInstance().attach(this.TabTitlefontSize)
     BreakpointSystem.getInstance().attach(this.breakPointStateHomeCardPadding)
@@ -621,10 +613,9 @@ struct Index {
       duration: this.uiConfig.animationSpeed,
       curve: curves.springMotion(),
       iterations: 1,
-      playMode: PlayMode.Alternate
+      playMode: PlayMode.Normal,
     }, () => {
       indexController.setTabBarTranslate(this.isLandscapePhone ? { x: '-100%' } : { y: '100%' })
-      indexController.setTabBarOpacity(0)
     })
   }
 
@@ -633,10 +624,9 @@ struct Index {
       duration: this.uiConfig.animationSpeed,
       curve: curves.springMotion(),
       iterations: 1,
-      playMode: PlayMode.Alternate
+      playMode: PlayMode.Normal,
     }, () => {
       indexController.setTabBarTranslate(this.isLandscapePhone ? { x: 0 } : { y: 0 })
-      indexController.setTabBarOpacity(1)
     })
   }
 
@@ -651,7 +641,7 @@ struct Index {
   }
 
   build() {
-    Column() {
+    Stack() {
         Tabs({
           barPosition: this.isLandscapePhone ? BarPosition.Start : this.compBarPose.value,
           index: this.currentIndex,
@@ -700,15 +690,15 @@ struct Index {
           }
           .tabBar(this.TabBarBuilder($r('app.string.More'), 3, $r('sys.symbol.square_fill_grid_2x2')))
         }
+        .zIndex(1)
         .backgroundColor(this.uiConfig.isBlurr ? '#00ffffff' : $r('app.color.background'))
         .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Thick : null)
         .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
         .barOverlap(this.uiConfig.isBlurr ? (this.isLandscapePhone || ( this.istabletLandscape && !this.isSecondary) ? false : true) : false) //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
         .scrollable(this.isSecondary ? false : true)
         .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
-        .barWidth(this.isLandscapePhone ? '63vp' : this.compBarWidth.value) /**/
-        .barHeight(this.isLandscapePhone ? '100%' : this.compBarHeight.value) /**/
-        .padding(this.compMargin.value)
+        .barWidth(this.isLandscapePhone ? '77vp' : this.compBarWidth.value) /**/
+        .barHeight(this.isLandscapePhone ? '100%' :  this.compBarHeight.value) /**/
         .onChange((index: number) => {
           this.currentIndex = index
         })
@@ -727,10 +717,7 @@ struct Index {
           this.isEnableIndexForegroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
           { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
         )
-        .padding({
-          top: px2vp(this.topRectHeight)
-        }) //, bottom: this.isLandscapePhone ? 0 :px2vp(this.bottomRectHeight) -15})
-        //  .animation(this.uiConfig.isAnimation ? { duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
+        .padding({ top: px2vp(this.topRectHeight) })
     }
   }
 }
