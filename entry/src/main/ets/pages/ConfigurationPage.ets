@@ -348,9 +348,9 @@ struct ConfigurationPage {
                         Text(item.configName).fontColor(($r('sys.color.font_primary')))
                         Row() {
                           Text($r('app.string.update_by'))
-                            .fontColor($r('sys.color.font_secondary'))
+                            .fontColor($r('sys.color.font_secondary')).fontSize(12)
                           Text(convertTime(item.lastUpdateDateTime))
-                            .fontColor($r('sys.color.font_secondary'))
+                            .fontColor($r('sys.color.font_secondary')).fontSize(12)
                         }
 
                         //  Text(item.createdDate)

@@ -10,7 +10,7 @@ import { copy, UIConfig } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { getResourceString } from "../../utils/ResourceStringUtil"
 import { EventHub, EventKey } from "../../common/EventHub"
-import { customAnimationUtil } from "../../utils/Animation"
+import { customAnimationUtil, isON } from "../../utils/Animation"
 
 // 资源数据（假设）
 interface ResourcesData {
@@ -108,7 +108,8 @@ struct Resources {
   @Provide isShowGroupSort: Boolean = false
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @Provide resourceListData: Array<ResourcesData> = theResouresData
-
+  //开关不触发list转场动画判定
+  @State isON:isON = new isON()
   @Builder
   reaourceSearch() {
   }
@@ -125,6 +126,7 @@ struct Resources {
     .margin({ left: 10 })
     .backgroundColor($r('app.color.settings_container_background'))
     .onClick(() => {
+      this.isON.toggleAnim = true
       this.isEnableIndexForegroundBlur = true
       this.isShowGroupSort = true
     })
@@ -244,7 +246,7 @@ struct Resources {
             })
           }.width('100%')
           .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
-          .transition(customAnimationUtil.isSlide(200, this.uiConfig))
+          .transition(this.isON.toggleAnim? null :customAnimationUtil.isSlide(200, this.uiConfig))
           // 页面
           if(this.resourceListData.length === 0) {
             Nothing({ name: $r('app.string.Resources') })
@@ -300,6 +302,7 @@ struct Resources {
                     }.ButtonStyle()
                     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                     .onClick(() => {
+                      this.isON.toggleAnim = true
                       this.updateTime(index)
                       // 资源更新处理
                       this.updateGeoDateItem(item)
@@ -311,7 +314,7 @@ struct Resources {
                   .backgroundColor($r('app.color.container_background'))
                   .borderRadius(BORDER_RADIUS_20)
                 }.width('100%')
-                .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
+                .transition(this.isON.toggleAnim? null :customAnimationUtil.isScaleTran(index, this.uiConfig))
               })
             }.width('100%')
             .height('100%')
@@ -354,9 +357,11 @@ struct Sort {
   @Consume isShowGroupSort: Boolean
   @Consume resourceListData: Array<ResourcesData>
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
   @State lastSortList: string = ''
   @State SortHideList: Array<ResourcesData> = resourcesBlankData
-  @State save_icon: ResourceColor = $r('app.color.container_background')
   // 拖拽项
   @State dragItem: ResourcesData | null = null
   // 被拖拽项的原始索引
@@ -396,9 +401,11 @@ struct Sort {
     Row() {
       Text(item.resourceName)
         .fontWeight(FontWeight.Medium)
+        .fontColor($r('sys.color.font_primary'))
       Blank()
       SymbolGlyph(item.key=== 'NN' ? undefined : $r('sys.symbol.sort'))
         .fontSize(24)
+        .fontColor([$r('sys.color.font_primary')])
     }
     .width('100%')
     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
@@ -428,13 +435,13 @@ struct Sort {
         Button({ type: ButtonType.Circle, stateEffect: true }) {
           SymbolGlyph($r('sys.symbol.save'))
             .fontSize(24)
-            .fontColor([this.save_icon])
+            .fontColor([Color.White])
         }
         .width(40)
         .height(40)
         .margin({ top: 16 })
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-        .backgroundColor(Color.Blue)
+        .backgroundColor(this.icon_emphasize)
         .onClick(() => {
           this.isSave = true
           this.uiConfig.resourcesHideData = JSON.stringify(this.SortHideList)
@@ -455,6 +462,7 @@ struct Sort {
       Text('展示中')
         .fontWeight(FontWeight.Normal)
         .fontSize(15)
+        .fontColor($r('sys.color.font_secondary'))
 
       // 展示列表
       List({ space: 10 }) {
@@ -470,7 +478,7 @@ struct Sort {
         }, (item: ResourcesData) => item.key)
       }.width('100%')
       .borderRadius(24)
-      .backgroundColor(Color.White)
+      .backgroundColor($r('app.color.container_background'))
       .onItemDragStart((event: ItemDragInfo, index: number) => {
         this.dragItem = this.resourceListData[index]
         this.currentList = 1
@@ -496,6 +504,7 @@ struct Sort {
       Text('已隐藏')
         .fontWeight(FontWeight.Normal)
         .fontSize(15)
+        .fontColor($r('sys.color.font_secondary'))
 
       // 隐藏列表
       List({ space: 10 }) {
@@ -511,7 +520,7 @@ struct Sort {
         }, (item: ResourcesData) => item.key)
       }.width('100%')
       .borderRadius(24)
-      .backgroundColor(Color.White)
+      .backgroundColor($r('app.color.container_background'))
       .onItemDragStart((event: ItemDragInfo, index: number) => {
         this.dragItem = this.SortHideList[index]
         this.currentList = 2
