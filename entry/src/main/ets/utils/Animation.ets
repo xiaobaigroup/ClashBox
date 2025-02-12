@@ -4,7 +4,10 @@ import { curves } from "@kit.ArkUI"
 let effectEvent: TransitionEffect | null
 let clickEffect: ClickEffect | null
 let iconEffect: SymbolEffectStrategy | null
-export class isON{ toggleAnim: boolean = false }
+export class isON{
+  toggleAnim: boolean = false
+
+}
 
 class AnimationUtil{
 
@@ -75,7 +78,7 @@ class AnimationUtil{
   //点击动效，uiConfig为开关的切换
   public isClickEffect(uiConfig:UIConfig){
     clickEffect =
-    uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE,scale:0.93} : null
+    uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE,scale:0.95} : null
 
     return clickEffect
   }
@@ -100,7 +103,14 @@ class AnimationUtil{
   }
 }
 
-//使用方法 customAnimationUtil.isScaleTran(延迟参数（最好是index，自带计算递增效果）,this.uiConfig)
+/*
+转场动画使用方法:
+* .transition(customAnimationUtil.isScaleTran(延迟参数（最好是index，自带计算递增效果）,this.uiConfig))
+点击动效动画使用方法:
+* .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+图标动效使用方法
+* .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
+ */
 export const customAnimationUtil = new AnimationUtil()
 
 

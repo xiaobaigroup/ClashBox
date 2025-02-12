@@ -25,7 +25,10 @@ struct DNS {
         subtitle: ''
       })
       ConfigList({configList: this.overwriteDNSList})
+        .height('100%')
     }
+    .width('100%')
+    .height('100%')
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {

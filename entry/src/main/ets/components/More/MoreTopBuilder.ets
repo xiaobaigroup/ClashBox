@@ -1,3 +1,8 @@
+import { BreakpointState } from "../../common/breakpointsystem"
+import { TAB_CONTENT_TITLE_FONT_SIZE, TAB_CONTENT_TITLE_HEIGHT } from "../../common/Constants"
+import { UIConfig } from "../../entryability/AppState"
+import { customAnimationUtil } from "../../utils/Animation"
+
 /**
  * 更多页顶部导航栏
  * @param title 标题文本
@@ -22,6 +27,10 @@ export struct MoreTop {
   @BuilderParam searchButton: () => void = this.searchDefaultButton
   // 其它按钮
   @BuilderParam otherButton: () => void = this.otherDefaultButton
+  //page内顶部标题偏移量
+  @Consume curYOffset: number
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
 
   @Builder searchDefaultButton() {
     // 默认搜索按钮
@@ -33,6 +42,7 @@ export struct MoreTop {
     .backgroundColor($r('app.color.settings_container_background'))
     .width(40)
     .height(40)
+    .transition(customAnimationUtil.isSlide(100, this.uiConfig))
   }
   @Builder otherDefaultButton() {
     // 默认功能按钮为更多
@@ -45,6 +55,7 @@ export struct MoreTop {
     .height(40)
     .margin({ left: 10 })
     .backgroundColor($r('app.color.settings_container_background'))
+    .transition(customAnimationUtil.isSlide(50, this.uiConfig))
   }
 
   build() {
@@ -55,6 +66,7 @@ export struct MoreTop {
           .fontSize(28)
           .fontColor([this.icon_primary])
       }
+      .transition(customAnimationUtil.isSlide(200, this.uiConfig))
       .width(40)
       .height(40)
       .backgroundColor($r('app.color.settings_container_background'))
@@ -66,7 +78,7 @@ export struct MoreTop {
       })
       Column() {
         Text(this.title)
-          .fontSize(30)
+          .fontSize(this.curYOffset<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset/100:TAB_CONTENT_TITLE_FONT_SIZE)
           .geometryTransition(this.name)
           .fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Start)
@@ -81,13 +93,17 @@ export struct MoreTop {
         }
       }.layoutWeight(1)
       .alignItems(HorizontalAlign.Start)
+      .transition(customAnimationUtil.isSlide(150, this.uiConfig))
       Blank()
       this.searchButton()
       this.otherButton()
     }
-    .zIndex(1)
     .layoutWeight(1)
-    .height(56)
     .alignItems(VerticalAlign.Center)
+    .width('100%')
+    .position({x:0})
+    .height(this.curYOffset<0?TAB_CONTENT_TITLE_HEIGHT-this.curYOffset:TAB_CONTENT_TITLE_HEIGHT)
+    .zIndex(1)
+    .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
   }
 }

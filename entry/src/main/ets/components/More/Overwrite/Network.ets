@@ -1,5 +1,7 @@
 import { BreakpointState } from "../../../common/breakpointsystem"
-import { ConfigItemData, ListOverwriteNetworkData } from "../../../common/Constants"
+import {
+  BORDER_RADIUS_20,
+  ConfigItemData, ListOverwriteNetworkData, TAB_CONTENT_TITLE_HEIGHT } from "../../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import OverwriteTop from "./OverwriteTopBuilder"
 import { theCustomDialog } from "../../Common"
@@ -72,6 +74,8 @@ export struct NetworkRouterAddress {
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  //page内顶部标题偏移量
+  @Consume curYOffset: number
   /**
    * 添加路由地址弹窗控制器
    */
@@ -162,83 +166,102 @@ export struct NetworkRouterAddress {
 
   build() {
     NavDestination() {
-      // 导航栏
-      OverwriteTop({
-        title: $r('app.string.Network'),
-        subtitle: $r('app.string.Routing_Address')
-      })
+      Stack() {
+        // 导航栏
+        OverwriteTop({
+          title: $r('app.string.Network'),
+          subtitle: $r('app.string.Routing_Address')
+        })
 
-      List({space: this.listBottom.value}) {
-        ForEach(this.RouterAddressList, (item: RouterAddressData, index: number) => {
-          // 数据列表行
-          ListItem() {
-            Row() {
-              Row() {
-                Text(item.name)
-                  .fontWeight(FontWeight.Medium)
-                  .fontSize(16)
-                  .margin({left: 12})
-                Blank()
-                SymbolGlyph($r('sys.symbol.trash_fill'))
-                  .fontColor([this.icon_primary])
-                  .fontSize(28)
-                  .margin({right: 12})
-                  .onClick(() => {
-                    // 进去列表行删除
-                    this.handleDelete(index)
-                  })
+        Column() {
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT + 6)
+          Scroll() {
+            List({ space: this.listBottom.value }) {
+              ForEach(this.RouterAddressList, (item: RouterAddressData, index: number) => {
+                // 数据列表行
+                ListItem() {
+                  Row() {
+                    Row() {
+                      Text(item.name)
+                        .fontWeight(FontWeight.Medium)
+                        .fontSize(16)
+                        .margin({ left: 12 })
+                      Blank()
+                      SymbolGlyph($r('sys.symbol.trash_fill'))
+                        .fontColor([this.icon_primary])
+                        .fontSize(28)
+                        .margin({ right: 12 })
+                        .onClick(() => {
+                          // 进去列表行删除
+                          this.handleDelete(index)
+                        })
+                    }
+                    .width('100%')
+                    .height(53)
+                    .borderRadius(BORDER_RADIUS_20)
+                    .backgroundColor($r('app.color.container_background'))
+                  }
+
+                }
+                .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
+                .onClick(() => {
+                  // 启用背景模糊
+                  this.isEnableIndexForegroundBlur = true
+                  // 进入列表行数据编辑
+                  this.currentEditInputValue = item.name
+                  this.theEditPlaceholder = index
+                  this.editDialogController.open()
+                })
+              })
+
+              // 添加栏
+              ListItem() {
+                Row() {
+                  SymbolGlyph($r('sys.symbol.plus'))
+                    .fontSize(28)
+                    .margin({ left: 12, right: 16 })
+                    .fontColor([this.icon_primary])
+                  Text($r('app.string.Add'))
+                    .fontWeight(FontWeight.Medium)
+                    .fontSize(16)
+                }
+                .width('100%')
+                .height(53)
+                .borderRadius(BORDER_RADIUS_20)
+                .backgroundColor($r('app.color.container_background'))
               }
-              .width('100%')
-              .height(53)
-              .borderRadius(20)
-              .backgroundColor($r('app.color.container_background'))
+              .transition(customAnimationUtil.isScaleTran(3, this.uiConfig))
+              .onClick(() => {
+                // 启用背景模糊
+                this.isEnableIndexForegroundBlur = true
+                this.addDialogController.open()
+              })
             }
-
+            .width('100%')
+            .height('100%')
+            .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
+            .margin({ top: 10 })
+            .borderRadius(BORDER_RADIUS_20)
+            .alignListItem(ListItemAlign.Center)
+            .chainAnimation(true)
+            .nestedScroll({
+              scrollForward: NestedScrollMode.PARENT_FIRST,
+              scrollBackward: NestedScrollMode.SELF_FIRST
+            })
           }
-          .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
-          .onClick(() => {
-            // 启用背景模糊
-            this.isEnableIndexForegroundBlur = true
-            // 进入列表行数据编辑
-            this.currentEditInputValue = item.name
-            this.theEditPlaceholder = index
-            this.editDialogController.open()
+          .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring : null) //,{alwaysEnabled:true})
+          .onDidScroll((xOffset: number, yOffset: number): void => {
+            // 累计计算当前父组件滚动在Y轴方向的偏移量
+            if (this.uiConfig.isAnimation) {
+              this.curYOffset += yOffset
+            }
+            console.info("yOffset" + this.curYOffset);
           })
-        })
-
-        // 添加栏
-        ListItem() {
-          Row() {
-            SymbolGlyph($r('sys.symbol.plus'))
-              .fontSize(28)
-              .margin({left: 12, right: 16})
-              .fontColor([this.icon_primary])
-            Text($r('app.string.Add'))
-              .fontWeight(FontWeight.Medium)
-              .fontSize(16)
-          }
-          .width('100%')
-          .height(53)
-          .borderRadius(20)
-          .backgroundColor($r('app.color.container_background'))
         }
-        .transition(customAnimationUtil.isScaleTran(3,this.uiConfig))
-        .onClick(() => {
-          // 启用背景模糊
-          this.isEnableIndexForegroundBlur = true
-          this.addDialogController.open()
-        })
-
       }
-      .width('100%')
-      .height(this.isLandscapePhone ? 275 : 650)
-      .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
-      .margin({ top: 10 })
-      .borderRadius(18)
-      .alignListItem(ListItemAlign.Center)
-
-
     }
+    .width('100%')
+    .height('100%')
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {

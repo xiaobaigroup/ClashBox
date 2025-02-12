@@ -1,5 +1,5 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { BORDER_RADIUS_20, CONTENT_END_OFFSET_150 } from "../../common/Constants"
+import { BORDER_RADIUS_20, CONTENT_END_OFFSET_150, TAB_CONTENT_TITLE_HEIGHT } from "../../common/Constants"
 import { MoreTop } from "./MoreTopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { convertTime } from "../../utils/TimeConvertUtil"
@@ -32,7 +32,8 @@ struct RequestPage {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
-
+  //page内顶部标题偏移量
+  @Consume curYOffset: number
   // 临时数据
   @State
   private requestListData: Array<RequestData> = [
@@ -64,62 +65,82 @@ struct RequestPage {
 
   build() {
     NavDestination() {
-      // 标题栏
-      Row() {
-        MoreTop({
-          title: $r('app.string.Request'),
-          otherButton: (): void => { this.requestOther() }
-        })
-      }.width('100%')
-      .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
-      .transition(customAnimationUtil.isSlide(200,this.uiConfig))
-      // 页面
-      if(this.requestListData.length === 0) {
-        Nothing({ name: $r('app.string.Request') })
-      } else {
-        List({ space: 10 }) {
-          ForEach(this.requestListData, (item: RequestData, index: number) => {
-            ListItem() {
-              Row() {
-                // 文本显示区
-                Column() {
-                  Text(item.requestUrl)
-                    .fontWeight(FontWeight.Bold)
-                    .margin({ bottom: 2 })
-                    .fontSize(17)
-                  Row({ space: 2 }) {
-                    Text(item.requestSign === 0 ? $r('app.string.Direct') : item.requestConfigName)
-                      .smallText()
-                    Text('·')
-                      .smallText()
-                    if(item.requestSign === 1) {
-                      Text(item.requestProxyName)
-                        .smallText()
-                      Text('·')
-                        .smallText()
-                    }
-                    Text(convertTime(item.requestTime))
-                      .smallText()
-                  }.justifyContent(FlexAlign.Start)
-                }
-                .alignItems(HorizontalAlign.Start)
-                .layoutWeight(1)
-                Blank()
-              }.width('100%')
-              .padding(12)
-              .justifyContent(FlexAlign.Center)
-              .width('100%')
-              .backgroundColor($r('app.color.container_background'))
-              .borderRadius(BORDER_RADIUS_20)
-            }.width('100%')
-            .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
+      Stack() {
+        // 标题栏
+          MoreTop({
+            title: $r('app.string.Request'),
+            otherButton: (): void => {
+              this.requestOther()
+            }
           })
-        }.width('100%')
-        .height('100%')
-        .contentEndOffset(CONTENT_END_OFFSET_150)
-        .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
-      }
 
+        Column() {
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT+6)
+          // 页面
+          if (this.requestListData.length === 0) {
+            Nothing({ name: $r('app.string.Request') })
+          } else {
+            Scroll() {
+              List({ space: 10 }) {
+                ForEach(this.requestListData, (item: RequestData, index: number) => {
+                  ListItem() {
+                    Row() {
+                      // 文本显示区
+                      Column() {
+                        Text(item.requestUrl)
+                          .fontWeight(FontWeight.Bold)
+                          .margin({ bottom: 2 })
+                          .fontSize(17)
+                        Row({ space: 2 }) {
+                          Text(item.requestSign === 0 ? $r('app.string.Direct') : item.requestConfigName)
+                            .smallText()
+                          Text('·')
+                            .smallText()
+                          if (item.requestSign === 1) {
+                            Text(item.requestProxyName)
+                              .smallText()
+                            Text('·')
+                              .smallText()
+                          }
+                          Text(convertTime(item.requestTime))
+                            .smallText()
+                        }.justifyContent(FlexAlign.Start)
+                      }
+                      .alignItems(HorizontalAlign.Start)
+                      .layoutWeight(1)
+
+                      Blank()
+                    }
+                    .width('100%')
+                    .padding(12)
+                    .justifyContent(FlexAlign.Center)
+                    .width('100%')
+                    .backgroundColor($r('app.color.container_background'))
+                    .borderRadius(BORDER_RADIUS_20)
+                  }.width('100%')
+                  .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
+                })
+              }.width('100%')
+              .height('100%')
+              .contentEndOffset(CONTENT_END_OFFSET_150)
+              .padding({ right: this.morePageMargin.value, left: this.morePageMargin.value })
+              .chainAnimation(true)
+              .nestedScroll({
+                scrollForward: NestedScrollMode.PARENT_FIRST,
+                scrollBackward: NestedScrollMode.SELF_FIRST
+              })
+            }
+            .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)//,{alwaysEnabled:true})
+            .onDidScroll((xOffset: number, yOffset: number): void => {
+              // 累计计算当前父组件滚动在Y轴方向的偏移量
+              if (this.uiConfig.isAnimation){
+                this.curYOffset += yOffset
+              }
+              console.info("yOffset" + this.curYOffset);
+            })
+          }
+        }
+      }
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))

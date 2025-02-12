@@ -1,5 +1,5 @@
 import { BreakpointState } from "../../../common/breakpointsystem"
-import { ListOverwriteData, moreData } from "../../../common/Constants"
+import { BORDER_RADIUS_20, ListOverwriteData, moreData, TAB_CONTENT_TITLE_HEIGHT } from "../../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { skipRowList, theRowCustomDialog } from "../../Common"
 import { MoreTop } from "../MoreTopBuilder"
@@ -7,6 +7,7 @@ import { UIConfig } from "../../../entryability/AppState"
 import { ClashConfig } from "proxy_core"
 import { curves } from "@kit.ArkUI"
 import { customAnimationUtil } from "../../../utils/Animation"
+import OverwriteTop from "./OverwriteTopBuilder"
 
 @Component
 struct Overwrite {
@@ -25,7 +26,8 @@ struct Overwrite {
    * 是否开启 `Index` 页面的前景模糊
    */
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
-
+  //page内顶部标题偏移量
+  @Consume curYOffset: number
   /**
    * 重置覆写提示弹窗控制器
    */
@@ -94,41 +96,60 @@ struct Overwrite {
 
   build() {
     NavDestination() {
-      Row() {
-        MoreTop({
+      Stack() {
+        /*    MoreTop({
+              title: $r('app.string.Overwrite'),
+              searchButton: this.overwriteSearch,
+              otherButton: this.overwriteOther
+            })*/
+        OverwriteTop({
           title: $r('app.string.Overwrite'),
-          searchButton: this.overwriteSearch,
-          otherButton: this.overwriteOther
+          subtitle: ''
         })
-      }
-      .width('100%')
-      .transition(customAnimationUtil.isSlide(200,this.uiConfig))
 
-      List({space: 10}) {
-        ForEach(this.overwriteList, (item: moreData, index: number) => {
-          ListItem() {
-            skipRowList({
-              icons: item.icons,
-              title: item.title,
-              subtitle: item.subtitle,
-              isPrimaryIcons: true
+        Column() {
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT + 6)
+          Scroll() {
+            List({ space: 10 }) {
+              ForEach(this.overwriteList, (item: moreData, index: number) => {
+                ListItem() {
+                  skipRowList({
+                    icons: item.icons,
+                    title: item.title,
+                    subtitle: item.subtitle,
+                    isPrimaryIcons: true
+                  })
+                }.onClick(() => {
+                  this.handleCheck(index)
+                })
+                .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
+              })
+            }
+            .width('100%')
+            .height('100%')
+            .borderRadius(BORDER_RADIUS_20)
+            .alignListItem(ListItemAlign.Center)
+            .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
+            .chainAnimation(true)
+            .nestedScroll({
+              scrollForward: NestedScrollMode.PARENT_FIRST,
+              scrollBackward: NestedScrollMode.SELF_FIRST
             })
-          }.onClick(() => {
-            this.handleCheck(index)
+          }
+          .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)//,{alwaysEnabled:true})
+          .onDidScroll((xOffset: number, yOffset: number): void => {
+            // 累计计算当前父组件滚动在Y轴方向的偏移量
+            if (this.uiConfig.isAnimation){
+              this.curYOffset += yOffset
+            }
+            console.info("yOffset" + this.curYOffset);
           })
-          .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
-        })
-
+        }
       }
-      .width('100%')
-      .height(500)
-      .margin({ top: 10 })
-      .borderRadius(18)
-      .alignListItem(ListItemAlign.Center)
-
     }
+    .width('100%')
+    .height('100%')
     .hideTitleBar(true)
-    .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
       if(this.pageInfos.size() === 1) {

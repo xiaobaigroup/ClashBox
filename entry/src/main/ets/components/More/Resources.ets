@@ -1,5 +1,6 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { BIND_SHEET_DRAG_BAR_HEIGHT, BORDER_RADIUS_20, CONTENT_END_OFFSET_150 } from "../../common/Constants"
+import { BIND_SHEET_DRAG_BAR_HEIGHT, BORDER_RADIUS_20, CONTENT_END_OFFSET_150,
+  TAB_CONTENT_TITLE_HEIGHT } from "../../common/Constants"
 import { Nothing, theCustomDialog } from "../Common"
 import { MoreTop } from "./MoreTopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
@@ -110,6 +111,9 @@ struct Resources {
   @Provide resourceListData: Array<ResourcesData> = theResouresData
   //开关不触发list转场动画判定
   @State isON:isON = new isON()
+  //page内顶部标题偏移量
+  @Consume curYOffset: number
+
   @Builder
   reaourceSearch() {
   }
@@ -121,6 +125,7 @@ struct Resources {
         .fontSize(24)
         .fontColor([this.icon_primary])
     }
+    .transition(customAnimationUtil.isSlide(0, this.uiConfig))
     .width(40)
     .height(40)
     .margin({ left: 10 })
@@ -237,92 +242,109 @@ struct Resources {
           .justifyContent(FlexAlign.Center)
           .backgroundColor(Color.Transparent)
         }
+
+        MoreTop({
+          title: $r('app.string.Resources'),
+          searchButton: this.reaourceSearch,
+          otherButton: (): void => { this.reaourceOther() }
+        })
+
         Column() {
-          Row() {
-            MoreTop({
-              title: $r('app.string.Resources'),
-              searchButton: this.reaourceSearch,
-              otherButton: (): void => { this.reaourceOther() }
-            })
-          }.width('100%')
-          .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
-          .transition(this.isON.toggleAnim? null :customAnimationUtil.isSlide(200, this.uiConfig))
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT+6)
           // 页面
-          if(this.resourceListData.length === 0) {
+          if (this.resourceListData.length === 0) {
             Nothing({ name: $r('app.string.Resources') })
           } else {
-            List({ space: 10 }) {
-              ForEach(this.resourceListData, (item: ResourcesData, index: number) => {
-                ListItem() {
-                  Row() {
-                    // 文本显示区
-                    Column() {
-                      Text(item.resourceName)
-                        .fontWeight(FontWeight.Bold)
-                        .margin({ bottom: 2 })
-                        .fontSize(17)
+            Scroll() {
+              List({ space: 10 }) {
+                ForEach(this.resourceListData, (item: ResourcesData, index: number) => {
+                  ListItem() {
+                    Row() {
+                      // 文本显示区
                       Column() {
-                        Row({ space: 2 }) {
-                          Text(switchResourceSize(item.resourceSize))
+                        Text(item.resourceName)
+                          .fontWeight(FontWeight.Bold)
+                          .margin({ bottom: 2 })
+                          .fontSize(17)
+                        Column() {
+                          Row({ space: 2 }) {
+                            Text(switchResourceSize(item.resourceSize))
+                              .smallText()
+                            Text('·')
+                              .smallText()
+                            Text(convertTime(item.updateTime))
+                              .smallText()
+                          }.justifyContent(FlexAlign.Start)
+
+                          Text(this.clashConfig?.['geox-url']?.[item.key] ?? "")
                             .smallText()
-                          Text('·')
-                            .smallText()
-                          Text(convertTime(item.updateTime))
-                            .smallText()
-                        }.justifyContent(FlexAlign.Start)
-                        Text(this.clashConfig?.['geox-url']?.[item.key] ?? "")
-                          .smallText()
+                        }
+                        .alignItems(HorizontalAlign.Start)
                       }
                       .alignItems(HorizontalAlign.Start)
+                      .layoutWeight(1)
+
+                      Blank()
+                      // 功能按钮区
+                      // 编辑按钮
+                      Button({ type: ButtonType.Circle, stateEffect: true }) {
+                        SymbolGlyph($r('sys.symbol.square_and_pencil'))
+                          .fontSize(24)
+                          .fontColor([this.icon_primary])
+                      }.ButtonStyle().margin({ right: 12 })
+                      .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+                      .onClick(() => {
+                        // 进入列表行数据编辑
+                        this.currentEditInputValue = this.clashConfig?.['geox-url']?.[item.key] ?? ""
+                        this.theEditIndex = index
+                        hilog.info(0xFF00, "ResourcestestTag", "编辑中的序号：%{public}d", this.theEditIndex)
+                        hilog.info(0xFF00, "ResourcestestTag", "编辑中的链接：%{public}s", this.currentEditInputValue)
+                        this.editDialogController.open()
+                      })
+
+                      // 更新按钮
+                      Button({ type: ButtonType.Circle, stateEffect: true }) {
+                        SymbolGlyph($r('sys.symbol.arrow_clockwise'))
+                          .fontSize(24)
+                          .fontColor([this.icon_primary])
+                      }.ButtonStyle()
+                      .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+                      .onClick(() => {
+                        this.isON.toggleAnim = true
+                        this.updateTime(index)
+                        // 资源更新处理
+                        this.updateGeoDateItem(item)
+                      })
                     }
-                    .alignItems(HorizontalAlign.Start)
-                    .layoutWeight(1)
-                    Blank()
-                    // 功能按钮区
-                    // 编辑按钮
-                    Button({ type: ButtonType.Circle, stateEffect: true }) {
-                      SymbolGlyph($r('sys.symbol.square_and_pencil'))
-                        .fontSize(24)
-                        .fontColor([this.icon_primary])
-                    }.ButtonStyle().margin({ right: 12 })
-                    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                    .onClick(() => {
-                      // 进入列表行数据编辑
-                      this.currentEditInputValue = this.clashConfig?.['geox-url']?.[item.key] ?? ""
-                      this.theEditIndex = index
-                      hilog.info(0xFF00, "ResourcestestTag", "编辑中的序号：%{public}d", this.theEditIndex)
-                      hilog.info(0xFF00, "ResourcestestTag", "编辑中的链接：%{public}s", this.currentEditInputValue)
-                      this.editDialogController.open()
-                    })
-                    // 更新按钮
-                    Button({ type: ButtonType.Circle, stateEffect: true }) {
-                      SymbolGlyph($r('sys.symbol.arrow_clockwise'))
-                        .fontSize(24)
-                        .fontColor([this.icon_primary])
-                    }.ButtonStyle()
-                    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                    .onClick(() => {
-                      this.isON.toggleAnim = true
-                      this.updateTime(index)
-                      // 资源更新处理
-                      this.updateGeoDateItem(item)
-                    })
+                    .width('100%')
+                    .padding(12)
+                    .justifyContent(FlexAlign.Center)
+                    .width('100%')
+                    .backgroundColor($r('app.color.container_background'))
+                    .borderRadius(BORDER_RADIUS_20)
                   }.width('100%')
-                  .padding(12)
-                  .justifyContent(FlexAlign.Center)
-                  .width('100%')
-                  .backgroundColor($r('app.color.container_background'))
-                  .borderRadius(BORDER_RADIUS_20)
-                }.width('100%')
-                .transition(this.isON.toggleAnim? null :customAnimationUtil.isScaleTran(index, this.uiConfig))
+                  .transition(this.isON.toggleAnim ? null : customAnimationUtil.isScaleTran(index, this.uiConfig))
+                })
+              }.width('100%')
+              .height('100%')
+              .contentEndOffset(CONTENT_END_OFFSET_150)
+              .padding({ right: this.morePageMargin.value, left: this.morePageMargin.value })
+              .chainAnimation(true)
+              .nestedScroll({
+                scrollForward: NestedScrollMode.PARENT_FIRST,
+                scrollBackward: NestedScrollMode.SELF_FIRST
               })
-            }.width('100%')
-            .height('100%')
-            .contentEndOffset(CONTENT_END_OFFSET_150)
-            .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
+            }
+            .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)//,{alwaysEnabled:true})
+            .onDidScroll((xOffset: number, yOffset: number): void => {
+              // 累计计算当前父组件滚动在Y轴方向的偏移量
+              if (this.uiConfig.isAnimation){
+                this.curYOffset += yOffset
+              }
+              console.info("yOffset" + this.curYOffset);
+            })
           }
-        }.width('100%')
-        .height('100%')
+        }
       }.width('100%')
       .height('100%')
       .bindSheet($$this.isShowGroupSort, this.SortSheet(),
@@ -477,7 +499,7 @@ struct Sort {
           }
         }, (item: ResourcesData) => item.key)
       }.width('100%')
-      .borderRadius(24)
+      .borderRadius(BORDER_RADIUS_20)
       .backgroundColor($r('app.color.container_background'))
       .onItemDragStart((event: ItemDragInfo, index: number) => {
         this.dragItem = this.resourceListData[index]
@@ -519,7 +541,7 @@ struct Sort {
           }
         }, (item: ResourcesData) => item.key)
       }.width('100%')
-      .borderRadius(24)
+      .borderRadius(BORDER_RADIUS_20)
       .backgroundColor($r('app.color.container_background'))
       .onItemDragStart((event: ItemDragInfo, index: number) => {
         this.dragItem = this.SortHideList[index]

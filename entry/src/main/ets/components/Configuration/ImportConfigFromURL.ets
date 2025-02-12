@@ -114,17 +114,20 @@ export struct ImportConfigFromURL{
         // 取消保存配置后关闭半模态窗口
         this.isShowConfigAddBindSheet = false
         this.isEnableConfigPageBindSheetForegroundBlur = false
+        this.isEnableIndexForegroundBlur = false
         this.configAddPageInfos.pop(true)
       },
       confirm: ()=> {
         // 保存配置后关闭半模态窗口
         this.isShowConfigAddBindSheet = false
         this.isEnableConfigPageBindSheetForegroundBlur = false
+        this.isEnableIndexForegroundBlur = false
         this.saveConfig(this.configData.isNewConfig)
       }
     }),
     cancel: () => {
       this.isEnableConfigPageBindSheetForegroundBlur = false
+      this.isEnableIndexForegroundBlur = false
     },
     // autoCancel: true,
     alignment: DialogAlignment.Center,
@@ -186,7 +189,7 @@ export struct ImportConfigFromURL{
         // 弹框是否保存已经编辑好的配置
         this.configCustomConfirmDialogController?.open()
         // 更改bindSheet的前景模糊
-        this.isEnableConfigPageBindSheetForegroundBlur = true
+       this.isEnableConfigPageBindSheetForegroundBlur = true
         return true
       } else {
         return false
@@ -206,7 +209,6 @@ export struct ImportConfigFromURL{
       }
     })
     .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
-
   }
 
   aboutToAppear(): void {

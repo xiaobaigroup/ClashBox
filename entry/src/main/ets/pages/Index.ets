@@ -699,12 +699,12 @@ struct Index {
               })
           )
 
-          if (this.configList.length !== 0) {
+       //   if (this.configList.length !== 0) {
             TabContent() {
               ProxyPage()
             }
             .tabBar(this.TabBarBuilder($r('app.string.Proxy'), 1, $r('sys.symbol.list_bullet_square_fill')))
-          }
+        //  }
 
           TabContent() {
             ConfigurationPage()

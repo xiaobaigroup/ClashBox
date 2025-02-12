@@ -1,5 +1,6 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { BIND_SHEET_TITLE_CONTAINER_HEIGHT, BORDER_RADIUS_20, CONTENT_END_OFFSET_150 } from "../../common/Constants"
+import { BIND_SHEET_TITLE_CONTAINER_HEIGHT, BORDER_RADIUS_20, CONTENT_END_OFFSET_150,
+  TAB_CONTENT_TITLE_HEIGHT } from "../../common/Constants"
 import { UIConfig } from "../../entryability/AppState"
 import { convertTime, timestampToDateTime } from "../../utils/TimeConvertUtil"
 import { Nothing } from "../Common"
@@ -34,6 +35,8 @@ struct Connect {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  //page内顶部标题偏移量
+  @Consume curYOffset: number
 
   // 数据
   @State
@@ -59,6 +62,7 @@ struct Connect {
     .height(40)
     .margin({ left: 10 })
     .backgroundColor($r('app.color.settings_container_background'))
+    .transition(customAnimationUtil.isSlide(0, this.uiConfig))
   }
   async getPackageIcon(connection: ConnectionInfo)  {
     return connection.metadata.process;
@@ -90,79 +94,99 @@ struct Connect {
 
   build() {
     NavDestination() {
-      Column() {
-        Row() {
+      Stack() {
           MoreTop({
             title: $r('app.string.Connect'),
             otherButton: (): void => { this.connectOther() }
           })
-        }.width('100%')
-        .transition(customAnimationUtil.isSlide(200,this.uiConfig))
-        .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
-        // 页面
-        if(this.connectListData.length === 0) {
-          Nothing({ name: $r('app.string.Request') })
-        } else {
-          List({ space: 10 }) {
-            ForEach(this.connectListData, (item: ConnectionInfo, index: number) => {
-              ListItem() {
-                Row() {
-                  // 文本显示区
-                  Column() {
-                    Text(this.getRequestText(item.metadata))
-                      .fontWeight(FontWeight.Bold)
-                      .margin({ bottom: 2 })
-                      .fontSize(17)
-                    Flex({
-                      alignContent: FlexAlign.Start,
-                      direction: FlexDirection.Row,
-                      wrap: FlexWrap.Wrap,
-                      space: {main: LengthMetrics.vp(2), cross: LengthMetrics.vp(2)}
-                    }) {
-                      ForEach(item.chains, (c: string)=>{
-                        Text(c)
-                        .smallText()
+
+
+        Column() {
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT+6)
+          // 页面
+          if (this.connectListData.length === 0) {
+            Nothing({ name: $r('app.string.Request') })
+          } else {
+            Scroll() {
+              List({ space: 10 }) {
+                ForEach(this.connectListData, (item: ConnectionInfo, index: number) => {
+                  ListItem() {
+                    Row() {
+                      // 文本显示区
+                      Column() {
+                        Text(this.getRequestText(item.metadata))
+                          .fontWeight(FontWeight.Bold)
+                          .margin({ bottom: 2 })
+                          .fontSize(17)
+                        Flex({
+                          alignContent: FlexAlign.Start,
+                          direction: FlexDirection.Row,
+                          wrap: FlexWrap.Wrap,
+                          space: { main: LengthMetrics.vp(2), cross: LengthMetrics.vp(2) }
+                        }) {
+                          ForEach(item.chains, (c: string) => {
+                            Text(c)
+                              .smallText()
+                          })
+                          Text(this.getTheSourceText(item).toString())
+                            .smallText()
+                          Text('·')
+                            .smallText()
+                          Text(timestampToDateTime(this.getSourceText(item)))
+                            .smallText()
+                        }
+                      }
+                      .alignItems(HorizontalAlign.Start)
+                      .layoutWeight(1)
+
+                      Blank()
+                      Button({ type: ButtonType.Circle, stateEffect: true }) {
+                        SymbolGlyph($r('sys.symbol.nosign'))
+                          .fontSize(24)
+                          .fontColor([this.icon_primary])
+                      }
+                      .width(40)
+                      .height(40)
+                      .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+                      .backgroundColor($r('app.color.settings_container_background'))
+                      .onClick(() => {
+                        this.connectListData.splice(index, 1)
+                        ClashViewModel.closeConnection(item.id)
                       })
-                      Text(this.getTheSourceText(item).toString())
-                        .smallText()
-                      Text('·')
-                        .smallText()
-                      Text(timestampToDateTime(this.getSourceText(item)))
-                        .smallText()
                     }
-                  }
-                  .alignItems(HorizontalAlign.Start)
-                  .layoutWeight(1)
-                  Blank()
-                  Button({ type: ButtonType.Circle, stateEffect: true }) {
-                    SymbolGlyph($r('sys.symbol.nosign'))
-                      .fontSize(24)
-                      .fontColor([this.icon_primary])
-                  }.width(40)
-                  .height(40)
-                  .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                  .backgroundColor($r('app.color.settings_container_background')).onClick(()=>{
-                      this.connectListData.splice(index,1)
-                      ClashViewModel.closeConnection(item.id)
-                  })
-                }.width('100%')
-                .padding(12)
-                .justifyContent(FlexAlign.Center)
-                .width('100%')
-                .backgroundColor($r('app.color.container_background'))
-                .borderRadius(BORDER_RADIUS_20)
+                    .width('100%')
+                    .padding(12)
+                    .justifyContent(FlexAlign.Center)
+                    .width('100%')
+                    .backgroundColor($r('app.color.container_background'))
+                    .borderRadius(BORDER_RADIUS_20)
+                  }.width('100%')
+                  .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
+                })
               }.width('100%')
-              .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
+              .height('100%')
+              .padding({ right: this.morePageMargin.value, left: this.morePageMargin.value })
+              .contentEndOffset(CONTENT_END_OFFSET_150)
+              .chainAnimation(true)
+              .nestedScroll({
+                scrollForward: NestedScrollMode.PARENT_FIRST,
+                scrollBackward: NestedScrollMode.SELF_FIRST
+              })
+            }
+            .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)//,{alwaysEnabled:true})
+            .onDidScroll((xOffset: number, yOffset: number): void => {
+              // 累计计算当前父组件滚动在Y轴方向的偏移量
+              if (this.uiConfig.isAnimation){
+                this.curYOffset += yOffset
+              }
+              console.info("yOffset" + this.curYOffset);
             })
-          }.width('100%')
-          .height('100%')
-          .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
-          .contentEndOffset(CONTENT_END_OFFSET_150)
+          }
         }
       }
       .width('100%')
       .height('100%')
-      .justifyContent(FlexAlign.Start)
+     // .justifyContent(FlexAlign.Start)
 
     }
     .hideTitleBar(true)

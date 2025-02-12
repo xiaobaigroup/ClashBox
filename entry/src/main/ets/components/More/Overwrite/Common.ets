@@ -1,6 +1,7 @@
 import { ClashConfig } from 'proxy_core'
 import { BreakpointState } from '../../../common/breakpointsystem'
 import { ConfigItemData, CONTENT_END_OFFSET_150, OptionItem,
+  TAB_CONTENT_TITLE_HEIGHT,
   ValueType } from '../../../common/Constants'
 import { EventHub, EventKey } from '../../../common/EventHub'
 import { AppConfig, UIConfig } from '../../../entryability/AppState'
@@ -30,6 +31,8 @@ export struct ConfigList {
   @State SaveInputValue: string = ''
   @State theDialogTitle: ResourceStr = ''
   @State theUnit: ResourceStr = ''
+  //page内顶部标题偏移量
+  @Consume curYOffset: number
   //开关不触发list转场动画判定
   @State isON:isON = new isON()
 
@@ -163,76 +166,104 @@ export struct ConfigList {
   }
 
   build() {
-    List({space: this.listBottom.value}) {
-      ForEach(this.configList, (item: ConfigItemData, index: number) => {
-        if (item.sign === 0 ) {
-          ListItem() {
-            // 展开型
-            menuRowList({
-              icons: this.isShowIcons ? item.icons : undefined,
-              title: item.title,
-              isPrimaryIcons: true,
-              tips: () => { this.menuTipsBuilder(item.tips()) },
-              menu: (): void => { this.switchMenu(item, index) }
-            })
-          }
-          .transition(this.isON.toggleAnim? null : customAnimationUtil.isScaleTran(index,this.uiConfig))
-        } else if (item.sign === 1) {
-          ListItem() {
-            // 跳转型
-            skipRowList({
-              icons: this.isShowIcons ? item.icons : undefined,
-              title: item.title,
-              subtitle: item.subtitle,
-              isPrimaryIcons: true,
-              tips: () => { this.skipTipsBuilder(item.tips()) }
-            })
-          }.onClick(() => {
-            this.handleCheck(index)
-            this.isON.toggleAnim=true
+    Column() {
+      Blank().height(TAB_CONTENT_TITLE_HEIGHT + 6)
+      Scroll() {
+        List({ space: this.listBottom.value }) {
+          ForEach(this.configList, (item: ConfigItemData, index: number) => {
+            if (item.sign === 0) {
+              ListItem() {
+                // 展开型
+                menuRowList({
+                  icons: this.isShowIcons ? item.icons : undefined,
+                  title: item.title,
+                  isPrimaryIcons: true,
+                  tips: () => {
+                    this.menuTipsBuilder(item.tips())
+                  },
+                  menu: (): void => {
+                    this.switchMenu(item, index)
+                  }
+                })
+              }
+              .transition(this.isON.toggleAnim ? null : customAnimationUtil.isScaleTran(index, this.uiConfig))
+            } else if (item.sign === 1) {
+              ListItem() {
+                // 跳转型
+                skipRowList({
+                  icons: this.isShowIcons ? item.icons : undefined,
+                  title: item.title,
+                  subtitle: item.subtitle,
+                  isPrimaryIcons: true,
+                  tips: () => {
+                    this.skipTipsBuilder(item.tips())
+                  }
+                })
+              }.onClick(() => {
+                this.handleCheck(index)
+                this.isON.toggleAnim = true
+              })
+              .transition(this.isON.toggleAnim ? null : customAnimationUtil.isScaleTran(index, this.uiConfig))
+            } else if (item.sign === 2) {
+              ListItem() {
+                // 开关型
+                toggleRowList({
+                  icons: this.isShowIcons ? item.icons : undefined,
+                  title: item.title,
+                  subtitle: item.subtitle,
+                  isPrimaryIcons: true,
+                  toggle: () => {
+                    this.toggleBuilder(item.isCheck)
+                  }
+                })
+              }
+              .transition(this.isON.toggleAnim ? null : customAnimationUtil.isScaleTran(index, this.uiConfig))
+              .onClick(() => {
+                this.getUIContext()?.animateTo({
+                  duration: this.uiConfig.animationSpeed
+                }, () => {
+                  this.currentItemIndex = index
+                  this.handleToggle(index)
+                })
+                //使开关点击时不触发转场动画
+                this.isON.toggleAnim = true
+              })
+            } else {
+              // 标题栏
+              ListItem() {
+                Row() {
+                  Text(item.title)
+                    .fontWeight(FontWeight.Normal)
+                    .fontSize(15)
+                  Blank()
+                }.width('100%')
+                .justifyContent(FlexAlign.Start)
+              }
+              .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
+            }
           })
-          .transition(this.isON.toggleAnim? null :customAnimationUtil.isScaleTran(index,this.uiConfig))
-        } else if (item.sign === 2 ) {
-          ListItem() {
-            // 开关型
-            toggleRowList({
-              icons: this.isShowIcons ? item.icons : undefined,
-              title: item.title,
-              subtitle: item.subtitle,
-              isPrimaryIcons: true,
-              toggle:  () => { this.toggleBuilder(item.isCheck) }
-            })
-          }
-          .transition(this.isON.toggleAnim? null : customAnimationUtil.isScaleTran(index,this.uiConfig))
-          .onClick(() => {
-            this.getUIContext()?.animateTo({
-              duration: this.uiConfig.animationSpeed
-            }, () => {
-              this.currentItemIndex = index
-              this.handleToggle(index)
-            })
-            //使开关点击时不触发转场动画
-            this.isON.toggleAnim=true
-          })
-        } else  {
-          // 标题栏
-          ListItem() {
-            Row() {
-              Text(item.title)
-                .fontWeight(FontWeight.Normal)
-                .fontSize(15)
-              Blank()
-            }.width('100%')
-            .justifyContent(FlexAlign.Start)
-          }
-          .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
         }
+        .width('100%')
+        .height('100%')
+        .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
+        //.margin({ top: 10 })
+        .borderRadius(18)
+        .alignListItem(ListItemAlign.Center)
+        .contentEndOffset(CONTENT_END_OFFSET_150 - 40)
+        .chainAnimation(true)
+        .nestedScroll({
+          scrollForward: NestedScrollMode.PARENT_FIRST,
+          scrollBackward: NestedScrollMode.SELF_FIRST
+        })
+      }
+      .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)//,{alwaysEnabled:true})
+      .onDidScroll((xOffset: number, yOffset: number): void => {
+        // 累计计算当前父组件滚动在Y轴方向的偏移量
+        if (this.uiConfig.isAnimation){
+          this.curYOffset += yOffset
+        }
+        console.info("yOffset" + this.curYOffset);
       })
     }
-    .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
-    .margin({ top: 10 })
-    .borderRadius(18)
-    .alignListItem(ListItemAlign.Center)
-    .contentEndOffset(CONTENT_END_OFFSET_150 - 40)
   }
 }

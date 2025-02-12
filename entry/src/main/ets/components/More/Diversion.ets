@@ -1,7 +1,9 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import {
   BIND_SHEET_CONTAINER_HEIGHT,
-  BIND_SHEET_DRAG_BAR_HEIGHT, BIND_SHEET_TITLE_CONTAINER_HEIGHT } from "../../common/Constants"
+  BIND_SHEET_DRAG_BAR_HEIGHT, BIND_SHEET_TITLE_CONTAINER_HEIGHT,
+  BORDER_RADIUS_20,
+  TAB_CONTENT_TITLE_HEIGHT } from "../../common/Constants"
 import { skipRowList, toggleRowList } from "../Common"
 import { MoreTop } from "./MoreTopBuilder"
 import { curves, promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
@@ -43,12 +45,29 @@ struct Diversion {
   // 是否开启 `Index` 页面的前景模糊
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  //page内顶部标题偏移量
+  @Consume curYOffset: number
 
   @Builder
   diversionSearch() {
   }
   @Builder
   diversionOther() {
+    Button({ type: ButtonType.Circle, stateEffect: true }) {
+      SymbolGlyph($r('sys.symbol.plus'))
+        .fontSize(24)
+        .fontColor([this.icon_primary])
+    }
+    .transition(customAnimationUtil.isSlide(0,this.uiConfig))
+    .width(40)
+    .height(40)
+    .backgroundColor($r('app.color.settings_container_background'))
+    .onClick(() => {
+      this.isAdd = true
+      // 启用背景模糊
+      this.isEnableIndexForegroundBlur = true
+      this.isShowPolicy = true
+    })
   }
 
   /**
@@ -109,112 +128,118 @@ struct Diversion {
 
   build() {
     NavDestination() {
-      Row() {
-        MoreTop({
-          title: $r('app.string.Diversion_Strategy'),
-          searchButton: this.diversionSearch,
-          otherButton: () => { this.diversionOther() }
-        })
-        Button({ type: ButtonType.Circle, stateEffect: true }) {
-          SymbolGlyph($r('sys.symbol.plus'))
-            .fontSize(24)
-            .fontColor([this.icon_primary])
-        }
-        .width(40)
-        .height(40)
-        .backgroundColor($r('app.color.settings_container_background'))
-        .onClick(() => {
-          this.isAdd = true
-          // 启用背景模糊
-          this.isEnableIndexForegroundBlur = true
-          this.isShowPolicy = true
-        })
-      }.width('100%')
-      .transition(customAnimationUtil.isSlide(200,this.uiConfig))
-      // 数据列表行
-      List() {
-        ForEach(this.DiversionList, (item: DiversionData, index: number) => {
-          ListItem() {
-            Row() {
-              Row() {
-                Text(item.name)
-                  .fontWeight(FontWeight.Medium)
-                  .fontSize(16)
-                  .margin({left: 12})
-                Blank()
-                SymbolGlyph($r('sys.symbol.chevron_right'))
-                  .fontColor([this.icon_primary])
-                  .fontSize(28)
-                  .margin({right: 12})
-              }
-              .width('100%')
-              .height(53)
-              .borderRadius(20)
-              .backgroundColor($r('app.color.container_background'))
-              Row()
-                .height(10)
+      Stack() {
+          MoreTop({
+            title: $r('app.string.Diversion_Strategy'),
+            searchButton: this.diversionSearch,
+            otherButton: () => {
+              this.diversionOther()
             }
+          })
 
+        Column() {
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT+6)
+          Scroll() {
+            // 数据列表行
+            List({space:this.listBottom.value}) {
+              ForEach(this.DiversionList, (item: DiversionData, index: number) => {
+                ListItem() {
+                  Row() {
+                    Row() {
+                      Text(item.name)
+                        .fontWeight(FontWeight.Medium)
+                        .fontSize(16)
+                        .margin({ left: 12 })
+                      Blank()
+                      SymbolGlyph($r('sys.symbol.chevron_right'))
+                        .fontColor([this.icon_primary])
+                        .fontSize(28)
+                        .margin({ right: 12 })
+                    }
+                    .width('100%')
+                    .height(53)
+                    .borderRadius(BORDER_RADIUS_20)
+                    .backgroundColor($r('app.color.container_background'))
+
+                    Row()
+                      .height(10)
+                  }
+
+                }
+                .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
+                .onClick(() => {
+                  // 启用背景模糊
+                  this.isEnableIndexForegroundBlur = true
+                  this.SelectedListItem = index
+                  // 进入列表行数据编辑半模态页
+                  this.isShowPolicy = true
+                })
+                .bindContextMenu(this.FunctionMenu, ResponseType.LongPress, {
+                  preview: MenuPreviewMode.IMAGE,
+                  onAppear: (() => {
+                    this.SelectedListItem = index
+                  }),
+                  previewAnimationOptions: {
+                    scale: [0.95, 1.0],
+                    transition: this.uiConfig.isAnimation ? TransitionEffect.prototype.animation({ tempo: 1.5 }) :
+                      undefined
+                  }
+                })
+
+              })
+
+            }
+            .width('100%')
+            .borderRadius(BORDER_RADIUS_20)
+            .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
+            .alignListItem(ListItemAlign.Center)
+            .height(this.isLandscapePhone ? 275 : 650)
+            .bindSheet($$this.isShowPolicy, this.PolicySheet(),
+              {
+                detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE],
+                dragBar: false,
+                backgroundColor: $r('app.color.background'),
+                scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+                //keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
+                preferType: SheetType.CENTER,
+                onWillDismiss: () => {
+                  this.isShowPolicy = false
+                  this.isEnableIndexForegroundBlur = false
+                  // 置空文本保存变量
+                  this.SaveNameInputValue = ''
+                  this.SavePathInputValue = ''
+                  if (this.isAdd) {
+                    this.isAdd = false
+                  }
+                },
+                onDisappear: () => {
+                  // 等待半模态窗口完全退出后删除列表行
+                  if (this.isDelete) {
+                    setTimeout(() => {
+                      this.onDelete()
+                    }, 20)
+                  }
+                }
+              })
+            .chainAnimation(true)
+            .nestedScroll({
+              scrollForward: NestedScrollMode.PARENT_FIRST,
+              scrollBackward: NestedScrollMode.SELF_FIRST
+            })
           }
-          .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
-          .margin({bottom: this.listBottom.value })
-          .onClick(() => {
-            // 启用背景模糊
-            this.isEnableIndexForegroundBlur = true
-            this.SelectedListItem = index
-            // 进入列表行数据编辑半模态页
-            this.isShowPolicy = true
-          })
-          .bindContextMenu(this.FunctionMenu, ResponseType.LongPress, {
-            preview: MenuPreviewMode.IMAGE,
-            onAppear: (() => {
-              this.SelectedListItem = index
-            }),
-            previewAnimationOptions: {
-              scale: [0.95, 1.0],
-              transition: this.uiConfig.isAnimation ?TransitionEffect.prototype.animation({ tempo: 1.5 }) : undefined
+          .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)//,{alwaysEnabled:true})
+          .onDidScroll((xOffset: number, yOffset: number): void => {
+            // 累计计算当前父组件滚动在Y轴方向的偏移量
+            if (this.uiConfig.isAnimation){
+              this.curYOffset += yOffset
             }
+            console.info("yOffset" + this.curYOffset);
           })
-
-        })
-
+        }
       }
-      .width('100%')
-      .borderRadius(18)
-      .margin({ top: 10 })
-      .alignListItem(ListItemAlign.Center)
-      .height(this.isLandscapePhone ? 275 : 650)
-      .bindSheet($$this.isShowPolicy, this.PolicySheet(),
-      {
-        detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE],
-        dragBar: false,
-        backgroundColor: $r('app.color.background'),
-        scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-        //keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
-        preferType: SheetType.CENTER,
-        onWillDismiss: () => {
-          this.isShowPolicy = false
-          this.isEnableIndexForegroundBlur = false
-          // 置空文本保存变量
-          this.SaveNameInputValue = ''
-          this.SavePathInputValue = ''
-          if(this.isAdd) {
-            this.isAdd = false
-          }
-        },
-        onDisappear: () => {
-          // 等待半模态窗口完全退出后删除列表行
-          if(this.isDelete) {
-            setTimeout(() => {
-              this.onDelete()
-            }, 20)
-          }
-        }
-      })
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
-    .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
     .onBackPressed(() => {
       this.pageInfos.clear();
       this.isSecondary = false
@@ -416,7 +441,7 @@ struct Policy {
 
           })
       }.width('100%')
-      .borderRadius(20)
+      .borderRadius(BORDER_RADIUS_20)
       .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
       .backgroundColor($r('app.color.container_background'))
       // 删除资源
@@ -429,7 +454,7 @@ struct Policy {
             .fontSize(16)
         }.width('100%')
         .height(53)
-        .borderRadius(20)
+        .borderRadius(BORDER_RADIUS_20)
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .backgroundColor($r('app.color.container_background'))
         .onClick(() => {

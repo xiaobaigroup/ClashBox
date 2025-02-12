@@ -6,7 +6,7 @@ import { timestampToDateTime } from "../../utils/TimeConvertUtil"
 import { ClashConfig, LogLevel } from "proxy_core"
 import { AppConfig, UIConfig } from "../../entryability/AppState"
 import { EventHub, EventKey } from "../../common/EventHub"
-import { CONTENT_END_OFFSET_150 } from "../../common/Constants"
+import { BORDER_RADIUS_20, CONTENT_END_OFFSET_150, TAB_CONTENT_TITLE_HEIGHT } from "../../common/Constants"
 import { customAnimationUtil } from "../../utils/Animation"
 
 // 日志数据（假设）
@@ -44,6 +44,8 @@ struct Log {
   @State theSortTimeUp: boolean = false
   // 临时名称正序变量
   @State theSortNameUp: boolean = false
+  //page内顶部标题偏移量
+  @Consume curYOffset: number
   @Builder
   MoreMenu() {
     Menu() {
@@ -148,6 +150,7 @@ struct Log {
         .fontSize(24)
         .fontColor([this.icon_primary])
     }
+    .transition(customAnimationUtil.isSlide(50,this.uiConfig))
     .backgroundColor($r('app.color.settings_container_background'))
     .margin({ right: 10 })
     .width(40)
@@ -158,6 +161,17 @@ struct Log {
   }
   @Builder
   logOther() {
+    Button({ type: ButtonType.Circle, stateEffect: true }) {
+      SymbolGlyph($r('sys.symbol.dot_grid_2x2'))
+        .fontSize(24)
+        .fontColor([this.icon_primary])
+    }
+    .width(40)
+    .height(40)
+    .bindMenu(this.MoreMenu())
+    .backgroundColor($r('app.color.settings_container_background'))
+    .transition(customAnimationUtil.isSlide(0,this.uiConfig))
+    //.padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
   }
   @Builder
   logTipsBuilder() {
@@ -166,96 +180,99 @@ struct Log {
   build() {
     NavDestination() {
       Stack() {
-        Column() {
           // 导航区
-          Row() {
-            MoreTop({
-              title: $r('app.string.Log'),
-              name: 'Log',
-              searchButton: (): void => { this.logSearch() },
-              otherButton: (): void => { this.logOther() }
-            })
-            Button({ type: ButtonType.Circle, stateEffect: true }) {
-              SymbolGlyph($r('sys.symbol.dot_grid_2x2'))
-                .fontSize(24)
-                .fontColor([this.icon_primary])
-            }
-            .width(40)
-            .height(40)
-            .bindMenu(this.MoreMenu())
-            .backgroundColor($r('app.color.settings_container_background'))
-          }.width('100%')
-          .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
-          .transition(customAnimationUtil.isSlide(200,this.uiConfig))
+        MoreTop({
+          title: $r('app.string.Log'),
+          name: 'Log',
+          searchButton: (): void => { this.logSearch() },
+          otherButton: (): void => { this.logOther() }
+        })
 
-          // 主体
-          if (this.appConfig.enableLogger === false) {
-            Column() {
-              SymbolGlyph($r('sys.symbol.checkmark_circle'))
-                .fontSize(24)
-                .fontColor([this.icon_primary])
-                .margin({bottom: 4 })
-              Text($r('app.string.EnableLoggerPrompt'))
-            }
-            .transition(customAnimationUtil.isScaleTran(0,this.uiConfig))
-            .zIndex(1)
-            .alignItems(HorizontalAlign.Center)
-            .justifyContent(FlexAlign.Center)
-            .width('100%')
-            .height('85%')
-          } else if (this.logListData.length === 0) {
-            Nothing({ name: $r('app.string.Log') })
-          } else {
-            List({ space: 10 }) {
-              ForEach(this.logListData, (item: LogData, index: number) => {
-                ListItem() {
-                  if(item.logSkip) {
-                    // 需要跳转详情
-                    skipRowList({
-                      title: `Info ${timestampToDateTime(item.logTime)}`,
-                      subtitle: `${item.LogDetails}`,
-                      tips: this.logTipsBuilder
-                    }).onClick(() => {
-                      this.theLogSkipItem = index
-                      // 跳转至详情页
-                      this.pageInfos.pushPathByName('LogDetils', index)
-                    })
-                  } else {
-                    // 无跳转
-                    Row() {
-                      Column() {
-                        Text(`${item.logType} ${timestampToDateTime(item.logTime)}`)
-                          .fontWeight(FontWeight.Medium)
-                          .fontColor(item.logType === LogLevel.Error ? Color.Red : this.icon_primary)
-                          .fontSize(16)
-                        Text(`${item.LogDetails}`)
-                          .fontWeight(FontWeight.Normal)
-                          .textOverflow({ overflow: TextOverflow.Ellipsis })
-                          .maxLines(1)
-                          .margin({top: 2})
-                          .fontSize(14)
-                      }.layoutWeight(1)
-                      .alignItems(HorizontalAlign.Start)
+          Column() {
+            Blank().height(TAB_CONTENT_TITLE_HEIGHT+6)
+              // 主体
+              if (this.appConfig.enableLogger === false) {
+                Column() {
+                  SymbolGlyph($r('sys.symbol.checkmark_circle'))
+                    .fontSize(24)
+                    .fontColor([this.icon_primary])
+                    .margin({ bottom: 4 })
+                  Text($r('app.string.EnableLoggerPrompt'))
+                }
+                .transition(customAnimationUtil.isScaleTran(0, this.uiConfig))
+                .zIndex(1)
+                .alignItems(HorizontalAlign.Center)
+                .justifyContent(FlexAlign.Center)
+                .width('100%')
+                .height('85%')
+              } else if (this.logListData.length === 0) {
+                Nothing({ name: $r('app.string.Log') })
+              } else {
+                Scroll() {
+                List({ space: 10 }) {
+                  ForEach(this.logListData, (item: LogData, index: number) => {
+                    ListItem() {
+                      if (item.logSkip) {
+                        // 需要跳转详情
+                        skipRowList({
+                          title: `Info ${timestampToDateTime(item.logTime)}`,
+                          subtitle: `${item.LogDetails}`,
+                          tips: this.logTipsBuilder
+                        }).onClick(() => {
+                          this.theLogSkipItem = index
+                          // 跳转至详情页
+                          this.pageInfos.pushPathByName('LogDetils', index)
+                        })
+                      } else {
+                        // 无跳转
+                        Row() {
+                          Column() {
+                            Text(`${item.logType} ${timestampToDateTime(item.logTime)}`)
+                              .fontWeight(FontWeight.Medium)
+                              .fontColor(item.logType === LogLevel.Error ? Color.Red : this.icon_primary)
+                              .fontSize(16)
+                            Text(`${item.LogDetails}`)
+                              .fontWeight(FontWeight.Normal)
+                              .textOverflow({ overflow: TextOverflow.Ellipsis })
+                              .maxLines(1)
+                              .margin({ top: 2 })
+                              .fontSize(14)
+                          }.layoutWeight(1)
+                          .alignItems(HorizontalAlign.Start)
+                        }
+                        .width('100%')
+                        .borderRadius(BORDER_RADIUS_20)
+                        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+                        .backgroundColor($r('app.color.container_background'))
+                        .padding(12)
+                      }
                     }.width('100%')
-                    .borderRadius(20)
-                    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                    .backgroundColor($r('app.color.container_background'))
-                    .padding(12)
-                  }
+                    .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
+                  })
+
                 }.width('100%')
-                .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
-              })
-
-            }.width('100%')
-            .height('100%')
-            .contentEndOffset(CONTENT_END_OFFSET_150)
-            .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
+                .height('100%')
+                .contentEndOffset(CONTENT_END_OFFSET_150)
+                .padding({ right: this.morePageMargin.value, left: this.morePageMargin.value })
+                .chainAnimation(true)
+                .nestedScroll({
+                  scrollForward: NestedScrollMode.PARENT_FIRST,
+                  scrollBackward: NestedScrollMode.SELF_FIRST
+                })
+              }
+                .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)//,{alwaysEnabled:true})
+                .onDidScroll((xOffset: number, yOffset: number): void => {
+                  // 累计计算当前父组件滚动在Y轴方向的偏移量
+                  if (this.uiConfig.isAnimation){
+                    this.curYOffset += yOffset
+                  }
+                  console.info("yOffset" + this.curYOffset);
+                })
+            }
           }
-        }
-        .width('100%')
-        .height('100%')
-        .justifyContent(FlexAlign.Start)
-
+          .width('100%')
+          .height('100%')
+          .justifyContent(FlexAlign.Start)
 
        /* if (this.isShowMenu) {
           MoreMenu({
@@ -288,57 +305,82 @@ export struct LogDetils {
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  //page内顶部标题偏移量
+  @Consume curYOffset: number
   @Builder
   logDetilsSearch() {
+    Button({ type: ButtonType.Circle, stateEffect: true }) {
+      SymbolGlyph($r('sys.symbol.arrowshape_down_to_line_fill'))
+        .fontSize(24)
+        .fontColor([this.icon_primary])
+    }.ButtonStyle().margin({right: 10})
+    .transition(customAnimationUtil.isSlide(0,this.uiConfig))
   }
   @Builder
   logDetilsOther() {
+    Button({ type: ButtonType.Circle, stateEffect: true }) {
+      SymbolGlyph($r('sys.symbol.trash_fill'))
+        .fontSize(24)
+        .fontColor([this.icon_primary])
+    }
+    .ButtonStyle()
+    .transition(customAnimationUtil.isSlide(0,this.uiConfig))
   }
   controller: RichEditorController = new RichEditorController()
   options: RichEditorOptions = { controller: this.controller }
 
   build() {
     NavDestination() {
-      // 导航区
-      Row() {
+      Stack() {
+        // 导航区
         MoreTop({
           title: $r('app.string.Log'),
           subtitle: `${this.logListData[this.theLogSkipItem].logType} ${timestampToDateTime(this.logListData[this.theLogSkipItem].logTime)}`,
-          searchButton: (): void => { this.logDetilsSearch() },
-          otherButton: (): void => { this.logDetilsOther() }
-        })
-        Button({ type: ButtonType.Circle, stateEffect: true }) {
-          SymbolGlyph($r('sys.symbol.arrowshape_down_to_line_fill'))
-            .fontSize(24)
-            .fontColor([this.icon_primary])
-        }.ButtonStyle().margin({right: 10})
-        Button({ type: ButtonType.Circle, stateEffect: true }) {
-          SymbolGlyph($r('sys.symbol.trash_fill'))
-            .fontSize(24)
-            .fontColor([this.icon_primary])
+          searchButton: (): void => {
+            this.logDetilsSearch()
+          },
+          otherButton: (): void => {
+            this.logDetilsOther()
+          }
+        }).backgroundColor($r('app.color.background')).zIndex(1).position({ x: 0 })
+
+        Scroll() {
+          // 文本显示区域
+          Column() {
+            Blank().height(TAB_CONTENT_TITLE_HEIGHT+6)
+            RichEditor(this.options)
+              .onReady(() => {
+                this.controller.addTextSpan(`${this.logListData[this.theLogSkipItem].LogDetails}`,
+                  {
+                    style: {
+                      fontColor: this.icon_primary,
+                      fontSize: 15
+                    }
+                  })
+              })
+              .backgroundColor($r('app.color.container_background'))
+              .width('100%')
+              .margin({ right: this.morePageMargin.value, left: this.morePageMargin.value })
+              .padding({ top: this.morePageMargin.value, bottom: this.morePageMargin.value })
+              .borderRadius(BORDER_RADIUS_20)
+          }.height('100%')
+          .margin({ right: this.morePageMargin.value, left: this.morePageMargin.value })
         }
-        .ButtonStyle()
-      }.width('100%')
-      // 文本显示区域
-      Column() {
-        RichEditor(this.options)
-          .onReady(() => {
-            this.controller.addTextSpan(`${this.logListData[this.theLogSkipItem].LogDetails}`,
-            {
-              style: {
-                fontColor: this.icon_primary,
-                fontSize: 15
-              }
-            })
-          })
-      }.width('100%')
-      .padding({top: 6, bottom: 6})
-      .borderRadius(20)
-      .backgroundColor($r('app.color.container_background'))
+        .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)//,{alwaysEnabled:true})
+        .onDidScroll((xOffset: number, yOffset: number): void => {
+          // 累计计算当前父组件滚动在Y轴方向的偏移量
+          if (this.uiConfig.isAnimation){
+            this.curYOffset += yOffset
+          }
+          console.info("yOffset" + this.curYOffset);
+        })
+      }
     }
+    .width('100%')
+    .height('100%')
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
-    .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
     .onBackPressed(() => {
       this.pageInfos.pop()
       return true

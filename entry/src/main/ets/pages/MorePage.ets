@@ -191,12 +191,14 @@ struct MorePage {
         .zIndex(1)
         .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
         .position({ x: 0 })
+        .backgroundColor($r('app.color.background'))
         .transition(customAnimationUtil.isSlide(0, this.uiConfig))
         .padding({
           left: this.breakPointStateTabContentTitleMargin.value,
           right: this.breakPointStateTabContentTitleMargin.value,
         })
 
+     //   Column().height(TAB_CONTENT_TITLE_HEIGHT).position({ x: 0 })
           Scroll() {
             List({ space: 10 }) {
               ForEach(this.moreList, (item: moreData, index: number) => {

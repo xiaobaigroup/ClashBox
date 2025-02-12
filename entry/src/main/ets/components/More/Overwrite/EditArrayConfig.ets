@@ -4,14 +4,16 @@ import { KVCustomDialog, theCustomDialog } from "../../Common"
 import { curves, promptAction } from "@kit.ArkUI"
 import { EventHub, EventKey } from "../../../common/EventHub"
 import { UIConfig } from "../../../entryability/AppState"
-import { ConfigItemData, CONTENT_END_OFFSET_150, ValueType } from "../../../common/Constants"
+import {
+  BORDER_RADIUS_20,
+  ConfigItemData, CONTENT_END_OFFSET_150, TAB_CONTENT_TITLE_HEIGHT, ValueType } from "../../../common/Constants"
 import { getResourceString } from "../../../utils/ResourceStringUtil"
 import { customAnimationUtil } from "../../../utils/Animation"
 
 export interface ArrayConfigParam{
-    label?: string | ResourceStr
-    key: string
-    value: string[] | Record<string, string>
+  label?: string | ResourceStr
+  key: string
+  value: string[] | Record<string, string>
 }
 
 // 提取公共组件，复用
@@ -45,6 +47,8 @@ export struct ArrayConfigEditor {
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
   @Prop params: ConfigItemData
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  //page内顶部标题偏移量
+  @Consume curYOffset: number
 
   aboutToAppear(): void {
     this.addDialogTitle = getResourceString($r('app.string.Add'), this) + getResourceString(this.params.title, this)
@@ -229,77 +233,99 @@ export struct ArrayConfigEditor {
 
   build() {
     NavDestination() {
-      // 导航栏
-      Row() {
+      Stack() {
+        // 导航栏
         MoreTop({
           title: this.params.title as Resource,
           searchButton: this.FakeIPfilterSearch,
-          otherButton: () => { this.TopOtherButton() }
-        })
-      }.width('100%')
-      .padding({left: this.morePageMargin.value, right: this.morePageMargin.value})
-      .transition(customAnimationUtil.isSlide(200,this.uiConfig))
-
-      List() {
-        ForEach(this.ArrayConfigList, (item: KeyValueData, index: number) => {
-          // 数据列表行
-          ListItem() {
-            Row() {
-              Row() {
-                Column(){
-                  Text(item.key)
-                    .fontWeight(FontWeight.Medium)
-                    .fontSize(16)
-                    .margin({left: 12})
-                  Text(item.value)
-                    .fontWeight(FontWeight.Medium)
-                    .fontSize(16)
-                    .margin({left: 12})
-                }
-                Blank()
-                SymbolGlyph($r('sys.symbol.trash_fill'))
-                  .fontColor([this.icon_primary])
-                  .fontSize(28)
-                  .margin({right: 12})
-                  .onClick(() => {
-                    this.handleDelete(index)
-                  })
-              }
-              .width('100%')
-              .height(53)
-              .borderRadius(20)
-              .backgroundColor($r('app.color.container_background'))
-              Row()
-                .height(10)
-            }
-
+          otherButton: () => {
+            this.TopOtherButton()
           }
-          .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
-          .margin({bottom: this.listBottom.value })
-          .onClick(() => {
-            // 启用背景模糊
-            this.isEnableIndexForegroundBlur = true
-            // 进入列表行数据编辑
-            if(this.params.valueType != ValueType.Record){
-              this.currentEditInputValue = item.key
-              this.editDialogController.open()
-            } else {
-              this.keyValueData = item
-              // 替换为编辑标题
-              this.kvDialogTitle = getResourceString($r('app.string.Edit'), this) + getResourceString(this.params.title, this)
-              this.kvDialogController.open()
-            }
-            this.theEditPlaceholder = index
-          })
         })
 
+
+        Column() {
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT + 6)
+          Scroll() {
+            List() {
+              ForEach(this.ArrayConfigList, (item: KeyValueData, index: number) => {
+                // 数据列表行
+                ListItem() {
+                  Row() {
+                    Row() {
+                      Column() {
+                        Text(item.key)
+                          .fontWeight(FontWeight.Medium)
+                          .fontSize(16)
+                          .margin({ left: 12 })
+                        Text(item.value)
+                          .fontWeight(FontWeight.Medium)
+                          .fontSize(16)
+                          .margin({ left: 12 })
+                      }
+
+                      Blank()
+                      SymbolGlyph($r('sys.symbol.trash_fill'))
+                        .fontColor([this.icon_primary])
+                        .fontSize(28)
+                        .margin({ right: 12 })
+                        .onClick(() => {
+                          this.handleDelete(index)
+                        })
+                    }
+                    .width('100%')
+                    .height(53)
+                    .borderRadius(BORDER_RADIUS_20)
+                    .backgroundColor($r('app.color.container_background'))
+
+                    Row()
+                      .height(10)
+                  }
+
+                }
+                .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
+                .margin({ bottom: this.listBottom.value })
+                .onClick(() => {
+                  // 启用背景模糊
+                  this.isEnableIndexForegroundBlur = true
+                  // 进入列表行数据编辑
+                  if (this.params.valueType != ValueType.Record) {
+                    this.currentEditInputValue = item.key
+                    this.editDialogController.open()
+                  } else {
+                    this.keyValueData = item
+                    // 替换为编辑标题
+                    this.kvDialogTitle =
+                      getResourceString($r('app.string.Edit'), this) + getResourceString(this.params.title, this)
+                    this.kvDialogController.open()
+                  }
+                  this.theEditPlaceholder = index
+                })
+              })
+
+            }
+            .height('100%')
+            .width('100%')
+            .contentEndOffset(CONTENT_END_OFFSET_150 - 40)
+            .borderRadius(BORDER_RADIUS_20)
+            .alignListItem(ListItemAlign.Center)
+            .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
+            .chainAnimation(true)
+            .nestedScroll({
+              scrollForward: NestedScrollMode.PARENT_FIRST,
+              scrollBackward: NestedScrollMode.SELF_FIRST
+            })
+          }
+          .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring : null) //,{alwaysEnabled:true})
+          .onDidScroll((xOffset: number, yOffset: number): void => {
+            // 累计计算当前父组件滚动在Y轴方向的偏移量
+            if (this.uiConfig.isAnimation) {
+              this.curYOffset += yOffset
+            }
+            console.info("yOffset" + this.curYOffset);
+          })
+        }
       }
-      .width('100%')
-      .contentEndOffset(CONTENT_END_OFFSET_150 - 40)
-      .margin({ top: 10 })
-      .borderRadius(18)
-      .alignListItem(ListItemAlign.Center)
-      .padding({left: this.morePageMargin.value, right: this.morePageMargin.value})
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
