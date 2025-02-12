@@ -108,6 +108,10 @@ struct ProxyArrangement {
               .padding({ top:10, bottom: 10 })
           }
         }
+        .padding({
+          left: this.breakPointStateTabContentTitleMargin.value,
+          right: this.breakPointStateTabContentTitleMargin.value,
+        })
         .clickEffect(this.isContentShow?customAnimationUtil.isClickEffect(this.uiConfig):null)
         .transition(customAnimationUtil.isScaleTran(i,this.uiConfig))
         .onClick(() => {
@@ -128,7 +132,8 @@ struct ProxyArrangement {
       })
     }
     .chainAnimation(true)
-    .borderRadius(BORDER_RADIUS_20)
+    //.borderRadius(BORDER_RADIUS_20)
+  //  .backgroundColor(Color.Pink)
     .scrollBar(BarState.Off)
     .edgeEffect(EdgeEffect.Spring)
     .contentEndOffset(CONTENT_END_OFFSET_150)
@@ -139,10 +144,7 @@ struct ProxyArrangement {
     .sticky(StickyStyle.Header)
     .height('100%')
     .width('100%')
-    .padding({
-      left: this.breakPointStateTabContentTitleMargin.value,
-      right: this.breakPointStateTabContentTitleMargin.value,
-    })
+
   }
 }
 

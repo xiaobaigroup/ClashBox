@@ -305,7 +305,7 @@ struct Policy {
         Button({ type: ButtonType.Circle, stateEffect: true }) {
           SymbolGlyph($r('sys.symbol.save'))
             .fontSize(24)
-            .fontColor([this.save_icon])
+            .fontColor([Color.White])
         }
         .width(40)
         .height(40)
@@ -362,7 +362,7 @@ struct Policy {
         Button({ type: ButtonType.Circle, stateEffect: true }) {
           SymbolGlyph($r('sys.symbol.folder'))
             .fontSize(24)
-            .fontColor([this.save_icon])
+            .fontColor([Color.White])
         }
         .width(40)
         .height(40)

@@ -85,6 +85,8 @@ struct ConfigurationPage {
   private configAddPageInfos: NavPathStack = new NavPathStack()
   //page内顶部标题偏移量
   @Consume curYOffset: number
+  //loading动画
+  @State isLoading : boolean = false
 
   /* 配置列表List相关 */
   // 当前单选框选择的配置 TODO 待接入用户首选项，先写死 configName，单选框控制现在只用到configName所以先不给值
@@ -131,31 +133,31 @@ struct ConfigurationPage {
   }
   // ContextMenu列表项集合
   private configListLongPressCtxMenus: Array<LongPressContextMenuItem> = [
-    // { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.star'))
-    //     .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-    //   content: '收藏', callback: ()=>{this.favoriteConfig()}
-    // },
+  // { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.star'))
+  //     .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
+  //   content: '收藏', callback: ()=>{this.favoriteConfig()}
+  // },
     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.square_and_pencil'))
-        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
+      .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
       content: $r('app.string.Edit'), callback: ()=>{ this.editConfig() }
     },
     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.arrow_clockwise'))
-        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
+      .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
       content: $r('app.string.update'), callback: ()=>{ this.updateConfig(this.currentTouchConfigData.configId) }
     },
     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.share'))
-        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
+      .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
       content: $r('app.string.share'), callback: ()=>{ this.shareConfigUrl() }
     },
     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.qrcode'))
-        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
+      .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
       content: $r('app.string.generate_QR_code'), callback: ()=>{ this.generateQRcode() }
     },
     // XXX 分享链接和导出配置文件都已经集成到了“分享”菜单里
-/*    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.doc_text'))
-      .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-      content: '导出配置文件', callback: ()=>{ this.generateQRcode() }
-    },*/
+    /*    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.doc_text'))
+          .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
+          content: '导出配置文件', callback: ()=>{ this.generateQRcode() }
+        },*/
     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.plus_square_on_square'))
       .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
       content: $r('app.string.create_copy'), callback: ()=>{ this.generateQRcode() }
@@ -290,43 +292,43 @@ struct ConfigurationPage {
   build() {
     Stack() {
       // 标题栏 START
-    //  if (!this.isLandscapePhone) {
-        Row() {
-          Text($r('app.string.Configuration'))
-            .fontSize(this.curYOffset<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset/100:TAB_CONTENT_TITLE_FONT_SIZE)
-            .fontWeight(TAB_CONTENT_TITLE_FONT_WEIGHT)
-            .fontColor($r('sys.color.font_primary'))
-            .transition(customAnimationUtil.isSlide(200,this.uiConfig))
-          Blank()
-          // 刷新图标
-          Button({ type: ButtonType.Circle, stateEffect: true }) {
-            SymbolGlyph($r('sys.symbol.arrow_clockwise'))
-              .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
-              .fontColor([$r('sys.color.icon_primary')])
-              .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
-          }
-          .width(40)
-          .height(40)
-          .backgroundColor($r('app.color.settings_container_background'))
-          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-          .onClick(() => {
-            // TODO 国际化适配 更新配置中... 更新配置成功、
-            hilog.info(0xC001, this.componentName, `#button#onClick()#更新配置`)
-            this.updateConfig()
-          })
-          .transition(customAnimationUtil.isSlide(0,this.uiConfig))
+      //  if (!this.isLandscapePhone) {
+      Row() {
+        Text($r('app.string.Configuration'))
+          .fontSize(this.curYOffset<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset/100:TAB_CONTENT_TITLE_FONT_SIZE)
+          .fontWeight(TAB_CONTENT_TITLE_FONT_WEIGHT)
+          .fontColor($r('sys.color.font_primary'))
+          .transition(customAnimationUtil.isSlide(200,this.uiConfig))
+        Blank()
+        // 刷新图标
+        Button({ type: ButtonType.Circle, stateEffect: true }) {
+          SymbolGlyph($r('sys.symbol.arrow_clockwise'))
+            .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
+            .fontColor([$r('sys.color.icon_primary')])
+            .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
         }
-        .zIndex(1)
-        .height(this.curYOffset<0?TAB_CONTENT_TITLE_HEIGHT-this.curYOffset:TAB_CONTENT_TITLE_HEIGHT)
-        .position({x:0})
-        .alignItems(VerticalAlign.Center)
-        .width('100%')
-        .padding({
-          left: this.breakPointStateTabContentTitleMargin.value,
-          right: this.breakPointStateTabContentTitleMargin.value,
+        .width(40)
+        .height(40)
+        .backgroundColor($r('app.color.settings_container_background'))
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+        .onClick(() => {
+          // TODO 国际化适配 更新配置中... 更新配置成功、
+          hilog.info(0xC001, this.componentName, `#button#onClick()#更新配置`)
+          this.updateConfig()
         })
-        // .margin({ bottom: 15 })
-     // }
+        .transition(customAnimationUtil.isSlide(0,this.uiConfig))
+      }
+      .zIndex(1)
+      .height(this.curYOffset<0?TAB_CONTENT_TITLE_HEIGHT-this.curYOffset:TAB_CONTENT_TITLE_HEIGHT)
+      .position({x:0})
+      .alignItems(VerticalAlign.Center)
+      .width('100%')
+      .padding({
+        left: this.breakPointStateTabContentTitleMargin.value,
+        right: this.breakPointStateTabContentTitleMargin.value,
+      })
+      // .margin({ bottom: 15 })
+      // }
       // 标题栏 END
 
       // 主体 START
@@ -334,7 +336,7 @@ struct ConfigurationPage {
         if (this.configList.length === 0) {
           Nothing({ name: $r('app.string.Configuration') })
             .height('90%')
-           // .margin({bottom:10})
+          // .margin({bottom:10})
         } else {
           Column(){
             Blank().height(TAB_CONTENT_TITLE_HEIGHT)
@@ -357,7 +359,12 @@ struct ConfigurationPage {
                       }.alignItems(HorizontalAlign.Start)
 
                       Blank()
-                      Radio({ value: 'radio' + index, group: 'configGroup' })
+                      if (item.configId === this.appConfig.currentProfileId && this.isLoading===true){
+                        LoadingProgress()
+                          .color(this.icon_emphasize)
+                          .width(25).height(25)
+                      }
+                      Radio({ value: 'radio' + index, group: 'configGroup'})
                         .checked(item.configId === this.appConfig.currentProfileId)
                         .radioStyle({
                           checkedBackgroundColor: this.icon_emphasize,
@@ -368,9 +375,15 @@ struct ConfigurationPage {
                           this.appConfig.currentProfileName = item.configName
                           this.appConfig.currentProfileId = item.configId
                           EventHub.sendEvent(EventKey.LoadClashConfig)
+                          EventHub.on(EventKey.LoadClashConfig, async () => {
+                            this.isLoading = true;
+                            await ClashViewModel.loadConfig(); // 假设loadConfig返回一个Promise
+                            this.isLoading = false;
+                          });
                           hilog.info(0xC002, this.componentName,
                             `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
                         })
+
                     }
                     .width('100%')
                     .padding(LIST_ITEM_PADDING)
@@ -400,6 +413,11 @@ struct ConfigurationPage {
                     this.appConfig.currentProfileName = item.configName
                     this.appConfig.currentProfileId = item.configId
                     EventHub.sendEvent(EventKey.LoadClashConfig)
+                    EventHub.on(EventKey.LoadClashConfig, async () => {
+                      this.isLoading = true;
+                      await ClashViewModel.loadConfig(); // 假设loadConfig返回一个Promise
+                      this.isLoading = false;
+                    });
                     hilog.info(0xC002, this.componentName,
                       `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
                   })
@@ -500,7 +518,7 @@ struct ConfigurationPage {
           },
           // 半模态页面交互式关闭回调函数
           onWillDismiss: (dismissSheet :DismissSheetAction) => {
-          // 在二级路由页面内只能通过点击关闭按钮才能关掉bindSheet
+            // 在二级路由页面内只能通过点击关闭按钮才能关掉bindSheet
             if (this.configAddPageInfos.size() <= 0 || (dismissSheet.reason === DismissReason.CLOSE_BUTTON)) {
               dismissSheet.dismiss()
               this.isShowConfigAddBindSheet = false

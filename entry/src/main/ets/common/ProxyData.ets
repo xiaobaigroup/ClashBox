@@ -9,7 +9,7 @@ export interface ProxyItem {
   isShowFavoriteProxy?: boolean
 }
 
-// todo 节点假数据组后期可改可删
+// 节点假数据组
 export class ProxyData {
   private static items: ProxyItem[] = [
   // ...你的items数据...

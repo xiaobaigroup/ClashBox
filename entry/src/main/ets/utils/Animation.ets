@@ -1,13 +1,15 @@
+/*
+转场等动画参数配置
+ */
+
 import { UIConfig } from "../entryability/AppState"
 import { curves } from "@kit.ArkUI"
+
 
 let effectEvent: TransitionEffect | null
 let clickEffect: ClickEffect | null
 let iconEffect: SymbolEffectStrategy | null
-export class isON{
-  toggleAnim: boolean = false
-
-}
+export class isON{toggleAnim: boolean = false}
 
 class AnimationUtil{
 

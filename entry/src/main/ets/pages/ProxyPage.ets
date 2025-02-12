@@ -3,6 +3,7 @@ import {
   TAB_CONTENT_TITLE_HEIGHT,
   BIND_SHEET_CONTAINER_HEIGHT,
   TAB_CONTENT_TITLE_FONT_SIZE,
+  BORDER_RADIUS_20,
 } from '../common/Constants'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import ProxyGroupItem from '../components/Proxy/ProxyGroupItem'
