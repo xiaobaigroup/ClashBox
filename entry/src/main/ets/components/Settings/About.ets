@@ -43,9 +43,9 @@ struct About {
   @Consume ExperimentData: AboutListItemProp
 
   onClickCount() {
-    //振动触发 TODO 可改在实验功能开启的判定里
+    //振动触发
     customVibrator.vibratorTriggerOfHapticClockTimer()
-    this.clickCount++
+    hilog.info(0xFF00, "AboutClickTag", "点击次数: %{public}d", this.clickCount)
     if(this.uiConfig.enabledADvanced) {
       promptAction.showToast({message: '已处于高级模式' /*$r('app.string.click_prompt')*/, duration: 2000 })
     } else {
@@ -57,7 +57,7 @@ struct About {
         // 刷新更多页面数据
         this.moreList = ListMoreData()
         promptAction.showToast({message: '高级模式已开启' /*$r('app.string.click_prompt')*/, duration: 2000 })
-        //音效触发 TODO 可改在实验功能开启成功的判定里
+        //音效触发
         customSound.playAudioForSoundPool()
       } else if (this.clickCount === 3) {
         promptAction.showToast({message: '什么东西闪过去了' /*$r('app.string.click_prompt')*/, duration: 1000 })
@@ -237,7 +237,7 @@ struct About {
     // 加载时初始化内核版本显示
     this.refreshShowKernelVersion(this.appConfig.clashCore)
     hilog.info(0xFF00, "AboutClickTag", "高级功能: %{public}s", this.uiConfig.enabledADvanced)
-    if (this.uiConfig.enabledADvanced === false) {
+    if (this.uiConfig.enabledADvanced === false && this.aboutList.length === 7) {
       this.aboutList = removeItemsByIndex(this.aboutList, [1])
     }
   }
@@ -353,9 +353,7 @@ struct About {
                           .fontWeight(FontWeight.Normal)
                           .fontSize(14)
                           .margin({right: 12})
-                          .onClick(() => {
-
-                          })
+                          .hitTestBehavior(HitTestMode.None)
                       }
                     }.width('100%')
                     // 分割线
@@ -389,6 +387,7 @@ struct About {
                     } else if (itemChild.sign === 0) {
                      if (itemChild.name === 'ApplicationVersion') {
                        hilog.info(0xFF00, "AboutClickTag", "前: %{public}d", this.clickCount)
+                       this.clickCount++
                        this.onClickCount()
                        hilog.info(0xFF00, "AboutClickTag", "后: %{public}d", this.clickCount)
                      }
