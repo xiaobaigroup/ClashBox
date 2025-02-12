@@ -80,11 +80,11 @@ export class Profile {
     return true
   }
   async save(bytes: Uint8Array, vailConfig:(config: string)=> Promise<string>): Promise<Profile>{
-    // let result = utf8.decodeToString(bytes)
-    // let message = await vailConfig(result);
-    // if (message != "") {
-    //   throw new Error(message);
-    // }
+    let result = utf8.decodeToString(bytes)
+    let message = await vailConfig(result);
+    if (message != "") {
+      throw new Error(message);
+    }
     const filePath = await getProfilePath(this.context, this.id)
     const file = await fs.open(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE | fs.OpenMode.TRUNC)
     await fs.write(file.fd, bytes.buffer)
