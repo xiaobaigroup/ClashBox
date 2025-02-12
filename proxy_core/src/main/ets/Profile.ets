@@ -1,10 +1,9 @@
 import fs from '@ohos.file.fs';
 import { getProfilePath, getProfilesPath } from './appPath';
-import { rcp } from '@kit.RemoteCommunicationKit';
 import { Context } from '@kit.AbilityKit';
 import { fileUri } from '@kit.CoreFileKit';
 import { ProxyGroup, ProxyType, SubscriptionInfo } from './models/Common';
-import { JSON, uri, util } from '@kit.ArkTS';
+import {  util } from '@kit.ArkTS';
 import { http } from '@kit.NetworkKit';
 
 export function generateUUID() {
@@ -21,7 +20,6 @@ export enum ProfileType {
   External
 }
 
-let utf8 = new util.TextDecoder()
 let utf8e = new util.TextEncoder()
 export class Profile {
   id: string
@@ -36,6 +34,7 @@ export class Profile {
   subscriptionInfo: SubscriptionInfo | null
   proxySelected: Map<string, string> = new Map()
   context?: Context
+
   constructor(type = ProfileType.Url, url: string) {
     this.id = generateUUID()
     this.name = null
@@ -45,8 +44,10 @@ export class Profile {
     this.lastUpdateDate = new Date().getTime()
     this.subscriptionInfo = null
   }
-  loadContext(context: Context | undefined){
+  private globalUa: string = "ClashNext/v2.0.0"
+  loadContext(context: Context | undefined, globalUa: string | undefined = "ClashNext/v2.0.0"){
     this.context = context
+    this.globalUa = globalUa
   }
   async checkAndUpdate(vailConfig: (config: string) =>Promise<string>): Promise<void>{
     const isExists = await this.check();
@@ -71,14 +72,15 @@ export class Profile {
   }
   async update(vailConfig: (config: string) =>Promise<string>): Promise<boolean>{
     let httpRequest = http.createHttp()
-    const resp = await httpRequest.request(this.url, {connectTimeout: 5000, readTimeout: 5000})
+    const resp = await httpRequest.request(this.url, { header: {
+      "User-Agent": this.globalUa ?? "ClashNext/v2.0.0"
+    },connectTimeout: 5000, readTimeout: 5000})
     const disposition = resp.header["content-disposition"] as string
     const userinfo = resp.header["subscription-userinfo"] as string
     if (!this.name || this.name == "") {
       this.name = getFileNameForDisposition(disposition) ?? this.id
       this.subscriptionInfo = SubscriptionInfo.formHString(userinfo)
     }
-    console.log("download config", resp.result)
     if (resp.result) {
       await this.save(resp.result as string | ArrayBuffer, vailConfig)
     }
@@ -113,7 +115,6 @@ export class Profile {
     if (g.type !== ProxyType.Selector)
       return g.now
     let dd = this.proxySelected.get(g.name) ?? g.now
-    console.log("getSelectedProxy", dd)
     return dd
   }
 }

@@ -67,17 +67,18 @@ export class ClashViewModel {
 
 
   async updateProfileConfig(id: string | null): Promise<void>{
+    const ua = AppStorage.get<ClashConfig>("clashConfig")?.["global-ua"]
     if(id){
       const profile = await this.getProfile(id)
       if(profile){
-        profile.loadContext(this.context)
+        profile.loadContext(this.context, ua)
         await profile.update((c)=> this.VailConfig(c))
         await this.profileRepo.addOrUpdate(profile)
       }
     } else {
       const list = (await this.getProfiles()).filter(d => d.type == ProfileType.Url)
       for(let p of list){
-        p.loadContext(this.context)
+        p.loadContext(this.context, ua)
         await p.update((c)=>this.VailConfig(c))
         await this.profileRepo.addOrUpdate(p)
       }
