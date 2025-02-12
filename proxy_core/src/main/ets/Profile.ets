@@ -5,6 +5,7 @@ import { Context } from '@kit.AbilityKit';
 import { fileUri } from '@kit.CoreFileKit';
 import { ProxyGroup, ProxyType, SubscriptionInfo } from './models/Common';
 import { JSON, uri, util } from '@kit.ArkTS';
+import { http } from '@kit.NetworkKit';
 
 export function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -21,7 +22,7 @@ export enum ProfileType {
 }
 
 let utf8 = new util.TextDecoder()
-
+let utf8e = new util.TextEncoder()
 export class Profile {
   id: string
   name: string | null
@@ -62,34 +63,44 @@ export class Profile {
   async delete(): Promise<void>{
     if(!await this.check())
       return
+    let profileDir = await getProfilesPath(this.context)
     let profilePath = await getProfilePath(this.context, this.id);
     fs.unlink(profilePath)
+    fs.unlink(profileDir)
+
   }
   async update(vailConfig: (config: string) =>Promise<string>): Promise<boolean>{
-    const session = rcp.createSession();
-    const resp = await session.get(this.url)
-    const disposition = resp.headers["content-disposition"] as string
-    const userinfo = resp.headers["subscription-userinfo"] as string
+    let httpRequest = http.createHttp()
+    const resp = await httpRequest.request(this.url, {connectTimeout: 5000, readTimeout: 5000})
+    const disposition = resp.header["content-disposition"] as string
+    const userinfo = resp.header["subscription-userinfo"] as string
     if (!this.name || this.name == "") {
       this.name = getFileNameForDisposition(disposition) ?? this.id
       this.subscriptionInfo = SubscriptionInfo.formHString(userinfo)
     }
-    if (resp.body) {
-      await this.save(new Uint8Array(resp.body), vailConfig)
+    console.log("download config", resp.result)
+    if (resp.result) {
+      await this.save(resp.result as string | ArrayBuffer, vailConfig)
     }
     return true
   }
-  async save(bytes: Uint8Array, vailConfig:(config: string)=> Promise<string>): Promise<Profile>{
-    let result = utf8.decodeToString(bytes)
-    let message = await vailConfig(result);
-    if (message != "") {
-      throw new Error(message);
+  async save(raw: string | ArrayBuffer, vailConfig:(config: string)=> Promise<string>): Promise<Profile>{
+    let bytes = new Uint8Array()
+    if(typeof raw == "string"){
+      bytes= utf8e.encodeInto(raw)
+    }else{
+      bytes = new Uint8Array(raw)
     }
     const filePath = await getProfilePath(this.context, this.id)
     const file = await fs.open(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE | fs.OpenMode.TRUNC)
     await fs.write(file.fd, bytes.buffer)
     await fs.fsync(file.fd)
     await fs.close(file.fd)
+    let message = await vailConfig(this.id);
+    if (message != "") {
+      this.delete()
+      throw new Error(message);
+    }
     this.lastUpdateDate = new Date().getTime()
     return this
   }

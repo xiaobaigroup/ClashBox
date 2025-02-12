@@ -21,13 +21,13 @@ export class SocketProxyService implements IClashManager{
     return this.callbackRequest(ClashRpcType.setLogObserver, [], observer)
   }
 
-  async loadConfig(path: UpdateConfigParams): Promise<string> {
-    let result =  await this.sendMessageRequest(ClashRpcType.load, [JSON.stringify(path)])
+  async loadConfig(config: UpdateConfigParams): Promise<string> {
+    console.debug("loadConfig", JSON.stringify(config))
+    let result =  await this.sendMessageRequest(ClashRpcType.load, [JSON.stringify(config)])
     return result as string
   }
   async vailConfig(config: string){
     let result = await this.sendMessageRequest(ClashRpcType.validConfig, [config])
-    console.log("vailConfig", result)
     return result as string;
   }
   async queryTrafficTotal(): Promise<Traffic> {

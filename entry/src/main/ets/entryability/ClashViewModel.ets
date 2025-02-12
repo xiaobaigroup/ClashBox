@@ -260,12 +260,14 @@ export class ClashViewModel {
   async loadConfig(){
     let appConfig = AppStorage.get<AppConfig>("appConfig")
     let clashConfig = AppStorage.get<ClashConfig>("clashConfig")
+    const profile = await this.profileRepo.query(appConfig?.currentProfileId)
     await this.loadProfileAndConfig(appConfig?.currentProfileId ?? "", clashConfig, {
       "is-patch": false,
       "is-compatible": true,
-      "override-dns": appConfig?.overrideDns
+      "override-dns": appConfig?.overrideDns,
+      "selected-map": profile?.proxySelected
     } as ConfigExtendedParams)
-
+    EventHub.sendEvent(EventKey.FetchProxyGroup)
   }
 
   async initGeoIp(){
