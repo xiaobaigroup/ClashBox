@@ -173,6 +173,8 @@ struct Index {
 
   //page内顶部标题偏移量
   @Provide curYOffset: number = 0
+  //更多页一级页面顶部标题偏移量
+  @Provide curYOffsetMore: number = 0
   // 主页卡片内边距
   @Provide('breakPointStateHomeCardPadding')
   private breakPointStateHomeCardPadding: BreakpointState<MarginGenerate> = HomeCardPadding_14_15_16_17

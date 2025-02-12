@@ -67,8 +67,8 @@ struct MorePage {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @Consume('breakPointStateTabContentTitleMargin')
   private breakPointStateTabContentTitleMargin: BreakpointState<number>
-  //page内顶部标题偏移量
-  @Consume curYOffset: number
+  //更多页一级页面顶部标题偏移量
+  @Consume curYOffsetMore: number
   /**
    * 查询IP地址弹窗控制器
    */
@@ -182,14 +182,14 @@ struct MorePage {
         // 顶部导航栏
         Row() {
           Text($r('app.string.More'))
-            .fontSize(this.curYOffset<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset/100:TAB_CONTENT_TITLE_FONT_SIZE)
+            .fontSize(this.curYOffsetMore<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffsetMore/100:TAB_CONTENT_TITLE_FONT_SIZE)
             .fontWeight(FontWeight.Bold)
            // .width('83%')
             .textAlign(TextAlign.Start)
         }
         .width('100%')
         .zIndex(1)
-        .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
+        .height(this.curYOffsetMore < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffsetMore : TAB_CONTENT_TITLE_HEIGHT)
         .position({ x: 0 })
         .backgroundColor($r('app.color.background'))
         .transition(customAnimationUtil.isSlide(0, this.uiConfig))
@@ -262,9 +262,9 @@ struct MorePage {
           .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {
             // 累计计算当前父组件滚动在Y轴方向的偏移量
             if (this.uiConfig.isAnimation){
-              this.curYOffset += yOffset
+              this.curYOffsetMore += yOffset
             }
-            console.info("yOffset" + this.curYOffset);
+            console.info("yOffset" + this.curYOffsetMore);
           })
         }.height('100%').width('100%')
     }
