@@ -327,6 +327,68 @@ export struct CustomDownloadingDialog {
 /* 下载中`CustomDialog`小型弹框 END */
 
 /**
+ * 免责声明弹窗
+ */
+@CustomDialog
+@Component
+export struct DisclaimerCustomDialog {
+  /* 主题色 */
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  //一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  confirm: () => void = () => {}
+  cancel: () => void = () => {}
+  controller: CustomDialogController
+  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+
+  aboutToAppear(): void {
+    // 开启背景模糊
+    this.isEnableIndexForegroundBlur = true
+  }
+
+  build() {
+    Column() {
+      Text($r('app.string.Disclaimer'))
+        .fontSize(20)
+        .margin({ top: 15, bottom: 15 })
+      Text($r('app.string.Disclaimer_Content'))
+        .textAlign(TextAlign.Center)
+        .fontSize(FONT_SIZE_16)
+      Flex({direction: FlexDirection.Row}) {
+        if (this.uiConfig.isFirstStart) {
+          Button($r('app.string.refuse'))
+            .margin({ top: 15 })
+            .width('100%')
+            .backgroundColor($r('app.color.container_background'))
+            .onClick(() => {
+              if (this.controller != undefined) {
+                this.controller.close()
+                this.cancel()
+              }
+            })
+            .fontColor(Color.Red)
+        }
+        Button(this.uiConfig.isFirstStart ? $r('app.string.Confirm') : $r('app.string.agree'))
+          .margin({ top: 15 })
+          .width('100%')
+          .backgroundColor(this.icon_emphasize)
+          .onClick(() => {
+            if (this.controller != undefined) {
+              this.controller.close()
+              this.confirm()
+            }
+          })
+          .fontColor(Color.White)
+      }
+    }
+    .backgroundColor($r('app.color.container_background'))
+    .padding({left: 24, right: 24, bottom: 10})
+    .borderRadius(32)
+  }
+}
+
+/**
  * 开启&关闭提示弹窗组件（横排按钮）
  * @param leftButton 传入自定义左按钮
  */

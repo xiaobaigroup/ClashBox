@@ -111,6 +111,8 @@ export class UIConfig{
   proxyEnabled: boolean = false
   // 高级功能启用状态
   enabledADvanced: boolean = false
+  // 是否第一次启动
+  isFirstStart: boolean = true
   resourcesData: string = JSON.stringify(theResouresData)
   resourcesHideData: string = JSON.stringify(resourcesBlankData)
   constructor() {

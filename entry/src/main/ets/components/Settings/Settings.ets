@@ -11,44 +11,8 @@ import WipeData from "./WipeData"
 import About, { AboutContributors, CheckUpdate } from "./About"
 import Language from "./Language"
 import TopBuilder from "./TopBuilder"
+import { DisclaimerCustomDialog } from "../Common"
 
-// 免责声明弹窗
-@CustomDialog
-@Component
-struct DisclaimerCustomDialog {
-  /* 主题色 */
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
-  confirm: () => void = () => {}
-  controller?: CustomDialogController
-
-  build() {
-    Column() {
-      Text($r('app.string.Disclaimer'))
-        .fontSize(20)
-        .margin({ top: 15, bottom: 15 })
-      Text($r('app.string.Disclaimer_Content'))
-        .textAlign(TextAlign.Center)
-        .fontSize(FONT_SIZE_16)
-      Button($r('app.string.Confirm'))
-        .margin({ top: 15 })
-        .width('100%')
-        .backgroundColor(this.icon_emphasize)
-        .onClick(() => {
-          if (this.controller != undefined) {
-            this.controller.close()
-            this.confirm()
-          }
-        })
-        .fontColor(Color.White)
-    }
-    .backgroundColor($r('app.color.container_background'))
-    .padding({left: 24, right: 24})
-    .height(195)
-    .borderRadius(32)
-  }
-}
 
 @Entry
 @Component
@@ -82,11 +46,7 @@ struct Settings {
       if (dismissDialogAction.reason == DismissReason.TOUCH_OUTSIDE) {
         dismissDialogAction.dismiss()
       }
-    },
-    // alignment: DialogAlignment.Center,
-    // offset: { dx: 0, dy: -20 },
-    // gridCount: 4,
-    // customStyle: false,
+    }
   })
 
   onAccept() {

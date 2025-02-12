@@ -1587,6 +1587,14 @@
     {
       "name": "flclash_subtitle",
       "value": "Excellent open-source projects for reference and inspiration"
+    },
+    {
+      "name": "agree",
+      "value": "Agree"
+    },
+    {
+      "name": "refuse",
+      "value": "Disagree and withdraw"
     }
   ]
 }

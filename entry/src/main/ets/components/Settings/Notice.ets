@@ -262,6 +262,8 @@ struct Notice {
           })
           // 通知总开关 End
           if (this.uiConfig.Enablednotice) {
+            // 分割线
+            Row().height(0.5).backgroundColor('#0D000000').width('93%')
             // 常驻通知 Start
             Row() {
               toggleRowList({

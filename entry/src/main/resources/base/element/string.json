@@ -1587,6 +1587,14 @@
     {
       "name": "flclash_subtitle",
       "value": "用于借鉴参考的优秀开源项目"
+    },
+    {
+      "name": "agree",
+      "value": "同意"
+    },
+    {
+      "name": "refuse",
+      "value": "不同意并退出"
     }
   ]
 }

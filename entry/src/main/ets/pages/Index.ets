@@ -58,6 +58,7 @@ import { ConfigData, ConfigDataSourceType } from '../common/PageArgumentEntity'
 import { customAnimationUtil } from '../utils/Animation'
 import { getGreeting } from '../utils/GreetingUtil'
 import { removeItemsByIndex } from '../utils/RemoveItemsUtils'
+import { DisclaimerCustomDialog } from '../components/Common'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 
@@ -398,6 +399,34 @@ struct Index {
     })
   }
 
+  // 免责声明弹窗控制器
+  dialogController: CustomDialogController = new CustomDialogController({
+    builder: DisclaimerCustomDialog({
+      confirm: () => {
+        // 同意
+        setTimeout(() => {
+          this.uiConfig.isFirstStart = false
+        }, 200)
+        // 关闭背景模糊
+        this.isEnableIndexForegroundBlur = false
+      },
+      cancel: () => {
+        // 拒绝并退出
+        this.context.terminateSelf()
+      }
+    }),
+    autoCancel: false,
+    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+      if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
+
+      } else if (dismissDialogAction.reason == DismissReason.TOUCH_OUTSIDE) {
+
+      } else {
+        dismissDialogAction.dismiss()
+      }
+    }
+  })
+
   async aboutToAppear(): Promise<void> {
     hilog.info(0x1000, this.componentName, `#aboutToAppear executed`)
 
@@ -405,7 +434,10 @@ struct Index {
     EventHub.on(EventKey.FetchProfile, () => {
       this.fetchProfiles()
     })
-
+    // 免责声明弹窗
+    if (this.uiConfig.isFirstStart) {
+      this.dialogController.open()
+    }
     // 在页面build前改变主题颜色
     changeThemeColor(this.uiConfig.themeColor)
     hilog.info(0x1000, this.componentName, `#aboutToAppear#ThemeControl.setDefaultTheme(${this.uiConfig.themeColor})`)
@@ -648,9 +680,7 @@ struct Index {
           controller: indexController
         }) {
           TabContent() {
-            //   if (this.currentIndex===0){
             Home()
-            //    }
           }
           .tabBar(this.TabBarBuilder($r('app.string.Home'), 0, $r('sys.symbol.house_fill')))
           .gesture(
@@ -669,24 +699,20 @@ struct Index {
               })
           )
 
-          TabContent() {
-            // if (this.currentIndex===1) {
-            ProxyPage()
-            //  }
+          if (this.configList.length !== 0) {
+            TabContent() {
+              ProxyPage()
+            }
+            .tabBar(this.TabBarBuilder($r('app.string.Proxy'), 1, $r('sys.symbol.list_bullet_square_fill')))
           }
-          .tabBar(this.TabBarBuilder($r('app.string.Proxy'), 1, $r('sys.symbol.list_bullet_square_fill')))
 
           TabContent() {
-            //  if (this.currentIndex===2) {
             ConfigurationPage()
-            //  }
           }
           .tabBar(this.TabBarBuilder($r('app.string.Configuration'), 2, $r('sys.symbol.folder_fill')))
 
           TabContent() {
-            //   if (this.currentIndex===3) {
             MorePage()
-            //   }
           }
           .tabBar(this.TabBarBuilder($r('app.string.More'), 3, $r('sys.symbol.square_fill_grid_2x2')))
         }

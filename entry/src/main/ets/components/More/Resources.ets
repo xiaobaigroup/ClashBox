@@ -228,7 +228,7 @@ struct Resources {
           Column() {
             LoadingProgress()
               .color(this.icon_emphasize)
-              .width(80).height(80)
+              .width(40).height(40)
             Text('资源更新中..')
               .fontSize(16)
           }.zIndex(2)
