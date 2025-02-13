@@ -65,6 +65,9 @@ export abstract class CommonVpnService{
   }
   abstract startVpn(): Promise<boolean>
   stopVpn(){
+    if(!this.vpnConnection){
+      this.vpnConnection = vpnExtension.createVpnConnection(this.context as common.VpnExtensionContext);
+    }
     this.vpnConnection?.destroy()
   }
 }

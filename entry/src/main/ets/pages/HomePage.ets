@@ -872,8 +872,6 @@ struct Home {
         .clip(true)
         .onClick(async (event: ClickEvent) => {
           if(this.configList.length === 0 || this.proxyGroups.length === 0) {
-
-
             if (this.uiConfig.isVibrate) {
               customVibrator.vibratorTriggerOfHapticClockTimer()
             }

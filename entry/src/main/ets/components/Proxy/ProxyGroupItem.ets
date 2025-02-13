@@ -322,6 +322,9 @@ struct ProxyGroupItem {
             selected: this.selectedProxy,
             selectProxy: (p: ProxyItem) => {
               this.selectProxy(p)
+            },
+            onLatencyChange:(p:number) =>{
+              item.latency = p
             }
           })
         }

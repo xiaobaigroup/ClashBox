@@ -39,15 +39,18 @@ export struct ProxyNode {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
 
   selectProxy?: (item: ProxyItem) => void
+  onLatencyChange?:(l: number)=>void
   aboutToAppear(): void {
     EventHub.on(EventKey.TestDelayAll, async (name: string)=>{
       if(name == this.item.name){
         await ClashViewModel.testDelay(name).then(d => {
           this.item.latency = d
+          this.onLatencyChange?.(d)
         })
       } else if (!name) {
         await ClashViewModel.testDelay(this.item.name).then(d => {
           this.item.latency = d
+          this.onLatencyChange?.(d)
         })
       }
     }, false) // 批量监听

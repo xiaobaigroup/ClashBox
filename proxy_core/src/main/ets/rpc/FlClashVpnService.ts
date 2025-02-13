@@ -61,7 +61,7 @@ export class FlClashVpnService extends CommonVpnService{
     let request = JSON.parse(decoder.decodeToString(new Uint8Array(message.message))) as RpcRequest
     let code = request.method
     let params = request.params
-    console.debug(`socket stub ${code as ClashRpcType} request: `, params)
+    console.debug(`socket stub ${code} request: `, params)
     if(code == ClashRpcType.setLogObserver){
       // 订阅日志，需要持续输出
       startLog((message: string, value: string)=>{
