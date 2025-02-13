@@ -12,6 +12,8 @@ import About, { AboutContributors, CheckUpdate } from "./About"
 import Language from "./Language"
 import TopBuilder from "./TopBuilder"
 import { DisclaimerCustomDialog } from "../Common"
+import { AppState } from "../../entryability/AppState"
+import { promptAction } from "@kit.ArkUI"
 
 
 @Entry
@@ -59,6 +61,11 @@ struct Settings {
       if (this.dialogController != null) {
         this.dialogController.open()
       }
+    }
+    if(index == 6) {
+      // TODO 弹窗确定
+      AppState.ResetConfig()
+      promptAction.showToast({message: "配置已还原默认值"})
     } else {
       // 列表项路由跳转
       let itemSettingsData = this.settingsList[index]

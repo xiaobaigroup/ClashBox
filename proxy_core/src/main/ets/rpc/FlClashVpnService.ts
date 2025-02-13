@@ -22,9 +22,9 @@ import { JSON, util } from '@kit.ArkTS';
 import { RpcRequest } from './RpcRequest';
 import { ClashRpcType } from './IClashManager';
 import { ConnectionInfo, LogInfo, Provider, ProxyGroup, ProxyMode, ProxyType, Traffic } from '../models/Common';
-import { getHome } from '../appPath';
+import { getHome, getProfilePath } from '../appPath';
 import { UpdateConfigParams } from '../models/ClashConfig';
-import { readFile, readFileUri } from '../fileUtils';
+import { readFile, readFileUri, readText } from '../fileUtils';
 
 export interface AccessControl{
   mode:              string
@@ -222,7 +222,10 @@ export class FlClashVpnService extends CommonVpnService{
           break;
         }
         case ClashRpcType.validConfig: {
-          resolve(await validateConfig(JSON.stringify(data[0] as string)))
+          const profileId = data[0] as string
+          let filePath = await getProfilePath(this.context, profileId)
+          let raw = await readText(filePath)
+          resolve(await validateConfig(raw))
           break;
         }
         case ClashRpcType.startClash: {

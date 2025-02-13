@@ -1,8 +1,9 @@
-import { ClashConfig, Dns, IpInfo, ProxyGroup, ProxyMode, ProxySort, Traffic, } from "proxy_core";
+import { ClashConfig,  IpInfo, ProxyGroup, ProxyMode, ProxySort, Traffic, } from "proxy_core";
 import { CustomThemeName } from "../common/AppTheme";
-import { ANIMATION_DURATION_300,ANIMATION_DURATION_100,ANIMATION_DURATION_500, showHomeCard } from "../common/Constants";
+import { ANIMATION_DURATION_300, showHomeCard } from "../common/Constants";
 import { ProxyItem } from "../common/ProxyData";
 import { resourcesBlankData, theResouresData } from "../components/More/Resources";
+import ClashViewModel from "./ClashViewModel";
 
 export enum ProxyGroupType{
   Tabs,
@@ -133,6 +134,22 @@ export class AppState {
     PersistentStorage.persistProp("clashConfig", new ClashConfig())
     PersistentStorage.persistProp("uiConfig", new UIConfig())
     AppStorage.setOrCreate<AppFlowingState>("appFlowingState", new AppFlowingState())
+  }
+  // 还原腹泻配置
+  static ResetClashConfig(){
+    AppStorage.set("clashConfig", new ClashConfig())
+    AppStorage.set("appConfig", new AppConfig())
+  }
+  // 清理数据 还原默认值
+  static ResetConfig(){
+    ClashViewModel.StopVpn()
+    AppState.ResetClashConfig()
+    AppStorage.set("appConfig", new AppConfig())
+    AppStorage.set("favoriteProfiles", new Map<string, string>([]))
+    AppStorage.set("favoriteProxys", new Map<string, string>([]))
+    AppStorage.set("uiConfig",  new UIConfig())
+    AppStorage.set("appFlowingState", new AppFlowingState())
+    // TODO 还原其他配置
   }
 
   static fetchFavoriteProxys(favoriteProxys: Map<string, string>, proxyGroups: ProxyGroup[]):string[][] {

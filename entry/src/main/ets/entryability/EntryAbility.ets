@@ -50,7 +50,7 @@ export default class EntryAbility extends UIAbility {
       await ClashViewModel.ChangeCore(clashCore)
       ClashViewModel.initProfile()
       EventHub.on(EventKey.LoadClashConfig, ()=>{
-        ClashViewModel.initProfile()
+        ClashViewModel.loadConfig()
       })
       // 监测vpn服务是否被回收，并且重新启动
       setInterval(async ()=>{

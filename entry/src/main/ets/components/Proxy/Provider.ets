@@ -2,13 +2,13 @@ import { BreakpointState } from "../../common/breakpointsystem"
 import {  BORDER_RADIUS_20, CONTENT_END_OFFSET_150 } from "../../common/Constants"
 import { Nothing, theCustomDialog } from "../Common"
 import { convertTime } from "../../utils/TimeConvertUtil"
-import { ClashConfig } from 'proxy_core'
+import { ClashConfig, SubscriptionInfo } from 'proxy_core'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { Provider } from "proxy_core"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { UIConfig } from "../../entryability/AppState"
 import { picker } from "@kit.CoreFileKit"
-import { customAnimationUtil, isON } from "../../utils/Animation"
+import { customAnimationUtil } from "../../utils/Animation"
 
 
 // 资源数据（假设）
@@ -171,7 +171,6 @@ export struct ProviderPage {
                           Column({ space: 2 }) {
                             Text(item.name)
                               .nameText()
-
                             Row() {
                               Text($r('app.string.update_by'))
                                 .smallText()
@@ -187,15 +186,15 @@ export struct ProviderPage {
                             }
 
                             Row(){
-                              if (item["subscription-info"]?.expire != undefined) {
-                                Text(`${item["subscription-info"]?.expire}+'/'`)
+                              if (item["subscription-info"]) {
+                                Text(`${SubscriptionInfo.GetUsed(item["subscription-info"]).toString()} / `)
                                   .smallText()
                               }else {
                                 Text($r('app.string.usd_cellular_data'))
                                   .smallText()
                               }
-                              if (item["subscription-info"]?.total!= undefined) {
-                                Text(`${item["subscription-info"]?.total}`)
+                              if (item["subscription-info"]) {
+                                Text(`${SubscriptionInfo.GetTotal(item["subscription-info"]).toString()}`)
                                   .smallText()
                               }else {
                                 Text($r('app.string.total_cellular_data'))
@@ -206,8 +205,8 @@ export struct ProviderPage {
                             //
                             Column() {
                               Progress({
-                                value: item["subscription-info"]?.expire,
-                                total: item["subscription-info"]?.total,
+                                value: SubscriptionInfo.GetUsed(item["subscription-info"])?.value ?? 0,
+                                total: SubscriptionInfo.GetTotal(item["subscription-info"])?.value ?? 1,
                                 type: ProgressType.Capsule
                               })//value为使用流量的值
                                 .style({enableSmoothEffect: true,borderColor:'#00ffffff'})
@@ -280,7 +279,7 @@ export struct ProviderPage {
                                 this.isLoading = -1
                               })
                               animateTo({
-                                duration:this.uiConfig.animationSpeed,
+                                duration: this.uiConfig.animationSpeed,
                                 curve: Curve.Friction,
                                 iterations: 1, // 设置-1表示动画无限循环
                               }, () => {
@@ -461,6 +460,7 @@ export struct ProviderPage {
               })
             })
           })
+
         })
 
         //关闭按钮

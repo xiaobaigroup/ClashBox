@@ -67,23 +67,23 @@ export class ClashViewModel {
 
 
   async updateProfileConfig(id: string | null): Promise<void>{
+    const ua = AppStorage.get<ClashConfig>("clashConfig")?.["global-ua"]
     if(id){
       const profile = await this.getProfile(id)
       if(profile){
-        profile.loadContext(this.context)
+        profile.loadContext(this.context, ua)
         await profile.update((c)=> this.VailConfig(c))
         await this.profileRepo.addOrUpdate(profile)
       }
     } else {
       const list = (await this.getProfiles()).filter(d => d.type == ProfileType.Url)
       for(let p of list){
-        p.loadContext(this.context)
+        p.loadContext(this.context, ua)
         await p.update((c)=>this.VailConfig(c))
         await this.profileRepo.addOrUpdate(p)
       }
     }
     EventHub.sendEvent(EventKey.FetchProfile, null)
-
   }
   async VailConfig(config: string): Promise<string>{
     return this.socketProxy.vailConfig(config)
@@ -252,20 +252,22 @@ export class ClashViewModel {
     EventHub.sendEvent(EventKey.StopedClash)
   }
 
-  initProfile(){
+  async  initProfile(){
     let appConfig = AppStorage.get<AppConfig>("appConfig")
-    this.loadConfig()
+    await this.loadConfig()
     EventHub.sendEvent(EventKey.StartLog, appConfig?.enableLogger)
   }
   async loadConfig(){
     let appConfig = AppStorage.get<AppConfig>("appConfig")
     let clashConfig = AppStorage.get<ClashConfig>("clashConfig")
+    const profile = await this.profileRepo.query(appConfig?.currentProfileId)
     await this.loadProfileAndConfig(appConfig?.currentProfileId ?? "", clashConfig, {
       "is-patch": false,
       "is-compatible": true,
-      "override-dns": appConfig?.overrideDns
+      "override-dns": appConfig?.overrideDns,
+      "selected-map": profile?.proxySelected
     } as ConfigExtendedParams)
-
+    EventHub.sendEvent(EventKey.FetchProxyGroup)
   }
 
   async initGeoIp(){

@@ -39,6 +39,22 @@ export class SubscriptionInfo{
     si.expire = map["expire"] ?? 0
     return si
   }
+  static GetTotal(info: SubscriptionInfo): TrafficValue{
+    if(!info)
+      return
+    return new TrafficValue(info["Total"] ?? info.total ?? 0)
+  }
+  static GetUsed(info: SubscriptionInfo): TrafficValue{
+    if (!info)
+      return
+    return new TrafficValue((info["Upload"] ?? info.upload) + (info["Download"] ?? info.download ?? 0))
+  }
+  static getExpire(info: SubscriptionInfo){
+    if(!info)
+      return
+    return info["Expire"] ?? info.expire
+  }
+
 }
 
 export enum ProxySort {
