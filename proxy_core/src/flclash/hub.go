@@ -428,30 +428,5 @@ func handleGetMemory(fn func(value string)) {
 }
 
 func init() {
-	adapter.UrlTestHook = func(url string, name string, delay uint16) {
-		delayData := &Delay{
-			Name: name,
-		}
-		if delay == 0 {
-			delayData.Value = -1
-		} else {
-			delayData.Value = int32(delay)
-		}
-		// SendMessage(Message{
-		// 	Type: DelayMessage,
-		// 	Data: delayData,
-		// })
-	}
-	statistic.DefaultRequestNotify = func(c statistic.Tracker) {
-		// SendMessage(Message{
-		// 	Type: RequestMessage,
-		// 	Data: c,
-		// })
-	}
-	executor.DefaultProviderLoadedHook = func(providerName string) {
-		// SendMessage(Message{
-		// 	Type: LoadedMessage,
-		// 	Data: providerName,
-		// })
-	}
+
 }
