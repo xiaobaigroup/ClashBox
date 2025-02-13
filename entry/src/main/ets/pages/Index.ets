@@ -46,7 +46,7 @@ import {
   AboutListItemProp
 } from '../common/Constants'
 import { ProxyItem, ProxyData } from '../common/ProxyData'
-import { ClashConfig, Dns, LogLevel, Profile, ProxyGroup, ProxyMode } from 'proxy_core'
+import { ClashConfig, Dns, LogLevel, Profile, ProxyGroup, ProxyMode, SubscriptionInfo } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig, ClashCore, UIConfig } from '../entryability/AppState'
@@ -396,7 +396,8 @@ struct Index {
         configUrl: d.url,
         isConfigAutoUpdate: d.autoUpdate,
         configAutoUpdateTimeGapValue: d.autoUpdateDuration,
-        lastUpdateDateTime: d.lastUpdateDate
+        lastUpdateDateTime: d.lastUpdateDate,
+        subscriptionInfo: d.subscriptionInfo
       } as ConfigData
     })
   }

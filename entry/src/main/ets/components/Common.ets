@@ -923,39 +923,41 @@ export struct menuRowList {
 
 //共用使用流量/总流量+进度条组件
 @Builder export function cellularData(info: SubscriptionInfo) {
-  Row() {
-    if (info) {
-      Text(`${SubscriptionInfo.GetUsed(info).toString()} / `)
-        .smallText()
-    } else {
-      Text($r('app.string.usd_cellular_data'))
-        .smallText()
-    }
-    if (info) {
-      Text(`${SubscriptionInfo.GetTotal(info).toString()}`)
-        .smallText()
-    } else {
-      Text($r('app.string.total_cellular_data'))
-        .smallText()
-    }
-  }.padding({ bottom: 4 })
+  if(info?.total > 0){
+    Row() {
+      if (info) {
+        Text(`${SubscriptionInfo.GetUsed(info).toString()} / `)
+          .smallText()
+      } else {
+        Text($r('app.string.usd_cellular_data'))
+          .smallText()
+      }
+      if (info) {
+        Text(`${SubscriptionInfo.GetTotal(info).toString()}`)
+          .smallText()
+      } else {
+        Text($r('app.string.total_cellular_data'))
+          .smallText()
+      }
+    }.padding({ bottom: 4 })
 
-  //
-  Column() {
-    Progress({
-      value: SubscriptionInfo.GetUsed(info)?.show ?? 0,
-      total: SubscriptionInfo.GetTotal(info)?.show ?? 1,
-      type: ProgressType.Capsule
-    })//value为使用流量的值
-      .style({ enableSmoothEffect: true, borderColor: '#00ffffff' })
-      .color('#ff46b1e3')
-      .width('100%')
-      .height('100%')
+    //
+    Column() {
+      Progress({
+        value: SubscriptionInfo.GetUsed(info)?.show ?? 0,
+        total: SubscriptionInfo.GetTotal(info)?.show ?? 1,
+        type: ProgressType.Capsule
+      })//value为使用流量的值
+        .style({ enableSmoothEffect: true, borderColor: '#00ffffff' })
+        .color('#ff46b1e3')
+        .width('100%')
+        .height('100%')
+    }
+    .width('100%')
+    .backgroundColor('#4d46b1e3')
+    .height(6)
+    .borderRadius(6)
   }
-  .width('100%')
-  .backgroundColor('#4d46b1e3')
-  .height(6)
-  .borderRadius(6)
 }
 //副文本样式
 @Extend(Text)
