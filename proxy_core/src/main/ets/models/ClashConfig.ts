@@ -148,7 +148,7 @@ export class  ClashConfig {
     this["global-ua"] = ua
   }
 }
-export enum TunStack { Gvisor, System, Mixed }
+export enum TunStack { Gvisor = "gVisor", System = "System", Mixed = "Mixed" }
 
 export class Tun {
   enable: boolean = true
