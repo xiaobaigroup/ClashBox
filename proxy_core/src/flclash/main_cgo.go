@@ -141,6 +141,7 @@ func closeConnection(env js.Env, this js.Value, args []js.Value) any {
 	connectionId, _ := napi.GetValueStringUtf8(env.Env, args[0].Value)
 	return handleCloseConnection(connectionId)
 }
+
 func startLog(env js.Env, this js.Value, args []js.Value) any {
 	tsfn := env.CreateThreadsafeFunction(args[0], "startLog")
 	handleStartLog(func(value string) {
@@ -148,6 +149,7 @@ func startLog(env js.Env, this js.Value, args []js.Value) any {
 	})
 	return nil
 }
+
 func stopLog(env js.Env, this js.Value, args []js.Value) any {
 	handleStopLog()
 	return nil
@@ -208,7 +210,11 @@ func setFdMap(env js.Env, this js.Value, args []js.Value) any {
 	}()
 	return nil
 }
-
+var messageTsfn : Tsfn 
+func registerMessage(env js.Env, this js.Value, args []js.Value) any {
+	tsfn := env.CreateThreadsafeFunction(args[0], "messageTsfn")
+	return nil
+}
 func init() {
 	entry.Export("initClash", js.AsCallback(initClash))
 	entry.Export("startTun", js.AsCallback(startTun))
@@ -237,8 +243,28 @@ func init() {
 	entry.Export("updateDns", js.AsCallback(updateDns))
 	entry.Export("startLog", js.AsCallback(startLog))
 	entry.Export("stopLog", js.AsCallback(stopLog))
+	entry.Export("registerMessage", js.AsCallback(registerMessage))
 	entry.Export("getCountryCode", js.AsCallback(getCountryCode))
 	entry.Export("getMemory", js.AsCallback(getMemory))
+
+
+	adapter.UrlTestHook = func(url string, name string, delay uint16) {
+		delayData := &Delay{
+			Name: name,
+		}
+		if delay == 0 {
+			delayData.Value = -1
+		} else {
+			delayData.Value = int32(delay)
+		}
+		messageTsFn.Call(env.ValueOf("DelayMessage"), env.ValueOf(delayData))
+	}
+	statistic.DefaultRequestNotify = func(c statistic.Tracker) {
+		messageTsFn.Call(env.ValueOf("RequestMessage"), env.ValueOf(c))
+	}
+	executor.DefaultProviderLoadedHook = func(providerName string) {
+		messageTsFn.Call(env.ValueOf("LoadedMessage"), env.ValueOf(providerName))
+	}
 }
 func main() {
 }

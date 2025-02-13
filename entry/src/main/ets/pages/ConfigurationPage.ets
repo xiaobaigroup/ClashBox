@@ -29,6 +29,7 @@ import { EventHub, EventKey } from '../common/EventHub'
 import { getResourceString } from '../utils/ResourceStringUtil'
 import { convertTime } from '../utils/TimeConvertUtil'
 import { customAnimationUtil, isON } from '../utils/Animation'
+import { Profile } from 'proxy_core'
 
 
 /**
@@ -290,7 +291,18 @@ struct ConfigurationPage {
   // 配置添加按钮前Symbol动效
   private ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE
 
-
+  async  loadConfig(item: ConfigData){
+    if (this.isLoading)
+      return
+    this.isLoading = true;
+    this.currentConfigRadioCheckedConfigData = item
+    this.appConfig.currentProfileName = item.configName
+    this.appConfig.currentProfileId = item.configId
+    await ClashViewModel.loadConfig(); // 假设loadConfig返回一个Promise
+    this.isLoading = false;
+    //加载成功增加promptAction提示
+    this.promptAction.showToast({message: getResourceString($r('app.string.load_success'), this), duration: 1000})
+  }
   build() {
     Stack() {
       // 标题栏 START
@@ -361,7 +373,7 @@ struct ConfigurationPage {
                       }.alignItems(HorizontalAlign.Start)
 
                       Blank()
-                      if (item.configId === this.appConfig.currentProfileId && this.isLoading===true){
+                      if (item.configId === this.appConfig.currentProfileId && this.isLoading){
                         LoadingProgress()
                           .color(this.icon_emphasize)
                           .width(25).height(25)
@@ -372,18 +384,8 @@ struct ConfigurationPage {
                           checkedBackgroundColor: this.icon_emphasize,
                         })
                         .onClick(async () => {
-                          ClashViewModel.updateProfileConfig(item.configId)
-                          this.currentConfigRadioCheckedConfigData = item
-                          this.appConfig.currentProfileName = item.configName
-                          this.appConfig.currentProfileId = item.configId
-                          EventHub.sendEvent(EventKey.LoadClashConfig)
-                          EventHub.on(EventKey.LoadClashConfig, async () => {
-                            this.isLoading = true;
-                            await ClashViewModel.loadConfig(); // 假设loadConfig返回一个Promise
-                            this.isLoading = false;
-                            //加载成功增加promptAction提示
-                            this.promptAction.showToast({message: getResourceString($r('app.string.load_success'), this)})
-                          });
+                          await ClashViewModel.updateProfileConfig(item.configId)
+                          await this.loadConfig(item)
                           hilog.info(0xC002, this.componentName,
                             `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
                         })
@@ -413,19 +415,7 @@ struct ConfigurationPage {
                       }
                     })
                   .onClick(async () => {
-                    this.currentConfigRadioCheckedConfigData = item
-                    this.appConfig.currentProfileName = item.configName
-                    this.appConfig.currentProfileId = item.configId
-                    EventHub.sendEvent(EventKey.LoadClashConfig)
-                    EventHub.on(EventKey.LoadClashConfig, async () => {
-                      this.isLoading = true;
-                      await ClashViewModel.loadConfig(); // 假设loadConfig返回一个Promise
-                      this.isLoading = false;
-                      //加载成功增加promptAction提示
-                      this.promptAction.showToast({message: getResourceString($r('app.string.load_success'), this)})
-                    });
-                    hilog.info(0xC002, this.componentName,
-                      `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
+                    await this.loadConfig(item)
                   })
                   .onTouch((event: TouchEvent) => {
                     if (event.type === TouchType.Down) {

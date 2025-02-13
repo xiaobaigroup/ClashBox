@@ -3,7 +3,7 @@ import { BORDER_RADIUS_20, ListOverwriteData, moreData, TAB_CONTENT_TITLE_HEIGHT
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { skipRowList, theRowCustomDialog } from "../../Common"
 import { MoreTop } from "../MoreTopBuilder"
-import { UIConfig } from "../../../entryability/AppState"
+import { AppState, UIConfig } from "../../../entryability/AppState"
 import { ClashConfig } from "proxy_core"
 import { curves } from "@kit.ArkUI"
 import { customAnimationUtil } from "../../../utils/Animation"
@@ -68,8 +68,7 @@ struct Overwrite {
     // 关闭背景模糊
     this.isEnableIndexForegroundBlur = false
     // 重置覆写操作
-    const newConfig = new ClashConfig()
-    AppStorage.set("clashConfig", newConfig)
+    AppState.ResetClashConfig()
 
   }
 

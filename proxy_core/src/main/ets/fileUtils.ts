@@ -7,7 +7,7 @@ export async  function readFileUri(uri: string, tempPath: string): Promise<Uint8
   return await readFile(tempPath)
 }
 
-export async  function readFile(filePath: string): Promise<Uint8Array | null> {
+export async function readFile(filePath: string): Promise<Uint8Array | null> {
   if(!await fs.access(filePath))
     return null;
   const file = await fs.open(filePath)
@@ -17,6 +17,11 @@ export async  function readFile(filePath: string): Promise<Uint8Array | null> {
   await fs.read(file.fd, buf, { offset: 0, length: bufSize });
   await fs.close(file);
   return new Uint8Array(buf);
+}
+export async function readText(filePath: string): Promise<string>{
+  if(!await fs.access(filePath))
+    return "";
+  return await fs.readText(filePath)
 }
 export function writeFile(filePath: string, data: Uint8Array | null) {
   if(data != null && data.byteLength > 0){

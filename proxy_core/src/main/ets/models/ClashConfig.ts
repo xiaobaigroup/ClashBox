@@ -137,7 +137,7 @@ export class  ClashConfig {
   "find-process-mode"?: FindProcessMode = FindProcessMode.Off;
   "route-address"?: string[]
   "route-mode"?: RouteMode = RouteMode.Config
-  "global-ua"?: string
+  "global-ua"?: string = "ClashNext/v1.6.6"
   dns?: Dns = new Dns();
   app?: App;
   tun?: Tun = new Tun();
