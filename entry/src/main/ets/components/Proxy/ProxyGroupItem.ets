@@ -249,7 +249,7 @@ struct ProxyGroupItem {
   MyMenu(isShowFavoriteProxy: boolean, nodeName: string) {
     Menu() {
       // 根据当前配置信息来判断显示[收藏 /取消收藏] 单独处理 START
-      if (isShowFavoriteProxy) {
+      if (isShowFavoriteProxy&&this.favoriteProxys.size>0) {
         MenuItem({
           symbolStartIcon: this.proxyListLongPressCtxMenuForUnFavorite.symbolStartIcon!
             .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),

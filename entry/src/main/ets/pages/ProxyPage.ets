@@ -347,7 +347,6 @@ struct ProxyPage {
           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .onClick(() => {
             this.favoriteProxys.clear()
-            ProxyGroupItem.currentTouchProxyData.isShowFavoriteProxy=false
             this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_all_tip') })
           })
           .transition(customAnimationUtil.isSlide(150, this.uiConfig))
