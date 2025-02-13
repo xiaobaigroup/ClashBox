@@ -84,7 +84,6 @@ export class ClashViewModel {
       }
     }
     EventHub.sendEvent(EventKey.FetchProfile, null)
-
   }
   async VailConfig(config: string): Promise<string>{
     return this.socketProxy.vailConfig(config)
@@ -253,9 +252,9 @@ export class ClashViewModel {
     EventHub.sendEvent(EventKey.StopedClash)
   }
 
-  initProfile(){
+  async  initProfile(){
     let appConfig = AppStorage.get<AppConfig>("appConfig")
-    this.loadConfig()
+    await this.loadConfig()
     EventHub.sendEvent(EventKey.StartLog, appConfig?.enableLogger)
   }
   async loadConfig(){

@@ -63,7 +63,7 @@ struct FavoriteConfiguration {
                 })
                 .onChange((isChecked: boolean) => {
                   //在home页编辑状态时，无法操作
-                  if (this.isShowHomeEdit===false && isChecked) {
+                  if (this.isShowHomeEdit === false && isChecked) {
                     this.appConfig.currentProfileId = f[0]
                     EventHub.sendEvent(EventKey.LoadClashConfig)
                     EventHub.on(EventKey.LoadClashConfig, async () => {
