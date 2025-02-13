@@ -1595,6 +1595,14 @@
     {
       "name": "refuse",
       "value": "Disagree and withdraw"
+    },
+    {
+      "name": "download_success",
+      "value": "Success Download"
+    },
+    {
+      "name": "load_success",
+      "value": "Success Load"
     }
   ]
 }

@@ -106,7 +106,7 @@ export function BindSheetTitleCustomBuilder(param: BindSheetTitleCustomBuilderPa
         .fontWeight(param.mainTitleFontWeight?? FontWeight.Bold)
         .fontSize(param.mainTitleFontSize)
         .fontColor($r('sys.color.font_primary'))
-        .lineHeight(24)
+       // .lineHeight(24)
         .maxLines(1)
         .textOverflow({overflow: TextOverflow.MARQUEE})
         .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })

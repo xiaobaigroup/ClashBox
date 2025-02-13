@@ -28,7 +28,7 @@ import { AppConfig, UIConfig } from '../entryability/AppState'
 import { EventHub, EventKey } from '../common/EventHub'
 import { getResourceString } from '../utils/ResourceStringUtil'
 import { convertTime } from '../utils/TimeConvertUtil'
-import { customAnimationUtil } from '../utils/Animation'
+import { customAnimationUtil, isON } from '../utils/Animation'
 
 
 /**
@@ -78,6 +78,8 @@ struct ConfigurationPage {
   private isLandscapePhone: boolean = false
 
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  //开关不触发list转场动画判定
+  @State isON:isON = new isON()
 
   /* NV路由 相关 */
   // 路由栈
@@ -370,6 +372,8 @@ struct ConfigurationPage {
                           checkedBackgroundColor: this.icon_emphasize,
                         })
                         .onClick(async () => {
+                          //使开关点击时不触发转场动画
+                          this.isON.toggleAnim = true
                           ClashViewModel.updateProfileConfig(item.configId)
                           this.currentConfigRadioCheckedConfigData = item
                           this.appConfig.currentProfileName = item.configName
@@ -379,6 +383,8 @@ struct ConfigurationPage {
                             this.isLoading = true;
                             await ClashViewModel.loadConfig(); // 假设loadConfig返回一个Promise
                             this.isLoading = false;
+                            //加载成功增加promptAction提示
+                            this.promptAction.showToast({message: getResourceString($r('app.string.load_success'), this)})
                           });
                           hilog.info(0xC002, this.componentName,
                             `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
@@ -395,7 +401,7 @@ struct ConfigurationPage {
                   .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                   .borderRadius(BORDER_RADIUS_20)
                   .hoverEffect(HoverEffect.Scale)
-                  .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
+                  .transition(this.isON.toggleAnim ? null : customAnimationUtil.isScaleTran(index, this.uiConfig))
                   .bindContextMenu(this.configListLongPressCtxMenuBuilder(item?.isFavorite ?? false),
                     ResponseType.LongPress | ResponseType.RightClick,
                     {
@@ -409,6 +415,8 @@ struct ConfigurationPage {
                       }
                     })
                   .onClick(async () => {
+                    //使开关点击时不触发转场动画
+                    this.isON.toggleAnim = true
                     this.currentConfigRadioCheckedConfigData = item
                     this.appConfig.currentProfileName = item.configName
                     this.appConfig.currentProfileId = item.configId
@@ -417,6 +425,8 @@ struct ConfigurationPage {
                       this.isLoading = true;
                       await ClashViewModel.loadConfig(); // 假设loadConfig返回一个Promise
                       this.isLoading = false;
+                      //加载成功增加promptAction提示
+                      this.promptAction.showToast({message: getResourceString($r('app.string.load_success'), this)})
                     });
                     hilog.info(0xC002, this.componentName,
                       `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)

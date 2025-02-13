@@ -1595,6 +1595,14 @@
     {
       "name": "refuse",
       "value": "不同意并退出"
+    },
+    {
+      "name": "download_success",
+      "value": "下载成功"
+    },
+    {
+      "name": "load_success",
+      "value": "加载成功"
     }
   ]
 }
