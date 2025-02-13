@@ -8,7 +8,7 @@ import { Provider } from "proxy_core"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { UIConfig } from "../../entryability/AppState"
 import { picker } from "@kit.CoreFileKit"
-import { customAnimationUtil } from "../../utils/Animation"
+import { customAnimationUtil, isON } from "../../utils/Animation"
 
 
 // 资源数据（假设）
@@ -69,7 +69,8 @@ export struct ProviderPage {
   @Consume isProviderEdit: boolean
   //fl clash条目数量判定
   @State entriesNumber:number =0
-
+  //开关不触发list转场动画判定
+  @State isON:isON = new isON()
 
   /**
    * 监听加载状态改变执行UI数组更新
@@ -279,7 +280,7 @@ export struct ProviderPage {
                                 this.isLoading = -1
                               })
                               animateTo({
-                                duration: this.uiConfig.animationSpeed,
+                                duration:this.uiConfig.animationSpeed,
                                 curve: Curve.Friction,
                                 iterations: 1, // 设置-1表示动画无限循环
                               }, () => {
@@ -444,8 +445,9 @@ export struct ProviderPage {
         .backgroundColor($r('app.color.settings_container_background'))
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .onClick(() => {
+          this.isON.toggleAnim=true
           animateTo({
-            duration: this.uiConfig.animationSpeed,
+            duration: this.isON.toggleAnim ?0:this.uiConfig.animationSpeed,
             curve: Curve.Friction,
             iterations: 1, // 设置-1表示动画无限循环
           }, () => {
@@ -459,7 +461,6 @@ export struct ProviderPage {
               })
             })
           })
-
         })
 
         //关闭按钮

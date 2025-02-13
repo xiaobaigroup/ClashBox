@@ -349,16 +349,16 @@ struct ConfigurationPage {
                   ListItem() {
                     Row() {
                       Column({ space: 2 }) {
-                        Text(item.configName).fontColor(($r('sys.color.font_primary')))
+                        Text(item.configName).fontColor(($r('sys.color.font_primary'))).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
                         Row() {
                           Text($r('app.string.update_by'))
                             .fontColor($r('sys.color.font_secondary')).fontSize(12)
                           Text(convertTime(item.lastUpdateDateTime))
-                            .fontColor($r('sys.color.font_secondary')).fontSize(12)
+                            .fontColor($r('sys.color.font_secondary')).fontSize(12).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
                         }
 
                         //  Text(item.createdDate)
-                      }.alignItems(HorizontalAlign.Start)
+                      }.alignItems(HorizontalAlign.Start).width('85%')
 
                       Blank()
                       if (item.configId === this.appConfig.currentProfileId && this.isLoading===true){
