@@ -372,8 +372,6 @@ struct ConfigurationPage {
                           checkedBackgroundColor: this.icon_emphasize,
                         })
                         .onClick(async () => {
-                          //使开关点击时不触发转场动画
-                          this.isON.toggleAnim = true
                           ClashViewModel.updateProfileConfig(item.configId)
                           this.currentConfigRadioCheckedConfigData = item
                           this.appConfig.currentProfileName = item.configName
@@ -415,8 +413,6 @@ struct ConfigurationPage {
                       }
                     })
                   .onClick(async () => {
-                    //使开关点击时不触发转场动画
-                    this.isON.toggleAnim = true
                     this.currentConfigRadioCheckedConfigData = item
                     this.appConfig.currentProfileName = item.configName
                     this.appConfig.currentProfileId = item.configId
@@ -619,10 +615,14 @@ struct ConfigurationPage {
    */
   private favoriteConfig(): void {
     // TODO 收藏配置 & 判断是否已经收藏
+    if (this.favoriteProfiles.size<=3){
     this.promptAction.showToast({ message: $r('app.string.Collect_Tip') })
     hilog.info(0xC010, this.componentName, `#favoriteConfig#收藏配置: configName is [${this.currentTouchConfigData.configName}]`)
     this.currentTouchConfigData.isFavorite = true
     this.favoriteProfiles.set(this.currentTouchConfigData.configId, this.currentTouchConfigData.configName)
+    }else {
+      this.promptAction.showToast({ message: $r('app.string.favorite_config_no') })
+    }
   }
   /**
    * 取消收藏配置
@@ -652,6 +652,8 @@ struct ConfigurationPage {
     if (configId){
       // TODO loading and try
       ClashViewModel.updateProfileConfig(configId)
+      //使开关点击时不触发转场动画
+      this.isON.toggleAnim = true
       // TODO 单个配置更新
       hilog.info(0xC012, this.componentName, `#updateConfig#更新配置{单个}: configName is [${this.currentTouchConfigData.configName}], configId is [${this.currentTouchConfigData.configId}]`)
     } else {
@@ -659,6 +661,8 @@ struct ConfigurationPage {
       hilog.info(0xC012, this.componentName, `#updateConfig#更新配置{所有}`)
       // TODO loading and try
       await ClashViewModel.updateProfileConfig(null)
+      //使开关点击时不触发转场动画
+      this.isON.toggleAnim = true
     }
 
 

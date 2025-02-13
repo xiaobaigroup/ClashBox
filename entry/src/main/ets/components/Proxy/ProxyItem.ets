@@ -1,6 +1,6 @@
 import { EventHub, EventKey } from '../../common/EventHub'
 import { ProxyItem as ProxyItem, ProxyData } from '../../common/ProxyData'
-import { ProxyCardSize, UIConfig } from '../../entryability/AppState'
+import { AppConfig, ProxyCardSize, UIConfig } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { customVibrator } from '../../utils/VibratorUtil'
 
@@ -36,6 +36,7 @@ export struct ProxyNode {
   @Prop item: ProxyItem
   @Prop disabled: boolean
   @Prop selected: string
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
 
   selectProxy?: (item: ProxyItem) => void
   aboutToAppear(): void {
@@ -49,8 +50,11 @@ export struct ProxyNode {
           this.item.latency = d
         })
       }
-
     }, false) // 批量监听
+  }
+
+  aboutToDisappear() {
+
   }
   build() {
     if (this.itemSize === ProxyCardSize.Large){

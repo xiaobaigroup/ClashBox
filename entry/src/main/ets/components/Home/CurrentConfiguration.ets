@@ -4,6 +4,8 @@ import { CardTitle } from "./CardTitleBuilder"
 import { PromptAction } from "@kit.ArkUI"
 import { AppConfig, UIConfig } from "../../entryability/AppState"
 import { customVibrator } from "../../utils/VibratorUtil"
+import ClashViewModel from "../../entryability/ClashViewModel"
+import { ConfigData } from "../../common/PageArgumentEntity"
 
 @Component
 struct CurrentConfiguration {
@@ -23,6 +25,7 @@ struct CurrentConfiguration {
   private PromptAction:PromptAction = this.getUIContext()?.getPromptAction()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+
 
   build() {
     Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.End, justifyContent: FlexAlign.SpaceBetween}) {
@@ -44,6 +47,7 @@ struct CurrentConfiguration {
         .onClick(() => {
           //在home页添加按钮的半模拟态里和在编辑卡片状态时，无法操作，点击回调写在if判定里
           if (this.isShowHomeEdit==false) {
+            ClashViewModel.updateProfileConfig(this.appConfig.currentProfileId??'')
             this.PromptAction.showToast({ message: $r('app.string.refresh_tips') })
             if (this.uiConfig.isVibrate) {
               customVibrator.vibratorTriggerOfHapticClockTimer()

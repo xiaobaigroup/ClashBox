@@ -12,7 +12,9 @@ import { ProxyItem } from '../common/ProxyData'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { Profile, ProxyGroup, ProxySort, ProxyType } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
-import { AppConfig, ClashCore, isEnd, ProxyCardSize, ProxyGroupType, UIConfig } from '../entryability/AppState'
+import { AppConfig,
+  AppState,
+  ClashCore, isEnd, ProxyCardSize, ProxyGroupType, UIConfig } from '../entryability/AppState'
 import { curves, PromptAction } from '@kit.ArkUI'
 import { ProviderPage } from '../components/Proxy/Provider'
 import { indexController } from './Index'
@@ -100,6 +102,8 @@ struct ProxyPage {
   @Consume('HomeCardTitleButtonPadding') private HomeCardTitleButtonPadding: BreakpointState<number>
   //page内顶部标题偏移量
   @Consume curYOffset: number
+  //一键取消所有收藏判定
+  @Provide isClearFavoriteProxys :boolean = false
   //栅格点位配置
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
@@ -305,7 +309,6 @@ struct ProxyPage {
       .width('100%')
   }
 
-
   build() {
     Stack(){
       // 标题栏
@@ -331,6 +334,24 @@ struct ProxyPage {
               }
             })
           Blank()
+
+          //一键取消所有收藏按钮
+          Button({ type: ButtonType.Circle, stateEffect: true }) {
+            SymbolGlyph($r('sys.symbol.heart_slash'))
+              .fontSize(24)
+              .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+              .fontColor([this.icon_primary,Color.Red])
+          }
+          .width(40)
+          .height(40)
+          .backgroundColor($r('app.color.settings_container_background'))
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+          .onClick(() => {
+            this.isClearFavoriteProxys = true
+            this.favoriteProxys.clear()
+            this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_all_tip') })
+          })
+          .transition(customAnimationUtil.isSlide(150, this.uiConfig))
 
           //提供者按钮
           Button({ type: ButtonType.Circle, stateEffect: true }) {
@@ -442,7 +463,7 @@ struct ProxyPage {
                       })
                   )
                   .onWillShow(() => {
-                    animateTo(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }:null, () => {
+                    animateTo({ duration: this.uiConfig.animationSpeed, curve:curves.springMotion() }, () => {
                       this.currentIndex = i;
                       if(this.currentProfile){
                         this.currentProfile.currentGroupName = this.proxyGroups[i].name
@@ -455,8 +476,8 @@ struct ProxyPage {
               .barMode(BarMode.Scrollable)
               .barHeight(55)
               .fadingEdge(false)
-              .onAnimationStart((index: number, targetIndex: number) => {
-                if (this.uiConfig.animationSpeed===0) {
+            .onAnimationStart((index: number, targetIndex: number) => {
+               if (this.uiConfig.animationSpeed===0) {
                   this.currentIndex = targetIndex;
                 }
               })
@@ -500,9 +521,6 @@ struct ProxyPage {
                   .align(Alignment.Center)
               }.onClick(() => {
                 EventHub.sendEvent(EventKey.TestDelayAll)
-                if (this.uiConfig.isVibrate) {
-                  customVibrator.vibratorTriggerOfHapticClockTimer()
-                }
                 this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
               })
               .width('100%')

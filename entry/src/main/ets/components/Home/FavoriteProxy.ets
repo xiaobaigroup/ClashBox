@@ -10,6 +10,7 @@ import { customAnimationUtil } from '../../utils/Animation'
 import ClashViewModel from '../../entryability/ClashViewModel'
 
 
+
 @Component
 struct FavoriteProxy {
   //节点假数据组后期可改可删
@@ -60,52 +61,64 @@ struct FavoriteProxy {
     Column() {
       CardTitle({ title: $r('app.string.FavoriteProxy') })
       //拥有收藏节点的布局 start
-      if (this.favoriteProxys.size > 0) {
+      if (AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups).length > 0 ) {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceEvenly }) {
-          ForEach(AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups), (p:[string,string], i: number)=>{
-            Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-              Text(`${p[1]}`)
-                .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
-                .fontColor($r('sys.color.font_primary'))
-                .maxLines(1)
-                .width('80%')
-                .textOverflow({ overflow: TextOverflow.Ellipsis })
-              Radio({ value: 'FavoriteProxyRadio', group: 'FavoriteProxyGroup' })
-                .width(this.isLandscapePhone ? 16 : this.fontSize.value)
-                .checked(this.appConfig.currentProxyName === p[1])
-                .radioStyle({
-                  checkedBackgroundColor: this.icon_emphasize,
-                })
-                .onClick(() => {
-                  //在home页编辑状态时，无法操作
-                  if (this.isShowHomeEdit===false ) {
-                    this.appConfig.currentProxyName = p[1]
-                    this.appConfig.currentProxyItem = AppState.fetchProxyItem(this.proxyGroups, p[0], p[1])
-                    if (this.uiConfig.isVibrate) {
-                      customVibrator.vibratorTriggerOfHapticClockTimer()
-                    }
-                    //对应切换代理页节点
-                    this.changeProxy(p[0],this.appConfig.currentProxyItem)
+          List({}) {
+            ForEach(AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups),
+              (p: [string, string], i: number) => {
+                ListItem() {
+                  Flex({
+                    direction: FlexDirection.Row,
+                    alignItems: ItemAlign.Center,
+                    justifyContent: FlexAlign.SpaceBetween
+                  }) {
+                    Text(`${p[1]}`)
+                      .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+                      .fontColor($r('sys.color.font_primary'))
+                      .maxLines(1)
+                      .width('80%')
+                      .textOverflow({ overflow: TextOverflow.Ellipsis })
+                    Radio({ value: 'FavoriteProxyRadio', group: 'FavoriteProxyGroup' })
+                      .width(this.isLandscapePhone ? 16 : this.fontSize.value)
+                      .checked(this.appConfig.currentProxyName === p[1])
+                      .radioStyle({
+                        checkedBackgroundColor: this.icon_emphasize,
+                      })
+                      .onClick(() => {
+                        //在home页编辑状态时，无法操作
+                        if (this.isShowHomeEdit === false) {
+                          this.appConfig.currentProxyName = p[1]
+                          this.appConfig.currentProxyItem = AppState.fetchProxyItem(this.proxyGroups, p[0], p[1])
+                          if (this.uiConfig.isVibrate) {
+                            customVibrator.vibratorTriggerOfHapticClockTimer()
+                          }
+                          //对应切换代理页节点
+                          this.changeProxy(p[0], this.appConfig.currentProxyItem)
+                        }
+                      })
                   }
-                })
-            }
-            .onClick(() => {
-              //在home页编辑状态时，无法操作
-              if (this.isShowHomeEdit===false) {
-                this.appConfig.currentProxyName = p[1]
-                this.appConfig.currentProxyItem = AppState.fetchProxyItem(this.proxyGroups, p[0], p[1])
-                //对应切换代理页节点
-                this.changeProxy(p[0],this.appConfig.currentProxyItem)
-                if (this.uiConfig.isVibrate) {
-                  customVibrator.vibratorTriggerOfHapticClockTimer()
-                }
-              }
-            })
-            .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-            if (!isEnd(this.favoriteProxys.size, i)){
-              Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
-            }
-          })
+                  .onClick(() => {
+                    //在home页编辑状态时，无法操作
+                    if (this.isShowHomeEdit === false) {
+                      this.appConfig.currentProxyName = p[1]
+                      this.appConfig.currentProxyItem = AppState.fetchProxyItem(this.proxyGroups, p[0], p[1])
+                      //对应切换代理页节点
+                      this.changeProxy(p[0], this.appConfig.currentProxyItem)
+                      if (this.uiConfig.isVibrate) {
+                        customVibrator.vibratorTriggerOfHapticClockTimer()
+                      }
+                    }
+                  })
+                  .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+
+                  //   if (!isEnd(this.favoriteProxys.size, i)){
+                  //      Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
+                  //    }
+                }.height(AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups).length-1==1?'50%':'32%')
+              })
+          }.divider({ strokeWidth: 1, color: $r('app.color.FavoriteProxyDivider') })
+          .scrollBar(BarState.Off)
+          .edgeEffect(EdgeEffect.None)
         }
         .width('100%')
         .height('82%')
@@ -113,6 +126,7 @@ struct FavoriteProxy {
         .borderRadius(10)
         .padding({ left: 8, right: 5 })
       }//拥有收藏节点的布局 end
+
       //没有收藏节点的布局 start
       else
       {

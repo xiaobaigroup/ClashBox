@@ -9,9 +9,9 @@ import { LengthMetrics, SymbolGlyphModifier,PromptAction, curves } from '@kit.Ar
 import { webview } from '@kit.ArkWeb';
 import {  ProxyItem, ProxyData } from '../../common/ProxyData';
 import { EventHub, EventKey } from '../../common/EventHub';
-import { ProxySort } from 'proxy_core';
+import { ProxyGroup, ProxySort } from 'proxy_core';
 import { intl } from '@kit.LocalizationKit';
-import { AppConfig, ClashCore, ProxyCardSize, UIConfig } from '../../entryability/AppState';
+import { AppConfig, AppState, ClashCore, ProxyCardSize, UIConfig } from '../../entryability/AppState';
 import ClashViewModel from '../../entryability/ClashViewModel';
 import { ProxyNode } from './ProxyItem';
 import { customAnimationUtil } from '../../utils/Animation';
@@ -83,11 +83,9 @@ let ProxyCollator = new intl.Collator("zh-CN");
 @Entry
 @Component
 struct ProxyGroupItem {
-
   /* 主题色 */
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
-
   /* 速度与延迟区别弹窗 */
   ProxyDialogController: CustomDialogController | null = new CustomDialogController({
     builder: ProxyCustomDialog({
@@ -111,15 +109,14 @@ struct ProxyGroupItem {
       console.log("dialog onWillDismiss")
       if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
         dismissDialogAction.dismiss()
-        this.isEnableIndexForegroundBlur=false
+        this.isEnableIndexForegroundBlur = false
       }
       if (dismissDialogAction.reason == DismissReason.TOUCH_OUTSIDE) {
         dismissDialogAction.dismiss()
-        this.isEnableIndexForegroundBlur=false
+        this.isEnableIndexForegroundBlur = false
       }
     },
   })
-
   /*长按菜单相关参数  */
   //长按菜单图标
   @State startIconModifier1: SymbolGlyphModifier =
@@ -127,19 +124,15 @@ struct ProxyGroupItem {
   @State startIconModifier2: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.timer')).fontSize('24vp');
   @State startIconModifier3: SymbolGlyphModifier =
     new SymbolGlyphModifier($r('sys.symbol.questionmark_circle')).fontSize('24vp');
-
   //报错信息参数
   private componentName: string = 'ProxyPage'
-
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
-
   /* 断点布局相关 */
   @State
   private breakPointStateListLanes: BreakpointState<number> = BPS_LIST_LANES_2_2_3_4_4
   @Consume
   private breakPointStateListGutter: BreakpointState<number>
-
   /* 本页布局相关参数 */
   // 定义ProxyGroupItemSelectedWide的值便于切换布局方式
   @Prop ProxyGroupItemSelected: ProxyCardSize
@@ -147,11 +140,9 @@ struct ProxyGroupItem {
   @State isShowNetworkSpeed: boolean = false
   //网络测速半模拟态web控制器
   controller: webview.WebviewController = new webview.WebviewController();
-
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
-
   /* 代理节点数据相关参数  */
   //节点假数据组后期可改可删
   @Prop items: ProxyItem[]
@@ -161,12 +152,15 @@ struct ProxyGroupItem {
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @StorageProp("proxyGroups") proxyGroups: ProxyGroup[] = []
+  //一键取消所有收藏判定
+  @Consume isClearFavoriteProxys :boolean
   /**
    * XXX 当前手指触摸的ListItem的对应 `this.configList` 中的 `configId`
    *    List的长按菜单中的响应都是根据这个的对象中的属性来处理的，是个不稳定因素
    */
   private currentTouchProxyData: ProxyItem = {
-    name:'',
+    name: '',
     latency: 0,
     type: '',
     id: '',
@@ -174,20 +168,26 @@ struct ProxyGroupItem {
     isShowFavoriteProxy: false
   }
 
-
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     BreakpointSystem.getInstance().attach(this.breakPointStateListLanes)
     BreakpointSystem.getInstance().start()
-    EventHub.on(EventKey.ProxySort, (sort: ProxySort)=>{
+    EventHub.on(EventKey.ProxySort, (sort: ProxySort) => {
       console.log("ProxySort", sort)
-      switch (sort){
-        case ProxySort.Default: this.DefaultSortItems(); break;
-        case ProxySort.Title: this.NameSortItems(); break;
-        case ProxySort.Delay: this.LatencySortItems(); break;
+      switch (sort) {
+        case ProxySort.Default:
+          this.DefaultSortItems();
+          break;
+        case ProxySort.Title:
+          this.NameSortItems();
+          break;
+        case ProxySort.Delay:
+          this.LatencySortItems();
+          break;
       }
     })
   }
+
   // 延迟排序
   LatencySortItems() {
     this.items.sort((a, b) => (a.latency ?? 0) - (b.latency ?? 0));
@@ -237,9 +237,9 @@ struct ProxyGroupItem {
   existApp() {
     console.info('Click the callback in the blank area')
   }
-  //收藏与ping延迟即时动作
-  private ProxyPromptAction:PromptAction = this.getUIContext()?.getPromptAction()
 
+  //收藏与ping延迟即时动作
+  private ProxyPromptAction: PromptAction = this.getUIContext()?.getPromptAction()
   OnProxyChange: ((item: ProxyItem) => void) = () => {
 
   }
@@ -247,10 +247,10 @@ struct ProxyGroupItem {
   //长按菜单 start
   @Builder
   //长按菜单相关
-  MyMenu(isShowFavoriteProxy:boolean, nodeName: string) {
+  MyMenu(isShowFavoriteProxy: boolean, nodeName: string) {
     Menu() {
       // 根据当前配置信息来判断显示[收藏 /取消收藏] 单独处理 START
-      if (isShowFavoriteProxy) {
+      if (isShowFavoriteProxy && !this.isClearFavoriteProxys) {
         MenuItem({
           symbolStartIcon: this.proxyListLongPressCtxMenuForUnFavorite.symbolStartIcon!
             .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
@@ -258,19 +258,19 @@ struct ProxyGroupItem {
         })
           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .contentFontColor($r('sys.color.font_primary'))
-          .onClick( () => {
+          .onClick(() => {
             this.proxyListLongPressCtxMenuForUnFavorite.callback()
           })
       } else {
-          MenuItem({
-            symbolStartIcon: this.proxyListLongPressCtxMenuForFavorite.symbolStartIcon!
-              .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
-            content: this.proxyListLongPressCtxMenuForFavorite.content
-          })
-            .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-            .contentFontColor($r('sys.color.font_primary'))
-            .onClick(() => {
-              this.proxyListLongPressCtxMenuForFavorite.callback()
+        MenuItem({
+          symbolStartIcon: this.proxyListLongPressCtxMenuForFavorite.symbolStartIcon!
+            .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
+          content: this.proxyListLongPressCtxMenuForFavorite.content
+        })
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+          .contentFontColor($r('sys.color.font_primary'))
+          .onClick(() => {
+            this.proxyListLongPressCtxMenuForFavorite.callback()
           })
       }
       // ClashMeta内核时暂时不能测速及延迟
@@ -278,8 +278,10 @@ struct ProxyGroupItem {
         MenuItem({ symbolStartIcon: this.startIconModifier1, content: $r('app.string.Test_Delay') })
           .onClick(() => {
             EventHub.sendEvent(EventKey.TestDelayAll, nodeName)
-            this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip')
-            })})
+            this.ProxyPromptAction.showToast({
+              message: $r('app.string.Test_Delay_Tip')
+            })
+          })
         MenuItem({ symbolStartIcon: this.startIconModifier2, content: $r('app.string.Test_Speed') })
           .onClick(() => {
             this.isShowNetworkSpeed = true
@@ -290,7 +292,7 @@ struct ProxyGroupItem {
         .onClick(() => {
           if (this.ProxyDialogController != null) {
             this.ProxyDialogController.open()
-            this.isEnableIndexForegroundBlur=true
+            this.isEnableIndexForegroundBlur = true
           }
         })
     }
@@ -301,14 +303,15 @@ struct ProxyGroupItem {
     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
   } //长按菜单end
 
-  selectProxy(item: ProxyItem){
-    if (!this.disabled){
+  selectProxy(item: ProxyItem) {
+    if (!this.disabled) {
       this.selectedProxy = item.name
       this.appConfig.currentProxyName = item.name
       this.appConfig.currentProxyItem = item
       this.OnProxyChange(item)
     }
   }
+
   build() {
     List({ space: 10, initialIndex: 0 }) {
       ForEach(this.items, (item: ProxyItem, index: number) => {
@@ -319,11 +322,11 @@ struct ProxyGroupItem {
             disabled: this.disabled,
             selected: this.selectedProxy,
             selectProxy: (p: ProxyItem) => {
-            this.selectProxy(p)
-          }
+              this.selectProxy(p)
+            }
           })
         }
-        .transition(customAnimationUtil.isScaleTran(index,this.uiConfig))
+        .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
         .onClick(() => {
           this.selectProxy(item)
         })
@@ -341,12 +344,13 @@ struct ProxyGroupItem {
             }),
             previewAnimationOptions: {
               scale: [0.95, 1.0],
-              transition: this.uiConfig.isAnimation ?TransitionEffect.prototype.animation({ tempo: 1.5 }) : undefined
+              transition: this.uiConfig.isAnimation ? TransitionEffect.prototype.animation({ tempo: 1.5 }) : undefined
             },
           })
       })
     }
-    .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
+    .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : this.breakPointStateListLanes.value,
+      this.breakPointStateListGutter.value)
     .ListStyle()
     .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
       detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
@@ -354,7 +358,7 @@ struct ProxyGroupItem {
       backgroundColor: $r('app.color.settings_container_background'),
       showClose: true,
       scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-      title: { title: $r('app.string.Test_Speed'), subtitle:$r('app.string.Test_Speed_Explain')  },
+      title: { title: $r('app.string.Test_Speed'), subtitle: $r('app.string.Test_Speed_Explain') },
       //  maskColor: $r('app.color.dialog_maskcolor'),
       onWillDismiss: () => {
         this.isShowNetworkSpeed = false
@@ -363,15 +367,19 @@ struct ProxyGroupItem {
     })
   }
 
-  private proxyListLongPressCtxMenuForFavorite: LongPressContextMenuItem = {
+  public proxyListLongPressCtxMenuForFavorite: LongPressContextMenuItem = {
     symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.star'))
       .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-    content: '收藏', callback: ()=>{ this.favoriteProxy() }
+    content: '收藏', callback: () => {
+      this.favoriteProxy()
+    }
   }
-  private proxyListLongPressCtxMenuForUnFavorite: LongPressContextMenuItem = {
+  public proxyListLongPressCtxMenuForUnFavorite: LongPressContextMenuItem = {
     symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.star_fill'))
       .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.multi_color_11')]),
-    content: '取消收藏', callback: ()=>{ this.cancelFavoriteProxy() }
+    content: '取消收藏', callback: () => {
+      this.cancelFavoriteProxy()
+    }
   }
 
   /**
@@ -379,22 +387,28 @@ struct ProxyGroupItem {
    */
   private favoriteProxy(): void {
     //  收藏节点 & 判断是否已经收藏
+    if (AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups).length<3){
     this.ProxyPromptAction.showToast({ message: $r('app.string.Collect_Tip') })
     const p = this.currentTouchProxyData
     p.isShowFavoriteProxy = true
     this.favoriteProxys.set(p.g + '|' + p.name, this.appConfig.currentProfileId ?? "")
+    }else{
+      this.ProxyPromptAction.showToast({ message: $r('app.string.favorite_proxy_no') })
+    }
   }
+
   /**
    * 取消收藏配置
    */
   private cancelFavoriteProxy(): void {
-    //  取消收藏节点 & 判断是否已经收藏
     this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_tip') })
     const p = this.currentTouchProxyData
     p.isShowFavoriteProxy = false
     this.favoriteProxys.delete(p.g + '|' + p.name)
   }
 }
+
+
 /**
  * 长按菜单参数
  */

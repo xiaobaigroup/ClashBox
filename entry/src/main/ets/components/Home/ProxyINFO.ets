@@ -7,6 +7,7 @@ import { PromptAction } from "@kit.ArkUI"
 import ClashViewModel from "../../entryability/ClashViewModel"
 import { JSON } from "@kit.ArkTS"
 import { customVibrator } from "../../utils/VibratorUtil"
+import { EventHub, EventKey } from "../../common/EventHub"
 
 @Component
 struct ProxyINFO{
@@ -37,6 +38,7 @@ struct ProxyINFO{
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   //收藏与ping延迟即时动作
   private PromptAction:PromptAction = this.getUIContext()?.getPromptAction()
+
 
   build() {
     Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Start, justifyContent: FlexAlign.SpaceBetween}) {

@@ -719,8 +719,8 @@ struct Index {
           .tabBar(this.TabBarBuilder($r('app.string.More'), 3, $r('sys.symbol.square_fill_grid_2x2')))
         }
         .zIndex(1)
-        .backgroundColor(this.uiConfig.isBlurr ? '#00ffffff' : $r('app.color.background'))
-        .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Thick : null)
+        .backgroundColor(this.uiConfig.isBlurr ? $r('app.color.background') : $r('app.color.background'))
+        .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Regular : null)
         .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
         .barOverlap(this.uiConfig.isBlurr ? (this.isLandscapePhone || ( this.istabletLandscape && !this.isSecondary) ? false : true) : false) //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
         .scrollable(this.isSecondary ? false : true)

@@ -1603,6 +1603,18 @@
     {
       "name": "load_success",
       "value": "Success Load"
+    },
+    {
+      "name": "favorite_proxy_no",
+      "value": "The current configuration can only collect up to 3 nodes"
+    },
+    {
+      "name": "favorite_config_no",
+      "value": "You can only save up to 3 configurations at most"
+    },
+    {
+      "name": "uncollected_all_tip",
+      "value": "All favorites have been cancelled\uD83D\uDC94"
     }
   ]
 }

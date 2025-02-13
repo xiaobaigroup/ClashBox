@@ -1603,6 +1603,18 @@
     {
       "name": "load_success",
       "value": "加载成功"
+    },
+    {
+      "name": "favorite_proxy_no",
+      "value": "当前配置最多只能收藏3个节点"
+    },
+    {
+      "name": "favorite_config_no",
+      "value": "配置最多只能收藏3个"
+    },
+    {
+      "name": "uncollected_all_tip",
+      "value": "已取消所有收藏\uD83D\uDC94"
     }
   ]
 }
