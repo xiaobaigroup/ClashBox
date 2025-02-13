@@ -1,11 +1,12 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { AboutListItemProp, AboutList, BORDER_RADIUS_20, ContributorsListItemProp,
+import { AboutListItemProp, BORDER_RADIUS_20, ContributorsListItemProp,
   ContributorsList,
   CheckUpdateList,
   CheckUpdateListItemProp,
   CONTENT_END_OFFSET_150,
   moreData,
   ListMoreData,
+  getAboutList,
 } from "../../common/Constants"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
@@ -31,7 +32,7 @@ struct About {
   // 二级图标色，黑色
   @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary')
   @State EnableUpdateChenChannels: number = 0
-  @State aboutList: AboutListItemProp[] = AboutList
+  @State aboutList: AboutListItemProp[] = []
   // 更多页列表数组
   @Consume moreList: moreData[]
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
@@ -234,6 +235,7 @@ struct About {
   }
 
   aboutToAppear(): void {
+    this.aboutList = getAboutList()
     //音效
     customSound.initSoundPool(3, 'di.mp3')
     // 页面加载时初始化实验功能启用状态

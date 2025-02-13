@@ -4,6 +4,8 @@ import { ANIMATION_DURATION_300, showHomeCard } from "../common/Constants";
 import { ProxyItem } from "../common/ProxyData";
 import { resourcesBlankData, theResouresData } from "../components/More/Resources";
 import ClashViewModel from "./ClashViewModel";
+import { bundleManager } from "@kit.AbilityKit";
+import { EventHub, EventKey } from "../common/EventHub";
 
 export enum ProxyGroupType{
   Tabs,
@@ -124,20 +126,30 @@ export function isEnd(length: number, i: number){
      return length -1 == i
 }
 
+export function getPackageInfo(){
+  return bundleManager.getBundleInfoForSelf(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION)
+}
+
 // use @StorageLink('appConfig')
 export class AppState {
-
-  static init(){
+  static globalUA = "ClashNext/v0.0.0"
+  static versionName = ""
+  static coreVersion = "Prerelease-Alpha"
+  static async init(){
+    const packageInfo = await getPackageInfo()
+    AppState.versionName = packageInfo.versionName
+    AppState.globalUA =  "ClashNext/v" + packageInfo.versionName
     PersistentStorage.persistProp("appConfig", new AppConfig())
     PersistentStorage.persistProp("favoriteProfiles", new Map<string, string>([]))
     PersistentStorage.persistProp("favoriteProxys", new Map<string, string[][]>([]))
-    PersistentStorage.persistProp("clashConfig", new ClashConfig())
+
+    PersistentStorage.persistProp("clashConfig", new ClashConfig(AppState.globalUA))
     PersistentStorage.persistProp("uiConfig", new UIConfig())
     AppStorage.setOrCreate<AppFlowingState>("appFlowingState", new AppFlowingState())
   }
   // 还原腹泻配置
-  static ResetClashConfig(){
-    AppStorage.set("clashConfig", new ClashConfig())
+  static  ResetClashConfig(){
+    AppStorage.set("clashConfig", new ClashConfig(AppState.globalUA))
     AppStorage.set("appConfig", new AppConfig())
   }
   // 清理数据 还原默认值
@@ -151,6 +163,7 @@ export class AppState {
     AppStorage.set("appFlowingState", new AppFlowingState())
     AppStorage.set("proxyGroups", [])
     ClashViewModel.profileRepo.ClearAll()
+    EventHub.sendEvent(EventKey.FetchProfile)
     // TODO 还原其他配置
   }
 

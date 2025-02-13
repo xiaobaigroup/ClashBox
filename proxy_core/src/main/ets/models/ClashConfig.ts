@@ -120,11 +120,11 @@ export class  ClashConfig {
   "tproxy-port"?: number;
   "mixed-port"?: number = defaultMixedPort;
   authentication?: string[];
-  "allow-lan"?: boolean;
+  "allow-lan": boolean = false;
   "bind-address"?: string;
   mode?: ProxyMode = ProxyMode.Rule;
   "log-level"?: LogLevel = LogLevel.Info;
-  ipv6?: boolean = false;
+  ipv6: boolean = false;
   "external-controller"?: string;
   "external-controller-tls"?: string;
   "external-controller-cors"?: string;
@@ -137,13 +137,14 @@ export class  ClashConfig {
   "find-process-mode"?: FindProcessMode = FindProcessMode.Off;
   "route-address"?: string[]
   "route-mode"?: RouteMode = RouteMode.Config
-  "global-ua"?: string = "ClashNext/v1.6.6"
+  "global-ua": string
   dns?: Dns = new Dns();
   app?: App;
   tun?: Tun = new Tun();
   sniffer?: Sniffer;
   "geox-url"?: GeoXUrl = defaultGeoXMap;
-  constructor() {
+  constructor(ua: string = "ClashNext/v1.0.0") {
+    this["global-ua"] = ua
   }
 }
 export enum TunStack { Gvisor, System, Mixed }
@@ -246,3 +247,7 @@ export interface GeoXUrl {
 }
 
 export { LogLevel }
+
+function getPackageInfo() {
+  throw new Error("Function not implemented.")
+}

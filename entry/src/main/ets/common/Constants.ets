@@ -1,6 +1,6 @@
 import { ClashConfig, Dns, DnsEnhancedMode, LogLevel, RouteMode, TunStack } from "proxy_core";
 import { ArrayConfigParam } from "../components/More/Overwrite/EditArrayConfig";
-import { AppConfig, copy } from "../entryability/AppState";
+import { AppConfig, AppState, copy } from "../entryability/AppState";
 import { CustomThemeName } from "./AppTheme";
 import { BreakpointState } from "./breakpointsystem";
 import { promptAction } from "@kit.ArkUI";
@@ -293,7 +293,11 @@ export  const ListOverwriteBasicData = (clashConfig: ClashConfig, appConfig: App
   let result: ConfigItemData[] = new Array()
   result = [
     new ConfigItemData($r('sys.symbol.info_circle'), 'log-level', $r('app.string.LogLevel'), '', $r('app.string.Info'), 0).bindClashConfig(clashConfig).bindOption(LogMenu),
-    new ConfigItemData($r('sys.symbol.person_shield_fill'), 'global-ua', $r('app.string.UA'), '', $r('app.string.Default_UA'), 0).bindClashConfig(clashConfig).bindOption(UAMenu),
+    new ConfigItemData($r('sys.symbol.person_shield_fill'), 'global-ua', $r('app.string.UA'), '', $r('app.string.Default_UA'), 0).bindClashConfig(clashConfig).bindOption([
+      {title: AppState.globalUA, value: AppState.globalUA },
+      {title: 'clash-verge/v1.6.6', value:"clash-verge/v1.6.6"},
+      {title: 'ClashforWindows/0.19.23', value:"ClashforWindows/0.19.23"},
+    ]),
     new ConfigItemData($r('sys.symbol.stopwatch_2'), 'keep-alive-interval', $r('app.string.TCP_Active'), '', $r('app.string.TCP_interval'), 1).bindClashConfig(clashConfig).bindType(ValueType.Number),
     new ConfigItemData($r('sys.symbol.bolt_filled_on_circle'), "testUrl", $r('app.string.Test_Latency_Link'), 'https://www.gstatic.com/generate204', '', 1).bind<string>(appConfig.testUrl,(v)=>{ appConfig.testUrl = v}).bindType(ValueType.String),
     new ConfigItemData($r('sys.symbol.bolt_filled_on_circle'),"allow-lan", "局域网", '允许局域网', '', 2).bindClashConfig(clashConfig),
@@ -378,9 +382,7 @@ export const LogMenu :OptionItem[] = [
   {title: 'Silent', value: LogLevel.Silent},
 ]
 export const UAMenu: OptionItem[] = [
-  {title: $r('app.string.Default_UA'), value: "ClashNEXT/2.0.0Pre1"},
-  {title: 'clash-verge/v1.6.6', value:"clash-verge/v1.6.6"},
-  {title: 'ClashforWindows/0.19.23', value:"ClashforWindows/0.19.23"},
+
 ]
 export const StackMenu: OptionItem[] = [
   {title: 'Gvisor', value: TunStack.Gvisor},
@@ -536,75 +538,77 @@ export interface AboutListItemProp {
 /**
  * 关于列表
  */
-export const AboutList: AboutListItemProp[] = [
-  {
-    title: 'Version',
-    subtitle: '',
-    name: '',
-    children: [
-      { title: $r('app.string.Application_Version'), subtitle: '2.0.000 Preview1',sign: 0, name: 'ApplicationVersion' },
-      { title: $r('app.string.Kernel_Version'), subtitle: 'Unknown',sign: 0, name: 'KernelVersion' }
-    ]
-  },
-  {
-    title: 'Experiment',
-    subtitle: '',
-    name: '',
-    children: [
-      { title: $r('app.string.experimental_function'), subtitle: $r('app.string.experimental_function_Subtitle'), sign: 1, name: 'ExperimentalFunction', isOn: true },
-    ]
-  },
-  {
-    title: 'Contributors',
-    subtitle: '',
-    name: '',
-    children: [
-      { title: $r('app.string.Contributors'), subtitle: '', sign: 2, name: 'Contributors' },
-    ]
-  },
-  {
-    title: 'General',
-    subtitle: '',
-    name: '',
-    children: [
-      { title: $r('app.string.UseGuidance'), subtitle: '', sign: 2, name: 'UseGuidance' },
-      { title: $r('app.string.FQ'), subtitle: '', sign: 2, name: 'FQ' },
-    ]
-  },
-  { title: 'Update',
-    subtitle: '',
-    name: '',
-    children: [
-      { title: $r('app.string.Check_Updates'), subtitle: '', sign: 2, name: 'CheckUpdate' },
-      { title: $r('app.string.UpdateChannels'), subtitle: $r('app.string.UpdateChannels_Subtitle1'), sign: 3, name: 'UpdateChannels',
-        children: [
-          { title: $r('app.string.UpdateChannels_Subtitle1'), name: 'Github', subtitle: '' },
-          { title: 'Gitee', name: 'Gitee', subtitle: '' }
-         ]
-      },
-      { title: $r('app.string.Auto_Check_Updates'), subtitle: '', sign: 1, name: 'Auto', isOn: false },
-    ]
-  },
-  {
-    title: 'Contact',
-    subtitle: '',
-    name: '',
-    children: [
-      { title: $r('app.string.Official_Telegram_Channel'), subtitle: '', sign: 2, name: 'Telegram' },
-      { title: $r('app.string.Official_Discord_Community'), subtitle: '', sign: 2, name: 'Discord' },
-      { title: $r('app.string.Development_Team_Email'), subtitle: '', sign: 2, name: 'Email' },
-    ]
-  },
-  {
-    title: 'Repositories',
-    subtitle: '',
-    name: '',
-    children: [
-      { title: $r('app.string.ProjectRepositories'), subtitle: '', sign: 2, name: 'Repositories' },
-    ]
-  }
-]
 
+export function getAboutList(): AboutListItemProp[]{
+  return [
+    {
+      title: 'Version',
+      subtitle: '',
+      name: '',
+      children: [
+        { title: $r('app.string.Application_Version'), subtitle: AppState.versionName,sign: 0, name: 'ApplicationVersion' },
+        { title: $r('app.string.Kernel_Version'), subtitle: AppState.coreVersion,sign: 0, name: 'KernelVersion' }
+      ]
+    },
+    {
+      title: 'Experiment',
+      subtitle: '',
+      name: '',
+      children: [
+        { title: $r('app.string.experimental_function'), subtitle: $r('app.string.experimental_function_Subtitle'), sign: 1, name: 'ExperimentalFunction', isOn: true },
+      ]
+    },
+    {
+      title: 'Contributors',
+      subtitle: '',
+      name: '',
+      children: [
+        { title: $r('app.string.Contributors'), subtitle: '', sign: 2, name: 'Contributors' },
+      ]
+    },
+    {
+      title: 'General',
+      subtitle: '',
+      name: '',
+      children: [
+        { title: $r('app.string.UseGuidance'), subtitle: '', sign: 2, name: 'UseGuidance' },
+        { title: $r('app.string.FQ'), subtitle: '', sign: 2, name: 'FQ' },
+      ]
+    },
+    { title: 'Update',
+      subtitle: '',
+      name: '',
+      children: [
+        { title: $r('app.string.Check_Updates'), subtitle: '', sign: 2, name: 'CheckUpdate' },
+        { title: $r('app.string.UpdateChannels'), subtitle: $r('app.string.UpdateChannels_Subtitle1'), sign: 3, name: 'UpdateChannels',
+          children: [
+            { title: $r('app.string.UpdateChannels_Subtitle1'), name: 'Github', subtitle: '' },
+            { title: 'Gitee', name: 'Gitee', subtitle: '' }
+          ]
+        },
+        { title: $r('app.string.Auto_Check_Updates'), subtitle: '', sign: 1, name: 'Auto', isOn: false },
+      ]
+    },
+    {
+      title: 'Contact',
+      subtitle: '',
+      name: '',
+      children: [
+        { title: $r('app.string.Official_Telegram_Channel'), subtitle: '', sign: 2, name: 'Telegram' },
+        { title: $r('app.string.Official_Discord_Community'), subtitle: '', sign: 2, name: 'Discord' },
+        { title: $r('app.string.Development_Team_Email'), subtitle: '', sign: 2, name: 'Email' },
+      ]
+    },
+    {
+      title: 'Repositories',
+      subtitle: '',
+      name: '',
+      children: [
+        { title: $r('app.string.ProjectRepositories'), subtitle: '', sign: 2, name: 'Repositories' },
+      ]
+    }
+  ]
+}
 /**
  * 贡献者名单参数
  */
