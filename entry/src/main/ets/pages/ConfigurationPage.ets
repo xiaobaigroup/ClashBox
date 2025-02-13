@@ -299,10 +299,9 @@ struct ConfigurationPage {
     this.currentConfigRadioCheckedConfigData = item
     this.appConfig.currentProfileName = item.configName
     this.appConfig.currentProfileId = item.configId
+    await ClashViewModel.updateProfileConfig(item.configId)
     await ClashViewModel.loadConfig(); // 假设loadConfig返回一个Promise
     this.isLoading = false;
-    //加载成功增加promptAction提示
-    this.promptAction.showToast({message: getResourceString($r('app.string.load_success'), this), duration: 1000})
   }
 
   build() {
@@ -391,7 +390,6 @@ struct ConfigurationPage {
                           checkedBackgroundColor: this.icon_emphasize,
                         })
                         .onClick(async () => {
-                          await ClashViewModel.updateProfileConfig(item.configId)
                           await this.loadConfig(item)
                           hilog.info(0xC002, this.componentName,
                             `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)

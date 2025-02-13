@@ -119,6 +119,7 @@ export class  ClashConfig {
   "redir-port"?: number;
   "tproxy-port"?: number;
   "mixed-port"?: number = defaultMixedPort;
+  "geodata-loader": string = "memconservative" // standard,
   authentication?: string[];
   "allow-lan": boolean = false;
   "bind-address"?: string;
