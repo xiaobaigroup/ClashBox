@@ -102,8 +102,7 @@ struct ProxyPage {
   @Consume('HomeCardTitleButtonPadding') private HomeCardTitleButtonPadding: BreakpointState<number>
   //page内顶部标题偏移量
   @Consume curYOffset: number
-  //一键取消所有收藏判定
-  @Provide isClearFavoriteProxys :boolean = false
+
   //栅格点位配置
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
@@ -347,8 +346,8 @@ struct ProxyPage {
           .backgroundColor($r('app.color.settings_container_background'))
           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .onClick(() => {
-            this.isClearFavoriteProxys = true
             this.favoriteProxys.clear()
+            ProxyGroupItem.currentTouchProxyData.isShowFavoriteProxy=false
             this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_all_tip') })
           })
           .transition(customAnimationUtil.isSlide(150, this.uiConfig))

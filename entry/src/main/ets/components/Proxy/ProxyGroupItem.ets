@@ -153,13 +153,12 @@ struct ProxyGroupItem {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageProp("proxyGroups") proxyGroups: ProxyGroup[] = []
-  //一键取消所有收藏判定
-  @Consume isClearFavoriteProxys :boolean
+
   /**
    * XXX 当前手指触摸的ListItem的对应 `this.configList` 中的 `configId`
    *    List的长按菜单中的响应都是根据这个的对象中的属性来处理的，是个不稳定因素
    */
-  private currentTouchProxyData: ProxyItem = {
+  public static currentTouchProxyData: ProxyItem = {
     name: '',
     latency: 0,
     type: '',
@@ -250,7 +249,7 @@ struct ProxyGroupItem {
   MyMenu(isShowFavoriteProxy: boolean, nodeName: string) {
     Menu() {
       // 根据当前配置信息来判断显示[收藏 /取消收藏] 单独处理 START
-      if (isShowFavoriteProxy && !this.isClearFavoriteProxys) {
+      if (isShowFavoriteProxy) {
         MenuItem({
           symbolStartIcon: this.proxyListLongPressCtxMenuForUnFavorite.symbolStartIcon!
             .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
@@ -337,7 +336,7 @@ struct ProxyGroupItem {
           {
             preview: MenuPreviewMode.IMAGE,
             onAppear: (() => {
-              this.currentTouchProxyData = item
+              ProxyGroupItem.currentTouchProxyData = item
               if (this.uiConfig.isVibrate) {
                 customVibrator.vibratorTriggerOfHapticClockTimer()
               }
@@ -389,7 +388,7 @@ struct ProxyGroupItem {
     //  收藏节点 & 判断是否已经收藏
     if (AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups).length<3){
     this.ProxyPromptAction.showToast({ message: $r('app.string.Collect_Tip') })
-    const p = this.currentTouchProxyData
+    const p = ProxyGroupItem.currentTouchProxyData
     p.isShowFavoriteProxy = true
     this.favoriteProxys.set(p.g + '|' + p.name, this.appConfig.currentProfileId ?? "")
     }else{
@@ -402,7 +401,7 @@ struct ProxyGroupItem {
    */
   private cancelFavoriteProxy(): void {
     this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_tip') })
-    const p = this.currentTouchProxyData
+    const p = ProxyGroupItem.currentTouchProxyData
     p.isShowFavoriteProxy = false
     this.favoriteProxys.delete(p.g + '|' + p.name)
   }

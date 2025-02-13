@@ -1,3 +1,4 @@
+import { SubscriptionInfo } from "proxy_core"
 import {
   ANIMATION_DURATION_300,
   BIND_SHEET_DRAG_BAR_HEIGHT,
@@ -11,7 +12,7 @@ import { UIConfig } from "../entryability/AppState"
 import { customAnimationUtil, isON } from "../utils/Animation"
 import { getResourceString } from "../utils/ResourceStringUtil"
 import { KeyValueData } from "./More/Overwrite/EditArrayConfig"
-
+import { Provider } from "proxy_core"
 /* 通用属性 START */
 @Styles
 function outerLayerContainerCommonStyles(){
@@ -918,4 +919,50 @@ export struct menuRowList {
     .RowStyle()
     .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE} : null)
   }
+}
+
+//共用使用流量/总流量+进度条组件
+@Builder export function cellularData(item:Provider) {
+  Row() {
+    if (item["subscription-info"]) {
+      Text(`${SubscriptionInfo.GetUsed(item["subscription-info"]).toString()} / `)
+        .smallText()
+    } else {
+      Text($r('app.string.usd_cellular_data'))
+        .smallText()
+    }
+    if (item["subscription-info"]) {
+      Text(`${SubscriptionInfo.GetTotal(item["subscription-info"]).toString()}`)
+        .smallText()
+    } else {
+      Text($r('app.string.total_cellular_data'))
+        .smallText()
+    }
+  }.padding({ bottom: 4 })
+
+  //
+  Column() {
+    Progress({
+      value: SubscriptionInfo.GetUsed(item["subscription-info"])?.show ?? 0,
+      total: SubscriptionInfo.GetTotal(item["subscription-info"])?.show ?? 1,
+      type: ProgressType.Capsule
+    })//value为使用流量的值
+      .style({ enableSmoothEffect: true, borderColor: '#00ffffff' })
+      .color('#ff46b1e3')
+      .width('100%')
+      .height('100%')
+  }
+  .width('100%')
+  .backgroundColor('#4d46b1e3')
+  .height(6)
+  .borderRadius(6)
+}
+//副文本样式
+@Extend(Text)
+function smallText() {
+  .textOverflow({ overflow: TextOverflow.Ellipsis })
+  .fontWeight(FontWeight.Normal)
+  .fontSize(14)
+  .maxLines(1)
+  .fontColor($r('sys.color.font_secondary'))
 }

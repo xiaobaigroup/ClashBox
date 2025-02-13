@@ -17,7 +17,7 @@ import { ConfigAdd } from '../components/Configuration/ConfigAdd'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
 import { ConfigData, ConfigDataSourceType } from '../common/PageArgumentEntity'
-import { CustomConfirmDialog, Nothing } from '../components/Common'
+import { cellularData, CustomConfirmDialog, Nothing } from '../components/Common'
 import { customVibrator } from "../utils/VibratorUtil"
 import { common } from '@kit.AbilityKit'
 import { configShare } from '../utils/SystemShareUtil'
@@ -30,7 +30,7 @@ import { getResourceString } from '../utils/ResourceStringUtil'
 import { convertTime } from '../utils/TimeConvertUtil'
 import { customAnimationUtil, isON } from '../utils/Animation'
 import { Profile } from 'proxy_core'
-
+import { Provider } from "proxy_core"
 
 /**
  * 长按菜单参数
@@ -82,6 +82,7 @@ struct ConfigurationPage {
   //开关不触发list转场动画判定
   @State isON:isON = new isON()
 
+
   /* NV路由 相关 */
   // 路由栈
   @Provide('configAddPageInfos')
@@ -90,6 +91,7 @@ struct ConfigurationPage {
   @Consume curYOffset: number
   //loading动画
   @State isLoading : boolean = false
+  @Prop p: Provider
 
   /* 配置列表List相关 */
   // 当前单选框选择的配置 TODO 待接入用户首选项，先写死 configName，单选框控制现在只用到configName所以先不给值
@@ -120,7 +122,6 @@ struct ConfigurationPage {
 
   /* 配置页面内ListItem长按ContextMenu相关 */
   @Consume configList: Array<ConfigData>
-
   // ContextMenu 收藏&取消收藏列表项集合
   // private configListLongPressCtxMenusForFavorite: Array<LongPressContextMenuItem> = []
   // ContextMenu 列表项 动态替换用
@@ -303,6 +304,7 @@ struct ConfigurationPage {
     //加载成功增加promptAction提示
     this.promptAction.showToast({message: getResourceString($r('app.string.load_success'), this), duration: 1000})
   }
+
   build() {
     Stack() {
       // 标题栏 START
@@ -357,7 +359,7 @@ struct ConfigurationPage {
             Scroll() {
               // 配置列表 START
               List({ space: LIST_SPACE }) {
-                ForEach(this.configList, (item: ConfigData, index: number) => {
+                ForEach(this.configList, (item: ConfigData,index: number) => {
                   ListItem() {
                     Row() {
                       Column({ space: 2 }) {
@@ -369,8 +371,11 @@ struct ConfigurationPage {
                             .fontColor($r('sys.color.font_secondary')).fontSize(12).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
                         }
 
+                        //TODO 此处公共流量使用进度条组件this.p需要一个p: Provider，但不知道该怎么用，一直失败闪退
+                        //  cellularData(this.p) //解决后可删掉此行最前面注释
+
                         //  Text(item.createdDate)
-                      }.alignItems(HorizontalAlign.Start).width('85%')
+                      }.alignItems(HorizontalAlign.Start).width('85%').padding({top:10,bottom:10})
 
                       Blank()
                       if (item.configId === this.appConfig.currentProfileId && this.isLoading){
@@ -397,7 +402,7 @@ struct ConfigurationPage {
                   }
                   .backgroundColor($r('app.color.container_background'))
                   .width('100%')
-                  .height(LIST_ITEM_HEIGHT)
+                 // .height(LIST_ITEM_HEIGHT)
                   .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                   .borderRadius(BORDER_RADIUS_20)
                   .hoverEffect(HoverEffect.Scale)
@@ -430,7 +435,7 @@ struct ConfigurationPage {
                   //   this.isShownConfigListCtxMenu = !this.isShownConfigListCtxMenu
                   //   hilog.info(0xC002, this.componentName, `#gesture#LongPressGesture:`)
                   // }))
-                })
+                  })
               }
               .width('100%')
               .height('100%')

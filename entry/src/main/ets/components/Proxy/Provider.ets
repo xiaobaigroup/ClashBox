@@ -1,6 +1,6 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import {  BORDER_RADIUS_20, CONTENT_END_OFFSET_150 } from "../../common/Constants"
-import { Nothing, theCustomDialog } from "../Common"
+import { cellularData, Nothing, theCustomDialog } from "../Common"
 import { convertTime } from "../../utils/TimeConvertUtil"
 import { ClashConfig, SubscriptionInfo } from 'proxy_core'
 import ClashViewModel from '../../entryability/ClashViewModel'
@@ -8,7 +8,7 @@ import { Provider } from "proxy_core"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { UIConfig } from "../../entryability/AppState"
 import { picker } from "@kit.CoreFileKit"
-import { customAnimationUtil } from "../../utils/Animation"
+import { customAnimationUtil, isON } from "../../utils/Animation"
 
 
 // 资源数据（假设）
@@ -65,7 +65,7 @@ export struct ProviderPage {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 临时数据
   @State
-  private resourceListData: Array<Provider> = [ ]
+  public  resourceListData: Array<Provider> = [ ]
   @Consume isProviderEdit: boolean
   //fl clash条目数量判定
   @State entriesNumber:number =0
@@ -185,42 +185,9 @@ export struct ProviderPage {
                               }
                             }
 
-                            Row(){
-                              if (item["subscription-info"]) {
-                                Text(`${SubscriptionInfo.GetUsed(item["subscription-info"]).toString()} / `)
-                                  .smallText()
-                              }else {
-                                Text($r('app.string.usd_cellular_data'))
-                                  .smallText()
-                              }
-                              if (item["subscription-info"]) {
-                                Text(`${SubscriptionInfo.GetTotal(item["subscription-info"]).toString()}`)
-                                  .smallText()
-                              }else {
-                                Text($r('app.string.total_cellular_data'))
-                                  .smallText()
-                              }
-                            }.padding({bottom:4})
+                            //流量使用情况+进度条组件
+                            cellularData(item)
 
-                            //
-                            Column() {
-                              Progress({
-                                value: SubscriptionInfo.GetUsed(item["subscription-info"])?.value ?? 0,
-                                total: SubscriptionInfo.GetTotal(item["subscription-info"])?.value ?? 1,
-                                type: ProgressType.Capsule
-                              })//value为使用流量的值
-                                .style({enableSmoothEffect: true,borderColor:'#00ffffff'})
-                                .color('#ff46b1e3')
-                                .width('100%')
-                                .height('100%')
-                            }
-                            .width('100%')
-                            .backgroundColor('#4d46b1e3')
-                            .height(6)
-                            .borderRadius(6)
-
-                            //       Text(item.path)
-                            //        .smallText()
                           }.height(87).textColumn()
 
                           Divider().strokeWidth(1).color($r('app.color.divider'))
@@ -279,7 +246,7 @@ export struct ProviderPage {
                                 this.isLoading = -1
                               })
                               animateTo({
-                                duration: this.uiConfig.animationSpeed,
+                                duration: this.isON.toggleAnim ?0:this.uiConfig.animationSpeed,
                                 curve: Curve.Friction,
                                 iterations: 1, // 设置-1表示动画无限循环
                               }, () => {
@@ -386,7 +353,7 @@ export struct ProviderPage {
                               })
                               // 建议使用this.getUIContext()?.animateTo()
                               animateTo({
-                                duration: this.uiConfig.animationSpeed,
+                                duration: this.isON.toggleAnim ?0:this.uiConfig.animationSpeed,
                                 curve: Curve.Friction,
                                 iterations: 1, // 设置-1表示动画无限循环
                               }, () => {
@@ -552,4 +519,3 @@ function listFlex() {
   .backgroundColor($r('app.color.container_background'))
   .borderRadius(BORDER_RADIUS_20)
 }
-

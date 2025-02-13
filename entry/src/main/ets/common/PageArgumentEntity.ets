@@ -1,4 +1,5 @@
 /* 存放组件之间传输的实体类、需要持久化的数据对象 */
+import { SubscriptionInfo } from "proxy_core"
 
 // TODO 之后根据这些数据整理成用户首选项
 export interface UserPreferences{
@@ -67,8 +68,6 @@ export interface ConfigData{
   copySourceConfigId?: string
   updateTime: number
 }
-
-
 
 
 /* 更多 */
