@@ -18,6 +18,8 @@ import { removeItemsByIndex } from "../../utils/RemoveItemsUtils"
 import { customVibrator } from "../../utils/VibratorUtil"
 import { customSound } from "../../utils/SoundPoolUtil"
 
+const context = getContext(this) as common.UIAbilityContext
+
 @Component
 struct About {
   // 实验功能提示框展示变量
@@ -97,24 +99,24 @@ struct About {
       case 'Telegram':
         // 跳转Telegram频道
         hilog.info(0xFF00, "AboutestTag", "Telegram")
-        this.implicitStartAbility('https://xxx')
+        implicitStartAbility('https://t.me/+ihe73JZWYb40NTY1', context)
 
       break
       case 'Discord':
         // 跳转Discord社区
         hilog.info(0xFF00, "AboutestTag", "Discord")
-        this.implicitStartAbility('https://xxx')
+        implicitStartAbility('https://discord.gg/mZarq2EQmm', context)
 
       break
       case 'Email':
         // 电子邮件
         hilog.info(0xFF00, "AboutestTag", "Email")
-
+        handleMailto('mailto:xfz347@gmail.com?subject=反馈&body=你的反馈内容...', context)
       break
       case 'Repositories':
         // 跳转仓库
         hilog.info(0xFF00, "AboutestTag", "仓库")
-        this.implicitStartAbility('https://gitee.com/DXHXYT/ark-c')
+        this.implicitStartAbility('https://github.com/xxx%%')
 
       break
       default :
@@ -429,8 +431,7 @@ export default About
 @Component
 export struct AboutContributors {
   /* 主题色 */
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State ContributorsList: ContributorsListItemProp[] = ContributorsList
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
@@ -439,64 +440,36 @@ export struct AboutContributors {
   @Consume('breakPointStateSettingslistHeight') private SettingslistHeight: BreakpointState<number>
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
 
-  // 隐式 Want 跳转网站
-  async implicitStartAbility(url: string) {
-    try {
-      let want: Want = {
-        // 如果希望仅在特定包中隐式查询，请取消下面的注释行
-        // bundleName: "com.example.myapplication",
-        "action": "ohos.want.action.viewData",
-        // entities可以省略
-        "entities": [ "entity.system.browsable" ],
-        "uri": url,
-      }
-      let context = getContext(this) as common.UIAbilityContext;
-      await context.startAbility(want)
-      console.info(`explicit start ability succeed`)
-    } catch (error) {
-      console.info(`explicit start ability failed with ${error.code}`)
-    }
-  }
-
-  // 拉起邮件类应用（mailto方式）
-  async handleMailto(address: string) {
-    let ctx = getContext(this) as common.UIAbilityContext;
-    ctx.startAbility({
-      action: 'ohos.want.action.sendToData',
-      uri: address
-    })
-  }
-
   handleClick(index: number) {
     switch (index) {
       case 0:
         // 小白
-        this.implicitStartAbility('https://github.com/likuai2010')
+        implicitStartAbility('https://github.com/likuai2010', context)
       break
       case 1:
         // 船长
-        this.handleMailto('mailto:feedback@example.com?subject=App Feedback&body=Please describe your feedback here...')
+        handleMailto('mailto:xfz347@gmail.com?subject=联系&body=你的内容...', context)
       break
       case 2:
         // 柯蓝KL
-        this.handleMailto('mailto:feedback@example.com?subject=App Feedback&body=Please describe your feedback here...')
+        implicitStartAbility('https://github.com/kelanKL', context)
       break
       case 3:
         // 恩临大帝
-        this.handleMailto('mailto:feedback@example.com?subject=App Feedback&body=Please describe your feedback here...')
+        handleMailto('mailto:ealion@outlook.com?subject=联系&body=你的内容...', context)
       break
       case 4:
         // crazypig321
-        this.implicitStartAbility('https://github.com/crazypig321')
+        implicitStartAbility('https://github.com/crazypig321', context)
       break
       case 5:
         // 小雅
-        this.implicitStartAbility('https://github.com/XHXYT')
+        implicitStartAbility('https://github.com/XHXYT', context)
       break
       case 6:
         // FlClash
-        this.implicitStartAbility('https://github.com/chen08209/FlClash')
-        break
+        implicitStartAbility('https://github.com/chen08209/FlClash', context)
+      break
     }
   }
 
@@ -552,7 +525,7 @@ export struct AboutContributors {
                       .height(26)
                       .onClick(() => {
                         // 柯蓝KL Telegram
-                        this.implicitStartAbility('https://xxxx')
+                        implicitStartAbility('https://xxxx', context)
                       })
                   }
                 }
@@ -711,4 +684,35 @@ export struct CheckUpdate {
       return true
     })
   }
+}
+
+/**
+ * 隐式 Want 跳转网站
+ */
+async function implicitStartAbility(url: string, context: common.UIAbilityContext) {
+  try {
+    let want: Want = {
+      // 如果希望仅在特定包中隐式查询，请取消下面的注释行
+      // bundleName: "com.example.myapplication",
+      "action": "ohos.want.action.viewData",
+      // entities可以省略
+      "entities": [ "entity.system.browsable" ],
+      "uri": url,
+    }
+    await context.startAbility(want)
+    console.info(`explicit start ability succeed`)
+  } catch (error) {
+    console.info(`explicit start ability failed with ${error.code}`)
+  }
+}
+
+/**
+ * 拉起邮件类应用（mailto方式）
+ */
+async function
+handleMailto(address: string, ctx: common.UIAbilityContext) {
+  ctx.startAbility({
+    action: 'ohos.want.action.sendToData',
+    uri: address
+  })
 }

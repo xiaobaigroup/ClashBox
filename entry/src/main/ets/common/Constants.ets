@@ -430,7 +430,7 @@ export const SettingsListItem = (): settingsData[] => {
   result = [
     new settingsData($r('sys.symbol.translate_c2e'), 'Language', $r('app.string.Language'), '', $r('app.string.Language_Subtitle'), false),
     new settingsData($r('sys.symbol.brush_fill'), 'Appearance', $r('app.string.Appearance'), $r('app.string.AppearanceSubtitle'), '', false),
-    new settingsData($r('sys.symbol.externaldrive_fill'), 'Backup', $r('app.string.Backup_Recovery'), '', '', false),
+    new settingsData($r('sys.symbol.externaldrive_fill'), 'Backup', $r('app.string.Backup_Recovery'), $r('app.string.backup_subtitle'), '', false),
     new settingsData($r('sys.symbol.ellipsis_message_fill'), 'Notice', $r('app.string.Notice'), $r('app.string.subtitle'), '', false),
     new settingsData($r('sys.symbol.checkmark_square_on_square_fill'), 'Backgrounder', $r('app.string.Backgrounder'), $r('app.string.BackgrounderSubtitle'), '', false),
     new settingsData($r('sys.symbol.satellite_map_fill'), 'Kernel', $r('app.string.kernel'), $r('app.string.kernel_subtitle'), '', false),
@@ -621,7 +621,7 @@ export interface ContributorsListItemProp {
 export const ContributorsList: ContributorsListItemProp[] = [
   { title: '小白', subtitle: $r('app.string.XiaoBai_Subtitle'), contact: 'Github', image: $rawfile('XiaoBai.png')},
   { title: '船长', subtitle: $r('app.string.ChuanZhang_Subtitle'), contact: $r('app.string.Email'), image: $rawfile('chuanzhang.png')},
-  { title: '柯蓝KL', subtitle: $r('app.string.KL_Subtitle'), contact: $r('app.string.Email'), contact2: 'Telegram', image: $rawfile('kl.png')},
+  { title: '柯蓝KL', subtitle: $r('app.string.KL_Subtitle'), contact: 'Github', contact2: 'Telegram', image: $rawfile('kl.png')},
   { title: '恩临大帝', subtitle: $r('app.string.FrondEnd_Development'), contact: $r('app.string.Email'), image: $rawfile('enlin.png')},
   { title: 'crazypig321', subtitle: $r('app.string.FrondEnd_Development'), contact: 'Github', image: $rawfile('crazypig321.png')},
   { title: '小雅', subtitle: $r('app.string.FrondEnd_Development'), contact: 'Github', image: $rawfile('ya.png')},
