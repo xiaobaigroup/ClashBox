@@ -202,6 +202,7 @@ export struct ImportConfigFromURL{
       if( this.configAddPageInfos.getParamByName(RouteName.IMPORT_CONFIG_FROM_URL).length > 0 && this.configAddPageInfos.getParamByName(RouteName.IMPORT_CONFIG_FROM_URL)[0] !== null ) {
         try {
           this.configData = (JSON.parse(paramJsonStr) as Array<ConfigData>)[0]
+
         } catch (e) {
           let error = e as BusinessError;
           hilog.error(0xCA11, this.componentName, `#aboutToAppear#JSON.parse(paramJsonStr) as ConfigData#ERROR: code is [${error.code}],message is [${error.message}]`)
@@ -235,6 +236,7 @@ export struct ImportConfigFromURL{
       try {
         await ClashViewModel.addOrUpdateProfileByUrl(this.configData, null)
         this.configCustomDownloadingDialogController.close()
+        this.promptAction.showToast({message: getResourceString($r('app.string.download_success'), this)})
       } catch (e) {
         console.error("ClashNext", e.message, e.stack);
         this.configCustomDownloadingDialogController.close()
@@ -247,6 +249,7 @@ export struct ImportConfigFromURL{
       try {
         await ClashViewModel.addOrUpdateProfileByUrl(this.configData, this.configData.configId)
         this.configCustomDownloadingDialogController.close()
+        this.promptAction.showToast({message: getResourceString($r('app.string.update_success'), this)})
       } catch (e) {
         console.error("ClashNext", e.message, e.stack);
         this.configCustomDownloadingDialogController.close()

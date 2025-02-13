@@ -1,10 +1,13 @@
 import { BreakpointState } from '../../common/breakpointsystem'
-import { mediaquery } from '@kit.ArkUI'
+import { mediaquery, PromptAction } from '@kit.ArkUI'
 import { MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
 import { AppConfig, isEnd, UIConfig } from '../../entryability/AppState'
 import { customVibrator } from '../../utils/VibratorUtil'
 import { customAnimationUtil } from '../../utils/Animation'
+import ClashViewModel from '../../entryability/ClashViewModel'
+import { EventHub, EventKey } from '../../common/EventHub'
+import { getResourceString } from '../../utils/ResourceStringUtil'
 
 
 @Component
@@ -36,6 +39,7 @@ struct FavoriteConfiguration {
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  private promptAction:PromptAction = this.getUIContext()?.getPromptAction()
 
   build() {
     Column() {
@@ -61,6 +65,11 @@ struct FavoriteConfiguration {
                   //在home页编辑状态时，无法操作
                   if (this.isShowHomeEdit===false && isChecked) {
                     this.appConfig.currentProfileId = f[0]
+                    EventHub.sendEvent(EventKey.LoadClashConfig)
+                    EventHub.on(EventKey.LoadClashConfig, async () => {
+                      await ClashViewModel.loadConfig(); // 假设loadConfig返回一个Promise
+                      this.promptAction.showToast({message: getResourceString($r('app.string.load_success'), this)})
+                    });
                     if (this.uiConfig.isVibrate) {
                       customVibrator.vibratorTriggerOfHapticClockTimer()
                     }
@@ -70,6 +79,11 @@ struct FavoriteConfiguration {
             .onClick(() => {
               if (this.isShowHomeEdit===false) {
                 this.appConfig.currentProfileId = f[0]
+                EventHub.sendEvent(EventKey.LoadClashConfig)
+                EventHub.on(EventKey.LoadClashConfig, async () => {
+                  await ClashViewModel.loadConfig(); // 假设loadConfig返回一个Promise
+                  this.promptAction.showToast({message: getResourceString($r('app.string.load_success'), this)})
+                });
                 if (this.uiConfig.isVibrate) {
                   customVibrator.vibratorTriggerOfHapticClockTimer()
                 }

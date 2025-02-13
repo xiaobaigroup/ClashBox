@@ -44,7 +44,9 @@ struct About {
 
   onClickCount() {
     //振动触发
-    customVibrator.vibratorTriggerOfHapticClockTimer()
+    if (this.uiConfig.isVibrate) {
+      customVibrator.vibratorTriggerOfHapticClockTimer()
+    }
     hilog.info(0xFF00, "AboutClickTag", "点击次数: %{public}d", this.clickCount)
     if(this.uiConfig.enabledADvanced) {
       promptAction.showToast({message: '已处于高级模式' /*$r('app.string.click_prompt')*/, duration: 2000 })

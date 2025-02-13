@@ -247,7 +247,7 @@ export struct ArrayConfigEditor {
         Column() {
           Blank().height(TAB_CONTENT_TITLE_HEIGHT + 6)
           Scroll() {
-            List() {
+            List({ space: this.listBottom.value }) {
               ForEach(this.ArrayConfigList, (item: KeyValueData, index: number) => {
                 // 数据列表行
                 ListItem() {
@@ -284,7 +284,6 @@ export struct ArrayConfigEditor {
 
                 }
                 .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
-                .margin({ bottom: this.listBottom.value })
                 .onClick(() => {
                   // 启用背景模糊
                   this.isEnableIndexForegroundBlur = true
@@ -304,6 +303,7 @@ export struct ArrayConfigEditor {
               })
 
             }
+           // .margin({ bottom: this.listBottom.value })
             .height('100%')
             .width('100%')
             .contentEndOffset(CONTENT_END_OFFSET_150 - 40)

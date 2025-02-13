@@ -4,9 +4,10 @@ import { MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
 import { ProxyItem } from '../../common/ProxyData'
 import { AppConfig, AppState, isEnd, UIConfig } from '../../entryability/AppState'
-import { ProxyGroup } from 'proxy_core'
+import { Profile, ProxyGroup } from 'proxy_core'
 import { customVibrator } from '../../utils/VibratorUtil'
 import { customAnimationUtil } from '../../utils/Animation'
+import ClashViewModel from '../../entryability/ClashViewModel'
 
 
 @Component
@@ -45,16 +46,15 @@ struct FavoriteProxy {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageProp("proxyGroups") proxyGroups: ProxyGroup[] = []
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  OnProxyChange: ((item: ProxyItem) => void) = () => {
+  @Consume('currentProfile')
+  private currentProfile: Profile | null
 
-  }
-
-  selectProxy(item: ProxyItem){
-    if (!this.disabled){
-      this.appConfig.currentProxyItem = item
-      this.OnProxyChange(item)
+  changeProxy(g: string, item: ProxyItem){
+    if(this.currentProfile){
+      ClashViewModel.changeProxy(this.currentProfile, g, item.name)
     }
   }
+
 
   build() {
     Column() {
@@ -84,6 +84,8 @@ struct FavoriteProxy {
                     if (this.uiConfig.isVibrate) {
                       customVibrator.vibratorTriggerOfHapticClockTimer()
                     }
+                    //对应切换代理页节点
+                    this.changeProxy(p[0],this.appConfig.currentProxyItem)
                   }
                 })
             }
@@ -92,6 +94,8 @@ struct FavoriteProxy {
               if (this.isShowHomeEdit===false) {
                 this.appConfig.currentProxyName = p[1]
                 this.appConfig.currentProxyItem = AppState.fetchProxyItem(this.proxyGroups, p[0], p[1])
+                //对应切换代理页节点
+                this.changeProxy(p[0],this.appConfig.currentProxyItem)
                 if (this.uiConfig.isVibrate) {
                   customVibrator.vibratorTriggerOfHapticClockTimer()
                 }

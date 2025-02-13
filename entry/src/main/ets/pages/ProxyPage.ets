@@ -3,6 +3,7 @@ import {
   TAB_CONTENT_TITLE_HEIGHT,
   BIND_SHEET_CONTAINER_HEIGHT,
   TAB_CONTENT_TITLE_FONT_SIZE,
+  BORDER_RADIUS_20,
 } from '../common/Constants'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import ProxyGroupItem from '../components/Proxy/ProxyGroupItem'
@@ -181,8 +182,6 @@ struct ProxyPage {
           }
           .EditRow()
           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-          //    .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
-          //       .combine(TransitionEffect.SLIDE):null)
           // 点击后改变ProxyArrangementSelected状态为 标签
           .onClick(() => {
             animateTo({ duration: this.uiConfig.animationSpeed }, () => {
@@ -224,7 +223,6 @@ struct ProxyPage {
               })
               .radioStyle({
                 checkedBackgroundColor: this.icon_emphasize,
-                //   uncheckedBorderColor: this.icon_secondary
               })
           }
           .EditRow()
@@ -242,9 +240,6 @@ struct ProxyPage {
       }
       .height(142)
       .EditColumn()
-
-      //    .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
-      //     .combine(TransitionEffect.SLIDE):null)
 
       //代理节点卡片尺寸切换
       EditTitle({ title: $r('app.string.Card_Size') })
@@ -291,9 +286,6 @@ struct ProxyPage {
       }
       .height(142)
       .EditColumn()
-
-      //    .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
-      //      .combine(TransitionEffect.SLIDE):null)
 
     }
     .padding({
