@@ -28,6 +28,13 @@ export class ProfileRepo {
     predicates.equalTo('id', uuid);
     await this.store!.delete(predicates);
   }
+  async ClearAll(){
+    const list = await this.queryAll()
+    for (let d of list) {
+      this.delete(d.id)
+      await d.delete()
+    }
+  }
   async query(uuid: string | undefined) {
     if(uuid == undefined)
       return null

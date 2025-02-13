@@ -149,6 +149,8 @@ export class AppState {
     AppStorage.set("favoriteProxys", new Map<string, string>([]))
     AppStorage.set("uiConfig",  new UIConfig())
     AppStorage.set("appFlowingState", new AppFlowingState())
+    AppStorage.set("proxyGroups", [])
+    ClashViewModel.profileRepo.ClearAll()
     // TODO 还原其他配置
   }
 

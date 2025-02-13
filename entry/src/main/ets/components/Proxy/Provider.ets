@@ -186,7 +186,7 @@ export struct ProviderPage {
                             }
 
                             //流量使用情况+进度条组件
-                            cellularData(item)
+                            cellularData(item["subscription-info"])
 
                           }.height(87).textColumn()
 

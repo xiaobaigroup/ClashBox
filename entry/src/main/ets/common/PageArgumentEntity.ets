@@ -67,6 +67,7 @@ export interface ConfigData{
   // 如果是副本配置，对应源配置id
   copySourceConfigId?: string
   updateTime: number
+  subscriptionInfo?: SubscriptionInfo
 }
 
 

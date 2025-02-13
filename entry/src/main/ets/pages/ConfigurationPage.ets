@@ -29,7 +29,7 @@ import { EventHub, EventKey } from '../common/EventHub'
 import { getResourceString } from '../utils/ResourceStringUtil'
 import { convertTime } from '../utils/TimeConvertUtil'
 import { customAnimationUtil, isON } from '../utils/Animation'
-import { Profile } from 'proxy_core'
+import { Profile, SubscriptionInfo } from 'proxy_core'
 import { Provider } from "proxy_core"
 
 /**
@@ -372,7 +372,9 @@ struct ConfigurationPage {
                         }
 
                         //TODO 此处公共流量使用进度条组件this.p需要一个p: Provider，但不知道该怎么用，一直失败闪退
-                        //  cellularData(this.p) //解决后可删掉此行最前面注释
+                        if (item.subscriptionInfo){
+                          cellularData(item.subscriptionInfo) //解决后可删掉此行最前面注释
+                        }
 
                         //  Text(item.createdDate)
                       }.alignItems(HorizontalAlign.Start).width('85%').padding({top:10,bottom:10})
@@ -573,7 +575,8 @@ struct ConfigurationPage {
         configUrl: d.url,
         isConfigAutoUpdate: d.autoUpdate,
         configAutoUpdateTimeGapValue: d.autoUpdateDuration,
-        lastUpdateDateTime: d.lastUpdateDate
+        lastUpdateDateTime: d.lastUpdateDate,
+        subscriptionInfo: d.subscriptionInfo
       } as ConfigData
     })
   }

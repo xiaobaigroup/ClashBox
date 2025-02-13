@@ -922,17 +922,17 @@ export struct menuRowList {
 }
 
 //共用使用流量/总流量+进度条组件
-@Builder export function cellularData(item:Provider) {
+@Builder export function cellularData(info: SubscriptionInfo) {
   Row() {
-    if (item["subscription-info"]) {
-      Text(`${SubscriptionInfo.GetUsed(item["subscription-info"]).toString()} / `)
+    if (info) {
+      Text(`${SubscriptionInfo.GetUsed(info).toString()} / `)
         .smallText()
     } else {
       Text($r('app.string.usd_cellular_data'))
         .smallText()
     }
-    if (item["subscription-info"]) {
-      Text(`${SubscriptionInfo.GetTotal(item["subscription-info"]).toString()}`)
+    if (info) {
+      Text(`${SubscriptionInfo.GetTotal(info).toString()}`)
         .smallText()
     } else {
       Text($r('app.string.total_cellular_data'))
@@ -943,8 +943,8 @@ export struct menuRowList {
   //
   Column() {
     Progress({
-      value: SubscriptionInfo.GetUsed(item["subscription-info"])?.show ?? 0,
-      total: SubscriptionInfo.GetTotal(item["subscription-info"])?.show ?? 1,
+      value: SubscriptionInfo.GetUsed(info)?.show ?? 0,
+      total: SubscriptionInfo.GetTotal(info)?.show ?? 1,
       type: ProgressType.Capsule
     })//value为使用流量的值
       .style({ enableSmoothEffect: true, borderColor: '#00ffffff' })
