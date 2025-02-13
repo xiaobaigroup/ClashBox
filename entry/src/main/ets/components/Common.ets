@@ -923,7 +923,7 @@ export struct menuRowList {
 
 //共用使用流量/总流量+进度条组件
 @Builder export function cellularData(info: SubscriptionInfo) {
-  if(info?.total > 0){
+ // if(info?.total > 0){
     Row() {
       if (info) {
         Text(`${SubscriptionInfo.GetUsed(info).toString()} / `)
@@ -957,7 +957,7 @@ export struct menuRowList {
     .backgroundColor('#4d46b1e3')
     .height(6)
     .borderRadius(6)
-  }
+ // }
 }
 //副文本样式
 @Extend(Text)

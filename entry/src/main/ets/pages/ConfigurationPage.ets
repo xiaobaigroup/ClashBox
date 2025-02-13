@@ -91,7 +91,7 @@ struct ConfigurationPage {
   @Consume curYOffset: number
   //loading动画
   @State isLoading : boolean = false
-  @Prop p: Provider
+
 
   /* 配置列表List相关 */
   // 当前单选框选择的配置 TODO 待接入用户首选项，先写死 configName，单选框控制现在只用到configName所以先不给值
@@ -371,9 +371,9 @@ struct ConfigurationPage {
                             .fontColor($r('sys.color.font_secondary')).fontSize(12).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
                         }
 
-                        //TODO 此处公共流量使用进度条组件this.p需要一个p: Provider，但不知道该怎么用，一直失败闪退
+                        //共用使用流量/总流量+进度条组件
                         if (item.subscriptionInfo){
-                          cellularData(item.subscriptionInfo) //解决后可删掉此行最前面注释
+                          cellularData(item.subscriptionInfo)
                         }
 
                         //  Text(item.createdDate)

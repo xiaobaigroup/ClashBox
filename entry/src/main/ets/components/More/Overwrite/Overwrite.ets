@@ -96,15 +96,11 @@ struct Overwrite {
   build() {
     NavDestination() {
       Stack() {
-        /*    MoreTop({
+            MoreTop({
               title: $r('app.string.Overwrite'),
               searchButton: this.overwriteSearch,
               otherButton: this.overwriteOther
-            })*/
-        OverwriteTop({
-          title: $r('app.string.Overwrite'),
-          subtitle: ''
-        })
+            })
 
         Column() {
           Blank().height(TAB_CONTENT_TITLE_HEIGHT + 6)
