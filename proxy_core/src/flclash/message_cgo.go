@@ -16,6 +16,7 @@ func SendMessage(message Message) {
 	if err != nil {
 		return
 	}
+
 	if handler, ok := messageHandlers[message.Type]; ok {
 		handler(s)
 	} else {

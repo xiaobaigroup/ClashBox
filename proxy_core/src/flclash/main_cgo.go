@@ -14,6 +14,7 @@ import (
 	"github.com/likuai2010/ohos-napi/js"
 	"github.com/metacubex/mihomo/dns"
 	"github.com/metacubex/mihomo/log"
+	"github.com/metacubex/mihomo/tunnel/statistic"
 )
 
 func initClash(env js.Env, this js.Value, args []js.Value) any {
@@ -62,7 +63,6 @@ func getProxies(env js.Env, this js.Value, args []js.Value) any {
 func changeProxy(env js.Env, this js.Value, args []js.Value) any {
 	paramsString, _ := napi.GetValueStringUtf8(env.Env, args[0].Value)
 	promise := env.NewPromise()
-	fmt.Println("changeProxy", paramsString)
 	handleChangeProxy(paramsString, func(value string) {
 		promise.Resolve(value)
 	})
@@ -210,10 +210,20 @@ func setFdMap(env js.Env, this js.Value, args []js.Value) any {
 	}()
 	return nil
 }
-var messageTsfn : Tsfn 
+
+var messageHandlers = map[string]js.TsFunc{}
+
 func registerMessage(env js.Env, this js.Value, args []js.Value) any {
-	tsfn := env.CreateThreadsafeFunction(args[0], "messageTsfn")
+	messageHandlers["messageTsfn"] = env.CreateThreadsafeFunction(args[0], "messageTsfn")
 	return nil
+}
+func getRequestList(env js.Env, this js.Value, args []js.Value) any {
+	json, _ := json.Marshal(reqeustList)
+	return env.ValueOf(string(json))
+}
+func clearRequestList(env js.Env, this js.Value, args []js.Value) any {
+	reqeustList = []statistic.Tracker{}
+	return env.ValueOf("")
 }
 func init() {
 	entry.Export("initClash", js.AsCallback(initClash))
@@ -244,27 +254,27 @@ func init() {
 	entry.Export("startLog", js.AsCallback(startLog))
 	entry.Export("stopLog", js.AsCallback(stopLog))
 	entry.Export("registerMessage", js.AsCallback(registerMessage))
+	entry.Export("getRequestList", js.AsCallback(getRequestList))
+	entry.Export("clearRequestList", js.AsCallback(clearRequestList))
+
 	entry.Export("getCountryCode", js.AsCallback(getCountryCode))
 	entry.Export("getMemory", js.AsCallback(getMemory))
 
+}
 
-	adapter.UrlTestHook = func(url string, name string, delay uint16) {
-		delayData := &Delay{
-			Name: name,
-		}
-		if delay == 0 {
-			delayData.Value = -1
-		} else {
-			delayData.Value = int32(delay)
-		}
-		messageTsFn.Call(env.ValueOf("DelayMessage"), env.ValueOf(delayData))
+func sendMessage(message Message) {
+	res, err := message.Json()
+	if err != nil {
+		return
 	}
-	statistic.DefaultRequestNotify = func(c statistic.Tracker) {
-		messageTsFn.Call(env.ValueOf("RequestMessage"), env.ValueOf(c))
-	}
-	executor.DefaultProviderLoadedHook = func(providerName string) {
-		messageTsFn.Call(env.ValueOf("LoadedMessage"), env.ValueOf(providerName))
+	runLock.Lock()
+	defer runLock.Unlock()
+	if handler, ok := messageHandlers["messageTsfn"]; ok {
+		key := handler.Env.ValueOf("")
+		value := handler.Env.ValueOf(res)
+		handler.Call(key, value)
 	}
 }
+
 func main() {
 }

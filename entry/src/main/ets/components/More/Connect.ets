@@ -10,18 +10,30 @@ import ClashViewModel from "../../entryability/ClashViewModel"
 import { ConnectionInfo, Metadata } from "proxy_core"
 import { customAnimationUtil } from "../../utils/Animation"
 
-// 资源数据（假设）
-interface ConnectData {
-  // 配置名
-  connectConfigName: string
-  // 代理名
-  connectProxyName: string
-  // 请求时间(展示的时间)
-  connectTime: number
-  // 请求链接
-  connectUrl: string
-  // 请求标识（0：直连；1：代理）
-  connectSign: number
+
+export function  getRequestText(metadata: Metadata ) {
+  let text = `${metadata.network}://`;
+  const ips = [
+    metadata.host,
+    metadata.destinationIP,
+  ].filter((ip: string) => ip && ip !== "");
+  text += ips.join("/");
+  text += `:${metadata.destinationPort}`;
+  return text;
+}
+export function getSourceText( connection: ConnectionInfo) {
+  const  metadata = connection.metadata;
+  if (metadata.process != "") {
+    return connection.start;
+  }
+  return `${connection.start}`;
+}
+export function  getTheSourceText( connection: ConnectionInfo) {
+  const  metadata = connection.metadata;
+  if (metadata.process != "") {
+    return connection.start;
+  }
+  return `${metadata.process}`;
 }
 
 @Component
@@ -67,30 +79,7 @@ struct Connect {
   async getPackageIcon(connection: ConnectionInfo)  {
     return connection.metadata.process;
   }
-  getRequestText(metadata: Metadata ) {
-    let text = `${metadata.network}://`;
-      const ips = [
-        metadata.host,
-        metadata.destinationIP,
-      ].filter((ip: string) => ip && ip !== "");
-      text += ips.join("/");
-      text += `:${metadata.destinationPort}`;
-      return text;
-  }
-  getSourceText( connection: ConnectionInfo) {
-      const  metadata = connection.metadata;
-      if (metadata.process != "") {
-        return connection.start;
-      }
-    return `${connection.start}`;
-  }
-  getTheSourceText( connection: ConnectionInfo) {
-    const  metadata = connection.metadata;
-    if (metadata.process != "") {
-      return connection.start;
-    }
-    return `${metadata.process}`;
-  }
+
 
   build() {
     NavDestination() {
@@ -114,7 +103,7 @@ struct Connect {
                     Row() {
                       // 文本显示区
                       Column() {
-                        Text(this.getRequestText(item.metadata))
+                        Text(getRequestText(item.metadata))
                           .fontWeight(FontWeight.Bold)
                           .margin({ bottom: 2 })
                           .fontSize(17)
@@ -128,11 +117,11 @@ struct Connect {
                             Text(c)
                               .smallText()
                           })
-                          Text(this.getTheSourceText(item).toString())
+                          Text(getTheSourceText(item).toString())
                             .smallText()
                           Text('·')
                             .smallText()
-                          Text(timestampToDateTime(this.getSourceText(item)))
+                          Text(timestampToDateTime(getSourceText(item)))
                             .smallText()
                         }
                       }

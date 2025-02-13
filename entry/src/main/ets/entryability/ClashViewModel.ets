@@ -172,8 +172,14 @@ export class ClashViewModel {
   async closeConnection(id:string){
     return await this.socketProxy.closeConnection(id)
   }
-  async  clearConnections(){
+  async clearConnections(){
     return await this.socketProxy.clearConnections()
+  }
+  async getRequestList(){
+    return await this.socketProxy.getRequestList()
+  }
+  async clearRequestList(){
+    return await this.socketProxy.clearRequestList()
   }
   async getProxyGroups(model: ProxyMode): Promise<ProxyGroup[]>{
     console.log("FetchProxyGroup", model)
@@ -206,6 +212,11 @@ export class ClashViewModel {
       await vpnExtension.startVpnExtensionAbility(vpnWant);
       //
       await sleep(500)
+
+      // Bug
+      // this.socketProxy.registerMessage(()=>{
+      //
+      // })
     } catch (e) {
       // TODO 用户点取消
       // 是否退出程序

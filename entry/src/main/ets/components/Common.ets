@@ -923,7 +923,7 @@ export struct menuRowList {
 
 //共用使用流量/总流量+进度条组件
 @Builder export function cellularData(info: SubscriptionInfo) {
-  if(info?.total > 0){
+  if(SubscriptionInfo.GetTotal(info)?.value > 0){
     Row() {
       if (info) {
         Text(`${SubscriptionInfo.GetUsed(info).toString()} / `)

@@ -15,7 +15,10 @@ import {
   getConnections,
   closeConnections,
   closeConnection,
-  validateConfig
+  validateConfig,
+  registerMessage,
+  getRequestList,
+  clearRequestList
 } from 'libflclash.so';
 import { Address, CommonVpnService, isIpv4, isIpv6, VpnConfig } from './CommonVpnService';
 import { JSON, util } from '@kit.ArkTS';
@@ -75,6 +78,15 @@ export class FlClashVpnService extends CommonVpnService{
           }
         }
       })
+    } else if(code == ClashRpcType.registerOnMessage){
+        registerMessage((message: string, value: string)=>{
+          if (typeof value == "string"){
+            console.log("onMessage", value);
+            this.sendClient(client, value)
+          }else{
+            console.log("onMessage", "undefined");
+          }
+        })
     } else {
       try {
         let result = await this.onRemoteMessage(code, params)
@@ -135,7 +147,15 @@ export class FlClashVpnService extends CommonVpnService{
           resolve(JSON.stringify(groupsRaw))
           break;
         }
-
+        case ClashRpcType.getRequestList: {
+          resolve(getRequestList())
+          break;
+        }
+        case ClashRpcType.clearRequestList: {
+          clearRequestList()
+          resolve(true)
+          break;
+        }
         case ClashRpcType.changeProxy:{
           resolve(changeProxy(JSON.stringify({
             "group-name": data[0] as string,

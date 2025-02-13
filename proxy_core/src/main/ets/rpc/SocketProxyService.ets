@@ -18,11 +18,14 @@ export class SocketProxyService implements IClashManager{
     this.context = context
   }
   async setLogObserver(observer: (message: LogInfo) => void): Promise<()=>void> {
-    return this.callbackRequest(ClashRpcType.setLogObserver, [], observer)
+    return this.callbackRequest(ClashRpcType.setLogObserver, [], (message)=>{
+        observer(JSON.parse(message) as LogInfo)
+    })
   }
-
+  async registerMessage(observer: (message: string) => void): Promise<()=>void> {
+    return this.callbackRequest(ClashRpcType.registerOnMessage, [], observer)
+  }
   async loadConfig(config: UpdateConfigParams): Promise<string> {
-    console.debug("loadConfig", JSON.stringify(config))
     let result =  await this.sendMessageRequest(ClashRpcType.load, [JSON.stringify(config)])
     return result as string
   }
@@ -35,6 +38,7 @@ export class SocketProxyService implements IClashManager{
     const json = JSON.parse(result as string) as Traffic
     return new Traffic(json.upRaw ?? 1024, json.downRaw ?? 1024);
   }
+
   async checkIpInfo(): Promise<IpInfo> {
     let result = await checkIp()
     let country = await this.sendMessageRequest(ClashRpcType.getCountryCode, [result])
@@ -49,6 +53,14 @@ export class SocketProxyService implements IClashManager{
     let result = await this.sendMessageRequest(ClashRpcType.queryConnections)
     const json = JSON.parse(result as string) as ConnectionInfo[]
     return json;
+  }
+  async getRequestList(): Promise<ConnectionInfo[]>{
+    let result = await this.sendMessageRequest(ClashRpcType.getRequestList)
+    return JSON.parse(result as string) as ConnectionInfo[]
+  }
+  async  clearRequestList(): Promise<boolean>{
+    let result = await this.sendMessageRequest(ClashRpcType.clearRequestList)
+    return true
   }
   async closeConnection(id: string): Promise<string> {
     let result = await this.sendMessageRequest(ClashRpcType.closeConnection, [id])
@@ -154,18 +166,14 @@ export class SocketProxyService implements IClashManager{
   async callbackRequest(
     method: number,
     params: (string | number | boolean) [] = [],
-    callBack: (message: LogInfo) => void
+    callBack: (message: string) => void
   ): Promise<() => void> {
     return new Promise(async (resolve, reject)=>{
       let tcp: socket.LocalSocket = socket.constructLocalSocketInstance();
       tcp.on('message', (value: socket.LocalSocketMessageInfo) => {
         let text = new util.TextDecoder()
         let dd = text.decodeToString(new Uint8Array(value.message))
-        try {
-          callBack(JSON.parse(dd) as LogInfo)
-        } catch (e) {
-          console.log("socketProxy error", e, dd)
-        }
+        callBack(dd)
       })
       tcp.on('error', (e: Error) => {
         console.log("socketProxy error", e.message)

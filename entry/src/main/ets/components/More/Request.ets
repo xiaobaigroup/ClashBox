@@ -2,11 +2,14 @@ import { BreakpointState } from "../../common/breakpointsystem"
 import { BORDER_RADIUS_20, CONTENT_END_OFFSET_150, TAB_CONTENT_TITLE_HEIGHT } from "../../common/Constants"
 import { MoreTop } from "./MoreTopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
-import { convertTime } from "../../utils/TimeConvertUtil"
+import { convertTime, timestampToDateTime } from "../../utils/TimeConvertUtil"
 import { Nothing } from "../Common"
 import { UIConfig } from "../../entryability/AppState"
 import { curves } from "@kit.ArkUI"
 import { customAnimationUtil } from "../../utils/Animation"
+import ClashViewModel from "../../entryability/ClashViewModel"
+import { ConnectionInfo } from "proxy_core"
+import { getRequestText, getSourceText, getTheSourceText } from "./Connect"
 
 // 资源数据（假设）
 interface RequestData {
@@ -36,29 +39,12 @@ struct RequestPage {
   @Consume curYOffset: number
   // 临时数据
   @State
-  private requestListData: Array<RequestData> = [
-    {
-      requestConfigName: '',
-      requestProxyName: '',
-      requestTime: 1736990325781,
-      requestUrl: 'tcp://upadte.huawei.com:443',
-      requestSign: 0
-    },
-    {
-      requestConfigName: '配置1',
-      requestProxyName: '中国香港①',
-      requestTime: 1736996575781,
-      requestUrl: 'tcp://google.com:443',
-      requestSign: 1
-    },
-    {
-      requestConfigName: '配置名',
-      requestProxyName: '代理名',
-      requestTime: 1736990425781,
-      requestUrl: '链接',
-      requestSign: 1
-    },
+  private requestListData: ConnectionInfo[] = [
   ]
+  async aboutToAppear(): Promise<void> {
+      // TODO  ClashViewModel.clearRequestList()
+      this.requestListData = await ClashViewModel.getRequestList()
+  }
   @Builder
   requestOther() {
   }
@@ -82,29 +68,30 @@ struct RequestPage {
           } else {
             Scroll() {
               List({ space: 10 }) {
-                ForEach(this.requestListData, (item: RequestData, index: number) => {
+                ForEach(this.requestListData, (item: ConnectionInfo, index: number) => {
                   ListItem() {
                     Row() {
-                      // 文本显示区
                       Column() {
-                        Text(item.requestUrl)
+                        Text(getRequestText(item.metadata))
                           .fontWeight(FontWeight.Bold)
                           .margin({ bottom: 2 })
                           .fontSize(17)
-                        Row({ space: 2 }) {
-                          Text(item.requestSign === 0 ? $r('app.string.Direct') : item.requestConfigName)
+                        Flex({
+                          alignContent: FlexAlign.Start,
+                          direction: FlexDirection.Row,
+                          wrap: FlexWrap.Wrap,
+                        }) {
+                          ForEach(item.chains, (c: string) => {
+                            Text(c)
+                              .smallText()
+                          })
+                          Text(getTheSourceText(item).toString())
                             .smallText()
                           Text('·')
                             .smallText()
-                          if (item.requestSign === 1) {
-                            Text(item.requestProxyName)
-                              .smallText()
-                            Text('·')
-                              .smallText()
-                          }
-                          Text(convertTime(item.requestTime))
+                          Text(timestampToDateTime(getSourceText(item)))
                             .smallText()
-                        }.justifyContent(FlexAlign.Start)
+                        }
                       }
                       .alignItems(HorizontalAlign.Start)
                       .layoutWeight(1)

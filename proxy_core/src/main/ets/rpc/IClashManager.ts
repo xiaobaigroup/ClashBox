@@ -27,6 +27,9 @@ export enum ClashRpcType{
   reset,
   getCountryCode,
   updateGeoData,
+  registerOnMessage,
+  getRequestList,
+  clearRequestList
 }
 
 export interface IClashManager {
