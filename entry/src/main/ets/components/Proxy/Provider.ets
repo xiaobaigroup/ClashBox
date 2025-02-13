@@ -204,7 +204,7 @@ export struct ProviderPage {
                               }
                             }.ButtonStyle()
                             .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                            .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
+                           // .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
                             .width(76)
                             .height(28)
                             .onClick(() => {
@@ -237,7 +237,7 @@ export struct ProviderPage {
                               }
                             }.ButtonStyle()
                             .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                            .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
+                            //.animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
                             .onClick(() => {
                               // 资源更新处理
                               ClashViewModel.updateProvider(item).then((result) => {
@@ -246,7 +246,8 @@ export struct ProviderPage {
                                 this.isLoading = -1
                               })
                               animateTo({
-                                duration: this.isON.toggleAnim ?0:this.uiConfig.animationSpeed,
+                              //  duration: this.isON.toggleAnim ?0:this.uiConfig.animationSpeed,
+                                duration: this.uiConfig.animationSpeed,
                                 curve: Curve.Friction,
                                 iterations: 1, // 设置-1表示动画无限循环
                               }, () => {
@@ -310,7 +311,7 @@ export struct ProviderPage {
                               }
                             }.ButtonStyle()
                             .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                            .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
+                        //    .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
                             .width(76)
                             .height(28)
                             .onClick(() => {
@@ -343,7 +344,7 @@ export struct ProviderPage {
                               }
                             }.ButtonStyle()
                             .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                            .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
+                         //   .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
                             .onClick(() => {
                               // 资源更新处理
                               ClashViewModel.updateProvider(item).then((result) => {
@@ -353,7 +354,8 @@ export struct ProviderPage {
                               })
                               // 建议使用this.getUIContext()?.animateTo()
                               animateTo({
-                                duration: this.isON.toggleAnim ?0:this.uiConfig.animationSpeed,
+                               // duration: this.isON.toggleAnim ?0:this.uiConfig.animationSpeed,
+                                duration: this.uiConfig.animationSpeed,
                                 curve: Curve.Friction,
                                 iterations: 1, // 设置-1表示动画无限循环
                               }, () => {
@@ -413,7 +415,8 @@ export struct ProviderPage {
         .onClick(() => {
           this.isON.toggleAnim=true
           animateTo({
-            duration: this.isON.toggleAnim ?0:this.uiConfig.animationSpeed,
+         //   duration: this.isON.toggleAnim ?0:this.uiConfig.animationSpeed,
+            duration: this.uiConfig.animationSpeed,
             curve: Curve.Friction,
             iterations: 1, // 设置-1表示动画无限循环
           }, () => {
