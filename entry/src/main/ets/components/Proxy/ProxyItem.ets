@@ -80,9 +80,10 @@ export struct ProxyNode {
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
             })
-            .onClick(() => {
-              this.selectProxy?.(this.item)
-            })
+      //      .onClick(() => {
+      //        this.selectProxy?.(this.item)
+       //     })
+            .hitTestBehavior(HitTestMode.None)
         }
       }.width('100%')
       .padding({left:14,right:16})
@@ -107,9 +108,10 @@ export struct ProxyNode {
           .radioStyle({
             checkedBackgroundColor: this.icon_emphasize,
           })
-          .onClick(() => {
-            this.selectProxy?.(this.item)
-          })
+         // .onClick(() => {
+        //    this.selectProxy?.(this.item)
+        //  })
+          .hitTestBehavior(HitTestMode.None)
       }
       .ListRowStyle()
     }else{
@@ -134,9 +136,10 @@ export struct ProxyNode {
             checkedBackgroundColor: this.icon_emphasize,
           })
             // 不要用chang
-          .onClick(() => {
-            this.selectProxy?.(this.item)
-          })
+       //   .onClick(() => {
+     //       this.selectProxy?.(this.item)
+       //   })
+          .hitTestBehavior(HitTestMode.None)
       }
       .ListRowStyle()
     }

@@ -394,6 +394,7 @@ struct ConfigurationPage {
                         .radioStyle({
                           checkedBackgroundColor: this.icon_emphasize,
                         })
+                        .hitTestBehavior(HitTestMode.None)
                         .onClick(async () => {
                           this.isON.toggleAnim=true
                           await this.loadConfig(item)
@@ -428,6 +429,7 @@ struct ConfigurationPage {
                   .onClick(async () => {
                     this.isON.toggleAnim=true
                     await this.loadConfig(item)
+                    hilog.info(0xC002, this.componentName, `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
                   })
                   .onTouch((event: TouchEvent) => {
                     if (event.type === TouchType.Down) {

@@ -451,10 +451,10 @@ struct Index {
     if (this.uiConfig.userLanguage) {
       ChangeLanguage(this.uiConfig.userLanguage)
     }
-    if(!this.uiConfig.enabledADvanced || !this.uiConfig.isShowExperimentalFunction) {
+   // if(!this.uiConfig.enabledADvanced || !this.uiConfig.isShowExperimentalFunction) {
       // 屏蔽分流策略
-      this.moreList = removeItemsByIndex(this.moreList, [5])
-    }
+  //    this.moreList = removeItemsByIndex(this.moreList, [5])
+  //  }
     if(this.appConfig.clashCore !== ClashCore.FlClash) {
       // 屏蔽请求与连接
       this.moreList = removeItemsByIndex(this.moreList, [2,3])

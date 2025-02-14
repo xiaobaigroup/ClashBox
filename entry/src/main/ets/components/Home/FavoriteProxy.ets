@@ -84,6 +84,7 @@ struct FavoriteProxy {
                       .radioStyle({
                         checkedBackgroundColor: this.icon_emphasize,
                       })
+                      .hitTestBehavior(HitTestMode.None)
                       .onClick(() => {
                         //在home页编辑状态时，无法操作
                         if (this.isShowHomeEdit === false) {

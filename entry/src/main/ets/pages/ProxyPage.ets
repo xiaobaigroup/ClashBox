@@ -181,6 +181,7 @@ struct ProxyPage {
                   })
                 }
               })
+              .hitTestBehavior(HitTestMode.None)
               .radioStyle({
                 checkedBackgroundColor: this.icon_emphasize,
                 //   uncheckedBorderColor: this.icon_secondary
@@ -227,6 +228,7 @@ struct ProxyPage {
                   })
                 }
               })
+              .hitTestBehavior(HitTestMode.None)
               .radioStyle({
                 checkedBackgroundColor: this.icon_emphasize,
               })
@@ -271,6 +273,7 @@ struct ProxyPage {
                   })
                 }
               })
+              .hitTestBehavior(HitTestMode.None)
               .radioStyle({
                 checkedBackgroundColor: this.icon_emphasize,
                 //   uncheckedBorderColor: this.icon_secondary
@@ -349,35 +352,8 @@ struct ProxyPage {
           .backgroundColor($r('app.color.settings_container_background'))
           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .onClick(() => {
-          /*  // 遍历出已收藏配置将其重置为false
-            this.favoriteProxys.forEach((value, key) => {
-              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏数组 键：%{public}s 值: %{public}s", key, value)
-              const proxyName = key.split('|')[1]
-              const groupName = key.split('|')[0]
-              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏的组名: %{public}s", groupName)
-              const proxyGroupsIndex = this.proxyGroups.findIndex((value) => value.name === groupName)
-              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏的组的序号: %{public}d", proxyGroupsIndex)
-              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏的组: %{public}s", JSON.stringify(this.proxyGroups[proxyGroupsIndex].proxies))
-              const proxyIndex = this.proxyGroups[proxyGroupsIndex].proxies.findIndex((value) => value.name === proxyName)
-              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏的代理在组中的序号: %{public}d", proxyIndex)
-              let updatedProxy = this.proxyGroups[proxyGroupsIndex]
-              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏的代理1: %{public}s", JSON.stringify(this.proxyGroups[proxyGroupsIndex].proxies[proxyIndex]))
-              updatedProxy.proxies[proxyIndex].isShowFavoriteProxy = true
-              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏的代理将要更改的收藏状态1: %{public}s", updatedProxy.proxies[proxyIndex].isShowFavoriteProxy)
-              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏的代理将要更改: %{public}s", JSON.stringify(updatedProxy.proxies[proxyIndex]))
-              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏的代理2: %{public}s", JSON.stringify(this.proxyGroups[proxyGroupsIndex].proxies[proxyIndex]))
-              this.proxyGroups.splice(proxyGroupsIndex, 1, updatedProxy)
-              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏的代理3: %{public}s", JSON.stringify(this.proxyGroups[proxyGroupsIndex].proxies[proxyIndex]))
-              updatedProxy.proxies[proxyIndex].isShowFavoriteProxy = false
-              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏的代理将要更改的收藏状态2: %{public}s", updatedProxy.proxies[proxyIndex].isShowFavoriteProxy)
-              // 第二次刷新
-              this.proxyGroups.splice(proxyGroupsIndex, 1, updatedProxy)
-              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏的代理4: %{public}s", JSON.stringify(this.proxyGroups[proxyGroupsIndex].proxies[proxyIndex]))
-            })*/
-            // 清空配置收藏
             this.favoriteProxys.clear()
             this.showStart=true
-        //    AppState.fetchProxyItem(this.proxyGroups, g,this.item.name).isShowFavoriteProxy=false
             this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_all_tip') })
           })
           .transition(customAnimationUtil.isSlide(150, this.uiConfig))
@@ -548,7 +524,8 @@ struct ProxyPage {
                   .fontColor([Color.White])
                   .symbolEffect(this.ReplaceSymbolEffect)
                   .align(Alignment.Center)
-              }.onClick(async () => {
+              }
+              .onClick(async () => {
                 await  EventHub.sendEvent(EventKey.TestDelayAll)
                 if (this.appConfig.proxySort == ProxySort.Delay){
                   EventHub.sendEvent(EventKey.ProxySort, ProxySort.Delay)
