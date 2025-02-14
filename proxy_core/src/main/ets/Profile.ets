@@ -74,7 +74,7 @@ export class Profile {
     let httpRequest = http.createHttp()
     const resp = await httpRequest.request(this.url, { header: {
       "User-Agent": this.globalUa ?? "ClashNext/v2.0.0"
-    },connectTimeout: 5000, readTimeout: 5000})
+    },connectTimeout: 5000, readTimeout: 5000, })
     const disposition = resp.header["content-disposition"] as string
     const userinfo = resp.header["subscription-userinfo"] as string
     if (!this.name || this.name == "") {

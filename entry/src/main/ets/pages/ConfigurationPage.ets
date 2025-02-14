@@ -12,7 +12,7 @@ import {
   RouteName,
   CONTENT_END_OFFSET_150,
 } from '../common/Constants'
-import { curves, LengthMetrics, PromptAction, SymbolGlyphModifier } from '@kit.ArkUI'
+import { curves, LengthMetrics, promptAction, PromptAction, SymbolGlyphModifier } from '@kit.ArkUI'
 import { ConfigAdd } from '../components/Configuration/ConfigAdd'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
@@ -299,8 +299,12 @@ struct ConfigurationPage {
     this.currentConfigRadioCheckedConfigData = item
     this.appConfig.currentProfileName = item.configName
     this.appConfig.currentProfileId = item.configId
-    await ClashViewModel.updateProfileConfig(item.configId)
-    await ClashViewModel.loadConfig(); // 假设loadConfig返回一个Promise
+    try {
+      await ClashViewModel.updateProfileConfig(item.configId)
+      await ClashViewModel.loadConfig(); // 假设loadConfig返回一个Promise
+    }catch (e) {
+      promptAction.showToast({message: "加载配置失败: " + e.message || e })
+    }
     this.isLoading = false;
   }
 
@@ -647,7 +651,7 @@ struct ConfigurationPage {
     this.promptAction.showToast({message: `配置更新中...`})
     if (configId){
       // TODO loading and try
-      ClashViewModel.updateProfileConfig(configId)
+      this.loadConfig(this.currentTouchConfigData)
       //使开关点击时不触发转场动画
       this.isON.toggleAnim = true
       // TODO 单个配置更新

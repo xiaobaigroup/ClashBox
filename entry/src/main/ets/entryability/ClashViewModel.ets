@@ -10,7 +10,7 @@ import { promptAction } from "@kit.ArkUI";
 import { ProxyGroup } from "proxy_core/src/main/ets/models/Common";
 import { ConfigExtendedParams } from "proxy_core/src/main/ets/models/ClashConfig";
 import { EventHub, EventKey } from "../common/EventHub";
-import { AppConfig, ClashCore } from "./AppState";
+import { AppConfig, AppState, ClashCore, getPackageInfo } from "./AppState";
 import  fs from  "@ohos.file.fs"
 import { sleep } from "./EntryAbility";
 
@@ -19,6 +19,10 @@ export class ClashViewModel {
   socketProxy = new SocketProxyService()
   context: Context | undefined
   async init(context: Context) {
+
+    const packageInfo = await getPackageInfo()
+    AppState.versionName = packageInfo.versionName
+    AppState.globalUA =  "ClashNext/v" + packageInfo.versionName
     this.context = context
     await this.profileRepo.init(context)
     this.socketProxy.init(context)

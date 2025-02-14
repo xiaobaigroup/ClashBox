@@ -136,9 +136,7 @@ export class AppState {
   static versionName = ""
   static coreVersion = "Prerelease-Alpha"
   static async init(){
-    const packageInfo = await getPackageInfo()
-    AppState.versionName = packageInfo.versionName
-    AppState.globalUA =  "ClashNext/v" + packageInfo.versionName
+
     PersistentStorage.persistProp("appConfig", new AppConfig())
     PersistentStorage.persistProp("favoriteProfiles", new Map<string, string>([]))
     PersistentStorage.persistProp("favoriteProxys", new Map<string, string[][]>([]))

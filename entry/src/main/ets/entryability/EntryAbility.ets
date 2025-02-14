@@ -28,15 +28,7 @@ export default class EntryAbility extends UIAbility {
     // Main window is created, set main page for this ability
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onWindowStageCreate');
     let windowClass: window.Window = windowStage.getMainWindowSync(); // 获取应用主窗口
-
     await ClashViewModel.init(this.context)
-    const httpRequest = http.createHttp()
-    httpRequest.request("https://ipwho.is/?fields=ip&output=csv").then((r)=>{
-      console.log("requet", r.responseCode)
-    }).catch((e:Error)=>{
-      console.log("requet err", e)
-    })
-
     windowStage.loadContent('pages/Index', async (err) => {
       if (err.code) {
         hilog.error(0x0000, 'EntryAbility', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
