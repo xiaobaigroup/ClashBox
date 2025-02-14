@@ -12,7 +12,7 @@ import { curves, SymbolGlyphModifier } from "@kit.ArkUI"
 import { common } from "@kit.AbilityKit"
 import { setAutoColorMode, setDarkColorMode, setLightColorMode } from "../../utils/ChangeColorModeUtils"
 import { menuRowList, toggleRowList } from "../Common"
-import {  AppConfig, UIConfig } from "../../entryability/AppState"
+import {  AppConfig, isEnd, UIConfig } from "../../entryability/AppState"
 import { changeThemeColor } from "../../utils/ChangeThemeColorUtil"
 import { customAnimationUtil } from "../../utils/Animation"
 
@@ -393,7 +393,8 @@ struct Appearance {
               menu: (): void => { this.ThemeColorMenuEntrance() }
             })
             // 分割线
-            Row().height(0.5).backgroundColor('#0D000000').width('93%')
+        //    if(!isEnd(item.children!.length,i))
+              Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
             // 深色模式
             menuRowList({
               icons: $r('sys.symbol.circle_righthalf_inset_filled'),
@@ -403,7 +404,8 @@ struct Appearance {
               menu: (): void => { this.DarkModeMenuEntrance() }
             })
             // 分割线
-            Row().height(0.5).backgroundColor('#0D000000').width('93%')
+           // if(!isEnd(item.children!.length,i))
+              Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
             // 背景模糊
             Row() {
               toggleRowList({
@@ -427,7 +429,8 @@ struct Appearance {
             })
             if(this.isShowExperimentalFunction) {
               // 分割线
-              Row().height(0.5).backgroundColor('#0D000000').width('93%')
+             // if(!isEnd(item.children!.length,i))
+                Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
               // 动画速度
               menuRowList({
                 icons: $r('sys.symbol.livephoto'),
@@ -469,7 +472,8 @@ struct Appearance {
               })
             })
             // 分割线
-            Row().height(0.5).backgroundColor('#0D000000').width('93%')
+        //    if(!isEnd(item.children!.length,i))
+              Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
             // 悬浮按钮位置
             menuRowList({
               icons: $r('sys.symbol.local_fill'),

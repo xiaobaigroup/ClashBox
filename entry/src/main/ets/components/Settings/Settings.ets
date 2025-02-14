@@ -61,7 +61,7 @@ struct Settings {
       if (this.dialogController != null) {
         this.dialogController.open()
       }
-    }
+    }else
     if(index == 6) {
       // TODO 弹窗确定
       AppState.ResetConfig()

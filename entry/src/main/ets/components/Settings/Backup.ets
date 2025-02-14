@@ -82,7 +82,8 @@ struct Backup {
               this.onBackupData()
             })
           // 分割线
-          Row().height(0.5).backgroundColor('#0D000000').width('93%')
+        //  if(!isEnd(item.children!.length,i))
+            Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
           // 恢复
           skipRowList({
             icons: $r('sys.symbol.arrowshape_down_to_line_fill'),

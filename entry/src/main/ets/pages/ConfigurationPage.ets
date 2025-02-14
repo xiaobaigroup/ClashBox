@@ -332,6 +332,7 @@ struct ConfigurationPage {
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .onClick(() => {
           // TODO 国际化适配 更新配置中... 更新配置成功、
+          this.isON.toggleAnim=true
           hilog.info(0xC001, this.componentName, `#button#onClick()#更新配置`)
           this.updateConfig()
         })
@@ -394,6 +395,7 @@ struct ConfigurationPage {
                           checkedBackgroundColor: this.icon_emphasize,
                         })
                         .onClick(async () => {
+                          this.isON.toggleAnim=true
                           await this.loadConfig(item)
                           hilog.info(0xC002, this.componentName,
                             `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
@@ -424,6 +426,7 @@ struct ConfigurationPage {
                       }
                     })
                   .onClick(async () => {
+                    this.isON.toggleAnim=true
                     await this.loadConfig(item)
                   })
                   .onTouch((event: TouchEvent) => {
@@ -650,19 +653,22 @@ struct ConfigurationPage {
     // TODO 调用更新配置消息api
     this.promptAction.showToast({message: `配置更新中...`})
     if (configId){
+      //使开关点击时不触发转场动画
+      this.isON.toggleAnim = true
       // TODO loading and try
       this.loadConfig(this.currentTouchConfigData)
       //使开关点击时不触发转场动画
       this.isON.toggleAnim = true
+      ClashViewModel.updateProfileConfig(configId)
       // TODO 单个配置更新
       hilog.info(0xC012, this.componentName, `#updateConfig#更新配置{单个}: configName is [${this.currentTouchConfigData.configName}], configId is [${this.currentTouchConfigData.configId}]`)
     } else {
+      //使开关点击时不触发转场动画
+      this.isON.toggleAnim = true
       // TODO 所有配置更新
       hilog.info(0xC012, this.componentName, `#updateConfig#更新配置{所有}`)
       // TODO loading and try
       await ClashViewModel.updateProfileConfig(null)
-      //使开关点击时不触发转场动画
-      this.isON.toggleAnim = true
     }
 
 

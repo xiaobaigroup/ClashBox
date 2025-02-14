@@ -2,7 +2,7 @@ import { BreakpointState } from "../../common/breakpointsystem"
 import { BORDER_RADIUS_20, ListMoreData, moreData } from "../../common/Constants"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
-import { AppConfig, ClashCore, UIConfig } from '../../entryability/AppState'
+import { AppConfig, ClashCore, isEnd, UIConfig } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { promptAction } from "@kit.ArkUI"
 import { ExperimentalFunction } from "../Common"
@@ -82,8 +82,8 @@ struct Kernel {
   build() {
     NavDestination() {
       TopBuilder({title: $r('app.string.kernel')})
-      Column({space: 10}) {
-        Column() {
+      Column({space:10}) {
+Column({space:8}){
           ForEach(this.kernel, (item: KernelListItem, index: number) => {
             Row() {
               Image(item.icons)
@@ -118,8 +118,9 @@ struct Kernel {
                 })
                 .hitTestBehavior(HitTestMode.None)
             }.opacity(index !== 2 ? 1 : 0.5)
-            .height(53)
+            .height(72)
             .width('100%')
+            .padding({top:12,bottom:12})
             .onClick(() => {
               this.handleClick(index)
               if(index !== 2) {
@@ -127,17 +128,16 @@ struct Kernel {
               }
             })
             if ((this.isShowExperimentalFunction && (index === 0 || index === 1) || (index === 0 && this.isShowExperimentalFunction === false) )) {
-              // 分割线
-              Row().height(0.5).backgroundColor('#0D000000').width('93%').margin({top: 12, bottom: 12})
+             if(!isEnd(this.kernel!.length,index))
+                Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
             }
-
           })
-
         }.padding(12)
         .backgroundColor($r('app.color.container_background'))
         .borderRadius(BORDER_RADIUS_20)
          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
 
+        ///Blank(10)
         if(!this.isShowExperimentalFunction) {
           // 启用提示
           Text($r('app.string.open_core_prompt'))
@@ -153,6 +153,8 @@ struct Kernel {
       }.alignItems(HorizontalAlign.Start)
       .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
     }
+    .width('100%')
+    .height('100%')
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {

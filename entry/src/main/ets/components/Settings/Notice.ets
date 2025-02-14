@@ -210,7 +210,8 @@ struct Notice {
           })
           // 震动反馈开关 End
           // 分割线
-          Row().height(0.5).backgroundColor('#0D000000').width('93%')
+        //  if(!isEnd(item.children!.length,i))
+            Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
           // 声音反馈开关 Start
           Row() {
             toggleRowList({

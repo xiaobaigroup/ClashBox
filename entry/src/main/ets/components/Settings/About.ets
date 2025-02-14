@@ -13,7 +13,7 @@ import { hilog } from "@kit.PerformanceAnalysisKit"
 import { common, Want } from "@kit.AbilityKit"
 import { BusinessError } from "@kit.BasicServicesKit"
 import { promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
-import { AppConfig, ClashCore, UIConfig } from "../../entryability/AppState"
+import { AppConfig, ClashCore, isEnd, UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../utils/Animation"
 import { removeItemsByIndex } from "../../utils/RemoveItemsUtils"
 import { customVibrator } from "../../utils/VibratorUtil"
@@ -289,7 +289,7 @@ struct About {
         ForEach(this.aboutList, (item: AboutListItemProp, index: number) => {
           ListItem() {
             Column() {
-              ForEach(item.children, (itemChild: AboutListItemProp) => {
+              ForEach(item.children, (itemChild: AboutListItemProp,i:number) => {
                 if (itemChild.children) {
                   // 存在子项
                   Column() {
@@ -313,7 +313,9 @@ struct About {
                        .bindMenu(this.UpdateMenu(itemChild.children, index))
                     }.width('100%')
                     // 分割线
-                    Row().height(0.5).backgroundColor('#0D000000').width('93%')
+                    if(!isEnd(item.children!.length,i))
+                      Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
+
                   }
                      .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                   .onClick(() => {
@@ -363,7 +365,9 @@ struct About {
                       }
                     }.width('100%')
                     // 分割线
-                    Row().height(0.5).backgroundColor('#0D000000').width('93%')
+                   if(!isEnd(item.children!.length,i))
+                     Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
+
                   }
                   .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                   .onClick(() => {
@@ -600,7 +604,7 @@ export struct CheckUpdate {
       Column() {
         ForEach(this.updateList, (item: CheckUpdateListItemProp, index: number) => {
           Column() {
-            ForEach(item.children, (itemChild: CheckUpdateListItemProp) => {
+            ForEach(item.children, (itemChild: CheckUpdateListItemProp,i:number) => {
               Column() {
                 Row() {
                   // 图标
@@ -615,6 +619,7 @@ export struct CheckUpdate {
                     Text(itemChild.title)
                       .fontWeight(FontWeight.Medium)
                       .fontSize(16)
+
                     if(itemChild.subtitle && item.title != 'Version') {
                       Text(itemChild.subtitle)
                         .fontWeight(FontWeight.Normal)
@@ -641,8 +646,9 @@ export struct CheckUpdate {
                 }
                 .width('100%')
                 .justifyContent(FlexAlign.Start)
-                // 分割线
-                Row().height(0.5).backgroundColor('#0D000000').width('93%')
+                //分割线
+                if(!isEnd(item.children!.length,i))
+                  Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
               }
               .width('100%')
                    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))

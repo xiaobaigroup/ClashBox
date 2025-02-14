@@ -102,6 +102,7 @@ struct ProxyPage {
   @Consume('HomeCardTitleButtonPadding') private HomeCardTitleButtonPadding: BreakpointState<number>
   //page内顶部标题偏移量
   @Consume curYOffset: number
+  @Prop item: ProxyItem
 
   //栅格点位配置
   aboutToAppear(): void {
@@ -347,6 +348,7 @@ struct ProxyPage {
           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .onClick(() => {
             this.favoriteProxys.clear()
+        //    AppState.fetchProxyItem(this.proxyGroups, g,this.item.name).isShowFavoriteProxy=false
             this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_all_tip') })
           })
           .transition(customAnimationUtil.isSlide(150, this.uiConfig))
