@@ -70,7 +70,7 @@ export class ClashViewModel {
     const ua = AppStorage.get<ClashConfig>("clashConfig")?.["global-ua"]
     if(id){
       const profile = await this.getProfile(id)
-      if(profile){
+      if(profile && profile.type == ProfileType.Url){
         profile.loadContext(this.context, ua)
         await profile.update((c)=> this.VailConfig(c))
         await this.profileRepo.addOrUpdate(profile)

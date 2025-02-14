@@ -42,7 +42,7 @@ export default class EntryAbility extends UIAbility {
         hilog.error(0x0000, 'EntryAbility', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
         return;
       }
-      AppState.init()
+      await AppState.init()
       let clashCore = AppStorage.get<AppConfig>("appConfig")?.clashCore
       let appFlowingState = AppStorage.get<AppFlowingState>("appFlowingState") ?? new AppFlowingState()
       // 切换核心
