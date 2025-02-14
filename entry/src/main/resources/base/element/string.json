@@ -1615,6 +1615,18 @@
     {
       "name": "uncollected_all_tip",
       "value": "已取消所有收藏\uD83D\uDC94"
+    },
+    {
+      "name": "backup_restore_subtitle",
+      "value": "导入、导出备份"
+    },
+    {
+      "name": "settings_reset_prompt",
+      "value": "是否重置应用？"
+    },
+    {
+      "name": "settings_reset_tips",
+      "value": "数据已还原"
     }
   ]
 }

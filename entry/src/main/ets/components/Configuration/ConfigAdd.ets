@@ -52,7 +52,7 @@ export struct ConfigAdd {
     { symbolStart: $r('sys.symbol.paperclip'), text: $r('app.string.Import_from_url'), navPathStackName: RouteName.IMPORT_CONFIG_FROM_URL, isExperimentalFunction: false,symbolEnd: $r('sys.symbol.chevron_right')},
     { symbolStart: $r('sys.symbol.qrcode'), text: $r('app.string.import_from_QR_code'), navPathStackName: RouteName.IMPORT_CONFIG_FROM_QR_CODE, isExperimentalFunction: true, symbolEnd: $r('sys.symbol.chevron_right')},
     { symbolStart: $r('sys.symbol.doc_text_fill'), text: $r('app.string.import_from_file'), navPathStackName: RouteName.IMPORT_CONFIG_FROM_FILE, isExperimentalFunction: false, symbolEnd: $r('sys.symbol.chevron_right')},
-    { symbolStart: $r('sys.symbol.doc'), text: $r('app.string.new_blank_configuration'), navPathStackName: RouteName.CREATE_NEW_CONFIG, isExperimentalFunction: true, symbolEnd: $r('sys.symbol.chevron_right')},
+    // { symbolStart: $r('sys.symbol.doc'), text: $r('app.string.new_blank_configuration'), navPathStackName: RouteName.CREATE_NEW_CONFIG, isExperimentalFunction: true, symbolEnd: $r('sys.symbol.chevron_right')},
   ]
 
   /* NV路由 相关 */

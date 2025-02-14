@@ -347,6 +347,32 @@ struct ProxyPage {
           .backgroundColor($r('app.color.settings_container_background'))
           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .onClick(() => {
+          /*  // 遍历出已收藏配置将其重置为false
+            this.favoriteProxys.forEach((value, key) => {
+              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏数组 键：%{public}s 值: %{public}s", key, value)
+              const proxyName = key.split('|')[1]
+              const groupName = key.split('|')[0]
+              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏的组名: %{public}s", groupName)
+              const proxyGroupsIndex = this.proxyGroups.findIndex((value) => value.name === groupName)
+              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏的组的序号: %{public}d", proxyGroupsIndex)
+              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏的组: %{public}s", JSON.stringify(this.proxyGroups[proxyGroupsIndex].proxies))
+              const proxyIndex = this.proxyGroups[proxyGroupsIndex].proxies.findIndex((value) => value.name === proxyName)
+              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏的代理在组中的序号: %{public}d", proxyIndex)
+              let updatedProxy = this.proxyGroups[proxyGroupsIndex]
+              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏的代理1: %{public}s", JSON.stringify(this.proxyGroups[proxyGroupsIndex].proxies[proxyIndex]))
+              updatedProxy.proxies[proxyIndex].isShowFavoriteProxy = true
+              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏的代理将要更改的收藏状态1: %{public}s", updatedProxy.proxies[proxyIndex].isShowFavoriteProxy)
+              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏的代理将要更改: %{public}s", JSON.stringify(updatedProxy.proxies[proxyIndex]))
+              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏的代理2: %{public}s", JSON.stringify(this.proxyGroups[proxyGroupsIndex].proxies[proxyIndex]))
+              this.proxyGroups.splice(proxyGroupsIndex, 1, updatedProxy)
+              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏的代理3: %{public}s", JSON.stringify(this.proxyGroups[proxyGroupsIndex].proxies[proxyIndex]))
+              updatedProxy.proxies[proxyIndex].isShowFavoriteProxy = false
+              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏的代理将要更改的收藏状态2: %{public}s", updatedProxy.proxies[proxyIndex].isShowFavoriteProxy)
+              // 第二次刷新
+              this.proxyGroups.splice(proxyGroupsIndex, 1, updatedProxy)
+              hilog.info(0xFF00, "ProxyFavoriteTestTag", "收藏的代理4: %{public}s", JSON.stringify(this.proxyGroups[proxyGroupsIndex].proxies[proxyIndex]))
+            })*/
+            // 清空配置收藏
             this.favoriteProxys.clear()
             this.show=true
         //    AppState.fetchProxyItem(this.proxyGroups, g,this.item.name).isShowFavoriteProxy=false
@@ -369,7 +395,7 @@ struct ProxyPage {
             this.isEnableIndexForegroundBlur = true
           })
           .transition(customAnimationUtil.isSlide(100, this.uiConfig))
-          //代理样式编辑半模拟态
+          //代理样式编辑半模态
           .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
             detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
             backgroundColor: $r('app.color.background'),
@@ -423,82 +449,82 @@ struct ProxyPage {
                     Column(){
             Blank().height(TAB_CONTENT_TITLE_HEIGHT)
             Scroll() {
-          //根据ProxyArrangementSelected的状态决定是否显示
-          if (this.appConfig.proxyGroupType === ProxyGroupType.Tabs) {
-            Column() { //分组标签页 start
-              Tabs({ barPosition: BarPosition.Start, controller: this.tabsController, index: this.currentIndex }) {
-                ForEach(this.proxyGroups, (g: ProxyGroup, i: number) => {
-                  TabContent() {
-                    //    if ( this.currentIndex === i) {//为实现listltem转场动画的的if
-                    ProxyGroupItem({
-                      items: g.proxies as ProxyItem[],
-                      ProxyGroupItemSelected: this.appConfig.proxyCardSize,
-                      disabled: g.type !== ProxyType.Selector,
-                      selectedProxy: this.currentProfile?.getSelectedProxy(g) ?? "",
-                      OnProxyChange: (item) => {
-                        console.log("xxxxx", item)
-                        this.changeProxy(g.name, item)
-                      }
-                    })//list相关在components/ProxyGroupItem.ets文件里
-                      .padding({ right: this.breakPointStateTabContentTitleMargin.value, })
-                      .width('100%')
-                      .height('100%')
-
-                  }
-                  .tabBar(this.TabBuilder(g.name, i))
-                  .gesture(
-                    // 二级Tabs第一个页签向左拖动时，触发手势事件
-                    PanGesture({direction: this.currentIndex === 0 ? PanDirection.Right: this.currentIndex === this.proxyGroups.length - 1 ? PanDirection.Left:PanDirection.None})
-                      .onActionStart((event?: GestureEvent) => {
-                        console.info('Pan start')
-                      })// 通过父组件的TabsController的实例，改变其index，达到跳转一级Tabs（首页）的效果
-                      .onActionEnd(() => {
-                        if (!this.isLandscapePhone) {
-                          if (this.currentIndex === 0) {
-                            indexController.changeIndex(0)
-                            console.info('Pan end')
-                          } else if (this.currentIndex === this.proxyGroups.length - 1) {
-                            indexController.changeIndex(2)
+              //根据ProxyArrangementSelected的状态决定是否显示
+              if (this.appConfig.proxyGroupType === ProxyGroupType.Tabs) {
+                Column() { //分组标签页 start
+                  Tabs({ barPosition: BarPosition.Start, controller: this.tabsController, index: this.currentIndex }) {
+                    ForEach(this.proxyGroups, (g: ProxyGroup, i: number) => {
+                      TabContent() {
+                        //    if ( this.currentIndex === i) {//为实现listltem转场动画的的if
+                        ProxyGroupItem({
+                          items: g.proxies as ProxyItem[],
+                          ProxyGroupItemSelected: this.appConfig.proxyCardSize,
+                          disabled: g.type !== ProxyType.Selector,
+                          selectedProxy: this.currentProfile?.getSelectedProxy(g) ?? "",
+                          OnProxyChange: (item) => {
+                            console.log("xxxxx", item)
+                            this.changeProxy(g.name, item)
                           }
-                        }else if (this.istabletLandscape){}
-                      })
-                  )
-                  .onWillShow(() => {
-                    animateTo({ duration: this.uiConfig.animationSpeed, curve:curves.springMotion() }, () => {
-                      this.currentIndex = i;
-                      if(this.currentProfile){
-                        this.currentProfile.currentGroupName = this.proxyGroups[i].name
-                        ClashViewModel.updateProfile(this.currentProfile)
-                      }
-                    })
-                  })
-                })
-              }
-              .barMode(BarMode.Scrollable)
-              .barHeight(55)
-              .fadingEdge(false)
-            .onAnimationStart((index: number, targetIndex: number) => {
-               if (this.uiConfig.animationSpeed===0) {
-                  this.currentIndex = targetIndex;
-                }
-              })
-            }
-            .padding({
-              left: this.breakPointStateTabContentTitleMargin.value,
-            })
-            .width('100%')
-            .foregroundBlurStyle(
-              this.isEnableIndexForegroundBlur ? BlurStyle.Thin : BlurStyle.NONE,
-              { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
-            )
-            //分组tabs end
-          }
+                        })//list相关在components/ProxyGroupItem.ets文件里
+                          .padding({ right: this.breakPointStateTabContentTitleMargin.value, })
+                          .width('100%')
+                          .height('100%')
 
-          // 列表排列
-          else if (this.appConfig.proxyGroupType === ProxyGroupType.List) {
-            ProxyArrangement()
-          }
-          //列表排列end
+                      }
+                      .tabBar(this.TabBuilder(g.name, i))
+                      .gesture(
+                        // 二级Tabs第一个页签向左拖动时，触发手势事件
+                        PanGesture({direction: this.currentIndex === 0 ? PanDirection.Right: this.currentIndex === this.proxyGroups.length - 1 ? PanDirection.Left:PanDirection.None})
+                          .onActionStart((event?: GestureEvent) => {
+                            console.info('Pan start')
+                          })// 通过父组件的TabsController的实例，改变其index，达到跳转一级Tabs（首页）的效果
+                          .onActionEnd(() => {
+                            if (!this.isLandscapePhone) {
+                              if (this.currentIndex === 0) {
+                                indexController.changeIndex(0)
+                                console.info('Pan end')
+                              } else if (this.currentIndex === this.proxyGroups.length - 1) {
+                                indexController.changeIndex(2)
+                              }
+                            }else if (this.istabletLandscape){}
+                          })
+                      )
+                      .onWillShow(() => {
+                        animateTo({ duration: this.uiConfig.animationSpeed, curve:curves.springMotion() }, () => {
+                          this.currentIndex = i;
+                          if(this.currentProfile){
+                            this.currentProfile.currentGroupName = this.proxyGroups[i].name
+                            ClashViewModel.updateProfile(this.currentProfile)
+                          }
+                        })
+                      })
+                    }, (item: ProxyGroup) => item.name)
+                  }
+                  .barMode(BarMode.Scrollable)
+                  .barHeight(55)
+                  .fadingEdge(false)
+                  .onAnimationStart((index: number, targetIndex: number) => {
+                    if (this.uiConfig.animationSpeed===0) {
+                      this.currentIndex = targetIndex;
+                    }
+                  })
+                }
+                .padding({
+                  left: this.breakPointStateTabContentTitleMargin.value,
+                })
+                .width('100%')
+                .foregroundBlurStyle(
+                  this.isEnableIndexForegroundBlur ? BlurStyle.Thin : BlurStyle.NONE,
+                  { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
+                )
+                //分组tabs end
+              }
+
+              // 列表排列
+              else if (this.appConfig.proxyGroupType === ProxyGroupType.List) {
+                ProxyArrangement()
+              }
+              //列表排列end
             }
             .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)
             .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {

@@ -289,7 +289,7 @@ struct About {
         ForEach(this.aboutList, (item: AboutListItemProp, index: number) => {
           ListItem() {
             Column() {
-              ForEach(item.children, (itemChild: AboutListItemProp,i:number) => {
+              ForEach(item.children, (itemChild: AboutListItemProp, i: number) => {
                 if (itemChild.children) {
                   // 存在子项
                   Column() {
@@ -604,7 +604,7 @@ export struct CheckUpdate {
       Column() {
         ForEach(this.updateList, (item: CheckUpdateListItemProp, index: number) => {
           Column() {
-            ForEach(item.children, (itemChild: CheckUpdateListItemProp,i:number) => {
+            ForEach(item.children, (itemChild: CheckUpdateListItemProp, i: number) => {
               Column() {
                 Row() {
                   // 图标

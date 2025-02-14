@@ -28,6 +28,7 @@ struct Overwrite {
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
   //page内顶部标题偏移量
   @Consume curYOffset: number
+
   /**
    * 重置覆写提示弹窗控制器
    */

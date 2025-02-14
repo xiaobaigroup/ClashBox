@@ -145,7 +145,7 @@ export class AppState {
     PersistentStorage.persistProp("uiConfig", new UIConfig())
     AppStorage.setOrCreate<AppFlowingState>("appFlowingState", new AppFlowingState())
   }
-  // 还原腹泻配置
+  // 还原覆写配置
   static  ResetClashConfig(){
     AppStorage.set("clashConfig", new ClashConfig(AppState.globalUA))
     AppStorage.set("appConfig", new AppConfig())

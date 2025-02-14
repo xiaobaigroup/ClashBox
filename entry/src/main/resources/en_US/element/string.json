@@ -1615,6 +1615,18 @@
     {
       "name": "uncollected_all_tip",
       "value": "All favorites have been cancelled\uD83D\uDC94"
+    },
+    {
+      "name": "backup_restore_subtitle",
+      "value": "Import and export backup"
+    },
+    {
+      "name": "settings_reset_prompt",
+      "value": "Reset application ?"
+    },
+    {
+      "name": "settings_reset_tips",
+      "value": "Application data has been restored"
     }
   ]
 }

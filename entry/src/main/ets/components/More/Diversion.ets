@@ -10,7 +10,11 @@ import { curves, promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../utils/Animation"
-
+/**
+ *
+ * 暂时屏蔽，等待API更新支持
+ *
+ */
 @Component
 struct Diversion {
   // 是否进入二级界面

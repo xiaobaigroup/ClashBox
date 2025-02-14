@@ -80,7 +80,7 @@ let ProxyCollator = new intl.Collator("zh-CN");
 
 //自定义弹窗内容end
 
-@Entry
+
 @Component
 struct ProxyGroupItem {
   /* 主题色 */
@@ -144,7 +144,7 @@ struct ProxyGroupItem {
   @Consume('isEnableIndexForegroundBlur')
   private isEnableIndexForegroundBlur: boolean
   /* 代理节点数据相关参数  */
-  //节点假数据组后期可改可删
+  //节点数据组
   @Prop items: ProxyItem[]
   // 当前代理节点单选选择的值
   @Prop selectedProxy: string
@@ -153,7 +153,7 @@ struct ProxyGroupItem {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageProp("proxyGroups") proxyGroups: ProxyGroup[] = []
-@Consume show:boolean
+  @Consume show:boolean
   /**
    * XXX 当前手指触摸的ListItem的对应 `this.configList` 中的 `configId`
    *    List的长按菜单中的响应都是根据这个的对象中的属性来处理的，是个不稳定因素
@@ -249,7 +249,7 @@ struct ProxyGroupItem {
   MyMenu(isShowFavoriteProxy: boolean, nodeName: string) {
     Menu() {
       // 根据当前配置信息来判断显示[收藏 /取消收藏] 单独处理 START
-      if (isShowFavoriteProxy&&this.favoriteProxys.size>0&&!this.show) {
+      if (isShowFavoriteProxy && this.favoriteProxys.size <= 3 && !this.show) {
         MenuItem({
           symbolStartIcon: this.proxyListLongPressCtxMenuForUnFavorite.symbolStartIcon!
             .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
@@ -313,7 +313,7 @@ struct ProxyGroupItem {
 
   build() {
     List({ space: 10, initialIndex: 0 }) {
-      ForEach(this.items,(item: ProxyItem, index: number) => {
+      ForEach(this.items, (item: ProxyItem, index: number) => {
         ListItem() {
           ProxyNode({
             itemSize: this.ProxyGroupItemSelected,
@@ -335,7 +335,7 @@ struct ProxyGroupItem {
         .ListItemStyle()
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .height(LIST_ITEM_HEIGHT + (this.ProxyGroupItemSelected === ProxyCardSize.Small ? 32 : 0))
-        .bindContextMenu(this.MyMenu(item?.isShowFavoriteProxy ?? false, item.name), ResponseType.LongPress,
+        .bindContextMenu(this.MyMenu(item.isShowFavoriteProxy ?? false, item.name), ResponseType.LongPress,
           {
             preview: MenuPreviewMode.IMAGE,
             onAppear: (() => {
@@ -353,7 +353,7 @@ struct ProxyGroupItem {
               transition: this.uiConfig.isAnimation ? TransitionEffect.prototype.animation({ tempo: 1.5 }) : undefined
             },
           })
-      })
+      }, (item: ProxyItem) => item.name)
     }
     .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : this.breakPointStateListLanes.value,
       this.breakPointStateListGutter.value)

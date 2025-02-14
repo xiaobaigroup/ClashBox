@@ -11,7 +11,7 @@ import WipeData from "./WipeData"
 import About, { AboutContributors, CheckUpdate } from "./About"
 import Language from "./Language"
 import TopBuilder from "./TopBuilder"
-import { DisclaimerCustomDialog } from "../Common"
+import { DisclaimerCustomDialog, theRowCustomDialog } from "../Common"
 import { AppState } from "../../entryability/AppState"
 import { promptAction } from "@kit.ArkUI"
 
@@ -55,17 +55,59 @@ struct Settings {
 
   }
 
+  /**
+   * 清空应用设置提示弹窗控制器
+   */
+  resetDialogController: CustomDialogController = new CustomDialogController({
+    builder: theRowCustomDialog({
+      theDialogTitle: $r('app.string.settings_reset_prompt'),
+      cancel: ()=> { this.onresetCancel() },
+      confirm: ()=> { this.onresetAccept() },
+      leftButton: this.resetBuilder
+    }),
+    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+      if (dismissDialogAction.reason === DismissReason.TOUCH_OUTSIDE) {
+        // 点击遮蔽层不响应，防误触
+      } else {
+        // 通过dismiss主动关闭对话框
+        dismissDialogAction.dismiss()
+        // 关闭背景模糊
+        this.isEnableIndexForegroundBlur = false
+      }
+    }
+  })
+  /**
+   * 清空应用设置按钮
+   */
+  @Builder
+  resetBuilder() {
+    Button($r('app.string.reset'))
+      .backgroundColor($r('app.color.container_background'))
+      .width('100%')
+      .height(39)
+      .fontColor(Color.Red)
+  }
+  onresetCancel() {
+    // 关闭背景模糊
+    this.isEnableIndexForegroundBlur = false
+  }
+  onresetAccept() {
+    // 关闭背景模糊
+    this.isEnableIndexForegroundBlur = false
+    // 清空应用设置操作
+    AppState.ResetConfig()
+    promptAction.showToast({message: $r('app.string.settings_reset_tips')})
+  }
+
   handleCheck(index: number) {
     if(index === 7) {
       // 免责声明弹窗
       if (this.dialogController != null) {
         this.dialogController.open()
       }
-    }else
-    if(index == 6) {
-      // TODO 弹窗确定
-      AppState.ResetConfig()
-      promptAction.showToast({message: "配置已还原默认值"})
+    } else if(index == 6) {
+      // 清空应用设置弹窗
+      this.resetDialogController.open()
     } else {
       // 列表项路由跳转
       let itemSettingsData = this.settingsList[index]

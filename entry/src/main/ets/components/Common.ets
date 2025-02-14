@@ -370,7 +370,7 @@ export struct DisclaimerCustomDialog {
             })
             .fontColor(Color.Red)
         }
-        Button(this.uiConfig.isFirstStart ? $r('app.string.Confirm') : $r('app.string.agree'))
+        Button(this.uiConfig.isFirstStart ? $r('app.string.agree') : $r('app.string.Confirm'))
           .margin({ top: 15 })
           .width('100%')
           .backgroundColor(this.icon_emphasize)
@@ -403,6 +403,7 @@ export struct theRowCustomDialog {
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @BuilderParam leftButton: () => void = this.defaultBuilder
+  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
   // 默认的左按钮(蓝色字体开启)
   @Builder
   defaultBuilder() {
@@ -411,6 +412,10 @@ export struct theRowCustomDialog {
       .height(39)
       .fontColor(this.icon_emphasize)
       .backgroundColor($r('app.color.container_background'))
+  }
+
+  aboutToAppear(): void {
+    this.isEnableIndexForegroundBlur = true
   }
 
   build() {
