@@ -433,10 +433,7 @@ struct Index {
   async aboutToAppear(): Promise<void> {
     hilog.info(0x1000, this.componentName, `#aboutToAppear executed`)
 
-    this.fetchProfiles()
-    EventHub.on(EventKey.FetchProfile, () => {
-      this.fetchProfiles()
-    })
+
     // 免责声明弹窗
     if (this.uiConfig.isFirstStart) {
       this.dialogController.open()
@@ -525,13 +522,18 @@ struct Index {
     BreakpointSystem.getInstance().start()
     // TODO
 
-
+    this.fetchProfiles()
+    EventHub.on(EventKey.FetchProfile, () => {
+      this.fetchProfiles()
+    })
     EventHub.on(EventKey.FetchProxyGroup, async () => {
       if (this.appConfig.currentProfileId) {
         this.currentProfile = await ClashViewModel.getProfile(this.appConfig.currentProfileId)
         if (this.currentProfile) {
-          this.proxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode ?? ProxyMode.Rule)
+          this.proxyGroups  = await ClashViewModel.getProxyGroups(this.clashConfig.mode ?? ProxyMode.Rule)
         }
+      }else{
+        this.proxyGroups = []
       }
     })
     EventHub.on(EventKey.SwitchModeCard, async (mode: ProxyMode) => {

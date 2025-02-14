@@ -124,26 +124,31 @@ export class SocketProxyService implements IClashManager{
     return new Promise(async (resolve, reject)=>{
       let client: socket.LocalSocket = socket.constructLocalSocketInstance();
       let messageBuffer = ""
+
       client.on('message', async (value: socket.LocalSocketMessageInfo) => {
         let text = new util.TextDecoder()
         let result = text.decodeToString(new Uint8Array(value.message))
-        try {
-          let json = JSON.parse(messageBuffer + result) as RpcResult
-          if (!json.error)
-            resolve(json.result)
-          else{
-            promptAction.showToast({message: json.error})
-            resolve(json.error)
+        console.log("onMessage", result)
+        if('\n\0' == result){
+          try {
+            let json = JSON.parse(messageBuffer) as RpcResult
+            if (!json.error)
+              resolve(json.result)
+            else{
+              promptAction.showToast({message: json.error})
+              resolve(json.error)
+            }
+            client.close();
+          } catch (e) {
+            reject("解码失败")
+            client.close();
           }
-          client.close();
-        } catch (e) {
+        }else{
           messageBuffer += result
         }
       })
       client.on("error", ()=>{
-        console.log("socketProxy on error" )
-        promptAction.showToast({message: "socketProxy error"})
-        reject("vpn 中断")
+        reject("rpc client error")
       })
       const socketPath = this.context?.filesDir + '/clashNext.sock'
 

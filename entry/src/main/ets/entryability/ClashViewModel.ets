@@ -186,7 +186,6 @@ export class ClashViewModel {
     return await this.socketProxy.clearRequestList()
   }
   async getProxyGroups(model: ProxyMode): Promise<ProxyGroup[]>{
-    console.log("FetchProxyGroup", model)
     let list = await this.socketProxy.queryProxyGroups(model)
     let favoriteProxys = AppStorage.get<Map<string, string>>("favoriteProxys")
     const groups = list.map((g)=>{
@@ -199,7 +198,6 @@ export class ClashViewModel {
       return g
     })
     AppStorage.setOrCreate("proxyGroups", groups)
-    console.log("FetchProxyGroup", groups)
     return groups
   }
   //BUG 第一次启动，参数传不过去
