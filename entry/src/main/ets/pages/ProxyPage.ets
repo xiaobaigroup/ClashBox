@@ -21,6 +21,7 @@ import { indexController } from './Index'
 import { customVibrator } from '../utils/VibratorUtil'
 import { customAnimationUtil } from '../utils/Animation'
 import { Nothing } from '../components/Common'
+import { intl } from '@kit.LocalizationKit'
 
 
 @Entry
@@ -103,7 +104,8 @@ struct ProxyPage {
   //page内顶部标题偏移量
   @Consume curYOffset: number
   @Prop item: ProxyItem
-  @Provide show:boolean=false
+  //收藏显示判定
+  @Provide showStart:boolean=false
   //栅格点位配置
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
@@ -374,7 +376,7 @@ struct ProxyPage {
             })*/
             // 清空配置收藏
             this.favoriteProxys.clear()
-            this.show=true
+            this.showStart=true
         //    AppState.fetchProxyItem(this.proxyGroups, g,this.item.name).isShowFavoriteProxy=false
             this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_all_tip') })
           })
@@ -546,8 +548,11 @@ struct ProxyPage {
                   .fontColor([Color.White])
                   .symbolEffect(this.ReplaceSymbolEffect)
                   .align(Alignment.Center)
-              }.onClick(() => {
-                EventHub.sendEvent(EventKey.TestDelayAll)
+              }.onClick(async () => {
+                await  EventHub.sendEvent(EventKey.TestDelayAll)
+                if (this.appConfig.proxySort == ProxySort.Delay){
+                  EventHub.sendEvent(EventKey.ProxySort, ProxySort.Delay)
+                }
                 this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
               })
               .width('100%')

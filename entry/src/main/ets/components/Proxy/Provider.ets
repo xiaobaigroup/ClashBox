@@ -6,7 +6,7 @@ import { ClashConfig, SubscriptionInfo } from 'proxy_core'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { Provider } from "proxy_core"
 import { hilog } from "@kit.PerformanceAnalysisKit"
-import { UIConfig } from "../../entryability/AppState"
+import { isEnd, UIConfig } from "../../entryability/AppState"
 import { picker } from "@kit.CoreFileKit"
 import { customAnimationUtil, isON } from "../../utils/Animation"
 
@@ -71,6 +71,8 @@ export struct ProviderPage {
   @State entriesNumber:number =0
   //开关不触发list转场动画判定
   @State isON:isON = new isON()
+  //副标题是否显示
+  @State textTwoTitle:boolean = true
 
   /**
    * 监听加载状态改变执行UI数组更新
@@ -155,7 +157,7 @@ export struct ProviderPage {
               Nothing({ name: $r('app.string.Resources') })
                 .width('100%')
                 .height('100%')
-
+              
             } else {
               Column({ space: 8 }) {
                 //副标题
@@ -266,9 +268,9 @@ export struct ProviderPage {
 
 
                 //规则提供者相关
-                //副标题
-                Text($r('app.string.rule_provider'))
-                  .subtitleText()
+                //副标题)
+                  Text($r('app.string.rule_provider'))
+                    .subtitleText()
 
                 List({ space: 8 }) {
                   ForEach(this.resourceListData, (item: Provider, index: number) => {
@@ -522,3 +524,5 @@ function listFlex() {
   .backgroundColor($r('app.color.container_background'))
   .borderRadius(BORDER_RADIUS_20)
 }
+
+
