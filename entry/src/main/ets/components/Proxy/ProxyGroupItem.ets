@@ -153,7 +153,7 @@ struct ProxyGroupItem {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageProp("proxyGroups") proxyGroups: ProxyGroup[] = []
-
+@Consume show:boolean
   /**
    * XXX 当前手指触摸的ListItem的对应 `this.configList` 中的 `configId`
    *    List的长按菜单中的响应都是根据这个的对象中的属性来处理的，是个不稳定因素
@@ -249,7 +249,7 @@ struct ProxyGroupItem {
   MyMenu(isShowFavoriteProxy: boolean, nodeName: string) {
     Menu() {
       // 根据当前配置信息来判断显示[收藏 /取消收藏] 单独处理 START
-      if (isShowFavoriteProxy&&this.favoriteProxys.size>0) {
+      if (isShowFavoriteProxy&&this.favoriteProxys.size>0&&!this.show) {
         MenuItem({
           symbolStartIcon: this.proxyListLongPressCtxMenuForUnFavorite.symbolStartIcon!
             .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
@@ -313,7 +313,7 @@ struct ProxyGroupItem {
 
   build() {
     List({ space: 10, initialIndex: 0 }) {
-      ForEach(this.items, (item: ProxyItem, index: number) => {
+      ForEach(this.items,(item: ProxyItem, index: number) => {
         ListItem() {
           ProxyNode({
             itemSize: this.ProxyGroupItemSelected,
@@ -339,6 +339,10 @@ struct ProxyGroupItem {
           {
             preview: MenuPreviewMode.IMAGE,
             onAppear: (() => {
+              const p = ProxyGroupItem.currentTouchProxyData
+              if (this.show&&p.isShowFavoriteProxy&&AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups).length<3){
+                p.isShowFavoriteProxy = false
+              }
               ProxyGroupItem.currentTouchProxyData = item
               if (this.uiConfig.isVibrate) {
                 customVibrator.vibratorTriggerOfHapticClockTimer()
@@ -389,12 +393,13 @@ struct ProxyGroupItem {
    */
   private favoriteProxy(): void {
     //  收藏节点 & 判断是否已经收藏
-    if (AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups).length<3){
-    this.ProxyPromptAction.showToast({ message: $r('app.string.Collect_Tip') })
     const p = ProxyGroupItem.currentTouchProxyData
-    p.isShowFavoriteProxy = true
-    this.favoriteProxys.set(p.g + '|' + p.name, this.appConfig.currentProfileId ?? "")
-    }else{
+    if (!p.isShowFavoriteProxy&&AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups).length<3){
+      this.ProxyPromptAction.showToast({ message: $r('app.string.Collect_Tip') })
+      p.isShowFavoriteProxy = true
+      this.show=false
+      this.favoriteProxys.set(p.g + '|' + p.name, this.appConfig.currentProfileId ?? "")
+    }else {
       this.ProxyPromptAction.showToast({ message: $r('app.string.favorite_proxy_no') })
     }
   }

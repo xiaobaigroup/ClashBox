@@ -103,7 +103,7 @@ struct ProxyPage {
   //page内顶部标题偏移量
   @Consume curYOffset: number
   @Prop item: ProxyItem
-
+  @Provide show:boolean=false
   //栅格点位配置
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
@@ -348,6 +348,7 @@ struct ProxyPage {
           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .onClick(() => {
             this.favoriteProxys.clear()
+            this.show=true
         //    AppState.fetchProxyItem(this.proxyGroups, g,this.item.name).isShowFavoriteProxy=false
             this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_all_tip') })
           })
