@@ -429,83 +429,85 @@ struct ProxyPage {
         Stack({ alignContent: this.stackAlignContentAlignment }) {
           Column(){
             Blank().height(TAB_CONTENT_TITLE_HEIGHT)
+            Tabs({ barPosition: BarPosition.Start, controller: this.tabsController, index: this.currentIndex }) {
+              ForEach(this.proxyGroups, (g: ProxyGroup, i: number) => {
+                TabContent()
+                  .tabBar(this.TabBuilder(g.name, i))
+              })
+            }
+            .zIndex(1)
+            .barMode(BarMode.Scrollable)
+            .barHeight(55)
+            .height(55)
+            .width('100%')
+            .fadingEdge(false)
+            .translate({y:this.curYOffset<0 ? -this.curYOffset : 0 })
+
             Scroll() {
               //根据ProxyArrangementSelected的状态决定是否显示
               if (this.appConfig.proxyGroupType === ProxyGroupType.Tabs) {
                 Column() { //分组标签页 start
-                  Tabs({ barPosition: BarPosition.Start, controller: this.tabsController, index: this.currentIndex }) {
-                    ForEach(this.proxyGroups, (g: ProxyGroup, i: number) => {
-                      TabContent()
-                        .tabBar(this.TabBuilder(g.name, i))
-                    })
-                  }
-                  .zIndex(1)
-                  .barMode(BarMode.Scrollable)
-                  .barHeight(55)
-                  .height(55)
-                  .width('100%')
-                  .fadingEdge(false)
 
                   //TODO 改为懒加载后，切换配置不会把节点切换为选中配置的节点，暂时没找到原因，需修复
-                    Swiper(this.swiperController) {
-                      LazyForEach(this.swiperData, (g: ProxyGroup, i: number) => {
-                        //    if ( this.currentIndex === i) {//为实现listltem转场动画的的if
-                        ProxyGroupItem({
-                          items: g.proxies as ProxyItem[],
-                          ProxyGroupItemSelected: this.appConfig.proxyCardSize,
-                          disabled: g.type !== ProxyType.Selector,
-                          selectedProxy: this.currentProfile?.getSelectedProxy(g) ?? "",
-                          OnProxyChange: (item) => {
-                            console.log("xxxxx", item)
-                            this.changeProxy(g.name, item)
-                          }
-                        })//list相关在components/ProxyGroupItem.ets文件里
-                          .padding({ right: this.breakPointStateTabContentTitleMargin.value, })
-                          .width('100%')
-                          .height('100%')
-                          .onAppear(() => {
-                            console.info('onAppear ' + g.proxies.toString())
-                          })
-                          .onDisAppear(() => {
-                            console.info('onDisAppear ' + g.toString())
-                          })
-                      }, (item: ProxyGroup) => item.name)
-                    }
-                    //.vertical(true)
-                    .indicator(false)
-                    .nestedScroll(SwiperNestedScrollMode.SELF_FIRST)
-                    .gesture(
-                      // 二级Tabs第一个页签向左拖动时，触发手势事件
-                      PanGesture({
-                        direction: this.currentIndex === 0 ? PanDirection.Right :
-                          this.currentIndex === this.proxyGroups.length - 1 ? PanDirection.Left : PanDirection.None
-                      })
-                        .onActionStart((event?: GestureEvent) => {
-                          console.info('Pan start')
-                        })// 通过父组件的TabsController的实例，改变其index，达到跳转一级Tabs（首页）的效果
-                        .onActionEnd(() => {
-                          if (!this.isLandscapePhone) {
-                            if (this.currentIndex === 0) {
-                              indexController.changeIndex(0)
-                              console.info('Pan end')
-                            } else if (this.currentIndex === this.proxyGroups.length - 1) {
-                              indexController.changeIndex(2)
-                            }
-                          } else if (this.istabletLandscape) {
-                          }
+                  Swiper(this.swiperController) {
+                    LazyForEach(this.swiperData, (g: ProxyGroup, i: number) => {
+                      //    if ( this.currentIndex === i) {//为实现listltem转场动画的的if
+                      ProxyGroupItem({
+                        items: g.proxies as ProxyItem[],
+                        ProxyGroupItemSelected: this.appConfig.proxyCardSize,
+                        disabled: g.type !== ProxyType.Selector,
+                        selectedProxy: this.currentProfile?.getSelectedProxy(g) ?? "",
+                        OnProxyChange: (item) => {
+                          console.log("xxxxx", item)
+                          this.changeProxy(g.name, item)
+                        }
+                      })//list相关在components/ProxyGroupItem.ets文件里
+                        .padding({ right: this.breakPointStateTabContentTitleMargin.value, })
+                        .width('100%')
+                        .height('100%')
+                        .onAppear(() => {
+                          console.info('onAppear ' + g.proxies.toString())
                         })
-                    )
-                    .loop(false)
-                    .onAnimationStart((index: number, targetIndex: number) => {
-                      animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
-                        this.tabsController.changeIndex(targetIndex)
-                        this.currentIndex = targetIndex;
-                        if (this.currentProfile) {
-                          this.currentProfile.currentGroupName = this.proxyGroups[this.currentIndex].name
-                          ClashViewModel.updateProfile(this.currentProfile)
+                        .onDisAppear(() => {
+                          console.info('onDisAppear ' + g.toString())
+                        })
+                    }, (item: ProxyGroup) => item.name)
+                  }
+                  //.vertical(true)
+                  .indicator(false)
+                  .nestedScroll(SwiperNestedScrollMode.SELF_FIRST)
+                  .gesture(
+                    // 二级Tabs第一个页签向左拖动时，触发手势事件
+                    PanGesture({
+                      direction: this.currentIndex === 0 ? PanDirection.Right :
+                        this.currentIndex === this.proxyGroups.length - 1 ? PanDirection.Left : PanDirection.None
+                    })
+                      .onActionStart((event?: GestureEvent) => {
+                        console.info('Pan start')
+                      })// 通过父组件的TabsController的实例，改变其index，达到跳转一级Tabs（首页）的效果
+                      .onActionEnd(() => {
+                        if (!this.isLandscapePhone) {
+                          if (this.currentIndex === 0) {
+                            indexController.changeIndex(0)
+                            console.info('Pan end')
+                          } else if (this.currentIndex === this.proxyGroups.length - 1) {
+                            indexController.changeIndex(2)
+                          }
+                        } else if (this.istabletLandscape) {
                         }
                       })
+                  )
+                  .loop(false)
+                  .onAnimationStart((index: number, targetIndex: number) => {
+                    animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
+                      this.tabsController.changeIndex(targetIndex)
+                      this.currentIndex = targetIndex;
+                      if (this.currentProfile) {
+                        this.currentProfile.currentGroupName = this.proxyGroups[this.currentIndex].name
+                        ClashViewModel.updateProfile(this.currentProfile)
+                      }
                     })
+                  })
                 }
                 .padding({
                   left: this.breakPointStateTabContentTitleMargin.value,
@@ -629,4 +631,3 @@ struct EditTitle {
       .margin({ bottom: 10 })
   }
 }
-
