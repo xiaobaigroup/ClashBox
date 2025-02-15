@@ -7,11 +7,12 @@ import {
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE } from '../../common/Constants'
 import { LengthMetrics, SymbolGlyphModifier,PromptAction, curves } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
-import {  ProxyItem, ProxyData } from '../../common/ProxyData';
+import {  ProxyItem, ProxyData, proxyListLazyData } from '../../common/ProxyData';
 import { EventHub, EventKey } from '../../common/EventHub';
 import { ProxyGroup, ProxySort } from 'proxy_core';
 import { intl } from '@kit.LocalizationKit';
-import { AppConfig, AppState, ClashCore, ProxyCardSize, UIConfig } from '../../entryability/AppState';
+import { AppConfig, AppState, ClashCore, ProxyCardSize,
+  UIConfig } from '../../entryability/AppState';
 import ClashViewModel from '../../entryability/ClashViewModel';
 import { ProxyNode } from './ProxyItem';
 import { customAnimationUtil } from '../../utils/Animation';
@@ -154,7 +155,7 @@ struct ProxyGroupItem {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageProp("proxyGroups") proxyGroups: ProxyGroup[] = []
   //收藏显示判定
-@Consume showStart:boolean
+  @Consume showStart:boolean
   /**
    * XXX 当前手指触摸的ListItem的对应 `this.configList` 中的 `configId`
    *    List的长按菜单中的响应都是根据这个的对象中的属性来处理的，是个不稳定因素
@@ -169,6 +170,7 @@ struct ProxyGroupItem {
   }
 
   aboutToAppear(): void {
+    this.proxyListData = new proxyListLazyData(this.items)
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     BreakpointSystem.getInstance().attach(this.breakPointStateListLanes)
     BreakpointSystem.getInstance().start()
@@ -311,10 +313,11 @@ struct ProxyGroupItem {
       this.OnProxyChange(item)
     }
   }
-
+  private proxyListData: proxyListLazyData = new proxyListLazyData([])
   build() {
     List({ space: 10, initialIndex: 0 }) {
-      ForEach(this.items, (item: ProxyItem, index: number) => {
+      LazyForEach(this.proxyListData, (item: ProxyItem, index: number) => {
+   //   ForEach(this.items, (item: ProxyItem, index: number) => {
         ListItem() {
           ProxyNode({
             itemSize: this.ProxyGroupItemSelected,
@@ -448,11 +451,5 @@ function ListItemStyle() {
   .backgroundColor($r('app.color.container_background'))
   .width('100%')
 }
-
-
-
-
-
-
 
 export default ProxyGroupItem

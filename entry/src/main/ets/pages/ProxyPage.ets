@@ -8,20 +8,18 @@ import {
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import ProxyGroupItem from '../components/Proxy/ProxyGroupItem'
 import ProxyArrangement from '../components/Proxy/ProxyArrangement'
-import { ProxyItem } from '../common/ProxyData'
+import { proxyGroupsLazyData, ProxyItem } from '../common/ProxyData'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { Profile, ProxyGroup, ProxySort, ProxyType } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import { AppConfig,
-  AppState,
-  ClashCore, isEnd, ProxyCardSize, ProxyGroupType, UIConfig } from '../entryability/AppState'
+  ClashCore, isEnd, ProxyCardSize,
+  ProxyGroupType, UIConfig } from '../entryability/AppState'
 import { curves, PromptAction } from '@kit.ArkUI'
 import { ProviderPage } from '../components/Proxy/Provider'
 import { indexController } from './Index'
-import { customVibrator } from '../utils/VibratorUtil'
 import { customAnimationUtil } from '../utils/Animation'
 import { Nothing } from '../components/Common'
-import { intl } from '@kit.LocalizationKit'
 
 
 @Entry
@@ -106,8 +104,11 @@ struct ProxyPage {
   @Prop item: ProxyItem
   //收藏显示判定
   @Provide showStart:boolean=false
+  private swiperController: SwiperController = new SwiperController()
+  private swiperData: proxyGroupsLazyData = new proxyGroupsLazyData([])
   //栅格点位配置
   aboutToAppear(): void {
+    this.swiperData = new proxyGroupsLazyData(this.proxyGroups)
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     BreakpointSystem.getInstance().start()
     if (this.currentProfile) {
@@ -115,6 +116,7 @@ struct ProxyPage {
       setTimeout(() => {
         if (tabIndexes > -1) {
           this.tabsController.changeIndex(tabIndexes)
+          this.swiperController.changeIndex(tabIndexes)
           this.currentIndex = tabIndexes
         }
       }, 200)
@@ -151,6 +153,7 @@ struct ProxyPage {
     .onClick(() => {
       this.currentIndex = targetIndex;
       this.tabsController.changeIndex(this.currentIndex);
+      this.swiperController.changeIndex(this.currentIndex, true)
     })
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Start)
@@ -317,104 +320,104 @@ struct ProxyPage {
   build() {
     Stack(){
       // 标题栏
-     // if (!this.isLandscapePhone || this.appConfig.proxyGroupType === ProxyGroupType.List) {
-        Row({ space: this.HomeCardTitleButtonPadding.value }) {
-          Text($r('app.string.Proxy'))
-            .fontSize(this.curYOffset<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset/100:TAB_CONTENT_TITLE_FONT_SIZE)
-            .fontWeight(FontWeight.Bold)
-            .textAlign(TextAlign.Center)
-            .transition(customAnimationUtil.isSlide(200, this.uiConfig))
-            .transition(customAnimationUtil.isScaleTran(0, this.uiConfig))
-              //提供者半模拟态
-            .bindSheet($$this.isProviderEdit, this.ProviderBindSheetEdit(), {
-              detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
-              backgroundColor: $r('app.color.background'),
-              showClose: false,
-              dragBar: false,
-              scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-              preferType: SheetType.CENTER,
-              onWillDismiss: () => {
-                this.isProviderEdit = false
-                this.isEnableIndexForegroundBlur = false
-              }
-            })
-          Blank()
-
-          //一键取消所有收藏按钮
-          Button({ type: ButtonType.Circle, stateEffect: true }) {
-            SymbolGlyph($r('sys.symbol.heart_slash'))
-              .fontSize(24)
-              .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-              .fontColor([this.icon_primary,Color.Red])
-          }
-          .width(40)
-          .height(40)
-          .backgroundColor($r('app.color.settings_container_background'))
-          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-          .onClick(() => {
-            this.favoriteProxys.clear()
-            this.showStart=true
-            this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_all_tip') })
-          })
-          .transition(customAnimationUtil.isSlide(150, this.uiConfig))
-
-          //提供者按钮
-          Button({ type: ButtonType.Circle, stateEffect: true }) {
-            SymbolGlyph($r('sys.symbol.puzzle'))
-              .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-              .fontColor([this.icon_primary])
-          }
-          .width(40)
-          .height(40)
-          .backgroundColor($r('app.color.settings_container_background'))
-          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-          .onClick(() => {
-            this.isProviderEdit = true
-            this.isEnableIndexForegroundBlur = true
-          })
-          .transition(customAnimationUtil.isSlide(100, this.uiConfig))
-          //代理样式编辑半模态
-          .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
+      // if (!this.isLandscapePhone || this.appConfig.proxyGroupType === ProxyGroupType.List) {
+      Row({ space: this.HomeCardTitleButtonPadding.value }) {
+        Text($r('app.string.Proxy'))
+          .fontSize(this.curYOffset<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset/100:TAB_CONTENT_TITLE_FONT_SIZE)
+          .fontWeight(FontWeight.Bold)
+          .textAlign(TextAlign.Center)
+          .transition(customAnimationUtil.isSlide(200, this.uiConfig))
+          .transition(customAnimationUtil.isScaleTran(0, this.uiConfig))
+            //提供者半模拟态
+          .bindSheet($$this.isProviderEdit, this.ProviderBindSheetEdit(), {
             detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
             backgroundColor: $r('app.color.background'),
-            showClose: true,
+            showClose: false,
             dragBar: false,
             scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-            title: { title: $r('app.string.Edit') },
             preferType: SheetType.CENTER,
             onWillDismiss: () => {
-              this.isShowEdit = false
+              this.isProviderEdit = false
               this.isEnableIndexForegroundBlur = false
             }
           })
+        Blank()
 
-          //编辑图标
-          Button({ type: ButtonType.Circle, stateEffect: true }) {
-            SymbolGlyph($r('sys.symbol.square_and_pencil'))
-              .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-              .fontColor([this.icon_primary])
-          }
-          .width(40)
-          .height(40)
-          .backgroundColor($r('app.color.settings_container_background'))
-          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-          .onClick(() => {
-            this.isShowEdit = true
-            this.isEnableIndexForegroundBlur = true
-            hilog.info(0xB001, this.componentName, `#button#onClick()#编辑代理`)
-          })
+        //一键取消所有收藏按钮
+        Button({ type: ButtonType.Circle, stateEffect: true }) {
+          SymbolGlyph($r('sys.symbol.heart_slash'))
+            .fontSize(24)
+            .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+            .fontColor([this.icon_primary,Color.Red])
         }
-        .zIndex(1)
-        .height(this.curYOffset<0?TAB_CONTENT_TITLE_HEIGHT-this.curYOffset:TAB_CONTENT_TITLE_HEIGHT)
-        .position({x:0})
-        .alignItems(VerticalAlign.Center)
-        .width('100%')
-        .padding({
-          left: this.breakPointStateTabContentTitleMargin.value,
-          right: this.breakPointStateTabContentTitleMargin.value,
+        .width(40)
+        .height(40)
+        .backgroundColor($r('app.color.settings_container_background'))
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+        .onClick(() => {
+          this.favoriteProxys.clear()
+          this.showStart=true
+          this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_all_tip') })
         })
-        .transition(customAnimationUtil.isSlide(0, this.uiConfig))
-    //  }
+        .transition(customAnimationUtil.isSlide(150, this.uiConfig))
+
+        //提供者按钮
+        Button({ type: ButtonType.Circle, stateEffect: true }) {
+          SymbolGlyph($r('sys.symbol.puzzle'))
+            .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+            .fontColor([this.icon_primary])
+        }
+        .width(40)
+        .height(40)
+        .backgroundColor($r('app.color.settings_container_background'))
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+        .onClick(() => {
+          this.isProviderEdit = true
+          this.isEnableIndexForegroundBlur = true
+        })
+        .transition(customAnimationUtil.isSlide(100, this.uiConfig))
+        //代理样式编辑半模态
+        .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
+          detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
+          backgroundColor: $r('app.color.background'),
+          showClose: true,
+          dragBar: false,
+          scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+          title: { title: $r('app.string.Edit') },
+          preferType: SheetType.CENTER,
+          onWillDismiss: () => {
+            this.isShowEdit = false
+            this.isEnableIndexForegroundBlur = false
+          }
+        })
+
+        //编辑图标
+        Button({ type: ButtonType.Circle, stateEffect: true }) {
+          SymbolGlyph($r('sys.symbol.square_and_pencil'))
+            .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+            .fontColor([this.icon_primary])
+        }
+        .width(40)
+        .height(40)
+        .backgroundColor($r('app.color.settings_container_background'))
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+        .onClick(() => {
+          this.isShowEdit = true
+          this.isEnableIndexForegroundBlur = true
+          hilog.info(0xB001, this.componentName, `#button#onClick()#编辑代理`)
+        })
+      }
+      .zIndex(1)
+      .height(this.curYOffset<0?TAB_CONTENT_TITLE_HEIGHT-this.curYOffset:TAB_CONTENT_TITLE_HEIGHT)
+      .position({x:0})
+      .alignItems(VerticalAlign.Center)
+      .width('100%')
+      .padding({
+        left: this.breakPointStateTabContentTitleMargin.value,
+        right: this.breakPointStateTabContentTitleMargin.value,
+      })
+      .transition(customAnimationUtil.isSlide(0, this.uiConfig))
+      //  }
 
       if (this.proxyGroups.length == 0) {
         Column() {
@@ -424,7 +427,7 @@ struct ProxyPage {
       } else if (this.proxyGroups.length > 0) {
         // 代理页分组TAB+list主体
         Stack({ alignContent: this.stackAlignContentAlignment }) {
-                    Column(){
+          Column(){
             Blank().height(TAB_CONTENT_TITLE_HEIGHT)
             Scroll() {
               //根据ProxyArrangementSelected的状态决定是否显示
@@ -432,7 +435,20 @@ struct ProxyPage {
                 Column() { //分组标签页 start
                   Tabs({ barPosition: BarPosition.Start, controller: this.tabsController, index: this.currentIndex }) {
                     ForEach(this.proxyGroups, (g: ProxyGroup, i: number) => {
-                      TabContent() {
+                      TabContent()
+                        .tabBar(this.TabBuilder(g.name, i))
+                    })
+                  }
+                  .zIndex(1)
+                  .barMode(BarMode.Scrollable)
+                  .barHeight(55)
+                  .height(55)
+                  .width('100%')
+                  .fadingEdge(false)
+
+                  //TODO 改为懒加载后，切换配置不会把节点切换为选中配置的节点，暂时没找到原因，需修复
+                    Swiper(this.swiperController) {
+                      LazyForEach(this.swiperData, (g: ProxyGroup, i: number) => {
                         //    if ( this.currentIndex === i) {//为实现listltem转场动画的的if
                         ProxyGroupItem({
                           items: g.proxies as ProxyItem[],
@@ -447,45 +463,49 @@ struct ProxyPage {
                           .padding({ right: this.breakPointStateTabContentTitleMargin.value, })
                           .width('100%')
                           .height('100%')
-
-                      }
-                      .tabBar(this.TabBuilder(g.name, i))
-                      .gesture(
-                        // 二级Tabs第一个页签向左拖动时，触发手势事件
-                        PanGesture({direction: this.currentIndex === 0 ? PanDirection.Right: this.currentIndex === this.proxyGroups.length - 1 ? PanDirection.Left:PanDirection.None})
-                          .onActionStart((event?: GestureEvent) => {
-                            console.info('Pan start')
-                          })// 通过父组件的TabsController的实例，改变其index，达到跳转一级Tabs（首页）的效果
-                          .onActionEnd(() => {
-                            if (!this.isLandscapePhone) {
-                              if (this.currentIndex === 0) {
-                                indexController.changeIndex(0)
-                                console.info('Pan end')
-                              } else if (this.currentIndex === this.proxyGroups.length - 1) {
-                                indexController.changeIndex(2)
-                              }
-                            }else if (this.istabletLandscape){}
+                          .onAppear(() => {
+                            console.info('onAppear ' + g.proxies.toString())
                           })
-                      )
-                      .onWillShow(() => {
-                        animateTo({ duration: this.uiConfig.animationSpeed, curve:curves.springMotion() }, () => {
-                          this.currentIndex = i;
-                          if(this.currentProfile){
-                            this.currentProfile.currentGroupName = this.proxyGroups[i].name
-                            ClashViewModel.updateProfile(this.currentProfile)
+                          .onDisAppear(() => {
+                            console.info('onDisAppear ' + g.toString())
+                          })
+                      }, (item: ProxyGroup) => item.name)
+                    }
+                    //.vertical(true)
+                    .indicator(false)
+                    .nestedScroll(SwiperNestedScrollMode.SELF_FIRST)
+                    .gesture(
+                      // 二级Tabs第一个页签向左拖动时，触发手势事件
+                      PanGesture({
+                        direction: this.currentIndex === 0 ? PanDirection.Right :
+                          this.currentIndex === this.proxyGroups.length - 1 ? PanDirection.Left : PanDirection.None
+                      })
+                        .onActionStart((event?: GestureEvent) => {
+                          console.info('Pan start')
+                        })// 通过父组件的TabsController的实例，改变其index，达到跳转一级Tabs（首页）的效果
+                        .onActionEnd(() => {
+                          if (!this.isLandscapePhone) {
+                            if (this.currentIndex === 0) {
+                              indexController.changeIndex(0)
+                              console.info('Pan end')
+                            } else if (this.currentIndex === this.proxyGroups.length - 1) {
+                              indexController.changeIndex(2)
+                            }
+                          } else if (this.istabletLandscape) {
                           }
                         })
+                    )
+                    .loop(false)
+                    .onAnimationStart((index: number, targetIndex: number) => {
+                      animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
+                        this.tabsController.changeIndex(targetIndex)
+                        this.currentIndex = targetIndex;
+                        if (this.currentProfile) {
+                          this.currentProfile.currentGroupName = this.proxyGroups[this.currentIndex].name
+                          ClashViewModel.updateProfile(this.currentProfile)
+                        }
                       })
-                    }, (item: ProxyGroup) => item.name)
-                  }
-                  .barMode(BarMode.Scrollable)
-                  .barHeight(55)
-                  .fadingEdge(false)
-                  .onAnimationStart((index: number, targetIndex: number) => {
-                    if (this.uiConfig.animationSpeed===0) {
-                      this.currentIndex = targetIndex;
-                    }
-                  })
+                    })
                 }
                 .padding({
                   left: this.breakPointStateTabContentTitleMargin.value,
@@ -504,6 +524,7 @@ struct ProxyPage {
               }
               //列表排列end
             }
+            .scrollBar(BarState.Off)
             .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)
             .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {
               // 累计计算当前父组件滚动在Y轴方向的偏移量
@@ -512,7 +533,7 @@ struct ProxyPage {
               }
               console.info("yOffset" + this.curYOffset);
             })
-   }
+          }
 
           // ClashMeta内核时暂时无法测延迟
           if (this.appConfig.clashCore === ClashCore.FlClash) {
@@ -563,7 +584,7 @@ struct ProxyPage {
     }
     .width('100%')
     .height('100%')
-    }
+  }
 }
 
 export default ProxyPage
@@ -608,3 +629,4 @@ struct EditTitle {
       .margin({ bottom: 10 })
   }
 }
+

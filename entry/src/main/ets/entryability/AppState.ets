@@ -123,7 +123,7 @@ export class UIConfig{
 }
 
 export function isEnd(length: number, i: number){
-     return length -1 == i
+  return length -1 == i
 }
 
 export function getPackageInfo(){
@@ -214,3 +214,4 @@ export class TrafficQueue{
     return this.queue.map((q) => q.upRaw + q.downRaw);
   }
 }
+

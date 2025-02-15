@@ -3,9 +3,9 @@ import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import ProxyGroupItem from './ProxyGroupItem'
 import { Profile, ProxyGroup,ProxyType } from 'proxy_core'
-import { ProxyItem } from '../../common/ProxyData'
+import { proxyGroupsLazyData, ProxyItem } from '../../common/ProxyData'
 import ClashViewModel from '../../entryability/ClashViewModel'
-import { AppConfig, UIConfig } from '../../entryability/AppState'
+import { AppConfig,UIConfig } from '../../entryability/AppState'
 import { customAnimationUtil } from '../../utils/Animation'
 
 
@@ -29,8 +29,10 @@ struct ProxyArrangement {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   //page内顶部标题偏移量
   @Consume curYOffset: number
+  private swiperData: proxyGroupsLazyData = new proxyGroupsLazyData([])
 
   aboutToAppear(): void {
+    this.swiperData = new proxyGroupsLazyData(this.proxyGroups)
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     BreakpointSystem.getInstance().start()
 
@@ -86,7 +88,7 @@ struct ProxyArrangement {
 
   build() {
     List({ space: 10, initialIndex: 0,scroller:this.proxyScroller}) {
-      ForEach(this.proxyGroups, (g:ProxyGroup, i: number) => {
+      LazyForEach(this.swiperData, (g:ProxyGroup,i:number) => {
         ListItemGroup({ header: this.itemHead(g.name,
           !this.isContentShow && this.selectItem === i ? $r('sys.symbol.chevron_down')
             : $r('sys.symbol.chevron_right'))} ){
@@ -129,7 +131,7 @@ struct ProxyArrangement {
         })
         .width('100%')
         .borderRadius(BORDER_RADIUS_20)
-      })
+      },(item: ProxyGroup) => item.name)
     }
     .chainAnimation(true)
     //.borderRadius(BORDER_RADIUS_20)
