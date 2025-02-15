@@ -1,10 +1,13 @@
-import { Context, WantAgent, wantAgent } from "@kit.AbilityKit";
+import { abilityAccessCtrl, Context,
+  PermissionRequestResult,
+  Permissions, WantAgent, wantAgent } from "@kit.AbilityKit";
 import { backgroundTaskManager } from "@kit.BackgroundTasksKit";
 import { notificationManager } from "@kit.NotificationKit";
 import { BusinessError } from "@kit.BasicServicesKit";
 import { http } from "@kit.NetworkKit";
-import { AppFlowingState } from "../entryability/AppState";
+import { AppFlowingState, AppState } from "../entryability/AppState";
 import { hilog } from "@kit.PerformanceAnalysisKit";
+import { geoLocationManager } from "@kit.LocationKit";
 
 /**
  * 模拟下载长时任务
@@ -15,21 +18,50 @@ export class BackgroundDownService{
   ping: number = 0
   notice:number = 0
 
+
   async start(context: Context){
     if(this.notificationId)
       return
     let id = await this.startContinuousTask(context)
     this.notificationId = id
-    clearInterval(this.ping)
+    // 启动后台定位
+    this.getLocation(context)
+
     clearInterval(this.notice)
-    this.ping = setInterval(async ()=>{
-      this.client.request("http://localhost:9090")
-    },20000)
-    this.updateTraffic()
-    this.notice = setInterval(async ()=> {
-      this.updateTraffic()
-    }, 2000)
+    // 定位需要另一种通知
+    // this.updateTraffic()
+    // this.notice = setInterval(async ()=> {
+    //   this.updateTraffic()
+    // }, 2000)
   }
+  async requestPermissionsFromUser(context: Context): Promise<boolean> {
+    let atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
+    let permissionList: Permissions[] = [
+      'ohos.permission.INTERNET',
+      'ohos.permission.LOCATION',
+      'ohos.permission.APPROXIMATELY_LOCATION'
+    ];
+    try {
+      await atManager.requestPermissionsFromUser(context, permissionList)
+      return true
+    } catch (e) {
+      return false
+    }
+
+  }
+  async getLocation(context: Context) {
+    await this.requestPermissionsFromUser(context)
+    let request: geoLocationManager.LocationRequest = {
+      priority: geoLocationManager.LocationRequestPriority.FIRST_FIX, // Quick location acquisition is preferred
+      scenario: geoLocationManager.LocationRequestScenario.UNSET, // Indicates that no scenario information is set
+      timeInterval: 10, // Interval for reporting the location information
+      distanceInterval: 0, // Distance for reporting location information
+      maxAccuracy: 100 // The precision value required when the application requests location information from the system
+    };
+    geoLocationManager.on('locationChange', request, ()=>{ });
+  }
+
+
 
   async updateTraffic(): Promise<void>{
 
@@ -51,7 +83,6 @@ export class BackgroundDownService{
   updateProcess(id: number, message: string){
     notificationManager.isSupportTemplate('downloadTemplate').then((data:boolean) => {
       hilog.info(0xFF00, 'BackgroundDownService', '当前设备支持下载进度条模板')
-
       let downLoadTemplate: notificationManager.NotificationTemplate = {
         name: 'downloadTemplate', // 当前只支持downloadTemplate，保持不变
         data: {
@@ -112,12 +143,10 @@ export class BackgroundDownService{
     // 通过wantAgent模块下getWantAgent方法获取WantAgent对象
     try {
       let wantAgentObj: WantAgent =  await wantAgent.getWantAgent(wantAgentInfo)
-      let list: Array<string> = ["dataTransfer"]
-      let res: backgroundTaskManager.ContinuousTaskNotification =
-        await backgroundTaskManager.startBackgroundRunning(getContext(this), list, wantAgentObj)
+      let res = await backgroundTaskManager.startBackgroundRunning(getContext(this), ["location"], wantAgentObj)
       return res.notificationId
     } catch (err) {
-      hilog.error(0xFF00, 'BackgroundDownService', `Failed to operation startBackgroundDownRunning. Code is ${err.code}, message is ${err.message}`)
+      hilog.error(0xFF00, 'BackgroundDownService', `Failed to operation startBackgroundRunning. Code is ${err.code}, message is ${err.message}`)
       return -1
     }
   }

@@ -306,7 +306,14 @@ export  const ListOverwriteBasicData = (clashConfig: ClashConfig, appConfig: App
     new ConfigItemData($r('sys.symbol.mobiledata'), 'ipv6', $r('app.string.IPv6'), '', '', 2).bindClashConfig(clashConfig),
     new ConfigItemData($r('sys.symbol.line_arrowtriangle_2_inward'), 'unified-delay', $r('app.string.UnifiedLatency'), $r('app.string.Unified_Latency_Subtitle'), '', 2).bindClashConfig(clashConfig),
     new ConfigItemData($r('sys.symbol.order_play'), 'tcp-concurrent', $r('app.string.TCP_Concurrency'), '', '',  2, ).bindClashConfig(clashConfig),
-    new ConfigItemData($r('sys.symbol.selector'), 'External-Control', $r('app.string.External_Control'), $r('app.string.External_Control_Subtitle'), '',  2).bindClashConfig(clashConfig),
+    new ConfigItemData($r('sys.symbol.selector'), 'external-controller', $r('app.string.External_Control'), $r('app.string.External_Control_Subtitle'), '',  2).bind<boolean>(clashConfig["external-controller"] != "", (result)=>{
+          if(result){
+            clashConfig["external-controller"] = AppState.externalController
+          }else{
+            clashConfig["external-controller"] = ""
+          }
+
+    }),
   ]
   return result
 }

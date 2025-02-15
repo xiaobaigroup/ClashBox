@@ -27,6 +27,7 @@
         "backgroundModes": [ // 长时任务类型的配置项
           // 数据传输
           "dataTransfer",
+          "location",
           // 音频录制
           "audioRecording"
         ],
@@ -58,8 +59,37 @@
         "name": "ohos.permission.MICROPHONE",
         "reason": "$string:permission_reason_MICROPHONE",
         "usedScene": {}
-
-      }
+      },
+      {
+        "name": "ohos.permission.LOCATION",
+        "reason":  "$string:permission_reason_MICROPHONE",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
+      },
+      {
+        "name": "ohos.permission.LOCATION_IN_BACKGROUND",
+        "reason": "$string:permission_reason_MICROPHONE",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
+      },
+      {
+        "name": "ohos.permission.APPROXIMATELY_LOCATION",
+        "reason": "$string:permission_reason_MICROPHONE",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
+      },
     ],
     "extensionAbilities": [
       {
