@@ -6,6 +6,7 @@ import ClashViewModel from './ClashViewModel';
 import { AppConfig, AppFlowingState, AppState } from './AppState';
 import { EventHub, EventKey } from '../common/EventHub';
 import { http } from '@kit.NetworkKit';
+import { PipManager } from '../common/PipManager';
 
 export default class EntryAbility extends UIAbility {
  private currentLanguage: string | undefined = undefined
@@ -71,6 +72,11 @@ export default class EntryAbility extends UIAbility {
       hilog.info(0x0000, 'EntryAbility', 'Succeeded in loading the content.');
     });
 
+    // 通过主窗口UIContext创建typeNode节点
+    windowStage.getMainWindow().then((window) => {
+      let ctx = window.getUIContext();
+      PipManager.getInstance().makeTypeNode(ctx)
+    })
     // 1. 设置窗口全屏
     let isLayoutFullScreen = true;
     windowClass.setWindowLayoutFullScreen(isLayoutFullScreen).then(() => {

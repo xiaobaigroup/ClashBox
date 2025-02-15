@@ -949,16 +949,16 @@
       "value": "At present, we only support downloading updates from Github. You can also choose to join our Telegram channel to get updates."
     },
     {
-      "name": "simulate_download",
-      "value": "Simulated Download"
+      "name": "simulate_locate",
+      "value": "Simulated Positioning"
     },
     {
-      "name": "simulate_download_subtitle",
-      "value": "Simulate downloading to preserve the program backend"
+      "name": "simulate_locate_subtitle",
+      "value": "Simulate positioning to preserve the program backend"
     },
     {
-      "name": "simulate_player",
-      "value": "Simulated Playing"
+      "name": "simulate_pip",
+      "value": "Simulated PiP"
     },
     {
       "name": "simulate_record",
@@ -969,12 +969,16 @@
       "value": "By simulating recordings to preserve the program background"
     },
     {
-      "name": "simulate_player_subtitle",
-      "value": "By playing blank audio to preserve the program background"
+      "name": "simulate_pip_subtitle",
+      "value": "Enable picture in picture to preserve the program background"
     },
     {
       "name": "backgrounder_tips",
-      "value": "Tips: Which may result in an increase in power consumption; At present, it is known that tablet devices do not support download progress notification bars when using simulated downloads, and their background keep alive function is pending verification. The support for other devices is pending verification."
+      "value": "Tips: Enabling it will increase the power consumption of the application."
+    },
+    {
+      "name": "backgrounder_tips_2",
+      "value": "Tips：Enabling it will increase the power consumption of the application and only one option can be enabled"
     },
     {
       "name": "notice_main_switch",
@@ -1005,12 +1009,12 @@
       "value": "Reminder when VPN is not turned off for a long time"
     },
     {
-      "name": "simulate_download_closed_tips",
+      "name": "simulate_locate_closed_tips",
       "value": "Is it closed?"
     },
     {
-      "name": "simulate_download_closed_content_text",
-      "value": "Turning off this option will result in clashNEXT being unable to run in the background for extended periods of time"
+      "name": "simulate_locate_closed_content_text",
+      "value": "Turning off this option will result in clashNEXT being unable to run in the background for extended periods of time."
     },
     {
       "name": "simulate_record_open_tips",
@@ -1018,7 +1022,7 @@
     },
     {
       "name": "simulate_record_open_content_text",
-      "value": "It is recommended to use 'simulated download' to keep the application running in the background for a long time, as this option may increase the power consumption of the application"
+      "value": "Suggest using 'simulated positioning' to keep the application running in the background for a long time, as this option may result in faster battery consumption."
     },
     {
       "name": "open",

@@ -949,20 +949,20 @@
       "value": "目前仅支持从Github下载更新，您也可以选择加入我们的Telegram频道获取更新。"
     },
     {
-      "name": "simulate_download",
-      "value": "模拟下载"
+      "name": "simulate_locate",
+      "value": "模拟定位"
     },
     {
-      "name": "simulate_download_subtitle",
-      "value": "通过模拟下载以保留程序后台"
+      "name": "simulate_locate_subtitle",
+      "value": "通过模拟定位以保留程序后台"
     },
     {
-      "name": "simulate_player",
-      "value": "模拟播放"
+      "name": "simulate_pip",
+      "value": "模拟画中画"
     },
     {
-      "name": "simulate_player_subtitle",
-      "value": "通过播放空白音频以保留程序后台"
+      "name": "simulate_pip_subtitle",
+      "value": "通过启用空白画中画以保留程序后台"
     },
     {
       "name": "simulate_record",
@@ -974,7 +974,11 @@
     },
     {
       "name": "backgrounder_tips",
-      "value": "Tips：开启后可能会导致耗电量增加；目前已知平板设备使用模拟下载时不支持下载进度通知条且其后台保活功能待验证，其它设备的支持情况待验证"
+      "value": "Tips：开启后会导致应用耗电量增加"
+    },
+    {
+      "name": "backgrounder_tips_2",
+      "value": "Tips：开启后会导致应用耗电量增加且只能开启其中的一个选项"
     },
     {
       "name": "notice_main_switch",
@@ -1005,12 +1009,12 @@
       "value": "长时间未关闭VPN时提醒"
     },
     {
-      "name": "simulate_download_closed_tips",
+      "name": "simulate_locate_closed_tips",
       "value": "是否关闭？"
     },
     {
-      "name": "simulate_download_closed_content_text",
-      "value": "关闭此选项将会导致clashNEXT无法在后台长时间运行"
+      "name": "simulate_locate_closed_content_text",
+      "value": "关闭此选项可能会导致clashNEXT无法在后台长时间运行"
     },
     {
       "name": "simulate_record_open_tips",
@@ -1018,7 +1022,7 @@
     },
     {
       "name": "simulate_record_open_content_text",
-      "value": "建议使用“模拟下载”来保持应用的后台长时运行，本选项可能会导致应用的耗电量增加"
+      "value": "建议使用“模拟定位”来保持应用的后台长时运行，本选项可能会导致电量消耗更快"
     },
     {
       "name": "open",

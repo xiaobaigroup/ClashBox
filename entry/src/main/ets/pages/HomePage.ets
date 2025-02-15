@@ -887,14 +887,14 @@ struct Home {
               // 初始启动计时
               this.proxyStartedTimer.start(time => this.proxyStartingDuration = time)
               // 当模拟下载和通知均启用时
-              if(this.uiConfig.backgroundDownModel && this.uiConfig.Enablednotice){
+              if(this.uiConfig.backgroundLocateModel && this.uiConfig.Enablednotice){
                 BackgroundDownService.start(getContext(this))
               }
               await ClashViewModel.StartVpn()
             } else {
               // 计时器重置
               this.proxyStartedTimer.reset()
-              if(this.uiConfig.backgroundDownModel){
+              if(this.uiConfig.backgroundLocateModel){
                 BackgroundDownService.stop(getContext(this))
               }
               await ClashViewModel.StopVpn()

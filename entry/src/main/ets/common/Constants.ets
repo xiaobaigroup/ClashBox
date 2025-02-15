@@ -632,7 +632,7 @@ export interface ContributorsListItemProp {
 export const ContributorsList: ContributorsListItemProp[] = [
   { title: '小白', subtitle: $r('app.string.XiaoBai_Subtitle'), contact: 'Github', image: $rawfile('XiaoBai.png')},
   { title: '船长', subtitle: $r('app.string.ChuanZhang_Subtitle'), contact: $r('app.string.Email'), image: $rawfile('chuanzhang.png')},
-  { title: '柯蓝KL', subtitle: $r('app.string.KL_Subtitle'), contact: 'Github', contact2: 'Telegram', image: $rawfile('kl.png')},
+  { title: '科蓝KL', subtitle: $r('app.string.KL_Subtitle'), contact: 'Github', contact2: 'Telegram', image: $rawfile('kl.png')},
   { title: '恩临大帝', subtitle: $r('app.string.FrondEnd_Development'), contact: $r('app.string.Email'), image: $rawfile('enlin.png')},
   { title: 'crazypig321', subtitle: $r('app.string.FrondEnd_Development'), contact: 'Github', image: $rawfile('crazypig321.png')},
   { title: '小雅', subtitle: $r('app.string.FrondEnd_Development'), contact: 'Github', image: $rawfile('ya.png')},

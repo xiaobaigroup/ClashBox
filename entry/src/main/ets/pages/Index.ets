@@ -59,6 +59,7 @@ import { customAnimationUtil } from '../utils/Animation'
 import { getGreeting } from '../utils/GreetingUtil'
 import { removeItemsByIndex } from '../utils/RemoveItemsUtils'
 import { DisclaimerCustomDialog } from '../components/Common'
+import { PipManager } from '../common/PipManager'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 
@@ -451,10 +452,10 @@ struct Index {
     if (this.uiConfig.userLanguage) {
       ChangeLanguage(this.uiConfig.userLanguage)
     }
-   // if(!this.uiConfig.enabledADvanced || !this.uiConfig.isShowExperimentalFunction) {
-      // 屏蔽分流策略
-  //    this.moreList = removeItemsByIndex(this.moreList, [5])
-  //  }
+    // if(!this.uiConfig.enabledADvanced || !this.uiConfig.isShowExperimentalFunction) {
+    //   // 屏蔽分流策略
+    //   this.moreList = removeItemsByIndex(this.moreList, [5])
+    // }
     if(this.appConfig.clashCore !== ClashCore.FlClash) {
       // 屏蔽请求与连接
       this.moreList = removeItemsByIndex(this.moreList, [2,3])
@@ -570,7 +571,8 @@ struct Index {
     hilog.info(0x1000, this.componentName, `#aboutToDisappear executed`)
     // 停止监听断点事件，并清空断点对应数据
     BreakpointSystem.getInstance().stop()
-
+    // 解注册画中画生命周期及状态回调
+    PipManager.getInstance().unregisterPipStateChangeListener()
     // 解绑listener中注册的回调函数
     this.deviceHeightListener.off('change');
     this.tabletHeightListener.off('change')
@@ -579,12 +581,21 @@ struct Index {
 
   onPageShow(): void {
     hilog.info(0xFF00, "TimertestTag", "#onPageShow")
+    // 创建画中画控制器
+    PipManager.getInstance().init(getContext(this))
+    // 刷新问候语
     this.greetings = getGreeting()
     if (this.proxyEnabled) {
       this.theRestoreTime = new Date().getTime()
       hilog.info(0xFF00, "TimertestTag", "恢复的时刻： %{private}d", this.theRestoreTime)
     }
     this.isForeward = true
+    // 默认关闭一遍画中画再说
+    PipManager.getInstance().stopPip()
+    if (this.uiConfig.backgroundPiPModel && this.proxyEnabled) {
+      // 设置应用退后台时开启自动启动画中画
+      PipManager.getInstance().setAutoStart(true)
+    }
   }
 
   onPageHide(): void {
@@ -594,6 +605,10 @@ struct Index {
       hilog.info(0xFF00, "TimertestTag", "暂停的时刻： %{private}d", this.thePauseTime)
     }
     this.isForeward = false
+    if (this.uiConfig.backgroundPiPModel && this.proxyEnabled) {
+      // 设置应用处于前台时取消自动启动画中画
+      PipManager.getInstance().setAutoStart(false)
+    }
   }
 
   /**

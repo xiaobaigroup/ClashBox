@@ -11,17 +11,19 @@ struct Backgrounder {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 模拟播放控制变量
   @State isPlay: boolean = false
-  // 模拟录音控制变量
-  @State isRecord: boolean = false
+  // 模拟画中画控制变量
+  @State isPiP: boolean = false
+  // 模拟定位控制变量
+  @State isLocate: boolean = false
   // 实验功能展示变量
   @Consume isShowExperimentalFunction: boolean
-  // 模拟下载关闭提示弹窗标题
-  @State theColsedDialogTitle: ResourceStr = $r('app.string.simulate_download_closed_tips')
-  // 模拟下载关闭提示弹窗内容文本
-  @State closedContentText: ResourceStr = $r('app.string.simulate_download_closed_content_text')
-  // 模拟录音启用提示弹窗标题
+  // 模拟定位关闭提示弹窗标题
+  @State theColsedDialogTitle: ResourceStr = $r('app.string.simulate_locate_closed_tips')
+  // 模拟定位关闭提示弹窗内容文本
+  @State closedContentText: ResourceStr = $r('app.string.simulate_locate_closed_content_text')
+  // 模拟画中画启用提示弹窗标题
   @State theOpenDialogTitle: ResourceStr = $r('app.string.simulate_record_open_tips')
-  // 模拟录音启用提示弹窗内容文本
+  // 模拟画中画启用提示弹窗内容文本
   @State openContentText: ResourceStr = $r('app.string.simulate_record_open_content_text')
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   //一级图标色，黑色
@@ -30,7 +32,7 @@ struct Backgrounder {
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
 
   /**
-   * 关闭模拟下载提示弹窗控制器
+   * 关闭模拟定位提示弹窗控制器
    */
   closeDialogController: CustomDialogController = new CustomDialogController({
     builder: theRowCustomDialog({
@@ -42,7 +44,7 @@ struct Backgrounder {
     }),
   })
   /**
-   * 模拟下载关闭提示弹窗左按钮
+   * 模拟定位关闭提示弹窗左按钮
    */
   @Builder
   closedBuilder() {
@@ -52,23 +54,23 @@ struct Backgrounder {
       .height(39)
       .fontColor(Color.Red)
   }
-  // 模拟下载关闭提示弹窗-取消
+  // 模拟定位关闭提示弹窗-取消
   oncloseCancel() {
-    // 将模拟下载设置为 true
-    this.uiConfig.backgroundDownModel = true
+    // 将模拟定位设置为 true
+    this.isLocate = true
   }
-  // 模拟下载关闭提示弹窗-关闭
+  // 模拟定位关闭提示弹窗-关闭
   oncloseAccept() {
-    // 将模拟下载设置为 false
-    this.uiConfig.backgroundDownModel = false
-    hilog.info(0xFF00, "BackgrounderSwitchtestTag", "模拟下载设置为: %{public}s", this.uiConfig.backgroundDownModel)
-    // 关闭模拟下载逻辑处理
-    hilog.info(0xFF00, "BackgroundertestTag", "模拟下载正在关闭")
+    // 将模拟定位设置为 false
+    this.isLocate = false
+    hilog.info(0xFF00, "BackgrounderSwitchtestTag", "模拟定位设置为: %{public}s", this.isLocate)
+    // 关闭模拟定位逻辑处理
+    hilog.info(0xFF00, "BackgroundertestTag", "模拟定位正在关闭")
     this.onCloseDown()
   }
 
   /**
-   * 启用模拟模拟录音提示弹窗控制器
+   * 启用模拟模拟画中画提示弹窗控制器
    */
   openDialogController: CustomDialogController = new CustomDialogController({
     builder: theRowCustomDialog({
@@ -78,52 +80,52 @@ struct Backgrounder {
       confirm: ()=> { this.onopenAccept() }
     }),
   })
-  // 模拟录音启用提示弹窗-取消
+  // 模拟画中画启用提示弹窗-取消
   onopenCancel() {
-    // 将模拟录音设置为 false
-    this.isRecord = false
-    hilog.info(0xFF00, "BackgrounderSwitchtestTag", "模拟录音设置为: %{public}s", this.isRecord)
+    // 将模拟画中画设置为 false
+    this.isPiP = false
+    hilog.info(0xFF00, "BackgrounderSwitchtestTag", "模拟画中画设置为: %{public}s", this.isPiP)
   }
-  // 模拟录音启用提示弹窗-启用
+  // 模拟画中画启用提示弹窗-启用
   onopenAccept() {
-    // 将模拟录音设置为 true
-    this.isRecord = true
+    // 将模拟画中画设置为 true
+    this.isPiP = true
     // 关闭其它两个模拟
-    if(this.uiConfig.backgroundDownModel) {
-      // 关闭模拟下载
+    if(this.isLocate) {
+      // 关闭模拟定位
       this.oncloseAccept()
     } else if (this.isPlay) {
       // 关闭模拟播放
       this.isPlay = false
     }
-    // 启用模拟录音逻辑处理
-    hilog.info(0xFF00, "BackgroundertestTag", "模拟录音正在开启")
+    // 启用模拟画中画逻辑处理
+    hilog.info(0xFF00, "BackgroundertestTag", "模拟画中画正在开启")
     this.onOpenRecord()
   }
 
   /**
-   * 启用模拟下载
+   * 启用模拟定位
    */
   onOpenDown() {
-    this.uiConfig.backgroundDownModel = true
+    this.uiConfig.backgroundLocateModel = true
   }
   /**
-   * 关闭模拟下载
+   * 关闭模拟定位
    */
   onCloseDown() {
-    this.uiConfig.backgroundDownModel = false
+    this.uiConfig.backgroundLocateModel = false
   }
   /**
-   * 启用模拟播放
+   * 启用模拟画中画
    */
   onOpenPlay() {
-
+    this.uiConfig.backgroundPiPModel = true
   }
   /**
-   * 关闭模拟播放
+   * 关闭模拟画中画
    */
   onClosePlay() {
-
+    this.uiConfig.backgroundPiPModel = false
   }
   /**
    * 启用模拟录音
@@ -138,42 +140,85 @@ struct Backgrounder {
 
   }
 
+  aboutToAppear(): void {
+    // 初始化开关状态
+    this.isLocate = this.uiConfig.backgroundLocateModel
+    this.isPiP = this.uiConfig.backgroundPiPModel
+  }
+
+  aboutToDisappear(): void {
+    // 改变后台运行全局变量的状态
+    if(this.uiConfig.backgroundLocateModel || this.isPlay || this.isPiP) {
+      this.uiConfig.Enablebackgrounder = true
+    } else {
+      this.uiConfig.Enablebackgrounder = false
+    }
+    // 持久化开关状态
+    this.uiConfig.backgroundLocateModel = this.isLocate
+    this.uiConfig.backgroundPiPModel = this.isPiP
+  }
+
   build() {
     NavDestination() {
       TopBuilder({title: $r('app.string.Backgrounder')})
       Column({space: 10}) {
-        // 模拟下载
+        // 模拟定位
         Row() {
           toggleRowList({
             icons: $r('sys.symbol.arrow_down_circle'),
-            title: $r('app.string.simulate_download'),
-            subtitle: $r('app.string.simulate_download_subtitle')
+            title: $r('app.string.simulate_locate'),
+            subtitle: $r('app.string.simulate_locate_subtitle')
           }) {
-            Toggle({ type: ToggleType.Switch, isOn: $$this.uiConfig.backgroundDownModel })
+            Toggle({ type: ToggleType.Switch, isOn: $$this.isLocate })
               .selectedColor(this.icon_emphasize)
               .margin({right: 12})
               .hitTestBehavior(HitTestMode.None)
           }
         }.onClick(() => {
-          if(this.uiConfig.backgroundDownModel) {
-            // 打开模拟下载关闭提示弹窗
-            if(!this.isPlay && !this.isRecord) {
+          if(this.isLocate) {
+            // 打开模拟定位关闭提示弹窗
+            if(!this.isPlay && !this.isPiP) {
               this.closeDialogController.open()
             }
           } else {
-            // 关闭其它两个模拟并开启模拟下载
+            // 关闭其它两个模拟并开启模拟定位
             this.isPlay = false
-            this.isRecord = false
-            this.uiConfig.backgroundDownModel = true
+            this.isPiP = false
+            this.isLocate = true
           }
         })
         if(this.isShowExperimentalFunction) {
-         /* // 模拟播放
+          // 模拟画中画
           Row() {
             toggleRowList({
               icons: $r('sys.symbol.media_center'),
-              title: $r('app.string.simulate_player'),
-              subtitle: $r('app.string.simulate_player_subtitle'),
+              title: $r('app.string.simulate_pip'),
+              subtitle: $r('app.string.simulate_pip_subtitle'),
+              isExperimentalFunction: true
+            }) {
+              Toggle({ type: ToggleType.Switch, isOn: $$this.isPiP })
+                .selectedColor(this.icon_emphasize)
+                .margin({right: 12})
+                .hitTestBehavior(HitTestMode.None)
+            }
+          }.onClick(() => {
+            if(this.isPiP) {
+              // 关闭模拟画中画
+              this.isPiP= false
+            } else {
+              // 关闭其它两个模拟并开启模拟画中画
+              this.isLocate = false
+              this.isPlay = false
+              // 打开模拟画中画启用提示弹窗
+              this.openDialogController.open()
+            }
+          })
+          /*// 模拟播放
+          Row() {
+            toggleRowList({
+              icons: $r('sys.symbol.mic_circle'),
+              title: $r('app.string.simulate_record'),
+              subtitle: $r('app.string.simulate_record_subtitle'),
               isExperimentalFunction: true
             }) {
               Toggle({ type: ToggleType.Switch, isOn: $$this.isPlay })
@@ -182,42 +227,17 @@ struct Backgrounder {
                 .hitTestBehavior(HitTestMode.None)
             }
           }.onClick(() => {
-            if(this.isPlay) {
-              // 关闭模拟播放
-              this.isPlay = false
+            if(this.isPiP) {
+              // 模拟播放关闭
+              this.isPiP = false
             } else {
-              // 关闭其它两个模拟并开启模拟播放
-              this.uiConfig.backgroundDownModel = false
-              this.isRecord = false
-              // 开启
-              this.isPlay = true
-            }
-          })
-          // 模拟录音
-          Row() {
-            toggleRowList({
-              icons: $r('sys.symbol.mic_circle'),
-              title: $r('app.string.simulate_record'),
-              subtitle: $r('app.string.simulate_record_subtitle'),
-              isExperimentalFunction: true
-            }) {
-              Toggle({ type: ToggleType.Switch, isOn: $$this.isRecord })
-                .selectedColor(this.icon_emphasize)
-                .margin({right: 12})
-                .hitTestBehavior(HitTestMode.None)
-            }
-          }.onClick(() => {
-            if(this.isRecord) {
-              // 模拟录音关闭
-              this.isRecord = false
-            } else {
-              // 打开模拟录音启用提示弹窗
+              // 打开模拟播放启用提示弹窗
               this.openDialogController.open()
             }
           })*/
           // 提示
         }
-        Text($r('app.string.backgrounder_tips'))
+        Text(this.uiConfig.isShowExperimentalFunction ? $r('app.string.backgrounder_tips_2') : $r('app.string.backgrounder_tips'))
           .fontWeight(FontWeight.Normal)
           .fontSize(15)
       }
@@ -233,14 +253,7 @@ struct Backgrounder {
     })
   }
 
-  aboutToDisappear(): void {
-    // 改变后台运行全局变量的状态
-    if(this.uiConfig.backgroundDownModel || this.isPlay || this.isRecord) {
-      this.uiConfig.Enablebackgrounder = true
-    } else {
-      this.uiConfig.Enablebackgrounder = false
-    }
-  }
+
 
 }
 export default Backgrounder

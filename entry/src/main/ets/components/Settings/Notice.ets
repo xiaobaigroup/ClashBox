@@ -305,9 +305,11 @@ struct Notice {
         if(this.uiConfig.Enablednotice) {
           // 常驻通知提醒 Start
           if(this.uiConfig.Enablebackgrounder) {
-            Text($r('app.string.background_notice_tips'))
-              .fontWeight(FontWeight.Normal)
-              .fontSize(15)
+            Row() {
+              Text($r('app.string.background_notice_tips'))
+                .fontWeight(FontWeight.Normal)
+                .fontSize(15)
+            }.width('100%').justifyContent(FlexAlign.Center).alignItems(VerticalAlign.Center)
           }
           // 常驻通知提醒 End
 
