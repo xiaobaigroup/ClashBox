@@ -38,6 +38,7 @@ struct PublicNetwork {
   @State remoteIp: IpInfo | null = null
   aboutToAppear(): void {
     EventHub.on(EventKey.checkIpInfo, async ()=>{
+      this.remoteIp = null
       this.remoteIp = await ClashViewModel.checkIpInfo()
     })
   }

@@ -45,9 +45,6 @@ struct ProxyArrangement {
     }
     if(this.currentProfile && this.currentProfile?.proxySelected){
       console.log("proxySelected",this.currentProfile?.proxySelected.size)
-      for(let d of this.currentProfile.proxySelected?.entries()){
-        console.log("proxySelected",d[0],d[1])
-      }
     }
   }
 

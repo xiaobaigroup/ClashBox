@@ -64,10 +64,7 @@ export class ProfileRepo {
     const predicates = new relationalStore.RdbPredicates('Profiles')
     predicates.equalTo('id', details.id);
     const old = await this.store!.query(predicates)
-    const jsonObject: Record<string, string> = {};
-    details.proxySelected.forEach((value, key) => {
-      jsonObject[key] = value;
-    });
+    const jsonObject = details.getSelectedMap()
     const input: ValuesBucket = {
       id: details.id,
       name: details.name ,

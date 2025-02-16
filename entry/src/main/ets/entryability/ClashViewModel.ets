@@ -69,7 +69,6 @@ export class ClashViewModel {
     EventHub.sendEvent(EventKey.FetchProfile, null)
   }
 
-
   async updateProfileConfig(id: string | null): Promise<void>{
     const ua = AppStorage.get<ClashConfig>("clashConfig")?.["global-ua"]
     if(id){
@@ -97,6 +96,7 @@ export class ClashViewModel {
       profile.proxySelected?.set(g, p)
       await this.profileRepo.addOrUpdate(profile)
       await this.socketProxy.changeProxy(g, p)
+      EventHub.sendEvent(EventKey.checkIpInfo)
     } catch (e) {
       promptAction.showToast({message: e.message, duration:3000})
     }
@@ -255,30 +255,33 @@ export class ClashViewModel {
     if (!result){
       result = await this.socketProxy.startClash()
     }
-    if (result)
+    if (result){
       EventHub.sendEvent(EventKey.StartedClash)
+      EventHub.sendEvent(EventKey.checkIpInfo)
+    }
   }
 
   async StopVpn(){
     this.vpnStarted = false
     this.socketProxy.stopClash()
     EventHub.sendEvent(EventKey.StopedClash)
+    EventHub.sendEvent(EventKey.checkIpInfo)
   }
 
-  async  initProfile(){
+  async initProfile(){
     let appConfig = AppStorage.get<AppConfig>("appConfig")
-    await this.loadConfig()
     EventHub.sendEvent(EventKey.StartLog, appConfig?.enableLogger)
+    await this.loadConfig(false)
   }
-  async loadConfig(){
+  async loadConfig(patch: boolean = true){
     let appConfig = AppStorage.get<AppConfig>("appConfig")
     let clashConfig = AppStorage.get<ClashConfig>("clashConfig")
     const profile = await this.profileRepo.query(appConfig?.currentProfileId)
     await this.loadProfileAndConfig(appConfig?.currentProfileId ?? "", clashConfig, {
-      "is-patch": false,
+      "is-patch": patch,
       "is-compatible": true,
       "override-dns": appConfig?.overrideDns,
-      "selected-map": profile?.proxySelected
+      "selected-map": profile?.getSelectedMap()
     } as ConfigExtendedParams)
     EventHub.sendEvent(EventKey.FetchProxyGroup)
   }

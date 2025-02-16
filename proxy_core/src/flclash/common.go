@@ -71,7 +71,6 @@ func getProfileProvidersPath(id string) string {
 
 func getRawConfigWithId(id string) *config.RawConfig {
 	path := getProfilePath(id)
-	fmt.Println("getRawConfigWithId", path)
 	bytes, err := readFile(path)
 	if err != nil {
 		log.Errorln("profile is not exist")

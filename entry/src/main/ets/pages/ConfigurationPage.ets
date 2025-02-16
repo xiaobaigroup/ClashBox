@@ -294,7 +294,7 @@ struct ConfigurationPage {
   // 配置添加按钮前Symbol动效
   private ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE
 
-  async  loadConfig(item: ConfigData){
+  async loadConfig(item: ConfigData, needUpdated = false){
     if (this.isLoading)
       return
     this.isLoading = true;
@@ -302,7 +302,9 @@ struct ConfigurationPage {
     this.appConfig.currentProfileName = item.configName
     this.appConfig.currentProfileId = item.configId
     try {
-      await ClashViewModel.updateProfileConfig(item.configId)
+      if(needUpdated){
+        ClashViewModel.updateProfileConfig(item.configId)
+      }
       await ClashViewModel.loadConfig()
     }catch (e) {
       promptAction.showToast({message: "加载配置失败: " + e.message || e })
@@ -659,11 +661,10 @@ struct ConfigurationPage {
     if (configId){
       //使开关点击时不触发转场动画
       this.isON.toggleAnim = true
-      // TODO loading and try
-      this.loadConfig(this.currentTouchConfigData)
+
+      this.loadConfig(this.currentTouchConfigData, true)
       //使开关点击时不触发转场动画
       this.isON.toggleAnim = true
-      ClashViewModel.updateProfileConfig(configId)
       // TODO 单个配置更新
       hilog.info(0xC012, this.componentName, `#updateConfig#更新配置{单个}: configName is [${this.currentTouchConfigData.configName}], configId is [${this.currentTouchConfigData.configId}]`)
     } else {

@@ -117,6 +117,13 @@ export class Profile {
     let dd = this.proxySelected.get(g.name) ?? g.now
     return dd
   }
+  getSelectedMap(): Record<string, string>{
+    const jsonObject: Record<string, string> = {};
+    this.proxySelected.forEach((value, key) => {
+      jsonObject[key] = value;
+    });
+    return jsonObject
+  }
 }
 
 

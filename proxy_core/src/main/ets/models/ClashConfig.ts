@@ -8,7 +8,7 @@ export interface  UpdateConfigParams{
 export interface  ConfigExtendedParams{
   "is-patch": boolean
   "is-compatible": boolean
-  "selected-map": Map<string, string>
+  "selected-map": Record<string, string>
   "override-dns": boolean
   "test-url": string
 }
