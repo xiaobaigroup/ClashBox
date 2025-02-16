@@ -449,7 +449,7 @@ struct ProxyPage {
                       })
                         .width('100%')
                         .height('100%')
-                        .padding({bottom:CONTENT_END_OFFSET_150})
+                        .padding({bottom:CONTENT_END_OFFSET_150-50})
                         .onAppear(() => {
                           hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear %{public}s", group.proxies.toString())
                         })
@@ -491,6 +491,7 @@ struct ProxyPage {
                 // 列表分组页 Start
                 else if (this.appConfig.proxyGroupType === ProxyGroupType.List) {
                   ProxyArrangement()
+                    .padding({ bottom:50 })
                 }
               }.width('100%')
               .height('100%')

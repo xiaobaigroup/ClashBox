@@ -119,23 +119,26 @@ export class ProxyItemDataSource extends BaseDataSource<ProxyItem> {
   }
 
   // 延迟排序
-  public LatencySortItems(data:ProxyItem[]) {
+  public async LatencySortItems(data:ProxyItem[]) {
     data.sort((a, b) => (a.latency ?? 0) - (b.latency ?? 0));
-    this.dataArray = data
+    this.dataArray = data;
+    this.pushData(data)
     this.refresh()
   }
 
   //按名称排序
-  public NameSortItems(data:ProxyItem[]) {
+  public async NameSortItems(data:ProxyItem[]) {
     data.sort((a, b) => ProxyCollator.compare(a.name, b.name));
     this.dataArray = data;
+    this.pushData(data)
     this.refresh()
   }
 
   //默认排序
-  public DefaultSortItems(data:ProxyItem[]) {
+  public async DefaultSortItems(data:ProxyItem[]) {
     data.sort((a, b) => ProxyCollator.compare(a.id, b.id));
     this.dataArray = data;
+    this.pushData(data)
     this.refresh();
   }
 }

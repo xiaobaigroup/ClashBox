@@ -167,11 +167,12 @@ struct ProxyGroupItem {
   }
 
   aboutToAppear(): void {
-    hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     // 清空数据
-    this.proxyLazyItems.clear()
+   // this.proxyLazyItems.clear()
     // 写入数据
     this.proxyLazyItems.pushData(this.proxyitems)
+    this.proxyLazyItems.refresh()
+    hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     BreakpointSystem.getInstance().attach(this.breakPointStateListLanes)
     BreakpointSystem.getInstance().start()
     EventHub.on(EventKey.ProxySort, (sort: ProxySort) => {
@@ -189,24 +190,7 @@ struct ProxyGroupItem {
       }
     })
   }
-/*
-  // 延迟排序
-  LatencySortItems() {
-    this.proxyitems.sort((a, b) => (a.latency ?? 0) - (b.latency ?? 0));
-  }
 
-  //按名称排序
-  NameSortItems() {
-    this.proxyitems = this.proxyitems.sort((a, b) => {
-      return ProxyCollator.compare(a.name, b.name);
-    })
-  }
-
-  //默认排序
-  DefaultSortItems() {
-    this.proxyitems.sort((a, b) => ProxyCollator.compare(a.id, b.id));
-  }
-*/
   /**
    * 半模态窗口测速网站
    */
@@ -358,7 +342,7 @@ struct ProxyGroupItem {
               transition: this.uiConfig.isAnimation ? TransitionEffect.prototype.animation({ tempo: 1.5 }) : undefined
             },
           })
-      }, (item: ProxyItem) => item.name)
+      }, (item: ProxyItem,i:number) => item.name+i)
     }
     .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : this.breakPointStateListLanes.value,
       this.breakPointStateListGutter.value)

@@ -100,10 +100,6 @@ struct ProxyArrangement {
               .padding({ top:10, bottom: 10 })
           }
         }
-        .padding({
-          left: this.breakPointStateTabContentTitleMargin.value,
-          right: this.breakPointStateTabContentTitleMargin.value,
-        })
         .clickEffect(this.isContentShow?customAnimationUtil.isClickEffect(this.uiConfig):null)
         .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
         .onClick(() => {
