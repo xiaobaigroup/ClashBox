@@ -18,7 +18,9 @@ import {
   validateConfig,
   registerMessage,
   getRequestList,
-  clearRequestList
+  clearRequestList,
+  startListener,
+  stopListener
 } from 'libflclash.so';
 import { Address, CommonVpnService, isIpv4, isIpv6, VpnConfig } from './CommonVpnService';
 import { JSON, util } from '@kit.ArkTS';
@@ -249,6 +251,7 @@ export class FlClashVpnService extends CommonVpnService{
           break;
         }
         case ClashRpcType.startClash: {
+          startListener()
           this.startVpn().then((r)=>{
             resolve(r)
           }).catch((e:Error)=>{
@@ -257,6 +260,7 @@ export class FlClashVpnService extends CommonVpnService{
           break;
         }
         case ClashRpcType.stopClash:{
+          stopListener()
           this.stopVpn()
           resolve(true)
           break;
