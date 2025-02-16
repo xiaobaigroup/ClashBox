@@ -31,7 +31,7 @@ import { convertTime } from '../utils/TimeConvertUtil'
 import { customAnimationUtil, isON } from '../utils/Animation'
 import { Profile, ProxyGroup, SubscriptionInfo } from 'proxy_core'
 import { Provider } from "proxy_core"
-import  {  ProxyItem } from '../common/ProxyData'
+import { ProxyItem } from '../common/ProxyData'
 
 
 /**
@@ -95,7 +95,6 @@ struct ConfigurationPage {
   @Consume curYOffset: number
   //loading动画
   @State isLoading : boolean = false
-
   /* 配置列表List相关 */
   // 当前单选框选择的配置 TODO 待接入用户首选项，先写死 configName，单选框控制现在只用到configName所以先不给值
   // @StorageProp('currentConfigRadioCheckedConfigData')
@@ -398,7 +397,6 @@ struct ConfigurationPage {
                         })
                         .hitTestBehavior(HitTestMode.None)
                         .onClick(async () => {
-
                           this.isON.toggleAnim=true
                           await this.loadConfig(item)
                           hilog.info(0xC002, this.componentName,
