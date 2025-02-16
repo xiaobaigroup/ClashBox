@@ -46,7 +46,7 @@ import {
   AboutListItemProp
 } from '../common/Constants'
 import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/ProxyData'
-import { ClashConfig, Dns, LogLevel, Profile, ProxyGroup, ProxyMode, SubscriptionInfo } from 'proxy_core'
+import { ClashConfig, Dns, LogLevel, Profile, ProxyGroup, ProxyMode, ProxySort, SubscriptionInfo } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig, ClashCore, UIConfig } from '../entryability/AppState'
@@ -522,7 +522,6 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.HomeCardCellularDataPadding)
     BreakpointSystem.getInstance().start()
     // TODO
-
     this.fetchProfiles()
     EventHub.on(EventKey.FetchProfile, () => {
       this.fetchProfiles()
@@ -538,7 +537,7 @@ struct Index {
           this.theProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode ?? ProxyMode.Rule)
           this.proxyGroups.pushData(this.theProxyGroups)
         }
-      }else{
+      } else{
         this.proxyGroups = new ProxyGroupItemDataSource([])
       }
     })

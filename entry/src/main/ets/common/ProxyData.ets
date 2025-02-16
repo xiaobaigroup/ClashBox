@@ -1,5 +1,6 @@
 import { ProxyGroup } from "proxy_core"
 import { BaseDataSource } from "./BaseDataSource"
+import { intl } from "@kit.LocalizationKit"
 
 // 定义一个接口来描述列表项的数据结构
 export interface ProxyItem {
@@ -116,7 +117,29 @@ export class ProxyItemDataSource extends BaseDataSource<ProxyItem> {
   public refresh(): void {
     this.notifyDataReload()
   }
+
+  // 延迟排序
+  public LatencySortItems(data:ProxyItem[]) {
+    data.sort((a, b) => (a.latency ?? 0) - (b.latency ?? 0));
+    this.dataArray = data
+    this.refresh()
+  }
+
+  //按名称排序
+  public NameSortItems(data:ProxyItem[]) {
+    data.sort((a, b) => ProxyCollator.compare(a.name, b.name));
+    this.dataArray = data;
+    this.refresh()
+  }
+
+  //默认排序
+  public DefaultSortItems(data:ProxyItem[]) {
+    data.sort((a, b) => ProxyCollator.compare(a.id, b.id));
+    this.dataArray = data;
+    this.refresh();
+  }
 }
 
-
+//中文排序
+let ProxyCollator = new intl.Collator("zh-CN");
 

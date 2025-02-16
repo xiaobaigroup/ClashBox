@@ -7,12 +7,10 @@ import {
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE } from '../../common/Constants'
 import { LengthMetrics, SymbolGlyphModifier,PromptAction, curves } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
-import {  ProxyItem, ProxyData, ProxyItemDataSource } from '../../common/ProxyData';
+import {  ProxyItem, ProxyItemDataSource } from '../../common/ProxyData';
 import { EventHub, EventKey } from '../../common/EventHub';
 import { ProxyGroup, ProxySort } from 'proxy_core';
-import { intl } from '@kit.LocalizationKit';
 import { AppConfig, AppState, ClashCore, ProxyCardSize, UIConfig } from '../../entryability/AppState';
-import ClashViewModel from '../../entryability/ClashViewModel';
 import { ProxyNode } from './ProxyNodeItem';
 import { customAnimationUtil } from '../../utils/Animation';
 import { customVibrator } from '../../utils/VibratorUtil';
@@ -76,7 +74,7 @@ struct ProxyCustomDialog {
 }
 
 //中文排序
-let ProxyCollator = new intl.Collator("zh-CN");
+//let ProxyCollator = new intl.Collator("zh-CN");
 
 //自定义弹窗内容end
 
@@ -180,18 +178,18 @@ struct ProxyGroupItem {
       console.log("ProxySort", sort)
       switch (sort) {
         case ProxySort.Default:
-          this.DefaultSortItems();
+          this.proxyLazyItems.LatencySortItems(this.proxyitems);
           break;
         case ProxySort.Title:
-          this.NameSortItems();
+          this.proxyLazyItems.NameSortItems(this.proxyitems);
           break;
         case ProxySort.Delay:
-          this.LatencySortItems();
+          this.proxyLazyItems.LatencySortItems(this.proxyitems);
           break;
       }
     })
   }
-
+/*
   // 延迟排序
   LatencySortItems() {
     this.proxyitems.sort((a, b) => (a.latency ?? 0) - (b.latency ?? 0));
@@ -208,7 +206,7 @@ struct ProxyGroupItem {
   DefaultSortItems() {
     this.proxyitems.sort((a, b) => ProxyCollator.compare(a.id, b.id));
   }
-
+*/
   /**
    * 半模态窗口测速网站
    */

@@ -4,6 +4,7 @@ import {
   BIND_SHEET_CONTAINER_HEIGHT,
   TAB_CONTENT_TITLE_FONT_SIZE,
   BORDER_RADIUS_20,
+  CONTENT_END_OFFSET_150,
 } from '../common/Constants'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import ProxyGroupItem from '../components/Proxy/ProxyGroupItem'
@@ -448,6 +449,7 @@ struct ProxyPage {
                       })
                         .width('100%')
                         .height('100%')
+                        .padding({bottom:CONTENT_END_OFFSET_150})
                         .onAppear(() => {
                           hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear %{public}s", group.proxies.toString())
                         })
@@ -491,9 +493,11 @@ struct ProxyPage {
                   ProxyArrangement()
                 }
               }.width('100%')
+              .height('100%')
               .alignItems(HorizontalAlign.Center)
               // 列表排列页 End
             }.width('100%')
+            .height('100%')
             .scrollBar(BarState.Off)
             .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring : null)
             .padding({ left: this.breakPointStateTabContentTitleMargin.value, right: this.breakPointStateTabContentTitleMargin.value})
