@@ -114,7 +114,6 @@ export const defaultBypassPrivateRouteAddress = [
 ];
 
 export class  ClashConfig {
-  port?: number = defaultMixedPort;
   "socks-port"?: number;
   "redir-port"?: number;
   "tproxy-port"?: number;

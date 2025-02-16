@@ -66,7 +66,7 @@ struct PublicNetwork {
           .fontColor(this.icon_emphasize)
           .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
           .backgroundColor($r('app.color.home_card_background'))
-          .onClick(async () => {
+          .onClick(() => {
             //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
             if (this.isShowHomeEdit===false) {
                 this.remoteIp = null

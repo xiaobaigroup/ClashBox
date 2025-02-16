@@ -29,8 +29,10 @@ import { EventHub, EventKey } from '../common/EventHub'
 import { getResourceString } from '../utils/ResourceStringUtil'
 import { convertTime } from '../utils/TimeConvertUtil'
 import { customAnimationUtil, isON } from '../utils/Animation'
-import { Profile, SubscriptionInfo } from 'proxy_core'
+import { Profile, ProxyGroup, SubscriptionInfo } from 'proxy_core'
 import { Provider } from "proxy_core"
+import ProxyGroupsLazyData, { ObservedArray, ProxyItem } from '../common/ProxyData'
+
 
 /**
  * 长按菜单参数
@@ -81,8 +83,10 @@ struct ConfigurationPage {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   //开关不触发list转场动画判定
   @State isON:isON = new isON()
-
-
+  //节点数据组
+  @Prop items: ProxyItem[]
+  @Consume
+  proxyGroups: ProxyGroup[]
   /* NV路由 相关 */
   // 路由栈
   @Provide('configAddPageInfos')
@@ -91,8 +95,10 @@ struct ConfigurationPage {
   @Consume curYOffset: number
   //loading动画
   @State isLoading : boolean = false
-
-
+  pLazyData: ProxyGroupsLazyData<ProxyItem> = new ProxyGroupsLazyData<ProxyItem>()
+  observedProxy = new ObservedArray<ProxyItem>(this.items)
+  gLazyData: ProxyGroupsLazyData<ProxyGroup> = new ProxyGroupsLazyData<ProxyGroup>()
+  observedProxyGroup = new ObservedArray<ProxyGroup>(this.proxyGroups)
   /* 配置列表List相关 */
   // 当前单选框选择的配置 TODO 待接入用户首选项，先写死 configName，单选框控制现在只用到configName所以先不给值
   // @StorageProp('currentConfigRadioCheckedConfigData')
@@ -395,6 +401,8 @@ struct ConfigurationPage {
                         })
                         .hitTestBehavior(HitTestMode.None)
                         .onClick(async () => {
+                          this.gLazyData.pushArrayData(this.observedProxyGroup)
+                          this.pLazyData.pushArrayData(this.observedProxy)
                           this.isON.toggleAnim=true
                           await this.loadConfig(item)
                           hilog.info(0xC002, this.componentName,
@@ -428,6 +436,7 @@ struct ConfigurationPage {
                   .onClick(async () => {
                     this.isON.toggleAnim = true
                     await this.loadConfig(item)
+
                     hilog.info(0xC002, this.componentName, `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
                   })
                   .onTouch((event: TouchEvent) => {

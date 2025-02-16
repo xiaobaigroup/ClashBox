@@ -26,5 +26,6 @@ export const getRequestList: () => string;
 export const clearRequestList: () => string;
 export const registerMessage: (callback: (message: string, value: string) => void) => void;
 export const startLog: (callback: (message: string, value: string) => void) => string;
-
+export const startListener:() => void
+export const stopListener:() => void
 export const stopLog: () => void;
