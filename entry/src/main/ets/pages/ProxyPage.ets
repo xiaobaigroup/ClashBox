@@ -336,8 +336,8 @@ struct ProxyPage {
           })
         Blank()
 
-        //一键取消所有收藏按钮
-        Button({ type: ButtonType.Circle, stateEffect: true }) {
+        //一键取消所有收藏按钮 TODO 判定暂时有问题 不显示先
+       /* Button({ type: ButtonType.Circle, stateEffect: true }) {
           SymbolGlyph($r('sys.symbol.heart_slash'))
             .fontSize(24)
             .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
@@ -353,6 +353,7 @@ struct ProxyPage {
           this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_all_tip') })
         })
         .transition(customAnimationUtil.isSlide(150, this.uiConfig))
+        */
 
         //提供者按钮
         Button({ type: ButtonType.Circle, stateEffect: true }) {

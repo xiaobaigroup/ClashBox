@@ -256,7 +256,7 @@ struct ProxyGroupItem {
   MyMenu(isShowFavoriteProxy: boolean, nodeName: string) {
     Menu() {
       // 根据当前配置信息来判断显示[收藏 /取消收藏] 单独处理 START
-      if (isShowFavoriteProxy && this.favoriteProxys.size>0 && !this.showStart) {
+      if (isShowFavoriteProxy && this.favoriteProxys.size>0 ){//&& !this.showStart) {
         MenuItem({
           symbolStartIcon: this.proxyListLongPressCtxMenuForUnFavorite.symbolStartIcon!
             .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
@@ -404,7 +404,7 @@ struct ProxyGroupItem {
     if (!p.isShowFavoriteProxy&&AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups).length<3){
       this.ProxyPromptAction.showToast({ message: $r('app.string.Collect_Tip') })
       p.isShowFavoriteProxy = true
-      this.showStart=false
+     // this.showStart=false
       this.favoriteProxys.set(p.g + '|' + p.name, this.appConfig.currentProfileId ?? "")
     }else {
       this.ProxyPromptAction.showToast({ message: $r('app.string.favorite_proxy_no') })

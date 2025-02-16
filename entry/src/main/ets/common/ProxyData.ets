@@ -11,6 +11,7 @@ export interface ProxyItem {
   isShowFavoriteProxy?: boolean
 }
 
+@Observed
 // 节点假数据组
 export class ProxyData {
   private static items: ProxyItem[] = [

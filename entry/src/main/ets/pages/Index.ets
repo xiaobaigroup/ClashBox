@@ -266,7 +266,7 @@ struct Index {
   @Provide('HomeCardEditHeight')
   private HomeCardEditHeight: BreakpointState<number> = HomeCardEditHeight
   // 代理启动变量
-  @Provide proxyEnabled: boolean = false
+  @Provide @Watch('ShowPipChange')proxyEnabled: boolean = false
   // 前台判断变量
   @Provide isForeward: boolean = false
   // 暂停时刻
@@ -580,7 +580,7 @@ struct Index {
   @Provide("currentProfile") currentProfile: Profile | null = null
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
-  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @StorageLink('uiConfig') @Watch('ShowPipChange')uiConfig: UIConfig = new UIConfig()
 
   aboutToDisappear() {
     hilog.info(0x1000, this.componentName, `#aboutToDisappear executed`)
@@ -594,6 +594,25 @@ struct Index {
     this.foldPhoneOpenListener.off('change')
   }
 
+
+  /**
+   * 画中画根据代理启动和后台按钮监听是否开启
+   */
+  ShowPipChange() {
+    hilog.info(0xFF00, "HometestTag", "进入卡片编辑页面显示监听  %{public}s")
+    // 当编辑页面由 true -> false 时触发抖动动画刷新
+    if(this.uiConfig.backgroundPiPModel && this.proxyEnabled) {
+      // 创建画中画控制器
+      PipManager.getInstance().init(getContext(this))
+      // 禁用自动启用
+      PipManager.getInstance().setAutoStart(true)
+      hilog.info(0xFF00, "PipTag", "代理启用状态： %{private}s", this.proxyEnabled)
+      hilog.info(0xFF00, "PipTag", "画中画启用状态： %{private}s", this.uiConfig.backgroundPiPModel)
+    }else{
+      PipManager.getInstance().setAutoStart(false)
+    }
+  }
+
   onPageShow(): void {
     hilog.info(0xFF00, "TimertestTag", "#onPageShow")
     // 刷新问候语
@@ -603,17 +622,12 @@ struct Index {
       hilog.info(0xFF00, "TimertestTag", "恢复的时刻： %{private}d", this.theRestoreTime)
     }
     this.isForeward = true
-    // 创建画中画控制器
-    PipManager.getInstance().init(getContext(this))
-    // 禁用自动启用
-    PipManager.getInstance().setAutoStart(false)
-    hilog.info(0xFF00, "PipTag", "代理启用状态： %{private}s", this.proxyEnabled)
-    hilog.info(0xFF00, "PipTag", "画中画启用状态： %{private}s", this.uiConfig.backgroundPiPModel)
-    // 处于前台关闭画中画
+    this.ShowPipChange()
     PipManager.getInstance().stopPip()
   }
 
   onPageHide(): void {
+    PipManager.getInstance().setAutoStart(true)
     hilog.info(0xFF00, "TimertestTag", "#onPageHide")
     if (this.proxyEnabled) {
       this.thePauseTime = new Date().getTime()
@@ -622,13 +636,7 @@ struct Index {
     this.isForeward = false
     hilog.info(0xFF00, "PipTag", "代理启用状态： %{private}s", this.proxyEnabled)
     hilog.info(0xFF00, "PipTag", "画中画启用状态： %{private}s", this.uiConfig.backgroundPiPModel)
-    if (this.uiConfig.backgroundPiPModel && this.proxyEnabled) {
-      hilog.info(0xFF00, "PipTag", "画中画启动： %{private}s")
-      // 退至后台启用画中画
-      PipManager.getInstance().startPip()
-    } else {
-
-    }
+    this.ShowPipChange()
   }
 
   /**
