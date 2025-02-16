@@ -139,7 +139,7 @@ struct ProxyPage {
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
       }
-      .borderRadius(21)
+      .borderRadius(BORDER_RADIUS_20)
       .height(this.currentIndex === targetIndex ? 36 : 32)
       .width(this.currentIndex === targetIndex ? 96 : 87)
       .justifyContent(FlexAlign.Center)
@@ -571,7 +571,7 @@ function EditColumn() {
   .padding({ left: 12, right: 12 })
   .width('100%')
   .margin({ bottom: 10 })
-  .borderRadius(20)
+  .borderRadius(BORDER_RADIUS_20)
   .backgroundColor($r('app.color.container_background'))
   .justifyContent(FlexAlign.SpaceEvenly) // 非通用公共属性
 }

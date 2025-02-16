@@ -2,6 +2,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit'
 import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem'
 import {
   BIND_SHEET_CONTAINER_HEIGHT,
+  BORDER_RADIUS_20,
   CONTENT_END_OFFSET_150,
   LIST_ITEM_HEIGHT,
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE } from '../../common/Constants'
@@ -168,7 +169,7 @@ struct ProxyGroupItem {
 
   aboutToAppear(): void {
     // 清空数据
-   // this.proxyLazyItems.clear()
+    this.proxyLazyItems.clear()
     // 写入数据
     this.proxyLazyItems.pushData(this.proxyitems)
     this.proxyLazyItems.refresh()
@@ -287,7 +288,7 @@ struct ProxyGroupItem {
     //分割线
     .menuItemDivider({ color: $r('app.color.divider'), strokeWidth: LengthMetrics.vp(1) })
     .backgroundColor($r('app.color.container_background'))
-    .borderRadius(20)
+    .borderRadius(BORDER_RADIUS_20)
     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
   } //长按菜单end
 
@@ -435,7 +436,7 @@ function ListStyle() {
 @Extend(ListItem)
 function ListItemStyle() {
   .width('100%')
-  .borderRadius(20)
+  .borderRadius(BORDER_RADIUS_20)
   .backgroundColor($r('app.color.container_background'))
 }
 
