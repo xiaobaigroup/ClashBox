@@ -225,6 +225,14 @@ func clearRequestList(env js.Env, this js.Value, args []js.Value) any {
 	reqeustList = []statistic.Tracker{}
 	return env.ValueOf("")
 }
+func startListener(env js.Env, this js.Value, args []js.Value) any {
+	handleStartListener()
+	return env.ValueOf("")
+}
+func stopListener(env js.Env, this js.Value, args []js.Value) any {
+	handleStopListener()
+	return env.ValueOf("")
+}
 func init() {
 	entry.Export("initClash", js.AsCallback(initClash))
 	entry.Export("startTun", js.AsCallback(startTun))
@@ -249,6 +257,8 @@ func init() {
 	entry.Export("getCurrentProfileName", js.AsCallback(getCurrentProfileName))
 	entry.Export("setProcessMap", js.AsCallback(setProcessMap))
 	entry.Export("updateGeoData", js.AsCallback(updateGeoData))
+	entry.Export("startListener", js.AsCallback(startListener))
+	entry.Export("stopListener", js.AsCallback(stopListener))
 
 	entry.Export("updateDns", js.AsCallback(updateDns))
 	entry.Export("startLog", js.AsCallback(startLog))
