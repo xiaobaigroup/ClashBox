@@ -45,7 +45,7 @@ import {
   moreData,
   AboutListItemProp
 } from '../common/Constants'
-import { ProxyItem, ProxyData } from '../common/ProxyData'
+import { ProxyItem, ProxyData, ObservedArray } from '../common/ProxyData'
 import { ClashConfig, Dns, LogLevel, Profile, ProxyGroup, ProxyMode, SubscriptionInfo } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
@@ -55,7 +55,7 @@ import { common } from '@kit.AbilityKit'
 import { setAutoColorMode, setDarkColorMode, setLightColorMode } from '../utils/ChangeColorModeUtils'
 import { ChangeLanguage } from '../utils/ChangeLanguageUtil'
 import { ConfigData, ConfigDataSourceType } from '../common/PageArgumentEntity'
-import { customAnimationUtil } from '../utils/Animation'
+import { customAnimationUtil, isON } from '../utils/Animation'
 import { getGreeting } from '../utils/GreetingUtil'
 import { removeItemsByIndex } from '../utils/RemoveItemsUtils'
 import { DisclaimerCustomDialog } from '../components/Common'
@@ -329,6 +329,7 @@ struct Index {
   @Provide @Watch('isSecondaryChange') isSecondary: boolean = false
   // 更多页数据
   @Provide moreList: moreData[] = ListMoreData()
+
   // 实验功能开关列表行数据
   @Provide ExperimentData: AboutListItemProp = {
     title: 'Experiment',
@@ -694,76 +695,80 @@ struct Index {
 
   build() {
     Stack() {
-        Tabs({
-          barPosition: this.isLandscapePhone ? BarPosition.Start : this.compBarPose.value,
-          index: this.currentIndex,
-          controller: indexController
-        }) {
-          TabContent() {
-            Home()
-          }
-          .tabBar(this.TabBarBuilder($r('app.string.Home'), 0, $r('sys.symbol.house_fill')))
-          .gesture(
-            // 二级Tabs第一个页签向左拖动时，触发手势事件
-            PanGesture({direction:this.isLandscapePhone||this.istabletLandscape?PanDirection.Down:PanDirection.None})
-              .onActionStart((event?: GestureEvent) => {
-                console.info('Pan start')
-              })// 通过父组件的TabsController的实例，改变其index，达到跳转一级Tabs（首页）的效果
-              .onActionEnd(() => {
-                if (this.isLandscapePhone||this.istabletLandscape) {
-                  if (this.selectedIndex === 0) {
-                    indexController.changeIndex(1)
-                    console.info('Pan end')
-                  }
-                }
-              })
-          )
+      Tabs({
+        barPosition: this.isLandscapePhone ? BarPosition.Start : this.compBarPose.value,
+        index: this.currentIndex,
+        controller: indexController
+      }) {
 
-       //   if (this.configList.length !== 0) {
-            TabContent() {
-              ProxyPage()
-            }
-            .tabBar(this.TabBarBuilder($r('app.string.Proxy'), 1, $r('sys.symbol.list_bullet_square_fill')))
-        //  }
-
-          TabContent() {
-            ConfigurationPage()
-          }
-          .tabBar(this.TabBarBuilder($r('app.string.Configuration'), 2, $r('sys.symbol.folder_fill')))
-
-          TabContent() {
-            MorePage()
-          }
-          .tabBar(this.TabBarBuilder($r('app.string.More'), 3, $r('sys.symbol.square_fill_grid_2x2')))
+        TabContent() {
+          Home()
         }
-        .zIndex(1)
-        .backgroundColor(this.uiConfig.isBlurr ? $r('app.color.background') : $r('app.color.background'))
-        .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Regular : null)
-        .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
-        .barOverlap(this.uiConfig.isBlurr ? (this.isLandscapePhone || ( this.istabletLandscape && !this.isSecondary) ? false : true) : false) //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
-        .scrollable(this.isSecondary ? false : true)
-        .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
-        .barWidth(this.isLandscapePhone ? '77vp' : this.compBarWidth.value) /**/
-        .barHeight(this.isLandscapePhone ? '100%' :  this.compBarHeight.value) /**/
-        .onChange((index: number) => {
-          this.currentIndex = index
-        })
-        .onAnimationStart((index: number, targetIndex: number) => {
-          animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion(), }, () => {
-            if (index === targetIndex) {
-              return
-            }
-            this.selectedIndex = targetIndex;
+        .tabBar(this.TabBarBuilder($r('app.string.Home'), 0, $r('sys.symbol.house_fill')))
+        .gesture(
+          // 二级Tabs第一个页签向左拖动时，触发手势事件
+          PanGesture({
+            direction: this.isLandscapePhone || this.istabletLandscape ? PanDirection.Down : PanDirection.None
           })
-        })
-        .width('100%')
-        .height('100%')
-        .backgroundColor($r('app.color.background'))
-        .foregroundBlurStyle(
-          this.isEnableIndexForegroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
-          { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
+            .onActionStart((event?: GestureEvent) => {
+              console.info('Pan start')
+            })// 通过父组件的TabsController的实例，改变其index，达到跳转一级Tabs（首页）的效果
+            .onActionEnd(() => {
+              if (this.isLandscapePhone || this.istabletLandscape) {
+                if (this.selectedIndex === 0) {
+                  indexController.changeIndex(1)
+                  console.info('Pan end')
+                }
+              }
+            })
         )
-        .padding({ top: px2vp(this.topRectHeight) })
+
+        TabContent() {
+            ProxyPage()
+        }
+        .tabBar(this.TabBarBuilder($r('app.string.Proxy'), 1, $r('sys.symbol.list_bullet_square_fill')))
+
+
+        TabContent() {
+            ConfigurationPage()
+        }
+        .tabBar(this.TabBarBuilder($r('app.string.Configuration'), 2, $r('sys.symbol.folder_fill')))
+
+        TabContent() {
+            MorePage()
+        }
+        .tabBar(this.TabBarBuilder($r('app.string.More'), 3, $r('sys.symbol.square_fill_grid_2x2')))
+      }
+      .zIndex(1)
+      .backgroundColor(this.uiConfig.isBlurr ? $r('app.color.background') : $r('app.color.background'))
+      .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Regular : null)
+      .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
+      .barOverlap(this.uiConfig.isBlurr ?
+        (this.isLandscapePhone || (this.istabletLandscape && !this.isSecondary) ? false : true) :
+        false) //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
+      .scrollable(this.isSecondary ? false : true)
+      .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
+      .barWidth(this.isLandscapePhone ? '77vp' : this.compBarWidth.value) /**/
+      .barHeight(this.isLandscapePhone ? '100%' : this.compBarHeight.value) /**/
+      .onChange((index: number) => {
+        this.currentIndex = index
+      })
+      .onAnimationStart((index: number, targetIndex: number) => {
+        animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion(), }, () => {
+          if (index === targetIndex) {
+            return
+          }
+          this.selectedIndex = targetIndex;
+        })
+      })
+      .width('100%')
+      .height('100%')
+      .backgroundColor($r('app.color.background'))
+      .foregroundBlurStyle(
+        this.isEnableIndexForegroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
+        { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
+      )
+      .padding({ top: px2vp(this.topRectHeight) })
     }
   }
 }

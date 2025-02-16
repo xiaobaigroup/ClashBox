@@ -6,7 +6,6 @@
  *  3. 二次启动：调用`resumeWithExtraTime(需累加时间戳)`方法可传入需累加时间戳
  *  4. 重置：调用`reset()`方法
  */
-
 export class Timer {
   private startTime: number
   private elapsed: number

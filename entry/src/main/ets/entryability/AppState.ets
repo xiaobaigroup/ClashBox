@@ -34,6 +34,7 @@ export class AppFlowingState{
   removeIp: IpInfo | null = null
 
 }
+
 export class AppConfig{
   currentProfileId?: string
   currentProxyName?: string
@@ -132,6 +133,7 @@ export function getPackageInfo(){
   return bundleManager.getBundleInfoForSelf(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION)
 }
 
+@Observed
 // use @StorageLink('appConfig')
 export class AppState {
   static externalController = "127.0.0.1:9090"

@@ -7,9 +7,9 @@ import {
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE } from '../../common/Constants'
 import { LengthMetrics, SymbolGlyphModifier,PromptAction, curves } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
-import {  ProxyItem, ProxyData, proxyListLazyData } from '../../common/ProxyData';
+import ProxyGroupsLazyData, { ObservedArray, ProxyItem } from '../../common/ProxyData';
 import { EventHub, EventKey } from '../../common/EventHub';
-import { ProxyGroup, ProxySort } from 'proxy_core';
+import { Profile, ProxyGroup, ProxySort } from 'proxy_core';
 import { intl } from '@kit.LocalizationKit';
 import { AppConfig, AppState, ClashCore, ProxyCardSize,
   UIConfig } from '../../entryability/AppState';
@@ -17,7 +17,7 @@ import ClashViewModel from '../../entryability/ClashViewModel';
 import { ProxyNode } from './ProxyItem';
 import { customAnimationUtil } from '../../utils/Animation';
 import { customVibrator } from '../../utils/VibratorUtil';
-
+import { ConfigData } from '../../common/PageArgumentEntity';
 
 //断点布局
 export const BPS_LIST_LANES_2_2_3_4_4: BreakpointState<number> = BreakpointState.of({
@@ -81,7 +81,7 @@ let ProxyCollator = new intl.Collator("zh-CN");
 
 //自定义弹窗内容end
 
-
+@Reusable
 @Component
 struct ProxyGroupItem {
   /* 主题色 */
@@ -169,8 +169,12 @@ struct ProxyGroupItem {
     isShowFavoriteProxy: false
   }
 
+  pLazyData: ProxyGroupsLazyData<ProxyItem> = new ProxyGroupsLazyData<ProxyItem>()
+  observedProxy = new ObservedArray<ProxyItem>(this.items)
+
   aboutToAppear(): void {
-    this.proxyListData = new proxyListLazyData(this.items)
+    this.pLazyData.pushArrayData(this.observedProxy)
+
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     BreakpointSystem.getInstance().attach(this.breakPointStateListLanes)
     BreakpointSystem.getInstance().start()
@@ -313,10 +317,11 @@ struct ProxyGroupItem {
       this.OnProxyChange(item)
     }
   }
-  private proxyListData: proxyListLazyData = new proxyListLazyData([])
+
+
   build() {
     List({ space: 10, initialIndex: 0 }) {
-      LazyForEach(this.proxyListData, (item: ProxyItem, index: number) => {
+      LazyForEach(this.pLazyData, (item: ProxyItem, index: number) => {
    //   ForEach(this.items, (item: ProxyItem, index: number) => {
         ListItem() {
           ProxyNode({
@@ -331,10 +336,13 @@ struct ProxyGroupItem {
               item.latency = p
             }
           })
+            .onAppear(() => {
+              console.info("appear:" + JSON.stringify(item))
+            })
         }
         .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
         .onClick(() => {
-          this.selectProxy(item)
+         this.selectProxy(item)
         })
         .ListItemStyle()
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
@@ -357,7 +365,9 @@ struct ProxyGroupItem {
               transition: this.uiConfig.isAnimation ? TransitionEffect.prototype.animation({ tempo: 1.5 }) : undefined
             },
           })
-      }, (item: ProxyItem) => item.name)
+      }, (item: ProxyItem, index: number) => {
+        return index + '__' + JSON.stringify(item.name)
+      })
     }
     .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : this.breakPointStateListLanes.value,
       this.breakPointStateListGutter.value)

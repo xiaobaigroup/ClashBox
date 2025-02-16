@@ -1,8 +1,8 @@
 import { EventHub, EventKey } from '../../common/EventHub'
-import { ProxyItem as ProxyItem, ProxyData } from '../../common/ProxyData'
+import ProxyGroupsLazyData, { ProxyItem as ProxyItem, ProxyData, ObservedArray} from '../../common/ProxyData'
 import { AppConfig, ProxyCardSize, UIConfig } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
-import { customVibrator } from '../../utils/VibratorUtil'
+
 
 
 @Extend(Text)
@@ -27,6 +27,7 @@ function ListRowStyle() {
   .alignItems(VerticalAlign.Center)
 }
 
+
 @Component
 export struct ProxyNode {
   @Consume('icon_emphasize')
@@ -40,6 +41,7 @@ export struct ProxyNode {
 
   selectProxy?: (item: ProxyItem) => void
   onLatencyChange?:(l: number)=>void
+
   aboutToAppear(): void {
     EventHub.on(EventKey.TestDelayAll, async (name: string)=>{
       if(name == this.item.name){
@@ -59,6 +61,8 @@ export struct ProxyNode {
   aboutToDisappear() {
 
   }
+
+
   build() {
     if (this.itemSize === ProxyCardSize.Large){
       Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween}) {

@@ -3,11 +3,11 @@ import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import ProxyGroupItem from './ProxyGroupItem'
 import { Profile, ProxyGroup,ProxyType } from 'proxy_core'
-import { proxyGroupsLazyData, ProxyItem } from '../../common/ProxyData'
+import ProxyGroupsLazyData, { ObservedArray, ProxyItem } from '../../common/ProxyData'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { AppConfig,UIConfig } from '../../entryability/AppState'
 import { customAnimationUtil } from '../../utils/Animation'
-
+import { EventHub, EventKey } from '../../common/EventHub'
 
 
 @Entry
@@ -27,15 +27,18 @@ struct ProxyArrangement {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @StorageProp("proxyGroups") proxyGroups: ProxyGroup[] = []
   //page内顶部标题偏移量
   @Consume curYOffset: number
-  private swiperData: proxyGroupsLazyData = new proxyGroupsLazyData([])
+  @State currentIndex: number =0
+  gLazyData: ProxyGroupsLazyData<ProxyGroup> = new ProxyGroupsLazyData<ProxyGroup>()
+  observedProxyGroup = new ObservedArray<ProxyGroup>(this.proxyGroups)
 
   aboutToAppear(): void {
-    this.swiperData = new proxyGroupsLazyData(this.proxyGroups)
+    this.gLazyData.pushArrayData(this.observedProxyGroup)
+
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     BreakpointSystem.getInstance().start()
-
     if (this.currentProfile){
       let listIndexes = this.proxyGroups.findIndex((d)=>d.name == this.currentProfile?.currentGroupName)
       setTimeout(() => {
@@ -52,10 +55,6 @@ struct ProxyArrangement {
       }
     }
   }
-
- @State currentIndex: number =0
-  @Consume
-  proxyGroups: ProxyGroup[]
 
   changeProxy(g: string, item: ProxyItem){
     if(this.currentProfile){
@@ -88,7 +87,7 @@ struct ProxyArrangement {
 
   build() {
     List({ space: 10, initialIndex: 0,scroller:this.proxyScroller}) {
-      LazyForEach(this.swiperData, (g:ProxyGroup,i:number) => {
+      LazyForEach(this.gLazyData, (g:ProxyGroup,i:number) => {
         ListItemGroup({ header: this.itemHead(g.name,
           !this.isContentShow && this.selectItem === i ? $r('sys.symbol.chevron_down')
             : $r('sys.symbol.chevron_right'))} ){
@@ -110,6 +109,10 @@ struct ProxyArrangement {
               .padding({ top:10, bottom: 10 })
           }
         }
+        .onAppear(() => {
+
+          console.info("appear:" + g)
+        })
         .padding({
           left: this.breakPointStateTabContentTitleMargin.value,
           right: this.breakPointStateTabContentTitleMargin.value,
@@ -131,7 +134,9 @@ struct ProxyArrangement {
         })
         .width('100%')
         .borderRadius(BORDER_RADIUS_20)
-      },(item: ProxyGroup) => item.name)
+      }, (item: ProxyGroup, index: number) => {
+        return index + '__' + JSON.stringify(item)
+      })
     }
     .chainAnimation(true)
     //.borderRadius(BORDER_RADIUS_20)

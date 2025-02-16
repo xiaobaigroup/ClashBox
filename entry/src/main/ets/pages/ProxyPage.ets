@@ -4,11 +4,12 @@ import {
   BIND_SHEET_CONTAINER_HEIGHT,
   TAB_CONTENT_TITLE_FONT_SIZE,
   BORDER_RADIUS_20,
+  CONTENT_END_OFFSET_150,
 } from '../common/Constants'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import ProxyGroupItem from '../components/Proxy/ProxyGroupItem'
 import ProxyArrangement from '../components/Proxy/ProxyArrangement'
-import { proxyGroupsLazyData, ProxyItem } from '../common/ProxyData'
+import ProxyGroupsLazyData, { ObservedArray, ProxyItem } from '../common/ProxyData'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { Profile, ProxyGroup, ProxySort, ProxyType } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
@@ -20,6 +21,7 @@ import { ProviderPage } from '../components/Proxy/Provider'
 import { indexController } from './Index'
 import { customAnimationUtil } from '../utils/Animation'
 import { Nothing } from '../components/Common'
+
 
 
 @Entry
@@ -63,8 +65,7 @@ struct ProxyPage {
   /*节点相关数据以及排序 */
   //节点假数据组后期可改可删
   @Consume items: ProxyItem[]
-  @Consume
-  proxyGroups: ProxyGroup[]
+  @StorageProp("proxyGroups") proxyGroups: ProxyGroup[] = []
 
   hasGroups() {
     this.FristPage = this.proxyGroups.length == 0;
@@ -105,10 +106,12 @@ struct ProxyPage {
   //收藏显示判定
   @Provide showStart:boolean=false
   private swiperController: SwiperController = new SwiperController()
-  private swiperData: proxyGroupsLazyData = new proxyGroupsLazyData([])
+  gLazyData: ProxyGroupsLazyData<ProxyGroup> = new ProxyGroupsLazyData<ProxyGroup>()
+  observedProxyGroup = new ObservedArray<ProxyGroup>(this.proxyGroups)
   //栅格点位配置
   aboutToAppear(): void {
-    this.swiperData = new proxyGroupsLazyData(this.proxyGroups)
+    this.gLazyData.pushArrayData(this.observedProxyGroup)
+
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     BreakpointSystem.getInstance().start()
     if (this.currentProfile) {
@@ -317,18 +320,19 @@ struct ProxyPage {
       .width('100%')
   }
 
+
   build() {
-    Stack(){
+    Stack() {
       // 标题栏
       // if (!this.isLandscapePhone || this.appConfig.proxyGroupType === ProxyGroupType.List) {
       Row({ space: this.HomeCardTitleButtonPadding.value }) {
         Text($r('app.string.Proxy'))
-          .fontSize(this.curYOffset<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset/100:TAB_CONTENT_TITLE_FONT_SIZE)
+          .fontSize(this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE - this.curYOffset / 100 :
+            TAB_CONTENT_TITLE_FONT_SIZE)
           .fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Center)
           .transition(customAnimationUtil.isSlide(200, this.uiConfig))
-          .transition(customAnimationUtil.isScaleTran(0, this.uiConfig))
-            //提供者半模拟态
+          .transition(customAnimationUtil.isScaleTran(0, this.uiConfig))//提供者半模拟态
           .bindSheet($$this.isProviderEdit, this.ProviderBindSheetEdit(), {
             detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
             backgroundColor: $r('app.color.background'),
@@ -348,7 +352,7 @@ struct ProxyPage {
           SymbolGlyph($r('sys.symbol.heart_slash'))
             .fontSize(24)
             .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-            .fontColor([this.icon_primary,Color.Red])
+            .fontColor([this.icon_primary, Color.Red])
         }
         .width(40)
         .height(40)
@@ -356,7 +360,7 @@ struct ProxyPage {
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .onClick(() => {
           this.favoriteProxys.clear()
-          this.showStart=true
+          this.showStart = true
           this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_all_tip') })
         })
         .transition(customAnimationUtil.isSlide(150, this.uiConfig))
@@ -408,8 +412,8 @@ struct ProxyPage {
         })
       }
       .zIndex(1)
-      .height(this.curYOffset<0?TAB_CONTENT_TITLE_HEIGHT-this.curYOffset:TAB_CONTENT_TITLE_HEIGHT)
-      .position({x:0})
+      .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
+      .position({ x: 0 })
       .alignItems(VerticalAlign.Center)
       .width('100%')
       .padding({
@@ -417,6 +421,7 @@ struct ProxyPage {
         right: this.breakPointStateTabContentTitleMargin.value,
       })
       .transition(customAnimationUtil.isSlide(0, this.uiConfig))
+
       //  }
 
       if (this.proxyGroups.length == 0) {
@@ -427,21 +432,26 @@ struct ProxyPage {
       } else if (this.proxyGroups.length > 0) {
         // 代理页分组TAB+list主体
         Stack({ alignContent: this.stackAlignContentAlignment }) {
-          Column(){
+          Column() {
             Blank().height(TAB_CONTENT_TITLE_HEIGHT)
-            Tabs({ barPosition: BarPosition.Start, controller: this.tabsController, index: this.currentIndex }) {
-              ForEach(this.proxyGroups, (g: ProxyGroup, i: number) => {
-                TabContent()
-                  .tabBar(this.TabBuilder(g.name, i))
+            if (this.appConfig.proxyGroupType === ProxyGroupType.Tabs) {
+              Tabs({ barPosition: BarPosition.Start, controller: this.tabsController, index: this.currentIndex }) {
+                ForEach(this.proxyGroups, (g: ProxyGroup, i: number) => {
+                  TabContent()
+                    .tabBar(this.TabBuilder(g.name, i))
+                })
+              }
+              .zIndex(1)
+              .barMode(BarMode.Scrollable)
+              .barHeight(55)
+              .height(55)
+              .width('100%')
+              .fadingEdge(false)
+              .translate({ y: this.curYOffset < 0 ? -this.curYOffset : 0 })
+              .margin({
+                left: this.breakPointStateTabContentTitleMargin.value,
               })
             }
-            .zIndex(1)
-            .barMode(BarMode.Scrollable)
-            .barHeight(55)
-            .height(55)
-            .width('100%')
-            .fadingEdge(false)
-            .translate({y:this.curYOffset<0 ? -this.curYOffset : 0 })
 
             Scroll() {
               //根据ProxyArrangementSelected的状态决定是否显示
@@ -450,7 +460,7 @@ struct ProxyPage {
 
                   //TODO 改为懒加载后，切换配置不会把节点切换为选中配置的节点，暂时没找到原因，需修复
                   Swiper(this.swiperController) {
-                    LazyForEach(this.swiperData, (g: ProxyGroup, i: number) => {
+                    LazyForEach(this.gLazyData, (g: ProxyGroup, i: number) => {
                       //    if ( this.currentIndex === i) {//为实现listltem转场动画的的if
                       ProxyGroupItem({
                         items: g.proxies as ProxyItem[],
@@ -466,12 +476,16 @@ struct ProxyPage {
                         .width('100%')
                         .height('100%')
                         .onAppear(() => {
-                          console.info('onAppear ' + g.proxies.toString())
+
+                          console.info("appear:" + g)
                         })
                         .onDisAppear(() => {
                           console.info('onDisAppear ' + g.toString())
                         })
-                    }, (item: ProxyGroup) => item.name)
+                        .padding({bottom:CONTENT_END_OFFSET_150})
+                    }, (item: ProxyGroup, index: number) => {
+                      return index + '__' + JSON.stringify(item)
+                    })
                   }
                   //.vertical(true)
                   .indicator(false)
@@ -499,14 +513,27 @@ struct ProxyPage {
                   )
                   .loop(false)
                   .onAnimationStart((index: number, targetIndex: number) => {
-                    animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
-                      this.tabsController.changeIndex(targetIndex)
-                      this.currentIndex = targetIndex;
-                      if (this.currentProfile) {
-                        this.currentProfile.currentGroupName = this.proxyGroups[this.currentIndex].name
-                        ClashViewModel.updateProfile(this.currentProfile)
+                    if (targetIndex < this.gLazyData.totalCount() - 2) {
+                      let gLazyData = this.gLazyData.getData(targetIndex + 2);
+                      animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
+                        this.tabsController.changeIndex(targetIndex)
+                        this.currentIndex = targetIndex;
+                        if (this.currentProfile) {
+                          this.currentProfile.currentGroupName = this.proxyGroups[this.currentIndex].name
+                        }
+                      })
+                      if (this.gLazyData.getDataList()) {
+                        return;
+                      } else {
+                        animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
+                          this.tabsController.changeIndex(targetIndex)
+                          this.currentIndex = targetIndex;
+                          if (this.currentProfile) {
+                            this.currentProfile.currentGroupName = this.proxyGroups[this.currentIndex].name
+                          }
+                        })
                       }
-                    })
+                    }
                   })
                 }
                 .padding({
@@ -517,6 +544,7 @@ struct ProxyPage {
                   this.isEnableIndexForegroundBlur ? BlurStyle.Thin : BlurStyle.NONE,
                   { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
                 )
+
                 //分组tabs end
               }
 
@@ -527,10 +555,10 @@ struct ProxyPage {
               //列表排列end
             }
             .scrollBar(BarState.Off)
-            .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)
+            .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring : null)
             .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {
               // 累计计算当前父组件滚动在Y轴方向的偏移量
-              if (this.uiConfig.isAnimation){
+              if (this.uiConfig.isAnimation) {
                 this.curYOffset += yOffset
               }
               console.info("yOffset" + this.curYOffset);
@@ -549,8 +577,8 @@ struct ProxyPage {
                   .align(Alignment.Center)
               }
               .onClick(async () => {
-                await  EventHub.sendEvent(EventKey.TestDelayAll)
-                if (this.appConfig.proxySort == ProxySort.Delay){
+                await EventHub.sendEvent(EventKey.TestDelayAll)
+                if (this.appConfig.proxySort == ProxySort.Delay) {
                   EventHub.sendEvent(EventKey.ProxySort, ProxySort.Delay)
                 }
                 this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
@@ -566,7 +594,12 @@ struct ProxyPage {
             })
             .borderRadius(100)
             .backgroundColor(this.icon_emphasize)
-            .margin({bottom:this.isLandscapePhone ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
+            .margin({
+              bottom: this.isLandscapePhone ? $r('app.integer.vp_proxy_start_button_left_right_margin') :
+              $r('app.integer.vp_proxy_start_button_bottom_margin'),
+              right: $r('app.integer.vp_proxy_start_button_left_right_margin'),
+              left: $r('app.integer.vp_proxy_start_button_left_right_margin')
+            })
             .width(this.proxyStartButtonWidth)
             .height(this.proxyStartButtonHeight)
             .clip(true)
@@ -580,7 +613,8 @@ struct ProxyPage {
         .backgroundColor($r('app.color.background'))
         // .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
         .width('100%')
-        .height( '100%' )
+        .height('100%')
+
         // 主体 END
       }
     }
