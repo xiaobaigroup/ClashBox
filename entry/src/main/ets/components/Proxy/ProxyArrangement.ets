@@ -17,6 +17,8 @@ struct ProxyArrangement {
   @Consume curYOffset: number
   @State selectItem: number = 0
   @State currentIndex: number =0
+  // 代理原始数据
+  @Consume theProxyGroups: ProxyGroup[]
   @Consume proxyGroups: ProxyGroupItemDataSource
   private componentName: string = 'ProxyPage'
   @State isContentShow: boolean |undefined = false
@@ -34,12 +36,12 @@ struct ProxyArrangement {
     BreakpointSystem.getInstance().start()
 
     if (this.currentProfile){
-      // let listIndexes = this.proxyGroups.findIndex((d)=>d.name == this.currentProfile?.currentGroupName)
-      // setTimeout(() => {
-      //   if(listIndexes > -1){
-      //     this.currentIndex = listIndexes
-      //   }
-      // }, 200)
+      let listIndexes = this.theProxyGroups.findIndex((d)=>d.name == this.currentProfile?.currentGroupName)
+      setTimeout(() => {
+        if(listIndexes > -1){
+          this.currentIndex = listIndexes
+        }
+      }, 200)
     }
     if(this.currentProfile && this.currentProfile?.proxySelected){
       console.log("proxySelected",this.currentProfile?.proxySelected.size)
