@@ -305,7 +305,8 @@ struct ConfigurationPage {
       if(needUpdated){
         ClashViewModel.updateProfileConfig(item.configId)
       }
-      await ClashViewModel.loadConfig()
+      ClashViewModel.socketProxy.reset()
+      await ClashViewModel.loadConfig(false)
     }catch (e) {
       promptAction.showToast({message: "加载配置失败: " + e.message || e })
     }

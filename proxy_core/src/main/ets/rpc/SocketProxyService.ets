@@ -116,7 +116,19 @@ export class SocketProxyService implements IClashManager{
     let json = await this.sendMessageRequest(ClashRpcType.reset, [])
     return json as boolean
   }
-
+  async ParseMessage(messageBuffer: string, resolve: (s: string| number | boolean | undefined)=>void, reject:  (err: string)=>void){
+    try {
+      let json = JSON.parse(messageBuffer) as RpcResult
+      if (!json.error)
+        resolve(json.result)
+      else{
+        promptAction.showToast({message: json.error})
+        resolve(json.error)
+      }
+    } catch (e) {
+      reject("JSON解码失败")
+    }
+  }
   async sendMessageRequest(
     method: number,
     params: (string| number | boolean) [] = []
@@ -124,29 +136,25 @@ export class SocketProxyService implements IClashManager{
     return new Promise(async (resolve, reject)=>{
       let client: socket.LocalSocket = socket.constructLocalSocketInstance();
       let messageBuffer = ""
+      let timeout = true
 
       client.on('message', async (value: socket.LocalSocketMessageInfo) => {
         let text = new util.TextDecoder()
         let result = text.decodeToString(new Uint8Array(value.message))
-        console.log("onMessage", result)
+        console.log("onMessage " + method, result)
         if('\n\0' == result){
-          try {
-            let json = JSON.parse(messageBuffer) as RpcResult
-            if (!json.error)
-              resolve(json.result)
-            else{
-              promptAction.showToast({message: json.error})
-              resolve(json.error)
-            }
-            client.close();
-          } catch (e) {
-            reject("解码失败")
-            client.close();
-          }
+          this.ParseMessage(messageBuffer, resolve, reject)
+          timeout = false
+          client.close();
         }else{
           messageBuffer += result
         }
       })
+      setTimeout(()=>{
+        if(timeout){
+          this.ParseMessage(messageBuffer, resolve, reject)
+        }
+      }, 3000)
       client.on("error", ()=>{
         reject("rpc client error")
       })

@@ -62,29 +62,24 @@ struct FavoriteConfiguration {
                   checkedBackgroundColor: this.icon_emphasize,
                 })
                 .hitTestBehavior(HitTestMode.None)
-                .onChange((isChecked: boolean) => {
+                .onChange(async (isChecked: boolean) => {
                   //在home页编辑状态时，无法操作
                   if (this.isShowHomeEdit === false && isChecked) {
+                    await ClashViewModel.loadConfig(false); // 假设loadConfig返回一个Promise
                     this.appConfig.currentProfileId = f[0]
-                    EventHub.sendEvent(EventKey.LoadClashConfig)
-                    EventHub.on(EventKey.LoadClashConfig, async () => {
-                      await ClashViewModel.loadConfig(); // 假设loadConfig返回一个Promise
-                      this.promptAction.showToast({message: getResourceString($r('app.string.load_success'), this)})
-                    });
+                    this.promptAction.showToast({message: getResourceString($r('app.string.load_success'), this)})
                     if (this.uiConfig.isVibrate) {
                       customVibrator.vibratorTriggerOfHapticClockTimer()
                     }
                   }
                 })
             }
-            .onClick(() => {
+            .onClick(async () => {
               if (this.isShowHomeEdit===false) {
                 this.appConfig.currentProfileId = f[0]
                 EventHub.sendEvent(EventKey.LoadClashConfig)
-                EventHub.on(EventKey.LoadClashConfig, async () => {
-                  await ClashViewModel.loadConfig(); // 假设loadConfig返回一个Promise
-                  this.promptAction.showToast({message: getResourceString($r('app.string.load_success'), this)})
-                });
+                await ClashViewModel.loadConfig(false); // 假设loadConfig返回一个Promise
+                this.promptAction.showToast({message: getResourceString($r('app.string.load_success'), this)})
                 if (this.uiConfig.isVibrate) {
                   customVibrator.vibratorTriggerOfHapticClockTimer()
                 }

@@ -42,8 +42,8 @@ export default class EntryAbility extends UIAbility {
       promptAction.showToast({message: "核心启动中..."})
       await ClashViewModel.ChangeCore(clashCore)
       ClashViewModel.initProfile()
-      EventHub.on(EventKey.LoadClashConfig, ()=>{
-        ClashViewModel.loadConfig()
+      EventHub.on(EventKey.LoadClashConfig, (isPatch: boolean)=>{
+        ClashViewModel.loadConfig(isPatch)
       })
       // 监测vpn服务是否被回收，并且重新启动
       setInterval(async ()=>{

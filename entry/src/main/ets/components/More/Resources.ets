@@ -190,7 +190,7 @@ struct Resources {
       geoMap[name] = url
       this.clashConfig['geox-url'] = copy(geoMap)
     }
-    EventHub.sendEvent(EventKey.LoadClashConfig)
+    EventHub.sendEvent(EventKey.LoadClashConfig, true)
   }
   updateTime(index: number) {
     let ItemData = this.resourceListData[index]

@@ -227,11 +227,13 @@ export class ClashViewModel {
   }
 
   async loadProfileAndConfig(id: string, config: ClashConfig | null = null, params: ConfigExtendedParams | null= null){
+
     let result = await this.socketProxy.loadConfig({
       "profile-id": id,
       config: config ?? new ClashConfig(),
       params: params ?? {} as ConfigExtendedParams
     } as UpdateConfigParams)
+
     if (result != ""){
       promptAction.showToast({message: result, duration: 3000})
     }
@@ -283,7 +285,6 @@ export class ClashViewModel {
       "override-dns": appConfig?.overrideDns,
       "selected-map": profile?.getSelectedMap()
     } as ConfigExtendedParams)
-    EventHub.sendEvent(EventKey.FetchProxyGroup)
   }
 
   async initGeoIp(){
