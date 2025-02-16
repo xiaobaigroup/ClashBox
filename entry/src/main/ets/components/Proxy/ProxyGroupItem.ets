@@ -7,14 +7,13 @@ import {
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE } from '../../common/Constants'
 import { LengthMetrics, SymbolGlyphModifier,PromptAction, curves } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
-import {  ProxyItem, ProxyData, proxyListLazyData } from '../../common/ProxyData';
+import {  ProxyItem, ProxyData, ProxyItemDataSource } from '../../common/ProxyData';
 import { EventHub, EventKey } from '../../common/EventHub';
 import { ProxyGroup, ProxySort } from 'proxy_core';
 import { intl } from '@kit.LocalizationKit';
-import { AppConfig, AppState, ClashCore, ProxyCardSize,
-  UIConfig } from '../../entryability/AppState';
+import { AppConfig, AppState, ClashCore, ProxyCardSize, UIConfig } from '../../entryability/AppState';
 import ClashViewModel from '../../entryability/ClashViewModel';
-import { ProxyNode } from './ProxyItem';
+import { ProxyNode } from './ProxyNodeItem';
 import { customAnimationUtil } from '../../utils/Animation';
 import { customVibrator } from '../../utils/VibratorUtil';
 
@@ -84,9 +83,10 @@ let ProxyCollator = new intl.Collator("zh-CN");
 
 @Component
 struct ProxyGroupItem {
+  // 组件名
+  private componentName: string = 'ProxyPage'
   /* 主题色 */
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
   /* 速度与延迟区别弹窗 */
   ProxyDialogController: CustomDialogController | null = new CustomDialogController({
     builder: ProxyCustomDialog({
@@ -98,11 +98,9 @@ struct ProxyGroupItem {
       },
     }),
     alignment: DialogAlignment.Center,
-    // offset: { dx: 0, dy: -20 },
     customStyle: false,
     cornerRadius: 32,
     gridCount: 4,
-    // maskColor: $r('app.color.dialog_maskcolor'),
     cancel: this.existApp,
     autoCancel: true,
     onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
@@ -118,22 +116,22 @@ struct ProxyGroupItem {
       }
     },
   })
+
   /*长按菜单相关参数  */
   //长按菜单图标
   @State startIconModifier1: SymbolGlyphModifier =
     new SymbolGlyphModifier($r('sys.symbol.bolt_filled_on_circle')).fontSize('24vp');
-  @State startIconModifier2: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.timer')).fontSize('24vp');
+  @State startIconModifier2: SymbolGlyphModifier =
+    new SymbolGlyphModifier($r('sys.symbol.timer')).fontSize('24vp');
   @State startIconModifier3: SymbolGlyphModifier =
     new SymbolGlyphModifier($r('sys.symbol.questionmark_circle')).fontSize('24vp');
-  //报错信息参数
-  private componentName: string = 'ProxyPage'
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+
   /* 断点布局相关 */
-  @State
-  private breakPointStateListLanes: BreakpointState<number> = BPS_LIST_LANES_2_2_3_4_4
-  @Consume
-  private breakPointStateListGutter: BreakpointState<number>
+  @State private breakPointStateListLanes: BreakpointState<number> = BPS_LIST_LANES_2_2_3_4_4
+  @Consume private breakPointStateListGutter: BreakpointState<number>
+
   /* 本页布局相关参数 */
   // 定义ProxyGroupItemSelectedWide的值便于切换布局方式
   @Prop ProxyGroupItemSelected: ProxyCardSize
@@ -146,7 +144,8 @@ struct ProxyGroupItem {
   private isEnableIndexForegroundBlur: boolean
   /* 代理节点数据相关参数  */
   //节点数据组
-  @Prop items: ProxyItem[]
+  @Prop proxyitems: ProxyItem[]
+  @State proxyLazyItems: ProxyItemDataSource = new ProxyItemDataSource()
   // 当前代理节点单选选择的值
   @Prop selectedProxy: string
   @Prop disabled: boolean
@@ -155,7 +154,7 @@ struct ProxyGroupItem {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageProp("proxyGroups") proxyGroups: ProxyGroup[] = []
   //收藏显示判定
-  @Consume showStart:boolean
+@Consume showStart:boolean
   /**
    * XXX 当前手指触摸的ListItem的对应 `this.configList` 中的 `configId`
    *    List的长按菜单中的响应都是根据这个的对象中的属性来处理的，是个不稳定因素
@@ -170,8 +169,11 @@ struct ProxyGroupItem {
   }
 
   aboutToAppear(): void {
-    this.proxyListData = new proxyListLazyData(this.items)
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
+    // 清空数据
+    this.proxyLazyItems.clear()
+    // 写入数据
+    this.proxyLazyItems.pushData(this.proxyitems)
     BreakpointSystem.getInstance().attach(this.breakPointStateListLanes)
     BreakpointSystem.getInstance().start()
     EventHub.on(EventKey.ProxySort, (sort: ProxySort) => {
@@ -192,22 +194,24 @@ struct ProxyGroupItem {
 
   // 延迟排序
   LatencySortItems() {
-    this.items.sort((a, b) => (a.latency ?? 0) - (b.latency ?? 0));
+    this.proxyitems.sort((a, b) => (a.latency ?? 0) - (b.latency ?? 0));
   }
 
   //按名称排序
   NameSortItems() {
-    this.items = this.items.sort((a, b) => {
+    this.proxyitems = this.proxyitems.sort((a, b) => {
       return ProxyCollator.compare(a.name, b.name);
     })
   }
 
   //默认排序
   DefaultSortItems() {
-    this.items.sort((a, b) => ProxyCollator.compare(a.id, b.id));
+    this.proxyitems.sort((a, b) => ProxyCollator.compare(a.id, b.id));
   }
 
-  //半模态窗口测速网站
+  /**
+   * 半模态窗口测速网站
+   */
   @Builder
   BindSheetNetworkSpeed() {
     Row() {
@@ -225,9 +229,9 @@ struct ProxyGroupItem {
     .justifyContent(FlexAlign.Center)
     //   .padding({bottom:100})
     .backgroundColor(($r('app.color.container_background')))
-  } //半模态网络测速 end
+  }
+  //半模态网络测速 end
 
-  // 在自定义组件即将析构销毁时将dialogController置空
   onCancel() {
     console.info('Callback when the first button is clicked')
   }
@@ -313,11 +317,10 @@ struct ProxyGroupItem {
       this.OnProxyChange(item)
     }
   }
-  private proxyListData: proxyListLazyData = new proxyListLazyData([])
+
   build() {
     List({ space: 10, initialIndex: 0 }) {
-      LazyForEach(this.proxyListData, (item: ProxyItem, index: number) => {
-   //   ForEach(this.items, (item: ProxyItem, index: number) => {
+      LazyForEach(this.proxyLazyItems, (item: ProxyItem, index: number) => {
         ListItem() {
           ProxyNode({
             itemSize: this.ProxyGroupItemSelected,
@@ -434,10 +437,12 @@ interface LongPressContextMenuItem {
 @Extend(List)
 function ListStyle() {
   // transition保证组件离场不被立即析构，可设置其他转场效果
+  .width('100%')
+  .chainAnimation(true)
   .scrollBar(BarState.Off)
   .edgeEffect(EdgeEffect.Spring)
+  .alignListItem(ListItemAlign.Center)
   .contentEndOffset(CONTENT_END_OFFSET_150)
-  .chainAnimation(true)
   .nestedScroll({
     scrollForward: NestedScrollMode.PARENT_FIRST,
     scrollBackward: NestedScrollMode.SELF_FIRST
@@ -447,9 +452,15 @@ function ListStyle() {
 //ListItem公用样式
 @Extend(ListItem)
 function ListItemStyle() {
+  .width('100%')
   .borderRadius(20)
   .backgroundColor($r('app.color.container_background'))
-  .width('100%')
 }
+
+
+
+
+
+
 
 export default ProxyGroupItem

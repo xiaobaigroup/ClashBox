@@ -29,8 +29,7 @@ function ListRowStyle() {
 
 @Component
 export struct ProxyNode {
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @Prop itemSize: ProxyCardSize
   @Prop item: ProxyItem
@@ -40,6 +39,7 @@ export struct ProxyNode {
 
   selectProxy?: (item: ProxyItem) => void
   onLatencyChange?:(l: number)=>void
+
   aboutToAppear(): void {
     EventHub.on(EventKey.TestDelayAll, async (name: string)=>{
       if(name == this.item.name){
@@ -57,8 +57,8 @@ export struct ProxyNode {
   }
 
   aboutToDisappear() {
-
   }
+
   build() {
     if (this.itemSize === ProxyCardSize.Large){
       Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween}) {
@@ -80,14 +80,11 @@ export struct ProxyNode {
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
             })
-      //      .onClick(() => {
-      //        this.selectProxy?.(this.item)
-       //     })
             .hitTestBehavior(HitTestMode.None)
         }
       }.width('100%')
       .padding({left:14,right:16})
-    }else if (this.itemSize === ProxyCardSize.Mini){
+    } else if (this.itemSize === ProxyCardSize.Mini){
       Row() {
         Column({space:3}) {
           Text(`${this.item.name}`).ItemTextStyle()
@@ -108,9 +105,6 @@ export struct ProxyNode {
           .radioStyle({
             checkedBackgroundColor: this.icon_emphasize,
           })
-         // .onClick(() => {
-        //    this.selectProxy?.(this.item)
-        //  })
           .hitTestBehavior(HitTestMode.None)
       }
       .ListRowStyle()
@@ -118,10 +112,9 @@ export struct ProxyNode {
       Row() {
         Column({space:5}) {
           Text(`${this.item.name}`).ItemTextStyle().maxLines(2)
-
           Column() {
             Text(`${this.item.type}`).ItemTypeStyle()
-            Text(`${this.item.latency}` + 'ms')//  Text(`${item.id }`)
+            Text(`${this.item.latency}` + 'ms')
               .fontColor(ProxyData.getColorForLatency(this.item.latency))
               .fontSize(12)
               .maxLines(1)
@@ -135,10 +128,7 @@ export struct ProxyNode {
           .radioStyle({
             checkedBackgroundColor: this.icon_emphasize,
           })
-            // 不要用chang
-       //   .onClick(() => {
-     //       this.selectProxy?.(this.item)
-       //   })
+           // 不要用chang
           .hitTestBehavior(HitTestMode.None)
       }
       .ListRowStyle()

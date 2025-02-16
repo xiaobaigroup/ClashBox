@@ -3,47 +3,43 @@ import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import ProxyGroupItem from './ProxyGroupItem'
 import { Profile, ProxyGroup,ProxyType } from 'proxy_core'
-import { proxyGroupsLazyData, ProxyItem } from '../../common/ProxyData'
+import { ProxyItem, ProxyGroupItemDataSource, ProxyItemDataSource } from '../../common/ProxyData'
 import ClashViewModel from '../../entryability/ClashViewModel'
-import { AppConfig,UIConfig } from '../../entryability/AppState'
+import { AppConfig, UIConfig } from '../../entryability/AppState'
 import { customAnimationUtil } from '../../utils/Animation'
 
-
-
-@Entry
+/**
+ * 列表排列
+ */
 @Component
 struct ProxyArrangement {
-  @State isContentShow: boolean |undefined = false;
-  @State selectItem: number = 0;
-  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone')
-  private isLandscapePhone: boolean = false
-  /* 断点布局相关 */
-  @Consume
-  private breakPointStateTabContentTitleMargin: BreakpointState<number>
-  private componentName: string = 'ProxyPage'
-  @Consume('currentProfile')
-  private currentProfile: Profile | null
-  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-  @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
-  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   //page内顶部标题偏移量
   @Consume curYOffset: number
-  private swiperData: proxyGroupsLazyData = new proxyGroupsLazyData([])
+  @State selectItem: number = 0
+  @State currentIndex: number =0
+  @Consume proxyGroups: ProxyGroupItemDataSource
+  private componentName: string = 'ProxyPage'
+  @State isContentShow: boolean |undefined = false
+  @Consume('currentProfile') private currentProfile: Profile
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
+  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+  /* 断点布局相关 */
+  @Consume private breakPointStateTabContentTitleMargin: BreakpointState<number>
+  @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
 
   aboutToAppear(): void {
-    this.swiperData = new proxyGroupsLazyData(this.proxyGroups)
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     BreakpointSystem.getInstance().start()
 
     if (this.currentProfile){
-      let listIndexes = this.proxyGroups.findIndex((d)=>d.name == this.currentProfile?.currentGroupName)
-      setTimeout(() => {
-        if(listIndexes > -1){
-      //    this.listController.changeIndex(listIndexes)
-          this.currentIndex = listIndexes
-        }
-      }, 200)
+      // let listIndexes = this.proxyGroups.findIndex((d)=>d.name == this.currentProfile?.currentGroupName)
+      // setTimeout(() => {
+      //   if(listIndexes > -1){
+      //     this.currentIndex = listIndexes
+      //   }
+      // }, 200)
     }
     if(this.currentProfile && this.currentProfile?.proxySelected){
       console.log("proxySelected",this.currentProfile?.proxySelected.size)
@@ -53,10 +49,6 @@ struct ProxyArrangement {
     }
   }
 
- @State currentIndex: number =0
-  @Consume
-  proxyGroups: ProxyGroup[]
-
   changeProxy(g: string, item: ProxyItem){
     if(this.currentProfile){
       ClashViewModel.changeProxy(this.currentProfile, g, item.name)
@@ -65,7 +57,7 @@ struct ProxyArrangement {
 
   //分组标签
   @Builder
-  itemHead(text: string,icon:Resource) {
+  itemHead(text: string, icon: Resource) {
       Row() {
         Text(text)
           .fontSize(FONT_SIZE_16)
@@ -87,26 +79,25 @@ struct ProxyArrangement {
   proxyScroller: ListScroller = new ListScroller()
 
   build() {
-    List({ space: 10, initialIndex: 0,scroller:this.proxyScroller}) {
-      LazyForEach(this.swiperData, (g:ProxyGroup,i:number) => {
-        ListItemGroup({ header: this.itemHead(g.name,
-          !this.isContentShow && this.selectItem === i ? $r('sys.symbol.chevron_down')
-            : $r('sys.symbol.chevron_right'))} ){
-
-          //展开后内容显示区域
-          if (!this.isContentShow && this.selectItem === i) {
+    List({ space: 10, initialIndex: 0, scroller: this.proxyScroller}) {
+      LazyForEach(this.proxyGroups, (group: ProxyGroup, index: number) => {
+        ListItemGroup({
+          header: this.itemHead(group.name, !this.isContentShow && this.selectItem === index
+            ? $r('sys.symbol.chevron_down') : $r('sys.symbol.chevron_right'))
+        }){
+          // 展开后内容显示区域
+          if (!this.isContentShow && this.selectItem === index) {
             ProxyGroupItem({
-              items: g.proxies as ProxyItem[],
+              proxyitems: group.proxies as ProxyItem[],
               ProxyGroupItemSelected: this.appConfig.proxyCardSize,
-              disabled: g.type !== ProxyType.Selector,
-              selectedProxy: this.currentProfile?.getSelectedProxy(g),
+              disabled: group.type !== ProxyType.Selector,
+              selectedProxy: this.currentProfile.getSelectedProxy(group),
               OnProxyChange: (item) => {
-                this.changeProxy(g.name, item)
+                this.changeProxy(group.name, item)
               }
             })
               .borderRadius(BORDER_RADIUS_20)
               .width('100%')
-                //   .height(500) //展开后界面高度
               .padding({ top:10, bottom: 10 })
           }
         }
@@ -115,7 +106,7 @@ struct ProxyArrangement {
           right: this.breakPointStateTabContentTitleMargin.value,
         })
         .clickEffect(this.isContentShow?customAnimationUtil.isClickEffect(this.uiConfig):null)
-        .transition(customAnimationUtil.isScaleTran(i,this.uiConfig))
+        .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
         .onClick(() => {
           animateTo({
             duration: this.uiConfig.animationSpeed,
@@ -123,19 +114,18 @@ struct ProxyArrangement {
             }
           }, () => {
             if (!this.isContentShow) {
-              this.proxyScroller.scrollToItemInGroup(i,0,true,ScrollAlign.START)
+              this.proxyScroller.scrollToItemInGroup(index, 0, true, ScrollAlign.START)
             }
-            this.isContentShow=!this.isContentShow
-            this.selectItem = i;
+            this.isContentShow = !this.isContentShow
+            this.selectItem = index
           })
         })
         .width('100%')
         .borderRadius(BORDER_RADIUS_20)
-      },(item: ProxyGroup) => item.name)
+      }, (item: ProxyGroup) => item.name)
     }
+    .cachedCount(5)
     .chainAnimation(true)
-    //.borderRadius(BORDER_RADIUS_20)
-  //  .backgroundColor(Color.Pink)
     .scrollBar(BarState.Off)
     .edgeEffect(EdgeEffect.Spring)
     .contentEndOffset(CONTENT_END_OFFSET_150)

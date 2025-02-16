@@ -10,36 +10,9 @@ import { isEnd, UIConfig } from "../../entryability/AppState"
 import { picker } from "@kit.CoreFileKit"
 import { customAnimationUtil, isON } from "../../utils/Animation"
 
-
-// 资源数据（假设）
-interface ResourcesData {
-  // 资源名
-  resourceName: string
-  key: string
-  fileName: string
-  // 资源大小（KB）
-  resourceSize: number
-  // 更新时间(展示的时间)
-  updateTime: number
-}
-
 /**
- * 文件大小转换
+ * 提供者
  */
-function switchResourceSize(size: number) {
-  if (size < 1000) {
-    return `${size}KB`
-  } else if (size < 1000000) {
-    return `${Math.floor(size / 1000)}MB`
-  } else if (size < 1000000000) {
-    return `${Math.floor(size / 1000000)}GB`
-  } else if (size < 1000000000000) {
-    return `${Math.floor(size / 1000000000)}TB`
-  } else {
-    return `${size}KB`
-  }
-}
-
 @Component
 export struct ProviderPage {
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
@@ -63,9 +36,9 @@ export struct ProviderPage {
   @State isLoadingAll: number = -1;
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  // 临时数据
+  // 提供者数据
   @State
-  public  resourceListData: Array<Provider> = [ ]
+  public providerListData: Array<Provider> = [ ]
   @Consume isProviderEdit: boolean
   //fl clash条目数量判定
   @State entriesNumber:number =0
@@ -81,56 +54,17 @@ export struct ProviderPage {
     if(this.isLoading === -1) {
       hilog.debug(0xFF00, "ProvidertestTag", "进入loadingChange状态改变执行 %{public}s")
       const newlist = await ClashViewModel.getProviders()
-      this.resourceListData = newlist
+      this.providerListData = newlist
       hilog.debug(0xFF00, "ProvidertestTag", "getProviders: %{public}s", JSON.stringify(newlist))
     }
   }
 
   async aboutToAppear(): Promise<void> {
     const list = await ClashViewModel.getProviders()
-    this.resourceListData = list
+    this.providerListData = list
     console.debug("getProviders", JSON.stringify(list))
   }
 
-  /**
-   * 资源编辑弹窗控制器
-   */
-  editDialogController: CustomDialogController = new CustomDialogController({
-    builder: theCustomDialog({
-      theplaceholder: $theEditIndex,
-      currentInputValue: $currentEditInputValue,
-      SaveInputValue: $SaveEditInputValue,
-      theDialogTitle: this.theEditDialogTitle,
-      cancel: ()=> { this.onCancel() },
-      confirm: ()=> { this.onAccept() },
-    }),
-    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-      // 1、PRESS_BACK    点击三键back、左滑/右滑、键盘ESC。
-      // 2、TOUCH_OUTSIDE    点击遮障层时
-      // 3、CLOSE_BUTTON    点击关闭按钮
-      if (dismissDialogAction.reason === DismissReason.TOUCH_OUTSIDE) {
-        // 点击遮蔽层不响应，防误触
-      } else {
-        // 完成IP地址查询后主动通过dismiss主动关闭对话框
-        dismissDialogAction.dismiss()
-        // 关闭背景模糊
-        this.isEnableIndexForegroundBlur = false
-      }
-    },
-  })
-
-  onCancel() {
-    // 关闭背景模糊
-    this.isEnableIndexForegroundBlur = false
-  }
-  onAccept() {
-    // 关闭背景模糊
-    this.isEnableIndexForegroundBlur = false
-    // 更新资源数组中对应元素
-    const editItem = this.resourceListData[this.theEditIndex]
-    editItem.path = this.SaveEditInputValue
-    this.resourceListData.splice(this.theEditIndex, 1, editItem)
-  }
   uploadProvider(item: Provider){
     let filePicker = new picker.DocumentViewPicker(getContext(this))
     let options = new picker.DocumentSelectOptions()
@@ -147,13 +81,13 @@ export struct ProviderPage {
   build() {
     NavDestination() {
       Column(){
-        //顶部半模拟态标题及按钮
+        // 顶部半模拟态标题及按钮
         this.titleStyle()
 
         List() {
           ListItem(){
             // 代理提供者相关
-            if (this.resourceListData.length === 0) {
+            if (this.providerListData.length === 0) {
               Nothing({ name: $r('app.string.Resources') })
                 .width('100%')
                 .height('100%')
@@ -165,7 +99,7 @@ export struct ProviderPage {
                   .subtitleText()
 
                 List({ space: 8 }) {
-                  ForEach(this.resourceListData, (item: Provider, index: number) => {
+                  ForEach(this.providerListData, (item: Provider, index: number) => {
                     if (item.type === "Proxy") {
                       ListItem() {
                         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.Start }) {
@@ -216,7 +150,7 @@ export struct ProviderPage {
 
                             // 更新按钮
                             Button({ type: ButtonType.Normal, stateEffect: true }) {
-                              if (this.isLoading ===index ||this.isLoadingAll ===this.resourceListData.length) {
+                              if (this.isLoading ===index ||this.isLoadingAll === this.providerListData.length) {
                                 Row({ space: 4.67 }) {
                                   LoadingProgress()
                                     .color(this.icon_emphasize)
@@ -273,7 +207,7 @@ export struct ProviderPage {
                     .subtitleText()
 
                 List({ space: 8 }) {
-                  ForEach(this.resourceListData, (item: Provider, index: number) => {
+                  ForEach(this.providerListData, (item: Provider, index: number) => {
                     if (item.type === "Rule") {
                       ListItem() {
                         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.Start }) {
@@ -323,7 +257,7 @@ export struct ProviderPage {
 
                             // 更新按钮
                             Button({ type: ButtonType.Normal, stateEffect: true }) {
-                              if (this.isLoading ===index || this.isLoadingAll ===this.resourceListData.length) {
+                              if (this.isLoading ===index || this.isLoadingAll === this.providerListData.length) {
                                 Row({ space: 4.67 }) {
                                   LoadingProgress()
                                     .color(this.icon_emphasize)
@@ -380,7 +314,7 @@ export struct ProviderPage {
             }
           }
         }.width('100%')
-        .contentEndOffset(this.resourceListData.length === 0?null:CONTENT_END_OFFSET_150+40)
+        .contentEndOffset(this.providerListData.length === 0?null:CONTENT_END_OFFSET_150+40)
         .scrollBar(BarState.Off)
       }
     }.width('100%')
@@ -422,9 +356,9 @@ export struct ProviderPage {
             curve: Curve.Friction,
             iterations: 1, // 设置-1表示动画无限循环
           }, () => {
-            this.resourceListData.forEach((item: Provider) => {
+            this.providerListData.forEach((item: Provider) => {
               convertTime(item["update-at"])
-              this.isLoadingAll =this.resourceListData.length
+              this.isLoadingAll = this.providerListData.length
               ClashViewModel.updateProvider(item).then((result) => {
                 this.isLoadingAll = -1
               }).catch((error: Error) => {

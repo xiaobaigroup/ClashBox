@@ -187,32 +187,31 @@ struct Backgrounder {
             this.isLocate = true
           }
         })
+        // 模拟画中画
+        Row() {
+          toggleRowList({
+            icons: $r('sys.symbol.media_center'),
+            title: $r('app.string.simulate_pip'),
+            subtitle: $r('app.string.simulate_pip_subtitle'),
+          }) {
+            Toggle({ type: ToggleType.Switch, isOn: $$this.isPiP })
+              .selectedColor(this.icon_emphasize)
+              .margin({right: 12})
+              .hitTestBehavior(HitTestMode.None)
+          }
+        }.onClick(() => {
+          if(this.isPiP) {
+            // 关闭模拟画中画
+            this.isPiP= false
+          } else {
+            // 关闭其它两个模拟并开启模拟画中画
+            this.isLocate = false
+            this.isPlay = false
+            // 打开模拟画中画启用提示弹窗
+            this.openDialogController.open()
+          }
+        })
         if(this.isShowExperimentalFunction) {
-          // 模拟画中画
-          Row() {
-            toggleRowList({
-              icons: $r('sys.symbol.media_center'),
-              title: $r('app.string.simulate_pip'),
-              subtitle: $r('app.string.simulate_pip_subtitle'),
-              isExperimentalFunction: true
-            }) {
-              Toggle({ type: ToggleType.Switch, isOn: $$this.isPiP })
-                .selectedColor(this.icon_emphasize)
-                .margin({right: 12})
-                .hitTestBehavior(HitTestMode.None)
-            }
-          }.onClick(() => {
-            if(this.isPiP) {
-              // 关闭模拟画中画
-              this.isPiP= false
-            } else {
-              // 关闭其它两个模拟并开启模拟画中画
-              this.isLocate = false
-              this.isPlay = false
-              // 打开模拟画中画启用提示弹窗
-              this.openDialogController.open()
-            }
-          })
           /*// 模拟播放
           Row() {
             toggleRowList({
@@ -237,7 +236,7 @@ struct Backgrounder {
           })*/
           // 提示
         }
-        Text(this.uiConfig.isShowExperimentalFunction ? $r('app.string.backgrounder_tips_2') : $r('app.string.backgrounder_tips'))
+        Text($r('app.string.backgrounder_tips_2'))
           .fontWeight(FontWeight.Normal)
           .fontSize(15)
       }

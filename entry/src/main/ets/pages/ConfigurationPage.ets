@@ -301,7 +301,7 @@ struct ConfigurationPage {
     this.appConfig.currentProfileId = item.configId
     try {
       await ClashViewModel.updateProfileConfig(item.configId)
-      await ClashViewModel.loadConfig(); // 假设loadConfig返回一个Promise
+      await ClashViewModel.loadConfig()
     }catch (e) {
       promptAction.showToast({message: "加载配置失败: " + e.message || e })
     }
@@ -356,7 +356,6 @@ struct ConfigurationPage {
         if (this.configList.length === 0) {
           Nothing({ name: $r('app.string.Configuration') })
             .height('90%')
-          // .margin({bottom:10})
         } else {
           Column(){
             Blank().height(TAB_CONTENT_TITLE_HEIGHT)
@@ -427,7 +426,7 @@ struct ConfigurationPage {
                       }
                     })
                   .onClick(async () => {
-                    this.isON.toggleAnim=true
+                    this.isON.toggleAnim = true
                     await this.loadConfig(item)
                     hilog.info(0xC002, this.componentName, `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
                   })

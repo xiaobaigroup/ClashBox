@@ -8,13 +8,13 @@ import {
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import ProxyGroupItem from '../components/Proxy/ProxyGroupItem'
 import ProxyArrangement from '../components/Proxy/ProxyArrangement'
-import { proxyGroupsLazyData, ProxyItem } from '../common/ProxyData'
+import { ProxyGroupItemDataSource, ProxyItem } from '../common/ProxyData'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { Profile, ProxyGroup, ProxySort, ProxyType } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import { AppConfig,
-  ClashCore, isEnd, ProxyCardSize,
-  ProxyGroupType, UIConfig } from '../entryability/AppState'
+  AppState,
+  ClashCore, isEnd, ProxyCardSize, ProxyGroupType, UIConfig } from '../entryability/AppState'
 import { curves, PromptAction } from '@kit.ArkUI'
 import { ProviderPage } from '../components/Proxy/Provider'
 import { indexController } from './Index'
@@ -61,13 +61,16 @@ struct ProxyPage {
   @State currentRadioValue3: number = 0 // 卡片尺寸切换
   @State FristPage: boolean = true
   /*节点相关数据以及排序 */
-  //节点假数据组后期可改可删
-  @Consume items: ProxyItem[]
-  @Consume
-  proxyGroups: ProxyGroup[]
-
+  // 代理原始数据
+  @Consume theProxyGroups: ProxyGroup[]
+  // 代理数据(懒加载)
+  @Consume proxyGroups: ProxyGroupItemDataSource
+  // 代理分组List控制器
+  private ListScroller: Scroller = new Scroller()
+  // 代理节点Swiper控制器
+  private SwiperController: SwiperController = new SwiperController()
   hasGroups() {
-    this.FristPage = this.proxyGroups.length == 0;
+    this.FristPage = this.theProxyGroups.length == 0;
   }
 
   //收藏与ping延迟即时动作
@@ -79,7 +82,6 @@ struct ProxyPage {
   private breakPointStateListGutter: BreakpointState<number>
   @Consume('breakPointStateTabContentTitleMargin')
   private breakPointStateTabContentTitleMargin: BreakpointState<number>
-  private tabsController: TabsController = new TabsController()
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone')
   private isLandscapePhone: boolean = false
@@ -92,41 +94,36 @@ struct ProxyPage {
   private ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE
   //定义组件名
   private componentName: string = 'ProxyPage'
-  @Consume('currentProfile')
-  private currentProfile: Profile | null
+  @Consume('currentProfile') private currentProfile: Profile
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   /**主页卡片标题按钮间距*/
   @Consume('HomeCardTitleButtonPadding') private HomeCardTitleButtonPadding: BreakpointState<number>
-  //page内顶部标题偏移量
+  // page内顶部标题偏移量
   @Consume curYOffset: number
-  @Prop item: ProxyItem
-  //收藏显示判定
-  @Provide showStart:boolean=false
-  private swiperController: SwiperController = new SwiperController()
-  private swiperData: proxyGroupsLazyData = new proxyGroupsLazyData([])
-  //栅格点位配置
+  // 收藏显示判定
+  @Provide showStart: boolean = false
+  // 是否可以切换页面
+  private enableSwitchIndexPage: boolean = false
+  // 栅格点位配置
   aboutToAppear(): void {
-    this.swiperData = new proxyGroupsLazyData(this.proxyGroups)
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     BreakpointSystem.getInstance().start()
     if (this.currentProfile) {
-      let tabIndexes = this.proxyGroups.findIndex((d) => d.name == this.currentProfile?.currentGroupName)
+      let tabIndex = this.theProxyGroups.findIndex((d) => d.name == this.currentProfile?.currentGroupName)
       setTimeout(() => {
-        if (tabIndexes > -1) {
-          this.tabsController.changeIndex(tabIndexes)
-          this.swiperController.changeIndex(tabIndexes)
-          this.currentIndex = tabIndexes
+        if (tabIndex > -1) {
+          this.ListScroller.scrollToIndex(tabIndex)
+          this.currentIndex = tabIndex
         }
       }, 200)
     }
   }
 
-
-  changeProxy(g: string, item: ProxyItem) {
+  changeProxy(group: string, item: ProxyItem) {
     if (this.currentProfile) {
-      ClashViewModel.changeProxy(this.currentProfile, g, item.name)
+      ClashViewModel.changeProxy(this.currentProfile, group, item.name)
     }
   }
 
@@ -151,9 +148,8 @@ struct ProxyPage {
     .height(55)
     .margin({ right: 8, bottom: 10 })
     .onClick(() => {
-      this.currentIndex = targetIndex;
-      this.tabsController.changeIndex(this.currentIndex);
-      this.swiperController.changeIndex(this.currentIndex, true)
+      this.currentIndex = targetIndex
+      this.SwiperController.changeIndex(this.currentIndex)
     })
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Start)
@@ -165,7 +161,6 @@ struct ProxyPage {
     Column() {
       //代理节点分组方式切换
       EditTitle({ title: $r('app.string.Packet_mode') })
-
       Column() {
         ForEach([{ t: $r('app.string.Tabs'), v: ProxyGroupType.Tabs },
           { t: $r('app.string.List'), v: ProxyGroupType.List }], (n: [Resource, number], i: number) => {
@@ -187,7 +182,6 @@ struct ProxyPage {
               .hitTestBehavior(HitTestMode.None)
               .radioStyle({
                 checkedBackgroundColor: this.icon_emphasize,
-                //   uncheckedBorderColor: this.icon_secondary
               })
           }
           .EditRow()
@@ -318,17 +312,16 @@ struct ProxyPage {
   }
 
   build() {
-    Stack(){
+    Stack() {
       // 标题栏
-      // if (!this.isLandscapePhone || this.appConfig.proxyGroupType === ProxyGroupType.List) {
       Row({ space: this.HomeCardTitleButtonPadding.value }) {
         Text($r('app.string.Proxy'))
-          .fontSize(this.curYOffset<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset/100:TAB_CONTENT_TITLE_FONT_SIZE)
+          .fontSize(this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset / 100 : TAB_CONTENT_TITLE_FONT_SIZE)
           .fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Center)
           .transition(customAnimationUtil.isSlide(200, this.uiConfig))
           .transition(customAnimationUtil.isScaleTran(0, this.uiConfig))
-            //提供者半模拟态
+            //提供者半模态
           .bindSheet($$this.isProviderEdit, this.ProviderBindSheetEdit(), {
             detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
             backgroundColor: $r('app.color.background'),
@@ -408,7 +401,7 @@ struct ProxyPage {
         })
       }
       .zIndex(1)
-      .height(this.curYOffset<0?TAB_CONTENT_TITLE_HEIGHT-this.curYOffset:TAB_CONTENT_TITLE_HEIGHT)
+      .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
       .position({x:0})
       .alignItems(VerticalAlign.Center)
       .width('100%')
@@ -417,123 +410,98 @@ struct ProxyPage {
         right: this.breakPointStateTabContentTitleMargin.value,
       })
       .transition(customAnimationUtil.isSlide(0, this.uiConfig))
-      //  }
 
-      if (this.proxyGroups.length == 0) {
-        Column() {
-          Nothing({ name: $r('app.string.None_Proxy') })
-        }
-
-      } else if (this.proxyGroups.length > 0) {
-        // 代理页分组TAB+list主体
+      if (this.theProxyGroups.length == 0) {
+        Nothing({ name: $r('app.string.None_Proxy') })
+      } else {
         Stack({ alignContent: this.stackAlignContentAlignment }) {
-          Column(){
+          Column() {
             Blank().height(TAB_CONTENT_TITLE_HEIGHT)
-            Tabs({ barPosition: BarPosition.Start, controller: this.tabsController, index: this.currentIndex }) {
-              ForEach(this.proxyGroups, (g: ProxyGroup, i: number) => {
-                TabContent()
-                  .tabBar(this.TabBuilder(g.name, i))
-              })
-            }
-            .zIndex(1)
-            .barMode(BarMode.Scrollable)
-            .barHeight(55)
-            .height(55)
-            .width('100%')
-            .fadingEdge(false)
-            .translate({y:this.curYOffset<0 ? -this.curYOffset : 0 })
-
             Scroll() {
-              //根据ProxyArrangementSelected的状态决定是否显示
-              if (this.appConfig.proxyGroupType === ProxyGroupType.Tabs) {
-                Column() { //分组标签页 start
-
-                  //TODO 改为懒加载后，切换配置不会把节点切换为选中配置的节点，暂时没找到原因，需修复
-                  Swiper(this.swiperController) {
-                    LazyForEach(this.swiperData, (g: ProxyGroup, i: number) => {
-                      //    if ( this.currentIndex === i) {//为实现listltem转场动画的的if
+              // 标签分组页 start
+              Column() {
+                //根据ProxyArrangementSelected的状态决定是否显示
+                if (this.appConfig.proxyGroupType === ProxyGroupType.Tabs) {
+                  // 代理分组List Start
+                  List({scroller: this.ListScroller}) {
+                    LazyForEach(this.proxyGroups, (group: ProxyGroup, index: number) => {
+                      this.TabBuilder(group.name, index)
+                    }, (item: ProxyGroup) => item.name)
+                  }
+                  .height(55)
+                  .width('100%')
+                  .scrollBar(BarState.Off)
+                  .listDirection(Axis.Horizontal)
+                  // 代理分组List End
+                  // 代理节点Swiper Start
+                  Swiper(this.SwiperController) {
+                    LazyForEach(this.proxyGroups, (group: ProxyGroup, index: number) => {
                       ProxyGroupItem({
-                        items: g.proxies as ProxyItem[],
+                        proxyitems: group.proxies as ProxyItem[],
                         ProxyGroupItemSelected: this.appConfig.proxyCardSize,
-                        disabled: g.type !== ProxyType.Selector,
-                        selectedProxy: this.currentProfile?.getSelectedProxy(g) ?? "",
+                        disabled: group.type !== ProxyType.Selector,
+                        selectedProxy: this.currentProfile?.getSelectedProxy(group) ?? "",
                         OnProxyChange: (item) => {
-                          console.log("xxxxx", item)
-                          this.changeProxy(g.name, item)
+                          this.changeProxy(group.name, item)
                         }
-                      })//list相关在components/ProxyGroupItem.ets文件里
-                        .padding({ right: this.breakPointStateTabContentTitleMargin.value, })
+                      })
                         .width('100%')
                         .height('100%')
                         .onAppear(() => {
-                          console.info('onAppear ' + g.proxies.toString())
+                          hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear %{public}s", group.proxies.toString())
                         })
                         .onDisAppear(() => {
-                          console.info('onDisAppear ' + g.toString())
+                          hilog.info(0xFF00, "ProxyPageGroupTag", "#onDisAppear %{public}s", group.toString())
                         })
                     }, (item: ProxyGroup) => item.name)
                   }
-                  //.vertical(true)
+                  .loop(false)
+                  .cachedCount(5)
                   .indicator(false)
-                  .nestedScroll(SwiperNestedScrollMode.SELF_FIRST)
-                  .gesture(
-                    // 二级Tabs第一个页签向左拖动时，触发手势事件
-                    PanGesture({
-                      direction: this.currentIndex === 0 ? PanDirection.Right :
-                        this.currentIndex === this.proxyGroups.length - 1 ? PanDirection.Left : PanDirection.None
-                    })
-                      .onActionStart((event?: GestureEvent) => {
-                        console.info('Pan start')
-                      })// 通过父组件的TabsController的实例，改变其index，达到跳转一级Tabs（首页）的效果
-                      .onActionEnd(() => {
+                  .alignSelf(ItemAlign.Center)
+                  .onAnimationStart((index: number, targetIndex: number) => {
+                    animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
+                      this.ListScroller.scrollToIndex(targetIndex)
+                      this.currentIndex = targetIndex
+                      if (index === targetIndex) {
+                        hilog.info(0xFF00, "ProxyPagePanTag", "首页&尾页滑动")
+                        // 处于首页&尾页的结束动画时触发二级界面控制一级tab变化
                         if (!this.isLandscapePhone) {
                           if (this.currentIndex === 0) {
                             indexController.changeIndex(0)
-                            console.info('Pan end')
-                          } else if (this.currentIndex === this.proxyGroups.length - 1) {
+                          } else if (this.currentIndex === this.theProxyGroups.length - 1) {
                             indexController.changeIndex(2)
                           }
-                        } else if (this.istabletLandscape) {
                         }
-                      })
-                  )
-                  .loop(false)
-                  .onAnimationStart((index: number, targetIndex: number) => {
-                    animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
-                      this.tabsController.changeIndex(targetIndex)
-                      this.currentIndex = targetIndex;
+                      } else {
+                        hilog.info(0xFF00, "ProxyPagePanTag", "中间页滑动")
+                      }
                       if (this.currentProfile) {
-                        this.currentProfile.currentGroupName = this.proxyGroups[this.currentIndex].name
+                        this.currentProfile.currentGroupName = this.theProxyGroups[this.currentIndex].name
                         ClashViewModel.updateProfile(this.currentProfile)
                       }
                     })
                   })
+                  // 代理节点Swiper End
                 }
-                .padding({
-                  left: this.breakPointStateTabContentTitleMargin.value,
-                })
-                .width('100%')
-                .foregroundBlurStyle(
-                  this.isEnableIndexForegroundBlur ? BlurStyle.Thin : BlurStyle.NONE,
-                  { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
-                )
-                //分组tabs end
-              }
-
-              // 列表排列
-              else if (this.appConfig.proxyGroupType === ProxyGroupType.List) {
-                ProxyArrangement()
-              }
-              //列表排列end
-            }
+                // 标签分组页 End
+                // 列表分组页 Start
+                else if (this.appConfig.proxyGroupType === ProxyGroupType.List) {
+                  ProxyArrangement()
+                }
+              }.width('100%')
+              .alignItems(HorizontalAlign.Center)
+              // 列表排列页 End
+            }.width('100%')
             .scrollBar(BarState.Off)
-            .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)
+            .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring : null)
+            .padding({ left: this.breakPointStateTabContentTitleMargin.value, right: this.breakPointStateTabContentTitleMargin.value})
             .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {
               // 累计计算当前父组件滚动在Y轴方向的偏移量
               if (this.uiConfig.isAnimation){
                 this.curYOffset += yOffset
               }
-              console.info("yOffset" + this.curYOffset);
+              hilog.info(0xFF00, "ProxyPageTag", "yOffset: %{public}d", this.curYOffset)
             })
           }
 
@@ -578,7 +546,6 @@ struct ProxyPage {
 
         }
         .backgroundColor($r('app.color.background'))
-        // .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
         .width('100%')
         .height( '100%' )
         // 主体 END
@@ -586,7 +553,7 @@ struct ProxyPage {
     }
     .width('100%')
     .height('100%')
-  }
+    }
 }
 
 export default ProxyPage
@@ -621,7 +588,6 @@ function EditText() {
 @Component
 struct EditTitle {
   @State title: ResourceStr = $r('app.string.Packet_mode')
-
   build() {
     Text(this.title)
       .width('100%')

@@ -1,4 +1,5 @@
 import { ProxyGroup } from "proxy_core"
+import { BaseDataSource } from "./BaseDataSource"
 
 // 定义一个接口来描述列表项的数据结构
 export interface ProxyItem {
@@ -37,53 +38,84 @@ export class ProxyData {
     // 默认情况下，返回系统定义的次要字体颜色，适用于无效或未知的延迟值
     return $r('sys.color.font_secondary');
   }
+}
 
+/**
+ * 代理页分组数据源
+ */
+@Observed
+export class ProxyGroupItemDataSource extends BaseDataSource<ProxyGroup> {
+  private dataArray: ProxyGroup[] = []
 
+  public totalCount(): number {
+    return this.dataArray.length
+  }
+
+  public getData(index: number): ProxyGroup {
+    return this.dataArray[index]
+  }
+
+  public addData(index: number, data: ProxyGroup): void {
+    this.dataArray.splice(index, 0, data)
+    this.notifyDataAdd(index)
+  }
+
+  public pushData(data: ProxyGroup[]): void {
+    this.dataArray = data
+    this.notifyDataAdd(this.dataArray.length - 1)
+  }
+
+  //删除全部数据
+  public clear(): void {
+    this.empty()
+    this.refresh()
+  }
+
+  public empty(): void {
+    this.dataArray = []
+  }
+  public refresh(): void {
+    this.notifyDataReload()
+  }
+}
+
+/**
+ * 代理页节点数据源
+ */
+@Observed
+export class ProxyItemDataSource extends BaseDataSource<ProxyItem> {
+  private dataArray: ProxyItem[] = []
+
+  public totalCount(): number {
+    return this.dataArray.length
+  }
+
+  public getData(index: number): ProxyItem {
+    return this.dataArray[index]
+  }
+
+  public addData(index: number, data: ProxyItem): void {
+    this.dataArray.splice(index, 0, data)
+    this.notifyDataAdd(index)
+  }
+
+  public pushData(data: ProxyItem[]): void {
+    this.dataArray = data
+    this.notifyDataAdd(this.dataArray.length - 1)
+  }
+  //删除全部数据
+  public clear(): void {
+    this.empty()
+    this.refresh()
+  }
+
+  public empty(): void {
+    this.dataArray = []
+  }
+  public refresh(): void {
+    this.notifyDataReload()
+  }
 }
 
 
-//懒加载节点分组使用class
-export class proxyGroupsLazyData implements IDataSource  {
-  public list: ProxyGroup[] = []
 
-  constructor(list: ProxyGroup[]) {
-    this.list = list
-  }
-
-  totalCount(): number {
-    return this.list.length
-  }
-
-  getData(index: number): ProxyGroup {
-    return this.list[index]
-  }
-
-  registerDataChangeListener(listener: DataChangeListener): void {
-  }
-
-  unregisterDataChangeListener() {
-  }
-}
-
-//懒加载节点使用class
-export class proxyListLazyData implements IDataSource  {
-  public list: ProxyItem[] = []
-
-  constructor(list: ProxyItem[]) {
-    this.list = list
-  }
-
-  totalCount(): number {
-    return this.list.length
-  }
-
-  getData(index: number): ProxyItem {
-    return this.list[index]
-  }
-
-  registerDataChangeListener(listener: DataChangeListener): void {
-  }
-
-  unregisterDataChangeListener() {
-  }
-}

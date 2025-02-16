@@ -45,7 +45,7 @@ import {
   moreData,
   AboutListItemProp
 } from '../common/Constants'
-import { ProxyItem, ProxyData } from '../common/ProxyData'
+import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/ProxyData'
 import { ClashConfig, Dns, LogLevel, Profile, ProxyGroup, ProxyMode, SubscriptionInfo } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
@@ -528,18 +528,28 @@ struct Index {
       this.fetchProfiles()
     })
     EventHub.on(EventKey.FetchProxyGroup, async () => {
+      // 清空数据
+      this.proxyGroups.clear()
+      this.proxyLazyItems.clear()
       if (this.appConfig.currentProfileId) {
         this.currentProfile = await ClashViewModel.getProfile(this.appConfig.currentProfileId)
         if (this.currentProfile) {
-          this.proxyGroups  = await ClashViewModel.getProxyGroups(this.clashConfig.mode ?? ProxyMode.Rule)
+          // 写入数据
+          this.theProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode ?? ProxyMode.Rule)
+          this.proxyGroups.pushData(this.theProxyGroups)
         }
       }else{
-        this.proxyGroups = []
+        this.proxyGroups = new ProxyGroupItemDataSource([])
       }
     })
     EventHub.on(EventKey.SwitchModeCard, async (mode: ProxyMode) => {
+      // 清空数据
+      this.proxyGroups.clear()
+      this.proxyLazyItems.clear()
       if (this.currentProfile) {
-        this.proxyGroups = await ClashViewModel.getProxyGroups(mode)
+        // 写入数据
+        this.theProxyGroups = await ClashViewModel.getProxyGroups(mode)
+        this.proxyGroups.pushData(this.theProxyGroups)
       }
     })
     EventHub.on(EventKey.StartLog, async (enable: boolean) => {
@@ -561,7 +571,12 @@ struct Index {
     })
   }
 
-  @Provide proxyGroups: ProxyGroup[] = []
+  // 代理页分组数据（懒加载）
+  @Provide proxyGroups: ProxyGroupItemDataSource = new ProxyGroupItemDataSource()
+  // 节点数据
+  @Provide proxyLazyItems: ProxyItemDataSource = new ProxyItemDataSource()
+  // 代理页原始数据
+  @Provide theProxyGroups: ProxyGroup[] = []
   @Provide("currentProfile") currentProfile: Profile | null = null
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
@@ -581,8 +596,6 @@ struct Index {
 
   onPageShow(): void {
     hilog.info(0xFF00, "TimertestTag", "#onPageShow")
-    // 创建画中画控制器
-    PipManager.getInstance().init(getContext(this))
     // 刷新问候语
     this.greetings = getGreeting()
     if (this.proxyEnabled) {
@@ -590,12 +603,14 @@ struct Index {
       hilog.info(0xFF00, "TimertestTag", "恢复的时刻： %{private}d", this.theRestoreTime)
     }
     this.isForeward = true
-    // 默认关闭一遍画中画再说
+    // 创建画中画控制器
+    PipManager.getInstance().init(getContext(this))
+    // 禁用自动启用
+    PipManager.getInstance().setAutoStart(false)
+    hilog.info(0xFF00, "PipTag", "代理启用状态： %{private}s", this.proxyEnabled)
+    hilog.info(0xFF00, "PipTag", "画中画启用状态： %{private}s", this.uiConfig.backgroundPiPModel)
+    // 处于前台关闭画中画
     PipManager.getInstance().stopPip()
-    if (this.uiConfig.backgroundPiPModel && this.proxyEnabled) {
-      // 设置应用退后台时开启自动启动画中画
-      PipManager.getInstance().setAutoStart(true)
-    }
   }
 
   onPageHide(): void {
@@ -605,9 +620,14 @@ struct Index {
       hilog.info(0xFF00, "TimertestTag", "暂停的时刻： %{private}d", this.thePauseTime)
     }
     this.isForeward = false
+    hilog.info(0xFF00, "PipTag", "代理启用状态： %{private}s", this.proxyEnabled)
+    hilog.info(0xFF00, "PipTag", "画中画启用状态： %{private}s", this.uiConfig.backgroundPiPModel)
     if (this.uiConfig.backgroundPiPModel && this.proxyEnabled) {
-      // 设置应用处于前台时取消自动启动画中画
-      PipManager.getInstance().setAutoStart(false)
+      hilog.info(0xFF00, "PipTag", "画中画启动： %{private}s")
+      // 退至后台启用画中画
+      PipManager.getInstance().startPip()
+    } else {
+
     }
   }
 
