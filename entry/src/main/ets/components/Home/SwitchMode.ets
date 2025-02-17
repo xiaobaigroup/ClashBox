@@ -13,11 +13,7 @@ struct SwitchMode {
   //自定义主题，颜色在AppTheme里面修改
   @Consume('icon_emphasize') icon_emphasize: ResourceColor //高亮图标,可在apptheme更换
   @State font_primary: ResourceColor = $r('sys.color.font_primary')
-  onWillApplyTheme(theme: Theme) {
-    this.icon_emphasize = theme.colors.iconEmphasize;
-  }
-  // 代理模式选中状态
-  @State currentChecked: number = 0
+  onWillApplyTheme(theme: Theme) {this.icon_emphasize = theme.colors.iconEmphasize;}
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
@@ -25,6 +21,8 @@ struct SwitchMode {
   @Consume('breakPointStateHomeCardSwitchModeFontSize') private fontSize: BreakpointState<number>
   // 卡片内边距
   @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
+  // 代理模式选中状态
+  @State currentChecked: number = 0
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
@@ -58,7 +56,7 @@ struct SwitchMode {
       CardTitle({ title: $r('app.string.Mode') })
       Stack() {
         //平移动画使用的底色组件
-        Button()
+        Button({type:ButtonType.Normal})
           .ButtonStyle()
           .shadow({ radius:10,color:$r('app.color.shadow')})
           .height('33.3%')

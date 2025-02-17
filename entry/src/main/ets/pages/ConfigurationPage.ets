@@ -17,7 +17,7 @@ import { ConfigAdd } from '../components/Configuration/ConfigAdd'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
 import { ConfigData, ConfigDataSourceType } from '../common/PageArgumentEntity'
-import { cellularData, CustomConfirmDialog, Nothing } from '../components/Common'
+import { cellularData, CustomConfirmDialog, Nothing, RightDownButton } from '../components/Common'
 import { customVibrator } from "../utils/VibratorUtil"
 import { common } from '@kit.AbilityKit'
 import { configShare } from '../utils/SystemShareUtil'
@@ -479,45 +479,25 @@ struct ConfigurationPage {
             })
           }
         }
+
         // 悬浮新增配置按钮 START
         Column() {
-          Stack({ alignContent: Alignment.Center }) {
-            SymbolGlyph($r('sys.symbol.plus'))
-              .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
-              .fontColor([Color.White])
-              .symbolEffect(this.ReplaceSymbolEffect)
-              .align(Alignment.Center)
-              .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
-          }.zIndex(3)
-          .width('100%')
-          .height('100%')
+          RightDownButton(
+            $r('sys.symbol.plus'),
+            this.ReplaceSymbolEffect,
+            this.proxyStartButtonWidth,
+            this.proxyStartButtonHeight,
+            this.icon_emphasize,
+            this.uiConfig
+          )
         }
-        // .backgroundColor($r('app.color.speed_down_icon'))
-        .shadow({
-          radius: 10,
-          color: $r('app.color.speed_down_icon'),
-          offsetY: 4,
-          type: ShadowType.BLUR
-        })
-        .borderRadius(100)
         .margin({bottom:this.isLandscapePhone ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
-        .width(this.proxyStartButtonWidth)
-        .height(this.proxyStartButtonHeight)
-        .backgroundColor(this.icon_emphasize)
-        .clip(true)
-        .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
-        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-        .hoverEffect(HoverEffect.Scale)
         .bindSheet( this.isShowConfigAddBindSheet, this.ConfigAddBindSheetBuilder, {
-          // title: { title: $r('app.string.AddConfig') },
           detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE, ],// SheetSize.LARGE
-          // backgroundColor: $r('app.color.container_background'),
           backgroundColor: $r('app.color.background'),
           showClose: true,
           dragBar: false,
           preferType: SheetType.CENTER,
-          // blurStyle: BlurStyle.COMPONENT_ULTRA_THICK,
-          // blurStyle: BlurStyle.BACKGROUND_REGULAR,
           scrollSizeMode: ScrollSizeMode.CONTINUOUS,
           // width: ('100%'),
           /**
@@ -554,11 +534,9 @@ struct ConfigurationPage {
             customVibrator.vibratorTriggerOfHapticClockTimer()
           }
         })
-        .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
         // 悬浮新增配置按钮 END
       }
       .backgroundColor($r('app.color.background'))
-      // .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
       .width('100%')
       .height('100%')
       // 主体 END

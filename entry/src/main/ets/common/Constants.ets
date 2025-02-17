@@ -678,6 +678,28 @@ export const CheckUpdateList: CheckUpdateListItemProp[] = [
   }
 ]
 
+/**
+ * 主页卡片编辑半模拟态里列表
+ */
+export interface HomeCardItem {
+  image:Resource
+  aspectRatio:number
+  isShow:boolean
+  width:ResourceStr
+}
+
+export const HomeCardList: HomeCardItem[] = [
+  {image:$r('app.media.Speed'),aspectRatio:2.07,isShow:true,width:'100%'},
+  {image:$r('app.media.SwitchMode'),aspectRatio:1,isShow:true,width:'48.5%'},
+  {image:$r('app.media.CellularData'),aspectRatio:1,isShow:true,width:'48.5%'},
+  {image:$r('app.media.CurrentNode'),aspectRatio:1,isShow:true,width:'48.5%'},
+  {image:$r('app.media.PublicNetwork'),aspectRatio:1,isShow:true,width:'48.5%'},
+  {image:$r('app.media.FavoriteProxy'),aspectRatio:1,isShow:true,width:'48.5%'},
+  {image:$r('app.media.FavoriteConfiguration'),aspectRatio:1,isShow:true,width:'48.5%'},
+  {image:$r('app.media.ProxyINFO'),aspectRatio:2.07,isShow:true,width:'100%'},
+  {image:$r('app.media.CurrentConfiguration'),aspectRatio:1,isShow:true,width:'48.5%'},
+]
+
 
 /* 断点相关 */
 // List组件的布局 列数或行数

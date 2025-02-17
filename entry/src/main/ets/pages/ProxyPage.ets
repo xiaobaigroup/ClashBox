@@ -20,7 +20,7 @@ import { curves, PromptAction } from '@kit.ArkUI'
 import { ProviderPage } from '../components/Proxy/Provider'
 import { indexController } from './Index'
 import { customAnimationUtil } from '../utils/Animation'
-import { Nothing } from '../components/Common'
+import { Nothing, RightDownButton } from '../components/Common'
 
 
 @Entry
@@ -515,41 +515,25 @@ struct ProxyPage {
           if (this.appConfig.clashCore === ClashCore.FlClash) {
             // 悬浮代理测速按钮 START
             Column() {
-              Stack({ alignContent: Alignment.Center }) {
-                SymbolGlyph($r('sys.symbol.bolt_filled_on_circle'))
-                  .fontSize(24)
-                  .fontColor([Color.White])
-                  .symbolEffect(this.ReplaceSymbolEffect)
-                  .align(Alignment.Center)
-              }
-              .onClick(() => {
-                EventHub.sendEvent(EventKey.TestDelayAll)
-                if (this.appConfig.proxySort === ProxySort.Delay){
-                  EventHub.sendEvent(EventKey.ProxySort, ProxySort.Delay)
-                }
-                this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
-              })
-              .width('100%')
-              .height('100%')
+              RightDownButton(
+                $r('sys.symbol.bolt_filled_on_circle'),
+                this.ReplaceSymbolEffect,
+                this.proxyStartButtonWidth,
+                this.proxyStartButtonHeight,
+                this.icon_emphasize,
+                this.uiConfig
+              )
             }
-            .shadow({
-              radius: 10,
-              color: this.icon_emphasize,
-              offsetY: 4,
-              type: ShadowType.BLUR
-            })
-            .borderRadius(100)
-            .backgroundColor(this.icon_emphasize)
             .margin({bottom:this.isLandscapePhone ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
-            .width(this.proxyStartButtonWidth)
-            .height(this.proxyStartButtonHeight)
-            .clip(true)
-            .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
-            .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-            .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
+            .onClick(async () => {
+              await EventHub.sendEvent(EventKey.TestDelayAll)
+              if (this.appConfig.proxySort == ProxySort.Delay) {
+                EventHub.sendEvent(EventKey.ProxySort, ProxySort.Delay)
+              }
+              this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
+            })
             // 悬浮代理测速按钮 END
           }
-
         }
         .backgroundColor($r('app.color.background'))
         .width('100%')

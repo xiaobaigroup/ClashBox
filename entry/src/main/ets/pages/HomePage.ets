@@ -713,7 +713,6 @@ struct Home {
                     .backgroundColor($r('app.color.container_background'))
                     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                     .transition(customAnimationUtil.isScaleTran(8, this.uiConfig))
-                    // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:20}):null)
                     .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
                     //编辑模式下跳动动画
                     .rotate({ angle: this.uiConfig.isAnimation ? this.rotateAngle : null })
