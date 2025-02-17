@@ -267,7 +267,7 @@ struct ProxyGroupItem {
             this.proxyListLongPressCtxMenuForFavorite.callback()
           })
       }
-      // ClashMeta内核时暂时不能测速及延迟
+      // ClashMeta内核时暂时不能测速及延迟  暂时先屏蔽
       if (this.appConfig.clashCore === ClashCore.FlClash) {
         MenuItem({ symbolStartIcon: this.startIconModifier1, content: $r('app.string.Test_Delay') })
           .onClick(() => {
@@ -276,19 +276,21 @@ struct ProxyGroupItem {
               message: $r('app.string.Test_Delay_Tip')
             })
           })
-        MenuItem({ symbolStartIcon: this.startIconModifier2, content: $r('app.string.Test_Speed') })
-          .onClick(() => {
-            this.isShowNetworkSpeed = true
-            this.isEnableIndexForegroundBlur = true
-          })
-      }
+          }
+      //暂时先屏蔽网站测速功能
+      /* MenuItem({ symbolStartIcon: this.startIconModifier2, content: $r('app.string.Test_Speed') })
+         .onClick(() => {
+           this.isShowNetworkSpeed = true
+           this.isEnableIndexForegroundBlur = true
+         })
+
       MenuItem({ symbolStartIcon: this.startIconModifier3, content: $r('app.string.Delay_Speed') })
         .onClick(() => {
           if (this.ProxyDialogController != null) {
             this.ProxyDialogController.open()
             this.isEnableIndexForegroundBlur = true
           }
-        })
+        })*/
     }
     //分割线
     .menuItemDivider({ color: $r('app.color.divider'), strokeWidth: LengthMetrics.vp(1) })
@@ -358,7 +360,7 @@ struct ProxyGroupItem {
     .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : this.breakPointStateListLanes.value,
       this.breakPointStateListGutter.value)
     .ListStyle()
-    .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
+   /* .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
       detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
       preferType: SheetType.CENTER,
       backgroundColor: $r('app.color.settings_container_background'),
@@ -370,7 +372,7 @@ struct ProxyGroupItem {
         this.isShowNetworkSpeed = false
         this.isEnableIndexForegroundBlur = false
       }
-    })
+    })*/
   }
 
   public proxyListLongPressCtxMenuForFavorite: LongPressContextMenuItem = {
