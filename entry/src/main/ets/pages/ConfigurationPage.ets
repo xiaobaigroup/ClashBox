@@ -31,7 +31,7 @@ import { convertTime } from '../utils/TimeConvertUtil'
 import { customAnimationUtil, isON } from '../utils/Animation'
 import { Profile, ProxyGroup, SubscriptionInfo } from 'proxy_core'
 import { Provider } from "proxy_core"
-import { ProxyItem } from '../common/ProxyData'
+import { ProxyItem, ProxyItemDataSource } from '../common/ProxyData'
 
 
 /**
@@ -554,6 +554,10 @@ struct ConfigurationPage {
     // XXX 删除 这里模拟获取所有hap沙箱路径配置文件的文件名
     showFileNameListOfFileDir(this.context.filesDir)
 
+    this.fetchProfiles()
+    EventHub.on(EventKey.FetchProfile, () => {
+      this.fetchProfiles()
+    })
   }
   // 获取配置列表
   async fetchProfiles(){
@@ -574,7 +578,7 @@ struct ConfigurationPage {
 
   aboutToDisappear(): void {
     hilog.info(0xC000, this.componentName, `#aboutToDisappear executed`)
-
+    EventHub.off(EventKey.FetchProfile)
     this.configCustomDialogController = null
     this.isEnableIndexForegroundBlur = false
     hilog.info(0xC000, this.componentName, `#aboutToDisappear#置空[配置页\`bindSheet\`内提示是否删除配置信息的自定义弹框]`)

@@ -28,4 +28,7 @@ export class EventHub{
       callback(data.data)
     })
   }
+  static off(key: EventKey) {
+    emitter.off(key)
+  }
 }

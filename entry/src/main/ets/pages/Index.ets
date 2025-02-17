@@ -522,25 +522,7 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.HomeCardCellularDataPadding)
     BreakpointSystem.getInstance().start()
     // TODO
-    this.fetchProfiles()
-    EventHub.on(EventKey.FetchProfile, () => {
-      this.fetchProfiles()
-    })
-    EventHub.on(EventKey.FetchProxyGroup, async () => {
-      // 清空数据
-      this.proxyGroups.clear()
-      this.proxyLazyItems.clear()
-      if (this.appConfig.currentProfileId) {
-        this.currentProfile = await ClashViewModel.getProfile(this.appConfig.currentProfileId)
-        if (this.currentProfile) {
-          // 写入数据
-          this.theProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode ?? ProxyMode.Rule)
-          this.proxyGroups.pushData(this.theProxyGroups)
-        }
-      } else{
-        this.proxyGroups = new ProxyGroupItemDataSource([])
-      }
-    })
+
     EventHub.on(EventKey.SwitchModeCard, async (mode: ProxyMode) => {
       // 清空数据
       this.proxyGroups.clear()

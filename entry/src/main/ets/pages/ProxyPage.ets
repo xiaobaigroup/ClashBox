@@ -9,9 +9,9 @@ import {
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import ProxyGroupItem from '../components/Proxy/ProxyGroupItem'
 import ProxyArrangement from '../components/Proxy/ProxyArrangement'
-import { ProxyGroupItemDataSource, ProxyItem } from '../common/ProxyData'
+import { ProxyGroupItemDataSource, ProxyItem, ProxyItemDataSource } from '../common/ProxyData'
 import ClashViewModel from '../entryability/ClashViewModel'
-import { Profile, ProxyGroup, ProxySort, ProxyType } from 'proxy_core'
+import { ClashConfig, Profile, ProxyGroup, ProxyMode, ProxySort, ProxyType } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import { AppConfig,
   AppState,
@@ -95,7 +95,7 @@ struct ProxyPage {
   private ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE
   //定义组件名
   private componentName: string = 'ProxyPage'
-  @Consume('currentProfile') private currentProfile: Profile
+  @Consume('currentProfile') private currentProfile: Profile | null
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
@@ -120,6 +120,30 @@ struct ProxyPage {
         }
       }, 200)
     }
+
+    EventHub.on(EventKey.FetchProxyGroup, async () => {
+      // 清空数据
+      this.proxyGroups.clear()
+      this.proxyLazyItems.clear()
+      if (this.appConfig.currentProfileId) {
+        this.currentProfile = await ClashViewModel.getProfile(this.appConfig.currentProfileId)
+        if (this.currentProfile) {
+          // 写入数据
+          this.theProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode ?? ProxyMode.Rule)
+          this.proxyGroups.pushData(this.theProxyGroups)
+        }
+      } else{
+        this.proxyGroups = new ProxyGroupItemDataSource([])
+      }
+    })
+  }
+  @Consume proxyLazyItems: ProxyItemDataSource
+  @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
+
+  aboutToDisappear() {
+    EventHub.off(EventKey.FetchProxyGroup)
+    EventHub.off(EventKey.ProxySort)
+    EventHub.off(EventKey.TestDelayAll)
   }
 
   changeProxy(group: string, item: ProxyItem) {
