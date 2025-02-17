@@ -130,7 +130,7 @@ struct ProxyPage {
         if (this.currentProfile) {
           // 写入数据
           this.theProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode ?? ProxyMode.Rule)
-          this.proxyGroups.pushData(this.theProxyGroups)
+        await this.proxyGroups.pushData(this.theProxyGroups)
         }
       } else{
         this.proxyGroups = new ProxyGroupItemDataSource([])

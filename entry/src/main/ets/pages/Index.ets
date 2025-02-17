@@ -523,16 +523,7 @@ struct Index {
     BreakpointSystem.getInstance().start()
     // TODO
 
-    EventHub.on(EventKey.SwitchModeCard, async (mode: ProxyMode) => {
-      // 清空数据
-      this.proxyGroups.clear()
-      this.proxyLazyItems.clear()
-      if (this.currentProfile) {
-        // 写入数据
-        this.theProxyGroups = await ClashViewModel.getProxyGroups(mode)
-        this.proxyGroups.pushData(this.theProxyGroups)
-      }
-    })
+
     EventHub.on(EventKey.StartLog, async (enable: boolean) => {
       ClashViewModel.startLog(enable, (log) => {
         this.logListData.push({

@@ -33,8 +33,10 @@ import BackgroundDownService from '../utils/BackgroundDownService'
 import { ConfigData } from '../common/PageArgumentEntity'
 import { customVibrator } from '../utils/VibratorUtil'
 import { customAnimationUtil } from '../utils/Animation'
-import { ProxyGroup } from 'proxy_core'
+import { Profile, ProxyGroup, ProxyMode } from 'proxy_core'
 import { image } from '@kit.ImageKit'
+import { ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/ProxyData'
+import { EventHub, EventKey } from '../common/EventHub'
 
 
 @Entry
@@ -62,7 +64,7 @@ struct Home {
   @State TopHeight: string = ''
   //节点假数据组后期可改可删
   @Consume
-  proxyGroups: ProxyGroup[]
+  theProxyGroups: ProxyGroup[]
   /* 主页卡片高度*/
   @Consume('HomeCardEditHeight') private HomeCardEditHeight: BreakpointState<number>
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
@@ -150,17 +152,34 @@ struct Home {
   //page内顶部标题偏移量
   @Consume curYOffset: number
 
+  // 代理页分组数据（懒加载）
+  @Consume proxyGroups: ProxyGroupItemDataSource
+  // 节点数据
+  @Consume proxyLazyItems: ProxyItemDataSource
+  @Consume ("currentProfile") currentProfile: Profile | null
+
   aboutToAppear(): void {
     this.greetings = getGreeting()
     // 初始化主页卡片布局
     if (this.uiConfig.isShowHomeCard)
       this.theCurrentHomeCard = JSON.parse(this.uiConfig.isShowHomeCard)
     hilog.info(0xFF00, "HometestTag", "布局初始化为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
+    EventHub.on(EventKey.SwitchModeCard, async (mode: ProxyMode) => {
+      // 清空数据
+      this.proxyGroups.clear()
+      this.proxyLazyItems.clear()
+      if (this.currentProfile) {
+        // 写入数据
+        this.theProxyGroups = await ClashViewModel.getProxyGroups(mode)
+        this.proxyGroups.pushData(this.theProxyGroups)
+      }
+    })
   }
 
   aboutToDisappear() {
     // 将dialogController置空
     this.SaveDialogController = null
+    EventHub.off(EventKey.SwitchModeCard)
   }
 
 
@@ -870,7 +889,7 @@ struct Home {
         .height(this.proxyStartButtonHeight)
         .clip(true)
         .onClick(async (event: ClickEvent) => {
-          if(this.configList.length === 0 || this.proxyGroups.length === 0) {
+          if(this.configList.length === 0 || this.theProxyGroups.length === 0) {
             if (this.uiConfig.isVibrate) {
               customVibrator.vibratorTriggerOfHapticClockTimer()
             }
