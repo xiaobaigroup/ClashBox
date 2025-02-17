@@ -189,6 +189,7 @@ struct ProxyGroupItem {
           this.proxyLazyItems.LatencySortItems(this.proxyitems);
           break;
       }
+      this.proxyLazyItems.pushData(this.proxyitems)
     })
   }
 

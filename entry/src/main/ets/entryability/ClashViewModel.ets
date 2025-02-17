@@ -13,6 +13,7 @@ import { EventHub, EventKey } from "../common/EventHub";
 import { AppConfig, AppState, ClashCore, getPackageInfo } from "./AppState";
 import  fs from  "@ohos.file.fs"
 import { sleep } from "./EntryAbility";
+import { JSON } from "@kit.ArkTS";
 
 export class ClashViewModel {
   profileRepo = new ProfileRepo()
@@ -27,7 +28,7 @@ export class ClashViewModel {
     await this.profileRepo.init(context)
     this.socketProxy.init(context)
     await this.initGeoIp()
-    await this.ChangeCore()
+    await this.ChangeCore(undefined, false)
   }
   // 添加配置 url
   async addOrUpdateProfileByUrl(data: ConfigData, id: string | null){
@@ -202,7 +203,7 @@ export class ClashViewModel {
   }
   //BUG 第一次启动，参数传不过去
   // 第一次要权限弹窗
-  async ChangeCore(coreType: ClashCore | undefined = undefined){
+  async ChangeCore(coreType: ClashCore | undefined = undefined, restart: boolean = true){
     try {
       const vpnWant = {
         deviceId: "",
@@ -210,9 +211,14 @@ export class ClashViewModel {
         abilityName: "ClashVpnAbility",
         parameters: { "ClashCore" : coreType}
       } as Want
-      await vpnExtension.stopVpnExtensionAbility(vpnWant)
+      // 若vpn进程没启动直接停止，会导致卡死或闪退， 不同系统不同现象
+      if(restart){
+        // 停止vpn进程
+        await vpnExtension.stopVpnExtensionAbility(vpnWant)
+      }
+      // 启动vpn进程
+      // bug： 用户点取消，pad最新系统可能导致卡死在这里， 无解等系统修复
       await vpnExtension.startVpnExtensionAbility(vpnWant);
-      //
       await sleep(500)
 
       // Bug
@@ -220,8 +226,9 @@ export class ClashViewModel {
       //
       // })
     } catch (e) {
-      // TODO 用户点取消
-      // 是否退出程序
+      console.error("ChangeCore", e.message || JSON.stringify(e))
+      // 用户点取消，会走这里
+      // 可能导致显现闪退
       this.context?.getApplicationContext().killAllProcesses()
     }
   }

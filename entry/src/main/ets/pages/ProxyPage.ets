@@ -522,9 +522,9 @@ struct ProxyPage {
                   .symbolEffect(this.ReplaceSymbolEffect)
                   .align(Alignment.Center)
               }
-              .onClick(async () => {
-                await  EventHub.sendEvent(EventKey.TestDelayAll)
-                if (this.appConfig.proxySort == ProxySort.Delay){
+              .onClick(() => {
+                EventHub.sendEvent(EventKey.TestDelayAll)
+                if (this.appConfig.proxySort === ProxySort.Delay){
                   EventHub.sendEvent(EventKey.ProxySort, ProxySort.Delay)
                 }
                 this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
