@@ -126,7 +126,8 @@ export class SocketProxyService implements IClashManager{
         resolve(json.error)
       }
     } catch (e) {
-      reject("JSON解码失败")
+      console.error("ParseMessage", e, messageBuffer)
+      reject("JSON解码失败: " + JSON.stringify(e))
     }
   }
   async sendMessageRequest(
@@ -135,26 +136,25 @@ export class SocketProxyService implements IClashManager{
   ): Promise<string| number | boolean | undefined>{
     return new Promise(async (resolve, reject)=>{
       let client: socket.LocalSocket = socket.constructLocalSocketInstance();
-      let messageBuffer = ""
-      let timeout = true
+      let text = new util.TextDecoder()
 
-      client.on('message', async (value: socket.LocalSocketMessageInfo) => {
-        let text = new util.TextDecoder()
-        let result = text.decodeToString(new Uint8Array(value.message))
+      let parseMessage = debounce((buffer)=>{
+        let result = text.decodeToString(new Uint8Array(buffer))
         console.log("onMessage " + method, result)
-        if('\n\0' == result){
-          this.ParseMessage(messageBuffer, resolve, reject)
-          timeout = false
-          client.close();
-        }else{
-          messageBuffer += result
-        }
+        this.ParseMessage(result, resolve, reject)
+      }, 200)
+      let buffer = new ArrayBuffer(0)
+      client.on('message', async (value: socket.LocalSocketMessageInfo) => {
+        buffer = appendArrayBuffers(buffer, value.message)
+        parseMessage(new Uint8Array(buffer))
       })
-      setTimeout(()=>{
-        if(timeout){
-          this.ParseMessage(messageBuffer, resolve, reject)
-        }
-      }, 3000)
+      // setTimeout(()=>{
+      //   if (timeout) {
+      //     console.log("ParseMessage timeout", messageBuffer)
+      //     this.ParseMessage(messageBuffer, resolve, reject)
+      //     client.close();
+      //   }
+      // }, 5000)
       client.on("error", ()=>{
         reject("rpc client error")
       })
@@ -166,7 +166,6 @@ export class SocketProxyService implements IClashManager{
       }).catch((e:Error)=>{
         this.active = false
         this.offlineCount++
-        console.log("socketProxy error ", method, e.message)
         if(e.message == "Connection refused"){
           promptAction.showToast({message: "vpn服务系统被回收!"})
         }else{
@@ -204,6 +203,31 @@ export class SocketProxyService implements IClashManager{
       });
     })
   }
+}
+function appendArrayBuffers(buffer1: ArrayBuffer, buffer2: ArrayBuffer) {
+  // 如果其中一个 buffer 是空的，直接返回另一个
+  if (buffer1.byteLength === 0) return buffer2;
+  if (buffer2.byteLength === 0) return buffer1;
+
+  // 创建一个新的 ArrayBuffer，总长度为两个 buffer 之和
+  const resultBuffer = new ArrayBuffer(buffer1.byteLength + buffer2.byteLength);
+
+  // 使用 Uint8Array 视图操作二进制数据
+  const resultView = new Uint8Array(resultBuffer);
+
+  // 拷贝 buffer1 和 buffer2 的数据到新 buffer
+  resultView.set(new Uint8Array(buffer1), 0);
+  resultView.set(new Uint8Array(buffer2), buffer1.byteLength);
+  return resultBuffer;
+}
+function debounce(func:(bytes: Uint8Array)=>void, delay =100) {
+  let timer = 0;
+  return (bytes: Uint8Array) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func(bytes);
+    }, delay);
+  };
 }
 
 export default new SocketProxyService()

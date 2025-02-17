@@ -44,8 +44,6 @@ export abstract class CommonVpnService{
   }
   async sendClient(client: socket.LocalSocketConnection, message: string){
     await client.send({data: message, encoding:"utf-8", })
-    // 结束标志
-    await client.send({data: "\n\0", encoding:"utf-8"})
   }
   abstract onRemoteMessageRequest(client: socket.LocalSocketConnection, message: socket.LocalSocketMessageInfo): Promise<void>
   abstract init()

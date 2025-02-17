@@ -308,7 +308,8 @@ struct ConfigurationPage {
       ClashViewModel.socketProxy.reset()
       await ClashViewModel.loadConfig(false)
     }catch (e) {
-      promptAction.showToast({message: "加载配置失败: " + e.message || e })
+      console.debug("loadConfigList", e.message, JSON.stringify(e))
+      promptAction.showToast({message: "加载配置失败: " + (e.message || e) })
     }
     this.isLoading = false;
   }
