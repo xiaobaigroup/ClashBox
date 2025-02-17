@@ -144,6 +144,9 @@ struct ProxyGroupItem {
   /* 代理节点数据相关参数  */
   //节点数据组
   @Prop proxyitems: ProxyItem[]
+  @Prop proxyGroup: number
+  // 代理原始数据
+  @Consume theProxyGroups: ProxyGroup[]
   @State proxyLazyItems: ProxyItemDataSource = new ProxyItemDataSource()
   // 当前代理节点单选选择的值
   @Prop selectedProxy: string
@@ -180,16 +183,17 @@ struct ProxyGroupItem {
       console.log("ProxySort", sort)
       switch (sort) {
         case ProxySort.Default:
-          this.proxyLazyItems.LatencySortItems(this.proxyitems);
-          break;
+          this.proxyLazyItems.DefaultSortItems(this.proxyitems)
+          break
         case ProxySort.Title:
-          this.proxyLazyItems.NameSortItems(this.proxyitems);
-          break;
+          this.proxyLazyItems.NameSortItems(this.proxyitems)
+          break
         case ProxySort.Delay:
-          this.proxyLazyItems.LatencySortItems(this.proxyitems);
-          break;
+          this.proxyLazyItems.LatencySortItems(this.theProxyGroups[this.proxyGroup].proxies as ProxyItem[])
+          hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行4 %{public}s")
+          hilog.info(0xFF00, "ProxyPageLatencyTag", "this.proxyitems %{public}s", JSON.stringify(this.theProxyGroups[this.proxyGroup].proxies as ProxyItem[]))
+          break
       }
-      this.proxyLazyItems.pushData(this.proxyitems)
     })
   }
 
@@ -315,7 +319,12 @@ struct ProxyGroupItem {
               this.selectProxy(p)
             },
             onLatencyChange:(p:number) =>{
-              item.latency = p
+              // item.latency = p
+              hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行3 延迟更新为%{public}d", p)
+              const nodeItem = this.theProxyGroups[this.proxyGroup]
+              nodeItem.proxies[index].latency = p
+              this.theProxyGroups.splice(this.proxyGroup, 1, nodeItem)
+              hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行3 %{public}s", JSON.stringify(nodeItem))
             }
           })
         }

@@ -635,13 +635,13 @@ export struct ExperimentalFunction {
         .fontColor(Color.White)
         .fontSize(10)
     }
-    .alignItems(HorizontalAlign.Center)
-    .justifyContent(FlexAlign.Center)
-    .width(50)
     .height(18)
     .borderRadius(4)
     .margin({left: 2})
+    .alignItems(HorizontalAlign.Center)
+    .justifyContent(FlexAlign.Center)
     .backgroundColor(this.icon_emphasize)
+    .padding({left: 3, right: 3})
   }
 }
 

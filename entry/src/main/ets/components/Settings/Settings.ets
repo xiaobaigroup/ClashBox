@@ -12,8 +12,9 @@ import About, { AboutContributors, CheckUpdate } from "./About"
 import Language from "./Language"
 import TopBuilder from "./TopBuilder"
 import { DisclaimerCustomDialog, theRowCustomDialog } from "../Common"
-import { AppState } from "../../entryability/AppState"
+import { AppState, UIConfig } from "../../entryability/AppState"
 import { promptAction } from "@kit.ArkUI"
+import { removeItemsByIndex } from "../../utils/RemoveItemsUtils"
 
 
 @Entry
@@ -22,17 +23,18 @@ struct Settings {
 
   @State settingsList: settingsData[] = SettingsListItem()
   @Consume currentLanguage: ResourceStr
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 当前设备`height`是否符合(320vp< height <= 500vp)
-  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   // 列表底边距
   @Consume('breakPointStatemorePagelistBottom') private listBottom: BreakpointState<number>
   // 列表高度
   @Consume('breakPointStateSettingslistHeight') private SettingslistHeight: BreakpointState<number>
-
+  // 断点系统
+  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur')
-  private isEnableIndexForegroundBlur: boolean
+  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
   // 免责声明弹窗控制器
   dialogController: CustomDialogController | null = new CustomDialogController({
     builder: DisclaimerCustomDialog({
@@ -100,14 +102,17 @@ struct Settings {
   }
 
   handleCheck(index: number) {
-    if(index === 7) {
+    if(index === (this.uiConfig.isShowExperimentalFunction ? 7 : 6)) {
       // 免责声明弹窗
       if (this.dialogController != null) {
         this.dialogController.open()
       }
-    } else if(index == 6) {
+    } else if(index == (this.uiConfig.isShowExperimentalFunction ? 6 : 5)) {
       // 清空应用设置弹窗
       this.resetDialogController.open()
+    } else if (index === (this.uiConfig.isShowExperimentalFunction ? 2 : -1)) {
+      // 备份
+      promptAction.showToast({message: $r('app.string.developing')})
     } else {
       // 列表项路由跳转
       let itemSettingsData = this.settingsList[index]
@@ -131,6 +136,9 @@ struct Settings {
   }
 
   aboutToAppear(): void {
+    if (!this.uiConfig.isShowExperimentalFunction) {
+      this.settingsList = removeItemsByIndex(this.settingsList, [2])
+    }
   }
 
   // 在自定义组件即将析构销毁时将dialogController置空
@@ -196,7 +204,6 @@ struct Settings {
               }
             })
           }
-          .margin({bottom: this.listBottom.value })
         })
 
       }
@@ -204,6 +211,7 @@ struct Settings {
       .contentEndOffset(CONTENT_END_OFFSET_150 - 85)
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)
+      .padding({left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value})
     }
     .hideToolBar(true)
     .mode(this.isLandscapePhone ? NavigationMode.Stack : NavigationMode.Auto)
@@ -215,6 +223,13 @@ struct Settings {
       const itemData = this.settingsList[0]
       itemData.hint = this.currentLanguage
       this.settingsList.splice(0, 1, itemData)
+      // 刷新备份行显示
+      if (this.uiConfig.isShowExperimentalFunction) {
+        this.settingsList = SettingsListItem()
+        const itemData = this.settingsList[0]
+        itemData.hint = this.currentLanguage
+        this.settingsList.splice(0, 1, itemData)
+      }
     })
   }
 }

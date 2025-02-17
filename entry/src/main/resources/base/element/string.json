@@ -305,8 +305,12 @@
       "value": "代理端口"
     },
     {
-      "name": "Hosts",
-      "value": "Hosts"
+      "name": "lan",
+      "value": "局域网"
+    },
+    {
+      "name": "lan_subtitle",
+      "value": "允许局域网"
     },
     {
       "name": "IPv6",
@@ -1630,7 +1634,7 @@
     },
     {
       "name": "settings_reset_tips",
-      "value": "数据已还原"
+      "value": "数据已清空"
     }
   ]
 }

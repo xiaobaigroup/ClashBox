@@ -56,7 +56,7 @@ struct SwitchMode {
       CardTitle({ title: $r('app.string.Mode') })
       Stack() {
         //平移动画使用的底色组件
-        Button({type:ButtonType.Normal})
+        Button({type: ButtonType.Normal})
           .ButtonStyle()
           .shadow({ radius:10,color:$r('app.color.shadow')})
           .height('33.3%')

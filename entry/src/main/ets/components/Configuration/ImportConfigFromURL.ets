@@ -263,16 +263,6 @@ export struct ImportConfigFromURL{
    * 检查配置名 Input && 配置 URL 是否都有值
    *    true: 显示保存按钮。 false反之
    */
-  // checkInput() {
-  //   if(this.configNameInputHaveText && this.configUrlInputHaveText) {
-  //     this.menus.push(this.saveMenus)
-  //   }
-  // }
-
-  /**
-   * 检查配置名 Input && 配置 URL 是否都有值
-   *    true: 显示保存按钮。 false反之
-   */
   configDataChanged() {
     this.checkAllInputHaveValue()
     if (this.allInputHaveValue) {
@@ -295,7 +285,7 @@ export struct ImportConfigFromURL{
    * 检查配置名 Input && 配置 URL 是否都有值
    */
   checkAllInputHaveValue() {
-    this.allInputHaveValue = (this.configData.configUrl.length > 0)
+    this.allInputHaveValue = (this.configData.configUrl.length > 0/* && this.configData.configName.length > 0*/)
     // hilog.info(0xCA12, this.componentName, `#checkAllInputHaveValue is [${this.allInputHaveValue}]}`)
   }
 }

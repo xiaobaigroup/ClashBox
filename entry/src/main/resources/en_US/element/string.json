@@ -305,8 +305,12 @@
       "value": "Proxy Port"
     },
     {
-      "name": "Hosts",
-      "value": "Hosts"
+      "name": "lan",
+      "value": "LAN"
+    },
+    {
+      "name": "lan_subtitle",
+      "value": "Allow LAN"
     },
     {
       "name": "IPv6",
@@ -1630,7 +1634,7 @@
     },
     {
       "name": "settings_reset_tips",
-      "value": "Application data has been restored"
+      "value": "Application data has been cleared"
     }
   ]
 }

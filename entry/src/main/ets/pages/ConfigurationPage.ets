@@ -380,7 +380,7 @@ struct ConfigurationPage {
                             .fontColor($r('sys.color.font_secondary')).fontSize(12).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
                         }
 
-                        //共用使用流量/总流量+进度条组件
+                        // 进度条组件: 共用使用流量 / 总流量
                         if (item.subscriptionInfo){
                           cellularData(item.subscriptionInfo)
                         }

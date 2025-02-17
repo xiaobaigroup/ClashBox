@@ -120,7 +120,7 @@ export class  ClashConfig {
   "mixed-port"?: number = defaultMixedPort;
   "geodata-loader": string = "memconservative" // standard,
   authentication?: string[];
-  "allow-lan": boolean = false;
+  "allow-lan": boolean = true;
   "bind-address"?: string;
   mode?: ProxyMode = ProxyMode.Rule;
   "log-level"?: LogLevel = LogLevel.Info;
@@ -131,7 +131,7 @@ export class  ClashConfig {
   secret?: string;
   hosts?: Record<string, string>;
   "keep-alive-interval"?: number = defaultKeepAliveInterval
-  "unified-delay"?: boolean = false;
+  "unified-delay"?: boolean = true;
   "geodata-mode"?: boolean;
   "tcp-concurrent"?: boolean;
   "find-process-mode"?: FindProcessMode = FindProcessMode.Off;

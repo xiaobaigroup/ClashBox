@@ -218,14 +218,14 @@ struct ProxyPage {
               indicatorType: RadioIndicatorType.TICK
             })
               .checked(this.appConfig.proxySort == n["v"])
-              .onChange((isChecked: boolean) => {
-                if (isChecked) {
-                  EventHub.sendEvent(EventKey.ProxySort, n["v"])
-                  animateTo({ duration: this.uiConfig.animationSpeed }, () => {
-                    this.appConfig.proxySort = n["v"]
-                  })
-                }
-              })
+              // .onChange((isChecked: boolean) => {
+              //   if (isChecked) {
+              //     EventHub.sendEvent(EventKey.ProxySort, n["v"])
+              //     animateTo({ duration: this.uiConfig.animationSpeed }, () => {
+              //       this.appConfig.proxySort = n["v"]
+              //     })
+              //   }
+              // })
               .hitTestBehavior(HitTestMode.None)
               .radioStyle({
                 checkedBackgroundColor: this.icon_emphasize,
@@ -439,6 +439,7 @@ struct ProxyPage {
                   Swiper(this.SwiperController) {
                     LazyForEach(this.proxyGroups, (group: ProxyGroup, index: number) => {
                       ProxyGroupItem({
+                        proxyGroup: index,
                         proxyitems: group.proxies as ProxyItem[],
                         ProxyGroupItemSelected: this.appConfig.proxyCardSize,
                         disabled: group.type !== ProxyType.Selector,
@@ -462,23 +463,22 @@ struct ProxyPage {
                   .cachedCount(5)
                   .indicator(false)
                   .alignSelf(ItemAlign.Center)
+                  .onGestureSwipe((index: number, extraInfo: SwiperAnimationEvent) => {
+                    hilog.info(0xFF00, "ProxyPagePanTag", "currentOffset: %{private}d", extraInfo.currentOffset)
+                    animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
+                      if (!this.isLandscapePhone) {
+                        if (this.currentIndex === 0 && extraInfo.currentOffset > 79) {
+                          indexController.changeIndex(0)
+                        } else if (this.currentIndex === this.theProxyGroups.length - 1 && extraInfo.currentOffset < -79) {
+                          indexController.changeIndex(2)
+                        }
+                      }
+                    })
+                  })
                   .onAnimationStart((index: number, targetIndex: number) => {
                     animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
                       this.ListScroller.scrollToIndex(targetIndex)
                       this.currentIndex = targetIndex
-                      if (index === targetIndex) {
-                        hilog.info(0xFF00, "ProxyPagePanTag", "首页&尾页滑动")
-                        // 处于首页&尾页的结束动画时触发二级界面控制一级tab变化
-                        if (!this.isLandscapePhone) {
-                          if (this.currentIndex === 0) {
-                            indexController.changeIndex(0)
-                          } else if (this.currentIndex === this.theProxyGroups.length - 1) {
-                            indexController.changeIndex(2)
-                          }
-                        }
-                      } else {
-                        hilog.info(0xFF00, "ProxyPagePanTag", "中间页滑动")
-                      }
                       if (this.currentProfile) {
                         this.currentProfile.currentGroupName = this.theProxyGroups[this.currentIndex].name
                         ClashViewModel.updateProfile(this.currentProfile)
@@ -527,8 +527,10 @@ struct ProxyPage {
             .margin({bottom:this.isLandscapePhone ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
             .onClick(async () => {
               await EventHub.sendEvent(EventKey.TestDelayAll)
+              hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行1 %{public}s")
               if (this.appConfig.proxySort == ProxySort.Delay) {
                 EventHub.sendEvent(EventKey.ProxySort, ProxySort.Delay)
+                hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行2 %{public}s")
               }
               this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
             })

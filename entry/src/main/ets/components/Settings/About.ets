@@ -200,13 +200,13 @@ struct About {
     if (showItem && showItem.children) {
       switch (kernel) {
         case 0:
-          showItem.children[1].subtitle = 'ClashMeta'
+          showItem.children[1].subtitle = `ClashMeta ${showItem.children[1].subtitle}`
           break
         case 1:
-          showItem.children[1].subtitle = 'FlClash'
+          showItem.children[1].subtitle = `FlClash ${showItem.children[1].subtitle}`
           break
         case 2:
-          showItem.children[1].subtitle = 'ClashRS'
+          showItem.children[1].subtitle = `ClashRS ${showItem.children[1].subtitle}`
           break
       }
       // 使用splice来更新父组件数组
@@ -236,7 +236,7 @@ struct About {
 
   aboutToAppear(): void {
     this.aboutList = getAboutList()
-    //音效
+    // 音效
     customSound.initSoundPool(3, 'di.mp3')
     // 页面加载时初始化实验功能启用状态
     this.refreshShowExperimentalFunction(this.uiConfig.isShowExperimentalFunction)

@@ -5,13 +5,13 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "/Users/fiber/.ohos/config/default_ClashNEXT_HMPBKNGhCHuIPAA1ZqRurRxNw5tOXirXzi3le10Hywk=.cer",
-          "storePassword": "0000001A0875133F579DC32229825343723261B21A2C51616BAB2C8B38EA9133AE15C5E481F9704C9065",
+          "certpath": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashNEXT_zL_lCO4bAvPSCUi1B2mkUCrHIVGxm3QDrMJXyoen8AI=.cer",
+          "storePassword": "0000001BB4397DA58FDABC09A85FE463616D588614BCDBC4FF0EDC12F262ADF35C56D3299540B4BE8B507F",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001ABD2D1205B0C90562DF0666F36D3BB49188CE984B083FAF8E75908B171D64928F5E98AF1AD719",
-          "profile": "/Users/fiber/.ohos/config/default_ClashNEXT_HMPBKNGhCHuIPAA1ZqRurRxNw5tOXirXzi3le10Hywk=.p7b",
+          "keyPassword": "0000001B1F16195AAC774E291AFDCFDC3938A94239DF52FD9E695562D284AD908D8F4D1E0FD7024E0EF14F",
+          "profile": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashNEXT_zL_lCO4bAvPSCUi1B2mkUCrHIVGxm3QDrMJXyoen8AI=.p7b",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "/Users/fiber/.ohos/config/default_ClashNEXT_HMPBKNGhCHuIPAA1ZqRurRxNw5tOXirXzi3le10Hywk=.p12"
+          "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashNEXT_zL_lCO4bAvPSCUi1B2mkUCrHIVGxm3QDrMJXyoen8AI=.p12"
         }
       }
     ],
@@ -25,6 +25,9 @@
           "strictMode": {
             "caseSensitiveCheck": true,
             "useNormalizedOHMUrl": true
+          },
+          "externalNativeOptions": {
+            "abiFilters": ["arm64-v8a", "x86_64"]
           }
         }
       }

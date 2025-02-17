@@ -123,7 +123,6 @@ export class ProxyItemDataSource extends BaseDataSource<ProxyItem> {
     data.sort((a, b) => (a.latency ?? 0) - (b.latency ?? 0));
     this.dataArray = data;
     this.pushData(data)
-    this.refresh()
   }
 
   //按名称排序
@@ -131,15 +130,13 @@ export class ProxyItemDataSource extends BaseDataSource<ProxyItem> {
     data.sort((a, b) => ProxyCollator.compare(a.name, b.name));
     this.dataArray = data;
     this.pushData(data)
-    this.refresh()
   }
 
   //默认排序
   public async DefaultSortItems(data:ProxyItem[]) {
     data.sort((a, b) => ProxyCollator.compare(a.id, b.id));
-    this.dataArray = data;
+    this.dataArray = data
     this.pushData(data)
-    this.refresh();
   }
 }
 
