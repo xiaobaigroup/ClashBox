@@ -129,13 +129,16 @@ struct ProxyPage {
         this.currentProfile = await ClashViewModel.getProfile(this.appConfig.currentProfileId)
         if (this.currentProfile) {
           // 写入数据
+          this.proxyGroups.clear()
+          this.theProxyGroups = []
           this.theProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode ?? ProxyMode.Rule)
-          await this.proxyGroups.pushData(this.theProxyGroups)
+          this.proxyGroups.pushData(this.theProxyGroups)
         }
       } else{
         this.proxyGroups = new ProxyGroupItemDataSource([])
       }
     })
+    EventHub.sendEvent(EventKey.FetchProxyGroup)
   }
   @Consume proxyLazyItems: ProxyItemDataSource
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()

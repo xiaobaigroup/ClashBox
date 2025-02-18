@@ -232,7 +232,7 @@ export class ClashViewModel {
           console.log("#VPN启动失败, 用户拒绝授权")
           this.context?.getApplicationContext().killAllProcesses()
         })
-      // await sleep(500)
+       await sleep(500)
       // Bug
       // this.socketProxy.registerMessage(()=>{
       //
@@ -247,13 +247,11 @@ export class ClashViewModel {
   }
 
   async loadProfileAndConfig(id: string, config: ClashConfig | null = null, params: ConfigExtendedParams | null= null){
-
     let result = await this.socketProxy.loadConfig({
       "profile-id": id,
       config: config ?? new ClashConfig(),
       params: params ?? {} as ConfigExtendedParams
     } as UpdateConfigParams)
-
     if (result != ""){
       promptAction.showToast({message: result, duration: 3000})
     }

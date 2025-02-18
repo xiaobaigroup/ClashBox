@@ -78,8 +78,7 @@ export class SocketProxyService implements IClashManager{
   }
   async queryProxyGroups(model: ProxyMode): Promise<ProxyGroup[]> {
     let result = await this.sendMessageRequest(ClashRpcType.queryProxyGroup,[model])
-    console.log("queryProxyGroups",model, result)
-    return JSON.parse(result as string) as ProxyGroup[]
+    return JSON.parse(result as  string) as ProxyGroup[]
   }
   async queryProviders(): Promise<Provider[]> {
     let result = await this.sendMessageRequest(ClashRpcType.queryProviders)
@@ -137,16 +136,18 @@ export class SocketProxyService implements IClashManager{
     return new Promise(async (resolve, reject)=>{
       let client: socket.LocalSocket = socket.constructLocalSocketInstance();
       let text = new util.TextDecoder()
-
-      let parseMessage = debounce((buffer)=>{
-        let result = text.decodeToString(new Uint8Array(buffer))
-        console.log("onMessage " + method, result)
-        this.ParseMessage(result, resolve, reject)
+      let fullMessage = '';
+      let parseMessage = debounce((message)=>{
+       // console.log("onMessage " + method, message)
+        this.ParseMessage(message, resolve, reject)
+        message = ''
+        fullMessage = ''
+        client.close()
       }, 200)
-      let buffer = new ArrayBuffer(0)
       client.on('message', async (value: socket.LocalSocketMessageInfo) => {
-        buffer = appendArrayBuffers(buffer, value.message)
-        parseMessage(new Uint8Array(buffer))
+        let chunk = text.decodeToString(new Uint8Array(value.message),  { stream: true })
+        fullMessage += chunk;
+        parseMessage(fullMessage)
       })
       // setTimeout(()=>{
       //   if (timeout) {
@@ -220,12 +221,12 @@ function appendArrayBuffers(buffer1: ArrayBuffer, buffer2: ArrayBuffer) {
   resultView.set(new Uint8Array(buffer2), buffer1.byteLength);
   return resultBuffer;
 }
-function debounce(func:(bytes: Uint8Array)=>void, delay =100) {
+function debounce(func:(json: string)=>void, delay =100) {
   let timer = 0;
-  return (bytes: Uint8Array) => {
+  return (json: string) => {
     clearTimeout(timer);
     timer = setTimeout(() => {
-      func(bytes);
+      func(json);
     }, delay);
   };
 }
