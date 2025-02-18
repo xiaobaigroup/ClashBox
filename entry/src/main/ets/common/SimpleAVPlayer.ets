@@ -44,7 +44,7 @@ export class AVPlayer {
     this.avPlayer = await media.createAVPlayer();
     this.setAVPlayerCallback();
     let context = getContext(this) as common.UIAbilityContext;
-    let fileDescriptor = await context.resourceManager.getRawFd('xxx.mp4');
+    let fileDescriptor = await context.resourceManager.getRawFd('app_icon.png');
     this.avPlayer.fdSrc = fileDescriptor;
   }
 }

@@ -219,17 +219,14 @@ struct Settings {
     .width('100%')
     .height('100%')
     .onNavBarStateChange((isVisible: boolean) => {
+      // 刷新备份行显示
+      if (this.uiConfig.isShowExperimentalFunction) {
+        this.settingsList = SettingsListItem()
+      }
       // 刷新语言行的语言提示
       const itemData = this.settingsList[0]
       itemData.hint = this.currentLanguage
       this.settingsList.splice(0, 1, itemData)
-      // 刷新备份行显示
-      if (this.uiConfig.isShowExperimentalFunction) {
-        this.settingsList = SettingsListItem()
-        const itemData = this.settingsList[0]
-        itemData.hint = this.currentLanguage
-        this.settingsList.splice(0, 1, itemData)
-      }
     })
   }
 }

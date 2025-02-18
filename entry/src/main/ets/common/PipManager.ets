@@ -120,8 +120,8 @@ export class PipManager {
       context: ctx,
       componentController: this.getXComponentController(),
       templateType: PiPWindow.PiPTemplateType.VIDEO_PLAY,
-      contentWidth: 1920, // 使用typeNode启动画中画时，contentWidth需设置为大于0的值，否则将设置为16:9默认比例
-      contentHeight: 1080, // 使用typeNode启动画中画时，contentHeight需设置为大于0的值，否则将设置为16:9默认比例
+      contentWidth: 800, // 使用typeNode启动画中画时，contentWidth需设置为大于0的值，否则将设置为16:9默认比例
+      contentHeight: 300, // 使用typeNode启动画中画时，contentHeight需设置为大于0的值，否则将设置为16:9默认比例
     };
     // 通过create接口创建画中画控制器实例
     let promise: Promise<PiPWindow.PiPController> = PiPWindow.create(config, this.xComponent);
@@ -179,17 +179,17 @@ export class PipManager {
   makeTypeNode(ctx: UIContext) {
     if (this.xComponent === null || this.xComponent === undefined) {
       // 创建typeNode
-      // let xc_options: XComponentOptions = {
-      //   type: XComponentType.TEXTURE, // 类型设置为TEXTURE
-      //   controller: PipManager.getInstance().getXComponentController(), // 设置XComponentController
-      // }
-      // this.xComponent = typeNode.createNode(ctx, "XComponent", xc_options);
+      let xc_options: XComponentOptions = {
+        type: XComponentType.TEXTURE, // 类型设置为TEXTURE
+        controller: PipManager.getInstance().getXComponentController(), // 设置XComponentController
+      }
+      this.xComponent = typeNode.createNode(ctx, "XComponent", xc_options);
 
       // 创建XComponent类型的typeNode
-      this.xComponent = typeNode.createNode(ctx, "XComponent", {
-        type: XComponentType.SURFACE, // 类型设置为SURFACE
-        controller: PipManager.getInstance().getXComponentController(), // 设置XComponentController
-      });
+      // this.xComponent = typeNode.createNode(ctx, "XComponent", {
+      //   type: XComponentType.SURFACE, // 类型设置为SURFACE
+      //   controller: PipManager.getInstance().getXComponentController(), // 设置XComponentController
+      // });
     }
   }
 }

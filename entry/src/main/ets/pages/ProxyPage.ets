@@ -28,27 +28,30 @@ import { Nothing, RightDownButton } from '../components/Common'
 struct ProxyPage {
   //系统颜色调用
   /* 主题色 */
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
   /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur')
-  private isEnableIndexForegroundBlur: boolean
+  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
   // 所有子组件在容器内的对齐方式
   @Consume('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
-  @State font_primary: ResourceColor = $r('sys.color.font_primary') //一级文本色，黑色
-  @State font_secondary: ResourceColor = $r('sys.color.font_secondary') //二级文本色，深灰色
-  @State container_background: ResourceColor = ($r('app.color.container_background')); //卡片颜色
-  /* 配置列表List相关 */
-  @State font_on_primary: ResourceColor = $r('sys.color.font_on_primary') //一级文本反色，白色
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
-  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary') //二级图标色，深灰色
+  //一级文本色，黑色
+  @State font_primary: ResourceColor = $r('sys.color.font_primary')
+  //二级文本色，深灰色
+  @State font_secondary: ResourceColor = $r('sys.color.font_secondary')
+  //卡片颜色
+  @State container_background: ResourceColor = ($r('app.color.container_background'))
+  //一级文本反色，白色
+  @State font_on_primary: ResourceColor = $r('sys.color.font_on_primary')
+  //一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  //二级图标色，深灰色
+  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary')
   /* Stack层叠布局 */
-  //编辑按钮点击
+  // 编辑按钮点击
   @State isShowEdit: boolean = false
   @Provide isProviderEdit: boolean = false
-  //分组tabs相关
+  // 分组tabs相关
   @State currentIndex: number = 0;
-  //假数据延迟颜色设置
+  // 假数据延迟颜色设置
   @State color: ResourceColor = $r('sys.color.font_secondary')
   // 定义ProxyArrangementSelected的值便于切换分组方式
   @State ProxyArrangementSelected: string = 'ProxyArrangementSelected1';
@@ -60,7 +63,7 @@ struct ProxyPage {
   @State currentRadioValue1: number = 0 // 分组方式切换
   @State currentRadioValue2: number = 0 // 排列方式切换
   @State currentRadioValue3: number = 0 // 卡片尺寸切换
-  @State FristPage: boolean = true
+
   /*节点相关数据以及排序 */
   // 代理原始数据
   @Consume theProxyGroups: ProxyGroup[]
@@ -70,11 +73,8 @@ struct ProxyPage {
   private ListScroller: Scroller = new Scroller()
   // 代理节点Swiper控制器
   private SwiperController: SwiperController = new SwiperController()
-  hasGroups() {
-    this.FristPage = this.theProxyGroups.length == 0;
-  }
 
-  //收藏与ping延迟即时动作
+  // 收藏与ping延迟即时动作
   private ProxyPromptAction: PromptAction = this.getUIContext()?.getPromptAction()
   /* 断点布局相关 相关作用看定义时候的注释 */
   @Consume('breakPointStateListLanes')
@@ -84,8 +84,7 @@ struct ProxyPage {
   @Consume('breakPointStateTabContentTitleMargin')
   private breakPointStateTabContentTitleMargin: BreakpointState<number>
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone')
-  private isLandscapePhone: boolean = false
+  @StorageProp('isLandscapePhone') isLandscapePhone: boolean = false
   @StorageProp('istabletLandscape') istabletLandscape: boolean = false
   // 按钮宽度
   private proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
@@ -105,9 +104,7 @@ struct ProxyPage {
   @Consume curYOffset: number
   // 收藏显示判定
   @Provide showStart: boolean = false
-  // 是否可以切换页面
-  private enableSwitchIndexPage: boolean = false
-  // 栅格点位配置
+
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     BreakpointSystem.getInstance().start()
@@ -122,9 +119,6 @@ struct ProxyPage {
     }
 
     EventHub.on(EventKey.FetchProxyGroup, async () => {
-      // 清空数据
-      this.proxyGroups.clear()
-      this.proxyLazyItems.clear()
       if (this.appConfig.currentProfileId) {
         this.currentProfile = await ClashViewModel.getProfile(this.appConfig.currentProfileId)
         if (this.currentProfile) {
@@ -134,7 +128,7 @@ struct ProxyPage {
           this.theProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode ?? ProxyMode.Rule)
           this.proxyGroups.pushData(this.theProxyGroups)
         }
-      } else{
+      } else {
         this.proxyGroups = new ProxyGroupItemDataSource([])
       }
     })
@@ -155,7 +149,7 @@ struct ProxyPage {
     }
   }
 
-  //分组tabs内容
+  // 分组tabs内容
   @Builder
   TabBuilder(title: ResourceStr, targetIndex: number) {
     Column() {
@@ -185,7 +179,7 @@ struct ProxyPage {
   }
 
   @Builder
-  //半模态编辑菜单Start
+  // 半模态编辑菜单Start
   ProxyBindSheetEdit() {
     Column() {
       //代理节点分组方式切换

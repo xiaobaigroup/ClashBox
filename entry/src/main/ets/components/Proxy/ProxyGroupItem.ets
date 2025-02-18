@@ -139,8 +139,7 @@ struct ProxyGroupItem {
   //网络测速半模拟态web控制器
   controller: webview.WebviewController = new webview.WebviewController();
   /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur')
-  private isEnableIndexForegroundBlur: boolean
+  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
   /* 代理节点数据相关参数  */
   //节点数据组
   @Prop proxyitems: ProxyItem[]
@@ -323,12 +322,12 @@ struct ProxyGroupItem {
               this.selectProxy(p)
             },
             onLatencyChange:(p:number) =>{
-              // item.latency = p
-              hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行3 延迟更新为%{public}d", p)
-              const nodeItem = this.theProxyGroups[this.proxyGroup]
-              nodeItem.proxies[index].latency = p
-              this.theProxyGroups.splice(this.proxyGroup, 1, nodeItem)
-              hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行3 %{public}s", JSON.stringify(nodeItem))
+              item.latency = p
+              // hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行3 延迟更新为%{public}d", p)
+              // const nodeItem = this.theProxyGroups[this.proxyGroup]
+              // nodeItem.proxies[index].latency = p
+              // this.theProxyGroups.splice(this.proxyGroup, 1, nodeItem)
+              // hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行3 %{public}s", JSON.stringify(nodeItem))
             }
           })
         }
