@@ -5,7 +5,7 @@ export enum EventKey{
   FetchProfile = 10001,
   ProxySort = 10002,
   ChangeProxy = 10003,
-  TestDelayAll = 10004,
+  TestDelay = 10004,
   StartLog = 10005,
   SwitchModeCard = 10006,
   ClearLog = 10007,

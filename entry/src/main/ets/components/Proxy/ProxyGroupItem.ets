@@ -15,6 +15,7 @@ import { AppConfig, AppState, ClashCore, ProxyCardSize, UIConfig } from '../../e
 import { ProxyNode } from './ProxyNodeItem';
 import { customAnimationUtil } from '../../utils/Animation';
 import { customVibrator } from '../../utils/VibratorUtil';
+import ClashViewModel from '../../entryability/ClashViewModel';
 
 
 //断点布局
@@ -272,12 +273,9 @@ struct ProxyGroupItem {
       if (this.appConfig.clashCore === ClashCore.FlClash) {
         MenuItem({ symbolStartIcon: this.startIconModifier1, content: $r('app.string.Test_Delay') })
           .onClick(() => {
-            EventHub.sendEvent(EventKey.TestDelayAll, nodeName)
-            this.ProxyPromptAction.showToast({
-              message: $r('app.string.Test_Delay_Tip')
-            })
+            ClashViewModel.testDelay(nodeName)
           })
-          }
+        }
       //暂时先屏蔽网站测速功能
       /* MenuItem({ symbolStartIcon: this.startIconModifier2, content: $r('app.string.Test_Speed') })
          .onClick(() => {

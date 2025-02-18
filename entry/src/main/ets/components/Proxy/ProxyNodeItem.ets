@@ -1,7 +1,7 @@
 import { EventHub, EventKey } from '../../common/EventHub'
 import { ProxyItem as ProxyItem, ProxyData } from '../../common/ProxyData'
 import { AppConfig, ProxyCardSize, UIConfig } from '../../entryability/AppState'
-import ClashViewModel from '../../entryability/ClashViewModel'
+import ClashViewModel, { DelayInfo } from '../../entryability/ClashViewModel'
 import { customVibrator } from '../../utils/VibratorUtil'
 
 
@@ -34,6 +34,7 @@ export struct ProxyNode {
   @Prop itemSize: ProxyCardSize
   @Prop item: ProxyItem
   @Prop disabled: boolean
+  @State delay: number = 0
   @Prop selected: string
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
 
@@ -41,22 +42,25 @@ export struct ProxyNode {
   onLatencyChange?:(l: number)=>void
 
   aboutToAppear(): void {
-    EventHub.on(EventKey.TestDelayAll, async (name: string)=>{
-      if(name == this.item.name){
-        await ClashViewModel.testDelay(name).then(d => {
-          this.item.latency = d
-          this.onLatencyChange?.(d)
-        })
-      } else if (!name) {
-        await ClashViewModel.testDelay(this.item.name).then(d => {
-          this.item.latency = d
-          this.onLatencyChange?.(d)
-        })
+    this.delay = ClashViewModel.delayMap.get(this.item.name)?.delay ?? 0
+    EventHub.on(EventKey.TestDelay, async (delay: DelayInfo)=>{
+      if (delay.name == this.item.name){
+        this.delay = delay.delay
       }
     }, false) // 批量监听
   }
 
   aboutToDisappear() {
+  }
+
+  delayText(){
+    if (this.delay == 0) {
+      return ""
+    } else if(this.delay < 0){
+      return "timeout"
+    } else {
+      return this.delay + "ms"
+    }
   }
 
   build() {
@@ -67,8 +71,8 @@ export struct ProxyNode {
           Text(`${this.item.type}`).ItemTypeStyle()
         }.alignItems(HorizontalAlign.Start)
         Row({space:10}){
-          Text(`${this.item.latency ?? "-"}` + 'ms')
-            .fontColor(ProxyData.getColorForLatency(this.item.latency))
+          Text(this.delayText())
+            .fontColor(ProxyData.getColorForLatency(this.delay))
             .fontSize(12)
             .maxLines(1)
             .textAlign(TextAlign.End)
@@ -90,8 +94,8 @@ export struct ProxyNode {
           Text(`${this.item.name}`).ItemTextStyle()
           Row({space:3}) {
             Text(`${this.item.type}`).ItemTypeStyle().maxLines(1).width('25%').textOverflow({ overflow: TextOverflow.Clip})
-            Text(`${this.item.latency}` + 'ms')
-              .fontColor(ProxyData.getColorForLatency(this.item.latency))
+            Text(this.delayText())
+              .fontColor(ProxyData.getColorForLatency(this.delay))
               .fontSize(12)
               .maxLines(1)
               .width('55%')
@@ -114,8 +118,8 @@ export struct ProxyNode {
           Text(`${this.item.name}`).ItemTextStyle().maxLines(2)
           Column() {
             Text(`${this.item.type}`).ItemTypeStyle()
-            Text(`${this.item.latency}` + 'ms')
-              .fontColor(ProxyData.getColorForLatency(this.item.latency))
+            Text(this.delayText())
+              .fontColor(ProxyData.getColorForLatency(this.delay))
               .fontSize(12)
               .maxLines(1)
               .width('80%')

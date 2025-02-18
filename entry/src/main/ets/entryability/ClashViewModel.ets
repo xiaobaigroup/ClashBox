@@ -14,13 +14,18 @@ import { AppConfig, AppState, ClashCore, getPackageInfo } from "./AppState";
 import  fs from  "@ohos.file.fs"
 import { sleep } from "./EntryAbility";
 import { JSON } from "@kit.ArkTS";
+import { ProxyItem } from "../common/ProxyData";
+
+export interface DelayInfo{
+    name: string
+    delay: number
+}
 
 export class ClashViewModel {
   profileRepo = new ProfileRepo()
   socketProxy = new SocketProxyService()
   context: Context | undefined
   async init(context: Context) {
-
     const packageInfo = await getPackageInfo()
     AppState.versionName = packageInfo.versionName
     AppState.globalUA =  "ClashNext/v" + packageInfo.versionName
@@ -102,15 +107,26 @@ export class ClashViewModel {
       promptAction.showToast({message: e.message, duration:3000})
     }
   }
+  delayMap: Map<string, DelayInfo> = new Map()
+
   async testDelay(proxyName: string): Promise<number>{
     try {
+      EventHub.sendEvent(EventKey.TestDelay, { name: proxyName, delay: 0 } as DelayInfo)
       let delay = await this.socketProxy.healthCheck(proxyName)
+      EventHub.sendEvent(EventKey.TestDelay, { name: proxyName, delay: delay } as DelayInfo)
+      this.delayMap.set(proxyName, { name: proxyName, delay: delay } as DelayInfo)
       return delay;
     } catch (e) {
       promptAction.showToast({message: e.message, duration: 3000})
     }
     return -1;
   }
+  async testAllDelay(list: ProxyItem[]): Promise<number[]>{
+    const result = await Promise.all(list.map((l)=> this.testDelay(l.name)))
+    EventHub.sendEvent(EventKey.FetchProxyGroup)
+    return result;
+  }
+
   async updateGeoData( geoType: string, geoName: string): Promise<string>{
     return this.socketProxy.updateGeoData(geoType, geoName)
   }
@@ -198,7 +214,6 @@ export class ClashViewModel {
       })
       return g
     })
-    AppStorage.setOrCreate("proxyGroups", groups)
     return groups
   }
   //BUG 第一次启动，参数传不过去
@@ -293,6 +308,8 @@ export class ClashViewModel {
     EventHub.sendEvent(EventKey.StartLog, appConfig?.enableLogger)
     await this.loadConfig(false)
   }
+
+  proxyGroups :ProxyGroup[] = []
   async loadConfig(patch: boolean = true){
     let appConfig = AppStorage.get<AppConfig>("appConfig")
     let clashConfig = AppStorage.get<ClashConfig>("clashConfig")
