@@ -189,9 +189,9 @@ struct ProxyGroupItem {
           this.proxyLazyItems.NameSortItems(this.proxyitems)
           break
         case ProxySort.Delay:
-          this.proxyLazyItems.LatencySortItems(this.theProxyGroups[this.proxyGroup].proxies as ProxyItem[])
+          this.proxyLazyItems.LatencySortItems(this.proxyitems)
           hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行4 %{public}s")
-          hilog.info(0xFF00, "ProxyPageLatencyTag", "this.proxyitems %{public}s", JSON.stringify(this.theProxyGroups[this.proxyGroup].proxies as ProxyItem[]))
+          hilog.info(0xFF00, "ProxyPageLatencyTag", "this.proxyitems %{public}s", JSON.stringify(this.proxyitems))
           break
       }
     })
@@ -357,7 +357,7 @@ struct ProxyGroupItem {
               transition: this.uiConfig.isAnimation ? TransitionEffect.prototype.animation({ tempo: 1.5 }) : undefined
             },
           })
-      }, (item: ProxyItem,i:number) => item.name+i)
+      }, (item: ProxyItem,i:number) => item.name+ '-' + i.toString())
     }
     .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : this.breakPointStateListLanes.value,
       this.breakPointStateListGutter.value)

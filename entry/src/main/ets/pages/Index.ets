@@ -522,7 +522,7 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.HomeCardCellularDataPadding)
     BreakpointSystem.getInstance().start()
     // TODO
-
+    this.fetchProfiles()
 
     EventHub.on(EventKey.StartLog, async (enable: boolean) => {
       ClashViewModel.startLog(enable, (log) => {

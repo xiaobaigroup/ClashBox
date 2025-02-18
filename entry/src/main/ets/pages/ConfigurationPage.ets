@@ -553,11 +553,11 @@ struct ConfigurationPage {
     hilog.info(0xC000, this.componentName, `#aboutToAppear executed`)
     // XXX 删除 这里模拟获取所有hap沙箱路径配置文件的文件名
     showFileNameListOfFileDir(this.context.filesDir)
-
-    this.fetchProfiles()
     EventHub.on(EventKey.FetchProfile, () => {
       this.fetchProfiles()
     })
+
+
   }
   // 获取配置列表
   async fetchProfiles(){

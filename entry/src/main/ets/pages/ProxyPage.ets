@@ -130,7 +130,7 @@ struct ProxyPage {
         if (this.currentProfile) {
           // 写入数据
           this.theProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode ?? ProxyMode.Rule)
-        await this.proxyGroups.pushData(this.theProxyGroups)
+          await this.proxyGroups.pushData(this.theProxyGroups)
         }
       } else{
         this.proxyGroups = new ProxyGroupItemDataSource([])
@@ -162,6 +162,7 @@ struct ProxyPage {
           .fontColor(this.currentIndex === targetIndex ? this.font_on_primary : this.font_secondary)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .padding({left:3,right:3})
       }
       .borderRadius(BORDER_RADIUS_20)
       .height(this.currentIndex === targetIndex ? 36 : 32)
@@ -242,14 +243,14 @@ struct ProxyPage {
               indicatorType: RadioIndicatorType.TICK
             })
               .checked(this.appConfig.proxySort == n["v"])
-              // .onChange((isChecked: boolean) => {
-              //   if (isChecked) {
-              //     EventHub.sendEvent(EventKey.ProxySort, n["v"])
-              //     animateTo({ duration: this.uiConfig.animationSpeed }, () => {
-              //       this.appConfig.proxySort = n["v"]
-              //     })
-              //   }
-              // })
+                // .onChange((isChecked: boolean) => {
+                //   if (isChecked) {
+                //     EventHub.sendEvent(EventKey.ProxySort, n["v"])
+                //     animateTo({ duration: this.uiConfig.animationSpeed }, () => {
+                //       this.appConfig.proxySort = n["v"]
+                //     })
+                //   }
+                // })
               .hitTestBehavior(HitTestMode.None)
               .radioStyle({
                 checkedBackgroundColor: this.icon_emphasize,
@@ -362,23 +363,23 @@ struct ProxyPage {
         Blank()
 
         //一键取消所有收藏按钮 TODO 判定暂时有问题 不显示先
-       /* Button({ type: ButtonType.Circle, stateEffect: true }) {
-          SymbolGlyph($r('sys.symbol.heart_slash'))
-            .fontSize(24)
-            .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-            .fontColor([this.icon_primary,Color.Red])
-        }
-        .width(40)
-        .height(40)
-        .backgroundColor($r('app.color.settings_container_background'))
-        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-        .onClick(() => {
-          this.favoriteProxys.clear()
-          this.showStart=true
-          this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_all_tip') })
-        })
-        .transition(customAnimationUtil.isSlide(150, this.uiConfig))
-        */
+        /* Button({ type: ButtonType.Circle, stateEffect: true }) {
+           SymbolGlyph($r('sys.symbol.heart_slash'))
+             .fontSize(24)
+             .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+             .fontColor([this.icon_primary,Color.Red])
+         }
+         .width(40)
+         .height(40)
+         .backgroundColor($r('app.color.settings_container_background'))
+         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+         .onClick(() => {
+           this.favoriteProxys.clear()
+           this.showStart=true
+           this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_all_tip') })
+         })
+         .transition(customAnimationUtil.isSlide(150, this.uiConfig))
+         */
 
         //提供者按钮
         Button({ type: ButtonType.Circle, stateEffect: true }) {
@@ -484,7 +485,7 @@ struct ProxyPage {
                     }, (item: ProxyGroup) => item.name)
                   }
                   .loop(false)
-                  .cachedCount(5)
+                  .cachedCount(2)
                   .indicator(false)
                   .alignSelf(ItemAlign.Center)
                   .onGestureSwipe((index: number, extraInfo: SwiperAnimationEvent) => {
@@ -569,7 +570,7 @@ struct ProxyPage {
     }
     .width('100%')
     .height('100%')
-    }
+  }
 }
 
 export default ProxyPage
