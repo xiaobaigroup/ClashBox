@@ -104,6 +104,7 @@ struct ProxyPage {
   @Consume curYOffset: number
   // 收藏显示判定
   @Provide showStart: boolean = false
+  @State loading: boolean = false
 
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
@@ -140,7 +141,7 @@ struct ProxyPage {
   aboutToDisappear() {
     EventHub.off(EventKey.FetchProxyGroup)
     EventHub.off(EventKey.ProxySort)
-    EventHub.off(EventKey.TestDelayAll)
+    EventHub.off(EventKey.TestDelay)
   }
 
   changeProxy(group: string, item: ProxyItem) {
@@ -548,13 +549,18 @@ struct ProxyPage {
             }
             .margin({bottom:this.isLandscapePhone ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
             .onClick(async () => {
-              await EventHub.sendEvent(EventKey.TestDelayAll)
+              if(this.loading){
+                return
+              }
+              this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
+              this.loading = true
+              await ClashViewModel.testAllDelay(this.theProxyGroups[this.currentIndex].proxies as ProxyItem[])
+              this.loading = false
               hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行1 %{public}s")
               if (this.appConfig.proxySort == ProxySort.Delay) {
                 EventHub.sendEvent(EventKey.ProxySort, ProxySort.Delay)
                 hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行2 %{public}s")
               }
-              this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
             })
             // 悬浮代理测速按钮 END
           }
