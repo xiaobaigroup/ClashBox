@@ -182,36 +182,24 @@ struct ProxyGroupItem {
     BreakpointSystem.getInstance().start()
 
     if (this.appConfig.proxySort==ProxySort.Default){
-      this.proxyLazyItems.empty()
-      this.proxyLazyItems.pushData(this.proxyLazyItems.DefaultSortItems(this.proxyitems))
-      this.proxyLazyItems.refresh()
+      this.proxyLazyItems.DefaultSortItems(this.proxyitems)
     }else if (this.appConfig.proxySort==ProxySort.Title){
-      this.proxyLazyItems.empty()
-      this.proxyLazyItems.pushData(this.proxyLazyItems.NameSortItems(this.proxyitems))
-      this.proxyLazyItems.refresh()
+      this.proxyLazyItems.NameSortItems(this.proxyitems)
     }else if (this.appConfig.proxySort==ProxySort.Delay){
-      this.proxyLazyItems.empty()
-      this.proxyLazyItems.pushData(this.proxyLazyItems.LatencySortItems(this.proxyitems))
-      this.proxyLazyItems.refresh()
+      this.proxyLazyItems.LatencySortItems(this.proxyitems)
     }
 
     EventHub.on(EventKey.ProxySort, async (sort: ProxySort) => {
       console.log("ProxySort", sort)
       switch (sort) {
         case ProxySort.Default:
-          this.proxyLazyItems.empty()
-          this.proxyLazyItems.pushData(this.proxyLazyItems.DefaultSortItems(this.proxyitems))
-          this.proxyLazyItems.refresh()
+          this.proxyLazyItems.DefaultSortItems(this.proxyitems)
           break
         case ProxySort.Title:
-          this.proxyLazyItems.empty()
-          this.proxyLazyItems.pushData(this.proxyLazyItems.NameSortItems(this.proxyitems))
-          this.proxyLazyItems.refresh()
+          this.proxyLazyItems.NameSortItems(this.proxyitems)
           break
         case ProxySort.Delay:
-          this.proxyLazyItems.empty()
-          this.proxyLazyItems.pushData(this.proxyLazyItems.LatencySortItems(this.proxyitems))
-          this.proxyLazyItems.refresh()
+          this.proxyLazyItems.LatencySortItems(this.proxyitems)
           break
       }
       hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行4 %{public}s")
@@ -378,7 +366,7 @@ struct ProxyGroupItem {
               transition: this.uiConfig.isAnimation ? TransitionEffect.prototype.animation({ tempo: 1.5 }) : undefined
             },
           })
-      }, (item: ProxyItem,i:number) => item.name+ '-' + i.toString()+item.latency.toString())
+      }, (item: ProxyItem,i:number) => item.name+ '-' + i.toString())
     }
     .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : this.breakPointStateListLanes.value,
       this.breakPointStateListGutter.value)
