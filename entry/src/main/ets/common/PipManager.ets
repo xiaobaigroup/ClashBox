@@ -1,8 +1,46 @@
 
 // 画中画控制器单例
-import { PiPWindow, typeNode } from '@kit.ArkUI'; // 引入PiPWindow模块
+import { BuilderNode, NodeController, PiPWindow, typeNode } from '@kit.ArkUI'; // 引入PiPWindow模块
 import { BusinessError } from '@kit.BasicServicesKit';
+import Speed from '../components/Home/Speed';
 import { AVPlayer} from './SimpleAVPlayer'
+
+class Params {
+  text: string = ""
+}
+
+@Builder
+function PipBackgroundBuilder(params: Params) {
+  Row() {
+    Stack() {
+      Image($r('app.media.About_name_1'))
+        .width(384)
+        .fillColor($r('app.color.symbol_logo_name_color'))
+      Image($r('app.media.About_name_2'))
+        .height(52)
+        .offset({x: 101, y: -2})
+    }
+    Text(params.text)
+  }.width('100%').height('100%')
+  .backgroundColor($r('app.color.container_background'))
+  .justifyContent(FlexAlign.Center)
+  .alignItems(VerticalAlign.Center)
+}
+
+// 自定义节点
+class PipBackgroundNodeController extends NodeController {
+  private pipBackgroundNode: BuilderNode<[Params]> | null = null;
+  private wrapBuilder: WrappedBuilder<[Params]> = wrapBuilder(PipBackgroundBuilder);
+
+  makeNode(uiContext: UIContext): FrameNode {
+    if (this.pipBackgroundNode == null) {
+      this.pipBackgroundNode = new BuilderNode(uiContext);
+      this.pipBackgroundNode.build(this.wrapBuilder, { text: "" })
+    }
+    return this.pipBackgroundNode!.getFrameNode()!;
+  }
+
+}
 
 // 自定义XComponentController
 class CustomXComponentController extends XComponentController {
@@ -36,7 +74,7 @@ export class PipManager {
 
   constructor() {
     this.player = new AVPlayer();
-    this.mXComponentController = new CustomXComponentController();
+    this.mXComponentController = new XComponentController();
   }
 
   onActionEvent(control: PiPWindow.ControlEventParam) {
@@ -116,12 +154,15 @@ export class PipManager {
       return;
     }
 
+    let nodeController: PipBackgroundNodeController = new PipBackgroundNodeController()
+
     let config: PiPWindow.PiPConfiguration = {
       context: ctx,
-      componentController: this.getXComponentController(),
+      componentController: new XComponentController(),
       templateType: PiPWindow.PiPTemplateType.VIDEO_PLAY,
-      contentWidth: 800, // 使用typeNode启动画中画时，contentWidth需设置为大于0的值，否则将设置为16:9默认比例
-      contentHeight: 300, // 使用typeNode启动画中画时，contentHeight需设置为大于0的值，否则将设置为16:9默认比例
+      contentWidth: 160, // 使用typeNode启动画中画时，contentWidth需设置为大于0的值，否则将设置为16:9默认比例
+      contentHeight: 90, // 使用typeNode启动画中画时，contentHeight需设置为大于0的值，否则将设置为16:9默认比例
+      customUIController: nodeController
     };
     // 通过create接口创建画中画控制器实例
     let promise: Promise<PiPWindow.PiPController> = PiPWindow.create(config, this.xComponent);
@@ -179,17 +220,17 @@ export class PipManager {
   makeTypeNode(ctx: UIContext) {
     if (this.xComponent === null || this.xComponent === undefined) {
       // 创建typeNode
-      let xc_options: XComponentOptions = {
-        type: XComponentType.TEXTURE, // 类型设置为TEXTURE
-        controller: PipManager.getInstance().getXComponentController(), // 设置XComponentController
-      }
-      this.xComponent = typeNode.createNode(ctx, "XComponent", xc_options);
+      // let xc_options: XComponentOptions = {
+      //   type: XComponentType.TEXTURE, // 类型设置为TEXTURE
+      //   controller: PipManager.getInstance().getXComponentController(), // 设置XComponentController
+      // }
+      // this.xComponent = typeNode.createNode(ctx, "XComponent", xc_options);
 
       // 创建XComponent类型的typeNode
-      // this.xComponent = typeNode.createNode(ctx, "XComponent", {
-      //   type: XComponentType.SURFACE, // 类型设置为SURFACE
-      //   controller: PipManager.getInstance().getXComponentController(), // 设置XComponentController
-      // });
+      this.xComponent = typeNode.createNode(ctx, "XComponent", {
+        type: XComponentType.SURFACE, // 类型设置为SURFACE
+        controller: PipManager.getInstance().getXComponentController(), // 设置XComponentController
+      });
     }
   }
 }

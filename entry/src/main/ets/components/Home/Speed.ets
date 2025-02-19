@@ -88,8 +88,7 @@ struct Speed {
     ]
   })
   /* 主题色 */
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 定时器ID，用于清除定时器
   private timerId: number = 0;
 

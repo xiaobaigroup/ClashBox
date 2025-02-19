@@ -4,6 +4,8 @@ import { MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
 import { ProxyItem, ProxyData  } from '../../common/ProxyData'
 import { AppConfig } from '../../entryability/AppState'
+import ClashViewModel from '../../entryability/ClashViewModel'
+import { delayText } from '../Proxy/ProxyNodeItem'
 
 
 @Component
@@ -35,9 +37,9 @@ struct CurrentNode {
             .fontColor(this.font_primary)
             .maxLines(2)
 
-          Text('ping ' + `${this.appConfig.currentProxyItem.latency ?? '-'}` + 'ms')
+          Text('ping ' + `${delayText(ClashViewModel.delayMap.get(this.appConfig.currentProxyItem.name)?.delay ?? 0)}`)
             .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)
-            .fontColor(ProxyData.getColorForLatency(this.appConfig.currentProxyItem.latency))
+            .fontColor(ProxyData.getColorForLatency(ClashViewModel.delayMap.get(this.appConfig.currentProxyItem.name)?.delay ?? 0))
         }
         else{
           Text($r('app.string.proxy_name'))

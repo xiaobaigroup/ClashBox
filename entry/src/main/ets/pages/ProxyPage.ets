@@ -5,6 +5,8 @@ import {
   TAB_CONTENT_TITLE_FONT_SIZE,
   BORDER_RADIUS_20,
   CONTENT_END_OFFSET_150,
+  FONT_SIZE_16,
+  LIST_ITEM_HEIGHT,
 } from '../common/Constants'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import ProxyGroupItem from '../components/Proxy/ProxyGroupItem'
@@ -21,6 +23,7 @@ import { ProviderPage } from '../components/Proxy/Provider'
 import { indexController } from './Index'
 import { customAnimationUtil } from '../utils/Animation'
 import { Nothing, RightDownButton } from '../components/Common'
+import { StylesEdit } from '../components/Proxy/StylesEdit'
 
 
 @Entry
@@ -46,9 +49,11 @@ struct ProxyPage {
   //二级图标色，深灰色
   @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary')
   /* Stack层叠布局 */
-  // 编辑按钮点击
-  @State isShowEdit: boolean = false
-  @Provide isProviderEdit: boolean = false
+
+  // 是否要打开样式编辑
+  @State isStylesEdit: boolean = false
+  // 半模态页
+  @State isShowProxyBindSheet: boolean = false
   // 分组tabs相关
   @State currentIndex: number = 0;
   // 假数据延迟颜色设置
@@ -150,7 +155,26 @@ struct ProxyPage {
     }
   }
 
-  // 分组tabs内容
+  // 标题按钮
+  @Builder
+  ButtonBuilder(icons: Resource, onCheck: () => void ) {
+    Button({ type: ButtonType.Circle, stateEffect: true }) {
+      SymbolGlyph(icons)
+        .fontSize(24)
+        .fontColor([this.icon_primary])
+    }
+    .width(40)
+    .height(40)
+    .backgroundColor($r('app.color.settings_container_background'))
+    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+    .onClick(() => {
+      onCheck()
+      this.isShowProxyBindSheet = true
+      this.isEnableIndexForegroundBlur = true
+    })
+    .transition(customAnimationUtil.isSlide(100, this.uiConfig))
+  }
+  // 标签列表样式标签
   @Builder
   TabBuilder(title: ResourceStr, targetIndex: number) {
     Column() {
@@ -178,161 +202,39 @@ struct ProxyPage {
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Start)
   }
-
+  // 嵌套分组样式标签头
   @Builder
-  // 半模态编辑菜单Start
-  ProxyBindSheetEdit() {
-    Column() {
-      //代理节点分组方式切换
-      EditTitle({ title: $r('app.string.Packet_mode') })
-      Column() {
-        ForEach([{ t: $r('app.string.Tabs'), v: ProxyGroupType.Tabs },
-          { t: $r('app.string.List'), v: ProxyGroupType.List }], (n: [Resource, number], i: number) => {
-          Row() {
-            Text(n["t"])
-              .EditText()
-            Radio({
-              value: 'ProxyArrangementSelected1', group: 'ProxyArrangementSelectedRadioGroup',
-              indicatorType: RadioIndicatorType.TICK,
-            })
-              .checked(this.appConfig.proxyGroupType == n["v"])
-              .onChange((isChecked: boolean) => {
-                if (isChecked) {
-                  animateTo({ duration: this.uiConfig.animationSpeed }, () => {
-                    this.appConfig.proxyGroupType = n["v"]
-                  })
-                }
-              })
-              .hitTestBehavior(HitTestMode.None)
-              .radioStyle({
-                checkedBackgroundColor: this.icon_emphasize,
-              })
-          }
-          .EditRow()
-          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-          // 点击后改变ProxyArrangementSelected状态为 标签
-          .onClick(() => {
-            animateTo({ duration: this.uiConfig.animationSpeed }, () => {
-              this.appConfig.proxyGroupType = n["v"]
-            })
-          })
-
-          if (!isEnd(2, i)) {
-            Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
-          }
-        })
-      }
-      .height(94)
-      .EditColumn()
-
-      //代理节点排列切换
-      EditTitle({ title: $r('app.string.Arrangement') })
-      Column() {
-        ForEach([
-          { t: $r('app.string.Default'), v: ProxySort.Default },
-          { t: $r('app.string.Delay'), v: ProxySort.Delay },
-          { t: $r('app.string.Name'), v: ProxySort.Title }
-        ], (n: [Resource, number], i: number) => {
-          Row() {
-            Text(n["t"])
-              .EditText()
-            Radio({
-              value: 'SortRadio1', group: 'SortRadioGroup',
-              indicatorType: RadioIndicatorType.TICK
-            })
-              .checked(this.appConfig.proxySort == n["v"])
-                // .onChange((isChecked: boolean) => {
-                //   if (isChecked) {
-                //     EventHub.sendEvent(EventKey.ProxySort, n["v"])
-                //     animateTo({ duration: this.uiConfig.animationSpeed }, () => {
-                //       this.appConfig.proxySort = n["v"]
-                //     })
-                //   }
-                // })
-              .hitTestBehavior(HitTestMode.None)
-              .radioStyle({
-                checkedBackgroundColor: this.icon_emphasize,
-              })
-          }
-          .EditRow()
-          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-          .onClick(() => {
-            EventHub.sendEvent(EventKey.ProxySort, n["v"])
-            animateTo({ duration: this.uiConfig.animationSpeed }, () => {
-              this.appConfig.proxySort = n["v"]
-            })
-          })
-
-          if (!isEnd(3, i))
-            Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
-        })
-      }
-      .height(142)
-      .EditColumn()
-
-      //代理节点卡片尺寸切换
-      EditTitle({ title: $r('app.string.Card_Size') })
-      Column() {
-        ForEach([
-          { t: $r('app.string.Mini'), v: ProxyCardSize.Mini },
-          { t: $r('app.string.Thin'), v: ProxyCardSize.Small },
-          { t: $r('app.string.Wide'), v: ProxyCardSize.Large },
-        ], (n: [Resource, number], i: number) => {
-          Row() {
-            Text(n["t"])
-              .EditText()
-            Radio({
-              value: 'ProxyGroupItemSelectedRadio1', group: 'ProxyGroupItemSelectedRadioGroup',
-              indicatorType: RadioIndicatorType.TICK
-            })
-              .checked(this.appConfig.proxyCardSize == n["v"])
-              .onChange((isChecked: boolean) => {
-                if (isChecked) {
-                  animateTo({ duration: this.uiConfig.animationSpeed }, () => {
-                    this.currentRadioValue3 = 0
-                    this.appConfig.proxyCardSize = n["v"]
-                  })
-                }
-              })
-              .hitTestBehavior(HitTestMode.None)
-              .radioStyle({
-                checkedBackgroundColor: this.icon_emphasize,
-                //   uncheckedBorderColor: this.icon_secondary
-              })
-          }
-          .EditRow()
-          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-          // 点击后改变ProxyGroupItemSelected状态为 多列
-          .onClick(() => {
-            animateTo({ duration: this.uiConfig.animationSpeed }, () => {
-              this.appConfig.proxyCardSize = n["v"]
-            })
-          })
-
-          if (!isEnd(3, i)) {
-            Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
-          }
-        })
-      }
-      .height(142)
-      .EditColumn()
-
+  itemHead(text: string, icon: Resource) {
+    Row() {
+      Text(text)
+        .fontSize(FONT_SIZE_16)
+        .fontColor($r('sys.color.font_primary'))
+        .maxLines(1)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
+      SymbolGlyph(icon)
+        .fontSize(25).fontColor([$r('sys.color.icon_primary')])
     }
-    .padding({
-      left: this.breakPointStateTabContentTitleMargin.value,
-      right: this.breakPointStateTabContentTitleMargin.value,
-    })
     .width('100%')
-  } //半模态编辑菜单end
-
+    .justifyContent(FlexAlign.SpaceBetween)
+    .padding({ left: 10, right: 10 })
+    .borderRadius(BORDER_RADIUS_20)
+    .backgroundColor($r('app.color.container_background'))
+    .height(LIST_ITEM_HEIGHT)
+    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+  }
+  // 半模态页面
   @Builder
-  ProviderBindSheetEdit() {
-    ProviderPage()
-      .padding({
-        left: this.breakPointStateTabContentTitleMargin.value,
-        right: this.breakPointStateTabContentTitleMargin.value,
-      })
-      .width('100%')
+  ProxyBindSheet() {
+    Column() {
+      if (this.isStylesEdit) {
+        // 样式编辑
+        StylesEdit()
+      } else {
+        // 提供者
+        ProviderPage()
+      }
+    }
+    .width('100%')
   }
 
   build() {
@@ -345,85 +247,17 @@ struct ProxyPage {
           .textAlign(TextAlign.Center)
           .transition(customAnimationUtil.isSlide(200, this.uiConfig))
           .transition(customAnimationUtil.isScaleTran(0, this.uiConfig))
-            //提供者半模态
-          .bindSheet($$this.isProviderEdit, this.ProviderBindSheetEdit(), {
-            detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
-            backgroundColor: $r('app.color.background'),
-            showClose: false,
-            dragBar: false,
-            scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-            preferType: SheetType.CENTER,
-            onWillDismiss: () => {
-              this.isProviderEdit = false
-              this.isEnableIndexForegroundBlur = false
-            }
-          })
         Blank()
-
-        //一键取消所有收藏按钮 TODO 判定暂时有问题 不显示先
-        /* Button({ type: ButtonType.Circle, stateEffect: true }) {
-           SymbolGlyph($r('sys.symbol.heart_slash'))
-             .fontSize(24)
-             .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-             .fontColor([this.icon_primary,Color.Red])
-         }
-         .width(40)
-         .height(40)
-         .backgroundColor($r('app.color.settings_container_background'))
-         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-         .onClick(() => {
+        // 一键取消所有收藏按钮 TODO 判定暂时有问题 不显示先
+        /*this.ButtonBuilder($r('sys.symbol.heart_slash'), () => {
            this.favoriteProxys.clear()
            this.showStart=true
            this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_all_tip') })
-         })
-         .transition(customAnimationUtil.isSlide(150, this.uiConfig))
-         */
-
-        //提供者按钮
-        Button({ type: ButtonType.Circle, stateEffect: true }) {
-          SymbolGlyph($r('sys.symbol.puzzle'))
-            .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-            .fontColor([this.icon_primary])
-        }
-        .width(40)
-        .height(40)
-        .backgroundColor($r('app.color.settings_container_background'))
-        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-        .onClick(() => {
-          this.isProviderEdit = true
-          this.isEnableIndexForegroundBlur = true
-        })
-        .transition(customAnimationUtil.isSlide(100, this.uiConfig))
-        //代理样式编辑半模态
-        .bindSheet($$this.isShowEdit, this.ProxyBindSheetEdit(), {
-          detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
-          backgroundColor: $r('app.color.background'),
-          showClose: true,
-          dragBar: false,
-          scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-          title: { title: $r('app.string.Edit') },
-          preferType: SheetType.CENTER,
-          onWillDismiss: () => {
-            this.isShowEdit = false
-            this.isEnableIndexForegroundBlur = false
-          }
-        })
-
-        //编辑图标
-        Button({ type: ButtonType.Circle, stateEffect: true }) {
-          SymbolGlyph($r('sys.symbol.square_and_pencil'))
-            .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-            .fontColor([this.icon_primary])
-        }
-        .width(40)
-        .height(40)
-        .backgroundColor($r('app.color.settings_container_background'))
-        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-        .onClick(() => {
-          this.isShowEdit = true
-          this.isEnableIndexForegroundBlur = true
-          hilog.info(0xB001, this.componentName, `#button#onClick()#编辑代理`)
-        })
+         })*/
+        // 提供者按钮
+        this.ButtonBuilder($r('sys.symbol.puzzle'), () => { this.isStylesEdit = false })
+        // 编辑图标
+        this.ButtonBuilder($r('sys.symbol.square_and_pencil'), () => { this.isStylesEdit = true })
       }
       .zIndex(1)
       .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
@@ -583,6 +417,21 @@ struct ProxyPage {
     }
     .width('100%')
     .height('100%')
+    // 半模态页
+    .bindSheet($$this.isShowProxyBindSheet, this.ProxyBindSheet(), {
+      detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],
+      backgroundColor: $r('app.color.background'),
+      dragBar: false,
+      scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+      preferType: SheetType.CENTER,
+      onWillDismiss: () => {
+        this.isShowProxyBindSheet = false
+        this.isEnableIndexForegroundBlur = false
+        setTimeout(() => {
+          this.isStylesEdit = false
+        }, 20)
+      }
+    })
   }
 }
 

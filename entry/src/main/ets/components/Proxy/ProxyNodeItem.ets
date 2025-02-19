@@ -27,6 +27,16 @@ function ListRowStyle() {
   .alignItems(VerticalAlign.Center)
 }
 
+export function delayText(delay: number){
+  if (delay == 0) {
+    return ""
+  } else if(delay < 0){
+    return "timeout"
+  } else {
+    return delay + "ms"
+  }
+}
+
 @Component
 export struct ProxyNode {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
@@ -53,15 +63,7 @@ export struct ProxyNode {
   aboutToDisappear() {
   }
 
-  delayText(){
-    if (this.delay == 0) {
-      return ""
-    } else if(this.delay < 0){
-      return "timeout"
-    } else {
-      return this.delay + "ms"
-    }
-  }
+
 
   build() {
     if (this.itemSize === ProxyCardSize.Large){
@@ -71,7 +73,7 @@ export struct ProxyNode {
           Text(`${this.item.type}`).ItemTypeStyle()
         }.alignItems(HorizontalAlign.Start)
         Row({space:10}){
-          Text(this.delayText())
+          Text(delayText(this.delay))
             .fontColor(ProxyData.getColorForLatency(this.delay))
             .fontSize(12)
             .maxLines(1)
@@ -94,7 +96,7 @@ export struct ProxyNode {
           Text(`${this.item.name}`).ItemTextStyle()
           Row({space:3}) {
             Text(`${this.item.type}`).ItemTypeStyle().maxLines(1).width('25%').textOverflow({ overflow: TextOverflow.Clip})
-            Text(this.delayText())
+            Text(delayText(this.delay))
               .fontColor(ProxyData.getColorForLatency(this.delay))
               .fontSize(12)
               .maxLines(1)
@@ -118,7 +120,7 @@ export struct ProxyNode {
           Text(`${this.item.name}`).ItemTextStyle().maxLines(2)
           Column() {
             Text(`${this.item.type}`).ItemTypeStyle()
-            Text(this.delayText())
+            Text(delayText(this.delay))
               .fontColor(ProxyData.getColorForLatency(this.delay))
               .fontSize(12)
               .maxLines(1)
