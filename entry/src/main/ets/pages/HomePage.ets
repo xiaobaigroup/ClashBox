@@ -37,6 +37,7 @@ import { Profile, ProxyGroup, ProxyMode } from 'proxy_core'
 import { image } from '@kit.ImageKit'
 import { ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/ProxyData'
 import { EventHub, EventKey } from '../common/EventHub'
+import { RightDownButton } from '../components/Common'
 
 
 @Entry

@@ -975,8 +975,7 @@ function smallText() {
 }
 
 //代理和配置右下角图标按钮
-@Builder export function RightDownButton(s:Resource,a:SymbolEffect,w:Length,h:Length,c:ResourceColor,u:UIConfig){
-  Column() {
+@Builder export function RightDownButton(s:Resource,a:SymbolEffect)  {
     Stack({ alignContent: Alignment.Center }) {
       SymbolGlyph(s)
         .fontSize(24)
@@ -986,19 +985,4 @@ function smallText() {
     }
     .width('100%')
     .height('100%')
-  }
-  .shadow({
-    radius: 10,
-    color: c,
-    offsetY: 4,
-    type: ShadowType.BLUR
-  })
-  .borderRadius(100)
-  .backgroundColor(c)
-  .width(w)
-  .height(h)
-  .clip(true)
-  .hoverEffect(HoverEffect.Scale)
-  .clickEffect(customAnimationUtil.isClickEffect(u))
-  .transition(customAnimationUtil.isSlideSwitch(u))
 }

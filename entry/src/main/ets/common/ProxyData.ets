@@ -127,15 +127,17 @@ export class ProxyItemDataSource extends BaseDataSource<ProxyItem> {
 
   //按名称排序
   public async NameSortItems(data:ProxyItem[]) {
-    await data.sort((a, b) => ProxyCollator.compare(a.name, b.name));
-    this.dataArray = data;
+    this.empty()
+  await data.sort((a, b) => ProxyCollator.compare(a.name, b.name))
+    this.pushData(data)
     this.refresh()
   }
 
   //默认排序
   public async DefaultSortItems(data:ProxyItem[]) {
+    this.empty()
     await data.sort((a, b) => ProxyCollator.compare(a.id, b.id));
-    this.dataArray = data
+    this.pushData(data)
     this.refresh()
   }
 }
