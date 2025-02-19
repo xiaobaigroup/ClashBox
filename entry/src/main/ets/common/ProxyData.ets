@@ -119,26 +119,21 @@ export class ProxyItemDataSource extends BaseDataSource<ProxyItem> {
   }
 
   // 延迟排序
-  public async LatencySortItems(data:ProxyItem[]) {
-   await data.sort((a, b) => (a.latency ?? 0) - (b.latency ?? 0));
-    this.dataArray = data;
-    this.refresh()
+  public LatencySortItems(data: ProxyItem[]): ProxyItem[] {
+    data.sort((a, b) => (a.latency ?? 0) - (b.latency ?? 0))
+    return data
   }
 
   //按名称排序
-  public async NameSortItems(data:ProxyItem[]) {
-    this.empty()
-  await data.sort((a, b) => ProxyCollator.compare(a.name, b.name))
-    this.pushData(data)
-    this.refresh()
+  public NameSortItems(data: ProxyItem[]):ProxyItem[] {
+    data.sort((a, b) => ProxyCollator.compare(a.name, b.name))
+    return data
   }
 
   //默认排序
-  public async DefaultSortItems(data:ProxyItem[]) {
-    this.empty()
-    await data.sort((a, b) => ProxyCollator.compare(a.id, b.id));
-    this.pushData(data)
-    this.refresh()
+  public DefaultSortItems(data: ProxyItem[]):ProxyItem[] {
+    data.sort((a, b) => ProxyCollator.compare(a.id, b.id))
+    return data
   }
 }
 

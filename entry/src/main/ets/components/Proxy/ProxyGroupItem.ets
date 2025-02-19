@@ -8,9 +8,9 @@ import {
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE } from '../../common/Constants'
 import { LengthMetrics, SymbolGlyphModifier,PromptAction, curves } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
-import {  ProxyItem, ProxyItemDataSource } from '../../common/ProxyData';
+import { ProxyGroupItemDataSource, ProxyItem, ProxyItemDataSource } from '../../common/ProxyData';
 import { EventHub, EventKey } from '../../common/EventHub';
-import { ProxyGroup, ProxySort } from 'proxy_core';
+import { Profile, ProxyGroup, ProxySort } from 'proxy_core';
 import { AppConfig, AppState, ClashCore, ProxyCardSize, UIConfig } from '../../entryability/AppState';
 import { ProxyNode } from './ProxyNodeItem';
 import { customAnimationUtil } from '../../utils/Animation';
@@ -148,6 +148,7 @@ struct ProxyGroupItem {
   // 代理原始数据
   @Consume theProxyGroups: ProxyGroup[]
   @State proxyLazyItems: ProxyItemDataSource = new ProxyItemDataSource()
+  @Consume('currentProfile') private currentProfile: Profile | null
   // 当前代理节点单选选择的值
   @Prop selectedProxy: string
   @Prop disabled: boolean
@@ -170,34 +171,57 @@ struct ProxyGroupItem {
     isShowFavoriteProxy: false
   }
 
-  aboutToAppear(): void {
+  async aboutToAppear(): Promise<void> {
     // 清空数据
-    this.proxyLazyItems.clear()
+    //this.proxyLazyItems.empty()
     // 写入数据
-    this.proxyLazyItems.pushData(this.proxyitems)
-    this.proxyLazyItems.refresh()
+    //this.proxyLazyItems.pushData(this.proxyitems)
+  // this.proxyLazyItems.refresh()
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     BreakpointSystem.getInstance().attach(this.breakPointStateListLanes)
     BreakpointSystem.getInstance().start()
-    EventHub.on(EventKey.ProxySort, (sort: ProxySort) => {
+
+    if (this.appConfig.proxySort==ProxySort.Default){
+      this.proxyLazyItems.empty()
+      this.proxyLazyItems.pushData(this.proxyLazyItems.DefaultSortItems(this.proxyitems))
+      this.proxyLazyItems.refresh()
+    }else if (this.appConfig.proxySort==ProxySort.Title){
+      this.proxyLazyItems.empty()
+      this.proxyLazyItems.pushData(this.proxyLazyItems.NameSortItems(this.proxyitems))
+      this.proxyLazyItems.refresh()
+    }else if (this.appConfig.proxySort==ProxySort.Delay){
+      this.proxyLazyItems.empty()
+      this.proxyLazyItems.pushData(this.proxyLazyItems.LatencySortItems(this.proxyitems))
+      this.proxyLazyItems.refresh()
+    }
+
+    EventHub.on(EventKey.ProxySort, async (sort: ProxySort) => {
       console.log("ProxySort", sort)
       switch (sort) {
         case ProxySort.Default:
-          this.proxyLazyItems.DefaultSortItems(this.proxyitems)
+          this.proxyLazyItems.empty()
+          this.proxyLazyItems.pushData(this.proxyLazyItems.DefaultSortItems(this.proxyitems))
+          this.proxyLazyItems.refresh()
           break
         case ProxySort.Title:
-          this.proxyLazyItems.NameSortItems(this.proxyitems)
+          this.proxyLazyItems.empty()
+          this.proxyLazyItems.pushData(this.proxyLazyItems.NameSortItems(this.proxyitems))
+          this.proxyLazyItems.refresh()
           break
         case ProxySort.Delay:
-          this.proxyLazyItems.LatencySortItems(this.proxyitems)
-          hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行4 %{public}s")
-          hilog.info(0xFF00, "ProxyPageLatencyTag", "this.proxyitems %{public}s", JSON.stringify(this.proxyitems))
+          this.proxyLazyItems.empty()
+          this.proxyLazyItems.pushData(this.proxyLazyItems.LatencySortItems(this.proxyitems))
+          this.proxyLazyItems.refresh()
           break
       }
+      hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行4 %{public}s")
+      hilog.info(0xFF00, "ProxyPageLatencyTag", "this.proxyitems %{public}s", JSON.stringify(this.proxyitems))
     })
   }
 
+  aboutToDisappear() {
 
+  }
 
   /**
    * 半模态窗口测速网站
@@ -354,7 +378,7 @@ struct ProxyGroupItem {
               transition: this.uiConfig.isAnimation ? TransitionEffect.prototype.animation({ tempo: 1.5 }) : undefined
             },
           })
-      }, (item: ProxyItem,i:number) => item.name+ '-' + i.toString())
+      }, (item: ProxyItem,i:number) => item.name+ '-' + i.toString()+item.latency.toString())
     }
     .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : this.breakPointStateListLanes.value,
       this.breakPointStateListGutter.value)

@@ -167,8 +167,8 @@ struct Home {
     hilog.info(0xFF00, "HometestTag", "布局初始化为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
     EventHub.on(EventKey.SwitchModeCard, async (mode: ProxyMode) => {
       // 清空数据
-      this.proxyGroups.clear()
-      this.proxyLazyItems.clear()
+      this.proxyGroups.empty()
+      this.proxyLazyItems.empty()
       if (this.currentProfile) {
         // 写入数据
         this.theProxyGroups = await ClashViewModel.getProxyGroups(mode)

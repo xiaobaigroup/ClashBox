@@ -72,6 +72,7 @@ struct ProxyPage {
   /*节点相关数据以及排序 */
   // 代理原始数据
   @Consume theProxyGroups: ProxyGroup[]
+  @Prop proxyitems: ProxyItem[]
   // 代理数据(懒加载)
   @Consume proxyGroups: ProxyGroupItemDataSource
   // 代理分组List控制器
@@ -129,13 +130,14 @@ struct ProxyPage {
         this.currentProfile = await ClashViewModel.getProfile(this.appConfig.currentProfileId)
         if (this.currentProfile) {
           // 写入数据
-          this.proxyGroups.clear()
+          this.proxyGroups.empty()
           this.theProxyGroups = []
           this.theProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode ?? ProxyMode.Rule)
           this.proxyGroups.pushData(this.theProxyGroups)
+          this.proxyGroups.refresh()
         }
       } else {
-        this.proxyGroups = new ProxyGroupItemDataSource([])
+      //  this.proxyGroups = new ProxyGroupItemDataSource([])
       }
     })
     EventHub.sendEvent(EventKey.FetchProxyGroup)
@@ -145,7 +147,7 @@ struct ProxyPage {
 
   aboutToDisappear() {
     EventHub.off(EventKey.FetchProxyGroup)
-    EventHub.off(EventKey.ProxySort)
+   // EventHub.off(EventKey.ProxySort)
     EventHub.off(EventKey.TestDelay)
   }
 
