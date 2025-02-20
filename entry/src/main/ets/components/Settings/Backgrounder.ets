@@ -165,7 +165,7 @@ struct Backgrounder {
         // 模拟定位
         Row() {
           toggleRowList({
-            icons: $r('sys.symbol.arrow_down_circle'),
+            icons: $r('sys.symbol.compass_circle'),
             title: $r('app.string.simulate_locate'),
             subtitle: $r('app.string.simulate_locate_subtitle')
           }) {
