@@ -64,8 +64,8 @@ struct Home {
   @State ContainerHeight: string = ''
   @State TopHeight: string = ''
   //节点假数据组后期可改可删
-  @Consume
-  theProxyGroups: ProxyGroup[]
+  @Consume theProxyGroups: ProxyGroup[]
+ //@StorageProp("proxyGroups") theProxyGroups: ProxyGroup[] = []
   /* 主页卡片高度*/
   @Consume('HomeCardEditHeight') private HomeCardEditHeight: BreakpointState<number>
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()

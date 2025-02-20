@@ -155,7 +155,7 @@ struct ProxyGroupItem {
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  @StorageProp("proxyGroups") proxyGroups: ProxyGroup[] = []
+ // @StorageProp("proxyGroups") theProxyGroups: ProxyGroup[] = []
   //收藏显示判定
 @Consume showStart:boolean
   /**
@@ -352,11 +352,7 @@ struct ProxyGroupItem {
           {
             preview: MenuPreviewMode.IMAGE,
             onAppear: (() => {
-              const p = ProxyGroupItem.currentTouchProxyData
-              if (this.showStart&&p.isShowFavoriteProxy&&AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups).length<3){
-                p.isShowFavoriteProxy = false
-              }
-              ProxyGroupItem.currentTouchProxyData = item
+                ProxyGroupItem.currentTouchProxyData = item
               if (this.uiConfig.isVibrate) {
                 customVibrator.vibratorTriggerOfHapticClockTimer()
               }
@@ -407,11 +403,11 @@ struct ProxyGroupItem {
   private favoriteProxy(): void {
     //  收藏节点 & 判断是否已经收藏
     const p = ProxyGroupItem.currentTouchProxyData
-    if (!p.isShowFavoriteProxy&&AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups).length<3){
+    if (!p.isShowFavoriteProxy && AppState.fetchFavoriteProxys(this.favoriteProxys, this.theProxyGroups).length<3){
       this.ProxyPromptAction.showToast({ message: $r('app.string.Collect_Tip') })
       p.isShowFavoriteProxy = true
-     // this.showStart=false
       this.favoriteProxys.set(p.g + '|' + p.name, this.appConfig.currentProfileId ?? "")
+      console.info('favoriteProxys',`${JSON.stringify(this.favoriteProxys)}`)
     }else {
       this.ProxyPromptAction.showToast({ message: $r('app.string.favorite_proxy_no') })
     }
@@ -425,6 +421,7 @@ struct ProxyGroupItem {
     const p = ProxyGroupItem.currentTouchProxyData
     p.isShowFavoriteProxy = false
     this.favoriteProxys.delete(p.g + '|' + p.name)
+    console.info('favoriteProxys',`${JSON.stringify(this.favoriteProxys)}`)
   }
 }
 

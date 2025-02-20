@@ -72,6 +72,7 @@ struct ProxyPage {
   /*节点相关数据以及排序 */
   // 代理原始数据
   @Consume theProxyGroups: ProxyGroup[]
+ // @StorageProp("proxyGroups") theProxyGroups: ProxyGroup[] = []
   @Prop proxyitems: ProxyItem[]
   // 代理数据(懒加载)
   @Consume proxyGroups: ProxyGroupItemDataSource
@@ -137,7 +138,7 @@ struct ProxyPage {
           this.proxyGroups.refresh()
         }
       } else {
-      //  this.proxyGroups = new ProxyGroupItemDataSource([])
+        this.proxyGroups = new ProxyGroupItemDataSource([])
       }
     })
     EventHub.sendEvent(EventKey.FetchProxyGroup)

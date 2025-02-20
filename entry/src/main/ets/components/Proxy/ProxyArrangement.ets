@@ -18,7 +18,8 @@ struct ProxyArrangement {
   @State selectItem: number = 0
   @State currentIndex: number =0
   // 代理原始数据
-  @Consume theProxyGroups: ProxyGroup[]
+ @Consume theProxyGroups: ProxyGroup[]
+ // @StorageProp("proxyGroups") theProxyGroups: ProxyGroup[] = []
   @Consume proxyGroups: ProxyGroupItemDataSource
   private componentName: string = 'ProxyPage'
   @State isContentShow: boolean |undefined = false
