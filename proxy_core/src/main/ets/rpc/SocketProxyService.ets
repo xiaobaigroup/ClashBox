@@ -133,12 +133,15 @@ export class SocketProxyService implements IClashManager{
     method: number,
     params: (string| number | boolean) [] = []
   ): Promise<string| number | boolean | undefined>{
+    console.log("sendMessageRequest " + method)
     return new Promise(async (resolve, reject)=>{
       let client: socket.LocalSocket = socket.constructLocalSocketInstance();
       let text = new util.TextDecoder()
       let fullMessage = '';
+      let timeout = true
       let parseMessage = debounce((message)=>{
-       // console.log("onMessage " + method, message)
+        console.log("onMessage " + method, message)
+        timeout = false
         this.ParseMessage(message, resolve, reject)
         message = ''
         fullMessage = ''
@@ -149,13 +152,12 @@ export class SocketProxyService implements IClashManager{
         fullMessage += chunk;
         parseMessage(fullMessage)
       })
-      // setTimeout(()=>{
-      //   if (timeout) {
-      //     console.log("ParseMessage timeout", messageBuffer)
-      //     this.ParseMessage(messageBuffer, resolve, reject)
-      //     client.close();
-      //   }
-      // }, 5000)
+      setTimeout(()=>{
+        if (timeout) {
+          reject("请求超时")
+          client.close();
+        }
+      }, 5000)
       client.on("error", ()=>{
         reject("rpc client error")
       })

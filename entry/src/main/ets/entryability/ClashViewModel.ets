@@ -203,18 +203,23 @@ export class ClashViewModel {
     return await this.socketProxy.clearRequestList()
   }
   async getProxyGroups(model: ProxyMode): Promise<ProxyGroup[]>{
-    let list = await this.socketProxy.queryProxyGroups(model)
-    let favoriteProxys = AppStorage.get<Map<string, string>>("favoriteProxys")
-    const groups = list.map((g)=>{
-      g.proxies = g.proxies.map((p) => {
-        p.isShowFavoriteProxy = favoriteProxys?.get(g.name + "|" + p.name) != null
-        p.latency = -1
-        p.g = g.name
-        return p
+    try {
+      let list = await this.socketProxy.queryProxyGroups(model)
+      let favoriteProxys = AppStorage.get<Map<string, string>>("favoriteProxys")
+      const groups = list.map((g)=>{
+        g.proxies = g.proxies.map((p) => {
+          p.isShowFavoriteProxy = favoriteProxys?.get(g.name + "|" + p.name) != null
+          p.latency = -1
+          p.g = g.name
+          return p
+        })
+        return g
       })
-      return g
-    })
-    return groups
+      return groups
+    } catch (e) {
+      promptAction.showToast({message: "获取代理失败: " + (e.message || e)})
+    }
+    return []
   }
   //BUG 第一次启动，参数传不过去
   // 第一次要权限弹窗
@@ -240,14 +245,7 @@ export class ClashViewModel {
       // 启动vpn进程
       // bug： 用户点取消，pad最新系统可能导致卡死在这里， 无解等系统修复
       await vpnExtension.startVpnExtensionAbility(vpnWant)
-        .then(() => {
-          console.log("#VPN启动成功")
-        })
-        .catch((error: Error) => {
-          console.log("#VPN启动失败, 用户拒绝授权")
-          this.context?.getApplicationContext().killAllProcesses()
-        })
-       await sleep(500)
+      await sleep(500)
       // Bug
       // this.socketProxy.registerMessage(()=>{
       //
@@ -268,18 +266,16 @@ export class ClashViewModel {
       params: params ?? {} as ConfigExtendedParams
     } as UpdateConfigParams)
     if (result != ""){
-      promptAction.showToast({message: result, duration: 3000})
+      promptAction.showToast({message: result, duration: 3000 })
     }
     EventHub.sendEvent(EventKey.FetchProxyGroup, null)
   }
   async ReStartVpn(){
     if(this.vpnStarted){
-      await this.loadConfig()
-      let result = await this.socketProxy.startClash()
+      await this.loadConfig(false)
+      await this.socketProxy.stopClash()
       // 核心崩溃 小钥匙一直在，要重启两量变
-      if (!result){
-        result = await this.socketProxy.startClash()
-      }
+      await this.socketProxy.startClash()
     }
   }
   vpnStarted = false
@@ -307,6 +303,7 @@ export class ClashViewModel {
     let appConfig = AppStorage.get<AppConfig>("appConfig")
     EventHub.sendEvent(EventKey.StartLog, appConfig?.enableLogger)
     await this.loadConfig(false)
+    EventHub.sendEvent(EventKey.FetchProxyGroup)
   }
 
   proxyGroups :ProxyGroup[] = []
