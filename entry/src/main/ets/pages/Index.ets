@@ -396,10 +396,10 @@ struct Index {
 
   @Builder
   WelcomeSheet() {
-    if (this.uiConfig.isFirstStart) {
-      Welcome()
-    } else if (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) {
+    if (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) {
       CrashPage()
+    } else {
+      Welcome()
     }
   }
 
@@ -805,9 +805,9 @@ struct Index {
       scrollSizeMode: ScrollSizeMode.CONTINUOUS,
       preferType: SheetType.CENTER,
       onWillDismiss: ((DismissSheetAction: DismissSheetAction) => {
+        // 关闭背景模糊
+        this.isEnableIndexForegroundBlur = false
         if (!this.isShowWelcome || DismissSheetAction.reason === DismissReason.CLOSE_BUTTON) {
-          // 关闭背景模糊
-          this.isEnableIndexForegroundBlur = false
           DismissSheetAction.dismiss()
           hilog.info(0xFF00, "WelcomeTestTag", "欢迎页启用状态： %{private}s", this.isShowWelcome)
         }

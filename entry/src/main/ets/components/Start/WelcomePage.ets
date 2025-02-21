@@ -89,6 +89,8 @@ export struct Welcome {
            .fontColor(Color.White)
            .backgroundColor(this.icon_emphasize)
            .onClick(() => {
+             // 关闭背景模糊
+             this.isEnableIndexForegroundBlur = false
              // 第一次启动应用
              this.uiConfig.isFirstStart = false
              // 关闭模态页
