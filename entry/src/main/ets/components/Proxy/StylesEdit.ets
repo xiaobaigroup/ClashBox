@@ -4,6 +4,8 @@ import { BORDER_RADIUS_20 } from '../../common/Constants'
 import { EventHub, EventKey } from '../../common/EventHub'
 import { AppConfig, isEnd, ProxyCardSize, ProxyGroupType, UIConfig } from '../../entryability/AppState'
 import { customAnimationUtil } from '../../utils/Animation'
+import { getResourceString } from '../../utils/ResourceStringUtil'
+import { promptAction } from '@kit.ArkUI'
 
 @Component
 export struct StylesEdit {
@@ -64,8 +66,8 @@ export struct StylesEdit {
       Column() {
         ForEach([
           { t: $r('app.string.Default'), v: ProxySort.Default },
+          { t: $r('app.string.Name'), v: ProxySort.Title },
           { t: $r('app.string.Delay'), v: ProxySort.Delay },
-          { t: $r('app.string.Name'), v: ProxySort.Title }
         ], (n: [Resource, number], i: number) => {
           Row() {
             Text(n["t"])
@@ -74,19 +76,23 @@ export struct StylesEdit {
               value: 'SortRadio1', group: 'SortRadioGroup',
               indicatorType: RadioIndicatorType.TICK
             })
-              .checked(this.appConfig.proxySort == n["v"])
+              .checked(this.appConfig.proxySort == n["v"] && i !== 2)
               .hitTestBehavior(HitTestMode.None)
               .radioStyle({
                 checkedBackgroundColor: this.icon_emphasize,
               })
-          }
+          }.opacity(i === 2 ? 0.5 : 1)
           .EditRow()
           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .onClick(() => {
-            EventHub.sendEvent(EventKey.ProxySort, n["v"])
-            animateTo({ duration: this.uiConfig.animationSpeed }, () => {
-              this.appConfig.proxySort = n["v"]
-            })
+           if (i !== 2) {
+             EventHub.sendEvent(EventKey.ProxySort, n["v"])
+             animateTo({ duration: this.uiConfig.animationSpeed }, () => {
+               this.appConfig.proxySort = n["v"]
+             })
+           } else {
+             promptAction.showToast({message: getResourceString($r('app.string.developing'), this)})
+           }
           })
 
           if (!isEnd(3, i))

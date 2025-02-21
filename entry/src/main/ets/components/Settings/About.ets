@@ -498,6 +498,8 @@ export struct AboutContributors {
                 Image(item.image)
                   .width(48)
                   .height(48)
+                  .borderRadius(100)
+                  .interpolation(ImageInterpolation.High)
                   .transition(customAnimationUtil.isScaleTranIcon(10,this.uiConfig))
                 Column() {
                   // 名字

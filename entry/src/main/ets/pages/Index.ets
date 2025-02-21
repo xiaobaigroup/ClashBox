@@ -424,8 +424,8 @@ struct Index {
   dialogController: CustomDialogController = new CustomDialogController({
     builder: DisclaimerCustomDialog({
       confirm: () => {
-        this.uiConfig.isFirstStartDisclaimer = false
-        this.isShowWelcome = true
+        // 关闭背景模糊
+        this.isEnableIndexForegroundBlur = false
       },
       cancel: () => {
         // 拒绝并退出
@@ -447,15 +447,24 @@ struct Index {
   async aboutToAppear(): Promise<void> {
     hilog.info(0x1000, componentName, `#aboutToAppear executed`)
 
+    // 启动时检查上一次是否崩溃
     if (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) {
       hilog.info(0x1000, componentName, `进入崩溃日志`)
       this.isShowWelcome = true
     }
 
-    // 免责声明弹窗
+    // 首次启动打开欢迎页
     if (this.uiConfig.isFirstStart) {
+      this.isShowWelcome = true
+    }
+
+    let nowDate = new Date().getTime()
+    // 检查是否要弹出免责声明
+    if (nowDate - this.uiConfig.useTime >= 1296000000) {
+      // 大于等于15天打开弹窗
       this.dialogController.open()
     }
+
     // 在页面build前改变主题颜色
     changeThemeColor(this.uiConfig.themeColor)
     hilog.info(0x1000, componentName, `#aboutToAppear#ThemeControl.setDefaultTheme(${this.uiConfig.themeColor})`)
@@ -588,6 +597,8 @@ struct Index {
 
   aboutToDisappear() {
     hilog.info(0x1000, componentName, `#aboutToDisappear executed`)
+    // 纪录软件关闭时间
+    this.uiConfig.useTime = new Date().getTime()
     // 停止监听断点事件，并清空断点对应数据
     BreakpointSystem.getInstance().stop()
     // 解注册画中画生命周期及状态回调
@@ -750,12 +761,10 @@ struct Index {
               })
           )
 
-       //   if (this.configList.length !== 0) {
             TabContent() {
               ProxyPage()
             }
             .tabBar(this.TabBarBuilder($r('app.string.Proxy'), 1, $r('sys.symbol.list_bullet_square_fill')))
-        //  }
 
           TabContent() {
             ConfigurationPage()

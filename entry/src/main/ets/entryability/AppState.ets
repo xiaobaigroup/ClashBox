@@ -119,8 +119,8 @@ export class UIConfig{
   enabledADvanced: boolean = false
   // 是否第一次启动应用
   isFirstStart: boolean = true
-  // 是否第一次启动免责弹窗
-  isFirstStartDisclaimer: boolean = true
+  // 应用使用时间记录
+  useTime: number = new Date().getTime()
   resourcesData: string = JSON.stringify(theResouresData)
   resourcesHideData: string = JSON.stringify(resourcesBlankData)
   constructor() {

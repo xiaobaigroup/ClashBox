@@ -22,7 +22,6 @@ export struct Welcome {
   dialogController: CustomDialogController = new CustomDialogController({
     builder: DisclaimerCustomDialog({
       confirm: () => {
-        this.uiConfig.isFirstStartDisclaimer = false
         // 同意
         this.isShowWelcome = true
       }
@@ -58,6 +57,12 @@ export struct Welcome {
       .layoutWeight(1)
       .justifyContent(FlexAlign.Center)
       .alignItems(HorizontalAlign.Center)
+     // 免责声明
+     Column() {
+       Text($r('app.string.Disclaimer_Content'))
+         .textAlign(TextAlign.Center)
+     }.margin({bottom: 10})
+     .alignItems(HorizontalAlign.Center)
      // 提示
      Column() {
        SymbolGlyph($r('sys.symbol.person_shield_fill'))
