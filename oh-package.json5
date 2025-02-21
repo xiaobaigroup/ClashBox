@@ -1,5 +1,5 @@
 {
-  "modelVersion": "5.0.0",
+  "modelVersion": "5.0.2",
   "description": "Please describe the basic information.",
   "dependencies": {
     "@mcui/mccharts": "^2.8.2"
