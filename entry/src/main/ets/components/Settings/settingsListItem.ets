@@ -31,10 +31,11 @@ struct settingsListItem {
       }){
         Text(this.itemObj.title)
           .fontWeight(FontWeight.Medium)
-          .fontSize(16)
+          .fontSize(17)
         if(this.itemObj.subtitle) {
           Text(this.itemObj.subtitle)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .fontColor($r('sys.color.font_secondary'))
             .maxLines(1)
             .fontSize(14)
         }
@@ -51,7 +52,7 @@ struct settingsListItem {
         .fontSize(24)
         .margin({left: 12, right: 12})
         .fontColor([this.icon_primary])
-    }.height(53)
+    }.height(56)
     .width('100%')
     .borderRadius(20)
     .margin({bottom: 10})

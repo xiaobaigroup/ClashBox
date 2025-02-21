@@ -8,7 +8,7 @@ import Kernel from "./Kernel"
 import Notice, { CellularDataReminder } from "./Notice"
 import Backgrounder from "./Backgrounder"
 import WipeData from "./WipeData"
-import About, { AboutContributors, CheckUpdate } from "./About"
+import About, { AboutContributors, CheckUpdate, FAQ } from "./About"
 import Language from "./Language"
 import TopBuilder from "./TopBuilder"
 import { DisclaimerCustomDialog, theRowCustomDialog } from "../Common"
@@ -184,6 +184,9 @@ struct Settings {
       } else
       if (name == 'Kernel') {
         Kernel()
+      } else
+      if (name == 'FAQ') {
+        FAQ()
       }
   }
 

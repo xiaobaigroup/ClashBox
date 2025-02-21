@@ -689,7 +689,7 @@
       "value": "Project Repositories"
     },
     {
-      "name": "FQ",
+      "name": "FAQ",
       "value": "Frequent Questions"
     },
     {
@@ -730,7 +730,7 @@
     },
     {
       "name": "Disclaimer_Content",
-      "value": "This software is only for non-commercial purposes such as learning, communication, scientific research, etc. It is prohibited to use this software for commercial purposes. Any commercial activities are unrelated to this software."
+      "value": "This software is only for non-commercial purposes such as learning, communication and scientific research. It is prohibited to use this software for commercial purposes. If there is any commercial activity, it has nothing to do with the software. The current version is beta beta beta, and may encounter unknown bugs."
     },
     {
       "name": "Speed_Delay",
@@ -1635,6 +1635,90 @@
     {
       "name": "settings_reset_tips",
       "value": "Application data has been cleared"
+    },
+    {
+      "name": "welcome",
+      "value": "Welcome to"
+    },
+    {
+      "name": "welcome_tips",
+      "value": "By clicking \"agree and continue\", you agree to the following:"
+    },
+    {
+      "name": "reject_exit",
+      "value": "Reject and Exit"
+    },
+    {
+      "name": "agree_continue",
+      "value": "Agree and Continue"
+    },
+    {
+      "name": "crash_subtitle",
+      "value": "Please give the log to the developer for troubleshooting~"
+    },
+    {
+      "name": "crash_title",
+      "value": "Uh oh, it just seemed like a crash"
+    },
+    {
+      "name": "show_full_log",
+      "value": "Show full log information"
+    },
+    {
+      "name": "statement",
+      "value": "ClashNext is a free software and we do not provide any additional services for it. Some networking services use third-party free API interfaces, so there is an access limit. If access exceptions occur, it is normal. For more third-party services, please go to the third-party library and services to check."
+    },
+    {
+      "name": "third_party_services",
+      "value": "Third party services"
+    },
+    {
+      "name": "meta_q",
+      "value": "Why is there no speed measurement function under the meta core"
+    },
+    {
+      "name": "meta_a",
+      "value": "Under the current meta core, the three functions of speed measurement, connection and request are temporarily not supported"
+    },
+    {
+      "name": "function_q",
+      "value": "Why some functions are missing"
+    },
+    {
+      "name": "function_a",
+      "value": "Affected by the system permissions, some functions cannot be realized temporarily, so they are shielded and hidden. Please look forward to subsequent version updates"
+    },
+    {
+      "name": "link_q",
+      "value": "Why is it easy to disconnect applications when they are running in the background"
+    },
+    {
+      "name": "link_a",
+      "value": "The background management of the current system is very strict. It is recommended to turn on the notification and simulation background functions of the software during use to maintain the stable connection of the application running in the background"
+    },
+    {
+      "name": "node_q",
+      "value": "Why does the node flash after speed measurement"
+    },
+    {
+      "name": "node_a",
+      "value": "This is a normal phenomenon. The purpose of this is to refresh the data in the list and minimize the possible memory leakage after speed measurement"
+    },
+    {
+      "name": "config_q",
+      "value": "Why some configurations cannot be imported or the agent is empty after import"
+    },
+    {
+      "name": "config_a",
+      "value": "It is recommended to use the subscription conversion tool to convert and then try to import. Below is the address of the subscription conversion. You can click to jump directly"
+    },
+    {
+      "name": "attach",
+      "value": "Attach:"
+    },
+    {
+      "name": "link",
+      "value": "Link"
     }
   ]
 }

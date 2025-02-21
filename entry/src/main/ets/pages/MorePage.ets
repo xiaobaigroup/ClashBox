@@ -184,7 +184,6 @@ struct MorePage {
           Text($r('app.string.More'))
             .fontSize(this.curYOffsetMore<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffsetMore/100:TAB_CONTENT_TITLE_FONT_SIZE)
             .fontWeight(FontWeight.Bold)
-           // .width('83%')
             .textAlign(TextAlign.Start)
         }
         .width('100%')
@@ -198,7 +197,6 @@ struct MorePage {
           right: this.breakPointStateTabContentTitleMargin.value,
         })
 
-     //   Column().height(TAB_CONTENT_TITLE_HEIGHT).position({ x: 0 })
           Scroll() {
             List({ space: 10 }) {
               ForEach(this.moreList, (item: moreData, index: number) => {
@@ -243,6 +241,14 @@ struct MorePage {
                   this.SettingsPageInfos.clear()
                 }
               })
+
+              ListItem() {
+                Button("appCrash 测试按钮，请勿点击").onClick(()=>{
+                  // 在按钮点击函数中构造一个crash场景，触发应用崩溃事件
+                  let result: object = JSON.parse("");
+                })
+              }
+
             }
             .width('100%')
             .height('100%')

@@ -265,7 +265,7 @@ export class moreData {
 export  const ListMoreData = (): moreData[] => {
   let result: moreData[] = new Array()
   result = [
-    new moreData($r('sys.symbol.doc_text_fill'), 'Log', $r('app.string.Log'), '', 0, false),
+    // new moreData($r('sys.symbol.doc_text_fill'), 'Log', $r('app.string.Log'), '', 0, false),
     new moreData($r('sys.symbol.externaldrive_fill_3'), 'Resources', $r('app.string.Resources'), '', 0, false),
     new moreData($r('sys.symbol.list_bullet'), 'Request', $r('app.string.Request'), '', 0, false),
     new moreData($r('sys.symbol.swap'), 'Connect', $r('app.string.Connect'), '', 0, false),
@@ -545,7 +545,6 @@ export interface AboutListItemProp {
 /**
  * 关于列表
  */
-
 export function getAboutList(): AboutListItemProp[]{
   return [
     {
@@ -571,6 +570,7 @@ export function getAboutList(): AboutListItemProp[]{
       name: '',
       children: [
         { title: $r('app.string.Contributors'), subtitle: '', sign: 2, name: 'Contributors' },
+        { title: $r('app.string.third_party_services'), subtitle: '', sign: 2, name: 'Three' },
       ]
     },
     {
@@ -579,7 +579,7 @@ export function getAboutList(): AboutListItemProp[]{
       name: '',
       children: [
         { title: $r('app.string.UseGuidance'), subtitle: '', sign: 2, name: 'UseGuidance' },
-        { title: $r('app.string.FQ'), subtitle: '', sign: 2, name: 'FQ' },
+        { title: $r('app.string.FAQ'), subtitle: '', sign: 2, name: 'FAQ' },
       ]
     },
     { title: 'Update',
@@ -635,10 +635,26 @@ export const ContributorsList: ContributorsListItemProp[] = [
   { title: '科蓝KL', subtitle: $r('app.string.KL_Subtitle'), contact: 'Github', contact2: 'Telegram', image: $rawfile('kl.png')},
   { title: '恩临大帝', subtitle: $r('app.string.FrondEnd_Development'), contact: $r('app.string.Email'), image: $rawfile('enlin.png')},
   { title: 'crazypig321', subtitle: $r('app.string.FrondEnd_Development'), contact: 'Github', image: $rawfile('crazypig321.png')},
+  { title: '鱼🐟', subtitle: $r('app.string.FrondEnd_Development'), contact: 'Github', image: $rawfile('yu.png')},
   { title: '小雅', subtitle: $r('app.string.FrondEnd_Development'), contact: 'Github', image: $rawfile('ya.png')},
   { title: 'FlClash', subtitle: $r('app.string.flclash_subtitle'), contact: 'Github', image: $rawfile('FlClash.svg')},
   { title: '凛凛早露', subtitle: $r('app.string.LLZL_Subtitle'), image: $rawfile('llzl.png')},
   { title: $r('app.string.Dear_Group_Members'), subtitle: $r('app.string.Dear_Group_Members_Subtitle'), image: $rawfile('group.jpg')},
+]
+
+/**
+ * 常见问题
+ */
+export interface FAQItemProp {
+  title: ResourceStr
+  content: ResourceStr
+}
+export const FAQList: FAQItemProp[] = [
+  {title: $r('app.string.meta_q'), content: $r('app.string.meta_a')},
+  {title: $r('app.string.function_q'), content: $r('app.string.function_a')},
+  {title: $r('app.string.link_q'), content: $r('app.string.link_a')},
+  {title: $r('app.string.node_q'), content: $r('app.string.node_a')},
+  {title: $r('app.string.config_q'), content: $r('app.string.config_a')},
 ]
 
 /**

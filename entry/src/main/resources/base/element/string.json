@@ -689,7 +689,7 @@
       "value": "项目仓库"
     },
     {
-      "name": "FQ",
+      "name": "FAQ",
       "value": "常见问题"
     },
     {
@@ -730,7 +730,7 @@
     },
     {
       "name": "Disclaimer_Content",
-      "value": "本软件仅供学习交流、科研等非商业性质的用途，禁止将本软件用于商业目的。如有任何商业行为，均与本软件无关。"
+      "value": "本软件仅供学习交流、科研等非商业性质的用途，禁止将本软件用于商业目的。如有任何商业行为，均与本软件无关。当前版本为BETA公测版，可能会遇到未知Bug。"
     },
     {
       "name": "Speed_Delay",
@@ -1635,6 +1635,90 @@
     {
       "name": "settings_reset_tips",
       "value": "数据已清空"
+    },
+    {
+      "name": "welcome",
+      "value": "欢迎使用"
+    },
+    {
+      "name": "welcome_tips",
+      "value": "点击“同意并继续”表示您同意以下内容："
+    },
+    {
+      "name": "reject_exit",
+      "value": "拒绝并退出"
+    },
+    {
+      "name": "agree_continue",
+      "value": "同意并继续"
+    },
+    {
+      "name": "crash_subtitle",
+      "value": "请将日志交给开发者，以便于排查~"
+    },
+    {
+      "name": "crash_title",
+      "value": "啊哦，刚刚好像崩溃了"
+    },
+    {
+      "name": "show_full_log",
+      "value": "展示完整日志信息"
+    },
+    {
+      "name": "statement",
+      "value": "ClashNext是一个免费软件并且我们不为其提供任何额外服务，部分联网服务使用的是第三方免费API接口，因此具有访问上限，若出现访问异常属于正常现象，更多第三方服务请前往三方库与服务中查看"
+    },
+    {
+      "name": "third_party_services",
+      "value": "三方库与服务"
+    },
+    {
+      "name": "meta_q",
+      "value": "为什么ClashMeta核心下没有测速功能"
+    },
+    {
+      "name": "meta_a",
+      "value": "当前Meta核心下，暂时不支持测速，连接，请求3个功能"
+    },
+    {
+      "name": "function_q",
+      "value": "为什么有的功能不见了"
+    },
+    {
+      "name": "function_a",
+      "value": "受到系统权限影响，部分功能暂时无法实现故而进行了屏蔽隐藏，请期待后续版本更新"
+    },
+    {
+      "name": "link_q",
+      "value": "为什么应用在后台运行的过程中容易中断连接"
+    },
+    {
+      "name": "link_a",
+      "value": "当前系统的后台管理非常严格，建议使用过程中开启软件的通知及模拟后台功能，以保持应用在后台运行的连接稳定"
+    },
+    {
+      "name": "node_q",
+      "value": "为什么测速完成后节点会闪一下"
+    },
+    {
+      "name": "node_a",
+      "value": "这是正常现象，这么做的目的是为了刷新列表中的数据，尽量减少测速后可能存在内存泄漏"
+    },
+    {
+      "name": "config_q",
+      "value": "为什么有的配置无法导入或导入后代理为空"
+    },
+    {
+      "name": "config_a",
+      "value": "建议使用订阅转换工具转换后再尝试导入，下面有订阅转换的地址，可以点击后直接跳转"
+    },
+    {
+      "name": "attach",
+      "value": "附："
+    },
+    {
+      "name": "link",
+      "value": "链接"
     }
   ]
 }

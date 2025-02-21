@@ -7,6 +7,8 @@ import { AboutListItemProp, BORDER_RADIUS_20, ContributorsListItemProp,
   moreData,
   ListMoreData,
   getAboutList,
+  FAQItemProp,
+  FAQList,
 } from "../../common/Constants"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
@@ -18,6 +20,7 @@ import { customAnimationUtil } from "../../utils/Animation"
 import { removeItemsByIndex } from "../../utils/RemoveItemsUtils"
 import { customVibrator } from "../../utils/VibratorUtil"
 import { customSound } from "../../utils/SoundPoolUtil"
+import { getResourceString } from "../../utils/ResourceStringUtil"
 
 const context = getContext(this) as common.UIAbilityContext
 
@@ -469,10 +472,14 @@ export struct AboutContributors {
         implicitStartAbility('https://github.com/crazypig321', context)
       break
       case 5:
+        // 鱼🐟
+        // implicitStartAbility('https://github.com/yu', context)
+        break
+      case 6:
         // 小雅
         implicitStartAbility('https://github.com/XHXYT', context)
       break
-      case 6:
+      case 7:
         // FlClash
         implicitStartAbility('https://github.com/chen08209/FlClash', context)
       break
@@ -553,8 +560,124 @@ export struct AboutContributors {
       .alignListItem(ListItemAlign.Center)
       .contentEndOffset(CONTENT_END_OFFSET_150 - 85)
       .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
-    }
-    .width('100%')
+    }.width('100%')
+    .backgroundColor($r('app.color.background'))
+    .hideTitleBar(true)
+    .onBackPressed(() => {
+      this.SettingsPageInfos.pop(true)
+      return true
+    })
+  }
+}
+
+/**
+ *  常见问题
+ */
+@Component
+export struct FAQ {
+  @State FAQlist: FAQItemProp[] = FAQList
+  /* 主题色 */
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
+  // 一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+
+  build() {
+    NavDestination() {
+      TopBuilder({title: $r('app.string.About'), subtitle: $r('app.string.FAQ')})
+      List({space: 10}) {
+        ListItem() {
+          Row({space: 10}) {
+            SymbolGlyph($r('sys.symbol.info_circle'))
+              .fontSize(24)
+              .margin({left: 7})
+              .fontColor([this.icon_primary])
+            Text($r('app.string.statement'))
+              .fontSize(17)
+              .width('90%')
+              .textAlign(TextAlign.JUSTIFY)
+          }.width('100%')
+          .justifyContent(FlexAlign.Start)
+        }.width('100%')
+        .margin({top: 5})
+
+        ListItem() {
+          Column(){
+            Text('F&Q')
+              .fontSize(16)
+          }.width('100%')
+          .margin({left: 11})
+          .alignItems(HorizontalAlign.Start)
+        }.width('100%')
+        // F&Q
+        ForEach(this.FAQlist, (item: FAQItemProp, index: number) => {
+          ListItem() {
+            Column({space: 3}) {
+              Row({space: 3}) {
+                Text('·')
+                  .fontSize(32)
+                  .fontWeight(FontWeight.Bolder)
+                Text(item.title)
+                  .fontSize(17)
+                  .fontWeight(FontWeight.Medium)
+              }.width('100%').margin({left: 8})
+              Text(item.content)
+                .fontSize(15)
+                .margin({left: 11})
+                .fontWeight(FontWeight.Regular)
+            }.width('100%')
+            .alignItems(HorizontalAlign.Start)
+          }
+        }, (item: FAQItemProp) => getResourceString(item.title, this))
+
+        ListItem() {
+         Column() {
+           Text($r('app.string.attach'))
+             .fontSize(15)
+             .fontWeight(FontWeight.Regular)
+           Row() {
+             Text(`${getResourceString($r('app.string.link'), this)}1：`)
+               .fontSize(15)
+               .fontWeight(FontWeight.Regular)
+             Text(`https://sub.xeton.dev`)
+               .fontSize(15)
+               .fontColor(this.icon_emphasize)
+               .fontWeight(FontWeight.Regular)
+               .decoration({
+                 type: TextDecorationType.Underline,
+                 color: this.icon_emphasize
+               })
+               .onClick(() => {
+                 implicitStartAbility('https://sub.xeton.dev', context)
+               })
+           }.width('100%') .margin({top: 3})
+           Row() {
+             Text(`${getResourceString($r('app.string.link'), this)}2：`)
+               .fontSize(15)
+               .fontWeight(FontWeight.Regular)
+             Text(`https://acl4ssr-sub.github.io`)
+               .fontSize(15)
+               .fontColor(this.icon_emphasize)
+               .fontWeight(FontWeight.Regular)
+               .decoration({
+                 type: TextDecorationType.Underline,
+                 color: this.icon_emphasize
+               })
+               .onClick(() => {
+                 implicitStartAbility('https://acl4ssr-sub.github.io', context)
+               })
+           }.width('100%')
+           .margin({top: 3})
+         }.margin({left: 11})
+          .alignItems(HorizontalAlign.Start)
+        }.width('100%')
+
+      }.width('100%')
+      .contentEndOffset(85)
+      .alignListItem(ListItemAlign.Center)
+      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+    }.width('100%')
     .backgroundColor($r('app.color.background'))
     .hideTitleBar(true)
     .onBackPressed(() => {

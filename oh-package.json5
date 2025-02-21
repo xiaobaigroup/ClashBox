@@ -1,12 +1,12 @@
 {
-  "modelVersion": "5.0.2",
-  "description": "Please describe the basic information.",
-  "dependencies": {
-    "@mcui/mccharts": "^2.8.2"
-  },
   "devDependencies": {
     "@ohos/hypium": "1.0.19",
     "@ohos/hamock": "1.0.0"
   },
-  "dynamicDependencies": {}
+  "modelVersion": "5.0.2",
+  "description": "Please describe the basic information.",
+  "dynamicDependencies": {},
+  "dependencies": {
+    "@mcui/mccharts": "^2.8.2"
+  }
 }

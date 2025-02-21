@@ -1,21 +1,31 @@
 import { AbilityConstant,  ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
+import { hiAppEvent, hilog } from '@kit.PerformanceAnalysisKit';
 import { promptAction, window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import ClashViewModel from './ClashViewModel';
 import { AppConfig, AppFlowingState, AppState } from './AppState';
 import { EventHub, EventKey } from '../common/EventHub';
-import { http } from '@kit.NetworkKit';
 import { PipManager } from '../common/PipManager';
 
 export default class EntryAbility extends UIAbility {
  private currentLanguage: string | undefined = undefined
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onCreate');
-
-/*    this.currentLanguage = this.context.config.language
-    AppStorage.setOrCreate<string>('language', this.currentLanguage)
-    hilog.info(0x0000, 'EntryAbility', `#onCreate#currentLanguage is [${this.currentLanguage}]`);*/
+    // 添加崩溃监听
+    hiAppEvent.addWatcher({
+      name: "watcher",
+      // 订阅崩溃事件
+      appEventFilters: [
+        {
+          domain: hiAppEvent.domain.OS,
+          names: [hiAppEvent.event.APP_CRASH]
+        }
+      ],
+      onReceive: (domain: string, appEventGroups: Array<hiAppEvent.AppEventGroup>) => {
+        AppStorage.setOrCreate('crash', true)
+        AppStorage.setOrCreate('crashEvent', appEventGroups)
+      }
+    })
     // 当前主题模式
     AppStorage.setOrCreate<ConfigurationConstant.ColorMode>('currentColorMode', this.context.config.colorMode)
   }
@@ -28,7 +38,9 @@ export default class EntryAbility extends UIAbility {
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     // Main window is created, set main page for this ability
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onWindowStageCreate');
-    let windowClass: window.Window = windowStage.getMainWindowSync(); // 获取应用主窗口
+    // 获取应用主窗口
+    let windowClass: window.Window = windowStage.getMainWindowSync();
+
     await ClashViewModel.init(this.context)
     windowStage.loadContent('pages/Index', async (err) => {
       if (err.code) {

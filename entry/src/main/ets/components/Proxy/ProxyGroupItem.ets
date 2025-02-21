@@ -362,7 +362,7 @@ struct ProxyGroupItem {
               transition: this.uiConfig.isAnimation ? TransitionEffect.prototype.animation({ tempo: 1.5 }) : undefined
             },
           })
-      }, (item: ProxyItem,i:number) => item.name+ '-' + i.toString())
+      }, (item: ProxyItem,i: number) => item.name+ '-' + i.toString())
     }
     .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : this.breakPointStateListLanes.value,
       this.breakPointStateListGutter.value)

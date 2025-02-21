@@ -5,7 +5,7 @@ import Home from './HomePage'
 import ProxyPage from './ProxyPage'
 import ConfigurationPage from './ConfigurationPage'
 import MorePage from './MorePage'
-import { hilog } from '@kit.PerformanceAnalysisKit'
+import { hiAppEvent, hilog } from '@kit.PerformanceAnalysisKit'
 import {
   BPS_LIST_LANES_1_1_2_3_4,
   BPS_LIST_GUTTER_1_1_2_3_3,
@@ -43,7 +43,8 @@ import {
   PROXY_STARTED_DURATION_INIT_VALUE,
   ListMoreData,
   moreData,
-  AboutListItemProp
+  AboutListItemProp,
+  BIND_SHEET_CONTAINER_HEIGHT
 } from '../common/Constants'
 import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/ProxyData'
 import { ClashConfig, Dns, LogLevel, Profile, ProxyGroup, ProxyMode, ProxySort, SubscriptionInfo } from 'proxy_core'
@@ -60,6 +61,9 @@ import { getGreeting } from '../utils/GreetingUtil'
 import { removeItemsByIndex } from '../utils/RemoveItemsUtils'
 import { DisclaimerCustomDialog } from '../components/Common'
 import { PipManager } from '../common/PipManager'
+import { deviceInfo } from '@kit.BasicServicesKit'
+import { Welcome } from '../components/Start/WelcomePage'
+import { CrashPage } from '../components/Start/CrashPage'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 
@@ -84,10 +88,11 @@ interface LogData {
   logSkip: boolean
 }
 
+const componentName: string = 'Index'
+
 @Entry
 @Component
 struct Index {
-  private componentName: string = 'Index'
   /**
    * 主题色
    *    示例中主题配置里配置了一个颜色，所以只用`ResourceColor`类型的变量来接收色值，
@@ -102,7 +107,7 @@ struct Index {
    * @param theme
    */
   onWillApplyTheme(theme: Theme) {
-    hilog.info(0x1000, this.componentName, `#onWillApplyTheme`)
+    hilog.info(0x1000, componentName, `#onWillApplyTheme`)
     this.icon_emphasize = theme.colors.iconEmphasize;
 
   }
@@ -172,9 +177,12 @@ struct Index {
     xl: 16
   });
 
-  //page内顶部标题偏移量
+  // 欢迎页半模态窗口
+  @Provide isShowWelcome: boolean = false
+
+  // page内顶部标题偏移量
   @Provide curYOffset: number = 0
-  //更多页一级页面顶部标题偏移量
+  // 更多页一级页面顶部标题偏移量
   @Provide curYOffsetMore: number = 0
   // 主页卡片内边距
   @Provide('breakPointStateHomeCardPadding')
@@ -285,8 +293,7 @@ struct Index {
   //节点数据组
   @Provide items: ProxyItem[] = ProxyData.ProxyItems();
   // 日志页数据
-  @Provide
-  private logListData: Array<LogData> = []
+  @Provide private logListData: Array<LogData> = []
   @Provide configList: Array<ConfigData> = [
     {
       configId: 'a4e2593d-9927-4f57-8868-f316190657a1',
@@ -338,6 +345,20 @@ struct Index {
       { title: $r('app.string.experimental_function'), subtitle: $r('app.string.experimental_function_Subtitle'), sign: 1, name: 'ExperimentalFunction', isOn: true },
     ]
   }
+
+  /* 是否开启 `Index` 页面的前景模糊 */
+  @Provide('isEnableIndexForegroundBlur')
+  private isEnableIndexForegroundBlur: boolean = false
+  // 当手机横屏时条件成立
+  deviceHeightListener: mediaquery.MediaQueryListener =
+    this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp) and (640vp< width <= 1000vp)');
+  // 平板横屏判断
+  tabletHeightListener: mediaquery.MediaQueryListener =
+    this.getUIContext().getMediaQuery().matchMediaSync('(1000vp< width)');
+  // 折叠屏展开判断
+  foldPhoneOpenListener: mediaquery.MediaQueryListener =
+    this.getUIContext().getMediaQuery().matchMediaSync('(640vp< height <= 1000vp) and (640vp< width <= 1000vp)');
+
   @Builder
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
 
@@ -360,7 +381,7 @@ struct Index {
           .fontSize(this.isLandscapePhone ? 12 : this.TabTitlefontSize.value)
           .transition(customAnimationUtil.isTranslate(this.uiConfig))
       }
-     .padding(this.isLandscapePhone|| this.istabletLandscape ? { right:5 } : { top: 5 })
+      .padding(this.isLandscapePhone|| this.istabletLandscape ? { right:5 } : { top: 5 })
     }
     .width('100%')
     .height('100%')
@@ -373,18 +394,14 @@ struct Index {
     } : null)
   }
 
-  /* 是否开启 `Index` 页面的前景模糊 */
-  @Provide('isEnableIndexForegroundBlur')
-  private isEnableIndexForegroundBlur: boolean = false
-  // 当手机横屏时条件成立
-  deviceHeightListener: mediaquery.MediaQueryListener =
-    this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp) and (640vp< width <= 1000vp)');
-  // 平板横屏判断
-  tabletHeightListener: mediaquery.MediaQueryListener =
-    this.getUIContext().getMediaQuery().matchMediaSync('(1000vp< width)');
-  // 折叠屏展开判断
-  foldPhoneOpenListener: mediaquery.MediaQueryListener =
-    this.getUIContext().getMediaQuery().matchMediaSync('(640vp< height <= 1000vp) and (640vp< width <= 1000vp)');
+  @Builder
+  WelcomeSheet() {
+    if (this.uiConfig.isFirstStart) {
+      Welcome()
+    } else if (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) {
+      CrashPage()
+    }
+  }
 
   // 获取配置列表
   async fetchProfiles() {
@@ -407,12 +424,8 @@ struct Index {
   dialogController: CustomDialogController = new CustomDialogController({
     builder: DisclaimerCustomDialog({
       confirm: () => {
-        // 同意
-        setTimeout(() => {
-          this.uiConfig.isFirstStart = false
-        }, 200)
-        // 关闭背景模糊
-        this.isEnableIndexForegroundBlur = false
+        this.uiConfig.isFirstStartDisclaimer = false
+        this.isShowWelcome = true
       },
       cancel: () => {
         // 拒绝并退出
@@ -432,8 +445,12 @@ struct Index {
   })
 
   async aboutToAppear(): Promise<void> {
-    hilog.info(0x1000, this.componentName, `#aboutToAppear executed`)
+    hilog.info(0x1000, componentName, `#aboutToAppear executed`)
 
+    if (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) {
+      hilog.info(0x1000, componentName, `进入崩溃日志`)
+      this.isShowWelcome = true
+    }
 
     // 免责声明弹窗
     if (this.uiConfig.isFirstStart) {
@@ -441,7 +458,7 @@ struct Index {
     }
     // 在页面build前改变主题颜色
     changeThemeColor(this.uiConfig.themeColor)
-    hilog.info(0x1000, this.componentName, `#aboutToAppear#ThemeControl.setDefaultTheme(${this.uiConfig.themeColor})`)
+    hilog.info(0x1000, componentName, `#aboutToAppear#ThemeControl.setDefaultTheme(${this.uiConfig.themeColor})`)
     // 初始化切换颜色模式(深色模式)
     this.switchColorMode(this.uiConfig.darkModeIndex)
     // 初始化切换按钮位置
@@ -465,19 +482,19 @@ struct Index {
     this.deviceHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
       this.isLandscapePhone = mediaQueryResult.matches
       AppStorage.setOrCreate<boolean>('isLandscapePhone', this.isLandscapePhone)
-      hilog.info(0x1000, this.componentName,
+      hilog.info(0x1000, componentName,
         `#媒体查询#设备高度改变#(320vp< height <= 500vp) and (640vp< width <= 1000vp)手机横屏结果: ${this.isLandscapePhone}`)
     });
     this.tabletHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
       this.istabletLandscape = mediaQueryResult.matches
       AppStorage.setOrCreate<boolean>('istabletLandscape', this.istabletLandscape)
-      hilog.info(0xFF00, this.componentName,
+      hilog.info(0xFF00, componentName,
         `#媒体查询#设备高度改变#(1000vp< width)平板横屏结果: ${this.istabletLandscape}`)
     });
     this.foldPhoneOpenListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
       this.isFoldStatus = mediaQueryResult.matches
       AppStorage.setOrCreate<boolean>('isFoldStatus', this.isFoldStatus)
-      hilog.info(0xFF00, this.componentName,
+      hilog.info(0xFF00, componentName,
         `#媒体查询#设备折叠状态改变#(640vp< height <= 1000vp) and (640vp< width <= 1000vp)折叠展开结果: ${this.isFoldStatus}`)
     });
 
@@ -570,7 +587,7 @@ struct Index {
   @StorageLink('uiConfig') @Watch('ShowPipChange')uiConfig: UIConfig = new UIConfig()
 
   aboutToDisappear() {
-    hilog.info(0x1000, this.componentName, `#aboutToDisappear executed`)
+    hilog.info(0x1000, componentName, `#aboutToDisappear executed`)
     // 停止监听断点事件，并清空断点对应数据
     BreakpointSystem.getInstance().stop()
     // 解注册画中画生命周期及状态回调
@@ -586,8 +603,9 @@ struct Index {
    * 画中画根据代理启动和后台按钮监听是否开启
    */
   ShowPipChange() {
-    hilog.info(0xFF00, "HometestTag", "进入卡片编辑页面显示监听  %{public}s")
-    // 当编辑页面由 true -> false 时触发抖动动画刷新
+    if (deviceInfo.deviceType === 'tablet') {
+      PipManager.getInstance().updateContentSize(80, 30)
+    }
     if(this.uiConfig.backgroundPiPModel && this.proxyEnabled) {
       // 创建画中画控制器
       PipManager.getInstance().init(getContext(this))
@@ -670,8 +688,6 @@ struct Index {
     }
   }
 
-  // tab控制为新控制
-//public indexController: TabsController = new TabsController()
 
   // tab移动动画
   startAnim() {
@@ -779,6 +795,23 @@ struct Index {
           { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
         )
         .padding({ top: px2vp(this.topRectHeight) })
-    }
+    } // 欢迎页&崩溃页
+    .bindSheet($$this.isShowWelcome, this.WelcomeSheet(), {
+      detents: [BIND_SHEET_CONTAINER_HEIGHT],
+      showClose: (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) ? true : false,
+      dragBar: false,
+      backgroundColor: $r('app.color.background'),
+      keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
+      scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+      preferType: SheetType.CENTER,
+      onWillDismiss: ((DismissSheetAction: DismissSheetAction) => {
+        if (!this.isShowWelcome || DismissSheetAction.reason === DismissReason.CLOSE_BUTTON) {
+          // 关闭背景模糊
+          this.isEnableIndexForegroundBlur = false
+          DismissSheetAction.dismiss()
+          hilog.info(0xFF00, "WelcomeTestTag", "欢迎页启用状态： %{private}s", this.isShowWelcome)
+        }
+      })
+    })
   }
 }

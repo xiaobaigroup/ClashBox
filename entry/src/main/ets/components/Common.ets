@@ -357,7 +357,7 @@ export struct DisclaimerCustomDialog {
         .textAlign(TextAlign.Center)
         .fontSize(FONT_SIZE_16)
       Flex({direction: FlexDirection.Row}) {
-        if (this.uiConfig.isFirstStart) {
+        if (this.uiConfig.isFirstStartDisclaimer) {
           Button($r('app.string.refuse'))
             .margin({ top: 15 })
             .width('100%')
@@ -370,7 +370,7 @@ export struct DisclaimerCustomDialog {
             })
             .fontColor(Color.Red)
         }
-        Button(this.uiConfig.isFirstStart ? $r('app.string.agree') : $r('app.string.Confirm'))
+        Button(this.uiConfig.isFirstStartDisclaimer ? $r('app.string.agree') : $r('app.string.Confirm'))
           .margin({ top: 15 })
           .width('100%')
           .backgroundColor(this.icon_emphasize)
