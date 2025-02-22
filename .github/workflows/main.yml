@@ -91,7 +91,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/v')
         with:
-          name: ${{ github.ref_name }}
+          name: ${{ xfz347 }}
           files: |
             ${{ steps.sign_hap.outcome == 'success' && '$GITHUB_WORKSPACE/entry/build/default/outputs/default/entry-default-signed.hap' || '$GITHUB_WORKSPACE/entry/build/default/outputs/default/entry-default-unsigned.hap' }}
           draft: false
