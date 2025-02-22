@@ -1673,6 +1673,14 @@
       "value": "三方库与服务"
     },
     {
+      "name": "game_q",
+      "value": "为什么Clash运行中玩游戏延迟高或者掉线"
+    },
+    {
+      "name": "game_a",
+      "value": "因Clash规则不完善和后台问题导致，建议准备玩游戏前关闭Clash的VPN功能"
+    },
+    {
       "name": "meta_q",
       "value": "为什么ClashMeta核心下没有测速功能"
     },

@@ -2,8 +2,8 @@
   "app": {
     "bundleName": "org.xbgroup.clashnext",
     "vendor": "example",
-    "versionCode": 1002000,
-    "versionName": "1.2.0",
+    "versionCode": 1002001,
+    "versionName": "1.2.1",
     "icon": "$media:app_icon",
     "label": "$string:app_name"
   }

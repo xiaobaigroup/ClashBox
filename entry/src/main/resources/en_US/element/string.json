@@ -1719,6 +1719,14 @@
     {
       "name": "link",
       "value": "Link"
+    },
+    {
+      "name": "game_q",
+      "value": "Why is there high lag or disconnection when playing games while Clash is running"
+    },
+    {
+      "name": "game_a",
+      "value": "Due to imperfect Clash rules and background issues, it is recommended to turn off Clash’s VPN function before playing games"
     }
   ]
 }
