@@ -1,0 +1,100 @@
+name: HarmonyOS CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: ghcr.io/sanchuanhehe/harmony-next-pipeline-docker/harmonyos-ci-image:latest
+
+    steps:
+      # 1. 拉取代码
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. 安装项目依赖
+      - name: Install dependencies
+        run: |
+          cd $GITHUB_WORKSPACE
+          ohpm install --all
+
+      # 3. 构建 HAP 文件
+      - name: Build HAP
+        run: |
+          cd $GITHUB_WORKSPACE
+          hvigorw clean --no-daemon
+          hvigorw assembleHap --mode module -p product=default -p buildMode=debug --no-daemon
+
+      # 4. 获取构建输出路径
+      - name: Get build output path
+        id: get_build_output_path
+        run: |
+          cd $GITHUB_WORKSPACE
+          echo "output_path=$(ls -d $PWD/entry/build/default/outputs/default)" >> $GITHUB_OUTPUT
+
+      # 5. 上传构建输出作为 artifact
+      - name: Upload Build Output
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: ${{ steps.get_build_output_path.outputs.output_path }}
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write 
+    container: ghcr.io/sanchuanhehe/harmony-next-pipeline-docker/harmonyos-ci-image:latest
+    if: startsWith(github.ref, 'refs/tags/v') 
+    steps:
+      # 1. 拉取代码
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. 下载构建输出 artifact
+      - name: Download Build Output
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: $GITHUB_WORKSPACE/entry/build/default/outputs/default
+
+      # 3. 签名 HAP 文件，如果存在签名文件和证书文件还有密钥文件和KEY_PASSWORD和KEYSTORE_PASSWORD
+      - name: Sign HAP
+        id: sign_hap
+        if: env.SIGNING_CERT && env.SIGNING_PROFILE && env.SIGNING_KEY
+        run: |
+          cd $GITHUB_WORKSPACE
+          java -jar /harmonyos-tools/command-line-tools/sdk/default/openharmony/toolchains/lib/hap-sign-tool.jar \
+          sign-app \
+          -keyAlias "ide_demo_app" \
+          -signAlg "SHA256withECDSA" \
+          -mode "localSign" \
+          -appCertFile "${{ env.SIGNING_CERT }}" \
+          -profileFile "${{ env.SIGNING_PROFILE }}" \
+          -inFile "./entry/build/default/outputs/default/entry-default.hap" \
+          -keystoreFile "${{ env.SIGNING_KEY }}" \
+          -outFile "./entry/build/default/outputs/default/entry-default-signed.hap" \
+          -keyPwd "${{ secrets.KEY_PASSWORD }}" \
+          -keystorePwd "${{ secrets.KEYSTORE_PASSWORD }}" \
+          -signCode "1"
+
+      # 4. 创建 GitHub Release 并上传资产
+      - name: Create Release and Upload Assets
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          name: ${{ github.ref_name }}
+          files: |
+            ${{ steps.sign_hap.outcome == 'success' && '$GITHUB_WORKSPACE/entry/build/default/outputs/default/entry-default-signed.hap' || '$GITHUB_WORKSPACE/entry/build/default/outputs/default/entry-default-unsigned.hap' }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ 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 }}
