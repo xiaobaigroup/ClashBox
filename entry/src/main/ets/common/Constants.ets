@@ -545,7 +545,7 @@ export interface AboutListItemProp {
 /**
  * 关于列表
  */
-export function getAboutList(): AboutListItemProp[]{
+export function getAboutList(): AboutListItemProp[] {
   return [
     {
       title: 'Version',
@@ -590,7 +590,7 @@ export function getAboutList(): AboutListItemProp[]{
         { title: $r('app.string.UpdateChannels'), subtitle: $r('app.string.UpdateChannels_Subtitle1'), sign: 3, name: 'UpdateChannels',
           children: [
             { title: $r('app.string.UpdateChannels_Subtitle1'), name: 'Github', subtitle: '' },
-            { title: 'Gitee', name: 'Gitee', subtitle: '' }
+            // { title: 'Gitee', name: 'Gitee', subtitle: '' }
           ]
         },
         { title: $r('app.string.Auto_Check_Updates'), subtitle: '', sign: 1, name: 'Auto', isOn: false },
@@ -643,13 +643,39 @@ export const ContributorsList: ContributorsListItemProp[] = [
 ]
 
 /**
- * 常见问题
+ * 标题&内容
  */
-export interface FAQItemProp {
+export interface TCItemProp {
   title: ResourceStr
   content: ResourceStr
 }
-export const FAQList: FAQItemProp[] = [
+
+/**
+ * 三方库与服务
+ */
+export const ThirdServicesList: TCItemProp[] = [
+  {title: 'mcCharts(莓创图表)', content: 'http://meichuangit.net.cn/GettingStarted'},
+  {title: 'VORE-API', content: 'https://api.vore.top/doc/IPdata.html'},
+  {title: 'IP-API', content: 'https://ip-api.com/'},
+  {title: 'IPWHOIS.IO', content: 'https://ipwhois.io/'},
+  {title: 'IPinfo', content: 'https://ipinfo.io/'},
+  {title: 'ifconfig.me', content: 'https://ifconfig.me/'},
+]
+
+/**
+ * 使用引导
+ */
+export const UseGuidanceList: TCItemProp[] = [
+  {title: $r('app.string.home_start_button'), content: $rawfile('start_pop.png')},
+  {title: $r('app.string.config_list_items'), content: $rawfile('config_guidance.png')},
+  {title: $r('app.string.proxy_node_list_item'), content: $rawfile('proxy_node_pop.png')},
+  {title: $r('app.string.delay_test_button'), content: $rawfile('proxy_delay_pop.png')},
+]
+
+/**
+ * 常见问题
+ */
+export const FAQList: TCItemProp[] = [
   {title: $r('app.string.game_q'), content: $r('app.string.game_a')},
   {title: $r('app.string.meta_q'), content: $r('app.string.meta_a')},
   {title: $r('app.string.function_q'), content: $r('app.string.function_a')},
@@ -668,32 +694,35 @@ export interface CheckUpdateListItemProp {
   children?: Array<CheckUpdateListItemProp>
 }
 /**
- *  检查更新页列表
+ * 检查更新页列表
  */
-export const CheckUpdateList: CheckUpdateListItemProp[] = [
-  {
-    title: 'Version',
-    subtitle: '',
-    children: [
-      { title: $r('app.string.current_version'), subtitle: '2.0.000 Preview1' },
-      { title: $r('app.string.latest_version'), subtitle: '2.0.000' }
-    ]
-  },
-  {
-    title: 'Go',
-    subtitle: '',
-    children: [
-      { icons: $r('sys.symbol.arrowshape_down_to_line_fill'), title: $r('app.string.go_download_update'), subtitle: $r('app.string.go_download_update_subtitle') },
-    ]
-  },
-  {
-    title: 'Ignore',
-    subtitle: '',
-    children: [
-      { icons: $r('sys.symbol.hand_raised_hexagon'), title: $r('app.string.ignore_update'), subtitle: '' },
-    ]
-  }
-]
+export function getCheckUpdateList(): CheckUpdateListItemProp[] {
+  return [
+    {
+      title: 'Version',
+      subtitle: '',
+      children: [
+        { title: $r('app.string.current_version'), subtitle: `${AppState.versionName} Beta` },
+        { title: $r('app.string.latest_version'), subtitle: 'XXX' }
+      ]
+    },
+    {
+      title: 'Go',
+      subtitle: '',
+      children: [
+        { icons: $r('sys.symbol.arrowshape_down_to_line_fill'), title: $r('app.string.go_download_update'), subtitle: $r('app.string.go_download_update_subtitle') },
+      ]
+    },
+    {
+      title: 'Ignore',
+      subtitle: '',
+      children: [
+        { icons: $r('sys.symbol.hand_raised_hexagon'), title: $r('app.string.ignore_update'), subtitle: '' },
+      ]
+    }
+  ]
+}
+
 
 /**
  * 主页卡片编辑半模拟态里列表

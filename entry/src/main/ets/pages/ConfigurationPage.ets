@@ -32,6 +32,7 @@ import { customAnimationUtil, isON } from '../utils/Animation'
 import { Profile, ProxyGroup, SubscriptionInfo } from 'proxy_core'
 import { Provider } from "proxy_core"
 import { ProxyItem, ProxyItemDataSource } from '../common/ProxyData'
+import { PopTips, PopupBuilder } from '../components/Start/Popup'
 
 
 /**
@@ -385,7 +386,6 @@ struct ConfigurationPage {
                           cellularData(item.subscriptionInfo)
                         }
 
-                        //  Text(item.createdDate)
                       }.alignItems(HorizontalAlign.Start).width('85%').padding({top:10,bottom:10})
 
                       Blank()
@@ -411,10 +411,8 @@ struct ConfigurationPage {
                     .width('100%')
                     .padding(LIST_ITEM_PADDING)
                     .alignItems(VerticalAlign.Center)
-                  }
+                  }.width('100%')
                   .backgroundColor($r('app.color.container_background'))
-                  .width('100%')
-                 // .height(LIST_ITEM_HEIGHT)
                   .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                   .borderRadius(BORDER_RADIUS_20)
                   .hoverEffect(HoverEffect.Scale)
@@ -445,12 +443,15 @@ struct ConfigurationPage {
                         `#ListItem#onTouch(TouchType.Down): configName is [${this.currentTouchConfigData.configName}]`)
                     }
                   })
-
-                  // .gesture(LongPressGesture({ repeat: false }).onAction(() => {
-                  //   this.isShownConfigListCtxMenu = !this.isShownConfigListCtxMenu
-                  //   hilog.info(0xC002, this.componentName, `#gesture#LongPressGesture:`)
-                  // }))
+                  .bindPopup(!!this.uiConfig.ShowConfigPop, {
+                    builder: PopupBuilder(this, PopTips[1], () => {
+                      this.uiConfig.ShowConfigPop = false
+                    }),
+                    onWillDismiss: false,
+                    autoCancel: false
                   })
+
+                })
               }
               .width('100%')
               .height('100%')

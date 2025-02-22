@@ -518,7 +518,7 @@
     },
     {
       "name": "query_ip_region_Subtitle",
-      "value": "使用ip-api查询IP所在地区"
+      "value": "使用第三方API查询IP所在地区"
     },
     {
       "name": "Diversion_Strategy",
@@ -1666,7 +1666,11 @@
     },
     {
       "name": "statement",
-      "value": "ClashNext是一个免费软件并且我们不为其提供任何额外服务，部分联网服务使用的是第三方免费API接口，因此具有访问上限，若出现访问异常属于正常现象，更多第三方服务请前往三方库与服务中查看"
+      "value": "ClashNext是一个免费软件并且我们不为其提供任何额外服务，部分联网服务使用的是第三方免费API接口，因此具有访问上限，若出现访问异常属于正常现象，更多第三方服务请前往"
+    },
+    {
+      "name": "statement_1",
+      "value": "中查看"
     },
     {
       "name": "third_party_services",
@@ -1727,6 +1731,50 @@
     {
       "name": "link",
       "value": "链接"
+    },
+    {
+      "name": "project",
+      "value": "项目"
+    },
+    {
+      "name": "know",
+      "value": "我知道啦"
+    },
+    {
+      "name": "tips",
+      "value": "小提示"
+    },
+    {
+      "name": "start_pop",
+      "value": "导入配置并成功加载后才可以启动哦~"
+    },
+    {
+      "name": "config_pop",
+      "value": "可以长按配置进行更多操作哦~"
+    },
+    {
+      "name": "proxy_pop",
+      "value": "可以长按代理节点进行收藏等更多操作哦~"
+    },
+    {
+      "name": "proxy_delay_pop",
+      "value": "这个按钮可以一键测试所有代理的延迟哦~"
+    },
+    {
+      "name": "home_start_button",
+      "value": "主页启动按钮"
+    },
+    {
+      "name": "config_list_items",
+      "value": "配置列表项"
+    },
+    {
+      "name": "proxy_node_list_item",
+      "value": "代理节点列表项"
+    },
+    {
+      "name": "delay_test_button",
+      "value": "延迟测试按钮"
     }
   ]
 }

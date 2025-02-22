@@ -1,6 +1,6 @@
 //主页 栅格布局、媒体查询
 import { BreakpointState } from '../common/breakpointsystem'
-import { componentSnapshot, curves, PromptAction, window } from '@kit.ArkUI'
+import { curves, PromptAction, window } from '@kit.ArkUI'
 import SwitchMode from '../components/Home/SwitchMode'
 import CellularData from '../components/Home/CellularData'
 import PublicNetwork from '../components/Home/PublicNetwork'
@@ -9,8 +9,6 @@ import { getGreeting } from '../utils/GreetingUtil'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Timer } from '../common/HHmmssTimer'
 import {
-  PROXY_STARTED_DURATION_INIT_VALUE,
-  TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE,
   BIND_SHEET_CONTAINER_HEIGHT,
   TAB_CONTENT_TITLE_HEIGHT,
   gutterHomeGridcol,
@@ -34,10 +32,9 @@ import { ConfigData } from '../common/PageArgumentEntity'
 import { customVibrator } from '../utils/VibratorUtil'
 import { customAnimationUtil } from '../utils/Animation'
 import { Profile, ProxyGroup, ProxyMode } from 'proxy_core'
-import { image } from '@kit.ImageKit'
 import { ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/ProxyData'
 import { EventHub, EventKey } from '../common/EventHub'
-import { RightDownButton } from '../components/Common'
+import { PopTips, PopupBuilder } from '../components/Start/Popup'
 
 
 @Entry
@@ -69,6 +66,8 @@ struct Home {
   /* 主页卡片高度*/
   @Consume('HomeCardEditHeight') private HomeCardEditHeight: BreakpointState<number>
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @State rotateAngle : number  = 0
 
   windowClass = AppStorage.get<window.Window>('windowClass') as window.Window;
   // 编辑按钮点击后显示编辑状态判定
@@ -150,9 +149,8 @@ struct Home {
   @Provide theCurrentHomeCard: boolean[] = showHomeCard
   // 上一次主页布局
   @State theLastHomeCard: boolean[] = showHomeCard
-  //page内顶部标题偏移量
+  // page内顶部标题偏移量
   @Consume curYOffset: number
-
   // 代理页分组数据（懒加载）
   @Consume proxyGroups: ProxyGroupItemDataSource
   // 节点数据
@@ -182,8 +180,6 @@ struct Home {
     this.SaveDialogController = null
     EventHub.off(EventKey.SwitchModeCard)
   }
-
-
 
   // 在自定义组件即将析构销毁时将dialogController置空
   onCancel() {
@@ -233,26 +229,6 @@ struct Home {
       })
     } else { this.isShowDeleteButton = false }
   }
-
-  // 通过@Builder构建设置模态展示界面
-  @Builder
-  SettingsSheet() {
-    Column() {
-      Settings()
-    }
-    .width('100%')
-    .height('100%')
-  }
-
-  //卡片编辑半模拟态
-  @Builder
-  CardEdit() {
-    CardEdit()
-  }
-
-  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-  @State rotateAngle : number  = 0
-
 
   //卡片摇摆动画
   startAnim() {
@@ -308,6 +284,40 @@ struct Home {
     }
   }
 
+  // 通过@Builder构建设置模态展示界面
+  @Builder
+  SettingsSheet() {
+    Column() {
+      Settings()
+    }
+    .width('100%')
+    .height('100%')
+  }
+
+  //卡片编辑半模拟态
+  @Builder
+  CardEdit() {
+    CardEdit()
+  }
+
+  // 标题按钮
+  @Builder
+  ButtonBuilder(icons: Resource, onCheck: () => void ) {
+    Button({ type: ButtonType.Circle, stateEffect: true }) {
+      SymbolGlyph(icons)
+        .fontSize(24)
+        .fontColor([this.icon_primary])
+    }
+    .width(40)
+    .height(40)
+    .backgroundColor($r('app.color.settings_container_background'))
+    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+    .onClick(() => {
+      onCheck()
+    })
+    .transition(customAnimationUtil.isSlide(100, this.uiConfig))
+  }
+
   build() {
     Stack() {
       if (!this.isLandscapePhone) {
@@ -322,15 +332,8 @@ struct Home {
               .fontColor(this.font_primary)
               .transition(customAnimationUtil.isSlide(200,this.uiConfig))
             Blank()
-            //编辑按钮
-            Button({ type: ButtonType.Circle, stateEffect: true }) {
-              SymbolGlyph($r('sys.symbol.square_and_pencil'))
-                .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-                .fontColor([this.icon_primary])
-                .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
-            }
-            .transition(customAnimationUtil.isSlide(150,this.uiConfig))
-            .onClick(() => {
+            // 编辑按钮
+            this.ButtonBuilder($r('sys.symbol.square_and_pencil'), () => {
               this.isShowHomeEdit = true
               // 编辑布局前储存之前的布局变量
               hilog.info(0xFF00, "HometestTag", "上一次布局1： %{public}s", JSON.stringify(this.theLastHomeCard))
@@ -340,83 +343,41 @@ struct Home {
                 animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
                   this.isShowDeleteButton = true
                 })
-              }else {this.isShowDeleteButton = true}
+              } else {
+                this.isShowDeleteButton = true
+              }
             })
-            .width(40)
-            .height(40)
-            .backgroundColor($r('app.color.settings_container_background'))
-
-            //设置按钮
-            Button({ type: ButtonType.Circle, stateEffect: true }) {
-              SymbolGlyph($r('sys.symbol.gearshape'))
-                .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
-                .fontColor([this.icon_primary]) //设置图标无法分层设为单色
-                .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
-            }
-            .width(40)
-            .height(40)
-            .backgroundColor($r('app.color.settings_container_background'))
-            .transition(customAnimationUtil.isSlide(100,this.uiConfig))
-            .onClick(() => {
+            // 设置按钮
+            this.ButtonBuilder($r('sys.symbol.gearshape'), () => {
               this.isShowSettings = true
               this.isEnableIndexForegroundBlur = true
             })
+
           } else {
-            //编辑布局按钮判定：是编辑状态
+            // 编辑布局按钮判定：是编辑状态
             Text($r('app.string.home_edit'))
               .fontSize(32)
               .fontWeight(FontWeight.Bold)
               .fontColor(this.font_primary)
               .transition(customAnimationUtil.isSlide(200,this.uiConfig))
             Blank()
-            //添加按钮
-            Button({ type: ButtonType.Circle, stateEffect: true }) {
-              SymbolGlyph($r('sys.symbol.plus'))
-                .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)// .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-                .fontColor([Color.White])
-                .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
-            }
-            .width(40)
-            .height(40)
-            .backgroundColor(this.icon_emphasize)
-            .transition(customAnimationUtil.isSlide(150,this.uiConfig))
-            .onClick(() => {
+            // 添加按钮
+            this.ButtonBuilder($r('sys.symbol.plus'), () => {
               this.isShowCardEdit = true
               this.isEnableIndexForegroundBlur = true
             })
-
-            //保存按钮
-            Button({ type: ButtonType.Circle, stateEffect: true }) {
-              SymbolGlyph($r('sys.symbol.save'))
-                .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
-                .fontColor([Color.White])
-                .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
-            }
-            .width(40)
-            .height(40)
-            .backgroundColor(this.icon_emphasize)
-            .transition(customAnimationUtil.isSlide(100,this.uiConfig))
-            .onClick(() => {
+            // 保存按钮
+            this.ButtonBuilder($r('sys.symbol.save'), () => {
               this.saveHomeLayout()
             })
-
-            //取消按钮
-            Button({ type: ButtonType.Circle, stateEffect: true }) {
-              SymbolGlyph($r('sys.symbol.xmark'))
-                .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
-                .fontColor([Color.White])
-                .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
-            }
-            .width(40)
-            .height(40)
-            .backgroundColor(this.icon_emphasize)
-            .transition(customAnimationUtil.isSlide(50,this.uiConfig))
-            .onClick(() => {
+            // 取消按钮
+            this.ButtonBuilder($r('sys.symbol.xmark'), () => {
               if (this.SaveDialogController != null) {
                 this.SaveDialogController.open()
                 this.isEnableIndexForegroundBlur = true
               }
             })
+
           }
         }
         .zIndex(1)
@@ -853,82 +814,85 @@ struct Home {
           })
         }
 
-      if (!this.isShowHomeEdit){
-        // 代理启动按钮层
-        Column() {
-          Row() {
-            Stack({ alignContent: Alignment.Center }) {
-              SymbolGlyph(this.proxyEnabled ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
-                .fontSize(24)
-                .fontColor([Color.White])
-                //.symbolEffect(this.ReplaceSymbolEffect)
-                .align(Alignment.Center)
-                .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
-            }
-            .width(this.proxyStartButtonHeight)
-            .height(this.proxyStartButtonHeight)
-
-            // .border({ width:2, radius: '50%', style: BorderStyle.Dashed, color: Color.White })
-            // 计时器文本
-            Text(this.proxyStartingDuration)
-              .fontSize(20)// 使用透明度控制是否显示计时器，是因为用 `visibility` 来控制的话，不显示的时间长了之后，再次显示时候会延迟一秒，体验不好
-              .fontColor(this.proxyEnabled ? Color.White : Color.Transparent)
-              .fontWeight(FontWeight.Bold)
-          }.width('100%')
-        }
-        .borderRadius(100)
-        .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
-        .backgroundColor(this.icon_emphasize)
-        .shadow({
-          radius: 10,
-          color: this.icon_emphasize,
-          offsetY: 4,
-          type: ShadowType.BLUR
-        })
-        .margin({bottom:this.isLandscapePhone ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
-        .width(this.proxyEnabled ? $r('app.integer.vp_proxy_started_button_width') : $r('app.integer.vp_proxy_not_start_button_width'))
-        .height(this.proxyStartButtonHeight)
-        .clip(true)
-        .onClick(async (event: ClickEvent) => {
-          if(this.configList.length === 0 || this.theProxyGroups.length === 0) {
-            if (this.uiConfig.isVibrate) {
-              customVibrator.vibratorTriggerOfHapticClockTimer()
-            }
-            // 配置页没有数据，或者代理节点未加载
-            this.promptAction.showToast({ message: `${getContext().resourceManager.getStringSync($r('app.string.start_prompt'))}` })
-            // vpn小钥匙可能卡死，关闭vpn小钥匙
-            await ClashViewModel.StopVpn()
+        if (!this.isShowHomeEdit) {
+          // 代理启动按钮层
+          Column() {
+            Row() {
+              Stack({ alignContent: Alignment.Center }) {
+                SymbolGlyph(this.proxyEnabled ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
+                  .fontSize(24)
+                  .fontColor([Color.White])
+                  .align(Alignment.Center)
+                  .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
+              }
+              .width(this.proxyStartButtonHeight)
+              .height(this.proxyStartButtonHeight)
+              // 计时器文本
+              Text(this.proxyStartingDuration)
+                .fontSize(20)// 使用透明度控制是否显示计时器，是因为用 `visibility` 来控制的话，不显示的时间长了之后，再次显示时候会延迟一秒，体验不好
+                .fontColor(this.proxyEnabled ? Color.White : Color.Transparent)
+                .fontWeight(FontWeight.Bold)
+            }.width('100%')
           }
-          else {
-            this.proxyEnabled = !this.proxyEnabled
-            hilog.info(0xA002, this.componentName, `代理启动按钮状态：${this.proxyEnabled}`)
-            if (this.proxyEnabled) {
-              // 初始启动计时
-              this.proxyStartedTimer.start(time => this.proxyStartingDuration = time)
-              // 当模拟下载和通知均启用时
-              if(this.uiConfig.backgroundLocateModel && this.uiConfig.Enablednotice){
-                BackgroundDownService.start(getContext(this))
+          .borderRadius(100)
+          .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
+          .backgroundColor(this.icon_emphasize)
+          .shadow({
+            radius: 10,
+            color: this.icon_emphasize,
+            offsetY: 4,
+            type: ShadowType.BLUR
+          })
+          .margin({bottom:this.isLandscapePhone ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
+          .width(this.proxyEnabled ? $r('app.integer.vp_proxy_started_button_width') : $r('app.integer.vp_proxy_not_start_button_width'))
+          .height(this.proxyStartButtonHeight)
+          .clip(true)
+          .onClick(async (event: ClickEvent) => {
+            if(this.configList.length === 0 || this.theProxyGroups.length === 0) {
+              if (this.uiConfig.isVibrate) {
+                customVibrator.vibratorTriggerOfHapticClockTimer()
               }
-              await ClashViewModel.StartVpn()
-            } else {
-              // 计时器重置
-              this.proxyStartedTimer.reset()
-              if(this.uiConfig.backgroundLocateModel){
-                BackgroundDownService.stop(getContext(this))
-              }
+              // 配置页没有数据，或者代理节点未加载
+              this.promptAction.showToast({ message: `${getContext().resourceManager.getStringSync($r('app.string.start_prompt'))}` })
+              // vpn小钥匙可能卡死，关闭vpn小钥匙
               await ClashViewModel.StopVpn()
             }
-            if (this.uiConfig.isVibrate) {
-              customVibrator.vibratorTriggerOfHapticClockTimer()
+            else {
+              this.proxyEnabled = !this.proxyEnabled
+              hilog.info(0xA002, this.componentName, `代理启动按钮状态：${this.proxyEnabled}`)
+              if (this.proxyEnabled) {
+                // 初始启动计时
+                this.proxyStartedTimer.start(time => this.proxyStartingDuration = time)
+                // 当模拟下载和通知均启用时
+                if(this.uiConfig.backgroundLocateModel && this.uiConfig.Enablednotice){
+                  BackgroundDownService.start(getContext(this))
+                }
+                await ClashViewModel.StartVpn()
+              } else {
+                // 计时器重置
+                this.proxyStartedTimer.reset()
+                if(this.uiConfig.backgroundLocateModel){
+                  BackgroundDownService.stop(getContext(this))
+                }
+                await ClashViewModel.StopVpn()
+              }
+              if (this.uiConfig.isVibrate) {
+                customVibrator.vibratorTriggerOfHapticClockTimer()
+              }
             }
-          }
-        })
-        .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed,curve:curves.springMotion() }:null)
-        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-      }
+          })
+          .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed,curve:curves.springMotion() }:null)
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+          .bindPopup(!!this.uiConfig.ShowStartPop, {
+            builder: PopupBuilder(this, PopTips[0], () => {
+              this.uiConfig.ShowStartPop = false
+            }),
+            onWillDismiss: false,
+            autoCancel: false
+          })
+        }
       }
       .backgroundColor($r('app.color.background'))
-      //    .padding(this.isLandscapePhone ? '0vp' : { bottom: '45vp' })
       .height('100%' )
       .width("100%")
       .bindSheet($$this.isShowSettings, this.SettingsSheet(), {

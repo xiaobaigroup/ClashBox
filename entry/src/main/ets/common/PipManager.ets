@@ -2,7 +2,6 @@
 // 画中画控制器单例
 import { BuilderNode, NodeController, PiPWindow, typeNode } from '@kit.ArkUI'; // 引入PiPWindow模块
 import { BusinessError } from '@kit.BasicServicesKit';
-import Speed from '../components/Home/Speed';
 import { AVPlayer} from './SimpleAVPlayer'
 
 class Params {

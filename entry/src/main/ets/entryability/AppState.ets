@@ -121,6 +121,14 @@ export class UIConfig{
   isFirstStart: boolean = true
   // 应用使用时间记录
   useTime: number = new Date().getTime()
+  // 代理启动按钮提示气泡
+  ShowStartPop: boolean = true
+  // 长按配置列表提示气泡
+  ShowConfigPop: boolean = true
+  // 长按代理节点列表提示气泡
+  ShowProxyPop: boolean = true
+  // 延迟统一测速提示气泡
+  ShowDelayPop: boolean = false
   resourcesData: string = JSON.stringify(theResouresData)
   resourcesHideData: string = JSON.stringify(resourcesBlankData)
   constructor() {

@@ -13,7 +13,6 @@ struct SwitchMode {
   //自定义主题，颜色在AppTheme里面修改
   @Consume('icon_emphasize') icon_emphasize: ResourceColor //高亮图标,可在apptheme更换
   @State font_primary: ResourceColor = $r('sys.color.font_primary')
-  onWillApplyTheme(theme: Theme) {this.icon_emphasize = theme.colors.iconEmphasize;}
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
   @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
@@ -34,6 +33,10 @@ struct SwitchMode {
   aboutToAppear() {
   }
   aboutToDisappear() {
+  }
+
+  onWillApplyTheme(theme: Theme) {
+    this.icon_emphasize = theme.colors.iconEmphasize
   }
 
   //平移选择动画参数切换

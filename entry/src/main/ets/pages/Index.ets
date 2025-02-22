@@ -101,22 +101,14 @@ struct Index {
   @Provide('icon_emphasize') icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize')
   //三级图标色，浅灰色
   @State icon_tertiary: ResourceColor = $r('sys.color.icon_tertiary')
-  // 预留自定义主题，颜色在AppTheme里面修改
-  /**
-   *
-   * @param theme
-   */
-  onWillApplyTheme(theme: Theme) {
-    hilog.info(0x1000, componentName, `#onWillApplyTheme`)
-    this.icon_emphasize = theme.colors.iconEmphasize;
-
-  }
   @Provide greetings: Resource = $r('app.string.GoodMorning')
   //tabs图标文字颜色，修改resources/base(dark)/element/color.json中tabs_icon_text配置选中图标文字深浅模式颜色
   // app.color.tabs_icon_text1配置非选中图标和文字深浅模式颜色
   //  @State fontColorValue:ResourceColor = ($r('app.color.tabs_icon_text'));
   //  @State fontColorValue1:ResourceColor = ($r('app.color.tabs_icon_text1'));
-  @State currentIndex: number = 0
+  // 主界面当前index
+  @Provide IndexCurrentindex: number = 0
+  // 主界面选择的index
   @State selectedIndex: number = 0
   // 设备高度是否 (320vp< height <= 500vp) 媒体查询
   @State isLandscapePhone: boolean = false
@@ -124,6 +116,8 @@ struct Index {
   @State istabletLandscape: boolean = false
   // 折叠展开状态判断变量
   @State isFoldStatus: boolean = false
+  // 设备横竖屏状态判断变量
+  @State isLandscapeStatus: boolean = false
   // 读取导航条区域的高度
   @StorageProp('bottomRectHeight') bottomRectHeight: number = 0;
   @StorageProp('topRectHeight') topRectHeight: number = 0;
@@ -179,7 +173,8 @@ struct Index {
 
   // 欢迎页半模态窗口
   @Provide isShowWelcome: boolean = false
-
+  // 代理页延迟按钮气泡提示
+  @Provide isShowDelayPop: boolean = false
   // page内顶部标题偏移量
   @Provide curYOffset: number = 0
   // 更多页一级页面顶部标题偏移量
@@ -347,8 +342,8 @@ struct Index {
   }
 
   /* 是否开启 `Index` 页面的前景模糊 */
-  @Provide('isEnableIndexForegroundBlur')
-  private isEnableIndexForegroundBlur: boolean = false
+  @Provide('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean = false
+
   // 当手机横屏时条件成立
   deviceHeightListener: mediaquery.MediaQueryListener =
     this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp) and (640vp< width <= 1000vp)');
@@ -358,10 +353,12 @@ struct Index {
   // 折叠屏展开判断
   foldPhoneOpenListener: mediaquery.MediaQueryListener =
     this.getUIContext().getMediaQuery().matchMediaSync('(640vp< height <= 1000vp) and (640vp< width <= 1000vp)');
+  // 当设备横屏时条件成立
+  landscapelistener: mediaquery.MediaQueryListener =
+    this.getUIContext().getMediaQuery().matchMediaSync('(orientation: landscape)')
 
   @Builder
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
-
     Flex({
       direction: this.compDirection.value,
       justifyContent:this.isLandscapePhone|| this.istabletLandscape ? FlexAlign.Center: FlexAlign.Start,
@@ -418,6 +415,15 @@ struct Index {
         subscriptionInfo: d.subscriptionInfo
       } as ConfigData
     })
+  }
+
+  /**
+   *  预留自定义主题，颜色在AppTheme里面修改
+   *  @param theme
+   */
+  onWillApplyTheme(theme: Theme) {
+    hilog.info(0x1000, componentName, `#onWillApplyTheme`)
+    this.icon_emphasize = theme.colors.iconEmphasize;
   }
 
   // 免责声明弹窗控制器
@@ -487,24 +493,34 @@ struct Index {
       this.moreList = removeItemsByIndex(this.moreList, [2,3])
     }
 
-    // 开启change监听
-    this.deviceHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
-      this.isLandscapePhone = mediaQueryResult.matches
-      AppStorage.setOrCreate<boolean>('isLandscapePhone', this.isLandscapePhone)
-      hilog.info(0x1000, componentName,
-        `#媒体查询#设备高度改变#(320vp< height <= 500vp) and (640vp< width <= 1000vp)手机横屏结果: ${this.isLandscapePhone}`)
-    });
-    this.tabletHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
-      this.istabletLandscape = mediaQueryResult.matches
-      AppStorage.setOrCreate<boolean>('istabletLandscape', this.istabletLandscape)
+    // 根据设备选择性开启change监听
+    if (deviceInfo.deviceType === 'phone') {
+      this.deviceHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
+        this.isLandscapePhone = mediaQueryResult.matches
+        AppStorage.setOrCreate<boolean>('isLandscapePhone', this.isLandscapePhone)
+        hilog.info(0x1000, componentName,
+          `#媒体查询#设备高度改变#(320vp< height <= 500vp) and (640vp< width <= 1000vp)手机横屏结果: ${this.isLandscapePhone}`)
+      })
+      this.foldPhoneOpenListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
+        this.isFoldStatus = mediaQueryResult.matches
+        AppStorage.setOrCreate<boolean>('isFoldStatus', this.isFoldStatus)
+        hilog.info(0xFF00, componentName,
+          `#媒体查询#设备折叠状态改变#(640vp< height <= 1000vp) and (640vp< width <= 1000vp)折叠展开结果: ${this.isFoldStatus}`)
+      })
+    }
+    if (deviceInfo.deviceType === 'tablet') {
+      this.tabletHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
+        this.istabletLandscape = mediaQueryResult.matches
+        AppStorage.setOrCreate<boolean>('istabletLandscape', this.istabletLandscape)
+        hilog.info(0xFF00, componentName,
+          `#媒体查询#设备高度改变#(1000vp< width)平板横屏结果: ${this.istabletLandscape}`)
+      })
+    }
+    this.landscapelistener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
+      this.isLandscapeStatus = mediaQueryResult.matches
+      AppStorage.setOrCreate<boolean>('isLandscapeStatus', this.isLandscapeStatus)
       hilog.info(0xFF00, componentName,
-        `#媒体查询#设备高度改变#(1000vp< width)平板横屏结果: ${this.istabletLandscape}`)
-    });
-    this.foldPhoneOpenListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
-      this.isFoldStatus = mediaQueryResult.matches
-      AppStorage.setOrCreate<boolean>('isFoldStatus', this.isFoldStatus)
-      hilog.info(0xFF00, componentName,
-        `#媒体查询#设备折叠状态改变#(640vp< height <= 1000vp) and (640vp< width <= 1000vp)折叠展开结果: ${this.isFoldStatus}`)
+        `#媒体查询#设备方向改变，设备横屏结果: ${this.isLandscapeStatus}`)
     });
 
     BreakpointSystem.getInstance().attach(this.compStr)
@@ -607,6 +623,7 @@ struct Index {
     this.deviceHeightListener.off('change');
     this.tabletHeightListener.off('change')
     this.foldPhoneOpenListener.off('change')
+    this.landscapelistener.off('change')
   }
 
 
@@ -624,13 +641,14 @@ struct Index {
       PipManager.getInstance().setAutoStart(true)
       hilog.info(0xFF00, "PipTag", "代理启用状态： %{private}s", this.proxyEnabled)
       hilog.info(0xFF00, "PipTag", "画中画启用状态： %{private}s", this.uiConfig.backgroundPiPModel)
-    }else{
+    } else {
       PipManager.getInstance().setAutoStart(false)
     }
   }
 
   onPageShow(): void {
     hilog.info(0xFF00, "TimertestTag", "#onPageShow")
+    hilog.info(0xFF00, "PoptestTag", "startPop: %{private}d", this.uiConfig.ShowStartPop)
     // 刷新问候语
     this.greetings = getGreeting()
     if (this.proxyEnabled) {
@@ -738,7 +756,7 @@ struct Index {
     Stack() {
         Tabs({
           barPosition: this.isLandscapePhone ? BarPosition.Start : this.compBarPose.value,
-          index: this.currentIndex,
+          index: this.IndexCurrentindex,
           controller: indexController
         }) {
           TabContent() {
@@ -786,7 +804,7 @@ struct Index {
         .barWidth(this.isLandscapePhone ? '77vp' : this.compBarWidth.value) /**/
         .barHeight(this.isLandscapePhone ? '100%' :  this.compBarHeight.value) /**/
         .onChange((index: number) => {
-          this.currentIndex = index
+          this.IndexCurrentindex = index
         })
         .onAnimationStart((index: number, targetIndex: number) => {
           animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion(), }, () => {
@@ -814,9 +832,9 @@ struct Index {
       scrollSizeMode: ScrollSizeMode.CONTINUOUS,
       preferType: SheetType.CENTER,
       onWillDismiss: ((DismissSheetAction: DismissSheetAction) => {
-        // 关闭背景模糊
-        this.isEnableIndexForegroundBlur = false
         if (!this.isShowWelcome || DismissSheetAction.reason === DismissReason.CLOSE_BUTTON) {
+          // 关闭背景模糊
+          this.isEnableIndexForegroundBlur = false
           DismissSheetAction.dismiss()
           hilog.info(0xFF00, "WelcomeTestTag", "欢迎页启用状态： %{private}s", this.isShowWelcome)
         }

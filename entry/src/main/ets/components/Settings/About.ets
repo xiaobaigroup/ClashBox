@@ -1,14 +1,16 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import { AboutListItemProp, BORDER_RADIUS_20, ContributorsListItemProp,
   ContributorsList,
-  CheckUpdateList,
   CheckUpdateListItemProp,
   CONTENT_END_OFFSET_150,
   moreData,
   ListMoreData,
   getAboutList,
-  FAQItemProp,
+  getCheckUpdateList,
+  TCItemProp,
   FAQList,
+  ThirdServicesList,
+  UseGuidanceList,
 } from "../../common/Constants"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
@@ -224,7 +226,7 @@ struct About {
       ForEach(item, (menuItem: AboutListItemProp, index: number) => {
         MenuItem({
           content: menuItem.title,
-          symbolEndIcon: this.EnableUpdateChenChannels === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')).fontColor([this.icon_emphasize]) : undefined
+          symbolEndIcon: this.EnableUpdateChenChannels === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
         })
           .selected(this.EnableUpdateChenChannels === index)
           .onChange((selected) => {
@@ -425,8 +427,8 @@ struct About {
     .backgroundColor($r('app.color.background'))
     .hideTitleBar(true)
     .onBackPressed(() => {
-      this.SettingsPageInfos.clear();
-      return true;
+      this.SettingsPageInfos.clear()
+      return true
     })
   }
 }
@@ -573,11 +575,130 @@ export struct AboutContributors {
 }
 
 /**
+ *  三方库与服务
+ */
+@Component
+export struct ThirdServices {
+  /* 主题色 */
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  @State thirdServicesList: TCItemProp[] = ThirdServicesList
+  @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
+  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+
+  build() {
+    NavDestination() {
+      TopBuilder({title: $r('app.string.About'), subtitle: $r('app.string.third_party_services')})
+      List({space: 10}) {
+        ForEach(this.thirdServicesList, (item: TCItemProp, index: number) => {
+          ListItem() {
+            Column() {
+              // 项目
+              Text(`${getResourceString($r('app.string.Name'), this)}: ${item.title}`)
+                .fontSize(17)
+                .fontWeight(FontWeight.Medium)
+              // 内容
+              Text(`${getResourceString($r('app.string.project'), this)}: ${item.content}`)
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
+                .maxLines(1)
+                .fontSize(17)
+                .fontWeight(FontWeight.Normal)
+                .margin({top: 2})
+            }.width('100%')
+            .margin({left: 12})
+            .alignItems(HorizontalAlign.Start)
+          }
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+          .backgroundColor($r('app.color.container_background'))
+          .borderRadius(BORDER_RADIUS_20)
+          .width('100%')
+          .padding({left: 12, top: 12, bottom: 12})
+          .onClick(() => {
+            implicitStartAbility(getResourceString(item.content, this), context)
+          })
+        }, (item: TCItemProp) => getResourceString(item.title, this))
+      }
+      .width('100%')
+      .alignListItem(ListItemAlign.Center)
+      .contentEndOffset(CONTENT_END_OFFSET_150 - 85)
+      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+    }.width('100%')
+    .backgroundColor($r('app.color.background'))
+    .hideTitleBar(true)
+    .onBackPressed(() => {
+      this.SettingsPageInfos.pop(true)
+      return true
+    })
+  }
+}
+
+/**
+ *  使用引导
+ */
+@Component
+export struct UseGuidance {
+  /* 主题色 */
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  @State useGuidanceList: TCItemProp[] = UseGuidanceList
+  @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
+  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+
+  build() {
+    NavDestination() {
+      TopBuilder({title: $r('app.string.About'), subtitle: $r('app.string.UseGuidance')})
+      List({space: 10}) {
+        ForEach(this.useGuidanceList, (item: TCItemProp, index: number) => {
+          ListItem() {
+            Column() {
+              // 项目
+              Row() {
+                Text('·')
+                  .fontSize(32)
+                  .fontWeight(FontWeight.Bolder)
+                Text() {
+                  Span(item.title)
+                    .fontSize(17)
+                    .fontWeight(FontWeight.Medium)
+                }
+              }.alignItems(VerticalAlign.Center)
+              // 内容
+              Image(item.content)
+                .height(169)
+                .width('100%')
+                .borderRadius(BORDER_RADIUS_20)
+            }.width('100%')
+            .alignItems(HorizontalAlign.Start)
+          }
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+          .backgroundColor($r('app.color.container_background'))
+          .borderRadius(BORDER_RADIUS_20)
+          .width('100%')
+          .padding(12)
+        }, (item: TCItemProp) => getResourceString(item.title, this))
+      }
+      .width('100%')
+      .alignListItem(ListItemAlign.Center)
+      .contentEndOffset(CONTENT_END_OFFSET_150 - 65)
+      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+    }.width('100%')
+    .backgroundColor($r('app.color.background'))
+    .hideTitleBar(true)
+    .onBackPressed(() => {
+      this.SettingsPageInfos.pop(true)
+      return true
+    })
+  }
+}
+
+/**
  *  常见问题
  */
 @Component
 export struct FAQ {
-  @State FAQlist: FAQItemProp[] = FAQList
+  @State FAQlist: TCItemProp[] = FAQList
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
@@ -595,10 +716,21 @@ export struct FAQ {
               .fontSize(24)
               .margin({left: 7})
               .fontColor([this.icon_primary])
-            Text($r('app.string.statement'))
-              .fontSize(17)
-              .width('90%')
-              .textAlign(TextAlign.JUSTIFY)
+            Flex({
+              alignContent: FlexAlign.Start,
+              direction: FlexDirection.Row,
+              wrap: FlexWrap.Wrap,
+            }) {
+              Text() {
+                Span($r('app.string.statement'))
+                Span($r('app.string.third_party_services'))
+                  .fontColor(this.icon_emphasize)
+                  .onClick(() => {
+                    this.SettingsPageInfos.pushPathByName('Three', false)
+                  })
+                Span($r('app.string.statement_1'))
+              }
+            }.width('90%')
           }.width('100%')
           .justifyContent(FlexAlign.Start)
         }.width('100%')
@@ -613,7 +745,7 @@ export struct FAQ {
           .alignItems(HorizontalAlign.Start)
         }.width('100%')
         // F&Q
-        ForEach(this.FAQlist, (item: FAQItemProp, index: number) => {
+        ForEach(this.FAQlist, (item: TCItemProp, index: number) => {
           ListItem() {
             Column({space: 3}) {
               Row({space: 3}) {
@@ -631,7 +763,7 @@ export struct FAQ {
             }.width('100%')
             .alignItems(HorizontalAlign.Start)
           }
-        }, (item: FAQItemProp) => getResourceString(item.title, this))
+        }, (item: TCItemProp) => getResourceString(item.title, this))
 
         ListItem() {
          Column() {
@@ -695,7 +827,7 @@ export struct FAQ {
 @Component
 export struct CheckUpdate {
 
-  @State updateList: CheckUpdateListItemProp[] = CheckUpdateList
+  @State updateList: CheckUpdateListItemProp[] = []
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
@@ -704,23 +836,8 @@ export struct CheckUpdate {
   //一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
 
-  // 隐式 Want 跳转网站
-  async implicitStartAbility(url: string) {
-    try {
-      let want: Want = {
-        // 如果希望仅在特定包中隐式查询，请取消下面的注释行
-        // bundleName: "com.example.myapplication",
-        "action": "ohos.want.action.viewData",
-        // entities可以省略
-        "entities": [ "entity.system.browsable" ],
-        "uri": url,
-      }
-      let context = getContext(this) as common.UIAbilityContext;
-      await context.startAbility(want)
-      console.info(`explicit start ability succeed`)
-    } catch (error) {
-      console.info(`explicit start ability failed with ${error.code}`)
-    }
+  aboutToAppear(): void {
+    this.updateList = getCheckUpdateList()
   }
 
   build() {
@@ -731,45 +848,39 @@ export struct CheckUpdate {
           Column() {
             ForEach(item.children, (itemChild: CheckUpdateListItemProp, i: number) => {
               Column() {
-                Row() {
+                Row({space: 12}) {
                   // 图标
                   if(itemChild.icons) {
                     SymbolGlyph(itemChild.icons)
                       .fontSize(24)
-                      .margin({left: 12, right: 12})
                       .fontColor([this.icon_emphasize])
                   }
                   // 标题
-                  Column() {
+                  Column({space: 2}) {
                     Text(itemChild.title)
                       .fontWeight(FontWeight.Medium)
                       .fontSize(16)
-
                     if(itemChild.subtitle && item.title != 'Version') {
                       Text(itemChild.subtitle)
                         .fontWeight(FontWeight.Normal)
                         .fontSize(14)
-                        .margin({top: 2})
                     }
                   }
                   .height(53)
                   .justifyContent(FlexAlign.Center)
                   .alignItems(HorizontalAlign.Start)
-                  .margin({ left: 12 })
                   Blank()
                   if(item.title === 'Version') {
                     Text(itemChild.subtitle)
                       .fontWeight(FontWeight.Normal)
                       .fontSize(14)
-                      .margin({ right: 12})
                   } else {
                     SymbolGlyph($r('sys.symbol.chevron_right'))
                       .fontSize(24)
-                      .margin({ right: 12})
                       .fontColor([this.icon_primary])
                   }
-                }
-                .width('100%')
+                }.width('100%')
+                .padding({left: 12, right: 12})
                 .justifyContent(FlexAlign.Start)
                 //分割线
                 if(!isEnd(item.children!.length,i))
@@ -781,16 +892,13 @@ export struct CheckUpdate {
                 if(index === 1) {
                   // 前往下载网页
                   hilog.info(0xFF00, "checkUpdateTest", "前往下载网页")
-                  // 网站的URL后期需要更换为动态变化
-                  // this.implicitStartAbility('https://xxxx')
-                  // 预览版暂不提供此功能
+                 implicitStartAbility('https://github.com/xfz347/hapapp/releases/tag/clashnext', context)
+                } else if(index === 2) {
+                  // 忽略本次更新
                   promptAction.showToast({
                     message: '开发中，敬请期待',
                     duration: 2000
                   })
-                } else if(index === 2) {
-                  // 忽略本次更新
-                  hilog.info(0xFF00, "checkUpdateTest", "忽略本次更新")
 
                 }
               })

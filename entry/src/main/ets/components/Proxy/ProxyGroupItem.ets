@@ -16,6 +16,7 @@ import { ProxyNode } from './ProxyNodeItem';
 import { customAnimationUtil } from '../../utils/Animation';
 import { customVibrator } from '../../utils/VibratorUtil';
 import ClashViewModel from '../../entryability/ClashViewModel';
+import { PopTips, PopupBuilder } from '../Start/Popup';
 
 
 //断点布局
@@ -132,6 +133,9 @@ struct ProxyGroupItem {
   @State private breakPointStateListLanes: BreakpointState<number> = BPS_LIST_LANES_2_2_3_4_4
   @Consume private breakPointStateListGutter: BreakpointState<number>
 
+  // 主界面index
+  @Consume IndexCurrentindex: number
+
   /* 本页布局相关参数 */
   // 定义ProxyGroupItemSelectedWide的值便于切换布局方式
   @Prop ProxyGroupItemSelected: ProxyCardSize
@@ -155,9 +159,11 @@ struct ProxyGroupItem {
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
- // @StorageProp("proxyGroups") theProxyGroups: ProxyGroup[] = []
-  //收藏显示判定
-@Consume showStart:boolean
+  // 收藏显示判定
+  @Consume showStart:boolean
+  // 代理页延迟按钮气泡提示
+  @Consume isShowDelayPop: boolean
+
   /**
    * XXX 当前手指触摸的ListItem的对应 `this.configList` 中的 `configId`
    *    List的长按菜单中的响应都是根据这个的对象中的属性来处理的，是个不稳定因素
@@ -362,6 +368,14 @@ struct ProxyGroupItem {
               transition: this.uiConfig.isAnimation ? TransitionEffect.prototype.animation({ tempo: 1.5 }) : undefined
             },
           })
+        .bindPopup((this.uiConfig.ShowProxyPop && this.proxyGroup === 0 && index === 0 && this.IndexCurrentindex === 1), {
+          builder: PopupBuilder(this, PopTips[2], () => {
+            this.uiConfig.ShowProxyPop = false
+            this.isShowDelayPop = true
+          }),
+          onWillDismiss: false,
+          autoCancel: false
+        })
       }, (item: ProxyItem,i: number) => item.name+ '-' + i.toString())
     }
     .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : this.breakPointStateListLanes.value,

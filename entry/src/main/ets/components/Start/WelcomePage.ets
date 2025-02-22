@@ -102,7 +102,7 @@ export struct Welcome {
              this.isShowWelcome = false
            })
        }.width('90%')
-       .margin({ top: 12 })
+       .margin({ top: 12, bottom: 5 })
      }.width('100%')
      .justifyContent(FlexAlign.Center)
      .alignItems(HorizontalAlign.Center)

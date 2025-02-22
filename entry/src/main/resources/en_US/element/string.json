@@ -518,7 +518,7 @@
     },
     {
       "name": "query_ip_region_Subtitle",
-      "value": "Using ip-api to query the location of IP addresses"
+      "value": "Use third-party APIs to query the location of IP addresses"
     },
     {
       "name": "Diversion_Strategy",
@@ -1666,7 +1666,11 @@
     },
     {
       "name": "statement",
-      "value": "ClashNext is a free software and we do not provide any additional services for it. Some networking services use third-party free API interfaces, so there is an access limit. If access exceptions occur, it is normal. For more third-party services, please go to the third-party library and services to check."
+      "value": "ClashNext is a free software and we do not provide any additional services for it. Some networking services use third-party free API interfaces, so there is an access limit. If access exceptions occur, it is normal. For more third-party services, please go to the  "
+    },
+    {
+      "name": "statement_1",
+      "value": "to check."
     },
     {
       "name": "third_party_services",
@@ -1727,6 +1731,50 @@
     {
       "name": "game_a",
       "value": "Due to imperfect Clash rules and background issues, it is recommended to turn off Clash’s VPN function before playing games"
+    },
+    {
+      "name": "project",
+      "value": "Project"
+    },
+    {
+      "name": "know",
+      "value": "I know"
+    },
+    {
+      "name": "tips",
+      "value": "Tips"
+    },
+    {
+      "name": "start_pop",
+      "value": "You can only start after importing the configuration and loading it successfully"
+    },
+    {
+      "name": "config_pop",
+      "value": "You can press and hold the configuration for more operations~"
+    },
+    {
+      "name": "proxy_pop",
+      "value": "You can long press the proxy node to save and perform more operations~"
+    },
+    {
+      "name": "proxy_delay_pop",
+      "value": "This button can test the latency of all agents with just one click~"
+    },
+    {
+      "name": "home_start_button",
+      "value": "Home Start Button"
+    },
+    {
+      "name": "config_list_items",
+      "value": "Configure list items"
+    },
+    {
+      "name": "proxy_node_list_item",
+      "value": "Proxy node list item"
+    },
+    {
+      "name": "delay_test_button",
+      "value": "Delay Test Button"
     }
   ]
 }

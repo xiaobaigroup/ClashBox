@@ -24,6 +24,7 @@ import { indexController } from './Index'
 import { customAnimationUtil } from '../utils/Animation'
 import { Nothing, RightDownButton } from '../components/Common'
 import { StylesEdit } from '../components/Proxy/StylesEdit'
+import { PopTips, PopupBuilder } from '../components/Start/Popup'
 
 
 @Entry
@@ -92,7 +93,7 @@ struct ProxyPage {
   private breakPointStateTabContentTitleMargin: BreakpointState<number>
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone') isLandscapePhone: boolean = false
-  @StorageProp('istabletLandscape') istabletLandscape: boolean = false
+  @StorageProp('isLandscapeStatus') isLandscapeStatus: boolean = false
   // 按钮宽度
   private proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
   // 按钮高度
@@ -112,9 +113,12 @@ struct ProxyPage {
   // 收藏显示判定
   @Provide showStart: boolean = false
   @State loading: boolean = false
+  // 代理页延迟按钮气泡提示
+  @Consume isShowDelayPop: boolean
 
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
+    this.isShowDelayPop = this.uiConfig.ShowDelayPop
     BreakpointSystem.getInstance().start()
     if (this.currentProfile) {
       let tabIndex = this.theProxyGroups.findIndex((d) => d.name == this.currentProfile?.currentGroupName)
@@ -134,6 +138,7 @@ struct ProxyPage {
     EventHub.off(EventKey.FetchProxyGroup)
    // EventHub.off(EventKey.ProxySort)
     EventHub.off(EventKey.TestDelay)
+    this.uiConfig.ShowDelayPop = this.isShowDelayPop
   }
 
   changeProxy(group: string, item: ProxyItem) {
@@ -156,8 +161,6 @@ struct ProxyPage {
     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
     .onClick(() => {
       onCheck()
-      this.isShowProxyBindSheet = true
-      this.isEnableIndexForegroundBlur = true
     })
     .transition(customAnimationUtil.isSlide(100, this.uiConfig))
   }
@@ -242,9 +245,17 @@ struct ProxyPage {
            this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_all_tip') })
          })*/
         // 提供者按钮
-        this.ButtonBuilder($r('sys.symbol.puzzle'), () => { this.isStylesEdit = false })
+        this.ButtonBuilder($r('sys.symbol.puzzle'), () => {
+          this.isStylesEdit = false
+          this.isShowProxyBindSheet = true
+          this.isEnableIndexForegroundBlur = true
+        })
         // 编辑图标
-        this.ButtonBuilder($r('sys.symbol.square_and_pencil'), () => { this.isStylesEdit = true })
+        this.ButtonBuilder($r('sys.symbol.square_and_pencil'), () => {
+          this.isStylesEdit = true
+          this.isShowProxyBindSheet = true
+          this.isEnableIndexForegroundBlur = true
+        })
       }
       .zIndex(1)
       .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
@@ -294,7 +305,7 @@ struct ProxyPage {
                       })
                         .width('100%')
                         .height('100%')
-                        .padding({bottom:CONTENT_END_OFFSET_150-50})
+                        .padding({bottom:CONTENT_END_OFFSET_150 - 50})
                         .onAppear(() => {
                           hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear %{public}s", group.proxies.toString())
                         })
@@ -310,7 +321,9 @@ struct ProxyPage {
                   .onGestureSwipe((index: number, extraInfo: SwiperAnimationEvent) => {
                     hilog.info(0xFF00, "ProxyPagePanTag", "currentOffset: %{private}d", extraInfo.currentOffset)
                     animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
-                      if (!this.isLandscapePhone) {
+                      // 当设备横屏，即主tab栏竖排时不触发切换
+                      // hilog.info(0xFF00, "ProxyLandscapeTag", "设备横屏状态: %{public}s", this.isLandscapeStatus)
+                      if (!this.isLandscapeStatus) {
                         if (this.currentIndex === 0 && extraInfo.currentOffset > 79) {
                           indexController.changeIndex(0)
                         } else if (this.currentIndex === this.theProxyGroups.length - 1 && extraInfo.currentOffset < -79) {
@@ -379,6 +392,13 @@ struct ProxyPage {
             .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
             .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
             .margin({bottom:this.isLandscapePhone ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
+            .bindPopup(!!this.isShowDelayPop, {
+              builder: PopupBuilder(this, PopTips[3], () => {
+                this.isShowDelayPop = false
+              }),
+              onWillDismiss: false,
+              autoCancel: false
+            })
             .onClick(async () => {
               if(this.loading){
                 return
