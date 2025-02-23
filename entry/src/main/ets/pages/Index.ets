@@ -118,8 +118,6 @@ struct Index {
   @State istabletLandscape: boolean = false
   // 折叠展开状态判断变量
   @State isFoldStatus: boolean = false
-  // 设备横竖屏状态判断变量
-  @State isLandscapeStatus: boolean = false
   // 读取导航条区域的高度
   @StorageProp('bottomRectHeight') bottomRectHeight: number = 0;
   @StorageProp('topRectHeight') topRectHeight: number = 0;
@@ -142,7 +140,8 @@ struct Index {
     lg: BarPosition.End,
     xl: BarPosition.Start
   });
-  @State compVertical: BreakpointState<boolean> = BreakpointState.of({
+  @Provide
+  compVertical: BreakpointState<boolean> = BreakpointState.of({
     sm: false,
     md: false,
     lg: false,
@@ -281,6 +280,7 @@ struct Index {
   @Provide thePauseTime: number = 0
   // 恢复时刻
   @Provide theRestoreTime: number = 0
+
   /*
   代理页Provide相关数据
    */
@@ -357,9 +357,9 @@ struct Index {
   // 折叠屏展开判断
   foldPhoneOpenListener: mediaquery.MediaQueryListener =
     this.getUIContext().getMediaQuery().matchMediaSync('(640vp< height <= 1000vp) and (640vp< width <= 1000vp)');
-  // 当设备横屏时条件成立
-  landscapelistener: mediaquery.MediaQueryListener =
-    this.getUIContext().getMediaQuery().matchMediaSync('(orientation: landscape)')
+  // // 当设备横屏时条件成立
+  // landscapelistener: mediaquery.MediaQueryListener =
+  //   this.getUIContext().getMediaQuery().matchMediaSync('(orientation: landscape)')
 
   @Builder
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
@@ -534,12 +534,7 @@ struct Index {
           `#媒体查询#设备高度改变#(1000vp< width)平板横屏结果: ${this.istabletLandscape}`)
       })
     }
-    this.landscapelistener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
-      this.isLandscapeStatus = mediaQueryResult.matches
-      AppStorage.setOrCreate<boolean>('isLandscapeStatus', this.isLandscapeStatus)
-      hilog.info(0xFF00, componentName,
-        `#媒体查询#设备方向改变，设备横屏结果: ${this.isLandscapeStatus}`)
-    });
+
 
     BreakpointSystem.getInstance().attach(this.compStr)
     BreakpointSystem.getInstance().attach(this.compDirection)
@@ -664,7 +659,6 @@ struct Index {
     this.deviceHeightListener.off('change');
     this.tabletHeightListener.off('change')
     this.foldPhoneOpenListener.off('change')
-    this.landscapelistener.off('change')
   }
 
 

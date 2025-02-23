@@ -65,13 +65,14 @@ export struct ProxyNode {
 
 
   build() {
-    if (this.itemSize === ProxyCardSize.Large){
+    if (this.itemSize === ProxyCardSize.Large) {
       Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween}) {
-        Column({space:3}) {
+        Column({space: 3}) {
           Text(`${this.item.name}`).ItemTextStyle()
           Text(`${this.item.type}`).ItemTypeStyle()
-        }.alignItems(HorizontalAlign.Start)
-        Row({space:10}){
+        }.layoutWeight(1)
+        .alignItems(HorizontalAlign.Start)
+        Row({space: 10}) {
           Text(delayText(this.delay))
             .fontColor(ProxyData.getColorForLatency(this.delay))
             .fontSize(12)
@@ -79,7 +80,6 @@ export struct ProxyNode {
             .textAlign(TextAlign.End)
           // group 不要写死, 会和其他tab页的生效，在一个组里唯一
           // 使用.enabled(!this.disabled) 来禁用radio不让选
-          //Radio({ value: 'ProxyRadio' + index, group: 'ProxyGroup' }).enabled(!this.disabled)
           Radio({ value: this.item.name, group: this.item.g + this.item.name}).enabled(!this.disabled)
             .checked(this.item.name === this.selected)
             .radioStyle({
@@ -88,18 +88,25 @@ export struct ProxyNode {
             .hitTestBehavior(HitTestMode.None)
         }
       }.width('100%')
-      .padding({left:14,right:16})
+      .padding({left: 14, right: 16})
     } else if (this.itemSize === ProxyCardSize.Mini){
       Row() {
-        Column({space:3}) {
+        Column({space: 3}) {
           Text(`${this.item.name}`).ItemTextStyle()
-          Row({space:3}) {
-            Text(`${this.item.type}`).ItemTypeStyle().maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis})
+          Row({space: 3}) {
+            Text(`${this.item.type}`)
+              .maxLines(1)
+              .ItemTypeStyle()
+              .constraintSize({maxWidth: '55%'})
+              .textOverflow({ overflow: TextOverflow.Clip})
             Text(delayText(this.delay))
               .fontColor(ProxyData.getColorForLatency(this.delay))
+              .textOverflow({ overflow: TextOverflow.Ellipsis})
+              .layoutWeight(1)
               .fontSize(12)
               .maxLines(1)
-          }.justifyContent(FlexAlign.Start).layoutWeight(1)
+          }.width('70%')
+          .justifyContent(FlexAlign.Start)
         }.layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
         Radio({ value: this.item.name, group: this.item.g + this.item.name }).enabled(!this.disabled)
@@ -110,9 +117,9 @@ export struct ProxyNode {
           .hitTestBehavior(HitTestMode.None)
       }
       .ListRowStyle()
-    }else{
+    } else {
       Row() {
-        Column({space:5}) {
+        Column({space: 5}) {
           Text(`${this.item.name}`).ItemTextStyle().maxLines(2)
           Column() {
             Text(`${this.item.type}`).ItemTypeStyle().textOverflow({ overflow: TextOverflow.Ellipsis})
@@ -120,11 +127,13 @@ export struct ProxyNode {
               .fontColor(ProxyData.getColorForLatency(this.delay))
               .fontSize(12)
               .maxLines(1)
-              .width('80%')
-          }.alignItems(HorizontalAlign.Start).layoutWeight(1)
-        }.alignItems(HorizontalAlign.Start).justifyContent(FlexAlign.SpaceBetween).height('100%')
-        .padding({top:10,bottom:10})
+          }
+          .alignItems(HorizontalAlign.Start)
+        }
         .layoutWeight(1)
+        .padding({top: 10,bottom: 10})
+        .alignItems(HorizontalAlign.Start)
+        .justifyContent(FlexAlign.SpaceBetween)
         Radio({ value: this.item.name, group: this.item.g + this.item.name }).enabled(!this.disabled)
           .checked(this.item.name === this.selected)
           .radioStyle({
