@@ -20,9 +20,9 @@ import { removeItemsByIndex } from "../../utils/RemoveItemsUtils"
 @Entry
 @Component
 struct Settings {
-
-  @State settingsList: settingsData[] = SettingsListItem()
+  @Consume isDisclaimer: boolean
   @Consume currentLanguage: ResourceStr
+  @State settingsList: settingsData[] = SettingsListItem()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 当前设备`height`是否符合(320vp< height <= 500vp)
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
@@ -40,7 +40,8 @@ struct Settings {
     builder: DisclaimerCustomDialog({
       confirm: () => {
         this.onAccept()
-      }
+      },
+      isDisclaimer: this.isDisclaimer
     }),
     autoCancel: false,
     onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
@@ -103,6 +104,7 @@ struct Settings {
     if(index === (this.uiConfig.isShowExperimentalFunction ? 7 : 6)) {
       // 免责声明弹窗
       if (this.dialogController != null) {
+        this.isDisclaimer = true
         this.dialogController.open()
       }
     } else if(index == (this.uiConfig.isShowExperimentalFunction ? 6 : 5)) {

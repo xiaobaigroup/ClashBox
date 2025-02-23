@@ -914,12 +914,19 @@ export struct CheckUpdate {
                 } else if(index === 3) {
                   // 忽略本次更新
                   promptAction.showToast({
-                    message: '开发中，敬请期待',
+                    message: $r('app.string.developing'),
                     duration: 2000
                   })
                 } else if(index === 2) {
                   // 前往下载
-                  implicitStartAbility(this.theAppVersionInfo.browser_download_url, context)
+                  if (this.theAppVersionInfo.browser_download_url === '') {
+                    promptAction.showToast({
+                      message: $r('app.string.no_link'),
+                      duration: 2000
+                    })
+                  } else {
+                    implicitStartAbility(this.theAppVersionInfo.browser_download_url, context)
+                  }
 
                 }
               })

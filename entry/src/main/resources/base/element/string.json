@@ -1795,6 +1795,10 @@
     {
       "name": "to_update",
       "value": "前往更新"
+    },
+    {
+      "name": "no_link",
+      "value": "暂无下载地址"
     }
   ]
 }

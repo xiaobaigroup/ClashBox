@@ -6,6 +6,7 @@ import { DisclaimerCustomDialog } from '../Common'
 
 @Component
 export struct Welcome {
+  @Consume isDisclaimer: boolean
   @Consume isShowWelcome: boolean
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
@@ -24,7 +25,8 @@ export struct Welcome {
       confirm: () => {
         // 同意
         this.isShowWelcome = true
-      }
+      },
+      isDisclaimer: this.isDisclaimer
     }),
     autoCancel: false,
     onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
@@ -36,6 +38,7 @@ export struct Welcome {
         dismissDialogAction.dismiss()
       }
     }
+
   })
 
   build() {
@@ -76,6 +79,7 @@ export struct Welcome {
          Text($r('app.string.Disclaimer'))
            .fontColor(this.icon_emphasize)
            .onClick(() => {
+             this.isDisclaimer = true
              this.dialogController.open()
            })
        }

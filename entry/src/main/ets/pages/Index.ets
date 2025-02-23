@@ -173,7 +173,7 @@ struct Index {
     xl: 16
   });
   // 是否为免责弹窗
-  @State isDisclaimer: boolean = false
+  @Provide isDisclaimer: boolean = false
   // 欢迎页半模态窗口
   @Provide isShowWelcome: boolean = false
   // 代理页延迟按钮气泡提示
@@ -183,7 +183,7 @@ struct Index {
   // 更多页一级页面顶部标题偏移量
   @Provide curYOffsetMore: number = 0
   // 应用更新信息
-  @Provide theAppVersionInfo: UpdateInfo = {tag_name: AppState.versionName, name: '1.3.5', published_at: '2024-01-28T15:13:58Z', browser_download_url: ''}
+  @Provide theAppVersionInfo: UpdateInfo = {tag_name: AppState.versionName, name: '1.2.3', published_at: '2024-01-28T15:13:58Z', browser_download_url: ''}
   // 主页卡片内边距
   @Provide('breakPointStateHomeCardPadding')
   private breakPointStateHomeCardPadding: BreakpointState<MarginGenerate> = HomeCardPadding_14_15_16_17
