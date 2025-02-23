@@ -246,7 +246,6 @@ export struct ConfigList {
         .width('100%')
         .height('100%')
         .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
-        //.margin({ top: 10 })
         .borderRadius(18)
         .alignListItem(ListItemAlign.Center)
         .contentEndOffset(CONTENT_END_OFFSET_150 - 40)

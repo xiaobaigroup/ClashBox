@@ -938,7 +938,7 @@
     },
     {
       "name": "go_download_update",
-      "value": "Go to download update (Github)"
+      "value": "Go to download update"
     },
     {
       "name": "ignore_update",
@@ -1775,6 +1775,26 @@
     {
       "name": "delay_test_button",
       "value": "Delay Test Button"
+    },
+    {
+      "name": "download_url",
+      "value": "Download Link"
+    },
+    {
+      "name": "query_success",
+      "value": "Query was successful"
+    },
+    {
+      "name": "new_version",
+      "value": "New version found"
+    },
+    {
+      "name": "new_version_content",
+      "value": "New version found, do you want to update"
+    },
+    {
+      "name": "to_update",
+      "value": "Go to update"
     }
   ]
 }

@@ -13,6 +13,10 @@ import { customAnimationUtil, isON } from "../utils/Animation"
 import { getResourceString } from "../utils/ResourceStringUtil"
 import { KeyValueData } from "./More/Overwrite/EditArrayConfig"
 import { Provider } from "proxy_core"
+import { common } from "@kit.AbilityKit"
+
+const context = getContext(this) as common.UIAbilityContext
+
 /* 通用属性 START */
 @Styles
 function outerLayerContainerCommonStyles(){
@@ -328,7 +332,7 @@ export struct CustomDownloadingDialog {
 /* 下载中`CustomDialog`小型弹框 END */
 
 /**
- * 免责声明弹窗
+ * 免责声明 & 检查更新 弹窗
  */
 @CustomDialog
 @Component
@@ -338,6 +342,9 @@ export struct DisclaimerCustomDialog {
   //一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  // 是否为免责声明弹窗
+  @State isDisclaimer: boolean = false
+  @State version: string = ''
   confirm: () => void = () => {}
   cancel: () => void = () => {}
   controller: CustomDialogController
@@ -350,15 +357,15 @@ export struct DisclaimerCustomDialog {
 
   build() {
     Column() {
-      Text($r('app.string.Disclaimer'))
+      Text(this.isDisclaimer ? $r('app.string.Disclaimer') : `${getResourceString($r('app.string.new_version'), context)} ${this.version}`)
         .fontSize(20)
         .margin({ top: 15, bottom: 15 })
-      Text($r('app.string.Disclaimer_Content'))
+      Text(this.isDisclaimer ? $r('app.string.Disclaimer_Content') : $r('app.string.new_version_content'))
         .textAlign(TextAlign.Center)
         .fontSize(FONT_SIZE_16)
       Flex({direction: FlexDirection.Row}) {
-        if (this.uiConfig.isFirstStart) {
-          Button($r('app.string.refuse'))
+        if (this.uiConfig.isFirstStart || !this.isDisclaimer) {
+          Button(this.isDisclaimer ? $r('app.string.refuse') : $r('app.string.Cancel'))
             .margin({ top: 15 })
             .width('100%')
             .backgroundColor($r('app.color.container_background'))
@@ -370,7 +377,7 @@ export struct DisclaimerCustomDialog {
             })
             .fontColor(Color.Red)
         }
-        Button(this.uiConfig.isFirstStart ? $r('app.string.agree') : $r('app.string.Confirm'))
+        Button(this.isDisclaimer ? (this.uiConfig.isFirstStart ? $r('app.string.agree') : $r('app.string.Confirm')) : $r('app.string.to_update'))
           .margin({ top: 15 })
           .width('100%')
           .backgroundColor(this.icon_emphasize)
@@ -744,6 +751,7 @@ export struct skipRowList {
         if(this.subtitle) {
           Text(this.subtitle)
             .fontWeight(FontWeight.Normal)
+            .fontColor($r('sys.color.font_secondary'))
             .textOverflow({ overflow: TextOverflow.Ellipsis })
             .maxLines(1)
             .margin({top: 2})
@@ -821,6 +829,7 @@ export struct toggleRowList {
         if(this.subtitle) {
           Text(this.subtitle)
             .fontWeight(FontWeight.Normal)
+            .fontColor($r('sys.color.font_secondary'))
             .textOverflow({ overflow: TextOverflow.Ellipsis })
             .maxLines(1)
             .margin({top: 2})

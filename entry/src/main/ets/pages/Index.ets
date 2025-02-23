@@ -50,7 +50,7 @@ import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } f
 import { ClashConfig, Dns, LogLevel, Profile, ProxyGroup, ProxyMode, ProxySort, SubscriptionInfo } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
-import { AppConfig, ClashCore, UIConfig } from '../entryability/AppState'
+import { AppConfig, AppState, ClashCore, UIConfig } from '../entryability/AppState'
 import { changeThemeColor } from '../utils/ChangeThemeColorUtil'
 import { common } from '@kit.AbilityKit'
 import { setAutoColorMode, setDarkColorMode, setLightColorMode } from '../utils/ChangeColorModeUtils'
@@ -64,9 +64,11 @@ import { PipManager } from '../common/PipManager'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { Welcome } from '../components/Start/WelcomePage'
 import { CrashPage } from '../components/Start/CrashPage'
+import { compareVersions, extractUpdateInfo, getUpdateInfo, UpdateInfo } from '../utils/CheckUpdateUtil'
+import { implicitStartAbility } from '../components/Settings/About'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
-
+const context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
 export const indexController: TabsController = new TabsController()
 //
 interface marginGenerate {
@@ -170,7 +172,8 @@ struct Index {
     lg: 16,
     xl: 16
   });
-
+  // 是否为免责弹窗
+  @State isDisclaimer: boolean = false
   // 欢迎页半模态窗口
   @Provide isShowWelcome: boolean = false
   // 代理页延迟按钮气泡提示
@@ -179,6 +182,8 @@ struct Index {
   @Provide curYOffset: number = 0
   // 更多页一级页面顶部标题偏移量
   @Provide curYOffsetMore: number = 0
+  // 应用更新信息
+  @Provide theAppVersionInfo: UpdateInfo = {tag_name: AppState.versionName, name: '1.3.5', published_at: '2024-01-28T15:13:58Z', browser_download_url: ''}
   // 主页卡片内边距
   @Provide('breakPointStateHomeCardPadding')
   private breakPointStateHomeCardPadding: BreakpointState<MarginGenerate> = HomeCardPadding_14_15_16_17
@@ -307,7 +312,6 @@ struct Index {
       sourceType: ConfigDataSourceType.URL,
     },
   ]
-  private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
   // 所有子组件在容器内的对齐方式
   @Provide('stackAlignContentAlignment') stackAlignContentAlignment: Alignment = Alignment.BottomEnd
   @StorageLink('favoriteProfiles') favoriteProfiles: Map<string, string> = new Map<string, string>([])
@@ -426,17 +430,27 @@ struct Index {
     this.icon_emphasize = theme.colors.iconEmphasize;
   }
 
-  // 免责声明弹窗控制器
+  // 免责声明 & 检查更新 弹窗控制器
   dialogController: CustomDialogController = new CustomDialogController({
     builder: DisclaimerCustomDialog({
       confirm: () => {
         // 关闭背景模糊
         this.isEnableIndexForegroundBlur = false
+        if (!this.isDisclaimer) {
+          implicitStartAbility(this.theAppVersionInfo.browser_download_url, context)
+        }
       },
       cancel: () => {
-        // 拒绝并退出
-        this.context.terminateSelf()
-      }
+        if (this.isDisclaimer) {
+          // 拒绝并退出
+          context.terminateSelf()
+        } else {
+          // 关闭背景模糊
+          this.isEnableIndexForegroundBlur = false
+        }
+      },
+      isDisclaimer: this.isDisclaimer,
+      version: this.isDisclaimer ? '' : this.theAppVersionInfo.tag_name
     }),
     autoCancel: false,
     onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
@@ -446,6 +460,9 @@ struct Index {
 
       } else {
         dismissDialogAction.dismiss()
+        setTimeout(() => {
+          this.isDisclaimer = false
+        }, 20)
       }
     }
   })
@@ -467,6 +484,7 @@ struct Index {
     let nowDate = new Date().getTime()
     // 检查是否要弹出免责声明
     if (nowDate - this.uiConfig.useTime >= 1296000000) {
+      this.isDisclaimer = true
       // 大于等于15天打开弹窗
       this.dialogController.open()
     }
@@ -598,6 +616,29 @@ struct Index {
     EventHub.on(EventKey.ExportLog, () => {
       // TODO 导出日志
     })
+
+    if (this.uiConfig.autoCheckUpdate) {
+      // 检查版本更新
+      try {
+        const updateInfo = await getUpdateInfo()
+        hilog.info(0xFF00, "UpdatetestTag", "Update Info: %{public}s", JSON.stringify(updateInfo))
+        const theLatest = extractUpdateInfo(updateInfo)
+        if (theLatest) {
+          // 查询完成
+          if (compareVersions(theLatest.tag_name, AppState.versionName)) {
+            this.theAppVersionInfo = theLatest
+            this.isDisclaimer = false
+            this.dialogController.open()
+          }
+        } else {
+          hilog.info(0xFF00, "UpdatetestTag", "提取更新信息失败")
+        }
+      } catch (err) {
+        // 处理错误情况
+        const infoError = `Error:${JSON.stringify(err)}`
+        hilog.info(0xFF00, "UpdatetestTag", "Info: %{public}s", infoError)
+      }
+    }
   }
 
   // 代理页分组数据（懒加载）
@@ -681,15 +722,15 @@ struct Index {
     switch (index) {
       case 0:
         // 跟随系统
-        setAutoColorMode(this.context)
+        setAutoColorMode(context)
         break;
       case 1:
         // 始终浅色
-        setLightColorMode(this.context)
+        setLightColorMode(context)
         break
       case 2:
         // 始终深色
-        setDarkColorMode(this.context)
+        setDarkColorMode(context)
         break
     }
   }

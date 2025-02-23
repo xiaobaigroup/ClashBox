@@ -6,6 +6,7 @@ import { resourcesBlankData, theResouresData } from "../components/More/Resource
 import ClashViewModel from "./ClashViewModel";
 import { bundleManager } from "@kit.AbilityKit";
 import { EventHub, EventKey } from "../common/EventHub";
+import { UpdateInfo } from "../utils/CheckUpdateUtil";
 
 export enum ProxyGroupType{
   Tabs,
@@ -129,6 +130,8 @@ export class UIConfig{
   ShowProxyPop: boolean = true
   // 延迟统一测速提示气泡
   ShowDelayPop: boolean = false
+  // 自动检查更新
+  autoCheckUpdate: boolean = false
   resourcesData: string = JSON.stringify(theResouresData)
   resourcesHideData: string = JSON.stringify(resourcesBlankData)
   constructor() {

@@ -73,8 +73,6 @@ struct Settings {
       } else {
         // 通过dismiss主动关闭对话框
         dismissDialogAction.dismiss()
-        // 关闭背景模糊
-        this.isEnableIndexForegroundBlur = false
       }
     }
   })

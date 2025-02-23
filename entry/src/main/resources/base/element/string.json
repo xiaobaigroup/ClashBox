@@ -938,7 +938,7 @@
     },
     {
       "name": "go_download_update",
-      "value": "前往下载更新(Github)"
+      "value": "前往下载更新"
     },
     {
       "name": "ignore_update",
@@ -1775,6 +1775,26 @@
     {
       "name": "delay_test_button",
       "value": "延迟测试按钮"
+    },
+    {
+      "name": "download_url",
+      "value": "下载地址"
+    },
+    {
+      "name": "query_success",
+      "value": "查询成功"
+    },
+    {
+      "name": "new_version",
+      "value": "发现新版本"
+    },
+    {
+      "name": "new_version_content",
+      "value": "发现新版本，是否前往更新"
+    },
+    {
+      "name": "to_update",
+      "value": "前往更新"
     }
   ]
 }

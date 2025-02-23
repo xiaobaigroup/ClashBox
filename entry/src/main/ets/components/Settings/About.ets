@@ -23,6 +23,7 @@ import { removeItemsByIndex } from "../../utils/RemoveItemsUtils"
 import { customVibrator } from "../../utils/VibratorUtil"
 import { customSound } from "../../utils/SoundPoolUtil"
 import { getResourceString } from "../../utils/ResourceStringUtil"
+import { extractUpdateInfo, getUpdateInfo, UpdateInfo } from "../../utils/CheckUpdateUtil"
 
 const context = getContext(this) as common.UIAbilityContext
 
@@ -49,6 +50,7 @@ struct About {
   @State clickCount: number = 0
   // 实验功能开关列表行数据
   @Consume ExperimentData: AboutListItemProp
+  @Consume theAppVersionInfo: UpdateInfo
 
   onClickCount() {
     //振动触发
@@ -72,25 +74,6 @@ struct About {
       } else if (this.clickCount === 3) {
         promptAction.showToast({message: '什么东西闪过去了' /*$r('app.string.click_prompt')*/, duration: 1000 })
       }
-    }
-  }
-
-  // 隐式 Want 跳转网站
-  async implicitStartAbility(url: string) {
-    try {
-      let want: Want = {
-        // 如果希望仅在特定包中隐式查询，请取消下面的注释行
-        // bundleName: "com.example.myapplication",
-        "action": "ohos.want.action.viewData",
-        // entities可以省略
-        "entities": [ "entity.system.browsable" ],
-        "uri": url,
-      }
-      let context = getContext(this) as common.UIAbilityContext;
-      await context.startAbility(want)
-      console.info(`explicit start ability succeed`)
-    } catch (error) {
-      console.info(`explicit start ability failed with ${error.code}`)
     }
   }
 
@@ -122,7 +105,7 @@ struct About {
       case 'Repositories':
         // 跳转仓库
         hilog.info(0xFF00, "AboutestTag", "仓库")
-        this.implicitStartAbility('https://github.com/xxx%%')
+        implicitStartAbility('https://github.com/xxx%%', context)
 
       break
       default :
@@ -132,11 +115,11 @@ struct About {
 
   // 列表行开关事件处理
   handleToggle(isOn: boolean, name: string) {
-    // 持久化实验功能开关状态
-    this.uiConfig.isShowExperimentalFunction = isOn
     switch (name) {
       case 'ExperimentalFunction':
         // 实验功能开关
+        // 持久化实验功能开关状态
+        this.uiConfig.isShowExperimentalFunction = isOn
         hilog.info(0xFF00, "AboutestTag", "实验功能")
         if(isOn) {
           this.isShowExperimentalFunction = true
@@ -149,9 +132,9 @@ struct About {
         }
         break
       case 'Auto':
-        // 自动检查更新
-        hilog.info(0xFF00, "AboutestTag", "自动检查更新")
-
+      // 自动检查更新
+      hilog.info(0xFF00, "AboutestTag", "自动检查更新")
+      this.uiConfig.autoCheckUpdate = isOn
     }
   }
 
@@ -218,6 +201,15 @@ struct About {
       this.aboutList.splice(0, 1, showItem)
     }
   }
+  // 刷新自动检查更新启用开关状态
+  refreshShowAutoUpdate(isOn: boolean) {
+    const showItem = this.aboutList[4]
+    if (showItem && showItem.children) {
+      showItem.children[2].isOn = isOn
+      // 使用splice来更新父组件数组
+      this.aboutList.splice(4, 1, showItem)
+    }
+  }
 
   // 更新渠道菜单
   @Builder
@@ -247,6 +239,8 @@ struct About {
     this.refreshShowExperimentalFunction(this.uiConfig.isShowExperimentalFunction)
     // 加载时初始化内核版本显示
     this.refreshShowKernelVersion(this.appConfig.clashCore)
+    // 加载时初始化自动检查更新开关状态
+    this.refreshShowAutoUpdate(this.uiConfig.autoCheckUpdate)
     hilog.info(0xFF00, "AboutClickTag", "高级功能: %{public}s", this.uiConfig.enabledADvanced)
     if (this.uiConfig.enabledADvanced === false && this.aboutList.length === 7) {
       this.aboutList = removeItemsByIndex(this.aboutList, [1])
@@ -377,23 +371,23 @@ struct About {
                   .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                   .onClick(() => {
                    if(itemChild.sign === 1) {
+                     // 点击提示 防误触
+                     promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
                       if (itemChild.name === 'ExperimentalFunction') {
-                        // 点击提示 防误触
-                        promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
-                      } else {
-                        // 改变自动检查更新开关状态 显式动画
-                        this.getUIContext()?.animateTo({
-                          duration: this.uiConfig.animationSpeed,
-                          curve: Curve.Ease
-                        }, () => {
-                          const childItem = this.aboutList[4]
-                          if (childItem && childItem.children) {
-                            childItem.children[2].isOn = !childItem.children[2].isOn
-                            // 使用splice来更新父组件数组
-                            this.aboutList.splice(4, 1, childItem)
-                          }
-                        })
 
+                      // } else {
+                      //   // 改变自动检查更新开关状态 显式动画
+                      //   this.getUIContext()?.animateTo({
+                      //     duration: this.uiConfig.animationSpeed,
+                      //     curve: Curve.Ease
+                      //   }, () => {
+                      //     const childItem = this.aboutList[4]
+                      //     if (childItem && childItem.children) {
+                      //       childItem.children[2].isOn = !childItem.children[2].isOn
+                      //       // 使用splice来更新父组件数组
+                      //       this.aboutList.splice(4, 1, childItem)
+                      //     }
+                      //   })
                       }
 
                     } else if (itemChild.sign === 2) {
@@ -835,15 +829,39 @@ export struct CheckUpdate {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   //一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  @Consume theAppVersionInfo: UpdateInfo
 
-  aboutToAppear(): void {
-    this.updateList = getCheckUpdateList()
+  async aboutToAppear(): Promise<void> {
+    if (!this.uiConfig.autoCheckUpdate) {
+      await this.checkUpdate()
+    }
+    this.updateList = getCheckUpdateList(this.theAppVersionInfo)
+  }
+
+  async checkUpdate() {
+    // 检查版本更新
+    try {
+      const updateInfo = await getUpdateInfo()
+      hilog.info(0xFF00, "UpdatetestTag", "Update Info: %{public}s", JSON.stringify(updateInfo))
+      const theLatest = extractUpdateInfo(updateInfo)
+      if (theLatest) {
+        promptAction.showToast({message: $r('app.string.query_success'), duration: 2000 })
+        // 查询完成
+        this.theAppVersionInfo = theLatest
+      } else {
+        hilog.info(0xFF00, "UpdatetestTag", "提取更新信息失败")
+      }
+    } catch (err) {
+      // 处理错误情况
+      const infoError = `Error:${JSON.stringify(err)}`
+      hilog.info(0xFF00, "UpdatetestTag", "Info: %{public}s", infoError)
+    }
   }
 
   build() {
     NavDestination() {
       TopBuilder({title: $r('app.string.Check_Updates')})
-      Column() {
+      Column({space: 10}) {
         ForEach(this.updateList, (item: CheckUpdateListItemProp, index: number) => {
           Column() {
             ForEach(item.children, (itemChild: CheckUpdateListItemProp, i: number) => {
@@ -865,8 +883,8 @@ export struct CheckUpdate {
                         .fontWeight(FontWeight.Normal)
                         .fontSize(14)
                     }
-                  }
-                  .height(53)
+                  }.layoutWeight(1)
+                  .constraintSize({minHeight: 49})
                   .justifyContent(FlexAlign.Center)
                   .alignItems(HorizontalAlign.Start)
                   Blank()
@@ -880,7 +898,7 @@ export struct CheckUpdate {
                       .fontColor([this.icon_primary])
                   }
                 }.width('100%')
-                .padding({left: 12, right: 12})
+                .padding({left: 12, right: 12, top: 5, bottom: 5})
                 .justifyContent(FlexAlign.Start)
                 //分割线
                 if(!isEnd(item.children!.length,i))
@@ -893,12 +911,15 @@ export struct CheckUpdate {
                   // 前往下载网页
                   hilog.info(0xFF00, "checkUpdateTest", "前往下载网页")
                  implicitStartAbility('https://github.com/xfz347/hapapp/releases/tag/clashnext', context)
-                } else if(index === 2) {
+                } else if(index === 3) {
                   // 忽略本次更新
                   promptAction.showToast({
                     message: '开发中，敬请期待',
                     duration: 2000
                   })
+                } else if(index === 2) {
+                  // 前往下载
+                  implicitStartAbility(this.theAppVersionInfo.browser_download_url, context)
 
                 }
               })
@@ -907,7 +928,6 @@ export struct CheckUpdate {
           .width('100%')
           .backgroundColor($r('app.color.container_background'))
           .borderRadius(BORDER_RADIUS_20)
-          .margin({bottom: 10 })
         })
         // 提示
         Text($r('app.string.check_update_tips'))
@@ -930,7 +950,7 @@ export struct CheckUpdate {
 /**
  * 隐式 Want 跳转网站
  */
-async function implicitStartAbility(url: string, context: common.UIAbilityContext) {
+export async function implicitStartAbility(url: string, context: common.UIAbilityContext) {
   try {
     let want: Want = {
       // 如果希望仅在特定包中隐式查询，请取消下面的注释行

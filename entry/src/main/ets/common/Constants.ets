@@ -4,6 +4,7 @@ import { AppConfig, AppState, copy } from "../entryability/AppState";
 import { CustomThemeName } from "./AppTheme";
 import { BreakpointState } from "./breakpointsystem";
 import { promptAction } from "@kit.ArkUI";
+import { UpdateInfo } from "../utils/CheckUpdateUtil";
 
 
 /* 基础 */
@@ -552,8 +553,8 @@ export function getAboutList(): AboutListItemProp[] {
       subtitle: '',
       name: '',
       children: [
-        { title: $r('app.string.Application_Version'), subtitle: `${AppState.versionName} Beta`,sign: 0, name: 'ApplicationVersion' },
-        { title: $r('app.string.Kernel_Version'), subtitle: AppState.coreVersion,sign: 0, name: 'KernelVersion' }
+        { title: $r('app.string.Application_Version'), subtitle: `${AppState.versionName} Beta`, sign: 0, name: 'ApplicationVersion' },
+        { title: $r('app.string.Kernel_Version'), subtitle: AppState.coreVersion, sign: 0, name: 'KernelVersion' }
       ]
     },
     {
@@ -689,6 +690,7 @@ export const FAQList: TCItemProp[] = [
  */
 export interface CheckUpdateListItemProp {
   icons?: Resource
+  url?: string
   title: string | Resource
   subtitle: string | Resource
   children?: Array<CheckUpdateListItemProp>
@@ -696,14 +698,14 @@ export interface CheckUpdateListItemProp {
 /**
  * 检查更新页列表
  */
-export function getCheckUpdateList(): CheckUpdateListItemProp[] {
+export function getCheckUpdateList(updateInfo: UpdateInfo): CheckUpdateListItemProp[] {
   return [
     {
       title: 'Version',
       subtitle: '',
       children: [
         { title: $r('app.string.current_version'), subtitle: `${AppState.versionName} Beta` },
-        { title: $r('app.string.latest_version'), subtitle: 'XXX' }
+        { title: $r('app.string.latest_version'), subtitle: `${updateInfo.tag_name} Beta` }
       ]
     },
     {
@@ -711,6 +713,13 @@ export function getCheckUpdateList(): CheckUpdateListItemProp[] {
       subtitle: '',
       children: [
         { icons: $r('sys.symbol.arrowshape_down_to_line_fill'), title: $r('app.string.go_download_update'), subtitle: $r('app.string.go_download_update_subtitle') },
+      ]
+    },
+    {
+      title: 'Url',
+      subtitle: '',
+      children: [
+        { icons: $r('sys.symbol.download_fill'), title: $r('app.string.download_url'), subtitle: updateInfo.browser_download_url },
       ]
     },
     {

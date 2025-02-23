@@ -12,7 +12,6 @@ function ItemTextStyle() {
   .fontWeight(FontWeight.Medium)
   .maxLines(1)
   .textOverflow({ overflow: TextOverflow.Ellipsis })
-  .width('80%')
 }
 //Item中type（节点类型）公用样式
 @Extend(Text)
@@ -23,7 +22,7 @@ function ItemTypeStyle() {
 @Extend(Row)
 function ListRowStyle() {
   .width('100%')
-  .padding({ left: 14, right:8})
+  .padding({ left: 14, right: 8, top: 5, bottom: 5})
   .alignItems(VerticalAlign.Center)
 }
 
@@ -95,17 +94,14 @@ export struct ProxyNode {
         Column({space:3}) {
           Text(`${this.item.name}`).ItemTextStyle()
           Row({space:3}) {
-            Text(`${this.item.type}`).ItemTypeStyle().maxLines(1).width('25%').textOverflow({ overflow: TextOverflow.Clip})
+            Text(`${this.item.type}`).ItemTypeStyle().maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis})
             Text(delayText(this.delay))
               .fontColor(ProxyData.getColorForLatency(this.delay))
               .fontSize(12)
               .maxLines(1)
-              .width('55%')
-          }.justifyContent(FlexAlign.Start)
-        }
+          }.justifyContent(FlexAlign.Start).layoutWeight(1)
+        }.layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
-
-        Blank()
         Radio({ value: this.item.name, group: this.item.g + this.item.name }).enabled(!this.disabled)
           .checked(this.item.name === this.selected)
           .radioStyle({
@@ -119,16 +115,16 @@ export struct ProxyNode {
         Column({space:5}) {
           Text(`${this.item.name}`).ItemTextStyle().maxLines(2)
           Column() {
-            Text(`${this.item.type}`).ItemTypeStyle()
+            Text(`${this.item.type}`).ItemTypeStyle().textOverflow({ overflow: TextOverflow.Ellipsis})
             Text(delayText(this.delay))
               .fontColor(ProxyData.getColorForLatency(this.delay))
               .fontSize(12)
               .maxLines(1)
               .width('80%')
-          }.alignItems(HorizontalAlign.Start)
+          }.alignItems(HorizontalAlign.Start).layoutWeight(1)
         }.alignItems(HorizontalAlign.Start).justifyContent(FlexAlign.SpaceBetween).height('100%')
         .padding({top:10,bottom:10})
-        Blank()
+        .layoutWeight(1)
         Radio({ value: this.item.name, group: this.item.g + this.item.name }).enabled(!this.disabled)
           .checked(this.item.name === this.selected)
           .radioStyle({

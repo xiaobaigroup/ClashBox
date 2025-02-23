@@ -10,7 +10,7 @@ import { hilog } from "@kit.PerformanceAnalysisKit";
 import { geoLocationManager } from "@kit.LocationKit";
 
 /**
- * 模拟下载长时任务
+ * 模拟定位长时任务
  */
 export class BackgroundDownService{
   client = http.createHttp()
