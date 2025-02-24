@@ -76,23 +76,19 @@ export struct StylesEdit {
               value: 'SortRadio1', group: 'SortRadioGroup',
               indicatorType: RadioIndicatorType.TICK
             })
-              .checked(this.appConfig.proxySort == n["v"] && i !== 2)
+              .checked(this.appConfig.proxySort == n["v"] )
               .hitTestBehavior(HitTestMode.None)
               .radioStyle({
                 checkedBackgroundColor: this.icon_emphasize,
               })
-          }.opacity(i === 2 ? 0.5 : 1)
+          }
           .EditRow()
           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .onClick(() => {
-           if (i !== 2) {
              EventHub.sendEvent(EventKey.ProxySort, n["v"])
              animateTo({ duration: this.uiConfig.animationSpeed }, () => {
                this.appConfig.proxySort = n["v"]
              })
-           } else {
-             promptAction.showToast({message: getResourceString($r('app.string.developing'), this)})
-           }
           })
 
           if (!isEnd(3, i))

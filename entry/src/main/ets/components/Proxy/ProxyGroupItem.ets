@@ -15,7 +15,7 @@ import { AppConfig, AppState, ClashCore, ProxyCardSize, ProxyGroupType, UIConfig
 import { ProxyNode } from './ProxyNodeItem';
 import { customAnimationUtil } from '../../utils/Animation';
 import { customVibrator } from '../../utils/VibratorUtil';
-import ClashViewModel from '../../entryability/ClashViewModel';
+import ClashViewModel, { DelayInfo } from '../../entryability/ClashViewModel';
 import { PopTips, PopupBuilder } from '../Start/Popup';
 
 
@@ -178,48 +178,43 @@ struct ProxyGroupItem {
   }
 
   async aboutToAppear(): Promise<void> {
-    // 清空数据
-    //this.proxyLazyItems.empty()
-    // 写入数据
-    //this.proxyLazyItems.pushData(this.proxyitems)
-  // this.proxyLazyItems.refresh()
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     BreakpointSystem.getInstance().attach(this.breakPointStateListLanes)
     BreakpointSystem.getInstance().start()
 
-    if (this.appConfig.proxySort==ProxySort.Default){
-      this.proxyLazyItems.DefaultSortItems(this.proxyitems)
-    }else if (this.appConfig.proxySort==ProxySort.Title){
-      this.proxyLazyItems.NameSortItems(this.proxyitems)
-    }else if (this.appConfig.proxySort==ProxySort.Delay){
-      this.proxyLazyItems.LatencySortItems(this.proxyitems)
-    }
+     if (this.appConfig.proxySort==ProxySort.Default){
+       this.proxyLazyItems.DefaultSortItems(this.proxyitems)
+     }else if (this.appConfig.proxySort==ProxySort.Title){
+       this.proxyLazyItems.NameSortItems(this.proxyitems)
+     }else if (this.appConfig.proxySort==ProxySort.Delay){
+       this.proxyLazyItems.LatencySortItems(this.proxyitems)
+     }
 
-    EventHub.on(EventKey.ProxySort, async (sort: ProxySort) => {
-      console.log("ProxySort", sort)
-      switch (sort) {
-        case ProxySort.Default:
-          this.proxyLazyItems.DefaultSortItems(this.proxyitems)
-          break
-        case ProxySort.Title:
+     EventHub.on(EventKey.ProxySort, async (sort: ProxySort) => {
+       console.log("ProxySort", sort)
+       switch (sort) {
+         case ProxySort.Default:
+           this.proxyLazyItems.DefaultSortItems(this.proxyitems)
+           break
+         case ProxySort.Title:
           this.proxyLazyItems.NameSortItems(this.proxyitems)
-          break
-        case ProxySort.Delay:
-          this.proxyLazyItems.LatencySortItems(this.proxyitems)
-          break
-      }
-      hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行4 %{public}s")
-      hilog.info(0xFF00, "ProxyPageLatencyTag", "this.proxyitems %{public}s", JSON.stringify(this.proxyitems))
-    })
-  }
+           break
+         case ProxySort.Delay:
+           this.proxyLazyItems.LatencySortItems(this.proxyitems)
+           break
+       }
+       hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行4 %{public}s")
+       hilog.info(0xFF00, "ProxyPageLatencyTag", "this.proxyitems %{public}s", JSON.stringify(this.proxyitems))
+     })
+   }
 
-  aboutToDisappear() {
+   aboutToDisappear() {
 
-  }
+   }
 
-  /**
-   * 半模态窗口测速网站
-   */
+   /**
+    * 半模态窗口测速网站
+    */
   @Builder
   BindSheetNetworkSpeed() {
     Row() {

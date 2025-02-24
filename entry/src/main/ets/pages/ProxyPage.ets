@@ -132,7 +132,6 @@ struct ProxyPage {
         }
       }, 200)
     }
-
   }
   @Consume proxyLazyItems: ProxyItemDataSource
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()

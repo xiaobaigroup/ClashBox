@@ -23,7 +23,7 @@ function ItemTypeStyle() {
 function ListRowStyle() {
   .width('100%')
   .padding({ left: 14, right: 8, top: 5, bottom: 5})
-  .alignItems(VerticalAlign.Center)
+// .alignItems(VerticalAlign.Center)
 }
 
 export function delayText(delay: number){
@@ -72,7 +72,7 @@ export struct ProxyNode {
           Text(`${this.item.type}`).ItemTypeStyle()
         }.layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
-        Row({space: 10}) {
+        Row({space: 5}) {
           Text(delayText(this.delay))
             .fontColor(ProxyData.getColorForLatency(this.delay))
             .fontSize(12)
@@ -106,6 +106,7 @@ export struct ProxyNode {
               .layoutWeight(1)
               .fontSize(12)
               .maxLines(1)
+              .textAlign(this.uiConfig.stringDisplayIndex === 0 ? TextAlign.End:TextAlign.Start)
           }.width(this.uiConfig.stringDisplayIndex === 0 ? '70%' : '100%')
           .justifyContent(FlexAlign.Start)
         }.layoutWeight(1)
@@ -121,8 +122,8 @@ export struct ProxyNode {
       .ListRowStyle()
     } else {
       Row() {
-        Column({space: 5}) {
-          Text(`${this.item.name}`).ItemTextStyle().maxLines(2)
+        Column() {
+          Text(`${this.item.name}`).ItemTextStyle().maxLines(2).padding({bottom:5})
           Column() {
             Text(`${this.item.type}`).ItemTypeStyle()
               .textOverflow({ overflow: TextOverflow.Ellipsis})
@@ -133,7 +134,6 @@ export struct ProxyNode {
           }.alignItems(HorizontalAlign.Start)
         }
         .layoutWeight(1)
-        .padding({top: 10,bottom: 10})
         .alignItems(HorizontalAlign.Start)
         .justifyContent(FlexAlign.SpaceBetween)
         Radio({ value: this.item.name, group: this.item.g + this.item.name })

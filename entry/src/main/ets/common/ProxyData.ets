@@ -1,6 +1,7 @@
-import { ProxyGroup } from "proxy_core"
+import { ProxyGroup, ProxySort } from "proxy_core"
 import { BaseDataSource } from "./BaseDataSource"
 import { intl } from "@kit.LocalizationKit"
+import ClashViewModel, { DelayInfo } from "../entryability/ClashViewModel"
 
 // 定义一个接口来描述列表项的数据结构
 export interface ProxyItem {
@@ -121,7 +122,7 @@ export class ProxyItemDataSource extends BaseDataSource<ProxyItem> {
   // 延迟排序
   public LatencySortItems(data: ProxyItem[]) {
     this.empty()
-    this.pushData(data.sort((a, b) => (a.latency ?? 0) - (b.latency ?? 0)))
+    this.pushData(data.sort((a, b) => (ClashViewModel.delayMap.get(a.name)?.delay ?? 0) - (ClashViewModel.delayMap.get(b.name)?.delay ?? 0)))
     this.refresh()
   }
 
