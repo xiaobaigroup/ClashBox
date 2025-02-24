@@ -73,6 +73,8 @@ export class UIConfig{
   buttonPositionIndex: number = 0
   // 动画速度序号
   animationSpeedIndex: number = 1
+  // 字符显示权重序号
+  stringDisplayIndex: number = 0
   // 背景模糊变量
   isBlurr: boolean = true
   // 实验功能显示变量

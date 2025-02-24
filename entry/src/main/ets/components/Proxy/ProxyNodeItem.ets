@@ -80,7 +80,8 @@ export struct ProxyNode {
             .textAlign(TextAlign.End)
           // group 不要写死, 会和其他tab页的生效，在一个组里唯一
           // 使用.enabled(!this.disabled) 来禁用radio不让选
-          Radio({ value: this.item.name, group: this.item.g + this.item.name}).enabled(!this.disabled)
+          Radio({ value: this.item.name, group: this.item.g + this.item.name})
+            .enabled(!this.disabled)
             .checked(this.item.name === this.selected)
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
@@ -97,7 +98,7 @@ export struct ProxyNode {
             Text(`${this.item.type}`)
               .maxLines(1)
               .ItemTypeStyle()
-              .constraintSize({maxWidth: '55%'})
+              .constraintSize({maxWidth: this.uiConfig.stringDisplayIndex === 0 ? '55%' : Infinity})
               .textOverflow({ overflow: TextOverflow.Clip})
             Text(delayText(this.delay))
               .fontColor(ProxyData.getColorForLatency(this.delay))
@@ -105,11 +106,12 @@ export struct ProxyNode {
               .layoutWeight(1)
               .fontSize(12)
               .maxLines(1)
-          }.width('70%')
+          }.width(this.uiConfig.stringDisplayIndex === 0 ? '70%' : '100%')
           .justifyContent(FlexAlign.Start)
         }.layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
-        Radio({ value: this.item.name, group: this.item.g + this.item.name }).enabled(!this.disabled)
+        Radio({ value: this.item.name, group: this.item.g + this.item.name })
+          .enabled(!this.disabled)
           .checked(this.item.name === this.selected)
           .radioStyle({
             checkedBackgroundColor: this.icon_emphasize,
@@ -122,19 +124,20 @@ export struct ProxyNode {
         Column({space: 5}) {
           Text(`${this.item.name}`).ItemTextStyle().maxLines(2)
           Column() {
-            Text(`${this.item.type}`).ItemTypeStyle().textOverflow({ overflow: TextOverflow.Ellipsis})
+            Text(`${this.item.type}`).ItemTypeStyle()
+              .textOverflow({ overflow: TextOverflow.Ellipsis})
             Text(delayText(this.delay))
               .fontColor(ProxyData.getColorForLatency(this.delay))
               .fontSize(12)
               .maxLines(1)
-          }
-          .alignItems(HorizontalAlign.Start)
+          }.alignItems(HorizontalAlign.Start)
         }
         .layoutWeight(1)
         .padding({top: 10,bottom: 10})
         .alignItems(HorizontalAlign.Start)
         .justifyContent(FlexAlign.SpaceBetween)
-        Radio({ value: this.item.name, group: this.item.g + this.item.name }).enabled(!this.disabled)
+        Radio({ value: this.item.name, group: this.item.g + this.item.name })
+          .enabled(!this.disabled)
           .checked(this.item.name === this.selected)
           .radioStyle({
             checkedBackgroundColor: this.icon_emphasize,

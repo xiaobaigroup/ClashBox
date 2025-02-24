@@ -35,7 +35,7 @@ struct PublicNetwork {
   //收藏与ping延迟即时动作
   private PromptAction:PromptAction = this.getUIContext()?.getPromptAction()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  @State remoteIp: IpInfo | null = null
+  @Consume remoteIp: IpInfo | null
   aboutToAppear(): void {
     EventHub.on(EventKey.checkIpInfo, async ()=>{
       this.remoteIp = null
@@ -51,7 +51,7 @@ struct PublicNetwork {
           .fontColor($r('sys.color.font_secondary'))
 
         Text(this.remoteIp?.ip ?? $r('app.string.loading'))
-          .fontSize(this.isLandscapePhone ? 18 :this.isFoldStatus ?22: this.IPfontSize.value)
+          .fontSize(this.isLandscapePhone ? 18 :this.isFoldStatus ? 22: this.IPfontSize.value)
           .textAlign(TextAlign.JUSTIFY)
           .fontColor($r('sys.color.font_primary'))
       }
@@ -69,7 +69,7 @@ struct PublicNetwork {
           .backgroundColor($r('app.color.home_card_background'))
           .onClick(() => {
             //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
-            if (this.isShowHomeEdit===false) {
+            if (this.isShowHomeEdit === false) {
                 this.remoteIp = null
                 EventHub.sendEvent(EventKey.checkIpInfo)
               if (this.uiConfig.isVibrate) {

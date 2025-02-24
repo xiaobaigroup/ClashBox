@@ -47,6 +47,8 @@ struct Appearance {
   @State EnableButtonPositionText: ResourceStr = $r('app.string.right')
   // 动画速度选中文本
   @State EnableAnimationSpeedText: ResourceStr = $r('app.string.normal')
+  // 字符串显示权重选中文本
+  @State EnableStringDisplayText: ResourceStr = $r('app.string.appearance')
   // 按钮位置偏移量（默认在右侧的偏移量）
   @Consume ButtonPositionOffset: number
   // 所有子组件在容器内的对齐方式
@@ -132,6 +134,23 @@ struct Appearance {
             })
         }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
       }
+    } else if (index === 4) {
+      // 切换字符显示权重
+      Menu() {
+        ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
+          MenuItem({
+            content: menuItem.title,
+            symbolEndIcon: this.uiConfig.stringDisplayIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+          })
+            .selected(this.uiConfig.stringDisplayIndex === index)
+            .onChange((selected) => {
+              // 持久化字符显示权重
+              this.uiConfig.stringDisplayIndex = index
+              // UI刷新
+              this.EnableStringDisplayText = menuItem.title
+            })
+        }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
+      }
     }
   }
 
@@ -152,7 +171,6 @@ struct Appearance {
         break
     }
   }
-
 
   // 切换按钮位置
   switchButtonPosition(index:number) {
@@ -179,24 +197,24 @@ struct Appearance {
   switchAnimationSpeed(index: number) {
     switch (index) {
       case 0:
-        //快速
-        this.uiConfig.isAnimation=true
-        this.uiConfig.animationSpeed=ANIMATION_DURATION_100
+        // 快速
+        this.uiConfig.isAnimation = true
+        this.uiConfig.animationSpeed = ANIMATION_DURATION_100
         break
       case 1:
-        //正常
-        this.uiConfig.isAnimation=true
-        this.uiConfig.animationSpeed=ANIMATION_DURATION_300
+        // 正常
+        this.uiConfig.isAnimation = true
+        this.uiConfig.animationSpeed = ANIMATION_DURATION_300
         break
       case 2:
-        //慢速
-        this.uiConfig.isAnimation=true
-        this.uiConfig.animationSpeed=ANIMATION_DURATION_500
+        // 慢速
+        this.uiConfig.isAnimation = true
+        this.uiConfig.animationSpeed = ANIMATION_DURATION_500
         break
       case 3:
-        //关闭
-        this.uiConfig.isAnimation=false
-        this.uiConfig.animationSpeed=0
+        // 关闭
+        this.uiConfig.isAnimation = false
+        this.uiConfig.animationSpeed = 0
         break
     }
   }
@@ -218,6 +236,10 @@ struct Appearance {
     if (this.appearanceList && this.appearanceList[3].children) {
       this.EnableAnimationSpeedText = this.appearanceList[3].children[this.uiConfig.animationSpeedIndex].title
     }
+    // 初始化字符显示权重显示文本
+    if (this.appearanceList && this.appearanceList[4].children) {
+      this.EnableStringDisplayText = this.appearanceList[4].children[this.uiConfig.stringDisplayIndex].title
+    }
   }
 
   aboutToDisappear(): void {
@@ -225,69 +247,65 @@ struct Appearance {
   }
 
   @Builder
-  ThemeColorTipsText() {
-    Text(this.EnableThemeColorText)
-      .fontWeight(FontWeight.Normal)
-      .textOverflow({ overflow: TextOverflow.Ellipsis })
-      .maxLines(1)
-      .margin({top: 2 })
-      .fontSize(14)
-  }
-  @Builder
-  ThemeColorMenuEntrance() {
-    // 确保children存在
-    if(this.appearanceList && this.appearanceList[1].children) {
-      this.switchMenu(this.appearanceList[1].children, 1)
+  TipsText(index: number) {
+    if (index === 0) {
+      // 主题色
+      Text(this.EnableThemeColorText)
+        .tipsText()
+    } else if (index === 1) {
+      // 深色模式
+      Text(this.EnableDarkModeText)
+        .tipsText()
+    } else if (index === 2) {
+      // 按钮位置
+      Text(this.EnableButtonPositionText)
+        .tipsText()
+    } else if (index === 3) {
+      // 动画速度
+      Text(this.EnableAnimationSpeedText)
+        .tipsText()
+    } else if (index === 4) {
+      // 字符显示权重
+      Text(this.EnableStringDisplayText)
+        .tipsText()
     }
   }
+
   @Builder
-  DarkModeTipsText() {
-    Text(this.EnableDarkModeText)
-      .fontWeight(FontWeight.Normal)
-      .textOverflow({ overflow: TextOverflow.Ellipsis })
-      .maxLines(1)
-      .margin({top: 2 })
-      .fontSize(14)
-  }
-  @Builder
-  DarkModeMenuEntrance() {
-    // 确保children存在
-    if(this.appearanceList && this.appearanceList[0].children) {
-      this.switchMenu(this.appearanceList[0].children, 0)
+  MenuEntrance(index: number) {
+    if (index === 0) {
+      // 主题色
+      // 确保children存在
+      if(this.appearanceList && this.appearanceList[1].children) {
+        this.switchMenu(this.appearanceList[1].children, 1)
+      }
+    } else if (index === 1) {
+      // 深色模式
+      // 确保children存在
+      if(this.appearanceList && this.appearanceList[0].children) {
+        this.switchMenu(this.appearanceList[0].children, 0)
+      }
+    } else if (index === 2) {
+      // 按钮位置
+      // 确保children存在
+      if(this.appearanceList && this.appearanceList[2].children) {
+        this.switchMenu(this.appearanceList[2].children, 2)
+      }
+    } else if (index === 3) {
+      // 动画速度
+      // 确保children存在
+      if(this.appearanceList && this.appearanceList[3].children) {
+        this.switchMenu(this.appearanceList[3].children, 3)
+      }
+    } else if (index === 4) {
+      // 字符显示权重
+      // 确保children存在
+      if(this.appearanceList && this.appearanceList[4].children) {
+        this.switchMenu(this.appearanceList[4].children, 4)
+      }
     }
   }
-  @Builder
-  ButtonPositionTipsText() {
-    Text(this.EnableButtonPositionText)
-      .fontWeight(FontWeight.Normal)
-      .textOverflow({ overflow: TextOverflow.Ellipsis })
-      .maxLines(1)
-      .margin({top: 2 })
-      .fontSize(14)
-  }
-  @Builder
-  ButtonPositionMenuEntrance() {
-    // 确保children存在
-    if(this.appearanceList && this.appearanceList[2].children) {
-      this.switchMenu(this.appearanceList[2].children, 2)
-    }
-  }
-  @Builder
-  AnimationSpeedTipsText() {
-    Text(this.EnableAnimationSpeedText)
-      .fontWeight(FontWeight.Normal)
-      .textOverflow({ overflow: TextOverflow.Ellipsis })
-      .maxLines(1)
-      .margin({top: 2 })
-      .fontSize(14)
-  }
-  @Builder
-  AnimationSpeedMenuEntrance() {
-    // 确保children存在
-    if(this.appearanceList && this.appearanceList[3].children) {
-      this.switchMenu(this.appearanceList[3].children, 3)
-    }
-  }
+
 
   build() {
     NavDestination() {
@@ -297,90 +315,78 @@ struct Appearance {
       List({ space: 10 }) {
         // 预览区
         ListItem() {
-          Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
-            Stack({ alignContent: this.stackAlignContentAlignment }) {
-              // 单选框预览区
-              Column() {
-                Row() {
-                  Text($r('app.string.color_preview'))
-                    .width(80)
-                    .fontWeight(FontWeight.Bold)
-                    .fontSize(16)
-                    .margin({ right: 9 })
-                    .fontColor(this.font_primary)
-                  Radio({ value: 'preview', group: 'appearanceRadioGroup', })
-                    .checked(true)
-                    .radioStyle({
-                      checkedBackgroundColor: this.icon_emphasize,
-                    })
-                }
-
-                Row() {
-                  Text($r('app.string.configuration_1'))
-                    .fontWeight(FontWeight.Bold)
-                    .width(80)
-                    .fontSize(16)
-                    .margin({ right: 9 })
-                    .fontColor(this.font_primary)
-                  Radio({ value: 'config', group: 'appearanceRadioGroup', })
-                    .checked(false)
-                    .radioStyle({
-                      checkedBackgroundColor: this.icon_emphasize,
-                    })
-                }
-                .margin({ top: 10 })
-
-                Row() {
-                  Text($r('app.string.proxy_1'))
-                    .fontWeight(FontWeight.Bold)
-                    .width(80)
-                    .fontSize(16)
-                    .margin({ right: 9 })
-                    .fontColor(this.font_primary)
-                  Radio({ value: 'proxy', group: 'appearanceRadioGroup', })
-                    .checked(false)
-                    .radioStyle({
-                      checkedBackgroundColor: this.icon_emphasize,
-                    })
-                }
-                .margin({ top: 10 })
+          Stack({ alignContent: this.stackAlignContentAlignment }) {
+            // 单选框预览区
+            Column({space: 10}) {
+              Row({space: 9}) {
+                Text($r('app.string.color_preview'))
+                  .width(80)
+                  .fontWeight(FontWeight.Bold)
+                  .fontSize(16)
+                  .fontColor(this.font_primary)
+                Radio({ value: 'preview', group: 'appearanceRadioGroup', })
+                  .checked(true)
+                  .radioStyle({
+                    checkedBackgroundColor: this.icon_emphasize,
+                  })
               }
-              .width(188)
-              .height(130)
-              .borderRadius(20)
-              .backdropBlur(2)
-              .alignItems(HorizontalAlign.Start)
-              .backgroundColor($r('app.color.container_background'))
-              .padding({ left: 16, top: 15 })
-              .shadow({
-                color: '#1a000000',
-                radius: 60,
-                type: ShadowType.COLOR
-              })
-
-              // 按钮预览区
-              Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
-                SymbolGlyph($r('sys.symbol.play_fill'))
-                  .fontSize(24)
-                  .fontColor([Color.White])
+              Row({space: 9}) {
+                Text($r('app.string.configuration_1'))
+                  .fontWeight(FontWeight.Bold)
+                  .width(80)
+                  .fontSize(16)
+                  .fontColor(this.font_primary)
+                Radio({ value: 'config', group: 'appearanceRadioGroup', })
+                  .checked(false)
+                  .radioStyle({
+                    checkedBackgroundColor: this.icon_emphasize,
+                  })
               }
-              .offset({x:this.ButtonPositionOffset ,y: 13})
-              .borderRadius(100)
-              .backgroundColor(this.icon_emphasize)
-              .shadow({
-                radius: 10,
-                color: this.icon_emphasize,
-                offsetY: 4,
-                type: ShadowType.BLUR
-              })
-              .width(this.proxyStartButtonHeight)
-              .height(this.proxyStartButtonHeight)
+              Row({space: 9}) {
+                Text($r('app.string.proxy_1'))
+                  .fontWeight(FontWeight.Bold)
+                  .width(80)
+                  .fontSize(16)
+                  .fontColor(this.font_primary)
+                Radio({ value: 'proxy', group: 'appearanceRadioGroup', })
+                  .checked(false)
+                  .radioStyle({
+                    checkedBackgroundColor: this.icon_emphasize,
+                  })
+              }
             }
+            .width(188)
+            .borderRadius(20)
+            .backdropBlur(2)
+            .alignItems(HorizontalAlign.Start)
+            .backgroundColor($r('app.color.container_background'))
+            .padding({ left: 16, top: 15, bottom: 15 })
+            .shadow({
+              color: '#1a000000',
+              radius: 60,
+              type: ShadowType.COLOR
+            })
+
+            // 按钮预览区
+            Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
+              SymbolGlyph($r('sys.symbol.play_fill'))
+                .fontSize(24)
+                .fontColor([Color.White])
+            }
+            .offset({x:this.ButtonPositionOffset ,y: 13})
+            .borderRadius(100)
+            .backgroundColor(this.icon_emphasize)
+            .shadow({
+              radius: 10,
+              color: this.icon_emphasize,
+              offsetY: 4,
+              type: ShadowType.BLUR
+            })
+            .width(this.proxyStartButtonHeight)
+            .height(this.proxyStartButtonHeight)
           }
-          .width('100%')
-          .height(220)
-               .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-        }
+        }.width('100%').margin({top: 20, bottom: 15})
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         // 列表区 Start
         ListItem() {
           Column() {
@@ -389,23 +395,21 @@ struct Appearance {
               icons: $r('sys.symbol.paintpalette_fill'),
               title: $r('app.string.theme_color'),
               // 确保this指向父组件
-              tips: (): void => { this.ThemeColorTipsText() },
-              menu: (): void => { this.ThemeColorMenuEntrance() }
+              tips: (): void => { this.TipsText(0) },
+              menu: (): void => { this.MenuEntrance(0) }
             })
             // 分割线
-        //    if(!isEnd(item.children!.length,i))
-              Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
+            Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
             // 深色模式
             menuRowList({
               icons: $r('sys.symbol.circle_righthalf_inset_filled'),
               title: $r('app.string.dark_mode'),
               // 确保this指向父组件
-              tips: (): void => { this.DarkModeTipsText() },
-              menu: (): void => { this.DarkModeMenuEntrance() }
+              tips: (): void => { this.TipsText(1) },
+              menu: (): void => { this.MenuEntrance(1) }
             })
             // 分割线
-           // if(!isEnd(item.children!.length,i))
-              Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
+            Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
             // 背景模糊
             Row() {
               toggleRowList({
@@ -429,8 +433,7 @@ struct Appearance {
             })
             if(this.isShowExperimentalFunction) {
               // 分割线
-             // if(!isEnd(item.children!.length,i))
-                Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
+              Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
               // 动画速度
               menuRowList({
                 icons: $r('sys.symbol.livephoto'),
@@ -438,8 +441,8 @@ struct Appearance {
                 subtitle: $r('app.string.animation_speed_subtitle'),
                 isExperimentalFunction: true,
                 // 确保this指向父组件
-                tips: (): void => { this.AnimationSpeedTipsText() },
-                menu: (): void => { this.AnimationSpeedMenuEntrance() }
+                tips: (): void => { this.TipsText(3) },
+                menu: (): void => { this.MenuEntrance(3) }
               })
             }
           }
@@ -472,28 +475,37 @@ struct Appearance {
               })
             })
             // 分割线
-        //    if(!isEnd(item.children!.length,i))
-              Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
+            Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
             // 悬浮按钮位置
             menuRowList({
               icons: $r('sys.symbol.local_fill'),
               title: $r('app.string.suspension_button_position'),
               // 确保this指向父组件
-              tips: (): void => { this.ButtonPositionTipsText() },
-              menu: (): void => { this.ButtonPositionMenuEntrance() }
+              tips: (): void => { this.TipsText(2) },
+              menu: (): void => { this.MenuEntrance(2) }
+            })
+            // 分割线
+            Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
+            // 字符串显示权重
+            menuRowList({
+              icons: $r('sys.symbol.list_square_bill'),
+              title: $r('app.string.string_display_preferences'),
+              // 确保this指向父组件
+              tips: (): void => { this.TipsText(4) },
+              menu: (): void => { this.MenuEntrance(4) }
             })
           }
           .width('100%')
           .borderRadius(20)
-               .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .backgroundColor($r('app.color.container_background'))
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         }
         // 列表区 End
       }
       .width('100%')
       .align(Alignment.Top)
       .edgeEffect(EdgeEffect.Spring)
-      .contentEndOffset(CONTENT_END_OFFSET_150 - 45)
+      .contentEndOffset(CONTENT_END_OFFSET_150 - 85)
       .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value, bottom: this.breakPointStatemorePageMargin.value })
 
     }
@@ -507,4 +519,15 @@ struct Appearance {
 
   }
 }
+
 export default Appearance
+
+@Extend(Text)
+function tipsText() {
+  .textOverflow({ overflow: TextOverflow.Ellipsis })
+  .fontColor($r('sys.color.font_secondary'))
+  .fontWeight(FontWeight.Normal)
+  .margin({top: 2 })
+  .fontSize(14)
+  .maxLines(1)
+}

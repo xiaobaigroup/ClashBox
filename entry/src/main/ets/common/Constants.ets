@@ -529,7 +529,13 @@ export const AppearanceList: AppearanceListItemProp[] = [
       { title: $r('app.string.low') },
       { title: $r('app.string.close') }
     ]
-  }
+  },
+  { title: $r('app.string.string_display_preferences'),
+    children: [
+      { title: $r('app.string.Appearance') },
+      { title: $r('app.string.information') },
+    ]
+  },
 ]
 
 /**

@@ -47,7 +47,9 @@ import {
   BIND_SHEET_CONTAINER_HEIGHT
 } from '../common/Constants'
 import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/ProxyData'
-import { ClashConfig, Dns, LogLevel, Profile, ProxyGroup, ProxyMode, ProxySort, SubscriptionInfo } from 'proxy_core'
+import { ClashConfig, Dns,
+  IpInfo,
+  LogLevel, Profile, ProxyGroup, ProxyMode, ProxySort, SubscriptionInfo } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig, AppState, ClashCore, UIConfig } from '../entryability/AppState'
@@ -280,6 +282,8 @@ struct Index {
   @Provide thePauseTime: number = 0
   // 恢复时刻
   @Provide theRestoreTime: number = 0
+
+  @Provide remoteIp: IpInfo | null = null
 
   /*
   代理页Provide相关数据

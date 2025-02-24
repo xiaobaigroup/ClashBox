@@ -982,7 +982,7 @@
     },
     {
       "name": "backgrounder_tips_2",
-      "value": "Tips：开启后会导致应用耗电量增加且只能开启其中的一个选项"
+      "value": "Tips：开启后会导致应用耗电量增加且只能开启其中的一个选项；目前已知从自由多窗模式无法主动发起画中画窗口"
     },
     {
       "name": "notice_main_switch",
@@ -1799,6 +1799,22 @@
     {
       "name": "no_link",
       "value": "暂无下载地址"
+    },
+    {
+      "name": "string_display_preferences",
+      "value": "字符显示偏好"
+    },
+    {
+      "name": "information",
+      "value": "信息"
+    },
+    {
+      "name": "appearance",
+      "value": "外观"
+    },
+    {
+      "name": "string_display_preferences_subtitle",
+      "value": "设置字符显示的权重"
     }
   ]
 }

@@ -7,6 +7,9 @@ import { PromptAction } from "@kit.ArkUI"
 import ClashViewModel from "../../entryability/ClashViewModel"
 import { JSON } from "@kit.ArkTS"
 import { customVibrator } from "../../utils/VibratorUtil"
+import { delayText } from "../Proxy/ProxyNodeItem"
+import { IpInfo } from "proxy_core"
+import { EventHub, EventKey } from "../../common/EventHub"
 
 @Component
 struct ProxyINFO{
@@ -18,11 +21,14 @@ struct ProxyINFO{
   @Consume items: ProxyItem[]
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  // 折叠屏展开状态判定
+  @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
+  // 主页卡片内容IP地址字体大小
+  @Consume('IPfontSize') private IPfontSize: BreakpointState<number>
   //主页卡片内容当前节点字体大小
   @Consume('ProxyFontSize') private ProxyFontSize: BreakpointState<number>
   //主页卡片内容IP地址小字体大小
-  @Consume('HomeCardIPSmFontSize')
-  private HomeCardIPSmFontSize: BreakpointState<number>
+  @Consume('HomeCardIPSmFontSize') private HomeCardIPSmFontSize: BreakpointState<number>
   //主页卡片内容当前延迟小字体大小（16,20,18,24）
   @Consume('HomeCardPrpxySmFontSize') private HomeCardPrpxySmFontSize: BreakpointState<number>
   //主页卡片内容网络测速字体大小
@@ -37,43 +43,49 @@ struct ProxyINFO{
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   //收藏与ping延迟即时动作
   private PromptAction:PromptAction = this.getUIContext()?.getPromptAction()
+  @Consume remoteIp: IpInfo | null
+
+  aboutToAppear(): void {
+    EventHub.on(EventKey.checkIpInfo, async ()=>{
+      this.remoteIp = null
+      this.remoteIp = await ClashViewModel.checkIpInfo()
+    })
+  }
 
   build() {
-    Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Start, justifyContent: FlexAlign.SpaceBetween}) {
+    Row() {
       Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.SpaceBetween }) {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.Start }) {
           CardTitle({ title: $r('app.string.proxy_INFO') })
           if (this.appConfig.currentProxyItem) {
             Text(`${this.appConfig.currentProxyName}`)
-              .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
+              .maxLines(2)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('sys.color.font_primary'))
-              .maxLines(1)
-              .textOverflow({ overflow: TextOverflow.MARQUEE })
-          }
-          else {
+              .textOverflow({ overflow: TextOverflow.Clip })
+              .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
+          } else {
             Text($r('app.string.proxy_name'))
               .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('sys.color.font_primary'))
           }
           Row(){
-            Text(this.appFlowingState.removeIp?.country ?? "" )
+            Text(this.remoteIp?.country ?? "" )
               .fontSize(this.isLandscapePhone ? 12 : this.HomeCardIPSmFontSize.value)
               .fontColor($r('sys.color.font_secondary'))
 
-           Text( this.appFlowingState.removeIp?.ip ?? $r('app.string.loading'))
-              .fontSize(this.isLandscapePhone ? 12 : this.HomeCardIPSmFontSize.value)
+            Text( this.remoteIp?.ip  ?? $r('app.string.loading'))
+              .fontSize(this.isLandscapePhone ? 18 :this.isFoldStatus ?22: this.IPfontSize.value)
               .fontColor($r('sys.color.font_secondary'))
           }
         }
         if (this.appConfig.currentProxyItem) {
-          Text('ping ' + `${this.appConfig.currentProxyItem.latency}` + 'ms')
+          Text('ping ' + `${delayText(ClashViewModel.delayMap.get(this.appConfig.currentProxyItem.name)?.delay ?? 0)}`)
             .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)
-            .fontColor(ProxyData.getColorForLatency(this.appConfig.currentProxyItem.latency))
-        }
-        else {
-          Row(){
+            .fontColor(ProxyData.getColorForLatency(ClashViewModel.delayMap.get(this.appConfig.currentProxyItem.name)?.delay ?? 0))
+        } else {
+          Row() {
             Text('ping ')
               .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)
               .fontColor('#64BB5C')
@@ -82,10 +94,10 @@ struct ProxyINFO{
               .fontColor('#64BB5C')
           }
         }
-      }
+      }.width('60%')
       Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.End, justifyContent: FlexAlign.SpaceBetween }) {
         Column() {
-          Row({space:5}) {
+          Row({space: 5}) {
             Text(this.appFlowingState.traffics.getLast()?.up?.toString() ?? "0 kb")
               .fontSize(this.isLandscapePhone ? 12:this.SpeedfontSize12_14_14_16.value)
               .fontColor($r('sys.color.font_primary'))
@@ -95,7 +107,7 @@ struct ProxyINFO{
               .fontColor([$r('sys.color.font_primary')])
           }.width('100%').justifyContent(FlexAlign.End)
 
-          Row({space:5}) {
+          Row({space: 5}) {
             Text(this.appFlowingState.traffics.getLast()?.down?.toString() ?? "0 kb")
               .fontSize(this.isLandscapePhone ? 12:this.SpeedfontSize12_14_14_16.value)
               .fontColor($r('sys.color.font_primary'))
@@ -115,15 +127,15 @@ struct ProxyINFO{
           .onClick(async () => {
             //在home页在编辑卡片状态时，无法操作，点击回调写在if判定里
             if ( this.isShowHomeEdit===false) {
-              this.appFlowingState.removeIp = null
-              this.appFlowingState.removeIp = await ClashViewModel.checkIpInfo()
-              console.log("checkIpInfo", JSON.stringify( this.appFlowingState.removeIp))
+              this.remoteIp = null
+              EventHub.sendEvent(EventKey.checkIpInfo)
               if (this.uiConfig.isVibrate) {
                 customVibrator.vibratorTriggerOfHapticClockTimer()
               }
             }
           })
       }
+      .width('40%')
     }
     .width('100%')
     .height('100%')

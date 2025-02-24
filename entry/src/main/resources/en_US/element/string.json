@@ -982,7 +982,7 @@
     },
     {
       "name": "backgrounder_tips_2",
-      "value": "Tips：Enabling it will increase the power consumption of the application and only one option can be enabled"
+      "value": "Tips： When enabled, the power consumption of the application will increase and only one of the options can be enabled; At present, it is known that the picture in picture window cannot be initiated from the free multi window mode"
     },
     {
       "name": "notice_main_switch",
@@ -1799,6 +1799,22 @@
     {
       "name": "no_link",
       "value": "No download link"
+    },
+    {
+      "name": "string_display_preferences",
+      "value": "String display preferences"
+    },
+    {
+      "name": "information",
+      "value": "Information"
+    },
+    {
+      "name": "appearance",
+      "value": "Appearance"
+    },
+    {
+      "name": "string_display_preferences_subtitle",
+      "value": "Set the weight of string display"
     }
   ]
 }

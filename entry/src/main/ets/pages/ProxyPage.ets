@@ -26,6 +26,7 @@ import { Nothing, RightDownButton } from '../components/Common'
 import { StylesEdit } from '../components/Proxy/StylesEdit'
 import { PopTips, PopupBuilder } from '../components/Start/Popup'
 import { deviceInfo } from '@kit.BasicServicesKit'
+import { customVibrator } from '../utils/VibratorUtil'
 
 
 @Entry
@@ -414,6 +415,9 @@ struct ProxyPage {
               if (this.appConfig.proxySort == ProxySort.Delay) {
                 EventHub.sendEvent(EventKey.ProxySort, ProxySort.Delay)
                 hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行2 %{public}s")
+              }
+              if (this.uiConfig.isVibrate) {
+                customVibrator.vibratorTriggerOfHapticClockTimer()
               }
             })
             // 悬浮代理测速按钮 END

@@ -691,8 +691,9 @@ export struct Nothing {
 @Extend(Row)
 function RowStyle() {
   .width('100%')
-  .height(53)
   .borderRadius(20)
+  .constraintSize({minHeight: 53})
+  .padding({left: 12, right: 12, top: 6, bottom: 6})
   .backgroundColor($r('app.color.container_background'))
 }
 
@@ -730,13 +731,12 @@ export struct skipRowList {
   }
 
   build() {
-    Row() {
+    Row({space: 12}) {
       if(this.icons) {
         SymbolGlyph(this.icons)
           .fontSize(24)
-          .margin({left: 12})
           .fontColor([this.isPrimaryIcons ? this.icon_primary : this.icon_emphasize])
-          .transition(customAnimationUtil.isScaleTranIcon(10,this.uiConfig))
+          .transition(customAnimationUtil.isScaleTranIcon(10, this.uiConfig))
       }
       Column() {
         Row() {
@@ -752,19 +752,17 @@ export struct skipRowList {
           Text(this.subtitle)
             .fontWeight(FontWeight.Normal)
             .fontColor($r('sys.color.font_secondary'))
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-            .maxLines(1)
+            .textOverflow({ overflow: this.uiConfig.stringDisplayIndex === 0 ? TextOverflow.Ellipsis : TextOverflow.Clip})
+            .maxLines(this.uiConfig.stringDisplayIndex === 0 ? 1 : 2)
             .margin({top: 2})
             .fontSize(14)
         }
       }.layoutWeight(2)
       .alignItems(HorizontalAlign.Start)
-      .margin({ left: 12 })
       Blank()
       this.tips()
       SymbolGlyph($r('sys.symbol.chevron_right'))
         .fontSize(28)
-        .margin({right: 12})
         .fontColor([this.icon_primary])
     }
     .RowStyle()
@@ -804,15 +802,13 @@ export struct toggleRowList {
   defaultBuilder() {
     Toggle({ type: ToggleType.Switch, isOn: false })
       .selectedColor(this.icon_emphasize)
-      .margin({right: 12})
   }
 
   build() {
-    Row() {
+    Row({space: 12}) {
       if(this.icons) {
         SymbolGlyph(this.icons)
           .fontSize(24)
-          .margin({left: 12})
           .fontColor([this.isPrimaryIcons ? this.icon_primary : this.icon_emphasize])
           .transition(customAnimationUtil.isScaleTranIcon(10,this.uiConfig))
       }
@@ -830,14 +826,14 @@ export struct toggleRowList {
           Text(this.subtitle)
             .fontWeight(FontWeight.Normal)
             .fontColor($r('sys.color.font_secondary'))
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-            .maxLines(1)
+            .textOverflow({ overflow: this.uiConfig.stringDisplayIndex === 0 ? TextOverflow.Ellipsis : TextOverflow.Clip})
+            .maxLines(this.uiConfig.stringDisplayIndex === 0 ? 1 : 2)
             .margin({top: 2})
             .fontSize(14)
         }
       }.layoutWeight(1)
       .alignItems(HorizontalAlign.Start)
-      .margin({ left: this.icons != null ? 12 : 14 })
+      .margin({ left: this.icons !== null ? 0 : 2 })
       Blank()
       this.toggle()
     }
@@ -891,11 +887,10 @@ export struct menuRowList {
   }
 
   build() {
-    Row() {
+    Row({space: 12}) {
       if(this.icons) {
         SymbolGlyph(this.icons)
           .fontSize(24)
-          .margin({left: 12})
           .fontColor([this.isPrimaryIcons ? this.icon_primary : this.icon_emphasize])
           .transition(customAnimationUtil.isScaleTranIcon(10,this.uiConfig))
       }
@@ -912,13 +907,12 @@ export struct menuRowList {
         if(this.subtitle) {
           Text(this.subtitle)
             .fontWeight(FontWeight.Normal)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-            .maxLines(1)
+            .textOverflow({ overflow: this.uiConfig.stringDisplayIndex === 0 ? TextOverflow.Ellipsis : TextOverflow.Clip})
+            .maxLines(this.uiConfig.stringDisplayIndex === 0 ? 1 : 2)
             .margin({ top: 2 })
             .fontSize(14)
         }
       }.layoutWeight(1)
-      .margin({ left: 12 })
       .alignItems(HorizontalAlign.Start)
       Blank()
       // 菜单
@@ -926,7 +920,7 @@ export struct menuRowList {
         this.tips()
         SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
           .fontSize(14)
-          .margin({left: 7, right: 20})
+          .margin({left: 7, right: 8})
           .fontColor([this.icon_primary])
       }.bindMenu(this.menu())
     }
@@ -936,7 +930,8 @@ export struct menuRowList {
 }
 
 //共用使用流量/总流量+进度条组件
-@Builder export function cellularData(info: SubscriptionInfo) {
+@Builder
+export function cellularData(info: SubscriptionInfo) {
   if(SubscriptionInfo.GetTotal(info)?.value > 0){
     Row() {
       if (info) {
@@ -973,7 +968,8 @@ export struct menuRowList {
     .borderRadius(6)
   }
 }
-//副文本样式
+
+// 副文本样式
 @Extend(Text)
 function smallText() {
   .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -984,7 +980,8 @@ function smallText() {
 }
 
 //代理和配置右下角图标按钮
-@Builder export function RightDownButton(s:Resource,a:SymbolEffect)  {
+@Builder
+export function RightDownButton(s:Resource,a:SymbolEffect)  {
     Stack({ alignContent: Alignment.Center }) {
       SymbolGlyph(s)
         .fontSize(24)
