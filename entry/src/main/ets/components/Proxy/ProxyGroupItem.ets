@@ -11,7 +11,7 @@ import { webview } from '@kit.ArkWeb';
 import { ProxyGroupItemDataSource, ProxyItem, ProxyItemDataSource } from '../../common/ProxyData';
 import { EventHub, EventKey } from '../../common/EventHub';
 import { Profile, ProxyGroup, ProxySort } from 'proxy_core';
-import { AppConfig, AppState, ClashCore, ProxyCardSize, UIConfig } from '../../entryability/AppState';
+import { AppConfig, AppState, ClashCore, ProxyCardSize, ProxyGroupType, UIConfig } from '../../entryability/AppState';
 import { ProxyNode } from './ProxyNodeItem';
 import { customAnimationUtil } from '../../utils/Animation';
 import { customVibrator } from '../../utils/VibratorUtil';
@@ -381,6 +381,7 @@ struct ProxyGroupItem {
     .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : this.breakPointStateListLanes.value,
       this.breakPointStateListGutter.value)
     .ListStyle()
+    .contentEndOffset(this.appConfig.proxyGroupType === ProxyGroupType.List?0:CONTENT_END_OFFSET_150)
    /* .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
       detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
       preferType: SheetType.CENTER,
@@ -459,7 +460,6 @@ function ListStyle() {
   .scrollBar(BarState.Off)
   .edgeEffect(EdgeEffect.Spring)
   .alignListItem(ListItemAlign.Center)
-  .contentEndOffset(CONTENT_END_OFFSET_150)
   .nestedScroll({
     scrollForward: NestedScrollMode.PARENT_FIRST,
     scrollBackward: NestedScrollMode.SELF_FIRST

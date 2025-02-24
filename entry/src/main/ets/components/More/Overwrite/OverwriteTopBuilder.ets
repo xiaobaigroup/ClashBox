@@ -44,13 +44,12 @@ struct OverwriteTop {
             .fontSize(14)
         }
       }
-      .transition(customAnimationUtil.isSlide(0, this.uiConfig))
+      .transition(customAnimationUtil.isSlide(100, this.uiConfig))
       .alignItems(HorizontalAlign.Center)
       Blank()
     }
     .width('100%')
     .alignItems(VerticalAlign.Center)
-    .transition(customAnimationUtil.isSlide(0,this.uiConfig))
     .height(this.curYOffset<0?TAB_CONTENT_TITLE_HEIGHT-this.curYOffset:TAB_CONTENT_TITLE_HEIGHT)
     .zIndex(1)
     .position({x:0})

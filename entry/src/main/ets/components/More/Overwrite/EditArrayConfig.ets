@@ -217,6 +217,7 @@ export struct ArrayConfigEditor {
     }
     .width(40)
     .height(40)
+    .transition(customAnimationUtil.isSlide(0, this.uiConfig))
     .backgroundColor($r('app.color.settings_container_background'))
     .onClick(() => {
       // 启用背景模糊

@@ -376,9 +376,9 @@ struct ConfigurationPage {
                         Text(item.configName).fontColor(($r('sys.color.font_primary'))).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
                         Row() {
                           Text($r('app.string.update_by'))
-                            .fontColor($r('sys.color.font_secondary')).fontSize(12)
+                            .fontColor($r('sys.color.font_secondary')).fontSize(14)
                           Text(convertTime(item.lastUpdateDateTime))
-                            .fontColor($r('sys.color.font_secondary')).fontSize(12).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+                            .fontColor($r('sys.color.font_secondary')).fontSize(14).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
                         }
 
                         // 进度条组件: 共用使用流量 / 总流量

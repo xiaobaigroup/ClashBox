@@ -98,7 +98,7 @@ struct ProxyArrangement {
             })
               .borderRadius(BORDER_RADIUS_20)
               .width('100%')
-              .padding({ top:10, bottom: 10 })
+              .padding({ top:10})
           }
         }
         .clickEffect(this.isContentShow?customAnimationUtil.isClickEffect(this.uiConfig):null)
