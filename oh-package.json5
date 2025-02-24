@@ -7,6 +7,6 @@
   "description": "Please describe the basic information.",
   "dynamicDependencies": {},
   "dependencies": {
-    "@mcui/mccharts": "^2.8.2"
+    "@mcui/mccharts": "^2.8.5"
   }
 }

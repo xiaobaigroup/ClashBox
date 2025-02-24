@@ -1815,6 +1815,10 @@
     {
       "name": "string_display_preferences_subtitle",
       "value": "Set the weight of string display"
+    },
+    {
+      "name": "edit_layout",
+      "value": "Edit Layout"
     }
   ]
 }

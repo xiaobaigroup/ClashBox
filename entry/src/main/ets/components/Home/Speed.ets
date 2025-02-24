@@ -54,7 +54,7 @@ struct Speed {
     yAxis:
     {
       min: 0,
-      max: 3000,
+      max: 1500,
       //刻度线
       axisTick: {
         show: false
@@ -136,6 +136,9 @@ struct Speed {
             color: '#ff759bf5',
             offset: [0, 0]
           },
+          endLabel:{
+            show:false
+        },
           //折线拐点配置
           itemStyle: {
             symbol: 'solidCircle',

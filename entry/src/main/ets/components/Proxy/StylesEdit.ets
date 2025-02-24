@@ -6,6 +6,7 @@ import { AppConfig, isEnd, ProxyCardSize, ProxyGroupType, UIConfig } from '../..
 import { customAnimationUtil } from '../../utils/Animation'
 import { getResourceString } from '../../utils/ResourceStringUtil'
 import { promptAction } from '@kit.ArkUI'
+import { proxyBindSheetTitleStyle } from '../Common'
 
 @Component
 export struct StylesEdit {
@@ -17,8 +18,17 @@ export struct StylesEdit {
   @Consume('breakPointStateTabContentTitleMargin')
   private breakPointStateTabContentTitleMargin: BreakpointState<number>
 
+
   build() {
-    Column() {
+    NavDestination() {
+      // 顶部半模拟态标题及按钮
+      proxyBindSheetTitleStyle({
+        title: $r('app.string.edit_layout'),
+        otherButton: (): void => {
+        }
+      })
+
+      Column(){
       //代理节点分组方式切换
       EditTitle({ title: $r('app.string.Packet_mode') })
       Column() {
@@ -76,7 +86,7 @@ export struct StylesEdit {
               value: 'SortRadio1', group: 'SortRadioGroup',
               indicatorType: RadioIndicatorType.TICK
             })
-              .checked(this.appConfig.proxySort == n["v"] )
+              .checked(this.appConfig.proxySort == n["v"])
               .hitTestBehavior(HitTestMode.None)
               .radioStyle({
                 checkedBackgroundColor: this.icon_emphasize,
@@ -85,10 +95,10 @@ export struct StylesEdit {
           .EditRow()
           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .onClick(() => {
-             EventHub.sendEvent(EventKey.ProxySort, n["v"])
-             animateTo({ duration: this.uiConfig.animationSpeed }, () => {
-               this.appConfig.proxySort = n["v"]
-             })
+            EventHub.sendEvent(EventKey.ProxySort, n["v"])
+            animateTo({ duration: this.uiConfig.animationSpeed }, () => {
+              this.appConfig.proxySort = n["v"]
+            })
           })
 
           if (!isEnd(3, i))
@@ -142,10 +152,19 @@ export struct StylesEdit {
       }
       .height(142)
       .EditColumn()
+      }
+      .padding({
+        left: this.breakPointStateTabContentTitleMargin.value,
+        right: this.breakPointStateTabContentTitleMargin.value,
+      })
     }
-    .padding({top: 36,
-      left: this.breakPointStateTabContentTitleMargin.value,
-      right: this.breakPointStateTabContentTitleMargin.value,})
+    .width('100%')
+    .height('100%')
+    .hideTitleBar(true)
+    .backgroundColor($r('app.color.background'))
+    .onBackPressed(() => {
+      return true;
+    })
   }
 }
 

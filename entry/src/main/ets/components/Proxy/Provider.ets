@@ -1,6 +1,6 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import { BIND_SHEET_TITLE_CONTAINER_HEIGHT, BORDER_RADIUS_20, CONTENT_END_OFFSET_150 } from "../../common/Constants"
-import { cellularData, Nothing, theCustomDialog } from "../Common"
+import { cellularData, Nothing, proxyBindSheetTitleStyle, theCustomDialog } from "../Common"
 import { convertTime } from "../../utils/TimeConvertUtil"
 import { ClashConfig, SubscriptionInfo } from 'proxy_core'
 import ClashViewModel from '../../entryability/ClashViewModel'
@@ -38,13 +38,13 @@ export struct ProviderPage {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 提供者数据
   @State
-  public providerListData: Array<Provider> = [ ]
+  public providerListData: Array<Provider> = []
   //fl clash条目数量判定
-  @State entriesNumber:number =0
+  @State entriesNumber: number = 0
   //开关不触发list转场动画判定
-  @State isON:isON = new isON()
+  @State isON: isON = new isON()
   //副标题是否显示
-  @State textTwoTitle:boolean = true
+  @State textTwoTitle: boolean = true
   // 内容外边距
   @Consume('breakPointStateTabContentTitleMargin')
   private breakPointStateTabContentTitleMargin: BreakpointState<number>
@@ -53,7 +53,7 @@ export struct ProviderPage {
    * 监听加载状态改变执行UI数组更新
    */
   async loadingChange(): Promise<void> {
-    if(this.isLoading === -1) {
+    if (this.isLoading === -1) {
       hilog.debug(0xFF00, "ProvidertestTag", "进入loadingChange状态改变执行 %{public}s")
       const newlist = await ClashViewModel.getProviders()
       this.providerListData = newlist
@@ -67,10 +67,10 @@ export struct ProviderPage {
     console.debug("getProviders", JSON.stringify(list))
   }
 
-  uploadProvider(item: Provider){
+  uploadProvider(item: Provider) {
     let filePicker = new picker.DocumentViewPicker(getContext(this))
     let options = new picker.DocumentSelectOptions()
-    filePicker.select(options).then((documentSelectResult)=>{
+    filePicker.select(options).then((documentSelectResult) => {
       const fileUrl = documentSelectResult[0];
       ClashViewModel.upLoadProvider(item, fileUrl).then(() => {
         this.isLoading = -1
@@ -80,12 +80,53 @@ export struct ProviderPage {
     })
   }
 
+  @Builder
+  titleButton() {
+    // 全部更新按钮
+    Button({ type: ButtonType.Circle, stateEffect: true }) {
+      SymbolGlyph($r('sys.symbol.arrow_clockwise'))
+        .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+        .fontColor([this.icon_primary])
+    }
+    .width(40)
+    .height(40)
+    .margin({ right: 66 })
+    .backgroundColor($r('app.color.settings_container_background'))
+    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+    .onClick(() => {
+      this.isON.toggleAnim = true
+      animateTo({
+        duration: this.uiConfig.animationSpeed,
+        curve: Curve.Friction,
+        iterations: 1, // 设置-1表示动画无限循环
+      }, () => {
+        this.providerListData.forEach((item: Provider) => {
+          convertTime(item["update-at"])
+          this.isLoadingAll = this.providerListData.length
+          ClashViewModel.updateProvider(item)
+            .then((result) => {
+              this.isLoadingAll = -1
+            })
+            .catch((error: Error) => {
+              this.isLoadingAll = -1
+            })
+        })
+      })
+    })
+  }
+
   build() {
     NavDestination() {
       // 顶部半模拟态标题及按钮
-      this.titleStyle()
+      proxyBindSheetTitleStyle({
+        title: $r('app.string.provider'),
+        otherButton: (): void => {
+          this.titleButton()
+        }
+      })
+      // this.titleStyle()
       List() {
-        ListItem(){
+        ListItem() {
           // 代理提供者相关
           if (this.providerListData.length === 0) {
             Nothing({ name: $r('app.string.Resources') })
@@ -93,16 +134,20 @@ export struct ProviderPage {
               .height('100%')
 
           } else {
-            Column({ space: 8 }) {
+            Column({ space: 10 }) {
               //副标题
-              Text( $r('app.string.proxy_provider') )
+              Text($r('app.string.proxy_provider'))
                 .subtitleText()
 
-              List({ space: 8 }) {
+              List({ space: 10 }) {
                 ForEach(this.providerListData, (item: Provider, index: number) => {
                   if (item.type === "Proxy") {
                     ListItem() {
-                      Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.Start }) {
+                      Flex({
+                        direction: FlexDirection.Column,
+                        alignItems: ItemAlign.Start,
+                        justifyContent: FlexAlign.Start
+                      }) {
                         // 文本显示区
                         Column({ space: 2 }) {
                           Text(item.name)
@@ -113,7 +158,7 @@ export struct ProviderPage {
                             Text(convertTime(item["update-at"]))
                               .smallText()
                             //clash meta 暂无此数据，TODO 后期fl clash接入后可改
-                            if (this.entriesNumber>0) {
+                            if (this.entriesNumber > 0) {
                               Text('.')
                                 .smallText()
                               Text($r('app.string.list_item_number'))
@@ -128,17 +173,18 @@ export struct ProviderPage {
 
                         Divider().strokeWidth(1).color($r('app.color.divider'))
 
-                        Row({space:8}) {
+                        Row({ space: 8 }) {
                           // 功能按钮区
                           // 上传按钮
                           Button({ type: ButtonType.Normal, stateEffect: true }) {
-                            Row({space:4.67}) {
+                            Row({ space: 4.67 }) {
                               SymbolGlyph($r('sys.symbol.arrowshape_up_to_line_fill'))
                                 .fontSize(14.67)
                                 .fontColor([this.icon_emphasize])
                               Text($r('app.string.upload')).fontSize(12).fontColor(this.icon_emphasize)
                             }
-                          }.ButtonStyle()
+                          }
+                          .ButtonStyle()
                           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                           // .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
                           .width(76)
@@ -150,7 +196,7 @@ export struct ProviderPage {
 
                           // 更新按钮
                           Button({ type: ButtonType.Normal, stateEffect: true }) {
-                            if (this.isLoading ===index ||this.isLoadingAll === this.providerListData.length) {
+                            if (this.isLoading === index || this.isLoadingAll === this.providerListData.length) {
                               Row({ space: 4.67 }) {
                                 LoadingProgress()
                                   .color(this.icon_emphasize)
@@ -160,7 +206,7 @@ export struct ProviderPage {
                               .width(100)
                               .height(28)
                               .justifyContent(FlexAlign.Center)
-                            } else{
+                            } else {
                               Row({ space: 4.67 }) {
                                 SymbolGlyph($r('sys.symbol.arrow_clockwise'))
                                   .fontSize(14.67)
@@ -194,6 +240,7 @@ export struct ProviderPage {
                       }
                       .listFlex()
                     }
+
                     //      .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
                     //       .combine(TransitionEffect.SLIDE):null)
                   }
@@ -206,13 +253,17 @@ export struct ProviderPage {
               Text($r('app.string.rule_provider'))
                 .subtitleText()
 
-              List({ space: 8 }) {
+              List({ space: 10 }) {
                 ForEach(this.providerListData, (item: Provider, index: number) => {
                   if (item.type === "Rule") {
                     ListItem() {
-                      Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.Start }) {
+                      Flex({
+                        direction: FlexDirection.Column,
+                        alignItems: ItemAlign.Start,
+                        justifyContent: FlexAlign.Start
+                      }) {
                         // 文本显示区
-                        Column({space:2}){
+                        Column({ space: 2 }) {
                           Text(item.name)
                             .nameText()
 
@@ -222,10 +273,10 @@ export struct ProviderPage {
                             Text(convertTime(item["update-at"]))
                               .smallText()
                             //clash meta 暂无此数据，TODO 后期fl clash接入后可改
-                            if (this.entriesNumber>0) {
+                            if (this.entriesNumber > 0) {
                               Text('.')
                                 .smallText()
-                              Text(''+ $r('app.string.list_item_number'))
+                              Text('' + $r('app.string.list_item_number'))
                                 .smallText()
                             }
                           }
@@ -235,17 +286,18 @@ export struct ProviderPage {
                         //      Text(item.path)
                         //        .smallText().margin({ bottom: 8 })
 
-                        Row({space:8}) {
+                        Row({ space: 8 }) {
                           // 功能按钮区
                           // 上传按钮
                           Button({ type: ButtonType.Normal, stateEffect: true }) {
-                            Row({space:4.67}) {
+                            Row({ space: 4.67 }) {
                               SymbolGlyph($r('sys.symbol.arrowshape_up_to_line_fill'))
                                 .fontSize(14.67)
                                 .fontColor([this.icon_emphasize])
                               Text($r('app.string.upload')).fontSize(12).fontColor(this.icon_emphasize)
                             }
-                          }.ButtonStyle()
+                          }
+                          .ButtonStyle()
                           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                           //    .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: Curve.Ease }:null)
                           .width(76)
@@ -257,7 +309,7 @@ export struct ProviderPage {
 
                           // 更新按钮
                           Button({ type: ButtonType.Normal, stateEffect: true }) {
-                            if (this.isLoading ===index || this.isLoadingAll === this.providerListData.length) {
+                            if (this.isLoading === index || this.isLoadingAll === this.providerListData.length) {
                               Row({ space: 4.67 }) {
                                 LoadingProgress()
                                   .color(this.icon_emphasize)
@@ -267,7 +319,7 @@ export struct ProviderPage {
                               .width(100)
                               .height(28)
                               .justifyContent(FlexAlign.Center)
-                            } else{
+                            } else {
                               Row({ space: 4.67 }) {
                                 SymbolGlyph($r('sys.symbol.arrow_clockwise'))
                                   .fontSize(14.67)
@@ -302,6 +354,7 @@ export struct ProviderPage {
                       }
                       .listFlex()
                     }
+
                     //   .transition(this.isAnimation ?TransitionEffect.OPACITY.animation({ duration: this.uiConfig.animationSpeed, delay: 0 })
                     //      .combine(TransitionEffect.SLIDE):null)
                   }
@@ -320,61 +373,14 @@ export struct ProviderPage {
         right: this.breakPointStateTabContentTitleMargin.value,
       })
       .scrollBar(BarState.Off)
-    }.width('100%')
+    }
+    .width('100%')
     .height('100%')
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
       return true;
     })
-  }
-
-  //顶部半模拟态标题及按钮
-  @Builder
-  titleStyle() {
-    // 顶部标题区域
-    Row() {
-      Text($r('app.string.provider'))
-        .fontSize(20)
-        .fontWeight(FontWeight.Bold)
-        .maxLines(1)
-        .margin({left: this.breakPointStateTabContentTitleMargin.value})
-        .fontColor($r('sys.color.font_primary'))
-      Blank()
-      // 全部更新按钮
-      Button({ type: ButtonType.Circle, stateEffect: true }) {
-        SymbolGlyph($r('sys.symbol.arrow_clockwise'))
-          .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-          .fontColor([this.icon_primary])
-      }
-      .width(40)
-      .height(40)
-      .margin({right: 66})
-      .backgroundColor($r('app.color.settings_container_background'))
-      .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-      .onClick(() => {
-        this.isON.toggleAnim = true
-        animateTo({
-          duration: this.uiConfig.animationSpeed,
-          curve: Curve.Friction,
-          iterations: 1, // 设置-1表示动画无限循环
-        }, () => {
-          this.providerListData.forEach((item: Provider) => {
-            convertTime(item["update-at"])
-            this.isLoadingAll = this.providerListData.length
-            ClashViewModel.updateProvider(item)
-              .then((result) => {
-                this.isLoadingAll = -1
-              })
-              .catch((error: Error) => {
-                this.isLoadingAll = -1
-              })
-          })
-        })
-      })
-    }.width('100%')
-    .margin({bottom: 8, top: 8})
-    .height(BIND_SHEET_TITLE_CONTAINER_HEIGHT)
   }
 }
 

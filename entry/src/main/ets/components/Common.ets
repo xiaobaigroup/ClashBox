@@ -14,6 +14,9 @@ import { getResourceString } from "../utils/ResourceStringUtil"
 import { KeyValueData } from "./More/Overwrite/EditArrayConfig"
 import { Provider } from "proxy_core"
 import { common } from "@kit.AbilityKit"
+import { BreakpointState } from "../common/breakpointsystem"
+import ClashViewModel from "../entryability/ClashViewModel"
+import { convertTime } from "../utils/TimeConvertUtil"
 
 const context = getContext(this) as common.UIAbilityContext
 
@@ -991,4 +994,59 @@ export function RightDownButton(s:Resource,a:SymbolEffect)  {
     }
     .width('100%')
     .height('100%')
+}
+
+//代理页顶部半模拟态标题及按钮
+@Component
+export struct proxyBindSheetTitleStyle {
+  // 顶部标题区域
+  // 内容外边距
+  @Consume('breakPointStateTabContentTitleMargin')
+  private breakPointStateTabContentTitleMargin: BreakpointState<number>
+  // 一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  //开关不触发list转场动画判定
+  @State isON: isON = new isON()
+  // 提供者数据
+  @State
+  public providerListData: Array<Provider> = []
+  @State isLoadingAll: number = -1;
+  @State title: string | Resource = ''
+  @State icon: Resource | null = null
+  @BuilderParam otherButton: (icon:Resource | null) => void = this.titleButton
+
+  @Builder titleText(title: string | Resource) {
+      Text(title)
+        .fontSize(20)
+        .fontWeight(FontWeight.Bold)
+        .maxLines(1)
+        .margin({ left: this.breakPointStateTabContentTitleMargin.value })
+        .fontColor($r('sys.color.font_primary'))
+  }
+
+  @Builder titleButton(icon:Resource | null){
+    // 全部更新按钮
+    Button({ type: ButtonType.Circle, stateEffect: true }) {
+      SymbolGlyph(icon)
+        .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
+        .fontColor([this.icon_primary])
+    }
+    .width(40)
+    .height(40)
+    .margin({ right: 66 })
+    .backgroundColor($r('app.color.settings_container_background'))
+    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+  }
+
+  build() {
+    Row() {
+      this.titleText(this.title)
+      Blank()
+      this.otherButton(this.icon)
+    }
+    .width('100%')
+    .margin({ bottom: 8, top: 8 })
+    .height(BIND_SHEET_TITLE_CONTAINER_HEIGHT)
+  }
 }

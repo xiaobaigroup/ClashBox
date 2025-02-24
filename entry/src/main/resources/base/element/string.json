@@ -1815,6 +1815,10 @@
     {
       "name": "string_display_preferences_subtitle",
       "value": "设置字符显示的权重"
+    },
+    {
+      "name": "edit_layout",
+      "value": "编辑布局"
     }
   ]
 }
