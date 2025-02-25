@@ -1819,6 +1819,14 @@
     {
       "name": "edit_layout",
       "value": "Edit Layout"
+    },
+    {
+      "name": "email_feedback",
+      "value": "Email feedback"
+    },
+    {
+      "name": "export_share",
+      "value": "Export share"
     }
   ]
 }

@@ -371,12 +371,12 @@ struct ProxyGroupItem {
           onWillDismiss: false,
           autoCancel: false
         })
-      }, (item: ProxyItem,i: number) => item.name+ '-' + i.toString())
+      }, (item: ProxyItem,i: number) => item.name + '-' + i.toString())
     }
     .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : this.breakPointStateListLanes.value,
       this.breakPointStateListGutter.value)
     .ListStyle()
-    .contentEndOffset(this.appConfig.proxyGroupType === ProxyGroupType.List?0:CONTENT_END_OFFSET_150)
+    .contentEndOffset(this.appConfig.proxyGroupType === ProxyGroupType.List ? 10 : CONTENT_END_OFFSET_150)
    /* .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
       detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
       preferType: SheetType.CENTER,

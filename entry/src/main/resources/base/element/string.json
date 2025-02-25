@@ -1819,6 +1819,14 @@
     {
       "name": "edit_layout",
       "value": "编辑布局"
+    },
+    {
+      "name": "email_feedback",
+      "value": "邮件反馈"
+    },
+    {
+      "name": "export_share",
+      "value": "导出分享"
     }
   ]
 }

@@ -38,7 +38,6 @@ export struct Welcome {
         dismissDialogAction.dismiss()
       }
     }
-
   })
 
   build() {

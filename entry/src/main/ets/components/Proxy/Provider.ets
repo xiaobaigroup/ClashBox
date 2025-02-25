@@ -123,7 +123,7 @@ export struct ProviderPage {
         otherButton: (): void => {
           this.titleButton()
         }
-      })
+      }).margin({ left: this.breakPointStateTabContentTitleMargin.value })
       // this.titleStyle()
       List() {
         ListItem() {

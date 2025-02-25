@@ -59,7 +59,7 @@ export const ANIMATION_DURATION_100: number = 100
 export const ANIMATION_DURATION_500: number = 500
 
 /**
- * list偏移数值：110
+ * list偏移数值：150
  */
 export const CONTENT_END_OFFSET_150: number = 150
 

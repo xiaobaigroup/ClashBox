@@ -24,6 +24,7 @@ import { customVibrator } from "../../utils/VibratorUtil"
 import { customSound } from "../../utils/SoundPoolUtil"
 import { getResourceString } from "../../utils/ResourceStringUtil"
 import { extractUpdateInfo, getUpdateInfo, UpdateInfo } from "../../utils/CheckUpdateUtil"
+import { handleMailto } from "../../utils/MailTwoUtil"
 
 const context = getContext(this) as common.UIAbilityContext
 
@@ -974,13 +975,3 @@ export async function implicitStartAbility(url: string, context: common.UIAbilit
   }
 }
 
-/**
- * 拉起邮件类应用（mailto方式）
- */
-async function
-handleMailto(address: string, ctx: common.UIAbilityContext) {
-  ctx.startAbility({
-    action: 'ohos.want.action.sendToData',
-    uri: address
-  })
-}

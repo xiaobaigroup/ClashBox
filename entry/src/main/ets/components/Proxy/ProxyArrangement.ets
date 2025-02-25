@@ -8,6 +8,8 @@ import ClashViewModel from '../../entryability/ClashViewModel'
 import { AppConfig, UIConfig } from '../../entryability/AppState'
 import { customAnimationUtil } from '../../utils/Animation'
 
+const  componentName: string = 'ProxyPageArrangement'
+
 /**
  * 列表排列
  */
@@ -18,11 +20,9 @@ struct ProxyArrangement {
   @State selectItem: number = 0
   @State currentIndex: number =0
   // 代理原始数据
- @Consume theProxyGroups: ProxyGroup[]
- // @StorageProp("proxyGroups") theProxyGroups: ProxyGroup[] = []
+  @Consume theProxyGroups: ProxyGroup[]
   @Consume proxyGroups: ProxyGroupItemDataSource
-  private componentName: string = 'ProxyPage'
-  @State isContentShow: boolean |undefined = false
+  @State isContentShow: boolean | undefined = false
   @Consume('currentProfile') private currentProfile: Profile
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
@@ -33,11 +33,11 @@ struct ProxyArrangement {
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
 
   aboutToAppear(): void {
-    hilog.info(0xB000, this.componentName, `#aboutToAppear`)
+    hilog.info(0xB000, componentName, '#aboutToAppear 组1数组长度： %{public}d', this.theProxyGroups[0].proxies.length )
     BreakpointSystem.getInstance().start()
 
     if (this.currentProfile){
-      let listIndexes = this.theProxyGroups.findIndex((d)=>d.name == this.currentProfile?.currentGroupName)
+      let listIndexes = this.theProxyGroups.findIndex((d) => d.name == this.currentProfile?.currentGroupName)
       setTimeout(() => {
         if(listIndexes > -1){
           this.currentIndex = listIndexes
@@ -45,12 +45,12 @@ struct ProxyArrangement {
       }, 200)
     }
     if(this.currentProfile && this.currentProfile?.proxySelected){
-      console.log("proxySelected",this.currentProfile?.proxySelected.size)
+      console.log("proxySelected", this.currentProfile?.proxySelected.size)
     }
   }
 
   changeProxy(g: string, item: ProxyItem){
-    if(this.currentProfile){
+    if (this.currentProfile) {
       ClashViewModel.changeProxy(this.currentProfile, g, item.name)
     }
   }
@@ -79,7 +79,7 @@ struct ProxyArrangement {
   proxyScroller: ListScroller = new ListScroller()
 
   build() {
-    List({ space: 10, initialIndex: 0, scroller: this.proxyScroller}) {
+    List({ initialIndex: 0, scroller: this.proxyScroller}) {
       LazyForEach(this.proxyGroups, (group: ProxyGroup, index: number) => {
         ListItemGroup({
           header: this.itemHead(group.name, !this.isContentShow && this.selectItem === index
@@ -100,7 +100,7 @@ struct ProxyArrangement {
               .width('100%')
               .padding({ top:10})
           }
-        }
+        }.margin({bottom: (!this.isContentShow && this.selectItem === index) ? 0 : 10})
         .clickEffect(this.isContentShow?customAnimationUtil.isClickEffect(this.uiConfig):null)
         .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
         .onClick(() => {
@@ -121,10 +121,10 @@ struct ProxyArrangement {
       }, (item: ProxyGroup) => item.name)
     }
     .cachedCount(5)
+    .contentEndOffset(13)
     .chainAnimation(true)
     .scrollBar(BarState.Off)
     .edgeEffect(EdgeEffect.Spring)
-    .contentEndOffset(CONTENT_END_OFFSET_150)
     .nestedScroll({
       scrollForward: NestedScrollMode.PARENT_FIRST,
       scrollBackward: NestedScrollMode.SELF_FIRST

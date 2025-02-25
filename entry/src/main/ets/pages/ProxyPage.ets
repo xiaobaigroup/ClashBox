@@ -279,7 +279,7 @@ struct ProxyPage {
             Scroll() {
               // 标签分组页 start
               Column() {
-                //根据ProxyArrangementSelected的状态决定是否显示
+                // 根据ProxyArrangementSelected的状态决定是否显示
                 if (this.appConfig.proxyGroupType === ProxyGroupType.Tabs) {
                   // 代理分组List Start
                   List({scroller: this.ListScroller}) {

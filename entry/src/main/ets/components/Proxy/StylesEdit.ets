@@ -4,8 +4,6 @@ import { BORDER_RADIUS_20 } from '../../common/Constants'
 import { EventHub, EventKey } from '../../common/EventHub'
 import { AppConfig, isEnd, ProxyCardSize, ProxyGroupType, UIConfig } from '../../entryability/AppState'
 import { customAnimationUtil } from '../../utils/Animation'
-import { getResourceString } from '../../utils/ResourceStringUtil'
-import { promptAction } from '@kit.ArkUI'
 import { proxyBindSheetTitleStyle } from '../Common'
 
 @Component
@@ -18,6 +16,16 @@ export struct StylesEdit {
   @Consume('breakPointStateTabContentTitleMargin')
   private breakPointStateTabContentTitleMargin: BreakpointState<number>
 
+  // 编辑页标题
+  @Builder
+  EditTitleBuilder(title: ResourceStr) {
+    Text(title)
+      .fontSize(16)
+      .textAlign(0)
+      .width('100%')
+      .margin({ bottom: 10 })
+      .fontColor($r('sys.color.font_secondary'))
+  }
 
   build() {
     NavDestination() {
@@ -28,9 +36,8 @@ export struct StylesEdit {
         }
       })
 
-      Column(){
-      //代理节点分组方式切换
-      EditTitle({ title: $r('app.string.Packet_mode') })
+      // 代理节点分组方式切换
+      this.EditTitleBuilder($r('app.string.Packet_mode'))
       Column() {
         ForEach([{ t: $r('app.string.Tabs'), v: ProxyGroupType.Tabs },
           { t: $r('app.string.List'), v: ProxyGroupType.List }], (n: [Resource, number], i: number) => {
@@ -42,13 +49,6 @@ export struct StylesEdit {
               indicatorType: RadioIndicatorType.TICK,
             })
               .checked(this.appConfig.proxyGroupType == n["v"])
-              .onChange((isChecked: boolean) => {
-                if (isChecked) {
-                  animateTo({ duration: this.uiConfig.animationSpeed }, () => {
-                    this.appConfig.proxyGroupType = n["v"]
-                  })
-                }
-              })
               .hitTestBehavior(HitTestMode.None)
               .radioStyle({
                 checkedBackgroundColor: this.icon_emphasize,
@@ -71,8 +71,8 @@ export struct StylesEdit {
       .height(94)
       .EditColumn()
 
-      //代理节点排列切换
-      EditTitle({ title: $r('app.string.Arrangement') })
+      // 代理节点排列切换
+      this.EditTitleBuilder($r('app.string.Arrangement'))
       Column() {
         ForEach([
           { t: $r('app.string.Default'), v: ProxySort.Default },
@@ -108,8 +108,8 @@ export struct StylesEdit {
       .height(142)
       .EditColumn()
 
-      //代理节点卡片尺寸切换
-      EditTitle({ title: $r('app.string.Card_Size') })
+      // 代理节点卡片尺寸切换
+      this.EditTitleBuilder($r('app.string.Card_Size'))
       Column() {
         ForEach([
           { t: $r('app.string.Mini'), v: ProxyCardSize.Mini },
@@ -124,13 +124,6 @@ export struct StylesEdit {
               indicatorType: RadioIndicatorType.TICK
             })
               .checked(this.appConfig.proxyCardSize == n["v"])
-              .onChange((isChecked: boolean) => {
-                if (isChecked) {
-                  animateTo({ duration: this.uiConfig.animationSpeed }, () => {
-                    this.appConfig.proxyCardSize = n["v"]
-                  })
-                }
-              })
               .hitTestBehavior(HitTestMode.None)
               .radioStyle({
                 checkedBackgroundColor: this.icon_emphasize,
@@ -152,18 +145,15 @@ export struct StylesEdit {
       }
       .height(142)
       .EditColumn()
-      }
-      .padding({
-        left: this.breakPointStateTabContentTitleMargin.value,
-        right: this.breakPointStateTabContentTitleMargin.value,
-      })
+
     }
     .width('100%')
     .height('100%')
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
-    .onBackPressed(() => {
-      return true;
+    .padding({
+      left: this.breakPointStateTabContentTitleMargin.value,
+      right: this.breakPointStateTabContentTitleMargin.value,
     })
   }
 }
@@ -193,16 +183,4 @@ function EditText() {
   .fontColor($r('sys.color.font_primary')) // 一级文本色，黑色
 }
 
-// 编辑页标题
-@Component
-struct EditTitle {
-  @State title: ResourceStr = $r('app.string.Packet_mode')
-  build() {
-    Text(this.title)
-      .width('100%')
-      .fontSize(16)
-      .fontColor($r('sys.color.font_secondary'))
-      .textAlign(0)
-      .margin({ bottom: 10 })
-  }
-}
+
