@@ -3,7 +3,7 @@ import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import ProxyGroupItem from './ProxyGroupItem'
 import { Profile, ProxyGroup,ProxyType } from 'proxy_core'
-import { ProxyItem, ProxyGroupItemDataSource, ProxyItemDataSource } from '../../common/ProxyData'
+import { ProxyItem, ProxyGroupItemDataSource } from '../../common/ProxyData'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { AppConfig, UIConfig } from '../../entryability/AppState'
 import { customAnimationUtil } from '../../utils/Animation'

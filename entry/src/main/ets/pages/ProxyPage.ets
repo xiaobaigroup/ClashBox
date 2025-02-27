@@ -75,7 +75,7 @@ struct ProxyPage {
   /*节点相关数据以及排序 */
   // 代理原始数据
   @Consume theProxyGroups: ProxyGroup[]
- // @StorageProp("proxyGroups") theProxyGroups: ProxyGroup[] = []
+  // @StorageProp("proxyGroups") theProxyGroups: ProxyGroup[] = []
   @Prop proxyitems: ProxyItem[]
   // 代理数据(懒加载)
   @Consume proxyGroups: ProxyGroupItemDataSource
@@ -119,6 +119,7 @@ struct ProxyPage {
   // Index页tab栏竖直状态
   @Consume compVertical: BreakpointState<boolean>
 
+
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     this.isShowDelayPop = this.uiConfig.ShowDelayPop
@@ -138,7 +139,7 @@ struct ProxyPage {
 
   aboutToDisappear() {
     EventHub.off(EventKey.FetchProxyGroup)
-   // EventHub.off(EventKey.ProxySort)
+    // EventHub.off(EventKey.ProxySort)
     EventHub.off(EventKey.TestDelay)
     this.uiConfig.ShowDelayPop = this.isShowDelayPop
   }
@@ -307,8 +308,9 @@ struct ProxyPage {
                       })
                         .width('100%')
                         .height('100%')
-                        .padding({bottom:CONTENT_END_OFFSET_150 - 50})
+                        .padding({ bottom: CONTENT_END_OFFSET_150 - 50 })
                         .onAppear(() => {
+
                           hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear %{public}s", group.proxies.toString())
                         })
                         .onDisAppear(() => {
@@ -317,7 +319,9 @@ struct ProxyPage {
                     }, (item: ProxyGroup) => item.name)
                   }
                   .loop(false)
-                  .cachedCount(2)
+                  .effectMode(EdgeEffect.None)
+                  .nestedScroll(SwiperNestedScrollMode.SELF_FIRST)
+                  //  .cachedCount(2)
                   .indicator(false)
                   .alignSelf(ItemAlign.Center)
                   .onGestureSwipe((index: number, extraInfo: SwiperAnimationEvent) => {
@@ -335,7 +339,7 @@ struct ProxyPage {
                       }
                     })
                   })
-                  .onAnimationStart((index: number, targetIndex: number) => {
+                  .onAnimationStart((index: number,targetIndex: number) => {
                     animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
                       this.ListScroller.scrollToIndex(targetIndex)
                       this.currentIndex = targetIndex

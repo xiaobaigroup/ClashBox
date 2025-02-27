@@ -157,7 +157,7 @@ struct ProxyGroupItem {
   @Prop selectedProxy: string
   @Prop disabled: boolean
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
-  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @StorageLink('appConfig') @Watch('switchSort') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 收藏显示判定
   @Consume showStart:boolean
@@ -181,16 +181,11 @@ struct ProxyGroupItem {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     BreakpointSystem.getInstance().attach(this.breakPointStateListLanes)
     BreakpointSystem.getInstance().start()
+    this.switchSort()
 
-     if (this.appConfig.proxySort==ProxySort.Default){
-       this.proxyLazyItems.DefaultSortItems(this.proxyitems)
-     }else if (this.appConfig.proxySort==ProxySort.Title){
-       this.proxyLazyItems.NameSortItems(this.proxyitems)
-     }else if (this.appConfig.proxySort==ProxySort.Delay){
-       this.proxyLazyItems.LatencySortItems(this.proxyitems)
-     }
+    //用@watch监测数据变化排序，不需eventhub.on
 
-     EventHub.on(EventKey.ProxySort, async (sort: ProxySort) => {
+   /*  EventHub.on(EventKey.ProxySort, async (sort: ProxySort) => {
        console.log("ProxySort", sort)
        switch (sort) {
          case ProxySort.Default:
@@ -205,7 +200,17 @@ struct ProxyGroupItem {
        }
        hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行4 %{public}s")
        hilog.info(0xFF00, "ProxyPageLatencyTag", "this.proxyitems %{public}s", JSON.stringify(this.proxyitems))
-     })
+     })*/
+   }
+
+   switchSort(){
+     if (this.appConfig.proxySort==ProxySort.Default){
+       this.proxyLazyItems.DefaultSortItems(this.proxyitems)
+     }else if (this.appConfig.proxySort==ProxySort.Title){
+       this.proxyLazyItems.NameSortItems(this.proxyitems)
+     }else if (this.appConfig.proxySort==ProxySort.Delay){
+       this.proxyLazyItems.LatencySortItems(this.proxyitems)
+     }
    }
 
    aboutToDisappear() {
