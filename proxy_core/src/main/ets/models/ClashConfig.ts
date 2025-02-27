@@ -225,10 +225,13 @@ export enum DnsEnhancedMode {
 }
 
 export class SnifferDefault {
-  enable?: boolean = false;
+  enable?: boolean = true;
   "force-dns-mapping"?: boolean = true;
   "parse-pure-ip"?: boolean = true;
   "override-destination"?: boolean = true;
+  "force-domain"?: string[] = [];
+  "skip-domain"?: string[] = [];
+  "port-whitelist"?: string[] = [];
   "sniff"?:Record<string, Sniff> = {
   "HTTP": {
     ports: ["80", "8080-8880"],

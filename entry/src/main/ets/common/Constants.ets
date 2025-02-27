@@ -390,22 +390,24 @@ export  const ListOverwriteNetworkData = (clashConfig: ClashConfig, appConfig: A
 // 更多 -> 覆写 -> 网络 -> 兼容模式
 export  const OverwriteNetworkCompatible = (clashConfig: ClashConfig, appConfig: AppConfig): ConfigItemData[] => {
   let result: ConfigItemData[] = new Array()
-  let snifferDefault = clashConfig.snifferDefault?? new SnifferDefault()
   clashConfig.sniffer = clashConfig.sniffer ?? { } as Sniffer
   result = [
-    new ConfigItemData($r('sys.symbol.network_acceleration'), 'compatible', $r('app.string.compatibility_mode'), $r('app.string.compatibility_mode_subtitle'), '', 2).bindClashConfigBy(clashConfig,'sniffer').bindType(ValueType.Boolean),
+    new ConfigItemData($r('sys.symbol.network_acceleration'), 'compatible', $r('app.string.compatibility_mode'), $r('app.string.compatibility_mode_subtitle'), '', 2).bindClashConfigBy(clashConfig,'snifferDefault').bindType(ValueType.Boolean)
+      .bind<boolean>(appConfig.overwriteNetwork, (v)=>{
+      appConfig.overwriteNetwork = v
+    }),
     new ConfigItemData($r('sys.symbol.selector'), 'Option', 'Sniffer Setting', '', '', 3),
-    new ConfigItemData($r('sys.symbol.satellite_map_fill'), 'strategy', $r('app.string.strategy'), '', $r('app.string.not_modify'), 0).bindClashConfigBy(clashConfig,'sniffer')
+    new ConfigItemData($r('sys.symbol.satellite_map_fill'), 'strategy', $r('app.string.strategy'), '', $r('app.string.enabled'), 0).bindClashConfigBy(clashConfig,'snifferDefault')
       .bindOption(SwitchMenu),
-    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'force-dns-mapping', 'Force DNS Mapping', '', '', 0).bindClashConfigBy(clashConfig,"sniffer")
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'force-dns-mapping', 'Force DNS Mapping', '', $r('app.string.enabled'), 0).bindClashConfigBy(clashConfig,"snifferDefault")
       .bindOption(SwitchMenu),
-    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'parse-pure-ip', 'Parse Pure Ip', '', '', 0).bindClashConfigBy(clashConfig,'sniffer')
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'parse-pure-ip', 'Parse Pure Ip', '', $r('app.string.enabled'), 0).bindClashConfigBy(clashConfig,'snifferDefault')
       .bindOption(SwitchMenu),
-    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'override-destination', 'Override Destination', '', '', 0).bindClashConfigBy(clashConfig,'sniffer')
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'override-destination', 'Override Destination', '', $r('app.string.enabled'), 0).bindClashConfigBy(clashConfig,'snifferDefault')
       .bindOption(SwitchMenu),
-    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'force-domain', 'Force Domain', '', '', 1).bindClashConfigBy(clashConfig,'sniffer'),
-    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'skip-domain', 'Skip Domain', '', '', 1).bindClashConfigBy(clashConfig,'sniffer'),
-    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'sniff', 'Sniff', '', '', 1).bindSnifferConfig(clashConfig,snifferDefault,"sniff").bindType(ValueType.Record),
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'force-domain', 'Force Domain', '', '', 1).bindClashConfigBy(clashConfig,'snifferDefault').bindType(ValueType.StringArray),
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'skip-domain', 'Skip Domain', '', '', 1).bindClashConfigBy(clashConfig,'snifferDefault').bindType(ValueType.StringArray),
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'sniff', 'Sniff', '', '', 1).bindClashConfigBy(clashConfig,"snifferDefault").bindType(ValueType.Record),
   ]
   return result
 }

@@ -49,7 +49,7 @@ export class AppConfig{
   overrideDns: boolean = false
   clashCore: ClashCore = ClashCore.FlClash
   switchMode: ProxyMode = ProxyMode.Rule
-
+  overwriteNetwork: boolean = true
   constructor() {
   }
 }
