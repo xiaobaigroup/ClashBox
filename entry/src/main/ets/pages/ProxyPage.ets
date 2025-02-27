@@ -415,10 +415,6 @@ struct ProxyPage {
               await ClashViewModel.testAllDelay(this.theProxyGroups[this.currentIndex].proxies as ProxyItem[])
               this.loading = false
               hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行1 %{public}s")
-              if (this.appConfig.proxySort == ProxySort.Delay) {
-                EventHub.sendEvent(EventKey.ProxySort, ProxySort.Delay)
-                hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行2 %{public}s")
-              }
               if (this.uiConfig.isVibrate) {
                 customVibrator.vibratorTriggerOfHapticClockTimer()
               }
