@@ -1,4 +1,7 @@
-import { ClashConfig, Dns, DnsEnhancedMode, LogLevel, RouteMode, TunStack } from "proxy_core";
+import { ClashConfig, Dns, DnsEnhancedMode, LogLevel, RouteMode,
+  Sniff,
+  Sniffer, SnifferDefault,
+  TunStack } from "proxy_core";
 import { ArrayConfigParam } from "../components/More/Overwrite/EditArrayConfig";
 import { AppConfig, AppState, copy } from "../entryability/AppState";
 import { CustomThemeName } from "./AppTheme";
@@ -142,7 +145,7 @@ export class ConfigItemData{
   }
   tips(): string | Resource{
     if (this.options){
-        return this.options.find((d)=>d.value == this.value)?.title ?? (this.value as string) ?? this.theTips
+      return this.options.find((d)=>d.value == this.value)?.title ?? (this.value as string) ?? this.theTips
     }
     if(this.isEditType()){
       return (this.value  + "") as string
@@ -151,8 +154,8 @@ export class ConfigItemData{
     }
   }
   bindOption(options: OptionItem[]){
-      this.options = options
-      return this
+    this.options = options
+    return this
   }
   bindType(type: ValueType){
     this.valueType = type
@@ -202,6 +205,22 @@ export class ConfigItemData{
       this.onChange = (value: boolean | string [] | Record<string, string> | string | number )=>{
         config[this.name] = value
       }
+    }
+    this.initValue()
+    return this
+  }
+  bindSnifferConfig(
+    config: ClashConfig,
+    snifferDefault: SnifferDefault,
+    key: string
+  ){
+    if(!snifferDefault[key])
+      snifferDefault[key] = {}
+    this.value = snifferDefault[key][this.name]
+    this.onChange = (value: boolean | string [] | Record<string, Sniff> | string | number|Record<string, string> )=>{
+      snifferDefault[key][this.name] = value
+      promptAction.showToast({message: "debug: " + value})
+      config.snifferDefault = copy(snifferDefault)
     }
     this.initValue()
     return this
@@ -266,7 +285,7 @@ export class moreData {
 export  const ListMoreData = (): moreData[] => {
   let result: moreData[] = new Array()
   result = [
-    // new moreData($r('sys.symbol.doc_text_fill'), 'Log', $r('app.string.Log'), '', 0, false),
+  // new moreData($r('sys.symbol.doc_text_fill'), 'Log', $r('app.string.Log'), '', 0, false),
     new moreData($r('sys.symbol.externaldrive_fill_3'), 'Resources', $r('app.string.Resources'), '', 0, false),
     new moreData($r('sys.symbol.list_bullet'), 'Request', $r('app.string.Request'), '', 0, false),
     new moreData($r('sys.symbol.swap'), 'Connect', $r('app.string.Connect'), '', 0, false),
@@ -308,11 +327,11 @@ export  const ListOverwriteBasicData = (clashConfig: ClashConfig, appConfig: App
     new ConfigItemData($r('sys.symbol.line_arrowtriangle_2_inward'), 'unified-delay', $r('app.string.UnifiedLatency'), $r('app.string.Unified_Latency_Subtitle'), '', 2).bindClashConfig(clashConfig),
     new ConfigItemData($r('sys.symbol.order_play'), 'tcp-concurrent', $r('app.string.TCP_Concurrency'), '', '',  2, ).bindClashConfig(clashConfig),
     new ConfigItemData($r('sys.symbol.selector'), 'external-controller', $r('app.string.External_Control'), $r('app.string.External_Control_Subtitle'), '',  2).bind<boolean>(clashConfig["external-controller"] != "", (result)=>{
-          if(result){
-            clashConfig["external-controller"] = AppState.externalController
-          }else{
-            clashConfig["external-controller"] = ""
-          }
+      if(result){
+        clashConfig["external-controller"] = AppState.externalController
+      }else{
+        clashConfig["external-controller"] = ""
+      }
 
     }),
   ]
@@ -356,7 +375,7 @@ export  const ListOverwriteDNSData = (clashConfig: ClashConfig, appConfig: AppCo
 export  const ListOverwriteNetworkData = (clashConfig: ClashConfig, appConfig: AppConfig): ConfigItemData[] => {
   let result: ConfigItemData[] = new Array()
   result = [
-    // new ConfigItemData($r('sys.symbol.key_shield_fill'), 'VPN', 'VPN', '', '', 2),
+  // new ConfigItemData($r('sys.symbol.key_shield_fill'), 'VPN', 'VPN', '', '', 2),
     new ConfigItemData($r('sys.symbol.selector'), 'Option', $r('app.string.option'), '', '', 3),
     new ConfigItemData($r('sys.symbol.selector'), 'ipv6', $r('app.string.IPv6'), $r('app.string.Info'), '', 2).bindClashConfig(clashConfig),
     new ConfigItemData($r('sys.symbol.satellite_map_fill'), 'stack', $r('app.string.stack_mode'), '', 'gvisor', 0).bindClashConfigBy(clashConfig, "tun").bindOption(StackMenu),
@@ -371,20 +390,22 @@ export  const ListOverwriteNetworkData = (clashConfig: ClashConfig, appConfig: A
 // 更多 -> 覆写 -> 网络 -> 兼容模式
 export  const OverwriteNetworkCompatible = (clashConfig: ClashConfig, appConfig: AppConfig): ConfigItemData[] => {
   let result: ConfigItemData[] = new Array()
+  let snifferDefault = clashConfig.snifferDefault?? new SnifferDefault()
+  clashConfig.sniffer = clashConfig.sniffer ?? { } as Sniffer
   result = [
-    new ConfigItemData($r('sys.symbol.network_acceleration'), 'compatible', $r('app.string.compatibility_mode'), $r('app.string.compatibility_mode_subtitle'), '', 2),
+    new ConfigItemData($r('sys.symbol.network_acceleration'), 'compatible', $r('app.string.compatibility_mode'), $r('app.string.compatibility_mode_subtitle'), '', 2).bindClashConfigBy(clashConfig,'sniffer').bindType(ValueType.Boolean),
     new ConfigItemData($r('sys.symbol.selector'), 'Option', 'Sniffer Setting', '', '', 3),
-    new ConfigItemData($r('sys.symbol.satellite_map_fill'), 'strategy', $r('app.string.strategy'), '', $r('app.string.not_modify'), 0)
+    new ConfigItemData($r('sys.symbol.satellite_map_fill'), 'strategy', $r('app.string.strategy'), '', $r('app.string.not_modify'), 0).bindClashConfigBy(clashConfig,'sniffer')
       .bindOption(SwitchMenu),
-    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'force-dns-mapping', 'Force DNS Mapping', '', '', 0)
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'force-dns-mapping', 'Force DNS Mapping', '', '', 0).bindClashConfigBy(clashConfig,"sniffer")
       .bindOption(SwitchMenu),
-    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'parse-pure-ip', 'Parse Pure Ip', '', '', 0)
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'parse-pure-ip', 'Parse Pure Ip', '', '', 0).bindClashConfigBy(clashConfig,'sniffer')
       .bindOption(SwitchMenu),
-    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'override-destination', 'Override Destination', '', '', 0)
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'override-destination', 'Override Destination', '', '', 0).bindClashConfigBy(clashConfig,'sniffer')
       .bindOption(SwitchMenu),
-    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'force-domain', 'Force Domain', '', '', 1),
-    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'skip-domain', 'Skip Domain', '', '', 1),
-    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'sniff', 'Sniff', '', '', 1),
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'force-domain', 'Force Domain', '', '', 1).bindClashConfigBy(clashConfig,'sniffer'),
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'skip-domain', 'Skip Domain', '', '', 1).bindClashConfigBy(clashConfig,'sniffer'),
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'sniff', 'Sniff', '', '', 1).bindSnifferConfig(clashConfig,snifferDefault,"sniff").bindType(ValueType.Record),
   ]
   return result
 }
@@ -436,9 +457,9 @@ export const RouteMenu: OptionItem[] = [
  * 更多 -> 覆写 -> 网络 -> 兼容模式切换菜单
  */
 export const SwitchMenu: OptionItem[] = [ // TODO value的值不会写
-  {title: $r('app.string.not_modify'),value: ''},
-  {title: $r('app.string.enabled'),value: ''},
-  {title: $r('app.string.disabled'), value: ''},
+  {title: $r('app.string.not_modify'),value:''},
+  {title: $r('app.string.enabled'),value:''},
+  {title: $r('app.string.disabled'), value:''},
 ]
 
 /**
@@ -636,7 +657,7 @@ export function getAboutList(): AboutListItemProp[] {
         { title: $r('app.string.UpdateChannels'), subtitle: $r('app.string.UpdateChannels_Subtitle1'), sign: 3, name: 'UpdateChannels',
           children: [
             { title: $r('app.string.UpdateChannels_Subtitle1'), name: 'Github', subtitle: '' },
-            // { title: 'Gitee', name: 'Gitee', subtitle: '' }
+          // { title: 'Gitee', name: 'Gitee', subtitle: '' }
           ]
         },
         { title: $r('app.string.Auto_Check_Updates'), subtitle: '', sign: 1, name: 'Auto', isOn: false },
@@ -998,9 +1019,9 @@ export const IPfontSize: BreakpointState<number> = BreakpointState.of({
   sm: 18, md: 24, lg: 20, xl: 24
 });
 /**
-* 主页添加卡片半模拟态卡片高度
-  */
-  export const HomeCardEditHeight: BreakpointState<number> = BreakpointState.of({
+ * 主页添加卡片半模拟态卡片高度
+ */
+export const HomeCardEditHeight: BreakpointState<number> = BreakpointState.of({
   sm: 160, md: 160, lg: 180, xl: 180
 });
 /**

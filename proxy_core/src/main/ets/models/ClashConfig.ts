@@ -142,6 +142,7 @@ export class  ClashConfig {
   app?: App;
   tun?: Tun = new Tun();
   sniffer?: Sniffer;
+  snifferDefault?: SnifferDefault = new SnifferDefault()
   "geox-url"?: GeoXUrl = defaultGeoXMap;
   constructor(ua: string = "ClashNext/v1.0.0") {
     this["global-ua"] = ua
@@ -221,6 +222,25 @@ export enum DnsEnhancedMode {
   None = "normal",
   Mapping = "redir-host",
   FakeIp = "fake-ip",
+}
+
+export class SnifferDefault {
+  enable?: boolean = false;
+  "force-dns-mapping"?: boolean = true;
+  "parse-pure-ip"?: boolean = true;
+  "override-destination"?: boolean = true;
+  "sniff"?:Record<string, Sniff> = {
+  "HTTP": {
+    ports: ["80", "8080-8880"],
+    'override-destination': true
+  },
+  "TLS": {
+    ports: ["443", "8443"]
+  },
+  "QUIC": {
+    ports: ["443", "8443"]
+  },
+  }
 }
 
 export interface  Sniffer {
