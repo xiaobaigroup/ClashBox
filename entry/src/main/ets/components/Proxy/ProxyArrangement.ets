@@ -120,8 +120,7 @@ struct ProxyArrangement {
         .borderRadius(BORDER_RADIUS_20)
       }, (item: ProxyGroup) => item.name)
     }
-    .cachedCount(5)
-    .contentEndOffset(13)
+    .contentEndOffset(CONTENT_END_OFFSET_150)
     .chainAnimation(true)
     .scrollBar(BarState.Off)
     .edgeEffect(EdgeEffect.Spring)
