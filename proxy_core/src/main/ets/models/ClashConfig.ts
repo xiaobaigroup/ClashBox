@@ -226,6 +226,7 @@ export enum DnsEnhancedMode {
 
 export class SnifferDefault {
   enable?: boolean = true;
+  sniffing?: string[] = [];
   "force-dns-mapping"?: boolean = true;
   "parse-pure-ip"?: boolean = true;
   "override-destination"?: boolean = true;

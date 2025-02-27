@@ -397,16 +397,18 @@ export  const OverwriteNetworkCompatible = (clashConfig: ClashConfig, appConfig:
       appConfig.overwriteNetwork = v
     }),
     new ConfigItemData($r('sys.symbol.selector'), 'Option', 'Sniffer Setting', '', '', 3),
-    new ConfigItemData($r('sys.symbol.satellite_map_fill'), 'strategy', $r('app.string.strategy'), '', $r('app.string.enabled'), 0).bindClashConfigBy(clashConfig,'snifferDefault')
-      .bindOption(SwitchMenu),
-    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'force-dns-mapping', 'Force DNS Mapping', '', $r('app.string.enabled'), 0).bindClashConfigBy(clashConfig,"snifferDefault")
-      .bindOption(SwitchMenu),
-    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'parse-pure-ip', 'Parse Pure Ip', '', $r('app.string.enabled'), 0).bindClashConfigBy(clashConfig,'snifferDefault')
-      .bindOption(SwitchMenu),
-    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'override-destination', 'Override Destination', '', $r('app.string.enabled'), 0).bindClashConfigBy(clashConfig,'snifferDefault')
-      .bindOption(SwitchMenu),
+    new ConfigItemData($r('sys.symbol.satellite_map_fill'), 'strategy', $r('app.string.strategy'), '', $r('app.string.enabled'), 2).bindClashConfigBy(clashConfig,'snifferDefault'),
+  //.bindOption(SwitchMenu),
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'force-dns-mapping', 'Force DNS Mapping', '', $r('app.string.enabled'), 2).bindClashConfigBy(clashConfig,"snifferDefault"),
+  //  .bindOption(SwitchMenu),
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'parse-pure-ip', 'Parse Pure Ip', '', $r('app.string.enabled'), 2).bindClashConfigBy(clashConfig,'snifferDefault'),
+  // .bindOption(SwitchMenu),
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'override-destination', 'Override Destination', '', $r('app.string.enabled'), 2).bindClashConfigBy(clashConfig,'snifferDefault'),
+  // .bindOption(SwitchMenu),
+    new ConfigItemData($r('sys.symbol.satellite_map_fill'), 'sniffing', 'Sniffing', '', '', 1).bindClashConfigBy(clashConfig,'snifferDefault'),
     new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'force-domain', 'Force Domain', '', '', 1).bindClashConfigBy(clashConfig,'snifferDefault').bindType(ValueType.StringArray),
     new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'skip-domain', 'Skip Domain', '', '', 1).bindClashConfigBy(clashConfig,'snifferDefault').bindType(ValueType.StringArray),
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'port-whitelist', 'Port Whitelist', '', '', 1).bindClashConfigBy(clashConfig,'snifferDefault').bindType(ValueType.StringArray),
     new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'sniff', 'Sniff', '', '', 1).bindClashConfigBy(clashConfig,"snifferDefault").bindType(ValueType.Record),
   ]
   return result
