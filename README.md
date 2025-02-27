@@ -12,4 +12,5 @@ ClashNEXT是一个HarmonyOS NEXT(OpenHarmony)平台的代理软件，使用改�
 #### 食用方法
 
 需要使用[Auto-installer](https://github.com/likuai2010/auto-installer/)进行安装。
-注意：在HarmonyOS NEXT使用自签名的方式进行侧载的App只有14天至30天的有效期，到期后需要重新安装App。
+
+注意：在HarmonyOS NEXT使用自签名的方式进行侧载的App默认只有14天的有效期，进行实名认证后即可将有效期提升至180天。
