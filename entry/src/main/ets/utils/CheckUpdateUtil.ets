@@ -27,7 +27,7 @@ export function getUpdateInfo(): Promise<Release> {
   return new Promise<Release>((resolve, reject) => {
     let httpRequest = http.createHttp()
 
-    httpRequest.request(`https://api.github.com/repos/xfz347/hapapp/releases/latest`, (err: Error, data: http.HttpResponse) => {
+    httpRequest.request(`https://api.github.com/repos/xiaobaigroup/hapapp/releases/latest`, (err: Error, data: http.HttpResponse) => {
       if (!err) {
         hilog.info(0xFF00, "UpdateTestTag", "HTTP返回值: %{public}s", JSON.stringify(data))
         // 确保 data.result 是字符串类型

@@ -1,7 +1,9 @@
 import { BreakpointState } from "../../../common/breakpointsystem"
 import {
   BORDER_RADIUS_20,
-  ConfigItemData, ListOverwriteNetworkData, TAB_CONTENT_TITLE_HEIGHT } from "../../../common/Constants"
+  ConfigItemData, ListOverwriteNetworkData,
+  OverwriteNetworkCompatible,
+  TAB_CONTENT_TITLE_HEIGHT } from "../../../common/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import OverwriteTop from "./OverwriteTopBuilder"
 import { theCustomDialog } from "../../Common"
@@ -44,6 +46,45 @@ struct Network {
   }
 }
 export default Network
+
+// 网络 -> 兼容模式
+@Component
+export struct NetworkCompatible {
+
+  @Consume('NavPathStack') pageInfos: NavPathStack
+  @State networkCompatibleList: ConfigItemData[] = []
+  @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+
+  aboutToAppear(): void {
+    this.networkCompatibleList = OverwriteNetworkCompatible(this.clashConfig, this.appConfig)
+  }
+
+  build() {
+    NavDestination() {
+      Stack() {
+        // 导航栏
+        OverwriteTop({
+          title: $r('app.string.Network'),
+          subtitle: $r('app.string.compatibility_mode')
+        })
+        ConfigList({configList: this.networkCompatibleList})
+      }
+    }
+    .width('100%')
+    .height('100%')
+    .hideTitleBar(true)
+    .backgroundColor($r('app.color.background'))
+    .onBackPressed(() => {
+      if(this.pageInfos.size() === 1) {
+        this.pageInfos.clear()
+      } else {
+        this.pageInfos.pop(true)
+      }
+      return true
+    })
+  }
+}
 
 // 网络 -> 路由地址
 @Component

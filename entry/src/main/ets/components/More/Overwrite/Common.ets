@@ -89,6 +89,8 @@ export struct ConfigList {
       this.theDialogTitle =  getResourceString($r('app.string.Edit'), this) +  getResourceString(itemData.title, this)
       this.isEnableIndexForegroundBlur = true
       this.dialogController.open()
+    } else if (index === 5) {
+      this.pageInfos.pushPathByName("compatible", true)
     } else {
       this.pageInfos.pushPathByName("EditArrayConfig", itemData, true)
     }
@@ -109,7 +111,7 @@ export struct ConfigList {
       this.configList.splice(this.currentItemIndex, 1, item)
     })
     // 设置DNS页无图标
-    if(this.configList[0].name === 'overrideDns') {
+    if((this.configList[0].name === 'overrideDns') || (this.configList[0].name === 'compatible')) {
       this.isShowIcons = false
     }
   }

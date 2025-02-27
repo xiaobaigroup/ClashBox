@@ -950,7 +950,15 @@
     },
     {
       "name": "check_update_tips",
-      "value": "目前仅支持从Github下载更新，您也可以选择加入我们的Telegram频道获取更新。"
+      "value": "目前仅支持从Github下载更新，您也可以选择加入我们的"
+    },
+    {
+      "name": "check_update_tips_1",
+      "value": "获取更新。"
+    },
+    {
+      "name": "check_update_tips_2",
+      "value": "频道"
     },
     {
       "name": "simulate_locate",
@@ -982,7 +990,7 @@
     },
     {
       "name": "backgrounder_tips_2",
-      "value": "Tips：开启后会导致应用耗电量增加且只能开启其中的一个选项；目前已知从自由多窗模式无法主动发起画中画窗口"
+      "value": "Tips：开启后会导致应用耗电量增加且只能开启其中的一个选项，并且开关模拟定位后请重启软件；目前已知从自由多窗模式无法主动发起画中画窗口"
     },
     {
       "name": "notice_main_switch",
@@ -1827,6 +1835,26 @@
     {
       "name": "export_share",
       "value": "导出分享"
+    },
+    {
+      "name": "compatibility_mode",
+      "value": "兼容模式"
+    },
+    {
+      "name": "compatibility_mode_subtitle",
+      "value": "强制开启Sniffer"
+    },
+    {
+      "name": "strategy",
+      "value": "策略"
+    },
+    {
+      "name": "not_modify",
+      "value": "不修改"
+    },
+    {
+      "name": "disabled",
+      "value": "已禁用"
     }
   ]
 }

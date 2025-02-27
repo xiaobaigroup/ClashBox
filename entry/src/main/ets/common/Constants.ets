@@ -93,7 +93,7 @@ export enum ValueType {
   StringArray,
   Record
 }
-// 更多列表类
+// 更多配置项列表类
 export class ConfigItemData{
   icons: Resource;
   name: string;
@@ -363,6 +363,28 @@ export  const ListOverwriteNetworkData = (clashConfig: ClashConfig, appConfig: A
     new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'route-mode', $r('app.string.route_mode'), '', $r('app.string.using_configuration'), 0)
       .bindClashConfig(clashConfig).bindOption(RouteMenu),
     new ConfigItemData($r('sys.symbol.local_fill'), 'route-address', $r('app.string.Routing_Address'), $r('app.string.Routing_Address_Subtitle'), '', 1).bindClashConfig(clashConfig),
+    new ConfigItemData($r('sys.symbol.network_acceleration'), 'compatible', $r('app.string.compatibility_mode'), $r('app.string.compatibility_mode_subtitle'), '', 1),
+  ]
+  return result
+}
+
+// 更多 -> 覆写 -> 网络 -> 兼容模式
+export  const OverwriteNetworkCompatible = (clashConfig: ClashConfig, appConfig: AppConfig): ConfigItemData[] => {
+  let result: ConfigItemData[] = new Array()
+  result = [
+    new ConfigItemData($r('sys.symbol.network_acceleration'), 'compatible', $r('app.string.compatibility_mode'), $r('app.string.compatibility_mode_subtitle'), '', 2),
+    new ConfigItemData($r('sys.symbol.selector'), 'Option', 'Sniffer Setting', '', '', 3),
+    new ConfigItemData($r('sys.symbol.satellite_map_fill'), 'strategy', $r('app.string.strategy'), '', $r('app.string.not_modify'), 0)
+      .bindOption(SwitchMenu),
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'force-dns-mapping', 'Force DNS Mapping', '', '', 0)
+      .bindOption(SwitchMenu),
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'parse-pure-ip', 'Parse Pure Ip', '', '', 0)
+      .bindOption(SwitchMenu),
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'override-destination', 'Override Destination', '', '', 0)
+      .bindOption(SwitchMenu),
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'force-domain', 'Force Domain', '', '', 1),
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'skip-domain', 'Skip Domain', '', '', 1),
+    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'sniff', 'Sniff', '', '', 1),
   ]
   return result
 }
@@ -392,14 +414,31 @@ export const LogMenu :OptionItem[] = [
 export const UAMenu: OptionItem[] = [
 
 ]
+
+/**
+ * 更多 -> 覆写 -> 网络 -> 栈模式菜单
+ */
 export const StackMenu: OptionItem[] = [
   {title: 'Gvisor', value: TunStack.Gvisor},
   {title: 'System', value: TunStack.System},
   {title: 'Mixed',  value: TunStack.Mixed},
 ]
+
+/**
+ * 更多 -> 覆写 -> 网络 -> 路由模式菜单
+ */
 export const RouteMenu: OptionItem[] = [
   {title: $r('app.string.bypass_private_route_address'),value: RouteMode.BypassPrivate},
   {title: $r('app.string.using_configuration'), value: RouteMode.Config},
+]
+
+/**
+ * 更多 -> 覆写 -> 网络 -> 兼容模式切换菜单
+ */
+export const SwitchMenu: OptionItem[] = [ // TODO value的值不会写
+  {title: $r('app.string.not_modify'),value: ''},
+  {title: $r('app.string.enabled'),value: ''},
+  {title: $r('app.string.disabled'), value: ''},
 ]
 
 /**
@@ -689,6 +728,15 @@ export const FAQList: TCItemProp[] = [
   {title: $r('app.string.link_q'), content: $r('app.string.link_a')},
   {title: $r('app.string.node_q'), content: $r('app.string.node_a')},
   {title: $r('app.string.config_q'), content: $r('app.string.config_a')},
+]
+
+/**
+ * 常见问题 -> 转换链接
+ */
+export const LinkList: TCItemProp[] = [
+  {title: `https://sub.xeton.dev`, content: `https://sub.xeton.dev`},
+  {title: 'https://acl4ssr-sub.github.io', content: 'https://acl4ssr-sub.github.io'},
+  {title: 'https://sub.2c.lol', content: 'https://sub.2c.lol'},
 ]
 
 /**

@@ -950,7 +950,15 @@
     },
     {
       "name": "check_update_tips",
-      "value": "At present, we only support downloading updates from Github. You can also choose to join our Telegram channel to get updates."
+      "value": "At present, we only support downloading updates from Github. You can also choose to join our"
+    },
+    {
+      "name": "check_update_tips_1",
+      "value": " to get updates."
+    },
+    {
+      "name": "check_update_tips_2",
+      "value": " channel"
     },
     {
       "name": "simulate_locate",
@@ -982,7 +990,7 @@
     },
     {
       "name": "backgrounder_tips_2",
-      "value": "Tips： When enabled, the power consumption of the application will increase and only one of the options can be enabled; At present, it is known that the picture in picture window cannot be initiated from the free multi window mode"
+      "value": "Tips： When enabled, the power consumption of the application will increase and only one of the options can be enabled. Please restart the software after the switch is simulated and positioned; At present, it is known that the picture in picture window cannot be initiated from the free multi window mode."
     },
     {
       "name": "notice_main_switch",
@@ -1827,6 +1835,26 @@
     {
       "name": "export_share",
       "value": "Export share"
+    },
+    {
+      "name": "compatibility_mode",
+      "value": "Compatibility Mode"
+    },
+    {
+      "name": "compatibility_mode_subtitle",
+      "value": "Force sniffer on"
+    },
+    {
+      "name": "strategy",
+      "value": "Strategy"
+    },
+    {
+      "name": "not_modify",
+      "value": "Do not modify"
+    },
+    {
+      "name": "disabled",
+      "value": "Disabled "
     }
   ]
 }

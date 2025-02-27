@@ -11,6 +11,7 @@ import { AboutListItemProp, BORDER_RADIUS_20, ContributorsListItemProp,
   FAQList,
   ThirdServicesList,
   UseGuidanceList,
+  LinkList,
 } from "../../common/Constants"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
@@ -694,6 +695,7 @@ export struct UseGuidance {
 @Component
 export struct FAQ {
   @State FAQlist: TCItemProp[] = FAQList
+  @State linkList: TCItemProp[] = LinkList
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
@@ -759,45 +761,32 @@ export struct FAQ {
             .alignItems(HorizontalAlign.Start)
           }
         }, (item: TCItemProp) => getResourceString(item.title, this))
-
+        // 附录
         ListItem() {
-         Column() {
+         Column({space: 3}) {
            Text($r('app.string.attach'))
              .fontSize(15)
              .fontWeight(FontWeight.Regular)
-           Row() {
-             Text(`${getResourceString($r('app.string.link'), this)}1：`)
-               .fontSize(15)
-               .fontWeight(FontWeight.Regular)
-             Text(`https://sub.xeton.dev`)
-               .fontSize(15)
-               .fontColor(this.icon_emphasize)
-               .fontWeight(FontWeight.Regular)
-               .decoration({
-                 type: TextDecorationType.Underline,
-                 color: this.icon_emphasize
-               })
-               .onClick(() => {
-                 implicitStartAbility('https://sub.xeton.dev', context)
-               })
-           }.width('100%') .margin({top: 3})
-           Row() {
-             Text(`${getResourceString($r('app.string.link'), this)}2：`)
-               .fontSize(15)
-               .fontWeight(FontWeight.Regular)
-             Text(`https://acl4ssr-sub.github.io`)
-               .fontSize(15)
-               .fontColor(this.icon_emphasize)
-               .fontWeight(FontWeight.Regular)
-               .decoration({
-                 type: TextDecorationType.Underline,
-                 color: this.icon_emphasize
-               })
-               .onClick(() => {
-                 implicitStartAbility('https://acl4ssr-sub.github.io', context)
-               })
-           }.width('100%')
-           .margin({top: 3})
+           // 转换链接
+           ForEach(this.linkList, (item: TCItemProp, index: number) => {
+             Row() {
+               Text(`${getResourceString($r('app.string.link'), this)}${index + 1}：`)
+                 .fontSize(15)
+                 .fontWeight(FontWeight.Regular)
+               Text(item.title)
+                 .fontSize(15)
+                 .fontColor(this.icon_emphasize)
+                 .fontWeight(FontWeight.Regular)
+                 .decoration({
+                   type: TextDecorationType.Underline,
+                   color: this.icon_emphasize
+                 })
+                 .onClick(() => {
+                   implicitStartAbility(item.content as string, context)
+                 })
+             }.width('100%')
+           }, (item: TCItemProp) => getResourceString(item.title, this))
+
          }.margin({left: 11})
           .alignItems(HorizontalAlign.Start)
         }.width('100%')
@@ -938,7 +927,15 @@ export struct CheckUpdate {
           .borderRadius(BORDER_RADIUS_20)
         })
         // 提示
-        Text($r('app.string.check_update_tips'))
+        Text() {
+          Span($r('app.string.check_update_tips'))
+          Span(`Telegram${getResourceString($r('app.string.check_update_tips_2'), context)}`)
+            .fontColor(this.icon_emphasize)
+            .onClick(() => {
+              implicitStartAbility('https://t.me/+ihe73JZWYb40NTY1', context)
+            })
+          Span($r('app.string.check_update_tips_1'))
+        }
           .fontWeight(FontWeight.Normal)
           .fontSize(15)
       }

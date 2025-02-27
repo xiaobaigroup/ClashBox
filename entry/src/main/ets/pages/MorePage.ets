@@ -20,7 +20,7 @@ import Diversion from '../components/More/Diversion';
 import Settings from '../components/Settings/Settings';
 import Basic from '../components/More/Overwrite/Basic';
 import DNS from '../components/More/Overwrite/DNS';
-import Network, { NetworkRouterAddress } from '../components/More/Overwrite/Network';
+import Network, { NetworkCompatible, NetworkRouterAddress } from '../components/More/Overwrite/Network';
 import { getResourceString } from '../utils/ResourceStringUtil';
 import { extractLocationInfo, getIpInfo, mapLocation } from '../utils/GetIpInfo';
 import {  promptAction } from '@kit.ArkUI';
@@ -159,10 +159,13 @@ struct MorePage {
       NetworkRouterAddress()
     } else
     if (name == 'EditArrayConfig') {
-        ArrayConfigEditor({params: params as ConfigItemData})
+      ArrayConfigEditor({params: params as ConfigItemData})
     } else
     if (name == 'LogDetils') {
       LogDetils()
+    } else
+    if (name == 'compatible') {
+      NetworkCompatible()
     }
   }
 
@@ -242,7 +245,7 @@ struct MorePage {
                 }
               })
 
-             /* ListItem() {
+              /*ListItem() {
                 Button("appCrash 测试按钮，请勿点击").onClick(()=>{
                   // 在按钮点击函数中构造一个crash场景，触发应用崩溃事件
                   let result: object = JSON.parse("");

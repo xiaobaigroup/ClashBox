@@ -161,7 +161,7 @@ export enum  RouteMode{
   BypassPrivate, // route-address is defaultBypassPrivateRouteAddress
 }
 export class Dns {
-  enable?: boolean = true;
+  enable?: boolean = false;
   "prefer-h3"?: boolean = false;
   listen?: string;
   ipv6?: boolean = false;
