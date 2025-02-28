@@ -94,9 +94,11 @@ export enum ValueType {
   Boolean,
   String,
   StringArray,
-  Record
+  Record,
+  Sniff
 }
 // 更多配置项列表类
+@Observed
 export class ConfigItemData{
   icons: Resource;
   name: string;
@@ -105,7 +107,7 @@ export class ConfigItemData{
   theTips: string | Resource;
   sign: number;
   isCheck: boolean = false
-  value: boolean | string[] | Record<string, string> | string | number = false
+  value: boolean | string[] | Record<string, string> | Record<string, Sniff>| string | number = false
   options?: OptionItem[]
   onChange: (value: boolean | string [] | Record<string, string> | string | number ) => void = ()=> {}
   valueType: ValueType = ValueType.Boolean
@@ -143,11 +145,18 @@ export class ConfigItemData{
       this.isCheck = this.value as boolean
     }
   }
+  theSubtitle(): string | Resource{
+    if(this.isEditType() && this.theTips === ''){
+      return this.value !== '' ? (this.value  + "") as string : this.subtitle
+    } else {
+      return this.subtitle
+    }
+  }
   tips(): string | Resource{
     if (this.options){
-      return this.options.find((d)=>d.value == this.value)?.title ?? (this.value as string) ?? this.theTips
+      return this.options.find((d) => d.value == this.value)?.title ?? (this.value as string) ?? this.theTips
     }
-    if(this.isEditType()){
+    if(this.isEditType() && this.theTips !== ''){
       return (this.value  + "") as string
     } else {
       return this.theTips
@@ -205,22 +214,6 @@ export class ConfigItemData{
       this.onChange = (value: boolean | string [] | Record<string, string> | string | number )=>{
         config[this.name] = value
       }
-    }
-    this.initValue()
-    return this
-  }
-  bindSnifferConfig(
-    config: ClashConfig,
-    snifferDefault: SnifferDefault,
-    key: string
-  ){
-    if(!snifferDefault[key])
-      snifferDefault[key] = {}
-    this.value = snifferDefault[key][this.name]
-    this.onChange = (value: boolean | string [] | Record<string, Sniff> | string | number|Record<string, string> )=>{
-      snifferDefault[key][this.name] = value
-      promptAction.showToast({message: "debug: " + value})
-      config.snifferDefault = copy(snifferDefault)
     }
     this.initValue()
     return this
@@ -285,7 +278,7 @@ export class moreData {
 export  const ListMoreData = (): moreData[] => {
   let result: moreData[] = new Array()
   result = [
-  // new moreData($r('sys.symbol.doc_text_fill'), 'Log', $r('app.string.Log'), '', 0, false),
+    // new moreData($r('sys.symbol.doc_text_fill'), 'Log', $r('app.string.Log'), '', 0, false),
     new moreData($r('sys.symbol.externaldrive_fill_3'), 'Resources', $r('app.string.Resources'), '', 0, false),
     new moreData($r('sys.symbol.list_bullet'), 'Request', $r('app.string.Request'), '', 0, false),
     new moreData($r('sys.symbol.swap'), 'Connect', $r('app.string.Connect'), '', 0, false),
@@ -320,7 +313,7 @@ export  const ListOverwriteBasicData = (clashConfig: ClashConfig, appConfig: App
     ]),
     new ConfigItemData($r('sys.symbol.stopwatch_2'), 'keep-alive-interval', $r('app.string.TCP_Active'), '', $r('app.string.TCP_interval'), 1).bindClashConfig(clashConfig).bindType(ValueType.Number),
     new ConfigItemData($r('sys.symbol.bolt_filled_on_circle'), "testUrl", $r('app.string.Test_Latency_Link'), 'https://www.gstatic.com/generate204', '', 1).bind<string>(appConfig.testUrl,(v)=>{ appConfig.testUrl = v}).bindType(ValueType.String),
-    new ConfigItemData($r('sys.symbol.bolt_filled_on_circle'),"allow-lan", $r('app.string.lan'), $r('app.string.lan_subtitle'), '', 2).bindClashConfig(clashConfig),
+    new ConfigItemData($r('sys.symbol.worldclock_badge_checkmark'),"allow-lan", $r('app.string.lan'), $r('app.string.lan_subtitle'), '', 2).bindClashConfig(clashConfig),
     new ConfigItemData($r('sys.symbol.record_circle'), 'mixed-port', $r('app.string.Proxy_Port'), '', '7890', 1).bindClashConfig(clashConfig).bindType(ValueType.Number),
     new ConfigItemData($r('sys.symbol.list_bullet_square_fill'), 'hosts', 'Hosts', '', '', 1).bindClashConfig(clashConfig).bindType(ValueType.Record),
     new ConfigItemData($r('sys.symbol.mobiledata'), 'ipv6', $r('app.string.IPv6'), '', '', 2).bindClashConfig(clashConfig),
@@ -375,7 +368,7 @@ export  const ListOverwriteDNSData = (clashConfig: ClashConfig, appConfig: AppCo
 export  const ListOverwriteNetworkData = (clashConfig: ClashConfig, appConfig: AppConfig): ConfigItemData[] => {
   let result: ConfigItemData[] = new Array()
   result = [
-  // new ConfigItemData($r('sys.symbol.key_shield_fill'), 'VPN', 'VPN', '', '', 2),
+    // new ConfigItemData($r('sys.symbol.key_shield_fill'), 'VPN', 'VPN', '', '', 2),
     new ConfigItemData($r('sys.symbol.selector'), 'Option', $r('app.string.option'), '', '', 3),
     new ConfigItemData($r('sys.symbol.selector'), 'ipv6', $r('app.string.IPv6'), $r('app.string.Info'), '', 2).bindClashConfig(clashConfig),
     new ConfigItemData($r('sys.symbol.satellite_map_fill'), 'stack', $r('app.string.stack_mode'), '', 'gvisor', 0).bindClashConfigBy(clashConfig, "tun").bindOption(StackMenu),
@@ -390,26 +383,24 @@ export  const ListOverwriteNetworkData = (clashConfig: ClashConfig, appConfig: A
 // 更多 -> 覆写 -> 网络 -> 兼容模式
 export  const OverwriteNetworkCompatible = (clashConfig: ClashConfig, appConfig: AppConfig): ConfigItemData[] => {
   let result: ConfigItemData[] = new Array()
-  clashConfig.sniffer = clashConfig.sniffer ?? { } as Sniffer
+  clashConfig.sniffer = clashConfig.sniffer as Sniffer ?? clashConfig.snifferDefault
   result = [
-    new ConfigItemData($r('sys.symbol.network_acceleration'), 'compatible', $r('app.string.compatibility_mode'), $r('app.string.compatibility_mode_subtitle'), '', 2).bindClashConfigBy(clashConfig,'snifferDefault').bindType(ValueType.Boolean)
-      .bind<boolean>(appConfig.overwriteNetwork, (v)=>{
-      appConfig.overwriteNetwork = v
+    new ConfigItemData($r('sys.symbol.network_acceleration'), 'enable', $r('app.string.compatibility_mode'), $r('app.string.compatibility_mode_subtitle'), '', 2).bind<boolean>(clashConfig.sniffer.enable as boolean, (result)=>{
+      if (result) {
+        clashConfig.sniffer = clashConfig.snifferDefault
+      } else {
+        clashConfig.sniffer = {} as Sniffer
+      }
     }),
     new ConfigItemData($r('sys.symbol.selector'), 'Option', 'Sniffer Setting', '', '', 3),
-    new ConfigItemData($r('sys.symbol.satellite_map_fill'), 'strategy', $r('app.string.strategy'), '', $r('app.string.enabled'), 2).bindClashConfigBy(clashConfig,'snifferDefault'),
-  //.bindOption(SwitchMenu),
-    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'force-dns-mapping', 'Force DNS Mapping', '', $r('app.string.enabled'), 2).bindClashConfigBy(clashConfig,"snifferDefault"),
-  //  .bindOption(SwitchMenu),
-    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'parse-pure-ip', 'Parse Pure Ip', '', $r('app.string.enabled'), 2).bindClashConfigBy(clashConfig,'snifferDefault'),
-  // .bindOption(SwitchMenu),
-    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'override-destination', 'Override Destination', '', $r('app.string.enabled'), 2).bindClashConfigBy(clashConfig,'snifferDefault'),
-  // .bindOption(SwitchMenu),
-    new ConfigItemData($r('sys.symbol.satellite_map_fill'), 'sniffing', 'Sniffing', '', '', 1).bindClashConfigBy(clashConfig,'snifferDefault'),
-    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'force-domain', 'Force Domain', '', '', 1).bindClashConfigBy(clashConfig,'snifferDefault').bindType(ValueType.StringArray),
-    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'skip-domain', 'Skip Domain', '', '', 1).bindClashConfigBy(clashConfig,'snifferDefault').bindType(ValueType.StringArray),
-    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'port-whitelist', 'Port Whitelist', '', '', 1).bindClashConfigBy(clashConfig,'snifferDefault').bindType(ValueType.StringArray),
-    new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'sniff', 'Sniff', '', '', 1).bindClashConfigBy(clashConfig,"snifferDefault").bindType(ValueType.Record),
+    new ConfigItemData($r('sys.symbol.save'), 'enable', $r('app.string.strategy'), '', $r('app.string.not_modify'), 0).bindClashConfigBy(clashConfig, "sniffer").bindOption(SwitchMenu),
+    new ConfigItemData($r('sys.symbol.save'), 'force-dns-mapping', 'Force DNS Mapping', '', $r('app.string.not_modify'), 0).bindClashConfigBy(clashConfig, "sniffer").bindOption(SwitchMenu),
+    new ConfigItemData($r('sys.symbol.save'), 'parse-pure-ip', 'Parse Pure Ip', '', $r('app.string.not_modify'), 0).bindClashConfigBy(clashConfig, "sniffer").bindOption(SwitchMenu),
+    new ConfigItemData($r('sys.symbol.save'), 'override-destination', 'Override Destination', '', $r('app.string.not_modify'), 0).bindClashConfigBy(clashConfig, "sniffer").bindOption(SwitchMenu),
+    new ConfigItemData($r('sys.symbol.save'), 'force-domain', 'Force Domain', '', '', 1).bindClashConfigBy(clashConfig, "sniffer").bindType(ValueType.StringArray),
+    new ConfigItemData($r('sys.symbol.save'), 'skip-domain', 'Skip Domain', '', '', 1).bindClashConfigBy(clashConfig, "sniffer").bindType(ValueType.StringArray),
+    new ConfigItemData($r('sys.symbol.save'), 'port-whitelist', 'Port Whitelist', '', '', 1).bindClashConfigBy(clashConfig, "sniffer"),
+    new ConfigItemData($r('sys.symbol.save'), 'sniff', 'Sniff', '', '', 1).bindClashConfigBy(clashConfig, "sniffer").bindType(ValueType.Sniff),
   ]
   return result
 }
@@ -423,7 +414,7 @@ export interface MenuListItemProp {
 }
 export interface OptionItem{
   title: string | Resource
-  value: string | number
+  value: string | number | boolean
 }
 
 /**
@@ -460,10 +451,10 @@ export const RouteMenu: OptionItem[] = [
 /**
  * 更多 -> 覆写 -> 网络 -> 兼容模式切换菜单
  */
-export const SwitchMenu: OptionItem[] = [ // TODO value的值不会写
-  {title: $r('app.string.not_modify'),value:''},
-  {title: $r('app.string.enabled'),value:''},
-  {title: $r('app.string.disabled'), value:''},
+export const SwitchMenu: OptionItem[] = [
+  {title: $r('app.string.not_modify'),value: -1},
+  {title: $r('app.string.enabled'),value: true},
+  {title: $r('app.string.disabled'), value: false},
 ]
 
 /**
@@ -661,7 +652,7 @@ export function getAboutList(): AboutListItemProp[] {
         { title: $r('app.string.UpdateChannels'), subtitle: $r('app.string.UpdateChannels_Subtitle1'), sign: 3, name: 'UpdateChannels',
           children: [
             { title: $r('app.string.UpdateChannels_Subtitle1'), name: 'Github', subtitle: '' },
-          // { title: 'Gitee', name: 'Gitee', subtitle: '' }
+            // { title: 'Gitee', name: 'Gitee', subtitle: '' }
           ]
         },
         { title: $r('app.string.Auto_Check_Updates'), subtitle: '', sign: 1, name: 'Auto', isOn: false },

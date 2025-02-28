@@ -760,7 +760,7 @@ export struct skipRowList {
             .margin({top: 2})
             .fontSize(14)
         }
-      }.layoutWeight(2)
+      }.layoutWeight(1)
       .alignItems(HorizontalAlign.Start)
       Blank()
       this.tips()
@@ -780,7 +780,7 @@ export struct skipRowList {
  * 系统资源文件地址-Resource
  * @param title 标题文本-ResourceStr
  * @param subtitle 副标题文本-ResourceStr
- * @param toggle 尾随闭包内传入自定义开关
+ * @param toggle 传入自定义开关
  */
 @Component
 export struct toggleRowList {

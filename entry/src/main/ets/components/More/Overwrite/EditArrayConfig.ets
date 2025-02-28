@@ -9,6 +9,9 @@ import {
   ConfigItemData, CONTENT_END_OFFSET_150, TAB_CONTENT_TITLE_HEIGHT, ValueType } from "../../../common/Constants"
 import { getResourceString } from "../../../utils/ResourceStringUtil"
 import { customAnimationUtil } from "../../../utils/Animation"
+import { common } from "@kit.AbilityKit"
+import { hilog } from "@kit.PerformanceAnalysisKit"
+import { Sniff } from "proxy_core"
 
 export interface ArrayConfigParam{
   label?: string | ResourceStr
@@ -16,10 +19,14 @@ export interface ArrayConfigParam{
   value: string[] | Record<string, string>
 }
 
+const context = getContext(this) as common.UIAbilityContext
+
 // 提取公共组件，复用
 @Component
 export struct ArrayConfigEditor {
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
+  //一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  @State isEditPage: boolean = false
   @State SaveInputValue: string = ''
   @State currentInputValue: string = ''
   @State theplaceholder: string = '请输入内容'
@@ -49,19 +56,30 @@ export struct ArrayConfigEditor {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   //page内顶部标题偏移量
   @Consume curYOffset: number
+  @State content: string = ""
 
   aboutToAppear(): void {
     this.addDialogTitle = getResourceString($r('app.string.Add'), this) + getResourceString(this.params.title, this)
     this.editDialogTitle = getResourceString($r('app.string.Edit'), this) + getResourceString(this.params.title, this)
     // string []
     if(this.params.valueType == ValueType.StringArray){
+      this.isEditPage = false
       const list = this.params.value as string []
       if(list){
         this.ArrayConfigList = list.map((v: string)=>{
           return new KeyValueData(v)
         }) ?? []
       }
-    }else{ // Record<string, string>
+    } else if(this.params.valueType == ValueType.Sniff) {
+      // Record<string, Sniff>
+      this.isEditPage = true
+      hilog.info(0xFF00, "NetworkEditTag", "文本值%{public}s", JSON.stringify(this.params.value as Record<string, Sniff>))
+      if (this.params.value !== undefined) {
+        this.content = JSON.stringify(this.params.value as Record<string, Sniff>, null, 2)
+      }
+
+    } else { // Record<string, string>
+      this.isEditPage = false
       const list = this.params.value as Record<string, string>
       if(list){
         this.ArrayConfigList =  Object.entries(list).map((arr)=> new KeyValueData(arr[0], arr[1]))
@@ -211,7 +229,7 @@ export struct ArrayConfigEditor {
   @Builder
   TopOtherButton() {
     Button({ type: ButtonType.Circle, stateEffect: true }) {
-      SymbolGlyph($r('sys.symbol.plus'))
+      SymbolGlyph(this.isEditPage ? $r('sys.symbol.save') : $r('sys.symbol.plus'))
         .fontSize(24)
         .fontColor([this.icon_primary])
     }
@@ -220,14 +238,27 @@ export struct ArrayConfigEditor {
     .transition(customAnimationUtil.isSlide(0, this.uiConfig))
     .backgroundColor($r('app.color.settings_container_background'))
     .onClick(() => {
-      // 启用背景模糊
-      this.isEnableIndexForegroundBlur = true
-      if(this.params.valueType == ValueType.Record) {
-        // 替换为添加标题
-        this.kvDialogTitle = getResourceString($r('app.string.Add'), this) + getResourceString(this.params.title, this)
-        this.kvDialogController.open()
-      }else{
-        this.dialogController.open()
+      if (!this.isEditPage) {
+        // 启用背景模糊
+        this.isEnableIndexForegroundBlur = true
+        if(this.params.valueType == ValueType.Record) {
+          // 替换为添加标题
+          this.kvDialogTitle = getResourceString($r('app.string.Add'), this) + getResourceString(this.params.title, this)
+          this.kvDialogController.open()
+        }else{
+          this.dialogController.open()
+        }
+      } else {
+        // 编辑页时保存按钮
+        let value = this.content
+        if(this.content != ""){
+          if (this.params.valueType == ValueType.StringArray || this.params.valueType == ValueType.Record){
+            value = JSON.parse(this.content)
+          }
+        }
+        //  TODO 保存Sniff
+
+        this.pageInfos.pop()
       }
     })
   }
@@ -244,78 +275,91 @@ export struct ArrayConfigEditor {
           }
         })
 
-
         Column() {
           Blank().height(TAB_CONTENT_TITLE_HEIGHT + 6)
           Scroll() {
-            List({ space: this.listBottom.value }) {
-              ForEach(this.ArrayConfigList, (item: KeyValueData, index: number) => {
-                // 数据列表行
-                ListItem() {
-                  Row() {
+            if (this.isEditPage) {
+              // 文本编辑页
+              Column() {
+                TextArea({text:this.content})
+                  .onChange((e)=>{
+                    this.content = e
+                  })
+                  .width('100%')
+                  .height('100%')
+              }.width('100%')
+              .height('100%')
+              .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
+            } else {
+              // 键值页
+              List({ space: this.listBottom.value }) {
+                ForEach(this.ArrayConfigList, (item: KeyValueData, index: number) => {
+                  // 数据列表行
+                  ListItem() {
                     Row() {
-                      Column() {
-                        Text(item.key)
-                          .fontWeight(FontWeight.Medium)
-                          .fontSize(16)
-                          .margin({ left: 12 })
-                        Text(item.value)
-                          .fontWeight(FontWeight.Medium)
-                          .fontSize(16)
-                          .margin({ left: 12 })
+                      Row() {
+                        Column() {
+                          Text(item.key)
+                            .fontWeight(FontWeight.Medium)
+                            .fontSize(16)
+                            .margin({ left: 12 })
+                          Text(item.value)
+                            .fontWeight(FontWeight.Medium)
+                            .fontSize(16)
+                            .margin({ left: 12 })
+                        }
+
+                        Blank()
+                        SymbolGlyph($r('sys.symbol.trash_fill'))
+                          .fontColor([this.icon_primary])
+                          .fontSize(28)
+                          .margin({ right: 12 })
+                          .onClick(() => {
+                            this.handleDelete(index)
+                          })
                       }
+                      .width('100%')
+                      .height(53)
+                      .borderRadius(BORDER_RADIUS_20)
+                      .backgroundColor($r('app.color.container_background'))
 
-                      Blank()
-                      SymbolGlyph($r('sys.symbol.trash_fill'))
-                        .fontColor([this.icon_primary])
-                        .fontSize(28)
-                        .margin({ right: 12 })
-                        .onClick(() => {
-                          this.handleDelete(index)
-                        })
+                      Row()
+                        .height(10)
                     }
-                    .width('100%')
-                    .height(53)
-                    .borderRadius(BORDER_RADIUS_20)
-                    .backgroundColor($r('app.color.container_background'))
 
-                    Row()
-                      .height(10)
                   }
-
-                }
-                .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
-                .onClick(() => {
-                  // 启用背景模糊
-                  this.isEnableIndexForegroundBlur = true
-                  // 进入列表行数据编辑
-                  if (this.params.valueType != ValueType.Record) {
-                    this.currentEditInputValue = item.key
-                    this.editDialogController.open()
-                  } else {
-                    this.keyValueData = item
-                    // 替换为编辑标题
-                    this.kvDialogTitle =
-                      getResourceString($r('app.string.Edit'), this) + getResourceString(this.params.title, this)
-                    this.kvDialogController.open()
-                  }
-                  this.theEditPlaceholder = index
+                  .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
+                  .onClick(() => {
+                    // 启用背景模糊
+                    this.isEnableIndexForegroundBlur = true
+                    // 进入列表行数据编辑
+                    if (this.params.valueType != ValueType.Record) {
+                      this.currentEditInputValue = item.key
+                      this.editDialogController.open()
+                    } else {
+                      this.keyValueData = item
+                      // 替换为编辑标题
+                      this.kvDialogTitle =
+                        getResourceString($r('app.string.Edit'), this) + getResourceString(this.params.title, this)
+                      this.kvDialogController.open()
+                    }
+                    this.theEditPlaceholder = index
+                  })
                 })
-              })
 
+              }
+              .height('100%')
+              .width('100%')
+              .contentEndOffset(CONTENT_END_OFFSET_150 - 40)
+              .borderRadius(BORDER_RADIUS_20)
+              .alignListItem(ListItemAlign.Center)
+              .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
+              .chainAnimation(true)
+              .nestedScroll({
+                scrollForward: NestedScrollMode.PARENT_FIRST,
+                scrollBackward: NestedScrollMode.SELF_FIRST
+              })
             }
-           // .margin({ bottom: this.listBottom.value })
-            .height('100%')
-            .width('100%')
-            .contentEndOffset(CONTENT_END_OFFSET_150 - 40)
-            .borderRadius(BORDER_RADIUS_20)
-            .alignListItem(ListItemAlign.Center)
-            .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
-            .chainAnimation(true)
-            .nestedScroll({
-              scrollForward: NestedScrollMode.PARENT_FIRST,
-              scrollBackward: NestedScrollMode.SELF_FIRST
-            })
           }
           .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring : null) //,{alwaysEnabled:true})
           .onDidScroll((xOffset: number, yOffset: number): void => {

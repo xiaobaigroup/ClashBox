@@ -11,7 +11,9 @@ import { ArrayConfigParam } from './EditArrayConfig'
 import { SymbolGlyphModifier } from '@kit.ArkUI'
 import { JSON } from '@kit.ArkTS'
 import { customAnimationUtil, isON } from '../../../utils/Animation'
+import { common } from '@kit.AbilityKit'
 
+const context = getContext(this) as common.UIAbilityContext
 
 @Component
 export struct ConfigList {
@@ -84,12 +86,12 @@ export struct ConfigList {
     if(itemData.isEditType()){
       console.debug("debug itemData", JSON.stringify(itemData))
       this.theUnit = itemData.name === 'keep-alive-interval' ? getResourceString($r('app.string.s'), this) : ''
-      this.theplaceholder = `${getResourceString($r('app.string.example'), this)}: ${getResourceString(itemData.tips(), this)}`
+      this.theplaceholder = `${getResourceString($r('app.string.example'), this)}: ${getResourceString(itemData.theSubtitle(), this)}`
       this.currentInputValue = (itemData.value + "") as string
       this.theDialogTitle =  getResourceString($r('app.string.Edit'), this) +  getResourceString(itemData.title, this)
       this.isEnableIndexForegroundBlur = true
       this.dialogController.open()
-    } else if (index === 5) {
+    } else if (index === 5 && this.configList[5].name === 'compatible') {
       this.pageInfos.pushPathByName("compatible", true)
     } else {
       this.pageInfos.pushPathByName("EditArrayConfig", itemData, true)
@@ -111,7 +113,7 @@ export struct ConfigList {
       this.configList.splice(this.currentItemIndex, 1, item)
     })
     // 设置DNS页无图标
-    if((this.configList[0].name === 'overrideDns') || (this.configList[0].name === 'compatible')) {
+    if((this.configList[0].name === 'overrideDns') || (this.configList[0].name === 'enable')) {
       this.isShowIcons = false
     }
   }
@@ -195,7 +197,7 @@ export struct ConfigList {
                 skipRowList({
                   icons: this.isShowIcons ? item.icons : undefined,
                   title: item.title,
-                  subtitle: item.subtitle,
+                  subtitle: item.theSubtitle(),
                   isPrimaryIcons: true,
                   tips: () => {
                     this.skipTipsBuilder(item.tips())
@@ -214,9 +216,7 @@ export struct ConfigList {
                   title: item.title,
                   subtitle: item.subtitle,
                   isPrimaryIcons: true,
-                  toggle: () => {
-                    this.toggleBuilder(item.isCheck)
-                  }
+                  toggle: (): void => { this.toggleBuilder(item.isCheck) }
                 })
               }
               .transition(this.isON.toggleAnim ? null : customAnimationUtil.isScaleTran(index, this.uiConfig))
@@ -243,7 +243,7 @@ export struct ConfigList {
               }
               .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
             }
-          })
+          }) // (item: ConfigItemData) => `${item.name}`  ${getResourceString(item.title, context)}
         }
         .width('100%')
         .height('100%')

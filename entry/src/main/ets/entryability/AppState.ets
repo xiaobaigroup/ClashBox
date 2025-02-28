@@ -45,7 +45,7 @@ export class AppConfig{
   proxyGroupType: ProxyGroupType = ProxyGroupType.Tabs
   proxyCardSize: ProxyCardSize = ProxyCardSize.Mini
   enableLogger: boolean = false
-  testUrl: string = ""
+  testUrl: string = "https://www.gstatic.com/generate204"
   overrideDns: boolean = false
   clashCore: ClashCore = ClashCore.FlClash
   switchMode: ProxyMode = ProxyMode.Rule

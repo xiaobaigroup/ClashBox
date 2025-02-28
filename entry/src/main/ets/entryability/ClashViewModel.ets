@@ -245,7 +245,13 @@ export class ClashViewModel {
       // 启动vpn进程
       // bug： 用户点取消，pad最新系统可能导致卡死在这里， 无解等系统修复
       await vpnExtension.startVpnExtensionAbility(vpnWant)
-      await sleep(500)
+        .then(() => {
+          console.log("#VPN启动成功")
+        })
+        .catch((error: Error) => {
+          console.log("#VPN启动失败, 用户拒绝授权")
+          this.context?.getApplicationContext().killAllProcesses()
+        })
       // Bug
       // this.socketProxy.registerMessage(()=>{
       //
