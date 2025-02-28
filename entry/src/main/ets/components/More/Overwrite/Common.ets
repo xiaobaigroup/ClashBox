@@ -84,7 +84,6 @@ export struct ConfigList {
     this.currentItemIndex = index
     let itemData = this.configList[index]
     if(itemData.isEditType()){
-      console.debug("debug itemData", JSON.stringify(itemData))
       this.theUnit = itemData.name === 'keep-alive-interval' ? getResourceString($r('app.string.s'), this) : ''
       this.theplaceholder = `${getResourceString($r('app.string.example'), this)}: ${getResourceString(itemData.theSubtitle(), this)}`
       this.currentInputValue = (itemData.value + "") as string

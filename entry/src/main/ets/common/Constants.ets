@@ -228,7 +228,6 @@ export class ConfigItemData{
     this.value = dns[key][this.name]
     this.onChange = (value: boolean | string [] | Record<string, string> | string | number )=>{
       dns[key][this.name] = value
-      promptAction.showToast({message: "debug: " + value})
       config.dns = copy(dns)
     }
     this.initValue()
@@ -385,7 +384,7 @@ export  const OverwriteNetworkCompatible = (clashConfig: ClashConfig, appConfig:
   let result: ConfigItemData[] = new Array()
   clashConfig.sniffer = clashConfig.sniffer as Sniffer ?? clashConfig.snifferDefault
   result = [
-    new ConfigItemData($r('sys.symbol.network_acceleration'), 'enable', $r('app.string.compatibility_mode'), $r('app.string.compatibility_mode_subtitle'), '', 2).bind<boolean>(clashConfig.sniffer.enable as boolean, (result)=>{
+    new ConfigItemData($r('sys.symbol.network_acceleration'), 'enable', $r('app.string.compatibility_mode'), $r('app.string.compatibility_mode_subtitle'), '', 2).bind<boolean>(clashConfig.sniffer?.enable != null, (result)=>{
       if (result) {
         clashConfig.sniffer = clashConfig.snifferDefault
       } else {
@@ -393,10 +392,10 @@ export  const OverwriteNetworkCompatible = (clashConfig: ClashConfig, appConfig:
       }
     }),
     new ConfigItemData($r('sys.symbol.selector'), 'Option', 'Sniffer Setting', '', '', 3),
-    new ConfigItemData($r('sys.symbol.save'), 'enable', $r('app.string.strategy'), '', $r('app.string.not_modify'), 0).bindClashConfigBy(clashConfig, "sniffer").bindOption(SwitchMenu),
-    new ConfigItemData($r('sys.symbol.save'), 'force-dns-mapping', 'Force DNS Mapping', '', $r('app.string.not_modify'), 0).bindClashConfigBy(clashConfig, "sniffer").bindOption(SwitchMenu),
-    new ConfigItemData($r('sys.symbol.save'), 'parse-pure-ip', 'Parse Pure Ip', '', $r('app.string.not_modify'), 0).bindClashConfigBy(clashConfig, "sniffer").bindOption(SwitchMenu),
-    new ConfigItemData($r('sys.symbol.save'), 'override-destination', 'Override Destination', '', $r('app.string.not_modify'), 0).bindClashConfigBy(clashConfig, "sniffer").bindOption(SwitchMenu),
+    new ConfigItemData($r('sys.symbol.save'), 'enable', $r('app.string.strategy'), '', $r('app.string.not_modify'), 2).bindClashConfigBy(clashConfig, "sniffer"),
+    new ConfigItemData($r('sys.symbol.save'), 'force-dns-mapping', 'Force DNS Mapping', '', $r('app.string.not_modify'), 2).bindClashConfigBy(clashConfig, "sniffer"),
+    new ConfigItemData($r('sys.symbol.save'), 'parse-pure-ip', 'Parse Pure Ip', '', $r('app.string.not_modify'), 2).bindClashConfigBy(clashConfig, "sniffer"),
+    new ConfigItemData($r('sys.symbol.save'), 'override-destination', 'Override Destination', '', $r('app.string.not_modify'), 2).bindClashConfigBy(clashConfig, "sniffer"),
     new ConfigItemData($r('sys.symbol.save'), 'force-domain', 'Force Domain', '', '', 1).bindClashConfigBy(clashConfig, "sniffer").bindType(ValueType.StringArray),
     new ConfigItemData($r('sys.symbol.save'), 'skip-domain', 'Skip Domain', '', '', 1).bindClashConfigBy(clashConfig, "sniffer").bindType(ValueType.StringArray),
     new ConfigItemData($r('sys.symbol.save'), 'port-whitelist', 'Port Whitelist', '', '', 1).bindClashConfigBy(clashConfig, "sniffer"),

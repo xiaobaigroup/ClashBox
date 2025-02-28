@@ -90,19 +90,28 @@ export struct ArrayConfigEditor {
     this.updateArrayConfig()
   }
   updateArrayConfig(){
-    // string[]
-    if(Array.isArray(this.params.value)){
-      EventHub.sendEvent(EventKey.ArrayConfigChanged, {key: this.params.name, value: this.ArrayConfigList.map((d)=>{
-        return d.key
-      })})
-    }else{
-      // record<string, string>
-      const record = {} as Record<string, string>;
-      for (let kv of this.ArrayConfigList){
-        record[kv.key] = kv.value as string
+    if(this.params.valueType == ValueType.Sniff){
+      try {
+        EventHub.sendEvent(EventKey.ArrayConfigChanged, {key: this.params.name, value: JSON.parse(this.content)})
+      }catch (e) {
+        promptAction.showToast({message:'格式不正确'})
       }
-      EventHub.sendEvent(EventKey.ArrayConfigChanged, {key: this.params.name, value: record})
+    }else{
+      // string[]
+      if(Array.isArray(this.params.value)){
+        EventHub.sendEvent(EventKey.ArrayConfigChanged, {key: this.params.name, value: this.ArrayConfigList.map((d)=>{
+          return d.key
+        })})
+      }else{
+        // record<string, string>
+        const record = {} as Record<string, string>;
+        for (let kv of this.ArrayConfigList){
+          record[kv.key] = kv.value as string
+        }
+        EventHub.sendEvent(EventKey.ArrayConfigChanged, {key: this.params.name, value: record})
+      }
     }
+
   }
 
   /**
@@ -250,15 +259,8 @@ export struct ArrayConfigEditor {
         }
       } else {
         // 编辑页时保存按钮
-        let value = this.content
-        if(this.content != ""){
-          if (this.params.valueType == ValueType.StringArray || this.params.valueType == ValueType.Record){
-            value = JSON.parse(this.content)
-          }
-        }
-        //  TODO 保存Sniff
-
         this.pageInfos.pop()
+
       }
     })
   }
