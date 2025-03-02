@@ -1,4 +1,4 @@
-import { ClashConfig,  IpInfo, ProxyGroup, ProxyMode, ProxySort, Traffic, } from "proxy_core";
+import { ClashConfig,  IpInfo, ProxyGroup, ProxyMode, ProxySort, SnifferDefault, Traffic, } from "proxy_core";
 import { CustomThemeName } from "../common/AppTheme";
 import { ANIMATION_DURATION_300, showHomeCard } from "../common/Constants";
 import { ProxyItem } from "../common/ProxyData";
@@ -50,6 +50,7 @@ export class AppConfig{
   clashCore: ClashCore = ClashCore.FlClash
   switchMode: ProxyMode = ProxyMode.Rule
   overwriteNetwork: boolean = true
+  snifferDefault?: SnifferDefault = new SnifferDefault()
   constructor() {
   }
 }

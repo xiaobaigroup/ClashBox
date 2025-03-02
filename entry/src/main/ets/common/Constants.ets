@@ -382,17 +382,10 @@ export  const ListOverwriteNetworkData = (clashConfig: ClashConfig, appConfig: A
 // 更多 -> 覆写 -> 网络 -> 兼容模式
 export  const OverwriteNetworkCompatible = (clashConfig: ClashConfig, appConfig: AppConfig): ConfigItemData[] => {
   let result: ConfigItemData[] = new Array()
-  clashConfig.sniffer = clashConfig.sniffer as Sniffer ?? clashConfig.snifferDefault
+  clashConfig.sniffer = clashConfig.sniffer ?? appConfig.snifferDefault
   result = [
-    new ConfigItemData($r('sys.symbol.network_acceleration'), 'enable', $r('app.string.compatibility_mode'), $r('app.string.compatibility_mode_subtitle'), '', 2).bind<boolean>(clashConfig.sniffer?.enable != null, (result)=>{
-      if (result) {
-        clashConfig.sniffer = clashConfig.snifferDefault
-      } else {
-        clashConfig.sniffer = {} as Sniffer
-      }
-    }),
+    new ConfigItemData($r('sys.symbol.network_acceleration'), 'enable', $r('app.string.compatibility_mode'), $r('app.string.compatibility_mode_subtitle'), '', 2).bindClashConfigBy(clashConfig, "sniffer"),
     new ConfigItemData($r('sys.symbol.selector'), 'Option', 'Sniffer Setting', '', '', 3),
-    new ConfigItemData($r('sys.symbol.save'), 'enable', $r('app.string.strategy'), '', $r('app.string.not_modify'), 2).bindClashConfigBy(clashConfig, "sniffer"),
     new ConfigItemData($r('sys.symbol.save'), 'force-dns-mapping', 'Force DNS Mapping', '', $r('app.string.not_modify'), 2).bindClashConfigBy(clashConfig, "sniffer"),
     new ConfigItemData($r('sys.symbol.save'), 'parse-pure-ip', 'Parse Pure Ip', '', $r('app.string.not_modify'), 2).bindClashConfigBy(clashConfig, "sniffer"),
     new ConfigItemData($r('sys.symbol.save'), 'override-destination', 'Override Destination', '', $r('app.string.not_modify'), 2).bindClashConfigBy(clashConfig, "sniffer"),

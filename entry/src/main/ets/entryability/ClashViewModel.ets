@@ -232,36 +232,29 @@ export class ClashViewModel {
         parameters: { "ClashCore" : coreType}
       } as Want
       // 若vpn进程没启动直接停止，会导致卡死或闪退， 不同系统不同现象
-      if(restart){
+      if (restart){
         // 停止vpn进程
         await vpnExtension.stopVpnExtensionAbility(vpnWant)
+      }
+      await new Promise<boolean>((resolve, reject)=>{
+        vpnExtension.startVpnExtensionAbility(vpnWant)
           .then(() => {
-            console.log("#VPN停止成功")
+            console.log("#VPN启动成功")
+            resolve(true)
           })
           .catch((error: Error) => {
-            console.log("#VPN停止失败")
+            this.context?.getApplicationContext().killAllProcesses()
           })
-      }
+          setTimeout(()=>{
+            reject(false)
+          }, 10000)
+      })
+      await sleep(500)
       // 启动vpn进程
       // bug： 用户点取消，pad最新系统可能导致卡死在这里， 无解等系统修复
-      await vpnExtension.startVpnExtensionAbility(vpnWant)
-        .then(() => {
-          console.log("#VPN启动成功")
-        })
-        .catch((error: Error) => {
-          console.log("#VPN启动失败, 用户拒绝授权")
-          this.context?.getApplicationContext().killAllProcesses()
-        })
-      // Bug
-      // this.socketProxy.registerMessage(()=>{
-      //
-      // })
     } catch (err) {
       console.log("#VPN try失败")
       console.error("ChangeCore", err.message || JSON.stringify(err))
-      // 用户点取消，会走这里
-      // 可能导致显现闪退
-      // this.context?.getApplicationContext().killAllProcesses()
     }
   }
 
