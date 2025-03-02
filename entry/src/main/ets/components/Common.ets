@@ -15,8 +15,7 @@ import { KeyValueData } from "./More/Overwrite/EditArrayConfig"
 import { Provider } from "proxy_core"
 import { common } from "@kit.AbilityKit"
 import { BreakpointState } from "../common/breakpointsystem"
-import ClashViewModel from "../entryability/ClashViewModel"
-import { convertTime } from "../utils/TimeConvertUtil"
+import { convertToSwitchNub, convertToSwitchNub1 } from "../utils/DataUnitConvertUtils"
 
 const context = getContext(this) as common.UIAbilityContext
 
@@ -114,7 +113,7 @@ export function BindSheetTitleCustomBuilder(param: BindSheetTitleCustomBuilderPa
         .fontWeight(param.mainTitleFontWeight?? FontWeight.Bold)
         .fontSize(param.mainTitleFontSize)
         .fontColor($r('sys.color.font_primary'))
-       // .lineHeight(24)
+          // .lineHeight(24)
         .maxLines(1)
         .textOverflow({overflow: TextOverflow.MARQUEE})
         .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
@@ -586,21 +585,21 @@ export struct theCustomDialog {
         direction: FlexDirection.Row,
         alignItems: ItemAlign.Center
       }) {
-          if(this.isArea) {
-            TextArea({placeholder: this.theplaceholder, text: this.currentInputValue })
-              .onChange((value: string) => {
-                this.currentInputValue = value
-              })
-          } else {
-            TextInput({placeholder: this.theplaceholder, text: this.currentInputValue })
-              .onChange((value: string) => {
-                this.currentInputValue = value
-              })
-          }
-          if(this.Unit) {
-            Text(this.Unit)
-              .margin({left: 5})
-          }
+        if(this.isArea) {
+          TextArea({placeholder: this.theplaceholder, text: this.currentInputValue })
+            .onChange((value: string) => {
+              this.currentInputValue = value
+            })
+        } else {
+          TextInput({placeholder: this.theplaceholder, text: this.currentInputValue })
+            .onChange((value: string) => {
+              this.currentInputValue = value
+            })
+        }
+        if(this.Unit) {
+          Text(this.Unit)
+            .margin({left: 5})
+        }
       }.margin({bottom: 8 })
       Button($r('app.string.Save'))
         .width('100%')
@@ -956,7 +955,7 @@ export function cellularData(info: SubscriptionInfo) {
     //
     Column() {
       Progress({
-        value: SubscriptionInfo.GetUsed(info)?.show ?? 0,
+        value: convertToSwitchNub1(SubscriptionInfo.GetUsed(info)?.show ?? 0,SubscriptionInfo.GetTotal(info)!.unit,SubscriptionInfo.GetUsed(info)!.unit),
         total: SubscriptionInfo.GetTotal(info)?.show ?? 1,
         type: ProgressType.Capsule
       })//value为使用流量的值
@@ -985,15 +984,15 @@ function smallText() {
 //代理和配置右下角图标按钮
 @Builder
 export function RightDownButton(s:Resource,a:SymbolEffect)  {
-    Stack({ alignContent: Alignment.Center }) {
-      SymbolGlyph(s)
-        .fontSize(24)
-        .fontColor([Color.White])
-        .symbolEffect(a)
-        .align(Alignment.Center)
-    }
-    .width('100%')
-    .height('100%')
+  Stack({ alignContent: Alignment.Center }) {
+    SymbolGlyph(s)
+      .fontSize(24)
+      .fontColor([Color.White])
+      .symbolEffect(a)
+      .align(Alignment.Center)
+  }
+  .width('100%')
+  .height('100%')
 }
 
 //代理页顶部半模拟态标题及按钮
@@ -1016,11 +1015,11 @@ export struct proxyBindSheetTitleStyle {
   @BuilderParam otherButton: (icon: Resource | null) => void = this.titleButton
 
   @Builder titleText(title: string | Resource) {
-      Text(title)
-        .fontSize(20)
-        .fontWeight(FontWeight.Bold)
-        .maxLines(1)
-        .fontColor($r('sys.color.font_primary'))
+    Text(title)
+      .fontSize(20)
+      .fontWeight(FontWeight.Bold)
+      .maxLines(1)
+      .fontColor($r('sys.color.font_primary'))
   }
 
   @Builder titleButton(icon: Resource | null){

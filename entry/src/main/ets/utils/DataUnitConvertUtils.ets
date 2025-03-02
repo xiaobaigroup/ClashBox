@@ -82,6 +82,66 @@ export function convertToSwitchNub(value: number, unit: keyof GeneratedUnitInter
   }
 }
 
+/**
+ * 将B单位数值转换为选择的单位值
+ * @param value - 要转换的数值
+ * @param unit - 单位（'TB'、'GB'、'MB'、'KB'）
+ */
+export function convertToSwitchNub1(value: number, unitT: TrafficUnit,unitU:TrafficUnit): number {
+  switch (unitT) {
+    case 'TB':
+      if (unitU=='GB'){
+        return  value / Math.pow(1024, 1)
+      }else if (unitU=='MB'){
+        return  value / Math.pow(1024, 2)
+      }else if(unitU=='KB'){
+        return  value / Math.pow(1024, 3)
+      }else if(unitU=='B'){
+        return  value / Math.pow(1024, 4)
+      }else {
+        return  value
+      } ;
+    case 'GB':
+      if (unitU=='TB'){
+        return  value * Math.pow(1024, 1)
+      }else if (unitU=='MB'){
+        return  value / Math.pow(1024, 1)
+      }else if(unitU=='KB'){
+        return  value / Math.pow(1024, 2)
+      }else if(unitU=='B'){
+        return  value / Math.pow(1024, 3)
+      }else {
+        return  value
+      } ;
+    case 'MB':
+      if (unitU=='TB'){
+        return  value * Math.pow(1024, 2)
+      }else if (unitU=='GB'){
+        return  value * Math.pow(1024, 1)
+      }else if(unitU=='KB'){
+        return  value / Math.pow(1024, 1)
+      }else if(unitU=='B'){
+        return  value / Math.pow(1024, 2)
+      }else {
+        return  value
+      } ;
+    case 'KB':
+      if (unitU=='TB'){
+        return  value * Math.pow(1024, 3)
+      }else if (unitU=='GB'){
+        return  value * Math.pow(1024, 2)
+      }else if(unitU=='MB'){
+        return  value * Math.pow(1024, 1)
+      }else if(unitU=='B'){
+        return  value / Math.pow(1024, 1)
+      }else {
+        return  value
+      } ;
+    default:
+      throw new Error(`Unsupported unit: `);
+  }
+}
+
 /*
 根据数值带单位取最大单位整数
  */

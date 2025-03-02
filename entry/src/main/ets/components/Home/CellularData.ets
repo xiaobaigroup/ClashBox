@@ -49,7 +49,7 @@ struct totalCustomDialog {
       { value: TrafficUnit.MB},
       { value: TrafficUnit.GB},
       { value: TrafficUnit.TB}])
-      .width(80)
+     //.width(80)
       .align(Alignment.Center)
       .selected(this.uiConfig.cellularDataIndex)
       .value(this.uiConfig.switchUnit)
