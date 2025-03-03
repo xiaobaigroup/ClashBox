@@ -582,7 +582,6 @@ struct Index {
     BreakpointSystem.getInstance().start()
     // TODO
     this.fetchProfiles()
-
     EventHub.on(EventKey.StartLog, async (enable: boolean) => {
       ClashViewModel.startLog(enable, (log) => {
         this.logListData.push({
@@ -756,6 +755,7 @@ struct Index {
     }
   }
 
+  @State barHeight:number|ResourceStr|undefined=0
 
   // tab移动动画
   startAnim() {
@@ -765,8 +765,11 @@ struct Index {
       curve: curves.springMotion(),
       iterations: 1,
       playMode: PlayMode.Normal,
-    }, () => {
-      indexController.setTabBarTranslate(this.isLandscapePhone ? { x: '-100%' } : { y: '100%' })
+    }, async () => {
+     await indexController.setTabBarTranslate(this.isLandscapePhone ? { x: '-100%' } : { y: '100%' })
+    setTimeout(()=> {
+      this.barHeight= 0
+    },100)
     })
   }
 
@@ -776,15 +779,18 @@ struct Index {
       curve: curves.springMotion(),
       iterations: 1,
       playMode: PlayMode.Normal,
-    }, () => {
-      indexController.setTabBarTranslate(this.isLandscapePhone ? { x: 0 } : { y: 0 })
+    }, async () => {
+     await indexController.setTabBarTranslate(this.isLandscapePhone ? { x: 0 } : { y: 0 })
+    setTimeout(()=>{
+      this.barHeight=this.compBarHeight.value
+    },100)
     })
   }
 
   isSecondaryChange() {
     // 监听二级页面布尔判定动画是否执行
     if (this.isSecondary) {
-      this.stopAnim()
+     // this.stopAnim()
       this.startAnim()
     } else {
       this.stopAnim()
@@ -834,14 +840,14 @@ struct Index {
           .tabBar(this.TabBarBuilder($r('app.string.More'), 3, $r('sys.symbol.square_fill_grid_2x2')))
         }
         .zIndex(1)
-        .backgroundColor(this.uiConfig.isBlurr ? $r('app.color.background') : $r('app.color.background'))
+        .backgroundColor( $r('app.color.background'))
         .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Regular : null)
         .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
         .barOverlap(this.uiConfig.isBlurr ? (this.isLandscapePhone || ( this.istabletLandscape && !this.isSecondary) ? false : true) : false) //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
         .scrollable(this.isSecondary ? false : true)
         .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
         .barWidth(this.isLandscapePhone ? '77vp' : this.compBarWidth.value) /**/
-        .barHeight(this.isLandscapePhone ? '100%' :  this.compBarHeight.value) /**/
+        .barHeight(this.isLandscapePhone ? '100%':(!this.uiConfig.isBlurr&&this.isSecondary)?this.barHeight:this.compBarHeight.value) /**/
         .onChange((index: number) => {
           this.IndexCurrentindex = index
         })

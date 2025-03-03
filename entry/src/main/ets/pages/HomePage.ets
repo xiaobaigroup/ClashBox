@@ -788,7 +788,7 @@ struct Home {
             .width('100%')
             .height('100%')
             .scrollBar(BarState.Off)
-            .contentEndOffset(CONTENT_END_OFFSET_150+50)
+            .contentEndOffset(!this.uiConfig.isBlurr?CONTENT_END_OFFSET_150:CONTENT_END_OFFSET_150+50)
             .edgeEffect(EdgeEffect.Spring)
             .bindSheet($$this.isShowCardEdit, this.CardEdit(), {
               detents: [BIND_SHEET_CONTAINER_HEIGHT, 300,],
