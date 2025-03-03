@@ -502,7 +502,7 @@ struct ConfigurationPage {
         .hoverEffect(HoverEffect.Scale)
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
-        .margin({bottom:this.isLandscapePhone ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
+        .margin({bottom:this.isLandscapePhone || !this.uiConfig.isBlurr ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
         .bindSheet( this.isShowConfigAddBindSheet, this.ConfigAddBindSheetBuilder, {
           detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE, ],// SheetSize.LARGE
           backgroundColor: $r('app.color.background'),
