@@ -638,6 +638,19 @@ struct Index {
       }
     }
   }
+  //规则选择数据变化监控
+  async switchMode() {
+    if(this.clashConfig.mode==ProxyMode.Rule){
+      this.theProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode = ProxyMode.Rule)
+      this.proxyGroups.refresh()
+    }else if(this.clashConfig.mode==ProxyMode.Global){
+      this.theProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode = ProxyMode.Global)
+      this.proxyGroups.refresh()
+    }else if(this.clashConfig.mode==ProxyMode.Direct){
+      this.theProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode = ProxyMode.Direct)
+      this.proxyGroups.refresh()
+    }
+  }
 
   // 代理页分组数据（懒加载）
   @Provide proxyGroups: ProxyGroupItemDataSource = new ProxyGroupItemDataSource()
@@ -647,7 +660,7 @@ struct Index {
   @Provide theProxyGroups: ProxyGroup[] = []
   @Provide("currentProfile") currentProfile: Profile | null = null
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-  @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
+  @StorageLink('clashConfig') @Watch('switchMode')clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('uiConfig') @Watch('ShowPipChange')uiConfig: UIConfig = new UIConfig()
 
   aboutToDisappear() {
