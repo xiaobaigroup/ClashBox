@@ -469,15 +469,15 @@ export struct AboutContributors {
         // crazypig321
         implicitStartAbility('https://github.com/crazypig321', context)
       break
-      case 5:
+      /*case 5:
         // 鱼🐟
         // implicitStartAbility('https://github.com/yu', context)
-        break
-      case 6:
+        break*/
+      case 5:
         // 小雅
-        implicitStartAbility('https://github.com/XHXYT', context)
+        handleMailto('mailto:xytdg520@qq.com?subject=联系&body=你的内容...', context)
       break
-      case 7:
+      case 6:
         // FlClash
         implicitStartAbility('https://github.com/chen08209/FlClash', context)
       break
@@ -834,7 +834,7 @@ export struct CheckUpdate {
       const updateInfo = await getUpdateInfo()
       hilog.info(0xFF00, "UpdatetestTag", "Update Info: %{public}s", JSON.stringify(updateInfo))
       const theLatest = extractUpdateInfo(updateInfo)
-      if (theLatest) {
+      if (theLatest !== null) {
         promptAction.showToast({message: $r('app.string.query_success'), duration: 2000 })
         // 查询完成
         this.theAppVersionInfo = theLatest
@@ -900,7 +900,7 @@ export struct CheckUpdate {
                 if(index === 1) {
                   // 前往下载网页
                   hilog.info(0xFF00, "checkUpdateTest", "前往下载网页")
-                 implicitStartAbility('https://github.com/xfz347/hapapp/releases/tag/clashnext', context)
+                 implicitStartAbility('https://github.com/xiaobaigroup/hapapp/releases/tag/clashnext', context)
                 } else if(index === 3) {
                   // 忽略本次更新
                   promptAction.showToast({

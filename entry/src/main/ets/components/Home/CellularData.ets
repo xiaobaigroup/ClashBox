@@ -60,9 +60,9 @@ struct totalCustomDialog {
       .backgroundColor(Color.Transparent)
       .onSelect((index: number) => {
         this.index=index
-                      if (this.uiConfig.isVibrate) {
-                customVibrator.vibratorTriggerOfHapticClockTimer()
-              }
+        if (this.uiConfig.isVibrate) {
+          customVibrator.vibratorTriggerOfHapticClockTimer()
+        }
         console.info('Select:' + index+this.uiConfig.switchUnit);
       })
       .selectedOptionBgColor(this.icon_emphasize)
@@ -71,9 +71,9 @@ struct totalCustomDialog {
       .menuBackgroundColor($r('app.color.container_background'))
       .menuBackgroundBlurStyle(BlurStyle.NONE)
       .onClick(() => {
-                      if (this.uiConfig.isVibrate) {
-                customVibrator.vibratorTriggerOfHapticClockTimer()
-              }
+        if (this.uiConfig.isVibrate) {
+          customVibrator.vibratorTriggerOfHapticClockTimer()
+        }
       })
   }
 
@@ -92,18 +92,15 @@ struct totalCustomDialog {
         .type(InputType.Number)
         .onChange((value: string) => {
           this.TotalCellular = Number(value)
-      //    console.info('inputTotal', Number(value))
         })
-
         this.itemEnd()
       }.width('100%').alignItems(VerticalAlign.Center).justifyContent(FlexAlign.Center)
-
 
       Blank(15)
 
       Row({ space: 8 }) {
         Button($r('app.string.Cancel'))
-          .width(144)
+          .width('50%')
           .fontSize(FONT_SIZE_16)
           .fontColor(this.icon_emphasize)
           .backgroundColor('#00ffffff')
@@ -115,7 +112,7 @@ struct totalCustomDialog {
           })
 
         Button($r('app.string.Save'))
-          .width(144)
+          .width('50%')
           .fontSize(FONT_SIZE_16)
           .fontColor($r('sys.color.font_on_primary'))
           .backgroundColor(this.icon_emphasize)
@@ -123,13 +120,14 @@ struct totalCustomDialog {
            this.uiConfig.inputTotal= this.TotalCellular
             this.uiConfig.cellularDataIndex=this.index
             this.switchUnit(this.uiConfig.cellularDataIndex)
-       //     console.info('inputTotal1', this.uiConfig.inputTotal)
             if (this.controller != undefined) {
               this.controller.close()
               this.isEnableIndexForegroundBlur = false
             }
           })
-      }
+      }.width('100%')
+      .alignItems(VerticalAlign.Center)
+      .justifyContent(FlexAlign.Center)
     }
     .backgroundColor($r('app.color.container_background'))
     .width('100%')
@@ -282,13 +280,13 @@ struct CellularDataStat {
         .width('100%')
         .justifyContent(FlexAlign.Center)
 
-        //使用流量进度条
+        // 使用流量进度条
         Column() {
           Progress({
             value: convertToSwitchNub(this.uiConfig.dataTotal,this.uiConfig.switchUnit),
             total: this.uiConfig.inputTotal,
             type: ProgressType.Capsule
-          })//value为使用流量的值
+          })// value为使用流量的值
             .style({ enableSmoothEffect: true, borderColor: '#00ffffff' })
             .color('#ff46b1e3')
             .width('100%')
@@ -300,12 +298,12 @@ struct CellularDataStat {
         .borderRadius(this.barHeight.value)
 
         Row({space:2}) {
-          //使用流量/总流量
+          // 使用流量/总流量
           Text(convertDataNumberT(this.uiConfig.dataTotal) + ' / ' + this.uiConfig.inputTotal.toString())
             .fontSize(this.isLandscapePhone ? 10 : this.HomeCardCellularDataSmFontSize.value)
             .fontColor($r('sys.color.font_secondary'))
 
-          //总量单位
+          // 总量单位
           Text(this.uiConfig.switchUnit)
             .fontSize(this.isLandscapePhone ? 10 : this.HomeCardCellularDataSmFontSize.value)
             .fontColor($r('sys.color.font_secondary'))
@@ -323,7 +321,7 @@ struct CellularDataStat {
       .padding({bottom:this.isLandscapePhone ? 30: this.HomeCardCellularDataPadding.value})
       .onClick(()=>{
         if (this.dialogController != null) {
-          //在home页编辑状态时，无法操作
+          //  在home页编辑状态时，无法操作
           if (this.isShowHomeEdit===false ) {
             this.dialogController.open()
             this.isEnableIndexForegroundBlur=true
@@ -334,7 +332,7 @@ struct CellularDataStat {
           console.info('Total',convertToSwitchNub(this.appFlowingState.totalTraffic.upRaw+this.appFlowingState.totalTraffic.downRaw,this.uiConfig.switchUnit),this.uiConfig.inputTotal)
         }
       })
-    //  .alignItems(HorizontalAlign.Center)
+
     }
     .padding(this.cardPadding.value)
     .width('100%')
