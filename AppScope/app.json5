@@ -2,9 +2,9 @@
   "app": {
     "bundleName": "org.xbgroup.clashnext",
     "vendor": "example",
-    "versionCode": 1002004,
-    "versionName": "1.2.4",
-    "icon": "$media:app_icon",
+    "versionCode": 1002005,
+    "versionName": "1.2.5",
+    "icon": "$media:layered_image",
     "label": "$string:app_name"
   }
 }

@@ -346,6 +346,8 @@ export struct DisclaimerCustomDialog {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 是否为免责声明弹窗
   @State isDisclaimer: boolean = false
+  // 更新日志
+  @State body: string = ''
   @State version: string = ''
   confirm: () => void = () => {}
   cancel: () => void = () => {}
@@ -358,13 +360,25 @@ export struct DisclaimerCustomDialog {
   }
 
   build() {
-    Column() {
+    Flex({direction: FlexDirection.Column}) {
       Text(this.isDisclaimer ? $r('app.string.Disclaimer') : `${getResourceString($r('app.string.new_version'), context)} ${this.version}`)
         .fontSize(20)
         .margin({ top: 15, bottom: 15 })
-      Text(this.isDisclaimer ? $r('app.string.Disclaimer_Content') : $r('app.string.new_version_content'))
-        .textAlign(TextAlign.Center)
-        .fontSize(FONT_SIZE_16)
+      List() {
+        ListItem() {
+          Text() {
+            Span(this.isDisclaimer ? $r('app.string.Disclaimer_Content') : $r('app.string.new_version_content'))
+            if (!this.isDisclaimer) {
+              Span('\n' +
+                '更新日志：\n' +
+                `${this.body}`)
+            }
+          }
+          .textAlign(TextAlign.Start)
+          .fontSize(FONT_SIZE_16)
+        }
+      }.layoutWeight(1)
+      .contentEndOffset(5)
       Flex({direction: FlexDirection.Row}) {
         if (this.uiConfig.isFirstStart || !this.isDisclaimer) {
           Button(this.isDisclaimer ? $r('app.string.refuse') : $r('app.string.Cancel'))
@@ -391,7 +405,7 @@ export struct DisclaimerCustomDialog {
           })
           .fontColor(Color.White)
       }
-    }
+    }.constraintSize({maxHeight: 230})
     .backgroundColor($r('app.color.container_background'))
     .padding({left: 24, right: 24, bottom: 10})
     .borderRadius(32)

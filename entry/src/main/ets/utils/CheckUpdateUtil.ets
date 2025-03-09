@@ -13,6 +13,7 @@ interface Release {
   name: string
   published_at: string
   assets: Asset[]
+  body: string
 }
 
 export interface UpdateInfo {
@@ -20,6 +21,7 @@ export interface UpdateInfo {
   name: string
   published_at: string
   browser_download_url: string
+  body: string
 }
 
 // http请求获取Release信息
@@ -58,7 +60,8 @@ export function extractUpdateInfo(updateInfo: Release): UpdateInfo | null {
     tag_name: updateInfo.tag_name,
     name: updateInfo.name,
     published_at: updateInfo.published_at,
-    browser_download_url: updateInfo.assets[0].browser_download_url
+    browser_download_url: updateInfo.assets[0].browser_download_url,
+    body: updateInfo.body
   }
 }
 

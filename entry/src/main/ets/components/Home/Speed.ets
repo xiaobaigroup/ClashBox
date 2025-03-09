@@ -12,6 +12,10 @@ import { convertDataArray } from '../../utils/DataUnitConvertUtils';
 struct Speed {
   @State DownloadSpeed: string = ""
   @State UploadSpeed: string = ""
+  // 前台判断变量
+  @Consume isForeward: boolean
+  // 是否在主页
+  @Consume isHomePage: boolean
   // 卡片内边距
   @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
   //主页卡片内容网络测速字体大小
@@ -163,7 +167,8 @@ struct Speed {
    * @Watch监听事件：开启代理时启动定时器
    */
   proxyEnabledChanged() {
-    if(this.proxyEnabled) {
+    // 只有主页显示的时候启动
+    if(this.proxyEnabled && this.isForeward && this.isHomePage) {
       // 设置定时器，每秒调用一次 onSpeedData 函数
       this.timerId = setInterval(() => {
         this.onSpeedData()

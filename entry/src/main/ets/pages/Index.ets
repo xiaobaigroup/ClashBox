@@ -173,6 +173,8 @@ struct Index {
     lg: 16,
     xl: 16
   });
+  // 是否在主页
+  @Provide isHomePage: boolean = false
   // 是否为免责弹窗
   @Provide isDisclaimer: boolean = false
   // 欢迎页半模态窗口
@@ -184,7 +186,7 @@ struct Index {
   // 更多页一级页面顶部标题偏移量
   @Provide curYOffsetMore: number = 0
   // 应用更新信息
-  @Provide theAppVersionInfo: UpdateInfo = {tag_name: AppState.versionName, name: '1.2.3', published_at: '2024-01-28T15:13:58Z', browser_download_url: ''}
+  @Provide theAppVersionInfo: UpdateInfo = {tag_name: AppState.versionName, name: '1.2.3', published_at: '2024-01-28T15:13:58Z', browser_download_url: '', body: ''}
   // 主页卡片内边距
   @Provide('breakPointStateHomeCardPadding')
   private breakPointStateHomeCardPadding: BreakpointState<MarginGenerate> = HomeCardPadding_14_15_16_17
@@ -454,7 +456,8 @@ struct Index {
         }
       },
       isDisclaimer: this.isDisclaimer,
-      version: this.isDisclaimer ? '' : this.theAppVersionInfo.tag_name
+      version: this.isDisclaimer ? '' : this.theAppVersionInfo.tag_name,
+      body: this.theAppVersionInfo.body
     }),
     autoCancel: false,
     onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
@@ -863,6 +866,11 @@ struct Index {
         .barHeight(this.isLandscapePhone ? '100%':(!this.uiConfig.isBlurr&&this.isSecondary)?this.barHeight:this.compBarHeight.value) /**/
         .onChange((index: number) => {
           this.IndexCurrentindex = index
+          if (index === 0) {
+            this.isHomePage = true
+          } else {
+            this.isHomePage = false
+          }
         })
         .onAnimationStart((index: number, targetIndex: number) => {
           animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion(), }, () => {
