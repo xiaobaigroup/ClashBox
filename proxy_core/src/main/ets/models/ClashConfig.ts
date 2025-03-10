@@ -143,7 +143,7 @@ export class  ClashConfig {
   tun?: Tun = new Tun();
   sniffer?: Sniffer;
   "geox-url"?: GeoXUrl = defaultGeoXMap;
-  constructor(ua: string = "ClashNext/v1.0.0") {
+  constructor(ua: string = "clash.meta/1.18.7") {
     this["global-ua"] = ua
   }
 }
