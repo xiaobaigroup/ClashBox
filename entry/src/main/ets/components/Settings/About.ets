@@ -900,7 +900,7 @@ export struct CheckUpdate {
                 if(index === 1) {
                   // 前往下载网页
                   hilog.info(0xFF00, "checkUpdateTest", "前往下载网页")
-                 implicitStartAbility('https://github.com/xiaobaigroup/hapapp/releases/tag/clashnext', context)
+                 implicitStartAbility('https://github.com/xiaobaigroup/hapapp/releases', context)
                 } else if(index === 3) {
                   // 忽略本次更新
                   promptAction.showToast({
