@@ -7,11 +7,11 @@
         "material": {
           "certpath": "C:\\Users\\Administrator\\.ohos\\config\\default_xiangmu_Vyd5JaHS6xn_MF4wyJr4MIbr3LZ_bcUuxIrMDngWySU=.cer",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001B83F32951F6360A8FB6324D6E2B269DAD68D3F56E6A91183519F9FD262D66C9582B95837BA8624A",
+          "keyPassword": "0000001B2DA841A222DC73B5B4691FD4220AEC50801DC3C01E7FCA5D268C716DB00F326F47CB0600989495",
           "profile": "C:\\Users\\Administrator\\.ohos\\config\\default_xiangmu_Vyd5JaHS6xn_MF4wyJr4MIbr3LZ_bcUuxIrMDngWySU=.p7b",
           "signAlg": "SHA256withECDSA",
           "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\default_xiangmu_Vyd5JaHS6xn_MF4wyJr4MIbr3LZ_bcUuxIrMDngWySU=.p12",
-          "storePassword": "0000001B87CFD7E26A6389870AD5B7E692E86FD7EBB6B53C583313B7982B6ABA5150D139A2103D16618BEB"
+          "storePassword": "0000001B807B6957415548A94F0AC80F5E257C821E696EA25BCC7C4786144E7C9370001B48B74393B94484"
         }
       }
     ],
@@ -19,7 +19,8 @@
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.2(14)",
+        "compatibleSdkVersion": "5.0.0(12)",
+        "targetSdkVersion": "5.0.2(14)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
