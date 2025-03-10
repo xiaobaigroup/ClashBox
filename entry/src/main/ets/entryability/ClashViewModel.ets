@@ -28,7 +28,7 @@ export class ClashViewModel {
   async init(context: Context) {
     const packageInfo = await getPackageInfo()
     AppState.versionName = packageInfo.versionName
-    AppState.globalUA =  "ClashNext/v" + packageInfo.versionName
+    AppState.globalUA =  "clash.meta/1.18.7"
     this.context = context
     await this.profileRepo.init(context)
     this.socketProxy.init(context)

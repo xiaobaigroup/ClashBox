@@ -334,7 +334,7 @@
     },
     {
       "name": "Default_UA",
-      "value": "默认(ClashNEXT/2.0.0)"
+      "value": "默认(clash.meta/1.18.7)"
     },
     {
       "name": "TCP_interval",

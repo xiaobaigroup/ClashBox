@@ -307,6 +307,7 @@ export  const ListOverwriteBasicData = (clashConfig: ClashConfig, appConfig: App
     new ConfigItemData($r('sys.symbol.info_circle'), 'log-level', $r('app.string.LogLevel'), '', $r('app.string.Info'), 0).bindClashConfig(clashConfig).bindOption(LogMenu),
     new ConfigItemData($r('sys.symbol.person_shield_fill'), 'global-ua', $r('app.string.UA'), '', $r('app.string.Default_UA'), 0).bindClashConfig(clashConfig).bindOption([
       {title: AppState.globalUA, value: AppState.globalUA },
+      {title: 'ClashNext/v2.0.0', value:"ClashNext/v2.0.0"},
       {title: 'clash.meta/1.18.7', value:"clash.meta/1.18.7"},
       {title: 'clash-verge/v1.6.6', value:"clash-verge/v1.6.6"},
       {title: 'ClashforWindows/0.19.23', value:"ClashforWindows/0.19.23"},

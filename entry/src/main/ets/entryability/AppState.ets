@@ -153,7 +153,7 @@ export function getPackageInfo(){
 // use @StorageLink('appConfig')
 export class AppState {
   static externalController = "127.0.0.1:9090"
-  static globalUA = "clash-verge/v1.6.6"
+  static globalUA = "clash.meta/1.18.7"
   static versionName = ""
   static coreVersion = "Prerelease-Alpha"
   static async init(){

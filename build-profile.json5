@@ -5,13 +5,13 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashNEXT_zL_lCO4bAvPSCUi1B2mkUCrHIVGxm3QDrMJXyoen8AI=.cer",
+          "certpath": "C:\\Users\\Administrator\\.ohos\\config\\default_xiangmu_Vyd5JaHS6xn_MF4wyJr4MIbr3LZ_bcUuxIrMDngWySU=.cer",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001B19D4082FE7AE5678AD5DBF7BCE7844DFA4299015B5BE31A43A98C1AEB326C3F3C9D081064A9471",
-          "profile": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashNEXT_zL_lCO4bAvPSCUi1B2mkUCrHIVGxm3QDrMJXyoen8AI=.p7b",
+          "keyPassword": "0000001B83F32951F6360A8FB6324D6E2B269DAD68D3F56E6A91183519F9FD262D66C9582B95837BA8624A",
+          "profile": "C:\\Users\\Administrator\\.ohos\\config\\default_xiangmu_Vyd5JaHS6xn_MF4wyJr4MIbr3LZ_bcUuxIrMDngWySU=.p7b",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashNEXT_zL_lCO4bAvPSCUi1B2mkUCrHIVGxm3QDrMJXyoen8AI=.p12",
-          "storePassword": "0000001B89F633C3B21B582771E004E03191867E49A7D21B34E207E7F094D59D2D98B8354CFA1514D42789"
+          "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\default_xiangmu_Vyd5JaHS6xn_MF4wyJr4MIbr3LZ_bcUuxIrMDngWySU=.p12",
+          "storePassword": "0000001B87CFD7E26A6389870AD5B7E692E86FD7EBB6B53C583313B7982B6ABA5150D139A2103D16618BEB"
         }
       }
     ],
@@ -20,7 +20,6 @@
         "name": "default",
         "signingConfig": "default",
         "compatibleSdkVersion": "5.0.2(14)",
-        "targetSdkVersion": "5.0.2(14)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
@@ -38,7 +37,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug"
+        "name": "debug",
       },
       {
         "name": "release"
