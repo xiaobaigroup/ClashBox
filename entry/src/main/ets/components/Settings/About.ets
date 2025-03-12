@@ -727,7 +727,7 @@ export struct FAQ {
                   })
                 Span($r('app.string.statement_1'))
               }
-            }.width('90%')
+            }.width('88%')
           }.width('100%')
           .justifyContent(FlexAlign.Start)
         }.width('100%')
@@ -752,7 +752,7 @@ export struct FAQ {
                 Text(item.title)
                   .fontSize(17)
                   .fontWeight(FontWeight.Medium)
-              }.width('100%').margin({left: 8})
+              }.width('96%').margin({left: 8})
               Text(item.content)
                 .fontSize(15)
                 .margin({left: 11})

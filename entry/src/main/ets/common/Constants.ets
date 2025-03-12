@@ -839,7 +839,7 @@ export const BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36: BreakpointState<number> =
 
 // 更多页整体外边距
 export const morePageMargin_12_14_16: BreakpointState<number> = BreakpointState.of({
-  xs: 12, sm: 16, md: 16, lg: 16, xl: 16
+  xs: 12, sm: 15, md: 16, lg: 16, xl: 16
 })
 
 // 更多页列表底边距
