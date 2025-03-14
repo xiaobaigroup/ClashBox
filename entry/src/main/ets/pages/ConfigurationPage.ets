@@ -712,6 +712,8 @@ struct ConfigurationPage {
     this.promptAction.showToast({ message: `${getResourceString($r('app.string.configuration_deleted'), this)}💔` })
     hilog.info(0xC016, this.componentName, `#deleteConfig#删除配置: configName is [${this.currentTouchConfigData.configName}]`)
     await ClashViewModel.deleteProfile(this.currentTouchConfigData.configId)
+    this.appConfig.currentProxyName=undefined
+    this.appConfig.currentProfileName=undefined
     this.fetchProfiles()
   }
 }

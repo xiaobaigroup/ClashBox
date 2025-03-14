@@ -76,9 +76,6 @@ struct ProxyCustomDialog {
   }
 }
 
-//中文排序
-//let ProxyCollator = new intl.Collator("zh-CN");
-
 //自定义弹窗内容end
 
 

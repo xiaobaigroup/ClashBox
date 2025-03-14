@@ -151,10 +151,10 @@ export struct ConfigInfo{
                     this.configData.isConfigAutoUpdate = isOn
                   })
                   // （1. 新配置 || 2. 老配置之前没开自动更新，编辑的时候才打开自动更新）处理
-                  if (isOn && this.configData?.configAutoUpdateTimeGapTextPickerIndex === undefined){
+               /*   if (isOn){
                     // `TextPicker` 默认选择`小时`
-                    this.configData.configAutoUpdateTimeGapTextPickerIndex = 1
-                  }
+                    this.uiConfig.autoUpdateTimeUtils ?? 1
+                  }*/
                 })
             }.width('100%').alignItems(VerticalAlign.Center)
           }
@@ -232,6 +232,7 @@ export struct ConfigInfo{
                       if(this.uiConfig.isSound) {
                         customSound.playAudioForSoundPool()
                       }
+                      console.info('autoUpdateTimeUtils1',this.configData.configAutoUpdateTimeGapTextPickerIndex)
                     })
                     // 手指按下之后静态
                     // .onHover( (isHover: boolean, event: HoverEvent) => {
@@ -318,6 +319,7 @@ export struct ConfigInfo{
     if(this.uiConfig.isSound) {
       customSound.initSoundPool(3, 'beat_short.wav')
     }
+    this.configData.configAutoUpdateTimeGapTextPickerIndex=this.uiConfig.autoUpdateTimeUtils
   }
 
   aboutToDisappear(): void {

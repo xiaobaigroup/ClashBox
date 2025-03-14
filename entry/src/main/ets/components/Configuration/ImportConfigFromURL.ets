@@ -59,7 +59,7 @@ export struct ImportConfigFromURL{
     configUrl: '',
     isConfigAutoUpdate: false,
     lastUpdateDateTime: 0,
-    updateTime: 0
+    updateTime: 0,
   }
 
   /* 断点相关 */
@@ -246,6 +246,7 @@ export struct ImportConfigFromURL{
     } else {
       this.customDownloadingDialogTitle = $r('app.string.updating_configuration_file')
       this.configCustomDownloadingDialogController.open()
+      this.uiConfig.autoUpdateTimeUtils = this.configData.configAutoUpdateTimeGapTextPickerIndex
       try {
         await ClashViewModel.addOrUpdateProfileByUrl(this.configData, this.configData.configId)
         this.configCustomDownloadingDialogController.close()

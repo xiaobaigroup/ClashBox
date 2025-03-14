@@ -135,6 +135,8 @@ export class UIConfig{
   ShowDelayPop: boolean = false
   // 自动检查更新
   autoCheckUpdate: boolean = false
+  // 配置自动更新时间
+  autoUpdateTimeUtils?:number
   resourcesData: string = JSON.stringify(theResouresData)
   resourcesHideData: string = JSON.stringify(resourcesBlankData)
   constructor() {
