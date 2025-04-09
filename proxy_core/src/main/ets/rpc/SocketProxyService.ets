@@ -162,8 +162,10 @@ export class SocketProxyService implements IClashManager{
         reject("rpc client error")
       })
       const socketPath = this.context?.filesDir + '/clashNext.sock'
+      // test new ipc in go
+      const goPath = this.vpnService.context.filesDir + '/clash_go.sock'
 
-      client.connect({address: { address: socketPath }, timeout:1000}).then(async ()=>{
+      client.connect({address: { address: goPath }, timeout:1000}).then(async ()=>{
         this.active = true
         client.send({ data: JSON.stringify({method, params}) });
       }).catch((e:Error)=>{
