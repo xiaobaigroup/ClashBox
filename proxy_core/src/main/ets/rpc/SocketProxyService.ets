@@ -44,8 +44,8 @@ export class SocketProxyService implements IClashManager{
     let result =  await this.sendMessageRequest(ClashRpcType.load, [JSON.stringify(config)])
     return result as string
   }
-  async vailConfig(config: string){
-    let result = await this.sendMessageRequest(ClashRpcType.validConfig, [config])
+  async vailConfig(filepath: string){
+    let result = await this.sendMessageRequest(ClashRpcType.validConfig, [filepath])
     return result as string;
   }
   async queryTrafficTotal(): Promise<Traffic> {
@@ -67,7 +67,7 @@ export class SocketProxyService implements IClashManager{
   async queryConnections(): Promise<ConnectionInfo[]> {
     let result = await this.sendMessageRequest(ClashRpcType.queryConnections)
     const json = JSON.parse(result as string) as Snapshot
-    return json.connections;
+    return json.connections ?? [];
   }
   async getRequestList(): Promise<ConnectionInfo[]>{
     let result = await this.sendMessageRequest(ClashRpcType.getRequestList)
@@ -157,7 +157,6 @@ export class SocketProxyService implements IClashManager{
       let fullMessage = '';
       let timeout = true
       let parseMessage = debounce((message)=>{
-        console.log("onMessage " + method, message.length)
         timeout = false
         this.ParseMessage(message, resolve, reject)
         message = ''

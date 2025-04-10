@@ -98,7 +98,7 @@ export class Profile {
     await fs.write(file.fd, bytes.buffer)
     await fs.fsync(file.fd)
     await fs.close(file.fd)
-    let message = await vailConfig(this.id);
+    let message = await vailConfig(filePath);
     if (message != "") {
       this.delete()
       throw new Error(message);

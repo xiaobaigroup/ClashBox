@@ -182,7 +182,7 @@ func handleRemoteRequest(request RpcRequest, fn func(RpcResult)) {
 		})
 	case HealthCheck:
 		name, _ := request.Params[0].(string)
-		timeout, _ := request.Params[0].(int)
+		timeout, _ := request.Params[1].(int)
 		testInfo := map[string]any{
 			"proxy-name": name,
 			"timeout":    timeout,

@@ -88,7 +88,7 @@ export class ClashViewModel {
       const list = (await this.getProfiles()).filter(d => d.type == ProfileType.Url)
       for(let p of list){
         p.loadContext(this.context, ua)
-        await p.update((c)=>this.VailConfig(c))
+        await p.update((c) => this.VailConfig(c))
         await this.profileRepo.addOrUpdate(p)
       }
     }
