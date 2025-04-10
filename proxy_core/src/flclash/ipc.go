@@ -10,11 +10,11 @@ import (
 
 func startIpcProxy(path string) {
 	if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
-		log.Fatal("ipc_go", err)
+		log.Println("ipc_go", err)
 	}
 	listener, err := net.Listen("unix", path)
 	if err != nil {
-		log.Fatal("ipc_go", err)
+		log.Println("ipc_go", err)
 	}
 	defer listener.Close()
 	log.Println("ipc_go", "Server is listening on", path)
@@ -27,35 +27,38 @@ func startIpcProxy(path string) {
 	}
 }
 func handleConnection(conn net.Conn) {
-	defer conn.Close()
+
 	buffer := make([]byte, 10240)
 
-	_, err := conn.Read(buffer)
+	n, err := conn.Read(buffer)
 	if err != nil {
-		log.Fatal("ipc_go", err)
+		log.Println("ipc_go", err)
 	}
 	request := RpcRequest{}
-	err = json.Unmarshal(buffer, request)
+	err = json.Unmarshal(buffer[:n], &request)
 	if err != nil {
-		log.Fatal("ipc_go", err)
+		log.Println("ipc_go", err)
 	}
+	log.Println("ipc_go", "request", request)
 	handleRemoteRequest(request, func(rr RpcResult) {
-		fmt.Println("Received:", rr)
 		res, _ := json.Marshal(rr)
+		fmt.Println("ipc_go", "result", string(res))
 		conn.Write(res)
-	})
 
+	})
+	//defer conn.Close()
 }
 
 type RpcRequest struct {
-	Key    int
-	Method ClashRpcType
-	Params []any
+	Key    int          `json:"key"`
+	Method ClashRpcType `json:"method"`
+	Params []any        `json:"params"`
 }
 type RpcResult struct {
-	Key    int
-	Result string
-	Error  string
+	Key    int          `json:"key"`
+	Method ClashRpcType `json:"method"`
+	Result string       `json:"result"`
+	Error  string       `json:"error"`
 }
 type ClashRpcType int
 
@@ -87,9 +90,9 @@ const (
 )
 
 func handleRemoteRequest(request RpcRequest, fn func(RpcResult)) {
-	print("handle", request.Key)
 	ret := RpcResult{
-		Key: request.Key,
+		Key:    request.Key,
+		Method: request.Method,
 	}
 	switch request.Method {
 	case QueryTrafficNow:
@@ -123,7 +126,8 @@ func handleRemoteRequest(request RpcRequest, fn func(RpcResult)) {
 	case Load:
 		paramsString, _ := request.Params[0].(string)
 		bytes := []byte(paramsString)
-		handleUpdateConfig(bytes)
+		ret.Result = handleUpdateConfig(bytes)
+		fn(ret)
 	case Reset:
 		handleForceGc()
 		fn(ret)
@@ -177,10 +181,20 @@ func handleRemoteRequest(request RpcRequest, fn func(RpcResult)) {
 			fn(ret)
 		})
 	case HealthCheck:
-		proxy, _ := request.Params[0].(string)
-		handleAsyncTestDelay(proxy, func(value string) {
+		name, _ := request.Params[0].(string)
+		timeout, _ := request.Params[0].(int)
+		testInfo := map[string]any{
+			"proxy-name": name,
+			"timeout":    timeout,
+		}
+		json, _ := json.Marshal(testInfo)
+		handleAsyncTestDelay(string(json), func(value string) {
 			ret.Result = value
 			fn(ret)
 		})
+	default:
+		ret.Error = "未知请求"
+		fn(ret)
 	}
+
 }

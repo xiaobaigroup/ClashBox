@@ -5,10 +5,24 @@ import { common } from '@kit.AbilityKit';
 import { ClashRpcType, IClashManager } from './IClashManager';
 import { ConnectionInfo, IpInfo, LogInfo, Provider, ProxyGroup, ProxyMode,
   Traffic } from '../models/Common';
+import  fs from  "@ohos.file.fs"
+import { fileUri } from "@kit.CoreFileKit";
 import { promptAction } from '@kit.ArkUI';
 import { UpdateConfigParams } from '../models/ClashConfig';
 import { checkIp, queryIpInfo } from '../Request';
+import { ParseProxyGroup } from './FlClashVpnService';
 
+interface DelayInfo{
+  name: string
+  value: number
+}
+interface Snapshot{
+  connections: ConnectionInfo[]
+}
+interface TrafficInfo{
+  up: number
+  down: number
+}
 
 export class SocketProxyService implements IClashManager{
   context?: common.Context
@@ -26,6 +40,7 @@ export class SocketProxyService implements IClashManager{
     return this.callbackRequest(ClashRpcType.registerOnMessage, [], observer)
   }
   async loadConfig(config: UpdateConfigParams): Promise<string> {
+    config['profile-id'] = config['profile-id'] + "/config"
     let result =  await this.sendMessageRequest(ClashRpcType.load, [JSON.stringify(config)])
     return result as string
   }
@@ -35,8 +50,8 @@ export class SocketProxyService implements IClashManager{
   }
   async queryTrafficTotal(): Promise<Traffic> {
     let result = await this.sendMessageRequest(ClashRpcType.queryTrafficTotal)
-    const json = JSON.parse(result as string) as Traffic
-    return new Traffic(json.upRaw ?? 1024, json.downRaw ?? 1024);
+    const json = JSON.parse(result as string) as TrafficInfo
+    return new Traffic(json.up, json.down);
   }
 
   async checkIpInfo(): Promise<IpInfo> {
@@ -51,15 +66,15 @@ export class SocketProxyService implements IClashManager{
   }
   async queryConnections(): Promise<ConnectionInfo[]> {
     let result = await this.sendMessageRequest(ClashRpcType.queryConnections)
-    const json = JSON.parse(result as string) as ConnectionInfo[]
-    return json;
+    const json = JSON.parse(result as string) as Snapshot
+    return json.connections;
   }
   async getRequestList(): Promise<ConnectionInfo[]>{
     let result = await this.sendMessageRequest(ClashRpcType.getRequestList)
     return JSON.parse(result as string) as ConnectionInfo[]
   }
   async  clearRequestList(): Promise<boolean>{
-    let result = await this.sendMessageRequest(ClashRpcType.clearRequestList)
+    await this.sendMessageRequest(ClashRpcType.clearRequestList)
     return true
   }
   async closeConnection(id: string): Promise<string> {
@@ -73,22 +88,24 @@ export class SocketProxyService implements IClashManager{
   }
   async queryTrafficNow(): Promise<Traffic> {
     let result = await this.sendMessageRequest(ClashRpcType.queryTrafficNow)
-    const json = JSON.parse(result as string) as Traffic
-    return new Traffic(json.upRaw, json.downRaw);
+    const json = JSON.parse(result as string) as TrafficInfo
+    return new Traffic(json.up, json.down);
   }
   async queryProxyGroups(model: ProxyMode): Promise<ProxyGroup[]> {
     let result = await this.sendMessageRequest(ClashRpcType.queryProxyGroup,[model])
-    return JSON.parse(result as  string) as ProxyGroup[]
+    return ParseProxyGroup(model, result as string)
   }
   async queryProviders(): Promise<Provider[]> {
     let result = await this.sendMessageRequest(ClashRpcType.queryProviders)
     return JSON.parse(result as string) as Provider[]
   }
   async updateProvider(provider: Provider): Promise<string> {
-    return  (await this.sendMessageRequest(ClashRpcType.updateProvider,[JSON.stringify(provider)])) as string
+    return  (await this.sendMessageRequest(ClashRpcType.updateProvider,[provider.name])) as string
   }
-  async upLoadProvider(provider: Provider, filePath: string): Promise<string> {
-    return  (await this.sendMessageRequest(ClashRpcType.uploadProvider,[provider.name, filePath])) as string
+  async upLoadProvider(provider: Provider, uri: string): Promise<string> {
+    const temp = this.context?.filesDir + "/temp_provider"
+    fs.copy(uri, fileUri.getUriFromPath(temp))
+    return  (await this.sendMessageRequest(ClashRpcType.uploadProvider,[provider.name, temp])) as string
   }
   async updateGeoData(geoName: string, geoType: string): Promise<string>{
     return await (this.sendMessageRequest(ClashRpcType.updateGeoData,[geoName, geoType])) as string
@@ -97,11 +114,11 @@ export class SocketProxyService implements IClashManager{
     let result = await this.sendMessageRequest(ClashRpcType.changeProxy,[group, name])
     return result as string
   }
-
   async healthCheck(proxyName: string): Promise<number> {
-    return (await this.sendMessageRequest(ClashRpcType.healthCheck, [proxyName, 3000])) as number
+    let result = await this.sendMessageRequest(ClashRpcType.healthCheck, [proxyName, 3000])
+    let info = JSON.parse(result as string) as DelayInfo
+    return info.value
   }
-
 
   async startClash():Promise<boolean>{
     let json = await this.sendMessageRequest(ClashRpcType.startClash, [])
@@ -118,7 +135,7 @@ export class SocketProxyService implements IClashManager{
   async ParseMessage(messageBuffer: string, resolve: (s: string| number | boolean | undefined)=>void, reject:  (err: string)=>void){
     try {
       let json = JSON.parse(messageBuffer) as RpcResult
-      if (!json.error)
+      if (!json.error || json.error == "")
         resolve(json.result)
       else{
         promptAction.showToast({message: json.error})
@@ -140,7 +157,7 @@ export class SocketProxyService implements IClashManager{
       let fullMessage = '';
       let timeout = true
       let parseMessage = debounce((message)=>{
-        console.log("onMessage " + method, message)
+        console.log("onMessage " + method, message.length)
         timeout = false
         this.ParseMessage(message, resolve, reject)
         message = ''
@@ -161,11 +178,11 @@ export class SocketProxyService implements IClashManager{
       client.on("error", ()=>{
         reject("rpc client error")
       })
-      const socketPath = this.context?.filesDir + '/clashNext.sock'
-      // test new ipc in go
-      const goPath = this.vpnService.context.filesDir + '/clash_go.sock'
-
-      client.connect({address: { address: goPath }, timeout:1000}).then(async ()=>{
+      let socketPath = this.context?.filesDir + '/clash_go.sock'
+      if (method == ClashRpcType.startClash || method == ClashRpcType.stopClash){
+        socketPath = this.context?.filesDir + '/clashNext.sock'
+      }
+      client.connect({address: { address: socketPath }, timeout:1000}).then(async ()=>{
         this.active = true
         client.send({ data: JSON.stringify({method, params}) });
       }).catch((e:Error)=>{
@@ -209,22 +226,7 @@ export class SocketProxyService implements IClashManager{
     })
   }
 }
-function appendArrayBuffers(buffer1: ArrayBuffer, buffer2: ArrayBuffer) {
-  // 如果其中一个 buffer 是空的，直接返回另一个
-  if (buffer1.byteLength === 0) return buffer2;
-  if (buffer2.byteLength === 0) return buffer1;
 
-  // 创建一个新的 ArrayBuffer，总长度为两个 buffer 之和
-  const resultBuffer = new ArrayBuffer(buffer1.byteLength + buffer2.byteLength);
-
-  // 使用 Uint8Array 视图操作二进制数据
-  const resultView = new Uint8Array(resultBuffer);
-
-  // 拷贝 buffer1 和 buffer2 的数据到新 buffer
-  resultView.set(new Uint8Array(buffer1), 0);
-  resultView.set(new Uint8Array(buffer2), buffer1.byteLength);
-  return resultBuffer;
-}
 function debounce(func:(json: string)=>void, delay =100) {
   let timer = 0;
   return (json: string) => {

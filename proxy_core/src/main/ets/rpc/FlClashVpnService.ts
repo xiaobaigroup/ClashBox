@@ -196,8 +196,7 @@ export class FlClashVpnService extends CommonVpnService{
         case ClashRpcType.uploadProvider: {
           let provider = data[0] as string
           let pathUri = data[1] as string
-          const temp = this.context.filesDir + "/temp_provider"
-          const buffer = await readFileUri(pathUri, temp)
+          const buffer = await readFile(pathUri)
           sideLoadExternalProvider(provider, buffer).then((v)=>{
             resolve(v)
           })
@@ -321,4 +320,39 @@ export class FlClashVpnService extends CommonVpnService{
   override async init(){
     initClash(await getHome(this.context), "1.0.0")
   }
+}
+
+
+
+export function ParseProxyGroup(mode, result: string){
+  let map = JSON.parse(result) as Record<string, string | Record<string, string[] | string>>
+  let groupNames = map[ProxyMode.Global]["all"] as string[]
+  if(mode == ProxyMode.Global){
+    groupNames = ["GLOBAL", ...groupNames]
+  } else if(mode == ProxyMode.Rule) {
+    groupNames = groupNames
+  }else{
+    groupNames = []
+  }
+  groupNames = groupNames.filter(e => {
+    const proxy = map[e] as Record<string, string>
+    const indexes = ["Selector","URLTest", "Fallback", "LoadBalance", "Relay"].indexOf(proxy["type"])
+    return indexes > -1
+  })
+  const groupsRaw = groupNames.map((groupName) =>{
+    const group = map[groupName];
+    group["proxies"] = (group["all"] ?? []).map((n:string) =>{
+      map[n]["name"] = map[n]["name"]
+      return map[n]
+    }).filter((d: string) => d != null && d != undefined)
+    return {
+      name: group["name"] as string,
+      now: group["now"] as string,
+      type: group["type"] as ProxyType,
+      hidden: group["hidden"] == true,
+      icon: group["icon"] as string,
+      proxies: group["proxies"]
+    } as ProxyGroup
+  })
+  return groupsRaw;
 }

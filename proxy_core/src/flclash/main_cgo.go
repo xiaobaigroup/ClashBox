@@ -238,7 +238,7 @@ func stopListener(env js.Env, this js.Value, args []js.Value) any {
 }
 func startIpc(env js.Env, this js.Value, args []js.Value) any {
 	path, _ := napi.GetValueStringUtf8(env.Env, args[0].Value)
-	startIpcProxy(path)
+	go startIpcProxy(path)
 	return env.ValueOf("")
 }
 
@@ -283,7 +283,7 @@ func init() {
 }
 
 func sendMessage(message Message) {
-	res, err := message.Json()
+	_, err := message.Json()
 	if err != nil {
 		return
 	}

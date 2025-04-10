@@ -19,7 +19,6 @@ export enum ClashRpcType{
   closeConnection,
   clearConnections,
   setLogObserver,
-  queryConfiguration,
   load,
   startClash,
   stopClash,

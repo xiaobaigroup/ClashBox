@@ -113,6 +113,7 @@ export class ClashViewModel {
     try {
       EventHub.sendEvent(EventKey.TestDelay, { name: proxyName, delay: 0 } as DelayInfo)
       let delay = await this.socketProxy.healthCheck(proxyName)
+
       EventHub.sendEvent(EventKey.TestDelay, { name: proxyName, delay: delay } as DelayInfo)
       this.delayMap.set(proxyName, { name: proxyName, delay: delay } as DelayInfo)
       return delay;
@@ -122,6 +123,7 @@ export class ClashViewModel {
     return -1;
   }
   async testAllDelay(list: ProxyItem[]): Promise<number[]>{
+
     const result = await Promise.all(list.map((l)=> this.testDelay(l.name)))
     EventHub.sendEvent(EventKey.FetchProxyGroup)
     return result;
@@ -217,6 +219,7 @@ export class ClashViewModel {
       })
       return groups
     } catch (e) {
+      console.error("获取代理失败: ", e.stack)
       promptAction.showToast({message: "获取代理失败: " + (e.message || e)})
     }
     return []
