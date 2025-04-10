@@ -33,7 +33,9 @@ export class SocketProxyService implements IClashManager{
   }
   async setLogObserver(observer: (message: LogInfo) => void): Promise<()=>void> {
     return this.callbackRequest(ClashRpcType.setLogObserver, [], (message)=>{
-        observer(JSON.parse(message) as LogInfo)
+        if(message != ""){
+          observer(JSON.parse(message) as LogInfo)
+        }
     })
   }
   async registerMessage(observer: (message: string) => void): Promise<()=>void> {
@@ -177,6 +179,7 @@ export class SocketProxyService implements IClashManager{
       client.on("error", ()=>{
         reject("rpc client error")
       })
+      // {"proxy-name":"♻️自动选择","timeout":3000}
       let socketPath = this.context?.filesDir + '/clash_go.sock'
       if (method == ClashRpcType.startClash || method == ClashRpcType.stopClash){
         socketPath = this.context?.filesDir + '/clashNext.sock'
@@ -206,13 +209,18 @@ export class SocketProxyService implements IClashManager{
       tcp.on('message', (value: socket.LocalSocketMessageInfo) => {
         let text = new util.TextDecoder()
         let dd = text.decodeToString(new Uint8Array(value.message))
-        callBack(dd)
+        try {
+          let json = JSON.parse(dd) as RpcResult
+          callBack(json.result as string)
+        }catch (e) {
+          console.debug("log err", e.message, dd)
+        }
+
       })
       tcp.on('error', (e: Error) => {
-        console.log("socketProxy error", e.message)
         reject("失败")
       });
-      const socketPath = this.context?.filesDir + '/clashNext.sock'
+      const socketPath = this.context?.filesDir + '/clash_go.sock'
       tcp.connect({address: { address: socketPath }, timeout:3000}).then(()=>{
         tcp.send({ data: JSON.stringify({method, params}) });
         resolve(()=>{

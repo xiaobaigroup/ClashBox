@@ -18,7 +18,6 @@ export enum ClashRpcType{
   queryConnections,
   closeConnection,
   clearConnections,
-  setLogObserver,
   load,
   startClash,
   stopClash,
@@ -28,7 +27,9 @@ export enum ClashRpcType{
   updateGeoData,
   registerOnMessage,
   getRequestList,
-  clearRequestList
+  clearRequestList,
+  setLogObserver,
+  stopLogObserver,
 }
 
 export interface IClashManager {

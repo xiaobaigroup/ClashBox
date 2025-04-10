@@ -6,6 +6,9 @@ import (
 	"log"
 	"net"
 	"os"
+	"strconv"
+
+	"github.com/metacubex/mihomo/tunnel/statistic"
 )
 
 func startIpcProxy(path string) {
@@ -21,7 +24,7 @@ func startIpcProxy(path string) {
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			log.Fatal(err)
+			log.Println("ipc_go Accept err:", err)
 		}
 		go handleConnection(conn)
 	}
@@ -76,7 +79,6 @@ const (
 	QueryConnections
 	CloseConnection
 	ClearConnections
-	SetLogObserver
 	Load
 	StartClash
 	StopClash
@@ -87,6 +89,8 @@ const (
 	RegisterOnMessage
 	GetRequestList
 	ClearRequestList
+	SetLogObserver
+	StopLogObserver
 )
 
 func handleRemoteRequest(request RpcRequest, fn func(RpcResult)) {
@@ -116,6 +120,12 @@ func handleRemoteRequest(request RpcRequest, fn func(RpcResult)) {
 			ret.Result = value
 			fn(ret)
 		})
+	case GetRequestList:
+		ret.Result = HandleRequestList()
+		fn(ret)
+	case ClearRequestList:
+		reqeustList = []statistic.Tracker{}
+		fn(ret)
 	case CloseConnection:
 		str, _ := request.Params[0].(string)
 		handleCloseConnection(str)
@@ -182,19 +192,51 @@ func handleRemoteRequest(request RpcRequest, fn func(RpcResult)) {
 		})
 	case HealthCheck:
 		name, _ := request.Params[0].(string)
-		timeout, _ := request.Params[1].(int)
+		timeout := anyToInt(request.Params[1])
+		log.Println("ipc_go", "HealthCheck", timeout)
+
 		testInfo := map[string]any{
 			"proxy-name": name,
 			"timeout":    timeout,
 		}
 		json, _ := json.Marshal(testInfo)
+
 		handleAsyncTestDelay(string(json), func(value string) {
 			ret.Result = value
 			fn(ret)
 		})
+	case SetLogObserver:
+		handleStartLog(func(value string) {
+			ret.Result = value
+			fn(ret)
+		})
+	case StopLogObserver:
+		handleStopLog()
+		fn(ret)
 	default:
 		ret.Error = "未知请求"
 		fn(ret)
 	}
 
+}
+func HandleRequestList() string {
+	json, _ := json.Marshal(reqeustList)
+	return string(json)
+}
+
+func anyToInt(val any) int {
+	switch v := val.(type) {
+	case int:
+		return v
+	case int64:
+		return int(v)
+	case float64:
+		return int(v)
+	case string:
+		i, err := strconv.Atoi(v)
+		if err == nil {
+			return i
+		}
+	}
+	return 0
 }

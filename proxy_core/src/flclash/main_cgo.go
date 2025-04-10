@@ -220,10 +220,7 @@ func getRequestList(env js.Env, this js.Value, args []js.Value) any {
 	json, _ := json.Marshal(reqeustList)
 	return env.ValueOf(string(json))
 }
-func HandleRequestList() string {
-	json, _ := json.Marshal(reqeustList)
-	return string(json)
-}
+
 func clearRequestList(env js.Env, this js.Value, args []js.Value) any {
 	reqeustList = []statistic.Tracker{}
 	return env.ValueOf("")

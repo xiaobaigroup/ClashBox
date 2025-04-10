@@ -392,14 +392,20 @@ func handleStartLog(fn func(value string)) {
 			if logData.LogLevel < log.Level() {
 				continue
 			}
-			message := &Message{
-				Type: LogMessage,
-				Data: logData,
-			}
-			logMessage, _ := message.Json()
-			fn(logMessage)
+			logMessage, _ := json.Marshal(LogInfo{
+				LogLevel: logData.LogLevel.String(),
+				Payload:  logData.Payload,
+				Time:     time.Now().Unix(),
+			})
+			fn(string(logMessage))
 		}
 	}()
+}
+
+type LogInfo struct {
+	LogLevel string `json:"logLevel"`
+	Payload  string `json:"payload"`
+	Time     int64  `json:"time"`
 }
 
 func handleStopLog() {

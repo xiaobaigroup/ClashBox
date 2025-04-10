@@ -591,7 +591,6 @@ struct Index {
           logType: log.logLevel,
           logTime: log.time,
           LogDetails: log.payload,
-          // TODO
           logSkip: log.payload.length > 30
         })
       })

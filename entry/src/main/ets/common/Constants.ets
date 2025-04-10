@@ -277,7 +277,7 @@ export class moreData {
 export  const ListMoreData = (): moreData[] => {
   let result: moreData[] = new Array()
   result = [
-    // new moreData($r('sys.symbol.doc_text_fill'), 'Log', $r('app.string.Log'), '', 0, false),
+    new moreData($r('sys.symbol.doc_text_fill'), 'Log', $r('app.string.Log'), '', 0, false),
     new moreData($r('sys.symbol.externaldrive_fill_3'), 'Resources', $r('app.string.Resources'), '', 0, false),
     new moreData($r('sys.symbol.list_bullet'), 'Request', $r('app.string.Request'), '', 0, false),
     new moreData($r('sys.symbol.swap'), 'Connect', $r('app.string.Connect'), '', 0, false),
