@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net"
 	"os"
@@ -42,12 +41,9 @@ func handleConnection(conn net.Conn) {
 	if err != nil {
 		log.Println("ipc_go", err)
 	}
-	log.Println("ipc_go", "request", request)
 	handleRemoteRequest(request, func(rr RpcResult) {
 		res, _ := json.Marshal(rr)
-		fmt.Println("ipc_go", "result", string(res))
 		conn.Write(res)
-
 	})
 	//defer conn.Close()
 }

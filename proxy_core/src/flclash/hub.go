@@ -94,6 +94,8 @@ func handleUpdateConfig(bytes []byte) string {
 
 	configParams = params.Params
 	prof := decorationConfig(params.ProfileId, params.Config)
+	fmt.Println("ipc_go", "handleUpdateConfig", params.Config.Sniffer)
+	fmt.Println("ipc_go", "handleUpdateConfig", prof.Sniffer)
 	err = applyConfig(prof)
 	if err != nil {
 		return err.Error()

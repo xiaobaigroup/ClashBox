@@ -237,6 +237,10 @@ func overwriteConfig(targetConfig *config.RawConfig, patchConfig config.RawConfi
 	targetConfig.Profile.StoreSelected = false
 	targetConfig.GeoXUrl = patchConfig.GeoXUrl
 	targetConfig.GlobalUA = patchConfig.GlobalUA
+	if patchConfig.Sniffer.Enable {
+		targetConfig.Sniffer = patchConfig.Sniffer
+	}
+
 	if configParams.TestURL != nil {
 		constant.DefaultTestURL = *configParams.TestURL
 	}
