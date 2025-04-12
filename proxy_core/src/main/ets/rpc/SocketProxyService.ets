@@ -50,8 +50,13 @@ export class SocketProxyService implements IClashManager{
     let result = await this.sendMessageRequest(ClashRpcType.validConfig, [filepath])
     return result as string;
   }
-  async queryTrafficTotal(): Promise<Traffic> {
-    let result = await this.sendMessageRequest(ClashRpcType.queryTrafficTotal)
+  async queryTrafficTotal(onlyProxy: boolean = true): Promise<Traffic> {
+    let result = await this.sendMessageRequest(ClashRpcType.queryTrafficTotal, [onlyProxy])
+    const json = JSON.parse(result as string) as TrafficInfo
+    return new Traffic(json.up, json.down);
+  } 
+  async queryTrafficNow(onlyProxy: boolean = true): Promise<Traffic> {
+    let result = await this.sendMessageRequest(ClashRpcType.queryTrafficNow,  [onlyProxy])
     const json = JSON.parse(result as string) as TrafficInfo
     return new Traffic(json.up, json.down);
   }
@@ -88,11 +93,7 @@ export class SocketProxyService implements IClashManager{
     const json = JSON.parse(result as string) as ConnectionInfo[]
     return json;
   }
-  async queryTrafficNow(): Promise<Traffic> {
-    let result = await this.sendMessageRequest(ClashRpcType.queryTrafficNow)
-    const json = JSON.parse(result as string) as TrafficInfo
-    return new Traffic(json.up, json.down);
-  }
+
   async queryProxyGroups(model: ProxyMode): Promise<ProxyGroup[]> {
     let result = await this.sendMessageRequest(ClashRpcType.queryProxyGroup,[model])
     return ParseProxyGroup(model, result as string)

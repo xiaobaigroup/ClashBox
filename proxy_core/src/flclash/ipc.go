@@ -96,10 +96,12 @@ func handleRemoteRequest(request RpcRequest, fn func(RpcResult)) {
 	}
 	switch request.Method {
 	case QueryTrafficNow:
-		ret.Result = handleGetTraffic(true)
+		onlyProxy, _ := request.Params[0].(bool)
+		ret.Result = handleGetTraffic(onlyProxy)
 		fn(ret)
 	case QueryTrafficTotal:
-		ret.Result = handleGetTotalTraffic(true)
+		onlyProxy, _ := request.Params[0].(bool)
+		ret.Result = handleGetTotalTraffic(onlyProxy)
 		fn(ret)
 	case QueryProviders:
 		ret.Result = handleGetExternalProviders()
