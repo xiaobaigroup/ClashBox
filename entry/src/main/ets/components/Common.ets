@@ -671,9 +671,12 @@ export struct ExperimentalFunction {
 /**
  * 页面暂无XX
  * @param name 页面标题(暂无XX)-Resource
+ * @param isNotEnabled 是否为未启用样式(可选)
  */
 @Component
 export struct Nothing {
+  // 是否为未启用样式
+  @State isNotEnabled: boolean = false
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   //二级文本色，深灰色
@@ -688,7 +691,7 @@ export struct Nothing {
         .fontSize(32)
         .fontColor([this.icon_primary])
         .margin({bottom: 4 })
-      Text(getResourceString($r('app.string.none'), this) + getResourceString(this.name, this))
+      Text(getResourceString(this.isNotEnabled ? $r('app.string.not_enabled') : $r('app.string.none'), this) + getResourceString(this.name, this))
         .fontSize(20)
         .fontColor(this.font_secondary)
         .textAlign(TextAlign.Center)

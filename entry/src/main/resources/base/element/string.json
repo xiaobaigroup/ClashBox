@@ -1855,6 +1855,10 @@
     {
       "name": "disabled",
       "value": "已禁用"
+    },
+    {
+      "name": "overwrite_restart_tips",
+      "value": "更改覆写设置后请重启应用"
     }
   ]
 }

@@ -1855,6 +1855,10 @@
     {
       "name": "disabled",
       "value": "Disabled "
+    },
+    {
+      "name": "overwrite_restart_tips",
+      "value": "Please restart the application after changing the override settings"
     }
   ]
 }
