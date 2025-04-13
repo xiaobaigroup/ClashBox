@@ -313,8 +313,12 @@
       "value": "允许局域网"
     },
     {
-      "name": "IPv6",
-      "value": "IPv6"
+      "name": "only_proxy",
+      "value": "仅统计代理流量"
+    },
+    {
+      "name": "only_proxy_subtitle",
+      "value": "主页卡片仅统计代理流量"
     },
     {
       "name": "UnifiedLatency",

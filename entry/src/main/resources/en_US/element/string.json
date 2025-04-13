@@ -313,8 +313,12 @@
       "value": "Allow LAN"
     },
     {
-      "name": "IPv6",
-      "value": "IPv6"
+      "name": "only_proxy",
+      "value": "Only proxy traffic is counted"
+    },
+    {
+      "name": "only_proxy_subtitle",
+      "value": "The home page card only counts proxy traffic"
     },
     {
       "name": "UnifiedLatency",

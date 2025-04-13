@@ -131,6 +131,7 @@ export class  ClashConfig {
   secret?: string;
   hosts?: Record<string, string>;
   "keep-alive-interval"?: number = defaultKeepAliveInterval
+  "only-proxy"?: boolean = true;
   "unified-delay"?: boolean = true;
   "geodata-mode"?: boolean;
   "tcp-concurrent"?: boolean;

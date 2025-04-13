@@ -6,6 +6,7 @@ import ClashViewModel from './ClashViewModel';
 import { AppConfig, AppFlowingState, AppState } from './AppState';
 import { EventHub, EventKey } from '../common/EventHub';
 import { PipManager } from '../common/PipManager';
+import { ClashConfig } from 'proxy_core';
 
 export default class EntryAbility extends UIAbility {
  private currentLanguage: string | undefined = undefined
@@ -72,8 +73,10 @@ export default class EntryAbility extends UIAbility {
       }, 100)
       EventHub.on(EventKey.StartedClash, ()=>{
         const job = async ()=>{
-          let now = await ClashViewModel.getTraffic()
-          let total = await ClashViewModel.getTotalTraffic()
+          let onlyProxy = AppStorage.get<ClashConfig>("clashConfig")?.['only-proxy'] as boolean
+          hilog.info(0xFF00, "EntryAbilityTestTag", 'onlyProxy: %{public}s', onlyProxy)
+          let now = await ClashViewModel.getTraffic(onlyProxy)
+          let total = await ClashViewModel.getTotalTraffic(onlyProxy)
           appFlowingState.traffics.enqueue(now)
           appFlowingState.totalTraffic = total
         }

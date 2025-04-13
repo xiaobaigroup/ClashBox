@@ -317,7 +317,8 @@ export  const ListOverwriteBasicData = (clashConfig: ClashConfig, appConfig: App
     new ConfigItemData($r('sys.symbol.worldclock_badge_checkmark'),"allow-lan", $r('app.string.lan'), $r('app.string.lan_subtitle'), '', 2).bindClashConfig(clashConfig),
     new ConfigItemData($r('sys.symbol.record_circle'), 'mixed-port', $r('app.string.Proxy_Port'), '', '7890', 1).bindClashConfig(clashConfig).bindType(ValueType.Number),
     new ConfigItemData($r('sys.symbol.list_bullet_square_fill'), 'hosts', 'Hosts', '', '', 1).bindClashConfig(clashConfig).bindType(ValueType.Record),
-    new ConfigItemData($r('sys.symbol.mobiledata'), 'ipv6', $r('app.string.IPv6'), '', '', 2).bindClashConfig(clashConfig),
+    new ConfigItemData($r('sys.symbol.paperplane'), 'only-proxy', $r('app.string.only_proxy'), $r('app.string.only_proxy_subtitle'), '', 2).bindClashConfig(clashConfig),
+    new ConfigItemData($r('sys.symbol.mobiledata'), 'ipv6', 'IPv6', '', '', 2).bindClashConfig(clashConfig),
     new ConfigItemData($r('sys.symbol.line_arrowtriangle_2_inward'), 'unified-delay', $r('app.string.UnifiedLatency'), $r('app.string.Unified_Latency_Subtitle'), '', 2).bindClashConfig(clashConfig),
     new ConfigItemData($r('sys.symbol.order_play'), 'tcp-concurrent', $r('app.string.TCP_Concurrency'), '', '',  2, ).bindClashConfig(clashConfig),
     new ConfigItemData($r('sys.symbol.selector'), 'external-controller', $r('app.string.External_Control'), $r('app.string.External_Control_Subtitle'), '',  2).bind<boolean>(clashConfig["external-controller"] != "", (result)=>{
@@ -344,7 +345,7 @@ export  const ListOverwriteDNSData = (clashConfig: ClashConfig, appConfig: AppCo
     new ConfigItemData($r('sys.symbol.selector'), 'enable', $r('app.string.State'), $r('app.string.State_subtitle'), '', 2).bindClashConfigBy(clashConfig, "dns"),
     new ConfigItemData($r('sys.symbol.selector'), 'use-hosts', $r('app.string.UseHosts'), '', '', 2).bindClashConfigBy(clashConfig,"dns"),
     new ConfigItemData($r('sys.symbol.selector'), 'use-system-hosts', $r('app.string.Use_System_Hosts'), '', '', 2).bindClashConfigBy(clashConfig, "dns"),
-    new ConfigItemData($r('sys.symbol.selector'), 'ipv6', $r('app.string.IPv6'), '', '', 2).bindClashConfigBy(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'ipv6', 'IPv6', '', '', 2).bindClashConfigBy(clashConfig, "dns"),
     new ConfigItemData($r('sys.symbol.selector'), 'respect-rules', $r('app.string.Follow_The_Rules'), $r('app.string.Follow_The_Rules_Subtitle'), '', 2).bindClashConfigBy(clashConfig, "dns"),
     new ConfigItemData($r('sys.symbol.selector'), 'prefer-h3"', $r('app.string.Priority_Use_H3'), $r('app.string.Priority_Use_H3_Subtitle'), '', 2,).bindClashConfigBy(clashConfig, "dns"),
     new ConfigItemData($r('sys.symbol.selector'), 'enhanced-mode', $r('app.string.DNS_Mode'), '', dns?.["enhanced-mode"] ?? $r('app.string.DNS_Mode_Subtitle'), 0).bindClashConfigBy(clashConfig, "dns").bindOption(DNSMenu),
@@ -371,7 +372,7 @@ export  const ListOverwriteNetworkData = (clashConfig: ClashConfig, appConfig: A
   result = [
     // new ConfigItemData($r('sys.symbol.key_shield_fill'), 'VPN', 'VPN', '', '', 2),
     new ConfigItemData($r('sys.symbol.selector'), 'Option', $r('app.string.option'), '', '', 3),
-    new ConfigItemData($r('sys.symbol.selector'), 'ipv6', $r('app.string.IPv6'), $r('app.string.Info'), '', 2).bindClashConfig(clashConfig),
+    new ConfigItemData($r('sys.symbol.selector'), 'ipv6', 'IPv6', $r('app.string.Info'), '', 2).bindClashConfig(clashConfig),
     new ConfigItemData($r('sys.symbol.satellite_map_fill'), 'stack', $r('app.string.stack_mode'), '', 'gvisor', 0).bindClashConfigBy(clashConfig, "tun").bindOption(StackMenu),
     new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'route-mode', $r('app.string.route_mode'), '', $r('app.string.using_configuration'), 0)
       .bindClashConfig(clashConfig).bindOption(RouteMenu),

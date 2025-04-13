@@ -132,11 +132,11 @@ export class ClashViewModel {
   async updateGeoData( geoType: string, geoName: string): Promise<string>{
     return this.socketProxy.updateGeoData(geoType, geoName)
   }
-  async getTraffic(){
-    return await this.socketProxy.queryTrafficNow()
+  async getTraffic(onlyProxy: boolean){
+    return await this.socketProxy.queryTrafficNow(onlyProxy)
   }
-  async getTotalTraffic(){
-    return await this.socketProxy.queryTrafficTotal()
+  async getTotalTraffic(onlyProxy: boolean){
+    return await this.socketProxy.queryTrafficTotal(onlyProxy)
   }
   async getProviders(): Promise<Provider[]>{
     return await this.socketProxy.queryProviders()

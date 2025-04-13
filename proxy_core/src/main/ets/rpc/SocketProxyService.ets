@@ -50,12 +50,12 @@ export class SocketProxyService implements IClashManager{
     let result = await this.sendMessageRequest(ClashRpcType.validConfig, [filepath])
     return result as string;
   }
-  async queryTrafficTotal(onlyProxy: boolean = true): Promise<Traffic> {
+  async queryTrafficTotal(onlyProxy: boolean): Promise<Traffic> {
     let result = await this.sendMessageRequest(ClashRpcType.queryTrafficTotal, [onlyProxy])
     const json = JSON.parse(result as string) as TrafficInfo
     return new Traffic(json.up, json.down);
   } 
-  async queryTrafficNow(onlyProxy: boolean = true): Promise<Traffic> {
+  async queryTrafficNow(onlyProxy: boolean): Promise<Traffic> {
     let result = await this.sendMessageRequest(ClashRpcType.queryTrafficNow,  [onlyProxy])
     const json = JSON.parse(result as string) as TrafficInfo
     return new Traffic(json.up, json.down);

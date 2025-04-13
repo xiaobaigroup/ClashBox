@@ -11,7 +11,7 @@ import { delayText } from '../Proxy/ProxyNodeItem'
 @Component
 struct CurrentNode {
   @State font_primary: ResourceColor = $r('sys.color.font_primary')
-  //节点假数据组后期可改可删
+  // 节点假数据组后期可改可删
   @Consume items: ProxyItem[]
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
@@ -24,7 +24,6 @@ struct CurrentNode {
   // 当前代理节点单选框选择的配置
   // @Consume private ProxyRadioCheckedValue: number
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-  phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
 
   build() {
     Column() {
