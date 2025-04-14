@@ -24,11 +24,11 @@ import {
 } from 'libflclash.so';
 import { Address, CommonVpnService, isIpv4, isIpv6, VpnConfig } from './CommonVpnService';
 import { JSON, util } from '@kit.ArkTS';
-import { RpcRequest } from './RpcRequest';
+import { RpcRequest, RpcResult } from './RpcRequest';
 import { ClashRpcType } from './IClashManager';
 import { ConnectionInfo, LogInfo, Provider, ProxyGroup, ProxyMode, ProxyType, Traffic } from '../models/Common';
 import { getHome, getProfilePath } from '../appPath';
-import { UpdateConfigParams } from '../models/ClashConfig';
+import { Tun, UpdateConfigParams } from '../models/ClashConfig';
 import { readFile, readFileUri, readText } from '../fileUtils';
 
 export interface AccessControl{
@@ -263,7 +263,10 @@ export class FlClashVpnService extends CommonVpnService{
     let tunFd = -1
     try {
       tunFd = await super.getTunFd(config)
-      if(tunFd > -1){
+      console.error("ClashVPN  getTunFd ", tunFd, tunFd > -1)
+      if (tunFd > -1){
+        console.error("ClashVPN  getTunFd ", tunFd)
+        //this.startClash(tunFd)
         startTun(tunFd, async (id: number, fd: number) => {
           await this.protect(fd)
           setFdMap(id)
@@ -271,9 +274,39 @@ export class FlClashVpnService extends CommonVpnService{
       }
       return tunFd > -1;
     } catch (error) {
+      console.error("ClashVPN  error ", error)
       return false
     }
   }
+
+  startClash(tunFd:number){
+    let tcp: socket.LocalSocket = socket.constructLocalSocketInstance();
+
+    tcp.on('message', async (value: socket.LocalSocketMessageInfo) => {
+
+      let text = new util.TextDecoder()
+      let dd = text.decodeToString(new Uint8Array(value.message))
+      console.error("ClashVPN protect", dd)
+      try {
+        let json = JSON.parse(dd) as RpcResult
+        let fd = JSON.parse(json.result as string) as Fd
+        await this.protect(fd.value)
+        setFdMap(fd.id)
+      }catch (e) {
+        console.error("ClashVPN protect error", e.message, dd)
+      }
+    })
+    const socketPath = this.context?.filesDir + '/clash_go.sock'
+    console.error("ClashVPN connect", tunFd)
+    tcp.connect({address: { address: socketPath }, timeout:1000}).then(()=>{
+      console.error("ClashVPN connect", tunFd)
+      tcp.send({ data: JSON.stringify({method: ClashRpcType.startClash, params:[tunFd]}) });
+    }).catch((e)=>{
+       console.error("ClashVPN  error ",e.message, e)
+    })
+  }
+
+
   stopVpn(){
     stopTun()
     super.stopVpn()
@@ -283,7 +316,10 @@ export class FlClashVpnService extends CommonVpnService{
   }
 }
 
-
+interface Fd {
+  id: number
+  value: number
+}
 
 export function ParseProxyGroup(mode, result: string){
   let map = JSON.parse(result) as Record<string, string | Record<string, string[] | string>>

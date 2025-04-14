@@ -216,7 +216,6 @@ export class SocketProxyService implements IClashManager{
         }catch (e) {
           console.debug("log err", e.message, dd)
         }
-
       })
       tcp.on('error', (e: Error) => {
         reject("失败")

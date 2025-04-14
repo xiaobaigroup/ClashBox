@@ -211,6 +211,19 @@ func handleRemoteRequest(request RpcRequest, fn func(RpcResult)) {
 	case StopLogObserver:
 		handleStopLog()
 		fn(ret)
+	case StartClash:
+		log.Println("ipc_go", "StartClash")
+		tunFd, _ := request.Params[0].(int)
+		log.Println("ipc_go", "tunFd", tunFd)
+		StartTUN(int(tunFd), func(fd Fd) {
+			log.Println("ipc_go", "procted", fd)
+			res, _ := json.Marshal(fd)
+			ret.Result = string(res)
+			fn(ret)
+		})
+	case StopClash:
+		StopTun()
+		fn(ret)
 	default:
 		ret.Error = "未知请求"
 		fn(ret)
