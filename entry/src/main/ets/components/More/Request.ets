@@ -10,7 +10,7 @@ import { customAnimationUtil } from "../../utils/Animation"
 import ClashViewModel from "../../entryability/ClashViewModel"
 import { ConnectionInfo } from "proxy_core"
 import { getRequestText, getSourceText, getTheSourceText } from "./Connect"
-
+import { ConnectItemDataSource } from "../../common/ConnectData"
 
 
 @Component
@@ -28,9 +28,10 @@ struct RequestPage {
   // page内顶部标题偏移量
   @Consume curYOffset: number
   // 列表数据
-  @State private requestListData: ConnectionInfo[] = []
+  @State private requestListData: ConnectItemDataSource = new ConnectItemDataSource()
 
   async aboutToAppear(): Promise<void> {
+    this.requestListData.empty()
     if (this.appConfig.enableRequest) {
       this.getRequest()
       this.intervalId = setInterval(() => {
@@ -41,6 +42,7 @@ struct RequestPage {
 
   aboutToDisappear(): void {
     clearInterval(this.intervalId)
+    this.requestListData.empty()
   }
 
   async getRequest() {
@@ -48,14 +50,15 @@ struct RequestPage {
     let requestLatestListData = await ClashViewModel.getRequestList()
 
     // 合并后去重
-    const merged = [...requestLatestListData, ...this.requestListData]
+    const merged = [...requestLatestListData, ...this.requestListData.getTotslData()]
     const uniqueMap = new Map<string, ConnectionInfo>()
     merged.forEach(item => {
       uniqueMap.set(`${item.id}${item.start}`, item)
     })
 
     // 转换为数组并按时间排序
-    this.requestListData = Array.from(uniqueMap.values()).reverse()
+    const RequestListData = Array.from(uniqueMap.values()).reverse()
+    this.requestListData.pushData(RequestListData)
   }
 
   @Builder
@@ -70,7 +73,7 @@ struct RequestPage {
         this.appConfig.enableRequest = !this.appConfig.enableRequest
         if (!this.appConfig.enableRequest) {
           clearInterval(this.intervalId)
-          this.requestListData = []
+          this.requestListData.clear()
         } else {
           this.getRequest()
           this.intervalId = setInterval(() => {
@@ -105,12 +108,12 @@ struct RequestPage {
               name: $r('app.string.Request'),
               isNotEnabled: true
             })
-          } else  if (this.requestListData.length === 0) {
+          } else  if (this.requestListData.totalCount() === 0) {
            Nothing({ name: $r('app.string.Request') })
          } else {
             Scroll() {
               List({ space: 10 }) {
-                ForEach(this.requestListData, (item: ConnectionInfo, index: number) => {
+                LazyForEach(this.requestListData, (item: ConnectionInfo, index: number) => {
                   ListItem() {
                     Row() {
                       Column() {
@@ -151,6 +154,7 @@ struct RequestPage {
                 })
               }.width('100%')
               .height('100%')
+              .cachedCount(5, true)
               .contentEndOffset(CONTENT_END_OFFSET_150)
               .padding({ right: this.morePageMargin.value, left: this.morePageMargin.value })
               .chainAnimation(true)

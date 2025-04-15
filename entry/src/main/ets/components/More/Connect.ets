@@ -9,6 +9,7 @@ import { curves, LengthMetrics } from "@kit.ArkUI"
 import ClashViewModel from "../../entryability/ClashViewModel"
 import { ConnectionInfo, Metadata } from "proxy_core"
 import { customAnimationUtil } from "../../utils/Animation"
+import { ConnectItemDataSource } from "../../common/ConnectData"
 
 
 export function  getRequestText(metadata: Metadata ) {
@@ -45,7 +46,7 @@ struct Connect {
   @State intervalId: number = 0
   @Consume('NavPathStack') pageInfos: NavPathStack
   // 数据
-  @State private connectListData: Array<ConnectionInfo> = []
+  @State private connectListData: ConnectItemDataSource = new ConnectItemDataSource()
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
@@ -56,6 +57,7 @@ struct Connect {
 
 
   async aboutToAppear(): Promise<void> {
+    this.connectListData.empty()
     if (this.appConfig.enableConnect) {
       this.getConnections()
       this.intervalId = setInterval(() => {
@@ -68,26 +70,28 @@ struct Connect {
 
   aboutToDisappear(): void {
     clearInterval(this.intervalId)
+    this.connectListData.empty()
   }
 
   async getConnections() {
     let result = await ClashViewModel.getConnections()
     console.log("#getConnections result ", JSON.stringify(result))
-    // 合并并去重
-    const merged = [...result, ...this.connectListData]
+    // 合并后去重
+    const merged = [...result, ...this.connectListData.getTotslData()]
     const uniqueMap = new Map<string, ConnectionInfo>()
     merged.forEach(item => {
       uniqueMap.set(`${item.id}${item.start}`, item)
     })
 
     // 转换为数组并按时间排序
-    this.connectListData = Array.from(uniqueMap.values()).sort((a, b) => {
+    const ConnectListData = Array.from(uniqueMap.values()).sort((a, b) => {
       return new Date(b.start).getTime() - new Date(a.start).getTime()
     })
-    console.log("#getConnections result 长度", result.length)
-    console.log("#getConnections connectListData 原长度", this.connectListData.length)
-    console.log("#getConnections 合并后去重前长度", merged.length)
-    console.log("#getConnections 去重后长度", uniqueMap.size)
+    this.connectListData.pushData(ConnectListData)
+    // console.log("#getConnections result 长度", result.length)
+    // console.log("#getConnections connectListData 原长度", this.connectListData.length)
+    // console.log("#getConnections 合并后去重前长度", merged.length)
+    // console.log("#getConnections 去重后长度", uniqueMap.size)
   }
 
   @Builder
@@ -99,7 +103,7 @@ struct Connect {
           .fontSize(24)
           .fontColor([this.icon_primary])
       }.onClick(()=>{
-        this.connectListData = []
+        this.connectListData.clear()
         ClashViewModel.clearConnections()
       })
       .width(40)
@@ -118,7 +122,7 @@ struct Connect {
         this.appConfig.enableConnect = !this.appConfig.enableConnect
         if (!this.appConfig.enableConnect) {
           clearInterval(this.intervalId)
-          this.connectListData = []
+          this.connectListData.clear()
         } else {
           this.getConnections()
           this.intervalId = setInterval(() => {
@@ -155,12 +159,12 @@ struct Connect {
               name: $r('app.string.Connect'),
               isNotEnabled: true
             })
-          } else if (this.connectListData.length === 0) {
+          } else if (this.connectListData.totalCount() === 0) {
             Nothing({ name: $r('app.string.Connect') })
           } else {
             Scroll() {
               List({ space: 10 }) {
-                ForEach(this.connectListData, (item: ConnectionInfo, index: number) => {
+                LazyForEach(this.connectListData, (item: ConnectionInfo, index: number) => {
                   ListItem() {
                     Row() {
                       // 文本显示区
@@ -201,7 +205,7 @@ struct Connect {
                       .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                       .backgroundColor($r('app.color.settings_container_background'))
                       .onClick(() => {
-                        this.connectListData.splice(index, 1)
+                        this.connectListData.notifyDataDelete(index)
                         ClashViewModel.closeConnection(item.id)
                       })
                     }
@@ -216,6 +220,7 @@ struct Connect {
                 })
               }.width('100%')
               .height('100%')
+              .cachedCount(5, true)
               .padding({ right: this.morePageMargin.value, left: this.morePageMargin.value })
               .contentEndOffset(CONTENT_END_OFFSET_150)
               .chainAnimation(true)
