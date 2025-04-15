@@ -181,7 +181,7 @@ export class SocketProxyService implements IClashManager{
         reject("rpc client error")
       })
       // {"proxy-name":"♻️自动选择","timeout":3000}
-      let socketPath = this.context?.filesDir + '/clash_go.sock'
+      let socketPath = this.context?.filesDir + '/clashNext.sock'
       if (method == ClashRpcType.startClash || method == ClashRpcType.stopClash){
         socketPath = this.context?.filesDir + '/clashNext.sock'
       }

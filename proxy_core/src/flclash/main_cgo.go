@@ -2,6 +2,7 @@
 
 package main
 
+//#include "bridge.h"
 import "C"
 import (
 	"core/state"
@@ -26,6 +27,7 @@ func startTun(env js.Env, this js.Value, args []js.Value) any {
 	tunFd, _ := napi.GetValueInt32(env.Env, args[0].Value)
 	tsfn := env.CreateThreadsafeFunction(args[1], "startTun")
 	StartTUN(int(tunFd), func(fd Fd) {
+
 		tsfn.Call(env.ValueOf(fd.Id), env.ValueOf(fd.Value))
 	})
 	return nil

@@ -1,6 +1,7 @@
 #include "napi/native_api.h"
 #include "hilog/log.h"
 #include <thread>
+#include <libflclash.h>
 
 static napi_value Add(napi_env env, napi_callback_info info)
 {
@@ -27,12 +28,18 @@ static napi_value Add(napi_env env, napi_callback_info info)
     return sum;
 
 }
+
+struct CallbackData {
+    int fd;
+    int id;
+};
+static CallbackData callbackData;
+
 static napi_threadsafe_function tsfn;
 static napi_value nativeStartTun(napi_env env, napi_callback_info info)
 {
- 
-    size_t argc = 3;
-    napi_value args[3] = {nullptr};
+    size_t argc = 2;
+    napi_value args[2] = {nullptr};
     napi_get_cb_info(env, info, &argc, args , nullptr, nullptr);
     
     int tunFd;
@@ -45,18 +52,22 @@ static napi_value nativeStartTun(napi_env env, napi_callback_info info)
         CallbackData* cd = (CallbackData *)data;
         if (cd == nullptr)
             return ;
-        napi_value params[1];
-        napi_value result;
+        napi_value params[2];
+        napi_value id;
+        napi_value fd;
         OH_LOG_Print(LOG_APP, LOG_INFO, LOG_DOMAIN, "ClashNative", "Error get status %{public}d, %{public}d", cd->fd);
-        napi_create_int32(env, cd->fd, &result);
-        params[0] = result;
-        napi_call_function(env, nullptr, js_callback, 1, params, nullptr);
+        napi_create_int32(env, cd->id, &id);
+        napi_create_int32(env, cd->fd, &fd);
+        params[0] = id;
+        params[1] = fd;
+        napi_call_function(env, nullptr, js_callback, 2, params, nullptr);
         }, &tsfn);
     OH_LOG_Print(LOG_APP, LOG_INFO, LOG_DOMAIN, "ClashNative", "Error get tunfd status %{public}d, ", tunFd);
    
     std::thread t([](int fd){
         OH_LOG_Print(LOG_APP, LOG_DEBUG, 0x00000, "ClashVpn", "startRun %{public}d", fd);
-        startTun(fd, (void*)+[](void *tun_interface, int fd){
+        startFlTun(fd, (void*)+[](int id, int fd){
+            callbackData.id = id;
             callbackData.fd = fd;
             napi_call_threadsafe_function(tsfn, &callbackData, napi_tsfn_blocking);
         });
@@ -70,7 +81,8 @@ static napi_value Init(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
         { "add", nullptr, Add, nullptr, nullptr, nullptr, napi_default, nullptr },
-        { "startFlClash", nullptr, Add, nullptr, nullptr, nullptr, napi_default, nullptr }
+        { "startFlClash", nullptr, nativeStartTun, nullptr, nullptr, nullptr, napi_default, nullptr }
+         { "startFlClash", nullptr, nativeStartTun, nullptr, nullptr, nullptr, napi_default, nullptr }
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     return exports;

@@ -24,7 +24,7 @@ export class SocketStubService {
     try {
       const socketPath = this.vpnService.context.filesDir + '/clashNext.sock'
       const goPath = this.vpnService.context.filesDir + '/clash_go.sock'
-      startIpc(goPath)
+      //startIpc(goPath)
       await this.server.listen({ address: socketPath})
       this.server.on('connect', (client: socket.LocalSocketConnection) => {
           this.clientPool.set(client.clientId, client);

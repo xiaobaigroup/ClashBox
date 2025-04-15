@@ -30,6 +30,7 @@ import { ConnectionInfo, LogInfo, Provider, ProxyGroup, ProxyMode, ProxyType, Tr
 import { getHome, getProfilePath } from '../appPath';
 import { Tun, UpdateConfigParams } from '../models/ClashConfig';
 import { readFile, readFileUri, readText } from '../fileUtils';
+import { startFlClash } from 'libproxy_core.so';
 
 export interface AccessControl{
   mode:              string
@@ -267,10 +268,11 @@ export class FlClashVpnService extends CommonVpnService{
       if (tunFd > -1){
         console.error("ClashVPN  getTunFd ", tunFd)
         //this.startClash(tunFd)
-        startTun(tunFd, async (id: number, fd: number) => {
-          await this.protect(fd)
-          setFdMap(id)
-        })
+        // startFlClash(tunFd, async (id: number, fd: number) => {
+        //   console.error("ClashVPN  protect", id, fd)
+        //   await this.protect(fd)
+        //   setFdMap(id)
+        // })
       }
       return tunFd > -1;
     } catch (error) {
