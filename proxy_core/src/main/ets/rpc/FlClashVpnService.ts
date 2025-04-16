@@ -64,7 +64,7 @@ export class FlClashVpnService extends CommonVpnService{
     let request = JSON.parse(decoder.decodeToString(new Uint8Array(message.message))) as RpcRequest
     let code = request.method
     let params = request.params
-    console.debug(`socket stub ${code} request: `, params)
+    console.log(`socket stub ${code} request: `, params)
     if(code == ClashRpcType.setLogObserver){
       // 订阅日志，需要持续输出
       startLog((message: string, value: string)=>{
@@ -81,19 +81,11 @@ export class FlClashVpnService extends CommonVpnService{
           }
         }
       })
-    } else if(code == ClashRpcType.registerOnMessage){
-        registerMessage((message: string, value: string)=>{
-          if (typeof value == "string"){
-            console.log("onMessage", value);
-            this.sendClient(client, value)
-          }else{
-            console.log("onMessage", "undefined");
-          }
-        })
     } else {
       try {
+        console.log(`socket stub ${code} onRemoteMessage: `)
         let result = await this.onRemoteMessage(code, params)
-        console.debug(`socket stub ${code} result: `, result)
+        console.log(`socket stub ${code} result: `, result)
         this.sendClient(client, JSON.stringify({ result: result, error: undefined}))
       } catch (e) {
         console.error(`socket stub ${code} result: `, e.message ?? e, e.stack)
@@ -267,7 +259,7 @@ export class FlClashVpnService extends CommonVpnService{
       console.error("ClashVPN  getTunFd ", tunFd, tunFd > -1)
       if (tunFd > -1){
         console.error("ClashVPN  getTunFd ", tunFd)
-        //this.startClash(tunFd)
+        this.startClash(tunFd)
         // startFlClash(tunFd, async (id: number, fd: number) => {
         //   console.error("ClashVPN  protect", id, fd)
         //   await this.protect(fd)
@@ -283,19 +275,22 @@ export class FlClashVpnService extends CommonVpnService{
 
   startClash(tunFd:number){
     let tcp: socket.LocalSocket = socket.constructLocalSocketInstance();
-
     tcp.on('message', async (value: socket.LocalSocketMessageInfo) => {
-
       let text = new util.TextDecoder()
       let dd = text.decodeToString(new Uint8Array(value.message))
-      console.error("ClashVPN protect", dd)
-      try {
-        let json = JSON.parse(dd) as RpcResult
-        let fd = JSON.parse(json.result as string) as Fd
-        await this.protect(fd.value)
-        setFdMap(fd.id)
-      }catch (e) {
-        console.error("ClashVPN protect error", e.message, dd)
+      let list = dd.split("EOF")
+      for (let index = 0; index < list.length; index++) {
+        const element = list[index];
+        try {
+          if (element != ""){
+            let json = JSON.parse(element) as RpcResult
+            let fd = JSON.parse(json.result as string) as Fd
+            await this.protect(fd.value)
+            setFdMap(fd.id)
+          }
+        }catch (e) {
+          console.error("ClashVPN protect error", e.message, element)
+        }
       }
     })
     const socketPath = this.context?.filesDir + '/clash_go.sock'
@@ -318,7 +313,7 @@ export class FlClashVpnService extends CommonVpnService{
   }
 }
 
-interface Fd {
+export interface Fd {
   id: number
   value: number
 }

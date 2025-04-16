@@ -66,11 +66,11 @@ static napi_value nativeStartTun(napi_env env, napi_callback_info info)
    
     std::thread t([](int fd){
         OH_LOG_Print(LOG_APP, LOG_DEBUG, 0x00000, "ClashVpn", "startRun %{public}d", fd);
-        startFlTun(fd, (void*)+[](int id, int fd){
-            callbackData.id = id;
-            callbackData.fd = fd;
-            napi_call_threadsafe_function(tsfn, &callbackData, napi_tsfn_blocking);
-        });
+//        startFlTun(fd, (void*)+[](int id, int fd){
+//            callbackData.id = id;
+//            callbackData.fd = fd;
+//            napi_call_threadsafe_function(tsfn, &callbackData, napi_tsfn_blocking);
+//        });
     }, tunFd);
     t.detach();
     return NULL;
@@ -82,7 +82,6 @@ static napi_value Init(napi_env env, napi_value exports)
     napi_property_descriptor desc[] = {
         { "add", nullptr, Add, nullptr, nullptr, nullptr, napi_default, nullptr },
         { "startFlClash", nullptr, nativeStartTun, nullptr, nullptr, nullptr, napi_default, nullptr }
-         { "startFlClash", nullptr, nativeStartTun, nullptr, nullptr, nullptr, napi_default, nullptr }
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     return exports;

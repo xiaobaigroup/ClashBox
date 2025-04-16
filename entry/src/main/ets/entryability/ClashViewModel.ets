@@ -285,13 +285,14 @@ export class ClashViewModel {
     this.vpnStarted = true
     let result = await this.socketProxy.startClash()
     // 核心崩溃 小钥匙一直在，要重启两量变
-    if (!result){
-      result = await this.socketProxy.startClash()
-    }
-    if (result){
-      EventHub.sendEvent(EventKey.StartedClash)
-      EventHub.sendEvent(EventKey.checkIpInfo)
-    }
+    // if (!result){
+    //   result = await this.socketProxy.startClash()
+    // }
+    // if (result){
+    //
+    // }
+    EventHub.sendEvent(EventKey.StartedClash)
+    EventHub.sendEvent(EventKey.checkIpInfo)
   }
 
   async StopVpn(){

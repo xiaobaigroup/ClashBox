@@ -30,6 +30,7 @@ export enum ClashRpcType{
   clearRequestList,
   setLogObserver,
   stopLogObserver,
+  vpnOptions,
 }
 
 export interface IClashManager {

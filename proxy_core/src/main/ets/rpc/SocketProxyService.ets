@@ -1,4 +1,4 @@
-import { socket } from '@kit.NetworkKit';
+import { socket, vpnExtension } from '@kit.NetworkKit';
 import {  RpcResult } from './RpcRequest';
 import { JSON, util } from '@kit.ArkTS';
 import { common } from '@kit.AbilityKit';
@@ -10,7 +10,9 @@ import { fileUri } from "@kit.CoreFileKit";
 import { promptAction } from '@kit.ArkUI';
 import { UpdateConfigParams } from '../models/ClashConfig';
 import { checkIp, queryIpInfo } from '../Request';
-import { ParseProxyGroup } from './FlClashVpnService';
+import { Fd, ParseProxyGroup, VpnOptions } from './FlClashVpnService';
+import { getVpnOptions, setFdMap } from 'libflclash.so';
+import { Address, isIpv4, isIpv6, VpnConfig } from './CommonVpnService';
 
 interface DelayInfo{
   name: string
@@ -24,7 +26,7 @@ interface TrafficInfo{
   down: number
 }
 
-export class SocketProxyService implements IClashManager{
+export class SocketProxyService implements IClashManager {
   context?: common.Context
   active: boolean = false
   offlineCount: number = 0
@@ -102,6 +104,10 @@ export class SocketProxyService implements IClashManager{
     let result = await this.sendMessageRequest(ClashRpcType.queryProviders)
     return JSON.parse(result as string) as Provider[]
   }
+  async getVpnOptions(): Promise<VpnOptions> {
+    let result = await this.sendMessageRequest(ClashRpcType.vpnOptions)
+    return JSON.parse(result as string) as VpnOptions
+  }
   async updateProvider(provider: Provider): Promise<string> {
     return  (await this.sendMessageRequest(ClashRpcType.updateProvider,[provider.name])) as string
   }
@@ -127,7 +133,82 @@ export class SocketProxyService implements IClashManager{
     let json = await this.sendMessageRequest(ClashRpcType.startClash, [])
     return json as boolean
   }
+  // async startClash(){
+  //   let config = await this.ParseConfig();
+  //   let tunFd = await this.getTunFd(config)
+  //   // this.callbackRequest(ClashRpcType.startClash, [tunFd], (res)=>{
+  //   //   console.log("ClashVPN", `startClash : ${res}`)
+  //   // })
+  //   //this.startClashNew(tunFd);
+  //   return true
+  // }
+  vpnConnection : vpnExtension.VpnConnection | undefined
+  async getTunFd(config: VpnConfig): Promise<number> {
+    let tunFd = -1
+    try {
+      this.vpnConnection = vpnExtension.createVpnConnection(this.context as common.VpnExtensionContext);
+      tunFd = await this.vpnConnection.create(config)
+      console.log("ClashVPN", `获取tunFd: ${tunFd}`)
+      return tunFd;
+    } catch (error) {
+      console.log("ClashVPN", `Clash启动失败 ${error.message} => ${error.stack}` )
+      this.vpnConnection?.destroy()
+      return -1
+    }
+  }
+
+  async ParseConfig(): Promise<VpnConfig> {
+    let vpnConfig = new VpnConfig();
+    let option = await this.getVpnOptions()
+    if (option.ipv4Address != "") {
+      vpnConfig.addresses[0].address = new Address(option.ipv4Address.split("/")[0], 1)
+      option.routeAddress?.filter((a:string) => isIpv4(a)).map((f:string) => f.split("/")[0])
+    }
+    if (option.ipv6Address != ""){
+      vpnConfig.addresses[0].address = new Address(option.ipv6Address.split("/")[0], 2)
+      option.routeAddress?.filter((a:string) => isIpv6(a)).map((f:string) => f.split("/")[0])
+    }
+    if(option.accessControl?.mode){
+      if(option.accessControl?.mode == "AcceptSelected"){
+        vpnConfig.trustedApplications = option.accessControl?.acceptList
+      }else{
+        vpnConfig.blockedApplications = option.accessControl?.rejectList
+      }
+    }
+    if(option.systemProxy || option.allowBypass){
+      // TODO ohos 不支持
+      // not use option.bypassDomain option.port
+    }
+    console.debug("vpnConfig", JSON.stringify(vpnConfig))
+    return vpnConfig;
+  }
+
+  startClashNew(tunFd:number){
+    let tcp: socket.LocalSocket = socket.constructLocalSocketInstance();
+    tcp.on('message', async (value: socket.LocalSocketMessageInfo) => {
+      let text = new util.TextDecoder()
+      let dd = text.decodeToString(new Uint8Array(value.message))
+      console.log("ClashVPN", `protect: ${dd}`)
+      try {
+        let json = JSON.parse(dd) as RpcResult
+        //let fd = JSON.parse(json.result as string) as Fd
+        // await this.vpnConnection?.protect(fd.value)
+        // setFdMap(fd.id)
+      }catch (e) {
+        console.error("ClashVPN protect error", e.message, dd)
+      }
+    })
+    const socketPath = this.context?.filesDir + '/clash_go.sock'
+    console.log("ClashVPN", `connect: ${socketPath}}`)
+    tcp.connect({address: { address: socketPath }, timeout:1000}).then(()=>{
+      console.log("ClashVPN", `connect: ${tunFd}`)
+      tcp.send({ data: JSON.stringify({method: ClashRpcType.startClash, params:[tunFd]}) });
+    }).catch((e: Error)=>{
+      console.error("ClashVPN", `error: ${e}`)
+    })
+  }
   async stopClash():Promise<boolean>{
+    this.vpnConnection?.destroy()
     let json = await this.sendMessageRequest(ClashRpcType.stopClash, [])
     return json as boolean
   }
@@ -161,7 +242,7 @@ export class SocketProxyService implements IClashManager{
       let timeout = true
       let parseMessage = debounce((message)=>{
         timeout = false
-        this.ParseMessage(message, resolve, reject)
+        this.ParseMessage(message.replace("EOF",""), resolve, reject)
         message = ''
         fullMessage = ''
         client.close()
@@ -181,7 +262,7 @@ export class SocketProxyService implements IClashManager{
         reject("rpc client error")
       })
       // {"proxy-name":"♻️自动选择","timeout":3000}
-      let socketPath = this.context?.filesDir + '/clashNext.sock'
+      let socketPath = this.context?.filesDir + '/clash_go.sock'
       if (method == ClashRpcType.startClash || method == ClashRpcType.stopClash){
         socketPath = this.context?.filesDir + '/clashNext.sock'
       }
@@ -211,7 +292,7 @@ export class SocketProxyService implements IClashManager{
         let text = new util.TextDecoder()
         let dd = text.decodeToString(new Uint8Array(value.message))
         try {
-          let json = JSON.parse(dd) as RpcResult
+          let json = JSON.parse(dd.replace("EOF","")) as RpcResult
           callBack(json.result as string)
         }catch (e) {
           console.debug("log err", e.message, dd)

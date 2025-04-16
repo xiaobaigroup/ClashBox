@@ -44,6 +44,7 @@ func handleConnection(conn net.Conn) {
 	handleRemoteRequest(request, func(rr RpcResult) {
 		res, _ := json.Marshal(rr)
 		conn.Write(res)
+		conn.Write([]byte("EOF"))
 	})
 	//defer conn.Close()
 }
@@ -87,6 +88,7 @@ const (
 	ClearRequestList
 	SetLogObserver
 	StopLogObserver
+	VpnOptions
 )
 
 func handleRemoteRequest(request RpcRequest, fn func(RpcResult)) {
@@ -212,10 +214,9 @@ func handleRemoteRequest(request RpcRequest, fn func(RpcResult)) {
 		handleStopLog()
 		fn(ret)
 	case StartClash:
-		log.Println("ipc_go", "StartClash")
-		tunFd, _ := request.Params[0].(int)
+		tunFd := anyToInt(request.Params[0])
 		log.Println("ipc_go", "tunFd", tunFd)
-		StartTUN(int(tunFd), func(fd Fd) {
+		StartTUN(tunFd, func(fd Fd) {
 			log.Println("ipc_go", "procted", fd)
 			res, _ := json.Marshal(fd)
 			ret.Result = string(res)
@@ -223,6 +224,9 @@ func handleRemoteRequest(request RpcRequest, fn func(RpcResult)) {
 		})
 	case StopClash:
 		StopTun()
+		fn(ret)
+	case VpnOptions:
+		ret.Result = GetVpnOptions()
 		fn(ret)
 	default:
 		ret.Error = "未知请求"

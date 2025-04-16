@@ -24,9 +24,11 @@ export class SocketStubService {
     try {
       const socketPath = this.vpnService.context.filesDir + '/clashNext.sock'
       const goPath = this.vpnService.context.filesDir + '/clash_go.sock'
-      //startIpc(goPath)
+      startIpc(goPath)
       await this.server.listen({ address: socketPath})
+      console.debug(`socket listen  `)
       this.server.on('connect', (client: socket.LocalSocketConnection) => {
+        console.debug(`socket new  request: `)
           this.clientPool.set(client.clientId, client);
           client.on("message", (value: socket.LocalSocketMessageInfo) => {
             this.vpnService.onRemoteMessageRequest(client, value)
@@ -38,7 +40,7 @@ export class SocketStubService {
           });
       })
     } catch (e) {
-      console.error("socketService failure", e.message)
+      console.error("socket failure", e.message)
     }
   }
   startVpn(){
