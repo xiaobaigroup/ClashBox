@@ -256,15 +256,8 @@ export class FlClashVpnService extends CommonVpnService{
     let tunFd = -1
     try {
       tunFd = await super.getTunFd(config)
-      console.error("ClashVPN  getTunFd ", tunFd, tunFd > -1)
       if (tunFd > -1){
-        console.error("ClashVPN  getTunFd ", tunFd)
         this.startClash(tunFd)
-        // startFlClash(tunFd, async (id: number, fd: number) => {
-        //   console.error("ClashVPN  protect", id, fd)
-        //   await this.protect(fd)
-        //   setFdMap(id)
-        // })
       }
       return tunFd > -1;
     } catch (error) {

@@ -43,8 +43,7 @@ func handleConnection(conn net.Conn) {
 	}
 	handleRemoteRequest(request, func(rr RpcResult) {
 		res, _ := json.Marshal(rr)
-		conn.Write(res)
-		conn.Write([]byte("EOF"))
+		conn.Write([]byte(string(res) + "EOF"))
 	})
 	//defer conn.Close()
 }

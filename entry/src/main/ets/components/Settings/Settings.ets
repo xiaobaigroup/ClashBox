@@ -15,6 +15,7 @@ import { DisclaimerCustomDialog, theRowCustomDialog } from "../Common"
 import { AppState, UIConfig } from "../../entryability/AppState"
 import { promptAction } from "@kit.ArkUI"
 import { removeItemsByIndex } from "../../utils/RemoveItemsUtils"
+import ClashViewModel from "../../entryability/ClashViewModel"
 
 
 @Entry
@@ -201,6 +202,7 @@ struct Settings {
       TopBuilder({
         showBackButton: false,
         title: $r('app.string.Settings'),
+        subtitle: `${ClashViewModel.socketProxy.offlineCount}`
       })
       List() {
         ForEach(this.settingsList, (item: settingsData, index: number) => {

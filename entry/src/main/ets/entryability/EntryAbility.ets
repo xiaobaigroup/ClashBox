@@ -70,10 +70,10 @@ export default class EntryAbility extends UIAbility {
           await ClashViewModel.ChangeCore(clashCore)
           await ClashViewModel.ReStartVpn()
         }
-      }, 100)
+      }, 1000)
       EventHub.on(EventKey.StartedClash, ()=>{
         const job = async ()=>{
-          let onlyProxy = AppStorage.get<ClashConfig>("clashConfig")?.['only-proxy'] as boolean
+          let onlyProxy = AppStorage.get<ClashConfig>("clashConfig")?.['only-proxy'] as boolean ?? true
           hilog.info(0xFF00, "EntryAbilityTestTag", 'onlyProxy: %{public}s', onlyProxy)
           let now = await ClashViewModel.getTraffic(onlyProxy)
           let total = await ClashViewModel.getTotalTraffic(onlyProxy)
