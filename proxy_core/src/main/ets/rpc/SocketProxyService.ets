@@ -208,7 +208,6 @@ export class SocketProxyService implements IClashManager {
   //   })
   // }
   async stopClash():Promise<boolean>{
-    this.vpnConnection?.destroy()
     let json = await this.sendMessageRequest(ClashRpcType.stopClash, [])
     return json as boolean
   }

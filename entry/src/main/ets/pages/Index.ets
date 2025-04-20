@@ -1,6 +1,6 @@
 //Index 媒体查询
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
-import { curves, mediaquery, window } from '@kit.ArkUI'
+import { curves, mediaquery, promptAction, window } from '@kit.ArkUI'
 import Home from './HomePage'
 import ProxyPage from './ProxyPage'
 import ConfigurationPage from './ConfigurationPage'
@@ -68,10 +68,15 @@ import { Welcome } from '../components/Start/WelcomePage'
 import { CrashPage } from '../components/Start/CrashPage'
 import { compareVersions, extractUpdateInfo, getUpdateInfo, UpdateInfo } from '../utils/CheckUpdateUtil'
 import { implicitStartAbility } from '../components/Settings/About'
+import { fileUri, picker } from '@kit.CoreFileKit'
+import { fileIo as fs } from '@kit.CoreFileKit';
+import { timestampToDateTime } from '../utils/TimeConvertUtil'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 const context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
 export const indexController: TabsController = new TabsController()
+
+
 //
 interface marginGenerate {
   top: number,
@@ -114,8 +119,6 @@ struct Index {
   @Provide IndexCurrentindex: number = 0
   // 主界面选择的index
   @State selectedIndex: number = 0
-  // 小方屏
-  @Provide isSmallSquareScreen: boolean = false
   // 设备高度是否 (320vp< height <= 500vp) 媒体查询
   @State isLandscapePhone: boolean = false
   // 平板竖屏判断变量
@@ -155,7 +158,7 @@ struct Index {
     sm: '100%',
     md: '100%',
     lg: '100%',
-    xl: '67vp'
+    xl: '77vp'
   });
   @State compBarHeight: BreakpointState<string> = BreakpointState.of({
     sm: '77vp',
@@ -341,8 +344,6 @@ struct Index {
   @Provide private proxyStartingDuration: string = PROXY_STARTED_DURATION_INIT_VALUE
   // 是否进入二级界面(Tab区)
   @Provide @Watch('isSecondaryChange') isSecondary: boolean = false
-  // 列表是否滚动
-  @Provide @Watch('isSecondaryChange') isRolling: boolean = false
   // 更多页数据
   @Provide moreList: moreData[] = ListMoreData()
   // 实验功能开关列表行数据
@@ -357,8 +358,6 @@ struct Index {
 
   /* 是否开启 `Index` 页面的前景模糊 */
   @Provide('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean = false
-  @StorageLink('windowHeight') @Watch('onWindowChange') windowHeight: number = 0
-  @StorageLink('windowWidth') @Watch('onWindowChange') windowWidth: number = 0
 
   // 当手机横屏时条件成立
   deviceHeightListener: mediaquery.MediaQueryListener =
@@ -369,7 +368,7 @@ struct Index {
   // 折叠屏展开判断
   foldPhoneOpenListener: mediaquery.MediaQueryListener =
     this.getUIContext().getMediaQuery().matchMediaSync('(640vp< height <= 1000vp) and (640vp< width <= 1000vp)');
-  // 当设备横屏时条件成立
+  // // 当设备横屏时条件成立
   // landscapelistener: mediaquery.MediaQueryListener =
   //   this.getUIContext().getMediaQuery().matchMediaSync('(orientation: landscape)')
 
@@ -442,36 +441,6 @@ struct Index {
     this.icon_emphasize = theme.colors.iconEmphasize;
   }
 
-  /**窗口变化监听*/
-  onWindowChange() {
-    hilog.info(0xFF00, componentName,
-      `#WindowChange#应用窗口状态 width: ${this.windowWidth} height: ${this.windowHeight}`)
-    if (320 < this.windowHeight && this.windowHeight <= 500 && 640 < this.windowWidth && this.windowWidth <= 1000) {
-      this.isLandscapePhone = true
-      hilog.info(0x1000, componentName,
-        `#WindowChange#应用窗口状态改变#(320vp< height <= 500vp) and (640vp< width <= 1000vp)手机横屏结果: ${this.isLandscapePhone}`)
-    } else if (640 < this.windowWidth && this.windowWidth <= 1000 && 640 < this.windowHeight && this.windowHeight <= 1000) {
-      this.isFoldStatus = true
-      hilog.info(0xFF00, componentName,
-        `#WindowChange#设备折叠状态改变#(640vp< height <= 1000vp) and (640vp< width <= 1000vp)折叠展开结果: ${this.isFoldStatus}`)
-    } else if (this.windowWidth > 1000) {
-      this.istabletLandscape = true
-      hilog.info(0xFF00, componentName,
-        `#WindowChange#应用窗口状态改变#(1000vp< width)平板横屏结果: ${this.istabletLandscape}`)
-    } else if (this.windowHeight <= 520 && this.windowWidth <= 520) {
-      this.isSmallSquareScreen = true
-      hilog.info(0xFF00, componentName,
-        `#WindowChange#应用窗口状态改变#(1000vp< width)平板横屏结果: ${this.isSmallSquareScreen}`)
-    } else {
-      this.isLandscapePhone = false
-      this.istabletLandscape = false
-      this.isSmallSquareScreen = false
-      this.isFoldStatus = false
-      hilog.info(0xFF00, componentName,
-        `#WindowChange#设备高度改变: ${this.isSmallSquareScreen}`)
-    }
-  }
-
   // 免责声明 & 检查更新 弹窗控制器
   dialogController: CustomDialogController = new CustomDialogController({
     builder: DisclaimerCustomDialog({
@@ -512,9 +481,6 @@ struct Index {
 
   async aboutToAppear(): Promise<void> {
     hilog.info(0x1000, componentName, `#aboutToAppear executed`)
-
-    // 运行一次窗口检查
-    this.onWindowChange()
 
     // 启动时检查上一次是否崩溃
     if (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) {
@@ -558,7 +524,7 @@ struct Index {
     }
 
     // 根据设备选择性开启change监听
-    /*if (deviceInfo.deviceType === 'phone') {
+    if (deviceInfo.deviceType === 'phone') {
       this.deviceHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
         this.isLandscapePhone = mediaQueryResult.matches
         AppStorage.setOrCreate<boolean>('isLandscapePhone', this.isLandscapePhone)
@@ -579,7 +545,8 @@ struct Index {
         hilog.info(0xFF00, componentName,
           `#媒体查询#设备高度改变#(1000vp< width)平板横屏结果: ${this.istabletLandscape}`)
       })
-    }*/
+    }
+
 
     BreakpointSystem.getInstance().attach(this.compStr)
     BreakpointSystem.getInstance().attach(this.compDirection)
@@ -652,7 +619,23 @@ struct Index {
       this.logListData = []
     })
     EventHub.on(EventKey.ExportLog, () => {
-      // TODO 导出日志
+      try {
+        let filePicker = new picker.DocumentViewPicker(getContext(this))
+        let options = new picker.DocumentSaveOptions()
+        options.newFileNames = ["clash_next.log"]
+        options.fileSuffixChoices = ["'文档|.txt'"]
+        options.pickerMode = picker.DocumentPickerMode.DOWNLOAD
+        filePicker.save(options).then(async (result)=>{
+          const path = new fileUri.FileUri(result[0] + '/clash_next.txt').path
+          await this.saveLog(path)
+          promptAction.showToast({message:"已保存到下载目录"})
+        }).catch((e:Error) =>{
+          hilog.debug(0xFF00, 'ExportLog', 'err ', e)
+        })
+      }catch (e) {
+        hilog.info(0xFF00, "ExportLog", "err %{public}s", e)
+      }
+
     })
 
     if (this.uiConfig.autoCheckUpdate) {
@@ -678,7 +661,18 @@ struct Index {
       }
     }
   }
-  // 规则选择数据变化监控
+  async saveLog(uri: string){
+    try {
+      let file = fs.openSync(uri, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE );
+      let message = this.logListData.map((d) => d.logType + " " + timestampToDateTime(d.logTime + 1000) + "\n" + d.LogDetails).join("\n")
+      fs.writeSync(file.fd, message);
+      fs.fsync(file.fd);
+    }catch (e) {
+      hilog.info(0xFF00, "ExportLog", "Err: %{public}s", e.message)
+    }
+
+  }
+  //规则选择数据变化监控
   async switchMode() {
     if(this.clashConfig.mode==ProxyMode.Rule){
       this.theProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode = ProxyMode.Rule)
@@ -808,7 +802,7 @@ struct Index {
     }
   }
 
-  @State barHeight: number | ResourceStr | undefined = 0
+  @State barHeight:number|ResourceStr|undefined=0
 
   // tab移动动画
   startAnim() {
@@ -819,9 +813,9 @@ struct Index {
       iterations: 1,
       playMode: PlayMode.Normal,
     }, async () => {
-      indexController.setTabBarTranslate(this.isLandscapePhone ? { x: '-100%' } : { y: '100%' })
+     await indexController.setTabBarTranslate(this.isLandscapePhone ? { x: '-100%' } : { y: '100%' })
     setTimeout(()=> {
-      this.barHeight = 0
+      this.barHeight= 0
     },100)
     })
   }
@@ -833,16 +827,16 @@ struct Index {
       iterations: 1,
       playMode: PlayMode.Normal,
     }, async () => {
-     indexController.setTabBarTranslate(this.isLandscapePhone ? { x: 0 } : { y: 0 })
+     await indexController.setTabBarTranslate(this.isLandscapePhone ? { x: 0 } : { y: 0 })
     setTimeout(()=>{
-      this.barHeight = this.compBarHeight.value
-    }, this.isSmallSquareScreen ? 2000 : 100)
+      this.barHeight=this.compBarHeight.value
+    },100)
     })
   }
 
   isSecondaryChange() {
     // 监听二级页面布尔判定动画是否执行
-    if (this.isSecondary || (this.isSmallSquareScreen && this.isRolling)) {
+    if (this.isSecondary) {
      // this.stopAnim()
       this.startAnim()
     } else {
@@ -877,10 +871,10 @@ struct Index {
               })
           )
 
-          TabContent() {
+            TabContent() {
               ProxyPage()
-          }
-          .tabBar(this.TabBarBuilder($r('app.string.Proxy'), 1, $r('sys.symbol.list_bullet_square_fill')))
+            }
+            .tabBar(this.TabBarBuilder($r('app.string.Proxy'), 1, $r('sys.symbol.list_bullet_square_fill')))
 
           TabContent() {
             ConfigurationPage()
@@ -900,7 +894,7 @@ struct Index {
         .scrollable(this.isSecondary ? false : true)
         .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
         .barWidth(this.isLandscapePhone ? '77vp' : this.compBarWidth.value) /**/
-        .barHeight(this.isLandscapePhone ? '100%': (!this.uiConfig.isBlurr && this.isSecondary) ? this.barHeight : this.compBarHeight.value) /**/
+        .barHeight(this.isLandscapePhone ? '100%':(!this.uiConfig.isBlurr&&this.isSecondary)?this.barHeight:this.compBarHeight.value) /**/
         .onChange((index: number) => {
           this.IndexCurrentindex = index
           if (index === 0) {
