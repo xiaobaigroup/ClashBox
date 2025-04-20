@@ -438,7 +438,7 @@ struct Appearance {
               icons: $r('sys.symbol.livephoto'),
               title: $r('app.string.animation_speed'),
               subtitle: $r('app.string.animation_speed_subtitle'),
-              isExperimentalFunction: true,
+              isExperimentalFunction: false,
               // 确保this指向父组件
               tips: (): void => { this.TipsText(3) },
               menu: (): void => { this.MenuEntrance(3) }
@@ -446,7 +446,7 @@ struct Appearance {
           }
           .width('100%')
           .borderRadius(20)
-               .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .backgroundColor($r('app.color.container_background'))
         }
         ListItem() {

@@ -4,7 +4,6 @@ import {
   TAB_CONTENT_TITLE_FONT_WEIGHT,
   TAB_CONTENT_TITLE_HEIGHT,
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE,
-  LIST_ITEM_HEIGHT,
   LIST_SPACE,
   BORDER_RADIUS_20,
   BIND_SHEET_CONTAINER_HEIGHT,
@@ -12,16 +11,15 @@ import {
   RouteName,
   CONTENT_END_OFFSET_150,
 } from '../common/Constants'
-import { curves, LengthMetrics, promptAction, PromptAction, SymbolGlyphModifier } from '@kit.ArkUI'
+import { LengthMetrics, promptAction, PromptAction, SymbolGlyphModifier } from '@kit.ArkUI'
 import { ConfigAdd } from '../components/Configuration/ConfigAdd'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
 import { ConfigData, ConfigDataSourceType } from '../common/PageArgumentEntity'
-import { cellularData, CustomConfirmDialog, Nothing, RightDownButton } from '../components/Common'
+import { CellularData, CustomConfirmDialog, Nothing, RightDownButton } from '../components/Common'
 import { customVibrator } from "../utils/VibratorUtil"
 import { common } from '@kit.AbilityKit'
 import { configShare } from '../utils/SystemShareUtil'
-// XXX 测试用 删除
 import { showFileNameListOfFileDir } from '../utils/FileUtil'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig, UIConfig } from '../entryability/AppState'
@@ -29,9 +27,8 @@ import { EventHub, EventKey } from '../common/EventHub'
 import { getResourceString } from '../utils/ResourceStringUtil'
 import { convertTime } from '../utils/TimeConvertUtil'
 import { customAnimationUtil, isON } from '../utils/Animation'
-import { Profile, ProxyGroup, SubscriptionInfo } from 'proxy_core'
-import { Provider } from "proxy_core"
-import { ProxyItem, ProxyItemDataSource } from '../common/ProxyData'
+import { ProxyGroup } from 'proxy_core'
+import { ProxyItem } from '../common/ProxyData'
 import { PopTips, PopupBuilder } from '../components/Start/Popup'
 
 
@@ -55,10 +52,15 @@ struct ConfigurationPage {
 
   // 获取应用沙箱文件路径
   private pathOfContextFilesDir = this.context.filesDir
+  // 列表是否滚动中
+  @Consume isRolling: boolean
+  // 主界面当前index
+  @Consume @Watch('onIndexChange') IndexCurrentindex: number
+  // 是否小窗口
+  @Consume isSmallSquareScreen: boolean
 
   /* 主题色 */
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 所有子组件在容器内的对齐方式
   @Consume ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
 
@@ -82,9 +84,9 @@ struct ConfigurationPage {
   private isLandscapePhone: boolean = false
 
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  //开关不触发list转场动画判定
+  // 开关不触发list转场动画判定
   @State isON:isON = new isON()
-  //节点数据组
+  // 节点数据组
   @Prop items: ProxyItem[]
   @Consume
   proxyGroups: ProxyGroup[]
@@ -92,7 +94,7 @@ struct ConfigurationPage {
   // 路由栈
   @Provide('configAddPageInfos')
   private configAddPageInfos: NavPathStack = new NavPathStack()
-  //page内顶部标题偏移量
+  // page内顶部标题偏移量
   @Consume curYOffset: number
   //loading动画
   @State isLoading : boolean = false
@@ -310,7 +312,7 @@ struct ConfigurationPage {
       await ClashViewModel.loadConfig(false)
     }catch (e) {
       console.debug("loadConfigList", e.message, JSON.stringify(e))
-      promptAction.showToast({message: "加载配置失败: " + (e.message || e) })
+      promptAction.showToast({message: `${getResourceString($r('app.string.failed_load_config'), this.context)}` + (e.message || e) })
     }
     this.isLoading = false;
   }
@@ -318,7 +320,6 @@ struct ConfigurationPage {
   build() {
     Stack() {
       // 标题栏 START
-      //  if (!this.isLandscapePhone) {
       Row() {
         Text($r('app.string.Configuration'))
           .fontSize(this.curYOffset<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset/100:TAB_CONTENT_TITLE_FONT_SIZE)
@@ -336,9 +337,9 @@ struct ConfigurationPage {
         .width(40)
         .height(40)
         .backgroundColor($r('app.color.settings_container_background'))
+        .visibility((this.isRolling && this.isSmallSquareScreen) ? Visibility.Hidden : Visibility.Visible)
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .onClick(() => {
-          // TODO 国际化适配 更新配置中... 更新配置成功、
           this.isON.toggleAnim=true
           hilog.info(0xC001, this.componentName, `#button#onClick()#更新配置`)
           this.updateConfig()
@@ -346,16 +347,14 @@ struct ConfigurationPage {
         .transition(customAnimationUtil.isSlide(0,this.uiConfig))
       }
       .zIndex(1)
-      .height(this.curYOffset<0?TAB_CONTENT_TITLE_HEIGHT-this.curYOffset:TAB_CONTENT_TITLE_HEIGHT)
-      .position({x:0})
+      .height((this.isRolling && this.isSmallSquareScreen) ? 0 : (this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT))
+      .position({x: 0})
       .alignItems(VerticalAlign.Center)
       .width('100%')
       .padding({
         left: this.breakPointStateTabContentTitleMargin.value,
         right: this.breakPointStateTabContentTitleMargin.value,
       })
-      // .margin({ bottom: 15 })
-      // }
       // 标题栏 END
 
       // 主体 START
@@ -365,7 +364,7 @@ struct ConfigurationPage {
             .height('90%')
         } else {
           Column(){
-            Blank().height(TAB_CONTENT_TITLE_HEIGHT)
+            Blank().height((this.isRolling && this.isSmallSquareScreen) ? 0 : TAB_CONTENT_TITLE_HEIGHT)
             Scroll() {
               // 配置列表 START
               List({ space: LIST_SPACE }) {
@@ -383,7 +382,7 @@ struct ConfigurationPage {
 
                         // 进度条组件: 共用使用流量 / 总流量
                         if (item.subscriptionInfo){
-                          cellularData(item.subscriptionInfo)
+                          CellularData({ info: item.subscriptionInfo })
                         }
 
                       }.alignItems(HorizontalAlign.Start).width('85%').padding({top:10,bottom:10})
@@ -401,7 +400,7 @@ struct ConfigurationPage {
                         })
                         .hitTestBehavior(HitTestMode.None)
                         .onClick(async () => {
-                          this.isON.toggleAnim=true
+                          this.isON.toggleAnim = true
                           await this.loadConfig(item)
                           hilog.info(0xC002, this.componentName,
                             `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
@@ -455,6 +454,12 @@ struct ConfigurationPage {
               }
               .width('100%')
               .height('100%')
+              .onScrollStart(() => {
+                this.isRolling = true
+              })
+              .onScrollStop(() => {
+                this.isRolling = false
+              })
               .padding({
                 left: this.breakPointStateTabContentTitleMargin.value,
                 right: this.breakPointStateTabContentTitleMargin.value,
@@ -502,7 +507,7 @@ struct ConfigurationPage {
         .hoverEffect(HoverEffect.Scale)
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
-        .margin({bottom:this.isLandscapePhone || !this.uiConfig.isBlurr ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
+        .margin({bottom:this.isLandscapePhone || !this.uiConfig.isBlurr || (this.isRolling && this.isSmallSquareScreen) ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
         .bindSheet( this.isShowConfigAddBindSheet, this.ConfigAddBindSheetBuilder, {
           detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE, ],// SheetSize.LARGE
           backgroundColor: $r('app.color.background'),
@@ -567,9 +572,15 @@ struct ConfigurationPage {
     EventHub.on(EventKey.FetchProfile, () => {
       this.fetchProfiles()
     })
-
-
   }
+
+  async onIndexChange() {
+    if (this.configList.length !== 0 && this.IndexCurrentindex === 2) {
+      await ClashViewModel.updateProfileConfig(null)
+      this.promptAction.showToast({message: '更新所有配置成功'})
+    }
+  }
+
   // 获取配置列表
   async fetchProfiles(){
     const profiles = await ClashViewModel.getProfiles()
@@ -651,27 +662,23 @@ struct ConfigurationPage {
    * 更新配置
    */
   private async updateConfig(configId?: string): Promise<void> {
-    // TODO 调用更新配置消息api
-    this.promptAction.showToast({message: `配置更新中...`})
+    this.promptAction.showToast({message: $r('app.string.updating_config')})
     if (configId){
-      //使开关点击时不触发转场动画
+      // 使开关点击时不触发转场动画
       this.isON.toggleAnim = true
-
-      this.loadConfig(this.currentTouchConfigData, true)
-      //使开关点击时不触发转场动画
+      await this.loadConfig(this.currentTouchConfigData, true)
+      // 使开关点击时不触发转场动画
       this.isON.toggleAnim = true
-      // TODO 单个配置更新
+      this.promptAction.showToast({message: $r('app.string.updated_success_config')})
       hilog.info(0xC012, this.componentName, `#updateConfig#更新配置{单个}: configName is [${this.currentTouchConfigData.configName}], configId is [${this.currentTouchConfigData.configId}]`)
     } else {
-      //使开关点击时不触发转场动画
+      // 使开关点击时不触发转场动画
       this.isON.toggleAnim = true
-      // TODO 所有配置更新
       hilog.info(0xC012, this.componentName, `#updateConfig#更新配置{所有}`)
       // TODO loading and try
       await ClashViewModel.updateProfileConfig(null)
+      this.promptAction.showToast({message: $r('app.string.updated_success_config')})
     }
-
-
   }
   /**
    * 分享配置的URL

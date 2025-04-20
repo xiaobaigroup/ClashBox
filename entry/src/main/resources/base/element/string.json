@@ -1863,6 +1863,18 @@
     {
       "name": "overwrite_restart_tips",
       "value": "更改覆写设置后请重启应用"
+    },
+    {
+      "name": "updating_config",
+      "value": "配置更新中..."
+    },
+    {
+      "name": "updated_success_config",
+      "value": "配置更新成功"
+    },
+    {
+      "name": "failed_load_config",
+      "value": "加载配置失败"
     }
   ]
 }

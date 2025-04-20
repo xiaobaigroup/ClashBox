@@ -60,6 +60,7 @@ struct Home {
   @Consume greetings: Resource
   @State ContainerHeight: string = ''
   @State TopHeight: string = ''
+  @Consume isRolling: boolean
   //节点假数据组后期可改可删
   @Consume theProxyGroups: ProxyGroup[]
  //@StorageProp("proxyGroups") theProxyGroups: ProxyGroup[] = []
@@ -101,6 +102,7 @@ struct Home {
   编辑模式下右上角删除按钮
    */
   @Consume deleteButtonSize: BreakpointState<number>
+  @Consume isSmallSquareScreen: boolean
   // 删除按钮是否出现判定
   @State isShowDeleteButton: boolean = false
   //卡片编辑半模拟态判定
@@ -230,7 +232,7 @@ struct Home {
     } else { this.isShowDeleteButton = false }
   }
 
-  //卡片摇摆动画
+  // 卡片摇摆动画
   startAnim() {
     this.rotateAngle = 0
     animateTo({
@@ -311,6 +313,7 @@ struct Home {
     .width(40)
     .height(40)
     .backgroundColor($r('app.color.settings_container_background'))
+    .visibility((this.isRolling && this.isSmallSquareScreen) ? Visibility.Hidden : Visibility.Visible)
     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
     .onClick(() => {
       onCheck()
@@ -323,7 +326,7 @@ struct Home {
       if (!this.isLandscapePhone) {
         Row({space: this.HomeCardTitleButtonPadding.value}) {
           if (!this.isShowHomeEdit) {
-            //编辑布局按钮判定：非编辑状态
+            // 编辑布局按钮判定：非编辑状态
             Text(this.uiConfig.isGreeting ? this.greetings : 'ClashNext')
               .fontSize((this.uiConfig.userLanguage != 'en-Latn') || !this.uiConfig.isGreeting ? TAB_CONTENT_TITLE_FONT_SIZE : 27)
               .layoutWeight(1)
@@ -381,8 +384,8 @@ struct Home {
           }
         }
         .zIndex(1)
-        .height(this.curYOffset<0?TAB_CONTENT_TITLE_HEIGHT-this.curYOffset:TAB_CONTENT_TITLE_HEIGHT)
-        .position({x:0})
+        .height((this.isRolling && this.isSmallSquareScreen) ? 0 : (this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT))
+        .position({x: 0})
         .width('100%')
         .geometryTransition("Button")
         .padding({
@@ -395,7 +398,7 @@ struct Home {
 
       Stack({ alignContent: this.stackAlignContentAlignment }) {
         Column(){
-          Blank().height(!this.isLandscapePhone?TAB_CONTENT_TITLE_HEIGHT:0)
+          Blank().height(this.isLandscapePhone || (this.isRolling && this.isSmallSquareScreen) ? 0 : TAB_CONTENT_TITLE_HEIGHT)
           Scroll() {
             // 主页卡片层
             List() {
@@ -805,6 +808,12 @@ struct Home {
             })
           }
           .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)
+          .onScrollStart(() => {
+            this.isRolling = true
+          })
+          .onScrollStop(() => {
+            this.isRolling = false
+          })
           .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {
             // 累计计算当前父组件滚动在Y轴方向的偏移量
             if (this.uiConfig.isAnimation){
@@ -843,7 +852,7 @@ struct Home {
             offsetY: 4,
             type: ShadowType.BLUR
           })
-          .margin({bottom:this.isLandscapePhone || !this.uiConfig.isBlurr ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
+          .margin({bottom: this.isLandscapePhone || !this.uiConfig.isBlurr || (this.isRolling && this.isSmallSquareScreen) ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
           .width(this.proxyEnabled ? $r('app.integer.vp_proxy_started_button_width') : $r('app.integer.vp_proxy_not_start_button_width'))
           .height(this.proxyStartButtonHeight)
           .clip(true)

@@ -160,6 +160,7 @@ struct ProxyGroupItem {
   @Consume showStart:boolean
   // 代理页延迟按钮气泡提示
   @Consume isShowDelayPop: boolean
+  @Consume isRolling: boolean
 
   /**
    * XXX 当前手指触摸的ListItem的对应 `this.configList` 中的 `configId`
@@ -375,6 +376,12 @@ struct ProxyGroupItem {
         })
       }, (item: ProxyItem,i: number) => item.name + '-' + i.toString())
     }
+    .onScrollStart(() => {
+      this.isRolling = true
+    })
+    .onScrollStop(() => {
+      this.isRolling = false
+    })
     .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : this.breakPointStateListLanes.value,
       this.breakPointStateListGutter.value)
     .ListStyle()
