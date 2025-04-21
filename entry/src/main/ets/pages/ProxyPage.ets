@@ -289,9 +289,7 @@ struct ProxyPage {
                   // 代理分组List Start
                   List({scroller: this.ListScroller}) {
                     LazyForEach(this.proxyGroups, (group: ProxyGroup, index: number) => {
-                      if (!group.hidden) {
-                        this.TabBuilder(group.name, index)
-                      }
+                      this.TabBuilder(group.name, index)
                     }, (item: ProxyGroup) => item.name)
                   }
                   .height(55)
@@ -302,27 +300,26 @@ struct ProxyPage {
                   // 代理节点Swiper Start
                   Swiper(this.SwiperController) {
                     LazyForEach(this.proxyGroups, (group: ProxyGroup, index: number) => {
-                      if (!group.hidden) {
-                        ProxyGroupItem({
-                          proxyGroup: index,
-                          proxyitems: group.proxies as ProxyItem[],
-                          ProxyGroupItemSelected: this.appConfig.proxyCardSize,
-                          disabled: group.type !== ProxyType.Selector,
-                          selectedProxy: this.currentProfile?.getSelectedProxy(group) ?? "",
-                          OnProxyChange: (item) => {
-                            this.changeProxy(group.name, item)
-                          }
+                      ProxyGroupItem({
+                        proxyGroup: index,
+                        proxyitems: group.proxies as ProxyItem[],
+                        ProxyGroupItemSelected: this.appConfig.proxyCardSize,
+                        disabled: group.type !== ProxyType.Selector,
+                        selectedProxy: this.currentProfile?.getSelectedProxy(group) ?? "",
+                        OnProxyChange: (item) => {
+                          this.changeProxy(group.name, item)
+                        }
+                      })
+                        .width('100%')
+                        .height('100%')
+                        .padding({ bottom:!this.uiConfig.isBlurr ? CONTENT_END_OFFSET_150 - 100 : CONTENT_END_OFFSET_150 - 50 })
+                        .onAppear(() => {
+                          hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear %{public}s", group.proxies.toString())
+                          hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear hidden: %{public}s %{public}d", group.hidden, index)
                         })
-                          .width('100%')
-                          .height('100%')
-                          .padding({ bottom:!this.uiConfig.isBlurr?CONTENT_END_OFFSET_150-100: CONTENT_END_OFFSET_150 - 50 })
-                          .onAppear(() => {
-                            hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear %{public}s", group.proxies.toString())
-                          })
-                          .onDisAppear(() => {
-                            hilog.info(0xFF00, "ProxyPageGroupTag", "#onDisAppear %{public}s", group.toString())
-                          })
-                      }
+                        .onDisAppear(() => {
+                          hilog.info(0xFF00, "ProxyPageGroupTag", "#onDisAppear %{public}s", group.toString())
+                        })
                     }, (item: ProxyGroup) => item.name)
                   }
                   .loop(false)

@@ -1,6 +1,6 @@
-//Index 媒体查询
+// Index
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
-import { curves, mediaquery, promptAction, window } from '@kit.ArkUI'
+import { curves, mediaquery, promptAction } from '@kit.ArkUI'
 import Home from './HomePage'
 import ProxyPage from './ProxyPage'
 import ConfigurationPage from './ConfigurationPage'
@@ -44,12 +44,20 @@ import {
   ListMoreData,
   moreData,
   AboutListItemProp,
-  BIND_SHEET_CONTAINER_HEIGHT
+  BIND_SHEET_CONTAINER_HEIGHT,
+  DefaultUpdateInfo,
+  TabTitlefontSize_12_16,
+  TabIconfontSize_24_29,
+  TabBarHeight,
+  TabBarWidth,
+  TabVertical,
+  TabBarPose,
+  TabDirection,
+  CompStr,
+  TheExperimentData
 } from '../common/Constants'
 import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/ProxyData'
-import { ClashConfig, Dns,
-  IpInfo,
-  LogLevel, Profile, ProxyGroup, ProxyMode, ProxySort, SubscriptionInfo } from 'proxy_core'
+import { ClashConfig, IpInfo, LogLevel, Profile, ProxyGroup, ProxyMode } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig, AppState, ClashCore, UIConfig } from '../entryability/AppState'
@@ -109,7 +117,7 @@ struct Index {
   //三级图标色，浅灰色
   @State icon_tertiary: ResourceColor = $r('sys.color.icon_tertiary')
   @Provide greetings: Resource = $r('app.string.GoodMorning')
-  //tabs图标文字颜色，修改resources/base(dark)/element/color.json中tabs_icon_text配置选中图标文字深浅模式颜色
+  // tabs图标文字颜色，修改resources/base(dark)/element/color.json中tabs_icon_text配置选中图标文字深浅模式颜色
   // app.color.tabs_icon_text1配置非选中图标和文字深浅模式颜色
   //  @State fontColorValue:ResourceColor = ($r('app.color.tabs_icon_text'));
   //  @State fontColorValue1:ResourceColor = ($r('app.color.tabs_icon_text1'));
@@ -128,56 +136,10 @@ struct Index {
   // 读取导航条区域的高度
   @StorageProp('bottomRectHeight') bottomRectHeight: number = 0;
   @StorageProp('topRectHeight') topRectHeight: number = 0;
-  /* 断点布局相关 相关作用看定义时候的注释 */
-  @State compStr: BreakpointState<string> = BreakpointState.of({
-    sm: "sm",
-    md: "md",
-    lg: "lg",
-    xl: "xl"
-  })
-  @State compDirection: BreakpointState<FlexDirection> = BreakpointState.of({
-    sm: FlexDirection.Column,
-    md: FlexDirection.Column,
-    lg: FlexDirection.Column,
-    xl: FlexDirection.Column
-  });
-  @State compBarPose: BreakpointState<BarPosition> = BreakpointState.of({
-    sm: BarPosition.End,
-    md: BarPosition.End,
-    lg: BarPosition.End,
-    xl: BarPosition.Start
-  });
-  @Provide
-  compVertical: BreakpointState<boolean> = BreakpointState.of({
-    sm: false,
-    md: false,
-    lg: false,
-    xl: true
-  });
-  @State compBarWidth: BreakpointState<string> = BreakpointState.of({
-    sm: '100%',
-    md: '100%',
-    lg: '100%',
-    xl: '67vp'
-  });
-  @State compBarHeight: BreakpointState<string> = BreakpointState.of({
-    sm: '77vp',
-    md: '77vp',
-    lg: '77vp',
-    xl: '100%'
-  });
-  @State TabIconfontSize: BreakpointState<number> = BreakpointState.of({
-    sm: 24,
-    md: 29,
-    lg: 29,
-    xl: 29
-  });
-  @State TabTitlefontSize: BreakpointState<number> = BreakpointState.of({
-    sm: 12,
-    md: 16,
-    lg: 16,
-    xl: 16
-  });
+    // page内顶部标题偏移量
+  @Provide curYOffset: number = 0
+  // 更多页一级页面顶部标题偏移量
+  @Provide curYOffsetMore: number = 0
   // 是否在主页
   @Provide isHomePage: boolean = false
   // 是否为免责弹窗
@@ -186,12 +148,17 @@ struct Index {
   @Provide isShowWelcome: boolean = false
   // 代理页延迟按钮气泡提示
   @Provide isShowDelayPop: boolean = false
-  // page内顶部标题偏移量
-  @Provide curYOffset: number = 0
-  // 更多页一级页面顶部标题偏移量
-  @Provide curYOffsetMore: number = 0
   // 应用更新信息
-  @Provide theAppVersionInfo: UpdateInfo = {tag_name: AppState.versionName, name: '1.2.3', published_at: '2024-01-28T15:13:58Z', browser_download_url: '', body: ''}
+  @Provide theAppVersionInfo: UpdateInfo = DefaultUpdateInfo
+  /* 断点布局相关 相关作用看定义时候的注释 */
+  @State compStr: BreakpointState<string> = CompStr
+  @State tabBarWidth: BreakpointState<string> = TabBarWidth
+  @State compBarHeight: BreakpointState<string> = TabBarHeight
+  @Provide compVertical: BreakpointState<boolean> = TabVertical
+  @State compBarPose: BreakpointState<BarPosition> = TabBarPose
+  @State compDirection: BreakpointState<FlexDirection> = TabDirection
+  @State TabIconfontSize: BreakpointState<number> = TabIconfontSize_24_29
+  @State TabTitlefontSize: BreakpointState<number> = TabTitlefontSize_12_16
   // 主页卡片内边距
   @Provide('breakPointStateHomeCardPadding')
   private breakPointStateHomeCardPadding: BreakpointState<MarginGenerate> = HomeCardPadding_14_15_16_17
@@ -349,21 +316,14 @@ struct Index {
   // 更多页数据
   @Provide moreList: moreData[] = ListMoreData()
   // 实验功能开关列表行数据
-  @Provide ExperimentData: AboutListItemProp = {
-    title: 'Experiment',
-    subtitle: '',
-    name: '',
-    children: [
-      { title: $r('app.string.experimental_function'), subtitle: $r('app.string.experimental_function_Subtitle'), sign: 1, name: 'ExperimentalFunction', isOn: true },
-    ]
-  }
+  @Provide ExperimentData: AboutListItemProp = TheExperimentData
 
   /* 是否开启 `Index` 页面的前景模糊 */
   @Provide('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean = false
   @StorageLink('windowHeight') @Watch('onWindowChange') windowHeight: number = 0
   @StorageLink('windowWidth') @Watch('onWindowChange') windowWidth: number = 0
 
-  // 当手机横屏时条件成立
+ /* // 当手机横屏时条件成立
   deviceHeightListener: mediaquery.MediaQueryListener =
     this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp) and (640vp< width <= 1000vp)');
   // 平板横屏判断
@@ -371,7 +331,7 @@ struct Index {
     this.getUIContext().getMediaQuery().matchMediaSync('(1000vp< width)');
   // 折叠屏展开判断
   foldPhoneOpenListener: mediaquery.MediaQueryListener =
-    this.getUIContext().getMediaQuery().matchMediaSync('(640vp< height <= 1000vp) and (640vp< width <= 1000vp)');
+    this.getUIContext().getMediaQuery().matchMediaSync('(640vp< height <= 1000vp) and (640vp< width <= 1000vp)');*/
   // 当设备横屏时条件成立
   // landscapelistener: mediaquery.MediaQueryListener =
   //   this.getUIContext().getMediaQuery().matchMediaSync('(orientation: landscape)')
@@ -588,7 +548,7 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.compDirection)
     BreakpointSystem.getInstance().attach(this.compBarPose)
     BreakpointSystem.getInstance().attach(this.compVertical)
-    BreakpointSystem.getInstance().attach(this.compBarWidth)
+    BreakpointSystem.getInstance().attach(this.tabBarWidth)
     BreakpointSystem.getInstance().attach(this.compBarHeight)
     BreakpointSystem.getInstance().attach(this.TabIconfontSize)
     BreakpointSystem.getInstance().attach(this.TabTitlefontSize)
@@ -643,7 +603,8 @@ struct Index {
           // 写入数据
           this.proxyGroups.empty()
           this.theProxyGroups = []
-          this.theProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode ?? ProxyMode.Rule)
+          let TheProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode ?? ProxyMode.Rule)
+          this.theProxyGroups = TheProxyGroups.filter(item => item.hidden !== true)
           this.proxyGroups.pushData(this.theProxyGroups)
           this.proxyGroups.refresh()
         }
@@ -742,9 +703,9 @@ struct Index {
     // 解注册画中画生命周期及状态回调
     PipManager.getInstance().unregisterPipStateChangeListener()
     // 解绑listener中注册的回调函数
-    this.deviceHeightListener.off('change');
-    this.tabletHeightListener.off('change')
-    this.foldPhoneOpenListener.off('change')
+    // this.deviceHeightListener.off('change');
+    // this.tabletHeightListener.off('change')
+    // this.foldPhoneOpenListener.off('change')
   }
 
 
@@ -871,7 +832,7 @@ struct Index {
   }
 
   isSecondaryChange() {
-    // 监听二级页面布尔判定动画是否执行
+    // 监听二级页面布尔判定动画是否执行 监听小屏是否滚动
     if (this.isSecondary || (this.isSmallSquareScreen && this.isRolling)) {
      // this.stopAnim()
       this.startAnim()
@@ -929,7 +890,7 @@ struct Index {
         .barOverlap(this.uiConfig.isBlurr ? (this.isLandscapePhone || ( this.istabletLandscape && !this.isSecondary) ? false : true) : false) //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
         .scrollable(this.isSecondary ? false : true)
         .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
-        .barWidth(this.isLandscapePhone ? '77vp' : this.compBarWidth.value) /**/
+        .barWidth(this.isLandscapePhone ? '77vp' : this.tabBarWidth.value) /**/
         .barHeight(this.isLandscapePhone ? '100%': (!this.uiConfig.isBlurr && this.isSecondary) ? this.barHeight : this.compBarHeight.value) /**/
         .onChange((index: number) => {
           this.IndexCurrentindex = index

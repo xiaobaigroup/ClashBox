@@ -82,45 +82,43 @@ struct ProxyArrangement {
   build() {
     List({ initialIndex: 0, scroller: this.proxyScroller}) {
       LazyForEach(this.proxyGroups, (group: ProxyGroup, index: number) => {
-        if (!group.hidden) {
-          ListItemGroup({
-            header: this.itemHead(group.name, !this.isContentShow && this.selectItem === index
-              ? $r('sys.symbol.chevron_down') : $r('sys.symbol.chevron_right'))
-          }){
-            // 展开后内容显示区域
-            if (!this.isContentShow && this.selectItem === index) {
-              ProxyGroupItem({
-                proxyitems: group.proxies as ProxyItem[],
-                ProxyGroupItemSelected: this.appConfig.proxyCardSize,
-                disabled: group.type !== ProxyType.Selector,
-                selectedProxy: this.currentProfile.getSelectedProxy(group),
-                OnProxyChange: (item) => {
-                  this.changeProxy(group.name, item)
-                }
-              })
-                .borderRadius(BORDER_RADIUS_20)
-                .width('100%')
-                .padding({ top:10})
-            }
-          }.margin({bottom: (!this.isContentShow && this.selectItem === index) ? 0 : 10})
-          .clickEffect(this.isContentShow?customAnimationUtil.isClickEffect(this.uiConfig):null)
-          .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
-          .onClick(() => {
-            animateTo({
-              duration: this.uiConfig.animationSpeed,
-              onFinish: () => {
+        ListItemGroup({
+          header: this.itemHead(group.name, !this.isContentShow && this.selectItem === index
+            ? $r('sys.symbol.chevron_down') : $r('sys.symbol.chevron_right'))
+        }){
+          // 展开后内容显示区域
+          if (!this.isContentShow && this.selectItem === index) {
+            ProxyGroupItem({
+              proxyitems: group.proxies as ProxyItem[],
+              ProxyGroupItemSelected: this.appConfig.proxyCardSize,
+              disabled: group.type !== ProxyType.Selector,
+              selectedProxy: this.currentProfile.getSelectedProxy(group),
+              OnProxyChange: (item) => {
+                this.changeProxy(group.name, item)
               }
-            }, () => {
-              if (!this.isContentShow) {
-                this.proxyScroller.scrollToItemInGroup(index, 0, true, ScrollAlign.START)
-              }
-              this.isContentShow = !this.isContentShow
-              this.selectItem = index
             })
+              .borderRadius(BORDER_RADIUS_20)
+              .width('100%')
+              .padding({ top:10})
+          }
+        }.margin({bottom: (!this.isContentShow && this.selectItem === index) ? 0 : 10})
+        .clickEffect(this.isContentShow?customAnimationUtil.isClickEffect(this.uiConfig):null)
+        .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
+        .onClick(() => {
+          animateTo({
+            duration: this.uiConfig.animationSpeed,
+            onFinish: () => {
+            }
+          }, () => {
+            if (!this.isContentShow) {
+              this.proxyScroller.scrollToItemInGroup(index, 0, true, ScrollAlign.START)
+            }
+            this.isContentShow = !this.isContentShow
+            this.selectItem = index
           })
-          .width('100%')
-          .borderRadius(BORDER_RADIUS_20)
-        }
+        })
+        .width('100%')
+        .borderRadius(BORDER_RADIUS_20)
       }, (item: ProxyGroup) => item.name)
     }
     .contentEndOffset(CONTENT_END_OFFSET_150)

@@ -38,10 +38,6 @@ struct Log {
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  // 临时排序变量
-  @State theSort: number = 0
-  // 临时时间正序变量
-  @State theSortTimeUp: boolean = false
   // 临时名称正序变量
   @State theSortNameUp: boolean = false
   //page内顶部标题偏移量
@@ -99,21 +95,16 @@ struct Log {
     Menu() {
       MenuItem({ content: $r('app.string.sort') })
         .contentFont({ weight: FontWeight.Bold })
-      // MenuItem({
-      //   content: $r('app.string.sort_name'),
-      //   symbolEndIcon: this.theSort === 0 ? new SymbolGlyphModifier(this.theSortNameUp ? $r('sys.symbol.arrow_up') : $r('sys.symbol.arrow_down')) : undefined
-      // })
-      //   .onClick(() => {
-      //     this.theSort = 0
-      //     this.theSortNameUp = !this.theSortNameUp
-      //   })
       MenuItem({
         content: $r('app.string.sort_time'),
-        symbolEndIcon: this.theSort === 1 ? new SymbolGlyphModifier(this.theSortTimeUp ? $r('sys.symbol.arrow_up') : $r('sys.symbol.arrow_down')) : undefined
+        symbolEndIcon: new SymbolGlyphModifier(this.uiConfig.LogSortTime === 0 ? $r('sys.symbol.arrow_up') : $r('sys.symbol.arrow_down'))
       })
         .onClick(() => {
-          this.theSort = 1
-          this.theSortTimeUp = !this.theSortTimeUp
+          if (this.uiConfig.LogSortTime === 0) {
+            this.uiConfig.LogSortTime = 1
+          } else {
+            this.uiConfig.LogSortTime = 0
+          }
         })
     }
   }
@@ -221,7 +212,7 @@ struct Log {
               } else {
                 Scroll() {
                 List({ space: 10 }) {
-                  ForEach(this.sortedLogs(this.theSortTimeUp, this.clashConfig?.["log-level"] ?? LogLevel.Debug), (item: LogData, index: number) => {
+                  ForEach(this.sortedLogs(this.uiConfig.LogSortTime === 0, this.clashConfig?.["log-level"] ?? LogLevel.Debug), (item: LogData, index: number) => {
                     ListItem() {
                       if (item.logSkip) {
                         // 需要跳转详情
@@ -378,7 +369,7 @@ export struct LogDetils {
           }.height('100%')
           .margin({ right: this.morePageMargin.value, left: this.morePageMargin.value })
         }
-        .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)//,{alwaysEnabled:true})
+        .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring : null)//,{alwaysEnabled:true})
         .onDidScroll((xOffset: number, yOffset: number): void => {
           // 累计计算当前父组件滚动在Y轴方向的偏移量
           if (this.uiConfig.isAnimation){

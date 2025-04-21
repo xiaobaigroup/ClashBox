@@ -101,22 +101,22 @@ export class UIConfig{
   // 模拟画中画启用变量
   backgroundPiPModel: boolean = false
   /* 主页小卡片相关 */
-  //分流模式小卡片  平移属性参数
+  // 分流模式小卡片  平移属性参数
   translateY:number|string='-100%'
-  //快捷方式小卡片
+  // 快捷方式小卡片
   inputTitle1: string = ''
   inputTitle2: string = ''
   inputTitle3: string = ''
   inputWeb1: string = ''
   inputWeb2: string = ''
   inputWeb3: string = ''
-  //流量统计小卡片
+  // 流量统计小卡片
   inputTotal: number = 0
   switchUnit: TrafficUnit = TrafficUnit.MB
   cellularDataIndex: number = 1
   dataTotal: number = 0
   dataTotalLast: number = 0
-  //动画速度
+  // 动画速度
   animationSpeed:number = ANIMATION_DURATION_300
   isAnimation:boolean=true
   // 代理启动按钮状态
@@ -141,6 +141,8 @@ export class UIConfig{
   autoUpdateTimeUtils?:number
   resourcesData: string = JSON.stringify(theResouresData)
   resourcesHideData: string = JSON.stringify(resourcesBlankData)
+  // 日志时间排序
+  LogSortTime: number = 0
   constructor() {
   }
 }
