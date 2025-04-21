@@ -77,8 +77,11 @@ export class Profile {
     },connectTimeout: 5000, readTimeout: 5000, })
     const disposition = resp.header["content-disposition"] as string
     const userinfo = resp.header["subscription-userinfo"] as string
+
     if (!this.name || this.name == "") {
       this.name = getFileNameForDisposition(disposition) ?? this.id
+    }
+    if(userinfo){
       this.subscriptionInfo = SubscriptionInfo.formHString(userinfo)
     }
     if (resp.result) {
