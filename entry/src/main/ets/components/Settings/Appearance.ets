@@ -431,24 +431,22 @@ struct Appearance {
                 this.uiConfig.isBlurr = !this.uiConfig.isBlurr
               })
             })
-            if(this.isShowExperimentalFunction) {
-              // 分割线
-              Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
-              // 动画速度
-              menuRowList({
-                icons: $r('sys.symbol.livephoto'),
-                title: $r('app.string.animation_speed'),
-                subtitle: $r('app.string.animation_speed_subtitle'),
-                isExperimentalFunction: true,
-                // 确保this指向父组件
-                tips: (): void => { this.TipsText(3) },
-                menu: (): void => { this.MenuEntrance(3) }
-              })
-            }
+            // 分割线
+            Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
+            // 动画速度
+            menuRowList({
+              icons: $r('sys.symbol.livephoto'),
+              title: $r('app.string.animation_speed'),
+              subtitle: $r('app.string.animation_speed_subtitle'),
+              isExperimentalFunction: false,
+              // 确保this指向父组件
+              tips: (): void => { this.TipsText(3) },
+              menu: (): void => { this.MenuEntrance(3) }
+            })
           }
           .width('100%')
           .borderRadius(20)
-               .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .backgroundColor($r('app.color.container_background'))
         }
         ListItem() {

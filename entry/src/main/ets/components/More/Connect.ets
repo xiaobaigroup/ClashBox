@@ -1,7 +1,7 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import { BIND_SHEET_TITLE_CONTAINER_HEIGHT, BORDER_RADIUS_20, CONTENT_END_OFFSET_150,
   TAB_CONTENT_TITLE_HEIGHT } from "../../common/Constants"
-import { UIConfig } from "../../entryability/AppState"
+import { AppConfig, UIConfig } from "../../entryability/AppState"
 import { convertTime, timestampToDateTime } from "../../utils/TimeConvertUtil"
 import { Nothing } from "../Common"
 import { MoreTop } from "./MoreTopBuilder"
@@ -9,6 +9,7 @@ import { curves, LengthMetrics } from "@kit.ArkUI"
 import ClashViewModel from "../../entryability/ClashViewModel"
 import { ConnectionInfo, Metadata } from "proxy_core"
 import { customAnimationUtil } from "../../utils/Animation"
+import { ConnectItemDataSource } from "../../common/ConnectData"
 
 
 export function  getRequestText(metadata: Metadata ) {
@@ -38,37 +39,97 @@ export function  getTheSourceText( connection: ConnectionInfo) {
 
 @Component
 struct Connect {
+  // page内顶部标题偏移量
+  @Consume curYOffset: number
   // 是否进入二级界面
   @Consume isSecondary: boolean
+  @State intervalId: number = 0
   @Consume('NavPathStack') pageInfos: NavPathStack
+  // 数据
+  @State private connectListData: ConnectItemDataSource = new ConnectItemDataSource()
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
-  //page内顶部标题偏移量
-  @Consume curYOffset: number
 
-  // 数据
-  @State
-  private connectListData: Array<ConnectionInfo> = [
-  ]
+
   async aboutToAppear(): Promise<void> {
-    let result = await ClashViewModel.getConnections()
-    this.connectListData = result
-    console.log("getConnections", JSON.stringify(result) )
+    this.connectListData.empty()
+    if (this.appConfig.enableConnect) {
+      this.getConnections()
+      this.intervalId = setInterval(() => {
+        this.getConnections()
+      }, 9000)
+    } else {
+      console.log("getConnections 未启用" )
+    }
   }
+
+  aboutToDisappear(): void {
+    clearInterval(this.intervalId)
+    this.connectListData.empty()
+  }
+
+  async getConnections() {
+    let result = await ClashViewModel.getConnections()
+    console.log("#getConnections result ", JSON.stringify(result))
+    // 合并后去重
+    const merged = [...result, ...this.connectListData.getTotslData()]
+    const uniqueMap = new Map<string, ConnectionInfo>()
+    merged.forEach(item => {
+      uniqueMap.set(`${item.id}${item.start}`, item)
+    })
+
+    // 转换为数组并按时间排序
+    const ConnectListData = Array.from(uniqueMap.values()).sort((a, b) => {
+      return new Date(b.start).getTime() - new Date(a.start).getTime()
+    })
+    this.connectListData.pushData(ConnectListData)
+    // console.log("#getConnections result 长度", result.length)
+    // console.log("#getConnections connectListData 原长度", this.connectListData.length)
+    // console.log("#getConnections 合并后去重前长度", merged.length)
+    // console.log("#getConnections 去重后长度", uniqueMap.size)
+  }
+
   @Builder
   connectOther() {
-    // 清理按钮
+    if (this.appConfig.enableConnect) {
+      // 清理按钮
+      Button({ type: ButtonType.Circle, stateEffect: true }) {
+        SymbolGlyph($r('sys.symbol.clean_fill'))
+          .fontSize(24)
+          .fontColor([this.icon_primary])
+      }.onClick(()=>{
+        this.connectListData.clear()
+        ClashViewModel.clearConnections()
+      })
+      .width(40)
+      .height(40)
+      .margin({ left: 10 })
+      .backgroundColor($r('app.color.settings_container_background'))
+      .transition(customAnimationUtil.isSlide(0, this.uiConfig))
+    }
+    // 启用按钮
     Button({ type: ButtonType.Circle, stateEffect: true }) {
-      SymbolGlyph($r('sys.symbol.clean_fill'))
+      SymbolGlyph(!this.appConfig.enableConnect ? $r('sys.symbol.checkmark_circle') : $r('sys.symbol.checkmark_circle_fill'))
         .fontSize(24)
         .fontColor([this.icon_primary])
-    }.onClick(()=>{
-      this.connectListData = []
-      ClashViewModel.clearConnections()
+    }.onClick(() => {
+      animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+        this.appConfig.enableConnect = !this.appConfig.enableConnect
+        if (!this.appConfig.enableConnect) {
+          clearInterval(this.intervalId)
+          this.connectListData.clear()
+        } else {
+          this.getConnections()
+          this.intervalId = setInterval(() => {
+            this.getConnections()
+          }, 9000)
+        }
+      })
     })
     .width(40)
     .height(40)
@@ -76,6 +137,7 @@ struct Connect {
     .backgroundColor($r('app.color.settings_container_background'))
     .transition(customAnimationUtil.isSlide(0, this.uiConfig))
   }
+
   async getPackageIcon(connection: ConnectionInfo)  {
     return connection.metadata.process;
   }
@@ -89,16 +151,20 @@ struct Connect {
             otherButton: (): void => { this.connectOther() }
           })
 
-
         Column() {
           Blank().height(TAB_CONTENT_TITLE_HEIGHT+6)
           // 页面
-          if (this.connectListData.length === 0) {
-            Nothing({ name: $r('app.string.Request') })
+          if (!this.appConfig.enableConnect) {
+            Nothing({
+              name: $r('app.string.Connect'),
+              isNotEnabled: true
+            })
+          } else if (this.connectListData.totalCount() === 0) {
+            Nothing({ name: $r('app.string.Connect') })
           } else {
             Scroll() {
               List({ space: 10 }) {
-                ForEach(this.connectListData, (item: ConnectionInfo, index: number) => {
+                LazyForEach(this.connectListData, (item: ConnectionInfo, index: number) => {
                   ListItem() {
                     Row() {
                       // 文本显示区
@@ -139,7 +205,7 @@ struct Connect {
                       .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                       .backgroundColor($r('app.color.settings_container_background'))
                       .onClick(() => {
-                        this.connectListData.splice(index, 1)
+                        this.connectListData.notifyDataDelete(index)
                         ClashViewModel.closeConnection(item.id)
                       })
                     }
@@ -154,6 +220,7 @@ struct Connect {
                 })
               }.width('100%')
               .height('100%')
+              .cachedCount(5, true)
               .padding({ right: this.morePageMargin.value, left: this.morePageMargin.value })
               .contentEndOffset(CONTENT_END_OFFSET_150)
               .chainAnimation(true)
@@ -175,7 +242,6 @@ struct Connect {
       }
       .width('100%')
       .height('100%')
-     // .justifyContent(FlexAlign.Start)
 
     }
     .hideTitleBar(true)

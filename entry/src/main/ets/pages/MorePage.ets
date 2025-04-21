@@ -35,6 +35,8 @@ import { customAnimationUtil } from '../utils/Animation';
 @Component
 struct MorePage {
   private componentName: string = 'MorePage'
+  @Consume isRolling: boolean
+  @Consume isSmallSquareScreen: boolean
   // 设置页显示变量
   @State isShowSettings: boolean = false
   // 是否进入二级界面
@@ -191,7 +193,7 @@ struct MorePage {
         }
         .width('100%')
         .zIndex(1)
-        .height(this.curYOffsetMore < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffsetMore : TAB_CONTENT_TITLE_HEIGHT)
+        .height((this.isRolling && this.isSmallSquareScreen) ? 0 : (this.curYOffsetMore < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffsetMore : TAB_CONTENT_TITLE_HEIGHT))
         .position({ x: 0 })
         .backgroundColor($r('app.color.background'))
         .transition(customAnimationUtil.isSlide(0, this.uiConfig))
@@ -265,9 +267,15 @@ struct MorePage {
               scrollBackward: NestedScrollMode.SELF_FIRST
             })
           }
-          .padding({top:TAB_CONTENT_TITLE_HEIGHT})
+          .padding({top: (this.isRolling && this.isSmallSquareScreen) ? 0 : TAB_CONTENT_TITLE_HEIGHT})
           .height('100%')
-          .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)
+          .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring: null)
+          .onScrollStart(() => {
+            this.isRolling = true
+          })
+          .onScrollStop(() => {
+            this.isRolling = false
+          })
           .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {
             // 累计计算当前父组件滚动在Y轴方向的偏移量
             if (this.uiConfig.isAnimation){

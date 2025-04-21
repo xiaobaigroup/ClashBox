@@ -82,20 +82,31 @@ struct Log {
       }
     }
   }
-
+  sortedLogs( time: boolean, level:LogLevel){
+    let logs = this.logListData;
+    if (time) {
+      logs = this.logListData.sort((a,b)=> b.logTime - a.logTime)
+    } else {
+      logs = this.logListData.sort((a,b)=> a.logTime - b.logTime)
+    }
+    if(level !== LogLevel.Debug){
+      return logs.filter((l)=> l.logType == level );
+    }
+    return logs;
+  }
   @Builder
   SortMenu() {
     Menu() {
       MenuItem({ content: $r('app.string.sort') })
         .contentFont({ weight: FontWeight.Bold })
-      MenuItem({
-        content: $r('app.string.sort_name'),
-        symbolEndIcon: this.theSort === 0 ? new SymbolGlyphModifier(this.theSortNameUp ? $r('sys.symbol.arrow_up') : $r('sys.symbol.arrow_down')) : undefined
-      })
-        .onClick(() => {
-          this.theSort = 0
-          this.theSortNameUp = !this.theSortNameUp
-        })
+      // MenuItem({
+      //   content: $r('app.string.sort_name'),
+      //   symbolEndIcon: this.theSort === 0 ? new SymbolGlyphModifier(this.theSortNameUp ? $r('sys.symbol.arrow_up') : $r('sys.symbol.arrow_down')) : undefined
+      // })
+      //   .onClick(() => {
+      //     this.theSort = 0
+      //     this.theSortNameUp = !this.theSortNameUp
+      //   })
       MenuItem({
         content: $r('app.string.sort_time'),
         symbolEndIcon: this.theSort === 1 ? new SymbolGlyphModifier(this.theSortTimeUp ? $r('sys.symbol.arrow_up') : $r('sys.symbol.arrow_down')) : undefined
@@ -210,12 +221,12 @@ struct Log {
               } else {
                 Scroll() {
                 List({ space: 10 }) {
-                  ForEach(this.logListData, (item: LogData, index: number) => {
+                  ForEach(this.sortedLogs(this.theSortTimeUp, this.clashConfig?.["log-level"] ?? LogLevel.Debug), (item: LogData, index: number) => {
                     ListItem() {
                       if (item.logSkip) {
                         // 需要跳转详情
                         skipRowList({
-                          title: `Info ${timestampToDateTime(item.logTime)}`,
+                          title: `Info ${timestampToDateTime(item.logTime * 1000)}`,
                           subtitle: `${item.LogDetails}`,
                           tips: this.logTipsBuilder
                         }).onClick(() => {
@@ -227,7 +238,7 @@ struct Log {
                         // 无跳转
                         Row() {
                           Column() {
-                            Text(`${item.logType} ${timestampToDateTime(item.logTime)}`)
+                            Text(`${item.logType} ${timestampToDateTime(item.logTime * 1000)}`)
                               .fontWeight(FontWeight.Medium)
                               .fontColor(item.logType === LogLevel.Error ? Color.Red : this.icon_primary)
                               .fontSize(16)
@@ -336,7 +347,7 @@ export struct LogDetils {
         // 导航区
         MoreTop({
           title: $r('app.string.Log'),
-          subtitle: `${this.logListData[this.theLogSkipItem].logType} ${timestampToDateTime(this.logListData[this.theLogSkipItem].logTime)}`,
+          subtitle: `${this.logListData[this.theLogSkipItem].logType} ${timestampToDateTime(this.logListData[this.theLogSkipItem].logTime * 1000)}`,
           searchButton: (): void => {
             this.logDetilsSearch()
           },

@@ -4,49 +4,89 @@ import { MoreTop } from "./MoreTopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { convertTime, timestampToDateTime } from "../../utils/TimeConvertUtil"
 import { Nothing } from "../Common"
-import { UIConfig } from "../../entryability/AppState"
+import { AppConfig, UIConfig } from "../../entryability/AppState"
 import { curves } from "@kit.ArkUI"
 import { customAnimationUtil } from "../../utils/Animation"
 import ClashViewModel from "../../entryability/ClashViewModel"
 import { ConnectionInfo } from "proxy_core"
 import { getRequestText, getSourceText, getTheSourceText } from "./Connect"
+import { ConnectItemDataSource } from "../../common/ConnectData"
 
-// 资源数据（假设）
-interface RequestData {
-  // 配置名
-  requestConfigName: string
-  // 代理名
-  requestProxyName: string
-  // 请求时间(展示的时间)
-  requestTime: number
-  // 请求链接
-  requestUrl: string
-  // 请求标识（0：直连；1：代理）
-  requestSign: number
-}
 
 @Component
 struct RequestPage {
   @Consume isSecondary: boolean
+  @State intervalId: number = 0
   @Consume('NavPathStack') pageInfos: NavPathStack
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
-  //page内顶部标题偏移量
+  // page内顶部标题偏移量
   @Consume curYOffset: number
-  // 临时数据
-  @State
-  private requestListData: ConnectionInfo[] = [
-  ]
+  // 列表数据
+  @State private requestListData: ConnectItemDataSource = new ConnectItemDataSource()
+
   async aboutToAppear(): Promise<void> {
-      // TODO  ClashViewModel.clearRequestList()
-      this.requestListData = await ClashViewModel.getRequestList()
+    this.requestListData.empty()
+    if (this.appConfig.enableRequest) {
+      this.getRequest()
+      this.intervalId = setInterval(() => {
+        this.getRequest()
+      }, 9000)
+    }
   }
+
+  aboutToDisappear(): void {
+    clearInterval(this.intervalId)
+    this.requestListData.empty()
+  }
+
+  async getRequest() {
+    // TODO  ClashViewModel.clearRequestList()
+    let requestLatestListData = await ClashViewModel.getRequestList()
+
+    // 合并后去重
+    const merged = [...requestLatestListData, ...this.requestListData.getTotslData()]
+    const uniqueMap = new Map<string, ConnectionInfo>()
+    merged.forEach(item => {
+      uniqueMap.set(`${item.id}${item.start}`, item)
+    })
+
+    // 转换为数组并按时间排序
+    const RequestListData = Array.from(uniqueMap.values()).reverse()
+    this.requestListData.pushData(RequestListData)
+  }
+
   @Builder
   requestOther() {
+    // 启用按钮
+    Button({ type: ButtonType.Circle, stateEffect: true }) {
+      SymbolGlyph(!this.appConfig.enableRequest ? $r('sys.symbol.checkmark_circle') : $r('sys.symbol.checkmark_circle_fill'))
+        .fontSize(24)
+        .fontColor([this.icon_primary])
+    }.onClick(() => {
+      animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+        this.appConfig.enableRequest = !this.appConfig.enableRequest
+        if (!this.appConfig.enableRequest) {
+          clearInterval(this.intervalId)
+          this.requestListData.clear()
+        } else {
+          this.getRequest()
+          this.intervalId = setInterval(() => {
+            this.getRequest()
+          }, 9000)
+        }
+      })
+    })
+    .width(40)
+    .height(40)
+    .margin({ left: 10 })
+    .backgroundColor($r('app.color.settings_container_background'))
+    .transition(customAnimationUtil.isSlide(0, this.uiConfig))
   }
 
   build() {
@@ -63,12 +103,17 @@ struct RequestPage {
         Column() {
           Blank().height(TAB_CONTENT_TITLE_HEIGHT+6)
           // 页面
-          if (this.requestListData.length === 0) {
-            Nothing({ name: $r('app.string.Request') })
-          } else {
+         if (!this.appConfig.enableRequest) {
+            Nothing({
+              name: $r('app.string.Request'),
+              isNotEnabled: true
+            })
+          } else  if (this.requestListData.totalCount() === 0) {
+           Nothing({ name: $r('app.string.Request') })
+         } else {
             Scroll() {
               List({ space: 10 }) {
-                ForEach(this.requestListData, (item: ConnectionInfo, index: number) => {
+                LazyForEach(this.requestListData, (item: ConnectionInfo, index: number) => {
                   ListItem() {
                     Row() {
                       Column() {
@@ -109,6 +154,7 @@ struct RequestPage {
                 })
               }.width('100%')
               .height('100%')
+              .cachedCount(5, true)
               .contentEndOffset(CONTENT_END_OFFSET_150)
               .padding({ right: this.morePageMargin.value, left: this.morePageMargin.value })
               .chainAnimation(true)

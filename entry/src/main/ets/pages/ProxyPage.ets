@@ -53,6 +53,9 @@ struct ProxyPage {
   @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary')
   /* Stack层叠布局 */
 
+  @Consume isRolling: boolean
+  @Consume isSmallSquareScreen: boolean
+
   // 是否要打开样式编辑
   @State isStylesEdit: boolean = false
   // 半模态页
@@ -161,6 +164,7 @@ struct ProxyPage {
     .width(40)
     .height(40)
     .backgroundColor($r('app.color.settings_container_background'))
+    .visibility((this.isRolling && this.isSmallSquareScreen) ? Visibility.Hidden : Visibility.Visible)
     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
     .onClick(() => {
       onCheck()
@@ -261,8 +265,8 @@ struct ProxyPage {
         })
       }
       .zIndex(1)
-      .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
-      .position({x:0})
+      .height((this.isRolling && this.isSmallSquareScreen) ? 0 : (this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT))
+      .position({x: 0})
       .alignItems(VerticalAlign.Center)
       .width('100%')
       .padding({
@@ -276,7 +280,7 @@ struct ProxyPage {
       } else {
         Stack({ alignContent: this.stackAlignContentAlignment }) {
           Column() {
-            Blank().height(TAB_CONTENT_TITLE_HEIGHT)
+            Blank().height((this.isRolling && this.isSmallSquareScreen) ? 0 : TAB_CONTENT_TITLE_HEIGHT)
             Scroll() {
               // 标签分组页 start
               Column() {
@@ -285,7 +289,9 @@ struct ProxyPage {
                   // 代理分组List Start
                   List({scroller: this.ListScroller}) {
                     LazyForEach(this.proxyGroups, (group: ProxyGroup, index: number) => {
-                      this.TabBuilder(group.name, index)
+                      if (!group.hidden) {
+                        this.TabBuilder(group.name, index)
+                      }
                     }, (item: ProxyGroup) => item.name)
                   }
                   .height(55)
@@ -296,26 +302,27 @@ struct ProxyPage {
                   // 代理节点Swiper Start
                   Swiper(this.SwiperController) {
                     LazyForEach(this.proxyGroups, (group: ProxyGroup, index: number) => {
-                      ProxyGroupItem({
-                        proxyGroup: index,
-                        proxyitems: group.proxies as ProxyItem[],
-                        ProxyGroupItemSelected: this.appConfig.proxyCardSize,
-                        disabled: group.type !== ProxyType.Selector,
-                        selectedProxy: this.currentProfile?.getSelectedProxy(group) ?? "",
-                        OnProxyChange: (item) => {
-                          this.changeProxy(group.name, item)
-                        }
-                      })
-                        .width('100%')
-                        .height('100%')
-                        .padding({ bottom:!this.uiConfig.isBlurr?CONTENT_END_OFFSET_150-100: CONTENT_END_OFFSET_150 - 50 })
-                        .onAppear(() => {
-
-                          hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear %{public}s", group.proxies.toString())
+                      if (!group.hidden) {
+                        ProxyGroupItem({
+                          proxyGroup: index,
+                          proxyitems: group.proxies as ProxyItem[],
+                          ProxyGroupItemSelected: this.appConfig.proxyCardSize,
+                          disabled: group.type !== ProxyType.Selector,
+                          selectedProxy: this.currentProfile?.getSelectedProxy(group) ?? "",
+                          OnProxyChange: (item) => {
+                            this.changeProxy(group.name, item)
+                          }
                         })
-                        .onDisAppear(() => {
-                          hilog.info(0xFF00, "ProxyPageGroupTag", "#onDisAppear %{public}s", group.toString())
-                        })
+                          .width('100%')
+                          .height('100%')
+                          .padding({ bottom:!this.uiConfig.isBlurr?CONTENT_END_OFFSET_150-100: CONTENT_END_OFFSET_150 - 50 })
+                          .onAppear(() => {
+                            hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear %{public}s", group.proxies.toString())
+                          })
+                          .onDisAppear(() => {
+                            hilog.info(0xFF00, "ProxyPageGroupTag", "#onDisAppear %{public}s", group.toString())
+                          })
+                      }
                     }, (item: ProxyGroup) => item.name)
                   }
                   .loop(false)
@@ -398,7 +405,7 @@ struct ProxyPage {
             .hoverEffect(HoverEffect.Scale)
             .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
             .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
-            .margin({bottom:this.isLandscapePhone || !this.uiConfig.isBlurr ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
+            .margin({bottom:this.isLandscapePhone || !this.uiConfig.isBlurr || (this.isRolling && this.isSmallSquareScreen) ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
             .bindPopup(!!this.isShowDelayPop, {
               builder: PopupBuilder(this, PopTips[3], () => {
                 this.isShowDelayPop = false

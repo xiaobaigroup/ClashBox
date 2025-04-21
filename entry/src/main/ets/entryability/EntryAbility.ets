@@ -6,6 +6,7 @@ import ClashViewModel from './ClashViewModel';
 import { AppConfig, AppFlowingState, AppState } from './AppState';
 import { EventHub, EventKey } from '../common/EventHub';
 import { PipManager } from '../common/PipManager';
+import { ClashConfig } from 'proxy_core';
 
 export default class EntryAbility extends UIAbility {
  private currentLanguage: string | undefined = undefined
@@ -38,8 +39,6 @@ export default class EntryAbility extends UIAbility {
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     // Main window is created, set main page for this ability
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onWindowStageCreate');
-    // 获取应用主窗口
-    let windowClass: window.Window = windowStage.getMainWindowSync();
 
     await ClashViewModel.init(this.context)
     windowStage.loadContent('pages/Index', async (err) => {
@@ -69,11 +68,13 @@ export default class EntryAbility extends UIAbility {
           await ClashViewModel.ChangeCore(clashCore)
           await ClashViewModel.ReStartVpn()
         }
-      }, 100)
+      }, 1000)
       EventHub.on(EventKey.StartedClash, ()=>{
         const job = async ()=>{
-          let now = await ClashViewModel.getTraffic()
-          let total = await ClashViewModel.getTotalTraffic()
+          let onlyProxy = AppStorage.get<ClashConfig>("clashConfig")?.['only-proxy'] as boolean ?? true
+          hilog.info(0xFF00, "EntryAbilityTestTag", 'onlyProxy: %{public}s', onlyProxy)
+          let now = await ClashViewModel.getTraffic(onlyProxy)
+          let total = await ClashViewModel.getTotalTraffic(onlyProxy)
           appFlowingState.traffics.enqueue(now)
           appFlowingState.totalTraffic = total
         }
@@ -92,6 +93,9 @@ export default class EntryAbility extends UIAbility {
       let ctx = window.getUIContext();
       PipManager.getInstance().makeTypeNode(ctx)
     })
+
+    // 获取应用主窗口
+    let windowClass: window.Window = windowStage.getMainWindowSync();
     // 1. 设置窗口全屏
     let isLayoutFullScreen = true;
     windowClass.setWindowLayoutFullScreen(isLayoutFullScreen).then(() => {
@@ -102,6 +106,7 @@ export default class EntryAbility extends UIAbility {
 
     // 缓存window窗口对象
     AppStorage.setOrCreate('windowClass', windowClass);
+
 
     // 2. 获取布局避让遮挡的区域
     let type = window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR; // 以导航条避让为例
@@ -124,6 +129,25 @@ export default class EntryAbility extends UIAbility {
         AppStorage.setOrCreate('bottomRectHeight', bottomRectHeight);
       }
     });
+
+    // 应用窗口初始高度和宽度
+    let properties = windowClass.getWindowProperties()
+    let rect = properties.windowRect
+    let WindowHeight = rect.height
+    let WindowWidth = rect.width
+    hilog.info(0x0000, 'PicaWindowLog', '窗口高度：%{public}d 宽度：%{public}i', rect.height, rect.width)
+    AppStorage.setOrCreate('windowHeight', px2vp(WindowHeight))
+    AppStorage.setOrCreate('windowWidth', px2vp(WindowWidth))
+    // 监听窗口大小变化
+    try {
+      windowClass.on('windowSizeChange', (data) => {
+        console.info('#WindowChange Succeeded in enabling the listener for window size changes. Data: ' + JSON.stringify(data))
+        AppStorage.setOrCreate('windowHeight', px2vp(data.height)) // 980px 约等于 512vp
+        AppStorage.setOrCreate('windowWidth', px2vp(data.width))
+      })
+    } catch (exception) {
+      console.error(`#EntryAbility Failed to enable the listener for window size changes. Cause code: ${exception.code}, message: ${exception.message}`)
+    }
   }
 
   /*onConfigurationUpdate(newConfig: Configuration): void {

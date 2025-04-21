@@ -120,6 +120,13 @@ struct Overwrite {
                 })
                 .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
               })
+              // 重启应用提示
+              ListItem() {
+                Text($r('app.string.overwrite_restart_tips'))
+                  .fontColor($r('sys.color.font_secondary'))
+                  .fontWeight(FontWeight.Normal)
+                  .fontSize(14)
+              }.transition(customAnimationUtil.isScaleTran(4, this.uiConfig))
             }
             .width('100%')
             .height('100%')

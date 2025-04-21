@@ -45,3 +45,7 @@ fi
 # 复制生成的 .so 文件到指定目录
 cp -f "$outputFile" "$PWD/../../libs/$outdir/$outputFile"
 rm -f "$outputFile" 
+
+
+# ubex > gvisor@v0.0-20240320004321-933faba989ec > pkg>tcpip>link >fdbased>~60 endpoint.go
+#isSocketFD

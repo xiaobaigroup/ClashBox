@@ -671,9 +671,12 @@ export struct ExperimentalFunction {
 /**
  * 页面暂无XX
  * @param name 页面标题(暂无XX)-Resource
+ * @param isNotEnabled 是否为未启用样式(可选)
  */
 @Component
 export struct Nothing {
+  // 是否为未启用样式
+  @State isNotEnabled: boolean = false
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   //二级文本色，深灰色
@@ -688,7 +691,7 @@ export struct Nothing {
         .fontSize(32)
         .fontColor([this.icon_primary])
         .margin({bottom: 4 })
-      Text(getResourceString($r('app.string.none'), this) + getResourceString(this.name, this))
+      Text(getResourceString(this.isNotEnabled ? $r('app.string.not_enabled') : $r('app.string.none'), this) + getResourceString(this.name, this))
         .fontSize(20)
         .fontColor(this.font_secondary)
         .textAlign(TextAlign.Center)
@@ -945,45 +948,49 @@ export struct menuRowList {
   }
 }
 
-//共用使用流量/总流量+进度条组件
-@Builder
-export function cellularData(info: SubscriptionInfo) {
-  if(SubscriptionInfo.GetTotal(info)?.value > 0){
-    Row() {
-      if (info) {
-        Text(`${SubscriptionInfo.GetUsed(info).toString()} / `)
-          .smallText()
-      } else {
-        Text($r('app.string.usd_cellular_data'))
-          .smallText()
-      }
-      if (info) {
-        Text(`${SubscriptionInfo.GetTotal(info).toString()}`)
-          .smallText()
-      } else {
-        Text($r('app.string.total_cellular_data'))
-          .smallText()
-      }
-    }.padding({ bottom: 4 })
+/**
+ * 使用流量/总流量+进度条组件
+ * @param info SubscriptionInfo
+ */
+@Component
+export struct CellularData {
+  @State info: SubscriptionInfo | null = null
 
-    //
-    Column() {
-      Progress({
-        value: convertToSwitchNub1(SubscriptionInfo.GetUsed(info)?.show ?? 0,SubscriptionInfo.GetTotal(info)!.unit,SubscriptionInfo.GetUsed(info)!.unit),
-        total: SubscriptionInfo.GetTotal(info)?.show ?? 1,
-        type: ProgressType.Capsule
-      })//value为使用流量的值
-        .style({ enableSmoothEffect: true, borderColor: '#00ffffff' })
-        .color('#ff46b1e3')
-        .width('100%')
-        .height('100%')
+  build() {
+    if(SubscriptionInfo.GetTotal(this.info)?.value > 0){
+      Row() {
+        if (this.info) {
+          Text(`${SubscriptionInfo.GetUsed(this.info).toString()} / `)
+            .smallText()
+          Text(`${SubscriptionInfo.GetTotal(this.info).toString()}`)
+            .smallText()
+        } else {
+          Text($r('app.string.usd_cellular_data'))
+            .smallText()
+          Text($r('app.string.total_cellular_data'))
+            .smallText()
+        }
+      }.padding({ bottom: 4 })
+
+      Column() {
+        Progress({
+          value: convertToSwitchNub1(SubscriptionInfo.GetUsed(this.info)?.show ?? 0, SubscriptionInfo.GetTotal(this.info)!.unit,SubscriptionInfo.GetUsed(this.info)!.unit),
+          total: SubscriptionInfo.GetTotal(this.info)?.show ?? 1,
+          type: ProgressType.Capsule
+        })//value为使用流量的值
+          .style({ enableSmoothEffect: true, borderColor: '#00ffffff' })
+          .color('#ff46b1e3')
+          .width('100%')
+          .height('100%')
+      }
+      .width('100%')
+      .backgroundColor('#4d46b1e3')
+      .height(6)
+      .borderRadius(6)
     }
-    .width('100%')
-    .backgroundColor('#4d46b1e3')
-    .height(6)
-    .borderRadius(6)
   }
 }
+
 
 // 副文本样式
 @Extend(Text)

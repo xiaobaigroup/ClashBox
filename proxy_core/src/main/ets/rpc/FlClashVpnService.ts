@@ -24,12 +24,13 @@ import {
 } from 'libflclash.so';
 import { Address, CommonVpnService, isIpv4, isIpv6, VpnConfig } from './CommonVpnService';
 import { JSON, util } from '@kit.ArkTS';
-import { RpcRequest } from './RpcRequest';
+import { RpcRequest, RpcResult } from './RpcRequest';
 import { ClashRpcType } from './IClashManager';
 import { ConnectionInfo, LogInfo, Provider, ProxyGroup, ProxyMode, ProxyType, Traffic } from '../models/Common';
 import { getHome, getProfilePath } from '../appPath';
-import { UpdateConfigParams } from '../models/ClashConfig';
+import { Tun, UpdateConfigParams } from '../models/ClashConfig';
 import { readFile, readFileUri, readText } from '../fileUtils';
+import { startFlClash } from 'libproxy_core.so';
 
 export interface AccessControl{
   mode:              string
@@ -63,7 +64,7 @@ export class FlClashVpnService extends CommonVpnService{
     let request = JSON.parse(decoder.decodeToString(new Uint8Array(message.message))) as RpcRequest
     let code = request.method
     let params = request.params
-    console.debug(`socket stub ${code} request: `, params)
+    console.log(`socket stub ${code} request: `, params)
     if(code == ClashRpcType.setLogObserver){
       // 订阅日志，需要持续输出
       startLog((message: string, value: string)=>{
@@ -80,19 +81,11 @@ export class FlClashVpnService extends CommonVpnService{
           }
         }
       })
-    } else if(code == ClashRpcType.registerOnMessage){
-        registerMessage((message: string, value: string)=>{
-          if (typeof value == "string"){
-            console.log("onMessage", value);
-            this.sendClient(client, value)
-          }else{
-            console.log("onMessage", "undefined");
-          }
-        })
     } else {
       try {
+        console.log(`socket stub ${code} onRemoteMessage: `)
         let result = await this.onRemoteMessage(code, params)
-        console.debug(`socket stub ${code} result: `, result)
+        console.log(`socket stub ${code} result: `, result)
         this.sendClient(client, JSON.stringify({ result: result, error: undefined}))
       } catch (e) {
         console.error(`socket stub ${code} result: `, e.message ?? e, e.stack)
@@ -106,47 +99,16 @@ export class FlClashVpnService extends CommonVpnService{
     return new Promise(async (resolve, reject) => {
       switch (code){
         case ClashRpcType.queryTrafficTotal:{
-          const data = JSON.parse(getTotalTraffic())
-          resolve(JSON.stringify({ upRaw: data["up"], downRaw: data["down"]} as Traffic))
+          resolve(getTotalTraffic())
           break;
         }
         case ClashRpcType.queryTrafficNow:{
-          const data = JSON.parse(getTraffic())
-          resolve(JSON.stringify({ upRaw: data["up"], downRaw: data["down"]} as Traffic))
+          resolve(getTraffic())
           break;
         }
         case ClashRpcType.queryProxyGroup:{
           let result = getProxies()
-          let map = JSON.parse(result as string) as Record<string, string | Record<string, string[] | string>>
-          let groupNames = map[ProxyMode.Global]["all"] as string[]
-          if(data[0] == ProxyMode.Global){
-            groupNames = ["GLOBAL", ...groupNames]
-          } else if(data[0] == ProxyMode.Rule) {
-            groupNames = groupNames
-          }else{
-            groupNames = []
-          }
-          groupNames = groupNames.filter(e => {
-            const proxy = map[e] as Record<string, string>
-            const indexes = ["Selector","URLTest", "Fallback", "LoadBalance", "Relay"].indexOf(proxy["type"])
-            return indexes > -1
-          })
-          const groupsRaw = groupNames.map((groupName) =>{
-            const group = map[groupName];
-            group["proxies"] = (group["all"] ?? []).map((n:string) =>{
-              map[n]["name"] = map[n]["name"]
-              return map[n]
-            }).filter((d: string) => d != null && d != undefined)
-            return {
-              name: group["name"] as string,
-              now: group["now"] as string,
-              type: group["type"] as ProxyType,
-              hidden: group["hidden"] == true,
-              icon: group["icon"] as string,
-              proxies: group["proxies"]
-            } as ProxyGroup
-          })
-          resolve(JSON.stringify(groupsRaw))
+          resolve(result)
           break;
         }
         case ClashRpcType.getRequestList: {
@@ -170,11 +132,7 @@ export class FlClashVpnService extends CommonVpnService{
             "proxy-name": data[0] as string,
             timeout: data[1] as string,
           })).then((v)=>{
-            if (v != ""){
-              resolve(JSON.parse(v)["value"])
-            }else{
-              resolve(-1)
-            }
+            resolve(v)
           }).catch((e)=> {
             console.error("healthCheck error", e)
             resolve(0)
@@ -196,8 +154,7 @@ export class FlClashVpnService extends CommonVpnService{
         case ClashRpcType.uploadProvider: {
           let provider = data[0] as string
           let pathUri = data[1] as string
-          const temp = this.context.filesDir + "/temp_provider"
-          const buffer = await readFileUri(pathUri, temp)
+          const buffer = await readFile(pathUri)
           sideLoadExternalProvider(provider, buffer).then((v)=>{
             resolve(v)
           })
@@ -205,8 +162,7 @@ export class FlClashVpnService extends CommonVpnService{
         }
         case ClashRpcType.queryConnections:{
           let v = await getConnections()
-          let payload = JSON.parse(v)["connections"] as ConnectionInfo
-          resolve(payload ? JSON.stringify(payload) : "[]")
+          resolve(v)
           break;
         }
         case ClashRpcType.closeConnection:{
@@ -231,8 +187,6 @@ export class FlClashVpnService extends CommonVpnService{
         }
         case ClashRpcType.load:{
           const parms = JSON.parse(data[0] as string) as UpdateConfigParams
-          // 兼容clashMeta的路径
-          parms['profile-id'] =  parms['profile-id'] + "/config"
           updateConfig(JSON.stringify(parms)).then(e=>{
             resolve(e)
           })
@@ -244,8 +198,7 @@ export class FlClashVpnService extends CommonVpnService{
           break;
         }
         case ClashRpcType.validConfig: {
-          const profileId = data[0] as string
-          let filePath = await getProfilePath(this.context, profileId)
+          const filePath = data[0] as string
           let raw = await readText(filePath)
           resolve(await validateConfig(raw))
           break;
@@ -303,17 +256,47 @@ export class FlClashVpnService extends CommonVpnService{
     let tunFd = -1
     try {
       tunFd = await super.getTunFd(config)
-      if(tunFd > -1){
-        startTun(tunFd, async (id: number, fd: number) => {
-          await this.protect(fd)
-          setFdMap(id)
-        })
+      if (tunFd > -1){
+        this.startClash(tunFd)
       }
       return tunFd > -1;
     } catch (error) {
+      console.error("ClashVPN  error ", error)
       return false
     }
   }
+
+  startClash(tunFd:number){
+    let tcp: socket.LocalSocket = socket.constructLocalSocketInstance();
+    tcp.on('message', async (value: socket.LocalSocketMessageInfo) => {
+      let text = new util.TextDecoder()
+      let dd = text.decodeToString(new Uint8Array(value.message))
+      let list = dd.split("EOF")
+      for (let index = 0; index < list.length; index++) {
+        const element = list[index];
+        try {
+          if (element != ""){
+            let json = JSON.parse(element) as RpcResult
+            let fd = JSON.parse(json.result as string) as Fd
+            await this.protect(fd.value)
+            setFdMap(fd.id)
+          }
+        }catch (e) {
+          console.error("ClashVPN protect error", e.message, element)
+        }
+      }
+    })
+    const socketPath = this.context?.filesDir + '/clash_go.sock'
+    console.error("ClashVPN connect", tunFd)
+    tcp.connect({address: { address: socketPath }, timeout:1000}).then(()=>{
+      console.error("ClashVPN connect", tunFd)
+      tcp.send({ data: JSON.stringify({method: ClashRpcType.startClash, params:[tunFd]}) });
+    }).catch((e)=>{
+       console.error("ClashVPN  error ",e.message, e)
+    })
+  }
+
+
   stopVpn(){
     stopTun()
     super.stopVpn()
@@ -321,4 +304,42 @@ export class FlClashVpnService extends CommonVpnService{
   override async init(){
     initClash(await getHome(this.context), "1.0.0")
   }
+}
+
+export interface Fd {
+  id: number
+  value: number
+}
+
+export function ParseProxyGroup(mode, result: string){
+  let map = JSON.parse(result) as Record<string, string | Record<string, string[] | string>>
+  let groupNames = map[ProxyMode.Global]["all"] as string[]
+  if(mode == ProxyMode.Global){
+    groupNames = ["GLOBAL", ...groupNames]
+  } else if(mode == ProxyMode.Rule) {
+    groupNames = groupNames
+  }else{
+    groupNames = []
+  }
+  groupNames = groupNames.filter(e => {
+    const proxy = map[e] as Record<string, string>
+    const indexes = ["Selector","URLTest", "Fallback", "LoadBalance", "Relay"].indexOf(proxy["type"])
+    return indexes > -1
+  })
+  const groupsRaw = groupNames.map((groupName) =>{
+    const group = map[groupName];
+    group["proxies"] = (group["all"] ?? []).map((n:string) =>{
+      map[n]["name"] = map[n]["name"]
+      return map[n]
+    }).filter((d: string) => d != null && d != undefined)
+    return {
+      name: group["name"] as string,
+      now: group["now"] as string,
+      type: group["type"] as ProxyType,
+      hidden: group["hidden"] == true,
+      icon: group["icon"] as string,
+      proxies: group["proxies"]
+    } as ProxyGroup
+  })
+  return groupsRaw;
 }

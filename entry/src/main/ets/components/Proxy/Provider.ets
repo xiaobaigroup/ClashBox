@@ -1,6 +1,6 @@
 import { BreakpointState } from "../../common/breakpointsystem"
 import { BIND_SHEET_TITLE_CONTAINER_HEIGHT, BORDER_RADIUS_20, CONTENT_END_OFFSET_150 } from "../../common/Constants"
-import { cellularData, Nothing, proxyBindSheetTitleStyle, theCustomDialog } from "../Common"
+import { CellularData, Nothing, proxyBindSheetTitleStyle, theCustomDialog } from "../Common"
 import { convertTime } from "../../utils/TimeConvertUtil"
 import { ClashConfig, SubscriptionInfo } from 'proxy_core'
 import ClashViewModel from '../../entryability/ClashViewModel'
@@ -166,8 +166,8 @@ export struct ProviderPage {
                             }
                           }
 
-                          //流量使用情况+进度条组件
-                          cellularData(item["subscription-info"])
+                          // 流量使用情况+进度条组件
+                          CellularData({ info: item["subscription-info"] })
 
                         }.height(87).textColumn()
 

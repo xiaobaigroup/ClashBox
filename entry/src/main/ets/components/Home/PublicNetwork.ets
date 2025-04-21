@@ -32,8 +32,8 @@ struct PublicNetwork {
   @Consume isShowHomeEdit: boolean
   // 折叠屏展开状态判定
   @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
-  //收藏与ping延迟即时动作
-  private PromptAction:PromptAction = this.getUIContext()?.getPromptAction()
+  // 收藏与ping延迟即时动作
+  private PromptAction: PromptAction = this.getUIContext()?.getPromptAction()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @Consume remoteIp: IpInfo | null
   aboutToAppear(): void {
@@ -68,7 +68,7 @@ struct PublicNetwork {
           .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
           .backgroundColor($r('app.color.home_card_background'))
           .onClick(() => {
-            //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
+            // 在home页编辑卡片状态时，无法操作，点击回调写在if判定里
             if (this.isShowHomeEdit === false) {
                 this.remoteIp = null
                 EventHub.sendEvent(EventKey.checkIpInfo)

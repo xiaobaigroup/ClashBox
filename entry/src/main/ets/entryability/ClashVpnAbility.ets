@@ -15,6 +15,7 @@ export default class ClashVpnAbility extends VpnExtensionAbility {
       console.log("ClashNext", `启用核心 ${core}`);
       this.clashStubService = new SocketStubService(core, this.context)
       await this.clashStubService.startService()
+      console.log("ClashNext", `启用核心 ${core} 成功`);
     } catch (e) {
       console.log("ClashNext", `启用VPN失败 ${e.message} ${e.stack}`);
     }

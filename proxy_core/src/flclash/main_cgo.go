@@ -2,6 +2,7 @@
 
 package main
 
+//#include "bridge.h"
 import "C"
 import (
 	"core/state"
@@ -26,6 +27,7 @@ func startTun(env js.Env, this js.Value, args []js.Value) any {
 	tunFd, _ := napi.GetValueInt32(env.Env, args[0].Value)
 	tsfn := env.CreateThreadsafeFunction(args[1], "startTun")
 	StartTUN(int(tunFd), func(fd Fd) {
+
 		tsfn.Call(env.ValueOf(fd.Id), env.ValueOf(fd.Value))
 	})
 	return nil
@@ -71,7 +73,6 @@ func changeProxy(env js.Env, this js.Value, args []js.Value) any {
 
 func getTraffic(env js.Env, this js.Value, args []js.Value) any {
 	onlyProxy := true
-	handleGetTraffic(onlyProxy)
 	return handleGetTraffic(onlyProxy)
 }
 func getTotalTraffic(env js.Env, this js.Value, args []js.Value) any {
@@ -221,6 +222,7 @@ func getRequestList(env js.Env, this js.Value, args []js.Value) any {
 	json, _ := json.Marshal(reqeustList)
 	return env.ValueOf(string(json))
 }
+
 func clearRequestList(env js.Env, this js.Value, args []js.Value) any {
 	reqeustList = []statistic.Tracker{}
 	return env.ValueOf("")
@@ -233,6 +235,12 @@ func stopListener(env js.Env, this js.Value, args []js.Value) any {
 	handleStopListener()
 	return env.ValueOf("")
 }
+func startIpc(env js.Env, this js.Value, args []js.Value) any {
+	path, _ := napi.GetValueStringUtf8(env.Env, args[0].Value)
+	go startIpcProxy(path)
+	return env.ValueOf("")
+}
+
 func init() {
 	entry.Export("initClash", js.AsCallback(initClash))
 	entry.Export("startTun", js.AsCallback(startTun))
@@ -259,6 +267,7 @@ func init() {
 	entry.Export("updateGeoData", js.AsCallback(updateGeoData))
 	entry.Export("startListener", js.AsCallback(startListener))
 	entry.Export("stopListener", js.AsCallback(stopListener))
+	entry.Export("startIpc", js.AsCallback(startIpc))
 
 	entry.Export("updateDns", js.AsCallback(updateDns))
 	entry.Export("startLog", js.AsCallback(startLog))
@@ -273,17 +282,17 @@ func init() {
 }
 
 func sendMessage(message Message) {
-	res, err := message.Json()
+	_, err := message.Json()
 	if err != nil {
 		return
 	}
 	runLock.Lock()
 	defer runLock.Unlock()
-	if handler, ok := messageHandlers["messageTsfn"]; ok {
-		key := handler.Env.ValueOf("")
-		value := handler.Env.ValueOf(res)
-		handler.Call(key, value)
-	}
+	// if handler, ok := messageHandlers["messageTsfn"]; ok {
+	// 	key := handler.Env.ValueOf("")
+	// 	value := handler.Env.ValueOf(res)
+	// 	handler.Call(key, value)
+	// }
 }
 
 func main() {

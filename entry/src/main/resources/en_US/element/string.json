@@ -313,8 +313,12 @@
       "value": "Allow LAN"
     },
     {
-      "name": "IPv6",
-      "value": "IPv6"
+      "name": "only_proxy",
+      "value": "Only proxy traffic is counted"
+    },
+    {
+      "name": "only_proxy_subtitle",
+      "value": "The home page card only counts proxy traffic"
     },
     {
       "name": "UnifiedLatency",
@@ -1855,6 +1859,22 @@
     {
       "name": "disabled",
       "value": "Disabled "
+    },
+    {
+      "name": "overwrite_restart_tips",
+      "value": "Please restart the application after changing the override settings"
+    },
+    {
+      "name": "updating_config",
+      "value": "Configuration update in progress..."
+    },
+    {
+      "name": "updated_success_config",
+      "value": "Configuration updated successfully"
+    },
+    {
+      "name": "failed_load_config",
+      "value": "Failed to load configuration"
     }
   ]
 }

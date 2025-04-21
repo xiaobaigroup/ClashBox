@@ -77,8 +77,11 @@ export class Profile {
     },connectTimeout: 5000, readTimeout: 5000, })
     const disposition = resp.header["content-disposition"] as string
     const userinfo = resp.header["subscription-userinfo"] as string
+
     if (!this.name || this.name == "") {
       this.name = getFileNameForDisposition(disposition) ?? this.id
+    }
+    if(userinfo){
       this.subscriptionInfo = SubscriptionInfo.formHString(userinfo)
     }
     if (resp.result) {
@@ -98,7 +101,7 @@ export class Profile {
     await fs.write(file.fd, bytes.buffer)
     await fs.fsync(file.fd)
     await fs.close(file.fd)
-    let message = await vailConfig(this.id);
+    let message = await vailConfig(filePath);
     if (message != "") {
       this.delete()
       throw new Error(message);
