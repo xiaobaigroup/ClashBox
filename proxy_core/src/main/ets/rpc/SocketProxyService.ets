@@ -290,11 +290,17 @@ export class SocketProxyService implements IClashManager {
       tcp.on('message', (value: socket.LocalSocketMessageInfo) => {
         let text = new util.TextDecoder()
         let dd = text.decodeToString(new Uint8Array(value.message))
-        try {
-          let json = JSON.parse(dd.replace("EOF","")) as RpcResult
-          callBack(json.result as string)
-        }catch (e) {
-          console.debug("log err", e.message, dd)
+        let list = dd.split("EOF")
+        for (let index = 0; index < list.length; index++) {
+          const element = list[index];
+          try {
+            if (element != ""){
+              let json = JSON.parse(element) as RpcResult
+              callBack(json.result as string)
+            }
+          }catch (e) {
+            console.error("log error", e.message, element)
+          }
         }
       })
       tcp.on('error', (e: Error) => {

@@ -661,7 +661,7 @@ struct Index {
   async saveLog(uri: string){
     try {
       let file = fs.openSync(uri, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE );
-      let message = this.logListData.map((d) => d.logType + " " + timestampToDateTime(d.logTime + 1000) + "\n" + d.LogDetails).join("\n")
+      let message = this.logListData.map((d) => d.logType + " " + timestampToDateTime(d.logTime * 1000) + "\n" + d.LogDetails).join("\n")
       fs.writeSync(file.fd, message);
       fs.fsync(file.fd);
     }catch (e) {
