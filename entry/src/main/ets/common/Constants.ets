@@ -66,6 +66,29 @@ export const ANIMATION_DURATION_500: number = 500
  */
 export const CONTENT_END_OFFSET_150: number = 150
 
+// 默认更新信息
+export const DefaultUpdateInfo: UpdateInfo = {
+  tag_name: '1.0.0',
+  name: '1.2.3',
+  published_at: '2024-01-28T15:13:58Z',
+  browser_download_url: '',
+  body: ''
+}
+
+// 实验功能开关列表行数据
+export const TheExperimentData: AboutListItemProp = {
+  title: 'Experiment',
+  subtitle: '',
+  name: '',
+  children: [
+    { title: $r('app.string.experimental_function'),
+      subtitle: $r('app.string.experimental_function_Subtitle'),
+      sign: 1,
+      name: 'ExperimentalFunction',
+      isOn: true },
+  ]
+}
+
 // enum：routeName
 export enum RouteName {
   IMPORT_CONFIG_FROM_URL = 'ImportConfigFromURL',
@@ -863,6 +886,62 @@ export interface MarginGenerate {
   left: number, top: number, right: number,
   bottom?:number
 }
+
+export const CompStr: BreakpointState<string> = BreakpointState.of({
+  sm: "sm",
+  md: "md",
+  lg: "lg",
+  xl: "xl"
+})
+
+export const TabTitlefontSize_12_16: BreakpointState<number> = BreakpointState.of({
+  sm: 12,
+  md: 16,
+  lg: 16,
+  xl: 16
+})
+
+export const TabIconfontSize_24_29: BreakpointState<number> = BreakpointState.of({
+  sm: 24,
+  md: 29,
+  lg: 29,
+  xl: 29
+})
+
+export const TabBarHeight: BreakpointState<string> = BreakpointState.of({
+  sm: '77vp',
+  md: '77vp',
+  lg: '77vp',
+  xl: '100%'
+})
+
+export const TabBarWidth: BreakpointState<string> = BreakpointState.of({
+  sm: '100%',
+  md: '100%',
+  lg: '100%',
+  xl: '67vp'
+})
+
+export const TabVertical: BreakpointState<boolean> = BreakpointState.of({
+  sm: false,
+  md: false,
+  lg: false,
+  xl: true
+})
+
+export const TabBarPose: BreakpointState<BarPosition> = BreakpointState.of({
+  sm: BarPosition.End,
+  md: BarPosition.End,
+  lg: BarPosition.End,
+  xl: BarPosition.Start
+})
+
+export const TabDirection: BreakpointState<FlexDirection> = BreakpointState.of({
+  sm: FlexDirection.Column,
+  md: FlexDirection.Column,
+  lg: FlexDirection.Column,
+  xl: FlexDirection.Column
+})
 
 /**
  * 主页卡片内边距
