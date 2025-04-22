@@ -1,3 +1,6 @@
 [submodule "proxy_core/src/flclash/core"]
 	path = proxy_core/src/flclash/core
 	url = https://github.com/xfz347/Clash.Meta.git
+[submodule "proxy_core/src/flclash/gvisor-ohos"]
+	path = proxy_core/src/flclash/gvisor-ohos
+	url = https://github.com/likuai2010/gvisor-ohos.git

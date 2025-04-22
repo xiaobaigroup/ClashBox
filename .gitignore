@@ -22,3 +22,4 @@
 /.idea
 **/build
 /.hvigor
+proxy_core/src/flclash/libflclash.so
