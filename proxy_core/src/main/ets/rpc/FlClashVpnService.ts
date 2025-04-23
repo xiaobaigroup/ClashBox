@@ -312,8 +312,11 @@ export interface Fd {
 }
 
 export function ParseProxyGroup(mode, result: string){
-  let map = JSON.parse(result) as Record<string, string | Record<string, string[] | string>>
-  let groupNames = map[ProxyMode.Global]["all"] as string[]
+  if(result == null)
+    return []
+  const map = JSON.parse(result) as Record<string, string | Record<string, string[] | string>>
+  const global = map[ProxyMode.Global]
+  let groupNames =global?.["all"] as string[] ?? []
   if(mode == ProxyMode.Global){
     groupNames = ["GLOBAL", ...groupNames]
   } else if(mode == ProxyMode.Rule) {
