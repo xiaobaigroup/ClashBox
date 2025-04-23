@@ -69,7 +69,6 @@ struct Home {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @State rotateAngle : number  = 0
-
   windowClass = AppStorage.get<window.Window>('windowClass') as window.Window;
   // 编辑按钮点击后显示编辑状态判定
   @Provide @Watch('ShowHomeEditChange')isShowHomeEdit: boolean = false
@@ -158,6 +157,9 @@ struct Home {
   // 节点数据
   @Consume proxyLazyItems: ProxyItemDataSource
   @Consume ("currentProfile") currentProfile: Profile | null
+//px外屏隐藏top和tab偏移
+  @Consume heightTop: number
+  @Consume curOffsetRemain: number
 
   aboutToAppear(): void {
     this.greetings = getGreeting()
@@ -313,7 +315,6 @@ struct Home {
     .width(40)
     .height(40)
     .backgroundColor($r('app.color.settings_container_background'))
-    .visibility((this.isRolling && this.isSmallSquareScreen) ? Visibility.Hidden : Visibility.Visible)
     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
     .onClick(() => {
       onCheck()
@@ -384,21 +385,19 @@ struct Home {
           }
         }
         .zIndex(1)
-        .height((this.isRolling && this.isSmallSquareScreen) ? 0 : (this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT))
-        .position({x: 0})
+        .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
+        .position({x: 0,y:this.isRolling && this.isSmallSquareScreen?this.heightTop:0})
         .width('100%')
         .geometryTransition("Button")
         .padding({
           left: this.breakPointStateTabContentTitleMargin.value,
           right: this.breakPointStateTabContentTitleMargin.value,
         })
-        // transition保证组件离场不被立即析构，可设置其他转场效果
-     //   .transition(this.uiConfig.isAnimation ? TransitionEffect.OPACITY:null)
       }
 
       Stack({ alignContent: this.stackAlignContentAlignment }) {
         Column(){
-          Blank().height(this.isLandscapePhone || (this.isRolling && this.isSmallSquareScreen) ? 0 : TAB_CONTENT_TITLE_HEIGHT)
+          Blank().height(this.isLandscapePhone || (this.isRolling && this.isSmallSquareScreen) ? this.heightTop : TAB_CONTENT_TITLE_HEIGHT)
           Scroll() {
             // 主页卡片层
             List() {
@@ -808,18 +807,27 @@ struct Home {
             })
           }
           .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)
-          .onScrollStart(() => {
-            this.isRolling = true
+          .onScrollFrameBegin((offset: number) => {
+            this.curOffsetRemain  += offset
+            if (offset>0) {
+              this.isRolling = true
+            }else if(offset<0){
+              this.isRolling = false
+              this.curOffsetRemain = 0
+            }
+            console.info("offsetRemain:" + offset + '/' +this.curOffsetRemain);
+            return { offsetRemain: offset }
           })
           .onScrollStop(() => {
-            this.isRolling = false
+          //  this.isRolling = false
+
           })
           .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {
             // 累计计算当前父组件滚动在Y轴方向的偏移量
             if (this.uiConfig.isAnimation){
               this.curYOffset += yOffset
             }
-            console.info("yOffset" + this.curYOffset);
+            console.info("yOffset:" + yOffset);
           })
         }
 
@@ -852,7 +860,7 @@ struct Home {
             offsetY: 4,
             type: ShadowType.BLUR
           })
-          .margin({bottom: this.isLandscapePhone || !this.uiConfig.isBlurr || (this.isRolling && this.isSmallSquareScreen) ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
+        .margin({bottom: this.isLandscapePhone || !this.uiConfig.isBlurr || (this.isRolling && this.isSmallSquareScreen) ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
           .width(this.proxyEnabled ? $r('app.integer.vp_proxy_started_button_width') : $r('app.integer.vp_proxy_not_start_button_width'))
           .height(this.proxyStartButtonHeight)
           .clip(true)

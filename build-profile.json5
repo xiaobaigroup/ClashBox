@@ -5,20 +5,33 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashNEXT_oIk8J3Ej7FE8LEqFvYEotMh8OOH8DvSrSYhuXSPnjio=.cer",
+          "certpath": "C:\\Users\\Administrator\\.ohos\\config\\default_clashnext_Apnc9t_FUReHaFfg8Vz9lpnZZJ7DvWIe8Dh4lmf_dwI=.cer",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001B5B83CDF0149415BCDAC9434C339D9CF14595633BEBD5565594BDAE45069C037D0E56CFA4377BE4",
-          "profile": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashNEXT_oIk8J3Ej7FE8LEqFvYEotMh8OOH8DvSrSYhuXSPnjio=.p7b",
+          "keyPassword": "0000001AAFD3DA2AF1B32638692B40FC496638C93D15E32E4830D0FDFF71AB2EED52C894B7457411261C",
+          "profile": "C:\\Users\\Administrator\\.ohos\\config\\default_clashnext_Apnc9t_FUReHaFfg8Vz9lpnZZJ7DvWIe8Dh4lmf_dwI=.p7b",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashNEXT_oIk8J3Ej7FE8LEqFvYEotMh8OOH8DvSrSYhuXSPnjio=.p12",
-          "storePassword": "0000001BF9D03ED97D6AFDA3F5A5F38B79D8E81138A6CF72C4EB0713F0F1EE268676B5E4CCE1250FDB850E"
+          "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\default_clashnext_Apnc9t_FUReHaFfg8Vz9lpnZZJ7DvWIe8Dh4lmf_dwI=.p12",
+          "storePassword": "0000001A793AA1CF0CBFB8EF4CC968B08D3C97306241B7B4B011E0BE2DC9BA632490EC9ACDCDD684D510"
+        }
+      },
+      {
+        "name": "usePX",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "C:\\Users\\Administrator\\.ohos\\config\\usePX_clashnext_Apnc9t_FUReHaFfg8Vz9lpnZZJ7DvWIe8Dh4lmf_dwI=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001B11B79F18D67B014489CBEECCC3A94C1F85BC67B71AE9D0D74124C2867385E4454038C15AB1A2A7",
+          "profile": "C:\\Users\\Administrator\\.ohos\\config\\usePX_clashnext_Apnc9t_FUReHaFfg8Vz9lpnZZJ7DvWIe8Dh4lmf_dwI=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\usePX_clashnext_Apnc9t_FUReHaFfg8Vz9lpnZZJ7DvWIe8Dh4lmf_dwI=.p12",
+          "storePassword": "0000001B18DE747E11EF5159F6BFBE24B6A5FCAFC32B9F943C2B9115C1A1A75C6A1652A31F43CCCCF7643E"
         }
       }
     ],
     "products": [
       {
         "name": "default",
-        "signingConfig": "default",
+        "signingConfig": "usePX",
         "compatibleSdkVersion": "5.0.0(12)",
         "targetSdkVersion": "5.0.2(14)",
         "runtimeOS": "HarmonyOS",

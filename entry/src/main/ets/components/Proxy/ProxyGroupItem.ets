@@ -161,6 +161,8 @@ struct ProxyGroupItem {
   // 代理页延迟按钮气泡提示
   @Consume isShowDelayPop: boolean
   @Consume isRolling: boolean
+  //px外屏隐藏top和tab偏移
+  @Consume curOffsetRemain: number
 
   /**
    * XXX 当前手指触摸的ListItem的对应 `this.configList` 中的 `configId`
@@ -376,11 +378,16 @@ struct ProxyGroupItem {
         })
       }, (item: ProxyItem,i: number) => item.name + '-' + i.toString())
     }
-    .onScrollStart(() => {
-      this.isRolling = true
-    })
-    .onScrollStop(() => {
-      this.isRolling = false
+    .onScrollFrameBegin((offset: number) => {
+      this.curOffsetRemain  += offset
+      if (offset>0) {
+        this.isRolling = true
+      }else if(offset<0){
+        this.isRolling = false
+        this.curOffsetRemain = 0
+      }
+      console.info("offsetRemain:" + offset + '/' +this.curOffsetRemain);
+      return { offsetRemain: offset }
     })
     .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : this.breakPointStateListLanes.value,
       this.breakPointStateListGutter.value)

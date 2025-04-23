@@ -20,6 +20,8 @@ struct ProxyArrangement {
   @Consume curYOffset: number
   @State selectItem: number = 0
   @State currentIndex: number =0
+  //px外屏隐藏top和tab偏移
+  @Consume curOffsetRemain: number
   // 代理原始数据
   @Consume theProxyGroups: ProxyGroup[]
   @Consume proxyGroups: ProxyGroupItemDataSource
@@ -125,11 +127,16 @@ struct ProxyArrangement {
     .chainAnimation(true)
     .scrollBar(BarState.Off)
     .edgeEffect(EdgeEffect.Spring)
-    .onScrollStart(() => {
-      this.isRolling = true
-    })
-    .onScrollStop(() => {
-      this.isRolling = false
+    .onScrollFrameBegin((offset: number) => {
+      this.curOffsetRemain  += offset
+      if (offset>0) {
+        this.isRolling = true
+      }else if(offset<0){
+        this.isRolling = false
+        this.curOffsetRemain = 0
+      }
+      console.info("offsetRemain:" + offset + '/' +this.curOffsetRemain);
+      return { offsetRemain: offset }
     })
     .nestedScroll({
       scrollForward: NestedScrollMode.PARENT_FIRST,

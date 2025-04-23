@@ -71,6 +71,9 @@ struct MorePage {
   private breakPointStateTabContentTitleMargin: BreakpointState<number>
   //更多页一级页面顶部标题偏移量
   @Consume curYOffsetMore: number
+  //px外屏隐藏top和tab偏移
+  @Consume heightTop: number
+  @Consume curOffsetRemain: number
   /**
    * 查询IP地址弹窗控制器
    */
@@ -193,8 +196,8 @@ struct MorePage {
         }
         .width('100%')
         .zIndex(1)
-        .height((this.isRolling && this.isSmallSquareScreen) ? 0 : (this.curYOffsetMore < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffsetMore : TAB_CONTENT_TITLE_HEIGHT))
-        .position({ x: 0 })
+        .height(this.curYOffsetMore < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffsetMore : TAB_CONTENT_TITLE_HEIGHT)
+        .position({x: 0,y:this.isRolling && this.isSmallSquareScreen?this.heightTop:0})
         .backgroundColor($r('app.color.background'))
         .transition(customAnimationUtil.isSlide(0, this.uiConfig))
         .padding({
@@ -267,14 +270,19 @@ struct MorePage {
               scrollBackward: NestedScrollMode.SELF_FIRST
             })
           }
-          .padding({top: (this.isRolling && this.isSmallSquareScreen) ? 0 : TAB_CONTENT_TITLE_HEIGHT})
+          .padding({top: (this.isRolling && this.isSmallSquareScreen) ? this.heightTop : TAB_CONTENT_TITLE_HEIGHT})
           .height('100%')
           .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring: null)
-          .onScrollStart(() => {
-            this.isRolling = true
-          })
-          .onScrollStop(() => {
-            this.isRolling = false
+          .onScrollFrameBegin((offset: number) => {
+            this.curOffsetRemain  += offset
+            if (offset>0) {
+              this.isRolling = true
+            }else if(offset<0){
+              this.isRolling = false
+              this.curOffsetRemain = 0
+            }
+            console.info("offsetRemain:" + offset + '/' +this.curOffsetRemain);
+            return { offsetRemain: offset }
           })
           .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {
             // 累计计算当前父组件滚动在Y轴方向的偏移量

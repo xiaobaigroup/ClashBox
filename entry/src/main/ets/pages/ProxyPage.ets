@@ -121,7 +121,9 @@ struct ProxyPage {
   @Consume isShowDelayPop: boolean
   // Index页tab栏竖直状态
   @Consume compVertical: BreakpointState<boolean>
-
+  //px外屏隐藏top和tab偏移
+  @Consume heightTop: number
+  @Consume curOffsetRemain: number
 
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
@@ -164,7 +166,7 @@ struct ProxyPage {
     .width(40)
     .height(40)
     .backgroundColor($r('app.color.settings_container_background'))
-    .visibility((this.isRolling && this.isSmallSquareScreen) ? Visibility.Hidden : Visibility.Visible)
+    //.visibility((this.isRolling && this.isSmallSquareScreen) ? Visibility.Hidden : Visibility.Visible)
     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
     .onClick(() => {
       onCheck()
@@ -265,8 +267,8 @@ struct ProxyPage {
         })
       }
       .zIndex(1)
-      .height((this.isRolling && this.isSmallSquareScreen) ? 0 : (this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT))
-      .position({x: 0})
+      .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
+      .position({x: 0,y:this.isRolling && this.isSmallSquareScreen?this.heightTop:0})
       .alignItems(VerticalAlign.Center)
       .width('100%')
       .padding({
@@ -280,7 +282,7 @@ struct ProxyPage {
       } else {
         Stack({ alignContent: this.stackAlignContentAlignment }) {
           Column() {
-            Blank().height((this.isRolling && this.isSmallSquareScreen) ? 0 : TAB_CONTENT_TITLE_HEIGHT)
+            Blank().height((this.isRolling && this.isSmallSquareScreen) ? this.heightTop : TAB_CONTENT_TITLE_HEIGHT)
             Scroll() {
               // 标签分组页 start
               Column() {
@@ -376,6 +378,17 @@ struct ProxyPage {
                 this.curYOffset += yOffset
               }
               hilog.info(0xFF00, "ProxyPageTag", "yOffset: %{public}d", this.curYOffset)
+            })
+            .onScrollFrameBegin((offset: number) => {
+              this.curOffsetRemain  += offset
+              if (offset>0) {
+                this.isRolling = true
+              }else if(offset<0){
+                this.isRolling = false
+                this.curOffsetRemain = 0
+              }
+              console.info("offsetRemain:" + offset + '/' +this.curOffsetRemain);
+              return { offsetRemain: offset }
             })
           }
 

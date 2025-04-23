@@ -54,7 +54,8 @@ import {
   TabBarPose,
   TabDirection,
   CompStr,
-  TheExperimentData
+  TheExperimentData,
+  TAB_CONTENT_TITLE_HEIGHT
 } from '../common/Constants'
 import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/ProxyData'
 import { ClashConfig, IpInfo, LogLevel, Profile, ProxyGroup, ProxyMode } from 'proxy_core'
@@ -126,7 +127,7 @@ struct Index {
   // 主界面选择的index
   @State selectedIndex: number = 0
   // 小方屏
-  @Provide isSmallSquareScreen: boolean = false
+  @Provide @Watch('isHiddenChange')isSmallSquareScreen: boolean = false
   // 设备高度是否 (320vp< height <= 500vp) 媒体查询
   @State isLandscapePhone: boolean = false
   // 平板竖屏判断变量
@@ -312,7 +313,7 @@ struct Index {
   // 是否进入二级界面(Tab区)
   @Provide @Watch('isSecondaryChange') isSecondary: boolean = false
   // 列表是否滚动
-  @Provide @Watch('isSecondaryChange') isRolling: boolean = false
+  @Provide @Watch('isHiddenChange') isRolling: boolean = false
   // 更多页数据
   @Provide moreList: moreData[] = ListMoreData()
   // 实验功能开关列表行数据
@@ -799,47 +800,97 @@ struct Index {
     }
   }
 
-  @State barHeight: number | ResourceStr | undefined = 0
+  @State barHeight: string | number | undefined = this.compBarHeight.value
 
   // tab移动动画
   startAnim() {
     indexController.setTabBarTranslate({ y: 0 })
     animateTo({
       duration: this.uiConfig.animationSpeed,
-      curve: curves.springMotion(),
+      curve: Curve.Linear,
       iterations: 1,
       playMode: PlayMode.Normal,
-    }, async () => {
-      indexController.setTabBarTranslate(this.isLandscapePhone ? { x: '-100%' } : { y: '100%' })
-    setTimeout(()=> {
-      this.barHeight = 0
-    },100)
+    }, () => {
+        if (this.uiConfig.isBlurr) {
+          indexController.setTabBarTranslate(this.isLandscapePhone ? { x: '-100%' } : { y: '100%' })
+        } else {
+          this.barHeight = 0
+        }
     })
   }
 
   stopAnim() {
     animateTo({
       duration: this.uiConfig.animationSpeed,
-      curve: curves.springMotion(),
+      curve: Curve.Linear,
       iterations: 1,
       playMode: PlayMode.Normal,
     }, async () => {
-     indexController.setTabBarTranslate(this.isLandscapePhone ? { x: 0 } : { y: 0 })
-    setTimeout(()=>{
-      this.barHeight = this.compBarHeight.value
-    }, this.isSmallSquareScreen ? 2000 : 100)
+      if (!this.isSmallSquareScreen || !this.isRolling) {
+        if (this.uiConfig.isBlurr) {
+          indexController.setTabBarTranslate(this.isLandscapePhone ? { x: 0 } : { y: 0 })
+        }else{
+          this.barHeight = this.compBarHeight.value
+        }
+      }
     })
   }
 
   isSecondaryChange() {
     // 监听二级页面布尔判定动画是否执行 监听小屏是否滚动
-    if (this.isSecondary || (this.isSmallSquareScreen && this.isRolling)) {
-     // this.stopAnim()
+    if ((this.isSecondary && this.isSmallSquareScreen && !this.isRolling)|| (this.isSecondary && !this.isSmallSquareScreen )) {
       this.startAnim()
     } else {
       this.stopAnim()
     }
   }
+
+  /*
+    px外屏手势动画
+   */
+  @Provide heightTop: Length = TAB_CONTENT_TITLE_HEIGHT
+  @Provide curOffsetRemain: number = 0
+  //tab隐藏
+  startAnimPX(){
+    animateTo({
+      duration: this.uiConfig.animationSpeed,
+      curve: Curve.Linear,
+      iterations: 1,
+      playMode: PlayMode.Normal,
+    }, () => {
+      if (this.uiConfig.isBlurr) {
+        indexController.setTabBarTranslate({ y: '100%' })
+      }else {
+        this.barHeight = 0
+      }
+      this.heightTop = -TAB_CONTENT_TITLE_HEIGHT
+    })
+  }
+
+  //tab显示
+  stopAnimPX(){
+    animateTo({
+      duration: this.uiConfig.animationSpeed,
+      curve: Curve.EaseOut,
+      iterations: 1,
+      playMode: PlayMode.Normal,
+    }, () => {
+      if (this.uiConfig.isBlurr) {
+        indexController.setTabBarTranslate({ y: 0 })
+      }else {
+        this.barHeight = 77
+      }
+      this.heightTop = TAB_CONTENT_TITLE_HEIGHT
+    })
+  }
+//监听上下滚动时，tab是否隐藏
+  isHiddenChange(){
+    if (this.isSmallSquareScreen && this.isRolling){
+      this.startAnimPX()
+    } else {
+      this.stopAnimPX()
+    }
+  }// px外屏手势动画 end
 
   build() {
     Stack() {
@@ -891,7 +942,7 @@ struct Index {
         .scrollable(this.isSecondary ? false : true)
         .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
         .barWidth(this.isLandscapePhone ? '77vp' : this.tabBarWidth.value) /**/
-        .barHeight(this.isLandscapePhone ? '100%': (!this.uiConfig.isBlurr && this.isSecondary) ? this.barHeight : this.compBarHeight.value) /**/
+        .barHeight(this.isLandscapePhone ? '100%':(!this.uiConfig.isBlurr && this.isSecondary) || (this.isSmallSquareScreen && this.isRolling) ? this.barHeight : this.compBarHeight.value) /**/
         .onChange((index: number) => {
           this.IndexCurrentindex = index
           if (index === 0) {
@@ -917,6 +968,8 @@ struct Index {
         )
         .padding({ top: px2vp(this.topRectHeight) })
     } // 欢迎页&崩溃页
+    .width('100%')
+    .height('100%')
     .bindSheet($$this.isShowWelcome, this.WelcomeSheet(), {
       detents: [BIND_SHEET_CONTAINER_HEIGHT],
       showClose: (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) ? true : false,

@@ -98,6 +98,9 @@ struct ConfigurationPage {
   @Consume curYOffset: number
   //loading动画
   @State isLoading : boolean = false
+  //px外屏隐藏top和tab偏移
+  @Consume heightTop: number
+  @Consume curOffsetRemain: number
   /* 配置列表List相关 */
   // 当前单选框选择的配置 TODO 待接入用户首选项，先写死 configName，单选框控制现在只用到configName所以先不给值
   // @StorageProp('currentConfigRadioCheckedConfigData')
@@ -337,7 +340,6 @@ struct ConfigurationPage {
         .width(40)
         .height(40)
         .backgroundColor($r('app.color.settings_container_background'))
-        .visibility((this.isRolling && this.isSmallSquareScreen) ? Visibility.Hidden : Visibility.Visible)
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .onClick(() => {
           this.isON.toggleAnim=true
@@ -347,8 +349,8 @@ struct ConfigurationPage {
         .transition(customAnimationUtil.isSlide(0,this.uiConfig))
       }
       .zIndex(1)
-      .height((this.isRolling && this.isSmallSquareScreen) ? 0 : (this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT))
-      .position({x: 0})
+      .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
+      .position({x: 0,y:this.isRolling && this.isSmallSquareScreen?this.heightTop:0})
       .alignItems(VerticalAlign.Center)
       .width('100%')
       .padding({
@@ -364,7 +366,7 @@ struct ConfigurationPage {
             .height('90%')
         } else {
           Column(){
-            Blank().height((this.isRolling && this.isSmallSquareScreen) ? 0 : TAB_CONTENT_TITLE_HEIGHT)
+            Blank().height((this.isRolling && this.isSmallSquareScreen) ? this.heightTop : TAB_CONTENT_TITLE_HEIGHT)
             Scroll() {
               // 配置列表 START
               List({ space: LIST_SPACE }) {
@@ -454,11 +456,16 @@ struct ConfigurationPage {
               }
               .width('100%')
               .height('100%')
-              .onScrollStart(() => {
-                this.isRolling = true
-              })
-              .onScrollStop(() => {
-                this.isRolling = false
+              .onScrollFrameBegin((offset: number) => {
+                this.curOffsetRemain  += offset
+                if (offset>0) {
+                  this.isRolling = true
+                }else if(offset<0){
+                  this.isRolling = false
+                  this.curOffsetRemain = 0
+                }
+                console.info("offsetRemain:" + offset + '/' +this.curOffsetRemain);
+                return { offsetRemain: offset }
               })
               .padding({
                 left: this.breakPointStateTabContentTitleMargin.value,
