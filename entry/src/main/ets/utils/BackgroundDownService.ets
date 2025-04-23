@@ -129,8 +129,8 @@ export class BackgroundDownService{
       // 添加需要被拉起应用的bundleName和abilityName
       wants: [
         {
-          bundleName: "cn.damai.hongmeng",
-          //bundleName: "org.xbgroup.clashnext",
+         // bundleName: "cn.damai.hongmeng",
+          bundleName: "org.xbgroup.clashnext",
           abilityName: "EntryAbility"
         }
       ],
