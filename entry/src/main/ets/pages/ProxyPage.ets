@@ -235,7 +235,7 @@ struct ProxyPage {
     }
     .width('100%')
   }
-
+  @Consume paddingButtom:number|Resource
   build() {
     Stack() {
       // 标题栏
@@ -412,10 +412,11 @@ struct ProxyPage {
             .width(this.proxyStartButtonWidth)
             .height(this.proxyStartButtonHeight)
             .clip(true)
-            .hoverEffect(HoverEffect.Scale)
             .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
             .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
-            .margin({bottom:this.isLandscapePhone || !this.uiConfig.isBlurr || (this.isRolling && this.isSmallSquareScreen) ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
+            .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed,curve:curves.springMotion() }:null)
+            .margin({bottom:this.isLandscapePhone || !this.uiConfig.isBlurr ? $r('app.integer.vp_proxy_start_button_left_right_margin') :(this.isRolling && this.isSmallSquareScreen) ?
+              this.paddingButtom: $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
             .bindPopup(!!this.isShowDelayPop, {
               builder: PopupBuilder(this, PopTips[3], () => {
                 this.isShowDelayPop = false

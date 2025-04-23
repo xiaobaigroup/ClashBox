@@ -422,7 +422,7 @@ struct Index {
       this.istabletLandscape = true
       hilog.info(0xFF00, componentName,
         `#WindowChange#应用窗口状态改变#(1000vp< width)平板横屏结果: ${this.istabletLandscape}`)
-    } else if (this.windowHeight <= 520 && this.windowWidth <= 520) {
+    } else if (this.windowHeight < 440 && this.windowWidth <= 440) {
       this.isSmallSquareScreen = true
       hilog.info(0xFF00, componentName,
         `#WindowChange#应用窗口状态改变#(1000vp< width)平板横屏结果: ${this.isSmallSquareScreen}`)
@@ -850,9 +850,10 @@ struct Index {
    */
   @Provide heightTop: Length = TAB_CONTENT_TITLE_HEIGHT
   @Provide curOffsetRemain: number = 0
+  @Provide paddingButtom:number|Resource = $r('app.integer.vp_proxy_start_button_left_right_margin')
   //tab隐藏
   startAnimPX(){
-    animateTo({
+    this.getUIContext().animateTo({
       duration: this.uiConfig.animationSpeed,
       curve: Curve.Linear,
       iterations: 1,
@@ -860,8 +861,11 @@ struct Index {
     }, () => {
       if (this.uiConfig.isBlurr) {
         indexController.setTabBarTranslate({ y: '100%' })
+        this.paddingButtom = $r('app.integer.vp_proxy_start_button_left_right_margin')
       }else {
+        indexController.setTabBarTranslate({ y: '100%' })
         this.barHeight = 0
+        console.info('barHeight1:',this.barHeight)
       }
       this.heightTop = -TAB_CONTENT_TITLE_HEIGHT
     })
@@ -869,19 +873,24 @@ struct Index {
 
   //tab显示
   stopAnimPX(){
-    animateTo({
-      duration: this.uiConfig.animationSpeed,
-      curve: Curve.EaseOut,
-      iterations: 1,
-      playMode: PlayMode.Normal,
-    }, () => {
-      if (this.uiConfig.isBlurr) {
-        indexController.setTabBarTranslate({ y: 0 })
-      }else {
-        this.barHeight = 77
-      }
-      this.heightTop = TAB_CONTENT_TITLE_HEIGHT
-    })
+      this.getUIContext().animateTo({
+        duration: this.uiConfig.animationSpeed,
+        curve: Curve.EaseOut,
+        iterations: 1,
+        playMode: PlayMode.Normal,
+        onFinish:()=>{
+        }
+      }, () => {
+        if (this.uiConfig.isBlurr) {
+          indexController.setTabBarTranslate({ y: 0 })
+          this.paddingButtom = $r('app.integer.vp_proxy_start_button_bottom_margin')
+        }else {
+          indexController.setTabBarTranslate({ y: 0 })
+          this.barHeight = 77
+          console.info('barHeight1:',this.barHeight)
+        }
+        this.heightTop = TAB_CONTENT_TITLE_HEIGHT
+      })
   }
 //监听上下滚动时，tab是否隐藏
   isHiddenChange(){
@@ -942,7 +951,7 @@ struct Index {
         .scrollable(this.isSecondary ? false : true)
         .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
         .barWidth(this.isLandscapePhone ? '77vp' : this.tabBarWidth.value) /**/
-        .barHeight(this.isLandscapePhone ? '100%':(!this.uiConfig.isBlurr && this.isSecondary) || (this.isSmallSquareScreen && this.isRolling) ? this.barHeight : this.compBarHeight.value) /**/
+        .barHeight(this.isLandscapePhone ? '100%':(!this.uiConfig.isBlurr && this.isSecondary) ||(this.isSmallSquareScreen && this.isRolling) ? this.barHeight :this.compBarHeight.value) /**/
         .onChange((index: number) => {
           this.IndexCurrentindex = index
           if (index === 0) {
