@@ -757,7 +757,6 @@ export const UseGuidanceList: TCItemProp[] = [
  */
 export const FAQList: TCItemProp[] = [
   {title: $r('app.string.game_q'), content: $r('app.string.game_a')},
-  {title: $r('app.string.meta_q'), content: $r('app.string.meta_a')},
   {title: $r('app.string.function_q'), content: $r('app.string.function_a')},
   {title: $r('app.string.link_q'), content: $r('app.string.link_a')},
   {title: $r('app.string.node_q'), content: $r('app.string.node_a')},

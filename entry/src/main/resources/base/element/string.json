@@ -1197,10 +1197,6 @@
       "value": "开启后将显示正在测试中的内核"
     },
     {
-      "name": "default_kernel",
-      "value": "ClashMeta"
-    },
-    {
       "name": "filter",
       "value": "筛选"
     },
@@ -1695,14 +1691,6 @@
     {
       "name": "game_a",
       "value": "因Clash规则不完善和后台问题导致，建议准备玩游戏前关闭Clash的VPN功能"
-    },
-    {
-      "name": "meta_q",
-      "value": "为什么ClashMeta核心下没有测速功能"
-    },
-    {
-      "name": "meta_a",
-      "value": "当前Meta核心下，暂时不支持测速，连接，请求3个功能"
     },
     {
       "name": "function_q",

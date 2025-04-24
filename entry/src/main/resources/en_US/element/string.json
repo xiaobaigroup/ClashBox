@@ -1193,10 +1193,6 @@
       "value": "Beta kernel"
     },
     {
-      "name": "default_kernel",
-      "value": "ClashMeta"
-    },
-    {
       "name": "filter",
       "value": "Filter"
     },
@@ -1687,14 +1683,6 @@
     {
       "name": "third_party_services",
       "value": "Third party services"
-    },
-    {
-      "name": "meta_q",
-      "value": "Why is there no speed measurement function under the meta core"
-    },
-    {
-      "name": "meta_a",
-      "value": "Under the current meta core, the three functions of speed measurement, connection and request are temporarily not supported"
     },
     {
       "name": "function_q",
