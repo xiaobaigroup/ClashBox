@@ -35,7 +35,7 @@ struct Kernel {
   @State private kernel: KernelListItem[] = [
     {icons: $rawfile('FlClash.svg'), title: 'FlClash', subtitle: $r('app.string.new_kernel'), isExperimental: false, ClashCore: ClashCore.FlClash},
     {icons: $rawfile('FlClash.svg'), title: "FlClash(前台模式)", subtitle: "注意要开启后台运行或者小窗运行", isExperimental: false, ClashCore: ClashCore.ClashMeta},
-    {icons: $rawfile('ClashRS.svg'), title: 'ClashRS', subtitle: $r('app.string.new_kernel'), isExperimental: true, ClashCore: ClashCore.ClashRs}
+    //{icons: $rawfile('ClashRS.svg'), title: 'ClashRS', subtitle: $r('app.string.new_kernel'), isExperimental: true, ClashCore: ClashCore.ClashRs}
   ]
 
   handleClick(index: number) {
@@ -65,7 +65,7 @@ struct Kernel {
   aboutToAppear(): void {
     if(!this.isShowExperimentalFunction) {
       // 话说好像我只用删除一个用splice好像也行
-      this.kernel = removeItemsByIndex(this.kernel, [1])
+      //this.kernel = removeItemsByIndex(this.kernel, [1])
     }
   }
 
