@@ -3,10 +3,10 @@ import { hiAppEvent, hilog } from '@kit.PerformanceAnalysisKit';
 import { promptAction, window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import ClashViewModel from './ClashViewModel';
-import { AppConfig, AppFlowingState, AppState } from './AppState';
+import { AppConfig, AppFlowingState, AppState, ClashCore } from './AppState';
 import { EventHub, EventKey } from '../common/EventHub';
 import { PipManager } from '../common/PipManager';
-import { ClashConfig } from 'proxy_core';
+import { ClashConfig, SocketProxyService, SocketStubService } from 'proxy_core';
 
 export default class EntryAbility extends UIAbility {
  private currentLanguage: string | undefined = undefined
@@ -30,7 +30,7 @@ export default class EntryAbility extends UIAbility {
     // 当前主题模式
     AppStorage.setOrCreate<ConfigurationConstant.ColorMode>('currentColorMode', this.context.config.colorMode)
   }
-
+  debugVpn: SocketStubService | null = null
 
   onDestroy(): void {
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onDestroy');
@@ -52,13 +52,14 @@ export default class EntryAbility extends UIAbility {
       // 切换核心
       promptAction.showToast({message: "核心启动中..."})
       await ClashViewModel.ChangeCore(clashCore)
+      if(clashCore != ClashCore.FlClash){
+        let service = new SocketStubService(this.context);
+        service.startService()
+      }
       ClashViewModel.initProfile()
       EventHub.on(EventKey.LoadClashConfig, (isPatch: boolean)=>{
         ClashViewModel.loadConfig(isPatch)
       })
-      // setInterval(()=>{
-      //   ClashViewModel.getProxyGroups(ProxyMode.Rule)
-      // }, 1000)
       // 监测vpn服务是否被回收，并且重新启动
       setInterval(async ()=>{
         if(!ClashViewModel.socketProxy.active){

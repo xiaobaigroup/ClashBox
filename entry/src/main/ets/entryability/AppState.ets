@@ -24,8 +24,9 @@ export enum SwitchModeCard{
   Direct = "DIRECT"
 }
 export enum ClashCore{
-  ClashMeta,
   FlClash,
+  // 非FlClash 用于开发调试， ui进程运行vpn核心；调试vpn核心崩溃和杀进程问题
+  ClashMeta,
   ClashRs,
 }
 export class AppFlowingState{

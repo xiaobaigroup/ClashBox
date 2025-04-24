@@ -12,10 +12,14 @@ export default class ClashVpnAbility extends VpnExtensionAbility {
   async onCreate(want: Want) {
     try {
       let core = want.parameters?.["ClashCore"] as ClashCore ?? ClashCore.FlClash
-      console.log("ClashNext", `启用核心 ${core}`);
-      this.clashStubService = new SocketStubService(core, this.context)
-      await this.clashStubService.startService()
-      console.log("ClashNext", `启用核心 ${core} 成功`);
+      if(core == ClashCore.FlClash){
+        console.log("ClashNext", `启用核心 FlClash`);
+        this.clashStubService = new SocketStubService( this.context)
+        await this.clashStubService.startService()
+        console.log("ClashNext", `启用核心 FlClash 成功`);
+      }else{
+        console.log("ClashNext", `前台模式`);
+      }
     } catch (e) {
       console.log("ClashNext", `启用VPN失败 ${e.message} ${e.stack}`);
     }

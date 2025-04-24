@@ -235,7 +235,6 @@ export class ClashViewModel {
     try {
       const vpnWant = {
         deviceId: "",
-        //bundleName: "cn.damai.hongmeng",
         bundleName: "org.xbgroup.clashnext",
         abilityName: "ClashVpnAbility",
         parameters: { "ClashCore" : coreType}
@@ -245,8 +244,8 @@ export class ClashViewModel {
         // 停止vpn进程
         await vpnExtension.stopVpnExtensionAbility(vpnWant)
       }
-      await new Promise<boolean>((resolve, reject)=>{
-        vpnExtension.startVpnExtensionAbility(vpnWant)
+      await new Promise<boolean>( async (resolve, reject)=>{
+          vpnExtension.startVpnExtensionAbility(vpnWant)
           .then(() => {
             console.log("#VPN启动成功")
             resolve(true)

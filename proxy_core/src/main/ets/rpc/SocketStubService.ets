@@ -2,7 +2,6 @@ import { socket } from '@kit.NetworkKit';
 import { common } from '@kit.AbilityKit';
 import { CommonVpnService } from './CommonVpnService';
 import { FlClashVpnService } from './FlClashVpnService';
-import { ClashMetaVpnService } from './ClashMetaVpnService';
 import { startIpc } from 'libflclash.so';
 
 
@@ -10,13 +9,9 @@ export class SocketStubService {
   server: socket.LocalSocketServer = socket.constructLocalSocketServerInstance();
   clientPool: Map<number, socket.LocalSocketConnection>
   vpnService: CommonVpnService
-  constructor(coreType: number, context: common.Context) {
+  constructor( context: common.Context) {
     this.clientPool = new Map()
-    if(coreType == 1){
-      this.vpnService = new FlClashVpnService(context)
-    }else{
-      this.vpnService = new ClashMetaVpnService(context)
-    }
+    this.vpnService = new FlClashVpnService(context)
     this.vpnService.init()
   }
 
@@ -26,9 +21,7 @@ export class SocketStubService {
       const goPath = this.vpnService.context.filesDir + '/clash_go.sock'
       startIpc(goPath)
       await this.server.listen({ address: socketPath})
-      console.debug(`socket listen  `)
       this.server.on('connect', (client: socket.LocalSocketConnection) => {
-        console.debug(`socket new  request: `)
           this.clientPool.set(client.clientId, client);
           client.on("message", (value: socket.LocalSocketMessageInfo) => {
             this.vpnService.onRemoteMessageRequest(client, value)

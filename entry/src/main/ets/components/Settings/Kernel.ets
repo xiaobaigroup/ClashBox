@@ -34,6 +34,7 @@ struct Kernel {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @State private kernel: KernelListItem[] = [
     {icons: $rawfile('FlClash.svg'), title: 'FlClash', subtitle: $r('app.string.new_kernel'), isExperimental: false, ClashCore: ClashCore.FlClash},
+    {icons: $rawfile('FlClash.svg'), title: "FlClash(前台模式)", subtitle: "注意要开启后台运行或者小窗运行", isExperimental: false, ClashCore: ClashCore.ClashMeta},
     {icons: $rawfile('ClashRS.svg'), title: 'ClashRS', subtitle: $r('app.string.new_kernel'), isExperimental: true, ClashCore: ClashCore.ClashRs}
   ]
 
