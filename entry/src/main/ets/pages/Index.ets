@@ -801,7 +801,7 @@ struct Index {
   }
 
   @State barHeight: string | number | undefined = this.compBarHeight.value
-
+  @State barWidth:string | number | undefined = this.tabBarWidth.value
   // tab移动动画
   startAnim() {
     indexController.setTabBarTranslate({ y: 0 })
@@ -814,8 +814,15 @@ struct Index {
         if (this.uiConfig.isBlurr) {
           indexController.setTabBarTranslate(this.isLandscapePhone ? { x: '-100%' } : { y: '100%' })
         } else {
+          indexController.setTabBarTranslate(this.isLandscapePhone ? { x: '-100%' } : { y: '100%' })
           this.barHeight = 0
         }
+
+      if (this.isLandscapePhone || this.istabletLandscape || this.isFoldStatus) {
+        indexController.setTabBarTranslate({ x: '-100%' })
+        this.barWidth = 0
+        this.barHeight = '100%'
+      }
     })
   }
 
@@ -830,7 +837,14 @@ struct Index {
         if (this.uiConfig.isBlurr) {
           indexController.setTabBarTranslate(this.isLandscapePhone ? { x: 0 } : { y: 0 })
         }else{
+          indexController.setTabBarTranslate(this.isLandscapePhone ? { x: 0 } : { y: 0 })
           this.barHeight = this.compBarHeight.value
+        }
+
+        if (this.isLandscapePhone || this.istabletLandscape || this.isFoldStatus) {
+          indexController.setTabBarTranslate({ x: 0 })
+          this.barWidth = '77vp'
+          this.barHeight = '100%'
         }
       }
     })
@@ -865,7 +879,6 @@ struct Index {
       }else {
         indexController.setTabBarTranslate({ y: '100%' })
         this.barHeight = 0
-        console.info('barHeight1:',this.barHeight)
       }
       this.heightTop = -TAB_CONTENT_TITLE_HEIGHT
     })
@@ -882,14 +895,11 @@ struct Index {
         }
       }, () => {
         if (this.uiConfig.isBlurr) {
-          indexController.setTabBarTranslate({ y: 0 })
           this.paddingButtom = $r('app.integer.vp_proxy_start_button_bottom_margin')
-        }else {
-          indexController.setTabBarTranslate({ y: 0 })
-          this.barHeight = 77
-          console.info('barHeight1:',this.barHeight)
         }
-        this.heightTop = TAB_CONTENT_TITLE_HEIGHT
+        this.barHeight = '77vp'
+        indexController.setTabBarTranslate({ y: 0 })
+        this.heightTop = 0
       })
   }
 //监听上下滚动时，tab是否隐藏
@@ -947,11 +957,11 @@ struct Index {
         .backgroundColor( $r('app.color.background'))
         .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Regular : null)
         .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
-        .barOverlap(this.uiConfig.isBlurr ? (this.isLandscapePhone || ( this.istabletLandscape && !this.isSecondary) ? false : true) : false) //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
+        .barOverlap(this.uiConfig.isBlurr ? (this.isLandscapePhone || ( this.istabletLandscape && !this.isSecondary)  ? false : true) : false) //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
         .scrollable(this.isSecondary ? false : true)
         .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
-        .barWidth(this.isLandscapePhone ? '77vp' : this.tabBarWidth.value) /**/
-        .barHeight(this.isLandscapePhone ? '100%':(!this.uiConfig.isBlurr && this.isSecondary) ||(this.isSmallSquareScreen && this.isRolling) ? this.barHeight :this.compBarHeight.value) /**/
+        .barWidth(this.isLandscapePhone ? this.barWidth : this.tabBarWidth.value) /**/
+        .barHeight(this.isLandscapePhone ? '100%':((!this.uiConfig.isBlurr && this.isSecondary) || this.isSmallSquareScreen) ? this.barHeight :this.compBarHeight.value) /**/
         .onChange((index: number) => {
           this.IndexCurrentindex = index
           if (index === 0) {
