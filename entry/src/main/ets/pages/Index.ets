@@ -516,10 +516,10 @@ struct Index {
     //   // 屏蔽分流策略
     //   this.moreList = removeItemsByIndex(this.moreList, [5])
     // }
-    if(this.appConfig.clashCore !== ClashCore.FlClash) {
-      // 屏蔽请求与连接
-      this.moreList = removeItemsByIndex(this.moreList, [2,3])
-    }
+    // if(this.appConfig.clashCore !== ClashCore.FlClash) {
+    //   // 屏蔽请求与连接
+    //   this.moreList = removeItemsByIndex(this.moreList, [2,3])
+    // }
 
     // 根据设备选择性开启change监听
     /*if (deviceInfo.deviceType === 'phone') {

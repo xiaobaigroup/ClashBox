@@ -178,7 +178,7 @@ struct ProxyPage {
   TabBuilder(title: ResourceStr, targetIndex: number) {
     Column() {
       Column() {
-        Text(title)
+        Text(`${title}`)
           .fontSize(14)
           .fontColor(this.currentIndex === targetIndex ? this.font_on_primary : this.font_secondary)
           .maxLines(1)
@@ -235,7 +235,7 @@ struct ProxyPage {
     }
     .width('100%')
   }
-  @Consume paddingButtom:number|Resource
+  @Consume paddingButtom: number | Resource
   build() {
     Stack() {
       // 标题栏
@@ -392,53 +392,50 @@ struct ProxyPage {
             })
           }
 
-          // ClashMeta内核时暂时无法测延迟
-          if (this.appConfig.clashCore === ClashCore.FlClash) {
-            // 悬浮代理测速按钮 START
-            Column() {
-              RightDownButton(
-                $r('sys.symbol.bolt_filled_on_circle'),
-                this.ReplaceSymbolEffect,
-              )
-            }
-            .backgroundColor(this.icon_emphasize)
-            .shadow({
-              radius: 10,
-              color: this.icon_emphasize,
-              offsetY: 4,
-              type: ShadowType.BLUR
-            })
-            .borderRadius(100)
-            .width(this.proxyStartButtonWidth)
-            .height(this.proxyStartButtonHeight)
-            .clip(true)
-            .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-            .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
-            .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed,curve:curves.springMotion() }:null)
-            .margin({bottom:this.isLandscapePhone || !this.uiConfig.isBlurr ? $r('app.integer.vp_proxy_start_button_left_right_margin') :(this.isRolling && this.isSmallSquareScreen) ?
-              this.paddingButtom: $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
-            .bindPopup(!!this.isShowDelayPop, {
-              builder: PopupBuilder(this, PopTips[3], () => {
-                this.isShowDelayPop = false
-              }),
-              onWillDismiss: false,
-              autoCancel: false
-            })
-            .onClick(async () => {
-              if(this.loading){
-                return
-              }
-              this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
-              this.loading = true
-              await ClashViewModel.testAllDelay(this.theProxyGroups[this.currentIndex].proxies as ProxyItem[])
-              this.loading = false
-              hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行1 %{public}s")
-              if (this.uiConfig.isVibrate) {
-                customVibrator.vibratorTriggerOfHapticClockTimer()
-              }
-            })
-            // 悬浮代理测速按钮 END
+          // 悬浮代理测速按钮 START
+          Column() {
+            RightDownButton(
+              $r('sys.symbol.bolt_filled_on_circle'),
+              this.ReplaceSymbolEffect,
+            )
           }
+          .backgroundColor(this.icon_emphasize)
+          .shadow({
+            radius: 10,
+            color: this.icon_emphasize,
+            offsetY: 4,
+            type: ShadowType.BLUR
+          })
+          .borderRadius(100)
+          .width(this.proxyStartButtonWidth)
+          .height(this.proxyStartButtonHeight)
+          .clip(true)
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+          .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
+          .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed,curve:curves.springMotion() }:null)
+          .margin({bottom:this.isLandscapePhone || !this.uiConfig.isBlurr ? $r('app.integer.vp_proxy_start_button_left_right_margin') :(this.isRolling && this.isSmallSquareScreen) ?
+          this.paddingButtom: $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
+          .bindPopup(!!this.isShowDelayPop, {
+            builder: PopupBuilder(this, PopTips[3], () => {
+              this.isShowDelayPop = false
+            }),
+            onWillDismiss: false,
+            autoCancel: false
+          })
+          .onClick(async () => {
+            if(this.loading){
+              return
+            }
+            this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
+            this.loading = true
+            await ClashViewModel.testAllDelay(this.theProxyGroups[this.currentIndex].proxies as ProxyItem[])
+            this.loading = false
+            hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行1 %{public}s")
+            if (this.uiConfig.isVibrate) {
+              customVibrator.vibratorTriggerOfHapticClockTimer()
+            }
+          })
+          // 悬浮代理测速按钮 END
         }
         .backgroundColor($r('app.color.background'))
         .width('100%')
