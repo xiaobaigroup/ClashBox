@@ -45,16 +45,21 @@ export class ClashViewModel {
     }
     profile.loadContext(this.context)
     profile.name = data.configName
+    profile.url = data.configUrl
     profile.autoUpdate = data.isConfigAutoUpdate
     profile.autoUpdateDuration = data.configAutoUpdateTimeGapValue ?? 10
     await profile.checkAndUpdate((c)=>this.VailConfig(c))
     const isExists = await profile.check();
     if (isExists) {
       await this.profileRepo.addOrUpdate(profile)
+        .then((value) => {
+          if (value === 0) {
+            EventHub.sendEvent(EventKey.FetchProfile, null)
+          }
+        })
     } else{
       promptAction.showToast({message: "文件保存失败！"})
     }
-    EventHub.sendEvent(EventKey.FetchProfile, null)
   }
   async addOrUpdateProfileByFile(path: string, id: string | null){
     let profile = new Profile(ProfileType.File, path)

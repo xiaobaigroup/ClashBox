@@ -34,20 +34,11 @@ struct Kernel {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @State private kernel: KernelListItem[] = [
     {icons: $rawfile('FlClash.svg'), title: 'FlClash', subtitle: $r('app.string.new_kernel'), isExperimental: false, ClashCore: ClashCore.FlClash},
-    {icons: $rawfile('ClashMeta.svg'), title: $r('app.string.default_kernel'), subtitle: $r('app.string.old_kernel'), isExperimental: false, ClashCore: ClashCore.ClashMeta},
     {icons: $rawfile('ClashRS.svg'), title: 'ClashRS', subtitle: $r('app.string.new_kernel'), isExperimental: true, ClashCore: ClashCore.ClashRs}
   ]
 
   handleClick(index: number) {
     switch (index) {
-      case 1:
-        // ClashMeta
-        this.appConfig.clashCore = ClashCore.ClashMeta
-        ClashViewModel.ChangeCore(ClashCore.ClashMeta)
-        hilog.info(0xFF00, "SettingsKerneltestTag", "当前内核：%{public}d", this.appConfig.clashCore)
-        // 屏蔽请求与连接
-        this.moreList = removeItemsByIndex(this.moreList, [2,3])
-        break
       case 0:
         // FlClash
         this.appConfig.clashCore = ClashCore.FlClash
@@ -60,7 +51,7 @@ struct Kernel {
           this.moreList = removeItemsByIndex(this.moreList, [5])
         }
         break
-      case 2:
+      case 1:
         promptAction.showToast({message: $r('app.string.developing'), duration: 2000 })
         // ClashRS
         // this.appConfig.clashCore = ClashCore.ClashRs
@@ -73,7 +64,7 @@ struct Kernel {
   aboutToAppear(): void {
     if(!this.isShowExperimentalFunction) {
       // 话说好像我只用删除一个用splice好像也行
-      this.kernel = removeItemsByIndex(this.kernel, [2])
+      this.kernel = removeItemsByIndex(this.kernel, [1])
     }
   }
 
@@ -83,7 +74,7 @@ struct Kernel {
     NavDestination() {
       TopBuilder({title: $r('app.string.kernel')})
       Column({space:10}) {
-Column({space:8}){
+        Column({space:8}){
           ForEach(this.kernel, (item: KernelListItem, index: number) => {
             Row() {
               Image(item.icons)
@@ -109,7 +100,7 @@ Column({space:8}){
                   .fontSize(14)
               }.margin({ left: 12 })
               .alignItems(HorizontalAlign.Start)
-               .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+              .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
               Blank()
               Radio({ value: 'kernel' + index, group: 'kernelGroup' })
                 .checked(item.ClashCore === this.appConfig.clashCore)
@@ -120,7 +111,6 @@ Column({space:8}){
             }.opacity(index !== 2 ? 1 : 0.5)
             .height(72)
             .width('100%')
-            .padding({top:12,bottom:12})
             .onClick(() => {
               this.handleClick(index)
               if(index !== 2) {
@@ -128,16 +118,15 @@ Column({space:8}){
               }
             })
             if ((this.isShowExperimentalFunction && (index === 0 || index === 1) || (index === 0 && this.isShowExperimentalFunction === false) )) {
-             if(!isEnd(this.kernel!.length,index))
+              if(!isEnd(this.kernel!.length,index))
                 Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
             }
           })
         }.padding(12)
         .backgroundColor($r('app.color.container_background'))
         .borderRadius(BORDER_RADIUS_20)
-         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
 
-        ///Blank(10)
         if(!this.isShowExperimentalFunction) {
           // 启用提示
           Text($r('app.string.open_core_prompt'))

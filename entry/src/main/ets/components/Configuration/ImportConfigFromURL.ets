@@ -38,8 +38,10 @@ export struct ImportConfigFromURL{
   // 模态弹窗显示变量
   @Consume isShowConfigAddBindSheet: boolean
   /* 主题色 */
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+
+  @Consume('currentTouchConfigData')
+  private currentTouchConfigData: ConfigData
 
   /* 是否开启 配置页 `bindSheet` 组件的前景模糊 */
   @Consume('isEnableConfigPageBindSheetForegroundBlur')
@@ -230,6 +232,7 @@ export struct ImportConfigFromURL{
    * TODO 保存配置
    */
   async saveConfig(isNewConfig: boolean){
+    this.currentTouchConfigData = this.configData
     if (isNewConfig) {
       this.customDownloadingDialogTitle = $r('app.string.downloading_configuration_file')
       this.configCustomDownloadingDialogController.open()
@@ -250,7 +253,6 @@ export struct ImportConfigFromURL{
       try {
         await ClashViewModel.addOrUpdateProfileByUrl(this.configData, this.configData.configId)
         this.configCustomDownloadingDialogController.close()
-        this.promptAction.showToast({message: getResourceString($r('app.string.update_success'), this)})
       } catch (e) {
         console.error("ClashNext", e.message, e.stack);
         this.configCustomDownloadingDialogController.close()

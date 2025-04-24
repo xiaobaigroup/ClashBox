@@ -1370,7 +1370,7 @@
     },
     {
       "name": "update_success",
-      "value": "更新成功："
+      "value": "更新成功"
     },
     {
       "name": "update_failed",
@@ -1875,6 +1875,18 @@
     {
       "name": "failed_load_config",
       "value": "加载配置失败"
+    },
+    {
+      "name": "resource_updating",
+      "value": "资源更新中"
+    },
+    {
+      "name": "settings_count_vpn",
+      "value": "VPN进程已被系统终结"
+    },
+    {
+      "name": "times",
+      "value": "次"
     }
   ]
 }

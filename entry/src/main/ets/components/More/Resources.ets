@@ -88,6 +88,8 @@ export const resourcesBlankData: Array<ResourcesData> = [
 struct Resources {
   // 是否进入二级界面
   @Consume isSecondary: boolean
+  @State theNumberUpdated: number = 0
+  @State isRefreshing: boolean = false
   @Consume('NavPathStack') pageInfos: NavPathStack
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
@@ -109,14 +111,31 @@ struct Resources {
   @Provide isShowGroupSort: Boolean = false
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @Provide resourceListData: Array<ResourcesData> = theResouresData
-  //开关不触发list转场动画判定
+  // 开关不触发list转场动画判定
   @State isON:isON = new isON()
-  //page内顶部标题偏移量
+  // page内顶部标题偏移量
   @Consume curYOffset: number
 
   @Builder
   reaourceSearch() {
+    // 全部刷新按钮
+    Button({ type: ButtonType.Circle, stateEffect: true }) {
+      SymbolGlyph($r('sys.symbol.arrow_clockwise'))
+        .fontSize(24)
+        .fontColor([this.icon_primary])
+    }
+    .transition(customAnimationUtil.isSlide(0, this.uiConfig))
+    .width(40)
+    .height(40)
+    .margin({ left: 10 })
+    .backgroundColor($r('app.color.settings_container_background'))
+    .onClick(() => {
+      this.isON.toggleAnim = true
+      promptAction.showToast({ message: getResourceString($r('app.string.resource_updating'), this) })
+      this.updateGeoDate()
+    })
   }
+
   @Builder
   reaourceOther() {
     // 排序按钮
@@ -143,6 +162,24 @@ struct Resources {
     }
     .width('100%')
     .height('100%')
+  }
+
+  @Builder
+  LoadingBuilder() {
+    Column({space: 5}) {
+      LoadingProgress()
+        .color(this.icon_emphasize)
+        .width(40)
+        .height(40)
+      Text() {
+        Span($r('app.string.resource_updating'))
+        Span('  ')
+        Span(this.theNumberUpdated.toString())
+        Span('/')
+        Span(this.resourceListData.length.toString())
+      }
+      .fontSize(16)
+    }.margin({bottom: 6})
   }
 
   /**
@@ -184,6 +221,7 @@ struct Resources {
     this.resourceListData.splice(this.theEditIndex, 1, editItem)
     this.updateTime(this.theEditIndex)
   }
+
   updateUrl(name: string, url: string){
     let geoMap = this.clashConfig?.['geox-url']
     if(geoMap){
@@ -192,14 +230,14 @@ struct Resources {
     }
     EventHub.sendEvent(EventKey.LoadClashConfig, true)
   }
+
   updateTime(index: number) {
     let ItemData = this.resourceListData[index]
     ItemData.updateTime = new Date().getTime()
     this.resourceListData.splice(index, 1, ItemData)
   }
 
-  async updateGeoDateItem(item: ResourcesData){
-    this.isLoading = true
+  async updateGeoDateItem(item: ResourcesData) {
     try {
       const message = await ClashViewModel.updateGeoData(
          item.resourceName,
@@ -218,9 +256,21 @@ struct Resources {
     }
   }
 
+  updateGeoDate() {
+    this.resourceListData.forEach(async (item, index) => {
+      await this.updateGeoDateItem(item)
+      this.updateTime(index)
+      this.theNumberUpdated++
+      if (index === this.resourceListData.length - 1) {
+        this.isRefreshing = false
+      }
+    })
+  }
+
   aboutToAppear(): void {
     this.resourceListData = JSON.parse(this.uiConfig.resourcesData)
   }
+
   aboutToDisappear(): void {
     this.uiConfig.resourcesData = JSON.stringify(this.resourceListData)
   }
@@ -233,8 +283,12 @@ struct Resources {
           Column() {
             LoadingProgress()
               .color(this.icon_emphasize)
-              .width(40).height(40)
-            Text('资源更新中..')
+              .width(40)
+              .height(40)
+            Text() {
+              Span($r('app.string.resource_updating'))
+              Span('..')
+            }
               .fontSize(16)
           }.zIndex(2)
           .width('100%')
@@ -245,7 +299,7 @@ struct Resources {
 
         MoreTop({
           title: $r('app.string.Resources'),
-          searchButton: this.reaourceSearch,
+          searchButton: () => { this.reaourceSearch() },
           otherButton: (): void => { this.reaourceOther() }
         })
 
@@ -255,7 +309,7 @@ struct Resources {
           if (this.resourceListData.length === 0) {
             Nothing({ name: $r('app.string.Resources') })
           } else {
-            Scroll() {
+            Refresh({refreshing: $$this.isRefreshing, builder: this.LoadingBuilder()}) {
               List({ space: 10 }) {
                 ForEach(this.resourceListData, (item: ResourcesData, index: number) => {
                   ListItem() {
@@ -311,6 +365,7 @@ struct Resources {
                       .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                       .onClick(() => {
                         this.isON.toggleAnim = true
+                        this.isLoading = true
                         this.updateTime(index)
                         // 资源更新处理
                         this.updateGeoDateItem(item)
@@ -335,6 +390,16 @@ struct Resources {
                 scrollBackward: NestedScrollMode.SELF_FIRST
               })
             }
+            .refreshOffset(64)
+            .pullToRefresh(true)
+            .onStateChange(() => {
+              this.theNumberUpdated = 0
+            })
+            .onRefreshing(() => {
+              this.updateGeoDate()
+            })
+            /*Scroll() {
+            }
             .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)//,{alwaysEnabled:true})
             .onDidScroll((xOffset: number, yOffset: number): void => {
               // 累计计算当前父组件滚动在Y轴方向的偏移量
@@ -342,7 +407,7 @@ struct Resources {
                 this.curYOffset += yOffset
               }
               console.info("yOffset" + this.curYOffset);
-            })
+            })*/
           }
         }
       }.width('100%')

@@ -55,7 +55,6 @@ struct settingsListItem {
     }.height(56)
     .width('100%')
     .borderRadius(20)
-    .margin({bottom: 10})
     .backgroundColor($r('app.color.container_background'))
     .alignItems(VerticalAlign.Center)
     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))

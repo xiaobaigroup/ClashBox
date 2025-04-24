@@ -55,10 +55,10 @@ struct ConfigurationPage {
   // 列表是否滚动中
   @Consume isRolling: boolean
   // 主界面当前index
-  @Consume @Watch('onIndexChange') IndexCurrentindex: number
+  @Consume /*@Watch('onIndexChange')*/ IndexCurrentindex: number
   // 是否小窗口
   @Consume isSmallSquareScreen: boolean
-
+  @State isRefreshing: boolean = false
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 所有子组件在容器内的对齐方式
@@ -88,8 +88,7 @@ struct ConfigurationPage {
   @State isON:isON = new isON()
   // 节点数据组
   @Prop items: ProxyItem[]
-  @Consume
-  proxyGroups: ProxyGroup[]
+  @Consume proxyGroups: ProxyGroup[]
   /* NV路由 相关 */
   // 路由栈
   @Provide('configAddPageInfos')
@@ -119,6 +118,7 @@ struct ConfigurationPage {
    * XXX 当前手指触摸的ListItem的对应 `this.configList` 中的 `configId`
    *    List的长按菜单中的响应都是根据这个的对象中的属性来处理的，是个不稳定因素
    */
+  @Provide('currentTouchConfigData')
   private currentTouchConfigData: ConfigData = {
     configId: '',
     isNewConfig: false,
@@ -287,10 +287,20 @@ struct ConfigurationPage {
   private isShowConfigAddBindSheet: boolean = false
   // 是否需要往`bindSheet`里`push`路由页面
   private isPushRoute2BindSheet: boolean = false
+  // 是否为二级半模态页
+  private isSecondBindSheet: boolean = false
   // 内容Builder
   @Builder
   private ConfigAddBindSheetBuilder(){
     ConfigAdd()
+  }
+  @Builder
+  LoadingBuilder() {
+    LoadingProgress()
+      .color(this.icon_emphasize)
+      .width(40)
+      .height(40)
+      .margin({bottom: 15})
   }
 
   /* 页面布局相关 */
@@ -368,10 +378,10 @@ struct ConfigurationPage {
         } else {
           Column(){
             Blank().height((this.isRolling && this.isSmallSquareScreen) ? this.heightTop : TAB_CONTENT_TITLE_HEIGHT)
-            Scroll() {
+            Refresh({refreshing: $$this.isRefreshing, builder: this.LoadingBuilder()}) {
               // 配置列表 START
               List({ space: LIST_SPACE }) {
-                ForEach(this.configList, (item: ConfigData,index: number) => {
+                ForEach(this.configList, (item: ConfigData, index: number) => {
                   ListItem() {
                     Row() {
                       Column({ space: 2 }) {
@@ -383,7 +393,7 @@ struct ConfigurationPage {
                             .fontColor($r('sys.color.font_secondary')).fontSize(14).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
                         }
 
-                        // 进度条组件: 共用使用流量 / 总流量
+                        // 进度条组件: 使用流量 / 总流量
                         if (item.subscriptionInfo){
                           CellularData({ info: item.subscriptionInfo })
                         }
@@ -483,6 +493,13 @@ struct ConfigurationPage {
               })
               // 配置列表 END
             }
+            .refreshOffset(64)
+            .pullToRefresh(true)
+            .onRefreshing(() => {
+              this.updateConfig()
+            })
+            /*Scroll() {
+            }
             .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)//,{alwaysEnabled:true})
             .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {
               // 累计计算当前父组件滚动在Y轴方向的偏移量
@@ -490,7 +507,7 @@ struct ConfigurationPage {
                 this.curYOffset += yOffset
               }
               console.info("yOffset" + this.curYOffset);
-            })
+            })*/
           }
         }
 
@@ -532,13 +549,15 @@ struct ConfigurationPage {
            */
           onWillAppear: () => {
             hilog.info(0xC020, this.componentName, `#button#bindSheet#onWillAppear() executed`)
+            this.isEnableIndexForegroundBlur = true
             if (this.isPushRoute2BindSheet) {
               this.pushEditConfigRoute2BindSheet()
+              this.isSecondBindSheet = true
               this.isPushRoute2BindSheet = false
             }
           },
           // 半模态页面交互式关闭回调函数
-          onWillDismiss: (dismissSheet :DismissSheetAction) => {
+          onWillDismiss: async (dismissSheet :DismissSheetAction) => {
             // 在二级路由页面内只能通过点击关闭按钮才能关掉bindSheet
             if (this.configAddPageInfos.size() <= 0 || (dismissSheet.reason === DismissReason.CLOSE_BUTTON)) {
               dismissSheet.dismiss()
@@ -546,6 +565,14 @@ struct ConfigurationPage {
               this.isEnableIndexForegroundBlur = false
               this.configAddPageInfos.clear(true)
               hilog.info(0xC020, this.componentName, `#button#bindSheet#onWillDismiss()#关闭配置添加按钮的bindSheet：DismissSheetAction.dismiss()`)
+            }
+          },
+          onWillDisappear: async () => {
+            if (this.isSecondBindSheet) {
+              hilog.info(0xC020, this.componentName, `#button#bindSheet#onWillDisappear() 二级模态页关闭`)
+              // 二级半模态页关闭时刷新当前选中数据行
+              await this.updateConfig(this.currentTouchConfigData.configId)
+              this.isSecondBindSheet = false
             }
           },
           onWillSpringBackWhenDismiss: (springBack: SpringBackAction)=> {
@@ -662,7 +689,6 @@ struct ConfigurationPage {
    * 编辑配置
    */
   private editConfig(): void {
-    // TODO 编辑bindSheet
     hilog.info(0xC011, this.componentName, `#editConfig#编辑配置: configName is [${this.currentTouchConfigData.configName}]`)
     this.isShowConfigAddBindSheet = true
     this.isPushRoute2BindSheet = true
@@ -673,12 +699,13 @@ struct ConfigurationPage {
   private async updateConfig(configId?: string): Promise<void> {
     this.promptAction.showToast({message: $r('app.string.updating_config')})
     if (configId){
+      this.isRefreshing = false
       // 使开关点击时不触发转场动画
       this.isON.toggleAnim = true
       await this.loadConfig(this.currentTouchConfigData, true)
+      this.promptAction.showToast({message: $r('app.string.updated_success_config')})
       // 使开关点击时不触发转场动画
       this.isON.toggleAnim = true
-      this.promptAction.showToast({message: $r('app.string.updated_success_config')})
       hilog.info(0xC012, this.componentName, `#updateConfig#更新配置{单个}: configName is [${this.currentTouchConfigData.configName}], configId is [${this.currentTouchConfigData.configId}]`)
     } else {
       // 使开关点击时不触发转场动画
@@ -686,6 +713,7 @@ struct ConfigurationPage {
       hilog.info(0xC012, this.componentName, `#updateConfig#更新配置{所有}`)
       // TODO loading and try
       await ClashViewModel.updateProfileConfig(null)
+      this.isRefreshing = false
       this.promptAction.showToast({message: $r('app.string.updated_success_config')})
     }
   }

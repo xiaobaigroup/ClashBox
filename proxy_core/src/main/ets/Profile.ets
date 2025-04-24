@@ -74,7 +74,7 @@ export class Profile {
     let httpRequest = http.createHttp()
     const resp = await httpRequest.request(this.url, { header: {
       "User-Agent": this.globalUa ?? "clash.meta/1.18.7"
-    },connectTimeout: 5000, readTimeout: 5000, })
+    },connectTimeout: 20000, readTimeout: 20000, })
     const disposition = resp.header["content-disposition"] as string
     const userinfo = resp.header["subscription-userinfo"] as string
 

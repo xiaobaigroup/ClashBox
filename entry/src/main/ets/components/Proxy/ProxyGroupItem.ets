@@ -183,7 +183,7 @@ struct ProxyGroupItem {
     BreakpointSystem.getInstance().start()
     this.switchSort()
 
-    //用@watch监测数据变化排序，不需eventhub.on
+    // 用@watch监测数据变化排序，不需eventhub.on
 
    /*  EventHub.on(EventKey.ProxySort, async (sort: ProxySort) => {
        console.log("ProxySort", sort)
@@ -204,11 +204,11 @@ struct ProxyGroupItem {
    }
 
    switchSort(){
-     if (this.appConfig.proxySort==ProxySort.Default){
+     if (this.appConfig.proxySort == ProxySort.Default){
        this.proxyLazyItems.DefaultSortItems(this.proxyitems)
-     }else if (this.appConfig.proxySort==ProxySort.Title){
+     } else if (this.appConfig.proxySort == ProxySort.Title){
        this.proxyLazyItems.NameSortItems(this.proxyitems)
-     }else if (this.appConfig.proxySort==ProxySort.Delay){
+     } else if (this.appConfig.proxySort == ProxySort.Delay){
        this.proxyLazyItems.LatencySortItems(this.proxyitems)
      }
    }
@@ -252,15 +252,15 @@ struct ProxyGroupItem {
     console.info('Click the callback in the blank area')
   }
 
-  //收藏与ping延迟即时动作
+  // 收藏与ping延迟即时动作
   private ProxyPromptAction: PromptAction = this.getUIContext()?.getPromptAction()
   OnProxyChange: ((item: ProxyItem) => void) = () => {
 
   }
 
-  //长按菜单 start
+  // 长按菜单 start
   @Builder
-  //长按菜单相关
+  // 长按菜单相关
   MyMenu(isShowFavoriteProxy: boolean, nodeName: string) {
     Menu() {
       // 根据当前配置信息来判断显示[收藏 /取消收藏] 单独处理 START
@@ -314,7 +314,7 @@ struct ProxyGroupItem {
     .backgroundColor($r('app.color.container_background'))
     .borderRadius(BORDER_RADIUS_20)
     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-  } //长按菜单end
+  } // 长按菜单end
 
   selectProxy(item: ProxyItem) {
     if (!this.disabled) {

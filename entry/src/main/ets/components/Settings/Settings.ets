@@ -202,9 +202,8 @@ struct Settings {
       TopBuilder({
         showBackButton: false,
         title: $r('app.string.Settings'),
-        subtitle: `${ClashViewModel.socketProxy.offlineCount}`
       })
-      List() {
+      List({space: 10}) {
         ForEach(this.settingsList, (item: settingsData, index: number) => {
           ListItem() {
             settingsListItem({
@@ -216,10 +215,19 @@ struct Settings {
             })
           }
         })
-
+        ListItem() {
+          Text() {
+            Span($r('app.string.settings_count_vpn'))
+            Span(`${ClashViewModel.socketProxy.offlineCount}`)
+            Span($r('app.string.times'))
+          }
+            .fontColor($r('sys.color.font_secondary'))
+            .maxLines(1)
+            .fontSize(14)
+        }
       }
       .width('100%')
-      .contentEndOffset(CONTENT_END_OFFSET_150 - 85)
+      .contentEndOffset(CONTENT_END_OFFSET_150 - 75)
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)
       .padding({left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value})

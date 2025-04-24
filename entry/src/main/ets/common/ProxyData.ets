@@ -122,7 +122,15 @@ export class ProxyItemDataSource extends BaseDataSource<ProxyItem> {
   // 延迟排序
   public LatencySortItems(data: ProxyItem[]) {
     this.empty()
-    this.pushData(data.sort((a, b) => (ClashViewModel.delayMap.get(a.name)?.delay ?? 0) - (ClashViewModel.delayMap.get(b.name)?.delay ?? 0)))
+    this.pushData(data.sort((a, b) => {
+      // 极大值
+      const MAX_DELAY = Number.MAX_SAFE_INTEGER
+      // 获取a和b的延迟值，如果是undefined或小于0则设置为MAX_DELAY
+      const delayA = ClashViewModel.delayMap.get(a.name)?.delay as number < 0 || ClashViewModel.delayMap.get(a.name)?.delay === undefined ? MAX_DELAY : ClashViewModel.delayMap.get(a.name)?.delay ?? 0;
+      const delayB = ClashViewModel.delayMap.get(b.name)?.delay as number < 0 || ClashViewModel.delayMap.get(a.name)?.delay === undefined ? MAX_DELAY : ClashViewModel.delayMap.get(b.name)?.delay ?? 0;
+      // 进行比较
+      return delayA - delayB;
+    }))
     this.refresh()
   }
 

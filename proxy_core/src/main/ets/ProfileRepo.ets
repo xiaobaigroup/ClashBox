@@ -60,7 +60,7 @@ export class ProfileRepo {
     return list;
   }
 
-  async addOrUpdate(details: Profile) {
+  async addOrUpdate(details: Profile): Promise<number> {
     const predicates = new relationalStore.RdbPredicates('Profiles')
     predicates.equalTo('id', details.id);
     const old = await this.store!.query(predicates)
@@ -71,7 +71,7 @@ export class ProfileRepo {
       type: details.type,
       url: details.url,
       currentGroupName: details.currentGroupName,
-      isUpdating: details.isUpdating ? 1: 0,
+      isUpdating: details.isUpdating ? 1 : 0,
       autoUpdate: details.autoUpdate ? 1 : 0,
       lastUpdateDate: details.lastUpdateDate,
       autoUpdateDuration: details.autoUpdateDuration,
@@ -80,9 +80,11 @@ export class ProfileRepo {
     }
     if (old.rowCount > 0){
       await this.store!.update(input, predicates)
+      return 1
     }
     else
       await this.store!.insert("Profiles", input)
+    return 0
   }
 
   getFromCursor(c: relationalStore.ResultSet): Profile {
