@@ -272,7 +272,7 @@ export class SocketProxyService implements IClashManager {
         this.active = false
         this.offlineCount++
         if(e.message == "Connection refused"){
-          promptAction.showToast({message: "vpn服务系统被回收!"})
+          promptAction.showToast({message: "VPN服务被系统干掉了"})
         }else{
           promptAction.showToast({message: "vpn服务失败: " + e.message})
         }
