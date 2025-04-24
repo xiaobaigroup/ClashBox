@@ -55,7 +55,11 @@ struct Kernel {
       case 1:
         this.appConfig.clashCore = ClashCore.ClashMeta
         ClashViewModel.ChangeCore(ClashCore.ClashMeta)
-        promptAction.showToast({message: "请重启应用", duration: 2000 })
+        promptAction.showToast({message: "应用即将退出，请重新打开", duration: 2000 })
+        setTimeout(()=>{
+          getContext(this)?.getApplicationContext().killAllProcesses()
+        }, 2000)
+
         // ClashRS
         // this.appConfig.clashCore = ClashCore.ClashRs
         // ClashViewModel.ChangeCore(ClashCore.ClashRs)
