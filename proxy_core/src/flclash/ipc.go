@@ -39,7 +39,7 @@ func handleConnection(conn net.Conn) {
 	request := RpcRequest{}
 	err = json.Unmarshal(buffer[:n], &request)
 	if err != nil {
-		log.Println("ipc_go", err)
+		log.Println("ipc_go error", err)
 	}
 	handleRemoteRequest(request, func(rr RpcResult) {
 		res, _ := json.Marshal(rr)
@@ -97,11 +97,20 @@ func handleRemoteRequest(request RpcRequest, fn func(RpcResult)) {
 	}
 	switch request.Method {
 	case QueryTrafficNow:
-		onlyProxy, _ := request.Params[0].(bool)
+		onlyProxy := true
+		if len(request.Params) > 1 {
+			res, _ := request.Params[0].(bool)
+			onlyProxy = res
+		}
 		ret.Result = handleGetTraffic(onlyProxy)
+
 		fn(ret)
 	case QueryTrafficTotal:
-		onlyProxy, _ := request.Params[0].(bool)
+		onlyProxy := true
+		if len(request.Params) > 1 {
+			res, _ := request.Params[0].(bool)
+			onlyProxy = res
+		}
 		ret.Result = handleGetTotalTraffic(onlyProxy)
 		fn(ret)
 	case QueryProviders:

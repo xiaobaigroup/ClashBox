@@ -53,7 +53,9 @@ struct Kernel {
         }
         break
       case 1:
-        promptAction.showToast({message: $r('app.string.developing'), duration: 2000 })
+        this.appConfig.clashCore = ClashCore.ClashMeta
+        ClashViewModel.ChangeCore(ClashCore.ClashMeta)
+        promptAction.showToast({message: "请重启应用", duration: 2000 })
         // ClashRS
         // this.appConfig.clashCore = ClashCore.ClashRs
         // ClashViewModel.ChangeCore(ClashCore.ClashRs)
@@ -114,9 +116,6 @@ struct Kernel {
             .width('100%')
             .onClick(() => {
               this.handleClick(index)
-              if(index !== 2) {
-                promptAction.showToast({message: $r('app.string.switch_clashcore_tips'), duration: 2000 })
-              }
             })
             if ((this.isShowExperimentalFunction && (index === 0 || index === 1) || (index === 0 && this.isShowExperimentalFunction === false) )) {
               if(!isEnd(this.kernel!.length,index))
