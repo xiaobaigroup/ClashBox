@@ -96,30 +96,6 @@ func StartTUN(fd int, markSocket func(Fd)) {
 	}()
 }
 
-// func startFlTun(fd int, callback unsafe.Pointer) {
-// 	if fd == 0 {
-// 		tunLock.Lock()
-// 		defer tunLock.Unlock()
-// 		now := time.Now()
-// 		runTime = &now
-// 		return
-// 	}
-// 	initSocketHook(func(fd Fd) {
-// 		//C.mark_socket(callback, C.int(fd.Id), C.int(fd.Value))
-// 	})
-// 	go func() {
-// 		tunLock.Lock()
-// 		defer tunLock.Unlock()
-// 		f := int(fd)
-// 		tunListener, _ = t.Start(f, currentConfig.General.Tun.Device, currentConfig.General.Tun.Stack)
-// 		if tunListener != nil {
-// 			log.Infoln("TUN address: %v", tunListener.Address())
-// 		}
-// 		now := time.Now()
-// 		runTime = &now
-// 	}()
-// }
-
 func GetRunTime() *C.char {
 	if runTime == nil {
 		return C.CString("")
@@ -128,7 +104,6 @@ func GetRunTime() *C.char {
 }
 
 func StopTun() {
-	removeSocketHook()
 	go func() {
 		tunLock.Lock()
 		defer tunLock.Unlock()
@@ -138,6 +113,7 @@ func StopTun() {
 		if tunListener != nil {
 			_ = tunListener.Close()
 		}
+		removeSocketHook()
 	}()
 }
 
