@@ -994,7 +994,7 @@
     },
     {
       "name": "backgrounder_tips_2",
-      "value": "Tips：开启后会导致应用耗电量增加且只能开启其中的一个选项，并且开关模拟定位后请重启软件；目前已知从自由多窗模式无法主动发起画中画窗口"
+      "value": "Tips：开启后会导致应用耗电量增加，并且开关模拟定位后请重启软件；目前已知从自由多窗模式无法主动发起画中画窗口；画中画开启后系统会锁90帧"
     },
     {
       "name": "notice_main_switch",
@@ -1123,6 +1123,10 @@
     {
       "name": "restart_app_tips",
       "value": "重启应用生效"
+    },
+    {
+      "name": "restart_vpn_tips",
+      "value": "重启代理服务生效"
     },
     {
       "name": "click_prompt",
@@ -1490,7 +1494,11 @@
     },
     {
       "name": "switch_core_prompt",
-      "value": "注：切换内核后需要重启VPN服务"
+      "value": "注：切换内核后需要重启VPN服务，启用前台模式会自动启用画中画功能"
+    },
+    {
+      "name": "switch_core_foreground_prompt",
+      "value": "注意要开启后台运行服务或者小窗前台运行"
     },
     {
       "name": "loading",
@@ -1875,6 +1883,10 @@
     {
       "name": "times",
       "value": "次"
+    },
+    {
+      "name": "restart_tips",
+      "value": "应用即将退出，请重新打开"
     }
   ]
 }

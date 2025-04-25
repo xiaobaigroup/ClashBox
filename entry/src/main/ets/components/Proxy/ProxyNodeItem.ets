@@ -37,6 +37,7 @@ export function delayText(delay: number){
 }
 
 @Component
+@Reusable
 export struct ProxyNode {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
@@ -81,7 +82,7 @@ export struct ProxyNode {
           // group 不要写死, 会和其他tab页的生效，在一个组里唯一
           // 使用.enabled(!this.disabled) 来禁用radio不让选
           Radio({ value: this.item.name, group: this.item.g/* + this.item.name*/})
-            .enabled(!this.disabled)
+            // .enabled(!this.disabled)
             .checked(this.item.name === this.selected)
             .radioStyle({
               checkedBackgroundColor: this.icon_emphasize,
@@ -111,8 +112,8 @@ export struct ProxyNode {
           .justifyContent(FlexAlign.Start)
         }.layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
-        Radio({ value: this.item.name, group: this.item.g + this.item.name })
-          .enabled(!this.disabled)
+        Radio({ value: this.item.name, group: this.item.g/* + this.item.name*/ })
+          // .enabled(!this.disabled)
           .checked(this.item.name === this.selected)
           .radioStyle({
             checkedBackgroundColor: this.icon_emphasize,
@@ -136,8 +137,8 @@ export struct ProxyNode {
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
         .justifyContent(FlexAlign.SpaceBetween)
-        Radio({ value: this.item.name, group: this.item.g + this.item.name })
-          .enabled(!this.disabled)
+        Radio({ value: this.item.name, group: this.item.g/* + this.item.name*/ })
+          // .enabled(!this.disabled)
           .checked(this.item.name === this.selected)
           .radioStyle({
             checkedBackgroundColor: this.icon_emphasize,

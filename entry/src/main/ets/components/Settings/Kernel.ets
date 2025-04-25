@@ -8,6 +8,8 @@ import { promptAction } from "@kit.ArkUI"
 import { ExperimentalFunction } from "../Common"
 import { removeItemsByIndex } from "../../utils/RemoveItemsUtils"
 import { customAnimationUtil } from "../../utils/Animation"
+import { getResourceString } from "../../utils/ResourceStringUtil"
+import { common } from "@kit.AbilityKit"
 
 interface KernelListItem {
   icons: Resource
@@ -16,6 +18,8 @@ interface KernelListItem {
   isExperimental: boolean
   ClashCore: number
 }
+
+const context = getContext(this) as common.UIAbilityContext
 
 @Component
 struct Kernel {
@@ -34,7 +38,7 @@ struct Kernel {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @State private kernel: KernelListItem[] = [
     {icons: $rawfile('FlClash.svg'), title: 'FlClash', subtitle: $r('app.string.new_kernel'), isExperimental: false, ClashCore: ClashCore.FlClash},
-    {icons: $rawfile('FlClash.svg'), title: "FlClash(前台模式)", subtitle: "注意要开启后台运行或者小窗运行", isExperimental: false, ClashCore: ClashCore.ClashMeta},
+    {icons: $rawfile('FlClash.svg'), title: "FlClash(前台模式)", subtitle: $r('app.string.switch_core_foreground_prompt'), isExperimental: false, ClashCore: ClashCore.ClashMeta},
     //{icons: $rawfile('ClashRS.svg'), title: 'ClashRS', subtitle: $r('app.string.new_kernel'), isExperimental: true, ClashCore: ClashCore.ClashRs}
   ]
 
@@ -45,6 +49,7 @@ struct Kernel {
         this.appConfig.clashCore = ClashCore.FlClash
         ClashViewModel.ChangeCore(ClashCore.FlClash)
         hilog.info(0xFF00, "SettingsKerneltestTag", "当前内核：%{public}d", this.appConfig.clashCore)
+        promptAction.showToast({message: getResourceString($r('app.string.restart_vpn_tips'), context), duration: 2000 })
         // 恢复更多页列表
         this.moreList = ListMoreData()
         if (!this.uiConfig.isShowExperimentalFunction) {
@@ -53,10 +58,12 @@ struct Kernel {
         }
         break
       case 1:
+        // 前台模式
         this.appConfig.clashCore = ClashCore.ClashMeta
         ClashViewModel.ChangeCore(ClashCore.ClashMeta)
-        promptAction.showToast({message: "应用即将退出，请重新打开", duration: 2000 })
-        setTimeout(()=>{
+        this.uiConfig.backgroundPiPModel = true
+        promptAction.showToast({message: $r('app.string.restart_tips'), duration: 2000 })
+        setTimeout(() => {
           getContext(this)?.getApplicationContext().killAllProcesses()
         }, 2000)
 
@@ -131,17 +138,18 @@ struct Kernel {
         .borderRadius(BORDER_RADIUS_20)
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
 
-        if(!this.isShowExperimentalFunction) {
-          // 启用提示
-          Text($r('app.string.open_core_prompt'))
-            .fontWeight(FontWeight.Normal)
-            .fontSize(15)
-        } else {
-          // 切换内核提示
-          Text($r('app.string.switch_core_prompt'))
-            .fontWeight(FontWeight.Normal)
-            .fontSize(15)
-        }
+        // if(!this.isShowExperimentalFunction) {
+        //   // 启用提示
+        //   Text($r('app.string.open_core_prompt'))
+        //     .fontWeight(FontWeight.Normal)
+        //     .fontSize(15)
+        // } else {
+        //
+        // }
+        // 切换内核提示
+        Text($r('app.string.switch_core_prompt'))
+          .fontWeight(FontWeight.Normal)
+          .fontSize(15)
 
       }.alignItems(HorizontalAlign.Start)
       .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })

@@ -18,7 +18,7 @@ import { EventHub, EventKey } from '../common/EventHub'
 import { AppConfig,
   AppState,
   ClashCore, isEnd, ProxyCardSize, ProxyGroupType, UIConfig } from '../entryability/AppState'
-import { curves, PromptAction } from '@kit.ArkUI'
+import { curves, promptAction, PromptAction } from '@kit.ArkUI'
 import { ProviderPage } from '../components/Proxy/Provider'
 import { indexController } from './Index'
 import { customAnimationUtil } from '../utils/Animation'
@@ -178,12 +178,12 @@ struct ProxyPage {
   TabBuilder(title: ResourceStr, targetIndex: number) {
     Column() {
       Column() {
-        Text(`${title}`)
+        Text(`${title}`) // ${targetIndex}
           .fontSize(14)
           .fontColor(this.currentIndex === targetIndex ? this.font_on_primary : this.font_secondary)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .padding({left:3,right:3})
+          .padding({left: 3, right: 3})
       }
       .borderRadius(BORDER_RADIUS_20)
       .height(this.currentIndex === targetIndex ? 36 : 32)
@@ -314,15 +314,16 @@ struct ProxyPage {
                       })
                         .width('100%')
                         .height('100%')
-                        .padding({ bottom:!this.uiConfig.isBlurr ? CONTENT_END_OFFSET_150 - 100 : CONTENT_END_OFFSET_150 - 50 })
+                        .padding({ bottom: !this.uiConfig.isBlurr ? CONTENT_END_OFFSET_150 - 100 : CONTENT_END_OFFSET_150 - 50 })
                         .onAppear(() => {
+                          // promptAction.showToast({message: `当前选中：${this.currentProfile?.getSelectedProxy(group) ?? ""}`, duration: 2000 })
                           hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear %{public}s", group.proxies.toString())
                           hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear hidden: %{public}s %{public}d", group.hidden, index)
                         })
                         .onDisAppear(() => {
                           hilog.info(0xFF00, "ProxyPageGroupTag", "#onDisAppear %{public}s", group.toString())
                         })
-                    }, (item: ProxyGroup) => item.name)
+                    }, (item: ProxyGroup) => item.name + Date.now())
                   }
                   .loop(false)
                   .effectMode(EdgeEffect.None)
@@ -354,6 +355,9 @@ struct ProxyPage {
                         ClashViewModel.updateProfile(this.currentProfile)
                       }
                     })
+                  })
+                  .onChange(() => {
+
                   })
                   // 代理节点Swiper End
                 }

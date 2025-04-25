@@ -145,6 +145,7 @@ struct ProxyGroupItem {
   /* 代理节点数据相关参数  */
   //节点数据组
   @Prop proxyitems: ProxyItem[]
+  // 代理分组序号[0 ~ +∞]
   @Prop proxyGroup: number
   // 代理原始数据
   @Consume theProxyGroups: ProxyGroup[]
@@ -160,8 +161,9 @@ struct ProxyGroupItem {
   @Consume showStart:boolean
   // 代理页延迟按钮气泡提示
   @Consume isShowDelayPop: boolean
+  // 列表滚动判断
   @Consume isRolling: boolean
-  //px外屏隐藏top和tab偏移
+  // px外屏隐藏top和tab偏移
   @Consume curOffsetRemain: number
 
   /**
@@ -264,7 +266,7 @@ struct ProxyGroupItem {
   MyMenu(isShowFavoriteProxy: boolean, nodeName: string) {
     Menu() {
       // 根据当前配置信息来判断显示[收藏 /取消收藏] 单独处理 START
-      if (isShowFavoriteProxy && this.favoriteProxys.size>0 ){//&& !this.showStart) {
+      if (isShowFavoriteProxy && this.favoriteProxys.size>0 ) {
         MenuItem({
           symbolStartIcon: this.proxyListLongPressCtxMenuForUnFavorite.symbolStartIcon!
             .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),

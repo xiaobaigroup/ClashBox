@@ -994,7 +994,7 @@
     },
     {
       "name": "backgrounder_tips_2",
-      "value": "Tips： When enabled, the power consumption of the application will increase and only one of the options can be enabled. Please restart the software after the switch is simulated and positioned; At present, it is known that the picture in picture window cannot be initiated from the free multi window mode."
+      "value": "After opening, the power consumption of the application will increase, and please restart the software after the switch is simulated and positioned; At present, it is known that the picture in picture window cannot be initiated from the free multi window mode; After picture in picture is turned on, the system will lock 90 frames."
     },
     {
       "name": "notice_main_switch",
@@ -1123,6 +1123,10 @@
     {
       "name": "restart_app_tips",
       "value": "Restart application to take effect"
+    },
+    {
+      "name": "restart_vpn_tips",
+      "value": "Restart the proxy service to take effect"
     },
     {
       "name": "click_prompt",
@@ -1490,7 +1494,11 @@
     },
     {
       "name": "switch_core_prompt",
-      "value": "Note: after switching the kernel, you need to restart the VPN service"
+      "value": "Note: After switching the kernel, you need to restart the VPN service. Enabling the foreground mode will automatically enable the picture in picture function"
+    },
+    {
+      "name": "switch_core_foreground_prompt",
+      "value": "Note that the background operation service or small window foreground operation should be enabled."
     },
     {
       "name": "loading",
@@ -1875,6 +1883,10 @@
     {
       "name": "times",
       "value": "times"
+    },
+    {
+      "name": "restart_tips",
+      "value": "The app will exit soon. Please reopen it."
     }
   ]
 }

@@ -3,7 +3,11 @@ import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { theRowCustomDialog, toggleRowList } from "../Common"
 import { UIConfig } from "../../entryability/AppState"
+import { BusinessError } from "@kit.BasicServicesKit"
+import { notificationManager } from "@kit.NotificationKit"
+import { common } from "@kit.AbilityKit"
 
+const context = getContext(this) as common.UIAbilityContext
 
 @Component
 struct Backgrounder {
@@ -55,7 +59,7 @@ struct Backgrounder {
       .fontColor(Color.Red)
   }
   // 模拟定位关闭提示弹窗-取消
-  oncloseCancel() {
+  async oncloseCancel() {
     // 将模拟定位设置为 true
     this.isLocate = true
   }
@@ -103,6 +107,30 @@ struct Backgrounder {
     this.onOpenRecord()
   }
 
+  toDialogController: CustomDialogController = new CustomDialogController({
+    builder: theRowCustomDialog({
+      theDialogTitle: $r('app.string.notice_request_to_settings'),
+      contentText: $r('app.string.notice_request_to_settings_text'),
+      cancel: ()=> {
+        this.uiConfig.Enablednotice = false
+        this.isLocate = false
+      },
+      confirm: ()=> {
+        this.handleToSettings()
+      },
+      leftButton: this.toBuilder
+    }),
+  })
+
+  @Builder
+  toBuilder() {
+    Button($r('app.string.to'))
+      .backgroundColor($r('app.color.container_background'))
+      .width('100%')
+      .height(39)
+      .fontColor(this.icon_emphasize)
+  }
+
   /**
    * 启用模拟定位
    */
@@ -148,7 +176,7 @@ struct Backgrounder {
 
   aboutToDisappear(): void {
     // 改变后台运行全局变量的状态
-    if(this.uiConfig.backgroundLocateModel || this.isPlay || this.isPiP) {
+    if(this.uiConfig.backgroundLocateModel || this.isPlay || this.isPiP || this.isLocate) {
       this.uiConfig.Enablebackgrounder = true
     } else {
       this.uiConfig.Enablebackgrounder = false
@@ -156,6 +184,70 @@ struct Backgrounder {
     // 持久化开关状态
     this.uiConfig.backgroundLocateModel = this.isLocate
     this.uiConfig.backgroundPiPModel = this.isPiP
+  }
+
+  async noticePermission() {
+    try {
+      // 先获取最新权限状态
+      const currentStatus = await notificationManager.isNotificationEnabled()
+      if (currentStatus) {
+        // 已有权限时通知开关启用或关闭
+        // 显示通知设置 显式动画
+        this.getUIContext()?.animateTo({
+          duration: this.uiConfig.animationSpeed,
+        }, () => {
+          this.isLocate = true
+          this.uiConfig.Enablednotice = true
+        })
+
+      } else {
+        // 没有授权时
+        this.uiConfig.Enablednotice = false
+        if (!this.uiConfig.isRequestNotification) {
+          // 首次请求权限
+          try {
+            await notificationManager.requestEnableNotification(context)
+            this.uiConfig.isRequestNotification = true
+            // 显示通知设置 显式动画
+            this.getUIContext()?.animateTo({
+              duration: this.uiConfig.animationSpeed,
+            }, () => {
+              this.isLocate = true
+              this.uiConfig.Enablednotice = true
+            })
+          } catch (err) {
+            if ((err as BusinessError).code === 1600004) {
+              hilog.error(0xFF00, "BackgrounderSwitchtestTag",'用户拒绝授权')
+              this.uiConfig.Enablednotice = false
+              this.isLocate = false
+              this.uiConfig.isRequestNotification = true
+            }
+          }
+        } else {
+          // 已请求过权限且通知开关,模拟定位开关均未启用，进入跳转设置
+          if(!this.uiConfig.Enablednotice) {
+            this.toDialogController.open()
+          }
+        }
+      }
+    } catch (err) {
+      hilog.error(0xFF00, "BackgrounderSwitchtestTag", `Toggle Error: ${(err as BusinessError).code}, ${(err as BusinessError).message}`);
+    }
+  }
+
+  /**
+   *  跳转至设置界面开启通知权限
+   */
+  handleToSettings() {
+    context.startAbility({
+      bundleName: 'com.huawei.hmos.settings', // 系统设置界面的包名 （固定）
+      abilityName: 'com.huawei.hmos.settings.MainAbility', // 系统设置的Ability的名字（固定）
+      uri: "application_info_entry", // 系统设置的界面 （固定）
+      parameters: {
+        //pushParams: 'cn.damai.hongmeng' // 包名
+        pushParams: "org.xbgroup.clashnext",
+      }
+    })
   }
 
   build() {
@@ -184,7 +276,7 @@ struct Backgrounder {
             // 关闭其它两个模拟并开启模拟定位
             this.isPlay = false
             this.isPiP = false
-            this.isLocate = true
+            this.noticePermission()
           }
         })
         // 模拟画中画
@@ -234,8 +326,8 @@ struct Backgrounder {
               this.openDialogController.open()
             }
           })*/
-          // 提示
         }
+        // 提示
         Text($r('app.string.backgrounder_tips_2'))
           .fontWeight(FontWeight.Normal)
           .fontSize(15)
