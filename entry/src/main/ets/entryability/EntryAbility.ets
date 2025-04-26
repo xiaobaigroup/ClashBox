@@ -151,15 +151,6 @@ export default class EntryAbility extends UIAbility {
     }
   }
 
-  /*onConfigurationUpdate(newConfig: Configuration): void {
-    if (newConfig.language !== this.currentLanguage) {
-      this.currentLanguage = newConfig.language
-      hilog.info(0x0000, 'EntryAbility', `#onConfigurationUpdate#newConfig.language is [${this.currentLanguage}]`);
-      AppStorage.setOrCreate<string>('language', newConfig.language)
-    }
-
-  }*/
-
   onWindowStageDestroy(): void {
     // Main window is destroyed, release UI related resources
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onWindowStageDestroy');

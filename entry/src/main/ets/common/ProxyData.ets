@@ -20,7 +20,7 @@ export class ProxyData {
   // ...你的items数据...
   ]
 
-//延迟颜色设定
+// 延迟颜色设定
   public static ProxyItems(): ProxyItem[] {
     return ProxyData.items;
   }
@@ -134,14 +134,14 @@ export class ProxyItemDataSource extends BaseDataSource<ProxyItem> {
     this.refresh()
   }
 
-  //按名称排序
+  // 按名称排序
   public NameSortItems(data: ProxyItem[]) {
     this.empty()
     this.pushData(data.sort((a, b) => ProxyCollator.compare(a.name, b.name)))
     this.refresh()
   }
 
-  //默认排序
+  // 默认排序
   public DefaultSortItems(data: ProxyItem[]) {
     this.empty()
     this.pushData(data.sort((a, b) => ProxyCollator.compare(a.id, b.id)))
@@ -149,6 +149,6 @@ export class ProxyItemDataSource extends BaseDataSource<ProxyItem> {
   }
 }
 
-//中文排序
+// 中文排序
 let ProxyCollator = new intl.Collator("zh-CN");
 

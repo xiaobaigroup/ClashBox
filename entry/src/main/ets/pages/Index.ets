@@ -92,7 +92,7 @@ interface marginGenerate {
   right: number
 }
 
-// 日志数据（假设）
+// 日志数据
 interface LogData {
   // 日志类型（0：Warning；1：Info）
   logType: LogLevel
@@ -131,7 +131,7 @@ struct Index {
   // 设备高度是否 (320vp< height <= 500vp) 媒体查询
   @State isLandscapePhone: boolean = false
   // 平板竖屏判断变量
-  @State istabletLandscape: boolean = false
+  @Provide istabletLandscape: boolean = false
   // 折叠展开状态判断变量
   @State isFoldStatus: boolean = false
   // 读取导航条区域的高度
@@ -269,33 +269,20 @@ struct Index {
   @Provide private ProxyItemLongPressValue: number = -1
   // 当前代理节点收藏的值
   @Provide private FavoriteProxy: number = -1
-  //节点数据组
+  // 节点数据组
   @Provide items: ProxyItem[] = ProxyData.ProxyItems();
-  // 日志页数据
+  // 日志数据
   @Provide private logListData: Array<LogData> = []
-  @Provide configList: Array<ConfigData> = [
-    {
-      configId: 'a4e2593d-9927-4f57-8868-f316190657a1',
-      isNewConfig: false,
-      configName: 'SS-Youtube速度快',
-      configUrl: 'https://aaa.com:8344',
-      isConfigAutoUpdate: true,
-      configAutoUpdateTimeGapValue: 10,
-      configAutoUpdateTimeGapTextPickerIndex: 1,
-      createdDate: '2024-05-21 21:21:21',
-      lastUpdateDateTime: 0,
-      updateTime: 0,
-      trafficUsed: '1329.43GB',
-      trafficTotal: '5000GB',
-      isFavorite: false,
-      sourceType: ConfigDataSourceType.URL,
-    },
-  ]
+  // 配置数据
+  @Provide configList: Array<ConfigData> = []
   // 所有子组件在容器内的对齐方式
   @Provide('stackAlignContentAlignment') stackAlignContentAlignment: Alignment = Alignment.BottomEnd
+  // 收藏的代理
   @StorageLink('favoriteProfiles') favoriteProfiles: Map<string, string> = new Map<string, string>([])
+  // 更多页面栈
   @Provide('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
-  // 设置页变量
+
+  /*设置页变量*/
   // 设置页面栈
   @Provide('NavSettingsPathStack') SettingsPageInfos: NavPathStack = new NavPathStack()
   // 设置 -> 备份与恢复 -> 是否启用云备份配置
@@ -425,7 +412,7 @@ struct Index {
     } else if (this.windowHeight < 440 && this.windowWidth <= 440) {
       this.isSmallSquareScreen = true
       hilog.info(0xFF00, componentName,
-        `#WindowChange#应用窗口状态改变#(1000vp< width)平板横屏结果: ${this.isSmallSquareScreen}`)
+        `#WindowChange#应用窗口状态改变#(1000vp< width)小正方形窗口结果: ${this.isSmallSquareScreen}`)
     } else {
       this.isLandscapePhone = false
       this.istabletLandscape = false
@@ -668,8 +655,8 @@ struct Index {
     }catch (e) {
       hilog.info(0xFF00, "ExportLog", "Err: %{public}s", e.message)
     }
-
   }
+
   // 规则选择数据变化监控
   async switchMode() {
     if(this.clashConfig.mode==ProxyMode.Rule){
@@ -801,7 +788,7 @@ struct Index {
   }
 
   @State barHeight: string | number | undefined = this.compBarHeight.value
-  @State barWidth:string | number | undefined = this.tabBarWidth.value
+  @State barWidth: string | number | undefined = this.tabBarWidth.value
   // tab移动动画
   startAnim() {
     indexController.setTabBarTranslate({ y: 0 })
@@ -951,7 +938,7 @@ struct Index {
           TabContent() {
             MorePage()
           }
-          .tabBar(this.TabBarBuilder($r('app.string.More'), 3, $r('sys.symbol.square_fill_grid_2x2')))
+         .tabBar(this.TabBarBuilder($r('app.string.More'), 3, $r('sys.symbol.square_fill_grid_2x2')))
         }
         .zIndex(1)
         .backgroundColor( $r('app.color.background'))
@@ -961,7 +948,7 @@ struct Index {
         .scrollable(this.isSecondary ? false : true)
         .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
         .barWidth(this.isLandscapePhone ? this.barWidth : this.tabBarWidth.value) /**/
-        .barHeight(this.isLandscapePhone ? '100%':((!this.uiConfig.isBlurr && this.isSecondary) || this.isSmallSquareScreen) ? this.barHeight :this.compBarHeight.value) /**/
+        .barHeight(this.isLandscapePhone ? '100%':((!this.uiConfig.isBlurr && this.isSecondary) || this.isSmallSquareScreen) ? this.barHeight : this.compBarHeight.value) /**/
         .onChange((index: number) => {
           this.IndexCurrentindex = index
           if (index === 0) {

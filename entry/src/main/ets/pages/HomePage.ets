@@ -331,7 +331,7 @@ struct Home {
             Text(this.uiConfig.isGreeting ? this.greetings : 'ClashNext')
               .fontSize((this.uiConfig.userLanguage != 'en-Latn') || !this.uiConfig.isGreeting ? TAB_CONTENT_TITLE_FONT_SIZE : 27)
               .layoutWeight(1)
-              .fontSize(this.curYOffset<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset/100:TAB_CONTENT_TITLE_FONT_SIZE)
+              .fontSize(this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE - this.curYOffset / 100 : TAB_CONTENT_TITLE_FONT_SIZE)
               .fontWeight(FontWeight.Bold)
               .fontColor(this.font_primary)
               .transition(customAnimationUtil.isSlide(200,this.uiConfig))

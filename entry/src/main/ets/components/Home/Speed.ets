@@ -218,7 +218,7 @@ struct Speed {
       }
       .width('100%')
 
-      //图表
+      // 图表
         McLineChart({
           options: this.defOption
         })

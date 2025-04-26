@@ -41,6 +41,8 @@ struct MorePage {
   @State isShowSettings: boolean = false
   // 是否进入二级界面
   @Consume isSecondary: boolean
+  // 平板竖屏判断变量
+  @Consume istabletLandscape: boolean
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   //一级图标色，黑色
@@ -126,7 +128,7 @@ struct MorePage {
       hilog.info(0xFF00, "MoretestTag", itemData.name)
       hilog.info(0xFF00, "MoretestTag", "isCheck状态: %{public}s", itemData.isCheck)
       this.pageInfos.replacePathByName(itemData.name, false)
-      this.isSecondary = true
+      this.isSecondary = this.istabletLandscape ? false : true
     }
   }
 
@@ -275,9 +277,9 @@ struct MorePage {
           .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring: null)
           .onScrollFrameBegin((offset: number) => {
             this.curOffsetRemain  += offset
-            if (offset>0) {
+            if (offset > 0) {
               this.isRolling = true
-            }else if(offset<0){
+            } else if(offset<0){
               this.isRolling = false
               this.curOffsetRemain = 0
             }

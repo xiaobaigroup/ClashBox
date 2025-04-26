@@ -79,14 +79,11 @@ export struct ProxyNode {
             .fontSize(12)
             .maxLines(1)
             .textAlign(TextAlign.End)
-          // group 不要写死, 会和其他tab页的生效，在一个组里唯一
-          // 使用.enabled(!this.disabled) 来禁用radio不让选
-          Radio({ value: this.item.name, group: this.item.g/* + this.item.name*/})
-            // .enabled(!this.disabled)
-            .checked(this.item.name === this.selected)
-            .radioStyle({
-              checkedBackgroundColor: this.icon_emphasize,
-            })
+          // group唯一
+          Checkbox({ name: this.item.name, group: this.item.g + this.item.name})
+            .shape(CheckBoxShape.CIRCLE)
+            .select(this.item.name === this.selected)
+            .selectedColor(this.icon_emphasize)
             .hitTestBehavior(HitTestMode.None)
         }
       }.width('100%')
@@ -112,12 +109,10 @@ export struct ProxyNode {
           .justifyContent(FlexAlign.Start)
         }.layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
-        Radio({ value: this.item.name, group: this.item.g/* + this.item.name*/ })
-          // .enabled(!this.disabled)
-          .checked(this.item.name === this.selected)
-          .radioStyle({
-            checkedBackgroundColor: this.icon_emphasize,
-          })
+        Checkbox({ name: this.item.name, group: this.item.g + this.item.name})
+          .shape(CheckBoxShape.CIRCLE)
+          .select(this.item.name === this.selected)
+          .selectedColor(this.icon_emphasize)
           .hitTestBehavior(HitTestMode.None)
       }
       .ListRowStyle()
@@ -137,13 +132,10 @@ export struct ProxyNode {
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
         .justifyContent(FlexAlign.SpaceBetween)
-        Radio({ value: this.item.name, group: this.item.g/* + this.item.name*/ })
-          // .enabled(!this.disabled)
-          .checked(this.item.name === this.selected)
-          .radioStyle({
-            checkedBackgroundColor: this.icon_emphasize,
-          })
-           // 不要用chang
+        Checkbox({ name: this.item.name, group: this.item.g + this.item.name})
+          .shape(CheckBoxShape.CIRCLE)
+          .select(this.item.name === this.selected)
+          .selectedColor(this.icon_emphasize)
           .hitTestBehavior(HitTestMode.None)
       }
       .ListRowStyle()
