@@ -36,17 +36,48 @@ class AnimationUtil{
     return effectEvent
   }
 
-  //转场滑动动画（从下到上），i为直接延迟数值，uiConfig为动画速度以及开关的切换
-  public isSlideBottom(i:number,uiConfig:UIConfig){
+  //转场滑动动画（从右到左边），i为直接延迟数值，uiConfig为动画速度以及开关的切换
+  public isSlideR(i:number,uiConfig:UIConfig){
     effectEvent=
       uiConfig.isAnimation ?
       TransitionEffect.OPACITY
         .animation({ duration: uiConfig.animationSpeed, curve:curves.springMotion(),delay: i })
-        .combine(TransitionEffect.translate({y:'100%'})):null
+        .combine(TransitionEffect.SLIDE):null
+
+    return effectEvent
+  }
+
+  //转场放大动画，i为直接延迟数值，uiConfig为动画速度以及开关的切换
+  public isSlideScaleBig(i:number,uiConfig:UIConfig){
+    effectEvent=
+      uiConfig.isAnimation ?
+      TransitionEffect.OPACITY
+        .animation({ duration: uiConfig.animationSpeed, curve:curves.springMotion(),delay: i })
+        .combine(TransitionEffect.scale({x:0,y:0})):null
     {}
 
     return effectEvent
   }
+
+  //转场缩小动画，i为直接延迟数值，uiConfig为动画速度以及开关的切换
+  public isSlideScaleSmall(i:number,uiConfig:UIConfig){
+    effectEvent=
+      uiConfig.isAnimation ?
+
+      TransitionEffect.asymmetric(
+        TransitionEffect.OPACITY
+          .animation({ duration: uiConfig.animationSpeed, curve:curves.springMotion(),delay: i })
+          .combine(TransitionEffect.scale({x:2,y:2})),
+
+        TransitionEffect.OPACITY
+          .animation({ duration: uiConfig.animationSpeed, curve:curves.springMotion(),delay: i })
+          .combine(TransitionEffect.translate({y:-5}))
+      ) :null
+    {}
+
+    return effectEvent
+  }
+
 
   //右下角按钮滑动动画（从右到左），uiConfig为动画速度以及开关的切换
   public isSlideSwitch(uiConfig:UIConfig){

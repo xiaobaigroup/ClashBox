@@ -46,6 +46,7 @@ export struct PXSecScreen{
   @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
   // 收藏与ping延迟即时动作
   private PXPromptAction: PromptAction = this.getUIContext()?.getPromptAction()
+
   //外屏三页
   @Builder
   PXSS(i:number){
@@ -156,9 +157,11 @@ export struct PXSecScreen{
     }else if (i==SwiperPage.PXSSProxy){
       ProxyPage()
         .padding({top:4})
+       // .transition(customAnimationUtil.isSlideR(0, this.uiConfig))
     }else if (i==SwiperPage.PXSSConfiguration){
       ConfigurationPage()
         .padding({top:14,bottom:14})
+       // .transition(customAnimationUtil.isSlideR(0, this.uiConfig))
     }
   }
 
@@ -198,7 +201,7 @@ export struct PXSecScreen{
               playMode: PlayMode.Normal,
               curve:Curve.Friction,
             }, () => {
-              this.switchTranslateX(i)
+              this.switchTranslateX(n.swiperPage)
               this.tabsSelect.swiperPage = n.swiperPage
             })
           })
@@ -212,8 +215,9 @@ export struct PXSecScreen{
     .backgroundColor($r('app.color.px_sec_screen_tabs'))
     .borderRadius(20)
     .margin({left:16,right:16,bottom:8})
-    .blur(0.5)
-    .transition(customAnimationUtil.isSlideBottom(0, this.uiConfig))
+   // .blur(0.5)
+    .transition(customAnimationUtil.isSlideScaleBig(0, this.uiConfig))
+    .geometryTransition("picture", { follow: false })
   }
 
   //平移选择动画参数切换
@@ -221,15 +225,15 @@ export struct PXSecScreen{
     switch (index) {
       case SwiperPage.PXSSHome:
         this.translateX='-100%'
-        this.indicatorController.changeIndex(0)
+        this.swiperController2.changeIndex(0)
         break;
       case SwiperPage.PXSSProxy:
         this.translateX=0
-        this.indicatorController.changeIndex(1)
+        this.swiperController2.changeIndex(1)
         break
       case SwiperPage.PXSSConfiguration:
         this.translateX='100%'
-        this.indicatorController.changeIndex(2)
+        this.swiperController2.changeIndex(2)
         break
     }
   }
@@ -241,12 +245,22 @@ export struct PXSecScreen{
           this.PXSS(n.swiperPage)
         })
       }
+      .cachedCount(0)
       .indicator(false)
       .loop(false)
       .width('100%')
       .height('100%')
       .indicator(this.indicatorController)
-      .onChange((index: number) => {
+      .onAnimationStart((index: number,targetIndex: number) => {
+        animateTo({
+          duration: this.uiConfig.animationSpeed,
+          iterations: 1,
+          playMode: PlayMode.Normal,
+          curve: Curve.Friction,
+        }, () => {
+          this.tabsSelect.swiperPage = targetIndex
+          this.switchTranslateX(targetIndex)
+        })
         console.info(index.toString())
       })
       // 单指长按文本触发该手势事件
@@ -259,61 +273,53 @@ export struct PXSecScreen{
           })
       )
 
-      Stack(){
-        IndicatorComponent(this.indicatorController)
-          .hitTestBehavior(HitTestMode.None)
-          .initialIndex(0)
-          .style(
-            new DotIndicator()
-              .itemWidth(8)
-              .itemHeight(8)
-              .selectedItemWidth(12)
-              .selectedItemHeight(8)
-             //.color(Color.Gray)
-              .selectedColor(this.icon_emphasize))
-          .loop(false)
-          .count(3)
-          .onChange((index: number) => {
-            animateTo({
-              duration: this.uiConfig.animationSpeed,
-              iterations: 1,
-              playMode: PlayMode.Normal,
-              curve:Curve.Friction,
-            }, () => {
-              this.tabsSelect.swiperPage = index
-              this.switchTranslateX(index)
+      if (!this.isTabSelect) {
+        Stack() {
+          IndicatorComponent(this.indicatorController)
+            .hitTestBehavior(HitTestMode.None)
+            .initialIndex(0)
+            .style(
+              new DotIndicator()
+                .itemWidth(8)
+                .itemHeight(8)
+                .selectedItemWidth(12)
+                .selectedItemHeight(8)//.color(Color.Gray)
+                .selectedColor(this.icon_emphasize))
+            .loop(false)
+            .count(3)
+            .onChange((index: number) => {
+              console.log("current index: " + index)
             })
-            console.log("current index: " + index )
-          })
-      }
-      .width(60)
-      .height(20)
-      .backgroundColor($r('app.color.px_sec_screen_dot'))
-      .align(Alignment.Center)
-      .borderRadius(20)
-      .margin({bottom:8})
-      .shadow({
-        radius: 10,
-        color: $r('app.color.shadow'),
-        offsetY: 4,
-        type: ShadowType.BLUR
-      })
-      .onClick(()=>{
-        animateTo({
-          duration: this.uiConfig.animationSpeed,
-          iterations: 1,
-          playMode: PlayMode.Normal,
-          curve:Curve.Friction,
-        }, () => {
-          this.isTabSelect = true
-
-          setTimeout(() => {
-            this.isTabSelect = false
-          }, 3500)
+        }
+        .width(60)
+        .height(20)
+        .backgroundColor($r('app.color.px_sec_screen_dot'))
+        .align(Alignment.Center)
+        .borderRadius(20)
+        .margin({ bottom: 8 })
+        .shadow({
+          radius: 10,
+          color: $r('app.color.shadow'),
+          offsetY: 4,
+          type: ShadowType.BLUR
         })
-      })
+        .onClick(() => {
+          animateTo({
+            duration: this.uiConfig.animationSpeed,
+            iterations: 1,
+            playMode: PlayMode.Normal,
+            curve: Curve.LinearOutSlowIn	,
+          }, () => {
+            this.isTabSelect = true
 
-      if (this.isTabSelect){
+            setTimeout(() => {
+              this.isTabSelect = false
+            }, 3500)
+          })
+        })
+        .geometryTransition("picture")
+        .transition(customAnimationUtil.isSlideScaleSmall(50, this.uiConfig))
+      }else{
         this.tabSelect()
       }
     }
@@ -321,7 +327,7 @@ export struct PXSecScreen{
     .height('100%')
     .backgroundColor($r('app.color.background'))
     .align(Alignment.Bottom)
-    .borderRadius(25)
+    //.borderRadius(25)
   }
 }
 
