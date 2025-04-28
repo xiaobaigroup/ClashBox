@@ -43,7 +43,7 @@ struct Home {
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 设置模态页控制变量
-  @State isShowSettings: boolean = false
+  @Consume isShowSettings: boolean
   // 设置页面栈
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   // 所有子组件在容器内的对齐方式

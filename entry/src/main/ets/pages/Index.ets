@@ -129,11 +129,13 @@ struct Index {
   // 小方屏
   @Provide @Watch('isHiddenChange')isSmallSquareScreen: boolean = false
   // 设备高度是否 (320vp< height <= 500vp) 媒体查询
-  @State isLandscapePhone: boolean = false
+  @Provide isLandscapePhone: boolean = false
   // 平板竖屏判断变量
   @Provide istabletLandscape: boolean = false
   // 折叠展开状态判断变量
   @State isFoldStatus: boolean = false
+  // 设置模态页控制变量
+  @Provide isShowSettings: boolean = false
   // 读取导航条区域的高度
   @StorageProp('bottomRectHeight') bottomRectHeight: number = 0;
   @StorageProp('topRectHeight') topRectHeight: number = 0;
@@ -263,8 +265,6 @@ struct Index {
   /*
   代理页Provide相关数据
    */
-  // 当前代理节点单选选择的值
-  // @Provide private ProxyRadioCheckedValue: number =-1
   // 当前代理节点长按选择的值
   @Provide private ProxyItemLongPressValue: number = -1
   // 当前代理节点收藏的值

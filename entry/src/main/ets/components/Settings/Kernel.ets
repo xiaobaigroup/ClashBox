@@ -13,7 +13,7 @@ import { common } from "@kit.AbilityKit"
 
 interface KernelListItem {
   icons: Resource
-  title: ResourceStr
+  title: string
   subtitle: ResourceStr
   isExperimental: boolean
   ClashCore: number
@@ -49,13 +49,16 @@ struct Kernel {
         this.appConfig.clashCore = ClashCore.FlClash
         ClashViewModel.ChangeCore(ClashCore.FlClash)
         hilog.info(0xFF00, "SettingsKerneltestTag", "当前内核：%{public}d", this.appConfig.clashCore)
-        promptAction.showToast({message: getResourceString($r('app.string.restart_vpn_tips'), context), duration: 2000 })
+        promptAction.showToast({message: $r('app.string.restart_tips'), duration: 2000 })
+        setTimeout(() => {
+          getContext(this)?.getApplicationContext().killAllProcesses()
+        }, 2000)
         // 恢复更多页列表
         this.moreList = ListMoreData()
-        if (!this.uiConfig.isShowExperimentalFunction) {
-          // 屏蔽分流策略
-          this.moreList = removeItemsByIndex(this.moreList, [5])
-        }
+        // if (!this.uiConfig.isShowExperimentalFunction) {
+        //   // 屏蔽分流策略
+        //   this.moreList = removeItemsByIndex(this.moreList, [5])
+        // }
         break
       case 1:
         // 前台模式
@@ -90,7 +93,10 @@ struct Kernel {
       Column({space:10}) {
         Column({space:8}){
           ForEach(this.kernel, (item: KernelListItem, index: number) => {
-            Row() {
+            Flex({
+              direction: FlexDirection.Row,
+              justifyContent: FlexAlign.Center
+            }) {
               Image(item.icons)
                 .width(48)
                 .height(48)
@@ -108,22 +114,22 @@ struct Kernel {
                 }
                 Text(item.subtitle)
                   .fontWeight(FontWeight.Normal)
-                  .textOverflow({ overflow: TextOverflow.Ellipsis })
-                  .maxLines(1)
+                  .maxLines(2)
                   .margin({ top: 2 })
                   .fontSize(14)
-              }.margin({ left: 12 })
+              }
+              .margin({ left: 12 })
+              .constraintSize({maxWidth: '80%'})
               .alignItems(HorizontalAlign.Start)
+              .justifyContent(FlexAlign.Center)
               .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
               Blank()
-              Radio({ value: 'kernel' + index, group: 'kernelGroup' })
-                .checked(item.ClashCore === this.appConfig.clashCore)
-                .radioStyle({
-                  checkedBackgroundColor: this.icon_emphasize,
-                })
+              Checkbox({ name: 'kernel' + index, group: item.title })
+                .selectedColor(this.icon_emphasize)
+                .select(item.ClashCore === this.appConfig.clashCore)
                 .hitTestBehavior(HitTestMode.None)
             }.opacity(index !== 2 ? 1 : 0.5)
-            .height(72)
+            .constraintSize({minHeight: 48, maxHeight: 72})
             .width('100%')
             .onClick(() => {
               this.handleClick(index)
@@ -134,6 +140,7 @@ struct Kernel {
             }
           })
         }.padding(12)
+        .width('100%')
         .backgroundColor($r('app.color.container_background'))
         .borderRadius(BORDER_RADIUS_20)
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))

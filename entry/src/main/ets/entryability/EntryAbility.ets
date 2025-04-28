@@ -40,6 +40,18 @@ export default class EntryAbility extends UIAbility {
     // Main window is created, set main page for this ability
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onWindowStageCreate');
 
+    // 设置自动记忆最后关闭的窗口大小(仅2in1设备生效)
+    try {
+      let AutoSave = windowStage.setWindowRectAutoSave(true);
+      AutoSave.then(() => {
+        hilog.info(0xFF00, "EntryAbilityTestTag", 'Succeeded in setting window rect auto-save')
+      }).catch((err: BusinessError) => {
+        hilog.error(0xFF00, "EntryAbilityTestTag", 'Failed to set window rect auto-save. Cause code: %{public}s smessage: %{public}s', err.code, err.message)
+      });
+    } catch (exception) {
+      hilog.error(0xFF00, "EntryAbilityTestTag", 'Failed to set window rect auto-save. Cause code: %{public}s smessage: %{public}s', exception.code, exception.message)
+    }
+
     await ClashViewModel.init(this.context)
     windowStage.loadContent('pages/Index', async (err) => {
       if (err.code) {
@@ -64,7 +76,7 @@ export default class EntryAbility extends UIAbility {
       setInterval(async ()=>{
         if(!ClashViewModel.socketProxy.active){
           ClashViewModel.socketProxy.active = true
-          promptAction.showToast({message: `核心恢复中(${ClashViewModel.socketProxy.offlineCount})...`})
+          promptAction.showToast({message: `核心恢复中(${ClashViewModel.socketProxy.offlineTime.length})...`})
           let clashCore = AppStorage.get<AppConfig>("appConfig")?.clashCore
           await ClashViewModel.ChangeCore(clashCore)
           await ClashViewModel.ReStartVpn()
@@ -136,7 +148,7 @@ export default class EntryAbility extends UIAbility {
     let rect = properties.windowRect
     let WindowHeight = rect.height
     let WindowWidth = rect.width
-    hilog.info(0x0000, 'PicaWindowLog', '窗口高度：%{public}d 宽度：%{public}i', rect.height, rect.width)
+    hilog.info(0x0000, 'WindowLog', '窗口高度：%{public}d 宽度：%{public}i', rect.height, rect.width)
     AppStorage.setOrCreate('windowHeight', px2vp(WindowHeight))
     AppStorage.setOrCreate('windowWidth', px2vp(WindowWidth))
     // 监听窗口大小变化

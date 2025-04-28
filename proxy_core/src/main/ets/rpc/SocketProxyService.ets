@@ -29,7 +29,7 @@ interface TrafficInfo{
 export class SocketProxyService implements IClashManager {
   context?: common.Context
   active: boolean = false
-  offlineCount: number = 0
+  offlineTime: number[] = []
   init(context: common.Context) {
     this.context = context
   }
@@ -270,7 +270,7 @@ export class SocketProxyService implements IClashManager {
         client.send({ data: JSON.stringify({method, params}) });
       }).catch((e:Error)=>{
         this.active = false
-        this.offlineCount++
+        this.offlineTime.push(Date.now())
         if(e.message == "Connection refused"){
           promptAction.showToast({message: "VPN服务被系统干掉了"})
         }else{

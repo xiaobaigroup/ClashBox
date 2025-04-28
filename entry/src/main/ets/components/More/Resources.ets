@@ -371,10 +371,9 @@ struct Resources {
                         this.updateGeoDateItem(item)
                       })
                     }
-                    .width('100%')
                     .padding(12)
-                    .justifyContent(FlexAlign.Center)
                     .width('100%')
+                    .justifyContent(FlexAlign.Center)
                     .backgroundColor($r('app.color.container_background'))
                     .borderRadius(BORDER_RADIUS_20)
                   }.width('100%')

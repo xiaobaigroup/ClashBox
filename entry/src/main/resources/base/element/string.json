@@ -1887,6 +1887,22 @@
     {
       "name": "restart_tips",
       "value": "应用即将退出，请重新打开"
+    },
+    {
+      "name": "view_detail",
+      "value": "查看详情"
+    },
+    {
+      "name": "offline",
+      "value": "VPN进程回收统计"
+    },
+    {
+      "name": "id",
+      "value": "序号"
+    },
+    {
+      "name": "time",
+      "value": "时间"
     }
   ]
 }

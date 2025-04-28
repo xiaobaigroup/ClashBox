@@ -23,6 +23,7 @@
         "startWindowBackground": "$color:start_window_background",
         "orientation": "auto_rotation_restricted",
         "supportWindowMode": ["floating","split","fullscreen"],
+        "minWindowWidth": 320,
         "exported": true,
         "backgroundModes": [ // 长时任务类型的配置项
           // 数据传输

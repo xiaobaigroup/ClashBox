@@ -277,7 +277,7 @@ struct ProxyPage {
       })
       .transition(customAnimationUtil.isSlide(0, this.uiConfig))
 
-      if (this.theProxyGroups.length == 0) {
+      if (this.proxyGroups.totalCount() == 0) {
         Nothing({ name: $r('app.string.None_Proxy') })
       } else {
         Stack({ alignContent: this.stackAlignContentAlignment }) {

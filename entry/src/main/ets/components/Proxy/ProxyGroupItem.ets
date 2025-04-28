@@ -155,7 +155,7 @@ struct ProxyGroupItem {
   @Prop selectedProxy: string
   @Prop disabled: boolean
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
-  @StorageLink('appConfig') @Watch('switchSort') appConfig: AppConfig = new AppConfig()
+  @StorageLink('appConfig') @Watch('switchSort') @Watch('FavoriteSelectProxy') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 收藏显示判定
   @Consume showStart:boolean
@@ -256,6 +256,7 @@ struct ProxyGroupItem {
 
   // 收藏与ping延迟即时动作
   private ProxyPromptAction: PromptAction = this.getUIContext()?.getPromptAction()
+
   OnProxyChange: ((item: ProxyItem) => void) = () => {
 
   }
@@ -325,6 +326,10 @@ struct ProxyGroupItem {
       this.appConfig.currentProxyItem = item
       this.OnProxyChange(item)
     }
+  }
+
+  FavoriteSelectProxy() {
+    this.selectedProxy =  this.appConfig.currentProxyName as string
   }
 
   build() {

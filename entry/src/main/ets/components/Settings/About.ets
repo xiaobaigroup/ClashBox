@@ -130,7 +130,7 @@ struct About {
         } else {
           this.isShowExperimentalFunction = false
           // 屏蔽分流策略
-          this.moreList = removeItemsByIndex(this.moreList, [5])
+          // this.moreList = removeItemsByIndex(this.moreList, [5])
         }
         break
       case 'Auto':
@@ -190,10 +190,10 @@ struct About {
     if (showItem && showItem.children) {
       switch (kernel) {
         case 0:
-          showItem.children[1].subtitle = `ClashMeta ${showItem.children[1].subtitle}`
+          showItem.children[1].subtitle = `FlClash ${showItem.children[1].subtitle}`
           break
         case 1:
-          showItem.children[1].subtitle = `FlClash ${showItem.children[1].subtitle}`
+          showItem.children[1].subtitle = `FlClash(前台模式) ${showItem.children[1].subtitle}`
           break
         case 2:
           showItem.children[1].subtitle = `ClashRS ${showItem.children[1].subtitle}`

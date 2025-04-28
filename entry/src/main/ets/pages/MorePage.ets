@@ -186,6 +186,16 @@ struct MorePage {
     .height('100%')
   }
 
+  onSecondary() {
+    if (this.pageInfos.size() !== 0) {
+      this.isSecondary = true
+      hilog.info(0xFF00, "MorePagetestTag", "#onSecondary 非0 是否二级页面: %{public}s", this.isSecondary)
+    } else {
+      this.isSecondary = false
+      hilog.info(0xFF00, "MorePagetestTag", "#onSecondary 0 是否二级页面: %{public}s", this.isSecondary)
+    }
+  }
+
   build() {
     Navigation(this.pageInfos) {
       Stack() {
@@ -270,6 +280,9 @@ struct MorePage {
             .nestedScroll({
               scrollForward: NestedScrollMode.PARENT_FIRST,
               scrollBackward: NestedScrollMode.SELF_FIRST
+            })
+            .onScrollStart(() => {
+              hilog.info(0xFF00, "MorePagetestTag", "#onScrollStart 是否二级页面: %{public}s", this.isSecondary)
             })
           }
           .padding({top: (this.isRolling && this.isSmallSquareScreen) ? this.heightTop : TAB_CONTENT_TITLE_HEIGHT})

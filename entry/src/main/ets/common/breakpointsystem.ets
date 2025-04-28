@@ -14,7 +14,7 @@ export class BreakpointSystem {
   private static instance: BreakpointSystem
   private readonly breakpoints: Breakpoint[] = [
     { name: 'xs', size: 0 },
-    { name: 'sm', size: 320 },
+    { name: 'sm', size: 310 },
     { name: 'md', size: 600 },
     { name: 'lg', size: 840 },
     { name: 'xl', size: 1000 },

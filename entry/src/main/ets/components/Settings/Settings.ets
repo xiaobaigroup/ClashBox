@@ -1,5 +1,7 @@
 import { BreakpointState } from "../../common/breakpointsystem"
-import { CONTENT_END_OFFSET_150, FONT_SIZE_16, settingsData, SettingsListItem } from "../../common/Constants"
+import {
+  BORDER_RADIUS_20,
+  CONTENT_END_OFFSET_150, FONT_SIZE_16, settingsData, SettingsListItem } from "../../common/Constants"
 import settingsListItem from "./settingsListItem"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import Appearance from "./Appearance"
@@ -11,19 +13,32 @@ import WipeData from "./WipeData"
 import About, { AboutContributors, CheckUpdate, FAQ, ThirdServices, UseGuidance } from "./About"
 import Language from "./Language"
 import TopBuilder from "./TopBuilder"
-import { DisclaimerCustomDialog, theRowCustomDialog } from "../Common"
+import { DisclaimerCustomDialog, Nothing, theRowCustomDialog } from "../Common"
 import { AppState, UIConfig } from "../../entryability/AppState"
 import { promptAction } from "@kit.ArkUI"
 import { removeItemsByIndex } from "../../utils/RemoveItemsUtils"
 import ClashViewModel from "../../entryability/ClashViewModel"
+import { getResourceString } from "../../utils/ResourceStringUtil"
+import { common } from "@kit.AbilityKit"
+import OverwriteTop from "../More/Overwrite/OverwriteTopBuilder"
+import { timestampToDateTime } from "../../utils/TimeConvertUtil"
+import { ProxyGroupItemDataSource } from "../../common/ProxyData"
+import { ConfigData } from "../../common/PageArgumentEntity"
 
+const context = getContext(this) as common.UIAbilityContext
 
 @Entry
 @Component
 struct Settings {
   @Consume isDisclaimer: boolean
+  // 设置模态页控制变量
+  @Consume isShowSettings: boolean
   @Consume currentLanguage: ResourceStr
+  @Consume configList: Array<ConfigData>
+  @Consume proxyGroups: ProxyGroupItemDataSource
   @State settingsList: settingsData[] = SettingsListItem()
+  /* 主题色 */
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 当前设备`height`是否符合(320vp< height <= 500vp)
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
@@ -91,14 +106,18 @@ struct Settings {
   }
   onresetCancel() {
     // 关闭背景模糊
-    this.isEnableIndexForegroundBlur = false
+    // this.isEnableIndexForegroundBlur = false
   }
   onresetAccept() {
-    // 关闭背景模糊
-    this.isEnableIndexForegroundBlur = false
     // 清空应用设置操作
     AppState.ResetConfig()
+    this.proxyGroups.clear()
+    this.configList = []
     promptAction.showToast({message: $r('app.string.settings_reset_tips')})
+    // 关闭背景模糊
+    this.isEnableIndexForegroundBlur = false
+    // 关闭设置页
+    this.isShowSettings = false
   }
 
   handleCheck(index: number) {
@@ -194,6 +213,9 @@ struct Settings {
       } else
       if (name == 'UseGuidance') {
         UseGuidance()
+      } else
+      if (name == 'offline-detail') {
+        OfflineDetail()
       }
   }
 
@@ -218,8 +240,13 @@ struct Settings {
         ListItem() {
           Text() {
             Span($r('app.string.settings_count_vpn'))
-            Span(`${ClashViewModel.socketProxy.offlineCount}`)
-            Span($r('app.string.times'))
+            Span(`${ClashViewModel.socketProxy.offlineTime.length}`)
+            Span(`${getResourceString($r('app.string.times'), context)}, `)
+            Span($r('app.string.view_detail'))
+              .fontColor(this.icon_emphasize)
+              .onClick(() => {
+                this.SettingsPageInfos.pushPathByName('offline-detail', false)
+              })
           }
             .fontColor($r('sys.color.font_secondary'))
             .maxLines(1)
@@ -250,3 +277,74 @@ struct Settings {
   }
 }
 export default Settings
+
+
+@Component
+struct OfflineDetail {
+
+  @State offline: number[] = []
+  @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
+  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+
+  aboutToAppear(): void {
+    this.offline = ClashViewModel.socketProxy.offlineTime.reverse()
+  }
+
+  build() {
+    NavDestination() {
+      TopBuilder({
+        title: $r('app.string.offline'),
+        subtitle: ''
+      })
+
+      if (this.offline.length === 0) {
+        Nothing({
+          name: $r('app.string.offline')
+        })
+      } else {
+        List({ space: 10 }) {
+          ForEach(this.offline, (item: number, index: number) => {
+            ListItem() {
+              Row() {
+                Column() {
+                  Text() {
+                    Span($r('app.string.id'))
+                    Span('：')
+                    Span((index + 1).toString())
+                  }
+                  .fontWeight(FontWeight.Normal)
+                  .fontSize(15)
+                  Text() {
+                    Span($r('app.string.time'))
+                    Span('：')
+                    Span(timestampToDateTime(item))
+                  }
+                  .fontWeight(FontWeight.Normal)
+                  .fontSize(15)
+                }
+                .alignItems(HorizontalAlign.Start)
+              }
+              .width('100%')
+              .padding(12)
+              .justifyContent(FlexAlign.Start)
+              .backgroundColor($r('app.color.container_background'))
+              .borderRadius(BORDER_RADIUS_20)
+            }
+          })
+        }.width('100%')
+        .align(Alignment.Top)
+        .edgeEffect(EdgeEffect.Spring)
+        .contentEndOffset(CONTENT_END_OFFSET_150 - 85)
+        .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value, bottom: this.breakPointStatemorePageMargin.value })
+
+      }
+
+    }.width('100%')
+    .backgroundColor($r('app.color.background'))
+    .hideTitleBar(true)
+    .onBackPressed(() => {
+      this.SettingsPageInfos.clear();
+      return true;
+    })
+  }
+}

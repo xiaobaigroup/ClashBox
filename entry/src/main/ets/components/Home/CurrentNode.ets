@@ -21,8 +21,6 @@ struct CurrentNode {
   @Consume('HomeCardPrpxySmFontSize') private HomeCardPrpxySmFontSize: BreakpointState<number>
   //主页卡片内容当前节点字体大小
   @Consume('ProxyFontSize') private ProxyFontSize: BreakpointState<number>
-  // 当前代理节点单选框选择的配置
-  // @Consume private ProxyRadioCheckedValue: number
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
 
   build() {

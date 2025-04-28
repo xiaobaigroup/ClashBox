@@ -1887,6 +1887,22 @@
     {
       "name": "restart_tips",
       "value": "The app will exit soon. Please reopen it."
+    },
+    {
+      "name": "view_detail",
+      "value": "View details"
+    },
+    {
+      "name": "offline",
+      "value": "VPN process recycling statistics"
+    },
+    {
+      "name": "id",
+      "value": "Serial number"
+    },
+    {
+      "name": "time",
+      "value": "Time"
     }
   ]
 }

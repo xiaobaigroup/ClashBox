@@ -1,8 +1,8 @@
 import { BreakpointState } from '../../common/breakpointsystem'
-import { mediaquery } from '@kit.ArkUI'
+import { mediaquery, promptAction } from '@kit.ArkUI'
 import { MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
-import { ProxyItem } from '../../common/ProxyData'
+import { ProxyGroupItemDataSource, ProxyItem } from '../../common/ProxyData'
 import { AppConfig, AppState, isEnd, UIConfig } from '../../entryability/AppState'
 import { Profile, ProxyGroup } from 'proxy_core'
 import { customVibrator } from '../../utils/VibratorUtil'
@@ -31,38 +31,36 @@ struct FavoriteProxy {
   //主页卡片内容IP地址小字体大小
   @Consume('HomeCardIPSmFontSize')
   private HomeCardIPSmFontSize: BreakpointState<number>
-  /*
-编辑模式下右上角删除按钮
- */
+  /*编辑模式下右上角删除按钮*/
   @Consume deleteButtonSize: BreakpointState<number>
   // 当前代理节点长按选择的值
   @Consume private FavoriteProxy: number
-  // 当前代理节点单选选择的值
-  // @Consume private ProxyRadioCheckedValue: number
   // 当前代理节点长按选择的值
   @Consume private ProxyItemLongPressValue: number
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
   @Consume theProxyGroups: ProxyGroup[]
+  // 代理数据(懒加载)
+  @Consume proxyGroups: ProxyGroupItemDataSource
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-  @StorageLink("proxyGroups") proxyGroups: ProxyGroup[] = []
+  @StorageLink("proxyGroups") ProxyGroups: ProxyGroup[] = []
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @Consume('currentProfile')
   private currentProfile: Profile | null
 
   changeProxy(g: string, item: ProxyItem){
-    if(this.currentProfile){
+    if (this.currentProfile) {
       ClashViewModel.changeProxy(this.currentProfile, g, item.name)
     }
   }
 
   aboutToAppear(): void {
-    this.theProxyGroups=this.proxyGroups
+    this.theProxyGroups = this.ProxyGroups
   }
 
   aboutToDisappear() {
-    this.proxyGroups= this.theProxyGroups
+    this.ProxyGroups = this.theProxyGroups
   }
 
 
@@ -102,7 +100,7 @@ struct FavoriteProxy {
                           if (this.uiConfig.isVibrate) {
                             customVibrator.vibratorTriggerOfHapticClockTimer()
                           }
-                          //对应切换代理页节点
+                          // 对应切换代理页节点
                           this.changeProxy(p[0], this.appConfig.currentProxyItem)
                         }
                       })
