@@ -29,7 +29,8 @@ struct SwitchMode {
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   // 手机横屏高度条件
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
-
+  // px外屏
+  @Consume isPXSecScreen: boolean
   aboutToAppear() {
   }
   aboutToDisappear() {
@@ -62,6 +63,7 @@ struct SwitchMode {
         Button({type: ButtonType.Normal})
           .ButtonStyle()
           .shadow({ radius:10,color:$r('app.color.shadow')})
+          .borderRadius(18)
           .height('33.3%')
           .translate({y:this.uiConfig.translateY})
           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
@@ -103,7 +105,7 @@ struct SwitchMode {
       .height('82%')
       .padding({ top:2,bottom:2,left:3,right:3 })
       .backgroundColor($r('app.color.home_card_background'))
-      .borderRadius(20)
+      .borderRadius(this.isPXSecScreen?16:20)
     }
     .width('100%')
     .height('100%')
@@ -119,7 +121,6 @@ export default SwitchMode
 function ButtonStyle() {
   .width('100%')
   .height(vp2px(32.67))
-  .borderRadius(18)
   .fontWeight(FontWeight.Bold)
   .stateEffect(false)
 }

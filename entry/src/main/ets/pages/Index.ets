@@ -66,10 +66,9 @@ import { changeThemeColor } from '../utils/ChangeThemeColorUtil'
 import { common } from '@kit.AbilityKit'
 import { setAutoColorMode, setDarkColorMode, setLightColorMode } from '../utils/ChangeColorModeUtils'
 import { ChangeLanguage } from '../utils/ChangeLanguageUtil'
-import { ConfigData, ConfigDataSourceType } from '../common/PageArgumentEntity'
+import { ConfigData } from '../common/PageArgumentEntity'
 import { customAnimationUtil } from '../utils/Animation'
 import { getGreeting } from '../utils/GreetingUtil'
-import { removeItemsByIndex } from '../utils/RemoveItemsUtils'
 import { DisclaimerCustomDialog } from '../components/Common'
 import { PipManager } from '../common/PipManager'
 import { deviceInfo } from '@kit.BasicServicesKit'
@@ -80,6 +79,7 @@ import { implicitStartAbility } from '../components/Settings/About'
 import { fileUri, picker } from '@kit.CoreFileKit'
 import { fileIo as fs } from '@kit.CoreFileKit';
 import { timestampToDateTime } from '../utils/TimeConvertUtil'
+import { PXSecScreen } from './PXSecScreen'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 const context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
@@ -126,7 +126,7 @@ struct Index {
   @Provide IndexCurrentindex: number = 0
   // 主界面选择的index
   @State selectedIndex: number = 0
-  // 小方屏
+  // px分屏
   @Provide @Watch('isHiddenChange')isSmallSquareScreen: boolean = false
   // 设备高度是否 (320vp< height <= 500vp) 媒体查询
   @Provide isLandscapePhone: boolean = false
@@ -134,15 +134,18 @@ struct Index {
   @Provide istabletLandscape: boolean = false
   // 折叠展开状态判断变量
   @State isFoldStatus: boolean = false
+  //px外屏判定
+  @Provide isPXSecScreen: boolean = false
   // 设置模态页控制变量
   @Provide isShowSettings: boolean = false
   // 读取导航条区域的高度
   @StorageProp('bottomRectHeight') bottomRectHeight: number = 0;
   @StorageProp('topRectHeight') topRectHeight: number = 0;
     // page内顶部标题偏移量
-  @Provide curYOffset: number = 0
+  @Provide curYOfisPXSmallScreenfset: number = 0
   // 更多页一级页面顶部标题偏移量
   @Provide curYOffsetMore: number = 0
+  @Provide curYOffset: number = 0
   // 是否在主页
   @Provide isHomePage: boolean = false
   // 是否为免责弹窗
@@ -261,10 +264,13 @@ struct Index {
   @Provide theRestoreTime: number = 0
 
   @Provide remoteIp: IpInfo | null = null
-
+  // 编辑按钮点击后显示编辑状态判定
+  @Provide isShowHomeEdit: boolean = false
   /*
   代理页Provide相关数据
    */
+  // 当前代理节点单选选择的值
+  // @Provide private ProxyRadioCheckedValue: number =-1
   // 当前代理节点长按选择的值
   @Provide private ProxyItemLongPressValue: number = -1
   // 当前代理节点收藏的值
@@ -409,15 +415,21 @@ struct Index {
       this.istabletLandscape = true
       hilog.info(0xFF00, componentName,
         `#WindowChange#应用窗口状态改变#(1000vp< width)平板横屏结果: ${this.istabletLandscape}`)
-    } else if (this.windowHeight < 440 && this.windowWidth <= 440) {
+    } else if (328<this.windowHeight && this.windowHeight < 440 && 328<this.windowWidth && this.windowWidth <= 440) {
       this.isSmallSquareScreen = true
       hilog.info(0xFF00, componentName,
-        `#WindowChange#应用窗口状态改变#(1000vp< width)小正方形窗口结果: ${this.isSmallSquareScreen}`)
-    } else {
+        `#WindowChange#应用窗口状态改变#(1000vp< width)px分屏窗口结果: ${this.isSmallSquareScreen}`)
+    } else if (this.windowHeight < 328 && this.windowWidth < 328) {
+      this.isPXSecScreen = true
+      hilog.info(0xFF00, componentName,
+        `#WindowChange#应用窗口状态改变#(1000vp< width)px分屏窗口结果: ${this.isSmallSquareScreen}`)
+    }
+    else {
       this.isLandscapePhone = false
       this.istabletLandscape = false
       this.isSmallSquareScreen = false
       this.isFoldStatus = false
+      this.isPXSecScreen = false
       hilog.info(0xFF00, componentName,
         `#WindowChange#设备高度改变: ${this.isSmallSquareScreen}`)
     }
@@ -899,6 +911,7 @@ struct Index {
   }// px外屏手势动画 end
 
   build() {
+    if (!this.isPXSecScreen){
     Stack() {
         Tabs({
           barPosition: this.isLandscapePhone ? BarPosition.Start : this.compBarPose.value,
@@ -993,5 +1006,8 @@ struct Index {
         }
       })
     })
+    }else {
+      PXSecScreen()
+    }
   }
 }

@@ -71,7 +71,7 @@ struct Home {
   @State rotateAngle : number  = 0
   windowClass = AppStorage.get<window.Window>('windowClass') as window.Window;
   // 编辑按钮点击后显示编辑状态判定
-  @Provide @Watch('ShowHomeEditChange')isShowHomeEdit: boolean = false
+  @Consume @Watch('ShowHomeEditChange')isShowHomeEdit: boolean
   /**
    * 是否保存布局弹窗
    */

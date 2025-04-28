@@ -236,9 +236,13 @@ struct ProxyPage {
     .width('100%')
   }
   @Consume paddingButtom: number | Resource
+  // px外屏
+  @Consume isPXSecScreen: boolean
+
   build() {
     Stack() {
       // 标题栏
+      if (!this.isPXSecScreen){
       Row({ space: this.HomeCardTitleButtonPadding.value }) {
         Text($r('app.string.Proxy'))
           .fontSize(this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset / 100 : TAB_CONTENT_TITLE_FONT_SIZE)
@@ -276,13 +280,16 @@ struct ProxyPage {
         right: this.breakPointStateTabContentTitleMargin.value,
       })
       .transition(customAnimationUtil.isSlide(0, this.uiConfig))
+      }
 
       if (this.proxyGroups.totalCount() == 0) {
         Nothing({ name: $r('app.string.None_Proxy') })
       } else {
         Stack({ alignContent: this.stackAlignContentAlignment }) {
           Column() {
-            Blank().height((this.isRolling && this.isSmallSquareScreen) ? this.heightTop : TAB_CONTENT_TITLE_HEIGHT)
+            if (!this.isPXSecScreen) {
+              Blank().height((this.isRolling && this.isSmallSquareScreen) ? this.heightTop : TAB_CONTENT_TITLE_HEIGHT)
+            }
             Scroll() {
               // 标签分组页 start
               Column() {
@@ -314,7 +321,7 @@ struct ProxyPage {
                       })
                         .width('100%')
                         .height('100%')
-                        .padding({ bottom: !this.uiConfig.isBlurr ? CONTENT_END_OFFSET_150 - 100 : CONTENT_END_OFFSET_150 - 50 })
+                        .padding({ bottom:  this.isPXSecScreen || (this.isSmallSquareScreen && this.isRolling) ? 0 : !this.uiConfig.isBlurr  ? CONTENT_END_OFFSET_150 - 100 : CONTENT_END_OFFSET_150 - 50 })
                         .onAppear(() => {
                           // promptAction.showToast({message: `当前选中：${this.currentProfile?.getSelectedProxy(group) ?? ""}`, duration: 2000 })
                           hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear %{public}s", group.proxies.toString())
@@ -371,9 +378,11 @@ struct ProxyPage {
               .height('100%')
               .alignItems(HorizontalAlign.Center)
               // 列表排列页 End
-            }.width('100%')
+            }
+            .width('100%')
             .height('100%')
             .scrollBar(BarState.Off)
+            .enableScrollInteraction(this.isPXSecScreen ? false : true)
             .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring : null)
             .padding({ left: this.breakPointStateTabContentTitleMargin.value, right: this.breakPointStateTabContentTitleMargin.value})
             .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {
@@ -397,6 +406,7 @@ struct ProxyPage {
           }
 
           // 悬浮代理测速按钮 START
+          if (!this.isPXSecScreen){
           Column() {
             RightDownButton(
               $r('sys.symbol.bolt_filled_on_circle'),
@@ -439,6 +449,7 @@ struct ProxyPage {
               customVibrator.vibratorTriggerOfHapticClockTimer()
             }
           })
+          }
           // 悬浮代理测速按钮 END
         }
         .backgroundColor($r('app.color.background'))

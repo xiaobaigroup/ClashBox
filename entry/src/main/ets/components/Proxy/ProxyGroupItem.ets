@@ -165,7 +165,8 @@ struct ProxyGroupItem {
   @Consume isRolling: boolean
   // px外屏隐藏top和tab偏移
   @Consume curOffsetRemain: number
-
+  // px外屏
+  @Consume isPXSecScreen: boolean
   /**
    * XXX 当前手指触摸的ListItem的对应 `this.configList` 中的 `configId`
    *    List的长按菜单中的响应都是根据这个的对象中的属性来处理的，是个不稳定因素
@@ -361,7 +362,7 @@ struct ProxyGroupItem {
         .ListItemStyle()
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .height(LIST_ITEM_HEIGHT + (this.ProxyGroupItemSelected === ProxyCardSize.Small ? 32 : 0))
-        .bindContextMenu(this.MyMenu(item.isShowFavoriteProxy ?? false, item.name), ResponseType.LongPress,
+        .bindContextMenu(this.isPXSecScreen ? null : this.MyMenu(item.isShowFavoriteProxy ?? false, item.name), ResponseType.LongPress,
           {
             preview: MenuPreviewMode.IMAGE,
             onAppear: (() => {
@@ -399,7 +400,11 @@ struct ProxyGroupItem {
     .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : this.breakPointStateListLanes.value,
       this.breakPointStateListGutter.value)
     .ListStyle()
-    .contentEndOffset(this.appConfig.proxyGroupType === ProxyGroupType.List ? 10 : CONTENT_END_OFFSET_150)
+    .nestedScroll({
+      scrollForward: this.isPXSecScreen ? NestedScrollMode.SELF_ONLY: NestedScrollMode.PARENT_FIRST,
+      scrollBackward: this.isPXSecScreen ? NestedScrollMode.SELF_ONLY:NestedScrollMode.SELF_FIRST
+    })
+    .contentEndOffset(this.isPXSecScreen? 65: this.appConfig.proxyGroupType === ProxyGroupType.List ? 10 : CONTENT_END_OFFSET_150)
    /* .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
       detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
       preferType: SheetType.CENTER,
@@ -474,14 +479,11 @@ interface LongPressContextMenuItem {
 function ListStyle() {
   // transition保证组件离场不被立即析构，可设置其他转场效果
   .width('100%')
+  .height('100%')
   .chainAnimation(true)
   .scrollBar(BarState.Off)
   .edgeEffect(EdgeEffect.Spring)
   .alignListItem(ListItemAlign.Center)
-  .nestedScroll({
-    scrollForward: NestedScrollMode.PARENT_FIRST,
-    scrollBackward: NestedScrollMode.SELF_FIRST
-  })
 }
 
 //ListItem公用样式

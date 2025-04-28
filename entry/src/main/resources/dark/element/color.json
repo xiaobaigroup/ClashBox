@@ -83,6 +83,10 @@
     {
       "name": "home_card_background",
       "value": "#26FFFFFF"
+    },
+    {
+      "name": "px_sec_screen_tabs",
+      "value": "#333333"
     }
   ]
 }

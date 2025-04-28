@@ -36,6 +36,18 @@ class AnimationUtil{
     return effectEvent
   }
 
+  //转场滑动动画（从下到上），i为直接延迟数值，uiConfig为动画速度以及开关的切换
+  public isSlideBottom(i:number,uiConfig:UIConfig){
+    effectEvent=
+      uiConfig.isAnimation ?
+      TransitionEffect.OPACITY
+        .animation({ duration: uiConfig.animationSpeed, curve:curves.springMotion(),delay: i })
+        .combine(TransitionEffect.translate({y:'100%'})):null
+    {}
+
+    return effectEvent
+  }
+
   //右下角按钮滑动动画（从右到左），uiConfig为动画速度以及开关的切换
   public isSlideSwitch(uiConfig:UIConfig){
   effectEvent=

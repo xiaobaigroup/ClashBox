@@ -1903,6 +1903,18 @@
     {
       "name": "time",
       "value": "时间"
+    },
+    {
+      "name": "px_sec_screen_tips",
+      "value": "请您展开屏幕以使用更多功能"
+    },
+    {
+      "name": "px_sec_screen_start",
+      "value": "开关"
+    },
+    {
+      "name": "px_sec_screen_use_time",
+      "value": "已运行"
     }
   ]
 }

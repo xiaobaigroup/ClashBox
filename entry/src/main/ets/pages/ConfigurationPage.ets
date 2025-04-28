@@ -101,6 +101,8 @@ struct ConfigurationPage {
   @Consume heightTop: number
   @Consume curOffsetRemain: number
   @Consume paddingButtom:number|Resource
+  // px外屏
+  @Consume isPXSecScreen: boolean
   /* 配置列表List相关 */
   // 当前单选框选择的配置 TODO 待接入用户首选项，先写死 configName，单选框控制现在只用到configName所以先不给值
   // @StorageProp('currentConfigRadioCheckedConfigData')
@@ -334,40 +336,43 @@ struct ConfigurationPage {
   build() {
     Stack() {
       // 标题栏 START
-      Row() {
-        Text($r('app.string.Configuration'))
-          .fontSize(this.curYOffset<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset/100:TAB_CONTENT_TITLE_FONT_SIZE)
-          .fontWeight(TAB_CONTENT_TITLE_FONT_WEIGHT)
-          .fontColor($r('sys.color.font_primary'))
-          .transition(customAnimationUtil.isSlide(200,this.uiConfig))
-        Blank()
-        // 刷新图标
-        Button({ type: ButtonType.Circle, stateEffect: true }) {
-          SymbolGlyph($r('sys.symbol.arrow_clockwise'))
-            .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
-            .fontColor([$r('sys.color.icon_primary')])
-            .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
+      if (!this.isPXSecScreen) {
+        Row() {
+          Text($r('app.string.Configuration'))
+            .fontSize(this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE - this.curYOffset / 100 :
+              TAB_CONTENT_TITLE_FONT_SIZE)
+            .fontWeight(TAB_CONTENT_TITLE_FONT_WEIGHT)
+            .fontColor($r('sys.color.font_primary'))
+            .transition(customAnimationUtil.isSlide(200, this.uiConfig))
+          Blank()
+          // 刷新图标
+          Button({ type: ButtonType.Circle, stateEffect: true }) {
+            SymbolGlyph($r('sys.symbol.arrow_clockwise'))
+              .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
+              .fontColor([$r('sys.color.icon_primary')])
+              .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
+          }
+          .width(40)
+          .height(40)
+          .backgroundColor($r('app.color.settings_container_background'))
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+          .onClick(() => {
+            this.isON.toggleAnim = true
+            hilog.info(0xC001, this.componentName, `#button#onClick()#更新配置`)
+            this.updateConfig()
+          })
+          .transition(customAnimationUtil.isSlide(0, this.uiConfig))
         }
-        .width(40)
-        .height(40)
-        .backgroundColor($r('app.color.settings_container_background'))
-        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-        .onClick(() => {
-          this.isON.toggleAnim=true
-          hilog.info(0xC001, this.componentName, `#button#onClick()#更新配置`)
-          this.updateConfig()
+        .zIndex(1)
+        .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
+        .position({ x: 0, y: this.isRolling && this.isSmallSquareScreen ? this.heightTop : 0 })
+        .alignItems(VerticalAlign.Center)
+        .width('100%')
+        .padding({
+          left: this.breakPointStateTabContentTitleMargin.value,
+          right: this.breakPointStateTabContentTitleMargin.value,
         })
-        .transition(customAnimationUtil.isSlide(0,this.uiConfig))
       }
-      .zIndex(1)
-      .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
-      .position({x: 0,y:this.isRolling && this.isSmallSquareScreen?this.heightTop:0})
-      .alignItems(VerticalAlign.Center)
-      .width('100%')
-      .padding({
-        left: this.breakPointStateTabContentTitleMargin.value,
-        right: this.breakPointStateTabContentTitleMargin.value,
-      })
       // 标题栏 END
 
       // 主体 START
@@ -377,7 +382,9 @@ struct ConfigurationPage {
             .height('90%')
         } else {
           Column(){
-            Blank().height((this.isRolling && this.isSmallSquareScreen) ? this.heightTop : TAB_CONTENT_TITLE_HEIGHT)
+            if (!this.isPXSecScreen) {
+              Blank().height((this.isRolling && this.isSmallSquareScreen) ? this.heightTop : TAB_CONTENT_TITLE_HEIGHT)
+            }
             Refresh({refreshing: $$this.isRefreshing, builder: this.LoadingBuilder()}) {
               // 配置列表 START
               List({ space: LIST_SPACE }) {
@@ -429,7 +436,7 @@ struct ConfigurationPage {
                   .borderRadius(BORDER_RADIUS_20)
                   .hoverEffect(HoverEffect.Scale)
                   .transition(this.isON.toggleAnim ? null : customAnimationUtil.isScaleTran(index, this.uiConfig))
-                  .bindContextMenu(this.configListLongPressCtxMenuBuilder(item?.isFavorite ?? false),
+                  .bindContextMenu(this.isPXSecScreen ? null :this.configListLongPressCtxMenuBuilder(item?.isFavorite ?? false),
                     ResponseType.LongPress | ResponseType.RightClick,
                     {
                       preview: MenuPreviewMode.IMAGE,
@@ -483,7 +490,7 @@ struct ConfigurationPage {
                 right: this.breakPointStateTabContentTitleMargin.value,
               })
               // 110 = app.integer.vp_proxy_start_button_margin *2 + app.integer.vp_proxy_not_start_button_width
-              .contentEndOffset(CONTENT_END_OFFSET_150)
+              .contentEndOffset(this.isPXSecScreen? 65:CONTENT_END_OFFSET_150)
               .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
               .edgeEffect(EdgeEffect.Spring)
               .chainAnimation(true)
@@ -512,80 +519,88 @@ struct ConfigurationPage {
         }
 
         // 悬浮新增配置按钮 START
-        Column() {
-          RightDownButton(
-            $r('sys.symbol.plus'),
-            this.ReplaceSymbolEffect,
-          )
-        }
-        .backgroundColor(this.icon_emphasize)
-        .shadow({
-          radius: 10,
-          color: this.icon_emphasize,
-          offsetY: 4,
-          type: ShadowType.BLUR
-        })
-        .borderRadius(100)
-        .width(this.proxyStartButtonWidth)
-        .height(this.proxyStartButtonHeight)
-        .clip(true)
-        .hoverEffect(HoverEffect.Scale)
-        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-        .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
-        .margin({bottom:this.isLandscapePhone || !this.uiConfig.isBlurr ? $r('app.integer.vp_proxy_start_button_left_right_margin') :(this.isRolling && this.isSmallSquareScreen) ?
-        this.paddingButtom: $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
-        .bindSheet( this.isShowConfigAddBindSheet, this.ConfigAddBindSheetBuilder, {
-          detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE, ],// SheetSize.LARGE
-          backgroundColor: $r('app.color.background'),
-          showClose: true,
-          dragBar: false,
-          preferType: SheetType.CENTER,
-          scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-          // width: ('100%'),
-          /**
-           * 半模态页面显示（动画开始前）回调函数
-           *    目前`通过URL(链接)导入`和`长按配置编辑`是用的同一个页面，
-           *    这里主要是用来处理拉起`bindSheet`之后可以等`bindSheet`渲染完毕之后正确传入路由信息
-           */
-          onWillAppear: () => {
-            hilog.info(0xC020, this.componentName, `#button#bindSheet#onWillAppear() executed`)
+        if (!this.isPXSecScreen) {
+          Column() {
+            RightDownButton(
+              $r('sys.symbol.plus'),
+              this.ReplaceSymbolEffect,
+            )
+          }
+          .backgroundColor(this.icon_emphasize)
+          .shadow({
+            radius: 10,
+            color: this.icon_emphasize,
+            offsetY: 4,
+            type: ShadowType.BLUR
+          })
+          .borderRadius(100)
+          .width(this.proxyStartButtonWidth)
+          .height(this.proxyStartButtonHeight)
+          .clip(true)
+          .hoverEffect(HoverEffect.Scale)
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+          .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
+          .margin({
+            bottom: this.isLandscapePhone || !this.uiConfig.isBlurr ?
+            $r('app.integer.vp_proxy_start_button_left_right_margin') : (this.isRolling && this.isSmallSquareScreen) ?
+              this.paddingButtom : $r('app.integer.vp_proxy_start_button_bottom_margin'),
+            right: $r('app.integer.vp_proxy_start_button_left_right_margin'),
+            left: $r('app.integer.vp_proxy_start_button_left_right_margin')
+          })
+          .bindSheet(this.isShowConfigAddBindSheet, this.ConfigAddBindSheetBuilder, {
+            detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,], // SheetSize.LARGE
+            backgroundColor: $r('app.color.background'),
+            showClose: true,
+            dragBar: false,
+            preferType: SheetType.CENTER,
+            scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+            // width: ('100%'),
+            /**
+             * 半模态页面显示（动画开始前）回调函数
+             *    目前`通过URL(链接)导入`和`长按配置编辑`是用的同一个页面，
+             *    这里主要是用来处理拉起`bindSheet`之后可以等`bindSheet`渲染完毕之后正确传入路由信息
+             */
+            onWillAppear: () => {
+              hilog.info(0xC020, this.componentName, `#button#bindSheet#onWillAppear() executed`)
+              this.isEnableIndexForegroundBlur = true
+              if (this.isPushRoute2BindSheet) {
+                this.pushEditConfigRoute2BindSheet()
+                this.isSecondBindSheet = true
+                this.isPushRoute2BindSheet = false
+              }
+            },
+            // 半模态页面交互式关闭回调函数
+            onWillDismiss: async (dismissSheet: DismissSheetAction) => {
+              // 在二级路由页面内只能通过点击关闭按钮才能关掉bindSheet
+              if (this.configAddPageInfos.size() <= 0 || (dismissSheet.reason === DismissReason.CLOSE_BUTTON)) {
+                dismissSheet.dismiss()
+                this.isShowConfigAddBindSheet = false
+                this.isEnableIndexForegroundBlur = false
+                this.configAddPageInfos.clear(true)
+                hilog.info(0xC020, this.componentName,
+                  `#button#bindSheet#onWillDismiss()#关闭配置添加按钮的bindSheet：DismissSheetAction.dismiss()`)
+              }
+            },
+            onWillDisappear: async () => {
+              if (this.isSecondBindSheet) {
+                hilog.info(0xC020, this.componentName, `#button#bindSheet#onWillDisappear() 二级模态页关闭`)
+                // 二级半模态页关闭时刷新当前选中数据行
+                await this.updateConfig(this.currentTouchConfigData.configId)
+                this.isSecondBindSheet = false
+              }
+            },
+            onWillSpringBackWhenDismiss: (springBack: SpringBackAction) => {
+              springBack.springBack()
+            }
+          })
+          .onClick(() => {
+            this.isShowConfigAddBindSheet = true
             this.isEnableIndexForegroundBlur = true
-            if (this.isPushRoute2BindSheet) {
-              this.pushEditConfigRoute2BindSheet()
-              this.isSecondBindSheet = true
-              this.isPushRoute2BindSheet = false
+            if (this.uiConfig.isVibrate) {
+              customVibrator.vibratorTriggerOfHapticClockTimer()
             }
-          },
-          // 半模态页面交互式关闭回调函数
-          onWillDismiss: async (dismissSheet :DismissSheetAction) => {
-            // 在二级路由页面内只能通过点击关闭按钮才能关掉bindSheet
-            if (this.configAddPageInfos.size() <= 0 || (dismissSheet.reason === DismissReason.CLOSE_BUTTON)) {
-              dismissSheet.dismiss()
-              this.isShowConfigAddBindSheet = false
-              this.isEnableIndexForegroundBlur = false
-              this.configAddPageInfos.clear(true)
-              hilog.info(0xC020, this.componentName, `#button#bindSheet#onWillDismiss()#关闭配置添加按钮的bindSheet：DismissSheetAction.dismiss()`)
-            }
-          },
-          onWillDisappear: async () => {
-            if (this.isSecondBindSheet) {
-              hilog.info(0xC020, this.componentName, `#button#bindSheet#onWillDisappear() 二级模态页关闭`)
-              // 二级半模态页关闭时刷新当前选中数据行
-              await this.updateConfig(this.currentTouchConfigData.configId)
-              this.isSecondBindSheet = false
-            }
-          },
-          onWillSpringBackWhenDismiss: (springBack: SpringBackAction)=> {
-            springBack.springBack()
-          }
-        })
-        .onClick( () => {
-          this.isShowConfigAddBindSheet = true
-          this.isEnableIndexForegroundBlur = true
-          if (this.uiConfig.isVibrate) {
-            customVibrator.vibratorTriggerOfHapticClockTimer()
-          }
-        })
+          })
+        }
         // 悬浮新增配置按钮 END
       }
       .backgroundColor($r('app.color.background'))

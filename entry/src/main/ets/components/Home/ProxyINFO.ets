@@ -44,7 +44,8 @@ struct ProxyINFO{
   //收藏与ping延迟即时动作
   private PromptAction:PromptAction = this.getUIContext()?.getPromptAction()
   @Consume remoteIp: IpInfo | null
-
+  // px外屏
+  @Consume isPXSecScreen: boolean
   aboutToAppear(): void {
     EventHub.on(EventKey.checkIpInfo, async ()=>{
       this.remoteIp = null
@@ -72,11 +73,11 @@ struct ProxyINFO{
           }
           Row(){
             Text(this.remoteIp?.country ?? "" )
-              .fontSize(this.isLandscapePhone ? 12 : this.HomeCardIPSmFontSize.value)
+              .fontSize(this.isPXSecScreen? 12 :this.isLandscapePhone ? 12 : this.HomeCardIPSmFontSize.value)
               .fontColor($r('sys.color.font_secondary'))
 
             Text( this.remoteIp?.ip  ?? $r('app.string.loading'))
-              .fontSize(this.isLandscapePhone ? 18 :this.isFoldStatus ?22: this.IPfontSize.value)
+              .fontSize(this.isPXSecScreen? 12 :this.isLandscapePhone ? 18 :this.isFoldStatus ?22: this.IPfontSize.value)
               .fontColor($r('sys.color.font_secondary'))
           }
         }
@@ -119,10 +120,10 @@ struct ProxyINFO{
         }
 
         Button($r('app.string.refresh_IP2'))
-          .width('55%')
-          .height('25%')
+          .width(this.isPXSecScreen? 78 :'55%')
+          .height(this.isPXSecScreen? 30 :'25%')
           .fontColor(this.icon_emphasize)
-          .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+          .fontSize(this.isPXSecScreen? 14 :this.isLandscapePhone ? 16 : this.fontSize.value)
           .backgroundColor($r('app.color.home_card_background'))
           .onClick(async () => {
             //在home页在编辑卡片状态时，无法操作，点击回调写在if判定里

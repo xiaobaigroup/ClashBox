@@ -1903,6 +1903,18 @@
     {
       "name": "time",
       "value": "Time"
+    },
+    {
+      "name": "px_sec_screen_tips",
+      "value": "Please expand the screen to access more features"
+    },
+    {
+      "name": "px_sec_screen_start",
+      "value": "Switch"
+    },
+    {
+      "name": "px_sec_screen_use_time",
+      "value": "Already running"
     }
   ]
 }
