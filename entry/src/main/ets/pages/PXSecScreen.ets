@@ -5,7 +5,7 @@ import SwitchMode from "../components/Home/SwitchMode"
 import { AppConfig, UIConfig } from "../entryability/AppState"
 import ClashViewModel from "../entryability/ClashViewModel"
 import { customAnimationUtil } from "../utils/Animation"
-import { PromptAction } from "@kit.ArkUI"
+import { curves, PromptAction } from "@kit.ArkUI"
 import { customVibrator } from "../utils/VibratorUtil"
 import { ConfigData } from "../common/PageArgumentEntity"
 import { Timer } from "../common/HHmmssTimer"
@@ -157,11 +157,11 @@ export struct PXSecScreen{
     }else if (i==SwiperPage.PXSSProxy){
       ProxyPage()
         .padding({top:4})
-       // .transition(customAnimationUtil.isSlideR(0, this.uiConfig))
+        .transition(customAnimationUtil.isSlideR(0, this.uiConfig))
     }else if (i==SwiperPage.PXSSConfiguration){
       ConfigurationPage()
         .padding({top:14,bottom:14})
-       // .transition(customAnimationUtil.isSlideR(0, this.uiConfig))
+        .transition(customAnimationUtil.isSlideR(0, this.uiConfig))
     }
   }
 
@@ -256,7 +256,7 @@ export struct PXSecScreen{
           duration: this.uiConfig.animationSpeed,
           iterations: 1,
           playMode: PlayMode.Normal,
-          curve: Curve.Friction,
+          curve: curves.interpolatingSpring(10, 1, 228, 30),
         }, () => {
           this.tabsSelect.swiperPage = targetIndex
           this.switchTranslateX(targetIndex)
@@ -308,7 +308,7 @@ export struct PXSecScreen{
             duration: this.uiConfig.animationSpeed,
             iterations: 1,
             playMode: PlayMode.Normal,
-            curve: Curve.LinearOutSlowIn	,
+            curve: Curve.Linear	,
           }, () => {
             this.isTabSelect = true
 
@@ -318,7 +318,7 @@ export struct PXSecScreen{
           })
         })
         .geometryTransition("picture")
-        .transition(customAnimationUtil.isSlideScaleSmall(50, this.uiConfig))
+        .transition(customAnimationUtil.isSlideScaleSmall(0, this.uiConfig))
       }else{
         this.tabSelect()
       }
