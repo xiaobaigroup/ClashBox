@@ -87,6 +87,10 @@
     {
       "name": "px_sec_screen_tabs",
       "value": "#333333"
+    },
+    {
+      "name": "px_sec_screen_dot",
+      "value": "#FF272728"
     }
   ]
 }

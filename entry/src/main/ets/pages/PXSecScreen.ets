@@ -44,7 +44,6 @@ export struct PXSecScreen{
   @Consume theProxyGroups: ProxyGroup[]
   // 卡片内边距
   @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
-  @State scaleValue: number = 1;
   // 收藏与ping延迟即时动作
   private PXPromptAction: PromptAction = this.getUIContext()?.getPromptAction()
   //外屏三页
@@ -250,7 +249,6 @@ export struct PXSecScreen{
       .onChange((index: number) => {
         console.info(index.toString())
       })
-      .scale({ x:this.scaleValue,y:this.scaleValue,z:1 })
       // 单指长按文本触发该手势事件
       .gesture(
         LongPressGesture({ repeat: true })
@@ -263,6 +261,7 @@ export struct PXSecScreen{
 
       Stack(){
         IndicatorComponent(this.indicatorController)
+          .hitTestBehavior(HitTestMode.None)
           .initialIndex(0)
           .style(
             new DotIndicator()
@@ -289,10 +288,30 @@ export struct PXSecScreen{
       }
       .width(60)
       .height(20)
-      .backgroundColor($r('app.color.shadow'))
+      .backgroundColor($r('app.color.px_sec_screen_dot'))
       .align(Alignment.Center)
       .borderRadius(20)
       .margin({bottom:8})
+      .shadow({
+        radius: 10,
+        color: $r('app.color.shadow'),
+        offsetY: 4,
+        type: ShadowType.BLUR
+      })
+      .onClick(()=>{
+        animateTo({
+          duration: this.uiConfig.animationSpeed,
+          iterations: 1,
+          playMode: PlayMode.Normal,
+          curve:Curve.Friction,
+        }, () => {
+          this.isTabSelect = true
+
+          setTimeout(() => {
+            this.isTabSelect = false
+          }, 3500)
+        })
+      })
 
       if (this.isTabSelect){
         this.tabSelect()
@@ -303,39 +322,6 @@ export struct PXSecScreen{
     .backgroundColor($r('app.color.background'))
     .align(Alignment.Bottom)
     .borderRadius(25)
-    //捏合手势触发切换页面组件
-    .gesture(
-      // 在组件上绑定三指触发的捏合手势
-      PinchGesture({ fingers: 2})
-        .onActionStart((event: GestureEvent|undefined) => {
-          console.info('Pinch start');
-        })
-          // 当捏合手势触发时，可以通过回调函数获取缩放比例，从而修改组件的缩放比例
-        .onActionUpdate((event: GestureEvent|undefined) => {
-          if(event){
-            if (event.scale >= 0.9 && event.scale < 1 ){
-              animateTo({
-                duration: this.uiConfig.animationSpeed,
-                iterations: 1,
-                playMode: PlayMode.Normal,
-                curve:Curve.Friction,
-              }, () => {
-                this.scaleValue = event.scale;
-                this.isTabSelect = true
-
-                setTimeout(() => {
-                  this.isTabSelect = false
-                }, 3500)
-              })
-            }
-            console.info('缩小数值：',this.scaleValue)
-          }
-        })
-        .onActionEnd(() => {
-          this.scaleValue = 1;
-          console.info('Pinch end');
-        })
-    )
   }
 }
 
