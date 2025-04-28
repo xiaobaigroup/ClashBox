@@ -83,11 +83,11 @@ export struct PXSecScreen{
 
               // 悬浮按钮 START
               Column(){
-                Column() {
-                  RightDownButton(
-                    this.proxyEnabled ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'),
-                    this.ReplaceSymbolEffect,
-                  )
+                Stack(){
+                  SymbolGlyph(this.proxyEnabled ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
+                    .fontColor([Color.White])
+                    .align(Alignment.Center)
+                    .fontSize(20)
                 }
                 .backgroundColor(this.icon_emphasize)
                 .shadow({
