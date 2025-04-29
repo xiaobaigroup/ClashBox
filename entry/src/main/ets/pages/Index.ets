@@ -260,7 +260,7 @@ struct Index {
   private HomeCardCellularDataPadding: BreakpointState<number> = HomeCardCellularDataPadding
   // 代理计时器Controller
   @Provide proxyStartedTimer: Timer = new Timer()
-
+  @Provide proxyTime:number = 0
   /**
    * 主页卡片标题按钮间距
    */
@@ -531,10 +531,11 @@ struct Index {
         BackgroundDownService.start(getContext(this))
       }
       // 启动前先初始化一下显示文本
-      this.proxyStartingDuration = this.isPXSecScreen ? '' : PROXY_STARTED_DURATION_INIT_VALUE
+      this.proxyStartingDuration = PROXY_STARTED_DURATION_INIT_VALUE
       // 启动代理计时器, 启用时间样式 XX小时XX分 或 XX:XX:XX
       this.proxyStartedTimer.start(time => {
-        this.proxyStartingDuration = this.isPXSecScreen ? (getResourceString($r('app.string.px_sec_screen_use_time'), this) + number2Time(time, true)) : number2Time(time)
+        this.proxyTime = time
+        this.proxyStartingDuration = number2Time(time)
       })
     })
     // 停止Clash

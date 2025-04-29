@@ -14,6 +14,8 @@ import {  MarginGenerate } from "../common/Constants"
 import ProxyPage from "./ProxyPage"
 import ConfigurationPage from "./ConfigurationPage"
 import { hilog } from "@kit.PerformanceAnalysisKit"
+import { number2Time } from "../utils/TimeConvertUtil"
+import { getResourceString } from "../utils/ResourceStringUtil"
 
 
 export enum SwiperPage{
@@ -26,7 +28,7 @@ export enum SwiperPage{
 export struct PXSecScreen{
   @Consume isPXSecScreen: boolean
   // 代理启动持续的时间
-  @Consume private proxyStartingDuration: string
+  @Consume proxyTime:number
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 按钮前Symbol动效
@@ -78,7 +80,7 @@ export struct PXSecScreen{
                 CardTitle({ title: $r('app.string.px_sec_screen_start') })
                 // 计时器文本
                 if(this.proxyEnabled) {
-                  Text(this.proxyStartingDuration)
+                  Text((getResourceString($r('app.string.px_sec_screen_use_time'), this) + number2Time(Number(this.proxyTime), true)))
                     .fontSize(14)// 使用透明度控制是否显示计时器，是因为用 `visibility` 来控制的话，不显示的时间长了之后，再次显示时候会延迟一秒，体验不好
                     .fontColor($r('sys.color.font_secondary'))
                     .transition(customAnimationUtil.isSlideR(0, this.uiConfig))
