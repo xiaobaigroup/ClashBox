@@ -39,12 +39,10 @@ export struct ConfigAdd {
   breakPointStateNavigationListPadding: BreakpointState<number>
 
   /* 是否开启 配置页 `bindSheet` 组件的前景模糊 */
-  @Provide('isEnableConfigPageBindSheetForegroundBlur')
-  private isEnableConfigPageBindSheetForegroundBlur: boolean = false
+  @Consume('isEnableConfigPageBindSheetForegroundBlur') isEnableConfigPageBindSheetForegroundBlur: boolean
 
   /* 主题色 */
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   /* List 相关 */
@@ -86,7 +84,6 @@ export struct ConfigAdd {
               .padding(LIST_ITEM_PADDING)
               .alignItems(VerticalAlign.Center)
             }
-            // .backgroundColor($r('app.color.container_background'))
             .backgroundColor($r('app.color.list_item_background_color'))
             .width('100%')
             .height(LIST_ITEM_HEIGHT)
@@ -114,8 +111,6 @@ export struct ConfigAdd {
         .edgeEffect(EdgeEffect.Spring)
         // 添加配置几种方式的ListItem END
       }
-      // .title({ main: $r('app.string.add_config'), sub: ' '})
-      // .titleMode(NavigationTitleMode.Mini)
       .title(
         {
           builder: BindSheetTitleCustomBuilder({

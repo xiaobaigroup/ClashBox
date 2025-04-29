@@ -46,8 +46,7 @@ struct FavoriteProxy {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink("proxyGroups") ProxyGroups: ProxyGroup[] = []
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  @Consume('currentProfile')
-  private currentProfile: Profile | null
+  @Consume('currentProfile') private currentProfile: Profile | null
 
   changeProxy(g: string, item: ProxyItem){
     if (this.currentProfile) {

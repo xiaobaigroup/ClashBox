@@ -1915,6 +1915,10 @@
     {
       "name": "px_sec_screen_use_time",
       "value": "已运行"
+    },
+    {
+      "name": "uncollected",
+      "value": "取消收藏"
     }
   ]
 }

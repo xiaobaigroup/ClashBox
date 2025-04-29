@@ -42,7 +42,7 @@ export function convertTime(timeStamp: number | string): string {
 }
 
 /**
- * 时间戳转化日常时间工具
+ * 时间戳转化日常时间工具 XXXX-XX-XX XX:XX:XX
  * @param timestamp 传入的时间戳
  */
 export function timestampToDateTime(timestamp: number | string): string {
@@ -57,4 +57,20 @@ export function timestampToDateTime(timestamp: number | string): string {
   const seconds = date.getSeconds().toString().padStart(2, '0')
 
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+}
+
+/**
+ * 数字转换成时间格式
+ * @param isTextStyle 是否为文本样式（XX小时XX分）(默认否)
+ */
+export function number2Time(number: number, isTextStyle: boolean = false) {
+  const hours = Math.floor(number / 3600000)
+  const minutes = Math.floor((number % 3600000) / 60000)
+  const seconds = Math.floor((number % 60000) / 1000)
+
+  if (isTextStyle) {
+    return `${hours}小时${minutes}分` // ${seconds}
+  } else {
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+  }
 }

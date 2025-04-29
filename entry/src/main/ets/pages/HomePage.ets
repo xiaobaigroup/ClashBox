@@ -16,6 +16,7 @@ import {
   showHomeCard,
   CONTENT_END_OFFSET_150,
   TAB_CONTENT_TITLE_FONT_SIZE,
+  PROXY_STARTED_DURATION_INIT_VALUE,
 } from '../common/Constants'
 import Settings from '../components/Settings/Settings'
 import CurrentNode from '../components/Home/CurrentNode'
@@ -35,6 +36,7 @@ import { Profile, ProxyGroup, ProxyMode } from 'proxy_core'
 import { ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/ProxyData'
 import { EventHub, EventKey } from '../common/EventHub'
 import { PopTips, PopupBuilder } from '../components/Start/Popup'
+import { number2Time, timestampToDateTime } from '../utils/TimeConvertUtil'
 
 
 @Entry
@@ -134,7 +136,7 @@ struct Home {
   // 按钮前Symbol动效
   private ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE // 按钮前Symbol动效
   // 定时器Controller
-  private proxyStartedTimer: Timer = new Timer()
+  @Consume proxyStartedTimer: Timer
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
   // 主页卡片内边距
@@ -160,6 +162,8 @@ struct Home {
 //px外屏隐藏top和tab偏移
   @Consume heightTop: number
   @Consume curOffsetRemain: number
+  // 是否为PX外屏
+  @Consume isPXSecScreen: boolean
 
   aboutToAppear(): void {
     this.greetings = getGreeting()
@@ -873,24 +877,12 @@ struct Home {
               this.promptAction.showToast({ message: `${getContext().resourceManager.getStringSync($r('app.string.start_prompt'))}` })
               // vpn小钥匙可能卡死，关闭vpn小钥匙
               await ClashViewModel.StopVpn()
-            }
-            else {
+            } else {
+              hilog.info(0xA002, this.componentName, `主页按钮点击事件 代理启动按钮状态：${this.proxyEnabled}`)
               this.proxyEnabled = !this.proxyEnabled
-              hilog.info(0xA002, this.componentName, `代理启动按钮状态：${this.proxyEnabled}`)
               if (this.proxyEnabled) {
-                // 初始启动计时
-                this.proxyStartedTimer.start(time => this.proxyStartingDuration = time)
-                // 当模拟下载和通知均启用时
-                if(this.uiConfig.backgroundLocateModel && this.uiConfig.Enablednotice){
-                  BackgroundDownService.start(getContext(this))
-                }
                 await ClashViewModel.StartVpn()
               } else {
-                // 计时器重置
-                this.proxyStartedTimer.reset()
-                if(this.uiConfig.backgroundLocateModel){
-                  BackgroundDownService.stop(getContext(this))
-                }
                 await ClashViewModel.StopVpn()
               }
               if (this.uiConfig.isVibrate) {
@@ -1019,8 +1011,8 @@ struct DeleteButton1 {
         .fontColor(['#fff'])
     }
     .borderRadius(20)
-    .width(this.isLandscapePhone ? 24 :this.isFoldStatus?24: this.deleteButtonSize.value)
-    .height(this.isLandscapePhone ? 24 :this.isFoldStatus?24: this.deleteButtonSize.value)
+    .width(this.isLandscapePhone ? 24 :this.isFoldStatus ? 24: this.deleteButtonSize.value)
+    .height(this.isLandscapePhone ? 24 :this.isFoldStatus ? 24: this.deleteButtonSize.value)
     .backgroundColor('#ffe84026')
     .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed,curve:curves.springMotion() }):null)
   }

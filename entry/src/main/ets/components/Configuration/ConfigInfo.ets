@@ -29,13 +29,6 @@ export struct ConfigInfo{
   @Consume('icon_emphasize')
   icon_emphasize: ResourceColor
 
-  /* 系统语言 */
-/*
-  @StorageProp('language')
-  @Watch('languageChange')
-  private currentLanguage: string = ''
-*/
-
   // 配置详情
   @Link
   configData: ConfigData
@@ -91,11 +84,8 @@ export struct ConfigInfo{
         .caretColor(this.icon_emphasize)
         .maxLength(TEXT_AREA_MAX_LENGTH)
         .enterKeyType(EnterKeyType.Next)
-        .defaultFocus(true)
+        // .defaultFocus(true)
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-        // .onChange( (value: string, previewText: PreviewText) => {
-        //   this.configData.configName = value.trim()
-        // })
         .onSubmit( (enterKey: EnterKeyType, event: SubmitEvent) => {
           // 焦点切换给`URL`框
           focusControl.requestFocus('text_area_config_url')
@@ -115,9 +105,6 @@ export struct ConfigInfo{
         .enterKeyType(this.configData.isConfigAutoUpdate ? EnterKeyType.Next : EnterKeyType.Done)
         .type(TextAreaType.URL)
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-        // .onChange( (value: string, previewText: PreviewText) => {
-        //   this.configData.configUrl = value.trim()
-        // })
         .onSubmit( (enterKey: EnterKeyType) => {
           // 条件判断是否需要将焦点切换给`自动更新时间间隔`框
           this.configData.isConfigAutoUpdate ? focusControl.requestFocus('text_input_auto_update_time') : null
@@ -309,7 +296,6 @@ export struct ConfigInfo{
       right: this.breakPointStateNavigationListPadding.value
     })
     .alignItems(HorizontalAlign.Start)
-    // .backgroundColor('#ffdd7f7f')
     .backgroundColor($r('app.color.background'))
   }
 
@@ -319,7 +305,7 @@ export struct ConfigInfo{
     if(this.uiConfig.isSound) {
       customSound.initSoundPool(3, 'beat_short.wav')
     }
-    this.configData.configAutoUpdateTimeGapTextPickerIndex=this.uiConfig.autoUpdateTimeUtils
+    this.configData.configAutoUpdateTimeGapTextPickerIndex = this.uiConfig.autoUpdateTimeUtils
   }
 
   aboutToDisappear(): void {

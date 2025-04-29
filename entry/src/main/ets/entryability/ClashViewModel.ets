@@ -15,6 +15,7 @@ import  fs from  "@ohos.file.fs"
 import { sleep } from "./EntryAbility";
 import { JSON } from "@kit.ArkTS";
 import { ProxyItem } from "../common/ProxyData";
+import { hilog } from "@kit.PerformanceAnalysisKit";
 
 export interface DelayInfo{
     name: string
@@ -53,15 +54,14 @@ export class ClashViewModel {
     if (isExists) {
       await this.profileRepo.addOrUpdate(profile)
         .then((value) => {
-          if (value === 0) {
-            EventHub.sendEvent(EventKey.FetchProfile, null)
-          }
+          hilog.info(0xFF00, "EditConfig configSaveTestTag", `文件名${profile.name} URL: ${profile.url} 保存结果${value}`)
+          EventHub.sendEvent(EventKey.FetchProfile, null)
         })
-    } else{
+    } else {
       promptAction.showToast({message: "文件保存失败！"})
     }
   }
-  async addOrUpdateProfileByFile(path: string, id: string | null){
+  async addOrUpdateProfileByFile(name: string, path: string, id: string | null){
     let profile = new Profile(ProfileType.File, path)
     if (id) {
       const old = await this.profileRepo.query(id)
@@ -69,15 +69,18 @@ export class ClashViewModel {
         profile = old
     }
     profile.loadContext(this.context)
-    profile.name = decodeURIComponent(path.substring(path.lastIndexOf('/') + 1))
+    profile.name = name // decodeURIComponent(path.substring(path.lastIndexOf('/') + 1))
     await profile.saveByUri(path);
     const isExists = await profile.check();
     if (isExists) {
       await this.profileRepo.addOrUpdate(profile)
-    }else{
+        .then((value) => {
+          hilog.info(0xFF00, "EditConfig configSaveTestTag", `文件名${profile.name} URL: ${profile.url} 保存结果${value}`)
+          EventHub.sendEvent(EventKey.FetchProfile, null)
+        })
+    } else {
       promptAction.showToast({message: "文件保存失败！"})
     }
-    EventHub.sendEvent(EventKey.FetchProfile, null)
   }
 
   async updateProfileConfig(id: string | null): Promise<void>{
@@ -235,7 +238,8 @@ export class ClashViewModel {
     try {
       const vpnWant = {
         deviceId: "",
-        bundleName: "org.xbgroup.clashnext",
+        // bundleName: "org.xbgroup.clashnext",
+        bundleName: "cn.damai.hongmeng",
         abilityName: "ClashVpnAbility",
         parameters: { "ClashCore" : coreType}
       } as Want

@@ -9,11 +9,12 @@ import { customVibrator } from "../utils/VibratorUtil"
 import { ConfigData } from "../common/PageArgumentEntity"
 import { Timer } from "../common/HHmmssTimer"
 import {  ProxyGroup } from "proxy_core"
-import BackgroundDownService from "../utils/BackgroundDownService"
 import { BreakpointState } from "../common/breakpointsystem"
 import {  MarginGenerate } from "../common/Constants"
 import ProxyPage from "./ProxyPage"
 import ConfigurationPage from "./ConfigurationPage"
+import { hilog } from "@kit.PerformanceAnalysisKit"
+
 
 export enum SwiperPage{
   PXSSHome,
@@ -38,7 +39,7 @@ export struct PXSecScreen{
   // 配置页数据表
   @Consume configList: Array<ConfigData>
   // 定时器Controller
-  private proxyStartedTimer: Timer = new Timer()
+  @Consume proxyStartedTimer: Timer
   //节点数据组后期
   @Consume theProxyGroups: ProxyGroup[]
   // 卡片内边距
@@ -47,9 +48,9 @@ export struct PXSecScreen{
   private PXPromptAction: PromptAction = this.getUIContext()?.getPromptAction()
   pageInfosPX: NavPathStack = new NavPathStack()
 
-  //外屏三页
+  // 外屏三页
   @Builder
-  PXSS(i:number){
+  PXSS(i: number){
     if (i==SwiperPage.PXSSHome){
       Column({ space: 8 }){
         Column(){
@@ -77,7 +78,7 @@ export struct PXSecScreen{
                 CardTitle({ title: $r('app.string.px_sec_screen_start') })
                 // 计时器文本
                 if(this.proxyEnabled) {
-                  Text('已运行' + this.proxyStartingDuration)
+                  Text(this.proxyStartingDuration)
                     .fontSize(14)// 使用透明度控制是否显示计时器，是因为用 `visibility` 来控制的话，不显示的时间长了之后，再次显示时候会延迟一秒，体验不好
                     .fontColor($r('sys.color.font_secondary'))
                     .transition(customAnimationUtil.isSlideR(0, this.uiConfig))
@@ -113,24 +114,12 @@ export struct PXSecScreen{
                     this.promptAction.showToast({ message: `${getContext().resourceManager.getStringSync($r('app.string.start_prompt'))}` })
                     // vpn小钥匙可能卡死，关闭vpn小钥匙
                     await ClashViewModel.StopVpn()
-                  }
-                  else {
+                  } else {
+                    hilog.info(0xFF00, 'StartProxy', `#WindowChange#Timer PX外屏点击事件`)
                     this.proxyEnabled = !this.proxyEnabled
-
                     if (this.proxyEnabled) {
-                      // 初始启动计时
-                      this.proxyStartedTimer.start(time => this.proxyStartingDuration = time)
-                      // 当模拟下载和通知均启用时
-                      if(this.uiConfig.backgroundLocateModel && this.uiConfig.Enablednotice){
-                        BackgroundDownService.start(getContext(this))
-                      }
                       await ClashViewModel.StartVpn()
                     } else {
-                      // 计时器重置
-                      this.proxyStartedTimer.reset()
-                      if(this.uiConfig.backgroundLocateModel){
-                        BackgroundDownService.stop(getContext(this))
-                      }
                       await ClashViewModel.StopVpn()
                     }
                     if (this.uiConfig.isVibrate) {
@@ -174,7 +163,7 @@ export struct PXSecScreen{
   @State tabsSelect: TabsSelect = new TabsSelect()
   @State tabsIconScale: number = 1
 
-  //底部切换页面组件
+  // 底部切换页面组件
   @Builder
   tabSelect(){
     Stack(){
@@ -229,7 +218,7 @@ export struct PXSecScreen{
     .geometryTransition("picture", { follow: false })
   }
 
-  //平移选择动画参数切换
+  // 平移选择动画参数切换
   switchTranslateX(index: SwiperPage) {
     switch (index) {
       case SwiperPage.PXSSHome:

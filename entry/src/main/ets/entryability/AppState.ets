@@ -139,7 +139,9 @@ export class UIConfig{
   // 自动检查更新
   autoCheckUpdate: boolean = false
   // 配置自动更新时间
-  autoUpdateTimeUtils?:number
+  autoUpdateTimeUtils?: number
+  // 是否第一次导入配置
+  isFirstImportConfig: boolean = true
   resourcesData: string = JSON.stringify(theResouresData)
   resourcesHideData: string = JSON.stringify(resourcesBlankData)
   // 日志时间排序

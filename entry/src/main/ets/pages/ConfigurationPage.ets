@@ -30,6 +30,8 @@ import { customAnimationUtil, isON } from '../utils/Animation'
 import { ProxyGroup } from 'proxy_core'
 import { ProxyItem } from '../common/ProxyData'
 import { PopTips, PopupBuilder } from '../components/Start/Popup'
+import { ImportConfigFromURL } from '../components/Configuration/ImportConfigFromURL'
+import { ImportConfigFromFile } from '../components/Configuration/ImportConfigFromFile'
 
 
 /**
@@ -54,6 +56,8 @@ struct ConfigurationPage {
   private pathOfContextFilesDir = this.context.filesDir
   // 列表是否滚动中
   @Consume isRolling: boolean
+  // 是否来自文件导入
+  @State isFromFile: boolean = false
   // 主界面当前index
   @Consume /*@Watch('onIndexChange')*/ IndexCurrentindex: number
   // 是否小窗口
@@ -104,47 +108,26 @@ struct ConfigurationPage {
   // px外屏
   @Consume isPXSecScreen: boolean
   /* 配置列表List相关 */
-  // 当前单选框选择的配置 TODO 待接入用户首选项，先写死 configName，单选框控制现在只用到configName所以先不给值
-  // @StorageProp('currentConfigRadioCheckedConfigData')
-  @State
-  private currentConfigRadioCheckedConfigData: ConfigData = {
-    configId: 'e91a4efc-cf14-467d-90c2-fec156806bfa',
-    isNewConfig: false,
-    configName: '',
-    configUrl: '',
-    isConfigAutoUpdate: false,
-    lastUpdateDateTime: 0,
-    updateTime: 0,
-  }
+  // 当前单选框选择的配置
+  @Consume currentConfigRadioCheckedConfigData: ConfigData
   /**
    * XXX 当前手指触摸的ListItem的对应 `this.configList` 中的 `configId`
    *    List的长按菜单中的响应都是根据这个的对象中的属性来处理的，是个不稳定因素
    */
-  @Provide('currentTouchConfigData')
-  private currentTouchConfigData: ConfigData = {
-    configId: '',
-    isNewConfig: false,
-    configName: '',
-    configUrl: '',
-    isConfigAutoUpdate: false,
-    updateTime: 0,
-    lastUpdateDateTime: 0
-  }
+  @Consume('currentTouchConfigData') currentTouchConfigData: ConfigData
 
   /* 配置页面内ListItem长按ContextMenu相关 */
-  @Consume configList: Array<ConfigData>
-  // ContextMenu 收藏&取消收藏列表项集合
-  // private configListLongPressCtxMenusForFavorite: Array<LongPressContextMenuItem> = []
+  @Consume @Watch('onConfigListChange') configList: Array<ConfigData>
   // ContextMenu 列表项 动态替换用
   private configListLongPressCtxMenuForUnFavorite: LongPressContextMenuItem = {
     symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.star_fill'))
       .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.multi_color_11')]),
-    content: '取消收藏', callback: ()=>{ this.cancelFavoriteConfig() }
+    content: $r('app.string.uncollected'), callback: ()=>{ this.cancelFavoriteConfig() }
   }
   private configListLongPressCtxMenuForFavorite: LongPressContextMenuItem = {
     symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.star'))
       .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-    content: '收藏', callback: ()=>{ this.favoriteConfig() }
+    content: $r('app.string.Collect'), callback: ()=>{ this.favoriteConfig() }
   }
   // ContextMenu列表项集合
   private configListLongPressCtxMenus: Array<LongPressContextMenuItem> = [
@@ -285,8 +268,7 @@ struct ConfigurationPage {
   /* 配置添加按钮bindSheet相关 */
 
   // 是否显示bindSheet
-  @Provide
-  private isShowConfigAddBindSheet: boolean = false
+  @Provide private isShowConfigAddBindSheet: boolean = false
   // 是否需要往`bindSheet`里`push`路由页面
   private isPushRoute2BindSheet: boolean = false
   // 是否为二级半模态页
@@ -294,7 +276,18 @@ struct ConfigurationPage {
   // 内容Builder
   @Builder
   private ConfigAddBindSheetBuilder(){
-    ConfigAdd()
+    if (this.isPushRoute2BindSheet) {
+      // 二级界面
+      if (this.isFromFile) {
+        // 文件导入的
+        ImportConfigFromFile({ configData: this.currentTouchConfigData })
+      } else {
+        // URL导入的
+        ImportConfigFromURL({ configData: this.currentTouchConfigData })
+      }
+    } else {
+      ConfigAdd()
+    }
   }
   @Builder
   LoadingBuilder() {
@@ -312,26 +305,6 @@ struct ConfigurationPage {
   private proxyStartButtonHeight: Length = $r('app.integer.vp_proxy_not_start_button_height')
   // 配置添加按钮前Symbol动效
   private ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE
-
-  async loadConfig(item: ConfigData, needUpdated = false){
-    if (this.isLoading)
-      return
-    this.isLoading = true;
-    this.currentConfigRadioCheckedConfigData = item
-    this.appConfig.currentProfileName = item.configName
-    this.appConfig.currentProfileId = item.configId
-    try {
-      if(needUpdated){
-        ClashViewModel.updateProfileConfig(item.configId)
-      }
-      ClashViewModel.socketProxy.reset()
-      await ClashViewModel.loadConfig(false)
-    }catch (e) {
-      console.debug("loadConfigList", e.message, JSON.stringify(e))
-      promptAction.showToast({message: `${getResourceString($r('app.string.failed_load_config'), this.context)}` + (e.message || e) })
-    }
-    this.isLoading = false;
-  }
 
   build() {
     Stack() {
@@ -414,18 +387,11 @@ struct ConfigurationPage {
                           .width(25).height(25)
                       }
                       Radio({ value: 'radio' + index, group: 'configGroup'})
-                        .checked(item.configId === this.appConfig.currentProfileId)
+                        .checked(item.configId === this.currentConfigRadioCheckedConfigData.configId)
                         .radioStyle({
                           checkedBackgroundColor: this.icon_emphasize,
                         })
                         .hitTestBehavior(HitTestMode.None)
-                        .onClick(async () => {
-                          this.isON.toggleAnim = true
-                          await this.loadConfig(item)
-                          hilog.info(0xC002, this.componentName,
-                            `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
-                        })
-
                     }
                     .width('100%')
                     .padding(LIST_ITEM_PADDING)
@@ -450,8 +416,9 @@ struct ConfigurationPage {
                     })
                   .onClick(async () => {
                     this.isON.toggleAnim = true
+                    // 更新当前选中
+                    this.currentConfigRadioCheckedConfigData = item
                     await this.loadConfig(item)
-
                     hilog.info(0xC002, this.componentName, `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
                   })
                   .onTouch((event: TouchEvent) => {
@@ -459,7 +426,7 @@ struct ConfigurationPage {
                       // TODO 现在用来代替获取长按的是哪一个ListItem，目前用`configName`作为每一个item的唯一性属性
                       this.currentTouchConfigData = item
                       hilog.info(0xC002, this.componentName,
-                        `#ListItem#onTouch(TouchType.Down): configName is [${this.currentTouchConfigData.configName}]`)
+                        `EditConfig #ListItem#onTouch(TouchType.Down): configUrl is [${this.currentTouchConfigData.configUrl}]`)
                     }
                   })
                   .bindPopup(!!this.uiConfig.ShowConfigPop, {
@@ -564,7 +531,7 @@ struct ConfigurationPage {
               hilog.info(0xC020, this.componentName, `#button#bindSheet#onWillAppear() executed`)
               this.isEnableIndexForegroundBlur = true
               if (this.isPushRoute2BindSheet) {
-                this.pushEditConfigRoute2BindSheet()
+                // this.pushEditConfigRoute2BindSheet()
                 this.isSecondBindSheet = true
                 this.isPushRoute2BindSheet = false
               }
@@ -583,9 +550,7 @@ struct ConfigurationPage {
             },
             onWillDisappear: async () => {
               if (this.isSecondBindSheet) {
-                hilog.info(0xC020, this.componentName, `#button#bindSheet#onWillDisappear() 二级模态页关闭`)
-                // 二级半模态页关闭时刷新当前选中数据行
-                await this.updateConfig(this.currentTouchConfigData.configId)
+                hilog.info(0xC020, this.componentName, `EditConfig #button#bindSheet#onWillDisappear 名称 ${this.currentTouchConfigData.configName}`)
                 this.isSecondBindSheet = false
               }
             },
@@ -623,6 +588,9 @@ struct ConfigurationPage {
     EventHub.on(EventKey.FetchProfile, () => {
       this.fetchProfiles()
     })
+    if (this.configList.length !== 0) {
+      this.currentConfigRadioCheckedConfigData = this.configList.find(obj => obj.configId === this.appConfig.currentProfileId) as ConfigData
+    }
   }
 
   async onIndexChange() {
@@ -632,7 +600,44 @@ struct ConfigurationPage {
     }
   }
 
-  // 获取配置列表
+  async loadConfig(item: ConfigData, needUpdated = false){
+    hilog.info(0xC011, this.componentName, `EditConfig #loadConfig#加载配置: configName is [${this.currentTouchConfigData.configName}]`)
+    if (this.isLoading)
+      return
+    this.isLoading = true;
+    this.appConfig.currentProfileName = item.configName
+    this.appConfig.currentProfileId = item.configId
+    try {
+      if(needUpdated){
+        ClashViewModel.updateProfileConfig(item.configId)
+      }
+      ClashViewModel.socketProxy.reset()
+      await ClashViewModel.loadConfig(false)
+    }catch (e) {
+      console.debug("loadConfigList", e.message, JSON.stringify(e))
+      promptAction.showToast({message: `${getResourceString($r('app.string.failed_load_config'), this.context)}` + (e.message || e) })
+    }
+    this.isLoading = false;
+  }
+
+  async onConfigListChange() {
+    hilog.info(0xC011, this.componentName, `EditConfig #onConfigListChange#配置列表第一项: configName is [${this.configList[0].configName}]`)
+    if (!this.uiConfig.isFirstImportConfig) {
+      return
+    }
+    // 首次导入配置自动选中
+    if (this.configList.length === 1 && this.uiConfig.isFirstImportConfig) {
+      this.isON.toggleAnim = true
+      hilog.info(0xC011, this.componentName, `EditConfig #onConfigListChange#配置列表的第一项: configName is [${this.configList[0].configName}]`)
+      await this.loadConfig(this.configList[0])
+      this.currentConfigRadioCheckedConfigData = this.configList[0]
+      this.uiConfig.isFirstImportConfig = false
+      hilog.info(0xC002, this.componentName,
+        `EditConfig #onConfigListChange: 首次导入：${this.uiConfig.isFirstImportConfig} configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
+    }
+  }
+
+  // 获取完整配置列表
   async fetchProfiles(){
     const profiles = await ClashViewModel.getProfiles()
     this.configList = profiles.map((d)=>{
@@ -705,8 +710,13 @@ struct ConfigurationPage {
    */
   private editConfig(): void {
     hilog.info(0xC011, this.componentName, `#editConfig#编辑配置: configName is [${this.currentTouchConfigData.configName}]`)
-    this.isShowConfigAddBindSheet = true
+    // 识别配置导入途径
+    this.isFromFile = this.currentTouchConfigData.configUrl.toLowerCase().startsWith('file://')
+    // 切换为二级界面
     this.isPushRoute2BindSheet = true
+    // 赋值为false
+    this.currentTouchConfigData.isNewConfig = false
+    this.isShowConfigAddBindSheet = true
   }
   /**
    * 更新配置
@@ -718,10 +728,8 @@ struct ConfigurationPage {
       // 使开关点击时不触发转场动画
       this.isON.toggleAnim = true
       await this.loadConfig(this.currentTouchConfigData, true)
+      hilog.info(0xC012, this.componentName, `#updateConfig#更新配置{单个}: configUrl is [${this.currentTouchConfigData.configUrl}], configId is [${this.currentTouchConfigData.configId}]`)
       this.promptAction.showToast({message: $r('app.string.updated_success_config')})
-      // 使开关点击时不触发转场动画
-      this.isON.toggleAnim = true
-      hilog.info(0xC012, this.componentName, `#updateConfig#更新配置{单个}: configName is [${this.currentTouchConfigData.configName}], configId is [${this.currentTouchConfigData.configId}]`)
     } else {
       // 使开关点击时不触发转场动画
       this.isON.toggleAnim = true
@@ -731,6 +739,7 @@ struct ConfigurationPage {
       this.isRefreshing = false
       this.promptAction.showToast({message: $r('app.string.updated_success_config')})
     }
+
   }
   /**
    * 分享配置的URL

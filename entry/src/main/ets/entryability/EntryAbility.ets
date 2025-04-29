@@ -35,7 +35,6 @@ export default class EntryAbility extends UIAbility {
   onDestroy(): void {
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onDestroy');
   }
-  trafficJob = 0
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     // Main window is created, set main page for this ability
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onWindowStageCreate');
@@ -60,7 +59,6 @@ export default class EntryAbility extends UIAbility {
       }
       await AppState.init()
       let clashCore = AppStorage.get<AppConfig>("appConfig")?.clashCore
-      let appFlowingState = AppStorage.get<AppFlowingState>("appFlowingState") ?? new AppFlowingState()
       // 切换核心
       promptAction.showToast({message: "核心启动中..."})
       await ClashViewModel.ChangeCore(clashCore)
@@ -82,21 +80,6 @@ export default class EntryAbility extends UIAbility {
           await ClashViewModel.ReStartVpn()
         }
       }, 1000)
-      EventHub.on(EventKey.StartedClash, ()=>{
-        const job = async ()=>{
-          let onlyProxy = AppStorage.get<ClashConfig>("clashConfig")?.['only-proxy'] as boolean ?? true
-          hilog.info(0xFF00, "EntryAbilityTestTag", 'onlyProxy: %{public}s', onlyProxy)
-          let now = await ClashViewModel.getTraffic(onlyProxy)
-          let total = await ClashViewModel.getTotalTraffic(onlyProxy)
-          appFlowingState.traffics.enqueue(now)
-          appFlowingState.totalTraffic = total
-        }
-        job()
-        this.trafficJob = setInterval(job, 1000)
-      })
-      EventHub.on(EventKey.StopedClash, ()=>{
-        clearInterval(this.trafficJob)
-      })
       EventHub.sendEvent(EventKey.checkIpInfo)
       hilog.info(0x0000, 'EntryAbility', 'Succeeded in loading the content.');
     });

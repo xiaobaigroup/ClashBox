@@ -61,6 +61,8 @@ export const ANIMATION_DURATION_300: number = 300
 export const ANIMATION_DURATION_100: number = 100
 export const ANIMATION_DURATION_500: number = 500
 
+export const CHART_NUMBER: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
 /**
  * list偏移数值：150
  */

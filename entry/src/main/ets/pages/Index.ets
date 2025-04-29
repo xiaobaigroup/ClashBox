@@ -53,7 +53,7 @@ import {
   TabVertical,
   TabBarPose,
   TabDirection,
-  CompStr,
+  CompStr,CHART_NUMBER,
   TheExperimentData,
   TAB_CONTENT_TITLE_HEIGHT
 } from '../common/Constants'
@@ -61,7 +61,7 @@ import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } f
 import { ClashConfig, IpInfo, LogLevel, Profile, ProxyGroup, ProxyMode } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
-import { AppConfig, AppState, ClashCore, UIConfig } from '../entryability/AppState'
+import { AppConfig, AppFlowingState, AppState, ClashCore, UIConfig } from '../entryability/AppState'
 import { changeThemeColor } from '../utils/ChangeThemeColorUtil'
 import { common } from '@kit.AbilityKit'
 import { setAutoColorMode, setDarkColorMode, setLightColorMode } from '../utils/ChangeColorModeUtils'
@@ -78,8 +78,13 @@ import { compareVersions, extractUpdateInfo, getUpdateInfo, UpdateInfo } from '.
 import { implicitStartAbility } from '../components/Settings/About'
 import { fileUri, picker } from '@kit.CoreFileKit'
 import { fileIo as fs } from '@kit.CoreFileKit';
-import { timestampToDateTime } from '../utils/TimeConvertUtil'
+import { number2Time, timestampToDateTime } from '../utils/TimeConvertUtil'
 import { PXSecScreen } from './PXSecScreen'
+import { BPS_LIST_LANES_2_2_3_4_4 } from '../components/Proxy/ProxyGroupItem'
+import { Timer } from '../common/HHmmssTimer'
+import { getResourceString } from '../utils/ResourceStringUtil'
+import BackgroundDownService from '../utils/BackgroundDownService'
+import { ConvertedUnit } from '../utils/DataUnitConvertUtils'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 const context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
@@ -122,11 +127,13 @@ struct Index {
   // app.color.tabs_icon_text1配置非选中图标和文字深浅模式颜色
   //  @State fontColorValue:ResourceColor = ($r('app.color.tabs_icon_text'));
   //  @State fontColorValue1:ResourceColor = ($r('app.color.tabs_icon_text1'));
+  // 流量任务id
+  @State trafficJob: number = 0
   // 主界面当前index
   @Provide IndexCurrentindex: number = 0
   // 主界面选择的index
   @State selectedIndex: number = 0
-  // px分屏
+  // 分屏（正方形窗口）
   @Provide @Watch('isHiddenChange')isSmallSquareScreen: boolean = false
   // 设备高度是否 (320vp< height <= 500vp) 媒体查询
   @Provide isLandscapePhone: boolean = false
@@ -134,7 +141,7 @@ struct Index {
   @Provide istabletLandscape: boolean = false
   // 折叠展开状态判断变量
   @State isFoldStatus: boolean = false
-  //px外屏判定
+  // px外屏判定
   @Provide isPXSecScreen: boolean = false
   // 设置模态页控制变量
   @Provide isShowSettings: boolean = false
@@ -157,7 +164,7 @@ struct Index {
   // 应用更新信息
   @Provide theAppVersionInfo: UpdateInfo = DefaultUpdateInfo
   /* 断点布局相关 相关作用看定义时候的注释 */
-  @State compStr: BreakpointState<string> = CompStr
+  @Provide compStr: BreakpointState<string> = CompStr
   @State tabBarWidth: BreakpointState<string> = TabBarWidth
   @State compBarHeight: BreakpointState<string> = TabBarHeight
   @Provide compVertical: BreakpointState<boolean> = TabVertical
@@ -165,6 +172,8 @@ struct Index {
   @State compDirection: BreakpointState<FlexDirection> = TabDirection
   @State TabIconfontSize: BreakpointState<number> = TabIconfontSize_24_29
   @State TabTitlefontSize: BreakpointState<number> = TabTitlefontSize_12_16
+  // 代理页
+  @Provide ProxyListLanes: BreakpointState<number> = BPS_LIST_LANES_2_2_3_4_4
   // 主页卡片内边距
   @Provide('breakPointStateHomeCardPadding')
   private breakPointStateHomeCardPadding: BreakpointState<MarginGenerate> = HomeCardPadding_14_15_16_17
@@ -249,6 +258,9 @@ struct Index {
    */
   @Provide('HomeCardCellularDataPadding')
   private HomeCardCellularDataPadding: BreakpointState<number> = HomeCardCellularDataPadding
+  // 代理计时器Controller
+  @Provide proxyStartedTimer: Timer = new Timer()
+
   /**
    * 主页卡片标题按钮间距
    */
@@ -266,11 +278,14 @@ struct Index {
   @Provide remoteIp: IpInfo | null = null
   // 编辑按钮点击后显示编辑状态判定
   @Provide isShowHomeEdit: boolean = false
+  // 速度卡片
+  @Provide DownloadSpeed: string = ""
+  @Provide UploadSpeed: string = ""
+  // 速度卡片图表数据
+  @Provide ChartData: number[] | ConvertedUnit[] = []
   /*
   代理页Provide相关数据
    */
-  // 当前代理节点单选选择的值
-  // @Provide private ProxyRadioCheckedValue: number =-1
   // 当前代理节点长按选择的值
   @Provide private ProxyItemLongPressValue: number = -1
   // 当前代理节点收藏的值
@@ -285,6 +300,30 @@ struct Index {
   @Provide('stackAlignContentAlignment') stackAlignContentAlignment: Alignment = Alignment.BottomEnd
   // 收藏的代理
   @StorageLink('favoriteProfiles') favoriteProfiles: Map<string, string> = new Map<string, string>([])
+
+  /* 配置页 */
+  @Provide currentConfigRadioCheckedConfigData: ConfigData = {
+    configId: 'e91a4efc-cf14-467d-90c2-fec156806bfa',
+    isNewConfig: false,
+    configName: '',
+    configUrl: '',
+    isConfigAutoUpdate: false,
+    lastUpdateDateTime: 0,
+    updateTime: 0,
+  }
+  @Provide('currentTouchConfigData')
+  currentTouchConfigData: ConfigData = {
+    configId: '',
+    isNewConfig: false,
+    configName: '',
+    configUrl: '',
+    isConfigAutoUpdate: false,
+    updateTime: 0,
+    lastUpdateDateTime: 0
+  }
+  // 配置页模糊变量
+  @Provide('isEnableConfigPageBindSheetForegroundBlur') isEnableConfigPageBindSheetForegroundBlur: boolean = false
+
   // 更多页面栈
   @Provide('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
 
@@ -302,7 +341,7 @@ struct Index {
   // 设置 -> 外观 -> 按钮位置变量
   @Provide ButtonPositionOffset: number = 0
   // 代理启动的计时文本
-  @Provide private proxyStartingDuration: string = PROXY_STARTED_DURATION_INIT_VALUE
+  @Provide private proxyStartingDuration: string = ''
   // 是否进入二级界面(Tab区)
   @Provide @Watch('isSecondaryChange') isSecondary: boolean = false
   // 列表是否滚动
@@ -418,20 +457,19 @@ struct Index {
     } else if (328<this.windowHeight && this.windowHeight < 440 && 328<this.windowWidth && this.windowWidth <= 440) {
       this.isSmallSquareScreen = true
       hilog.info(0xFF00, componentName,
-        `#WindowChange#应用窗口状态改变#(1000vp< width)px分屏窗口结果: ${this.isSmallSquareScreen}`)
+        `#WindowChange#应用窗口状态改变#(1000vp< width)分屏窗口结果: ${this.isSmallSquareScreen}`)
     } else if (this.windowHeight < 328 && this.windowWidth < 328) {
       this.isPXSecScreen = true
       hilog.info(0xFF00, componentName,
-        `#WindowChange#应用窗口状态改变#(1000vp< width)px分屏窗口结果: ${this.isSmallSquareScreen}`)
-    }
-    else {
+        `#WindowChange#应用窗口状态改变#(328vp< width && 328 < height)PX外屏结果: ${this.isPXSecScreen}`)
+    } else {
       this.isLandscapePhone = false
       this.istabletLandscape = false
       this.isSmallSquareScreen = false
       this.isFoldStatus = false
       this.isPXSecScreen = false
       hilog.info(0xFF00, componentName,
-        `#WindowChange#设备高度改变: ${this.isSmallSquareScreen}`)
+        `#WindowChange#设备高度改变 分屏窗口: ${this.isSmallSquareScreen}`)
     }
   }
 
@@ -475,7 +513,44 @@ struct Index {
 
   async aboutToAppear(): Promise<void> {
     hilog.info(0x1000, componentName, `#aboutToAppear executed`)
-
+    let appFlowingState = AppStorage.get<AppFlowingState>("appFlowingState") ?? new AppFlowingState()
+    // 启动Clash
+    EventHub.on(EventKey.StartedClash, ()=>{
+      const job = async ()=>{
+        let onlyProxy = AppStorage.get<ClashConfig>("clashConfig")?.['only-proxy'] as boolean ?? true
+        hilog.info(0xFF00, "EntryAbilityTestTag", 'onlyProxy: %{public}s', onlyProxy)
+        let now = await ClashViewModel.getTraffic(onlyProxy)
+        let total = await ClashViewModel.getTotalTraffic(onlyProxy)
+        appFlowingState.traffics.enqueue(now)
+        appFlowingState.totalTraffic = total
+      }
+      job()
+      this.trafficJob = setInterval(job, 1000)
+      // 当模拟下载和通知均启用时
+      if(this.uiConfig.backgroundLocateModel && this.uiConfig.Enablednotice) {
+        BackgroundDownService.start(getContext(this))
+      }
+      // 启动前先初始化一下显示文本
+      this.proxyStartingDuration = this.isPXSecScreen ? '' : PROXY_STARTED_DURATION_INIT_VALUE
+      // 启动代理计时器, 启用时间样式 XX小时XX分 或 XX:XX:XX
+      this.proxyStartedTimer.start(time => {
+        this.proxyStartingDuration = this.isPXSecScreen ? (getResourceString($r('app.string.px_sec_screen_use_time'), this) + number2Time(time, true)) : number2Time(time)
+      })
+    })
+    // 停止Clash
+    EventHub.on(EventKey.StopedClash, ()=>{
+      clearInterval(this.trafficJob)
+      if(this.uiConfig.backgroundLocateModel) {
+        BackgroundDownService.stop(getContext(this))
+      }
+      // 代理计时器重置
+      this.proxyStartedTimer.reset()
+      this.proxyStartingDuration = ''
+      // 速度卡片重置
+      this.DownloadSpeed = ''
+      this.UploadSpeed = ''
+      this.ChartData = CHART_NUMBER
+    })
     // 运行一次窗口检查
     this.onWindowChange()
 
@@ -550,6 +625,7 @@ struct Index {
     BreakpointSystem.getInstance().attach(this.compVertical)
     BreakpointSystem.getInstance().attach(this.tabBarWidth)
     BreakpointSystem.getInstance().attach(this.compBarHeight)
+    BreakpointSystem.getInstance().attach(this.ProxyListLanes)
     BreakpointSystem.getInstance().attach(this.TabIconfontSize)
     BreakpointSystem.getInstance().attach(this.TabTitlefontSize)
     BreakpointSystem.getInstance().attach(this.breakPointStateHomeCardPadding)
@@ -1006,7 +1082,8 @@ struct Index {
         }
       })
     })
-    }else {
+    } else {
+      // PX外屏样式
       PXSecScreen()
     }
   }

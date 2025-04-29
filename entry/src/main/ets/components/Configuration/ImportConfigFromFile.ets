@@ -66,9 +66,8 @@ export struct ImportConfigFromFile{
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   // 配置详情（要添加到用户首选项里的数据）
-  @State
-  @Watch('configDataChanged')
-  private configData: ConfigData = {
+  @State @Watch('configDataChanged')
+  configData: ConfigData = {
     configId: util.generateRandomUUID(),
     isNewConfig: true,
     configName: '',
@@ -95,9 +94,8 @@ export struct ImportConfigFromFile{
   private filemenus: Array<BindSheetTitleCustomBuilderMenu> = []
   /* Input事件相关变量 */
   // [true: 都有值, false: 不是所有的input都有值]
-  @State
-  private allInputHaveValue: boolean = false
-
+  @State private allInputHaveValue: boolean = false
+  @Consume('currentTouchConfigData') currentTouchConfigData: ConfigData
   /* 自定义弹框 */
   // 配置是否保存弹框 Controller定义
   private configCustomConfirmDialogController: CustomDialogController | null= new CustomDialogController({
@@ -134,10 +132,10 @@ export struct ImportConfigFromFile{
       // 替代`NavDestination`的标题栏 START
       BindSheetTitleCustomBuilder({
         pageInfos: this.configAddPageInfos,
-        isSubPage: true,
+        isSubPage: this.configData.isNewConfig,
         titlePaddingLeft: BIND_SHEET_DRAG_BAR_HEIGHT / 2,
-        mainTitle: this.mainTitle,
-        subTitle: this.subTitle,
+        mainTitle: this.configData.isNewConfig ? this.mainTitle : getResourceString($r('app.string.edit_config'), this),
+        subTitle: this.configData.isNewConfig ? this.subTitle : '',
         mainTitleFontWeight: BIND_SHEET_MAIN_FONT_WEIGHT,
         mainTitleFontSize: BIND_SHEET_MAIN_FONTSIZE,
         subTitleFontSize: BIND_SHEET_SUB_FONTSIZE,
@@ -167,7 +165,7 @@ export struct ImportConfigFromFile{
           .caretColor(this.icon_emphasize)
           .maxLength(TEXT_AREA_MAX_LENGTH)
           .enterKeyType(EnterKeyType.Next)
-          .defaultFocus(true)
+          // .defaultFocus(true)
           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
 
         // 导入文件
@@ -228,15 +226,32 @@ export struct ImportConfigFromFile{
 
   aboutToAppear(): void {
     hilog.info(0xCC10, this.componentName, `#aboutToAppear executed`)
+    // 若为编辑状态直接显示保存按钮
+    if (!this.configData.isNewConfig) {
+      this.filemenus.push(this.saveMenus)
+      // 赋予初始值
+      this.fileurl = this.configData.configUrl
+    }
   }
 
   aboutToDisappear(): void {
     hilog.info(0xCC10, this.componentName, `#aboutToDisappear executed`)
   }
 
-  async saveConfig(isNewConfig: boolean){
+  async saveConfig(isNewConfig: boolean) {
+    this.currentTouchConfigData = this.configData
+    hilog.info(0xFF00, "EditConfig #saveConfig configSaveTestTag", `File 新文件保存：${isNewConfig}`)
     if (isNewConfig) {
-      ClashViewModel.addOrUpdateProfileByFile(this.fileurl, null)
+      // 新增配置
+      await ClashViewModel.addOrUpdateProfileByFile(this.configData.configName, this.fileurl, null)
+    } else {
+      // 更新配置
+      hilog.info(0xFF00, "EditConfig #saveConfig configSaveTestTag", `文件更新 名称：${this.configData.configName} id：${this.configData.configId}`)
+      try {
+        await ClashViewModel.addOrUpdateProfileByFile(this.configData.configName, this.fileurl, this.configData.configId)
+      } catch (e) {
+        hilog.info(0xFF00, "EditConfig", `#saveConfig configSaveTestTag 文件更新错误：${e.message || e}`)
+      }
     }
   }
 
@@ -246,17 +261,19 @@ export struct ImportConfigFromFile{
    */
   configDataChanged() {
     this.checkTheInputHaveValue()
-    if (this.allInputHaveValue) {
-      if (this.filemenus.filter(i => i === this.saveMenus).length <= 0) {
-        // 新增`保存配置`菜单按钮
-        this.filemenus.push(this.saveMenus)
-      }
-    } else {
-      // 移除`保存配置`菜单按钮
-      for (let i = 0; i < this.filemenus.length; i++) {
-        if (this.filemenus[i] === this.saveMenus) {
-          this.filemenus.splice(i, 1)
-          break
+    if (this.configData.isNewConfig) {
+      if (this.allInputHaveValue) {
+        if (this.filemenus.filter(i => i === this.saveMenus).length <= 0) {
+          // 新增`保存配置`菜单按钮
+          this.filemenus.push(this.saveMenus)
+        }
+      } else {
+        // 移除`保存配置`菜单按钮
+        for (let i = 0; i < this.filemenus.length; i++) {
+          if (this.filemenus[i] === this.saveMenus) {
+            this.filemenus.splice(i, 1)
+            break
+          }
         }
       }
     }

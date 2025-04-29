@@ -1,17 +1,17 @@
 import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem';
 import { McLineChart, Options } from '@mcui/mccharts'
 import { CardTitle } from './CardTitleBuilder';
-import { MarginGenerate } from '../../common/Constants';
+import { CHART_NUMBER, MarginGenerate } from '../../common/Constants';
 import { AppFlowingState, getLast, UIConfig } from '../../entryability/AppState';
 import { JSON } from '@kit.ArkTS';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { convertDataArray } from '../../utils/DataUnitConvertUtils';
+import { convertDataArray, ConvertedUnit } from '../../utils/DataUnitConvertUtils';
 
 
 @Component
 struct Speed {
-  @State DownloadSpeed: string = ""
-  @State UploadSpeed: string = ""
+  @Consume DownloadSpeed: string
+  @Consume UploadSpeed: string
   // 前台判断变量
   @Consume isForeward: boolean
   // 是否在主页
@@ -26,7 +26,7 @@ struct Speed {
   @Consume
   @Watch('proxyEnabledChanged') proxyEnabled: boolean
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  @State chartdata: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  @Consume ChartData: number[] | ConvertedUnit[]
   //初始化图表数据
   @State defOption: Options = new Options({
     //图例
@@ -102,8 +102,8 @@ struct Speed {
     //图表
     // 使用Option实例对象的setVal方法来实现，修改什么属性就传什么
     // Tip 如果是一条曲线 合成一个 up + down
-    let data = this.proxyEnabled ? convertDataArray(this.appFlowingState.traffics.getData()) : this.chartdata
-    hilog.info(0xFF00, "HomeSpeedTestTag", "data: %{public}s", JSON.stringify(data))
+    this.ChartData = this.proxyEnabled ? convertDataArray(this.appFlowingState.traffics.getData()) : CHART_NUMBER
+    hilog.info(0xFF00, "HomeSpeedTestTag", "data: %{public}s", JSON.stringify(this.ChartData))
     this.defOption.setVal({
       series: [
           /*{
@@ -134,7 +134,7 @@ struct Speed {
         {
           smooth: true, //平滑曲线
           name: '',
-          data: data,
+          data: this.ChartData,
           label: {
             show: false,
             color: '#ff759bf5',

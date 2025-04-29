@@ -95,7 +95,7 @@ export struct StylesEdit {
           .EditRow()
           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .onClick(() => {
-            EventHub.sendEvent(EventKey.ProxySort, n["v"])
+            // EventHub.sendEvent(EventKey.ProxySort, n["v"])
             animateTo({ duration: this.uiConfig.animationSpeed }, () => {
               this.appConfig.proxySort = n["v"]
             })

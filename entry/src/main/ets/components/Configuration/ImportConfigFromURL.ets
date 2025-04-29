@@ -40,21 +40,18 @@ export struct ImportConfigFromURL{
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
 
-  @Consume('currentTouchConfigData')
-  private currentTouchConfigData: ConfigData
+  @Consume('currentTouchConfigData') currentTouchConfigData: ConfigData
 
   /* 是否开启 配置页 `bindSheet` 组件的前景模糊 */
-  @Consume('isEnableConfigPageBindSheetForegroundBlur')
-  private isEnableConfigPageBindSheetForegroundBlur: boolean
+  @Consume('isEnableConfigPageBindSheetForegroundBlur') isEnableConfigPageBindSheetForegroundBlur: boolean
 
   /* NV 路由相关 */
   @Consume('configAddPageInfos')
   // 页面栈
   private configAddPageInfos: NavPathStack
   // 配置详情（要添加到用户首选项里的数据）
-  @State
-  @Watch('configDataChanged')
-  private configData: ConfigData = {
+  @State @Watch('configDataChanged')
+  configData: ConfigData = {
     configId: util.generateRandomUUID(),
     isNewConfig: true,
     configName: '',
@@ -119,7 +116,7 @@ export struct ImportConfigFromURL{
         this.isEnableIndexForegroundBlur = false
         this.configAddPageInfos.pop(true)
       },
-      confirm: ()=> {
+      confirm: () => {
         // 保存配置后关闭半模态窗口
         this.isShowConfigAddBindSheet = false
         this.isEnableConfigPageBindSheetForegroundBlur = false
@@ -229,10 +226,13 @@ export struct ImportConfigFromURL{
   }
 
   /**
-   * TODO 保存配置
+   * 保存配置
    */
   async saveConfig(isNewConfig: boolean){
     this.currentTouchConfigData = this.configData
+    hilog.info(0xFF00, "EditConfig #saveConfig configSaveTestTag", `URL新文件保存：${isNewConfig}`)
+    hilog.info(0xC002, this.componentName,
+      `EditConfig #saveConfig Name: ${this.currentTouchConfigData.configName} configUrl is [${this.currentTouchConfigData.configUrl}]`)
     if (isNewConfig) {
       this.customDownloadingDialogTitle = $r('app.string.downloading_configuration_file')
       this.configCustomDownloadingDialogController.open()
@@ -245,7 +245,6 @@ export struct ImportConfigFromURL{
         this.configCustomDownloadingDialogController.close()
         this.promptAction.showToast({message: getResourceString($r('app.string.download_failed'), this) + e.message || e})
       }
-
     } else {
       this.customDownloadingDialogTitle = $r('app.string.updating_configuration_file')
       this.configCustomDownloadingDialogController.open()

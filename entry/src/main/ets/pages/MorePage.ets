@@ -36,6 +36,7 @@ import { customAnimationUtil } from '../utils/Animation';
 struct MorePage {
   private componentName: string = 'MorePage'
   @Consume isRolling: boolean
+  @Consume compStr: BreakpointState<string>
   @Consume isSmallSquareScreen: boolean
   // 设置页显示变量
   @State isShowSettings: boolean = false
@@ -128,7 +129,7 @@ struct MorePage {
       hilog.info(0xFF00, "MoretestTag", itemData.name)
       hilog.info(0xFF00, "MoretestTag", "isCheck状态: %{public}s", itemData.isCheck)
       this.pageInfos.replacePathByName(itemData.name, false)
-      this.isSecondary = this.istabletLandscape ? false : true
+      this.isSecondary = this.compStr.value === 'sm' ? true : false
     }
   }
 
@@ -186,15 +187,6 @@ struct MorePage {
     .height('100%')
   }
 
-  onSecondary() {
-    if (this.pageInfos.size() !== 0) {
-      this.isSecondary = true
-      hilog.info(0xFF00, "MorePagetestTag", "#onSecondary 非0 是否二级页面: %{public}s", this.isSecondary)
-    } else {
-      this.isSecondary = false
-      hilog.info(0xFF00, "MorePagetestTag", "#onSecondary 0 是否二级页面: %{public}s", this.isSecondary)
-    }
-  }
 
   build() {
     Navigation(this.pageInfos) {
@@ -292,7 +284,7 @@ struct MorePage {
             this.curOffsetRemain  += offset
             if (offset > 0) {
               this.isRolling = true
-            } else if(offset<0){
+            } else if (offset < 0){
               this.isRolling = false
               this.curOffsetRemain = 0
             }

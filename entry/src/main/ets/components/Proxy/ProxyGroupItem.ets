@@ -127,7 +127,7 @@ struct ProxyGroupItem {
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
 
   /* 断点布局相关 */
-  @State private breakPointStateListLanes: BreakpointState<number> = BPS_LIST_LANES_2_2_3_4_4
+  @Consume ProxyListLanes: BreakpointState<number>
   @Consume private breakPointStateListGutter: BreakpointState<number>
 
   // 主界面index
@@ -155,7 +155,7 @@ struct ProxyGroupItem {
   @Prop selectedProxy: string
   @Prop disabled: boolean
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
-  @StorageLink('appConfig') @Watch('switchSort') @Watch('FavoriteSelectProxy') appConfig: AppConfig = new AppConfig()
+  @StorageLink('appConfig') @Watch('switchSort') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 收藏显示判定
   @Consume showStart:boolean
@@ -182,42 +182,28 @@ struct ProxyGroupItem {
 
   async aboutToAppear(): Promise<void> {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
-    BreakpointSystem.getInstance().attach(this.breakPointStateListLanes)
-    BreakpointSystem.getInstance().start()
     this.switchSort()
-
-    // 用@watch监测数据变化排序，不需eventhub.on
-
-   /*  EventHub.on(EventKey.ProxySort, async (sort: ProxySort) => {
-       console.log("ProxySort", sort)
-       switch (sort) {
-         case ProxySort.Default:
-           this.proxyLazyItems.DefaultSortItems(this.proxyitems)
-           break
-         case ProxySort.Title:
-          this.proxyLazyItems.NameSortItems(this.proxyitems)
-           break
-         case ProxySort.Delay:
-           this.proxyLazyItems.LatencySortItems(this.proxyitems)
-           break
-       }
-       hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行4 %{public}s")
-       hilog.info(0xFF00, "ProxyPageLatencyTag", "this.proxyitems %{public}s", JSON.stringify(this.proxyitems))
-     })*/
+    /*EventHub.on(EventKey.ProxySort, async (sort: ProxySort) => {
+      console.log("ProxySort", sort)
+      // hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行4 %{public}s")
+      // hilog.info(0xFF00, "ProxyPageLatencyTag", "this.proxyitems %{public}s", JSON.stringify(this.proxyitems))
+    })*/
    }
 
    switchSort(){
+     this.selectedProxy =  this.appConfig.currentProxyName as string
      if (this.appConfig.proxySort == ProxySort.Default){
        this.proxyLazyItems.DefaultSortItems(this.proxyitems)
      } else if (this.appConfig.proxySort == ProxySort.Title){
        this.proxyLazyItems.NameSortItems(this.proxyitems)
      } else if (this.appConfig.proxySort == ProxySort.Delay){
        this.proxyLazyItems.LatencySortItems(this.proxyitems)
+       hilog.info(0xFF00, "ProxySort ProxyPageLatencyTag", "延迟排序 %{public}s", this.appConfig.proxySort)
      }
    }
 
    aboutToDisappear() {
-
+    // EventHub.off(EventKey.ProxySort)
    }
 
    /**
@@ -329,10 +315,6 @@ struct ProxyGroupItem {
     }
   }
 
-  FavoriteSelectProxy() {
-    this.selectedProxy =  this.appConfig.currentProxyName as string
-  }
-
   build() {
     List({ space: 10, initialIndex: 0 }) {
       LazyForEach(this.proxyLazyItems, (item: ProxyItem, index: number) => {
@@ -397,7 +379,7 @@ struct ProxyGroupItem {
       console.info("offsetRemain:" + offset + '/' +this.curOffsetRemain);
       return { offsetRemain: offset }
     })
-    .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : this.breakPointStateListLanes.value,
+    .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : this.ProxyListLanes.value,
       this.breakPointStateListGutter.value)
     .ListStyle()
     .nestedScroll({

@@ -6,7 +6,7 @@ interface GeneratedUnitInterface {
   KB: number
 }
 
-interface ConvertedUnit {
+export interface ConvertedUnit {
   value: number;
   unit: 'TB' | 'GB' | 'MB' | 'KB' | 'B';
 }
