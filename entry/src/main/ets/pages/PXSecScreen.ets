@@ -76,9 +76,12 @@ export struct PXSecScreen{
               Column(){
                 CardTitle({ title: $r('app.string.px_sec_screen_start') })
                 // 计时器文本
-                Text('已运行'+this.proxyStartingDuration)
-                  .fontSize(14)// 使用透明度控制是否显示计时器，是因为用 `visibility` 来控制的话，不显示的时间长了之后，再次显示时候会延迟一秒，体验不好
-                  .fontColor($r('sys.color.font_secondary'))
+                if(this.proxyEnabled) {
+                  Text('已运行' + this.proxyStartingDuration)
+                    .fontSize(14)// 使用透明度控制是否显示计时器，是因为用 `visibility` 来控制的话，不显示的时间长了之后，再次显示时候会延迟一秒，体验不好
+                    .fontColor($r('sys.color.font_secondary'))
+                    .transition(customAnimationUtil.isSlideR(0, this.uiConfig))
+                }
               }.width('100%').alignItems(HorizontalAlign.Start)
 
               // 悬浮按钮 START

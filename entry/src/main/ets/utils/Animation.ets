@@ -42,7 +42,7 @@ class AnimationUtil{
       uiConfig.isAnimation ?
       TransitionEffect.OPACITY
         .animation({ duration: uiConfig.animationSpeed, curve:curves.springMotion(),delay: i })
-        .combine(TransitionEffect.SLIDE):null
+        .combine(TransitionEffect.translate({x:20})):null
 
     return effectEvent
   }
