@@ -1,4 +1,3 @@
-import { RightDownButton } from "../components/Common"
 import { CardTitle } from "../components/Home/CardTitleBuilder"
 import ProxyINFO from "../components/Home/ProxyINFO"
 import SwitchMode from "../components/Home/SwitchMode"
@@ -46,6 +45,7 @@ export struct PXSecScreen{
   @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
   // 收藏与ping延迟即时动作
   private PXPromptAction: PromptAction = this.getUIContext()?.getPromptAction()
+  pageInfosPX: NavPathStack = new NavPathStack()
 
   //外屏三页
   @Builder
@@ -157,11 +157,9 @@ export struct PXSecScreen{
     }else if (i==SwiperPage.PXSSProxy){
       ProxyPage()
         .padding({top:4})
-        .transition(customAnimationUtil.isSlideR(0, this.uiConfig))
     }else if (i==SwiperPage.PXSSConfiguration){
       ConfigurationPage()
         .padding({top:14,bottom:14})
-        .transition(customAnimationUtil.isSlideR(0, this.uiConfig))
     }
   }
 
@@ -171,6 +169,7 @@ export struct PXSecScreen{
   @State isTabSelect: boolean = false
   @State translateX: number | string = '-100%'
   @State tabsSelect: TabsSelect = new TabsSelect()
+
   //底部切换页面组件
   @Builder
   tabSelect(){
@@ -188,21 +187,28 @@ export struct PXSecScreen{
           Column({space:6}) {
             SymbolGlyph(n.icon)
               .fontSize(24)
-              .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
               .fontColor([this.tabsSelect.swiperPage == n.swiperPage ? this.icon_emphasize : $r('sys.color.icon_tertiary')])
             Text(n.text)
               .fontSize(14)
               .fontColor(this.tabsSelect.swiperPage == n.swiperPage ? this.icon_emphasize : $r('sys.color.icon_tertiary'))
           }
-          .onClick(()=>{
+          .scale(this.tabsSelect.swiperPage == n.swiperPage ?{x: this.scaleSwiper,y: this.scaleSwiper }:{x:1,y:1})
+          .onTouch((event:TouchEvent)=>{
             animateTo({
               duration: this.uiConfig.animationSpeed,
               iterations: 1,
               playMode: PlayMode.Normal,
-              curve:Curve.Friction,
+              curve:Curve.Ease,
             }, () => {
-              this.switchTranslateX(n.swiperPage)
-              this.tabsSelect.swiperPage = n.swiperPage
+              if (event.type==TouchType.Down){
+                this.switchTranslateX(i)
+                this.tabsSelect.swiperPage = n.swiperPage
+
+                console.info('索引',i)
+                this.scaleSwiper = 0.8
+              }else if (event.type==TouchType.Up){
+                this.scaleSwiper = 1
+              }
             })
           })
         })
@@ -215,7 +221,6 @@ export struct PXSecScreen{
     .backgroundColor($r('app.color.px_sec_screen_tabs'))
     .borderRadius(20)
     .margin({left:16,right:16,bottom:8})
-   // .blur(0.5)
     .transition(customAnimationUtil.isSlideScaleBig(0, this.uiConfig))
     .geometryTransition("picture", { follow: false })
   }
@@ -225,18 +230,21 @@ export struct PXSecScreen{
     switch (index) {
       case SwiperPage.PXSSHome:
         this.translateX='-100%'
-        this.swiperController2.changeIndex(0)
+        this.swiperController2.changeIndex(0,true)
         break;
       case SwiperPage.PXSSProxy:
         this.translateX=0
-        this.swiperController2.changeIndex(1)
+        this.swiperController2.changeIndex(1,true)
         break
       case SwiperPage.PXSSConfiguration:
         this.translateX='100%'
-        this.swiperController2.changeIndex(2)
+        this.swiperController2.changeIndex(2,true)
         break
     }
   }
+
+  @State scaleSwiper: number = 1
+  @State opacitySwiper: number = 1
 
   build() {
     Stack(){
@@ -251,17 +259,17 @@ export struct PXSecScreen{
       .width('100%')
       .height('100%')
       .indicator(this.indicatorController)
-      .onAnimationStart((index: number,targetIndex: number) => {
+      .onAnimationStart((index: number,targetIndex: number,extraInfo: SwiperAnimationEvent) => {
         animateTo({
           duration: this.uiConfig.animationSpeed,
           iterations: 1,
           playMode: PlayMode.Normal,
           curve: curves.interpolatingSpring(10, 1, 228, 30),
-        }, () => {
+       }, () => {
           this.tabsSelect.swiperPage = targetIndex
           this.switchTranslateX(targetIndex)
         })
-        console.info(index.toString())
+       console.info('swiper索引:',extraInfo.targetOffset)
       })
       // 单指长按文本触发该手势事件
       .gesture(
@@ -288,7 +296,7 @@ export struct PXSecScreen{
             .loop(false)
             .count(3)
             .onChange((index: number) => {
-              console.log("current index: " + index)
+                console.info('dot索引：',index)
             })
         }
         .width(60)
@@ -308,16 +316,15 @@ export struct PXSecScreen{
             duration: this.uiConfig.animationSpeed,
             iterations: 1,
             playMode: PlayMode.Normal,
-            curve: Curve.Linear	,
+            curve: curves.interpolatingSpring(10, 1, 228, 30),
           }, () => {
             this.isTabSelect = true
-
             setTimeout(() => {
               this.isTabSelect = false
             }, 3500)
           })
         })
-        .geometryTransition("picture")
+      //  .geometryTransition("picture")
         .transition(customAnimationUtil.isSlideScaleSmall(0, this.uiConfig))
       }else{
         this.tabSelect()
@@ -327,7 +334,6 @@ export struct PXSecScreen{
     .height('100%')
     .backgroundColor($r('app.color.background'))
     .align(Alignment.Bottom)
-    //.borderRadius(25)
   }
 }
 
