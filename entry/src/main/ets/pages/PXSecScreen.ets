@@ -169,6 +169,7 @@ export struct PXSecScreen{
   @State isTabSelect: boolean = false
   @State translateX: number | string = '-100%'
   @State tabsSelect: TabsSelect = new TabsSelect()
+  @State tabsIconScale: number = 1
 
   //底部切换页面组件
   @Builder
@@ -192,7 +193,7 @@ export struct PXSecScreen{
               .fontSize(14)
               .fontColor(this.tabsSelect.swiperPage == n.swiperPage ? this.icon_emphasize : $r('sys.color.icon_tertiary'))
           }
-          .scale(this.tabsSelect.swiperPage == n.swiperPage ?{x: this.scaleSwiper,y: this.scaleSwiper }:{x:1,y:1})
+          .scale(this.tabsSelect.swiperPage == n.swiperPage ?{x: this.tabsIconScale,y: this.tabsIconScale }:{x:1,y:1})
           .onTouch((event:TouchEvent)=>{
             animateTo({
               duration: this.uiConfig.animationSpeed,
@@ -205,9 +206,9 @@ export struct PXSecScreen{
                 this.tabsSelect.swiperPage = n.swiperPage
 
                 console.info('索引',i)
-                this.scaleSwiper = 0.8
+                this.tabsIconScale = 0.8
               }else if (event.type==TouchType.Up){
-                this.scaleSwiper = 1
+                this.tabsIconScale = 1
               }
             })
           })
@@ -242,9 +243,6 @@ export struct PXSecScreen{
         break
     }
   }
-
-  @State scaleSwiper: number = 1
-  @State opacitySwiper: number = 1
 
   build() {
     Stack(){
