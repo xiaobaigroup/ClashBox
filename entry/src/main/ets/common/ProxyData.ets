@@ -126,8 +126,8 @@ export class ProxyItemDataSource extends BaseDataSource<ProxyItem> {
       // 极大值
       const MAX_DELAY = Number.MAX_SAFE_INTEGER
       // 获取a和b的延迟值，如果是undefined或小于0则设置为MAX_DELAY
-      const delayA = ClashViewModel.delayMap.get(a.name)?.delay as number < 0 || ClashViewModel.delayMap.get(a.name)?.delay === undefined ? MAX_DELAY : ClashViewModel.delayMap.get(a.name)?.delay ?? 0;
-      const delayB = ClashViewModel.delayMap.get(b.name)?.delay as number < 0 || ClashViewModel.delayMap.get(a.name)?.delay === undefined ? MAX_DELAY : ClashViewModel.delayMap.get(b.name)?.delay ?? 0;
+      const delayA = ClashViewModel.delayMap.get(a.name)?.delay as number < 0 ? MAX_DELAY : ClashViewModel.delayMap.get(a.name)?.delay ?? MAX_DELAY
+      const delayB = ClashViewModel.delayMap.get(b.name)?.delay as number < 0 ? MAX_DELAY : ClashViewModel.delayMap.get(b.name)?.delay ?? MAX_DELAY
       // 进行比较
       return delayA - delayB;
     }))

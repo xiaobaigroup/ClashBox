@@ -290,6 +290,8 @@ struct Index {
   @Provide private ProxyItemLongPressValue: number = -1
   // 当前代理节点收藏的值
   @Provide private FavoriteProxy: number = -1
+  // 当前显示的代理分组
+  @Provide currentProxyIndex: number = 0
   // 节点数据组
   @Provide items: ProxyItem[] = ProxyData.ProxyItems();
   // 日志数据

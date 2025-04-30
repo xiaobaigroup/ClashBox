@@ -60,8 +60,8 @@ struct ProxyPage {
   @State isStylesEdit: boolean = false
   // 半模态页
   @State isShowProxyBindSheet: boolean = false
-  // 分组tabs相关
-  @State currentIndex: number = 0;
+  // 当前代理分组
+  @Consume currentProxyIndex: number
   // 假数据延迟颜色设置
   @State color: ResourceColor = $r('sys.color.font_secondary')
   // 定义ProxyArrangementSelected的值便于切换分组方式
@@ -121,7 +121,7 @@ struct ProxyPage {
   @Consume isShowDelayPop: boolean
   // Index页tab栏竖直状态
   @Consume compVertical: BreakpointState<boolean>
-  //px外屏隐藏top和tab偏移
+  // px外屏隐藏top和tab偏移
   @Consume heightTop: number
   @Consume curOffsetRemain: number
 
@@ -132,9 +132,13 @@ struct ProxyPage {
     if (this.currentProfile) {
       let tabIndex = this.theProxyGroups.findIndex((d) => d.name == this.currentProfile?.currentGroupName)
       setTimeout(() => {
-        if (tabIndex > -1) {
+        if (tabIndex > -1 && this.currentProxyIndex === 0) {
           this.ListScroller.scrollToIndex(tabIndex)
-          this.currentIndex = tabIndex
+          this.currentProxyIndex = tabIndex
+          this.SwiperController.changeIndex(this.currentProxyIndex)
+        } else {
+          this.ListScroller.scrollToIndex(this.currentProxyIndex)
+          this.SwiperController.changeIndex(this.currentProxyIndex)
         }
       }, 200)
     }
@@ -177,26 +181,29 @@ struct ProxyPage {
   @Builder
   TabBuilder(title: ResourceStr, targetIndex: number) {
     Column() {
-      Column() {
+      Flex({
+        direction: FlexDirection.Row,
+        justifyContent: FlexAlign.Center,
+        alignItems: ItemAlign.Center
+      }) {
         Text(`${title}`) // ${targetIndex}
-          .fontSize(14)
-          .fontColor(this.currentIndex === targetIndex ? this.font_on_primary : this.font_secondary)
-          .maxLines(1)
+          .fontColor(this.currentProxyIndex === targetIndex ? this.font_on_primary : this.font_secondary)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .padding({left: 3, right: 3})
+          .padding({left: 6, right: 6})
+          .fontSize(14)
+          .maxLines(1)
       }
       .borderRadius(BORDER_RADIUS_20)
-      .height(this.currentIndex === targetIndex ? 36 : 32)
-      .width(this.currentIndex === targetIndex ? 96 : 87)
-      .justifyContent(FlexAlign.Center)
-      .backgroundColor(this.currentIndex === targetIndex ? this.icon_emphasize : this.container_background)
+      .height(this.currentProxyIndex === targetIndex ? 36 : 32)
+      // .width(this.currentProxyIndex === targetIndex ? 96 : 87)
+      .backgroundColor(this.currentProxyIndex === targetIndex ? this.icon_emphasize : this.container_background)
     }
     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
     .height(55)
     .margin({ right: 8, bottom: 10 })
     .onClick(() => {
-      this.currentIndex = targetIndex
-      this.SwiperController.changeIndex(this.currentIndex)
+      this.currentProxyIndex = targetIndex
+      this.SwiperController.changeIndex(this.currentProxyIndex)
     })
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Start)
@@ -314,7 +321,7 @@ struct ProxyPage {
                         proxyitems: group.proxies as ProxyItem[],
                         ProxyGroupItemSelected: this.appConfig.proxyCardSize,
                         disabled: group.type !== ProxyType.Selector,
-                        selectedProxy: this.currentProfile?.getSelectedProxy(group) ?? "",
+                        selectedProxy: this.currentProfile?.getSelectedProxy(group),
                         OnProxyChange: (item) => {
                           this.changeProxy(group.name, item)
                         }
@@ -322,20 +329,20 @@ struct ProxyPage {
                         .width('100%')
                         .height('100%')
                         .padding({ bottom:  this.isPXSecScreen || (this.isSmallSquareScreen && this.isRolling) ? 0 : !this.uiConfig.isBlurr  ? CONTENT_END_OFFSET_150 - 100 : CONTENT_END_OFFSET_150 - 50 })
-                        .onAppear(() => {
-                          // promptAction.showToast({message: `当前选中：${this.currentProfile?.getSelectedProxy(group) ?? ""}`, duration: 2000 })
-                          hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear %{public}s", group.proxies.toString())
-                          hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear hidden: %{public}s %{public}d", group.hidden, index)
-                        })
-                        .onDisAppear(() => {
-                          hilog.info(0xFF00, "ProxyPageGroupTag", "#onDisAppear %{public}s", group.toString())
-                        })
+                        // .onAppear(() => {
+                        //   // promptAction.showToast({message: `当前选中：${this.currentProfile?.getSelectedProxy(group) ?? ""}`, duration: 2000 })
+                        //   hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear %{public}s", group.proxies.toString())
+                        //   hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear hidden: %{public}s %{public}d", group.hidden, index)
+                        // })
+                        // .onDisAppear(() => {
+                        //   hilog.info(0xFF00, "ProxyPageGroupTag", "#onDisAppear %{public}s", group.toString())
+                        // })
                     }, (item: ProxyGroup) => item.name + Date.now())
                   }
                   .loop(false)
                   .effectMode(EdgeEffect.None)
                   .nestedScroll(SwiperNestedScrollMode.SELF_FIRST)
-                  //  .cachedCount(2)
+                  .cachedCount(0)
                   .indicator(false)
                   .alignSelf(ItemAlign.Center)
                   .onGestureSwipe((index: number, extraInfo: SwiperAnimationEvent) => {
@@ -345,9 +352,9 @@ struct ProxyPage {
                       hilog.info(0xFF00, "ProxyLandscapeTag", "tab栏竖排状态: %{public}s", this.compVertical.value)
                       hilog.info(0xFF00, "ProxyLandscapeTag", "手机横屏状态状态: %{public}s", this.isLandscapePhone)
                       if ((deviceInfo.deviceType === 'tablet' ? false : !this.isLandscapePhone) || !this.compVertical.value) {
-                        if (this.currentIndex === 0 && extraInfo.currentOffset > 79) {
+                        if (this.currentProxyIndex === 0 && extraInfo.currentOffset > 79) {
                           indexController.changeIndex(0)
-                        } else if (this.currentIndex === this.theProxyGroups.length - 1 && extraInfo.currentOffset < -79) {
+                        } else if (this.currentProxyIndex === this.theProxyGroups.length - 1 && extraInfo.currentOffset < -79) {
                           indexController.changeIndex(2)
                         }
                       }
@@ -356,15 +363,12 @@ struct ProxyPage {
                   .onAnimationStart((index: number,targetIndex: number) => {
                     animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
                       this.ListScroller.scrollToIndex(targetIndex)
-                      this.currentIndex = targetIndex
+                      this.currentProxyIndex = targetIndex
                       if (this.currentProfile) {
-                        this.currentProfile.currentGroupName = this.theProxyGroups[this.currentIndex].name
+                        this.currentProfile.currentGroupName = this.theProxyGroups[this.currentProxyIndex].name
                         ClashViewModel.updateProfile(this.currentProfile)
                       }
                     })
-                  })
-                  .onChange(() => {
-
                   })
                   // 代理节点Swiper End
                 }
@@ -442,7 +446,7 @@ struct ProxyPage {
             }
             this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
             this.loading = true
-            await ClashViewModel.testAllDelay(this.theProxyGroups[this.currentIndex].proxies as ProxyItem[])
+            await ClashViewModel.testAllDelay(this.theProxyGroups[this.currentProxyIndex].proxies as ProxyItem[])
             this.loading = false
             hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行1 %{public}s")
             if (this.uiConfig.isVibrate) {

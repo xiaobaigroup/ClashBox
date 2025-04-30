@@ -367,7 +367,7 @@ struct ProxyGroupItem {
           autoCancel: false
         })
       }, (item: ProxyItem,i: number) => item.name + '-' + i.toString())
-    }
+    }.cachedCount(4)
     .onScrollFrameBegin((offset: number) => {
       this.curOffsetRemain  += offset
       if (offset>0) {
@@ -465,6 +465,7 @@ function ListStyle() {
   .chainAnimation(true)
   .scrollBar(BarState.Off)
   .edgeEffect(EdgeEffect.Spring)
+  .constraintSize({minHeight: 120})
   .alignListItem(ListItemAlign.Center)
 }
 

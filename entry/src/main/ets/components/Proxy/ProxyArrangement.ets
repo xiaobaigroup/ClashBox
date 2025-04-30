@@ -16,12 +16,13 @@ const  componentName: string = 'ProxyPageArrangement'
 @Component
 struct ProxyArrangement {
   @Consume isRolling: boolean
-  //page内顶部标题偏移量
+  // page内顶部标题偏移量
   @Consume curYOffset: number
   @State selectItem: number = 0
-  @State currentIndex: number =0
-  //px外屏隐藏top和tab偏移
+  // px外屏隐藏top和tab偏移
   @Consume curOffsetRemain: number
+  // 当前代理分组
+  @Consume currentProxyIndex: number
   // 代理原始数据
   @Consume theProxyGroups: ProxyGroup[]
   @Consume proxyGroups: ProxyGroupItemDataSource
@@ -32,18 +33,23 @@ struct ProxyArrangement {
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
   /* 断点布局相关 */
-  @Consume private breakPointStateTabContentTitleMargin: BreakpointState<number>
+  @Consume breakPointStateTabContentTitleMargin: BreakpointState<number>
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
 
   aboutToAppear(): void {
     hilog.info(0xB000, componentName, '#aboutToAppear 组1数组长度： %{public}d', this.theProxyGroups[0].proxies.length )
     BreakpointSystem.getInstance().start()
-
+    hilog.info(0xFF00, "ProxyPageGroupTag", "#ProxyArrangement#aboutToAppear 当前显示分组%{public}d", this.currentProxyIndex)
     if (this.currentProfile){
       let listIndexes = this.theProxyGroups.findIndex((d) => d.name == this.currentProfile?.currentGroupName)
       setTimeout(() => {
-        if(listIndexes > -1){
-          this.currentIndex = listIndexes
+        if(listIndexes > -1 && this.currentProxyIndex === 0) {
+          this.currentProxyIndex = listIndexes
+          this.selectItem = listIndexes
+          this.proxyScroller.scrollToItemInGroup(0, this.currentProxyIndex)
+        } else {
+          this.proxyScroller.scrollToItemInGroup(0, this.currentProxyIndex)
+          this.selectItem = this.currentProxyIndex
         }
       }, 200)
     }
@@ -87,7 +93,7 @@ struct ProxyArrangement {
         ListItemGroup({
           header: this.itemHead(group.name, !this.isContentShow && this.selectItem === index
             ? $r('sys.symbol.chevron_down') : $r('sys.symbol.chevron_right'))
-        }){
+        }) {
           // 展开后内容显示区域
           if (!this.isContentShow && this.selectItem === index) {
             ProxyGroupItem({
@@ -99,9 +105,9 @@ struct ProxyArrangement {
                 this.changeProxy(group.name, item)
               }
             })
-              .borderRadius(BORDER_RADIUS_20)
               .width('100%')
-              .padding({ top:10})
+              .padding({ top: 10})
+              .borderRadius(BORDER_RADIUS_20)
           }
         }.margin({bottom: (!this.isContentShow && this.selectItem === index) ? 0 : 10})
         .clickEffect(this.isContentShow?customAnimationUtil.isClickEffect(this.uiConfig):null)
@@ -121,6 +127,7 @@ struct ProxyArrangement {
         })
         .width('100%')
         .borderRadius(BORDER_RADIUS_20)
+        .constraintSize({minHeight: 120})
       }, (item: ProxyGroup) => item.name)
     }
     .contentEndOffset(CONTENT_END_OFFSET_150)

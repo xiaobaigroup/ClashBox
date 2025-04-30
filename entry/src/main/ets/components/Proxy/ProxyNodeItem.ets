@@ -37,7 +37,6 @@ export function delayText(delay: number){
 }
 
 @Component
-@Reusable
 export struct ProxyNode {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
@@ -80,7 +79,7 @@ export struct ProxyNode {
             .maxLines(1)
             .textAlign(TextAlign.End)
           // group唯一
-          Checkbox({ name: this.item.name, group: this.item.g + this.item.name})
+          Checkbox({ name: this.item.name, group: this.item.g})
             .shape(CheckBoxShape.CIRCLE)
             .select(this.item.name === this.selected)
             .selectedColor(this.icon_emphasize)
@@ -109,7 +108,7 @@ export struct ProxyNode {
           .justifyContent(FlexAlign.Start)
         }.layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
-        Checkbox({ name: this.item.name, group: this.item.g + this.item.name})
+        Checkbox({ name: this.item.name, group: this.item.g/* + this.item.name*/})
           .shape(CheckBoxShape.CIRCLE)
           .select(this.item.name === this.selected)
           .selectedColor(this.icon_emphasize)
@@ -132,7 +131,7 @@ export struct ProxyNode {
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
         .justifyContent(FlexAlign.SpaceBetween)
-        Checkbox({ name: this.item.name, group: this.item.g + this.item.name})
+        Checkbox({ name: this.item.name, group: this.item.g})
           .shape(CheckBoxShape.CIRCLE)
           .select(this.item.name === this.selected)
           .selectedColor(this.icon_emphasize)
