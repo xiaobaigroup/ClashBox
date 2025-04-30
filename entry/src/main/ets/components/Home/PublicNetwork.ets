@@ -7,6 +7,7 @@ import ClashViewModel from '../../entryability/ClashViewModel'
 import { IpInfo } from 'proxy_core'
 import { EventHub, EventKey } from '../../common/EventHub'
 import { customVibrator } from '../../utils/VibratorUtil'
+import { customAnimationUtil } from '../../utils/Animation'
 
 @Component
 struct PublicNetwork {
@@ -46,14 +47,29 @@ struct PublicNetwork {
     Column() {
       CardTitle({ title: $r('app.string.PublicNetwork') })
       Column() {
-        Text(this.remoteIp?.country ?? "")
-          .fontSize(this.isLandscapePhone ? 12 : this.HomeCardIPSmFontSize.value)
-          .fontColor($r('sys.color.font_secondary'))
+        if (this.remoteIp?.ip != undefined){
+          Text(this.remoteIp?.country ?? " " )
+            .fontSize(this.isLandscapePhone ? 12 : this.HomeCardIPSmFontSize.value)
+            .fontColor($r('sys.color.font_secondary'))
+            .transition(customAnimationUtil.isOpacity(this.uiConfig))
 
-        Text(this.remoteIp?.ip ?? $r('app.string.loading'))
-          .fontSize(this.isLandscapePhone ? 18 :this.isFoldStatus ? 22: this.IPfontSize.value)
-          .textAlign(TextAlign.JUSTIFY)
-          .fontColor($r('sys.color.font_primary'))
+          Text( this.remoteIp?.ip  ?? $r('app.string.loading'))
+            .fontSize(this.isLandscapePhone ? 18 :this.isFoldStatus ? 22: this.IPfontSize.value)
+            .textAlign(TextAlign.JUSTIFY)
+            .fontColor($r('sys.color.font_primary'))
+            .transition(customAnimationUtil.isOpacity(this.uiConfig))
+        }else {
+          Row(){
+            LoadingProgress()
+              .size({width:24,height:24})
+              .color(this.icon_emphasize)
+
+            Text($r('app.string.loading'))
+              .fontSize(this.isLandscapePhone ? 18 :this.isFoldStatus ? 22: this.IPfontSize.value)
+              .textAlign(TextAlign.JUSTIFY)
+              .fontColor($r('sys.color.font_primary'))
+          }.transition(customAnimationUtil.isOpacity(this.uiConfig))
+        }
       }
       .alignItems(HorizontalAlign.Start)
       .justifyContent(FlexAlign.Start)

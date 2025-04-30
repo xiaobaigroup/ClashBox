@@ -25,6 +25,17 @@ class AnimationUtil{
     return effectEvent
   }
 
+  //转场隐显动画
+  public isOpacity(uiConfig:UIConfig){
+    effectEvent=
+      uiConfig.isAnimation ?
+      TransitionEffect.OPACITY
+        .animation({ duration: uiConfig.animationSpeed,curve:Curve.Ease,delay: 0 })
+        :null
+
+    return effectEvent
+  }
+
   //转场滑动动画（从左到右），i为直接延迟数值，uiConfig为动画速度以及开关的切换
   public isSlide(i:number,uiConfig:UIConfig){
     effectEvent=

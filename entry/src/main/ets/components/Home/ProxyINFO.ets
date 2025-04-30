@@ -10,6 +10,7 @@ import { customVibrator } from "../../utils/VibratorUtil"
 import { delayText } from "../Proxy/ProxyNodeItem"
 import { IpInfo } from "proxy_core"
 import { EventHub, EventKey } from "../../common/EventHub"
+import { customAnimationUtil } from "../../utils/Animation"
 
 @Component
 struct ProxyINFO{
@@ -71,14 +72,31 @@ struct ProxyINFO{
               .fontWeight(FontWeight.Bold)
               .fontColor($r('sys.color.font_primary'))
           }
-          Row(){
-            Text(this.remoteIp?.country ?? "" )
-              .fontSize(this.isPXSecScreen? 12 :this.isLandscapePhone ? 12 : this.HomeCardIPSmFontSize.value)
-              .fontColor($r('sys.color.font_secondary'))
 
-            Text( this.remoteIp?.ip  ?? $r('app.string.loading'))
-              .fontSize(this.isPXSecScreen? 12 :this.isLandscapePhone ? 18 :this.isFoldStatus ?22: this.IPfontSize.value)
-              .fontColor($r('sys.color.font_secondary'))
+          if (this.remoteIp?.ip != undefined){
+            Row(){
+              Text(this.remoteIp?.country ?? " " )
+                .fontSize(this.isPXSecScreen? 12 :this.isLandscapePhone ? 12 : this.HomeCardIPSmFontSize.value)
+                .fontColor($r('sys.color.font_secondary'))
+
+              Text(' ')
+                .fontSize(this.isPXSecScreen? 12 :this.isLandscapePhone ? 12 : this.HomeCardIPSmFontSize.value)
+                .fontColor($r('sys.color.font_secondary'))
+
+              Text( this.remoteIp?.ip  ?? $r('app.string.loading'))
+                .fontSize(this.isPXSecScreen? 12 :this.isLandscapePhone ? 18 :this.isFoldStatus ?22: this.IPfontSize.value)
+                .fontColor($r('sys.color.font_secondary'))
+            }.transition(customAnimationUtil.isOpacity(this.uiConfig))
+          }else {
+            Row(){
+              LoadingProgress()
+                .size({width:16,height:16})
+                .color(this.icon_emphasize)
+
+              Text($r('app.string.loading'))
+                .fontSize(this.isPXSecScreen? 12 :this.isLandscapePhone ? 18 :this.isFoldStatus ?22: this.IPfontSize.value)
+                .fontColor($r('sys.color.font_secondary'))
+            } .transition(customAnimationUtil.isOpacity(this.uiConfig))
           }
         }
         if (this.appConfig.currentProxyItem) {
