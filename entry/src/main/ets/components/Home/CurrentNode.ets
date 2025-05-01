@@ -37,8 +37,7 @@ struct CurrentNode {
           Text('ping ' + `${delayText(ClashViewModel.delayMap.get(this.appConfig.currentProxyItem.name)?.delay ?? 0)}`)
             .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)
             .fontColor(ProxyData.getColorForLatency(ClashViewModel.delayMap.get(this.appConfig.currentProxyItem.name)?.delay ?? 0))
-        }
-        else{
+        } else {
           Text($r('app.string.proxy_name'))
             .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
             .fontWeight(FontWeight.Bold)

@@ -46,7 +46,7 @@ struct FavoriteProxy {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink("proxyGroups") ProxyGroups: ProxyGroup[] = []
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  @Consume('currentProfile') private currentProfile: Profile | null
+  @Consume('currentProfile') currentProfile: Profile | null
 
   changeProxy(g: string, item: ProxyItem){
     if (this.currentProfile) {
@@ -91,25 +91,13 @@ struct FavoriteProxy {
                         checkedBackgroundColor: this.icon_emphasize,
                       })
                       .hitTestBehavior(HitTestMode.None)
-                      .onClick(() => {
-                        //在home页编辑状态时，无法操作
-                        if (this.isShowHomeEdit === false) {
-                          this.appConfig.currentProxyName = p[1]
-                          this.appConfig.currentProxyItem = AppState.fetchProxyItem(this.theProxyGroups, p[0], p[1])
-                          if (this.uiConfig.isVibrate) {
-                            customVibrator.vibratorTriggerOfHapticClockTimer()
-                          }
-                          // 对应切换代理页节点
-                          this.changeProxy(p[0], this.appConfig.currentProxyItem)
-                        }
-                      })
                   }
                   .onClick(() => {
-                    //在home页编辑状态时，无法操作
+                    // 在home页编辑状态时，无法操作
                     if (this.isShowHomeEdit === false) {
                       this.appConfig.currentProxyName = p[1]
                       this.appConfig.currentProxyItem = AppState.fetchProxyItem(this.theProxyGroups, p[0], p[1])
-                      //对应切换代理页节点
+                      // 对应切换代理页节点
                       this.changeProxy(p[0], this.appConfig.currentProxyItem)
                       if (this.uiConfig.isVibrate) {
                         customVibrator.vibratorTriggerOfHapticClockTimer()
@@ -117,11 +105,7 @@ struct FavoriteProxy {
                     }
                   })
                   .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-
-                  //   if (!isEnd(this.favoriteProxys.size, i)){
-                  //      Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
-                  //    }
-                }.height(AppState.fetchFavoriteProxys(this.favoriteProxys, this.theProxyGroups).length-1==1?'50%':'32%')
+                }.height(AppState.fetchFavoriteProxys(this.favoriteProxys, this.theProxyGroups).length - 1 == 1 ? '50%' : '32%')
               })
           }.divider({ strokeWidth: 1, color: $r('app.color.FavoriteProxyDivider') })
           .scrollBar(BarState.Off)

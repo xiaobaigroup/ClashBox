@@ -191,7 +191,6 @@ struct ProxyGroupItem {
    }
 
    switchSort(){
-     this.selectedProxy =  this.appConfig.currentProxyName as string
      if (this.appConfig.proxySort == ProxySort.Default){
        this.proxyLazyItems.DefaultSortItems(this.proxyitems)
      } else if (this.appConfig.proxySort == ProxySort.Title){
@@ -308,7 +307,6 @@ struct ProxyGroupItem {
 
   selectProxy(item: ProxyItem) {
     if (!this.disabled) {
-      this.selectedProxy = item.name
       this.appConfig.currentProxyName = item.name
       this.appConfig.currentProxyItem = item
       this.OnProxyChange(item)

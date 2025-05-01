@@ -1,7 +1,7 @@
 {
   "app": {
-    "bundleName": "cn.damai.hongmeng",
-//    "bundleName": "org.xbgroup.clashnext",
+//    "bundleName": "cn.damai.hongmeng",
+    "bundleName": "org.xbgroup.clashnext",
     "vendor": "example",
     "versionCode": 9903002,
     "versionName": "99.3.2",

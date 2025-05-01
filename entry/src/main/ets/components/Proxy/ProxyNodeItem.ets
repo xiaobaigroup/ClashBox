@@ -3,6 +3,7 @@ import { ProxyItem as ProxyItem, ProxyData } from '../../common/ProxyData'
 import { AppConfig, ProxyCardSize, UIConfig } from '../../entryability/AppState'
 import ClashViewModel, { DelayInfo } from '../../entryability/ClashViewModel'
 import { customVibrator } from '../../utils/VibratorUtil'
+import { hilog } from '@kit.PerformanceAnalysisKit'
 
 
 @Extend(Text)
@@ -78,11 +79,12 @@ export struct ProxyNode {
             .fontSize(12)
             .maxLines(1)
             .textAlign(TextAlign.End)
-          // group唯一
-          Checkbox({ name: this.item.name, group: this.item.g})
-            .shape(CheckBoxShape.CIRCLE)
-            .select(this.item.name === this.selected)
-            .selectedColor(this.icon_emphasize)
+          // group 不要写死, 会和其他tab页的生效，在一个组里唯一
+          Radio({ value: this.item.name, group: this.item.g + this.item.name})
+            .checked(this.item.name === this.selected)
+            .radioStyle({
+              checkedBackgroundColor: this.icon_emphasize,
+            })
             .hitTestBehavior(HitTestMode.None)
         }
       }.width('100%')
@@ -92,12 +94,12 @@ export struct ProxyNode {
         Column({space: 3}) {
           Text(`${this.item.name}`).ItemTextStyle()
           Row({space: 3}) {
-            Text(`${this.item.type}`)
+            Text(`${this.item.type}`) //
               .maxLines(1)
               .ItemTypeStyle()
               .constraintSize({maxWidth: this.uiConfig.stringDisplayIndex === 0 ? '55%' : Infinity})
               .textOverflow({ overflow: TextOverflow.Clip})
-            Text(delayText(this.delay))
+            Text(/**/`${delayText(this.delay)}`)
               .fontColor(ProxyData.getColorForLatency(this.delay))
               .textOverflow({ overflow: TextOverflow.Ellipsis})
               .layoutWeight(1)
@@ -108,17 +110,21 @@ export struct ProxyNode {
           .justifyContent(FlexAlign.Start)
         }.layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
-        Checkbox({ name: this.item.name, group: this.item.g/* + this.item.name*/})
-          .shape(CheckBoxShape.CIRCLE)
-          .select(this.item.name === this.selected)
-          .selectedColor(this.icon_emphasize)
+        Radio({ value: this.item.name, group: this.item.g + this.item.name })
+          .checked(this.item.name === this.selected)
+          .radioStyle({
+            checkedBackgroundColor: this.icon_emphasize,
+          })
           .hitTestBehavior(HitTestMode.None)
+          .onChange((isChecked) => {
+            hilog.info(0xFF00, "ProxyPageGroupTag", "ProxyNodeItem #onChange %{public}s的选中状态%{public}s", this.item.name, isChecked)
+          })
       }
       .ListRowStyle()
     } else {
       Row() {
         Column() {
-          Text(`${this.item.name}`).ItemTextStyle().maxLines(2).padding({bottom:5})
+          Text(`${this.item.name}`).ItemTextStyle().maxLines(2).padding({bottom: 5})
           Column() {
             Text(`${this.item.type}`).ItemTypeStyle()
               .textOverflow({ overflow: TextOverflow.Ellipsis})
@@ -131,10 +137,11 @@ export struct ProxyNode {
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
         .justifyContent(FlexAlign.SpaceBetween)
-        Checkbox({ name: this.item.name, group: this.item.g})
-          .shape(CheckBoxShape.CIRCLE)
-          .select(this.item.name === this.selected)
-          .selectedColor(this.icon_emphasize)
+        Radio({ value: this.item.name, group: this.item.g + this.item.name })
+          .checked(this.item.name === this.selected)
+          .radioStyle({
+            checkedBackgroundColor: this.icon_emphasize,
+          })
           .hitTestBehavior(HitTestMode.None)
       }
       .ListRowStyle()

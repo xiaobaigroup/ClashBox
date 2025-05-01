@@ -106,7 +106,7 @@ struct ProxyPage {
   private ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE
   //定义组件名
   private componentName: string = 'ProxyPage'
-  @Consume('currentProfile') private currentProfile: Profile | null
+  @Consume('currentProfile') currentProfile: Profile | null
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
@@ -194,8 +194,8 @@ struct ProxyPage {
           .maxLines(1)
       }
       .borderRadius(BORDER_RADIUS_20)
+      .constraintSize({minWidth: 86})
       .height(this.currentProxyIndex === targetIndex ? 36 : 32)
-      // .width(this.currentProxyIndex === targetIndex ? 96 : 87)
       .backgroundColor(this.currentProxyIndex === targetIndex ? this.icon_emphasize : this.container_background)
     }
     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
@@ -207,26 +207,6 @@ struct ProxyPage {
     })
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Start)
-  }
-  // 嵌套分组样式标签头
-  @Builder
-  itemHead(text: string, icon: Resource) {
-    Row() {
-      Text(text)
-        .fontSize(FONT_SIZE_16)
-        .fontColor($r('sys.color.font_primary'))
-        .maxLines(1)
-        .textOverflow({ overflow: TextOverflow.Ellipsis })
-      SymbolGlyph(icon)
-        .fontSize(25).fontColor([$r('sys.color.icon_primary')])
-    }
-    .width('100%')
-    .justifyContent(FlexAlign.SpaceBetween)
-    .padding({ left: 10, right: 10 })
-    .borderRadius(BORDER_RADIUS_20)
-    .backgroundColor($r('app.color.container_background'))
-    .height(LIST_ITEM_HEIGHT)
-    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
   }
   // 半模态页面
   @Builder
@@ -321,7 +301,7 @@ struct ProxyPage {
                         proxyitems: group.proxies as ProxyItem[],
                         ProxyGroupItemSelected: this.appConfig.proxyCardSize,
                         disabled: group.type !== ProxyType.Selector,
-                        selectedProxy: this.currentProfile?.getSelectedProxy(group),
+                        selectedProxy: this.currentProfile?.getSelectedProxy(group) ?? this.appConfig.currentProxyName ?? '',
                         OnProxyChange: (item) => {
                           this.changeProxy(group.name, item)
                         }

@@ -508,7 +508,9 @@ struct Sort {
       SymbolGlyph($r('sys.symbol.sort'))
         .fontSize(24)
     }
-    .width('100%')
+    .width(450)
+    .borderRadius(BORDER_RADIUS_20)
+    .backgroundColor($r('app.color.container_background'))
     .padding({left: 12, right: 12, top: 16, bottom: 16})
   }
 
