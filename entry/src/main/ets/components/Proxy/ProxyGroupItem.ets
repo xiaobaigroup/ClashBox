@@ -167,6 +167,8 @@ struct ProxyGroupItem {
   @Consume curOffsetRemain: number
   // px外屏
   @Consume isPXSecScreen: boolean
+  //延迟排序判定
+  @Consume @Watch('switchSort')isLatencySort: boolean
   /**
    * XXX 当前手指触摸的ListItem的对应 `this.configList` 中的 `configId`
    *    List的长按菜单中的响应都是根据这个的对象中的属性来处理的，是个不稳定因素
@@ -195,7 +197,7 @@ struct ProxyGroupItem {
        this.proxyLazyItems.DefaultSortItems(this.proxyitems)
      } else if (this.appConfig.proxySort == ProxySort.Title){
        this.proxyLazyItems.NameSortItems(this.proxyitems)
-     } else if (this.appConfig.proxySort == ProxySort.Delay){
+     } else if (this.appConfig.proxySort == ProxySort.Delay ||(this.appConfig.proxySort == ProxySort.Delay && this.isLatencySort==true)){
        this.proxyLazyItems.LatencySortItems(this.proxyitems)
        hilog.info(0xFF00, "ProxySort ProxyPageLatencyTag", "延迟排序 %{public}s", this.appConfig.proxySort)
      }

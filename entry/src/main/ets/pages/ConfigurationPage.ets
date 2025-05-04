@@ -385,13 +385,14 @@ struct ConfigurationPage {
                         LoadingProgress()
                           .color(this.icon_emphasize)
                           .width(25).height(25)
+                          .transition(customAnimationUtil.isOpacity(this.uiConfig))
                       }
-                      Radio({ value: 'radio' + index, group: 'configGroup'})
-                        .checked(item.configId === this.currentConfigRadioCheckedConfigData.configId)
-                        .radioStyle({
-                          checkedBackgroundColor: this.icon_emphasize,
-                        })
-                        .hitTestBehavior(HitTestMode.None)
+                        Radio({ value: 'radio' + index, group: 'configGroup'})
+                          .checked(item.configId === this.currentConfigRadioCheckedConfigData.configId)
+                          .radioStyle({
+                            checkedBackgroundColor: this.icon_emphasize,
+                          })
+                          .hitTestBehavior(HitTestMode.None)
                     }
                     .width('100%')
                     .padding(LIST_ITEM_PADDING)
@@ -604,7 +605,14 @@ struct ConfigurationPage {
     hilog.info(0xC011, this.componentName, `EditConfig #loadConfig#加载配置: configName is [${this.currentTouchConfigData.configName}]`)
     if (this.isLoading)
       return
-    this.isLoading = true;
+    animateTo({
+      duration: this.uiConfig.animationSpeed,
+      iterations: 1,
+      playMode: PlayMode.Normal,
+      curve:Curve.Ease,
+    }, () => {
+      this.isLoading = true;
+    })
     this.appConfig.currentProfileName = item.configName
     this.appConfig.currentProfileId = item.configId
     try {
@@ -617,7 +625,14 @@ struct ConfigurationPage {
       console.debug("loadConfigList", e.message, JSON.stringify(e))
       promptAction.showToast({message: `${getResourceString($r('app.string.failed_load_config'), this.context)}` + (e.message || e) })
     }
-    this.isLoading = false;
+    animateTo({
+      duration: this.uiConfig.animationSpeed,
+      iterations: 1,
+      playMode: PlayMode.Normal,
+      curve:Curve.Ease,
+    }, () => {
+      this.isLoading = false;
+    })
   }
 
   async onConfigListChange() {

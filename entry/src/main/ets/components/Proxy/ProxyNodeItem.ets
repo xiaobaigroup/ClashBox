@@ -47,7 +47,7 @@ export struct ProxyNode {
   @State delay: number = 0
   @Prop selected: string
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-
+  @Consume isPXSecScreen: boolean
   selectProxy?: (item: ProxyItem) => void
   onLatencyChange?:(l: number)=>void
 
@@ -97,13 +97,14 @@ export struct ProxyNode {
             Text(`${this.item.type}`) //
               .maxLines(1)
               .ItemTypeStyle()
+              .fontSize(this.isPXSecScreen ? 10 : 12)
               .constraintSize({maxWidth: this.uiConfig.stringDisplayIndex === 0 ? '55%' : Infinity})
               .textOverflow({ overflow: TextOverflow.Clip})
             Text(/**/`${delayText(this.delay)}`)
               .fontColor(ProxyData.getColorForLatency(this.delay))
-              .textOverflow({ overflow: TextOverflow.Ellipsis})
+              .textOverflow({ overflow:this.isPXSecScreen ? TextOverflow.MARQUEE : TextOverflow.Ellipsis})
               .layoutWeight(1)
-              .fontSize(12)
+              .fontSize(this.isPXSecScreen ? 10 : 12)
               .maxLines(1)
               .textAlign(this.uiConfig.stringDisplayIndex === 0 ? TextAlign.End:TextAlign.Start)
           }.width(this.uiConfig.stringDisplayIndex === 0 ? '70%' : '100%')

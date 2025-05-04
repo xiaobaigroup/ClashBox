@@ -116,7 +116,8 @@ struct ProxyPage {
   @Consume curYOffset: number
   // 收藏显示判定
   @Provide showStart: boolean = false
-  @State loading: boolean = false
+  //延迟排序判定
+  @Consume isLatencySort: boolean
   // 代理页延迟按钮气泡提示
   @Consume isShowDelayPop: boolean
   // Index页tab栏竖直状态
@@ -421,13 +422,16 @@ struct ProxyPage {
             autoCancel: false
           })
           .onClick(async () => {
-            if(this.loading){
+            if(this.isLatencySort){
               return
             }
             this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
-            this.loading = true
             await ClashViewModel.testAllDelay(this.theProxyGroups[this.currentProxyIndex].proxies as ProxyItem[])
-            this.loading = false
+            //当延迟排序选中时，让ui可以刷新
+            this.isLatencySort = true
+            setTimeout(() => {
+            this.isLatencySort = false
+            }, 1000)
             hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行1 %{public}s")
             if (this.uiConfig.isVibrate) {
               customVibrator.vibratorTriggerOfHapticClockTimer()

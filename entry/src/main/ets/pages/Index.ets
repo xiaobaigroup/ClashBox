@@ -298,6 +298,8 @@ struct Index {
   @Provide private logListData: Array<LogData> = []
   // 配置数据
   @Provide configList: Array<ConfigData> = []
+  //延迟排序判定
+  @Provide isLatencySort: boolean = false
   // 所有子组件在容器内的对齐方式
   @Provide('stackAlignContentAlignment') stackAlignContentAlignment: Alignment = Alignment.BottomEnd
   // 收藏的代理
