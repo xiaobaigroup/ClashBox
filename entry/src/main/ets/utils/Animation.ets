@@ -25,6 +25,18 @@ class AnimationUtil{
     return effectEvent
   }
 
+  //转场缩放动画(延迟小)，i为延迟，在list或者foreach中可以将i设为index，达到递增的动画效果，uiConfig为动画速度以及开关的切换
+  public isScaleTranFast(i:number,uiConfig:UIConfig){
+    effectEvent=
+      uiConfig.isAnimation ?
+      TransitionEffect.OPACITY
+        .combine(TransitionEffect.scale({x: 0, y: 0}))
+        .animation({ duration: uiConfig.animationSpeed,curve:curves.springMotion(),delay: i*2+30 })
+        :null
+
+    return effectEvent
+  }
+
   //转场隐显动画
   public isOpacity(uiConfig:UIConfig){
     effectEvent=

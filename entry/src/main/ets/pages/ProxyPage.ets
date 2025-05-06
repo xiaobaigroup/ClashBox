@@ -82,8 +82,9 @@ struct ProxyPage {
   @Prop proxyitems: ProxyItem[]
   // 代理数据(懒加载)
   @Consume proxyGroups: ProxyGroupItemDataSource
-  // 代理分组List控制器
-  private ListScroller: Scroller = new Scroller()
+  // 代理分组tabs控制器
+ // private ListScroller: Scroller = new Scroller()
+  private tabsController: TabsController = new TabsController();
   // 代理节点Swiper控制器
   private SwiperController: SwiperController = new SwiperController()
 
@@ -130,7 +131,7 @@ struct ProxyPage {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     this.isShowDelayPop = this.uiConfig.ShowDelayPop
     BreakpointSystem.getInstance().start()
-    if (this.currentProfile) {
+    /*if (this.currentProfile) {
       let tabIndex = this.theProxyGroups.findIndex((d) => d.name == this.currentProfile?.currentGroupName)
       setTimeout(() => {
         if (tabIndex > -1 && this.currentProxyIndex === 0) {
@@ -142,7 +143,7 @@ struct ProxyPage {
           this.SwiperController.changeIndex(this.currentProxyIndex)
         }
       }, 200)
-    }
+    }*/
   }
   @Consume proxyLazyItems: ProxyItemDataSource
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
@@ -203,8 +204,10 @@ struct ProxyPage {
     .height(55)
     .margin({ right: 8, bottom: 10 })
     .onClick(() => {
-      this.currentProxyIndex = targetIndex
-      this.SwiperController.changeIndex(this.currentProxyIndex)
+      animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
+        this.currentProxyIndex = targetIndex
+        this.SwiperController.changeIndex(this.currentProxyIndex, true)
+      })
     })
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Start)
@@ -284,16 +287,29 @@ struct ProxyPage {
                 // 根据ProxyArrangementSelected的状态决定是否显示
                 if (this.appConfig.proxyGroupType === ProxyGroupType.Tabs) {
                   // 代理分组List Start
-                  List({scroller: this.ListScroller}) {
+                 /* List({scroller: this.ListScroller,initialIndex:this.currentProxyIndex}) {
                     LazyForEach(this.proxyGroups, (group: ProxyGroup, index: number) => {
-                      this.TabBuilder(group.name, index)
+                        this.TabBuilder(group.name, index)
                     }, (item: ProxyGroup) => item.name)
                   }
                   .height(55)
                   .width('100%')
                   .scrollBar(BarState.Off)
-                  .listDirection(Axis.Horizontal)
-                  // 代理分组List End
+                  .listDirection(Axis.Horizontal)*/
+
+                  //此处可以直接用tabs懒加载+swiper懒加载并行实现 tabs start
+                  Tabs({ barPosition: BarPosition.Start,index:this.currentProxyIndex, controller: this.tabsController }) {
+                    LazyForEach(this.proxyGroups, (group: ProxyGroup, index: number) => {
+                      TabContent().tabBar(this.TabBuilder(group.name, index))
+                    }, (item: ProxyGroup) => item.name)
+                  }
+                  .barMode(BarMode.Scrollable)
+                  .height(55)
+                  .width('100%')
+                  .animationDuration(this.uiConfig.animationSpeed)
+                  .fadingEdge(false)
+                  // 代理分组tabs End
+
                   // 代理节点Swiper Start
                   Swiper(this.SwiperController) {
                     LazyForEach(this.proxyGroups, (group: ProxyGroup, index: number) => {
@@ -311,15 +327,16 @@ struct ProxyPage {
                         .height('100%')
                         .padding({ bottom:  this.isPXSecScreen || (this.isSmallSquareScreen && this.isRolling) ? 0 : !this.uiConfig.isBlurr  ? CONTENT_END_OFFSET_150 - 100 : CONTENT_END_OFFSET_150 - 50 })
                         // .onAppear(() => {
-                        //   // promptAction.showToast({message: `当前选中：${this.currentProfile?.getSelectedProxy(group) ?? ""}`, duration: 2000 })
-                        //   hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear %{public}s", group.proxies.toString())
-                        //   hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear hidden: %{public}s %{public}d", group.hidden, index)
-                        // })
+                        //promptAction.showToast({message: `当前选中：${this.currentProfile?.getSelectedProxy(group) ?? ""}`, duration: 2000 })
+                         //  hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear %{public}s", group.proxies.toString())
+                          // hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear hidden: %{public}s %{public}d", group.hidden, index)
+                         //})
                         // .onDisAppear(() => {
                         //   hilog.info(0xFF00, "ProxyPageGroupTag", "#onDisAppear %{public}s", group.toString())
                         // })
                     }, (item: ProxyGroup) => item.name + Date.now())
                   }
+                  .index(this.currentProxyIndex)
                   .loop(false)
                   .effectMode(EdgeEffect.None)
                   .nestedScroll(SwiperNestedScrollMode.SELF_FIRST)
@@ -343,7 +360,8 @@ struct ProxyPage {
                   })
                   .onAnimationStart((index: number,targetIndex: number) => {
                     animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
-                      this.ListScroller.scrollToIndex(targetIndex)
+                    //  this.ListScroller.scrollToIndex(targetIndex)
+                      this.tabsController.changeIndex(targetIndex)
                       this.currentProxyIndex = targetIndex
                       if (this.currentProfile) {
                         this.currentProfile.currentGroupName = this.theProxyGroups[this.currentProxyIndex].name
@@ -429,9 +447,8 @@ struct ProxyPage {
             await ClashViewModel.testAllDelay(this.theProxyGroups[this.currentProxyIndex].proxies as ProxyItem[])
             //当延迟排序选中时，让ui可以刷新
             this.isLatencySort = true
-            setTimeout(() => {
+            await this.isLatencySort == true
             this.isLatencySort = false
-            }, 1000)
             hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行1 %{public}s")
             if (this.uiConfig.isVibrate) {
               customVibrator.vibratorTriggerOfHapticClockTimer()

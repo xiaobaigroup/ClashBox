@@ -337,7 +337,7 @@ struct ProxyGroupItem {
             }
           })
         }
-        .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
+        .transition(customAnimationUtil.isScaleTranFast(index, this.uiConfig))
         .onClick(() => {
           this.selectProxy(item)
         })
