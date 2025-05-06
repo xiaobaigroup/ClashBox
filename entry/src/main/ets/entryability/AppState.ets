@@ -6,7 +6,6 @@ import { resourcesBlankData, theResouresData } from "../components/More/Resource
 import ClashViewModel from "./ClashViewModel";
 import { bundleManager } from "@kit.AbilityKit";
 import { EventHub, EventKey } from "../common/EventHub";
-import { UpdateInfo } from "../utils/CheckUpdateUtil";
 
 export enum ProxyGroupType{
   Tabs,

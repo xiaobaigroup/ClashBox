@@ -41,16 +41,11 @@ export default class EntryAbility extends UIAbility {
 
     // 设置自动记忆最后关闭的窗口大小(仅2in1设备生效)
     try {
-      let AutoSave = windowStage.setWindowRectAutoSave(true);
-      AutoSave.then(() => {
-        hilog.info(0xFF00, "EntryAbilityTestTag", 'Succeeded in setting window rect auto-save')
-      }).catch((err: BusinessError) => {
-        hilog.error(0xFF00, "EntryAbilityTestTag", 'Failed to set window rect auto-save. Cause code: %{public}s smessage: %{public}s', err.code, err.message)
-      });
+      await windowStage.setWindowRectAutoSave(true);
+      hilog.info(0xFF00, "EntryAbility", 'Succeeded in setting window rect auto-save')
     } catch (exception) {
-      hilog.error(0xFF00, "EntryAbilityTestTag", 'Failed to set window rect auto-save. Cause code: %{public}s smessage: %{public}s', exception.code, exception.message)
+      hilog.error(0xFF00, "EntryAbility", 'Failed to set window rect auto-save. Cause code: %{public}s smessage: %{public}s', exception.code, exception.message)
     }
-
     await ClashViewModel.init(this.context)
     windowStage.loadContent('pages/Index', async (err) => {
       if (err.code) {

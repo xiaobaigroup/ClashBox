@@ -239,7 +239,6 @@ export class ClashViewModel {
       const vpnWant = {
         deviceId: "",
         bundleName: "org.xbgroup.clashnext",
-        // bundleName: "cn.damai.hongmeng",
         abilityName: "ClashVpnAbility",
         parameters: { "ClashCore" : coreType}
       } as Want
@@ -248,6 +247,8 @@ export class ClashViewModel {
         // 停止vpn进程
         await vpnExtension.stopVpnExtensionAbility(vpnWant)
       }
+      // bundleName: "cn.damai.hongmeng",
+
       await new Promise<boolean>( async (resolve, reject)=>{
           vpnExtension.startVpnExtensionAbility(vpnWant)
           .then(() => {
@@ -332,13 +333,15 @@ export class ClashViewModel {
 
   async initGeoIp(){
     let geoIp = await readFile(this.context?.resourceDir + "/geoip.metadb")
-    writeFile(await getHome(this.context) + "/geoip.metadb", geoIp)
+    let home = await getHome(this.context)
+
+    writeFile(home+ "/geoip.metadb", geoIp)
     let geoip = await readFile(this.context?.resourceDir + "/GeoIP.dat")
-    writeFile(await getHome(this.context) + "/GeoIP.dat", geoip)
+    writeFile(home + "/GeoIP.dat", geoip)
     let geoSite = await readFile(this.context?.resourceDir + "/GeoSite.dat")
-    writeFile(await getHome(this.context) + "/GeoSite.dat", geoSite)
+    writeFile(home + "/GeoSite.dat", geoSite)
     let Country = await readFile(this.context?.resourceDir + "/ASN.mmdb")
-    writeFile(await getHome(this.context) + "/ASN.mmdb", Country)
+    writeFile(home + "/ASN.mmdb", Country)
 
   }
 }
@@ -354,12 +357,17 @@ export async  function readFile(filePath: string): Promise<Uint8Array | null> {
   return new Uint8Array(buf);
 }
 export function writeFile(filePath: string, data: Uint8Array | null) {
-  if(data != null && data.byteLength > 0){
-    const file = fs.openSync(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE)
-    fs.writeSync(file.fd, data.buffer);
-    fs.fsyncSync(file.fd)
-    fs.closeSync(file);
+  try {
+    if(data != null && data.byteLength > 0){
+      const file = fs.openSync(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE)
+      fs.writeSync(file.fd, data.buffer);
+      fs.fsyncSync(file.fd)
+      fs.closeSync(file);
+    }
+  }catch (e) {
+    hilog.error(0x0000, 'EntryAbility', '%{public}s', 'write ' + filePath + ' failure: ' + e.message + e.stack);
   }
+
 }
 
 export default new ClashViewModel()

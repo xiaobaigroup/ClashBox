@@ -14,7 +14,7 @@ export async function getHome(context: Context | undefined): Promise<string>{
 export async function getProfilesPath(context: Context | undefined): Promise<string> {
   let dir = await getHome(context) + profilesDirectoryName
   if(!await fs.access(dir, fs.AccessModeType.EXIST)){
-    fs.mkdir(dir)
+    await fs.mkdir(dir)
   }
   return dir
 }
