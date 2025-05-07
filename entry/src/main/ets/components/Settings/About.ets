@@ -17,7 +17,7 @@ import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { common, Want } from "@kit.AbilityKit"
 import { BusinessError } from "@kit.BasicServicesKit"
-import { promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
+import { LengthMetrics, promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 import { AppConfig, ClashCore, isEnd, UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../utils/Animation"
 import { removeItemsByIndex } from "../../utils/RemoveItemsUtils"
@@ -106,9 +106,9 @@ struct About {
       break
       case 'Repositories':
         // 跳转仓库
-        hilog.info(0xFF00, "AboutestTag", "仓库")
-        implicitStartAbility('https://github.com/xxx%%', context)
-
+        // hilog.info(0xFF00, "AboutestTag", "仓库")
+        // implicitStartAbility('https://github.com/xxx%%', context)
+        promptAction.showToast({message: $r('app.string.not_open'), duration: 2000 })
       break
       default :
         this.SettingsPageInfos.pushPathByName(name, false)
@@ -742,10 +742,17 @@ export struct FAQ {
           .alignItems(HorizontalAlign.Start)
         }.width('100%')
         // F&Q
-        ForEach(this.FAQlist, (item: TCItemProp, index: number) => {
+        ForEach(this.FAQlist, (item: TCItemProp) => {
           ListItem() {
-            Column({space: 3}) {
-              Row({space: 3}) {
+            Flex({
+              direction: FlexDirection.Column,
+              space: { main: LengthMetrics.vp(3)}
+            }) {
+              Flex({
+                direction: FlexDirection.Row,
+                space: { main: LengthMetrics.vp(3)},
+                alignItems: ItemAlign.Center
+              }) {
                 Text('·')
                   .fontSize(32)
                   .fontWeight(FontWeight.Bolder)
@@ -758,7 +765,6 @@ export struct FAQ {
                 .margin({left: 11})
                 .fontWeight(FontWeight.Regular)
             }.width('100%')
-            .alignItems(HorizontalAlign.Start)
           }
         }, (item: TCItemProp) => getResourceString(item.title, this))
         // 附录

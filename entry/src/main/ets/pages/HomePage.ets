@@ -951,7 +951,7 @@ struct SaveCustomDialog {
 
   build() {
     Column() {
-      Text($r('app.string.Home_Save_Layout'))
+      Text($r('app.string.home_save_layout'))
         .fontSize(20)
         .fontColor($r('sys.color.font_primary'))
 

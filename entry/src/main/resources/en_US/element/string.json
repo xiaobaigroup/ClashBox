@@ -753,7 +753,7 @@
       "value": "By CloundFlare"
     },
     {
-      "name": "Home_Save_Layout",
+      "name": "home_save_layout",
       "value": "Do you want to save the current layout？"
     },
     {
@@ -1177,7 +1177,7 @@
       "value": "Add Home Card"
     },
     {
-      "name": "proxy_INFO",
+      "name": "proxy_info",
       "value": "Proxy INFO"
     },
     {
@@ -1919,6 +1919,14 @@
     {
       "name": "uncollected",
       "value": "Uncollected"
+    },
+    {
+      "name": "not_open",
+      "value": "The project warehouse has not been opened yet"
+    },
+    {
+      "name": "ip_address_query_fail_tips",
+      "value": "Failed to query the IP address. Please check whether the address can be accessed normally."
     }
   ]
 }

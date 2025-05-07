@@ -42,7 +42,7 @@ struct MorePage {
   @State isShowSettings: boolean = false
   // 是否进入二级界面
   @Consume isSecondary: boolean
-  // 平板竖屏判断变量
+  // 平板横屏判断变量
   @Consume istabletLandscape: boolean
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
@@ -55,7 +55,7 @@ struct MorePage {
   // 添加路由地址弹窗标题
   @State QueryIPDialogTitle: ResourceStr = $r('app.string.query_ip_region')
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
   // 更多页列表数组
   @Consume moreList: moreData[]
   // 主页面栈
@@ -129,7 +129,7 @@ struct MorePage {
       hilog.info(0xFF00, "MoretestTag", itemData.name)
       hilog.info(0xFF00, "MoretestTag", "isCheck状态: %{public}s", itemData.isCheck)
       this.pageInfos.replacePathByName(itemData.name, false)
-      this.isSecondary =  true
+      this.isSecondary = this.istabletLandscape ? false : true
     }
   }
 
@@ -342,6 +342,7 @@ export struct theQueryIPDialog {
         hilog.info(0xFF00, "MoreIPtestTag", "IP地址(完整): %{public}s", this.IPaddressinfo)
       } else {
         hilog.info(0xFF00, "MoreIPtestTag", "提取位置信息失败")
+        promptAction.showToast({message: $r('app.string.ip_address_query_fail_tips'), duration: 5000 })
       }
     } catch (err) {
       // 处理错误情况

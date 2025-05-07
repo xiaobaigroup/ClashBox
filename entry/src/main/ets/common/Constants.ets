@@ -549,10 +549,10 @@ export const LanguageListItem = (): LanguageData[] => {
   let result: LanguageData[] = new Array()
   result = [
     new LanguageData($r('app.string.SimplifiedChinese'), $r('app.string.SimplifiedChinese_Subtitle'), 'zh-Hans', false),
-    new LanguageData($r('app.string.TraditionalChinese_HK'), $r('app.string.TraditionalChinese_HK_Subtitle'), 'zh-Hant', false),
-    new LanguageData($r('app.string.TraditionalChinese_TW'), $r('app.string.TraditionalChinese_TW_Subtitle'), 'zh-Hant', false),
+    new LanguageData($r('app.string.TraditionalChinese_HK'), $r('app.string.TraditionalChinese_HK_Subtitle'), 'zh-HK', false),
+    new LanguageData($r('app.string.TraditionalChinese_TW'), $r('app.string.TraditionalChinese_TW_Subtitle'), 'zh-TW', false),
     new LanguageData($r('app.string.English'), $r('app.string.English_Subtitle'), 'en-Latn', false),
-
+    // 更对语言...
   ]
   return result
 }

@@ -2,11 +2,11 @@
   "string": [
     {
       "name": "module_desc",
-      "value": "module description"
+      "value": "模組描述"
     },
     {
       "name": "EntryAbility_desc",
-      "value": "description"
+      "value": "描述"
     },
     {
       "name": "EntryAbility_label",
@@ -14,7 +14,7 @@
     },
     {
       "name": "Home",
-      "value": "主页"
+      "value": "首頁"
     },
     {
       "name": "Proxy",
@@ -22,7 +22,7 @@
     },
     {
       "name": "Configuration",
-      "value": "配置"
+      "value": "設定"
     },
     {
       "name": "More",
@@ -30,11 +30,11 @@
     },
     {
       "name": "Settings",
-      "value": "设置"
+      "value": "設定"
     },
     {
       "name": "Speed",
-      "value": "网络速率"
+      "value": "網路速率"
     },
     {
       "name": "Mode",
@@ -42,103 +42,103 @@
     },
     {
       "name": "Rule",
-      "value": "规则"
+      "value": "規則"
     },
     {
       "name": "Overall",
-      "value": "全局"
+      "value": "全域"
     },
     {
       "name": "Direct",
-      "value": "直连"
+      "value": "直連"
     },
     {
       "name": "CellularData",
-      "value": "流量统计"
+      "value": "流量統計"
     },
     {
       "name": "CurrentNode",
-      "value": "当前节点"
+      "value": "當前節點"
     },
     {
       "name": "CurrentConfiguration",
-      "value": "当前配置"
+      "value": "當前設定"
     },
     {
       "name": "PublicNetwork",
-      "value": "IP地址"
+      "value": "IP位址"
     },
     {
       "name": "Switch",
-      "value": "切换"
+      "value": "切換"
     },
     {
       "name": "CellularData_Statistics_explanation",
-      "value": "设置每月流量以启用"
+      "value": "設定每月流量以啟用"
     },
     {
       "name": "FavoriteProxy",
-      "value": "收藏节点"
+      "value": "收藏節點"
     },
     {
       "name": "FavoriteConfiguration",
-      "value": "收藏配置"
+      "value": "收藏設定"
     },
     {
       "name": "Log",
-      "value": "日志"
+      "value": "日誌"
     },
     {
       "name": "Resources",
-      "value": "资源"
+      "value": "資源"
     },
     {
       "name": "Request",
-      "value": "请求"
+      "value": "請求"
     },
     {
       "name": "Connect",
-      "value": "连接"
+      "value": "連線"
     },
     {
       "name": "Overwrite",
-      "value": "覆写"
+      "value": "覆寫"
     },
     {
       "name": "AccessControl",
-      "value": "访问控制"
+      "value": "存取控制"
     },
     {
       "name": "EnableLoggerPrompt",
-      "value": "请在右上角点击”启用日志记录“"
+      "value": "請在右上角點擊「啟用日誌記錄」"
     },
     {
       "name": "EnableLogger",
-      "value": "启用日志记录"
+      "value": "啟用日誌記錄"
     },
     {
       "name": "ClearLogs",
-      "value": "清空日志"
+      "value": "清除日誌"
     },
     {
       "name": "ExportLog",
-      "value": "导出日志"
+      "value": "匯出日誌"
     },
     {
       "name": "none",
-      "value": "暂无"
+      "value": "暫無"
     },
     {
       "name": "AddConfig",
-      "value": "添加配置"
+      "value": "新增設定"
     },
     {
       "name": "Basic",
-      "value": "基础"
+      "value": "基本"
     },
     {
       "name": "Network",
-      "value": "网络"
+      "value": "網路"
     },
     {
       "name": "DNS",
@@ -146,99 +146,99 @@
     },
     {
       "name": "Language",
-      "value": "语言"
+      "value": "語言"
     },
     {
       "name": "Appearance",
-      "value": "外观"
+      "value": "外觀"
     },
     {
       "name": "Backup_Recovery",
-      "value": "备份与恢复"
+      "value": "備份與還原"
     },
     {
       "name": "Notice",
-      "value": "通知与反馈"
+      "value": "通知與回饋"
     },
     {
       "name": "Backgrounder",
-      "value": "后台运行"
+      "value": "後台運行"
     },
     {
       "name": "WipeData",
-      "value": "清空数据"
+      "value": "清除資料"
     },
     {
       "name": "Disclaimer",
-      "value": "免责声明"
+      "value": "免責聲明"
     },
     {
       "name": "About",
-      "value": "关于"
+      "value": "關於"
     },
     {
       "name": "Language_Subtitle",
-      "value": "简体中文(默认)"
+      "value": "簡體中文(預設)"
     },
     {
       "name": "AppearanceSubtitle",
-      "value": "深色模式、主题色、动画"
+      "value": "深色模式、主題色、動畫"
     },
     {
       "name": "BackupSubtitle",
-      "value": "导出备份、导入备份、自动同步"
+      "value": "匯出備份、匯入備份、自動同步"
     },
     {
       "name": "ApplicationicationLockSubtitle",
-      "value": "设置应用锁、指纹/人脸解锁"
+      "value": "設定應用鎖、指紋/人臉解鎖"
     },
     {
       "name": "subtitle",
-      "value": "常驻通知、流量提醒、震动反馈"
+      "value": "常駐通知、流量提醒、震動回饋"
     },
     {
       "name": "BackgrounderSubtitle",
-      "value": "模拟长时任务运行"
+      "value": "模擬長時任務運行"
     },
     {
       "name": "WipeDataSubtitle",
-      "value": "删除应用的所有数据"
+      "value": "刪除應用的所有資料"
     },
     {
       "name": "already_open",
-      "value": "已开启"
+      "value": "已開啟"
     },
     {
       "name": "already_close",
-      "value": "已关闭"
+      "value": "已關閉"
     },
     {
       "name": "Edit",
-      "value": "编辑"
+      "value": "編輯"
     },
     {
       "name": "Tabs",
-      "value": "标签页(默认)"
+      "value": "標籤頁(預設)"
     },
     {
       "name": "List",
-      "value": "列表"
+      "value": "清單"
     },
     {
       "name": "Default",
-      "value": "默认"
+      "value": "預設"
     },
     {
       "name": "Delay",
-      "value": "延迟"
+      "value": "延遲"
     },
     {
       "name": "Name",
-      "value": "名称"
+      "value": "名稱"
     },
     {
       "name": "Wide",
-      "value": "宽(单列)"
+      "value": "寬(單列)"
     },
     {
       "name": "Thin",
@@ -246,11 +246,11 @@
     },
     {
       "name": "Mini",
-      "value": "迷你(默认多列)"
+      "value": "迷你(預設多列)"
     },
     {
       "name": "Packet_mode",
-      "value": "分组方式"
+      "value": "封包方式"
     },
     {
       "name": "Arrangement",
@@ -266,27 +266,27 @@
     },
     {
       "name": "Test_Delay",
-      "value": "测速延迟"
+      "value": "測速延遲"
     },
     {
       "name": "Test_Speed",
-      "value": "测试速度"
+      "value": "測試速度"
     },
     {
       "name": "Delay_Speed",
-      "value": "速度和延迟的区别"
+      "value": "速度和延遲的差異"
     },
     {
       "name": "Reset_overwrite_settings",
-      "value": "重置覆写设置"
+      "value": "重置覆寫設定"
     },
     {
       "name": "Reset_overwrite_settings_subtitle",
-      "value": "将覆写重置设为默认值"
+      "value": "將覆寫重置為預設值"
     },
     {
       "name": "LogLevel",
-      "value": "日志等级"
+      "value": "日誌等級"
     },
     {
       "name": "UA",
@@ -294,39 +294,39 @@
     },
     {
       "name": "TCP_Active",
-      "value": "TCP保持活动间隔"
+      "value": "TCP保持活躍間隔"
     },
     {
       "name": "Test_Latency_Link",
-      "value": "测试延迟链接"
+      "value": "測試延遲連結"
     },
     {
       "name": "Proxy_Port",
-      "value": "代理端口"
+      "value": "代理埠"
     },
     {
       "name": "lan",
-      "value": "局域网"
+      "value": "局域網"
     },
     {
       "name": "lan_subtitle",
-      "value": "允许局域网"
+      "value": "允許局域網"
     },
     {
       "name": "only_proxy",
-      "value": "仅统计代理流量"
+      "value": "僅統計代理流量"
     },
     {
       "name": "only_proxy_subtitle",
-      "value": "主页卡片仅统计代理流量"
+      "value": "首頁卡片僅統計代理流量"
     },
     {
       "name": "UnifiedLatency",
-      "value": "统一延迟"
+      "value": "統一延遲"
     },
     {
       "name": "TCP_Concurrency",
-      "value": "TCP并发"
+      "value": "TCP併發"
     },
     {
       "name": "External_Control",
@@ -338,7 +338,7 @@
     },
     {
       "name": "Default_UA",
-      "value": "默认(clash.meta/1.18.7)"
+      "value": "預設(clash.meta/1.18.7)"
     },
     {
       "name": "TCP_interval",
@@ -346,31 +346,31 @@
     },
     {
       "name": "Default_test_latency_link",
-      "value": "默认(gstatic.com)"
+      "value": "預設(gstatic.com)"
     },
     {
       "name": "Unified_Latency_Subtitle",
-      "value": "去除握手等额外延迟"
+      "value": "去除握手等額外延遲"
     },
     {
       "name": "External_Control_Subtitle",
-      "value": "通过9090端口控制Clash内核"
+      "value": "透過9090埠控制Clash核心"
     },
     {
       "name": "OverwriteDNS",
-      "value": "覆写DNS"
+      "value": "覆寫DNS"
     },
     {
       "name": "option",
-      "value": "选项"
+      "value": "選項"
     },
     {
       "name": "State",
-      "value": "状态"
+      "value": "狀態"
     },
     {
       "name": "State_subtitle",
-      "value": "关闭后将使用系统DNS"
+      "value": "關閉後將使用系統DNS"
     },
     {
       "name": "UseHosts",
@@ -378,23 +378,23 @@
     },
     {
       "name": "Use_System_Hosts",
-      "value": "使用系统Hosts"
+      "value": "使用系統Hosts"
     },
     {
       "name": "Follow_The_Rules",
-      "value": "遵守规则(配置文件Rules)"
+      "value": "遵守規則(設定檔Rules)"
     },
     {
       "name": "Follow_The_Rules_Subtitle",
-      "value": "需配置proxy-server-nameserver"
+      "value": "需設定proxy-server-name-server"
     },
     {
       "name": "Priority_Use_H3",
-      "value": "优先使用H3"
+      "value": "優先使用H3"
     },
     {
       "name": "Priority_Use_H3_Subtitle",
-      "value": "优先使用DOH的http/3"
+      "value": "優先使用DOH的http/3"
     },
     {
       "name": "DNS_Mode",
@@ -406,7 +406,7 @@
     },
     {
       "name": "FakeIP_Range",
-      "value": "FakeIP范围"
+      "value": "FakeIP範圍"
     },
     {
       "name": "FakeIP_Range_Subtitle_1",
@@ -414,31 +414,31 @@
     },
     {
       "name": "FakeIP_Filtering",
-      "value": "FakeIP过滤"
+      "value": "FakeIP篩選"
     },
     {
       "name": "Default_Domain_Name_Server",
-      "value": "默认域名服务器"
+      "value": "預設域名伺服器"
     },
     {
       "name": "Default_Domain_Name_Server_Subtitle",
-      "value": "用于解析DNS服务器"
+      "value": "用於解析DNS伺服器"
     },
     {
       "name": "Domain_Name_Server_Strategy",
-      "value": "域名服务器策略"
+      "value": "域名伺服器策略"
     },
     {
       "name": "Domain_Name_Server_Strategy_Subtitle",
-      "value": "指定对应域名服务器策略"
+      "value": "指定對應域名伺服器策略"
     },
     {
       "name": "Domain_Name_Server",
-      "value": "域名服务器"
+      "value": "域名伺服器"
     },
     {
       "name": "Domain_Name_Server_Subtitle",
-      "value": "用于解析域名"
+      "value": "用於解析域名"
     },
     {
       "name": "FallBack",
@@ -446,19 +446,19 @@
     },
     {
       "name": "FallBack_Subtitle",
-      "value": "一般情况下使用境外DNS"
+      "value": "一般情況下使用境外DNS"
     },
     {
       "name": "Proxy_Domain_Name_Server",
-      "value": "代理域名服务器"
+      "value": "代理域名伺服器"
     },
     {
       "name": "Proxy_Domain_Name_Server_Subtitle",
-      "value": "用于解析代理节点的域名"
+      "value": "用於解析代理節點的域名"
     },
     {
       "name": "FallBack_Filtering",
-      "value": "FallBack过滤"
+      "value": "FallBack篩選"
     },
     {
       "name": "GeoIP",
@@ -466,7 +466,7 @@
     },
     {
       "name": "GeoIP_Code",
-      "value": "GeoIP代码"
+      "value": "GeoIP代碼"
     },
     {
       "name": "GeoIP_Code_Subtitle_1",
@@ -478,7 +478,7 @@
     },
     {
       "name": "IP_Mask",
-      "value": "IP/掩码"
+      "value": "IP/掩碼"
     },
     {
       "name": "Domain_Name",
@@ -486,11 +486,11 @@
     },
     {
       "name": "Edit_FakeIP_Range",
-      "value": "编辑FakeIP范围"
+      "value": "編輯FakeIP範圍"
     },
     {
       "name": "Save",
-      "value": "保存"
+      "value": "儲存"
     },
     {
       "name": "Cancel",
@@ -498,7 +498,7 @@
     },
     {
       "name": "stack_mode",
-      "value": "栈模式"
+      "value": "堆疊模式"
     },
     {
       "name": "route_mode",
@@ -506,7 +506,7 @@
     },
     {
       "name": "using_configuration",
-      "value": "使用配置"
+      "value": "使用設定"
     },
     {
       "name": "Routing_Address",
@@ -514,15 +514,15 @@
     },
     {
       "name": "Routing_Address_Subtitle",
-      "value": "配置监听路由地址"
+      "value": "設定監聽路由地址"
     },
     {
       "name": "query_ip_region",
-      "value": "查询IP地区"
+      "value": "查詢IP地區"
     },
     {
       "name": "query_ip_region_Subtitle",
-      "value": "使用第三方API查询IP所在地区"
+      "value": "使用第三方API查詢IP所在地區"
     },
     {
       "name": "Diversion_Strategy",
@@ -530,23 +530,23 @@
     },
     {
       "name": "Add",
-      "value": "添加"
+      "value": "新增"
     },
     {
       "name": "Add_Router_Address",
-      "value": "添加路由地址"
+      "value": "新增路由地址"
     },
     {
       "name": "Add_FakeIPfilter",
-      "value": "添加FakeIP过滤"
+      "value": "新增FakeIP篩選"
     },
     {
       "name": "SystemLanguage",
-      "value": "系统语言"
+      "value": "系統語言"
     },
     {
       "name": "SimplifiedChinese",
-      "value": "简体中文"
+      "value": "簡體中文"
     },
     {
       "name": "SimplifiedChinese_Subtitle",
@@ -554,7 +554,7 @@
     },
     {
       "name": "TraditionalChinese_HK",
-      "value": "繁体中文(中国香港)"
+      "value": "繁體中文(中國香港)"
     },
     {
       "name": "TraditionalChinese_HK_Subtitle",
@@ -562,7 +562,7 @@
     },
     {
       "name": "TraditionalChinese_TW",
-      "value": "繁体中文(中国台湾)"
+      "value": "繁體中文(中國台灣)"
     },
     {
       "name": "TraditionalChinese_TW_Subtitle",
@@ -570,7 +570,7 @@
     },
     {
       "name": "English",
-      "value": "英语(通用)"
+      "value": "英文(通用)"
     },
     {
       "name": "English_Subtitle",
@@ -598,7 +598,7 @@
     },
     {
       "name": "Sleep",
-      "value": "该睡啦"
+      "value": "該睡囉"
     },
     {
       "name": "Valentine",
@@ -606,11 +606,11 @@
     },
     {
       "name": "Women",
-      "value": "妇女节快乐!"
+      "value": "婦女節快樂!"
     },
     {
       "name": "Tree",
-      "value": "绿色森林！"
+      "value": "綠色森林！"
     },
     {
       "name": "Youth",
@@ -618,115 +618,115 @@
     },
     {
       "name": "Children",
-      "value": "儿童节快乐！"
+      "value": "兒童節快樂！"
     },
     {
       "name": "Teacher",
-      "value": "教师节快乐！"
+      "value": "教師節快樂！"
     },
     {
       "name": "National",
-      "value": "国庆节快乐！"
+      "value": "國慶節快樂！"
     },
     {
       "name": "Work",
-      "value": "劳动节快乐！"
+      "value": "勞動節快樂！"
     },
     {
       "name": "None_Proxy",
-      "value": "代理\n请检查配置"
+      "value": "代理\n請檢查設定"
     },
     {
       "name": "Application_Version",
-      "value": "应用版本"
+      "value": "應用版本"
     },
     {
       "name": "Kernel_Version",
-      "value": "内核版本"
+      "value": "核心版本"
     },
     {
       "name": "experimental_function",
-      "value": "实验功能"
+      "value": "實驗功能"
     },
     {
       "name": "experimental_function_Subtitle",
-      "value": "开启实验功能可能会导致应用不稳定"
+      "value": "開啟實驗功能可能導致應用不穩定"
     },
     {
       "name": "Contributors",
-      "value": "贡献者名单"
+      "value": "貢獻者名單"
     },
     {
       "name": "UseGuidance",
-      "value": "使用引导"
+      "value": "使用指引"
     },
     {
       "name": "Check_Updates",
-      "value": "检查更新"
+      "value": "檢查更新"
     },
     {
       "name": "UpdateChannels",
-      "value": "更新渠道"
+      "value": "更新頻道"
     },
     {
       "name": "UpdateChannels_Subtitle1",
-      "value": "Github(默认)"
+      "value": "GitHub(預設)"
     },
     {
       "name": "Auto_Check_Updates",
-      "value": "自动检查更新"
+      "value": "自動檢查更新"
     },
     {
       "name": "Official_Telegram_Channel",
-      "value": "官方Telegram频道"
+      "value": "官方Telegram頻道"
     },
     {
       "name": "Official_Discord_Community",
-      "value": "官方Discord社区"
+      "value": "官方Discord社區"
     },
     {
       "name": "Development_Team_Email",
-      "value": "开发团队电子邮件"
+      "value": "開發團隊電子郵件"
     },
     {
       "name": "ProjectRepositories",
-      "value": "项目仓库"
+      "value": "專案倉儲"
     },
     {
       "name": "FAQ",
-      "value": "常见问题"
+      "value": "常見問題"
     },
     {
       "name": "XiaoBai_Subtitle",
-      "value": "内核移植及核心功能开发"
+      "value": "核心移植及核心功能開發"
     },
     {
       "name": "FrondEnd_Development",
-      "value": "前端开发"
+      "value": "前端開發"
     },
     {
       "name": "KL_Subtitle",
-      "value": "UI设计、Logo设计、功能规划"
+      "value": "UI設計、Logo設計、功能規劃"
     },
     {
       "name": "Email",
-      "value": "电子邮件"
+      "value": "電子郵件"
     },
     {
       "name": "ChuanZhang_Subtitle",
-      "value": "统筹、后端测试"
+      "value": "統籌、後端測試"
     },
     {
       "name": "LLZL_Subtitle",
-      "value": "为Logo设计提供灵感"
+      "value": "為Logo設計提供靈感"
     },
     {
       "name": "Dear_Group_Members",
-      "value": "各位群友们"
+      "value": "各位群友"
     },
     {
       "name": "Dear_Group_Members_Subtitle",
-      "value": "感谢你们的建议qwq"
+      "value": "感謝您的建議qwq"
     },
     {
       "name": "Confirm",
@@ -734,31 +734,31 @@
     },
     {
       "name": "Disclaimer_Content",
-      "value": "本软件仅供学习交流、科研等非商业性质的用途，禁止将本软件用于商业目的。如有任何商业行为，均与本软件无关。当前版本为BETA公测版，可能会遇到未知Bug"
+      "value": "本軟體僅供學習交流、科研等非商業用途，禁止將本軟體用於商業目的。如有任何商業行為，均與本軟體無關。當前版本為BETA公測版，可能遇到未知Bug"
     },
     {
       "name": "Speed_Delay",
-      "value": "速度和延迟的区别"
+      "value": "速度和延遲的差異"
     },
     {
       "name": "Speed_Delay_Content",
-      "value": "速度：通常指网络带宽，决定你下载文件及看视频、图片加载的速度\n延迟：通常指网络ping的时间，决定你打游戏的体验和访问网页的速度\n通常情况下，速度快不代表延迟低，延迟低也不能代表速度快，他们之间没有直接关系"
+      "value": "速度：通常指網路寬頻，決定你下載檔案及看影片、圖片加載的速度\n延遲：通常指網路ping的時間，決定你打遊戲的體驗和訪問網頁的速度\n通常情況下速度快不代表延遲低，延遲低也不能代表速度快，他們之間沒有直接關係"
     },
     {
       "name": "Sure",
-      "value": "确定"
+      "value": "確定"
     },
     {
       "name": "Test_Speed_Explain",
-      "value": "测速功能由CloundFlare提供"
+      "value": "測速功能由CloundFlare提供"
     },
     {
       "name": "home_save_layout",
-      "value": "是否保存当前布局"
+      "value": "是否儲存當前佈局"
     },
     {
       "name": "Give_Up",
-      "value": "放弃"
+      "value": "放棄"
     },
     {
       "name": "Collect_Tip",
@@ -770,7 +770,7 @@
     },
     {
       "name": "Test_Delay_Tip",
-      "value": "延迟测速中，请稍后..."
+      "value": "延遲測速中，請稍後..."
     },
     {
       "name": "dark_mode",
@@ -778,15 +778,15 @@
     },
     {
       "name": "theme_color",
-      "value": "主题色"
+      "value": "主題色"
     },
     {
       "name": "homepage_greetings",
-      "value": "主页问候"
+      "value": "首頁問候"
     },
     {
       "name": "suspension_button_position",
-      "value": "悬浮按钮位置"
+      "value": "懸浮按鈕位置"
     },
     {
       "name": "blurred_background",
@@ -794,39 +794,39 @@
     },
     {
       "name": "animation_speed",
-      "value": "动画速度"
+      "value": "動畫速度"
     },
     {
       "name": "homepage_greetings_subtitle",
-      "value": "主页标题的问候语"
+      "value": "首頁標題的問候語"
     },
     {
       "name": "blurred_background_subtitle",
-      "value": "关闭以缓解APP内的卡顿问题"
+      "value": "關閉以緩解APP內的卡頓問題"
     },
     {
       "name": "animation_speed_subtitle",
-      "value": "调整动画速度或关闭动画"
+      "value": "調整動畫速度或關閉動畫"
     },
     {
       "name": "star_river_blue",
-      "value": "星河蓝(默认)"
+      "value": "星河藍(預設)"
     },
     {
       "name": "cat_blue",
-      "value": "猫咪蓝"
+      "value": "貓咪藍"
     },
     {
       "name": "yellow",
-      "value": "便单黄"
+      "value": "便單黃"
     },
     {
       "name": "red",
-      "value": "华为红"
+      "value": "華為紅"
     },
     {
       "name": "purple",
-      "value": "优雅紫"
+      "value": "優雅紫"
     },
     {
       "name": "pink",
@@ -834,39 +834,39 @@
     },
     {
       "name": "green",
-      "value": "小草绿"
+      "value": "小草綠"
     },
     {
       "name": "follow_system",
-      "value": "跟随系统"
+      "value": "隨系統"
     },
     {
       "name": "always_light",
-      "value": "始终浅色"
+      "value": "始終淺色"
     },
     {
       "name": "always_dark",
-      "value": "始终深色"
+      "value": "始終深色"
     },
     {
       "name": "right",
-      "value": "右侧(默认)"
+      "value": "右側(預設)"
     },
     {
       "name": "middle",
-      "value": "中间"
+      "value": "中間"
     },
     {
       "name": "left",
-      "value": "左侧"
+      "value": "左側"
     },
     {
       "name": "color_preview",
-      "value": "颜色预览!"
+      "value": "顏色預覽!"
     },
     {
       "name": "configuration_1",
-      "value": "配置1"
+      "value": "設定1"
     },
     {
       "name": "proxy_1",
@@ -874,67 +874,67 @@
     },
     {
       "name": "home_edit",
-      "value": "编辑主页"
+      "value": "編輯首頁"
     },
     {
       "name": "cloud_backup",
-      "value": "云备份"
+      "value": "雲端備份"
     },
     {
       "name": "backup",
-      "value": "备份"
+      "value": "備份"
     },
     {
       "name": "restore",
-      "value": "恢复"
+      "value": "還原"
     },
     {
       "name": "cloud_backup_subtitle",
-      "value": "通过WebDav协议连接服务器"
+      "value": "透過WebDav協定連接伺服器"
     },
     {
       "name": "backup_subtitle",
-      "value": "将应用数据备份到本地"
+      "value": "將應用資料備份到本地"
     },
     {
       "name": "restore_subtitle",
-      "value": "通过备份文件恢复数据"
+      "value": "透過備份檔案還原資料"
     },
     {
       "name": "enabled",
-      "value": "已启用"
+      "value": "已啟用"
     },
     {
       "name": "not_enabled",
-      "value": "未启用"
+      "value": "未啟用"
     },
     {
       "name": "webdav_config",
-      "value": "WebDav配置"
+      "value": "WebDav設定"
     },
     {
       "name": "server_address",
-      "value": "服务器地址"
+      "value": "伺服器位址"
     },
     {
       "name": "account_name",
-      "value": "账号名"
+      "value": "帳號名"
     },
     {
       "name": "password",
-      "value": "密码"
+      "value": "密碼"
     },
     {
       "name": "log_on",
-      "value": "登录"
+      "value": "登入"
     },
     {
       "name": "connect_test",
-      "value": "连接测试"
+      "value": "連線測試"
     },
     {
       "name": "current_version",
-      "value": "当前版本"
+      "value": "當前版本"
     },
     {
       "name": "latest_version",
@@ -942,7 +942,7 @@
     },
     {
       "name": "go_download_update",
-      "value": "前往下载更新"
+      "value": "前往下載更新"
     },
     {
       "name": "ignore_update",
@@ -950,63 +950,63 @@
     },
     {
       "name": "go_download_update_subtitle",
-      "value": "建议先开启代理"
+      "value": "建議先啟用代理"
     },
     {
       "name": "check_update_tips",
-      "value": "目前仅支持从Github下载更新，您也可以选择加入我们的"
+      "value": "目前僅支援從GitHub下載更新，您也可以選擇加入我們"
     },
     {
       "name": "check_update_tips_1",
-      "value": "获取更新。"
+      "value": "獲取更新。"
     },
     {
       "name": "check_update_tips_2",
-      "value": "频道"
+      "value": "頻道"
     },
     {
       "name": "simulate_locate",
-      "value": "模拟定位"
+      "value": "模擬定位"
     },
     {
       "name": "simulate_locate_subtitle",
-      "value": "通过模拟定位以保留程序后台"
+      "value": "透過模擬定位以保留程式後台"
     },
     {
       "name": "simulate_pip",
-      "value": "模拟画中画"
+      "value": "模擬畫中畫"
     },
     {
       "name": "simulate_pip_subtitle",
-      "value": "通过启用空白画中画以保留程序后台"
+      "value": "透過啟用空白畫中畫以保留程式後台"
     },
     {
       "name": "simulate_record",
-      "value": "模拟录音"
+      "value": "模擬錄音"
     },
     {
       "name": "simulate_record_subtitle",
-      "value": "通过模拟录音以保留程序后台"
+      "value": "透過模擬錄音以保留程式後台，本選項可能導致電量消耗更快"
     },
     {
       "name": "backgrounder_tips",
-      "value": "Tips：开启后会导致应用耗电量增加"
+      "value": "Tips：開啟後會導致應用耗電量增加"
     },
     {
       "name": "backgrounder_tips_2",
-      "value": "Tips：开启后会导致应用耗电量增加，并且开关模拟定位后请重启软件；目前已知从自由多窗模式无法主动发起画中画窗口；画中画开启后系统会锁90帧"
+      "value": "Tips：開啟後會導致應用耗電量增加，並且開關模擬定位後請重啟軟體；目前已知從自由多窗模式無法主動發起畫中畫窗口；畫中畫開啟後系統會鎖90幀"
     },
     {
       "name": "notice_main_switch",
-      "value": "通知总开关"
+      "value": "通知總開關"
     },
     {
       "name": "background_notice",
-      "value": "常驻通知"
+      "value": "常駐通知"
     },
     {
       "name": "background_notice_subtitle",
-      "value": "不建议关闭"
+      "value": "不建議關閉"
     },
     {
       "name": "cellular_data_reminder",
@@ -1014,51 +1014,51 @@
     },
     {
       "name": "cellular_data_reminder_subtitle",
-      "value": "流量使用到一定额度后提醒"
+      "value": "流量使用到一定門檻後提醒"
     },
     {
       "name": "time_reminder",
-      "value": "时间提醒"
+      "value": "時間提醒"
     },
     {
       "name": "time_reminder_subtitle",
-      "value": "长时间未关闭VPN时提醒"
+      "value": "長時間未關閉VPN時提醒"
     },
     {
       "name": "simulate_locate_closed_tips",
-      "value": "是否关闭？"
+      "value": "是否關閉？"
     },
     {
       "name": "simulate_locate_closed_content_text",
-      "value": "关闭此选项可能会导致clashNEXT无法在后台长时间运行"
+      "value": "關閉此選項可能導致clashNEXT無法在後台長時間運行"
     },
     {
       "name": "simulate_record_open_tips",
-      "value": "是否开启？"
+      "value": "是否開啟？"
     },
     {
       "name": "simulate_record_open_content_text",
-      "value": "建议使用“模拟定位”来保持应用的后台长时运行，本选项可能会导致电量消耗更快"
+      "value": "建議使用「模擬定位」來保持應用的後台長時運行，本選項可能導致電量消耗更快"
     },
     {
       "name": "open",
-      "value": "开启"
+      "value": "開啟"
     },
     {
       "name": "close",
-      "value": "关闭"
+      "value": "關閉"
     },
     {
       "name": "edit_router_address",
-      "value": "编辑路由地址"
+      "value": "編輯路由地址"
     },
     {
       "name": "edit_fakeIP_filter",
-      "value": "编辑FakeIP过滤"
+      "value": "編輯FakeIP篩選"
     },
     {
       "name": "min",
-      "value": "分钟"
+      "value": "分鐘"
     },
     {
       "name": "day",
@@ -1066,19 +1066,19 @@
     },
     {
       "name": "hour",
-      "value": "小时"
+      "value": "小時"
     },
     {
       "name": "text_input_placeholder",
-      "value": "请输入"
+      "value": "請輸入"
     },
     {
       "name": "reminder_time",
-      "value": "提醒时间"
+      "value": "提醒時間"
     },
     {
       "name": "per_hour_notice",
-      "value": "每小时通知"
+      "value": "每小時通知"
     },
     {
       "name": "per_day_notice",
@@ -1086,7 +1086,7 @@
     },
     {
       "name": "per_week_notice",
-      "value": "每周通知"
+      "value": "每週通知"
     },
     {
       "name": "per_month_notice",
@@ -1094,83 +1094,83 @@
     },
     {
       "name": "per_hour_notice_subtitle",
-      "value": "一小时内使用的流量达到阈值后提醒"
+      "value": "一小時內使用的流量達到閾值後提醒"
     },
     {
       "name": "per_day_notice_subtitle",
-      "value": "一天内使用的流量达到阈值后提醒"
+      "value": "一天內使用的流量達到閾值後提醒"
     },
     {
       "name": "per_week_notice_subtitle",
-      "value": "一周内使用的流量达到阈值后提醒"
+      "value": "一週內使用的流量達到閾值後提醒"
     },
     {
       "name": "per_month_notice_subtitle",
-      "value": "一个月内使用的流量达到阈值后提醒"
+      "value": "一個月內使用的流量達到閾值後提醒"
     },
     {
       "name": "total_data_notice",
-      "value": "总量通知"
+      "value": "總量通知"
     },
     {
       "name": "total_data_notice_subtitle",
-      "value": "使用的流量达到阈值后提醒"
+      "value": "使用的流量達到閾值後提醒"
     },
     {
       "name": "threshold_data",
-      "value": "阈值流量"
+      "value": "閾值流量"
     },
     {
       "name": "restart_app_tips",
-      "value": "重启应用生效"
+      "value": "重啟應用生效"
     },
     {
       "name": "restart_vpn_tips",
-      "value": "重启代理服务生效"
+      "value": "重啟代理服務生效"
     },
     {
       "name": "click_prompt",
-      "value": "点击右边开关哦"
+      "value": "點擊右邊開關哦"
     },
     {
       "name": "vibrate_feedback",
-      "value": "震动反馈"
+      "value": "震動回饋"
     },
     {
       "name": "sound_feedback",
-      "value": "声音反馈"
+      "value": "聲音回饋"
     },
     {
       "name": "background_notice_tips",
-      "value": "您已开启“后台运行“选项，常驻通知无法关闭，若要关闭常驻通知，请先关闭后台运行"
+      "value": "您已開啟「後台運行」選項，常駐通知無法關閉，若要關閉常駐通知，請先關閉後台運行"
     },
     {
       "name": "kernel",
-      "value": "内核"
+      "value": "核心"
     },
     {
       "name": "kernel_subtitle",
-      "value": "切换Clash内核"
+      "value": "切換Clash核心"
     },
     {
       "name": "query_ip_region_placeholder",
-      "value": "支持IPv4和IPv6地址，回车键查询"
+      "value": "支援IPv4和IPv6位址，按回車鍵查詢"
     },
     {
       "name": "ip_address_query_tips",
-      "value": "IP地址查询中"
+      "value": "IP位址查詢中"
     },
     {
       "name": "ip_address_query_success_tips",
-      "value": "IP地址查询成功"
+      "value": "IP位址查詢成功"
     },
     {
       "name": "favorite_configuration_tips",
-      "value": "您在配置页面收藏的配置将会显示在此处"
+      "value": "您在設定頁面收藏的設定將顯示在此處"
     },
     {
       "name": "favorite_proxy_tips",
-      "value": "您在代理页面收藏的节点将会显示在此处"
+      "value": "您在代理頁面收藏的節點將顯示在此處"
     },
     {
       "name": "refresh_IP",
@@ -1178,11 +1178,11 @@
     },
     {
       "name": "add_home_card",
-      "value": "添加组件小卡片"
+      "value": "新增組件小卡片"
     },
     {
       "name": "proxy_info",
-      "value": "节点信息"
+      "value": "節點資訊"
     },
     {
       "name": "refresh_IP2",
@@ -1190,35 +1190,35 @@
     },
     {
       "name": "proxy_name",
-      "value": "节点名"
+      "value": "節點名"
     },
     {
       "name": "beta_kernel",
-      "value": "测试版内核"
+      "value": "測試版核心"
     },
     {
       "name": "beta_kernel_subtitle",
-      "value": "开启后将显示正在测试中的内核"
+      "value": "開啟後將顯示正在測試中的核心"
     },
     {
       "name": "filter",
-      "value": "筛选"
+      "value": "篩選"
     },
     {
       "name": "not_filter",
-      "value": "不筛选"
+      "value": "不篩選"
     },
     {
       "name": "information_only",
-      "value": "仅信息"
+      "value": "僅資訊"
     },
     {
       "name": "warning_only",
-      "value": "仅警告"
+      "value": "僅警告"
     },
     {
       "name": "error_only",
-      "value": "仅报错"
+      "value": "僅報錯"
     },
     {
       "name": "reset",
@@ -1226,51 +1226,51 @@
     },
     {
       "name": "override_reset_prompt",
-      "value": "是否重置覆写设置？"
+      "value": "是否重置覆寫設定？"
     },
     {
       "name": "write_url",
-      "value": "输入网址"
+      "value": "輸入網址"
     },
     {
       "name": "title",
-      "value": "标题"
+      "value": "標題"
     },
     {
       "name": "shortcuts_card",
-      "value": "快捷方式小卡片"
+      "value": "捷徑方式小卡片"
     },
     {
       "name": "shortcuts",
-      "value": "快捷方式"
+      "value": "捷徑方式"
     },
     {
       "name": "long_press_modify",
-      "value": "长按我修改"
+      "value": "長按我修改"
     },
     {
       "name": "option1",
-      "value": "选项1"
+      "value": "選項1"
     },
     {
       "name": "option2",
-      "value": "选项2"
+      "value": "選項2"
     },
     {
       "name": "option3",
-      "value": "选项3"
+      "value": "選項3"
     },
     {
       "name": "null_title_tips",
-      "value": "请输入网址，并确保你的网址含有‘http(s)://’前缀!!!"
+      "value": "請輸入網址，並確保您的網址含有「http(s)://」前綴!!!"
     },
     {
       "name": "add_policy",
-      "value": "添加策略"
+      "value": "新增策略"
     },
     {
       "name": "edit_policy",
-      "value": "编辑策略"
+      "value": "編輯策略"
     },
     {
       "name": "policy_name",
@@ -1278,39 +1278,39 @@
     },
     {
       "name": "resource_path",
-      "value": "资源路径"
+      "value": "資源路徑"
     },
     {
       "name": "insert_resource",
-      "value": "插入资源"
+      "value": "插入資源"
     },
     {
       "name": "insert_resource_subtitle",
-      "value": "该资源内容在本地资源加载之前加载"
+      "value": "該資源內容在本地資源加載之前加載"
     },
     {
       "name": "auto_update",
-      "value": "自动更新"
+      "value": "自動更新"
     },
     {
       "name": "auto_update_interval",
-      "value": "自动更新间隔"
+      "value": "自動更新間隔"
     },
     {
       "name": "delete_resource",
-      "value": "删除资源"
+      "value": "刪除資源"
     },
     {
       "name": "policy_name_placeholder",
-      "value": "输入策略名..."
+      "value": "輸入策略名..."
     },
     {
       "name": "resource_path_placeholder",
-      "value": "输入链接..."
+      "value": "輸入連結..."
     },
     {
       "name": "saved",
-      "value": "已保存"
+      "value": "已儲存"
     },
     {
       "name": "update",
@@ -1318,23 +1318,23 @@
     },
     {
       "name": "delete",
-      "value": "删除"
+      "value": "刪除"
     },
     {
       "name": "edit_resource",
-      "value": "编辑资源"
+      "value": "編輯資源"
     },
     {
       "name": "now",
-      "value": "刚刚"
+      "value": "剛剛"
     },
     {
       "name": "minutes_ago",
-      "value": "分钟前"
+      "value": "分鐘前"
     },
     {
       "name": "hours_ago",
-      "value": "小时前"
+      "value": "小時前"
     },
     {
       "name": "days_ago",
@@ -1342,11 +1342,11 @@
     },
     {
       "name": "months_ago",
-      "value": "个月前"
+      "value": "個月前"
     },
     {
       "name": "weeks_ago",
-      "value": "周前"
+      "value": "週前"
     },
     {
       "name": "years_ago",
@@ -1354,19 +1354,19 @@
     },
     {
       "name": "layout_saved",
-      "value": "布局已保存"
+      "value": "佈局已保存"
     },
     {
       "name": "refresh_tips",
-      "value": "刷新中，请稍后..."
+      "value": "刷新中，請稍後..."
     },
     {
       "name": "layout_restored",
-      "value": "布局已还原"
+      "value": "佈局已還原"
     },
     {
       "name": "Import_from_url",
-      "value": "从URL(链接)导入"
+      "value": "從URL(連結)匯入"
     },
     {
       "name": "update_success",
@@ -1374,59 +1374,59 @@
     },
     {
       "name": "update_failed",
-      "value": "更新失败："
+      "value": "更新失敗："
     },
     {
       "name": "import_from_QR_code",
-      "value": "从二维码导入"
+      "value": "從二維碼匯入"
     },
     {
       "name": "import_from_file",
-      "value": "从文件导入"
+      "value": "從檔案匯入"
     },
     {
       "name": "new_blank_configuration",
-      "value": "新建空白配置"
+      "value": "新建空白設定"
     },
     {
       "name": "add_config",
-      "value": "添加配置"
+      "value": "新增設定"
     },
     {
       "name": "config_name",
-      "value": "配置名"
+      "value": "設定名"
     },
     {
       "name": "enter_configuration_name",
-      "value": "输入配置名"
+      "value": "輸入設定名"
     },
     {
       "name": "save_current_configuration",
-      "value": "是否保存当前配置？"
+      "value": "是否保存當前設定？"
     },
     {
       "name": "downloading_configuration_file",
-      "value": "正在下载配置文件"
+      "value": "正在下載設定檔"
     },
     {
       "name": "cancel_download",
-      "value": "取消下载"
+      "value": "取消下載"
     },
     {
       "name": "configuration_download_canceled",
-      "value": "已取消下载配置"
+      "value": "已取消下載設定"
     },
     {
       "name": "updating_configuration_file",
-      "value": "正在更新配置文件"
+      "value": "正在更新設定檔"
     },
     {
       "name": "download_failed",
-      "value": "下载失败:"
+      "value": "下載失敗:"
     },
     {
       "name": "switch_clashcore_tips",
-      "value": "需要重启VPN服务哦"
+      "value": "需要重啟VPN服務哦"
     },
     {
       "name": "share",
@@ -1434,27 +1434,27 @@
     },
     {
       "name": "generate_QR_code",
-      "value": "生成二维码"
+      "value": "生成二維碼"
     },
     {
       "name": "create_copy",
-      "value": "创建副本"
+      "value": "創建副本"
     },
     {
       "name": "delete_current_configuration",
-      "value": "是否删除当前配置？"
+      "value": "是否刪除當前設定？"
     },
     {
       "name": "click_error_prompt",
-      "value": "就知道是你点错喽~"
+      "value": "就知道是你點錯喽~"
     },
     {
       "name": "config_share_prompt",
-      "value": "此配置仅支持分享配置文件"
+      "value": "此設定僅支援分享設定檔"
     },
     {
       "name": "configuration_deleted",
-      "value": "已删除配置"
+      "value": "已刪除設定"
     },
     {
       "name": "fast",
@@ -1474,47 +1474,47 @@
     },
     {
       "name": "sort_name",
-      "value": "按名称"
+      "value": "按名稱"
     },
     {
       "name": "sort_time",
-      "value": "按时间"
+      "value": "按時間"
     },
     {
       "name": "old_kernel",
-      "value": "老版本内核"
+      "value": "舊版本核心"
     },
     {
       "name": "new_kernel",
-      "value": "新内核"
+      "value": "新核心"
     },
     {
       "name": "open_core_prompt",
-      "value": "如需查看更多内核选项，请前往设置-关于，开启“实验功能”选项"
+      "value": "如需查看更多核心選項，請前往設定-關於，開啟「實驗功能」選項"
     },
     {
       "name": "switch_core_prompt",
-      "value": "注：切换内核后需要重启VPN服务，启用前台模式会自动启用画中画功能"
+      "value": "註：切換核心後需要重啟VPN服務，啟用前台模式會自動啟用畫中畫功能"
     },
     {
       "name": "switch_core_foreground_prompt",
-      "value": "注意要开启后台运行服务或者小窗前台运行"
+      "value": "注意要開啟後台運行服務或小窗前台運行"
     },
     {
       "name": "loading",
-      "value": "获取IP中"
+      "value": "獲取IP中"
     },
     {
       "name": "developing",
-      "value": "开发中"
+      "value": "開發中"
     },
     {
       "name": "edit_config",
-      "value": "编辑配置"
+      "value": "編輯設定"
     },
     {
       "name": "browse_local_files",
-      "value": "浏览本地文件"
+      "value": "瀏覽本地檔案"
     },
     {
       "name": "provider",
@@ -1526,19 +1526,19 @@
     },
     {
       "name": "update_by",
-      "value": "更新于"
+      "value": "更新於"
     },
     {
       "name": "usd_cellular_data",
-      "value": "已使用流量/"
+      "value": "已使用流量/總流量"
     },
     {
       "name": "total_cellular_data",
-      "value": "总流量"
+      "value": "總流量"
     },
     {
       "name": "upload",
-      "value": "上传"
+      "value": "上傳"
     },
     {
       "name": "updating",
@@ -1546,31 +1546,31 @@
     },
     {
       "name": "rule_provider",
-      "value": "规则提供者"
+      "value": "規則提供者"
     },
     {
       "name": "list_item_number",
-      "value": "个条目数"
+      "value": "個條目數"
     },
     {
       "name": "to",
-      "value": "跳转"
+      "value": "跳轉"
     },
     {
       "name": "notice_request_to_settings",
-      "value": "授权跳转弹窗"
+      "value": "授權跳轉彈窗"
     },
     {
       "name": "notice_request_to_settings_text",
-      "value": "您已取消通知权限授予，是否跳转至设置页进行通知权限授予以使用提醒等相关功能。"
+      "value": "您已取消通知權限授與，是否跳轉至設定頁進行通知權限授與以使用提醒等相关功能。"
     },
     {
       "name": "runing_download_background",
-      "value": "正在运行模拟下载"
+      "value": "正在運行模擬下載"
     },
     {
       "name": "key",
-      "value": "键"
+      "value": "鍵"
     },
     {
       "name": "the_value",
@@ -1578,27 +1578,27 @@
     },
     {
       "name": "cellular_data_tips",
-      "value": "(点击输入总流量)"
+      "value": "(點擊輸入總流量)"
     },
     {
       "name": "input_cellular_data",
-      "value": "输入总流量数值"
+      "value": "輸入總流量數值"
     },
     {
       "name": "import_config_file_tips",
-      "value": "Tips：选择文件后会自动填入名称并显示保存按钮"
+      "value": "Tips：選擇檔案後會自動填入名稱並顯示保存按鈕"
     },
     {
       "name": "start_prompt",
-      "value": "请检查配置文件是否导入，代理节点是否加载..."
+      "value": "請檢查設定檔是否匯入，代理節點是否加載..."
     },
     {
       "name": "permission_reason_MICROPHONE",
-      "value": "长时任务音频录制"
+      "value": "長時任務音頻錄製"
     },
     {
       "name": "bypass_private_route_address",
-      "value": "绕过私有路由地址"
+      "value": "繞過私有路由地址"
     },
     {
       "name": "example",
@@ -1610,7 +1610,7 @@
     },
     {
       "name": "flclash_subtitle",
-      "value": "用于借鉴参考的优秀开源项目"
+      "value": "用於借鑑參考的優秀開源專案"
     },
     {
       "name": "agree",
@@ -1618,71 +1618,71 @@
     },
     {
       "name": "refuse",
-      "value": "不同意并退出"
+      "value": "不同意並退出"
     },
     {
       "name": "download_success",
-      "value": "下载成功"
+      "value": "下載成功"
     },
     {
       "name": "load_success",
-      "value": "加载成功"
+      "value": "加載成功"
     },
     {
       "name": "favorite_proxy_no",
-      "value": "当前配置最多只能收藏3个节点"
+      "value": "當前設定最多只能收藏3個節點"
     },
     {
       "name": "favorite_config_no",
-      "value": "配置最多只能收藏3个"
+      "value": "設定最多只能收藏3個"
     },
     {
       "name": "uncollected_all_tip",
-      "value": "已取消所有收藏\uD83D\uDC94"
+      "value": "已取消所有收藏💔"
     },
     {
       "name": "backup_restore_subtitle",
-      "value": "导入、导出备份"
+      "value": "匯出、匯入備份"
     },
     {
       "name": "settings_reset_prompt",
-      "value": "是否重置应用？"
+      "value": "是否重置應用？"
     },
     {
       "name": "settings_reset_tips",
-      "value": "数据已清空"
+      "value": "資料已清除"
     },
     {
       "name": "welcome",
-      "value": "欢迎使用"
+      "value": "歡迎使用"
     },
     {
       "name": "welcome_tips",
-      "value": "点击“同意并继续”表示您同意以下内容："
+      "value": "點擊「同意並繼續」表示您同意以下內容："
     },
     {
       "name": "reject_exit",
-      "value": "拒绝并退出"
+      "value": "拒絕並退出"
     },
     {
       "name": "agree_continue",
-      "value": "同意并继续"
+      "value": "同意並繼續"
     },
     {
       "name": "crash_subtitle",
-      "value": "请将日志交给开发者，以便于排查~"
+      "value": "請將日誌交給開發者，以便於排查~"
     },
     {
       "name": "crash_title",
-      "value": "啊哦，刚刚好像崩溃了"
+      "value": "啊哦，剛剛好像崩潰了"
     },
     {
       "name": "show_full_log",
-      "value": "展示完整日志信息"
+      "value": "顯示完整日誌資訊"
     },
     {
       "name": "statement",
-      "value": "ClashNext是一个免费软件并且我们不为其提供任何额外服务，部分联网服务使用的是第三方免费API接口，因此具有访问上限，若出现访问异常属于正常现象，更多第三方服务请前往"
+      "value": "ClashNext是一個免費軟體並且我們不為其提供任何額外服務，部分聯網服務使用的是第三方免費API介面，因此具有訪問上限，若出現訪問異常屬於正常現象，更多第三方服務請前往"
     },
     {
       "name": "statement_1",
@@ -1690,47 +1690,47 @@
     },
     {
       "name": "third_party_services",
-      "value": "三方库与服务"
+      "value": "三方庫與服務"
     },
     {
       "name": "game_q",
-      "value": "为什么Clash运行中玩游戏延迟高或者掉线"
+      "value": "為什麼Clash運行中玩遊戲延遲高或者掉線"
     },
     {
       "name": "game_a",
-      "value": "因Clash规则不完善和后台问题导致，建议准备玩游戏前关闭Clash的VPN功能"
+      "value": "因Clash規則不完善和後台問題導致，建議準備玩遊戲前關閉Clash的VPN功能"
     },
     {
       "name": "function_q",
-      "value": "为什么有的功能不见了"
+      "value": "為什麼有的功能不見了"
     },
     {
       "name": "function_a",
-      "value": "受到系统权限影响，部分功能暂时无法实现故而进行了屏蔽隐藏，请期待后续版本更新"
+      "value": "受到系統權限影響，部分功能暫時無法實現故而進行了隱藏，請期待後續版本更新"
     },
     {
       "name": "link_q",
-      "value": "为什么应用在后台运行的过程中容易中断连接"
+      "value": "為什麼應用在後台運行過程中容易中斷連接"
     },
     {
       "name": "link_a",
-      "value": "当前系统的后台管理非常严格，建议使用过程中开启软件的通知及模拟后台功能，以保持应用在后台运行的连接稳定"
+      "value": "當前系統的後台管理非常嚴格，建議使用過程中開啟軟體的通知及模擬後台功能，以保持應用後台運行的連接穩定"
     },
     {
       "name": "node_q",
-      "value": "为什么测速完成后节点会闪一下"
+      "value": "為什麼測速完成後節點會閃一下"
     },
     {
       "name": "node_a",
-      "value": "这是正常现象，这么做的目的是为了刷新列表中的数据，尽量减少测速后可能存在内存泄漏"
+      "value": "這是正常現象，這樣做的目的是為了刷新列表中的數據，盡量減少測速後可能存在的記憶體洩漏"
     },
     {
       "name": "config_q",
-      "value": "为什么有的配置无法导入或导入后代理为空"
+      "value": "為什麼有的設定無法匯入或匯入後代理為空"
     },
     {
       "name": "config_a",
-      "value": "建议使用订阅转换工具转换后再尝试导入，下面有订阅转换的地址，可以点击后直接跳转"
+      "value": "建議使用訂閱轉換工具轉換後再嘗試匯入，下面有訂閱轉換的地址，可以點擊後直接跳轉"
     },
     {
       "name": "attach",
@@ -1738,11 +1738,11 @@
     },
     {
       "name": "link",
-      "value": "链接"
+      "value": "連結"
     },
     {
       "name": "project",
-      "value": "项目"
+      "value": "專案"
     },
     {
       "name": "know",
@@ -1750,55 +1750,55 @@
     },
     {
       "name": "tips",
-      "value": "小提示"
+      "value": "小技巧"
     },
     {
       "name": "start_pop",
-      "value": "导入配置并成功加载后才可以启动哦~"
+      "value": "匯入設定並成功加載後才可以啟動哦~"
     },
     {
       "name": "config_pop",
-      "value": "可以长按配置进行更多操作哦~"
+      "value": "可以長按設定進行更多操作哦~"
     },
     {
       "name": "proxy_pop",
-      "value": "可以长按代理节点进行收藏等更多操作哦~"
+      "value": "可以長按代理節點進行收藏等更多操作哦~"
     },
     {
       "name": "proxy_delay_pop",
-      "value": "这个按钮可以一键测试所有代理的延迟哦~"
+      "value": "此按鈕可以一鍵測試所有代理的延遲哦~"
     },
     {
       "name": "home_start_button",
-      "value": "主页启动按钮"
+      "value": "首頁啟動按鈕"
     },
     {
       "name": "config_list_items",
-      "value": "配置列表项"
+      "value": "設定列表項"
     },
     {
       "name": "proxy_node_list_item",
-      "value": "代理节点列表项"
+      "value": "代理節點列表項"
     },
     {
       "name": "delay_test_button",
-      "value": "延迟测试按钮"
+      "value": "延遲測試按鈕"
     },
     {
       "name": "download_url",
-      "value": "下载地址"
+      "value": "下載地址"
     },
     {
       "name": "query_success",
-      "value": "查询成功"
+      "value": "查詢成功"
     },
     {
       "name": "new_version",
-      "value": "发现新版本"
+      "value": "發現新版本"
     },
     {
       "name": "new_version_content",
-      "value": "发现新版本，是否前往更新"
+      "value": "發現新版本，是否前往更新"
     },
     {
       "name": "to_update",
@@ -1806,43 +1806,43 @@
     },
     {
       "name": "no_link",
-      "value": "暂无下载地址"
+      "value": "暫無下載地址"
     },
     {
       "name": "string_display_preferences",
-      "value": "字符显示偏好"
+      "value": "字元顯示偏好"
     },
     {
       "name": "information",
-      "value": "信息"
+      "value": "資訊"
     },
     {
       "name": "appearance",
-      "value": "外观"
+      "value": "外觀"
     },
     {
       "name": "string_display_preferences_subtitle",
-      "value": "设置字符显示的权重"
+      "value": "設定字元的顯示權重"
     },
     {
       "name": "edit_layout",
-      "value": "编辑布局"
+      "value": "編輯佈局"
     },
     {
       "name": "email_feedback",
-      "value": "邮件反馈"
+      "value": "郵件回饋"
     },
     {
       "name": "export_share",
-      "value": "导出分享"
+      "value": "匯出分享"
     },
     {
       "name": "compatibility_mode",
-      "value": "兼容模式"
+      "value": "相容模式"
     },
     {
       "name": "compatibility_mode_subtitle",
-      "value": "强制开启Sniffer"
+      "value": "強制啟用Sniffer"
     },
     {
       "name": "strategy",
@@ -1858,27 +1858,27 @@
     },
     {
       "name": "overwrite_restart_tips",
-      "value": "更改覆写设置后请重启应用"
+      "value": "更改覆寫設定後請重啟應用"
     },
     {
       "name": "updating_config",
-      "value": "配置更新中..."
+      "value": "設定更新中..."
     },
     {
       "name": "updated_success_config",
-      "value": "配置更新成功"
+      "value": "設定更新成功"
     },
     {
       "name": "failed_load_config",
-      "value": "加载配置失败"
+      "value": "加載設定失敗"
     },
     {
       "name": "resource_updating",
-      "value": "资源更新中"
+      "value": "資源更新中"
     },
     {
       "name": "settings_count_vpn",
-      "value": "VPN进程已被系统终结"
+      "value": "VPN進程已被系統終結"
     },
     {
       "name": "times",
@@ -1886,35 +1886,35 @@
     },
     {
       "name": "restart_tips",
-      "value": "应用即将退出，请重新打开"
+      "value": "應用即將退出，請重新打開"
     },
     {
       "name": "view_detail",
-      "value": "查看详情"
+      "value": "查看詳情"
     },
     {
       "name": "offline",
-      "value": "VPN进程回收统计"
+      "value": "VPN進程回收統計"
     },
     {
       "name": "id",
-      "value": "序号"
+      "value": "序號"
     },
     {
       "name": "time",
-      "value": "时间"
+      "value": "時間"
     },
     {
       "name": "px_sec_screen_tips",
-      "value": "请您展开屏幕以使用更多功能"
+      "value": "請您展開螢幕以使用更多功能"
     },
     {
       "name": "px_sec_screen_start",
-      "value": "开关"
+      "value": "開關"
     },
     {
       "name": "px_sec_screen_use_time",
-      "value": "已运行"
+      "value": "已運行"
     },
     {
       "name": "uncollected",
@@ -1922,11 +1922,11 @@
     },
     {
       "name": "not_open",
-      "value": "项目仓库暂未开放"
+      "value": "專案倉儲暫未開放"
     },
     {
       "name": "ip_address_query_fail_tips",
-      "value": "查询IP地址失败，请检查地址是否可以正常访问"
+      "value": "IP位址查證失敗，請確認指定位址連線正常性"
     }
   ]
 }

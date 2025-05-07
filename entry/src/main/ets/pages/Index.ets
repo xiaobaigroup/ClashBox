@@ -135,7 +135,7 @@ struct Index {
   @State selectedIndex: number = 0
   // 分屏（正方形窗口）
   @Provide @Watch('isHiddenChange')isSmallSquareScreen: boolean = false
-  // 设备高度是否 (320vp< height <= 500vp) 媒体查询
+  // 手机横屏判断
   @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
   // 平板竖屏判断变量
   @Provide istabletLandscape: boolean = false
@@ -466,7 +466,7 @@ struct Index {
       this.isPXSecScreen = true
       hilog.info(0xFF00, componentName,
         `#WindowChange#应用窗口状态改变#(328vp< width && 328 < height)PX外屏结果: ${this.isPXSecScreen}`)
-    }else {
+    } else {
       this.isLandscapePhone = false
       this.istabletLandscape = false
       this.isSmallSquareScreen = false
@@ -558,6 +558,11 @@ struct Index {
     })
     // 运行一次窗口检查
     this.onWindowChange()
+
+    // 除手机外更多页均默认跳转覆写
+    if (500 < this.windowHeight && !this.isLandscapePhone) {
+      this.pageInfos.pushPathByName(this.moreList[4].name, false)
+    }
 
     // 启动时检查上一次是否崩溃
     if (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) {
@@ -945,7 +950,7 @@ struct Index {
   @Provide heightTop: Length = TAB_CONTENT_TITLE_HEIGHT
   @Provide curOffsetRemain: number = 0
   @Provide paddingButtom:number|Resource = $r('app.integer.vp_proxy_start_button_left_right_margin')
-  //tab隐藏
+  // tab隐藏
   startAnimPX(){
     this.getUIContext().animateTo({
       duration: this.uiConfig.animationSpeed,
@@ -964,7 +969,7 @@ struct Index {
     })
   }
 
-  //tab显示
+  // tab显示
   stopAnimPX(){
       this.getUIContext().animateTo({
         duration: this.uiConfig.animationSpeed,
@@ -982,7 +987,7 @@ struct Index {
         this.heightTop = 0
       })
   }
-//监听上下滚动时，tab是否隐藏
+// 监听上下滚动时，tab是否隐藏
   isHiddenChange(){
     if (this.isSmallSquareScreen && this.isRolling){
       this.startAnimPX()

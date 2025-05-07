@@ -219,8 +219,8 @@ struct Resources {
     this.isEnableIndexForegroundBlur = false
     // 更新资源数组中对应元素
     const editItem = this.resourceListData[this.theEditIndex]
-    this.updateUrl(editItem.resourceName, this.SaveEditInputValue)
-    this.resourceListData.splice(this.theEditIndex, 1, editItem)
+    this.updateUrl(editItem.key, this.SaveEditInputValue)
+    // this.resourceListData.splice(this.theEditIndex, 1, editItem)
     this.updateTime(this.theEditIndex)
   }
 

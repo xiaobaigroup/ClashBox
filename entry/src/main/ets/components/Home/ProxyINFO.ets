@@ -58,7 +58,7 @@ struct ProxyINFO{
     Row() {
       Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.SpaceBetween }) {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.Start }) {
-          CardTitle({ title: $r('app.string.proxy_INFO') })
+          CardTitle({ title: $r('app.string.proxy_info') })
           if (this.appConfig.currentProxyItem) {
             Text(`${this.appConfig.currentProxyName}`)
               .maxLines(2)
