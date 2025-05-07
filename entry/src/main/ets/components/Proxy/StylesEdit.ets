@@ -1,6 +1,6 @@
 import { ProxySort } from 'proxy_core'
 import { BreakpointState } from '../../common/breakpointsystem'
-import { BORDER_RADIUS_20 } from '../../common/Constants'
+import { BORDER_RADIUS_20, CONTENT_END_OFFSET_150 } from '../../common/Constants'
 import { EventHub, EventKey } from '../../common/EventHub'
 import { AppConfig, isEnd, ProxyCardSize, ProxyGroupType, UIConfig } from '../../entryability/AppState'
 import { customAnimationUtil } from '../../utils/Animation'
@@ -36,116 +36,127 @@ export struct StylesEdit {
         }
       })
 
-      // 代理节点分组方式切换
-      this.EditTitleBuilder($r('app.string.Packet_mode'))
-      Column() {
-        ForEach([{ t: $r('app.string.Tabs'), v: ProxyGroupType.Tabs },
-          { t: $r('app.string.List'), v: ProxyGroupType.List }], (n: [Resource, number], i: number) => {
-          Row() {
-            Text(n["t"])
-              .EditText()
-            Radio({
-              value: 'ProxyArrangementSelected1', group: 'ProxyArrangementSelectedRadioGroup',
-              indicatorType: RadioIndicatorType.TICK,
-            })
-              .checked(this.appConfig.proxyGroupType == n["v"])
-              .hitTestBehavior(HitTestMode.None)
-              .radioStyle({
-                checkedBackgroundColor: this.icon_emphasize,
+      List(){
+        // 代理节点分组方式切换
+        this.EditTitleBuilder($r('app.string.Packet_mode'))
+        ListItem(){
+          Column() {
+            ForEach([{ t: $r('app.string.Tabs'), v: ProxyGroupType.Tabs },
+              { t: $r('app.string.List'), v: ProxyGroupType.List }], (n: [Resource, number], i: number) => {
+              Row() {
+                Text(n["t"])
+                  .EditText()
+                Radio({
+                  value: 'ProxyArrangementSelected1', group: 'ProxyArrangementSelectedRadioGroup',
+                  indicatorType: RadioIndicatorType.TICK,
+                })
+                  .checked(this.appConfig.proxyGroupType == n["v"])
+                  .hitTestBehavior(HitTestMode.None)
+                  .radioStyle({
+                    checkedBackgroundColor: this.icon_emphasize,
+                  })
+              }
+              .EditRow()
+              .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+              // 点击后改变ProxyArrangementSelected状态为 标签
+              .onClick(() => {
+                animateTo({ duration: this.uiConfig.animationSpeed }, () => {
+                  this.appConfig.proxyGroupType = n["v"]
+                })
               })
-          }
-          .EditRow()
-          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-          // 点击后改变ProxyArrangementSelected状态为 标签
-          .onClick(() => {
-            animateTo({ duration: this.uiConfig.animationSpeed }, () => {
-              this.appConfig.proxyGroupType = n["v"]
-            })
-          })
 
-          if (!isEnd(2, i)) {
-            Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
-          }
-        })
-      }
-      .height(94)
-      .EditColumn()
-
-      // 代理节点排列切换
-      this.EditTitleBuilder($r('app.string.Arrangement'))
-      Column() {
-        ForEach([
-          { t: $r('app.string.Default'), v: ProxySort.Default },
-          { t: $r('app.string.Name'), v: ProxySort.Title },
-          { t: $r('app.string.Delay'), v: ProxySort.Delay },
-        ], (n: [Resource, number], i: number) => {
-          Row() {
-            Text(n["t"])
-              .EditText()
-            Radio({
-              value: 'SortRadio1', group: 'SortRadioGroup',
-              indicatorType: RadioIndicatorType.TICK
+              if (!isEnd(2, i)) {
+                Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
+              }
             })
-              .checked(this.appConfig.proxySort == n["v"])
-              .hitTestBehavior(HitTestMode.None)
-              .radioStyle({
-                checkedBackgroundColor: this.icon_emphasize,
+          }
+          .height(94)
+          .EditColumn()
+        }
+
+        // 代理节点排列切换
+        this.EditTitleBuilder($r('app.string.Arrangement'))
+        ListItem(){
+          Column() {
+            ForEach([
+              { t: $r('app.string.Default'), v: ProxySort.Default },
+              { t: $r('app.string.Name'), v: ProxySort.Title },
+              { t: $r('app.string.Delay'), v: ProxySort.Delay },
+            ], (n: [Resource, number], i: number) => {
+              Row() {
+                Text(n["t"])
+                  .EditText()
+                Radio({
+                  value: 'SortRadio1', group: 'SortRadioGroup',
+                  indicatorType: RadioIndicatorType.TICK
+                })
+                  .checked(this.appConfig.proxySort == n["v"])
+                  .hitTestBehavior(HitTestMode.None)
+                  .radioStyle({
+                    checkedBackgroundColor: this.icon_emphasize,
+                  })
+              }
+              .EditRow()
+              .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+              .onClick(() => {
+                // EventHub.sendEvent(EventKey.ProxySort, n["v"])
+                animateTo({ duration: this.uiConfig.animationSpeed }, () => {
+                  this.appConfig.proxySort = n["v"]
+                })
               })
+
+              if (!isEnd(3, i))
+                Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
+            })
           }
-          .EditRow()
-          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-          .onClick(() => {
-            // EventHub.sendEvent(EventKey.ProxySort, n["v"])
-            animateTo({ duration: this.uiConfig.animationSpeed }, () => {
-              this.appConfig.proxySort = n["v"]
-            })
-          })
+          .height(142)
+          .EditColumn()
+        }
 
-          if (!isEnd(3, i))
-            Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
-        })
-      }
-      .height(142)
-      .EditColumn()
-
-      // 代理节点卡片尺寸切换
-      this.EditTitleBuilder($r('app.string.Card_Size'))
-      Column() {
-        ForEach([
-          { t: $r('app.string.Mini'), v: ProxyCardSize.Mini },
-          { t: $r('app.string.Thin'), v: ProxyCardSize.Small },
-          { t: $r('app.string.Wide'), v: ProxyCardSize.Large },
-        ], (n: [Resource, number], i: number) => {
-          Row() {
-            Text(n["t"])
-              .EditText()
-            Radio({
-              value: 'ProxyGroupItemSelectedRadio1', group: 'ProxyGroupItemSelectedRadioGroup',
-              indicatorType: RadioIndicatorType.TICK
-            })
-              .checked(this.appConfig.proxyCardSize == n["v"])
-              .hitTestBehavior(HitTestMode.None)
-              .radioStyle({
-                checkedBackgroundColor: this.icon_emphasize,
+        // 代理节点卡片尺寸切换
+        this.EditTitleBuilder($r('app.string.Card_Size'))
+        ListItem(){
+          Column() {
+            ForEach([
+              { t: $r('app.string.Mini'), v: ProxyCardSize.Mini },
+              { t: $r('app.string.Thin'), v: ProxyCardSize.Small },
+              { t: $r('app.string.Wide'), v: ProxyCardSize.Large },
+            ], (n: [Resource, number], i: number) => {
+              Row() {
+                Text(n["t"])
+                  .EditText()
+                Radio({
+                  value: 'ProxyGroupItemSelectedRadio1', group: 'ProxyGroupItemSelectedRadioGroup',
+                  indicatorType: RadioIndicatorType.TICK
+                })
+                  .checked(this.appConfig.proxyCardSize == n["v"])
+                  .hitTestBehavior(HitTestMode.None)
+                  .radioStyle({
+                    checkedBackgroundColor: this.icon_emphasize,
+                  })
+              }
+              .EditRow()
+              .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+              // 点击后改变ProxyGroupItemSelected状态为 多列
+              .onClick(() => {
+                animateTo({ duration: this.uiConfig.animationSpeed }, () => {
+                  this.appConfig.proxyCardSize = n["v"]
+                })
               })
-          }
-          .EditRow()
-          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-          // 点击后改变ProxyGroupItemSelected状态为 多列
-          .onClick(() => {
-            animateTo({ duration: this.uiConfig.animationSpeed }, () => {
-              this.appConfig.proxyCardSize = n["v"]
+
+              if (!isEnd(3, i)) {
+                Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
+              }
             })
-          })
-
-          if (!isEnd(3, i)) {
-            Divider().strokeWidth(1).color($r('app.color.divider')).padding({ left: 5, right: 10 })
           }
-        })
+          .height(142)
+          .EditColumn()
+        }
       }
-      .height(142)
-      .EditColumn()
-
+      .height('100%')
+      .width('100%')
+      .scrollBar(BarState.Off)
+      .contentEndOffset(CONTENT_END_OFFSET_150)
     }
     .width('100%')
     .height('100%')

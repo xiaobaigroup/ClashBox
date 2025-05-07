@@ -5,20 +5,16 @@ import {
   TAB_CONTENT_TITLE_FONT_SIZE,
   BORDER_RADIUS_20,
   CONTENT_END_OFFSET_150,
-  FONT_SIZE_16,
-  LIST_ITEM_HEIGHT,
 } from '../common/Constants'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import ProxyGroupItem from '../components/Proxy/ProxyGroupItem'
 import ProxyArrangement from '../components/Proxy/ProxyArrangement'
 import { ProxyGroupItemDataSource, ProxyItem, ProxyItemDataSource } from '../common/ProxyData'
 import ClashViewModel from '../entryability/ClashViewModel'
-import { ClashConfig, Profile, ProxyGroup, ProxyMode, ProxySort, ProxyType } from 'proxy_core'
+import { ClashConfig, Profile, ProxyGroup, ProxyType } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
-import { AppConfig,
-  AppState,
-  ClashCore, isEnd, ProxyCardSize, ProxyGroupType, UIConfig } from '../entryability/AppState'
-import { curves, promptAction, PromptAction } from '@kit.ArkUI'
+import { AppConfig, ProxyGroupType, UIConfig } from '../entryability/AppState'
+import { curves, PromptAction } from '@kit.ArkUI'
 import { ProviderPage } from '../components/Proxy/Provider'
 import { indexController } from './Index'
 import { customAnimationUtil } from '../utils/Animation'
