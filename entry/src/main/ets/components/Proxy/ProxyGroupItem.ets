@@ -252,7 +252,8 @@ struct ProxyGroupItem {
   // 长按菜单 start
   @Builder
   // 长按菜单相关
-  MyMenu(isShowFavoriteProxy: boolean, nodeName: string) {
+  MyMenu(isShowFavoriteProxy: boolean, item: ProxyItem) {
+
     Menu() {
       // 根据当前配置信息来判断显示[收藏 /取消收藏] 单独处理 START
       if (isShowFavoriteProxy && this.favoriteProxys.size>0 ) {
@@ -264,6 +265,7 @@ struct ProxyGroupItem {
           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .contentFontColor($r('sys.color.font_primary'))
           .onClick(() => {
+            ProxyGroupItem.currentTouchProxyData = item
             this.proxyListLongPressCtxMenuForUnFavorite.callback()
           })
       } else {
@@ -275,6 +277,7 @@ struct ProxyGroupItem {
           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .contentFontColor($r('sys.color.font_primary'))
           .onClick(() => {
+            ProxyGroupItem.currentTouchProxyData = item
             this.proxyListLongPressCtxMenuForFavorite.callback()
           })
       }
@@ -282,7 +285,7 @@ struct ProxyGroupItem {
       if (this.appConfig.clashCore === ClashCore.FlClash) {
         MenuItem({ symbolStartIcon: this.startIconModifier1, content: $r('app.string.Test_Delay') })
           .onClick(() => {
-            ClashViewModel.testDelay(nodeName)
+            ClashViewModel.testDelay(item.name)
           })
         }
       //暂时先屏蔽网站测速功能
@@ -344,11 +347,12 @@ struct ProxyGroupItem {
         .ListItemStyle()
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .height(LIST_ITEM_HEIGHT + (this.ProxyGroupItemSelected === ProxyCardSize.Small ? 32 : 0))
-        .bindContextMenu(this.isPXSecScreen ? null : this.MyMenu(item.isShowFavoriteProxy ?? false, item.name), ResponseType.LongPress,
+        .bindContextMenu(this.isPXSecScreen ? null : this.MyMenu(item.isShowFavoriteProxy ?? false, item), ResponseType.LongPress,
           {
             preview: MenuPreviewMode.IMAGE,
             onAppear: (() => {
-                ProxyGroupItem.currentTouchProxyData = item
+               // js 闭包 在函数里只能拿到最后一个item的值
+              // ProxyGroupItem.currentTouchProxyData = item
               if (this.uiConfig.isVibrate) {
                 customVibrator.vibratorTriggerOfHapticClockTimer()
               }
