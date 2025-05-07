@@ -3,7 +3,7 @@
 
 #### 介绍
 
-ClashNEXT是一个HarmonyOS NEXT(OpenHarmony)平台的代理软件，使用改版的ClashMate内核与flclash内核。
+ClashNEXT是一个HarmonyOS NEXT(OpenHarmony)平台的代理软件，使用改版的ClashMeta内核与flclash内核。
 使用前请仔细阅读免责声明和常见问题。
 鸿蒙首个基于navigation框架重新编译的Clash，手机、平板、折叠屏全线适配。
 
