@@ -177,6 +177,7 @@ struct Home {
       this.proxyGroups.empty()
       this.proxyLazyItems.empty()
       if (this.currentProfile) {
+        await ClashViewModel.loadConfig(true)
         // 写入数据
         this.theProxyGroups = await ClashViewModel.getProxyGroups(mode)
         this.proxyGroups.pushData(this.theProxyGroups)
