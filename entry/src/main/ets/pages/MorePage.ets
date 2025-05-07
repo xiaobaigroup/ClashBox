@@ -55,7 +55,7 @@ struct MorePage {
   // 添加路由地址弹窗标题
   @State QueryIPDialogTitle: ResourceStr = $r('app.string.query_ip_region')
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
   // 更多页列表数组
   @Consume moreList: moreData[]
   // 主页面栈
@@ -129,7 +129,7 @@ struct MorePage {
       hilog.info(0xFF00, "MoretestTag", itemData.name)
       hilog.info(0xFF00, "MoretestTag", "isCheck状态: %{public}s", itemData.isCheck)
       this.pageInfos.replacePathByName(itemData.name, false)
-      this.isSecondary = this.compStr.value === 'sm' ? true : false
+      this.isSecondary =  true
     }
   }
 
@@ -267,7 +267,7 @@ struct MorePage {
             .edgeEffect(EdgeEffect.Spring)
             .borderRadius(18)
             .alignListItem(ListItemAlign.Center)
-            .contentEndOffset(CONTENT_END_OFFSET_150)
+            .contentEndOffset(this.isLandscapePhone?10:CONTENT_END_OFFSET_150)
             .chainAnimation(true)
             .nestedScroll({
               scrollForward: NestedScrollMode.PARENT_FIRST,

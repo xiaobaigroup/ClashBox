@@ -98,7 +98,7 @@ struct ProxyPage {
   @Consume('breakPointStateTabContentTitleMargin')
   private breakPointStateTabContentTitleMargin: BreakpointState<number>
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone') isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
   // 按钮宽度
   private proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
   // 按钮高度

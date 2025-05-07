@@ -45,9 +45,10 @@ export struct ArrayConfigEditor {
   @Consume('NavPathStack') pageInfos: NavPathStack
   // 列表高度
   @Consume('breakPointStateListHeight') listHeight: BreakpointState<number>
-  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
   // 平板竖屏判断
-  @StorageProp('istabletVertical')  private istabletVertical: boolean = false
+  // 平板竖屏判断变量
+  @Consume istabletLandscape: boolean
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */

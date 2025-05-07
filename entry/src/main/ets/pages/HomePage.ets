@@ -109,7 +109,7 @@ struct Home {
   //卡片编辑半模拟态判定
   @State @Watch('ShowHomeEditChange')isShowCardEdit: boolean = false
   // 折叠屏展开状态判定
-  @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
+  @StorageLink ('isFoldStatus') private isFoldStatus: boolean = false
   // 配置页数据表
   @Consume configList: Array<ConfigData>
   // 页面名称 主页
@@ -138,7 +138,7 @@ struct Home {
   // 定时器Controller
   @Consume proxyStartedTimer: Timer
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone') @Watch('isLandscapePhoneScrollTo')private isLandscapePhone: boolean = false
   // 主页卡片内边距
   @Consume('breakPointStateHomeCardPadding') private cardPadding: BreakpointState<MarginGenerate>
   // 主页卡片内边距
@@ -164,7 +164,8 @@ struct Home {
   @Consume curOffsetRemain: number
   // 是否为PX外屏
   @Consume isPXSecScreen: boolean
-
+  //滚动控制
+  private scrollerForScroll: Scroller = new Scroller()
   aboutToAppear(): void {
     this.greetings = getGreeting()
     // 初始化主页卡片布局
@@ -274,6 +275,13 @@ struct Home {
       this.startAnim()
     }else{
       this.stopAnim()
+    }
+  }
+
+  //横屏HOME页滚动到中间
+  isLandscapePhoneScrollTo(){
+    if (this.isLandscapePhone) {
+      this.scrollerForScroll.scrollTo({xOffset:0,yOffset:'50%',animation:true})
     }
   }
 
@@ -404,7 +412,7 @@ struct Home {
           Blank().height(this.isLandscapePhone || (this.isRolling && this.isSmallSquareScreen) ? this.heightTop : TAB_CONTENT_TITLE_HEIGHT)
           Scroll() {
             // 主页卡片层
-            List() {
+            List({scroller:this.scrollerForScroll}) {
               ListItem() {
                 GridRow({ gutter: this.isLandscapePhone ? { x: 12, y: 15 } : this.gutterHomeGridcol.value }) {
                   //网络速度小卡片
@@ -794,7 +802,7 @@ struct Home {
             .width('100%')
             .height('100%')
             .scrollBar(BarState.Off)
-            .contentEndOffset(!this.uiConfig.isBlurr?CONTENT_END_OFFSET_150:CONTENT_END_OFFSET_150+50)
+            .contentEndOffset(!this.uiConfig.isBlurr && !this.isLandscapePhone ? CONTENT_END_OFFSET_150-15 :!this.uiConfig.isBlurr && this.isLandscapePhone ? 80 : this.uiConfig.isBlurr && this.isLandscapePhone ? 80: CONTENT_END_OFFSET_150+60)
             .edgeEffect(EdgeEffect.Spring)
             .bindSheet($$this.isShowCardEdit, this.CardEdit(), {
               detents: [BIND_SHEET_CONTAINER_HEIGHT, 300,],
@@ -999,9 +1007,9 @@ struct DeleteButton1 {
  */
   @Consume deleteButtonSize: BreakpointState<number>
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
   // 折叠屏展开状态判定
-  @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
+  @StorageLink ('isFoldStatus') private isFoldStatus: boolean = false
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   build() {
@@ -1026,9 +1034,9 @@ struct DeleteButton2 {
  */
   @Consume deleteButtonSize: BreakpointState<number>
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
   // 折叠屏展开状态判定
-  @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
+  @StorageLink ('isFoldStatus') private isFoldStatus: boolean = false
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   build() {

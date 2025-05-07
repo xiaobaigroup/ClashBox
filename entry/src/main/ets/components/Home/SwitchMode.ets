@@ -4,9 +4,11 @@ import { ANIMATION_DURATION_300, MarginGenerate } from '../../common/Constants';
 import { CardTitle } from './CardTitleBuilder';
 import { AppConfig, SwitchModeCard, UIConfig } from '../../entryability/AppState';
 import { EventHub, EventKey } from '../../common/EventHub';
-import { ClashConfig, ProxyMode } from 'proxy_core';
+import { ClashConfig, ProxyGroup, ProxyMode } from 'proxy_core';
 import { customVibrator } from '../../utils/VibratorUtil';
 import { customAnimationUtil } from '../../utils/Animation';
+import { ProxyGroupItemDataSource } from '../../common/ProxyData';
+import ClashViewModel from '../../entryability/ClashViewModel';
 
 @Component
 struct SwitchMode {
@@ -14,7 +16,7 @@ struct SwitchMode {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor //高亮图标,可在apptheme更换
   @State font_primary: ResourceColor = $r('sys.color.font_primary')
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
   @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
   // 内容文本字体大小
   @Consume('breakPointStateHomeCardSwitchModeFontSize') private fontSize: BreakpointState<number>
@@ -105,7 +107,7 @@ struct SwitchMode {
       .height('82%')
       .padding({ top:2,bottom:2,left:3,right:3 })
       .backgroundColor($r('app.color.home_card_background'))
-      .borderRadius(this.isPXSecScreen?16:20)
+      .borderRadius(this.isPXSecScreen || this.isLandscapePhone ? 16 : 20)
     }
     .width('100%')
     .height('100%')

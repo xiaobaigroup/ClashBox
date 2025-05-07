@@ -21,9 +21,9 @@ struct ProxyINFO{
   //节点假数据组后期可改可删
   @Consume items: ProxyItem[]
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
   // 折叠屏展开状态判定
-  @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
+  @StorageLink ('isFoldStatus') private isFoldStatus: boolean = false
   // 主页卡片内容IP地址字体大小
   @Consume('IPfontSize') private IPfontSize: BreakpointState<number>
   //主页卡片内容当前节点字体大小
@@ -65,10 +65,10 @@ struct ProxyINFO{
               .fontWeight(FontWeight.Bold)
               .fontColor($r('sys.color.font_primary'))
               .textOverflow({ overflow: TextOverflow.Clip })
-              .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
+              .fontSize(this.isLandscapePhone ? 20 : this.ProxyFontSize.value)
           } else {
             Text($r('app.string.proxy_name'))
-              .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
+              .fontSize(this.isLandscapePhone ? 20 : this.ProxyFontSize.value)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('sys.color.font_primary'))
           }
@@ -84,7 +84,7 @@ struct ProxyINFO{
                 .fontColor($r('sys.color.font_secondary'))
 
               Text( this.remoteIp?.ip  ?? $r('app.string.loading'))
-                .fontSize(this.isPXSecScreen? 12 :this.isLandscapePhone ? 18 :this.isFoldStatus ?22: this.IPfontSize.value)
+                .fontSize(this.isPXSecScreen? 12 :this.isLandscapePhone ? 16 :this.isFoldStatus ?22: this.IPfontSize.value)
                 .fontColor($r('sys.color.font_secondary'))
             }.transition(customAnimationUtil.isOpacity(this.uiConfig))
           }else {
@@ -94,7 +94,7 @@ struct ProxyINFO{
                 .color(this.icon_emphasize)
 
               Text($r('app.string.loading'))
-                .fontSize(this.isPXSecScreen? 12 :this.isLandscapePhone ? 18 :this.isFoldStatus ?22: this.IPfontSize.value)
+                .fontSize(this.isPXSecScreen? 12 :this.isLandscapePhone ? 16 :this.isFoldStatus ?22: this.IPfontSize.value)
                 .fontColor($r('sys.color.font_secondary'))
             } .transition(customAnimationUtil.isOpacity(this.uiConfig))
           }
@@ -138,10 +138,10 @@ struct ProxyINFO{
         }
 
         Button($r('app.string.refresh_IP2'))
-          .width(this.isPXSecScreen? 78 :'55%')
-          .height(this.isPXSecScreen? 30 :'25%')
+          .width(this.isPXSecScreen? 78 : this.isLandscapePhone ? '60%' : '55%')
+          .height(this.isPXSecScreen? 30 : this.isLandscapePhone ? '27%' : '25%')
           .fontColor(this.icon_emphasize)
-          .fontSize(this.isPXSecScreen? 14 :this.isLandscapePhone ? 16 : this.fontSize.value)
+          .fontSize(this.isPXSecScreen? 14 : this.isLandscapePhone ? 14 : this.fontSize.value)
           .backgroundColor($r('app.color.home_card_background'))
           .onClick(async () => {
             //在home页在编辑卡片状态时，无法操作，点击回调写在if判定里

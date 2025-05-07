@@ -107,7 +107,8 @@ struct Resources {
   @State currentEditInputValue: string = ''
   // 编辑路由地址弹窗标题
   @State theEditDialogTitle: ResourceStr = $r('app.string.edit_resource')
-  @State isLoading: boolean = false
+  @State isLoading: number = -1
+  @State isLoadingAll: boolean = false
   @Provide isShowGroupSort: Boolean = false
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @Provide resourceListData: Array<ResourcesData> = theResouresData
@@ -131,6 +132,7 @@ struct Resources {
     .backgroundColor($r('app.color.settings_container_background'))
     .onClick(() => {
       this.isON.toggleAnim = true
+      this.isLoadingAll = true
       promptAction.showToast({ message: getResourceString($r('app.string.resource_updating'), this) })
       this.updateGeoDate()
     })
@@ -243,7 +245,8 @@ struct Resources {
          item.resourceName,
          item.fileName,
       );
-      this.isLoading = false
+      this.isLoading = -1
+      this.isLoadingAll = false
       if (message != "") {
         promptAction.showToast({ message: getResourceString($r('app.string.update_failed'), this) +" " + message })
       }
@@ -251,7 +254,8 @@ struct Resources {
         promptAction.showToast({ message: getResourceString($r('app.string.update_success'), this) })
       }
     } catch (e) {
-      this.isLoading = false
+      this.isLoading = -1
+      this.isLoadingAll = false
       promptAction.showToast({message: getResourceString($r('app.string.update_failed'), this) + (e.message | e)})
     }
   }
@@ -278,25 +282,6 @@ struct Resources {
   build() {
     NavDestination() {
       Stack() {
-        if(this.isLoading) {
-          // 加载动画
-          Column() {
-            LoadingProgress()
-              .color(this.icon_emphasize)
-              .width(40)
-              .height(40)
-            Text() {
-              Span($r('app.string.resource_updating'))
-              Span('..')
-            }
-              .fontSize(16)
-          }.zIndex(2)
-          .width('100%')
-          .height('100%')
-          .justifyContent(FlexAlign.Center)
-          .backgroundColor(Color.Transparent)
-        }
-
         MoreTop({
           title: $r('app.string.Resources'),
           searchButton: () => { this.reaourceSearch() },
@@ -356,19 +341,28 @@ struct Resources {
                         this.editDialogController.open()
                       })
 
+
                       // 更新按钮
                       Button({ type: ButtonType.Circle, stateEffect: true }) {
-                        SymbolGlyph($r('sys.symbol.arrow_clockwise'))
-                          .fontSize(24)
-                          .fontColor([this.icon_primary])
+                        if(this.isLoading == index || this.isLoadingAll) {
+                          LoadingProgress()//.color(this.icon_emphasize)
+                            .size({ width: 35, height: 35 })
+                            //.transition(customAnimationUtil.isOpacity(this.uiConfig))
+                        }else {
+                          SymbolGlyph($r('sys.symbol.arrow_clockwise'))
+                            .fontSize(24)
+                            .fontColor([this.icon_primary])
+                            //.transition(customAnimationUtil.isOpacity(this.uiConfig))
+                        }
                       }.ButtonStyle()
                       .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                      .onClick(() => {
+                      .onClick(async () => {
                         this.isON.toggleAnim = true
-                        this.isLoading = true
+                        this.isLoading = index
                         this.updateTime(index)
                         // 资源更新处理
-                        this.updateGeoDateItem(item)
+                        await this.updateGeoDateItem(item)
+                        this.isLoading = -1
                       })
                     }
                     .padding(12)

@@ -148,5 +148,4 @@ export struct ProxyNode {
       .ListRowStyle()
     }
   }
-
 }

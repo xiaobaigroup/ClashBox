@@ -84,8 +84,7 @@ struct ConfigurationPage {
   private breakPointStateTabContentTitleMargin: BreakpointState<number>
 
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone')
-  private isLandscapePhone: boolean = false
+  @StorageLink('isLandscapePhone') private isLandscapePhone: boolean = false
 
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 开关不触发list转场动画判定

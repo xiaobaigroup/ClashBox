@@ -14,7 +14,7 @@ struct CurrentNode {
   // 节点假数据组后期可改可删
   @Consume items: ProxyItem[]
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
   // 卡片内边距
   @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
   //主页卡片内容当前延迟小字体大小（16,20,18,24）
@@ -29,7 +29,7 @@ struct CurrentNode {
       Column() {
         if (this.appConfig.currentProxyItem) {
           Text(`${this.appConfig.currentProxyName}`)
-            .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
+            .fontSize(this.isLandscapePhone ? 20 : this.ProxyFontSize.value)
             .fontWeight(FontWeight.Bold)
             .fontColor(this.font_primary)
             .maxLines(2)

@@ -20,7 +20,7 @@ struct Language {
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   //一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
-  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   aboutToAppear(): void {

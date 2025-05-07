@@ -124,7 +124,7 @@ struct ProxyGroupItem {
   @State startIconModifier3: SymbolGlyphModifier =
     new SymbolGlyphModifier($r('sys.symbol.questionmark_circle')).fontSize('24vp');
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
 
   /* 断点布局相关 */
   @Consume ProxyListLanes: BreakpointState<number>
@@ -386,7 +386,7 @@ struct ProxyGroupItem {
       scrollForward: this.isPXSecScreen ? NestedScrollMode.SELF_ONLY: NestedScrollMode.PARENT_FIRST,
       scrollBackward: this.isPXSecScreen ? NestedScrollMode.SELF_ONLY:NestedScrollMode.SELF_FIRST
     })
-    .contentEndOffset(this.isPXSecScreen? 65: this.appConfig.proxyGroupType === ProxyGroupType.List ? 10 : CONTENT_END_OFFSET_150)
+    .contentEndOffset(this.isPXSecScreen ? 65: this.appConfig.proxyGroupType === ProxyGroupType.List ? 10 : CONTENT_END_OFFSET_150)
    /* .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
       detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
       preferType: SheetType.CENTER,

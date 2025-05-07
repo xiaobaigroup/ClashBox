@@ -216,7 +216,7 @@ struct Connect {
                     .backgroundColor($r('app.color.container_background'))
                     .borderRadius(BORDER_RADIUS_20)
                   }.width('100%')
-                  .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
+                  .transition(customAnimationUtil.isScaleTranFast(index, this.uiConfig))
                 })
               }.width('100%')
               .height('100%')

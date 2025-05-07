@@ -109,7 +109,7 @@ export struct NetworkRouterAddress {
   @State theEditDialogTitle: ResourceStr = $r('app.string.edit_router_address')
   @State RouterAddressList: RouterAddressData[] = createRouterAddressData()
   @Consume('NavPathStack') pageInfos: NavPathStack
-  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */

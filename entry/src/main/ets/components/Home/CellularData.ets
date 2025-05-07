@@ -149,7 +149,7 @@ struct CellularDataStat {
   @State font_primary: ResourceColor = $r('sys.color.font_primary')
 
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
   // 内容文本字体大小
   @Consume('breakPointStateCardCellularDataFontSize') private fontSize: BreakpointState<number>
   // 上下行箭头图标大小

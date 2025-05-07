@@ -201,7 +201,7 @@ struct Log {
                     .margin({ bottom: 4 })
                   Text($r('app.string.EnableLoggerPrompt'))
                 }
-                .transition(customAnimationUtil.isScaleTran(0, this.uiConfig))
+                .transition(customAnimationUtil.isScaleTranFast(0, this.uiConfig))
                 .zIndex(1)
                 .alignItems(HorizontalAlign.Center)
                 .justifyContent(FlexAlign.Center)
@@ -249,7 +249,7 @@ struct Log {
                         .padding(12)
                       }
                     }.width('100%')
-                    .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
+                    .transition(customAnimationUtil.isScaleTranFast(index, this.uiConfig))
                   })
 
                 }.width('100%')

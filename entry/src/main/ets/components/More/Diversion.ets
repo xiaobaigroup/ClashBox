@@ -41,7 +41,7 @@ struct Diversion {
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   // 手机横屏判断变量
-  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
   // 整体页面边距
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   // 列表底边距

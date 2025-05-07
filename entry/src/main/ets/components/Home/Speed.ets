@@ -21,7 +21,7 @@ struct Speed {
   //主页卡片内容网络测速字体大小
   @Consume('SpeedfontSize12_14_14_16') private SpeedfontSize12_14_14_16: BreakpointState<number>
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
   @StorageProp("appFlowingState") appFlowingState: AppFlowingState = new AppFlowingState()
   @Consume
   @Watch('proxyEnabledChanged') proxyEnabled: boolean

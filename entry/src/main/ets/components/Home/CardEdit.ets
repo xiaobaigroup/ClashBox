@@ -13,13 +13,13 @@ export struct CardEdit {
    */
   scroller: Scroller = new Scroller()
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
   /* 主页卡片高度*/
   @Consume('HomeCardEditHeight') private HomeCardEditHeight: BreakpointState<number>
   @Consume('breakPointStateTabContentTitleMargin')
   private breakPointStateTabContentTitleMargin: BreakpointState<number>
   // 折叠屏展开状态判定
-  @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
+  @StorageLink ('isFoldStatus') private isFoldStatus: boolean = false
 
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   // 当前主页布局

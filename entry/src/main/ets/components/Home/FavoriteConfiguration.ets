@@ -15,7 +15,7 @@ struct FavoriteConfiguration {
   //后端接入后此处应改为收藏的配置项
   @State FavoriteConfiguration: string [] = ['收藏配置1','收藏配置2','收藏配置3']
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
   // 卡片内边距
   @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
   // 内容文本字体大小

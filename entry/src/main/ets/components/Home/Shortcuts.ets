@@ -16,7 +16,7 @@ import { customAnimationUtil } from '../../utils/Animation'
 @Component
 struct Shortcuts {
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
   // 内容文本字体大小
   @Consume('breakPointStateHomeCardSwitchModeFontSize') private fontSize: BreakpointState<number>
   // 卡片内边距
@@ -33,7 +33,7 @@ struct Shortcuts {
   @Consume('breakPointStateTabContentTitleMargin')
   private breakPointStateTabContentTitleMargin: BreakpointState<number>
   // 折叠屏展开状态判定
-  @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
+  @StorageLink ('isFoldStatus') private isFoldStatus: boolean = false
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 

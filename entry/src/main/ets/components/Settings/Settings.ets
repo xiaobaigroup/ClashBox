@@ -41,7 +41,7 @@ struct Settings {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 当前设备`height`是否符合(320vp< height <= 500vp)
-  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   // 列表底边距
   @Consume('breakPointStatemorePagelistBottom') private listBottom: BreakpointState<number>

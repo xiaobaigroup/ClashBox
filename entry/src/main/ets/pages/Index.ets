@@ -1,6 +1,6 @@
 // Index
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
-import { curves, mediaquery, promptAction } from '@kit.ArkUI'
+import { curves, display, mediaquery, promptAction } from '@kit.ArkUI'
 import Home from './HomePage'
 import ProxyPage from './ProxyPage'
 import ConfigurationPage from './ConfigurationPage'
@@ -136,11 +136,11 @@ struct Index {
   // 分屏（正方形窗口）
   @Provide @Watch('isHiddenChange')isSmallSquareScreen: boolean = false
   // 设备高度是否 (320vp< height <= 500vp) 媒体查询
-  @Provide isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
   // 平板竖屏判断变量
   @Provide istabletLandscape: boolean = false
   // 折叠展开状态判断变量
-  @State isFoldStatus: boolean = false
+  @StorageLink ('isFoldStatus') isFoldStatus: boolean = false
   // px外屏判定
   @Provide isPXSecScreen: boolean = false
   // 设置模态页控制变量
@@ -450,7 +450,7 @@ struct Index {
       this.isLandscapePhone = true
       hilog.info(0x1000, componentName,
         `#WindowChange#应用窗口状态改变#(320vp< height <= 500vp) and (640vp< width <= 1000vp)手机横屏结果: ${this.isLandscapePhone}`)
-    } else if (640 < this.windowWidth && this.windowWidth <= 1000 && 640 < this.windowHeight && this.windowHeight <= 1000) {
+    } else if ((640 < this.windowWidth && this.windowWidth <= 1000 && 640 < this.windowHeight && this.windowHeight <= 1000)) {
       this.isFoldStatus = true
       hilog.info(0xFF00, componentName,
         `#WindowChange#设备折叠状态改变#(640vp< height <= 1000vp) and (640vp< width <= 1000vp)折叠展开结果: ${this.isFoldStatus}`)
@@ -466,7 +466,7 @@ struct Index {
       this.isPXSecScreen = true
       hilog.info(0xFF00, componentName,
         `#WindowChange#应用窗口状态改变#(328vp< width && 328 < height)PX外屏结果: ${this.isPXSecScreen}`)
-    } else {
+    }else {
       this.isLandscapePhone = false
       this.istabletLandscape = false
       this.isSmallSquareScreen = false
@@ -772,7 +772,7 @@ struct Index {
   @Provide theProxyGroups: ProxyGroup[] = []
   @Provide("currentProfile") currentProfile: Profile | null = null
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-  @StorageLink('clashConfig') @Watch('switchMode')clashConfig: ClashConfig = new ClashConfig()
+  @StorageLink('clashConfig') /*@Watch('switchMode')*/clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('uiConfig') @Watch('ShowPipChange')uiConfig: UIConfig = new UIConfig()
 
   aboutToDisappear() {

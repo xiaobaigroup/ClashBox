@@ -47,7 +47,7 @@ struct About {
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
   // 点击次数
   @State clickCount: number = 0
   // 实验功能开关列表行数据
@@ -441,7 +441,7 @@ export struct AboutContributors {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State ContributorsList: ContributorsListItemProp[] = ContributorsList
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageLink('isLandscapePhone')  private isLandscapePhone: boolean = false
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 列表高度
   @Consume('breakPointStateSettingslistHeight') private SettingslistHeight: BreakpointState<number>
@@ -579,7 +579,7 @@ export struct ThirdServices {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State thirdServicesList: TCItemProp[] = ThirdServicesList
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
 
@@ -638,7 +638,7 @@ export struct UseGuidance {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State useGuidanceList: TCItemProp[] = UseGuidanceList
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
+ @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
 

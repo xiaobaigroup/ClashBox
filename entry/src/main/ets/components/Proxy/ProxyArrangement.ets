@@ -31,7 +31,7 @@ struct ProxyArrangement {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
   /* 断点布局相关 */
   @Consume breakPointStateTabContentTitleMargin: BreakpointState<number>
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
@@ -111,7 +111,7 @@ struct ProxyArrangement {
           }
         }.margin({bottom: (!this.isContentShow && this.selectItem === index) ? 0 : 10})
         .clickEffect(this.isContentShow?customAnimationUtil.isClickEffect(this.uiConfig):null)
-        .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
+        .transition(customAnimationUtil.isScaleTranFast(index, this.uiConfig))
         .onClick(() => {
           animateTo({
             duration: this.uiConfig.animationSpeed,
@@ -130,7 +130,7 @@ struct ProxyArrangement {
         .constraintSize({minHeight: 120})
       }, (item: ProxyGroup) => item.name)
     }
-    .contentEndOffset(CONTENT_END_OFFSET_150)
+    .contentEndOffset(this.isLandscapePhone?80:CONTENT_END_OFFSET_150)
     .chainAnimation(true)
     .scrollBar(BarState.Off)
     .edgeEffect(EdgeEffect.Spring)

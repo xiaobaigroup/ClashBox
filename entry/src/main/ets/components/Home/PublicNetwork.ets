@@ -22,7 +22,7 @@ struct PublicNetwork {
   @Consume('HomeCardIPSmFontSize')
   private HomeCardIPSmFontSize: BreakpointState<number>
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageProp('isLandscapePhone') private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
   // 卡片内边距
   @Consume('breakPointStateHomeCardPadding') private cardPadding: BreakpointState<MarginGenerate>
   // 主页卡片内容IP地址字体大小
@@ -32,7 +32,7 @@ struct PublicNetwork {
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
   // 折叠屏展开状态判定
-  @StorageProp('isFoldStatus') private isFoldStatus: boolean = false
+  @StorageLink ('isFoldStatus') private isFoldStatus: boolean = false
   // 收藏与ping延迟即时动作
   private PromptAction: PromptAction = this.getUIContext()?.getPromptAction()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
@@ -54,7 +54,7 @@ struct PublicNetwork {
             .transition(customAnimationUtil.isOpacity(this.uiConfig))
 
           Text( this.remoteIp?.ip  ?? $r('app.string.loading'))
-            .fontSize(this.isLandscapePhone ? 18 :this.isFoldStatus ? 22: this.IPfontSize.value)
+            .fontSize(this.isLandscapePhone ? 16 :this.isFoldStatus ? 22: this.IPfontSize.value)
             .textAlign(TextAlign.JUSTIFY)
             .fontColor($r('sys.color.font_primary'))
             .transition(customAnimationUtil.isOpacity(this.uiConfig))
@@ -65,7 +65,7 @@ struct PublicNetwork {
               .color(this.icon_emphasize)
 
             Text($r('app.string.loading'))
-              .fontSize(this.isLandscapePhone ? 18 :this.isFoldStatus ? 22: this.IPfontSize.value)
+              .fontSize(this.isLandscapePhone ? 16 : this.isFoldStatus ? 22: this.IPfontSize.value)
               .textAlign(TextAlign.JUSTIFY)
               .fontColor($r('sys.color.font_primary'))
           }.transition(customAnimationUtil.isOpacity(this.uiConfig))
@@ -81,7 +81,7 @@ struct PublicNetwork {
           .width('55%')
           .height('25%')
           .fontColor(this.icon_emphasize)
-          .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+          .fontSize(this.isLandscapePhone ? 14 : this.fontSize.value)
           .backgroundColor($r('app.color.home_card_background'))
           .onClick(() => {
             // 在home页编辑卡片状态时，无法操作，点击回调写在if判定里
