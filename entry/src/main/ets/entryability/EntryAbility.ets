@@ -7,6 +7,7 @@ import { AppConfig, AppFlowingState, AppState, ClashCore } from './AppState';
 import { EventHub, EventKey } from '../common/EventHub';
 import { PipManager } from '../common/PipManager';
 import { ClashConfig, SocketProxyService, SocketStubService } from 'proxy_core';
+import { deviceInfo } from '@kit.BasicServicesKit';
 
 export default class EntryAbility extends UIAbility {
  private currentLanguage: string | undefined = undefined
@@ -79,10 +80,19 @@ export default class EntryAbility extends UIAbility {
       hilog.info(0x0000, 'EntryAbility', 'Succeeded in loading the content.');
     });
 
-    // 通过主窗口UIContext创建typeNode节点
-    windowStage.getMainWindow().then((window) => {
+    windowStage.getMainWindow().then((window: window.Window) => {
+      // 通过主窗口UIContext创建typeNode节点
       let ctx = window.getUIContext();
       PipManager.getInstance().makeTypeNode(ctx)
+
+      let deviceTypeInfo: string = deviceInfo.deviceType;
+      if (deviceTypeInfo === '2in1' || 'tablet') {
+        // 设置标题栏 of the 2in1
+        // window.setWindowDecorVisible(false);
+        // When the title bar is invisible, set the height of the title bar and control the height of the three buttons (full screen/restore, maximize, and close) in the upper right corner.
+        // window.setWindowDecorHeight(64);
+      }
+
     })
 
     // 获取应用主窗口

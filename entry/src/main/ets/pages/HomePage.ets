@@ -104,6 +104,8 @@ struct Home {
    */
   @Consume deleteButtonSize: BreakpointState<number>
   @Consume isSmallSquareScreen: boolean
+  // 平板横屏
+  @Consume istabletLandscape: boolean
   // 删除按钮是否出现判定
   @State isShowDeleteButton: boolean = false
   //卡片编辑半模拟态判定
@@ -410,7 +412,8 @@ struct Home {
 
       Stack({ alignContent: this.stackAlignContentAlignment }) {
         Column(){
-          Blank().height(this.isLandscapePhone || (this.isRolling && this.isSmallSquareScreen) ? this.heightTop : TAB_CONTENT_TITLE_HEIGHT)
+          Blank()
+            .height(this.isLandscapePhone || (this.isRolling && this.isSmallSquareScreen) ? this.heightTop : this.istabletLandscape ? 72 : TAB_CONTENT_TITLE_HEIGHT)
           Scroll() {
             // 主页卡片层
             List({scroller:this.scrollerForScroll}) {
@@ -873,7 +876,11 @@ struct Home {
             offsetY: 4,
             type: ShadowType.BLUR
           })
-        .margin({bottom: this.isLandscapePhone || !this.uiConfig.isBlurr || (this.isRolling && this.isSmallSquareScreen) ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
+          .margin({
+            bottom: this.isLandscapePhone || this.istabletLandscape || !this.uiConfig.isBlurr || (this.isRolling && this.isSmallSquareScreen) ? $r('app.integer.vp_proxy_start_button_left_right_margin') : $r('app.integer.vp_proxy_start_button_bottom_margin'),
+            right:$r('app.integer.vp_proxy_start_button_left_right_margin'),
+            left:$r('app.integer.vp_proxy_start_button_left_right_margin')
+          })
           .width(this.proxyEnabled ? $r('app.integer.vp_proxy_started_button_width') : $r('app.integer.vp_proxy_not_start_button_width'))
           .height(this.proxyStartButtonHeight)
           .clip(true)

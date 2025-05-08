@@ -161,6 +161,7 @@ struct Log {
 
     })
   }
+  // 更多按钮
   @Builder
   logOther() {
     Button({ type: ButtonType.Circle, stateEffect: true }) {
@@ -361,6 +362,7 @@ export struct LogDetils {
                     }
                   })
               })
+              .hitTestBehavior(HitTestMode.None)
               .backgroundColor($r('app.color.container_background'))
               .width('100%')
               .margin({ right: this.morePageMargin.value, left: this.morePageMargin.value })

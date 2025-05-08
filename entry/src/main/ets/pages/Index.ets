@@ -560,7 +560,7 @@ struct Index {
     this.onWindowChange()
 
     // 除手机外更多页均默认跳转覆写
-    if (500 < this.windowHeight && !this.isLandscapePhone) {
+    if (500 < this.windowWidth && !this.isLandscapePhone) {
       this.pageInfos.pushPathByName(this.moreList[4].name, false)
     }
 
@@ -701,7 +701,7 @@ struct Index {
     EventHub.on(EventKey.ClearLog, () => {
       this.logListData = []
     })
-    EventHub.on(EventKey.ExportLog, () => {
+    EventHub.on(EventKey.ExportLog, (isSingleLog: boolean = false) => {
       try {
         let filePicker = new picker.DocumentViewPicker(getContext(this))
         let options = new picker.DocumentSaveOptions()
