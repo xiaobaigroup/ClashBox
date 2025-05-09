@@ -6,20 +6,8 @@ import { timestampToDateTime } from "../../utils/TimeConvertUtil"
 import { ClashConfig, LogLevel } from "proxy_core"
 import { AppConfig, UIConfig } from "../../entryability/AppState"
 import { EventHub, EventKey } from "../../common/EventHub"
-import { BORDER_RADIUS_20, CONTENT_END_OFFSET_150, TAB_CONTENT_TITLE_HEIGHT } from "../../common/Constants"
+import { BORDER_RADIUS_20, CONTENT_END_OFFSET_150, LogData, TAB_CONTENT_TITLE_HEIGHT } from "../../common/Constants"
 import { customAnimationUtil } from "../../utils/Animation"
-
-// 日志数据（假设）
-interface LogData {
-  // 日志类型（0：Warning；1：Info）
-  logType: LogLevel
-  // 日志生成时间(展示的时间)
-  logTime: number
-  // 日志详情
-  LogDetails: string
-  // 是否跳转
-  logSkip: boolean
-}
 
 @Component
 struct Log {
@@ -33,15 +21,51 @@ struct Log {
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @State filterChecked: number = 0
   @Consume theLogSkipItem: number
-  // 临时数据（数据本体在MorePage）
+  // 数据（数据本体在Index）
   @Consume logListData: Array<LogData>
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 临时名称正序变量
   @State theSortNameUp: boolean = false
-  //page内顶部标题偏移量
+  // page内顶部标题偏移量
   @Consume curYOffset: number
+
+  // 日志排序
+  sortedLogs( time: boolean, level:LogLevel){
+    let logs = this.logListData;
+    if (time) {
+      logs = this.logListData.sort((a,b)=> b.logTime - a.logTime)
+    } else {
+      logs = this.logListData.sort((a,b)=> a.logTime - b.logTime)
+    }
+    if(level !== LogLevel.Debug){
+      return logs.filter((l)=> l.logType == level );
+    }
+    return logs;
+  }
+
+
+  // 日志搜索
+ searchLogs(logs: LogData[], keyword: string): LogData[] {
+  const normalizedKeyword = keyword.trim().toLowerCase();
+  const searchTerms = normalizedKeyword.split(/\s+/).filter(term => term); // 分割关键词
+
+  return logs.filter(log => {
+    // 搜索时间字段（精确匹配）
+    const timeMatch = searchTerms.some(term =>
+    !isNaN(Number(term)) && log.logTime.toString() === term
+    );
+
+    // 搜索详情字段（模糊匹配）
+    const detailsMatch = searchTerms.some(term =>
+    log.LogDetails.toLowerCase().includes(term)
+    );
+
+    return timeMatch || detailsMatch;
+  });
+}
+
   @Builder
   MoreMenu() {
     Menu() {
@@ -78,18 +102,7 @@ struct Log {
       }
     }
   }
-  sortedLogs( time: boolean, level:LogLevel){
-    let logs = this.logListData;
-    if (time) {
-      logs = this.logListData.sort((a,b)=> b.logTime - a.logTime)
-    } else {
-      logs = this.logListData.sort((a,b)=> a.logTime - b.logTime)
-    }
-    if(level !== LogLevel.Debug){
-      return logs.filter((l)=> l.logType == level );
-    }
-    return logs;
-  }
+
   @Builder
   SortMenu() {
     Menu() {

@@ -122,6 +122,19 @@ export enum ValueType {
   Record,
   Sniff
 }
+
+// 日志数据
+export interface LogData {
+  // 日志类型（0：Warning；1：Info）
+  logType: LogLevel
+  // 日志生成时间(展示的时间)
+  logTime: number
+  // 日志详情
+  LogDetails: string
+  // 是否跳转
+  logSkip: boolean
+}
+
 // 更多配置项列表类
 @Observed
 export class ConfigItemData{

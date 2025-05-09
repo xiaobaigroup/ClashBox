@@ -55,7 +55,8 @@ import {
   TabDirection,
   CompStr,CHART_NUMBER,
   TheExperimentData,
-  TAB_CONTENT_TITLE_HEIGHT
+  TAB_CONTENT_TITLE_HEIGHT,
+  LogData
 } from '../common/Constants'
 import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/ProxyData'
 import { ClashConfig, IpInfo, LogLevel, Profile, ProxyGroup, ProxyMode } from 'proxy_core'
@@ -89,25 +90,7 @@ import { ConvertedUnit } from '../utils/DataUnitConvertUtils'
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 const context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
 export const indexController: TabsController = new TabsController()
-//
-interface marginGenerate {
-  top: number,
-  bottom: number,
-  left: number,
-  right: number
-}
 
-// 日志数据
-interface LogData {
-  // 日志类型（0：Warning；1：Info）
-  logType: LogLevel
-  // 日志生成时间(展示的时间)
-  logTime: number
-  // 日志详情
-  LogDetails: string
-  // 是否跳转
-  logSkip: boolean
-}
 
 const componentName: string = 'Index'
 
@@ -446,6 +429,11 @@ struct Index {
   onWindowChange() {
     hilog.info(0xFF00, componentName,
       `#WindowChange#应用窗口状态 width: ${this.windowWidth} height: ${this.windowHeight}`)
+    if (this.windowHeight === this.windowWidth) {
+      hilog.info(0xFF00, componentName,
+        `#WindowChange#应用窗口状态 重复执行，跳出`)
+      return
+    }
     if (320 < this.windowHeight && this.windowHeight <= 500 && 640 < this.windowWidth && this.windowWidth <= 1000) {
       this.isLandscapePhone = true
       hilog.info(0x1000, componentName,
@@ -454,7 +442,7 @@ struct Index {
       this.isFoldStatus = true
       hilog.info(0xFF00, componentName,
         `#WindowChange#设备折叠状态改变#(640vp< height <= 1000vp) and (640vp< width <= 1000vp)折叠展开结果: ${this.isFoldStatus}`)
-    } else if (this.windowWidth > 1000) {
+    } else if (this.windowWidth > 1000 && this.windowHeight > 700) {
       this.istabletLandscape = true
       hilog.info(0xFF00, componentName,
         `#WindowChange#应用窗口状态改变#(1000vp< width)平板横屏结果: ${this.istabletLandscape}`)

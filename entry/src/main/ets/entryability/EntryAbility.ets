@@ -86,11 +86,14 @@ export default class EntryAbility extends UIAbility {
       PipManager.getInstance().makeTypeNode(ctx)
 
       let deviceTypeInfo: string = deviceInfo.deviceType;
-      if (deviceTypeInfo === '2in1' || 'tablet') {
+      if (deviceTypeInfo === '2in1') {
         // 设置标题栏 of the 2in1
         // window.setWindowDecorVisible(false);
         // When the title bar is invisible, set the height of the title bar and control the height of the three buttons (full screen/restore, maximize, and close) in the upper right corner.
         // window.setWindowDecorHeight(64);
+        AppStorage.setOrCreate('2in1', true)
+      } else {
+        AppStorage.setOrCreate('2in1', false)
       }
 
     })
@@ -143,8 +146,8 @@ export default class EntryAbility extends UIAbility {
     try {
       windowClass.on('windowSizeChange', (data) => {
         console.info('#WindowChange Succeeded in enabling the listener for window size changes. Data: ' + JSON.stringify(data))
-        AppStorage.setOrCreate('windowHeight', px2vp(data.height)) // 980px 约等于 512vp
         AppStorage.setOrCreate('windowWidth', px2vp(data.width))
+        AppStorage.setOrCreate('windowHeight', px2vp(data.height)) // 980px 约等于 512vp
       })
     } catch (exception) {
       console.error(`#EntryAbility Failed to enable the listener for window size changes. Cause code: ${exception.code}, message: ${exception.message}`)
