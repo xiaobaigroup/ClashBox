@@ -79,8 +79,8 @@ struct ProxyPage {
   // 代理数据(懒加载)
   @Consume proxyGroups: ProxyGroupItemDataSource
   // 代理分组tabs控制器
- // private ListScroller: Scroller = new Scroller()
-  private tabsController: TabsController = new TabsController();
+  private ListScroller: Scroller = new Scroller()
+  //private tabsController: TabsController = new TabsController();
   // 代理节点Swiper控制器
   private SwiperController: SwiperController = new SwiperController()
 
@@ -200,10 +200,10 @@ struct ProxyPage {
     .height(55)
     .margin({ right: 8, bottom: 10 })
     .onClick(() => {
-      animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
+      animateTo({ duration: this.uiConfig.animationSpeed }, () => {
         this.currentProxyIndex = targetIndex
-        this.SwiperController.changeIndex(this.currentProxyIndex, true)
       })
+      this.SwiperController.changeIndex(targetIndex, this.uiConfig.animationSpeed != 0 ? true : false)
     })
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Start)
@@ -283,7 +283,7 @@ struct ProxyPage {
                 // 根据ProxyArrangementSelected的状态决定是否显示
                 if (this.appConfig.proxyGroupType === ProxyGroupType.Tabs) {
                   // 代理分组List Start
-                 /* List({scroller: this.ListScroller,initialIndex:this.currentProxyIndex}) {
+                  List({scroller: this.ListScroller,initialIndex:this.currentProxyIndex}) {
                     LazyForEach(this.proxyGroups, (group: ProxyGroup, index: number) => {
                         this.TabBuilder(group.name, index)
                     }, (item: ProxyGroup) => item.name)
@@ -291,10 +291,10 @@ struct ProxyPage {
                   .height(55)
                   .width('100%')
                   .scrollBar(BarState.Off)
-                  .listDirection(Axis.Horizontal)*/
+                  .listDirection(Axis.Horizontal)
 
                   //此处可以直接用tabs懒加载+swiper懒加载并行实现 tabs start
-                  Tabs({ barPosition: BarPosition.Start,index:this.currentProxyIndex, controller: this.tabsController }) {
+                 /* Tabs({ barPosition: BarPosition.Start,index:this.currentProxyIndex, controller: this.tabsController }) {
                     LazyForEach(this.proxyGroups, (group: ProxyGroup, index: number) => {
                       TabContent().tabBar(this.TabBuilder(group.name, index))
                     }, (item: ProxyGroup) => item.name)
@@ -304,6 +304,7 @@ struct ProxyPage {
                   .width('100%')
                   .animationDuration(this.uiConfig.animationSpeed)
                   .fadingEdge(false)
+                  .scrollable(false)*/
                   // 代理分组tabs End
 
                   // 代理节点Swiper Start
@@ -341,7 +342,7 @@ struct ProxyPage {
                   .alignSelf(ItemAlign.Center)
                   .onGestureSwipe((index: number, extraInfo: SwiperAnimationEvent) => {
                     hilog.info(0xFF00, "ProxyPagePanTag", "currentOffset: %{private}d", extraInfo.currentOffset)
-                    animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
+                    animateTo({ duration: this.uiConfig.animationSpeed }, () => {
                       // 当主tab栏竖排时不触发切换
                       hilog.info(0xFF00, "ProxyLandscapeTag", "tab栏竖排状态: %{public}s", this.compVertical.value)
                       hilog.info(0xFF00, "ProxyLandscapeTag", "手机横屏状态状态: %{public}s", this.isLandscapePhone)
@@ -355,9 +356,9 @@ struct ProxyPage {
                     })
                   })
                   .onAnimationStart((index: number,targetIndex: number) => {
-                    animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
-                    //  this.ListScroller.scrollToIndex(targetIndex)
-                      this.tabsController.changeIndex(targetIndex)
+                    animateTo({ duration: this.uiConfig.animationSpeed }, () => {
+                      this.ListScroller.scrollToIndex(targetIndex)
+                    //  this.tabsController.changeIndex(targetIndex)
                       this.currentProxyIndex = targetIndex
                       if (this.currentProfile) {
                         this.currentProfile.currentGroupName = this.theProxyGroups[this.currentProxyIndex].name
