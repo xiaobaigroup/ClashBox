@@ -307,12 +307,13 @@ struct Log {
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
-    .onReady(() => {
+    .onShown(() => {
       // 初始化搜索按钮
       this.needSearch = this.appConfig.enableLogger
     })
     .onWillHide(() => {
       this.needSearch = false
+      this.isSearching = false
     })
     .onBackPressed(() => {
       if(this.isSearching) {

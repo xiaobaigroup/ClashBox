@@ -216,8 +216,9 @@ struct RequestPage {
       // 初始化搜索按钮
       this.needSearch = this.appConfig.enableRequest
     })
-    .onReady(() => {
+    .onWillHide(() => {
       this.needSearch = false
+      this.isSearching = false
     })
     .onBackPressed(() => {
       if(this.isSearching) {
