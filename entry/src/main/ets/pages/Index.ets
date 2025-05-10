@@ -364,7 +364,7 @@ struct Index {
     Flex({
       direction: this.compDirection.value,
       justifyContent:this.isLandscapePhone|| this.istabletLandscape ? FlexAlign.Center: FlexAlign.Start,
-      alignItems:this.isLandscapePhone|| this.istabletLandscape ? ItemAlign.End:ItemAlign.Center
+      alignItems:this.isLandscapePhone|| (this.istabletLandscape && !this.isPC) ? ItemAlign.End:ItemAlign.Center
     }) {
       Column({ space:'4vp'}) {
         SymbolGlyph(TabIcon)
@@ -1040,8 +1040,8 @@ struct Index {
         .barOverlap(this.uiConfig.isBlurr ? (this.isLandscapePhone || ( this.istabletLandscape && !this.isSecondary)  ? false : true) : false) //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
         .scrollable(this.isSecondary ? false : true)
         .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
-        .barWidth(this.isLandscapePhone ? this.barWidth : this.tabBarWidth.value) /**/
-        .barHeight(this.isLandscapePhone ? '100%':((!this.uiConfig.isBlurr && this.isSecondary) || this.isSmallSquareScreen) ? this.barHeight : this.compBarHeight.value) /**/
+        .barWidth(this.isLandscapePhone  ? this.barWidth : this.tabBarWidth.value) /**/
+        .barHeight(this.isLandscapePhone  ? '100%':((!this.uiConfig.isBlurr && this.isSecondary) || this.isSmallSquareScreen) ? this.barHeight : this.compBarHeight.value) /**/
         .onChange((index: number) => {
           this.IndexCurrentindex = index
           if (index === 0) {

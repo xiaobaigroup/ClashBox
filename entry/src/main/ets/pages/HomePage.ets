@@ -759,8 +759,7 @@ struct Home {
                   }
 
                   //快捷方式小卡片
-                  if (this.theCurrentHomeCard[9] == this.isFoldStatus ? false :
-                    this.istabletLandscape && this.isPC ? true: true) {
+                  if (this.theCurrentHomeCard[9] == this.isFoldStatus ? false : true) {
                     GridCol({
                       span: {
                         xs: this.isLandscapePhone ? 3 : 6,
@@ -777,8 +776,7 @@ struct Home {
                             .onClick(() => {
                               animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
                                   // 将序号9变为false
-                                  this.theCurrentHomeCard.splice(9, 1,this.isFoldStatus ? true :
-                                    this.istabletLandscape && this.isPC ? false : false)
+                                  this.theCurrentHomeCard.splice(9, 1,this.isFoldStatus ? true : false)
                               })
                             })
                         }
