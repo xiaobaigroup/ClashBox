@@ -25,6 +25,8 @@ export struct CardEdit {
   // 当前主页布局
   @Consume theCurrentHomeCard: boolean[]
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  // PC判定
+  @StorageLink ('2in1') isPC: boolean = false
 
   @Builder CardImage(s:Resource,a:number,i:number,w:ResourceStr,isShow:boolean){
     if (this.theCurrentHomeCard[i] === false) {
@@ -50,7 +52,7 @@ export struct CardEdit {
       })
 
       //快捷方式小卡片
-      if (this.theCurrentHomeCard[9] === this.isFoldStatus ? true : false) {
+      if (this.isFoldStatus && !this.isPC ? this.theCurrentHomeCard[9] : !this.theCurrentHomeCard[9]) {
         Image($r('app.media.Shortcuts'))
           .width('48.5%')
           .height(this.HomeCardEditHeight.value)
@@ -59,7 +61,7 @@ export struct CardEdit {
           .transition(customAnimationUtil.isScaleTran(9,this.uiConfig))
           .onClick(() => {
             animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
-              this.theCurrentHomeCard.splice(9, 1, this.isFoldStatus ? false : true)
+              this.theCurrentHomeCard.splice(9, 1, this.isFoldStatus && !this.isPC ? false : true)
             })
           })
       }

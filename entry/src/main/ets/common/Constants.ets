@@ -114,6 +114,19 @@ export let showHomeCard = [
   false,
   false
 ]
+
+export let showHomeCardPC = [
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true,
+  true
+]
 export enum ValueType {
   Number,
   Boolean,

@@ -17,6 +17,7 @@ import {
   CONTENT_END_OFFSET_150,
   TAB_CONTENT_TITLE_FONT_SIZE,
   PROXY_STARTED_DURATION_INIT_VALUE,
+  showHomeCardPC,
 } from '../common/Constants'
 import Settings from '../components/Settings/Settings'
 import CurrentNode from '../components/Home/CurrentNode'
@@ -187,6 +188,12 @@ struct Home {
         this.proxyGroups.pushData(this.theProxyGroups)
       }
     })
+
+    if (this.isPC) {
+      this.theCurrentHomeCard = showHomeCardPC
+    }else {
+      this.theCurrentHomeCard = showHomeCard
+    }
   }
 
   aboutToDisappear() {
@@ -693,7 +700,7 @@ struct Home {
                         md: this.isLandscapePhone ? 6 : this.isFoldStatus ? 8 : 12,
                         lg: 6
                       },
-                      order: 1
+                      order: this.isFoldStatus ? 3 : 1
                     }) {
                       Stack({ alignContent: Alignment.TopEnd }) {
                         ProxyINFO()
@@ -759,7 +766,7 @@ struct Home {
                   }
 
                   //快捷方式小卡片
-                  if (this.theCurrentHomeCard[9] == this.isFoldStatus ? false : true) {
+                  if (this.isFoldStatus && !this.isPC ? !this.theCurrentHomeCard[9] : this.theCurrentHomeCard[9]) {
                     GridCol({
                       span: {
                         xs: this.isLandscapePhone ? 3 : 6,
@@ -776,8 +783,12 @@ struct Home {
                             .onClick(() => {
                               animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
                                   // 将序号9变为false
-                                  this.theCurrentHomeCard.splice(9, 1,this.isFoldStatus ? true : false)
+                                  this.theCurrentHomeCard.splice(9, 1,this.isFoldStatus && !this.isPC ? true : false)
+                                console.info('快捷卡片判定',this.theCurrentHomeCard[9])
                               })
+                            })
+                            .onAppear(()=>{
+                              console.info('快捷卡片判定',this.theCurrentHomeCard[9])
                             })
                         }
                       }
