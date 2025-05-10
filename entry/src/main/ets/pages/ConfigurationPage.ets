@@ -106,6 +106,8 @@ struct ConfigurationPage {
   @Consume paddingButtom:number|Resource
   // px外屏
   @Consume isPXSecScreen: boolean
+  // 平板竖屏判断变量
+  @Consume istabletLandscape: boolean
   /* 配置列表List相关 */
   // 当前单选框选择的配置
   @Consume currentConfigRadioCheckedConfigData: ConfigData
@@ -508,7 +510,7 @@ struct ConfigurationPage {
           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
           .margin({
-            bottom: this.isLandscapePhone || !this.uiConfig.isBlurr ?
+            bottom: this.isLandscapePhone || this.istabletLandscape || !this.uiConfig.isBlurr ?
             $r('app.integer.vp_proxy_start_button_left_right_margin') : (this.isRolling && this.isSmallSquareScreen) ?
               this.paddingButtom : $r('app.integer.vp_proxy_start_button_bottom_margin'),
             right: $r('app.integer.vp_proxy_start_button_left_right_margin'),

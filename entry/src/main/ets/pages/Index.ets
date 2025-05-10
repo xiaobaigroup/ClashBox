@@ -56,7 +56,8 @@ import {
   CompStr,CHART_NUMBER,
   TheExperimentData,
   TAB_CONTENT_TITLE_HEIGHT,
-  LogData
+  LogData,
+  showHomeCard
 } from '../common/Constants'
 import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/ProxyData'
 import { ClashConfig, IpInfo, LogLevel, Profile, ProxyGroup, ProxyMode } from 'proxy_core'
@@ -126,6 +127,8 @@ struct Index {
   @StorageLink ('isFoldStatus') isFoldStatus: boolean = false
   // px外屏判定
   @Provide isPXSecScreen: boolean = false
+  // PC判定
+  @StorageLink ('2in1') isPC: boolean = false
   // 设置模态页控制变量
   @Provide isShowSettings: boolean = false
   // 读取导航条区域的高度
@@ -438,11 +441,11 @@ struct Index {
       this.isLandscapePhone = true
       hilog.info(0x1000, componentName,
         `#WindowChange#应用窗口状态改变#(320vp< height <= 500vp) and (640vp< width <= 1000vp)手机横屏结果: ${this.isLandscapePhone}`)
-    } else if ((640 < this.windowWidth && this.windowWidth <= 1000 && 640 < this.windowHeight && this.windowHeight <= 1000)) {
+    } else if ((640 < this.windowWidth && this.windowWidth < 745 && 640 < this.windowHeight && this.windowHeight < 835)) {
       this.isFoldStatus = true
       hilog.info(0xFF00, componentName,
         `#WindowChange#设备折叠状态改变#(640vp< height <= 1000vp) and (640vp< width <= 1000vp)折叠展开结果: ${this.isFoldStatus}`)
-    } else if (this.windowWidth > 1000 && this.windowHeight > 700) {
+    } else if (this.windowWidth > 850 && this.windowHeight > 530) {
       this.istabletLandscape = true
       hilog.info(0xFF00, componentName,
         `#WindowChange#应用窗口状态改变#(1000vp< width)平板横屏结果: ${this.istabletLandscape}`)
@@ -546,6 +549,9 @@ struct Index {
     })
     // 运行一次窗口检查
     this.onWindowChange()
+
+
+    hilog.info(0xFF00, componentName, `#tab位置: ${this.compBarPose.value}`)
 
     // 除手机外更多页均默认跳转覆写
     if (500 < this.windowWidth && !this.isLandscapePhone) {

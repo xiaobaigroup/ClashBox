@@ -190,26 +190,26 @@ struct ProxyGroupItem {
       // hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行4 %{public}s")
       // hilog.info(0xFF00, "ProxyPageLatencyTag", "this.proxyitems %{public}s", JSON.stringify(this.proxyitems))
     })*/
-   }
+  }
 
-   switchSort(){
-     if (this.appConfig.proxySort == ProxySort.Default){
-       this.proxyLazyItems.DefaultSortItems(this.proxyitems)
-     } else if (this.appConfig.proxySort == ProxySort.Title){
-       this.proxyLazyItems.NameSortItems(this.proxyitems)
-     } else if (this.appConfig.proxySort == ProxySort.Delay ||(this.appConfig.proxySort == ProxySort.Delay && this.isLatencySort==true)){
-       this.proxyLazyItems.LatencySortItems(this.proxyitems)
-       hilog.info(0xFF00, "ProxySort ProxyPageLatencyTag", "延迟排序 %{public}s", this.appConfig.proxySort)
-     }
-   }
+  switchSort(){
+    if (this.appConfig.proxySort == ProxySort.Default){
+      this.proxyLazyItems.DefaultSortItems(this.proxyitems)
+    } else if (this.appConfig.proxySort == ProxySort.Title){
+      this.proxyLazyItems.NameSortItems(this.proxyitems)
+    } else if (this.appConfig.proxySort == ProxySort.Delay ||(this.appConfig.proxySort == ProxySort.Delay && this.isLatencySort==true)){
+      this.proxyLazyItems.LatencySortItems(this.proxyitems)
+      hilog.info(0xFF00, "ProxySort ProxyPageLatencyTag", "延迟排序 %{public}s", this.appConfig.proxySort)
+    }
+  }
 
-   aboutToDisappear() {
+  aboutToDisappear() {
     // EventHub.off(EventKey.ProxySort)
-   }
+  }
 
-   /**
-    * 半模态窗口测速网站
-    */
+  /**
+   * 半模态窗口测速网站
+   */
   @Builder
   BindSheetNetworkSpeed() {
     Row() {
@@ -287,7 +287,7 @@ struct ProxyGroupItem {
           .onClick(() => {
             ClashViewModel.testDelay(item.name)
           })
-        }
+      }
       //暂时先屏蔽网站测速功能
       /* MenuItem({ symbolStartIcon: this.startIconModifier2, content: $r('app.string.Test_Speed') })
          .onClick(() => {
@@ -351,7 +351,7 @@ struct ProxyGroupItem {
           {
             preview: MenuPreviewMode.IMAGE,
             onAppear: (() => {
-               // js 闭包 在函数里只能拿到最后一个item的值
+              // js 闭包 在函数里只能拿到最后一个item的值
               // ProxyGroupItem.currentTouchProxyData = item
               if (this.uiConfig.isVibrate) {
                 customVibrator.vibratorTriggerOfHapticClockTimer()
@@ -391,19 +391,19 @@ struct ProxyGroupItem {
       scrollBackward: this.isPXSecScreen ? NestedScrollMode.SELF_ONLY:NestedScrollMode.SELF_FIRST
     })
     .contentEndOffset(this.isPXSecScreen ? 65: this.appConfig.proxyGroupType === ProxyGroupType.List ? 10 : CONTENT_END_OFFSET_150)
-   /* .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
-      detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
-      preferType: SheetType.CENTER,
-      backgroundColor: $r('app.color.settings_container_background'),
-      showClose: true,
-      scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-      title: { title: $r('app.string.Test_Speed'), subtitle: $r('app.string.Test_Speed_Explain') },
-      //  maskColor: $r('app.color.dialog_maskcolor'),
-      onWillDismiss: () => {
-        this.isShowNetworkSpeed = false
-        this.isEnableIndexForegroundBlur = false
-      }
-    })*/
+    /* .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
+       detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
+       preferType: SheetType.CENTER,
+       backgroundColor: $r('app.color.settings_container_background'),
+       showClose: true,
+       scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+       title: { title: $r('app.string.Test_Speed'), subtitle: $r('app.string.Test_Speed_Explain') },
+       //  maskColor: $r('app.color.dialog_maskcolor'),
+       onWillDismiss: () => {
+         this.isShowNetworkSpeed = false
+         this.isEnableIndexForegroundBlur = false
+       }
+     })*/
   }
 
   public proxyListLongPressCtxMenuForFavorite: LongPressContextMenuItem = {

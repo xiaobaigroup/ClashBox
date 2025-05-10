@@ -166,6 +166,8 @@ struct Home {
   @Consume curOffsetRemain: number
   // 是否为PX外屏
   @Consume isPXSecScreen: boolean
+  // PC判定
+  @StorageLink ('2in1') isPC: boolean = false
   //滚动控制
   private scrollerForScroll: Scroller = new Scroller()
   aboutToAppear(): void {
@@ -757,7 +759,8 @@ struct Home {
                   }
 
                   //快捷方式小卡片
-                  if (this.theCurrentHomeCard[9] === this.isFoldStatus ? false : true) {
+                  if (this.theCurrentHomeCard[9] == this.isFoldStatus ? false :
+                    this.istabletLandscape && this.isPC ? true: true) {
                     GridCol({
                       span: {
                         xs: this.isLandscapePhone ? 3 : 6,
@@ -773,8 +776,9 @@ struct Home {
                             .position({ x: '90%', y: -4 })
                             .onClick(() => {
                               animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
-                                // 将序号9变为false
-                                this.theCurrentHomeCard.splice(9, 1, this.isFoldStatus ? true : false)
+                                  // 将序号9变为false
+                                  this.theCurrentHomeCard.splice(9, 1,this.isFoldStatus ? true :
+                                    this.istabletLandscape && this.isPC ? false : false)
                               })
                             })
                         }

@@ -71,7 +71,7 @@ struct SwitchMode {
           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .backgroundColor($r('app.color.container_background'))
 
-      Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
+      Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceAround }) {
           ForEach([
             { t: $r('app.string.Rule'), v: ProxyMode.Rule },
             { t: $r('app.string.Overall'), v: ProxyMode.Global },

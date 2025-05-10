@@ -1,14 +1,13 @@
 import { BreakpointState } from '../../common/breakpointsystem'
-import { mediaquery, promptAction } from '@kit.ArkUI'
+import { mediaquery} from '@kit.ArkUI'
 import { MarginGenerate } from '../../common/Constants'
 import { CardTitle } from './CardTitleBuilder'
 import { ProxyGroupItemDataSource, ProxyItem } from '../../common/ProxyData'
-import { AppConfig, AppState, isEnd, UIConfig } from '../../entryability/AppState'
+import { AppConfig, AppState, UIConfig } from '../../entryability/AppState'
 import { Profile, ProxyGroup } from 'proxy_core'
 import { customVibrator } from '../../utils/VibratorUtil'
 import { customAnimationUtil } from '../../utils/Animation'
 import ClashViewModel from '../../entryability/ClashViewModel'
-import { EventHub, EventKey } from '../../common/EventHub'
 
 
 @Component
@@ -144,5 +143,3 @@ struct FavoriteProxy {
   }
 }
 export default FavoriteProxy
-
-
