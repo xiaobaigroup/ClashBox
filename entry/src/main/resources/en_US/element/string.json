@@ -1927,6 +1927,10 @@
     {
       "name": "ip_address_query_fail_tips",
       "value": "Failed to query the IP address. Please check whether the address can be accessed normally."
+    },
+    {
+      "name": "enter_search",
+      "value": "Enter key search"
     }
   ]
 }

@@ -134,8 +134,14 @@ struct Index {
   // 读取导航条区域的高度
   @StorageProp('bottomRectHeight') bottomRectHeight: number = 0;
   @StorageProp('topRectHeight') topRectHeight: number = 0;
-    // page内顶部标题偏移量
+  // page内顶部标题偏移量
   @Provide curYOfisPXSmallScreenfset: number = 0
+  // 更多页标题是否搜索
+  @Provide needSearch: boolean = false
+  // 更多页标题是否搜索中
+  @Provide isSearching: boolean = false
+  // 更多页标题搜索文本
+  @Provide searchText: string = ''
   // 更多页一级页面顶部标题偏移量
   @Provide curYOffsetMore: number = 0
   @Provide curYOffset: number = 0

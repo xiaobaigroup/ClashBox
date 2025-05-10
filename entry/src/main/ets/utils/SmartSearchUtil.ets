@@ -1,3 +1,4 @@
+import { hilog } from "@kit.PerformanceAnalysisKit";
 
 interface Option {
   fields?: string[];
@@ -23,7 +24,7 @@ function getFieldValue<T>(obj: T, path: string): string {
 }
 
 /**
- * 通用智能搜索函数
+ * 通用智能搜索工具
  * @param data 待搜索的数组（任意对象类型）
  * @param input 搜索输入（关键词或正则表达式）
  * @param options 配置项：
@@ -31,7 +32,7 @@ function getFieldValue<T>(obj: T, path: string): string {
  *   - strictCase: 是否区分大小写（默认 false）
  *   - matchMode: 'all' 需匹配所有关键词 | 'any' 匹配任一关键词（默认 'all'）
  */
-function universalSearch<T>(
+export function universalSearch<T>(
   data: T[],
   input: string,
   options: Option = {}
@@ -61,8 +62,9 @@ function universalSearch<T>(
         .split(/\s+/)
         .map(k => strictCase ? k : k.toLowerCase())
         .filter(k => k);
-
+      hilog.info(0xFF00, 'SSU', `#SmartSearch 开始搜索，搜索文本：${keywords}`)
       return data.filter(item => {
+        // hilog.info(0xFF00, 'SSU', `#SmartSearch 搜索中，原始数组：${JSON.stringify(item)}`)
         const matchFn = (keyword: string) =>
         fields.some(field => {
           const value = getFieldValue(item, field);

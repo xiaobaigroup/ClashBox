@@ -118,7 +118,7 @@ struct Resources {
   @Consume curYOffset: number
 
   @Builder
-  reaourceSearch() {
+  reaourceOther() {
     // 全部刷新按钮
     Button({ type: ButtonType.Circle, stateEffect: true }) {
       SymbolGlyph($r('sys.symbol.arrow_clockwise'))
@@ -136,10 +136,7 @@ struct Resources {
       promptAction.showToast({ message: getResourceString($r('app.string.resource_updating'), this) })
       this.updateGeoDate()
     })
-  }
 
-  @Builder
-  reaourceOther() {
     // 排序按钮
     Button({ type: ButtonType.Circle, stateEffect: true }) {
       SymbolGlyph($r('sys.symbol.sort'))
@@ -284,7 +281,6 @@ struct Resources {
       Stack() {
         MoreTop({
           title: $r('app.string.Resources'),
-          searchButton: () => { this.reaourceSearch() },
           otherButton: (): void => { this.reaourceOther() }
         })
 

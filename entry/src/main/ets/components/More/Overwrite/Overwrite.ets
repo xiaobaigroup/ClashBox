@@ -74,9 +74,6 @@ struct Overwrite {
   }
 
   @Builder
-  overwriteSearch() {
-  }
-  @Builder
   overwriteOther() {
   }
 
@@ -99,7 +96,6 @@ struct Overwrite {
       Stack() {
             MoreTop({
               title: $r('app.string.Overwrite'),
-              searchButton: this.overwriteSearch,
               otherButton: this.overwriteOther
             })
 

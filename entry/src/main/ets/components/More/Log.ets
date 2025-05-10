@@ -8,6 +8,8 @@ import { AppConfig, UIConfig } from "../../entryability/AppState"
 import { EventHub, EventKey } from "../../common/EventHub"
 import { BORDER_RADIUS_20, CONTENT_END_OFFSET_150, LogData, TAB_CONTENT_TITLE_HEIGHT } from "../../common/Constants"
 import { customAnimationUtil } from "../../utils/Animation"
+import { hilog } from "@kit.PerformanceAnalysisKit"
+import { universalSearch } from "../../utils/SmartSearchUtil"
 
 @Component
 struct Log {
@@ -23,6 +25,7 @@ struct Log {
   @Consume theLogSkipItem: number
   // 数据（数据本体在Index）
   @Consume logListData: Array<LogData>
+  @State lastLogListData: Array<LogData> = []
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
@@ -30,6 +33,15 @@ struct Log {
   @State theSortNameUp: boolean = false
   // page内顶部标题偏移量
   @Consume curYOffset: number
+  @Consume needSearch: boolean
+  @Consume @Watch('loglist') isSearching: boolean
+  @Consume @Watch('searchLogs') searchText: string
+
+  aboutToAppear(): void {
+    // 缓存日志
+    this.lastLogListData = this.logListData
+  }
+
 
   // 日志排序
   sortedLogs( time: boolean, level:LogLevel){
@@ -45,26 +57,32 @@ struct Log {
     return logs;
   }
 
+  loglist() {
+    if (this.isSearching) {
+      if (this.searchText === '') {
+        return
+      }
+    } else {
+    // 如果不在搜索，还原日志列表
+    this.logListData = this.lastLogListData
+    }
+  }
 
-  // 日志搜索
- searchLogs(logs: LogData[], keyword: string): LogData[] {
-  const normalizedKeyword = keyword.trim().toLowerCase();
-  const searchTerms = normalizedKeyword.split(/\s+/).filter(term => term); // 分割关键词
-
-  return logs.filter(log => {
-    // 搜索时间字段（精确匹配）
-    const timeMatch = searchTerms.some(term =>
-    !isNaN(Number(term)) && log.logTime.toString() === term
-    );
-
-    // 搜索详情字段（模糊匹配）
-    const detailsMatch = searchTerms.some(term =>
-    log.LogDetails.toLowerCase().includes(term)
-    );
-
-    return timeMatch || detailsMatch;
-  });
-}
+ // 日志搜索
+ searchLogs(keyword: string) {
+   hilog.info(0xFF00, 'Log', `#smartsearchLogs 搜索文本：${this.searchText}`)
+   keyword = this.searchText
+   if (keyword !== '') {
+     hilog.info(0xFF00, 'Log', `#smartsearchLogs 开始搜索，搜索文本：${this.searchText}`)
+     this.logListData = universalSearch(this.logListData, keyword, {
+       fields: ['LogDetails']
+     })
+   } else {
+     hilog.info(0xFF00, 'Log', `#smartsearchLogs 空搜索文本：${this.searchText}`)
+     // 空文本恢复数据
+     this.logListData = this.lastLogListData
+   }
+  }
 
   @Builder
   MoreMenu() {
@@ -76,13 +94,14 @@ struct Log {
         .selected(this.appConfig.enableLogger ?? false)
         .onChange((selected) => {
           this.appConfig.enableLogger = !this.appConfig.enableLogger
+          this.needSearch = this.appConfig.enableLogger
           EventHub.sendEvent(EventKey.StartLog, this.appConfig.enableLogger)
         })
       if (this.appConfig.enableLogger) {
         MenuItem({ content: $r('app.string.ClearLogs')})
           .onClick(() => {
-            EventHub.sendEvent(EventKey.ClearLog)
             // 清空日志操作
+            EventHub.sendEvent(EventKey.ClearLog)
           })
         MenuItem({ content: $r('app.string.ExportLog')})
           .onClick(() => {
@@ -158,22 +177,6 @@ struct Log {
     }
   }
 
-  @Builder
-  logSearch() {
-    Button({ type: ButtonType.Circle, stateEffect: true }) {
-      SymbolGlyph($r('sys.symbol.magnifyingglass'))
-        .fontSize(24)
-        .fontColor([this.icon_primary])
-    }
-    .transition(customAnimationUtil.isSlide(50,this.uiConfig))
-    .backgroundColor($r('app.color.settings_container_background'))
-    .margin({ right: 10 })
-    .width(40)
-    .height(40)
-    .onClick(() => {
-
-    })
-  }
   // 更多按钮
   @Builder
   logOther() {
@@ -184,11 +187,12 @@ struct Log {
     }
     .width(40)
     .height(40)
+    .margin({ left: 10 })
     .bindMenu(this.MoreMenu())
     .backgroundColor($r('app.color.settings_container_background'))
     .transition(customAnimationUtil.isSlide(0,this.uiConfig))
-    //.padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
   }
+
   @Builder
   logTipsBuilder() {
   }
@@ -200,7 +204,6 @@ struct Log {
         MoreTop({
           title: $r('app.string.Log'),
           name: 'Log',
-          searchButton: (): void => { this.logSearch() },
           otherButton: (): void => { this.logOther() }
         })
 
@@ -304,7 +307,19 @@ struct Log {
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
+    .onReady(() => {
+      // 初始化搜索按钮
+      this.needSearch = this.appConfig.enableLogger
+    })
+    .onWillHide(() => {
+      this.needSearch = false
+    })
     .onBackPressed(() => {
+      if(this.isSearching) {
+        this.isSearching = false
+        this.searchText = ''
+        return true
+      }
       this.pageInfos.clear()
       this.isSecondary = false
       return true
@@ -324,17 +339,18 @@ export struct LogDetils {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   //page内顶部标题偏移量
   @Consume curYOffset: number
+
   @Builder
-  logDetilsSearch() {
+  logDetilsOther() {
+    // 保存按钮
     Button({ type: ButtonType.Circle, stateEffect: true }) {
       SymbolGlyph($r('sys.symbol.arrowshape_down_to_line_fill'))
         .fontSize(24)
         .fontColor([this.icon_primary])
-    }.ButtonStyle().margin({right: 10})
+    }
+    .ButtonStyle()
     .transition(customAnimationUtil.isSlide(0,this.uiConfig))
-  }
-  @Builder
-  logDetilsOther() {
+    // 删除按钮
     Button({ type: ButtonType.Circle, stateEffect: true }) {
       SymbolGlyph($r('sys.symbol.trash_fill'))
         .fontSize(24)
@@ -343,6 +359,7 @@ export struct LogDetils {
     .ButtonStyle()
     .transition(customAnimationUtil.isSlide(0,this.uiConfig))
   }
+
   controller: RichEditorController = new RichEditorController()
   options: RichEditorOptions = { controller: this.controller }
 
@@ -353,9 +370,6 @@ export struct LogDetils {
         MoreTop({
           title: $r('app.string.Log'),
           subtitle: `${this.logListData[this.theLogSkipItem].logType} ${timestampToDateTime(this.logListData[this.theLogSkipItem].logTime * 1000)}`,
-          searchButton: (): void => {
-            this.logDetilsSearch()
-          },
           otherButton: (): void => {
             this.logDetilsOther()
           }

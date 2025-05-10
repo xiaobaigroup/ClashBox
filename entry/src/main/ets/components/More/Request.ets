@@ -29,6 +29,9 @@ struct RequestPage {
   @Consume curYOffset: number
   // 列表数据
   @State private requestListData: ConnectItemDataSource = new ConnectItemDataSource()
+  @Consume needSearch: boolean
+  @Consume @Watch('RequestList') isSearching: boolean
+  @Consume @Watch('searchRequest') searchText: string
 
   async aboutToAppear(): Promise<void> {
     this.requestListData.empty()
@@ -43,6 +46,37 @@ struct RequestPage {
   aboutToDisappear(): void {
     clearInterval(this.intervalId)
     this.requestListData.empty()
+  }
+
+  RequestList() {
+    if (this.isSearching) {
+      // 暂停计时任务
+      clearInterval(this.intervalId)
+    } else {
+      // 如果不在搜索，还原请求列表并恢复计时任务
+      this.requestListData.restoreData()
+      this.intervalId = setInterval(() => {
+        this.getRequest()
+      }, 9000)
+    }
+  }
+
+  // 请求搜索
+  searchRequest(keyword: string) {
+    hilog.info(0xFF00, 'Request', `#smartsearchRequest 搜索文本：${this.searchText}`)
+    keyword = this.searchText
+    if (keyword !== '') {
+      hilog.info(0xFF00, 'Request', `#smartsearchRequest 开始搜索，搜索文本：${this.searchText}`)
+      // 搜索
+      this.requestListData.searchData(keyword)
+    } else {
+      hilog.info(0xFF00, 'Request', `#smartsearchRequest 空搜索文本：${this.searchText}`)
+      // 空文本还原请求列表并恢复计时任务
+      this.requestListData.restoreData()
+      this.intervalId = setInterval(() => {
+        this.getRequest()
+      }, 9000)
+    }
   }
 
   async getRequest() {
@@ -71,6 +105,7 @@ struct RequestPage {
     }.onClick(() => {
       animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
         this.appConfig.enableRequest = !this.appConfig.enableRequest
+        this.needSearch = this.appConfig.enableRequest
         if (!this.appConfig.enableRequest) {
           clearInterval(this.intervalId)
           this.requestListData.clear()
@@ -101,7 +136,7 @@ struct RequestPage {
           })
 
         Column() {
-          Blank().height(TAB_CONTENT_TITLE_HEIGHT+6)
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT + 6)
           // 页面
          if (!this.appConfig.enableRequest) {
             Nothing({
@@ -177,7 +212,19 @@ struct RequestPage {
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
+    .onShown(() => {
+      // 初始化搜索按钮
+      this.needSearch = this.appConfig.enableRequest
+    })
+    .onReady(() => {
+      this.needSearch = false
+    })
     .onBackPressed(() => {
+      if(this.isSearching) {
+        this.isSearching = false
+        this.searchText = ''
+        return true
+      }
       this.pageInfos.clear()
       this.isSecondary = false
       return true;

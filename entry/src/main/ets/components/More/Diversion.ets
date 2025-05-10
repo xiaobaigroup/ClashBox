@@ -53,9 +53,6 @@ struct Diversion {
   @Consume curYOffset: number
 
   @Builder
-  diversionSearch() {
-  }
-  @Builder
   diversionOther() {
     Button({ type: ButtonType.Circle, stateEffect: true }) {
       SymbolGlyph($r('sys.symbol.plus'))
@@ -135,7 +132,6 @@ struct Diversion {
       Stack() {
           MoreTop({
             title: $r('app.string.Diversion_Strategy'),
-            searchButton: this.diversionSearch,
             otherButton: () => {
               this.diversionOther()
             }

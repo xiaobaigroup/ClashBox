@@ -1927,6 +1927,10 @@
     {
       "name": "ip_address_query_fail_tips",
       "value": "查询IP地址失败，请检查地址是否可以正常访问"
+    },
+    {
+      "name": "enter_search",
+      "value": "回车键搜索哦"
     }
   ]
 }

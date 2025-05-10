@@ -22,8 +22,8 @@ struct Appearance {
   @Consume isShowExperimentalFunction: boolean
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @State appearanceList: AppearanceListItemProp[] = AppearanceList
-  /* 主题色 */
   @State font_primary: ResourceColor = $r('sys.color.font_primary')
+  /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   //一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')

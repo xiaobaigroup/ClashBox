@@ -2,6 +2,7 @@ import { BreakpointState } from "../../common/breakpointsystem"
 import { TAB_CONTENT_TITLE_FONT_SIZE, TAB_CONTENT_TITLE_HEIGHT } from "../../common/Constants"
 import { UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../utils/Animation"
+import { SymbolGlyphModifier } from "@kit.ArkUI"
 
 /**
  * 更多页顶部导航栏
@@ -23,8 +24,11 @@ export struct MoreTop {
   @State name: string = ''
   // 副标题
   @State subtitle: ResourceStr = ''
-  // 搜索按钮
-  @BuilderParam searchButton: () => void = this.searchDefaultButton
+  @Consume needSearch: boolean
+  @Consume isSearching: boolean
+  @Consume searchText: string
+  /* 主题色 */
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 其它按钮
   @BuilderParam otherButton: () => void = this.otherDefaultButton
   //page内顶部标题偏移量
@@ -32,7 +36,7 @@ export struct MoreTop {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
 
-  @Builder searchDefaultButton() {
+  @Builder searchButton() {
     // 默认搜索按钮
     Button({ type: ButtonType.Circle, stateEffect: true }) {
       SymbolGlyph($r('sys.symbol.magnifyingglass'))
@@ -43,6 +47,9 @@ export struct MoreTop {
     .width(40)
     .height(40)
     .transition(customAnimationUtil.isSlide(100, this.uiConfig))
+    .onClick(() => {
+      this.isSearching = true
+    })
   }
   @Builder otherDefaultButton() {
     // 默认功能按钮为更多
@@ -60,43 +67,72 @@ export struct MoreTop {
 
   build() {
     Row() {
-      // 返回图标
-      Button({ type: ButtonType.Circle, stateEffect: true }) {
-        SymbolGlyph($r('sys.symbol.chevron_left'))
-          .fontSize(28)
-          .fontColor([this.icon_primary])
+      if (this.isSearching) {
+        Search({ value: this.searchText, placeholder: $r('app.string.enter_search')})
+          .enterKeyType(EnterKeyType.Search)
+          .copyOption(CopyOptions.LocalDevice)
+          .searchIcon(new SymbolGlyphModifier($r('sys.symbol.magnifyingglass')).fontColor([this.icon_emphasize]))
+          .cancelButton({
+            style: CancelButtonStyle.CONSTANT,
+            icon: new SymbolGlyphModifier($r('sys.symbol.xmark')).fontColor([this.icon_emphasize])
+          })
+          .layoutWeight(1)
+          .onSubmit((value: string) => {
+            // 发送搜索
+            this.searchText = value
+          })
+        Button({ stateEffect: true }) {
+         Text($r('app.string.Cancel'))
+        }
+        .height(40)
+        .margin({ left: 10 })
+        .backgroundColor($r('app.color.background'))
+        .transition(customAnimationUtil.isSlide(50, this.uiConfig))
+        .onClick(() => {
+          this.isSearching = false
+        })
+      } else {
+        // 返回图标
+        Button({ type: ButtonType.Circle, stateEffect: true }) {
+          SymbolGlyph($r('sys.symbol.chevron_left'))
+            .fontSize(28)
+            .fontColor([this.icon_primary])
+        }
+        .transition(customAnimationUtil.isSlide(200, this.uiConfig))
+        .width(40)
+        .height(40)
+        .backgroundColor($r('app.color.settings_container_background'))
+        .onClick(() => {
+          this.pageInfos.pop(true)
+          if (this.pageInfos.size() <= 1) {
+            this.isSecondary = false
+          }
+        })
+        Column() {
+          Text(this.title)
+            .fontSize(this.curYOffset<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset/100:TAB_CONTENT_TITLE_FONT_SIZE)
+            .geometryTransition(this.name)
+            .fontWeight(FontWeight.Bold)
+            .textAlign(TextAlign.Start)
+            .margin({left: 8})
+          if(this.subtitle) {
+            Text(this.subtitle)
+              .fontWeight(FontWeight.Normal)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .margin({top: 2, left: 8})
+              .fontSize(14)
+              .maxLines(1)
+          }
+        }.layoutWeight(1)
+        .alignItems(HorizontalAlign.Start)
+        .transition(customAnimationUtil.isSlide(150, this.uiConfig))
+        Blank()
+        if (this.needSearch) {
+          this.searchButton()
+        }
+        this.otherButton()
       }
-      .transition(customAnimationUtil.isSlide(200, this.uiConfig))
-      .width(40)
-      .height(40)
-      .backgroundColor($r('app.color.settings_container_background'))
-      .onClick(() => {
-        this.pageInfos.pop(true)
-        if (this.pageInfos.size() <= 1) {
-          this.isSecondary = false
-        }
-      })
-      Column() {
-        Text(this.title)
-          .fontSize(this.curYOffset<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset/100:TAB_CONTENT_TITLE_FONT_SIZE)
-          .geometryTransition(this.name)
-          .fontWeight(FontWeight.Bold)
-          .textAlign(TextAlign.Start)
-          .margin({left: 8})
-        if(this.subtitle) {
-          Text(this.subtitle)
-            .fontWeight(FontWeight.Normal)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-            .margin({top: 2, left: 8})
-            .fontSize(14)
-            .maxLines(1)
-        }
-      }.layoutWeight(1)
-      .alignItems(HorizontalAlign.Start)
-      .transition(customAnimationUtil.isSlide(150, this.uiConfig))
-      Blank()
-      this.searchButton()
-      this.otherButton()
+
     }
     .layoutWeight(1)
     .alignItems(VerticalAlign.Center)

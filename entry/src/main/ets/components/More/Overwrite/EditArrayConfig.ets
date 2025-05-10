@@ -233,9 +233,7 @@ export struct ArrayConfigEditor {
   handleDelete(index: number) {
     this.ArrayConfigList.splice(index, 1)
   }
-  @Builder
-  FakeIPfilterSearch() {
-  }
+
   @Builder
   TopOtherButton() {
     Button({ type: ButtonType.Circle, stateEffect: true }) {
@@ -272,7 +270,6 @@ export struct ArrayConfigEditor {
         // 导航栏
         MoreTop({
           title: this.params.title as Resource,
-          searchButton: this.FakeIPfilterSearch,
           otherButton: () => {
             this.TopOtherButton()
           }

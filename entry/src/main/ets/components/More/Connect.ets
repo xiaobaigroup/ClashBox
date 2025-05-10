@@ -10,6 +10,7 @@ import ClashViewModel from "../../entryability/ClashViewModel"
 import { ConnectionInfo, Metadata } from "proxy_core"
 import { customAnimationUtil } from "../../utils/Animation"
 import { ConnectItemDataSource } from "../../common/ConnectData"
+import { hilog } from "@kit.PerformanceAnalysisKit"
 
 
 export function  getRequestText(metadata: Metadata ) {
@@ -54,7 +55,9 @@ struct Connect {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
-
+  @Consume needSearch: boolean
+  @Consume @Watch('ConnectList') isSearching: boolean
+  @Consume @Watch('searchConnect') searchText: string
 
   async aboutToAppear(): Promise<void> {
     this.connectListData.empty()
@@ -71,6 +74,37 @@ struct Connect {
   aboutToDisappear(): void {
     clearInterval(this.intervalId)
     this.connectListData.empty()
+  }
+
+  ConnectList() {
+    if (this.isSearching) {
+      // 暂停计时任务
+      clearInterval(this.intervalId)
+    } else {
+      // 如果不在搜索，还原请求列表并恢复计时任务
+      this.connectListData.restoreData()
+      this.intervalId = setInterval(() => {
+        this.getConnections()
+      }, 9000)
+    }
+  }
+
+  // 请求搜索
+  searchConnect(keyword: string) {
+    hilog.info(0xFF00, 'Request', `#smartsearchRequest 搜索文本：${this.searchText}`)
+    keyword = this.searchText
+    if (keyword !== '') {
+      hilog.info(0xFF00, 'Request', `#smartsearchRequest 开始搜索，搜索文本：${this.searchText}`)
+      // 搜索
+      this.connectListData.searchData(keyword)
+    } else {
+      hilog.info(0xFF00, 'Request', `#smartsearchRequest 空搜索文本：${this.searchText}`)
+      // 空文本还原请求列表并恢复计时任务
+      this.connectListData.restoreData()
+      this.intervalId = setInterval(() => {
+        this.getConnections()
+      }, 9000)
+    }
   }
 
   async getConnections() {
@@ -120,6 +154,7 @@ struct Connect {
     }.onClick(() => {
       animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
         this.appConfig.enableConnect = !this.appConfig.enableConnect
+        this.needSearch = this.appConfig.enableConnect
         if (!this.appConfig.enableConnect) {
           clearInterval(this.intervalId)
           this.connectListData.clear()
@@ -246,7 +281,19 @@ struct Connect {
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
+    .onReady(() => {
+      // 初始化搜索按钮
+      this.needSearch = this.appConfig.enableConnect
+    })
+    .onWillHide(() => {
+      this.needSearch = false
+    })
     .onBackPressed(() => {
+      if(this.isSearching) {
+        this.isSearching = false
+        this.searchText = ''
+        return true
+      }
       this.pageInfos.clear();
       this.isSecondary = false
       return true;
