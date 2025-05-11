@@ -169,8 +169,8 @@
       "value": "清空数据"
     },
     {
-      "name": "Disclaimer",
-      "value": "免责声明"
+      "name": "agreement_privacy",
+      "value": "用户协议与隐私政策"
     },
     {
       "name": "About",
@@ -1658,7 +1658,7 @@
     },
     {
       "name": "welcome_tips",
-      "value": "点击“同意并继续”表示您同意以下内容："
+      "value": "点击“进入引导”将开启新手操作提示"
     },
     {
       "name": "reject_exit",
@@ -1931,6 +1931,30 @@
     {
       "name": "enter_search",
       "value": "回车键搜索哦"
+    },
+    {
+      "name": "saved_download",
+      "value": "已保存至下载目录哦"
+    },
+    {
+      "name": "export_failed",
+      "value": "导出失败"
+    },
+    {
+      "name": "welcome_quickly_go",
+      "value": "我是老手啦"
+    },
+    {
+      "name": "welcome_go",
+      "value": "进入引导"
+    },
+    {
+      "name": "complete",
+      "value": "完成"
+    },
+    {
+      "name": "return",
+      "value": "返回"
     }
   ]
 }

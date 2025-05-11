@@ -169,8 +169,8 @@
       "value": "WipeData"
     },
     {
-      "name": "Disclaimer",
-      "value": "Disclaimer"
+      "name": "agreement_privacy",
+      "value": "User Agreement and Privacy Policy"
     },
     {
       "name": "About",
@@ -1658,7 +1658,7 @@
     },
     {
       "name": "welcome_tips",
-      "value": "By clicking \"agree and continue\", you agree to the following:"
+      "value": "Click \"Entry Guidance\" to open the novice operation prompt."
     },
     {
       "name": "reject_exit",
@@ -1931,6 +1931,30 @@
     {
       "name": "enter_search",
       "value": "Enter key search"
+    },
+    {
+      "name": "saved_download",
+      "value": "Saved to download directory"
+    },
+    {
+      "name": "export_failed",
+      "value": "Export failed"
+    },
+    {
+      "name": "welcome_go",
+      "value": "Entry Guidance"
+    },
+    {
+      "name": "welcome_quickly_go",
+      "value": "I’m a veteran"
+    },
+    {
+      "name": "complete",
+      "value": "Complete"
+    },
+    {
+      "name": "return",
+      "value": "Return"
     }
   ]
 }

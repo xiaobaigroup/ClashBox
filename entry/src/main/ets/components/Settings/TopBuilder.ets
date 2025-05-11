@@ -16,7 +16,7 @@ struct TopBuilder {
   build() {
     Row() {
       if (this.showBackButton) {
-        //返回图标
+        // 返回图标
         Button({ type: ButtonType.Circle, stateEffect: true }) {
           SymbolGlyph($r('sys.symbol.chevron_left'))
             .fontSize(28)

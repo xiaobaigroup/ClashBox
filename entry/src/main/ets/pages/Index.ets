@@ -74,7 +74,6 @@ import { getGreeting } from '../utils/GreetingUtil'
 import { DisclaimerCustomDialog } from '../components/Common'
 import { PipManager } from '../common/PipManager'
 import { deviceInfo } from '@kit.BasicServicesKit'
-import { Welcome } from '../components/Start/WelcomePage'
 import { CrashPage } from '../components/Start/CrashPage'
 import { compareVersions, extractUpdateInfo, getUpdateInfo, UpdateInfo } from '../utils/CheckUpdateUtil'
 import { implicitStartAbility } from '../components/Settings/About'
@@ -87,6 +86,8 @@ import { Timer } from '../common/HHmmssTimer'
 import { getResourceString } from '../utils/ResourceStringUtil'
 import BackgroundDownService from '../utils/BackgroundDownService'
 import { ConvertedUnit } from '../utils/DataUnitConvertUtils'
+import { CommonPage } from '../components/Start/CommonPage'
+import { WelcomeUserAgreement } from '../components/Start/WelcomePage'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 const context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
@@ -287,7 +288,7 @@ struct Index {
   // 节点数据组
   @Provide items: ProxyItem[] = ProxyData.ProxyItems();
   // 日志数据
-  @Provide private logListData: Array<LogData> = []
+  @Provide logListData: Array<LogData> = []
   // 配置数据
   @Provide configList: Array<ConfigData> = []
   //延迟排序判定
@@ -322,7 +323,8 @@ struct Index {
 
   // 更多页面栈
   @Provide('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
-
+  // 欢迎页面栈
+  @Provide('WelcomeNavPathStack') welcomePageInfos: NavPathStack = new NavPathStack()
   /*设置页变量*/
   // 设置页面栈
   @Provide('NavSettingsPathStack') SettingsPageInfos: NavPathStack = new NavPathStack()
@@ -404,7 +406,7 @@ struct Index {
     if (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) {
       CrashPage()
     } else {
-      Welcome()
+      WelcomeUserAgreement()
     }
   }
 
@@ -596,6 +598,28 @@ struct Index {
     if (this.uiConfig.userLanguage) {
       ChangeLanguage(this.uiConfig.userLanguage)
     }
+    // 检查版本更新
+    if (this.uiConfig.autoCheckUpdate) {
+      try {
+        const updateInfo = await getUpdateInfo()
+        hilog.info(0xFF00, "UpdatetestTag", "Update Info: %{public}s", JSON.stringify(updateInfo))
+        const theLatest = extractUpdateInfo(updateInfo)
+        if (theLatest) {
+          // 查询完成
+          if (compareVersions(theLatest.tag_name, AppState.versionName)) {
+            this.theAppVersionInfo = theLatest
+            this.isDisclaimer = false
+            this.dialogController.open()
+          }
+        } else {
+          hilog.info(0xFF00, "UpdatetestTag", "提取更新信息失败")
+        }
+      } catch (err) {
+        // 处理错误情况
+        const infoError = `Error:${JSON.stringify(err)}`
+        hilog.info(0xFF00, "UpdatetestTag", "Info: %{public}s", infoError)
+      }
+    }
     // if(!this.uiConfig.enabledADvanced || !this.uiConfig.isShowExperimentalFunction) {
     //   // 屏蔽分流策略
     //   this.moreList = removeItemsByIndex(this.moreList, [5])
@@ -701,17 +725,16 @@ struct Index {
     EventHub.on(EventKey.ClearLog, () => {
       this.logListData = []
     })
-    EventHub.on(EventKey.ExportLog, (isSingleLog: boolean = false) => {
+    EventHub.on(EventKey.ExportLog, (LogIndex?: number) => {
       try {
         let filePicker = new picker.DocumentViewPicker(getContext(this))
         let options = new picker.DocumentSaveOptions()
-        options.newFileNames = ["clash_next.log"]
+        options.newFileNames = LogIndex ? [`clash_next_${LogIndex}_${Date.now()}.log`] : ["clash_next.log"]
         options.fileSuffixChoices = ["'文档|.txt'"]
         options.pickerMode = picker.DocumentPickerMode.DOWNLOAD
         filePicker.save(options).then(async (result)=>{
-          const path = new fileUri.FileUri(result[0] + '/clash_next.txt').path
-          await this.saveLog(path)
-          promptAction.showToast({message:"已保存到下载目录"})
+          const path = new fileUri.FileUri(result[0] + '/' +`clash_next${LogIndex ? '_' + LogIndex + '_' +  Date.now() : ''}.txt`).path
+          await this.saveLog(path, LogIndex)
         }).catch((e:Error) =>{
           hilog.debug(0xFF00, 'ExportLog', 'err ', e)
         })
@@ -721,39 +744,27 @@ struct Index {
 
     })
 
-    if (this.uiConfig.autoCheckUpdate) {
-      // 检查版本更新
-      try {
-        const updateInfo = await getUpdateInfo()
-        hilog.info(0xFF00, "UpdatetestTag", "Update Info: %{public}s", JSON.stringify(updateInfo))
-        const theLatest = extractUpdateInfo(updateInfo)
-        if (theLatest) {
-          // 查询完成
-          if (compareVersions(theLatest.tag_name, AppState.versionName)) {
-            this.theAppVersionInfo = theLatest
-            this.isDisclaimer = false
-            this.dialogController.open()
-          }
-        } else {
-          hilog.info(0xFF00, "UpdatetestTag", "提取更新信息失败")
-        }
-      } catch (err) {
-        // 处理错误情况
-        const infoError = `Error:${JSON.stringify(err)}`
-        hilog.info(0xFF00, "UpdatetestTag", "Info: %{public}s", infoError)
-      }
-    }
   }
-  async saveLog(uri: string){
+
+  async saveLog(uri: string, index?: number): Promise<void> {
     try {
-      let file = fs.openSync(uri, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE );
-      let message = this.logListData.map((d) => d.logType + " " + timestampToDateTime(d.logTime * 1000) + "\n" + d.LogDetails).join("\n")
+      const file = fs.openSync(uri, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE);
+      // 生成日志内容
+      const message = index ?
+      [this.logListData[index]].map((d) => d.logType + " " + timestampToDateTime(d.logTime * 1000) + "\n" + d.LogDetails)
+        .join("\n") :
+      this.logListData.map((d) => d.logType + " " + timestampToDateTime(d.logTime * 1000) + "\n" + d.LogDetails)
+        .join("\n")
+      // hilog.info(0xFF00, "ExportLog", "保存内容: %{public}s", message)
       fs.writeSync(file.fd, message);
       fs.fsync(file.fd);
-    }catch (e) {
+      promptAction.showToast({message: $r('app.string.saved_download')})
+    } catch (e) {
+      promptAction.showToast({message: `${getResourceString($r('app.string.export_failed'), this)} ${e.message}`, duration: 3000})
       hilog.info(0xFF00, "ExportLog", "Err: %{public}s", e.message)
     }
   }
+
 
   // 规则选择数据变化监控
   async switchMode() {

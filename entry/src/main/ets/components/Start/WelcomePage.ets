@@ -1,8 +1,81 @@
 import { getResourceString } from '../../utils/ResourceStringUtil'
 import { common } from '@kit.AbilityKit'
 import { UIConfig } from '../../entryability/AppState'
-import { DisclaimerCustomDialog } from '../Common'
+import { CommonPage } from './CommonPage'
+import { BIND_SHEET_DRAG_BAR_HEIGHT } from '../../common/Constants'
+import { customAnimationUtil } from '../../utils/Animation'
+import { BackButton } from '../Common'
 
+
+// 欢迎入口
+@Component
+export struct WelcomeUserAgreement {
+
+  // 欢迎页面栈
+  @Consume('WelcomeNavPathStack') welcomePageInfos: NavPathStack
+
+  build() {
+    Navigation(this.welcomePageInfos) {
+      CommonPage({
+        isWelcomeStack: true,
+        nextPage: 'privacy-policy',
+        docSrc: $rawfile('html/user_agreement.html')
+      })
+    }
+    .width('100%')
+    .height('100%')
+    .navDestination(this.WelcomePagesMap)
+  }
+
+  @Builder
+  WelcomePagesMap(name: string) {
+    if (name == 'privacy-policy') {
+      WelcomePrivacyPolicy()
+    } else
+    if (name == 'welcome') {
+      Welcome()
+    }
+  }
+}
+
+// 隐私政策
+@Component
+export struct WelcomePrivacyPolicy {
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  // 欢迎页面栈
+  @Consume('WelcomeNavPathStack') welcomePageInfos: NavPathStack
+  //一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+
+  build() {
+    NavDestination() {
+      Stack() {
+        // 返回图标
+        Column() {
+          BackButton()
+        }.zIndex(1)
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+        .onClick(() => {
+          this.welcomePageInfos.pop(true)
+        })
+        CommonPage({
+          isWelcomeStack: true,
+          nextPage: 'welcome',
+          docSrc: $rawfile('html/privacy_policy.html')
+        })
+      }
+      .alignContent(Alignment.TopStart)
+    }
+    .width('100%')
+    .height('100%')
+    .hideTitleBar(true)
+    .backgroundColor($r('app.color.background'))
+    .onBackPressed(() => {
+      this.welcomePageInfos.pop(true)
+      return true
+    })
+  }
+}
 
 @Component
 export struct Welcome {
@@ -11,6 +84,10 @@ export struct Welcome {
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  // 欢迎页面栈
+  @Consume('WelcomeNavPathStack') welcomePageInfos: NavPathStack
+  //一级图标色，黑色
+  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
   private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
@@ -19,96 +96,101 @@ export struct Welcome {
     this.isEnableIndexForegroundBlur = true
   }
 
-  // 免责声明弹窗控制器
-  dialogController: CustomDialogController = new CustomDialogController({
-    builder: DisclaimerCustomDialog({
-      confirm: () => {
-        // 同意
-        this.isShowWelcome = true
-      },
-      isDisclaimer: this.isDisclaimer
-    }),
-    autoCancel: false,
-    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-      if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
-
-      } else if (dismissDialogAction.reason == DismissReason.TOUCH_OUTSIDE) {
-
-      } else {
-        dismissDialogAction.dismiss()
-      }
-    }
-  })
-
   build() {
-    Navigation() {
-      // Logo&欢迎语
-      Column() {
-        Image($r('app.media.foreground'))
-          .height(180)
-        Row() {
-          Text(`${getResourceString($r('app.string.welcome'), this)}Clash`)
-            .fontSize(30)
-            .fontWeight(FontWeight.Bold)
-          Text('NEXT')
-            .fontSize(30)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(this.icon_emphasize)
+    NavDestination() {
+      Stack() {
+        // 返回图标
+        Column() {
+          BackButton()
+        }.zIndex(1)
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+        .onClick(() => {
+          this.welcomePageInfos.pop(true)
+        })
+        Column() {
+          this.content()
         }
-      }.width('100%')
-      .layoutWeight(1)
-      .justifyContent(FlexAlign.Center)
-      .alignItems(HorizontalAlign.Center)
-     // 免责声明
-     Column() {
-       Text($r('app.string.Disclaimer_Content'))
-         .textAlign(TextAlign.Center)
-     }.margin({bottom: 10})
-     .alignItems(HorizontalAlign.Center)
-     // 提示
-     Column() {
-       SymbolGlyph($r('sys.symbol.person_shield_fill'))
-         .fontSize(20)
-         .margin({bottom: 3})
-         .fontColor([this.icon_emphasize])
-       Text($r('app.string.welcome_tips'))
-         .fontColor($r('sys.color.font_secondary'))
-       Row() {
-         // Text()
-         Text($r('app.string.Disclaimer'))
-           .fontColor(this.icon_emphasize)
-           .onClick(() => {
-             this.isDisclaimer = true
-             this.dialogController.open()
-           })
-       }
-       Row({space: 16}) {
-         Button($r('app.string.reject_exit'))
-           .width('50%')
-           .fontColor(Color.Red)
-           .backgroundColor($r('app.color.container_background'))
-           .onClick(() => {
-             // 拒绝并退出
-             this.context.terminateSelf()
-           })
-           .fontColor(Color.Red)
-         Button($r('app.string.agree_continue'))
-           .width('50%')
-           .fontColor(Color.White)
-           .backgroundColor(this.icon_emphasize)
-           .onClick(() => {
-             // 关闭背景模糊
-             this.isEnableIndexForegroundBlur = false
-             // 第一次启动应用
-             this.uiConfig.isFirstStart = false
-             // 关闭模态页
-             this.isShowWelcome = false
-           })
-       }.width('90%')
-       .margin({ top: 12, bottom: 5 })
-     }.width('100%')
-     .justifyContent(FlexAlign.Center)
-     .alignItems(HorizontalAlign.Center)
-    }.padding(15)
+      }
+      .alignContent(Alignment.TopStart)
+    }
+    .hideTitleBar(true)
+    .backgroundColor($r('app.color.background'))
   }
+
+  @Builder
+  content() {
+    // Logo&欢迎语
+    Column() {
+      Image($r('app.media.foreground'))
+        .height(180)
+      Row() {
+        Text(`${getResourceString($r('app.string.welcome'), this)}Clash`)
+          .fontSize(30)
+          .fontWeight(FontWeight.Bold)
+        Text('NEXT')
+          .fontSize(30)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(this.icon_emphasize)
+      }
+    }.width('100%')
+    .layoutWeight(1)
+    .justifyContent(FlexAlign.Center)
+    .alignItems(HorizontalAlign.Center)
+    // 免责声明
+    Column() {
+      Text($r('app.string.Disclaimer_Content'))
+        .textAlign(TextAlign.Center)
+    }.margin({bottom: 10, left: 15, right: 15})
+    .alignItems(HorizontalAlign.Center)
+    // 提示
+    Column() {
+      SymbolGlyph($r('sys.symbol.person_shield_fill'))
+        .fontSize(20)
+        .margin({bottom: 3})
+        .fontColor([this.icon_emphasize])
+        .onClick(() => {
+          this.welcomePageInfos.pop(true)
+        })
+      Text($r('app.string.welcome_tips'))
+        .fontColor($r('sys.color.font_secondary'))
+      Flex({
+        direction: FlexDirection.Row
+      }) {
+        Button($r('app.string.welcome_quickly_go'))
+          .width('50%')
+          .margin({ right: 16})
+          .fontColor(this.icon_emphasize)
+          .backgroundColor($r('app.color.container_background'))
+          .onClick(() => {
+            // 关闭背景模糊
+            this.isEnableIndexForegroundBlur = false
+            // 关闭所有气泡提示
+            this.uiConfig.isFirstStart = false
+            this.uiConfig.ShowStartPop = false
+            this.uiConfig.ShowConfigPop = false
+            this.uiConfig.ShowProxyPop = false
+            // 关闭模态页
+            this.isShowWelcome = false
+          })
+        Button($r('app.string.welcome_go'))
+          .width('50%')
+          .fontColor(Color.White)
+          .backgroundColor(this.icon_emphasize)
+          .onClick(() => {
+            // 关闭背景模糊
+            this.isEnableIndexForegroundBlur = false
+            // 第一次启动应用
+            this.uiConfig.isFirstStart = false
+            // 关闭模态页
+            this.isShowWelcome = false
+          })
+      }.width('90%')
+      .margin({ top: 12, bottom: 5 })
+    }.width('100%')
+    .justifyContent(FlexAlign.Center)
+    .alignItems(HorizontalAlign.Center)
+    .padding({left: 5, right: 5, bottom: 15})
+  }
+
 }
+

@@ -38,6 +38,7 @@ import { ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/ProxyDa
 import { EventHub, EventKey } from '../common/EventHub'
 import { PopTips, PopupBuilder } from '../components/Start/Popup'
 import { number2Time, timestampToDateTime } from '../utils/TimeConvertUtil'
+import { getResourceString } from '../utils/ResourceStringUtil'
 
 
 @Entry
@@ -312,6 +313,19 @@ struct Home {
     }
   }
 
+  /**根据字符数设置字符大小*/
+  calculateFontSizeLinear(
+    str: string,
+    minSize = 20,
+    maxSize = 33,
+    step = 1
+  ): number {
+    const length = str.length;
+    const maxAllowedLength = Math.floor((maxSize - minSize) / step);
+    const clampedLength = Math.min(length, maxAllowedLength);
+    return Math.max(minSize, maxSize - clampedLength * step);
+  }
+
   // 通过@Builder构建设置模态展示界面
   @Builder
   SettingsSheet() {
@@ -353,12 +367,13 @@ struct Home {
           if (!this.isShowHomeEdit) {
             // 编辑布局按钮判定：非编辑状态
             Text(this.uiConfig.isGreeting ? this.greetings : 'ClashNext')
-              .fontSize((this.uiConfig.userLanguage != 'en-Latn') || !this.uiConfig.isGreeting ? TAB_CONTENT_TITLE_FONT_SIZE : 27)
+              .fontSize(this.calculateFontSizeLinear(this.uiConfig.isGreeting ? getResourceString(this.greetings, this) : 'ClashNEXT'))
               .layoutWeight(1)
-              .fontSize(this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE - this.curYOffset / 100 : TAB_CONTENT_TITLE_FONT_SIZE)
+              // .fontSize(this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE - this.curYOffset / 100 : TAB_CONTENT_TITLE_FONT_SIZE)
               .fontWeight(FontWeight.Bold)
               .fontColor(this.font_primary)
-              .transition(customAnimationUtil.isSlide(200,this.uiConfig))
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .transition(customAnimationUtil.isSlide(200, this.uiConfig))
             Blank()
             // 编辑按钮
             this.ButtonBuilder($r('sys.symbol.square_and_pencil'), () => {

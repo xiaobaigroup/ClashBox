@@ -546,7 +546,7 @@ export const SettingsListItem = (): settingsData[] => {
     new settingsData($r('sys.symbol.checkmark_square_on_square_fill'), 'Backgrounder', $r('app.string.Backgrounder'), $r('app.string.BackgrounderSubtitle'), '', false),
     new settingsData($r('sys.symbol.satellite_map_fill'), 'Kernel', $r('app.string.kernel'), $r('app.string.kernel_subtitle'), '', false),
     new settingsData($r('sys.symbol.trash_fill'), 'WipeData', $r('app.string.WipeData'), $r('app.string.WipeDataSubtitle'), '', false),
-    new settingsData($r('sys.symbol.person_shield_fill'), 'Disclaimer', $r('app.string.Disclaimer'), '', '', false),
+    new settingsData($r('sys.symbol.person_shield_fill'), 'agreement-privacy', $r('app.string.agreement_privacy'), '', '', false),
     new settingsData($r('sys.symbol.info_circle'), 'About', $r('app.string.About'), '', '', false),
   ]
   return result
@@ -837,19 +837,19 @@ export function getCheckUpdateList(updateInfo: UpdateInfo): CheckUpdateListItemP
         { icons: $r('sys.symbol.download_fill'), title: $r('app.string.download_url'), subtitle: updateInfo.browser_download_url },
       ]
     },
-    {
-      title: 'Ignore',
-      subtitle: '',
-      children: [
-        { icons: $r('sys.symbol.hand_raised_hexagon'), title: $r('app.string.ignore_update'), subtitle: '' },
-      ]
-    }
+    // {
+    //   title: 'Ignore',
+    //   subtitle: '',
+    //   children: [
+    //     { icons: $r('sys.symbol.hand_raised_hexagon'), title: $r('app.string.ignore_update'), subtitle: '' },
+    //   ]
+    // }
   ]
 }
 
 
 /**
- * 主页卡片编辑半模拟态里列表
+ * 主页卡片编辑半模态里列表
  */
 export interface HomeCardItem {
   image:Resource

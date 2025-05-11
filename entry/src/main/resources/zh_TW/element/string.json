@@ -169,8 +169,8 @@
       "value": "清除資料"
     },
     {
-      "name": "Disclaimer",
-      "value": "免責聲明"
+      "name": "agreement_privacy",
+      "value": "使用者條款與隱私權政策"
     },
     {
       "name": "About",
@@ -1658,7 +1658,7 @@
     },
     {
       "name": "welcome_tips",
-      "value": "點擊「同意並繼續」表示您同意以下內容："
+      "value": "點擊「開始導覽」將開啓新手教學提示"
     },
     {
       "name": "reject_exit",
@@ -1931,6 +1931,30 @@
     {
       "name": "enter_search",
       "value": "Enter鍵搜尋喔"
+    },
+    {
+      "name": "saved_download",
+      "value": "已儲存到下載資料夾喔"
+    },
+    {
+      "name": "export_failed",
+      "value": "匯出失敗"
+    },
+    {
+      "name": "welcome_quickly_go",
+      "value": "我是老手喔"
+    },
+    {
+      "name": "welcome_go",
+      "value": "開始導覽"
+    },
+    {
+      "name": "complete",
+      "value": "完成"
+    },
+    {
+      "name": "return",
+      "value": "返回"
     }
   ]
 }

@@ -1,0 +1,55 @@
+/* styles.css */
+/* 全局基础样式 */
+body {
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+}
+
+/* 标题样式 */
+.main-title {
+    font-size: 20px;
+    text-align: center;
+}
+
+.sub-title {
+    font-size: 17px;
+    font-weight: normal;
+    text-align: center;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* 正文样式 */
+.content-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* 正文二级标题样式 */
+.section-title {
+    font-size: 20px;
+    font-weight: bold;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+/* 列表样式 */
+.feature-list {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+.tech-list {
+    list-style-type: decimal;
+    padding-left: 20px;
+}
+
+
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}

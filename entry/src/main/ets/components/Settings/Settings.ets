@@ -24,6 +24,7 @@ import OverwriteTop from "../More/Overwrite/OverwriteTopBuilder"
 import { timestampToDateTime } from "../../utils/TimeConvertUtil"
 import { ProxyGroupItemDataSource } from "../../common/ProxyData"
 import { ConfigData } from "../../common/PageArgumentEntity"
+import { PrivacyPolicy, UserAgreement } from "./AgreementPrivacyPage"
 
 const context = getContext(this) as common.UIAbilityContext
 
@@ -121,13 +122,7 @@ struct Settings {
   }
 
   handleCheck(index: number) {
-    if(index === (this.uiConfig.isShowExperimentalFunction ? 7 : 6)) {
-      // 免责声明弹窗
-      if (this.dialogController != null) {
-        this.isDisclaimer = true
-        this.dialogController.open()
-      }
-    } else if(index == (this.uiConfig.isShowExperimentalFunction ? 6 : 5)) {
+    if(index == (this.uiConfig.isShowExperimentalFunction ? 6 : 5)) {
       // 清空应用设置弹窗
       this.resetDialogController.open()
     } else if (index === (this.uiConfig.isShowExperimentalFunction ? 2 : -1)) {
@@ -216,6 +211,12 @@ struct Settings {
       } else
       if (name == 'offline-detail') {
         OfflineDetail()
+      } else
+      if (name == 'agreement-privacy') {
+        UserAgreement()
+      } else
+      if (name == 'privacy-policy') {
+        PrivacyPolicy()
       }
   }
 

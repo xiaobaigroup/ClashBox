@@ -27,6 +27,18 @@ function outerLayerContainerCommonStyles(){
 }
 /* 通用属性 END */
 
+@Builder
+export function BackButton() {
+  Button({ type: ButtonType.Circle, stateEffect: true }) {
+    SymbolGlyph($r('sys.symbol.chevron_left'))
+      .fontSize(28)
+      .fontColor([$r('sys.color.icon_primary')])
+  }
+  .width(40)
+  .height(40)
+  .margin({left: 16, top: 16 })
+  .backgroundColor($r('app.color.back'))
+}
 
 /* bindSheet 里套 `Navigation`、`NavDestination`是的标题栏的替代品 START */
 // XXX 前提：不使用NavDestination的标题栏.hideTitleBar(true)。不使用`bindSheet`的`dragBar`，仅使用`bindSheet`自带的`close`按钮。
@@ -361,7 +373,7 @@ export struct DisclaimerCustomDialog {
 
   build() {
     Flex({direction: FlexDirection.Column}) {
-      Text(this.isDisclaimer ? $r('app.string.Disclaimer') : `${getResourceString($r('app.string.new_version'), context)} ${this.version}`)
+      Text(this.isDisclaimer ? $r('app.string.new_version') : `${getResourceString($r('app.string.new_version'), context)} ${this.version}`)
         .fontSize(20)
         .margin({ top: 15, bottom: 15 })
       List() {

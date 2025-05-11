@@ -351,6 +351,11 @@ export struct LogDetils {
     }
     .ButtonStyle()
     .transition(customAnimationUtil.isSlide(0,this.uiConfig))
+    .onClick(() => {
+      // 导出单个日志
+      EventHub.sendEvent(EventKey.ExportLog, this.theLogSkipItem)
+    })
+
     // 删除按钮
     Button({ type: ButtonType.Circle, stateEffect: true }) {
       SymbolGlyph($r('sys.symbol.trash_fill'))
@@ -358,7 +363,12 @@ export struct LogDetils {
         .fontColor([this.icon_primary])
     }
     .ButtonStyle()
+    .margin({ left: 10})
     .transition(customAnimationUtil.isSlide(0,this.uiConfig))
+    .onClick(() => {
+      this.logListData.splice(this.theLogSkipItem, 1)
+      this.pageInfos.pop()
+    })
   }
 
   controller: RichEditorController = new RichEditorController()
