@@ -105,7 +105,7 @@ struct RequestPage {
     }.onClick(() => {
       animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
         this.appConfig.enableRequest = !this.appConfig.enableRequest
-        this.needSearch = this.appConfig.enableRequest
+        // this.needSearch = this.appConfig.enableRequest
         if (!this.appConfig.enableRequest) {
           clearInterval(this.intervalId)
           this.requestListData.clear()
@@ -214,7 +214,8 @@ struct RequestPage {
     .backgroundColor($r('app.color.background'))
     .onShown(() => {
       // 初始化搜索按钮
-      this.needSearch = this.appConfig.enableRequest
+      // this.needSearch = this.appConfig.enableRequest
+      this.needSearch = false
     })
     .onWillHide(() => {
       this.needSearch = false

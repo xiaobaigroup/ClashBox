@@ -154,7 +154,7 @@ struct Connect {
     }.onClick(() => {
       animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
         this.appConfig.enableConnect = !this.appConfig.enableConnect
-        this.needSearch = this.appConfig.enableConnect
+        // this.needSearch = this.appConfig.enableConnect
         if (!this.appConfig.enableConnect) {
           clearInterval(this.intervalId)
           this.connectListData.clear()
@@ -283,7 +283,8 @@ struct Connect {
     .backgroundColor($r('app.color.background'))
     .onShown(() => {
       // 初始化搜索按钮
-      this.needSearch = this.appConfig.enableConnect
+      // this.needSearch = this.appConfig.enableConnect
+      this.needSearch = false
     })
     .onWillHide(() => {
       this.needSearch = false
