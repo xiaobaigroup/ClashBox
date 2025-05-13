@@ -1,3 +1,4 @@
+[English](/README_en.md)
 
 # ClashNEXT
 
@@ -23,12 +24,17 @@ ClashNEXT是首个基于Navigation框架的HarmonyOS NEXT(OpenHarmony)平台的�
 
 您可以使用[Auto-installer](https://github.com/likuai2010/auto-installer/)或[DevEcho Testing](https://developer.huawei.com/consumer/cn/deveco-testing/)进行安装。
 
-注意：在HarmonyOS NEXT使用自签名的方式进行侧载的App默认只有14天的有效期，进行[开发者实名认证](https://developer.huawei.com/consumer/cn/verified/enrollment)后即可将有效期提升至180天。
+> [!IMPORTANT]
+> 华为的签名服务器屏蔽了非中国大陆的IP地址，若要在非中国大陆的国家/地区为HarmonyOS NEXT侧载软件，请使用代理等方式使用中国大陆的IP地址。
+
+> [!NOTE]
+> 在HarmonyOS NEXT使用自签名的方式进行侧载的App默认只有14天的有效期，进行[开发者实名认证](https://developer.huawei.com/consumer/cn/verified/enrollment)后即可将有效期提升至180天。
 
 #### 赞助&联系我们
 
 目前团队在入驻爱发电，支持我们项目的朋友可以前往爱发电赞助我们：
 https://afdian.com/a/Clashnext
+
 感谢您的支持~
 
-欢迎加入我们的[官方Telegram群组](https://t.me/+FdIuCMoMY-EyNThl)及[官方Telegram频道](https://t.me/+aYziOyq-ZhUyNjRl)
+欢迎加入我们的[官方Telegram群组](https://t.me/+FdIuCMoMY-EyNThl)及[官方Telegram频道](https://t.me/+aYziOyq-ZhUyNjRl)！
