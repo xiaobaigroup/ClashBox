@@ -55,7 +55,7 @@ struct Language {
             .alignItems(HorizontalAlign.Start)
             Blank()
             Radio({ value: 'language-1' , group: 'languageGroup' })
-                   .checked(this.currentRadioCheck === -1)
+              .checked(this.currentRadioCheck === -1)
               .margin({right: 12 })
               .radioStyle({
                 checkedBackgroundColor: this.icon_emphasize,

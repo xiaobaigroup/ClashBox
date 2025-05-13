@@ -1955,6 +1955,10 @@
     {
       "name": "return",
       "value": "返回"
+    },
+    {
+      "name": "resources_tips",
+      "value": "因部分地區IP連線至GitHub平台遭封鎖，若要透過預設網址更新資源時，請先開啟代理服務。"
     }
   ]
 }

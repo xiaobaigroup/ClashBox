@@ -1955,6 +1955,10 @@
     {
       "name": "return",
       "value": "Return"
+    },
+    {
+      "name": "resources_tips",
+      "value": "Because the IP access to GitHub in some regions is limited, please enable the proxy service before updating resources with the default address."
     }
   ]
 }

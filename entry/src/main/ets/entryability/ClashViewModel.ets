@@ -326,7 +326,7 @@ export class ClashViewModel {
     await this.loadProfileAndConfig(appConfig?.currentProfileId ?? "", clashConfig, {
       "is-patch": patch,
       "is-compatible": true,
-      "override-dns": appConfig?.overrideDns,
+      "override-dns": clashConfig?.overrideDns,
       "selected-map": profile?.getSelectedMap()
     } as ConfigExtendedParams)
   }

@@ -12,6 +12,7 @@ import ClashViewModel from '../../entryability/ClashViewModel'
 import { getResourceString } from "../../utils/ResourceStringUtil"
 import { EventHub, EventKey } from "../../common/EventHub"
 import { customAnimationUtil, isON } from "../../utils/Animation"
+import { i18n } from "@kit.LocalizationKit"
 
 // 资源数据（假设）
 interface ResourcesData {
@@ -369,8 +370,20 @@ struct Resources {
                   }.width('100%')
                   .transition(this.isON.toggleAnim ? null : customAnimationUtil.isScaleTran(index, this.uiConfig))
                 })
+
+                if (this.uiConfig.userLanguage === 'zh-Hans' || (i18n.System.getSystemLanguage() === 'zh-Hans-CN' && this.uiConfig.userLanguage === 'default')) {
+                  // 资源更新提示
+                  ListItem() {
+                    Text($r('app.string.resources_tips'))
+                      .fontColor($r('sys.color.font_secondary'))
+                      .fontWeight(FontWeight.Normal)
+                      .fontSize(14)
+                  }.transition(customAnimationUtil.isScaleTran(4, this.uiConfig))
+                }
+
               }.width('100%')
               .height('100%')
+              .alignListItem(ListItemAlign.Center)
               .contentEndOffset(CONTENT_END_OFFSET_150)
               .padding({ right: this.morePageMargin.value, left: this.morePageMargin.value })
               .chainAnimation(true)

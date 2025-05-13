@@ -785,14 +785,13 @@ struct ConfigurationPage {
    * 导出配置
    */
   private exportConfig(): void {
-    // TODO 删除用户首选项里的此配置
+    // TODO 导出配置
     hilog.info(0xC015, this.componentName, `#deleteConfig#删除配置: configName is [${this.currentTouchConfigData.configName}]`)
   }
   /**
    * 删除配置
    */
   private async  deleteConfig(): Promise<void> {
-    // TODO 删除用户首选项里的此配置
     this.promptAction.showToast({ message: `${getResourceString($r('app.string.configuration_deleted'), this)}💔` })
     hilog.info(0xC016, this.componentName, `#deleteConfig#删除配置: configName is [${this.currentTouchConfigData.configName}]`)
     await ClashViewModel.deleteProfile(this.currentTouchConfigData.configId)

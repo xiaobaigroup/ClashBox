@@ -1955,6 +1955,10 @@
     {
       "name": "return",
       "value": "返回"
+    },
+    {
+      "name": "resources_tips",
+      "value": "因部分地区IP访问Github受限，要使用默认地址更新资源时请先开启代理服务"
     }
   ]
 }

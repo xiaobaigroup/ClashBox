@@ -48,11 +48,8 @@ export class AppConfig{
   enableRequest: boolean = false
   enableConnect: boolean = false
   testUrl: string = "https://www.gstatic.com/generate204"
-  overrideDns: boolean = false
   clashCore: ClashCore = ClashCore.FlClash
   switchMode: ProxyMode = ProxyMode.Rule
-  overwriteNetwork: boolean = true
-  snifferDefault?: SnifferDefault = new SnifferDefault()
   constructor() {
   }
 }
@@ -177,7 +174,7 @@ export class AppState {
   // 还原覆写配置
   static  ResetClashConfig(){
     AppStorage.set("clashConfig", new ClashConfig(AppState.globalUA))
-    AppStorage.set("appConfig", new AppConfig())
+    // AppStorage.set("appConfig", new AppConfig())
   }
   // 清理数据 还原默认值
   static ResetConfig(){

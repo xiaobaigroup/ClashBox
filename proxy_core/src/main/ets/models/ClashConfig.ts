@@ -144,6 +144,9 @@ export class  ClashConfig {
   tun?: Tun = new Tun();
   sniffer?: Sniffer;
   "geox-url"?: GeoXUrl = defaultGeoXMap;
+  overrideDns: boolean = false
+  overwriteNetwork: boolean = true
+  snifferDefault?: SnifferDefault = new SnifferDefault()
   constructor(ua: string = "clash.meta/1.18.7") {
     this["global-ua"] = ua
   }

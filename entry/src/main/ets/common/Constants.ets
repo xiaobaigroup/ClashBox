@@ -389,8 +389,8 @@ export  const ListOverwriteDNSData = (clashConfig: ClashConfig, appConfig: AppCo
   let result: ConfigItemData[] = new Array()
   let dns = clashConfig.dns ?? new Dns()
   result = [
-    new ConfigItemData($r('sys.symbol.selector'), 'overrideDns', $r('app.string.OverwriteDNS'), '', '', 2).bind<boolean>(appConfig.overrideDns, (v)=>{
-      appConfig.overrideDns = v
+    new ConfigItemData($r('sys.symbol.selector'), 'overrideDns', $r('app.string.OverwriteDNS'), '', '', 2).bind<boolean>(clashConfig.overrideDns, (v)=>{
+      clashConfig.overrideDns = v
     }),
     new ConfigItemData($r('sys.symbol.selector'), 'Option', $r('app.string.option'), '', '', 3),
     new ConfigItemData($r('sys.symbol.selector'), 'enable', $r('app.string.State'), $r('app.string.State_subtitle'), '', 2).bindClashConfigBy(clashConfig, "dns"),
@@ -436,7 +436,7 @@ export  const ListOverwriteNetworkData = (clashConfig: ClashConfig, appConfig: A
 // 更多 -> 覆写 -> 网络 -> 兼容模式
 export  const OverwriteNetworkCompatible = (clashConfig: ClashConfig, appConfig: AppConfig): ConfigItemData[] => {
   let result: ConfigItemData[] = new Array()
-  clashConfig.sniffer = clashConfig.sniffer ?? appConfig.snifferDefault
+  clashConfig.sniffer = clashConfig.sniffer ?? clashConfig.snifferDefault
   result = [
     new ConfigItemData($r('sys.symbol.network_acceleration'), 'enable', $r('app.string.compatibility_mode'), $r('app.string.compatibility_mode_subtitle'), '', 2).bindClashConfigBy(clashConfig, "sniffer"),
     new ConfigItemData($r('sys.symbol.selector'), 'Option', 'Sniffer Setting', '', '', 3),

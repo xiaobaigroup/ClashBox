@@ -172,6 +172,7 @@ struct Home {
   @StorageLink ('2in1') isPC: boolean = false
   //滚动控制
   private scrollerForScroll: Scroller = new Scroller()
+
   aboutToAppear(): void {
     this.greetings = getGreeting()
     // 初始化主页卡片布局
@@ -190,11 +191,13 @@ struct Home {
       }
     })
 
-    if (this.isPC) {
+    // 只有当PC首次启动时重置主页布局
+    if (this.isPC && this.uiConfig.isShowHomeCard === JSON.stringify(showHomeCard)) {
       this.theCurrentHomeCard = showHomeCardPC
-    }else {
-      this.theCurrentHomeCard = showHomeCard
+      // 更新PC布局持久化, 避免二次启动重复调用覆盖
+      this.uiConfig.isShowHomeCard = JSON.stringify(showHomeCardPC)
     }
+
   }
 
   aboutToDisappear() {
