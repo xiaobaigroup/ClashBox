@@ -1,11 +1,10 @@
-[English](/README_en.md)   [隐私政策](/隐私政策.txt)
+[English](/README_en.md)
+
+# ClashNEXT
 
 [![Downloads](https://img.shields.io/github/downloads/xiaobaigroup/ClashNEXT/total?style=flat-square&logo=github)](https://github.com/xiaobaigroup/ClashNEXT/releases/)[![Last Version](https://img.shields.io/github/release/xiaobaigroup/ClashNEXT/all.svg?style=flat-square)](https://github.com/xiaobaigroup/ClashNEXT/releases/)[![License](https://img.shields.io/github/license/xiaobaigroup/ClashNEXT?style=flat-square)](LICENSE)
 
 [![Channel](https://img.shields.io/badge/Telegram-Channel-blue?style=flat-square&logo=telegram)](https://t.me/+aYziOyq-ZhUyNjRl)
-
-
-# ClashNEXT
 
 #### 介绍
 
