@@ -1,10 +1,15 @@
 [English](/README_en.md)   [隐私政策](/隐私政策.txt)
 
+[![Downloads](https://img.shields.io/github/downloads/xiaobaigroup/ClashNEXT/total?style=flat-square&logo=github)](https://github.com/xiaobaigroup/ClashNEXT/releases/)[![Last Version](https://img.shields.io/github/release/xiaobaigroup/ClashNEXT/all.svg?style=flat-square)](https://github.com/xiaobaigroup/ClashNEXT/releases/)[![License](https://img.shields.io/github/license/xiaobaigroup/ClashNEXT?style=flat-square)](LICENSE)
+
+[![Channel](https://img.shields.io/badge/Telegram-Channel-blue?style=flat-square&logo=telegram)](https://t.me/+aYziOyq-ZhUyNjRl)
+
+
 # ClashNEXT
 
 #### 介绍
 
-ClashNEXT是首个基于Navigation框架的HarmonyOS NEXT(OpenHarmony)平台的代理软件，使用改版的[FlClash](https://github.com/chen08209/FlClash)内核。
+ClashNEXT是首个基于Navigation框架的HarmonyOS NEXT(OpenHarmony)平台的代理软件，使用改版的[Mihomo(ClashMeta)](https://github.com/MetaCubeX/mihomo)内核。
 使用前请仔细阅读免责声明和常见问题。
 
 > [!IMPORTANT]
@@ -15,7 +20,7 @@ ClashNEXT是首个基于Navigation框架的HarmonyOS NEXT(OpenHarmony)平台的�
 - 💻原生开发：前端部分使用鸿蒙原生开发语言ArkTS开发，原生开发更流畅，动效更丰富;
 - ✨炫酷界面：使用HarmonyOS NEXT原生设计风格，采用类[Surfboard](https://github.com/getsurfboard/surfboard)的UI排版设计，支持深色模式、模糊效果等，使用体验上更进一步；
 - 📱多端适配：UI方面对手机、平板、折叠屏、鸿蒙电脑甚至PuraX外屏*都进行了适配；
-- 🚀稳定内核：采用广受好评的[FlClash](https://github.com/chen08209/FlClash)内核，功能基本对齐[FlClash](https://github.com/chen08209/FlClash)，稳定可靠；
+- 🚀稳定内核：采用广受好评的[Mihomo(ClashMeta)](https://github.com/MetaCubeX/mihomo)内核，功能基本对齐[Mihomo(ClashMeta)](https://github.com/MetaCubeX/mihomo)，稳定可靠；
 - 🔄核心恢复：由于HarmonyOS NEXT的后台调度机制尚不成熟，软件可能存在后台进程被系统关闭的情况，因此ClashNEXT内置了核心恢复功能，系统杀进程后将自动恢复核心进程（开启“后台运行-模拟画中画”后将自动启用本功能）。
 
 *PuraX外屏目前仅显示华为白名单内的App，在本软件获得白名单之前暂不可用。
