@@ -33,6 +33,19 @@ struct Language {
     }
   }
 
+  FollowSystemHotChanage() {
+    switch (i18n.System.getSystemLanguage()) {
+      case 'zh-Hans-CN':
+        // 简体中文
+        ChangeLanguage('zh-Hans')
+        this.currentLanguage = $r('app.string.Language_Subtitle')
+      break
+      default :
+        // TODO 存在隐患，没有确定其它语言文本时函数返回值
+        ChangeLanguage(i18n.System.getSystemLanguage())
+    }
+  }
+
   build() {
     NavDestination() {
       TopBuilder({title: $r('app.string.Language')})
@@ -75,7 +88,8 @@ struct Language {
           // 恢复默认
           ChangeLanguage("default")
           this.uiConfig.userLanguage = "default"
-          promptAction.showToast({message: $r('app.string.restart_app_tips'), duration: 2000 })
+          // promptAction.showToast({message: $r('app.string.restart_app_tips'), duration: 2000 })
+          this.FollowSystemHotChanage()
         })
         ForEach(this.SettingsLanguageList, (item: LanguageData, index: number) => {
           // 语言列表

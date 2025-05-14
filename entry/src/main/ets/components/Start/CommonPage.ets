@@ -1,7 +1,8 @@
 import { UIConfig } from "../../entryability/AppState"
 import { common } from "@kit.AbilityKit"
-import { getResourceString } from "../../utils/ResourceStringUtil"
 import { webview } from "@kit.ArkWeb"
+import { i18n } from "@kit.LocalizationKit"
+import { BusinessError } from "@kit.BasicServicesKit"
 
 
 @Component
@@ -15,6 +16,8 @@ export struct CommonPage {
   @State isWebAtEnd:boolean = false
   @State docSrc: Resource | string = ''
   @State isWelcomeStack: boolean = false
+  // 单前通信端口
+  @State currentPorts: webview.WebMessagePort[]  = []
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
@@ -29,6 +32,32 @@ export struct CommonPage {
 
   aboutToAppear(): void {
     this.isEnableIndexForegroundBlur = true
+    // 配置Web开启调试模式
+    webview.WebviewController.setWebDebuggingAccess(true);
+  }
+
+  createPorts() {
+    this.currentPorts = this.controller.createWebMessagePorts()
+    if (this.currentPorts.length) {
+      // 传递一个端口
+      this.controller.postMessage("trans_port", [this.currentPorts[1]], "*")
+      this.currentPorts[0].onMessageEvent((event: webview.WebMessage) => {
+        console.log(`CommonPage #webview #onMessageEvent ${JSON.stringify(event)}`)
+        if (event === 'ok') {
+          this.setLanguage()
+        }
+      })
+    }
+  }
+
+  setLanguage() {
+    if (this.uiConfig.userLanguage === 'zh-Hans' || (i18n.System.getSystemLanguage() === 'zh-Hans-CN' && this.uiConfig.userLanguage === 'default')) {
+      // 简体中文
+      this.currentPorts[0].postMessageEvent('zh-Hans')
+      console.log(`CommonPage #webview #setLanguage zh-Hans`)
+    } else {
+      this.currentPorts[0].postMessageEvent(`${/*i18n.System.getSystemLanguage() ?? */this.uiConfig.userLanguage}`);
+    }
   }
 
   // 获取web高度
@@ -69,17 +98,34 @@ export struct CommonPage {
         Web({ src: this.docSrc, controller: this.controller })
           .fileAccess(true)
           .databaseAccess(true)
-          .forceDarkAccess(true)
+          .javaScriptAccess(true)
+          // .forceDarkAccess(true)
           .domStorageAccess(true)
+          .darkMode(WebDarkMode.Auto)
           .backgroundColor($r('app.color.background'))
           .onPageBegin((event) => {
             console.log(`CommonPage #webviewBuilder ${JSON.stringify(event)}`)
           })
           .onPageEnd(() => {
             this.getWebHeight()
+            this.createPorts()
           })
           .onScroll(() => {
             this.getWebScrollEnd()
+          })
+          .onControllerAttached(() => {
+            try {
+              // 设置允许可以跨域访问的路径列表
+              this.controller.setPathAllowingUniversalAccess([
+                getContext().resourceDir,
+              ])
+            } catch (error) {
+              console.error(`#Webview ErrorCode: ${(error as BusinessError).code},  Message: ${(error as BusinessError).message}`);
+            }
+          })
+          .onAlert((event) => {
+            console.log('#Webview event.message:' + event.message)
+            return true
           })
       }.width('100%')
       .layoutWeight(1)

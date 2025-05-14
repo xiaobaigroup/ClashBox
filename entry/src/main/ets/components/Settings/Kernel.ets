@@ -95,7 +95,8 @@ struct Kernel {
           ForEach(this.kernel, (item: KernelListItem, index: number) => {
             Flex({
               direction: FlexDirection.Row,
-              justifyContent: FlexAlign.Center
+              justifyContent: FlexAlign.Center,
+              alignItems: ItemAlign.Center
             }) {
               Image(item.icons)
                 .width(48)

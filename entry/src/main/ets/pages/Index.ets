@@ -440,10 +440,12 @@ struct Index {
   onWindowChange() {
     hilog.info(0xFF00, componentName,
       `#WindowChange#应用窗口状态 width: ${this.windowWidth} height: ${this.windowHeight}`)
-    if (this.windowHeight === this.windowWidth) {
-      hilog.info(0xFF00, componentName,
-        `#WindowChange#应用窗口状态 重复执行，跳出`)
-      return
+    if (this.windowWidth > 328 || this.windowHeight > 328) {
+      if (this.windowHeight === this.windowWidth) {
+        hilog.info(0xFF00, componentName,
+          `#WindowChange#应用窗口状态 重复执行，跳出`)
+        return
+      }
     }
     if (320 < this.windowHeight && this.windowHeight <= 500 && 640 < this.windowWidth && this.windowWidth <= 1000) {
       this.isLandscapePhone = true
