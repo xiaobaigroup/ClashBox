@@ -660,7 +660,7 @@ export function getAboutList(): AboutListItemProp[] {
       subtitle: '',
       name: '',
       children: [
-        { title: $r('app.string.Application_Version'), subtitle: `${AppState.versionName} Beta`, sign: 0, name: 'ApplicationVersion' },
+        { title: $r('app.string.Application_Version'), subtitle: `${AppState.versionName} Release`, sign: 0, name: 'ApplicationVersion' },
         { title: $r('app.string.Kernel_Version'), subtitle: `${AppState.coreVersion}`, sign: 0, name: 'KernelVersion' }
       ]
     },
@@ -819,8 +819,8 @@ export function getCheckUpdateList(updateInfo: UpdateInfo): CheckUpdateListItemP
       title: 'Version',
       subtitle: '',
       children: [
-        { title: $r('app.string.current_version'), subtitle: `${AppState.versionName} Beta` },
-        { title: $r('app.string.latest_version'), subtitle: `${updateInfo.tag_name} Beta` }
+        { title: $r('app.string.current_version'), subtitle: `${AppState.versionName} Release` },
+        { title: $r('app.string.latest_version'), subtitle: `${updateInfo.tag_name} Release` }
       ]
     },
     {

@@ -107,7 +107,7 @@ struct About {
       case 'Repositories':
         // 跳转仓库
         // hilog.info(0xFF00, "AboutestTag", "仓库")
-        // implicitStartAbility('https://github.com/xxx%%', context)
+        implicitStartAbility('https://github.com/xiaobaigroup/ClashNEXT', context)
         promptAction.showToast({message: $r('app.string.not_open'), duration: 2000 })
       break
       default :
@@ -398,8 +398,8 @@ struct About {
                     } else if (itemChild.sign === 0) {
                      if (itemChild.name === 'ApplicationVersion') {
                        hilog.info(0xFF00, "AboutClickTag", "前: %{public}d", this.clickCount)
-                       this.clickCount++
-                       this.onClickCount()
+                       // this.clickCount++
+                       // this.onClickCount()
                        hilog.info(0xFF00, "AboutClickTag", "后: %{public}d", this.clickCount)
                      }
                    }

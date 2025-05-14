@@ -6,6 +6,11 @@ body {
     padding: 20px;
 }
 
+:root {
+    color-scheme: light dark; /* 支持浅色和深色模式，跟随系统切换 */
+    background-color: #F1F3F5 #ff000000;
+}
+
 /* 标题样式 */
 .main-title {
     font-size: 20px;

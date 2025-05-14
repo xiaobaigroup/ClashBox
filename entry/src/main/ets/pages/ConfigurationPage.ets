@@ -144,23 +144,24 @@ struct ConfigurationPage {
       .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
       content: $r('app.string.update'), callback: ()=>{ this.updateConfig(this.currentTouchConfigData.configId) }
     },
-    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.share'))
+    // TODO 配置分享、生成二维码、创建副本
+   /* { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.share'))
       .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
       content: $r('app.string.share'), callback: ()=>{ this.shareConfigUrl() }
     },
     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.qrcode'))
       .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
       content: $r('app.string.generate_QR_code'), callback: ()=>{ this.generateQRcode() }
-    },
+    },*/
     // XXX 分享链接和导出配置文件都已经集成到了“分享”菜单里
     /*    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.doc_text'))
           .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
           content: '导出配置文件', callback: ()=>{ this.generateQRcode() }
         },*/
-    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.plus_square_on_square'))
+   /* { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.plus_square_on_square'))
       .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
       content: $r('app.string.create_copy'), callback: ()=>{ this.generateQRcode() }
-    },
+    },*/
   ]
   // 配置页面ListItem的长按ContextMenu的Builder
   @Builder
@@ -264,7 +265,7 @@ struct ConfigurationPage {
   })
 
   /* Stack层叠布局 */
-  // 所有子组件在容器内的对齐方式 TODO 【用户首选项】在设置里可以更改 Alignment.BottomStart 和 Alignment.BottomEnd Enlin@2024-12-04
+  // 所有子组件在容器内的对齐方式
 
   /* 配置添加按钮bindSheet相关 */
 
