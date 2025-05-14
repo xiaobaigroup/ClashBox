@@ -5,13 +5,13 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "C:\\Users\\Administrator\\.ohos\\config\\default_clashnext_2vganiPLWwpKKfbVYqE5KuaUmXBOlrEtqu_uhZW8_cg=.cer",
-          "keyAlias": "debugKey",
-          "keyPassword": "0000001BAEA1A2EE3B9B8C17946317CEA11D09F48FDF5B69AF66A06557EDBCC0A702E54C1EB5B4B370B3FD",
-          "profile": "C:\\Users\\Administrator\\.ohos\\config\\default_clashnext_2vganiPLWwpKKfbVYqE5KuaUmXBOlrEtqu_uhZW8_cg=.p7b",
+          "storeFile": "D:/证书/.p12",
+          "storePassword": "0000001D7421B125A26255CFEF5C86FFCBDE8287EB6CC5704B8202D89DFCDFD036D2FAABE59C47DBA1876E839B",
+          "keyAlias": "xiaobaituandui",
+          "keyPassword": "0000001DDCDFAA7A553B31864065556C2A811ED9C9198B70089652DA9DB79F54733BA99BD45B7EB44F605564C8",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\default_clashnext_2vganiPLWwpKKfbVYqE5KuaUmXBOlrEtqu_uhZW8_cg=.p12",
-          "storePassword": "0000001B7AE5D2B5778BDA6673C6DFEF55F3C19156D505EBF5A8C8D971A8F5AA9DCE14DE3D7D2B5EF777C1"
+          "profile": "D:/证书/xiaobaituanduiRelease.p7b",
+          "certpath": "D:/证书/小白团队.cer"
         }
       },
       {
