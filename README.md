@@ -12,9 +12,6 @@
 ClashNEXT是首个基于Navigation框架的HarmonyOS NEXT(OpenHarmony)平台的代理软件，使用改版的[Mihomo(ClashMeta)](https://github.com/MetaCubeX/mihomo)内核。
 使用前请仔细阅读免责声明和常见问题。
 
-> [!IMPORTANT]
-> 注意：本仓库暂时仅上传Hap侧载包，源代码暂时不开源。
-
 #### 软件特色
 
 - 💻原生开发：前端部分使用鸿蒙原生开发语言ArkTS开发，原生开发更流畅，动效更丰富;
