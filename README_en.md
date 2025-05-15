@@ -1,12 +1,12 @@
 # ClashBox
 
-[![Downloads](https://img.shields.io/github/downloads/xiaobaigroup/ClashNEXT/total?style=flat-square&logo=github)](https://github.com/xiaobaigroup/ClashNEXT/releases/)[![Last Version](https://img.shields.io/github/release/xiaobaigroup/ClashNEXT/all.svg?style=flat-square)](https://github.com/xiaobaigroup/ClashNEXT/releases/)[![License](https://img.shields.io/github/license/xiaobaigroup/ClashNEXT?style=flat-square)](LICENSE)
+[![Downloads](https://img.shields.io/github/downloads/xiaobaigroup/ClashBox/total?style=flat-square&logo=github)](https://github.com/xiaobaigroup/ClashBox/releases/)[![Last Version](https://img.shields.io/github/release/xiaobaigroup/ClashBox/all.svg?style=flat-square)](https://github.com/xiaobaigroup/ClashBox/releases/)[![License](https://img.shields.io/github/license/xiaobaigroup/ClashBox?style=flat-square)](LICENSE)
 
 [![Channel](https://img.shields.io/badge/Telegram-Channel-blue?style=flat-square&logo=telegram)](https://t.me/+aYziOyq-ZhUyNjRl)
 
 
 > [!NOTE]
-> This document is machine translated and may contain errors.If you find a bug, you can report it to us on the [Issues page](https://github.com/xiaobaigroup/ClashNEXT/issues).
+> This document is machine translated and may contain errors.If you find a bug, you can report it to us on the [Issues page](https://github.com/xiaobaigroup/ClashBox/issues).
 
 #### Introduction
 
@@ -20,7 +20,7 @@ Please read the disclaimer and FAQ carefully before use.
 - ✨Cool interface: Using the native design style of HarmonyOS NEXT, adopting the UI layout design similar to [Surfboard](https://github.com/getsurfboard/surfboard), supporting dark mode, blur effect, etc., the user experience is further improved;
 - 📱Multi-terminal adaptation: The UI is adapted to mobile phones, tablets, folding screens, HarmonyOS computers and even PuraX external screens*;
 - 🚀Stable kernel: Using the highly acclaimed [Mihomo(ClashMeta)](https://github.com/MetaCubeX/mihomo) kernel, the functions are basically aligned with [Mihomo(ClashMeta)](https://github.com/MetaCubeX/mihomo), stable and reliable;
-- 🔄Core recovery: Due to HarmonyOS NEXT's background scheduling mechanism is not yet mature, and the software may have background processes that are closed by the system. Therefore, ClashNEXT has a built-in core recovery function. After the system kills the process, the core process will be automatically restored (this function will be automatically enabled after turning on "Background Run-Simulated Picture-in-Picture").
+- 🔄Core recovery: Due to HarmonyOS NEXT's background scheduling mechanism is not yet mature, and the software may have background processes that are closed by the system. Therefore, ClashBox has a built-in core recovery function. After the system kills the process, the core process will be automatically restored (this function will be automatically enabled after turning on "Background Run-Simulated Picture-in-Picture").
 
 *PuraX external screen currently only displays apps in Huawei's whitelist, and it is temporarily unavailable before this software obtains the whitelist.
 
@@ -39,7 +39,7 @@ You can use [Auto-installer](https://github.com/likuai2010/auto-installer/) or [
 #### Sponsorship & Contact Us
 
 The team is currently in Afdian. Friends who support our project can go to Afdian to sponsor us:
-https://afdian.com/a/Clashnext
+https://afdian.com/a/ClashBox
 
 Thank you for your support~
 
