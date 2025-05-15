@@ -40,5 +40,3 @@ https://afdian.com/a/Clashnext
 官方Telegram群组：  https://t.me/+FdIuCMoMY-EyNThl
 
 官方Telegram频道：  https://t.me/+aYziOyq-ZhUyNjRl
-
-官方QQ交流群：  693903194（一群） 2160023660（二群）
