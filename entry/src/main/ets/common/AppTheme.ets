@@ -25,7 +25,7 @@ class CatBlueAppTheme implements CustomTheme {
 }
 
 
-/* 便单黄 yellowAppTheme */
+/* 浣熊黄 yellowAppTheme */
 // 主题颜色
 class YellowAppThemeColors implements CustomColors {
   iconEmphasize: ResourceColor = $r('app.color.theme_color_main_yellow')

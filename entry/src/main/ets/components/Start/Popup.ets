@@ -1,6 +1,6 @@
 import { getResourceString } from '../../utils/ResourceStringUtil'
 
-const icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize')
+const icon_emphasize: ResourceColor = $r('app.color.theme_color_main_yellow')
 
 /**
  * 引导气泡资源目录

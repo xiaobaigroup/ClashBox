@@ -280,7 +280,7 @@ struct About {
           .justifyContent(FlexAlign.Center)
           .alignItems(HorizontalAlign.Center)
           .width('100%')
-          .backgroundColor($r('app.color.container_background'))
+         // .backgroundColor($r('app.color.container_background'))
           .borderRadius(BORDER_RADIUS_20)
           .height(220)
         }

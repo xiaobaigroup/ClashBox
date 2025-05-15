@@ -105,7 +105,7 @@ struct Index {
    *    示例中主题配置里配置了一个颜色，所以只用`ResourceColor`类型的变量来接收色值，
    *    如果有多个颜色，就把这个变量换成`CustomTheme`类型的变量）
    */
-  @Provide('icon_emphasize') icon_emphasize: ResourceColor = $r('sys.color.icon_emphasize')
+  @Provide('icon_emphasize') icon_emphasize: ResourceColor = $r('app.color.theme_color_main_yellow')
   //三级图标色，浅灰色
   @State icon_tertiary: ResourceColor = $r('sys.color.icon_tertiary')
   @Provide greetings: Resource = $r('app.string.GoodMorning')
