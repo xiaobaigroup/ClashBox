@@ -1,0 +1,11 @@
+{
+  "module": {
+    "name": "proxy_core",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet",
+      "2in1"
+    ]
+  }
+}
