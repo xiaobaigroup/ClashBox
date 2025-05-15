@@ -1,4 +1,4 @@
-# PandNEXT
+# ClashBox
 
 [![Downloads](https://img.shields.io/github/downloads/xiaobaigroup/ClashNEXT/total?style=flat-square&logo=github)](https://github.com/xiaobaigroup/ClashNEXT/releases/)[![Last Version](https://img.shields.io/github/release/xiaobaigroup/ClashNEXT/all.svg?style=flat-square)](https://github.com/xiaobaigroup/ClashNEXT/releases/)[![License](https://img.shields.io/github/license/xiaobaigroup/ClashNEXT?style=flat-square)](LICENSE)
 
@@ -10,7 +10,7 @@
 
 #### Introduction
 
-PandNEXT is the first proxy software for the HarmonyOS NEXT (OpenHarmony) platform based on the Navigation framework, using the modified [Mihomo(ClashMeta)](https://github.com/MetaCubeX/mihomo) kernel.
+ClashBox is the first proxy software for the HarmonyOS NEXT (OpenHarmony) platform based on the Navigation framework, using the modified [Mihomo(ClashMeta)](https://github.com/MetaCubeX/mihomo) kernel.
 
 Please read the disclaimer and FAQ carefully before use.
 
