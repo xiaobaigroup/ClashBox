@@ -371,7 +371,7 @@ struct Resources {
                   .transition(this.isON.toggleAnim ? null : customAnimationUtil.isScaleTran(index, this.uiConfig))
                 })
 
-                if (this.uiConfig.userLanguage === 'zh-Hans' || (i18n.System.getSystemLanguage() === 'zh-Hans-CN' && this.uiConfig.userLanguage === 'default')) {
+                if (this.uiConfig.userLanguage === 'zh-Hans' || (this.uiConfig.systemLanguage === 'zh-Hans' && this.uiConfig.userLanguage === 'default')) {
                   // 资源更新提示
                   ListItem() {
                     Text($r('app.string.resources_tips'))

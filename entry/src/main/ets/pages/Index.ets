@@ -360,15 +360,7 @@ struct Index {
  /* // 当手机横屏时条件成立
   deviceHeightListener: mediaquery.MediaQueryListener =
     this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp) and (640vp< width <= 1000vp)');
-  // 平板横屏判断
-  tabletHeightListener: mediaquery.MediaQueryListener =
-    this.getUIContext().getMediaQuery().matchMediaSync('(1000vp< width)');
-  // 折叠屏展开判断
-  foldPhoneOpenListener: mediaquery.MediaQueryListener =
-    this.getUIContext().getMediaQuery().matchMediaSync('(640vp< height <= 1000vp) and (640vp< width <= 1000vp)');*/
-  // 当设备横屏时条件成立
-  // landscapelistener: mediaquery.MediaQueryListener =
-  //   this.getUIContext().getMediaQuery().matchMediaSync('(orientation: landscape)')
+*/
 
   @Builder
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
@@ -377,10 +369,10 @@ struct Index {
       justifyContent:this.isLandscapePhone|| this.istabletLandscape ? FlexAlign.Center: FlexAlign.Start,
       alignItems:this.isLandscapePhone|| (this.istabletLandscape && !this.isPC) ? ItemAlign.End:ItemAlign.Center
     }) {
-      Column({ space:'4vp'}) {
+      Column({ space: 4}) {
         SymbolGlyph(TabIcon)
           .fontColor([this.selectedIndex === index ? this.icon_emphasize : this.icon_tertiary])
-          .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)//分层颜色
+          .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY) // 分层颜色
           .fontSize(this.isLandscapePhone ? 24 : this.TabIconfontSize.value)
           .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
           .transition(customAnimationUtil.isTranslate(this.uiConfig))
@@ -638,20 +630,6 @@ struct Index {
         hilog.info(0x1000, componentName,
           `#媒体查询#设备高度改变#(320vp< height <= 500vp) and (640vp< width <= 1000vp)手机横屏结果: ${this.isLandscapePhone}`)
       })
-      this.foldPhoneOpenListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
-        this.isFoldStatus = mediaQueryResult.matches
-        AppStorage.setOrCreate<boolean>('isFoldStatus', this.isFoldStatus)
-        hilog.info(0xFF00, componentName,
-          `#媒体查询#设备折叠状态改变#(640vp< height <= 1000vp) and (640vp< width <= 1000vp)折叠展开结果: ${this.isFoldStatus}`)
-      })
-    }
-    if (deviceInfo.deviceType === 'tablet') {
-      this.tabletHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
-        this.istabletLandscape = mediaQueryResult.matches
-        AppStorage.setOrCreate<boolean>('istabletLandscape', this.istabletLandscape)
-        hilog.info(0xFF00, componentName,
-          `#媒体查询#设备高度改变#(1000vp< width)平板横屏结果: ${this.istabletLandscape}`)
-      })
     }*/
 
     BreakpointSystem.getInstance().attach(this.compStr)
@@ -870,29 +848,34 @@ struct Index {
       default:
         this.currentLanguage =  $r('app.string.Language_Subtitle')
     }
-    // 初始化系统语言显示
+    // 标准化系统语言
     switch (systemLanguage) {
       case 'zh-Hans-CN':
       case 'zh-Hans':
         this.SystemLanguageSubtitle = $r('app.string.Language_Subtitle')
+        this.uiConfig.systemLanguage = 'zh-Hans'
         break
       case 'en-Latn-US':
       case 'en-Latn':
         this.SystemLanguageSubtitle  = $r('app.string.English_Subtitle')
+        this.uiConfig.systemLanguage = 'en-Latn'
         break
       case 'zh-Hant-HK':
       case 'zh-Hant':
       case 'zh-HK':
         this.SystemLanguageSubtitle = $r('app.string.TraditionalChinese_HK_Subtitle')
+        this.uiConfig.systemLanguage = 'zh-HK'
         break
       case 'zh-Hant-TW':
       case 'zh-TW':
         this.SystemLanguageSubtitle  = $r('app.string.TraditionalChinese_TW_Subtitle')
+        this.uiConfig.systemLanguage = 'zh-TW'
         break
       default:
         this.SystemLanguageSubtitle  =  $r('app.string.Language_Subtitle')
+        // 超出范围保存为系统返回值
+        this.uiConfig.systemLanguage = systemLanguage
     }
-    this.uiConfig.systemLanguage = systemLanguage
     hilog.info(0x1000, componentName, `#aboutToAppear#Language 用户选择语言：${this.uiConfig.userLanguage}`)
     hilog.info(0x1000, componentName, `#aboutToAppear#Language 当前语言文本：${getResourceString(this.currentLanguage, this)}`)
     hilog.info(0x1000, componentName, `#aboutToAppear#Language 当前系统语言文本：${getResourceString(this.SystemLanguageSubtitle, this)}`)
@@ -1142,9 +1125,10 @@ struct Index {
           { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
         )
         .padding({ top: px2vp(this.topRectHeight) })
-    } // 欢迎页&崩溃页
+    }
     .width('100%')
     .height('100%')
+    // 欢迎页&崩溃页
     .bindSheet($$this.isShowWelcome, this.WelcomeSheet(), {
       detents: [BIND_SHEET_CONTAINER_HEIGHT],
       showClose: (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) ? true : false,
