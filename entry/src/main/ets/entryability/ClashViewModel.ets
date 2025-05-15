@@ -238,7 +238,7 @@ export class ClashViewModel {
     try {
       const vpnWant = {
         deviceId: "",
-        bundleName: "org.xbgroup.clashnext",
+        bundleName: "org.xbgroup.clashbox",
         abilityName: "ClashVpnAbility",
         parameters: { "ClashCore" : coreType}
       } as Want

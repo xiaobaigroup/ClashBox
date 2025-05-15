@@ -5,7 +5,7 @@ const profilesDirectoryName = "/profiles";
 
 
 export async function getHome(context: Context | undefined): Promise<string>{
-  let home = context?.filesDir + "/ClashNext"
+  let home = context?.filesDir + "/ClashBox"
   if (!await fs.access(home, fs.AccessModeType.EXIST)){
     fs.mkdir(home)
   }

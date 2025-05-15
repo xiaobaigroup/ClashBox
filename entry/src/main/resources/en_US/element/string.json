@@ -10,7 +10,7 @@
     },
     {
       "name": "EntryAbility_label",
-      "value": "ClashNEXT"
+      "value": "ClashBox"
     },
     {
       "name": "Speed",
@@ -810,7 +810,7 @@
     },
     {
       "name": "star_river_blue",
-      "value": "Star River Blue (default)"
+      "value": "Star River Blue"
     },
     {
       "name": "cat_blue",
@@ -1030,7 +1030,7 @@
     },
     {
       "name": "simulate_locate_closed_content_text",
-      "value": "Turning off this option will result in clashNEXT being unable to run in the background for extended periods of time."
+      "value": "Turning off this option will result in ClashBox being unable to run in the background for extended periods of time."
     },
     {
       "name": "simulate_record_open_tips",
@@ -1686,7 +1686,7 @@
     },
     {
       "name": "statement",
-      "value": "ClashNext is a free software with basic functions and we do not provide any additional services for it. Some networking services use third-party free API interfaces, so there is an access limit. If access exceptions occur, it is normal. For more third-party services, please go to the  "
+      "value": "ClashBox is a free software with basic functions and we do not provide any additional services for it. Some networking services use third-party free API interfaces, so there is an access limit. If access exceptions occur, it is normal. For more third-party services, please go to the  "
     },
     {
       "name": "statement_1",

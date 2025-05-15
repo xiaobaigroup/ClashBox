@@ -17,7 +17,7 @@ export class SocketStubService {
 
   async startService(){
     try {
-      const socketPath = this.vpnService.context.filesDir + '/clashNext.sock'
+      const socketPath = this.vpnService.context.filesDir + '/ClashBox.sock'
       const goPath = this.vpnService.context.filesDir + '/clash_go.sock'
       startIpc(goPath)
       await this.server.listen({ address: socketPath})

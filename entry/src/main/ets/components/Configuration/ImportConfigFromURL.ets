@@ -241,7 +241,7 @@ export struct ImportConfigFromURL{
         this.configCustomDownloadingDialogController.close()
         this.promptAction.showToast({message: getResourceString($r('app.string.download_success'), this)})
       } catch (e) {
-        console.error("ClashNext", e.message, e.stack);
+        console.error("ClashBox", e.message, e.stack);
         this.configCustomDownloadingDialogController.close()
         this.promptAction.showToast({message: getResourceString($r('app.string.download_failed'), this) + e.message || e})
       }
@@ -253,7 +253,7 @@ export struct ImportConfigFromURL{
         await ClashViewModel.addOrUpdateProfileByUrl(this.configData, this.configData.configId)
         this.configCustomDownloadingDialogController.close()
       } catch (e) {
-        console.error("ClashNext", e.message, e.stack);
+        console.error("ClashBox", e.message, e.stack);
         this.configCustomDownloadingDialogController.close()
         this.promptAction.showToast({message: getResourceString($r('app.string.download_failed'), this) + e.message || e})
       }

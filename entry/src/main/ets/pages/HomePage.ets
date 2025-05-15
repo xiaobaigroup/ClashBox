@@ -369,8 +369,8 @@ struct Home {
         Row({space: this.HomeCardTitleButtonPadding.value}) {
           if (!this.isShowHomeEdit) {
             // 编辑布局按钮判定：非编辑状态
-            Text(this.uiConfig.isGreeting ? this.greetings : 'ClashNext')
-              .fontSize(this.calculateFontSizeLinear(this.uiConfig.isGreeting ? getResourceString(this.greetings, this) : 'ClashNEXT'))
+            Text(this.uiConfig.isGreeting ? this.greetings : 'ClashBox')
+              .fontSize(this.calculateFontSizeLinear(this.uiConfig.isGreeting ? getResourceString(this.greetings, this) : 'ClashBox'))
               .layoutWeight(1)
               // .fontSize(this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE - this.curYOffset / 100 : TAB_CONTENT_TITLE_FONT_SIZE)
               .fontWeight(FontWeight.Bold)

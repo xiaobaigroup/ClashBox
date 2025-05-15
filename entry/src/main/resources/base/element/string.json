@@ -10,7 +10,7 @@
     },
     {
       "name": "EntryAbility_label",
-      "value": "ClashNEXT"
+      "value": "ClashBox"
     },
     {
       "name": "Home",
@@ -810,7 +810,7 @@
     },
     {
       "name": "star_river_blue",
-      "value": "星河蓝(默认)"
+      "value": "星河蓝"
     },
     {
       "name": "cat_blue",
@@ -818,7 +818,7 @@
     },
     {
       "name": "yellow",
-      "value": "便单黄"
+      "value": "浣熊黄(默认)"
     },
     {
       "name": "red",
@@ -1030,7 +1030,7 @@
     },
     {
       "name": "simulate_locate_closed_content_text",
-      "value": "关闭此选项可能会导致clashNEXT无法在后台长时间运行"
+      "value": "关闭此选项可能会导致ClashBox无法在后台长时间运行"
     },
     {
       "name": "simulate_record_open_tips",
@@ -1686,7 +1686,7 @@
     },
     {
       "name": "statement",
-      "value": "ClashNext是一个基础功能免费的软件并且我们不为其提供任何额外服务，部分联网服务使用的是第三方免费API接口，因此具有访问上限，若出现访问异常属于正常现象，更多第三方服务请前往"
+      "value": "ClashBox是一个基础功能免费的软件并且我们不为其提供任何额外服务，部分联网服务使用的是第三方免费API接口，因此具有访问上限，若出现访问异常属于正常现象，更多第三方服务请前往"
     },
     {
       "name": "statement_1",

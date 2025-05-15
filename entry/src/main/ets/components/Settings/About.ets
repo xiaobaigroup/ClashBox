@@ -108,7 +108,7 @@ struct About {
       case 'Repositories':
         // 跳转仓库
         // hilog.info(0xFF00, "AboutestTag", "仓库")
-        implicitStartAbility('https://github.com/xiaobaigroup/ClashNEXT', context)
+        implicitStartAbility('https://github.com/xiaobaigroup/ClashBox', context)
         // promptAction.showToast({message: $r('app.string.not_open'), duration: 2000 })
       break
       default :
@@ -262,23 +262,22 @@ struct About {
       List() {
         // Logo&名称
         ListItem() {
-          Column() {
+          Column({space: 15}) {
+            // logo
             Stack() {
-              Image($r('app.media.foreground'))
-                .height(160)
+              Image($r('app.media.background_warm'))
+                .borderRadius(25)
+                .height(106)
+                .zIndex(1)
+              Image($r("app.media.panda"))
+                .height(106)
                 .zIndex(2)
-              Stack() {
-                Image($r('app.media.About_name_1'))
-                  .width(192)
-                  .fillColor($r('app.color.symbol_logo_name_color'))
-                Image($r('app.media.About_name_2'))
-                  .height(26)
-                  .offset({x: 51, y: -1})
-              }
-              .offset({y: 86})
             }
+            // 名称
+            Image($r('app.media.clashbox'))
+              .width(192)
           }
-          .justifyContent(FlexAlign.Start)
+          .justifyContent(FlexAlign.Center)
           .alignItems(HorizontalAlign.Center)
           .width('100%')
           .backgroundColor($r('app.color.container_background'))

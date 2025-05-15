@@ -358,7 +358,7 @@ export  const ListOverwriteBasicData = (clashConfig: ClashConfig, appConfig: App
     new ConfigItemData($r('sys.symbol.info_circle'), 'log-level', $r('app.string.LogLevel'), '', $r('app.string.Info'), 0).bindClashConfig(clashConfig).bindOption(LogMenu),
     new ConfigItemData($r('sys.symbol.person_shield_fill'), 'global-ua', $r('app.string.UA'), '', $r('app.string.Default_UA'), 0).bindClashConfig(clashConfig).bindOption([
       {title: AppState.globalUA, value: AppState.globalUA },
-      {title: 'ClashNext/v2.0.0', value:"ClashNext/v2.0.0"},
+      {title: 'ClashBox/v2.0.0', value:"ClashBox/v2.0.0"},
       {title: 'clash.meta/1.18.7', value:"clash.meta/1.18.7"},
       {title: 'clash-verge/v1.6.6', value:"clash-verge/v1.6.6"},
       {title: 'ClashforWindows/0.19.23', value:"ClashforWindows/0.19.23"},
@@ -607,9 +607,9 @@ export const AppearanceList: AppearanceListItemProp[] = [
   },
   { title: $r('app.string.theme_color'),
     children: [
+      { title: $r('app.string.yellow'), customThemeName: 'yellowAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_yellow')] },
       { title: $r('app.string.star_river_blue'), customThemeName: 'blueAppTheme', startSymbolFontColor: [$r('sys.color.icon_emphasize')] },
       { title: $r('app.string.cat_blue'), customThemeName: 'catBlueAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_cat_blue')] },
-      { title: $r('app.string.yellow'), customThemeName: 'yellowAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_yellow')] },
       { title: $r('app.string.red'), customThemeName: 'redAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_red')] },
       { title: $r('app.string.purple'), customThemeName: 'purpleAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_purple')] },
       { title: $r('app.string.pink'), customThemeName: 'pinkAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_pink')] },

@@ -263,7 +263,7 @@ export class SocketProxyService implements IClashManager {
       // {"proxy-name":"♻️自动选择","timeout":3000}
       let socketPath = this.context?.filesDir + '/clash_go.sock'
       if (method == ClashRpcType.startClash || method == ClashRpcType.stopClash){
-        socketPath = this.context?.filesDir + '/clashNext.sock'
+        socketPath = this.context?.filesDir + '/ClashBox.sock'
       }
       client.connect({address: { address: socketPath }, timeout:1000}).then(async ()=>{
         this.active = true

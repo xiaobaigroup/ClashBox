@@ -64,7 +64,7 @@ export class UIConfig{
   // 主页问候语
   isGreeting?: boolean = true
   // 主题色
-  themeColor: CustomThemeName = 'blueAppTheme'
+  themeColor: CustomThemeName = 'yellowAppTheme'
   // 主题色序号
   themeColorIndex: number = 0
   // 深色模式序号

@@ -19,7 +19,7 @@
         "description": "$string:EntryAbility_desc",
         "icon": "$media:layered_image",
         "label": "$string:EntryAbility_label",
-        "startWindowIcon": "$media:foreground",
+        "startWindowIcon": "$media:panda",
         "startWindowBackground": "$color:start_window_background",
         "orientation": "auto_rotation_restricted",
         "supportWindowMode": ["floating","split","fullscreen"],
@@ -56,11 +56,11 @@
         // 长时后台
         "name": "ohos.permission.KEEP_BACKGROUND_RUNNING"
       },
-      {
-        "name": "ohos.permission.MICROPHONE",
-        "reason": "$string:permission_reason_MICROPHONE",
-        "usedScene": {}
-      },
+//      {
+//        "name": "ohos.permission.MICROPHONE",
+//        "reason": "$string:permission_reason_MICROPHONE",
+//        "usedScene": {}
+//      },
       {
         "name": "ohos.permission.LOCATION",
         "reason":  "$string:permission_reason_MICROPHONE",

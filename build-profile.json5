@@ -5,26 +5,26 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "storeFile": "D:/证书/.p12",
-          "storePassword": "0000001D7421B125A26255CFEF5C86FFCBDE8287EB6CC5704B8202D89DFCDFD036D2FAABE59C47DBA1876E839B",
-          "keyAlias": "xiaobaituandui",
-          "keyPassword": "0000001DDCDFAA7A553B31864065556C2A811ED9C9198B70089652DA9DB79F54733BA99BD45B7EB44F605564C8",
+          "certpath": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashBox_yddCSabCuwuRMJdsGZDxF2XpfNYkUl1fZVP3BG0cRCA=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001B5A38868E0CFE50C64E2F4F04109B25BBF03C682B01C7CDF6977AA7D59E2F77DC4D50E98C1C739E",
+          "profile": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashBox_yddCSabCuwuRMJdsGZDxF2XpfNYkUl1fZVP3BG0cRCA=.p7b",
           "signAlg": "SHA256withECDSA",
-          "profile": "D:/证书/xiaobaituanduiRelease.p7b",
-          "certpath": "D:/证书/小白团队.cer"
+          "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashBox_yddCSabCuwuRMJdsGZDxF2XpfNYkUl1fZVP3BG0cRCA=.p12",
+          "storePassword": "0000001B150A5697CC31937E8046C31CB333E980DC12D183600B9E97706B8B3E439E43CB544861C32395B2"
         }
       },
       {
         "name": "usePX",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "C:\\Users\\Administrator\\.ohos\\config\\usePX_clashnext_Apnc9t_FUReHaFfg8Vz9lpnZZJ7DvWIe8Dh4lmf_dwI=.cer",
+          "certpath": "C:\\Users\\Administrator\\.ohos\\config\\usePX_ClashBox_Apnc9t_FUReHaFfg8Vz9lpnZZJ7DvWIe8Dh4lmf_dwI=.cer",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001B11B79F18D67B014489CBEECCC3A94C1F85BC67B71AE9D0D74124C2867385E4454038C15AB1A2A7",
-          "profile": "C:\\Users\\Administrator\\.ohos\\config\\usePX_clashnext_Apnc9t_FUReHaFfg8Vz9lpnZZJ7DvWIe8Dh4lmf_dwI=.p7b",
+          "keyPassword": "0000001A196067680FC1658D6627B8311B370BC1E703440E650E38BB094B9C7476BE3948029166ABD6DF",
+          "profile": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashBox_zL_lCO4bAvPSCUi1B2mkUCrHIVGxm3QDrMJXyoen8AI=.p7b",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\usePX_clashnext_Apnc9t_FUReHaFfg8Vz9lpnZZJ7DvWIe8Dh4lmf_dwI=.p12",
-          "storePassword": "0000001B18DE747E11EF5159F6BFBE24B6A5FCAFC32B9F943C2B9115C1A1A75C6A1652A31F43CCCCF7643E"
+          "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashBox_zL_lCO4bAvPSCUi1B2mkUCrHIVGxm3QDrMJXyoen8AI=.p12",
+          "storePassword": "0000001A08D13EA4DF4FEA7827F29C88EA42338282F04E69A7173A3D240867BECE8655C6A3476E9C92B3"
         }
       }
     ],

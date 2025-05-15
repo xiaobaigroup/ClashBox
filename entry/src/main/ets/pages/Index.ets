@@ -1040,7 +1040,7 @@ struct Index {
         this.heightTop = 0
       })
   }
-// 监听上下滚动时，tab是否隐藏
+  // 监听上下滚动时，tab是否隐藏
   isHiddenChange(){
     if (this.isSmallSquareScreen && this.isRolling){
       this.startAnimPX()

@@ -42,7 +42,7 @@ struct Appearance {
   // 深色模式选中文本
   @State EnableDarkModeText: ResourceStr = $r('app.string.follow_system')
   // 主题色选中文本
-  @State EnableThemeColorText: ResourceStr = $r('app.string.star_river_blue')
+  @State EnableThemeColorText: ResourceStr = $r('app.string.yellow')
   // 按钮位置选中文本
   @State EnableButtonPositionText: ResourceStr = $r('app.string.right')
   // 动画速度选中文本

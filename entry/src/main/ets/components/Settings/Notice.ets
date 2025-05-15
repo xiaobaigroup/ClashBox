@@ -175,7 +175,7 @@ struct Notice {
       uri: "application_info_entry", // 系统设置的界面 （固定）
       parameters: {
         // pushParams: 'cn.damai.hongmeng' // 包名
-        pushParams: "org.xbgroup.clashnext",
+        pushParams: "org.xbgroup.clashbox",
       }
     })
   }

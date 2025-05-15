@@ -120,18 +120,20 @@ export struct Welcome {
   @Builder
   content() {
     // Logo&欢迎语
-    Column() {
-      Image($r('app.media.foreground'))
-        .height(180)
-      Row() {
-        Text(`${getResourceString($r('app.string.welcome'), this)}Clash`)
-          .fontSize(30)
-          .fontWeight(FontWeight.Bold)
-        Text('NEXT')
-          .fontSize(30)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(this.icon_emphasize)
+    Column({space: 15}) {
+      // logo
+      Stack() {
+        Image($r('app.media.background_warm'))
+          .borderRadius(25)
+          .height(106)
+          .zIndex(1)
+        Image($r("app.media.panda"))
+          .height(106)
+          .zIndex(2)
       }
+      // 名称
+      Image($r('app.media.clashbox'))
+        .width(192)
     }.width('100%')
     .layoutWeight(1)
     .justifyContent(FlexAlign.Center)
