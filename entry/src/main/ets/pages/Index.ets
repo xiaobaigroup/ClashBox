@@ -859,6 +859,7 @@ struct Index {
         this.currentLanguage = $r('app.string.English_Subtitle')
         break
       case 'zh-Hant-HK':
+      case 'zh-Hant':
       case 'zh-HK':
         this.currentLanguage = $r('app.string.TraditionalChinese_HK_Subtitle')
         break
@@ -880,6 +881,7 @@ struct Index {
         this.SystemLanguageSubtitle  = $r('app.string.English_Subtitle')
         break
       case 'zh-Hant-HK':
+      case 'zh-Hant':
       case 'zh-HK':
         this.SystemLanguageSubtitle = $r('app.string.TraditionalChinese_HK_Subtitle')
         break
