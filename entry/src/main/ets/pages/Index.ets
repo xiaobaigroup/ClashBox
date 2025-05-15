@@ -626,7 +626,7 @@ struct Index {
     //   // 屏蔽分流策略
     //   this.moreList = removeItemsByIndex(this.moreList, [5])
     // }
-    // if(this.appConfig.clashCore !== ClashCore.FlClash) {
+    // if(this.appConfig.clashCore !== ClashCore.mihomo) {
     //   // 屏蔽请求与连接
     //   this.moreList = removeItemsByIndex(this.moreList, [2,3])
     // }

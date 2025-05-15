@@ -58,7 +58,7 @@ export default class EntryAbility extends UIAbility {
       // 切换核心
       promptAction.showToast({message: "核心启动中..."})
       await ClashViewModel.ChangeCore(clashCore)
-      if(clashCore != ClashCore.FlClash){
+      if(clashCore != ClashCore.mihomo){
         let service = new SocketStubService(this.context);
         service.startService()
       }

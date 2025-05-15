@@ -23,8 +23,8 @@ export enum SwitchModeCard{
   Direct = "DIRECT"
 }
 export enum ClashCore{
-  FlClash,
-  // 非FlClash 用于开发调试， ui进程运行vpn核心；调试vpn核心崩溃和杀进程问题
+  mihomo,
+  // 非mihomo用于开发调试， ui进程运行vpn核心；调试vpn核心崩溃和杀进程问题
   ClashMeta,
   ClashRs,
 }
@@ -48,7 +48,7 @@ export class AppConfig{
   enableRequest: boolean = false
   enableConnect: boolean = false
   testUrl: string = "https://www.gstatic.com/generate204"
-  clashCore: ClashCore = ClashCore.FlClash
+  clashCore: ClashCore = ClashCore.mihomo
   switchMode: ProxyMode = ProxyMode.Rule
   constructor() {
   }

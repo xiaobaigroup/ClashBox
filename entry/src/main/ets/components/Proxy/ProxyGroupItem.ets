@@ -282,7 +282,7 @@ struct ProxyGroupItem {
           })
       }
       // ClashMeta内核时暂时不能测速及延迟  暂时先屏蔽
-      if (this.appConfig.clashCore === ClashCore.FlClash) {
+      if (this.appConfig.clashCore === ClashCore.mihomo) {
         MenuItem({ symbolStartIcon: this.startIconModifier1, content: $r('app.string.Test_Delay') })
           .onClick(() => {
             ClashViewModel.testDelay(item.name)

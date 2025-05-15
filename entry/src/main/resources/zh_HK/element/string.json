@@ -1609,6 +1609,10 @@
       "value": "秒"
     },
     {
+      "name": "mihomo_subtitle",
+      "value": "一款優秀嘅開源內核"
+    },
+    {
       "name": "flclash_subtitle",
       "value": "用於借鑑參考的優秀開源專案"
     },

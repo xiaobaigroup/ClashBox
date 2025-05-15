@@ -108,7 +108,7 @@ struct About {
         // 跳转仓库
         // hilog.info(0xFF00, "AboutestTag", "仓库")
         implicitStartAbility('https://github.com/xiaobaigroup/ClashNEXT', context)
-        promptAction.showToast({message: $r('app.string.not_open'), duration: 2000 })
+        // promptAction.showToast({message: $r('app.string.not_open'), duration: 2000 })
       break
       default :
         this.SettingsPageInfos.pushPathByName(name, false)
@@ -190,10 +190,10 @@ struct About {
     if (showItem && showItem.children) {
       switch (kernel) {
         case 0:
-          showItem.children[1].subtitle = `FlClash ${showItem.children[1].subtitle}`
+          showItem.children[1].subtitle = `mihomo ${showItem.children[1].subtitle}`
           break
         case 1:
-          showItem.children[1].subtitle = `FlClash(前台模式) ${showItem.children[1].subtitle}`
+          showItem.children[1].subtitle = `前台模式 ${showItem.children[1].subtitle}`
           break
         case 2:
           showItem.children[1].subtitle = `ClashRS ${showItem.children[1].subtitle}`
@@ -477,6 +477,10 @@ export struct AboutContributors {
         // 小雅
         handleMailto('mailto:xytdg520@qq.com?subject=联系&body=你的内容...', context)
       break
+      case 6:
+        // mihomo
+        implicitStartAbility('https://github.com/MetaCubeX/mihomo', context)
+        break
       case 6:
         // FlClash
         implicitStartAbility('https://github.com/chen08209/FlClash', context)

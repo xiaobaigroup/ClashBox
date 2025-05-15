@@ -37,17 +37,17 @@ struct Kernel {
   @Consume moreList: moreData[]
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @State private kernel: KernelListItem[] = [
-    {icons: $rawfile('FlClash.svg'), title: 'FlClash', subtitle: $r('app.string.new_kernel'), isExperimental: false, ClashCore: ClashCore.FlClash},
-    {icons: $rawfile('FlClash.svg'), title: "FlClash(前台模式)", subtitle: $r('app.string.switch_core_foreground_prompt'), isExperimental: false, ClashCore: ClashCore.ClashMeta},
+    {icons: $rawfile('mihomo.png'), title: 'mihomo', subtitle: $r('app.string.new_kernel'), isExperimental: false, ClashCore: ClashCore.mihomo},
+    {icons: $rawfile('mihomo.png'), title: "前台模式", subtitle: $r('app.string.switch_core_foreground_prompt'), isExperimental: false, ClashCore: ClashCore.ClashMeta},
     //{icons: $rawfile('ClashRS.svg'), title: 'ClashRS', subtitle: $r('app.string.new_kernel'), isExperimental: true, ClashCore: ClashCore.ClashRs}
   ]
 
   handleClick(index: number) {
     switch (index) {
       case 0:
-        // FlClash
-        this.appConfig.clashCore = ClashCore.FlClash
-        ClashViewModel.ChangeCore(ClashCore.FlClash)
+        // mihomo
+        this.appConfig.clashCore = ClashCore.mihomo
+        ClashViewModel.ChangeCore(ClashCore.mihomo)
         hilog.info(0xFF00, "SettingsKerneltestTag", "当前内核：%{public}d", this.appConfig.clashCore)
         promptAction.showToast({message: $r('app.string.restart_tips'), duration: 2000 })
         setTimeout(() => {
@@ -101,6 +101,7 @@ struct Kernel {
               Image(item.icons)
                 .width(48)
                 .height(48)
+                .borderRadius(15)
                 .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                 .transition(customAnimationUtil.isScaleTranIcon(10,this.uiConfig))
               Column() {

@@ -11,8 +11,8 @@ export default class ClashVpnAbility extends VpnExtensionAbility {
   }
   async onCreate(want: Want) {
     try {
-      let core = want.parameters?.["ClashCore"] as ClashCore ?? ClashCore.FlClash
-      if(core == ClashCore.FlClash){
+      let core = want.parameters?.["ClashCore"] as ClashCore ?? ClashCore.mihomo
+      if(core == ClashCore.mihomo){
         console.log("ClashNext", `启用核心 FlClash`);
         this.clashStubService = new SocketStubService( this.context)
         await this.clashStubService.startService()
