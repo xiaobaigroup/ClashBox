@@ -56,7 +56,7 @@ export struct CommonPage {
       this.currentPorts[0].postMessageEvent('zh-Hans')
       console.log(`CommonPage #webview #setLanguage zh-Hans`)
     } else {
-      this.currentPorts[0].postMessageEvent(`${/*i18n.System.getSystemLanguage() ?? */this.uiConfig.userLanguage}`);
+      this.currentPorts[0].postMessageEvent(`${i18n.System.getSystemLanguage() ?? this.uiConfig.userLanguage}`);
     }
   }
 

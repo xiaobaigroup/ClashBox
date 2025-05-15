@@ -988,7 +988,7 @@ export const HomeCardAreaPadding: BreakpointState<MarginGenerate> = BreakpointSt
   sm: ({top: 4, left: 14, right: 14} as MarginGenerate),
   md: ({top: 4, left: 100, right: 100} as MarginGenerate),
   lg: ({top: 4, left: 14, right: 14} as MarginGenerate),
-  xl: ({top: 4, left: 14, right: 14} as MarginGenerate)
+  xl: ({top: 4, left: 30, right: 30} as MarginGenerate)
 })
 
 // 主页栅格卡片间距定义
@@ -1119,7 +1119,7 @@ export const IPfontSize: BreakpointState<number> = BreakpointState.of({
  * 主页添加卡片半模拟态卡片高度
  */
 export const HomeCardEditHeight: BreakpointState<number> = BreakpointState.of({
-  sm: 160, md: 160, lg: 180, xl: 180
+  sm: 160, md: 160, lg: 160, xl: 165
 });
 /**
  * 主页卡片内容网络测速字体大小

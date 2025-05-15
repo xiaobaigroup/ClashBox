@@ -451,7 +451,7 @@ struct Index {
       this.isLandscapePhone = true
       hilog.info(0x1000, componentName,
         `#WindowChange#应用窗口状态改变#(320vp< height <= 500vp) and (640vp< width <= 1000vp)手机横屏结果: ${this.isLandscapePhone}`)
-    } else if ((640 < this.windowWidth && this.windowWidth < 745 && 640 < this.windowHeight && this.windowHeight < 835)) {
+    } else if ((640 < this.windowWidth && this.windowWidth < 850 && 640 < this.windowHeight && this.windowHeight < 835)) {
       this.isFoldStatus = true
       hilog.info(0xFF00, componentName,
         `#WindowChange#设备折叠状态改变#(640vp< height <= 1000vp) and (640vp< width <= 1000vp)折叠展开结果: ${this.isFoldStatus}`)
