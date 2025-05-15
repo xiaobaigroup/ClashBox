@@ -1963,6 +1963,14 @@
     {
       "name": "resources_tips",
       "value": "因部分地區IP連線至GitHub平台遭封鎖，若要透過預設網址更新資源時，請先開啟代理服務。"
+    },
+    {
+      "name": "qq_copy",
+      "value": "已複製QQ群組編號"
+    },
+    {
+      "name": "copy_qq_group",
+      "value": "複製群組編號"
     }
   ]
 }

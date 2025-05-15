@@ -51,13 +51,8 @@ export struct CommonPage {
   }
 
   setLanguage() {
-    if (this.uiConfig.userLanguage === 'zh-Hans' || (i18n.System.getSystemLanguage() === 'zh-Hans-CN' && this.uiConfig.userLanguage === 'default')) {
-      // 简体中文
-      this.currentPorts[0].postMessageEvent('zh-Hans')
-      console.log(`CommonPage #webview #setLanguage zh-Hans`)
-    } else {
-      this.currentPorts[0].postMessageEvent(`${i18n.System.getSystemLanguage() ?? this.uiConfig.userLanguage}`);
-    }
+    // 保险起见用回调
+    this.currentPorts[0].postMessageEvent(`${i18n.System.getSystemLanguage()}`);
   }
 
   // 获取web高度

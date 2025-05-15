@@ -1963,6 +1963,14 @@
     {
       "name": "resources_tips",
       "value": "由於部分地區IP存取Github受限制，如需使用預設地址更新資源時，請先開啓代理服務。"
+    },
+    {
+      "name": "qq_copy",
+      "value": "已複製QQ群組號碼"
+    },
+    {
+      "name": "copy_qq_group",
+      "value": "複製群組號碼"
     }
   ]
 }

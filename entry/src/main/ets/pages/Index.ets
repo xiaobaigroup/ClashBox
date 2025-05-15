@@ -88,6 +88,7 @@ import BackgroundDownService from '../utils/BackgroundDownService'
 import { ConvertedUnit } from '../utils/DataUnitConvertUtils'
 import { CommonPage } from '../components/Start/CommonPage'
 import { WelcomeUserAgreement } from '../components/Start/WelcomePage'
+import { i18n } from '@kit.LocalizationKit'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 const context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
@@ -297,6 +298,8 @@ struct Index {
   @Provide('stackAlignContentAlignment') stackAlignContentAlignment: Alignment = Alignment.BottomEnd
   // 收藏的代理
   @StorageLink('favoriteProfiles') favoriteProfiles: Map<string, string> = new Map<string, string>([])
+
+  @Provide SystemLanguageSubtitle: ResourceStr = $r('app.string.SimplifiedChinese')
 
   /* 配置页 */
   @Provide currentConfigRadioCheckedConfigData: ConfigData = {
@@ -596,10 +599,6 @@ struct Index {
     this.switchButtonPosition(this.uiConfig.buttonPositionIndex)
     // 初始化实验功能显示状态
     this.isShowExperimentalFunction = this.uiConfig.isShowExperimentalFunction
-    // 初始化用户语言
-    if (this.uiConfig.userLanguage) {
-      ChangeLanguage(this.uiConfig.userLanguage)
-    }
     // 检查版本更新
     if (this.uiConfig.autoCheckUpdate) {
       try {
@@ -839,6 +838,62 @@ struct Index {
     this.isForeward = true
     this.ShowPipChange()
     PipManager.getInstance().stopPip()
+    // 初始化应用语言
+    const systemLanguage = i18n.System.getSystemLanguage()
+    let currentLanguage = ''
+    if (this.uiConfig.userLanguage !== 'default') {
+      currentLanguage = this.uiConfig.userLanguage
+      ChangeLanguage(this.uiConfig.userLanguage)
+    } else {
+      currentLanguage = systemLanguage
+      ChangeLanguage(systemLanguage)
+    }
+    // 初始化当前语言显示
+    switch (currentLanguage) {
+      case 'zh-Hans-CN':
+      case 'zh-Hans':
+        this.currentLanguage = $r('app.string.Language_Subtitle')
+        break
+      case 'en-Latn-US':
+      case 'en-Latn':
+        this.currentLanguage = $r('app.string.English_Subtitle')
+        break
+      case 'zh-Hant-HK':
+      case 'zh-HK':
+        this.currentLanguage = $r('app.string.TraditionalChinese_HK_Subtitle')
+        break
+      case 'zh-Hant-TW':
+      case 'zh-TW':
+        this.currentLanguage = $r('app.string.TraditionalChinese_TW_Subtitle')
+        break
+      default:
+        this.currentLanguage =  $r('app.string.Language_Subtitle')
+    }
+    // 初始化系统语言显示
+    switch (systemLanguage) {
+      case 'zh-Hans-CN':
+      case 'zh-Hans':
+        this.SystemLanguageSubtitle = $r('app.string.Language_Subtitle')
+        break
+      case 'en-Latn-US':
+      case 'en-Latn':
+        this.SystemLanguageSubtitle  = $r('app.string.English_Subtitle')
+        break
+      case 'zh-Hant-HK':
+      case 'zh-HK':
+        this.SystemLanguageSubtitle = $r('app.string.TraditionalChinese_HK_Subtitle')
+        break
+      case 'zh-Hant-TW':
+      case 'zh-TW':
+        this.SystemLanguageSubtitle  = $r('app.string.TraditionalChinese_TW_Subtitle')
+        break
+      default:
+        this.SystemLanguageSubtitle  =  $r('app.string.Language_Subtitle')
+    }
+    this.uiConfig.systemLanguage = systemLanguage
+    hilog.info(0x1000, componentName, `#aboutToAppear#Language 用户选择语言：${this.uiConfig.userLanguage}`)
+    hilog.info(0x1000, componentName, `#aboutToAppear#Language 当前语言文本：${getResourceString(this.currentLanguage, this)}`)
+    hilog.info(0x1000, componentName, `#aboutToAppear#Language 当前系统语言文本：${getResourceString(this.SystemLanguageSubtitle, this)}`)
   }
 
   onPageHide(): void {

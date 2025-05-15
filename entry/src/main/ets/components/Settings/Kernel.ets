@@ -38,7 +38,7 @@ struct Kernel {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @State private kernel: KernelListItem[] = [
     {icons: $rawfile('mihomo.png'), title: 'mihomo', subtitle: $r('app.string.new_kernel'), isExperimental: false, ClashCore: ClashCore.mihomo},
-    {icons: $rawfile('mihomo.png'), title: "前台模式", subtitle: $r('app.string.switch_core_foreground_prompt'), isExperimental: false, ClashCore: ClashCore.ClashMeta},
+    {icons: $rawfile('mihomo.png'), title: "前台模式(mihomo)", subtitle: $r('app.string.switch_core_foreground_prompt'), isExperimental: false, ClashCore: ClashCore.ClashMeta},
     //{icons: $rawfile('ClashRS.svg'), title: 'ClashRS', subtitle: $r('app.string.new_kernel'), isExperimental: true, ClashCore: ClashCore.ClashRs}
   ]
 

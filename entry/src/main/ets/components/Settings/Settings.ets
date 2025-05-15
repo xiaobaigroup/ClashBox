@@ -72,7 +72,6 @@ struct Settings {
   })
 
   onAccept() {
-
   }
 
   /**

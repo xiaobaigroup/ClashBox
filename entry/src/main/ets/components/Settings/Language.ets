@@ -13,7 +13,7 @@ struct Language {
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @Consume currentLanguage: ResourceStr
-  @State SystemLanguageSubtitle: ResourceStr = $r('app.string.SimplifiedChinese')
+  @Consume SystemLanguageSubtitle: ResourceStr
   @State private currentRadioCheck: number = -1
   @State SettingsLanguageList: LanguageData[] = LanguageListItem()
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
@@ -34,16 +34,28 @@ struct Language {
   }
 
   FollowSystemHotChanage() {
-    switch (i18n.System.getSystemLanguage()) {
+    switch (this.uiConfig.systemLanguage) {
       case 'zh-Hans-CN':
-        // 简体中文
-        ChangeLanguage('zh-Hans')
+      case 'zh-Hans':
         this.currentLanguage = $r('app.string.Language_Subtitle')
-      break
-      default :
-        // TODO 存在隐患，没有确定其它语言文本时函数返回值
-        ChangeLanguage(i18n.System.getSystemLanguage())
+        break
+      case 'en-Latn-US':
+      case 'en-Latn':
+        this.currentLanguage = $r('app.string.English_Subtitle')
+        break
+      case 'zh-Hant-HK':
+      case 'zh-HK':
+        this.currentLanguage = $r('app.string.TraditionalChinese_HK_Subtitle')
+        break
+      case 'zh-Hant-TW':
+      case 'zh-TW':
+        this.currentLanguage = $r('app.string.TraditionalChinese_TW_Subtitle')
+        break
+      default:
+        promptAction.showToast({message: `切换错误，当前系统语言：${this.uiConfig.systemLanguage}`, duration: 2000 })
+        this.currentLanguage =  $r('app.string.Language_Subtitle')
     }
+    ChangeLanguage(this.uiConfig.systemLanguage)
   }
 
   build() {
@@ -86,8 +98,8 @@ struct Language {
           // 点击整行对应单选框选中
            this.currentRadioCheck = -1
           // 恢复默认
-          ChangeLanguage("default")
           this.uiConfig.userLanguage = "default"
+          // ChangeLanguage("default")
           // promptAction.showToast({message: $r('app.string.restart_app_tips'), duration: 2000 })
           this.FollowSystemHotChanage()
         })

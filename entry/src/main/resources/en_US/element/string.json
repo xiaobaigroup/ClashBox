@@ -1963,6 +1963,14 @@
     {
       "name": "resources_tips",
       "value": "Because the IP access to GitHub in some regions is limited, please enable the proxy service before updating resources with the default address."
+    },
+    {
+      "name": "qq_copy",
+      "value": "QQ group number copied"
+    },
+    {
+      "name": "copy_qq_group",
+      "value": "Copy Group Number"
     }
   ]
 }

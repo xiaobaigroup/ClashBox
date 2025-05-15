@@ -26,6 +26,7 @@ import { customSound } from "../../utils/SoundPoolUtil"
 import { getResourceString } from "../../utils/ResourceStringUtil"
 import { extractUpdateInfo, getUpdateInfo, UpdateInfo } from "../../utils/CheckUpdateUtil"
 import { handleMailto } from "../../utils/MailTwoUtil"
+import { copy } from "../../utils/ClipBoardUtil"
 
 const context = getContext(this) as common.UIAbilityContext
 
@@ -453,19 +454,19 @@ export struct AboutContributors {
         // 小白
         implicitStartAbility('https://github.com/likuai2010', context)
       break
-      case 1:
+      case 3:
         // 船长
         handleMailto('mailto:xfz347@gmail.com?subject=联系&body=你的内容...', context)
       break
-      case 2:
+      case 4:
         // 柯蓝KL
         implicitStartAbility('https://github.com/kelanKL', context)
       break
-      case 3:
+      case 5:
         // 恩临大帝
         handleMailto('mailto:ealion@outlook.com?subject=联系&body=你的内容...', context)
       break
-      case 4:
+      case 6:
         // crazypig321
         implicitStartAbility('https://github.com/crazypig321', context)
       break
@@ -473,17 +474,22 @@ export struct AboutContributors {
         // 鱼🐟
         // implicitStartAbility('https://github.com/yu', context)
         break*/
-      case 5:
+      case 7:
         // 小雅
         handleMailto('mailto:xytdg520@qq.com?subject=联系&body=你的内容...', context)
       break
-      case 6:
+      case 1:
         // mihomo
         implicitStartAbility('https://github.com/MetaCubeX/mihomo', context)
         break
-      case 6:
+      case 2:
         // FlClash
         implicitStartAbility('https://github.com/chen08209/FlClash', context)
+      break
+      case 9:
+        // 交流群
+        copy('693903194')
+        promptAction.showToast({ message: `${getResourceString($r('app.string.qq_copy'), this)}：693903194`})
       break
     }
   }

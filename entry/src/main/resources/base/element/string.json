@@ -1963,6 +1963,14 @@
     {
       "name": "resources_tips",
       "value": "因部分地区IP访问Github受限，要使用默认地址更新资源时请先开启代理服务"
+    },
+    {
+      "name": "qq_copy",
+      "value": "已复制QQ群号"
+    },
+    {
+      "name": "copy_qq_group",
+      "value": "复制群号"
     }
   ]
 }

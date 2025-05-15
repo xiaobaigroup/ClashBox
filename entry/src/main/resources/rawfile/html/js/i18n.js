@@ -18,7 +18,16 @@ window.addEventListener("message", (event) => {
 })
 
 function loadLanguage(lang) {
-    currentPort.postMessage('loadLanguage开始运行')
+    if (lang === 'zh-Hans-CN') {
+        lang = 'zh-Hans'
+    } else if (lang === 'en-Latn-US') {
+        lang = 'en-Latn'
+    } else if (lang === 'zh-Hant-HK') {
+        lang = 'zh-HK'
+    } else if (lang === 'zh-Hant-TW') {
+        lang = 'zh-TW'
+    }
+    currentPort.postMessage(`loadLanguage开始运行: ${lang}`)
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
         element.textContent = translations[lang][key];

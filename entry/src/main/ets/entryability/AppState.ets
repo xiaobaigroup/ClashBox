@@ -83,6 +83,8 @@ export class UIConfig{
   isShowHomeCard: string = JSON.stringify(showHomeCard)
   // 用户选择的语言
   userLanguage: string = "default"
+  // 系统语言
+  systemLanguage: string = ''
   // 震动反馈变量
   isVibrate: boolean = true
   // 声音反馈变量
