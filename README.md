@@ -1,7 +1,7 @@
 [English](/README_en.md)
 
 # ClashBox
-[![Downloads](https://img.shields.io/github/downloads/xiaobaigroup/ClashNEXT/total?style=flat-square&logo=github)](https://github.com/xiaobaigroup/ClashNEXT/releases/)[![Last Version](https://img.shields.io/github/release/xiaobaigroup/ClashNEXT/all.svg?style=flat-square)](https://github.com/xiaobaigroup/ClashNEXT/releases/)[![License](https://img.shields.io/github/license/xiaobaigroup/ClashNEXT?style=flat-square)](LICENSE)
+[![Downloads](https://img.shields.io/github/downloads/xiaobaigroup/ClashBox/total?style=flat-square&logo=github)](https://github.com/xiaobaigroup/ClashBox/releases/)[![Last Version](https://img.shields.io/github/release/xiaobaigroup/ClashBox/all.svg?style=flat-square)](https://github.com/xiaobaigroup/ClashBox/releases/)[![License](https://img.shields.io/github/license/xiaobaigroup/ClashBox?style=flat-square)](LICENSE)
 
 [![Channel](https://img.shields.io/badge/Telegram-Channel-blue?style=flat-square&logo=telegram)](https://t.me/+aYziOyq-ZhUyNjRl)
 
@@ -33,7 +33,7 @@ ClashBox是首个基于Navigation框架的HarmonyOS NEXT(OpenHarmony)平台的�
 #### 赞助&联系我们
 
 目前团队在入驻爱发电，支持我们项目的朋友可以前往爱发电赞助我们：
-https://afdian.com/a/Clashnext
+https://afdian.com/a/ClashBox
 
 感谢您的支持~
 
