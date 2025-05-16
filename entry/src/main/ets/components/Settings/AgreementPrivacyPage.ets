@@ -2,6 +2,7 @@ import { UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../utils/Animation"
 import { BackButton } from "../Common"
 import { CommonPage } from "../Start/CommonPage"
+import { TopTitleText } from "../Start/WelcomePage"
 
 /*设置入口*/
 // 用户协议
@@ -15,8 +16,13 @@ export struct UserAgreement {
     NavDestination() {
       Stack() {
         Column() {
-          BackButton()
+          TopTitleText($r('app.string.user_agreement'))
         }.zIndex(1)
+        .width('100%')
+        .backgroundColor($r('app.color.background'))
+        Row() {
+          BackButton()
+        }.zIndex(2)
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .onClick(() => {
           this.SettingsPageInfos.pop(true)
@@ -45,6 +51,11 @@ export struct PrivacyPolicy {
   build() {
     NavDestination() {
       Stack() {
+        Column() {
+          TopTitleText($r('app.string.privacy_policy'))
+        }.zIndex(1)
+        .width('100%')
+        .backgroundColor($r('app.color.background'))
         Column() {
           BackButton()
         }.zIndex(1)

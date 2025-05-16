@@ -4,14 +4,14 @@ import { CommonPage } from './CommonPage'
 import { customAnimationUtil } from '../../utils/Animation'
 import { BackButton } from '../Common'
 
-//协议顶部标题
+// 协议顶部标题
 @Builder
 export function TopTitleText(t:Resource){
   Row(){
     Text(t)
       .fontSize(18)
       .fontWeight(FontWeight.Bold)
-  }.width('100%').justifyContent(FlexAlign.Center).alignItems(VerticalAlign.Center).height(70)
+  }.width('100%').justifyContent(FlexAlign.Center).alignItems(VerticalAlign.Center).height(61)
   .backgroundColor($r('app.color.background'))
 }
 
@@ -32,7 +32,7 @@ export struct WelcomeUserAgreement {
           docSrc: $rawfile('html/user_agreement.html')
         })
 
-        TopTitleText($r('app.string.title_privacy1'))
+        TopTitleText($r('app.string.user_agreement'))
       }.alignContent(Alignment.TopStart)
     }
     .width('100%')
@@ -81,7 +81,7 @@ export struct WelcomePrivacyPolicy {
           docSrc: $rawfile('html/privacy_policy.html')
         })
 
-        TopTitleText($r('app.string.title_privacy2'))
+        TopTitleText($r('app.string.privacy_policy'))
       }
       .alignContent(Alignment.TopStart)
     }

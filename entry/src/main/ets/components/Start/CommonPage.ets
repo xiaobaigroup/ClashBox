@@ -51,8 +51,8 @@ export struct CommonPage {
   }
 
   setLanguage() {
-    // 保险起见用回调
-    this.currentPorts[0].postMessageEvent(`${i18n.System.getSystemLanguage()}`);
+    // 用户优先级高
+    this.currentPorts[0].postMessageEvent(`${this.uiConfig.userLanguage === 'default' ? this.uiConfig.systemLanguage : this.uiConfig.userLanguage}`);
   }
 
   // 获取web高度

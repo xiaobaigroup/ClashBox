@@ -1973,11 +1973,11 @@
       "value": "复制群号"
     },
     {
-      "name": "title_privacy1",
+      "name": "user_agreement",
       "value": "用户协议"
     },
     {
-      "name": "title_privacy2",
+      "name": "privacy_policy",
       "value": "关于ClashBox与隐私的声明"
     }
   ]
