@@ -37,6 +37,7 @@ export struct WelcomeUserAgreement {
     }
     .width('100%')
     .height('100%')
+    .hideTitleBar(true)
     .navDestination(this.WelcomePagesMap)
     .backgroundColor($r('app.color.background'))
   }
