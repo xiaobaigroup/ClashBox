@@ -1971,6 +1971,14 @@
     {
       "name": "copy_qq_group",
       "value": "复制群号"
+    },
+    {
+      "name": "title_privacy1",
+      "value": "用户协议"
+    },
+    {
+      "name": "title_privacy2",
+      "value": "关于ClashBox与隐私的声明"
     }
   ]
 }

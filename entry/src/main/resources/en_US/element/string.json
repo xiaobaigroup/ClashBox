@@ -1971,6 +1971,14 @@
     {
       "name": "copy_qq_group",
       "value": "Copy Group Number"
+    },
+    {
+      "name": "title_privacy1",
+      "value": "User Agreement"
+    },
+    {
+      "name": "title_privacy2",
+      "value": "Statement on ClashBox and Privacy"
     }
   ]
 }

@@ -967,6 +967,8 @@ export struct menuRowList {
 @Component
 export struct CellularData {
   @State info: SubscriptionInfo | null = null
+  /* 主题色 */
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
 
   build() {
     if(SubscriptionInfo.GetTotal(this.info)?.value > 0){
@@ -984,7 +986,26 @@ export struct CellularData {
         }
       }.padding({ bottom: 4 })
 
-      Column() {
+
+      Stack(){
+        Progress({
+          value: convertToSwitchNub1(SubscriptionInfo.GetUsed(this.info)?.show ?? 0, SubscriptionInfo.GetTotal(this.info)!.unit,SubscriptionInfo.GetUsed(this.info)!.unit),
+          total: SubscriptionInfo.GetTotal(this.info)?.show ?? 1,
+          type: ProgressType.Capsule
+        })// value为使用流量的值
+          .style({ enableSmoothEffect: true, borderColor: '#00ffffff' })
+          .color(this.icon_emphasize)
+          .width('100%')
+          .height(6)
+
+        Column()
+          .backgroundColor(this.icon_emphasize)
+          .opacity(0.3)
+          .width('100%')
+          .height(6)
+          .borderRadius(6)
+      }
+     /* Column() {
         Progress({
           value: convertToSwitchNub1(SubscriptionInfo.GetUsed(this.info)?.show ?? 0, SubscriptionInfo.GetTotal(this.info)!.unit,SubscriptionInfo.GetUsed(this.info)!.unit),
           total: SubscriptionInfo.GetTotal(this.info)?.show ?? 1,
@@ -998,7 +1019,7 @@ export struct CellularData {
       .width('100%')
       .backgroundColor('#4d46b1e3')
       .height(6)
-      .borderRadius(6)
+      .borderRadius(6)*/
     }
   }
 }

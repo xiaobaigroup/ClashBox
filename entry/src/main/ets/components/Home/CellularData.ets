@@ -5,6 +5,8 @@ import { CardTitle } from './CardTitleBuilder'
 import { AppFlowingState, TrafficUnit, UIConfig } from '../../entryability/AppState'
 import { convertDataNumberT, convertToSwitchNub } from '../../utils/DataUnitConvertUtils'
 import { customVibrator } from '../../utils/VibratorUtil'
+import { JSON } from '@kit.ArkTS'
+import json from '@ohos.util.json'
 
 
 /* 输入总流量自定义弹窗相关 */
@@ -176,7 +178,8 @@ struct CellularDataStat {
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
-
+  /* 主题色 */
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
 
   /* 总流量输入弹窗数据  */
   dialogController: CustomDialogController | null = new CustomDialogController({
@@ -281,21 +284,24 @@ struct CellularDataStat {
         .justifyContent(FlexAlign.Center)
 
         // 使用流量进度条
-        Column() {
+        Stack(){
           Progress({
             value: convertToSwitchNub(this.uiConfig.dataTotal,this.uiConfig.switchUnit),
             total: this.uiConfig.inputTotal,
             type: ProgressType.Capsule
           })// value为使用流量的值
             .style({ enableSmoothEffect: true, borderColor: '#00ffffff' })
-            .color('#ff46b1e3')
-            .width('100%')
-            .height('100%')
+            .color(this.icon_emphasize)
+            .width('90%')
+            .height(this.barHeight.value)
+
+          Column()
+            .width('90%')
+            .backgroundColor(this.icon_emphasize)
+            .height(this.barHeight.value)
+            .borderRadius(this.barHeight.value)
+            .opacity(0.3)
         }
-        .width('90%')
-        .backgroundColor('#4d46b1e3')
-        .height(this.barHeight.value)
-        .borderRadius(this.barHeight.value)
 
         Row({space:2}) {
           // 使用流量/总流量

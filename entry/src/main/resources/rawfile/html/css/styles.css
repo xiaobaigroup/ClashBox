@@ -13,12 +13,12 @@ body {
 
 /* 标题样式 */
 .main-title {
-    font-size: 20px;
+    font-size: 18px;
     text-align: center;
 }
 
 .sub-title {
-    font-size: 17px;
+    font-size: 16px;
     font-weight: normal;
     text-align: center;
     border-bottom: 2px solid #eee;
@@ -33,7 +33,7 @@ body {
 
 /* 正文二级标题样式 */
 .section-title {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: bold;
     padding-bottom: 5px;
     border-bottom: 1px solid #eee;

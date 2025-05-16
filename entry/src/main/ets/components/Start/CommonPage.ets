@@ -97,7 +97,7 @@ export struct CommonPage {
           // .forceDarkAccess(true)
           .domStorageAccess(true)
           .darkMode(WebDarkMode.Auto)
-          .backgroundColor($r('app.color.background'))
+          .backgroundColor('#00ffffff')
           .onPageBegin((event) => {
             console.log(`CommonPage #webviewBuilder ${JSON.stringify(event)}`)
           })
@@ -161,6 +161,6 @@ export struct CommonPage {
           })
       }.width('90%')
       .margin({ top: 12, bottom: 5 })
-    }.padding({left: 5, right: 5, top: 15, bottom: 15})
+    }.padding({left: 5, right: 5,  bottom: 15})
   }
 }

@@ -1,10 +1,19 @@
-import { getResourceString } from '../../utils/ResourceStringUtil'
 import { common } from '@kit.AbilityKit'
 import { UIConfig } from '../../entryability/AppState'
 import { CommonPage } from './CommonPage'
-import { BIND_SHEET_DRAG_BAR_HEIGHT } from '../../common/Constants'
 import { customAnimationUtil } from '../../utils/Animation'
 import { BackButton } from '../Common'
+
+//协议顶部标题
+@Builder
+export function TopTitleText(t:Resource){
+  Row(){
+    Text(t)
+      .fontSize(18)
+      .fontWeight(FontWeight.Bold)
+  }.width('100%').justifyContent(FlexAlign.Center).alignItems(VerticalAlign.Center).height(70)
+  .backgroundColor($r('app.color.background'))
+}
 
 
 // 欢迎入口
@@ -16,15 +25,20 @@ export struct WelcomeUserAgreement {
 
   build() {
     Navigation(this.welcomePageInfos) {
-      CommonPage({
-        isWelcomeStack: true,
-        nextPage: 'privacy-policy',
-        docSrc: $rawfile('html/user_agreement.html')
-      })
+      Stack(){
+        CommonPage({
+          isWelcomeStack: true,
+          nextPage: 'privacy-policy',
+          docSrc: $rawfile('html/user_agreement.html')
+        })
+
+        TopTitleText($r('app.string.title_privacy1'))
+      }.alignContent(Alignment.TopStart)
     }
     .width('100%')
     .height('100%')
     .navDestination(this.WelcomePagesMap)
+    .backgroundColor($r('app.color.background'))
   }
 
   @Builder
@@ -55,14 +69,19 @@ export struct WelcomePrivacyPolicy {
           BackButton()
         }.zIndex(1)
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+        .height(70)
+        .alignItems(HorizontalAlign.Start)
         .onClick(() => {
           this.welcomePageInfos.pop(true)
         })
+
         CommonPage({
           isWelcomeStack: true,
           nextPage: 'welcome',
           docSrc: $rawfile('html/privacy_policy.html')
         })
+
+        TopTitleText($r('app.string.title_privacy2'))
       }
       .alignContent(Alignment.TopStart)
     }

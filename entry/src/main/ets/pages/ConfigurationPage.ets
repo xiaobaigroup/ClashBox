@@ -365,7 +365,7 @@ struct ConfigurationPage {
               List({ space: LIST_SPACE }) {
                 ForEach(this.configList, (item: ConfigData, index: number) => {
                   ListItem() {
-                    Row() {
+                    Stack() {
                       Column({ space: 2 }) {
                         Text(item.configName).fontColor(($r('sys.color.font_primary'))).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
                         Row() {
@@ -380,9 +380,9 @@ struct ConfigurationPage {
                           CellularData({ info: item.subscriptionInfo })
                         }
 
-                      }.alignItems(HorizontalAlign.Start).width('85%').padding({top:10,bottom:10})
+                      }.alignItems(HorizontalAlign.Start).width('100%').padding({top:10,bottom:10})
 
-                      Blank()
+                     Row(){
                       if (item.configId === this.appConfig.currentProfileId && this.isLoading){
                         LoadingProgress()
                           .color(this.icon_emphasize)
@@ -395,10 +395,11 @@ struct ConfigurationPage {
                             checkedBackgroundColor: this.icon_emphasize,
                           })
                           .hitTestBehavior(HitTestMode.None)
+                     }.width('100%').justifyContent(FlexAlign.End)
                     }
                     .width('100%')
                     .padding(LIST_ITEM_PADDING)
-                    .alignItems(VerticalAlign.Center)
+                   // .alignItems(VerticalAlign.Center)
                   }.width('100%')
                   .backgroundColor($r('app.color.container_background'))
                   .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
