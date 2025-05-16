@@ -11,7 +11,7 @@ export function TopTitleText(t:Resource){
     Text(t)
       .fontSize(18)
       .fontWeight(FontWeight.Bold)
-  }.width('100%').justifyContent(FlexAlign.Center).alignItems(VerticalAlign.Center).height(61)
+  }.width('100%').justifyContent(FlexAlign.Center).alignItems(VerticalAlign.Center).height(70)
   .backgroundColor($r('app.color.background'))
 }
 
