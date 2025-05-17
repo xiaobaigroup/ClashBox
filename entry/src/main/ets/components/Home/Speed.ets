@@ -174,10 +174,8 @@ struct Speed {
       // 设置定时器，每秒调用一次 onSpeedData 函数
       this.timerId = setInterval( () => {
         this.onSpeedData()
-      }, 1000)
-      this.timerId = setInterval( () => {
         this.lineStart = false
-      }, 2000)
+      }, 1000)
     } else {
       // 清除定时器
       clearInterval(this.timerId)
@@ -314,12 +312,13 @@ struct Speed {
 
       // 图表
       Stack(){
-        McLineChart({
-          options: this.defOption
-        }).transition(customAnimationUtil.isOpacity(this.uiConfig))
         if (this.lineStart){
-          Row().width('92%').height(3).backgroundColor(this.uiConfig.lineColor).margin({left:17,right:17,bottom:28})
+          Row().width('92%').height(3).backgroundColor(this.uiConfig.lineColor).margin({left:17,right:17,bottom:28.5})
             .transition(customAnimationUtil.isOpacity(this.uiConfig))
+        }else {
+          McLineChart({
+            options: this.defOption
+          }).transition(customAnimationUtil.isOpacity(this.uiConfig))
         }
       }.width('100%').height('100%').alignContent(Alignment.Bottom)
     }
