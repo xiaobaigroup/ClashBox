@@ -106,31 +106,31 @@ struct Speed {
     hilog.info(0xFF00, "HomeSpeedTestTag", "data: %{public}s", JSON.stringify(this.ChartData))
     this.defOption.setVal({
       series: [
-          /*{
-             smooth: false, //平滑曲线
-             name: '上行速度(Kb/s)',
-             data: this.appFlowingState.traffics.map((d) => d.up.value),
-             label: {
-               show: false,
-               color: '#FFF7980A',
-               offset: [-10, -10]//线条标签偏移量
-             },
-             //折线拐点配置
-             itemStyle: {
-               symbol: 'solidCircle',
-               symbolSize: 2,
-               borderWidth: 1
-             },
-             lineStyle: {
-               width: 3,
-               color: '#FFF7980A'
-             },
-             // 区域颜色，线性渐变
-             areaStyle: {
-               show: true,
-               gradient: ['#99f7980a']
-             },
-           },*/
+      /*{
+         smooth: false, //平滑曲线
+         name: '上行速度(Kb/s)',
+         data: this.appFlowingState.traffics.map((d) => d.up.value),
+         label: {
+           show: false,
+           color: '#FFF7980A',
+           offset: [-10, -10]//线条标签偏移量
+         },
+         //折线拐点配置
+         itemStyle: {
+           symbol: 'solidCircle',
+           symbolSize: 2,
+           borderWidth: 1
+         },
+         lineStyle: {
+           width: 3,
+           color: '#FFF7980A'
+         },
+         // 区域颜色，线性渐变
+         areaStyle: {
+           show: true,
+           gradient: ['#99f7980a']
+         },
+       },*/
         {
           smooth: true, //平滑曲线
           name: '',
@@ -142,7 +142,7 @@ struct Speed {
           },
           endLabel:{
             show:false
-        },
+          },
           //折线拐点配置
           itemStyle: {
             symbol: 'solidCircle',
@@ -219,9 +219,9 @@ struct Speed {
       .width('100%')
 
       // 图表
-        McLineChart({
-          options: this.defOption
-        })
+      McLineChart({
+        options: this.defOption
+      })
     }
     .padding(this.cardPadding.value)
     .width('100%')
