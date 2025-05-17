@@ -452,7 +452,7 @@ struct Home {
                       span: {
                         xs: this.isLandscapePhone ? 6 : 12,
                         md: this.isLandscapePhone ? 6 : this.isFoldStatus ? 8 : 12,
-                        lg: 6
+                        lg: this.isFoldStatus ? 8 : 6
                       },
                       order: 1
                     }) {
@@ -496,7 +496,7 @@ struct Home {
                       span: {
                         xs: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
-                        lg: 3
+                        lg: this.isFoldStatus ? 4 : 3
                       },
                       order: 2
                     }) {
@@ -534,7 +534,7 @@ struct Home {
                       span: {
                         xs: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
-                        lg: 3
+                        lg: this.isFoldStatus ? 4 : 3
                       },
                       order: 3
                     }) {
@@ -571,7 +571,7 @@ struct Home {
                       span: {
                         xs: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
-                        lg: 3
+                        lg: this.isFoldStatus ? 4 : 3
                       },
                       order: 4
                     }) {
@@ -608,7 +608,7 @@ struct Home {
                       span: {
                         xs: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
-                        lg: 3
+                        lg: this.isFoldStatus ? 4 : 3
                       },
                       order: 5
                     }) {
@@ -644,7 +644,7 @@ struct Home {
                       span: {
                         xs: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
-                        lg: 3
+                        lg: this.isFoldStatus ? 4 : 3
                       },
                       order: 6
                     }) {
@@ -680,7 +680,7 @@ struct Home {
                       span: {
                         xs: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
-                        lg: 3
+                        lg: this.isFoldStatus ? 4 : 3
                       },
                       order: 7
                     }) {
@@ -716,7 +716,7 @@ struct Home {
                       span: {
                         xs: this.isLandscapePhone ? 6 : 12,
                         md: this.isLandscapePhone ? 6 : this.isFoldStatus ? 8 : 12,
-                        lg: 6
+                        lg: this.isFoldStatus ? 8 : 6
                       },
                       order: this.isFoldStatus ? 3 : 1
                     }) {
@@ -753,7 +753,7 @@ struct Home {
                       span: {
                         xs: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
-                        lg: 3
+                        lg: this.isFoldStatus ? 4 : 3
                       },
                       order: 4
                     }) {
@@ -789,7 +789,7 @@ struct Home {
                       span: {
                         xs: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
-                        lg: 3
+                        lg: this.isFoldStatus ? 4 : 3
                       },
                       order: 8
                     }) {
