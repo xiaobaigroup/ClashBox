@@ -188,7 +188,7 @@ export class ConfigItemData{
     if(type == "number")
       this.valueType = ValueType.Number
     if(type == "object")
-      this.value == ValueType.Record
+      this.valueType = ValueType.Record
     if(Array.isArray(this.value))
       this.valueType = ValueType.StringArray
 
@@ -438,7 +438,7 @@ export  const OverwriteNetworkCompatible = (clashConfig: ClashConfig, appConfig:
   let result: ConfigItemData[] = new Array()
   clashConfig.sniffer = clashConfig.sniffer ?? clashConfig.snifferDefault
   result = [
-    new ConfigItemData($r('sys.symbol.network_acceleration'), 'enable', $r('app.string.compatibility_mode'), $r('app.string.compatibility_mode_subtitle'), '', 2).bindClashConfigBy(clashConfig, "sniffer"),
+    new ConfigItemData($r('sys.symbol.network_acceleration'), 'enable', $r('app.string.compatibility_mode'), $r('app.string.compatibility_mode_subtitle'), '', 2).bindClashConfigBy(clashConfig, "sniffer").bindType(ValueType.Boolean),
     new ConfigItemData($r('sys.symbol.selector'), 'Option', 'Sniffer Setting', '', '', 3),
     new ConfigItemData($r('sys.symbol.save'), 'force-dns-mapping', 'Force DNS Mapping', '', $r('app.string.not_modify'), 2).bindClashConfigBy(clashConfig, "sniffer"),
     new ConfigItemData($r('sys.symbol.save'), 'parse-pure-ip', 'Parse Pure Ip', '', $r('app.string.not_modify'), 2).bindClashConfigBy(clashConfig, "sniffer"),

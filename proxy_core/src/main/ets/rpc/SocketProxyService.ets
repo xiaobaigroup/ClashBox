@@ -6,7 +6,7 @@ import { ClashRpcType, IClashManager } from './IClashManager';
 import { ConnectionInfo, IpInfo, LogInfo, Provider, ProxyGroup, ProxyMode,
   Traffic } from '../models/Common';
 import  fs from  "@ohos.file.fs"
-import { fileUri } from "@kit.CoreFileKit";
+import { fileIo, fileUri } from "@kit.CoreFileKit";
 import { promptAction } from '@kit.ArkUI';
 import { UpdateConfigParams } from '../models/ClashConfig';
 import { checkIp, queryIpInfo } from '../Request';
@@ -265,12 +265,19 @@ export class SocketProxyService implements IClashManager {
       if (method == ClashRpcType.startClash || method == ClashRpcType.stopClash){
         socketPath = this.context?.filesDir + '/ClashBox.sock'
       }
+      if(!await fileIo.access(socketPath, fs.AccessModeType.EXIST))
+      {
+        promptAction.showToast({message: "VPN服务启动失败"})
+        reject("")
+        return;
+      }
       client.connect({address: { address: socketPath }, timeout:1000}).then(async ()=>{
         this.active = true
         client.send({ data: JSON.stringify({method, params}) });
       }).catch((e:Error)=>{
         this.active = false
         this.offlineTime.push(Date.now())
+        console.error("vpn服务启动失败", e.message, e.stack)
         if(e.message == "Connection refused"){
           promptAction.showToast({message: "VPN服务被系统干掉了"})
         }else{

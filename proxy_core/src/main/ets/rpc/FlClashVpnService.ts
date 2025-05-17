@@ -326,6 +326,8 @@ export function ParseProxyGroup(mode, result: string) {
   }
   groupNames = groupNames.filter(e => {
     const proxy = map[e] as Record<string, string>
+    if (!proxy)
+      return false
     const indexes = ["Selector", "URLTest", "Fallback", "LoadBalance", "Relay"].indexOf(proxy["type"])
     return indexes > -1
   })
