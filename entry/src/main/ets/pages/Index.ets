@@ -807,6 +807,7 @@ struct Index {
   onPageShow(): void {
     hilog.info(0xFF00, "TimertestTag", "#onPageShow")
     hilog.info(0xFF00, "PoptestTag", "startPop: %{private}d", this.uiConfig.ShowStartPop)
+    hilog.info(0x0000, 'WindowLog #Index', '窗口顶部避让高度：%{public}d', px2vp(this.topRectHeight))
     // 刷新问候语
     this.greetings = getGreeting()
     if (this.proxyEnabled) {

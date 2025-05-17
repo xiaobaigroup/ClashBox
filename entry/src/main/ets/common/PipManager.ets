@@ -12,12 +12,11 @@ class Params {
 function PipBackgroundBuilder(params: Params) {
   Row() {
     Stack() {
-      Image($r('app.media.About_name_1'))
+      Image($r('app.media.clashbox'))
         .width(384)
-        .fillColor($r('app.color.symbol_logo_name_color'))
-      Image($r('app.media.About_name_2'))
-        .height(52)
-        .offset({x: 101, y: -2})
+        .zIndex(1)
+      Image($r('app.media.pip_background'))
+        .width('100%')
     }
     Text(params.text)
   }.width('100%').height('100%')
