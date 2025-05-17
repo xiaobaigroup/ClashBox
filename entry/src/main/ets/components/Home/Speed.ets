@@ -6,6 +6,7 @@ import { AppFlowingState, getLast, UIConfig } from '../../entryability/AppState'
 import { JSON } from '@kit.ArkTS';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { convertDataArray, ConvertedUnit } from '../../utils/DataUnitConvertUtils';
+import { customAnimationUtil } from '../../utils/Animation';
 
 
 @Component
@@ -25,8 +26,9 @@ struct Speed {
   @StorageProp("appFlowingState") appFlowingState: AppFlowingState = new AppFlowingState()
   @Consume
   @Watch('proxyEnabledChanged') proxyEnabled: boolean
-  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @StorageLink('uiConfig') @Watch('colorTheme')uiConfig: UIConfig = new UIConfig()
   @Consume ChartData: number[] | ConvertedUnit[]
+  @State lineStart: boolean = true
   //初始化图表数据
   @State defOption: Options = new Options({
     //图例
@@ -82,8 +84,8 @@ struct Speed {
       {
         data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         lineStyle: {
-          width: 3,
-          color: '#ff759bf5'
+          width: 2,
+          color: this.uiConfig.lineColor
         },
         label: {
           show: false
@@ -137,7 +139,7 @@ struct Speed {
           data: this.ChartData,
           label: {
             show: false,
-            color: '#ff759bf5',
+            color: this.uiConfig.lineColor,
             offset: [0, 0]
           },
           endLabel:{
@@ -145,18 +147,18 @@ struct Speed {
           },
           //折线拐点配置
           itemStyle: {
-            symbol: 'solidCircle',
+            symbol: this.uiConfig.lineColor,
             symbolSize: 2,
             borderWidth: 1
           },
           lineStyle: {
             width: 3,
-            color: '#ff759bf5'
+            color: this.uiConfig.lineColor
           },
           // 区域颜色，线性渐变
           areaStyle: {
             show: true,
-            gradient: ['#ff759bf5']
+            gradient: [this.uiConfig.lineColor]
           },
         }
       ]
@@ -170,21 +172,113 @@ struct Speed {
     // 只有主页显示的时候启动
     if(this.proxyEnabled && this.isForeward && this.isHomePage) {
       // 设置定时器，每秒调用一次 onSpeedData 函数
-      this.timerId = setInterval(() => {
+      this.timerId = setInterval( () => {
         this.onSpeedData()
       }, 1000)
+      this.timerId = setInterval( () => {
+        this.lineStart = false
+      }, 2000)
     } else {
       // 清除定时器
       clearInterval(this.timerId)
+      animateTo({
+        duration: this.uiConfig.animationSpeed,
+        iterations: 1,
+        playMode: PlayMode.Normal,
+        curve:Curve.Ease,
+      }, () => {
+        this.defOption = new Options({
+          //图例
+          legend: {
+            show: false,
+            selectAble: false,
+          },
+          //图表位置
+          grid: {
+            top: 0,
+            left: 17,
+            right: 17,
+          },
+          //X轴
+          xAxis: {
+            data: ['', '', '', '', '', '', '', '', '', '', '', ''],
+            axisLine: {
+              // 轴线样式
+              show: true, // 是否显示
+            },
+            axisTick: {
+              show: false,
+              interval: 2
+            },
+            //坐标轴两侧是否留白
+            boundaryGap: false
+          },
+          //Y轴
+          yAxis:
+          {
+            min: 0,
+            max: 1500,
+            //刻度线
+            axisTick: {
+              show: false
+            },
+            //轴线
+            axisLine: {
+              show: false
+            },
+            //Y轴分割线
+            splitLine: {
+              show: false
+            },
+            axisLabel: {
+              show: false
+            }
+          },
+          //动画
+          animation: false,
+          //初始折线
+          series: [
+            {
+              data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+              lineStyle: {
+                width: 3,
+                color: this.uiConfig.lineColor
+              },
+              label: {
+                show: false
+              }
+            },
+          ]
+        })
+      })
     }
   }
 
   aboutToAppear() {
+    this.colorTheme()
   }
 
   aboutToDisappear() {
     // 清除定时器
     clearInterval(this.timerId);
+  }
+  
+  colorTheme(){
+    if (this.uiConfig.themeColor == 'yellowAppTheme') {
+      this.uiConfig.lineColor = '#ff9926'
+    }else if (this.uiConfig.themeColor == 'blueAppTheme'){
+      this.uiConfig.lineColor = '#ff759bf5'
+    }else if (this.uiConfig.themeColor == 'catBlueAppTheme'){
+      this.uiConfig.lineColor = '#E61E4377'
+    }else if (this.uiConfig.themeColor == 'redAppTheme'){
+      this.uiConfig.lineColor = '#E6D41C26'
+    }else if (this.uiConfig.themeColor == 'purpleAppTheme'){
+      this.uiConfig.lineColor = '#E6722ED1'
+    }else if (this.uiConfig.themeColor == 'pinkAppTheme'){
+      this.uiConfig.lineColor = '#E6FB7299'
+    }else if (this.uiConfig.themeColor == 'greenAppTheme'){
+      this.uiConfig.lineColor = '#E682D41C'
+    }
   }
 
   build() {
@@ -219,9 +313,15 @@ struct Speed {
       .width('100%')
 
       // 图表
-      McLineChart({
-        options: this.defOption
-      })
+      Stack(){
+        McLineChart({
+          options: this.defOption
+        }).transition(customAnimationUtil.isOpacity(this.uiConfig))
+        if (this.lineStart){
+          Row().width('92%').height(3).backgroundColor(this.uiConfig.lineColor).margin({left:17,right:17,bottom:28})
+            .transition(customAnimationUtil.isOpacity(this.uiConfig))
+        }
+      }.width('100%').height('100%').alignContent(Alignment.Bottom)
     }
     .padding(this.cardPadding.value)
     .width('100%')
