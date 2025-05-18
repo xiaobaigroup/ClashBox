@@ -186,11 +186,8 @@ export struct Welcome {
           .onClick(() => {
             // 关闭背景模糊
             this.isEnableIndexForegroundBlur = false
-            // 关闭所有气泡提示
+            // 第一次启动应用
             this.uiConfig.isFirstStart = false
-            this.uiConfig.ShowStartPop = false
-            this.uiConfig.ShowConfigPop = false
-            this.uiConfig.ShowProxyPop = false
             // 关闭模态页
             this.isShowWelcome = false
           })
@@ -203,6 +200,10 @@ export struct Welcome {
             this.isEnableIndexForegroundBlur = false
             // 第一次启动应用
             this.uiConfig.isFirstStart = false
+            // 启动所有气泡提示
+            this.uiConfig.ShowStartPop = true
+            this.uiConfig.ShowConfigPop = true
+            this.uiConfig.ShowProxyPop = true
             // 关闭模态页
             this.isShowWelcome = false
           })

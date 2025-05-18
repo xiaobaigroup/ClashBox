@@ -129,11 +129,11 @@ export class UIConfig{
   // 应用使用时间记录
   useTime: number = new Date().getTime()
   // 代理启动按钮提示气泡
-  ShowStartPop: boolean = true
+  ShowStartPop: boolean = false
   // 长按配置列表提示气泡
-  ShowConfigPop: boolean = true
+  ShowConfigPop: boolean = false
   // 长按代理节点列表提示气泡
-  ShowProxyPop: boolean = true
+  ShowProxyPop: boolean = false
   // 延迟统一测速提示气泡
   ShowDelayPop: boolean = false
   // 自动检查更新
