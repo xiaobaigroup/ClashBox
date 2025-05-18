@@ -1,6 +1,6 @@
 // Index
 import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
-import { curves, display, mediaquery, promptAction } from '@kit.ArkUI'
+import { curves, display, LengthMetrics, mediaquery, promptAction } from '@kit.ArkUI'
 import Home from './HomePage'
 import ProxyPage from './ProxyPage'
 import ConfigurationPage from './ConfigurationPage'
@@ -52,12 +52,12 @@ import {
   TabBarWidth,
   TabVertical,
   TabBarPose,
-  TabDirection,
   CompStr,CHART_NUMBER,
   TheExperimentData,
   TAB_CONTENT_TITLE_HEIGHT,
   LogData,
-  showHomeCard
+  showHomeCard,
+  TabBarJustifyContent
 } from '../common/Constants'
 import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/ProxyData'
 import { ClashConfig, IpInfo, LogLevel, Profile, ProxyGroup, ProxyMode } from 'proxy_core'
@@ -163,7 +163,6 @@ struct Index {
   @State compBarHeight: BreakpointState<string> = TabBarHeight
   @Provide compVertical: BreakpointState<boolean> = TabVertical
   @State compBarPose: BreakpointState<BarPosition> = TabBarPose
-  @State compDirection: BreakpointState<FlexDirection> = TabDirection
   @State TabIconfontSize: BreakpointState<number> = TabIconfontSize_24_29
   @State TabTitlefontSize: BreakpointState<number> = TabTitlefontSize_12_16
   // 代理页
@@ -217,9 +216,9 @@ struct Index {
   private breakPointStatemorePagelistBottom: BreakpointState<number> = morePagelistBottom_10_14
   @Provide('breakPointStateSettingslistHeight')
   private breakPointStateSettingslistHeight: BreakpointState<number> = SettingslistHeight_590_500
+  @State tabBarJustifyContent: BreakpointState<FlexAlign> = TabBarJustifyContent
   //主页编辑模式 删除按钮尺寸
-  @Provide('deleteButtonSize')
-  private deleteButtonSize: BreakpointState<number> = DeleteButtonSize_24_32
+  @Provide('deleteButtonSize') private deleteButtonSize: BreakpointState<number> = DeleteButtonSize_24_32
   //主页卡片内容流量统计下部小字体大小（10,16,14,16）
   @Provide('HomeCardCellularDataSmFontSize')
   private HomeCardCellularDataSmFontSize: BreakpointState<number> = HomeCardCellularDataSmFontSize
@@ -367,29 +366,29 @@ struct Index {
   @Builder
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
     Flex({
-      direction: this.compDirection.value,
-      justifyContent:this.isLandscapePhone|| this.istabletLandscape ? FlexAlign.Center: FlexAlign.Start,
-      alignItems:this.isLandscapePhone|| (this.istabletLandscape && !this.isPC) ? ItemAlign.End:ItemAlign.Center
-    }) {
-      Column({ space: 4}) {
-        SymbolGlyph(TabIcon)
-          .fontColor([this.selectedIndex === index ? this.icon_emphasize : this.icon_tertiary])
-          .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY) // 分层颜色
-          .fontSize(this.isLandscapePhone ? 24 : this.TabIconfontSize.value)
+      direction: FlexDirection.Column,
+      justifyContent: this.isLandscapePhone ? FlexAlign.Center : this.tabBarJustifyContent.value,
+      alignItems: this.isLandscapePhone ? ItemAlign.End : ItemAlign.Center,
+      space: {main: LengthMetrics.vp(4)}
+    })
+    {
+      SymbolGlyph(TabIcon)
+        .fontColor([this.selectedIndex === index ? this.icon_emphasize : this.icon_tertiary])
+        .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY) // 分层颜色
+        .fontSize(this.isLandscapePhone ? 24 : this.TabIconfontSize.value)
           //.effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
-          .transition(customAnimationUtil.isTranslate(this.uiConfig))
-          .translate({y: this.selectedIndex == index ? -3 : 0})
+        .transition(customAnimationUtil.isTranslate(this.uiConfig))
+        .translate({y: this.selectedIndex == index ? -3 : 0})
 
-        Text(title)
-          .fontColor(this.selectedIndex === index ? this.icon_emphasize : this.icon_tertiary)
-          .fontWeight(FontWeight.Medium)
-          .fontSize(this.isLandscapePhone ? 12 : this.TabTitlefontSize.value)
-          .transition(customAnimationUtil.isTranslate(this.uiConfig))
-      }
-      .padding(this.isLandscapePhone|| this.istabletLandscape ? { right:5 } : { top: 8 })
+      Text(title)
+        .fontColor(this.selectedIndex === index ? this.icon_emphasize : this.icon_tertiary)
+        .fontWeight(FontWeight.Medium)
+        .fontSize(this.isLandscapePhone ? 12 : this.TabTitlefontSize.value)
+        .transition(customAnimationUtil.isTranslate(this.uiConfig))
     }
     .width('100%')
     .height('100%')
+    .padding({top: 5})
     .animation(this.isSecondary === true ? {
       duration: this.uiConfig.animationSpeed,
       tempo: 0.3,
@@ -636,11 +635,11 @@ struct Index {
     }*/
 
     BreakpointSystem.getInstance().attach(this.compStr)
-    BreakpointSystem.getInstance().attach(this.compDirection)
     BreakpointSystem.getInstance().attach(this.compBarPose)
     BreakpointSystem.getInstance().attach(this.compVertical)
     BreakpointSystem.getInstance().attach(this.tabBarWidth)
     BreakpointSystem.getInstance().attach(this.compBarHeight)
+    BreakpointSystem.getInstance().attach(this.tabBarJustifyContent)
     BreakpointSystem.getInstance().attach(this.ProxyListLanes)
     BreakpointSystem.getInstance().attach(this.TabIconfontSize)
     BreakpointSystem.getInstance().attach(this.TabTitlefontSize)

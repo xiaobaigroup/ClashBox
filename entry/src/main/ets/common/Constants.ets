@@ -950,6 +950,21 @@ export const TabBarWidth: BreakpointState<string> = BreakpointState.of({
   xl: '67vp'
 })
 
+export const TabBarJustifyContent: BreakpointState<FlexAlign> = BreakpointState.of({
+  sm: FlexAlign.Start,
+  md: FlexAlign.Start,
+  lg: FlexAlign.Center,
+  xl: FlexAlign.Center
+})
+
+export const TabBarAlignItems: BreakpointState<ItemAlign> = BreakpointState.of({
+  sm: ItemAlign.Start,
+  md: ItemAlign.Start,
+  lg: ItemAlign.Center,
+  xl: ItemAlign.Center
+})
+
+
 export const TabVertical: BreakpointState<boolean> = BreakpointState.of({
   sm: false,
   md: false,
@@ -964,12 +979,6 @@ export const TabBarPose: BreakpointState<BarPosition> = BreakpointState.of({
   xl: BarPosition.Start
 })
 
-export const TabDirection: BreakpointState<FlexDirection> = BreakpointState.of({
-  sm: FlexDirection.Column,
-  md: FlexDirection.Column,
-  lg: FlexDirection.Column,
-  xl: FlexDirection.Column
-})
 
 /**
  * 主页卡片内边距

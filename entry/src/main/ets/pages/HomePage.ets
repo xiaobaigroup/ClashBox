@@ -451,6 +451,7 @@ struct Home {
                     GridCol({
                       span: {
                         xs: this.isLandscapePhone ? 6 : 12,
+                        sm: this.isLandscapePhone ? 6 : 12,
                         md: this.isLandscapePhone ? 6 : this.isFoldStatus ? 8 : 12,
                         lg: this.isFoldStatus ? 8 : 6
                       },
@@ -495,6 +496,7 @@ struct Home {
                     GridCol({
                       span: {
                         xs: this.isLandscapePhone ? 3 : 6,
+                        sm: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
                         lg: this.isFoldStatus ? 4 : 3
                       },
@@ -533,6 +535,7 @@ struct Home {
                     GridCol({
                       span: {
                         xs: this.isLandscapePhone ? 3 : 6,
+                        sm: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
                         lg: this.isFoldStatus ? 4 : 3
                       },
@@ -570,6 +573,7 @@ struct Home {
                     GridCol({
                       span: {
                         xs: this.isLandscapePhone ? 3 : 6,
+                        sm: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
                         lg: this.isFoldStatus ? 4 : 3
                       },
@@ -607,6 +611,7 @@ struct Home {
                     GridCol({
                       span: {
                         xs: this.isLandscapePhone ? 3 : 6,
+                        sm: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
                         lg: this.isFoldStatus ? 4 : 3
                       },
@@ -643,6 +648,7 @@ struct Home {
                     GridCol({
                       span: {
                         xs: this.isLandscapePhone ? 3 : 6,
+                        sm: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
                         lg: this.isFoldStatus ? 4 : 3
                       },
@@ -679,6 +685,7 @@ struct Home {
                     GridCol({
                       span: {
                         xs: this.isLandscapePhone ? 3 : 6,
+                        sm: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
                         lg: this.isFoldStatus ? 4 : 3
                       },
@@ -715,6 +722,7 @@ struct Home {
                     GridCol({
                       span: {
                         xs: this.isLandscapePhone ? 6 : 12,
+                        sm: this.isLandscapePhone ? 6 : 12,
                         md: this.isLandscapePhone ? 6 : this.isFoldStatus ? 8 : 12,
                         lg: this.isFoldStatus ? 8 : 6
                       },
@@ -752,6 +760,7 @@ struct Home {
                     GridCol({
                       span: {
                         xs: this.isLandscapePhone ? 3 : 6,
+                        sm: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
                         lg: this.isFoldStatus ? 4 : 3
                       },
@@ -788,6 +797,7 @@ struct Home {
                     GridCol({
                       span: {
                         xs: this.isLandscapePhone ? 3 : 6,
+                        sm: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
                         lg: this.isFoldStatus ? 4 : 3
                       },
