@@ -374,8 +374,9 @@ struct Index {
           .fontColor([this.selectedIndex === index ? this.icon_emphasize : this.icon_tertiary])
           .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY) // 分层颜色
           .fontSize(this.isLandscapePhone ? 24 : this.TabIconfontSize.value)
-          .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
+          //.effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
           .transition(customAnimationUtil.isTranslate(this.uiConfig))
+          .translate({y: this.selectedIndex == index ? -3 : 0})
 
         Text(title)
           .fontColor(this.selectedIndex === index ? this.icon_emphasize : this.icon_tertiary)
@@ -383,7 +384,7 @@ struct Index {
           .fontSize(this.isLandscapePhone ? 12 : this.TabTitlefontSize.value)
           .transition(customAnimationUtil.isTranslate(this.uiConfig))
       }
-      .padding(this.isLandscapePhone|| this.istabletLandscape ? { right:5 } : { top: 5 })
+      .padding(this.isLandscapePhone|| this.istabletLandscape ? { right:5 } : { top: 8 })
     }
     .width('100%')
     .height('100%')
@@ -1095,8 +1096,9 @@ struct Index {
         }
         .zIndex(1)
         .backgroundColor( $r('app.color.background'))
-        .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Regular : null)
-        .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
+       // .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Thin: null)
+       // .backgroundBrightness({rate:0.5,lightUpDegree:0.5})
+      //  .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
         .barOverlap(this.uiConfig.isBlurr ? (this.isLandscapePhone || ( this.istabletLandscape && !this.isSecondary)  ? false : true) : false) //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
         .scrollable(this.isSecondary ? false : true)
         .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
