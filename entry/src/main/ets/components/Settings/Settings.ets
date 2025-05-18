@@ -20,7 +20,6 @@ import { removeItemsByIndex } from "../../utils/RemoveItemsUtils"
 import ClashViewModel from "../../entryability/ClashViewModel"
 import { getResourceString } from "../../utils/ResourceStringUtil"
 import { common } from "@kit.AbilityKit"
-import OverwriteTop from "../More/Overwrite/OverwriteTopBuilder"
 import { timestampToDateTime } from "../../utils/TimeConvertUtil"
 import { ProxyGroupItemDataSource } from "../../common/ProxyData"
 import { ConfigData } from "../../common/PageArgumentEntity"
@@ -110,9 +109,13 @@ struct Settings {
     // 关闭背景模糊
     // this.isEnableIndexForegroundBlur = false
   }
-  onresetAccept() {
+  async onresetAccept() {
     // 清空应用设置操作
-    AppState.ResetConfig()
+    try {
+      await AppState.ResetConfig(getContext(this))
+    }catch (e) {
+      promptAction.showToast({message: "清理配置失败!"})
+    }
     this.proxyGroups.clear()
     this.isClearData = true
     this.configList = []

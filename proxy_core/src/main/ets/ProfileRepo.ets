@@ -28,10 +28,11 @@ export class ProfileRepo {
     predicates.equalTo('id', uuid);
     await this.store!.delete(predicates);
   }
-  async ClearAll(){
+  async ClearAll(context: Context){
     const list = await this.queryAll()
     for (let d of list) {
-      this.delete(d.id)
+      d.loadContext(context)
+      await this.delete(d.id)
       await d.delete()
     }
   }

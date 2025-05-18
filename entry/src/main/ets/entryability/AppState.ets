@@ -181,7 +181,7 @@ export class AppState {
     // AppStorage.set("appConfig", new AppConfig())
   }
   // 清理数据 还原默认值
-  static ResetConfig(){
+  static async ResetConfig(context: Context){
     ClashViewModel.StopVpn()
     AppState.ResetClashConfig()
     AppStorage.set("appConfig", new AppConfig())
@@ -190,7 +190,7 @@ export class AppState {
     AppStorage.set("uiConfig",  new UIConfig())
     AppStorage.set("appFlowingState", new AppFlowingState())
     AppStorage.set("proxyGroups", [])
-    ClashViewModel.profileRepo.ClearAll()
+    await ClashViewModel.profileRepo.ClearAll(context)
     EventHub.sendEvent(EventKey.FetchProfile)
     // TODO 还原其他配置
   }
