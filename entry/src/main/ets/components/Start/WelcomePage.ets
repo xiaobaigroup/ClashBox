@@ -47,9 +47,9 @@ export struct WelcomeUserAgreement {
     if (name == 'privacy-policy') {
       WelcomePrivacyPolicy()
     } else
-    if (name == 'welcome') {
-      Welcome()
-    }
+      if (name == 'welcome') {
+        Welcome()
+      }
   }
 }
 
@@ -216,4 +216,3 @@ export struct Welcome {
   }
 
 }
-

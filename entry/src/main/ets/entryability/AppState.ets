@@ -244,4 +244,3 @@ export class TrafficQueue{
     return this.queue.map((q) => q.upRaw + q.downRaw);
   }
 }
-
