@@ -134,8 +134,8 @@ struct Index {
   // 设置模态页控制变量
   @Provide isShowSettings: boolean = false
   // 读取导航条区域的高度
-  @StorageProp('bottomRectHeight') bottomRectHeight: number = 0;
-  @StorageProp('topRectHeight') topRectHeight: number = 0;
+  @StorageProp('bottomRectHeight') @Watch('onAvoidAreaChange') bottomRectHeight: number = 0;
+  @StorageProp('topRectHeight') @Watch('onAvoidAreaChange') topRectHeight: number = 0;
   // page内顶部标题偏移量
   @Provide curYOfisPXSmallScreenfset: number = 0
   // 更多页标题是否搜索
@@ -300,6 +300,8 @@ struct Index {
   @StorageLink('favoriteProfiles') favoriteProfiles: Map<string, string> = new Map<string, string>([])
 
   @Provide SystemLanguageSubtitle: ResourceStr = $r('app.string.SimplifiedChinese')
+  // 判断设置是否清楚数据
+  @Provide isClearData: boolean = false
 
   /* 配置页 */
   @Provide currentConfigRadioCheckedConfigData: ConfigData = {
@@ -1051,6 +1053,11 @@ struct Index {
     }
   }// px外屏手势动画 end
 
+  onAvoidAreaChange() {
+    hilog.info(0x0000, 'Index', '#onAvoidAreaChange 动态避让高度 Top：%{public}d Bottom: %{public}i', this.topRectHeight, this.bottomRectHeight)
+  }
+
+
   build() {
     if (!this.isPXSecScreen){
     Stack() {
@@ -1103,7 +1110,7 @@ struct Index {
         .scrollable(this.isSecondary ? false : true)
         .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
         .barWidth(this.isLandscapePhone  ? this.barWidth : this.tabBarWidth.value) /**/
-        .barHeight(this.isLandscapePhone  ? '100%':((!this.uiConfig.isBlurr && this.isSecondary) || this.isSmallSquareScreen) ? this.barHeight : this.compBarHeight.value) /**/
+        .barHeight(this.isLandscapePhone  ? '100%':((!this.uiConfig.isBlurr && this.isSecondary) || this.isSmallSquareScreen) ? this.barHeight : this.bottomRectHeight === 0 ? 57 : this.compBarHeight.value) /**/
         .onChange((index: number) => {
           this.IndexCurrentindex = index
           if (index === 0) {
@@ -1127,10 +1134,11 @@ struct Index {
           this.isEnableIndexForegroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
           { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
         )
-        .padding({ top: px2vp(this.topRectHeight) })
+        .padding({ top: this.topRectHeight })
     }
     .width('100%')
     .height('100%')
+    .backgroundColor( $r('app.color.background'))
     // 欢迎页&崩溃页
     .bindSheet($$this.isShowWelcome, this.WelcomeSheet(), {
       detents: [BIND_SHEET_CONTAINER_HEIGHT],

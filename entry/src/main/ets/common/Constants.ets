@@ -937,9 +937,9 @@ export const TabIconfontSize_24_29: BreakpointState<number> = BreakpointState.of
 })
 
 export const TabBarHeight: BreakpointState<string> = BreakpointState.of({
-  sm: '77vp',
-  md: '77vp',
-  lg: '77vp',
+  sm: `77vp`,
+  md: `77vp`,
+  lg: `77vp`,
   xl: '100%'
 })
 

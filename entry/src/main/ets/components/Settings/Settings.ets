@@ -32,6 +32,8 @@ const context = getContext(this) as common.UIAbilityContext
 @Component
 struct Settings {
   @Consume isDisclaimer: boolean
+  // 判断设置是否清楚数据
+  @Consume isClearData: boolean
   // 设置模态页控制变量
   @Consume isShowSettings: boolean
   @Consume currentLanguage: ResourceStr
@@ -112,7 +114,9 @@ struct Settings {
     // 清空应用设置操作
     AppState.ResetConfig()
     this.proxyGroups.clear()
+    this.isClearData = true
     this.configList = []
+    hilog.info(0xC011, 'Settings', `EditConfig #onConfigListChange#配置列表: ${JSON.stringify(this.configList)}`)
     promptAction.showToast({message: $r('app.string.settings_reset_tips')})
     // 关闭背景模糊
     this.isEnableIndexForegroundBlur = false

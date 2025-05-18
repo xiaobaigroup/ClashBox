@@ -67,6 +67,8 @@ struct ConfigurationPage {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 所有子组件在容器内的对齐方式
   @Consume ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
+  // 判断设置是否清楚数据
+  @Consume isClearData: boolean
 
   private promptAction:PromptAction = this.getUIContext()?.getPromptAction()
 
@@ -639,8 +641,11 @@ struct ConfigurationPage {
   }
 
   async onConfigListChange() {
-    hilog.info(0xC011, this.componentName, `EditConfig #onConfigListChange#配置列表第一项: configName is [${this.configList[0].configName}]`)
-    if (!this.uiConfig.isFirstImportConfig) {
+    hilog.info(0xC011, this.componentName, `EditConfig #onConfigListChange#配置列表长度: [${this.configList.length}]`)
+    if (!this.uiConfig.isFirstImportConfig || this.isClearData) {
+      hilog.info(0xC011, this.componentName, `EditConfig #onConfigListChange#设置数据清除: [${this.isClearData}]`)
+      this.isClearData = false
+      hilog.info(0xC011, this.componentName, `EditConfig #onConfigListChange#设置数据清除: [${this.isClearData}]`)
       return
     }
     // 首次导入配置自动选中
