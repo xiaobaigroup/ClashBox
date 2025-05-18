@@ -276,7 +276,6 @@ export class SocketProxyService implements IClashManager {
         client.send({ data: JSON.stringify({method, params}) });
       }).catch((e:Error)=>{
         this.active = false
-        this.offlineTime.push(Date.now())
         console.error("vpn服务启动失败", e.message, e.stack)
         if(e.message == "Connection refused"){
           promptAction.showToast({message: "VPN服务被系统干掉了"})

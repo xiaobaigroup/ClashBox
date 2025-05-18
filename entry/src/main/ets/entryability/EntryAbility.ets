@@ -55,8 +55,6 @@ export default class EntryAbility extends UIAbility {
       }
       await AppState.init()
       let clashCore = AppStorage.get<AppConfig>("appConfig")?.clashCore
-      // 切换核心
-      promptAction.showToast({message: "核心启动中..."})
       await ClashViewModel.ChangeCore(clashCore)
       if(clashCore != ClashCore.mihomo){
         let service = new SocketStubService(this.context);
@@ -67,13 +65,16 @@ export default class EntryAbility extends UIAbility {
         ClashViewModel.loadConfig(isPatch)
       })
       // 监测vpn服务是否被回收，并且重新启动
-      setInterval(async ()=>{
+      setInterval(async () => {
         if(!ClashViewModel.socketProxy.active){
           ClashViewModel.socketProxy.active = true
+          ClashViewModel.socketProxy.offlineTime.push(Date.now())
           promptAction.showToast({message: `核心恢复中(${ClashViewModel.socketProxy.offlineTime.length})...`})
           let clashCore = AppStorage.get<AppConfig>("appConfig")?.clashCore
-          await ClashViewModel.ChangeCore(clashCore)
-          await ClashViewModel.ReStartVpn()
+          let result = await ClashViewModel.ChangeCore(clashCore)
+          if (result){
+            await ClashViewModel.ReStartVpn()
+          }
         }
       }, 1000)
       EventHub.sendEvent(EventKey.checkIpInfo)

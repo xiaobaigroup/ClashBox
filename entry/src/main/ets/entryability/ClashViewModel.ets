@@ -13,9 +13,9 @@ import { EventHub, EventKey } from "../common/EventHub";
 import { AppConfig, AppState, ClashCore, getPackageInfo } from "./AppState";
 import  fs from  "@ohos.file.fs"
 import { sleep } from "./EntryAbility";
-import { JSON } from "@kit.ArkTS";
 import { ProxyItem } from "../common/ProxyData";
 import { hilog } from "@kit.PerformanceAnalysisKit";
+import { readText } from "proxy_core/src/main/ets/fileUtils";
 
 export interface DelayInfo{
     name: string
@@ -23,6 +23,7 @@ export interface DelayInfo{
 }
 
 export class ClashViewModel {
+  vpnRequestId = 0;
   profileRepo = new ProfileRepo()
   socketProxy = new SocketProxyService()
   context: Context | undefined
@@ -235,39 +236,44 @@ export class ClashViewModel {
   //BUG 第一次启动，参数传不过去
   // 第一次要权限弹窗
   async ChangeCore(coreType: ClashCore | undefined = undefined, restart: boolean = true){
-    try {
-      const vpnWant = {
-        deviceId: "",
-        bundleName: "org.xbgroup.clashbox",
-        abilityName: "ClashVpnAbility",
-        parameters: { "ClashCore" : coreType}
-      } as Want
-      // 若vpn进程没启动直接停止，会导致卡死或闪退， 不同系统不同现象
-      if (restart){
-        // 停止vpn进程
-        await vpnExtension.stopVpnExtensionAbility(vpnWant)
+    let requestId = Date.now();
+    this.vpnRequestId = requestId;
+    const vpnWant = {
+      deviceId: "",
+      bundleName: "org.xbgroup.clashbox",
+      abilityName: "ClashVpnAbility",
+      parameters: { "ClashCore" : coreType, requestId }
+    } as Want
+    // 若vpn进程没启动直接停止，会导致卡死或闪退， 不同系统不同现象
+    if (restart){
+      // 停止vpn进程
+      await vpnExtension.stopVpnExtensionAbility(vpnWant)
+    }
+    await new Promise<boolean>( async (resolve, reject)=>{
+      try {
+        await vpnExtension.startVpnExtensionAbility(vpnWant)
+      }catch(e){
+        this.context?.getApplicationContext().killAllProcesses()
       }
-      // bundleName: "cn.damai.hongmeng",
-
-      await new Promise<boolean>( async (resolve, reject)=>{
-          vpnExtension.startVpnExtensionAbility(vpnWant)
-          .then(() => {
-            console.log("#VPN启动成功")
-            resolve(true)
-          })
-          .catch((error: Error) => {
-            this.context?.getApplicationContext().killAllProcesses()
-          })
-          setTimeout(()=>{
-            reject(false)
-          }, 10000)
-      })
-      await sleep(500)
-      // 启动vpn进程
-      // bug： 用户点取消，pad最新系统可能导致卡死在这里， 无解等系统修复
-    } catch (err) {
-      console.log("#VPN try失败")
-      console.error("ChangeCore", err.message || JSON.stringify(err))
+      resolve(true)
+      setTimeout(() =>{
+        reject(false)
+      }, 10000)
+    })
+    await sleep(600)
+    let result = await this.checkVpnVpnAbility(requestId)
+    if(!result){
+        promptAction.showToast({message:"VpnAbility请求失败! 请重启应用"})
+    }
+    return result;
+  }
+  private async checkVpnVpnAbility(reqId: number): Promise<boolean>{
+    let lockPath = this.context?.filesDir + '/vpn_ipc.lock';
+    if (!await fs.access(lockPath, fs.AccessModeType.EXIST)) {
+        return true;
+    } else {
+        let requestId = await readText(lockPath)
+        return requestId == reqId + "";
     }
   }
 
@@ -286,7 +292,6 @@ export class ClashViewModel {
     if(this.vpnStarted){
       await this.loadConfig(false)
       await this.socketProxy.stopClash()
-      // 核心崩溃 小钥匙一直在，要重启两量变
       await this.socketProxy.startClash()
     }
   }
