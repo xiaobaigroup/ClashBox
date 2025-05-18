@@ -300,6 +300,8 @@ struct Index {
   @StorageLink('favoriteProfiles') favoriteProfiles: Map<string, string> = new Map<string, string>([])
 
   @Provide SystemLanguageSubtitle: ResourceStr = $r('app.string.SimplifiedChinese')
+  // 判断设置是否清楚数据
+  @Provide isClearData: boolean = false
 
   /* 配置页 */
   @Provide currentConfigRadioCheckedConfigData: ConfigData = {
@@ -1106,7 +1108,7 @@ struct Index {
         .scrollable(this.isSecondary ? false : true)
         .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
         .barWidth(this.isLandscapePhone  ? this.barWidth : this.tabBarWidth.value) /**/
-        .barHeight(this.isLandscapePhone  ? '100%':((!this.uiConfig.isBlurr && this.isSecondary) || this.isSmallSquareScreen) ? this.barHeight : this.compBarHeight.value) /**/
+        .barHeight(this.isLandscapePhone  ? '100%':((!this.uiConfig.isBlurr && this.isSecondary) || this.isSmallSquareScreen) ? this.barHeight : this.bottomRectHeight === 0 ? 57 : this.compBarHeight.value) /**/
         .onChange((index: number) => {
           this.IndexCurrentindex = index
           if (index === 0) {
@@ -1130,10 +1132,11 @@ struct Index {
           this.isEnableIndexForegroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
           { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
         )
-        .padding({ top: this.topRectHeight, bottom: this.bottomRectHeight - 10 })
+        .padding({ top: this.topRectHeight })
     }
     .width('100%')
     .height('100%')
+    .backgroundColor( $r('app.color.background'))
     // 欢迎页&崩溃页
     .bindSheet($$this.isShowWelcome, this.WelcomeSheet(), {
       detents: [BIND_SHEET_CONTAINER_HEIGHT],
