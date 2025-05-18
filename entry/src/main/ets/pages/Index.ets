@@ -134,8 +134,8 @@ struct Index {
   // 设置模态页控制变量
   @Provide isShowSettings: boolean = false
   // 读取导航条区域的高度
-  @StorageProp('bottomRectHeight') bottomRectHeight: number = 0;
-  @StorageProp('topRectHeight') topRectHeight: number = 0;
+  @StorageProp('bottomRectHeight') @Watch('onAvoidAreaChange') bottomRectHeight: number = 0;
+  @StorageProp('topRectHeight') @Watch('onAvoidAreaChange') topRectHeight: number = 0;
   // page内顶部标题偏移量
   @Provide curYOfisPXSmallScreenfset: number = 0
   // 更多页标题是否搜索
@@ -1050,6 +1050,11 @@ struct Index {
     }
   }// px外屏手势动画 end
 
+  onAvoidAreaChange() {
+    hilog.info(0x0000, 'Index', '#onAvoidAreaChange 动态避让高度 Top：%{public}d Bottom: %{public}i', this.topRectHeight, this.bottomRectHeight)
+  }
+
+
   build() {
     if (!this.isPXSecScreen){
     Stack() {
@@ -1125,7 +1130,7 @@ struct Index {
           this.isEnableIndexForegroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
           { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
         )
-        .padding({ top: px2vp(this.topRectHeight) })
+        .padding({ top: this.topRectHeight, bottom: this.bottomRectHeight - 10 })
     }
     .width('100%')
     .height('100%')

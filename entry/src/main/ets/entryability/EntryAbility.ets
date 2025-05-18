@@ -108,30 +108,32 @@ export default class EntryAbility extends UIAbility {
       console.error('Failed to set the window layout to full-screen mode. Cause:' + JSON.stringify(err));
     });
 
-    // 缓存window窗口对象
-    AppStorage.setOrCreate('windowClass', windowClass);
-
+    // // 缓存window窗口对象
+    // AppStorage.setOrCreate('windowClass', windowClass);
 
     // 2. 获取布局避让遮挡的区域
     let type = window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR; // 以导航条避让为例
     let avoidArea = windowClass.getWindowAvoidArea(type);
     let bottomRectHeight = avoidArea.bottomRect.height; // 获取到导航条区域的高度
-    AppStorage.setOrCreate('bottomRectHeight', bottomRectHeight);
+    AppStorage.setOrCreate('bottomRectHeight', px2vp(bottomRectHeight));
 
     type = window.AvoidAreaType.TYPE_SYSTEM; // 以状态栏避让为例
     avoidArea = windowClass.getWindowAvoidArea(type);
     let topRectHeight = avoidArea.topRect.height; // 获取状态栏区域高度
-    AppStorage.setOrCreate('topRectHeight', topRectHeight);
-
+    AppStorage.setOrCreate('topRectHeight', px2vp(topRectHeight));
+    hilog.info(0x0000, 'EntryAbility', '初始避让高度 Top：%{public}d Bottom: %{public}i', px2vp(topRectHeight), px2vp(bottomRectHeight));
     // 3. 注册监听函数，动态获取避让区域数据
     windowClass.on('avoidAreaChange', (data) => {
+      let topRectActiveHeight = 0
+      let bottomRectActiveHeight = 0
       if (data.type === window.AvoidAreaType.TYPE_SYSTEM) {
-        let topRectHeight = data.area.topRect.height;
-        AppStorage.setOrCreate('topRectHeight', topRectHeight);
+        topRectActiveHeight = data.area.topRect.height;
+        AppStorage.setOrCreate('topRectHeight', px2vp(topRectActiveHeight));
       } else if (data.type == window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR) {
-        let bottomRectHeight = data.area.bottomRect.height;
-        AppStorage.setOrCreate('bottomRectHeight', bottomRectHeight);
+        bottomRectActiveHeight = data.area.bottomRect.height;
+        AppStorage.setOrCreate('bottomRectHeight', px2vp(bottomRectActiveHeight));
       }
+      hilog.info(0x0000, 'EntryAbility', '动态避让高度 Top：%{public}d Bottom: %{public}i', px2vp(topRectActiveHeight), px2vp(bottomRectActiveHeight));
     });
 
     // 应用窗口初始高度和宽度
