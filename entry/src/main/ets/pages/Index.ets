@@ -100,6 +100,14 @@ const componentName: string = 'Index'
 @Entry
 @Component
 struct Index {
+  /*
+ 断点相关
+   */
+ @Provide uiContext: UIContext = this.getUIContext();
+ //高度断点
+ @StorageLink ('currentHeightBreakpoint') @Watch('onWindowChange')heightBp: HeightBreakpoint = this.uiContext.getWindowHeightBreakpoint();
+ //宽度断点
+ @StorageLink ('currentWidthBreakpoint') @Watch('onWindowChange')widthBp: WidthBreakpoint = this.uiContext.getWindowWidthBreakpoint();
   /**
    * 主题色
    *    示例中主题配置里配置了一个颜色，所以只用`ResourceColor`类型的变量来接收色值，
@@ -436,8 +444,41 @@ struct Index {
   /**窗口变化监听*/
   onWindowChange() {
     hilog.info(0xFF00, componentName,
-      `#WindowChange#应用窗口状态 width: ${this.windowWidth} height: ${this.windowHeight}`)
-    if (this.windowWidth > 328 || this.windowHeight > 328) {
+      `#WindowChange#应用窗口状态 width: ${this.widthBp} height: ${this.heightBp}`)
+    if (this.widthBp == 2 && this.heightBp == 0) {
+      this.isLandscapePhone = true
+      hilog.info(0x1000, componentName,
+        `#WindowChange#应用窗口状态改变#手机横屏结果: ${this.isLandscapePhone}`)
+    }else if (this.widthBp == 2 && this.heightBp == 1 || (this.widthBp==3 && this.heightBp == 1 &&
+      display.getFoldStatus() === display.FoldStatus.FOLD_STATUS_EXPANDED)){
+      this.isFoldStatus = true
+      hilog.info(0xFF00, componentName,
+        `#WindowChange#应用窗口状态改变#折叠展开结果: ${this.isFoldStatus}`)
+    }else if (this.widthBp == 3 && this.heightBp == 0 || (
+      this.widthBp == 3 && this.heightBp == 2 && deviceInfo.deviceType === 'tablet'
+    )){
+      this.istabletLandscape = true
+      hilog.info(0xFF00, componentName,
+        `#WindowChange#应用窗口状态改变#平板横屏结果: ${this.istabletLandscape}`)
+    }else if (328<this.windowHeight && this.windowHeight < 440 && 328<this.windowWidth && this.windowWidth <= 440) {
+      this.isSmallSquareScreen = true
+      hilog.info(0xFF00, componentName,
+        `#WindowChange#应用窗口状态改变#分屏窗口结果: ${this.isSmallSquareScreen}`)
+    }else if (this.widthBp == 1 && this.heightBp == 1 ){
+      this.isPXSecScreen = true
+      hilog.info(0xFF00, componentName,
+        `#WindowChange#应用窗口状态改变#PX外屏结果: ${this.isPXSecScreen}`)
+    } else {
+      this.isLandscapePhone = false
+      this.istabletLandscape = false
+      this.isSmallSquareScreen = false
+      this.isFoldStatus = false
+      this.isPXSecScreen = false
+      hilog.info(0xFF00, componentName,
+        `#WindowChange#设备高度改变 分屏窗口: ${this.isSmallSquareScreen}`)
+    }
+    
+   /* if (this.windowWidth > 328 || this.windowHeight > 328) {
       if (this.windowHeight === this.windowWidth) {
         hilog.info(0xFF00, componentName,
           `#WindowChange#应用窗口状态 重复执行，跳出`)
@@ -472,7 +513,7 @@ struct Index {
       this.isPXSecScreen = false
       hilog.info(0xFF00, componentName,
         `#WindowChange#设备高度改变 分屏窗口: ${this.isSmallSquareScreen}`)
-    }
+    }*/
   }
 
   // 免责声明 & 检查更新 弹窗控制器
@@ -514,6 +555,7 @@ struct Index {
   })
 
   async aboutToAppear(): Promise<void> {
+    console.info(`Window heightBP: ${this.heightBp}, widthBp: ${this.widthBp}`)
     hilog.info(0x1000, componentName, `#aboutToAppear executed`)
     let appFlowingState = AppStorage.get<AppFlowingState>("appFlowingState") ?? new AppFlowingState()
     // 启动Clash

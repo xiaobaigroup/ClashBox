@@ -11,6 +11,17 @@ import { deviceInfo } from '@kit.BasicServicesKit';
 
 export default class EntryAbility extends UIAbility {
  private currentLanguage: string | undefined = undefined
+  /*
+  设备断点获取
+   */
+  private uiContext?: UIContext;
+  private onWindowSizeChange: (windowSize: window.Size) => void = (windowSize: window.Size) => {
+    let widthBp: WidthBreakpoint = this.uiContext!.getWindowWidthBreakpoint();
+    AppStorage.setOrCreate('currentWidthBreakpoint', widthBp);
+    let heightBp: HeightBreakpoint = this.uiContext!.getWindowHeightBreakpoint();
+    AppStorage.setOrCreate('currentHeightBreakpoint', heightBp);
+  };
+
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onCreate');
     // 添加崩溃监听
@@ -97,6 +108,20 @@ export default class EntryAbility extends UIAbility {
         AppStorage.setOrCreate('2in1', false)
       }
 
+      /*
+      设备断点获取
+       */
+      windowStage.getMainWindow().then((data: window.Window) => {
+        this.uiContext = data.getUIContext();
+        let widthBp: WidthBreakpoint = this.uiContext.getWindowWidthBreakpoint();
+        let heightBp: HeightBreakpoint = this.uiContext.getWindowHeightBreakpoint();
+        AppStorage.setOrCreate('currentWidthBreakpoint', widthBp);
+        AppStorage.setOrCreate('currentHeightBreakpoint', heightBp);
+        data.on('windowSizeChange', this.onWindowSizeChange);
+
+      }).catch((err: BusinessError) => {
+        console.error(`Failed to obtain the main window. Cause code: ${err.code}, message: ${err.message}`);
+      });
     })
 
     // 获取应用主窗口
