@@ -110,9 +110,6 @@ struct ConfigurationPage {
   @Consume isPXSecScreen: boolean
   // 平板竖屏判断变量
   @Consume istabletLandscape: boolean
-  /* 配置列表List相关 */
-  // 当前单选框选择的配置
-  @Consume currentConfigRadioCheckedConfigData: ConfigData
   /**
    * XXX 当前手指触摸的ListItem的对应 `this.configList` 中的 `configId`
    *    List的长按菜单中的响应都是根据这个的对象中的属性来处理的，是个不稳定因素
@@ -392,7 +389,7 @@ struct ConfigurationPage {
                           .transition(customAnimationUtil.isOpacity(this.uiConfig))
                       }
                         Radio({ value: 'radio' + index, group: 'configGroup'})
-                          .checked(item.configId === this.currentConfigRadioCheckedConfigData.configId)
+                          .checked(item.configId === this.appConfig.currentProfileId)
                           .radioStyle({
                             checkedBackgroundColor: this.icon_emphasize,
                           })
@@ -423,9 +420,7 @@ struct ConfigurationPage {
                   .onClick(async () => {
                     this.isON.toggleAnim = true
                     // 更新当前选中
-                    this.currentConfigRadioCheckedConfigData = item
                     await this.loadConfig(item)
-                    hilog.info(0xC002, this.componentName, `#ListItem#onClick:configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
                   })
                   .onTouch((event: TouchEvent) => {
                     if (event.type === TouchType.Down) {
@@ -594,9 +589,6 @@ struct ConfigurationPage {
     EventHub.on(EventKey.FetchProfile, () => {
       this.fetchProfiles()
     })
-    if (this.configList.length !== 0) {
-      this.currentConfigRadioCheckedConfigData = this.configList.find(obj => obj.configId === this.appConfig.currentProfileId) as ConfigData
-    }
   }
 
   async onIndexChange() {
@@ -651,12 +643,10 @@ struct ConfigurationPage {
     // 首次导入配置自动选中
     if (this.configList.length === 1 && this.uiConfig.isFirstImportConfig) {
       this.isON.toggleAnim = true
-      hilog.info(0xC011, this.componentName, `EditConfig #onConfigListChange#配置列表的第一项: configName is [${this.configList[0].configName}]`)
       await this.loadConfig(this.configList[0])
-      this.currentConfigRadioCheckedConfigData = this.configList[0]
       this.uiConfig.isFirstImportConfig = false
       hilog.info(0xC002, this.componentName,
-        `EditConfig #onConfigListChange: 首次导入：${this.uiConfig.isFirstImportConfig} configName is [${this.currentConfigRadioCheckedConfigData.configName}]`)
+        `EditConfig #onConfigListChange: 首次导入：${this.uiConfig.isFirstImportConfig} configName is [${this.configList[0].configName}]`)
     }
   }
 
