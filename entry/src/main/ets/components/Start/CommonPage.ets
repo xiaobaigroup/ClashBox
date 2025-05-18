@@ -1,7 +1,6 @@
 import { UIConfig } from "../../entryability/AppState"
 import { common } from "@kit.AbilityKit"
 import { webview } from "@kit.ArkWeb"
-import { i18n } from "@kit.LocalizationKit"
 import { BusinessError } from "@kit.BasicServicesKit"
 
 
@@ -97,6 +96,12 @@ export struct CommonPage {
           // .forceDarkAccess(true)
           .domStorageAccess(true)
           .darkMode(WebDarkMode.Auto)
+          .overScrollMode(OverScrollMode.ALWAYS)
+          .nestedScroll({
+            scrollForward: NestedScrollMode.SELF_ONLY,
+            scrollBackward: NestedScrollMode.SELF_ONLY,
+          })
+         // .layoutMode(WebLayoutMode.FIT_CONTENT)
           .backgroundColor('#00ffffff')
           .onPageBegin((event) => {
             console.log(`CommonPage #webviewBuilder ${JSON.stringify(event)}`)
@@ -122,7 +127,7 @@ export struct CommonPage {
             console.log('#Webview event.message:' + event.message)
             return true
           })
-      }.width('100%')
+      }.width('100%').padding({ top: 35})
       .layoutWeight(1)
       // 按钮
       Flex({
@@ -160,7 +165,7 @@ export struct CommonPage {
             }
           })
       }.width('90%')
-      .margin({ top: 12, bottom: 5 })
-    }.padding({left: 5, right: 5,  bottom: 15})
+      .padding({ top: 12, bottom: 20 })
+    }.padding({left: 5, right: 5})
   }
 }

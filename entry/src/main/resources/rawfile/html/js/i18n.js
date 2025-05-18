@@ -37,7 +37,7 @@ function loadLanguage(lang) {
 
 const translations = {
     'zh-Hans': {
-        "u-main-title": "用户协议",
+     //   "u-main-title": "用户协议",
         "u-sub-title": "更新日期：2025年5月1日",
         "u-sub-title-2": "ClashBox的所有权和运作权归小白软件团队所有。在本服务条款中简称\"本团队\"或称为\"我们\"。使用ClashBox产品及服务将视为您同意以下使用条款。",
         "u-h2-1": "1. 仅供个人使用",
@@ -71,7 +71,7 @@ const translations = {
         "u-p-7-5": "693903194",
         "u-h2-8": "开发者：小白软件团队",
         "u-h2-9": "应用名称：ClashBox",
-        "p-main-title": "关于ClashBox与隐私的声明",
+     //   "p-main-title": "关于ClashBox与隐私的声明",
         "p-sub-title": "更新日期：2025年5月11日",
         "p-sub-title-1": "本政策仅适用于本公司（以下简称「我们」）的产品「ClashBox」及其相关服务。",
         "p-sub-title-2": "您的个人信息安全对我们来说至关重要，一直以来，我们都尽全力保护您的个人信息安全，致力于维持您对我们的信任。我们将依据相关法律法规和技术规范收集和使用您的个人信息，以帮助我们向您提供更优质的产品和服务。同时，我们承诺会对您的个人信息和其他数据进行严格保密，确保您的个人信息安全。",
@@ -116,7 +116,7 @@ const translations = {
         "p-h2-8": "应用名称：ClashBox"
     },
     'en-Latn': {
-        "u-main-title": "User Agreement",
+      //  "u-main-title": "User Agreement",
         "u-sub-title": "Last Updated: May 1, 2025",
         "u-sub-title-2": "All ownership and operational rights of ClashBox belong to Xiaobai Software Team. In this Service Agreement, referred to as \"the Team\" or \"we\". Use of ClashBox products and services constitutes acceptance of the following terms.",
         "u-h2-1": "1. Intended for Personal Use Only",
@@ -148,7 +148,7 @@ const translations = {
         "u-p-7-3": "QQ Group: 693903194",
         "u-h2-8": "Developer: Xiaobai Software Team",
         "u-h2-9": "App Name: ClashBox",
-        "p-main-title": "Statement on ClashBox and Privacy",
+     //   "p-main-title": "Statement on ClashBox and Privacy",
         "p-sub-title": "Updated: May 11, 2025",
         "p-sub-title-1": "This policy applies only to our product \"ClashBox\" and its related services provided by our company (hereinafter referred to as \"we\").",
         "p-sub-title-2": "Your personal information security is of utmost importance to us. We always strive to protect your personal information and maintain your trust. We collect and use your personal information in accordance with relevant laws, regulations, and technical specifications to help us provide you with better products and services. We are committed to strictly safeguarding your personal information and other data to ensure its security.",
@@ -193,7 +193,7 @@ const translations = {
         "p-h2-8": "App Name: ClashBox"
     },
     'zh-TW': {
-        "u-main-title": "使用者條款",
+      //  "u-main-title": "使用者條款",
         "u-sub-title": "更新日期：2025年5月1日",
         "u-sub-title-2": "ClashBox的所有權與營運權歸小白軟體團隊所有。在本服務條款中簡稱\"本團隊\"或稱為\"我們\"。使用ClashBox產品及服務將視為您同意以下使用條款。",
         "u-h2-1": "1. 僅供個人使用",
@@ -227,7 +227,7 @@ const translations = {
         "u-p-7-5": "693903194",
         "u-h2-8": "開發者：小白軟體團隊",
         "u-h2-9": "應用程式名稱：ClashBox",
-        "p-main-title": "關於ClashBox與隱私權的聲明",
+    //    "p-main-title": "關於ClashBox與隱私權的聲明",
         "p-sub-title": "更新日期：2025年5月11日",
         "p-sub-title-1": "本政策僅適用於本公司（以下簡稱「我們」）之產品「ClashBox」及其相關服務。",
         "p-sub-title-2": "您的個人資料安全對我們至關重要，我們始終致力於保護您的個人資料安全並維持您的信任。我們將依據相關法令及技術規範收集與使用您的個人資料，以提供更優質的產品與服務。同時，我們承諾嚴格保密您的個人資料與其他數據，確保其安全性。",
@@ -272,7 +272,7 @@ const translations = {
         "p-h2-8": "應用程式名稱：ClashBox"
     },
     'zh-HK': {
-        "u-main-title": "用戶協議",
+     //   "u-main-title": "用戶協議",
         "u-sub-title": "更新日期：2025年5月1日",
         "u-sub-title-2": "ClashBox嘅所有權同運作權歸小白軟件團隊所有。喺本服務條款中簡稱\"本團隊\"或稱為\"我哋\"。使用ClashBox產品及服務將視為您同意以下使用條款。",
         "u-h2-1": "1. 僅供個人使用",
@@ -306,7 +306,7 @@ const translations = {
         "u-p-7-5": "693903194",
         "u-h2-8": "開發者：小白軟件團隊",
         "u-h2-9": "應用名稱：ClashBox",
-        "p-main-title": "關於ClashBox與私隱嘅聲明",
+       // "p-main-title": "關於ClashBox與私隱嘅聲明",
         "p-sub-title": "更新日期：2025年5月11日",
         "p-sub-title-1": "本政策僅適用於本公司（以下簡稱「我哋」）嘅產品「ClashBox」及其相關服務。",
         "p-sub-title-2": "您嘅個人資料安全對我哋嚟講至關重要，一直以嚟，我哋都盡全力保護您嘅個人資料安全，致力於維持您對我哋嘅信任。我哋會依據相關法律法規同技術規範收集同使用您嘅個人資料，以幫助我哋向您提供更優質嘅產品同服務。同時，我哋承諾會對您嘅個人資料同其他數據進行嚴格保密，確保您嘅個人資料安全。",
