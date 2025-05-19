@@ -78,9 +78,9 @@ struct FavoriteProxy {
                     justifyContent: FlexAlign.SpaceBetween
                   }) {
                     Text(`${p[1]}`)
-                      .minFontSize(10)
-                      .maxFontSize(22)
-                      .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
+                    //  .minFontSize(10)
+                    //  .maxFontSize(22)
+                    //  .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
                       .fontSize(this.isLandscapePhone ? 15 : this.fontSize.value)
                       .fontColor($r('sys.color.font_primary'))
                       .maxLines(1)

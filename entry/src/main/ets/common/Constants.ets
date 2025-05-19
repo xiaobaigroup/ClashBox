@@ -975,7 +975,7 @@ export const TabVertical: BreakpointState<boolean> = BreakpointState.of({
   xs: false,
   sm: false,
   md: false,
-  lg: false,
+  lg: true,
   xl: true
 })
 

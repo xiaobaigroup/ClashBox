@@ -445,7 +445,8 @@ struct Index {
   onWindowChange() {
     hilog.info(0xFF00, componentName,
       `#WindowChange#应用窗口状态 width: ${this.widthBp} height: ${this.heightBp} `+' tab宽度:'+ this.barWidth?.toString())
-    if (this.widthBp == 2 && this.heightBp == 0) {
+    if ((this.widthBp == 2 && this.heightBp == 0 ) ||
+      (this.widthBp == 3 && this.heightBp == 0 && deviceInfo.deviceType === 'phone' )) {
       this.isLandscapePhone = true
       hilog.info(0x1000, componentName,
         `#WindowChange#应用窗口状态改变#手机横屏结果: ${this.isLandscapePhone}`)
@@ -1149,9 +1150,9 @@ struct Index {
       //  .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
         .barOverlap(this.uiConfig.isBlurr ? (this.isLandscapePhone || ( this.istabletLandscape && !this.isSecondary)  ? false : true) : false) //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
         .scrollable(this.isSecondary ? false : true)
-        .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
-        .barWidth(this.isLandscapePhone  ?  this.barWidth : this.tabBarWidth.value) /**/
-        .barHeight(this.isLandscapePhone  ? '100%':((!this.uiConfig.isBlurr && this.isSecondary) || this.isSmallSquareScreen) ? this.barHeight : this.bottomRectHeight === 0 ? 57 : this.compBarHeight.value) /**/
+        .vertical(this.isLandscapePhone || this.istabletLandscape ? true : this.compVertical.value) /**/
+        .barWidth(this.isLandscapePhone || this.istabletLandscape ?  this.barWidth : this.tabBarWidth.value) /**/
+        .barHeight(this.isLandscapePhone || this.istabletLandscape ? '100%':((!this.uiConfig.isBlurr && this.isSecondary) || this.isSmallSquareScreen) ? this.barHeight : this.bottomRectHeight === 0 ? 57 : this.compBarHeight.value) /**/
         .onChange((index: number) => {
           this.IndexCurrentindex = index
           if (index === 0) {

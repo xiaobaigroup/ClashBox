@@ -79,16 +79,8 @@ struct SwitchMode {
           ], (n: [Resource, number], i: number) => {
             Button(n["t"], { buttonStyle: ButtonStyleMode.TEXTUAL, stateEffect: false })
               .ButtonStyle()
-              .labelStyle({ overflow: TextOverflow.Clip,
-                maxLines: 1,
-                minFontSize: 8,
-                maxFontSize: 22,
-                font: {
-                  size: this.fontSize.value,
-                }
-              })
               .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-            //  .fontSize(this.isLandscapePhone ? 14 : this.fontSize.value)
+              .fontSize(this.isLandscapePhone ? 14 : this.fontSize.value)
               .fontColor(this.clashConfig.mode == n["v"] ? this.font_primary : $r('sys.color.font_secondary'))
               .onClick(() => {
                 //在home页编辑卡片状态时，无法操作，点击回调写在if判定里

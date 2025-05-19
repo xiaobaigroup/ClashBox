@@ -823,7 +823,7 @@ struct Home {
                     }
                     .GridColStyle()
                     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                    .height(this.isLandscapePhone ? '160vp' : this.HomeCardEditHeight.value)
+                    .height(this.isLandscapePhone ? '100vp' : this.HomeCardEditHeight.value)
                     .transition(customAnimationUtil.isScaleTran(10, this.uiConfig))
                     // .transition(this.uiConfig.isAnimation ? TransitionEffect.scale({x: 0, y: 0}).animation({ duration: this.uiConfig.animationSpeed ,delay:90}):null)
                     //编辑模式下跳动动画

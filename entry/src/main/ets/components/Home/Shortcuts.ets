@@ -75,9 +75,9 @@ struct Shortcuts {
           { t: this.uiConfig.inputTitle3, w: this.uiConfig.inputWeb3 }
         ], (m: [Resource, number], i: number) => {
             Text(`${m["t"]}` != '' ? `${m["t"]}` : $r('app.string.long_press_modify'))
-              .minFontSize(10)
-              .maxFontSize(22)
-              .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
+             // .minFontSize(10)
+             // .maxFontSize(22)
+             // .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
               .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
               .ShortcutsTextStyle()
               .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
