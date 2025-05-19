@@ -743,6 +743,17 @@ export struct FAQ {
         .margin({top: 5})
 
         ListItem() {
+          Flex({
+            alignContent: FlexAlign.Start,
+            direction: FlexDirection.Row,
+            wrap: FlexWrap.Wrap,
+          }) {
+            Text($r('app.string.qa_tips'))
+              .margin({top: 5, bottom: 5})
+          }.margin({left: 11})
+        }
+
+        ListItem() {
           Column(){
             Text('F&Q')
               .fontSize(16)

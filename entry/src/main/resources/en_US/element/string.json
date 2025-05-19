@@ -1979,6 +1979,10 @@
     {
       "name": "privacy_policy",
       "value": "Statement on ClashBox and Privacy"
+    },
+    {
+      "name": "qa_tips",
+      "value": "Special note: in case of frequent VPN disconnection, it is recommended to use the foreground mode+simulate the background to achieve a more stable operation of the agent. In addition, the picture in picture window can be reduced to the border."
     }
   ]
 }
