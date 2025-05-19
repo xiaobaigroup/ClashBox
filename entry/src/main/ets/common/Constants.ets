@@ -942,7 +942,7 @@ export const TabBarHeight: BreakpointState<string> = BreakpointState.of({
   xs: `77vp`,
   sm: `77vp`,
   md: `77vp`,
-  lg: `77vp`,
+  lg: `100%`,
   xl: '100%'
 })
 
@@ -950,7 +950,7 @@ export const TabBarWidth: BreakpointState<string> = BreakpointState.of({
   xs: '100%',
   sm: '100%',
   md: '100%',
-  lg: '100%',
+  lg: '70vp',
   xl: '70vp'
 })
 
@@ -983,7 +983,7 @@ export const TabBarPose: BreakpointState<BarPosition> = BreakpointState.of({
   xs: BarPosition.End,
   sm: BarPosition.End,
   md: BarPosition.End,
-  lg: BarPosition.End,
+  lg: BarPosition.Start,
   xl: BarPosition.Start
 })
 

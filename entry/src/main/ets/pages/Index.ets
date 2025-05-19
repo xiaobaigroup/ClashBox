@@ -375,8 +375,8 @@ struct Index {
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
     Flex({
       direction: FlexDirection.Column,
-      justifyContent: this.isLandscapePhone || this.istabletLandscape ? FlexAlign.Center : this.tabBarJustifyContent.value,
-      alignItems: this.isLandscapePhone || this.istabletLandscape ? ItemAlign.End : ItemAlign.Center,
+      justifyContent: this.isLandscapePhone ? FlexAlign.Center : this.isFoldStatus ? FlexAlign.Start : this.tabBarJustifyContent.value,
+      alignItems: this.isLandscapePhone ? ItemAlign.End : this.isFoldStatus ? ItemAlign.Start : ItemAlign.Center,
       space: {main: LengthMetrics.vp(3)}
     })
     {
@@ -1104,7 +1104,7 @@ struct Index {
     if (!this.isPXSecScreen){
     Stack() {
         Tabs({
-          barPosition: this.isLandscapePhone ? BarPosition.Start : this.compBarPose.value,
+          barPosition: this.isLandscapePhone ? BarPosition.Start : this.isFoldStatus ? BarPosition.End: this.compBarPose.value,
           index: this.IndexCurrentindex,
           controller: indexController
         }) {
@@ -1150,9 +1150,9 @@ struct Index {
       //  .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
         .barOverlap(this.uiConfig.isBlurr ? (this.isLandscapePhone || ( this.istabletLandscape && !this.isSecondary)  ? false : true) : false) //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
         .scrollable(this.isSecondary ? false : true)
-        .vertical(this.isLandscapePhone || this.istabletLandscape ? true : this.compVertical.value) /**/
-        .barWidth(this.isLandscapePhone || this.istabletLandscape ?  this.barWidth : this.tabBarWidth.value) /**/
-        .barHeight(this.isLandscapePhone || this.istabletLandscape ? '100%':((!this.uiConfig.isBlurr && this.isSecondary) || this.isSmallSquareScreen) ? this.barHeight : this.bottomRectHeight === 0 ? 57 : this.compBarHeight.value) /**/
+        .vertical(this.isLandscapePhone  ? true : this.isFoldStatus ? false : this.compVertical.value) /**/
+        .barWidth(this.isLandscapePhone  ?  this.barWidth : this.isFoldStatus ? '100%' : this.tabBarWidth.value) /**/
+        .barHeight(this.isLandscapePhone  ? '100%': this.isFoldStatus ? '77vp' :((!this.uiConfig.isBlurr && this.isSecondary) || this.isSmallSquareScreen) ? this.barHeight : this.bottomRectHeight === 0 ? 57 : this.compBarHeight.value) /**/
         .onChange((index: number) => {
           this.IndexCurrentindex = index
           if (index === 0) {
