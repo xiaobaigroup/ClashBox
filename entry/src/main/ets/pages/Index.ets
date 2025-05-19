@@ -375,9 +375,9 @@ struct Index {
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
     Flex({
       direction: FlexDirection.Column,
-      justifyContent: this.isLandscapePhone ? FlexAlign.Center : this.tabBarJustifyContent.value,
-      alignItems: this.isLandscapePhone ? ItemAlign.End : ItemAlign.Center,
-      space: {main: LengthMetrics.vp(4)}
+      justifyContent: this.isLandscapePhone || this.istabletLandscape ? FlexAlign.Center : this.tabBarJustifyContent.value,
+      alignItems: this.isLandscapePhone || this.istabletLandscape ? ItemAlign.End : ItemAlign.Center,
+      space: {main: LengthMetrics.vp(3)}
     })
     {
       SymbolGlyph(TabIcon)
@@ -396,7 +396,7 @@ struct Index {
     }
     .width('100%')
     .height('100%')
-    .padding({top: 5})
+    .padding({top: 8})
     .animation(this.isSecondary === true ? {
       duration: this.uiConfig.animationSpeed,
       tempo: 0.3,
@@ -444,7 +444,7 @@ struct Index {
   /**窗口变化监听*/
   onWindowChange() {
     hilog.info(0xFF00, componentName,
-      `#WindowChange#应用窗口状态 width: ${this.widthBp} height: ${this.heightBp}`)
+      `#WindowChange#应用窗口状态 width: ${this.widthBp} height: ${this.heightBp} `+' tab宽度:'+ this.barWidth?.toString())
     if (this.widthBp == 2 && this.heightBp == 0) {
       this.isLandscapePhone = true
       hilog.info(0x1000, componentName,
@@ -475,7 +475,7 @@ struct Index {
       this.isFoldStatus = false
       this.isPXSecScreen = false
       hilog.info(0xFF00, componentName,
-        `#WindowChange#设备高度改变 分屏窗口: ${this.isSmallSquareScreen}`)
+        `#WindowChange#设备高度改变 分屏窗口: ${this.isPXSecScreen}`)
     }
     
    /* if (this.windowWidth > 328 || this.windowHeight > 328) {
@@ -555,7 +555,7 @@ struct Index {
   })
 
   async aboutToAppear(): Promise<void> {
-    console.info(`Window heightBP: ${this.heightBp}, widthBp: ${this.widthBp}`)
+
     hilog.info(0x1000, componentName, `#aboutToAppear executed`)
     let appFlowingState = AppStorage.get<AppFlowingState>("appFlowingState") ?? new AppFlowingState()
     // 启动Clash
@@ -984,7 +984,7 @@ struct Index {
   }
 
   @State barHeight: string | number | undefined = this.compBarHeight.value
-  @State barWidth: string | number | undefined = this.tabBarWidth.value
+  @State barWidth: string | number | undefined =this.tabBarWidth.value ?? '70vp'
   // tab移动动画
   startAnim() {
     indexController.setTabBarTranslate({ y: 0 })
@@ -1001,7 +1001,7 @@ struct Index {
           this.barHeight = 0
         }
 
-      if (this.isLandscapePhone || this.istabletLandscape || this.isFoldStatus) {
+      if (this.isLandscapePhone || this.istabletLandscape ) {
         indexController.setTabBarTranslate({ x: '-100%' })
         this.barWidth = 0
         this.barHeight = '100%'
@@ -1024,9 +1024,9 @@ struct Index {
           this.barHeight = this.compBarHeight.value
         }
 
-        if (this.isLandscapePhone || this.istabletLandscape || this.isFoldStatus) {
+        if (this.isLandscapePhone || this.istabletLandscape ) {
           indexController.setTabBarTranslate({ x: 0 })
-          this.barWidth = '77vp'
+          this.barWidth = '70vp'
           this.barHeight = '100%'
         }
       }
@@ -1150,7 +1150,7 @@ struct Index {
         .barOverlap(this.uiConfig.isBlurr ? (this.isLandscapePhone || ( this.istabletLandscape && !this.isSecondary)  ? false : true) : false) //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
         .scrollable(this.isSecondary ? false : true)
         .vertical(this.isLandscapePhone ? true : this.compVertical.value) /**/
-        .barWidth(this.isLandscapePhone  ? this.barWidth : this.tabBarWidth.value) /**/
+        .barWidth(this.isLandscapePhone  ?  this.barWidth : this.tabBarWidth.value) /**/
         .barHeight(this.isLandscapePhone  ? '100%':((!this.uiConfig.isBlurr && this.isSecondary) || this.isSmallSquareScreen) ? this.barHeight : this.bottomRectHeight === 0 ? 57 : this.compBarHeight.value) /**/
         .onChange((index: number) => {
           this.IndexCurrentindex = index
@@ -1175,7 +1175,9 @@ struct Index {
           this.isEnableIndexForegroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
           { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
         )
+        .fadingEdge(true)
         .padding({ top: this.topRectHeight })
+       // .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
     }
     .width('100%')
     .height('100%')

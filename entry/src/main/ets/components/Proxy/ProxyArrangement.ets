@@ -127,7 +127,7 @@ struct ProxyArrangement {
         })
         .width('100%')
         .borderRadius(BORDER_RADIUS_20)
-        .constraintSize({minHeight: 120})
+     //   .constraintSize({maxHeight: 300})
       }, (item: ProxyGroup) => item.name)
     }
     .contentEndOffset(this.isLandscapePhone?80:CONTENT_END_OFFSET_150)

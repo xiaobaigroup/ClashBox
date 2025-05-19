@@ -947,7 +947,7 @@ export const TabBarWidth: BreakpointState<string> = BreakpointState.of({
   sm: '100%',
   md: '100%',
   lg: '100%',
-  xl: '67vp'
+  xl: '70vp'
 })
 
 export const TabBarJustifyContent: BreakpointState<FlexAlign> = BreakpointState.of({

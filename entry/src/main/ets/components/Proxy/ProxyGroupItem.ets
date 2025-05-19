@@ -1,21 +1,19 @@
 import { hilog } from '@kit.PerformanceAnalysisKit'
-import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem'
+import { BreakpointState, } from '../../common/breakpointsystem'
 import {
-  BIND_SHEET_CONTAINER_HEIGHT,
   BORDER_RADIUS_20,
   CONTENT_END_OFFSET_150,
   LIST_ITEM_HEIGHT,
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE } from '../../common/Constants'
 import { LengthMetrics, SymbolGlyphModifier,PromptAction, curves } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
-import { ProxyGroupItemDataSource, ProxyItem, ProxyItemDataSource } from '../../common/ProxyData';
-import { EventHub, EventKey } from '../../common/EventHub';
+import { ProxyItem, ProxyItemDataSource } from '../../common/ProxyData';
 import { Profile, ProxyGroup, ProxySort } from 'proxy_core';
 import { AppConfig, AppState, ClashCore, ProxyCardSize, ProxyGroupType, UIConfig } from '../../entryability/AppState';
 import { ProxyNode } from './ProxyNodeItem';
 import { customAnimationUtil } from '../../utils/Animation';
 import { customVibrator } from '../../utils/VibratorUtil';
-import ClashViewModel, { DelayInfo } from '../../entryability/ClashViewModel';
+import ClashViewModel from '../../entryability/ClashViewModel';
 import { PopTips, PopupBuilder } from '../Start/Popup';
 
 
@@ -387,10 +385,10 @@ struct ProxyGroupItem {
       this.breakPointStateListGutter.value)
     .ListStyle()
     .nestedScroll({
-      scrollForward: this.isPXSecScreen ? NestedScrollMode.SELF_ONLY: NestedScrollMode.PARENT_FIRST,
-      scrollBackward: this.isPXSecScreen ? NestedScrollMode.SELF_ONLY:NestedScrollMode.SELF_FIRST
+      scrollForward: this.isPXSecScreen ? NestedScrollMode.SELF_FIRST: NestedScrollMode.PARENT_FIRST,
+      scrollBackward: this.isPXSecScreen ? NestedScrollMode.SELF_FIRST:NestedScrollMode.SELF_FIRST
     })
-    .contentEndOffset(this.isPXSecScreen ? 65: this.appConfig.proxyGroupType === ProxyGroupType.List ? 10 : CONTENT_END_OFFSET_150)
+    .contentEndOffset(this.isPXSecScreen ? 65 : this.appConfig.proxyGroupType === ProxyGroupType.List ? 10 : CONTENT_END_OFFSET_150)
     /* .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
        detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
        preferType: SheetType.CENTER,
@@ -465,7 +463,6 @@ interface LongPressContextMenuItem {
 function ListStyle() {
   // transition保证组件离场不被立即析构，可设置其他转场效果
   .width('100%')
-  .height('100%')
   .chainAnimation(true)
   .scrollBar(BarState.Off)
   .edgeEffect(EdgeEffect.Spring)

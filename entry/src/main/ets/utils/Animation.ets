@@ -31,7 +31,7 @@ class AnimationUtil{
       uiConfig.isAnimation ?
       TransitionEffect.OPACITY
         .combine(TransitionEffect.scale({x: 0, y: 0}))
-        .animation({ duration: uiConfig.animationSpeed,curve:curves.springMotion(),delay: i*2+30 })
+        .animation({ duration: uiConfig.animationSpeed,curve:curves.springMotion(),delay: i*5+30 })
         :null
 
     return effectEvent
