@@ -32,7 +32,7 @@ ClashBox是首个基于Navigation框架的HarmonyOS NEXT(OpenHarmony)平台的�
 
 #### 赞助&联系我们
 
-目前团队在入驻爱发电，支持我们项目的朋友可以前往爱发电赞助我们：
+我们已入驻爱发电，支持我们项目的朋友可以前往爱发电赞助我们：
 https://afdian.com/a/xiaobaigroup
 
 感谢您的支持~
