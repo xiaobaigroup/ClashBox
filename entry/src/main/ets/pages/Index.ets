@@ -376,7 +376,7 @@ struct Index {
     Flex({
       direction: FlexDirection.Column,
       justifyContent: this.isLandscapePhone ? FlexAlign.Center : this.isFoldStatus ? FlexAlign.Start : this.tabBarJustifyContent.value,
-      alignItems: this.isLandscapePhone ? ItemAlign.End : this.isFoldStatus ? ItemAlign.Start : ItemAlign.Center,
+      alignItems: this.isLandscapePhone ? ItemAlign.End : this.isFoldStatus ? ItemAlign.Center : ItemAlign.Center,
       space: {main: LengthMetrics.vp(3)}
     })
     {
