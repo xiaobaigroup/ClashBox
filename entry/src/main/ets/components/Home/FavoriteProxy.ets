@@ -78,13 +78,16 @@ struct FavoriteProxy {
                     justifyContent: FlexAlign.SpaceBetween
                   }) {
                     Text(`${p[1]}`)
-                      .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+                      .minFontSize(10)
+                      .maxFontSize(22)
+                      .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
+                      .fontSize(this.isLandscapePhone ? 15 : this.fontSize.value)
                       .fontColor($r('sys.color.font_primary'))
                       .maxLines(1)
                       .width('80%')
                       .textOverflow({ overflow: TextOverflow.Ellipsis })
                     Radio({ value: 'FavoriteProxyRadio', group: 'FavoriteProxyGroup' })
-                      .width(this.isLandscapePhone ? 16 : this.fontSize.value)
+                      .width(this.isLandscapePhone ? 15 : this.fontSize.value)
                       .checked(this.appConfig.currentProxyName === p[1])
                       .radioStyle({
                         checkedBackgroundColor: this.icon_emphasize,
@@ -122,7 +125,7 @@ struct FavoriteProxy {
       {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
           SymbolGlyph($r('sys.symbol.star'))
-            .fontSize(this.isLandscapePhone?24 :this.deleteButtonSize.value)
+            .fontSize(this.isLandscapePhone?20 :this.deleteButtonSize.value)
             .fontColor([$r('sys.color.font_secondary')])
             .padding({bottom:5})
 

@@ -248,18 +248,18 @@ struct CellularDataStat {
     Column() {
       CardTitle({title: $r('app.string.CellularData')})
 
-      Column({space:this.RowMargin.value}) {
+      Column({space:this.isLandscapePhone ? 3 :this.RowMargin.value}) {
         Row({ space: 10 }) {
           //已使用上传流量
           Column() {
             Text() {
               SymbolSpan($r('sys.symbol.chevron_up'))
             }
-            .fontSize(this.isLandscapePhone ? FONT_SIZE_14 : this.chevronSize.value)
+            .fontSize(this.isLandscapePhone ? 12 : this.chevronSize.value)
             .fontColor(this.icon_primary)
 
             Text(this.appFlowingState.totalTraffic.up.toString())
-              .fontSize(this.isLandscapePhone ? FONT_SIZE_14 : this.fontSize.value)
+              .fontSize(this.isLandscapePhone ? 12 : this.fontSize.value)
               .fontColor(this.icon_primary)
               .maxLines(1)
               .textAlign(TextAlign.End)
@@ -270,11 +270,11 @@ struct CellularDataStat {
             Text() {
               SymbolSpan($r('sys.symbol.chevron_down'))
             }
-            .fontSize(this.isLandscapePhone ? FONT_SIZE_14 : this.chevronSize.value)
+            .fontSize(this.isLandscapePhone ? 12 : this.chevronSize.value)
             .fontColor(this.icon_primary)
 
             Text(this.appFlowingState.totalTraffic.down.toString())
-              .fontSize(this.isLandscapePhone ? FONT_SIZE_14 : this.fontSize.value)
+              .fontSize(this.isLandscapePhone ? 12 : this.fontSize.value)
               .fontColor(this.icon_primary)
               .maxLines(1)
               .textAlign(TextAlign.End)

@@ -41,6 +41,14 @@ struct CurrentConfiguration {
       Button($r('app.string.refresh_IP'))
         .width('55%')
         .height('34%')
+        .labelStyle({ overflow: TextOverflow.Clip,
+          maxLines: 1,
+          minFontSize: 6,
+          maxFontSize: 18,
+          font: {
+            size: this.fontSize.value,
+          }
+        })
         .fontColor(this.icon_emphasize)
         .fontSize(this.isLandscapePhone ? 14 : this.fontSize.value)
         .backgroundColor($r('app.color.home_card_background'))

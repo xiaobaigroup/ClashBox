@@ -2,7 +2,7 @@
 import { mediaquery } from '@kit.ArkUI'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 
-export type BreakpointType = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl'
+export type BreakpointType = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
 export interface Breakpoint {
   name: BreakpointType
@@ -18,7 +18,6 @@ export class BreakpointSystem {
     { name: 'md', size: 600 },
     { name: 'lg', size: 840 },
     { name: 'xl', size: 1000 },
-    { name: 'xxl', size: 1600 }
   ]
   private states: Set<BreakpointState<Object>>
 
@@ -109,15 +108,9 @@ export class BreakpointState<T extends Object> {
     } else if (type === 'lg') {
       this.value = this.options.lg
     } else if (type === 'xl') {
-      this.value = this.options.xl
-    } else if (type === 'xxl') {
-      if (this.options?.xxl === undefined){
-        this.value = this.options.xl
-      } else {
-        this.value = this.options.xxl
-      }
+      this.value = this.options.lg
     } else {
-      this.value = this.options.xl
+      this.value = this.options.sm
       hilog.info(0x1000, 'breakpointsystem', `#update(): 当前系统断点[${type}]没有匹配到对应的断点数据，默认使用xl断点数据`)
     }
   }

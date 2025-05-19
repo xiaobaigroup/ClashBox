@@ -50,13 +50,13 @@ struct FavoriteConfiguration {
           ForEach(Array.from(this.favoriteProfiles.entries()), (f:[string, string], i: number)=>{
             Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
               Text(f[1])
-                .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+                .fontSize(this.isLandscapePhone ? 15 : this.fontSize.value)
                 .fontColor($r('sys.color.font_primary'))
                 .maxLines(1)
                 .width('80%')
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
               Radio({ value: 'FavoriteConfigurationRadio1', group: 'FavoriteConfigurationRadioGroup' })
-                .width(this.isLandscapePhone ? 16 : this.fontSize.value)
+                .width(this.isLandscapePhone ? 15 : this.fontSize.value)
                 .checked(f[0] === this.appConfig.currentProfileId)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
@@ -101,7 +101,7 @@ struct FavoriteConfiguration {
       {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
           SymbolGlyph($r('sys.symbol.star'))
-            .fontSize(this.isLandscapePhone?24 :this.deleteButtonSize.value)
+            .fontSize(this.isLandscapePhone?20 :this.deleteButtonSize.value)
             .fontColor([$r('sys.color.font_secondary')])
             .padding({bottom:5})
 

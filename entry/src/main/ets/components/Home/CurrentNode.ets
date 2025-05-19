@@ -29,7 +29,7 @@ struct CurrentNode {
       Column() {
         if (this.appConfig.currentProxyItem) {
           Text(`${this.appConfig.currentProxyName}`)
-            .fontSize(this.isLandscapePhone ? 20 : this.ProxyFontSize.value)
+            .fontSize(this.isLandscapePhone ? 18 : this.ProxyFontSize.value)
             .fontWeight(FontWeight.Bold)
             .fontColor(this.font_primary)
             .maxLines(2)
@@ -39,7 +39,7 @@ struct CurrentNode {
             .fontColor(ProxyData.getColorForLatency(ClashViewModel.delayMap.get(this.appConfig.currentProxyItem.name)?.delay ?? 0))
         } else {
           Text($r('app.string.proxy_name'))
-            .fontSize(this.isLandscapePhone ? 24 : this.ProxyFontSize.value)
+            .fontSize(this.isLandscapePhone ? 18 : this.ProxyFontSize.value)
             .fontWeight(FontWeight.Bold)
             .fontColor(this.font_primary)
 

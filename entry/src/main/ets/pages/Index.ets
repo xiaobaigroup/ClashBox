@@ -47,7 +47,7 @@ import {
   BIND_SHEET_CONTAINER_HEIGHT,
   DefaultUpdateInfo,
   TabTitlefontSize_12_16,
-  TabIconfontSize_24_29,
+  TabIconfontSize_24_26,
   TabBarHeight,
   TabBarWidth,
   TabVertical,
@@ -171,7 +171,7 @@ struct Index {
   @State compBarHeight: BreakpointState<string> = TabBarHeight
   @Provide compVertical: BreakpointState<boolean> = TabVertical
   @State compBarPose: BreakpointState<BarPosition> = TabBarPose
-  @State TabIconfontSize: BreakpointState<number> = TabIconfontSize_24_29
+  @State TabIconfontSize: BreakpointState<number> = TabIconfontSize_24_26
   @State TabTitlefontSize: BreakpointState<number> = TabTitlefontSize_12_16
   // 代理页
   @Provide ProxyListLanes: BreakpointState<number> = BPS_LIST_LANES_2_2_3_4_4

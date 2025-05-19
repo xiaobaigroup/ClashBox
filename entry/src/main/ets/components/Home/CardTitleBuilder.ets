@@ -10,7 +10,7 @@ export struct CardTitle {
   build() {
     Row() {
       Text(this.title)
-        .fontSize(this.isLandscapePhone ? 18 : this.titleFontSize.value)
+        .fontSize(this.isLandscapePhone ? 16 : this.titleFontSize.value)
         .fontWeight(FontWeight.Bold)
         .fontColor($r('sys.color.font_primary'))
         .maxLines(1)

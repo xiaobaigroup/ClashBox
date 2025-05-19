@@ -65,7 +65,7 @@ struct PublicNetwork {
               .color(this.icon_emphasize)
 
             Text($r('app.string.loading'))
-              .fontSize(this.isLandscapePhone ? 16 : this.isFoldStatus ? 22: this.IPfontSize.value)
+              .fontSize(this.isLandscapePhone ? 15 : this.isFoldStatus ? 22: this.IPfontSize.value)
               .textAlign(TextAlign.JUSTIFY)
               .fontColor($r('sys.color.font_primary'))
           }.transition(customAnimationUtil.isOpacity(this.uiConfig))
@@ -80,8 +80,16 @@ struct PublicNetwork {
         Button($r('app.string.refresh_IP'))
           .width('55%')
           .height('25%')
+          .labelStyle({ overflow: TextOverflow.Clip,
+            maxLines: 1,
+            minFontSize: 6,
+            maxFontSize: 18,
+            font: {
+              size: this.fontSize.value,
+            }
+          })
           .fontColor(this.icon_emphasize)
-          .fontSize(this.isLandscapePhone ? 14 : this.fontSize.value)
+          //.fontSize(this.isLandscapePhone ? 14 : this.fontSize.value)
           .backgroundColor($r('app.color.home_card_background'))
           .onClick(() => {
             // 在home页编辑卡片状态时，无法操作，点击回调写在if判定里

@@ -923,20 +923,23 @@ export const CompStr: BreakpointState<string> = BreakpointState.of({
 })
 
 export const TabTitlefontSize_12_16: BreakpointState<number> = BreakpointState.of({
+  xs: 10,
   sm: 12,
   md: 16,
   lg: 16,
   xl: 16
 })
 
-export const TabIconfontSize_24_29: BreakpointState<number> = BreakpointState.of({
+export const TabIconfontSize_24_26: BreakpointState<number> = BreakpointState.of({
+  xs: 22,
   sm: 24,
-  md: 29,
-  lg: 29,
-  xl: 29
+  md: 26,
+  lg: 26,
+  xl: 26
 })
 
 export const TabBarHeight: BreakpointState<string> = BreakpointState.of({
+  xs: `77vp`,
   sm: `77vp`,
   md: `77vp`,
   lg: `77vp`,
@@ -944,6 +947,7 @@ export const TabBarHeight: BreakpointState<string> = BreakpointState.of({
 })
 
 export const TabBarWidth: BreakpointState<string> = BreakpointState.of({
+  xs: '100%',
   sm: '100%',
   md: '100%',
   lg: '100%',
@@ -951,6 +955,7 @@ export const TabBarWidth: BreakpointState<string> = BreakpointState.of({
 })
 
 export const TabBarJustifyContent: BreakpointState<FlexAlign> = BreakpointState.of({
+  xs: FlexAlign.Start,
   sm: FlexAlign.Start,
   md: FlexAlign.Start,
   lg: FlexAlign.Center,
@@ -958,6 +963,7 @@ export const TabBarJustifyContent: BreakpointState<FlexAlign> = BreakpointState.
 })
 
 export const TabBarAlignItems: BreakpointState<ItemAlign> = BreakpointState.of({
+  xs: ItemAlign.Start,
   sm: ItemAlign.Start,
   md: ItemAlign.Start,
   lg: ItemAlign.Center,
@@ -966,6 +972,7 @@ export const TabBarAlignItems: BreakpointState<ItemAlign> = BreakpointState.of({
 
 
 export const TabVertical: BreakpointState<boolean> = BreakpointState.of({
+  xs: false,
   sm: false,
   md: false,
   lg: false,
@@ -973,6 +980,7 @@ export const TabVertical: BreakpointState<boolean> = BreakpointState.of({
 })
 
 export const TabBarPose: BreakpointState<BarPosition> = BreakpointState.of({
+  xs: BarPosition.End,
   sm: BarPosition.End,
   md: BarPosition.End,
   lg: BarPosition.End,
@@ -984,7 +992,8 @@ export const TabBarPose: BreakpointState<BarPosition> = BreakpointState.of({
  * 主页卡片内边距
  */
 export const HomeCardPadding_14_15_16_17: BreakpointState<MarginGenerate> = BreakpointState.of({
-  sm: ({top: 14, bottom: 18, left: 14, right: 14} as MarginGenerate),
+  xs: ({top: 12, bottom: 16, left: 12, right: 12} as MarginGenerate),
+  sm: ({top: 12, bottom: 18, left: 14, right: 14} as MarginGenerate),
   md: ({top: 15, bottom: 20, left: 15, right: 15} as MarginGenerate),
   lg: ({top: 16, bottom: 22, left: 16, right: 16} as MarginGenerate),
   xl: ({top: 17, bottom: 25, left: 17, right: 17} as MarginGenerate)
@@ -994,6 +1003,7 @@ export const HomeCardPadding_14_15_16_17: BreakpointState<MarginGenerate> = Brea
  * 主页整个卡片区域边距
  */
 export const HomeCardAreaPadding: BreakpointState<MarginGenerate> = BreakpointState.of({
+  xs: ({top: 2, left: 12, right: 12} as MarginGenerate),
   sm: ({top: 4, left: 14, right: 14} as MarginGenerate),
   md: ({top: 4, left: 100, right: 100} as MarginGenerate),
   lg: ({top: 4, left: 14, right: 14} as MarginGenerate),
@@ -1008,6 +1018,7 @@ export interface gutterHomeGridcol {
  * 主页栅格卡片间距
  */
 export const gutterHomeGridcol_12_15: BreakpointState<gutterHomeGridcol> = BreakpointState.of({
+  xs: ({x: 10, y: 13} as gutterHomeGridcol),
   sm: ({x: 12, y: 15} as gutterHomeGridcol),
   md: ({x: 12, y: 15}  as gutterHomeGridcol),
   lg: ({x: 17.6, y: 22}  as gutterHomeGridcol),
@@ -1017,30 +1028,31 @@ export const gutterHomeGridcol_12_15: BreakpointState<gutterHomeGridcol> = Break
  * 主页卡片标题下边距（5，7，9）
  */
 export const HomeCardTitleBottomMargin: BreakpointState<number> = BreakpointState.of({
-  sm: 5, md: 7, lg: 9, xl: 9
+ xs:3, sm: 5, md: 7, lg: 9, xl: 9
 })
 /**
  * 主页卡片标题按钮间距
  */
 export const HomeCardTitleButtonPadding: BreakpointState<number> = BreakpointState.of({
-  sm: 10, md: 20, lg: 22, xl: 22
+ xs:8, sm: 10, md: 20, lg: 22, xl: 22
 })
 /**
  * 主页模式卡片上下边距（3，6）
  */
 export const HomeCardSwitchModeRowMargin: BreakpointState<number> = BreakpointState.of({
-  sm: 3, md: 6, lg: 6, xl: 6
+ xs:3, sm: 3, md: 6, lg: 6, xl: 6
 })
 /**
  * 主页模式卡片字体大小（16，27，26，27）
  */
 export const HomeCardSwitchModeFontSize: BreakpointState<number> = BreakpointState.of({
-  sm: 16, md: 20, lg: 20, xl: 22
+ xs:14, sm: 16, md: 20, lg: 20, xl: 22
 })
 /**
  * 主页模式卡片文本上下边距（6，7）
  */
 export const HomeCardSwitchModeTextMargin: BreakpointState<MarginGenerate> = BreakpointState.of({
+  xs: ({ top: 4, bottom: 4 } as MarginGenerate),
   sm: ({ top: 6, bottom: 6 } as MarginGenerate),
   md: ({ top: 7, bottom: 7 } as MarginGenerate),
   lg: ({ top: 7, bottom: 7 } as MarginGenerate),
@@ -1050,7 +1062,7 @@ export const HomeCardSwitchModeTextMargin: BreakpointState<MarginGenerate> = Bre
  * 主页流量统计卡片统计条边距
  */
 export const HomeCardCellularDatabarMargin: BreakpointState<MarginGenerate> = BreakpointState.of({
-  xs: ({ top: 10, bottom: 7 } as MarginGenerate),
+  xs: ({ top: 8, bottom: 5 } as MarginGenerate),
   sm: ({ top: 10, bottom: 7 } as MarginGenerate),
   md: ({ top: 15, bottom: 9 } as MarginGenerate),
   lg: ({ top: 15, bottom: 9 } as MarginGenerate),
@@ -1060,87 +1072,87 @@ export const HomeCardCellularDatabarMargin: BreakpointState<MarginGenerate> = Br
  * 主页流量统计卡片统计条高度
  */
 export const HomeCardCellularDatabarHeight_6_5: BreakpointState<number> = BreakpointState.of({
-  sm: 6, md: 5, lg: 5, xl: 5
+ xs:4, sm: 6, md: 5, lg: 5, xl: 5
 })
 /**
  * 主页流量统计卡片上下行箭头图标大小（16，22，26，27）
  */
 export const HomeCardCellularDataChevronSize: BreakpointState<number> = BreakpointState.of({
-  sm: 16, md: 22, lg: 26, xl: 27
+ xs:14, sm: 16, md: 22, lg: 26, xl: 27
 })
 /**
  * 主页流量统计卡片上下行箭头组件部分间距（20,10）
  */
 export const HomeCardCellularDataChevronRowMargin: BreakpointState<number> = BreakpointState.of({
-  sm: 10, md: 10, lg: 10, xl: 15
+ xs:8, sm: 10, md: 10, lg: 10, xl: 15
 })
 /**
  * 主页流量统计卡片内容文本字体大小（14,23,26,21）
  */
 export const HomeCardCellularDataFontSize: BreakpointState<number> = BreakpointState.of({
-  sm: 14, md: 16, lg: 18, xl: 18
+ xs:12, sm: 14, md: 16, lg: 18, xl: 18
 })
 /**
  * 主页卡片内容流量统计下部小字体大小（10,16,14,16）
  */
 export const HomeCardCellularDataSmFontSize: BreakpointState<number> = BreakpointState.of({
-  sm: 10, md: 16, lg: 14, xl: 16
+  xs:8, sm: 10, md: 16, lg: 14, xl: 16
 })
 
 /**
  * 主页卡片内容当前节点小字体大小（16,20,18,24）
  */
 export const HomeCardPrpxySmFontSize: BreakpointState<number> = BreakpointState.of({
-  sm: 16, md: 20, lg: 18, xl: 24
+  xs:14, sm: 16, md: 20, lg: 18, xl: 24
 })
 /**
  * 主页卡片标题字体大小
  */
 export const CardTitleFontSize_18_20_22_22: BreakpointState<number> = BreakpointState.of({
-  sm: 18, md: 20, lg: 22, xl: 22
+  xs:16, sm: 18, md: 20, lg: 22, xl: 22
 })
 /**
  * 主页卡片当前节点字体大小
  */
 export const HomeProxyFontSize_24_26_26_27: BreakpointState<number> = BreakpointState.of({
-  sm: 24, md: 26, lg: 26, xl: 27
+  xs:22, sm: 24, md: 26, lg: 26, xl: 27
 })
 
 /**
  * 主页卡片角标删除按钮大小
  */
 export const DeleteButtonSize_24_32: BreakpointState<number> = BreakpointState.of({
-  sm: 24, md: 32, lg: 32, xl: 32
+  xs:22, sm: 24, md: 32, lg: 32, xl: 32
 })
 /**
  * 主页卡片内容IP地址小字体大小（12,16,14,16）
  */
 export const HomeCardIPSmFontSize: BreakpointState<number> = BreakpointState.of({
-  sm: 12, md: 18, lg: 16, xl: 18
+  xs:10, sm: 12, md: 18, lg: 16, xl: 18
 })
 /**
  * 主页卡片内容IP地址字体大小
  */
 export const IPfontSize: BreakpointState<number> = BreakpointState.of({
-  sm: 18, md: 24, lg: 20, xl: 24
+  xs:8, sm: 18, md: 24, lg: 20, xl: 24
 });
 /**
  * 主页添加卡片半模拟态卡片高度
  */
 export const HomeCardEditHeight: BreakpointState<number> = BreakpointState.of({
-  sm: 160, md: 160, lg: 160, xl: 160
+  xs:160, sm: 160, md: 160, lg: 160, xl: 160
 });
 /**
  * 主页卡片内容网络测速字体大小
  */
 export const SpeedfontSize12_14_14_16: BreakpointState<number> = BreakpointState.of({
-  sm: 12,  md: 14,  lg: 14,  xl: 16
+  xs:10, sm: 12,  md: 14,  lg: 14,  xl: 16
 });
 /**
  * 主页流量统计卡片padding高度
  */
 export const HomeCardCellularDataPadding: BreakpointState<number> = BreakpointState.of({
-  sm: 30, md: 50, lg: 50, xl: 50
+  xs:28, sm: 30, md: 50, lg: 50, xl: 50
 });
 
 /* List 相关*/

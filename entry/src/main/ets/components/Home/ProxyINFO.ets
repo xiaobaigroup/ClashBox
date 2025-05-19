@@ -3,7 +3,7 @@ import { MarginGenerate } from "../../common/Constants"
 import { ProxyItem, ProxyData } from "../../common/ProxyData"
 import { AppConfig, AppFlowingState, UIConfig } from "../../entryability/AppState"
 import { CardTitle } from "./CardTitleBuilder"
-import { PromptAction } from "@kit.ArkUI"
+import { LengthMetrics, PromptAction } from "@kit.ArkUI"
 import ClashViewModel from "../../entryability/ClashViewModel"
 import { JSON } from "@kit.ArkTS"
 import { customVibrator } from "../../utils/VibratorUtil"
@@ -57,18 +57,18 @@ struct ProxyINFO{
   build() {
     Row() {
       Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.SpaceBetween }) {
-        Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.Start }) {
+        Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.Start}) {
           CardTitle({ title: $r('app.string.proxy_info') })
           if (this.appConfig.currentProxyItem) {
             Text(`${this.appConfig.currentProxyName}`)
-              .maxLines(2)
+              .maxLines(this.isLandscapePhone ? 1:2)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('sys.color.font_primary'))
               .textOverflow({ overflow: TextOverflow.Clip })
-              .fontSize(this.isLandscapePhone ? 20 : this.ProxyFontSize.value)
+              .fontSize(this.isLandscapePhone ? 18 : this.ProxyFontSize.value)
           } else {
             Text($r('app.string.proxy_name'))
-              .fontSize(this.isLandscapePhone ? 20 : this.ProxyFontSize.value)
+              .fontSize(this.isLandscapePhone ? 18 : this.ProxyFontSize.value)
               .fontWeight(FontWeight.Bold)
               .fontColor($r('sys.color.font_primary'))
           }
@@ -84,7 +84,7 @@ struct ProxyINFO{
                 .fontColor($r('sys.color.font_secondary'))
 
               Text( this.remoteIp?.ip  ?? $r('app.string.loading'))
-                .fontSize(this.isPXSecScreen? 12 :this.isLandscapePhone ? 16 :this.isFoldStatus ?22: this.IPfontSize.value)
+                .fontSize(this.isPXSecScreen? 12 :this.isLandscapePhone ? 12 :this.isFoldStatus ?22: this.IPfontSize.value)
                 .fontColor($r('sys.color.font_secondary'))
             }.transition(customAnimationUtil.isOpacity(this.uiConfig))
           }else {
@@ -94,7 +94,7 @@ struct ProxyINFO{
                 .color(this.icon_emphasize)
 
               Text($r('app.string.loading'))
-                .fontSize(this.isPXSecScreen? 12 :this.isLandscapePhone ? 16 :this.isFoldStatus ?22: this.IPfontSize.value)
+                .fontSize(this.isPXSecScreen? 12 :this.isLandscapePhone ? 12 :this.isFoldStatus ?22: this.IPfontSize.value)
                 .fontColor($r('sys.color.font_secondary'))
             } .transition(customAnimationUtil.isOpacity(this.uiConfig))
           }
@@ -106,10 +106,10 @@ struct ProxyINFO{
         } else {
           Row() {
             Text('ping ')
-              .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)
+              .fontSize(this.isLandscapePhone ? 14 : this.HomeCardPrpxySmFontSize.value)
               .fontColor('#64BB5C')
             Text($r('app.string.Delay'))
-              .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)
+              .fontSize(this.isLandscapePhone ? 14 : this.HomeCardPrpxySmFontSize.value)
               .fontColor('#64BB5C')
           }
         }
@@ -118,7 +118,7 @@ struct ProxyINFO{
         Column() {
           Row({space: 5}) {
             Text(this.appFlowingState.traffics.getLast()?.up?.toString() ?? "0 kb")
-              .fontSize(this.isLandscapePhone ? 12:this.SpeedfontSize12_14_14_16.value)
+              .fontSize(this.isLandscapePhone ? 10:this.SpeedfontSize12_14_14_16.value)
               .fontColor($r('sys.color.font_primary'))
               .textAlign(TextAlign.End)
 
@@ -128,7 +128,7 @@ struct ProxyINFO{
 
           Row({space: 5}) {
             Text(this.appFlowingState.traffics.getLast()?.down?.toString() ?? "0 kb")
-              .fontSize(this.isLandscapePhone ? 12:this.SpeedfontSize12_14_14_16.value)
+              .fontSize(this.isLandscapePhone ? 10:this.SpeedfontSize12_14_14_16.value)
               .fontColor($r('sys.color.font_primary'))
               .textAlign(TextAlign.End)
 
@@ -140,6 +140,14 @@ struct ProxyINFO{
         Button($r('app.string.refresh_IP2'))
           .width(this.isPXSecScreen? 78 : this.isLandscapePhone ? '60%' : '55%')
           .height(this.isPXSecScreen? 30 : this.isLandscapePhone ? '27%' : '25%')
+          .labelStyle({ overflow: TextOverflow.Clip,
+            maxLines: 1,
+            minFontSize: 6,
+            maxFontSize: 18,
+            font: {
+              size: this.fontSize.value,
+            }
+          })
           .fontColor(this.icon_emphasize)
           .fontSize(this.isPXSecScreen? 14 : this.isLandscapePhone ? 14 : this.fontSize.value)
           .backgroundColor($r('app.color.home_card_background'))
