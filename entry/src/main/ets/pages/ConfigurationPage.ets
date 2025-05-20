@@ -115,7 +115,15 @@ struct ConfigurationPage {
    *    List的长按菜单中的响应都是根据这个的对象中的属性来处理的，是个不稳定因素
    */
   @Consume('currentTouchConfigData') currentTouchConfigData: ConfigData
-
+  @State  currentRadioConfigData: ConfigData = {
+    configId: '',
+    isNewConfig: false,
+    configName: '',
+    configUrl: '',
+    isConfigAutoUpdate: false,
+    updateTime: 0,
+    lastUpdateDateTime: 0
+  }
   /* 配置页面内ListItem长按ContextMenu相关 */
   @Consume @Watch('onConfigListChange') configList: Array<ConfigData>
   // ContextMenu 列表项 动态替换用
@@ -420,6 +428,7 @@ struct ConfigurationPage {
                   .onClick(async () => {
                     this.isON.toggleAnim = true
                     // 更新当前选中
+                    this.currentRadioConfigData = item
                     await this.loadConfig(item)
                   })
                   .onTouch((event: TouchEvent) => {
@@ -736,6 +745,7 @@ struct ConfigurationPage {
    */
   private async updateConfig(configId?: string): Promise<void> {
     this.promptAction.showToast({message: $r('app.string.updating_config')})
+    this.loadConfig(this.currentRadioConfigData)
     if (configId){
       this.isRefreshing = false
       // 使开关点击时不触发转场动画

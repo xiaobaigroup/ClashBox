@@ -1105,7 +1105,8 @@ struct Index {
           barPosition: this.isLandscapePhone || this.istabletLandscape? BarPosition.Start : this.isFoldStatus ? BarPosition.End: this.compBarPose.value,
           index: this.IndexCurrentindex,
           controller: indexController
-        }) {
+        })
+        {
           TabContent() {
             Home()
           }
