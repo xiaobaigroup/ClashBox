@@ -453,7 +453,7 @@ struct Home {
                         xs: this.isLandscapePhone ? 6 : 12,
                         sm: this.isLandscapePhone ? 6 : 12,
                         md: this.isLandscapePhone ? 6 : this.isFoldStatus ? 8 : 12,
-                        lg: this.isFoldStatus ? 8 : 6
+                        lg: this.isFoldStatus ? 8 : this.isLandscapePhone || this.istabletLandscape ? 6 : 12
                       },
                       order: 1
                     }) {
@@ -498,7 +498,7 @@ struct Home {
                         xs: this.isLandscapePhone ? 3 : 6,
                         sm: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
-                        lg: this.isFoldStatus ? 4 : 3
+                        lg: this.isFoldStatus ? 4 : this.isLandscapePhone || this.istabletLandscape ? 3 : 6
                       },
                       order: 2
                     }) {
@@ -537,7 +537,7 @@ struct Home {
                         xs: this.isLandscapePhone ? 3 : 6,
                         sm: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
-                        lg: this.isFoldStatus ? 4 : 3
+                        lg: this.isFoldStatus ? 4 : this.isLandscapePhone || this.istabletLandscape ? 3 : 6
                       },
                       order: 3
                     }) {
@@ -575,7 +575,7 @@ struct Home {
                         xs: this.isLandscapePhone ? 3 : 6,
                         sm: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
-                        lg: this.isFoldStatus ? 4 : 3
+                        lg: this.isFoldStatus ? 4 : this.isLandscapePhone || this.istabletLandscape ? 3 : 6
                       },
                       order: 4
                     }) {
@@ -613,7 +613,7 @@ struct Home {
                         xs: this.isLandscapePhone ? 3 : 6,
                         sm: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
-                        lg: this.isFoldStatus ? 4 : 3
+                        lg: this.isFoldStatus ? 4 : this.isLandscapePhone || this.istabletLandscape ? 3 : 6
                       },
                       order: 5
                     }) {
@@ -650,7 +650,7 @@ struct Home {
                         xs: this.isLandscapePhone ? 3 : 6,
                         sm: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
-                        lg: this.isFoldStatus ? 4 : 3
+                        lg: this.isFoldStatus ? 4 : this.isLandscapePhone || this.istabletLandscape ? 3 : 6
                       },
                       order: 6
                     }) {
@@ -687,7 +687,7 @@ struct Home {
                         xs: this.isLandscapePhone ? 3 : 6,
                         sm: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
-                        lg: this.isFoldStatus ? 4 : 3
+                        lg: this.isFoldStatus ? 4 : this.isLandscapePhone || this.istabletLandscape ? 3 : 6
                       },
                       order: 7
                     }) {
@@ -724,7 +724,7 @@ struct Home {
                         xs: this.isLandscapePhone ? 6 : 12,
                         sm: this.isLandscapePhone ? 6 : 12,
                         md: this.isLandscapePhone ? 6 : this.isFoldStatus ? 8 : 12,
-                        lg: this.isFoldStatus ? 8 : 6
+                        lg: this.isFoldStatus ? 8 : this.isLandscapePhone || this.istabletLandscape ? 6 : 12
                       },
                       order: this.isFoldStatus ? 3 : 1
                     }) {
@@ -762,7 +762,7 @@ struct Home {
                         xs: this.isLandscapePhone ? 3 : 6,
                         sm: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
-                        lg: this.isFoldStatus ? 4 : 3
+                        lg: this.isFoldStatus ? 4 : this.isLandscapePhone || this.istabletLandscape ? 3 : 6
                       },
                       order: 4
                     }) {
@@ -799,7 +799,7 @@ struct Home {
                         xs: this.isLandscapePhone ? 3 : 6,
                         sm: this.isLandscapePhone ? 3 : 6,
                         md: this.isLandscapePhone ? 3 : this.isFoldStatus ? 4 : 6,
-                        lg: this.isFoldStatus ? 4 : 3
+                        lg: this.isFoldStatus ? 4 : this.isLandscapePhone || this.istabletLandscape ? 3 : 6
                       },
                       order: 8
                     }) {
@@ -834,8 +834,10 @@ struct Home {
                   }
                 } //GridRow的尾括号
                 .width('100%')
-                .padding(this.isLandscapePhone ? { top: 4, left: 25, right: 25 } :
-                  this.isFoldStatus ? { top: 4, left: 50, right: 50 } : this.HomeCardAreaPadding.value)
+                .padding(this.isLandscapePhone ? { top: 4, left: 14, right: 14 } :
+                  this.isFoldStatus ? { top: 4, left: 50, right: 50 } :
+                    this.istabletLandscape ? { top: 4, left: 25, right: 25 }
+                    : this.HomeCardAreaPadding.value)
                 .margin({ top: this.isLandscapePhone ? 7 : 0 })
               }
             }

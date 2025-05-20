@@ -942,32 +942,32 @@ export const TabBarHeight: BreakpointState<string> = BreakpointState.of({
   xs: `77vp`,
   sm: `77vp`,
   md: `77vp`,
-  lg: `100%`,
-  xl: '100%'
+  lg: `77vp`,
+  xl: `77vp`
 })
 
 export const TabBarWidth: BreakpointState<string> = BreakpointState.of({
   xs: '100%',
   sm: '100%',
   md: '100%',
-  lg: '70vp',
-  xl: '70vp'
+  lg: '100%',
+  xl: '100%'
 })
 
 export const TabBarJustifyContent: BreakpointState<FlexAlign> = BreakpointState.of({
   xs: FlexAlign.Start,
   sm: FlexAlign.Start,
   md: FlexAlign.Start,
-  lg: FlexAlign.Center,
-  xl: FlexAlign.Center
+  lg: FlexAlign.Start,
+  xl: FlexAlign.Start
 })
 
 export const TabBarAlignItems: BreakpointState<ItemAlign> = BreakpointState.of({
   xs: ItemAlign.Start,
   sm: ItemAlign.Start,
   md: ItemAlign.Start,
-  lg: ItemAlign.Center,
-  xl: ItemAlign.Center
+  lg: ItemAlign.Start,
+  xl: ItemAlign.Start
 })
 
 
@@ -975,16 +975,16 @@ export const TabVertical: BreakpointState<boolean> = BreakpointState.of({
   xs: false,
   sm: false,
   md: false,
-  lg: true,
-  xl: true
+  lg: false,
+  xl: false
 })
 
 export const TabBarPose: BreakpointState<BarPosition> = BreakpointState.of({
   xs: BarPosition.End,
   sm: BarPosition.End,
   md: BarPosition.End,
-  lg: BarPosition.Start,
-  xl: BarPosition.Start
+  lg: BarPosition.End,
+  xl: BarPosition.End
 })
 
 
@@ -1006,8 +1006,8 @@ export const HomeCardAreaPadding: BreakpointState<MarginGenerate> = BreakpointSt
   xs: ({top: 2, left: 12, right: 12} as MarginGenerate),
   sm: ({top: 4, left: 14, right: 14} as MarginGenerate),
   md: ({top: 4, left: 100, right: 100} as MarginGenerate),
-  lg: ({top: 4, left: 14, right: 14} as MarginGenerate),
-  xl: ({top: 4, left: 25, right: 25} as MarginGenerate)
+  lg: ({top: 4, left: 100, right: 100} as MarginGenerate),
+  xl: ({top: 4, left: 100, right: 100} as MarginGenerate)
 })
 
 // 主页栅格卡片间距定义

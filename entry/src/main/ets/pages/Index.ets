@@ -375,8 +375,8 @@ struct Index {
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
     Flex({
       direction: FlexDirection.Column,
-      justifyContent: this.isLandscapePhone ? FlexAlign.Center : this.isFoldStatus ? FlexAlign.Start : this.tabBarJustifyContent.value,
-      alignItems: this.isLandscapePhone ? ItemAlign.End : this.isFoldStatus ? ItemAlign.Center : ItemAlign.Center,
+      justifyContent: this.isLandscapePhone || this.istabletLandscape? FlexAlign.Center : this.isFoldStatus ? FlexAlign.Start : this.tabBarJustifyContent.value,
+      alignItems: this.isLandscapePhone || this.istabletLandscape? ItemAlign.End : this.isFoldStatus ? ItemAlign.Center : ItemAlign.Center,
       space: {main: LengthMetrics.vp(3)}
     })
     {
@@ -445,19 +445,16 @@ struct Index {
   onWindowChange() {
     hilog.info(0xFF00, componentName,
       `#WindowChange#应用窗口状态 width: ${this.widthBp} height: ${this.heightBp} `+' tab宽度:'+ this.barWidth?.toString())
-    if ((this.widthBp == 2 && this.heightBp == 0 ) ||
-      (this.widthBp == 3 && this.heightBp == 0 && deviceInfo.deviceType === 'phone' )) {
+    if (this.widthBp <= 3 && this.heightBp == 0  && deviceInfo.deviceType === 'phone' && this.windowWidth > this.windowHeight ) {
       this.isLandscapePhone = true
       hilog.info(0x1000, componentName,
         `#WindowChange#应用窗口状态改变#手机横屏结果: ${this.isLandscapePhone}`)
-    }else if (this.widthBp == 2 && this.heightBp == 1 || (this.widthBp==3 && this.heightBp == 1 &&
+    }else if ((this.widthBp == 2 && this.heightBp == 1) || (this.widthBp==3 && this.heightBp == 1 &&
       display.getFoldStatus() === display.FoldStatus.FOLD_STATUS_EXPANDED)){
       this.isFoldStatus = true
       hilog.info(0xFF00, componentName,
         `#WindowChange#应用窗口状态改变#折叠展开结果: ${this.isFoldStatus}`)
-    }else if (this.widthBp == 3 && this.heightBp == 0 || (
-      this.widthBp == 3 && this.heightBp == 2 && deviceInfo.deviceType === 'tablet'
-    )){
+    }else if (this.widthBp >= 3 && this.windowWidth > this.windowHeight){
       this.istabletLandscape = true
       hilog.info(0xFF00, componentName,
         `#WindowChange#应用窗口状态改变#平板横屏结果: ${this.istabletLandscape}`)
@@ -465,7 +462,7 @@ struct Index {
       this.isSmallSquareScreen = true
       hilog.info(0xFF00, componentName,
         `#WindowChange#应用窗口状态改变#分屏窗口结果: ${this.isSmallSquareScreen}`)
-    }else if (this.widthBp == 1 && this.heightBp == 1 ){
+    }else if (this.widthBp == 1 && this.heightBp == 1 && display.getFoldStatus() === display.FoldStatus.FOLD_STATUS_FOLDED){
       this.isPXSecScreen = true
       hilog.info(0xFF00, componentName,
         `#WindowChange#应用窗口状态改变#PX外屏结果: ${this.isPXSecScreen}`)
@@ -478,8 +475,9 @@ struct Index {
       hilog.info(0xFF00, componentName,
         `#WindowChange#设备高度改变 分屏窗口: ${this.isPXSecScreen}`)
     }
-    
-   /* if (this.windowWidth > 328 || this.windowHeight > 328) {
+  /*  hilog.info(0xFF00, componentName,
+      `#WindowChange#应用窗口状态 width: ${this.windowWidth} height: ${this.windowHeight} `+' tab宽度:'+ this.barWidth?.toString())
+    if (this.windowWidth > 328 || this.windowHeight > 328) {
       if (this.windowHeight === this.windowWidth) {
         hilog.info(0xFF00, componentName,
           `#WindowChange#应用窗口状态 重复执行，跳出`)
@@ -490,7 +488,7 @@ struct Index {
       this.isLandscapePhone = true
       hilog.info(0x1000, componentName,
         `#WindowChange#应用窗口状态改变#(320vp< height <= 500vp) and (640vp< width <= 1000vp)手机横屏结果: ${this.isLandscapePhone}`)
-    } else if ((640 < this.windowWidth && this.windowWidth < 950 && 640 < this.windowHeight && this.windowHeight < 950)) {
+    } else if ((640 < this.windowWidth && this.windowWidth < 1000 && 640 < this.windowHeight && this.windowHeight < 1000)) {
       this.isFoldStatus = true
       hilog.info(0xFF00, componentName,
         `#WindowChange#设备折叠状态改变#(640vp< height <= 1000vp) and (640vp< width <= 1000vp)折叠展开结果: ${this.isFoldStatus}`)
@@ -1104,7 +1102,7 @@ struct Index {
     if (!this.isPXSecScreen){
     Stack() {
         Tabs({
-          barPosition: this.isLandscapePhone ? BarPosition.Start : this.isFoldStatus ? BarPosition.End: this.compBarPose.value,
+          barPosition: this.isLandscapePhone || this.istabletLandscape? BarPosition.Start : this.isFoldStatus ? BarPosition.End: this.compBarPose.value,
           index: this.IndexCurrentindex,
           controller: indexController
         }) {
@@ -1150,9 +1148,15 @@ struct Index {
       //  .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
         .barOverlap(this.uiConfig.isBlurr ? (this.isLandscapePhone || ( this.istabletLandscape && !this.isSecondary)  ? false : true) : false) //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
         .scrollable(this.isSecondary ? false : true)
-        .vertical(this.isLandscapePhone  ? true : this.isFoldStatus ? false : this.compVertical.value) /**/
-        .barWidth(this.isLandscapePhone  ?  this.barWidth : this.isFoldStatus ? '100%' : this.tabBarWidth.value) /**/
-        .barHeight(this.isLandscapePhone  ? '100%': this.isFoldStatus ? '77vp' :((!this.uiConfig.isBlurr && this.isSecondary) || this.isSmallSquareScreen) ? this.barHeight : this.bottomRectHeight === 0 ? 57 : this.compBarHeight.value) /**/
+        .vertical(this.isLandscapePhone || this.istabletLandscape ? true : this.isFoldStatus ? false : this.compVertical.value) /**/
+        .barWidth(this.isLandscapePhone || this.istabletLandscape ?  this.barWidth :
+          this.isFoldStatus ? '100%' :
+          this.tabBarWidth.value) /**/
+        .barHeight(this.isLandscapePhone || this.istabletLandscape ? '100%':
+          this.isFoldStatus ? '77vp' :
+          ((!this.uiConfig.isBlurr && this.isSecondary) || this.isSmallSquareScreen) ? this.barHeight :
+            this.bottomRectHeight === 0 ? 57 :
+          this.compBarHeight.value) /**/
         .onChange((index: number) => {
           this.IndexCurrentindex = index
           if (index === 0) {

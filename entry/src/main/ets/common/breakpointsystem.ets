@@ -108,9 +108,9 @@ export class BreakpointState<T extends Object> {
     } else if (type === 'lg') {
       this.value = this.options.lg
     } else if (type === 'xl') {
-      this.value = this.options.lg
+      this.value = this.options.xl
     } else {
-      this.value = this.options.sm
+      this.value = this.options.xl
       hilog.info(0x1000, 'breakpointsystem', `#update(): 当前系统断点[${type}]没有匹配到对应的断点数据，默认使用xl断点数据`)
     }
   }
