@@ -178,7 +178,6 @@ export class AppState {
   // 还原覆写配置
   static  ResetClashConfig(){
     AppStorage.set("clashConfig", new ClashConfig(AppState.globalUA))
-    // AppStorage.set("appConfig", new AppConfig())
   }
   // 清理数据 还原默认值
   static async ResetConfig(context: Context){

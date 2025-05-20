@@ -149,6 +149,7 @@ export class  ClashConfig {
   snifferDefault?: SnifferDefault = new SnifferDefault()
   constructor(ua: string = "clash.meta/1.18.7") {
     this["global-ua"] = ua
+    this.sniffer = this.snifferDefault
   }
 }
 export enum TunStack { Gvisor = "gVisor", System = "System", Mixed = "Mixed" }
@@ -228,7 +229,7 @@ export enum DnsEnhancedMode {
 }
 
 export class SnifferDefault {
-  enable?: boolean = false;
+  enable?: boolean = true;
   sniffing?: string[] = [];
   "force-dns-mapping"?: boolean = true;
   "parse-pure-ip"?: boolean = true;
