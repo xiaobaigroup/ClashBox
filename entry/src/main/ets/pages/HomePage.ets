@@ -834,7 +834,7 @@ struct Home {
                   }
                 } //GridRow的尾括号
                 .width('100%')
-                .padding(this.isLandscapePhone ? { top: 4, left: 14, right: 14 } :
+                .padding(this.isLandscapePhone ? { top: 4, left: 25, right: 25 } :
                   this.isFoldStatus ? { top: 4, left: 50, right: 50 } :
                     this.istabletLandscape ? { top: 4, left: 25, right: 25 }
                     : this.HomeCardAreaPadding.value)

@@ -5,13 +5,13 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashBox_yddCSabCuwuRMJdsGZDxF2XpfNYkUl1fZVP3BG0cRCA=.cer",
-          "keyAlias": "debugKey",
-          "keyPassword": "0000001B5A38868E0CFE50C64E2F4F04109B25BBF03C682B01C7CDF6977AA7D59E2F77DC4D50E98C1C739E",
-          "profile": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashBox_yddCSabCuwuRMJdsGZDxF2XpfNYkUl1fZVP3BG0cRCA=.p7b",
+          "storeFile": "D:/证书/.p12",
+          "storePassword": "0000001D2885C64BF20EE27145BC9C44DD6957DE58DDF70871F8775C53FA58B7B1976846556D99980564697F26",
+          "keyAlias": "xiaobaituandui",
+          "keyPassword": "0000001D51B8ACBD9674787B3B7B36A0BB905B78BC38AD4DCBAE13B0530038868AF4453387D634CAFFC44C74DD",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashBox_yddCSabCuwuRMJdsGZDxF2XpfNYkUl1fZVP3BG0cRCA=.p12",
-          "storePassword": "0000001B150A5697CC31937E8046C31CB333E980DC12D183600B9E97706B8B3E439E43CB544861C32395B2"
+          "profile": "D:/证书/xiaobaituanduiRelease.p7b",
+          "certpath": "D:/证书/小白团队.cer"
         }
       },
       {

@@ -3,8 +3,8 @@
     //"bundleName": "cn.damai.hongmeng",
     "bundleName": "org.xbgroup.clashbox",
     "vendor": "example",
-    "versionCode": 1004005,
-    "versionName": "1.4.5",
+    "versionCode": 1004007,
+    "versionName": "1.4.7",
     "icon": "$media:layered_image",
     "label": "$string:app_name"
   }
