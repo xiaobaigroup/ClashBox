@@ -1,6 +1,6 @@
 [English](/README_en.md)
 
-# ClashBox-Proxy-Core
+# ClashBox
 [![Downloads](https://img.shields.io/github/downloads/xiaobaigroup/ClashBox/total?style=flat-square&logo=github)](https://github.com/xiaobaigroup/ClashBox/releases/)[![Last Version](https://img.shields.io/github/release/xiaobaigroup/ClashBox/all.svg?style=flat-square)](https://github.com/xiaobaigroup/ClashBox/releases/)[![License](https://img.shields.io/github/license/xiaobaigroup/ClashBox?style=flat-square)](LICENSE)
 
 [![Channel](https://img.shields.io/badge/Telegram-Channel-blue?style=flat-square&logo=telegram)](https://t.me/+aYziOyq-ZhUyNjRl)
