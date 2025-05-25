@@ -5,8 +5,6 @@
 
 [![Channel](https://img.shields.io/badge/Telegram-Channel-blue?style=flat-square&logo=telegram)](https://t.me/+aYziOyq-ZhUyNjRl)
 
-> [!IMPORTANT]
-> 当前仓库用于存放**ClashBox内核部分的源代码**及Hap包分发，UI部分的源代码暂时不开放，您可以自己构建前端页面打造您自己的软件
 
 #### 介绍
 
