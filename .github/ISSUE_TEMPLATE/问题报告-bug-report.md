@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-#简体中文 Simplified Chinese
+# 简体中文 Simplified Chinese
 
 ### 问题描述
 请对问题进行简明的描述。
@@ -35,7 +35,7 @@ assignees: ''
 **填写内容时请删去除标题外的描述文字以及英文版模板，感谢您的配合。**
 ---
 
-#英文 English
+# 英文 English
 
 ### Describe the bug
 A clear and concise description of what the bug is.
