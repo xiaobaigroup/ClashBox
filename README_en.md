@@ -8,8 +8,6 @@
 > [!NOTE]
 > This document is machine translated and may contain errors.If you find a bug, you can report it to us on the [Issues page](https://github.com/xiaobaigroup/ClashBox/issues).
 
-> [!IMPORTANT]
-> The current warehouse is used to store **the source code of the ClashBox kernel** and the distribution of the HAP package. The source code of the UI part is temporarily closed. You can build your own front-end page to build your own software.
 
 #### Introduction
 
