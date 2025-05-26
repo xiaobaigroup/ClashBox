@@ -108,7 +108,7 @@ struct About {
       case 'Repositories':
         // 跳转仓库
         // hilog.info(0xFF00, "AboutestTag", "仓库")
-        implicitStartAbility('https://github.com/xiaobaigroup/ClashBox-Proxy-Core', context)
+        implicitStartAbility('https://github.com/xiaobaigroup/ClashBox', context)
         // promptAction.showToast({message: $r('app.string.not_open'), duration: 2000 })
       break
       default :
@@ -926,7 +926,7 @@ export struct CheckUpdate {
                 if(index === 1) {
                   // 前往下载网页
                   hilog.info(0xFF00, "checkUpdateTest", "前往下载网页")
-                 implicitStartAbility('https://github.com/xiaobaigroup/ClashBox-Proxy-Core/releases', context)
+                 implicitStartAbility('https://github.com/xiaobaigroup/ClashBox/releases', context)
                 } else if(index === 3) {
                   // 忽略本次更新
                   promptAction.showToast({

@@ -389,7 +389,7 @@ export  const ListOverwriteDNSData = (clashConfig: ClashConfig, appConfig: AppCo
   let result: ConfigItemData[] = new Array()
   let dns = clashConfig.dns ?? new Dns()
   result = [
-    new ConfigItemData($r('sys.symbol.selector'), 'overrideDns', $r('app.string.OverwriteDNS'), '', '', 2).bind<boolean>(clashConfig.overrideDns, (v)=>{
+    new ConfigItemData($r('sys.symbol.selector'), 'overrideDns', $r('app.string.OverwriteDNS'), $r('app.string.overwrite_dns_subtitle'), '', 2).bind<boolean>(clashConfig.overrideDns, (v)=>{
       clashConfig.overrideDns = v
     }),
     new ConfigItemData($r('sys.symbol.selector'), 'Option', $r('app.string.option'), '', '', 3),

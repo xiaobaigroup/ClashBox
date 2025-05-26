@@ -1983,6 +1983,10 @@
     {
       "name": "qa_tips",
       "value": "Special note: in case of frequent VPN disconnection, it is recommended to use the foreground mode+simulate the background to achieve a more stable operation of the agent. In addition, the picture in picture window can be reduced to the border."
+    },
+    {
+      "name": "overwrite_dns_subtitle",
+      "value": "When enabled, the DNS option in the configuration will be overwritten"
     }
   ]
 }
