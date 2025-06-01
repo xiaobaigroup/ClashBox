@@ -1,7 +1,7 @@
 ---
 name: 功能建议 Feature request
 about: 为本项目提供功能建议 Suggest an idea for this project
-title: "[Suggestions ]"
+title: "[建议 Suggestions]"
 labels: enhancement
 assignees: ''
 
