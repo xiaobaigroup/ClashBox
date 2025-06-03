@@ -15,6 +15,7 @@ struct DNS {
 
   aboutToAppear(): void {
     this.overwriteDNSList = ListOverwriteDNSData(this.clashConfig, this.appConfig)
+    console.log("dnsConfig", JSON.stringify(this.clashConfig))
   }
 
   build() {

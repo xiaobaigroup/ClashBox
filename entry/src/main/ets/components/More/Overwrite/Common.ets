@@ -106,10 +106,14 @@ export struct ConfigList {
 
   aboutToAppear(): void {
     EventHub.on(EventKey.ArrayConfigChanged, (d: ArrayConfigParam) => {
-      let item = this.configList[this.currentItemIndex]
-      item.value = d.value
-      item.onChange(d.value)
-      this.configList.splice(this.currentItemIndex, 1, item)
+      let indexes = this.configList.findIndex( (c) => c.name == d.key)
+      let item = this.configList[indexes]
+      if(item){
+        item.value = d.value
+        item.onChange(d.value)
+        this.configList.splice(indexes, 1, item)
+      }
+
     })
     // 设置DNS页无图标
     if((this.configList[0].name === 'overrideDns') || (this.configList[0].name === 'enable')) {

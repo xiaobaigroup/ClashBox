@@ -99,7 +99,7 @@ export struct ArrayConfigEditor {
       }
     }else{
       // string[]
-      if(Array.isArray(this.params.value)){
+      if(this.params.valueType == ValueType.StringArray){
         EventHub.sendEvent(EventKey.ArrayConfigChanged, {key: this.params.name, value: this.ArrayConfigList.map((d)=>{
           return d.key
         })})
@@ -124,7 +124,13 @@ export struct ArrayConfigEditor {
       theDialogTitle: this.kvDialogTitle,
       confirm: (value)=>{
         this.onCancel()
-        this.ArrayConfigList = [...this.ArrayConfigList, value]
+        const indexes = this.ArrayConfigList.findIndex((d) => d.key == value.key)
+        if(indexes > -1){
+          this.ArrayConfigList[indexes].value = value.value
+          this.ArrayConfigList = [... this.ArrayConfigList]
+        }else{
+          this.ArrayConfigList = [...this.ArrayConfigList, value]
+        }
         // 保存后重置数据
         this.keyValueData = new KeyValueData("")
       },

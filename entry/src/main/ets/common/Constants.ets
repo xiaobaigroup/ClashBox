@@ -402,7 +402,7 @@ export  const ListOverwriteDNSData = (clashConfig: ClashConfig, appConfig: AppCo
     new ConfigItemData($r('sys.symbol.selector'), 'enhanced-mode', $r('app.string.DNS_Mode'), '', dns?.["enhanced-mode"] ?? $r('app.string.DNS_Mode_Subtitle'), 0).bindClashConfigBy(clashConfig, "dns").bindOption(DNSMenu),
     new ConfigItemData($r('sys.symbol.selector'), 'fake-ip-range', $r('app.string.FakeIP_Range'), '', $r('app.string.FakeIP_Range_Subtitle_1'), 1).bindClashConfigBy(clashConfig, "dns").bindType(ValueType.String),
     new ConfigItemData($r('sys.symbol.selector'), 'fake-ip-filter', $r('app.string.FakeIP_Filtering'), '', '', 1,).bindClashConfigBy(clashConfig, "dns"),
-    new ConfigItemData($r('sys.symbol.selector'), 'default-nameserver', $r('app.string.Default_Domain_Name_Server'), $r('app.string.Default_Domain_Name_Server_Subtitle'), '', 1).bindClashConfigBy(clashConfig, "dns"),
+    new ConfigItemData($r('sys.symbol.selector'), 'default-nameserver', $r('app.string.Default_Domain_Name_Server'), $r('app.string.Default_Domain_Name_Server_Subtitle'), '', 1).bindClashConfigBy(clashConfig, "dns").bindType(ValueType.StringArray),
     new ConfigItemData($r('sys.symbol.selector'), 'nameserver-policy', $r('app.string.Domain_Name_Server_Strategy'), $r('app.string.Domain_Name_Server_Strategy_Subtitle'), '', 1,).bindClashConfigBy(clashConfig, "dns").bindType(ValueType.Record),
     new ConfigItemData($r('sys.symbol.selector'), 'nameserver', $r('app.string.Domain_Name_Server'), $r('app.string.Domain_Name_Server_Subtitle'), '', 1,).bindClashConfigBy(clashConfig, "dns"),
     new ConfigItemData($r('sys.symbol.selector'), 'fallback', $r('app.string.FallBack'), $r('app.string.FallBack_Subtitle'), '', 1,).bindClashConfigBy(clashConfig, "dns"),
