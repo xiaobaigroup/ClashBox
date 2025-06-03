@@ -333,18 +333,23 @@ export function ParseProxyGroup(mode, result: string) {
   })
   const groupsRaw = groupNames.map((groupName) => {
     const group = map[groupName];
-    group["proxies"] = (group["all"] ?? []).map((n: string) => {
-      map[n]["name"] = map[n]["name"]
-      return map[n]
-    }).filter((d: string) => d != null && d != undefined)
-    return {
-      name: group["name"] as string,
-      now: group["now"] as string,
-      type: group["type"] as ProxyType,
-      hidden: group["hidden"] == true,
-      icon: group["icon"] as string,
-      proxies: group["proxies"]
-    } as ProxyGroup
+    if (group){
+      group["proxies"] = (group["all"] ?? []).map((n: string) => {
+        map[n]["name"] = map[n]["name"]
+        return map[n]
+      }).filter((d: string) => d != null && d != undefined)
+      return {
+        name: group["name"] as string,
+        now: group["now"] as string,
+        type: group["type"] as ProxyType,
+        hidden: group["hidden"] == true,
+        icon: group["icon"] as string,
+        proxies: group["proxies"]
+      } as ProxyGroup
+    } else {
+      return null;
+    }
+  
   })
-  return groupsRaw;
+  return groupsRaw.filter(g => g != null);
 }
