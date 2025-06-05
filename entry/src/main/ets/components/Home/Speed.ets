@@ -1,12 +1,12 @@
-import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem';
+import { BreakpointState, BreakpointSystem } from '../../common/breakpoint/breakpointsystem';
 import { McLineChart, Options } from '@mcui/mccharts'
 import { CardTitle } from './CardTitleBuilder';
-import { CHART_NUMBER, MarginGenerate } from '../../common/Constants';
+import { CHART_NUMBER, MarginGenerate } from '../../common/entity/Constants';
 import { AppFlowingState, getLast, UIConfig } from '../../entryability/AppState';
 import { JSON } from '@kit.ArkTS';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { convertDataArray, ConvertedUnit } from '../../utils/DataUnitConvertUtils';
-import { customAnimationUtil } from '../../utils/Animation';
+import { convertDataArray, ConvertedUnit } from '../../common/utils/DataUnitConvertUtils';
+import { customAnimationUtil } from '../../common/utils/Animation';
 
 
 @Component

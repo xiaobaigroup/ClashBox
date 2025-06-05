@@ -1,8 +1,8 @@
 import { curves, LengthMetrics } from "@kit.ArkUI"
-import { BreakpointState } from "../../common/breakpointsystem"
-import { HomeCardItem, HomeCardList } from "../../common/Constants"
+import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
+import { HomeCardItem, HomeCardList } from "../../common/entity/Constants"
 import { AppConfig, UIConfig } from "../../entryability/AppState"
-import { customAnimationUtil } from "../../utils/Animation"
+import { customAnimationUtil } from "../../common/utils/Animation"
 
 
 
@@ -26,7 +26,7 @@ export struct CardEdit {
   @Consume theCurrentHomeCard: boolean[]
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // PC判定
-  @StorageLink ('2in1') isPC: boolean = false
+  @StorageLink ('2in1') is2in1: boolean = false
 
   @Builder CardImage(s:Resource,a:number,i:number,w:ResourceStr,isShow:boolean){
     if (this.theCurrentHomeCard[i] === false) {
@@ -52,7 +52,7 @@ export struct CardEdit {
       })
 
       //快捷方式小卡片
-      if (this.isFoldStatus && !this.isPC ? this.theCurrentHomeCard[9] : !this.theCurrentHomeCard[9]) {
+      if (this.isFoldStatus && !this.is2in1 ? this.theCurrentHomeCard[9] : !this.theCurrentHomeCard[9]) {
         Image($r('app.media.Shortcuts'))
           .width('48.5%')
           .height(this.HomeCardEditHeight.value)
@@ -61,7 +61,7 @@ export struct CardEdit {
           .transition(customAnimationUtil.isScaleTran(9,this.uiConfig))
           .onClick(() => {
             animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
-              this.theCurrentHomeCard.splice(9, 1, this.isFoldStatus && !this.isPC ? false : true)
+              this.theCurrentHomeCard.splice(9, 1, this.isFoldStatus && !this.is2in1 ? false : true)
             })
           })
       }

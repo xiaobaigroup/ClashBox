@@ -5,21 +5,20 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import ClashViewModel from './ClashViewModel';
 import { AppConfig, AppFlowingState, AppState, ClashCore } from './AppState';
 import { EventHub, EventKey } from '../common/EventHub';
-import { PipManager } from '../common/PipManager';
+import { PipManager } from '../common/utils/PipManager';
 import { ClashConfig, SocketProxyService, SocketStubService } from 'proxy_core';
 import { deviceInfo } from '@kit.BasicServicesKit';
 
 export default class EntryAbility extends UIAbility {
- private currentLanguage: string | undefined = undefined
-  /*
-  设备断点获取
-   */
+
+  //   设备断点获取
   private uiContext?: UIContext;
   private onWindowSizeChange: (windowSize: window.Size) => void = (windowSize: window.Size) => {
     let widthBp: WidthBreakpoint = this.uiContext!.getWindowWidthBreakpoint();
     AppStorage.setOrCreate('currentWidthBreakpoint', widthBp);
-    let heightBp: HeightBreakpoint = this.uiContext!.getWindowHeightBreakpoint();
-    AppStorage.setOrCreate('currentHeightBreakpoint', heightBp);
+    // let heightBp: HeightBreakpoint = this.uiContext!.getWindowHeightBreakpoint();
+    // AppStorage.setOrCreate('currentHeightBreakpoint', heightBp);
+    console.log(`断点测试 widthBp: ${widthBp}`)
   };
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
@@ -58,7 +57,9 @@ export default class EntryAbility extends UIAbility {
     } catch (exception) {
       hilog.error(0xFF00, "EntryAbility", 'Failed to set window rect auto-save. Cause code: %{public}s smessage: %{public}s', exception.code, exception.message)
     }
+
     await ClashViewModel.init(this.context)
+
     windowStage.loadContent('pages/Index', async (err) => {
       if (err.code) {
         hilog.error(0x0000, 'EntryAbility', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
@@ -99,24 +100,19 @@ export default class EntryAbility extends UIAbility {
 
       let deviceTypeInfo: string = deviceInfo.deviceType;
       if (deviceTypeInfo === '2in1') {
-        // 设置标题栏 of the 2in1
-        // window.setWindowDecorVisible(false);
-        // When the title bar is invisible, set the height of the title bar and control the height of the three buttons (full screen/restore, maximize, and close) in the upper right corner.
-        // window.setWindowDecorHeight(64);
         AppStorage.setOrCreate('2in1', true)
       } else {
         AppStorage.setOrCreate('2in1', false)
       }
 
-      /*
-      设备断点获取
-       */
+      // 设备断点获取
       windowStage.getMainWindow().then((data: window.Window) => {
         this.uiContext = data.getUIContext();
         let widthBp: WidthBreakpoint = this.uiContext.getWindowWidthBreakpoint();
-        let heightBp: HeightBreakpoint = this.uiContext.getWindowHeightBreakpoint();
+        // let heightBp: HeightBreakpoint = this.uiContext.getWindowHeightBreakpoint();
         AppStorage.setOrCreate('currentWidthBreakpoint', widthBp);
-        AppStorage.setOrCreate('currentHeightBreakpoint', heightBp);
+        // AppStorage.setOrCreate('currentHeightBreakpoint', heightBp);
+        // console.log(`断点测试 初始 widthBp: ${widthBp} heightBp: ${heightBp}`)
         data.on('windowSizeChange', this.onWindowSizeChange);
 
       }).catch((err: BusinessError) => {
@@ -134,8 +130,8 @@ export default class EntryAbility extends UIAbility {
       console.error('Failed to set the window layout to full-screen mode. Cause:' + JSON.stringify(err));
     });
 
-    // // 缓存window窗口对象
-    // AppStorage.setOrCreate('windowClass', windowClass);
+    // 缓存window窗口对象
+    AppStorage.setOrCreate('WindowClass', windowClass)
 
     // 2. 获取布局避让遮挡的区域
     let type = window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR; // 以导航条避让为例
@@ -165,20 +161,60 @@ export default class EntryAbility extends UIAbility {
     // 应用窗口初始高度和宽度
     let properties = windowClass.getWindowProperties()
     let rect = properties.windowRect
-    let WindowHeight = rect.height
-    let WindowWidth = rect.width
-    hilog.info(0x0000, 'WindowLog', '窗口高度：%{public}d 宽度：%{public}i', rect.height, rect.width)
-    AppStorage.setOrCreate('windowHeight', px2vp(WindowHeight))
-    AppStorage.setOrCreate('windowWidth', px2vp(WindowWidth))
+    let WindowHeight = px2vp(rect.height)
+    let WindowWidth = px2vp(rect.width)
+    hilog.info(0x0000, 'WindowLog', '窗口高度：%{public}d px 宽度：%{public}i px', rect.height, rect.width)
+    AppStorage.setOrCreate('windowHeight', WindowHeight)
+    AppStorage.setOrCreate('windowWidth', WindowWidth)
     // 监听窗口大小变化
     try {
       windowClass.on('windowSizeChange', (data) => {
+        // 动态监听设备窗口模式
+        this.onWindowModeChange(windowStage, windowClass)
         console.info('#WindowChange Succeeded in enabling the listener for window size changes. Data: ' + JSON.stringify(data))
-        AppStorage.setOrCreate('windowWidth', px2vp(data.width))
-        AppStorage.setOrCreate('windowHeight', px2vp(data.height)) // 980px 约等于 512vp
+        WindowWidth = px2vp(data.width)
+        WindowHeight = px2vp(data.height)
+        AppStorage.setOrCreate('windowWidth', WindowWidth)
+        AppStorage.setOrCreate('windowHeight', WindowHeight) // 980px 约等于 512vp
+        // 动态监听高度断点
+        this.onHeightBpChange(WindowHeight, WindowWidth)
       })
     } catch (exception) {
       console.error(`#EntryAbility Failed to enable the listener for window size changes. Cause code: ${exception.code}, message: ${exception.message}`)
+    }
+  }
+
+  async onWindowModeChange(windowStage: window.WindowStage, windowClass: window.Window) {
+    try {
+      // 设置默认标题栏是否显示
+      windowClass.setWindowDecorVisible(false)
+      // 设置默认标题栏功能按钮是否显示
+      windowClass.setWindowTitleButtonVisible(false,false,false)
+      // 设置标题栏高度
+      // windowClass.setWindowDecorHeight(50)
+      hilog.info(0xFF00, "EntryAbility", 'WindowMode 当前为PC窗口模式 Succeeded in setting window rect auto-save')
+      AppStorage.setOrCreate('WindowMode', true)
+    } catch (exception) {
+      hilog.error(0xFF00, "EntryAbility", 'WindowMode 当前为普通模式 Failed to set window rect auto-save. Cause code: %{public}s smessage: %{public}s', exception.code, exception.message)
+      AppStorage.setOrCreate('WindowMode', false)
+    }
+  }
+
+  onHeightBpChange(WindowHeight: number, WindowWidth: number) {
+    let heightBp= 0
+    const WindowAspectRatio = WindowHeight / WindowWidth  // 重写高度断点
+    if (WindowAspectRatio < 0.79) {
+      heightBp = 0
+      AppStorage.setOrCreate('currentHeightBreakpoint', heightBp)
+      console.log(`断点测试 heightBp: ${heightBp} 高宽比：${WindowAspectRatio}`)
+    } else if (WindowAspectRatio >= 0.79 && WindowAspectRatio < 1.2) {
+      heightBp = 1
+      AppStorage.setOrCreate('currentHeightBreakpoint', heightBp)
+      console.log(`断点测试 heightBp: ${heightBp} 高宽比：${WindowAspectRatio}`)
+    } else if (WindowAspectRatio >= 1.2) {
+      heightBp = 2
+      AppStorage.setOrCreate('currentHeightBreakpoint', heightBp)
+      console.log(`断点测试 heightBp: ${heightBp} 高宽比：${WindowAspectRatio}`)
     }
   }
 

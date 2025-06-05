@@ -1,4 +1,4 @@
-import { ConfigItemData, ListOverwriteBasicData, TAB_CONTENT_TITLE_HEIGHT, } from "../../../common/Constants"
+import { ConfigItemData, ListOverwriteBasicData, TAB_CONTENT_TITLE_HEIGHT, } from "../../../common/entity/Constants"
 import OverwriteTop from "./OverwriteTopBuilder"
 import { ClashConfig } from 'proxy_core'
 import { AppConfig, UIConfig } from '../../../entryability/AppState'

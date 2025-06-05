@@ -1,4 +1,4 @@
-import { CustomThemeName, CUSTOM_THEME_MAP } from "../common/AppTheme";
+import { CustomThemeName, CUSTOM_THEME_MAP } from "./AppThemeManager";
 import { ThemeControl } from "@kit.ArkUI";
 
 /**

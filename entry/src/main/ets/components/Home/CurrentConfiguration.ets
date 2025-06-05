@@ -1,11 +1,11 @@
-import { BreakpointState } from "../../common/breakpointsystem"
-import { MarginGenerate } from "../../common/Constants"
+import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
+import { MarginGenerate } from "../../common/entity/Constants"
 import { CardTitle } from "./CardTitleBuilder"
 import { PromptAction } from "@kit.ArkUI"
 import { AppConfig, UIConfig } from "../../entryability/AppState"
-import { customVibrator } from "../../utils/VibratorUtil"
+import { customVibrator } from "../../common/utils/VibratorUtil"
 import ClashViewModel from "../../entryability/ClashViewModel"
-import { ConfigData } from "../../common/PageArgumentEntity"
+import { ConfigData } from "../../common/entity/PageArgumentEntity"
 
 @Component
 struct CurrentConfiguration {

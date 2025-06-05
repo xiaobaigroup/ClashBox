@@ -1,8 +1,8 @@
 import { EventHub, EventKey } from '../../common/EventHub'
-import { ProxyItem as ProxyItem, ProxyData } from '../../common/ProxyData'
+import { ProxyItem as ProxyItem, ProxyData } from '../../common/datasources/ProxyData'
 import { AppConfig, ProxyCardSize, UIConfig } from '../../entryability/AppState'
 import ClashViewModel, { DelayInfo } from '../../entryability/ClashViewModel'
-import { customVibrator } from '../../utils/VibratorUtil'
+import { customVibrator } from '../../common/utils/VibratorUtil'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 
 

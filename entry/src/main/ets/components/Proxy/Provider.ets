@@ -1,25 +1,28 @@
-import { BreakpointState } from "../../common/breakpointsystem"
-import { BIND_SHEET_TITLE_CONTAINER_HEIGHT, BORDER_RADIUS_20, CONTENT_END_OFFSET_150 } from "../../common/Constants"
-import { CellularData, Nothing, proxyBindSheetTitleStyle, theCustomDialog } from "../Common"
-import { convertTime } from "../../utils/TimeConvertUtil"
+import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
+import { BIND_SHEET_TITLE_CONTAINER_HEIGHT, BORDER_RADIUS_20, CONTENT_END_OFFSET_150 } from "../../common/entity/Constants"
+import { CellularData, Nothing, proxyBindSheetTitleStyle, theCustomDialog } from "../Common/Common"
+import { convertTime } from "../../common/utils/TimeConvertUtil"
 import { ClashConfig, SubscriptionInfo } from 'proxy_core'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { Provider } from "proxy_core"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { isEnd, UIConfig } from "../../entryability/AppState"
 import { picker } from "@kit.CoreFileKit"
-import { customAnimationUtil, isON } from "../../utils/Animation"
+import { customAnimationUtil, isON } from "../../common/utils/Animation"
+import { icon_primary } from '../Common/Common'
 
 /**
  * 提供者
  */
 @Component
 export struct ProviderPage {
-  @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
+
   /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
-  // 一级图标色，黑色
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 使用默认文本位置传递列表行的index
@@ -86,7 +89,7 @@ export struct ProviderPage {
     Button({ type: ButtonType.Circle, stateEffect: true }) {
       SymbolGlyph($r('sys.symbol.arrow_clockwise'))
         .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-        .fontColor([this.icon_primary])
+        .fontColor([icon_primary])
     }
     .width(40)
     .height(40)

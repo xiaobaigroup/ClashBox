@@ -1,4 +1,4 @@
-import { BreakpointState } from "../../common/breakpointsystem"
+import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
 import { AboutListItemProp, BORDER_RADIUS_20, ContributorsListItemProp,
   ContributorsList,
   CheckUpdateListItemProp,
@@ -12,21 +12,22 @@ import { AboutListItemProp, BORDER_RADIUS_20, ContributorsListItemProp,
   ThirdServicesList,
   UseGuidanceList,
   LinkList,
-} from "../../common/Constants"
+} from "../../common/entity/Constants"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { common, Want } from "@kit.AbilityKit"
-import { BusinessError } from "@kit.BasicServicesKit"
 import { LengthMetrics, promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 import { AppConfig, ClashCore, isEnd, UIConfig } from "../../entryability/AppState"
-import { customAnimationUtil } from "../../utils/Animation"
-import { removeItemsByIndex } from "../../utils/RemoveItemsUtils"
-import { customVibrator } from "../../utils/VibratorUtil"
-import { customSound } from "../../utils/SoundPoolUtil"
-import { getResourceString } from "../../utils/ResourceStringUtil"
-import { extractUpdateInfo, getUpdateInfo, UpdateInfo } from "../../utils/CheckUpdateUtil"
-import { handleMailto } from "../../utils/MailTwoUtil"
-import { copy } from "../../utils/ClipBoardUtil"
+import { customAnimationUtil } from "../../common/utils/Animation"
+import { removeItemsByIndex } from "../../common/utils/RemoveItemsUtils"
+import { customVibrator } from "../../common/utils/VibratorUtil"
+import { customSound } from "../../common/utils/SoundPoolUtil"
+import { getResourceString } from "../../common/utils/ResourceStringUtil"
+import { extractUpdateInfo, getUpdateInfo, UpdateInfo } from "../../common/utils/CheckUpdateUtil"
+import { handleMailto } from "../../common/utils/MailTwoUtil"
+import { copy } from "../../common/utils/ClipBoardUtil"
+import { PageMargin } from "../../common/breakpoint/BreakPoint"
+import { icon_primary } from '../Common/Common'
 
 const context = getContext(this) as common.UIAbilityContext
 
@@ -45,10 +46,13 @@ struct About {
   // 更多页列表数组
   @Consume moreList: moreData[]
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-  @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
   // 点击次数
   @State clickCount: number = 0
   // 实验功能开关列表行数据
@@ -417,7 +421,7 @@ struct About {
       .width('100%')
       .alignListItem(ListItemAlign.Center)
       .contentEndOffset(CONTENT_END_OFFSET_150 - 85)
-      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+      .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
     }
     .width('100%')
     .backgroundColor($r('app.color.background'))
@@ -444,8 +448,11 @@ export struct AboutContributors {
   @StorageLink('isLandscapePhone')  private isLandscapePhone: boolean = false
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 列表高度
-  @Consume('breakPointStateSettingslistHeight') private SettingslistHeight: BreakpointState<number>
-  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+  @Consume('breakPointStateSettingslistHeight') SettingslistHeight: BreakpointState<number>
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
 
   handleClick(index: number) {
     switch (index) {
@@ -568,7 +575,7 @@ export struct AboutContributors {
       .width('100%')
       .alignListItem(ListItemAlign.Center)
       .contentEndOffset(CONTENT_END_OFFSET_150 - 85)
-      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+      .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
     }.width('100%')
     .backgroundColor($r('app.color.background'))
     .hideTitleBar(true)
@@ -588,9 +595,13 @@ export struct ThirdServices {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State thirdServicesList: TCItemProp[] = ThirdServicesList
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+
 
   build() {
     NavDestination() {
@@ -627,7 +638,7 @@ export struct ThirdServices {
       .width('100%')
       .alignListItem(ListItemAlign.Center)
       .contentEndOffset(CONTENT_END_OFFSET_150 - 85)
-      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+      .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
     }.width('100%')
     .backgroundColor($r('app.color.background'))
     .hideTitleBar(true)
@@ -647,9 +658,13 @@ export struct UseGuidance {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State useGuidanceList: TCItemProp[] = UseGuidanceList
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
- @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+
 
   build() {
     NavDestination() {
@@ -687,7 +702,7 @@ export struct UseGuidance {
       .width('100%')
       .alignListItem(ListItemAlign.Center)
       .contentEndOffset(CONTENT_END_OFFSET_150 - 65)
-      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+      .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
     }.width('100%')
     .backgroundColor($r('app.color.background'))
     .hideTitleBar(true)
@@ -708,9 +723,10 @@ export struct FAQ {
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  // 一级图标色，黑色
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
-  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
 
   build() {
     NavDestination() {
@@ -721,7 +737,7 @@ export struct FAQ {
             SymbolGlyph($r('sys.symbol.info_circle'))
               .fontSize(24)
               .margin({left: 7})
-              .fontColor([this.icon_primary])
+              .fontColor([icon_primary])
             Flex({
               alignContent: FlexAlign.Start,
               direction: FlexDirection.Row,
@@ -820,7 +836,7 @@ export struct FAQ {
       }.width('100%')
       .contentEndOffset(85)
       .alignListItem(ListItemAlign.Center)
-      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+      .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
     }.width('100%')
     .backgroundColor($r('app.color.background'))
     .hideTitleBar(true)
@@ -839,12 +855,13 @@ export struct CheckUpdate {
 
   @State updateList: CheckUpdateListItemProp[] = []
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  //一级图标色，黑色
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @Consume theAppVersionInfo: UpdateInfo
 
   async aboutToAppear(): Promise<void> {
@@ -911,7 +928,7 @@ export struct CheckUpdate {
                   } else {
                     SymbolGlyph($r('sys.symbol.chevron_right'))
                       .fontSize(24)
-                      .fontColor([this.icon_primary])
+                      .fontColor([icon_primary])
                   }
                 }.width('100%')
                 .padding({left: 12, right: 12, top: 5, bottom: 5})
@@ -966,7 +983,7 @@ export struct CheckUpdate {
           .fontSize(15)
       }
       .width('100%')
-      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+      .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
     }
     .width('100%')
     .backgroundColor($r('app.color.background'))

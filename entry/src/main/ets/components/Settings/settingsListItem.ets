@@ -1,7 +1,7 @@
-import { settingsData } from "../../common/Constants"
+import { settingsData } from "../../common/entity/Constants"
 import { UIConfig } from "../../entryability/AppState"
-import { customAnimationUtil } from "../../utils/Animation"
-import { ExperimentalFunction } from "../Common"
+import { customAnimationUtil } from "../../common/utils/Animation"
+import { ExperimentalFunction } from "../Common/Common"
 import { LengthMetrics } from "@kit.ArkUI"
 
 @Component

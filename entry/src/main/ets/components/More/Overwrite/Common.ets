@@ -1,17 +1,18 @@
 import { ClashConfig } from 'proxy_core'
-import { BreakpointState } from '../../../common/breakpointsystem'
+import { BreakpointState } from '../../../common/breakpoint/breakpointsystem'
 import { ConfigItemData, CONTENT_END_OFFSET_150, OptionItem,
   TAB_CONTENT_TITLE_HEIGHT,
-  ValueType } from '../../../common/Constants'
+  ValueType } from '../../../common/entity/Constants'
 import { EventHub, EventKey } from '../../../common/EventHub'
 import { AppConfig, UIConfig } from '../../../entryability/AppState'
-import { getResourceString } from '../../../utils/ResourceStringUtil'
-import { menuRowList, skipRowList, theCustomDialog, toggleRowList } from '../../Common'
+import { getResourceString } from '../../../common/utils/ResourceStringUtil'
+import { menuRowList, skipRowList, theCustomDialog, toggleRowList } from '../../Common/Common'
 import { ArrayConfigParam } from './EditArrayConfig'
 import { SymbolGlyphModifier } from '@kit.ArkUI'
 import { JSON } from '@kit.ArkTS'
-import { customAnimationUtil, isON } from '../../../utils/Animation'
+import { customAnimationUtil, isON } from '../../../common/utils/Animation'
 import { common } from '@kit.AbilityKit'
+import { PageMargin } from '../../../common/breakpoint/BreakPoint'
 
 const context = getContext(this) as common.UIAbilityContext
 
@@ -19,13 +20,16 @@ const context = getContext(this) as common.UIAbilityContext
 export struct ConfigList {
   @Prop configList: ConfigItemData[]
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @Consume('NavPathStack') pageInfos: NavPathStack
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
-  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
   @State isShowIcons: boolean = true
   @State theplaceholder: string = ''
   @State currentInputValue: string = ''
@@ -250,7 +254,7 @@ export struct ConfigList {
         }
         .width('100%')
         .height('100%')
-        .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
+        .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
         .borderRadius(18)
         .alignListItem(ListItemAlign.Center)
         .contentEndOffset(this.uiConfig.isBlurr ? CONTENT_END_OFFSET_150 : 110)

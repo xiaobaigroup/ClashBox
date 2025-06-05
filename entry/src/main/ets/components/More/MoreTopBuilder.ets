@@ -1,8 +1,10 @@
-import { BreakpointState } from "../../common/breakpointsystem"
-import { TAB_CONTENT_TITLE_FONT_SIZE, TAB_CONTENT_TITLE_HEIGHT } from "../../common/Constants"
+import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
+import { TAB_CONTENT_TITLE_FONT_SIZE, TAB_CONTENT_TITLE_HEIGHT } from "../../common/entity/Constants"
 import { UIConfig } from "../../entryability/AppState"
-import { customAnimationUtil } from "../../utils/Animation"
+import { customAnimationUtil } from "../../common/utils/Animation"
 import { SymbolGlyphModifier } from "@kit.ArkUI"
+import { icon_primary } from '../Common/Common'
+import { PageMargin } from "../../common/breakpoint/BreakPoint"
 
 /**
  * 更多页顶部导航栏
@@ -16,8 +18,6 @@ export struct MoreTop {
   @Consume isSecondary: boolean
   // 更多页路由表
   @Consume('NavPathStack') pageInfos: NavPathStack
-  // 一级图标色，黑色
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   // 标题
   @State title?: Resource = undefined
   // 元素名称标识
@@ -27,21 +27,25 @@ export struct MoreTop {
   @Consume needSearch: boolean
   @Consume isSearching: boolean
   @Consume searchText: string
-  /* 主题色 */
-  @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 其它按钮
   @BuilderParam otherButton: () => void = this.otherDefaultButton
-  //page内顶部标题偏移量
+  // page内顶部标题偏移量
   @Consume curYOffset: number
+  @StorageProp('WindowMode') windowMode: boolean = false
+  /* 主题色 */
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
 
   @Builder searchButton() {
     // 默认搜索按钮
     Button({ type: ButtonType.Circle, stateEffect: true }) {
       SymbolGlyph($r('sys.symbol.magnifyingglass'))
         .fontSize(24)
-        .fontColor([this.icon_primary])
+        .fontColor([icon_primary])
     }
     .backgroundColor($r('app.color.settings_container_background'))
     .width(40)
@@ -56,7 +60,7 @@ export struct MoreTop {
     Button({ type: ButtonType.Circle, stateEffect: true }) {
       SymbolGlyph($r('sys.symbol.dot_grid_2x2'))
         .fontSize(24)
-        .fontColor([this.icon_primary])
+        .fontColor([icon_primary])
     }
     .width(40)
     .height(40)
@@ -96,7 +100,7 @@ export struct MoreTop {
         Button({ type: ButtonType.Circle, stateEffect: true }) {
           SymbolGlyph($r('sys.symbol.chevron_left'))
             .fontSize(28)
-            .fontColor([this.icon_primary])
+            .fontColor([icon_primary])
         }
         .transition(customAnimationUtil.isSlide(200, this.uiConfig))
         .width(40)
@@ -140,6 +144,6 @@ export struct MoreTop {
     .position({x:0})
     .height(this.curYOffset<0?TAB_CONTENT_TITLE_HEIGHT-this.curYOffset:TAB_CONTENT_TITLE_HEIGHT)
     .zIndex(1)
-    .padding({right: this.morePageMargin.value, left: this.morePageMargin.value})
+    .padding({right: this.windowMode ? 125 : PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp)})
   }
 }

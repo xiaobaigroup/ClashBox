@@ -5,7 +5,7 @@ import { SocketProxyService, Profile, ProfileType, UpdateConfigParams, ClashConf
   Provider,
   ProxyMode} from "proxy_core";
 import { vpnExtension } from "@kit.NetworkKit";
-import { ConfigData } from "../common/PageArgumentEntity";
+import { ConfigData } from "../common/entity/PageArgumentEntity";
 import { promptAction } from "@kit.ArkUI";
 import { ProxyGroup } from "proxy_core/src/main/ets/models/Common";
 import { ConfigExtendedParams } from "proxy_core/src/main/ets/models/ClashConfig";
@@ -13,7 +13,7 @@ import { EventHub, EventKey } from "../common/EventHub";
 import { AppConfig, AppState, ClashCore, getPackageInfo } from "./AppState";
 import  fs from  "@ohos.file.fs"
 import { sleep } from "./EntryAbility";
-import { ProxyItem } from "../common/ProxyData";
+import { ProxyItem } from "../common/datasources/ProxyData";
 import { hilog } from "@kit.PerformanceAnalysisKit";
 import { readText } from "proxy_core/src/main/ets/fileUtils";
 

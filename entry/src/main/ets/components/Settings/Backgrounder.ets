@@ -1,11 +1,12 @@
-import { BreakpointState } from "../../common/breakpointsystem"
+import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
-import { theRowCustomDialog, toggleRowList } from "../Common"
+import { theRowCustomDialog, toggleRowList } from "../Common/Common"
 import { UIConfig } from "../../entryability/AppState"
 import { BusinessError } from "@kit.BasicServicesKit"
 import { notificationManager } from "@kit.NotificationKit"
 import { common } from "@kit.AbilityKit"
+import { PageMargin } from "../../common/breakpoint/BreakPoint"
 
 const context = getContext(this) as common.UIAbilityContext
 
@@ -30,10 +31,11 @@ struct Backgrounder {
   // 模拟画中画启用提示弹窗内容文本
   @State openContentText: ResourceStr = $r('app.string.simulate_record_open_content_text')
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  //一级图标色，黑色
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
 
   /**
    * 关闭模拟定位提示弹窗控制器
@@ -104,7 +106,6 @@ struct Backgrounder {
     }
     // 启用模拟画中画逻辑处理
     hilog.info(0xFF00, "BackgroundertestTag", "模拟画中画正在开启")
-    this.onOpenRecord()
   }
 
   toDialogController: CustomDialogController = new CustomDialogController({
@@ -334,7 +335,7 @@ struct Backgrounder {
       }
       .width('100%')
       .alignItems(HorizontalAlign.Start)
-      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+      .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))

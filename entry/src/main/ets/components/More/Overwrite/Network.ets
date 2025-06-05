@@ -1,16 +1,17 @@
-import { BreakpointState } from "../../../common/breakpointsystem"
+import { BreakpointState } from "../../../common/breakpoint/breakpointsystem"
 import {
   BORDER_RADIUS_20,
   ConfigItemData, ListOverwriteNetworkData,
   OverwriteNetworkCompatible,
-  TAB_CONTENT_TITLE_HEIGHT } from "../../../common/Constants"
+  TAB_CONTENT_TITLE_HEIGHT } from "../../../common/entity/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import OverwriteTop from "./OverwriteTopBuilder"
-import { theCustomDialog } from "../../Common"
+import { theCustomDialog } from "../../Common/Common"
 import { AppConfig, UIConfig } from "../../../entryability/AppState"
 import { ConfigList } from "./Common"
 import { ClashConfig } from "proxy_core"
-import { customAnimationUtil } from "../../../utils/Animation"
+import { customAnimationUtil } from "../../../common/utils/Animation"
+import { PageMargin } from "../../../common/breakpoint/BreakPoint"
 
 @Component
 struct Network {
@@ -110,10 +111,13 @@ export struct NetworkRouterAddress {
   @State RouterAddressList: RouterAddressData[] = createRouterAddressData()
   @Consume('NavPathStack') pageInfos: NavPathStack
   @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
-  @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   //page内顶部标题偏移量
   @Consume curYOffset: number
@@ -280,7 +284,7 @@ export struct NetworkRouterAddress {
             }
             .width('100%')
             .height('100%')
-            .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
+            .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
             .margin({ top: 10 })
             .borderRadius(BORDER_RADIUS_20)
             .alignListItem(ListItemAlign.Center)

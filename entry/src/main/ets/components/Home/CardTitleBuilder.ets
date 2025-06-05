@@ -1,4 +1,4 @@
-import { BreakpointState } from '../../common/breakpointsystem'
+import { BreakpointState } from '../../common/breakpoint/breakpointsystem'
 
 @Component
 export struct CardTitle {

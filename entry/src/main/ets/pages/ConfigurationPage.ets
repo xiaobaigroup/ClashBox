@@ -1,4 +1,4 @@
-import { BreakpointState } from '../common/breakpointsystem'
+import { BreakpointState } from '../common/breakpoint/breakpointsystem'
 import {
   TAB_CONTENT_TITLE_FONT_SIZE,
   TAB_CONTENT_TITLE_FONT_WEIGHT,
@@ -10,28 +10,29 @@ import {
   LIST_ITEM_PADDING,
   RouteName,
   CONTENT_END_OFFSET_150,
-} from '../common/Constants'
+} from '../common/entity/Constants'
 import { LengthMetrics, promptAction, PromptAction, SymbolGlyphModifier } from '@kit.ArkUI'
 import { ConfigAdd } from '../components/Configuration/ConfigAdd'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
-import { ConfigData, ConfigDataSourceType } from '../common/PageArgumentEntity'
-import { CellularData, CustomConfirmDialog, Nothing, RightDownButton } from '../components/Common'
-import { customVibrator } from "../utils/VibratorUtil"
+import { ConfigData, ConfigDataSourceType } from '../common/entity/PageArgumentEntity'
+import { CellularData, CustomConfirmDialog, Nothing, RightDownButton } from '../components/Common/Common'
+import { customVibrator } from "../common/utils/VibratorUtil"
 import { common } from '@kit.AbilityKit'
-import { configShare } from '../utils/SystemShareUtil'
-import { showFileNameListOfFileDir } from '../utils/FileUtil'
+import { configShare } from '../common/utils/SystemShareUtil'
+import { showFileNameListOfFileDir } from '../common/utils/FileUtil'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig, UIConfig } from '../entryability/AppState'
 import { EventHub, EventKey } from '../common/EventHub'
-import { getResourceString } from '../utils/ResourceStringUtil'
-import { convertTime } from '../utils/TimeConvertUtil'
-import { customAnimationUtil, isON } from '../utils/Animation'
+import { getResourceString } from '../common/utils/ResourceStringUtil'
+import { convertTime } from '../common/utils/TimeConvertUtil'
+import { customAnimationUtil, isON } from '../common/utils/Animation'
 import { ProxyGroup } from 'proxy_core'
-import { ProxyItem } from '../common/ProxyData'
+import { ProxyItem } from '../common/datasources/ProxyData'
 import { PopTips, PopupBuilder } from '../components/Start/Popup'
 import { ImportConfigFromURL } from '../components/Configuration/ImportConfigFromURL'
 import { ImportConfigFromFile } from '../components/Configuration/ImportConfigFromFile'
+import { TopBar } from '../components/Common/TopBar'
 
 
 /**
@@ -89,6 +90,7 @@ struct ConfigurationPage {
   @StorageLink('isLandscapePhone') private isLandscapePhone: boolean = false
 
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @StorageProp('WindowMode') windowMode: boolean = false
   // 开关不触发list转场动画判定
   @State isON:isON = new isON()
   // 节点数据组
@@ -320,40 +322,24 @@ struct ConfigurationPage {
       // 标题栏 START
       if (!this.isPXSecScreen) {
         Row() {
-          Text($r('app.string.Configuration'))
-            .fontSize(this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE - this.curYOffset / 100 :
-              TAB_CONTENT_TITLE_FONT_SIZE)
-            .fontWeight(TAB_CONTENT_TITLE_FONT_WEIGHT)
-            .fontColor($r('sys.color.font_primary'))
-            .transition(customAnimationUtil.isSlide(200, this.uiConfig))
-          Blank()
-          // 刷新图标
-          Button({ type: ButtonType.Circle, stateEffect: true }) {
-            SymbolGlyph($r('sys.symbol.arrow_clockwise'))
-              .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE)
-              .fontColor([$r('sys.color.icon_primary')])
-              .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
-          }
-          .width(40)
-          .height(40)
-          .backgroundColor($r('app.color.settings_container_background'))
-          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-          .onClick(() => {
-            this.isON.toggleAnim = true
-            hilog.info(0xC001, this.componentName, `#button#onClick()#更新配置`)
-            this.updateConfig()
+          TopBar({
+            title: getResourceString($r('app.string.Configuration'), this),
+            titleFontSize: this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE - this.curYOffset / 100 : TAB_CONTENT_TITLE_FONT_SIZE,
+            icons: [$r('sys.symbol.arrow_clockwise')],
+            iconSize: this.windowMode ? 16 : 24,
+            // 刷新图标
+            onFClick: () => {
+              this.isON.toggleAnim = true
+              hilog.info(0xC001, this.componentName, `#button#onClick()#更新配置`)
+              this.updateConfig()
+            }
           })
-          .transition(customAnimationUtil.isSlide(0, this.uiConfig))
         }
         .zIndex(1)
-        .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
+        // .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
         .position({ x: 0, y: this.isRolling && this.isSmallSquareScreen ? this.heightTop : 0 })
         .alignItems(VerticalAlign.Center)
         .width('100%')
-        .padding({
-          left: this.breakPointStateTabContentTitleMargin.value,
-          right: this.breakPointStateTabContentTitleMargin.value,
-        })
       }
       // 标题栏 END
 

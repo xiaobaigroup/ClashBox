@@ -2,7 +2,7 @@
 转场等动画参数配置
  */
 
-import { UIConfig } from "../entryability/AppState"
+import { UIConfig } from "../../entryability/AppState"
 import { curves } from "@kit.ArkUI"
 
 

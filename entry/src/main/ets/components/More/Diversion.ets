@@ -1,15 +1,17 @@
-import { BreakpointState } from "../../common/breakpointsystem"
+import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
 import {
   BIND_SHEET_CONTAINER_HEIGHT,
   BIND_SHEET_DRAG_BAR_HEIGHT, BIND_SHEET_TITLE_CONTAINER_HEIGHT,
   BORDER_RADIUS_20,
-  TAB_CONTENT_TITLE_HEIGHT } from "../../common/Constants"
-import { skipRowList, toggleRowList } from "../Common"
+  TAB_CONTENT_TITLE_HEIGHT } from "../../common/entity/Constants"
+import { skipRowList, toggleRowList } from "../Common/Common"
 import { MoreTop } from "./MoreTopBuilder"
 import { curves, promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { UIConfig } from "../../entryability/AppState"
-import { customAnimationUtil } from "../../utils/Animation"
+import { customAnimationUtil } from "../../common/utils/Animation"
+import { PageMargin } from "../../common/breakpoint/BreakPoint"
+
 /**
  *
  * 暂时屏蔽，等待API更新支持
@@ -42,12 +44,14 @@ struct Diversion {
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   // 手机横屏判断变量
   @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
-  // 整体页面边距
-  @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   // 列表底边距
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
   // 是否开启 `Index` 页面的前景模糊
-  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   //page内顶部标题偏移量
   @Consume curYOffset: number
@@ -191,7 +195,7 @@ struct Diversion {
             }
             .width('100%')
             .borderRadius(BORDER_RADIUS_20)
-            .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
+            .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
             .alignListItem(ListItemAlign.Center)
             .height(this.isLandscapePhone ? 275 : 650)
             .bindSheet($$this.isShowPolicy, this.PolicySheet(),
@@ -273,8 +277,11 @@ struct Policy {
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 是否开启 `Index` 页面的前景模糊
-  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
-  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   @Builder
@@ -473,7 +480,7 @@ struct Policy {
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)
-    .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+    .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
     .onAppear(() => {
       this.EnabledAutoUpdate = this.DiversionList[this.SelectedListItem].isAutoUpdate
       this.EnabledInsertResource = this.DiversionList[this.SelectedListItem].isInsert

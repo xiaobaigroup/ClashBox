@@ -1,24 +1,26 @@
-import { BreakpointState } from "../../../common/breakpointsystem"
-import { BORDER_RADIUS_20, ListOverwriteData, moreData, TAB_CONTENT_TITLE_HEIGHT } from "../../../common/Constants"
+import { BreakpointState } from "../../../common/breakpoint/breakpointsystem"
+import { BORDER_RADIUS_20, ListOverwriteData, moreData, TAB_CONTENT_TITLE_HEIGHT } from "../../../common/entity/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
-import { skipRowList, theRowCustomDialog } from "../../Common"
+import { skipRowList, theRowCustomDialog } from "../../Common/Common"
 import { MoreTop } from "../MoreTopBuilder"
 import { AppState, UIConfig } from "../../../entryability/AppState"
 import { ClashConfig } from "proxy_core"
 import { curves } from "@kit.ArkUI"
-import { customAnimationUtil } from "../../../utils/Animation"
+import { customAnimationUtil } from "../../../common/utils/Animation"
 import OverwriteTop from "./OverwriteTopBuilder"
+import { PageMargin } from "../../../common/breakpoint/BreakPoint"
 
 @Component
 struct Overwrite {
   // 是否进入二级界面
   @Consume isSecondary: boolean
   @Consume('NavPathStack') pageInfos: NavPathStack
-  @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @State overwriteList: moreData[] = ListOverwriteData()
-  // 一级图标色，黑色
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
   // 重置覆写提示弹窗标题
   @State theResetDialogTitle: ResourceStr = $r('app.string.override_reset_prompt')
@@ -128,7 +130,7 @@ struct Overwrite {
             .height('100%')
             .borderRadius(BORDER_RADIUS_20)
             .alignListItem(ListItemAlign.Center)
-            .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
+            .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
             .chainAnimation(true)
             .nestedScroll({
               scrollForward: NestedScrollMode.PARENT_FIRST,

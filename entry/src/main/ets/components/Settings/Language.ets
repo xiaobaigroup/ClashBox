@@ -1,12 +1,13 @@
 import TopBuilder from "./TopBuilder"
 import { i18n } from "@kit.LocalizationKit"
-import { LanguageData, LanguageListItem } from "../../common/Constants"
-import { BreakpointState } from "../../common/breakpointsystem"
+import { LanguageData, LanguageListItem } from "../../common/entity/Constants"
+import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
 import { promptAction } from "@kit.ArkUI"
 import { hilog } from "@kit.PerformanceAnalysisKit"
-import { ChangeLanguage } from "../../utils/ChangeLanguageUtil"
+import { ChangeLanguage } from "../../common/utils/ChangeLanguageUtil"
 import { AppConfig, UIConfig } from "../../entryability/AppState"
-import { customAnimationUtil } from "../../utils/Animation"
+import { customAnimationUtil } from "../../common/utils/Animation"
+import { PageMargin } from "../../common/breakpoint/BreakPoint"
 
 @Component
 struct Language {
@@ -17,10 +18,13 @@ struct Language {
   @State private currentRadioCheck: number = -1
   @State SettingsLanguageList: LanguageData[] = LanguageListItem()
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   //一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   aboutToAppear(): void {
@@ -155,7 +159,7 @@ struct Language {
       .width('100%')
       .alignListItem(ListItemAlign.Center)
       .height(this.isLandscapePhone ? 275 : 800)
-      .margin({ left: this.morePageMargin.value, right: this.morePageMargin.value })
+      .margin({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
 
     }
     .hideTitleBar(true)

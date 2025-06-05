@@ -1,17 +1,18 @@
-import { BreakpointState } from "../../../common/breakpointsystem"
+import { BreakpointState } from "../../../common/breakpoint/breakpointsystem"
 import { MoreTop } from "../MoreTopBuilder"
-import { KVCustomDialog, theCustomDialog } from "../../Common"
+import { KVCustomDialog, theCustomDialog } from "../../Common/Common"
 import { curves, promptAction } from "@kit.ArkUI"
 import { EventHub, EventKey } from "../../../common/EventHub"
 import { UIConfig } from "../../../entryability/AppState"
 import {
   BORDER_RADIUS_20,
-  ConfigItemData, CONTENT_END_OFFSET_150, TAB_CONTENT_TITLE_HEIGHT, ValueType } from "../../../common/Constants"
-import { getResourceString } from "../../../utils/ResourceStringUtil"
-import { customAnimationUtil } from "../../../utils/Animation"
+  ConfigItemData, CONTENT_END_OFFSET_150, TAB_CONTENT_TITLE_HEIGHT, ValueType } from "../../../common/entity/Constants"
+import { getResourceString } from "../../../common/utils/ResourceStringUtil"
+import { customAnimationUtil } from "../../../common/utils/Animation"
 import { common } from "@kit.AbilityKit"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { Sniff } from "proxy_core"
+import { PageMargin } from "../../../common/breakpoint/BreakPoint"
 
 export interface ArrayConfigParam{
   label?: string | ResourceStr
@@ -49,10 +50,13 @@ export struct ArrayConfigEditor {
   // 平板竖屏判断
   // 平板竖屏判断变量
   @Consume istabletLandscape: boolean
-  @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @Prop params: ConfigItemData
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   //page内顶部标题偏移量
@@ -295,7 +299,7 @@ export struct ArrayConfigEditor {
                   .height('100%')
               }.width('100%')
               .height('100%')
-              .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
+              .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
             } else {
               // 键值页
               List({ space: this.listBottom.value }) {
@@ -359,7 +363,7 @@ export struct ArrayConfigEditor {
               .contentEndOffset(CONTENT_END_OFFSET_150 - 40)
               .borderRadius(BORDER_RADIUS_20)
               .alignListItem(ListItemAlign.Center)
-              .padding({ left: this.morePageMargin.value, right: this.morePageMargin.value })
+              .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
               .chainAnimation(true)
               .nestedScroll({
                 scrollForward: NestedScrollMode.PARENT_FIRST,

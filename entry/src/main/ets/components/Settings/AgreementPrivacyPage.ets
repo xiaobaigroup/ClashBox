@@ -1,6 +1,6 @@
 import { UIConfig } from "../../entryability/AppState"
-import { customAnimationUtil } from "../../utils/Animation"
-import { BackButton } from "../Common"
+import { customAnimationUtil } from "../../common/utils/Animation"
+import { BackButton } from "../Common/Common"
 import { CommonPage } from "../Start/CommonPage"
 import { TopTitleText } from "../Start/WelcomePage"
 

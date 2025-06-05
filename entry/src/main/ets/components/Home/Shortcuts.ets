@@ -1,17 +1,17 @@
-import { BreakpointState } from '../../common/breakpointsystem'
+import { BreakpointState } from '../../common/breakpoint/breakpointsystem'
 import { BIND_SHEET_CONTAINER_HEIGHT,
   BORDER_RADIUS_20,
   FONT_SIZE_14,
   FONT_SIZE_16,
   MarginGenerate, TEXT_AREA_MAX_LENGTH,
   TEXT_INPUT_HEIGHT,
-} from '../../common/Constants'
+} from '../../common/entity/Constants'
 import { CardTitle } from './CardTitleBuilder'
 import { common, Want } from '@kit.AbilityKit'
 import { PromptAction } from '@kit.ArkUI'
 import { AppConfig, isEnd, UIConfig } from '../../entryability/AppState'
-import { customVibrator } from '../../utils/VibratorUtil'
-import { customAnimationUtil } from '../../utils/Animation'
+import { customVibrator } from '../../common/utils/VibratorUtil'
+import { customAnimationUtil } from '../../common/utils/Animation'
 
 @Component
 struct Shortcuts {

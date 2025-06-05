@@ -1,8 +1,8 @@
-import { BreakpointState } from "../../../common/breakpointsystem"
-import { curves } from "@kit.ArkUI"
 import { UIConfig } from "../../../entryability/AppState"
-import { customAnimationUtil } from "../../../utils/Animation"
-import { TAB_CONTENT_TITLE_FONT_SIZE, TAB_CONTENT_TITLE_HEIGHT } from "../../../common/Constants"
+import { customAnimationUtil } from "../../../common/utils/Animation"
+import { TAB_CONTENT_TITLE_FONT_SIZE, TAB_CONTENT_TITLE_HEIGHT } from "../../../common/entity/Constants"
+import { PageMargin } from "../../../common/breakpoint/BreakPoint"
+import { icon_primary } from  '../../Common/Common'
 
 @Component
 struct OverwriteTop {
@@ -10,8 +10,10 @@ struct OverwriteTop {
   @State title: ResourceStr = ''
   @State subtitle: ResourceStr = ''
   @Consume('NavPathStack') pageInfos: NavPathStack
-  @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   //page内顶部标题偏移量
   @Consume curYOffset: number
@@ -21,10 +23,10 @@ struct OverwriteTop {
       Button({ type: ButtonType.Circle, stateEffect: true }) {
         SymbolGlyph($r('sys.symbol.chevron_left'))
           .fontSize(28)
-          .fontColor([this.icon_primary])
+          .fontColor([icon_primary])
       }
       .transition(customAnimationUtil.isSlide(200, this.uiConfig))
-      .margin({left: this.morePageMargin.value})
+      .margin({left: PageMargin(this.widthBp, this.heightBp)})
       .onClick(() => {
         this.pageInfos.pop(true)
       })

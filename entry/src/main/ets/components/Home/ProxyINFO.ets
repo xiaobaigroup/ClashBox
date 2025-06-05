@@ -1,16 +1,16 @@
-import { BreakpointState } from "../../common/breakpointsystem"
-import { MarginGenerate } from "../../common/Constants"
-import { ProxyItem, ProxyData } from "../../common/ProxyData"
+import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
+import { MarginGenerate } from "../../common/entity/Constants"
+import { ProxyItem, ProxyData } from "../../common/datasources/ProxyData"
 import { AppConfig, AppFlowingState, UIConfig } from "../../entryability/AppState"
 import { CardTitle } from "./CardTitleBuilder"
 import { LengthMetrics, PromptAction } from "@kit.ArkUI"
 import ClashViewModel from "../../entryability/ClashViewModel"
 import { JSON } from "@kit.ArkTS"
-import { customVibrator } from "../../utils/VibratorUtil"
+import { customVibrator } from "../../common/utils/VibratorUtil"
 import { delayText } from "../Proxy/ProxyNodeItem"
 import { IpInfo } from "proxy_core"
 import { EventHub, EventKey } from "../../common/EventHub"
-import { customAnimationUtil } from "../../utils/Animation"
+import { customAnimationUtil } from "../../common/utils/Animation"
 
 @Component
 struct ProxyINFO{

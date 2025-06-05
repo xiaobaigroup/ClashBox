@@ -1,18 +1,18 @@
 import { hilog } from '@kit.PerformanceAnalysisKit'
-import { BreakpointState, } from '../../common/breakpointsystem'
+import { BreakpointState, } from '../../common/breakpoint/breakpointsystem'
 import {
   BORDER_RADIUS_20,
   CONTENT_END_OFFSET_150,
   LIST_ITEM_HEIGHT,
-  TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE } from '../../common/Constants'
+  TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE } from '../../common/entity/Constants'
 import { LengthMetrics, SymbolGlyphModifier,PromptAction, curves } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
-import { ProxyItem, ProxyItemDataSource } from '../../common/ProxyData';
+import { ProxyItem, ProxyItemDataSource } from '../../common/datasources/ProxyData';
 import { Profile, ProxyGroup, ProxySort } from 'proxy_core';
 import { AppConfig, AppState, ClashCore, ProxyCardSize, ProxyGroupType, UIConfig } from '../../entryability/AppState';
 import { ProxyNode } from './ProxyNodeItem';
-import { customAnimationUtil } from '../../utils/Animation';
-import { customVibrator } from '../../utils/VibratorUtil';
+import { customAnimationUtil } from '../../common/utils/Animation';
+import { customVibrator } from '../../common/utils/VibratorUtil';
 import ClashViewModel from '../../entryability/ClashViewModel';
 import { PopTips, PopupBuilder } from '../Start/Popup';
 

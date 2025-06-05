@@ -1,4 +1,4 @@
-import { ConfigItemData, ListOverwriteDNSData,} from "../../../common/Constants"
+import { ConfigItemData, ListOverwriteDNSData,} from "../../../common/entity/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import OverwriteTop from "./OverwriteTopBuilder"
 import { ClashConfig, Dns } from 'proxy_core'

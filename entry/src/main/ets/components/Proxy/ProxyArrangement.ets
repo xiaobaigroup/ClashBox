@@ -1,12 +1,12 @@
-import { BORDER_RADIUS_20, CONTENT_END_OFFSET_150, FONT_SIZE_16, LIST_ITEM_HEIGHT} from '../../common/Constants'
-import { BreakpointState, BreakpointSystem } from '../../common/breakpointsystem'
+import { BORDER_RADIUS_20, CONTENT_END_OFFSET_150, FONT_SIZE_16, LIST_ITEM_HEIGHT} from '../../common/entity/Constants'
+import { BreakpointState, BreakpointSystem } from '../../common/breakpoint/breakpointsystem'
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import ProxyGroupItem from './ProxyGroupItem'
 import { Profile, ProxyGroup,ProxyType } from 'proxy_core'
-import { ProxyItem, ProxyGroupItemDataSource } from '../../common/ProxyData'
+import { ProxyItem, ProxyGroupItemDataSource } from '../../common/datasources/ProxyData'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { AppConfig, UIConfig } from '../../entryability/AppState'
-import { customAnimationUtil } from '../../utils/Animation'
+import { customAnimationUtil } from '../../common/utils/Animation'
 
 const  componentName: string = 'ProxyPageArrangement'
 

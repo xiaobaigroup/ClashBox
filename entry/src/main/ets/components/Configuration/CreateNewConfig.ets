@@ -1,4 +1,4 @@
-import { BreakpointState } from "../../common/breakpointsystem"
+import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
 import {
   BIND_SHEET_MAIN_FONT_WEIGHT,
   BIND_SHEET_MAIN_FONTSIZE,
@@ -6,10 +6,10 @@ import {
   BIND_SHEET_TITLE_CONTAINER_HEIGHT,
   BIND_SHEET_DRAG_BAR_HEIGHT,
   BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT
-} from "../../common/Constants"
-import { BindSheetTitleCustomBuilder } from "../Common"
+} from "../../common/entity/Constants"
+import { BindSheetTitleCustomBuilder } from "../Common/Common"
 import { hilog } from "@kit.PerformanceAnalysisKit"
-import { getResourceString } from "../../utils/ResourceStringUtil"
+import { getResourceString } from "../../common/utils/ResourceStringUtil"
 
 
 // 关联：route_map.json
