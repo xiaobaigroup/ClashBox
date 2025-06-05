@@ -1,6 +1,6 @@
-import { BIND_SHEET_DRAG_BAR_HEIGHT, BIND_SHEET_TITLE_CONTAINER_HEIGHT } from "../../common/Constants"
+import { BIND_SHEET_DRAG_BAR_HEIGHT, BIND_SHEET_TITLE_CONTAINER_HEIGHT } from "../../common/entity/Constants"
 import { UIConfig } from "../../entryability/AppState"
-import { customAnimationUtil } from "../../utils/Animation"
+import { customAnimationUtil } from "../../common/utils/Animation"
 
 @Preview
 @Component

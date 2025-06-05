@@ -1,13 +1,13 @@
-import {  BreakpointState } from '../../common/breakpointsystem'
+import {  BreakpointState } from '../../common/breakpoint/breakpointsystem'
 import { curves, mediaquery } from '@kit.ArkUI';
-import { ANIMATION_DURATION_300, MarginGenerate } from '../../common/Constants';
+import { ANIMATION_DURATION_300, MarginGenerate } from '../../common/entity/Constants';
 import { CardTitle } from './CardTitleBuilder';
 import { AppConfig, SwitchModeCard, UIConfig } from '../../entryability/AppState';
 import { EventHub, EventKey } from '../../common/EventHub';
 import { ClashConfig, ProxyGroup, ProxyMode } from 'proxy_core';
-import { customVibrator } from '../../utils/VibratorUtil';
-import { customAnimationUtil } from '../../utils/Animation';
-import { ProxyGroupItemDataSource } from '../../common/ProxyData';
+import { customVibrator } from '../../common/utils/VibratorUtil';
+import { customAnimationUtil } from '../../common/utils/Animation';
+import { ProxyGroupItemDataSource } from '../../common/datasources/ProxyData';
 import ClashViewModel from '../../entryability/ClashViewModel';
 
 @Component

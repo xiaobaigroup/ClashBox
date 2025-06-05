@@ -1,10 +1,10 @@
 import { ProxySort } from 'proxy_core'
-import { BreakpointState } from '../../common/breakpointsystem'
-import { BORDER_RADIUS_20, CONTENT_END_OFFSET_150 } from '../../common/Constants'
+import { BreakpointState } from '../../common/breakpoint/breakpointsystem'
+import { BORDER_RADIUS_20, CONTENT_END_OFFSET_150 } from '../../common/entity/Constants'
 import { EventHub, EventKey } from '../../common/EventHub'
 import { AppConfig, isEnd, ProxyCardSize, ProxyGroupType, UIConfig } from '../../entryability/AppState'
-import { customAnimationUtil } from '../../utils/Animation'
-import { proxyBindSheetTitleStyle } from '../Common'
+import { customAnimationUtil } from '../../common/utils/Animation'
+import { proxyBindSheetTitleStyle } from '../Common/Common'
 
 @Component
 export struct StylesEdit {

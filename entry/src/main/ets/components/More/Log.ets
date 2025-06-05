@@ -1,22 +1,21 @@
-import { BreakpointState } from "../../common/breakpointsystem"
-import { curves, SymbolGlyphModifier } from "@kit.ArkUI"
+import { SymbolGlyphModifier } from "@kit.ArkUI"
 import { MoreTop } from "./MoreTopBuilder"
-import { Nothing, skipRowList, toggleRowList } from "../Common"
-import { timestampToDateTime } from "../../utils/TimeConvertUtil"
+import { Nothing, skipRowList } from "../Common/Common"
+import { timestampToDateTime } from "../../common/utils/TimeConvertUtil"
 import { ClashConfig, LogLevel } from "proxy_core"
 import { AppConfig, UIConfig } from "../../entryability/AppState"
 import { EventHub, EventKey } from "../../common/EventHub"
-import { BORDER_RADIUS_20, CONTENT_END_OFFSET_150, LogData, TAB_CONTENT_TITLE_HEIGHT } from "../../common/Constants"
-import { customAnimationUtil } from "../../utils/Animation"
+import { BORDER_RADIUS_20, CONTENT_END_OFFSET_150, LogData, TAB_CONTENT_TITLE_HEIGHT } from "../../common/entity/Constants"
+import { customAnimationUtil } from "../../common/utils/Animation"
 import { hilog } from "@kit.PerformanceAnalysisKit"
-import { universalSearch } from "../../utils/SmartSearchUtil"
+import { universalSearch } from "../../common/utils/SmartSearchUtil"
+import { PageMargin } from "../../common/breakpoint/BreakPoint"
 
 @Component
 struct Log {
   // 是否进入二级界面
   @Consume isSecondary: boolean
   @Consume('NavPathStack') pageInfos: NavPathStack
-  @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State EnableLogger: boolean = false
   // 一级图标色，黑色
@@ -26,6 +25,10 @@ struct Log {
   // 数据（数据本体在Index）
   @Consume logListData: Array<LogData>
   @State lastLogListData: Array<LogData> = []
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
@@ -272,7 +275,7 @@ struct Log {
                 }.width('100%')
                 .height('100%')
                 .contentEndOffset(CONTENT_END_OFFSET_150)
-                .padding({ right: this.morePageMargin.value, left: this.morePageMargin.value })
+                .padding({ right: PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp) })
                 .chainAnimation(true)
                 .nestedScroll({
                   scrollForward: NestedScrollMode.PARENT_FIRST,
@@ -334,7 +337,10 @@ export struct LogDetils {
   @Consume theLogSkipItem: number
   @Consume logListData: Array<LogData>
   @Consume('NavPathStack') pageInfos: NavPathStack
-  @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
@@ -403,11 +409,11 @@ export struct LogDetils {
               .hitTestBehavior(HitTestMode.None)
               .backgroundColor($r('app.color.container_background'))
               .width('100%')
-              .margin({ right: this.morePageMargin.value, left: this.morePageMargin.value })
-              .padding({ top: this.morePageMargin.value, bottom: this.morePageMargin.value })
+              .margin({ right: PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp) })
+              .padding({ top: PageMargin(this.widthBp, this.heightBp), bottom: PageMargin(this.widthBp, this.heightBp) })
               .borderRadius(BORDER_RADIUS_20)
           }.height('100%')
-          .margin({ right: this.morePageMargin.value, left: this.morePageMargin.value })
+          .margin({ right: PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp) })
         }
         .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring : null)//,{alwaysEnabled:true})
         .onDidScroll((xOffset: number, yOffset: number): void => {

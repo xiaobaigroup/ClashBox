@@ -1,23 +1,24 @@
-import { BreakpointState } from "../../common/breakpointsystem"
+import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
 import {
   FONT_SIZE_14,
   FONT_SIZE_16,
   LIST_ITEM_HEIGHT_45,
   LIST_ITEM_HEIGHT,
   BORDER_RADIUS_20,
-  CONTENT_END_OFFSET_150} from "../../common/Constants"
-import { getResourceString } from "../../utils/ResourceStringUtil"
+  CONTENT_END_OFFSET_150} from "../../common/entity/Constants"
+import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
-import { customVibrator } from "../../utils/VibratorUtil"
-import { customSound } from "../../utils/SoundPoolUtil"
+import { customVibrator } from "../../common/utils/VibratorUtil"
+import { customSound } from "../../common/utils/SoundPoolUtil"
 import { promptAction } from "@kit.ArkUI"
-import { ExperimentalFunction, theRowCustomDialog, toggleRowList } from "../Common"
+import { ExperimentalFunction, theRowCustomDialog, toggleRowList } from "../Common/Common"
 import { UIConfig } from "../../entryability/AppState"
 import { notificationManager } from '@kit.NotificationKit'
 import { BusinessError } from '@kit.BasicServicesKit'
 import { common } from '@kit.AbilityKit'
-import { customAnimationUtil } from "../../utils/Animation"
+import { customAnimationUtil } from "../../common/utils/Animation"
+import { PageMargin } from "../../common/breakpoint/BreakPoint"
 
 const TAG: string = '[通知页]';
 const DOMAIN_NUMBER: number = 0xFF00;
@@ -35,7 +36,10 @@ struct Notice {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 流量提醒启用状态变量
   @Consume EnableCellularDataReminder: boolean
-  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   // UI控制变量
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 通知总开关变量
@@ -486,7 +490,7 @@ struct Notice {
       }
       .width('100%')
       .alignItems(HorizontalAlign.Start)
-      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+      .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
@@ -513,7 +517,10 @@ export struct CellularDataReminder {
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @StorageProp('isLandscapePhone')  private isLandscapePhone: boolean = false
-  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   // 滚动列表高度
   @Consume('breakPointStateSettingslistHeight') private SettingslistHeight: BreakpointState<number>
   // 每小时通知控制变量
@@ -825,7 +832,7 @@ export struct CellularDataReminder {
       .align(Alignment.Top)
       .edgeEffect(EdgeEffect.Spring)
       .contentEndOffset(CONTENT_END_OFFSET_150 - 85)
-      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+      .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
     }
     .width('100%')
     .hideTitleBar(true)

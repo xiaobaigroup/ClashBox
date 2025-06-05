@@ -5,7 +5,7 @@ import { backgroundTaskManager } from "@kit.BackgroundTasksKit";
 import { notificationManager } from "@kit.NotificationKit";
 import { BusinessError } from "@kit.BasicServicesKit";
 import { http } from "@kit.NetworkKit";
-import { AppFlowingState, AppState } from "../entryability/AppState";
+import { AppFlowingState, AppState } from "../../entryability/AppState";
 import { hilog } from "@kit.PerformanceAnalysisKit";
 import { geoLocationManager } from "@kit.LocationKit";
 

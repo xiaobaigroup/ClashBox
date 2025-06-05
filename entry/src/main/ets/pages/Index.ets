@@ -1,5 +1,5 @@
 // Index
-import { BreakpointSystem, BreakpointState } from '../common/breakpointsystem'
+import { BreakpointSystem, BreakpointState } from '../common/breakpoint/breakpointsystem'
 import { curves, display, LengthMetrics, mediaquery, promptAction } from '@kit.ArkUI'
 import Home from './HomePage'
 import ProxyPage from './ProxyPage'
@@ -35,7 +35,7 @@ import {
   gutterHomeGridcol,
   HomeCardAreaPadding,
   HomeCardTitleButtonPadding,
-  HomeCardEditHeight,
+
   CardTitleFontSize_18_20_22_22,
   HomeProxyFontSize_24_26_26_27,
   SpeedfontSize12_14_14_16,
@@ -48,47 +48,56 @@ import {
   DefaultUpdateInfo,
   TabTitlefontSize_12_16,
   TabIconfontSize_24_26,
-  TabBarHeight,
-  TabBarWidth,
-  TabVertical,
-  TabBarPose,
+  // TabBarHeight,
+  // TabBarWidth,
+  // TabVertical,
+  // TabBarPose,
   CompStr,CHART_NUMBER,
   TheExperimentData,
   TAB_CONTENT_TITLE_HEIGHT,
   LogData,
   showHomeCard,
-  TabBarJustifyContent
-} from '../common/Constants'
-import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/ProxyData'
+  // TabBarJustifyContent,
+  NullConfigData,
+  // TabBarAlignItems
+} from '../common/entity/Constants'
+import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/datasources/ProxyData'
 import { ClashConfig, IpInfo, LogLevel, Profile, ProxyGroup, ProxyMode } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig, AppFlowingState, AppState, ClashCore, UIConfig } from '../entryability/AppState'
-import { changeThemeColor } from '../utils/ChangeThemeColorUtil'
+import { changeThemeColor } from '../common/utils/ChangeThemeColorUtil'
 import { common } from '@kit.AbilityKit'
-import { setAutoColorMode, setDarkColorMode, setLightColorMode } from '../utils/ChangeColorModeUtils'
-import { ChangeLanguage } from '../utils/ChangeLanguageUtil'
-import { ConfigData } from '../common/PageArgumentEntity'
-import { customAnimationUtil } from '../utils/Animation'
-import { getGreeting } from '../utils/GreetingUtil'
-import { DisclaimerCustomDialog } from '../components/Common'
-import { PipManager } from '../common/PipManager'
+import { setAutoColorMode, setDarkColorMode, setLightColorMode } from '../common/utils/ChangeColorModeUtils'
+import { ChangeLanguage } from '../common/utils/ChangeLanguageUtil'
+import { ConfigData, TabBuild } from '../common/entity/PageArgumentEntity'
+import { customAnimationUtil } from '../common/utils/Animation'
+import { getGreeting } from '../common/utils/GreetingUtil'
+import { DisclaimerCustomDialog, icon_tertiary } from '../components/Common/Common'
+import { PipManager } from '../common/utils/PipManager'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { CrashPage } from '../components/Start/CrashPage'
-import { compareVersions, extractUpdateInfo, getUpdateInfo, UpdateInfo } from '../utils/CheckUpdateUtil'
+import { compareVersions, extractUpdateInfo, getUpdateInfo, UpdateInfo } from '../common/utils/CheckUpdateUtil'
 import { implicitStartAbility } from '../components/Settings/About'
 import { fileUri, picker } from '@kit.CoreFileKit'
 import { fileIo as fs } from '@kit.CoreFileKit';
-import { number2Time, timestampToDateTime } from '../utils/TimeConvertUtil'
+import { number2Time, timestampToDateTime } from '../common/utils/TimeConvertUtil'
 import { PXSecScreen } from './PXSecScreen'
 import { BPS_LIST_LANES_2_2_3_4_4 } from '../components/Proxy/ProxyGroupItem'
-import { Timer } from '../common/HHmmssTimer'
-import { getResourceString } from '../utils/ResourceStringUtil'
-import BackgroundDownService from '../utils/BackgroundDownService'
-import { ConvertedUnit } from '../utils/DataUnitConvertUtils'
+import { Timer } from '../common/utils/HHmmssTimer'
+import { getResourceString } from '../common/utils/ResourceStringUtil'
+import BackgroundDownService from '../common/utils/BackgroundDownService'
+import { ConvertedUnit } from '../common/utils/DataUnitConvertUtils'
 import { CommonPage } from '../components/Start/CommonPage'
 import { WelcomeUserAgreement } from '../components/Start/WelcomePage'
 import { i18n } from '@kit.LocalizationKit'
+import { TabBarAlignItems,
+  TabBarHeight,
+  TabBarJustifyContent,
+  TabBarPosition,
+  TabBarVertical, TabBarWidth } from '../common/breakpoint/BreakPoint'
+import { TopBar, WindowTopBar } from '../components/Common/TopBar'
+import { calculateFontSizeLinear } from '../common/utils/CalculateFontSizeUtil'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 const context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
@@ -100,77 +109,208 @@ const componentName: string = 'Index'
 @Entry
 @Component
 struct Index {
-  /*
- 断点相关
-   */
- @Provide uiContext: UIContext = this.getUIContext();
- //高度断点
- @StorageLink ('currentHeightBreakpoint') @Watch('onWindowChange')heightBp: HeightBreakpoint = this.uiContext.getWindowHeightBreakpoint();
- //宽度断点
- @StorageLink ('currentWidthBreakpoint') @Watch('onWindowChange')widthBp: WidthBreakpoint = this.uiContext.getWindowWidthBreakpoint();
+
   /**
-   * 主题色
-   *    示例中主题配置里配置了一个颜色，所以只用`ResourceColor`类型的变量来接收色值，
-   *    如果有多个颜色，就把这个变量换成`CustomTheme`类型的变量）
+   * 窗口
    */
-  @Provide('icon_emphasize') icon_emphasize: ResourceColor = $r('app.color.theme_color_main_yellow')
-  //三级图标色，浅灰色
-  @State icon_tertiary: ResourceColor = $r('sys.color.icon_tertiary')
-  @Provide greetings: Resource = $r('app.string.GoodMorning')
-  // tabs图标文字颜色，修改resources/base(dark)/element/color.json中tabs_icon_text配置选中图标文字深浅模式颜色
-  // app.color.tabs_icon_text1配置非选中图标和文字深浅模式颜色
-  //  @State fontColorValue:ResourceColor = ($r('app.color.tabs_icon_text'));
-  //  @State fontColorValue1:ResourceColor = ($r('app.color.tabs_icon_text1'));
-  // 流量任务id
-  @State trafficJob: number = 0
-  // 主界面当前index
-  @Provide IndexCurrentindex: number = 0
-  // 主界面选择的index
-  @State selectedIndex: number = 0
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') @Watch('onWindowChange') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') @Watch('onWindowChange') widthBp: WidthBreakpoint = 1
+  // 导航条区域的高度
+  @StorageProp('bottomRectHeight') @Watch('onAvoidAreaChange') bottomRectHeight: number = 0
+  // 状态栏高度
+  @StorageProp('topRectHeight') @Watch('onAvoidAreaChange') topRectHeight: number = 0
+  // 应用窗口高度
+  @StorageLink('windowHeight') @Watch('onWindowChange') windowHeight: number = 0
+  // 应用窗口宽度
+  @StorageLink('windowWidth') @Watch('onWindowChange') windowWidth: number = 0
   // 分屏（正方形窗口）
   @Provide @Watch('isHiddenChange')isSmallSquareScreen: boolean = false
   // 手机横屏判断
   @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
-  // 平板竖屏判断变量
-  @Provide istabletLandscape: boolean = false
   // 折叠展开状态判断变量
   @StorageLink ('isFoldStatus') isFoldStatus: boolean = false
+  // 平板竖屏判断变量
+  @Provide istabletLandscape: boolean = false
+  // PC判定
+  @StorageLink ('2in1') is2in1: boolean = false
   // px外屏判定
   @Provide isPXSecScreen: boolean = false
-  // PC判定
-  @StorageLink ('2in1') isPC: boolean = false
+
+  /**
+   * 颜色相关变量
+   *    示例中主题配置里配置了一个颜色，所以只用`ResourceColor`类型的变量来接收色值，
+   *    如果有多个颜色，就把这个变量换成`CustomTheme`类型的变量）
+   */
+  // 主题色
+  @Provide('icon_emphasize') icon_emphasize: ResourceColor = $r('app.color.theme_color_main_yellow')
+  // tabs图标文字颜色，修改resources/base(dark)/element/color.json中tabs_icon_text配置选中图标文字深浅模式颜色
+  // app.color.tabs_icon_text1配置非选中图标和文字深浅模式颜色
+  //  @State fontColorValue:ResourceColor = ($r('app.color.tabs_icon_text'));
+  //  @State fontColorValue1:ResourceColor = ($r('app.color.tabs_icon_text1'));
+
+  /**
+   * Index相关变量
+   */
+  // 所有子组件在容器内的对齐方式
+  @Provide('stackAlignContentAlignment') stackAlignContentAlignment: Alignment = Alignment.BottomEnd
+  @StorageLink('clashConfig') /*@Watch('switchMode')*/clashConfig: ClashConfig = new ClashConfig()
+  // 欢迎页面栈
+  @Provide('WelcomeNavPathStack') welcomePageInfos: NavPathStack = new NavPathStack()
+  @StorageLink('uiConfig') @Watch('ShowPipChange')uiConfig: UIConfig = new UIConfig()
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @Provide paddingButtom: number | Resource = $r('app.integer.vp_proxy_start_button_left_right_margin')
+  // 系统语言显示副标题
+  @Provide SystemLanguageSubtitle: ResourceStr = $r('app.string.SimplifiedChinese')
+  @State barWidth: string | number | undefined = ''
+  @State barHeight: string | number | undefined = ''
+  @Provide("currentProfile") currentProfile: Profile | null = null
+  @Provide remoteIp: IpInfo | null = null
+  // 是否开启`Index`页面的前景模糊
+  @Provide('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean = false
+  // 代理启动变量
+  @Provide @Watch('ShowPipChange')proxyEnabled: boolean = false
+  @StorageProp('WindowMode') windowMode: boolean = false
   // 设置模态页控制变量
   @Provide isShowSettings: boolean = false
-  // 读取导航条区域的高度
-  @StorageProp('bottomRectHeight') @Watch('onAvoidAreaChange') bottomRectHeight: number = 0;
-  @StorageProp('topRectHeight') @Watch('onAvoidAreaChange') topRectHeight: number = 0;
-  // page内顶部标题偏移量
-  @Provide curYOfisPXSmallScreenfset: number = 0
-  // 更多页标题是否搜索
-  @Provide needSearch: boolean = false
+  // 欢迎页半模态窗口
+  @Provide isShowWelcome: boolean = false
+  // 是否为免责弹窗
+  @Provide isDisclaimer: boolean = false
+  // 是否在主页
+  @Provide isHomePage: boolean = false
+  // 前台判断变量
+  @Provide isForeward: boolean = false
+  // 顶部Bar高度
+  @Provide heightTop: Length = TAB_CONTENT_TITLE_HEIGHT
+  // PX外屏-偏移
+  @Provide curOffsetRemain: number = 0
+  // 主界面当前index
+  @Provide IndexCurrentindex: number = 0
+  // 恢复时刻
+  @Provide theRestoreTime: number = 0
+  // 暂停时刻
+  @Provide thePauseTime: number = 0
+  // 主界面选择的index
+  @State selectedIndex: number = 0
+  // 流量任务id
+  @State trafficJob: number = 0
+  @State
+  tabList: TabBuild[] = [
+    { name: $r('app.string.Home'), icon: $r('sys.symbol.house_fill')},
+    { name: $r('app.string.Proxy'), icon: $r('sys.symbol.list_bullet_square_fill')},
+    { name: $r('app.string.Configuration'), icon: $r('sys.symbol.folder_fill')},
+    { name: $r('app.string.More'), icon: $r('sys.symbol.square_fill_grid_2x2')}
+  ]
+
+  /**
+   * 主页相关变量
+   */
+  // 编辑按钮点击后显示编辑状态判定
+  @Provide isShowHomeEdit: boolean = false
+  // 主页删除按钮是否出现判定
+  @Provide isShowDeleteButton: boolean = false
+  // 当前主页布局
+  @Provide theCurrentHomeCard: boolean[] = showHomeCard
+  // 上一次主页布局
+  @Provide theLastHomeCard: boolean[] = showHomeCard
+  // 速度卡片图表数据
+  @Provide ChartData: number[] | ConvertedUnit[] = []
+  // 代理启动的计时文本
+  @Provide proxyStartingDuration: string = ''
+  // 速度卡片
+  @Provide DownloadSpeed: string = ""
+  @Provide UploadSpeed: string = ""
+
+  /**
+   * 代理页Provide相关变量
+   */
+  // 收藏的代理节点
+  @StorageLink('favoriteProfiles') favoriteProfiles: Map<string, string> = new Map<string, string>([])
+  // 代理页分组数据（懒加载）
+  @Provide proxyGroups: ProxyGroupItemDataSource = new ProxyGroupItemDataSource()
+  // 节点数据
+  @Provide proxyLazyItems: ProxyItemDataSource = new ProxyItemDataSource()
+  // 节点数据组
+  @Provide items: ProxyItem[] = ProxyData.ProxyItems();
+  // 代理页原始数据
+  @Provide theProxyGroups: ProxyGroup[] = []
+  // 代理页延迟按钮气泡提示
+  @Provide isShowDelayPop: boolean = false
+  // 延迟排序判定
+  @Provide isLatencySort: boolean = false
+  // 当前代理节点长按选择的值
+  @Provide ProxyItemLongPressValue: number = -1
+  // 当前显示的代理分组
+  @Provide currentProxyIndex: number = 0
+  // 当前代理节点收藏的值
+  @Provide FavoriteProxy: number = -1
+
+  /**
+   * 配置页相关变量
+   */
+  // 配置页模糊变量
+  @Provide('isEnableConfigPageBindSheetForegroundBlur') isEnableConfigPageBindSheetForegroundBlur: boolean = false
+  // 当前触摸的配置行
+  @Provide('currentTouchConfigData') currentTouchConfigData: ConfigData = NullConfigData
+  // 当前选中的配置行
+  @Provide currentConfigRadioCheckedConfigData: ConfigData = NullConfigData
+  // 配置数据
+  @Provide configList: Array<ConfigData> = []
+
+  /**
+   * 更多页相关变量
+   */
+  // 更多页面栈
+  @Provide('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
+  // 更多页面数据
+  @Provide moreList: moreData[] = ListMoreData()
+  // 日志数据
+  @Provide logListData: Array<LogData> = []
   // 更多页标题是否搜索中
   @Provide isSearching: boolean = false
-  // 更多页标题搜索文本
-  @Provide searchText: string = ''
+  // 更多页标题是否搜索
+  @Provide needSearch: boolean = false
   // 更多页一级页面顶部标题偏移量
   @Provide curYOffsetMore: number = 0
   @Provide curYOffset: number = 0
-  // 是否在主页
-  @Provide isHomePage: boolean = false
-  // 是否为免责弹窗
-  @Provide isDisclaimer: boolean = false
-  // 欢迎页半模态窗口
-  @Provide isShowWelcome: boolean = false
-  // 代理页延迟按钮气泡提示
-  @Provide isShowDelayPop: boolean = false
+  // 更多页标题搜索文本
+  @Provide searchText: string = ''
+
+  /**
+   * 设置页变量
+   */
+  // 设置页面栈
+  @Provide('NavSettingsPathStack') SettingsPageInfos: NavPathStack = new NavPathStack()
+  // 设置页语言选中暂存变量
+  @Provide currentLanguage: ResourceStr = $r('app.string.Language_Subtitle')
+  // 实验功能开关列表行数据
+  @Provide ExperimentData: AboutListItemProp = TheExperimentData
   // 应用更新信息
   @Provide theAppVersionInfo: UpdateInfo = DefaultUpdateInfo
+  // 是否进入二级界面(Tab区)
+  @Provide @Watch('isSecondaryChange') isSecondary: boolean = false
+  // 列表是否滚动
+  @Provide @Watch('isHiddenChange') isRolling: boolean = false
+  // 设置 -> 通知 -> 流量提醒启用状态变量
+  @Provide EnableCellularDataReminder: boolean = false
+  // 设置页实验功能提示框显示变量
+  @Provide isShowExperimentalFunction: boolean = true
+  // 设置 -> 备份与恢复 -> 是否启用云备份配置
+  @Provide isShowCloudconfig: boolean = false
+  // 判断设置是否清楚数据
+  @Provide isClearData: boolean = false
+  // 设置 -> 外观 -> 按钮位置变量
+  @Provide ButtonPositionOffset: number = 0
+
+
   /* 断点布局相关 相关作用看定义时候的注释 */
   @Provide compStr: BreakpointState<string> = CompStr
-  @State tabBarWidth: BreakpointState<string> = TabBarWidth
-  @State compBarHeight: BreakpointState<string> = TabBarHeight
-  @Provide compVertical: BreakpointState<boolean> = TabVertical
-  @State compBarPose: BreakpointState<BarPosition> = TabBarPose
+  // @State tabBarWidth: BreakpointState<string> = TabBarWidth
+  // @State compBarHeight: BreakpointState<string> = TabBarHeight
+  // @Provide compVertical: BreakpointState<boolean> = TabVertical
+  // @State compBarPose: BreakpointState<BarPosition> = TabBarPose
   @State TabIconfontSize: BreakpointState<number> = TabIconfontSize_24_26
   @State TabTitlefontSize: BreakpointState<number> = TabTitlefontSize_12_16
   // 代理页
@@ -218,13 +358,12 @@ struct Index {
   private breakPointStateTabContentTitleMargin: BreakpointState<number> = BPS_TAB_CONTENT_TITLE_MARGIN_12_13_28_36
   @Provide('breakPointStateNavigationListPadding')
   private breakPointStateNavigationListPadding: BreakpointState<number> = BPS_NAVIGATION_LIST_PADDING_12_13_13_28_36
-  @Provide('breakPointStatemorePageMargin')
-  private breakPointStatemorePageMargin: BreakpointState<number> = morePageMargin_12_14_16
+
   @Provide('breakPointStatemorePagelistBottom')
   private breakPointStatemorePagelistBottom: BreakpointState<number> = morePagelistBottom_10_14
   @Provide('breakPointStateSettingslistHeight')
   private breakPointStateSettingslistHeight: BreakpointState<number> = SettingslistHeight_590_500
-  @State tabBarJustifyContent: BreakpointState<FlexAlign> = TabBarJustifyContent
+  // @State tabBarJustifyContent: BreakpointState<FlexAlign> = TabBarJustifyContent
   //主页编辑模式 删除按钮尺寸
   @Provide('deleteButtonSize') private deleteButtonSize: BreakpointState<number> = DeleteButtonSize_24_32
   //主页卡片内容流量统计下部小字体大小（10,16,14,16）
@@ -262,126 +401,122 @@ struct Index {
   // 代理计时器Controller
   @Provide proxyStartedTimer: Timer = new Timer()
   @Provide proxyTime:number = 0
-  /**
-   * 主页卡片标题按钮间距
-   */
-  @Provide('HomeCardEditHeight')
-  private HomeCardEditHeight: BreakpointState<number> = HomeCardEditHeight
-  // 代理启动变量
-  @Provide @Watch('ShowPipChange')proxyEnabled: boolean = false
-  // 前台判断变量
-  @Provide isForeward: boolean = false
-  // 暂停时刻
-  @Provide thePauseTime: number = 0
-  // 恢复时刻
-  @Provide theRestoreTime: number = 0
 
-  @Provide remoteIp: IpInfo | null = null
-  // 编辑按钮点击后显示编辑状态判定
-  @Provide isShowHomeEdit: boolean = false
-  // 速度卡片
-  @Provide DownloadSpeed: string = ""
-  @Provide UploadSpeed: string = ""
-  // 速度卡片图表数据
-  @Provide ChartData: number[] | ConvertedUnit[] = []
-  /*
-  代理页Provide相关数据
-   */
-  // 当前代理节点长按选择的值
-  @Provide private ProxyItemLongPressValue: number = -1
-  // 当前代理节点收藏的值
-  @Provide private FavoriteProxy: number = -1
-  // 当前显示的代理分组
-  @Provide currentProxyIndex: number = 0
-  // 节点数据组
-  @Provide items: ProxyItem[] = ProxyData.ProxyItems();
-  // 日志数据
-  @Provide logListData: Array<LogData> = []
-  // 配置数据
-  @Provide configList: Array<ConfigData> = []
-  //延迟排序判定
-  @Provide isLatencySort: boolean = false
-  // 所有子组件在容器内的对齐方式
-  @Provide('stackAlignContentAlignment') stackAlignContentAlignment: Alignment = Alignment.BottomEnd
-  // 收藏的代理
-  @StorageLink('favoriteProfiles') favoriteProfiles: Map<string, string> = new Map<string, string>([])
-
-  @Provide SystemLanguageSubtitle: ResourceStr = $r('app.string.SimplifiedChinese')
-  // 判断设置是否清楚数据
-  @Provide isClearData: boolean = false
-
-  /* 配置页 */
-  @Provide currentConfigRadioCheckedConfigData: ConfigData = {
-    configId: 'e91a4efc-cf14-467d-90c2-fec156806bfa',
-    isNewConfig: false,
-    configName: '',
-    configUrl: '',
-    isConfigAutoUpdate: false,
-    lastUpdateDateTime: 0,
-    updateTime: 0,
-  }
-  @Provide('currentTouchConfigData')
-  currentTouchConfigData: ConfigData = {
-    configId: '',
-    isNewConfig: false,
-    configName: '',
-    configUrl: '',
-    isConfigAutoUpdate: false,
-    updateTime: 0,
-    lastUpdateDateTime: 0
-  }
-  // 配置页模糊变量
-  @Provide('isEnableConfigPageBindSheetForegroundBlur') isEnableConfigPageBindSheetForegroundBlur: boolean = false
-
-  // 更多页面栈
-  @Provide('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
-  // 欢迎页面栈
-  @Provide('WelcomeNavPathStack') welcomePageInfos: NavPathStack = new NavPathStack()
-  /*设置页变量*/
-  // 设置页面栈
-  @Provide('NavSettingsPathStack') SettingsPageInfos: NavPathStack = new NavPathStack()
-  // 设置 -> 备份与恢复 -> 是否启用云备份配置
-  @Provide isShowCloudconfig: boolean = false
-  // 设置页语言选中暂存变量
-  @Provide currentLanguage: ResourceStr = $r('app.string.Language_Subtitle')
-  // 设置 -> 通知 -> 流量提醒启用状态变量
-  @Provide EnableCellularDataReminder: boolean = false
-  // 设置页实验功能提示框显示变量
-  @Provide isShowExperimentalFunction: boolean = true
-  // 设置 -> 外观 -> 按钮位置变量
-  @Provide ButtonPositionOffset: number = 0
-  // 代理启动的计时文本
-  @Provide private proxyStartingDuration: string = ''
-  // 是否进入二级界面(Tab区)
-  @Provide @Watch('isSecondaryChange') isSecondary: boolean = false
-  // 列表是否滚动
-  @Provide @Watch('isHiddenChange') isRolling: boolean = false
-  // 更多页数据
-  @Provide moreList: moreData[] = ListMoreData()
-  // 实验功能开关列表行数据
-  @Provide ExperimentData: AboutListItemProp = TheExperimentData
-
-  /* 是否开启 `Index` 页面的前景模糊 */
-  @Provide('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean = false
-  @StorageLink('windowHeight') @Watch('onWindowChange') windowHeight: number = 0
-  @StorageLink('windowWidth') @Watch('onWindowChange') windowWidth: number = 0
 
  /* // 当手机横屏时条件成立
   deviceHeightListener: mediaquery.MediaQueryListener =
     this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp) and (640vp< width <= 1000vp)');
 */
 
+  build() {
+    if (!this.isPXSecScreen){
+      Stack({alignContent: Alignment.TopEnd}) {
+        // 窗口控制器(窗口模式显示)
+        if (this.windowMode) {
+          WindowTopBar()
+            .zIndex(2)
+        }
+        // 主界面
+        Tabs({
+          barPosition: TabBarPosition(this.widthBp, this.heightBp),
+          index: this.IndexCurrentindex,
+          controller: indexController
+        })
+        {
+          ForEach(this.tabList, (item: TabBuild, index: number) => {
+            TabContent() { this.TabContentBuilder(index) }
+            .tabBar(this.TabBarBuilder(item.name, index, item.icon))
+            .gesture(
+              // 二级Tabs第一个页签向左拖动时，触发手势事件
+              PanGesture({direction: this.isLandscapePhone || this.istabletLandscape ? PanDirection.Down : PanDirection.None})
+                .onActionStart((event?: GestureEvent) => {
+                  console.info('Pan start')
+                })// 通过父组件的TabsController的实例，改变其index，达到跳转一级Tabs（首页）的效果
+                .onActionEnd(() => {
+                  if (this.isLandscapePhone || this.istabletLandscape) {
+                    if (this.selectedIndex == 0) {
+                      indexController.changeIndex(1)
+                      console.info('Pan end')
+                    }
+                  }
+                }))
+          })
+
+        }
+        .zIndex(1)
+        .backgroundColor( $r('app.color.background'))
+        // .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Thin: null)
+        // .backgroundBrightness({rate:0.5,lightUpDegree:0.5})
+        //  .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
+        .barOverlap(this.uiConfig.isBlurr ? (this.isLandscapePhone || ( this.istabletLandscape && !this.isSecondary)  ? false : true) : false) //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
+        .scrollable(this.isSecondary ? false : true)
+        .vertical(TabBarVertical(this.widthBp, this.heightBp))
+        .barWidth(TabBarWidth(this.widthBp, this.heightBp))
+        .barHeight(TabBarHeight(this.widthBp, this.heightBp))
+        .onChange((index: number) => {
+          this.IndexCurrentindex = index
+          if (index === 0) {
+            this.isHomePage = true
+          } else {
+            this.isHomePage = false
+          }
+        })
+        .onAnimationStart((index: number, targetIndex: number) => {
+          animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion(), }, () => {
+            if (index === targetIndex) {
+              return
+            }
+            this.selectedIndex = targetIndex;
+          })
+        })
+        .width('100%')
+        .height('100%')
+        .backgroundColor($r('app.color.background'))
+        .foregroundBlurStyle(
+          this.isEnableIndexForegroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
+          { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
+        )
+        .fadingEdge(true)
+        .padding({ top: this.topRectHeight })
+      }
+      .width('100%')
+      .height('100%')
+      .backgroundColor( $r('app.color.background'))
+      // 欢迎页&崩溃页
+      .bindSheet($$this.isShowWelcome, this.WelcomeSheet(), {
+        detents: [BIND_SHEET_CONTAINER_HEIGHT],
+        showClose: (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) ? true : false,
+        dragBar: false,
+        backgroundColor: $r('app.color.background'),
+        keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
+        scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+        preferType: SheetType.CENTER,
+        onWillDismiss: ((DismissSheetAction: DismissSheetAction) => {
+          if (!this.isShowWelcome || DismissSheetAction.reason === DismissReason.CLOSE_BUTTON) {
+            // 关闭背景模糊
+            this.isEnableIndexForegroundBlur = false
+            DismissSheetAction.dismiss()
+            hilog.info(0xFF00, "WelcomeTestTag", "欢迎页启用状态： %{private}s", this.isShowWelcome)
+          }
+        })
+      })
+    } else {
+      // PX外屏样式
+      PXSecScreen()
+    }
+  }
+
   @Builder
   TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
     Flex({
       direction: FlexDirection.Column,
-      justifyContent: this.isLandscapePhone || this.istabletLandscape? FlexAlign.Center : this.isFoldStatus ? FlexAlign.Start : this.tabBarJustifyContent.value,
-      alignItems: this.isLandscapePhone || this.istabletLandscape? ItemAlign.End : this.isFoldStatus ? ItemAlign.Center : ItemAlign.Center,
+      justifyContent: TabBarJustifyContent(this.widthBp, this.heightBp),
+      alignItems: this.windowMode ? ItemAlign.Center : TabBarAlignItems(this.widthBp, this.heightBp),
       space: {main: LengthMetrics.vp(3)}
     })
     {
       SymbolGlyph(TabIcon)
-        .fontColor([this.selectedIndex === index ? this.icon_emphasize : this.icon_tertiary])
+        .fontColor([this.selectedIndex === index ? this.icon_emphasize : icon_tertiary])
         .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY) // 分层颜色
         .fontSize(this.isLandscapePhone ? 24 : this.TabIconfontSize.value)
           //.effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
@@ -389,7 +524,7 @@ struct Index {
         .translate({y: this.selectedIndex == index ? -3 : 0})
 
       Text(title)
-        .fontColor(this.selectedIndex === index ? this.icon_emphasize : this.icon_tertiary)
+        .fontColor(this.selectedIndex === index ? this.icon_emphasize : icon_tertiary)
         .fontWeight(FontWeight.Medium)
         .fontSize(this.isLandscapePhone ? 12 : this.TabTitlefontSize.value)
         .transition(customAnimationUtil.isTranslate(this.uiConfig))
@@ -407,8 +542,21 @@ struct Index {
   }
 
   @Builder
+  TabContentBuilder(index: number) {
+    if (index == 0) {
+      Home()
+    } else if (index == 1) {
+      ProxyPage()
+    } else if (index == 2) {
+      ConfigurationPage()
+    } else {
+      MorePage()
+    }
+  }
+
+  @Builder
   WelcomeSheet() {
-    if (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) {
+    if (AppStorage.get<boolean>('crash') == true && !this.uiConfig.isFirstStart) {
       CrashPage()
     } else {
       WelcomeUserAgreement()
@@ -443,7 +591,7 @@ struct Index {
 
   /**窗口变化监听*/
   onWindowChange() {
-    hilog.info(0xFF00, componentName,
+/*    hilog.info(0xFF00, componentName,
       `#WindowChange#应用窗口状态 width: ${this.widthBp} height: ${this.heightBp} `+' tab宽度:'+ this.barWidth?.toString())
     if (this.widthBp <= 3 && this.heightBp == 0  && deviceInfo.deviceType === 'phone' && this.windowWidth > this.windowHeight ) {
       this.isLandscapePhone = true
@@ -474,8 +622,8 @@ struct Index {
       this.isPXSecScreen = false
       hilog.info(0xFF00, componentName,
         `#WindowChange#设备高度改变 分屏窗口: ${this.isPXSecScreen}`)
-    }
-  /*  hilog.info(0xFF00, componentName,
+    }*/
+    hilog.info(0xFF00, componentName,
       `#WindowChange#应用窗口状态 width: ${this.windowWidth} height: ${this.windowHeight} `+' tab宽度:'+ this.barWidth?.toString())
     if (this.windowWidth > 328 || this.windowHeight > 328) {
       if (this.windowHeight === this.windowWidth) {
@@ -512,7 +660,7 @@ struct Index {
       this.isPXSecScreen = false
       hilog.info(0xFF00, componentName,
         `#WindowChange#设备高度改变 分屏窗口: ${this.isSmallSquareScreen}`)
-    }*/
+    }
   }
 
   // 免责声明 & 检查更新 弹窗控制器
@@ -599,8 +747,6 @@ struct Index {
     this.onWindowChange()
 
 
-    hilog.info(0xFF00, componentName, `#tab位置: ${this.compBarPose.value}`)
-
     // 除手机外更多页均默认跳转覆写
     if (500 < this.windowWidth && !this.isLandscapePhone) {
       this.pageInfos.pushPathByName(this.moreList[4].name, false)
@@ -614,7 +760,7 @@ struct Index {
 
     // 首次启动打开欢迎页
     if (this.uiConfig.isFirstStart) {
-      this.isShowWelcome = true
+      this.isShowWelcome = false // TODO
     }
 
     let nowDate = new Date().getTime()
@@ -675,47 +821,9 @@ struct Index {
       })
     }*/
 
-    BreakpointSystem.getInstance().attach(this.compStr)
-    BreakpointSystem.getInstance().attach(this.compBarPose)
-    BreakpointSystem.getInstance().attach(this.compVertical)
-    BreakpointSystem.getInstance().attach(this.tabBarWidth)
-    BreakpointSystem.getInstance().attach(this.compBarHeight)
-    BreakpointSystem.getInstance().attach(this.tabBarJustifyContent)
-    BreakpointSystem.getInstance().attach(this.ProxyListLanes)
-    BreakpointSystem.getInstance().attach(this.TabIconfontSize)
-    BreakpointSystem.getInstance().attach(this.TabTitlefontSize)
-    BreakpointSystem.getInstance().attach(this.breakPointStateHomeCardPadding)
-    BreakpointSystem.getInstance().attach(this.breakPointStateListLanes)
-    BreakpointSystem.getInstance().attach(this.breakPointStateListGutter)
-    BreakpointSystem.getInstance().attach(this.breakPointStateTabContentTitleMargin)
-    BreakpointSystem.getInstance().attach(this.breakPointStateNavigationListPadding)
-    BreakpointSystem.getInstance().attach(this.breakPointStatemorePageMargin)
-    BreakpointSystem.getInstance().attach(this.breakPointStatemorePagelistBottom)
-    BreakpointSystem.getInstance().attach(this.breakPointStateListHeight)
-    BreakpointSystem.getInstance().attach(this.breakPointStateSettingslistHeight)
-    BreakpointSystem.getInstance().attach(this.breakPointStateCellularDataChevronSize)
-    BreakpointSystem.getInstance().attach(this.breakPointStateCellularDataChevronRowMargin)
-    BreakpointSystem.getInstance().attach(this.breakPointStateHomeCardSwitchModeTextMargin)
-    BreakpointSystem.getInstance().attach(this.breakPointStateHomeCardTitleBottomMargin)
-    BreakpointSystem.getInstance().attach(this.breakPointStateHomeCardSwitchModeRowMargin)
-    BreakpointSystem.getInstance().attach(this.breakPointStateHomeCardSwitchModeFontSize)
-    BreakpointSystem.getInstance().attach(this.breakPointStateCellularDatabarMargin)
-    BreakpointSystem.getInstance().attach(this.breakPointStateCellularDatabarHeight)
-    BreakpointSystem.getInstance().attach(this.breakPointStateCellularDataFontSize)
-    BreakpointSystem.getInstance().attach(this.breakPointStateCardTitleFontSize)
-    BreakpointSystem.getInstance().attach(this.deleteButtonSize)
-    BreakpointSystem.getInstance().attach(this.HomeCardCellularDataSmFontSize)
-    BreakpointSystem.getInstance().attach(this.HomeCardPrpxySmFontSize)
-    BreakpointSystem.getInstance().attach(this.ProxyFontSize)
-    BreakpointSystem.getInstance().attach(this.HomeCardIPSmFontSize)
-    BreakpointSystem.getInstance().attach(this.IPfontSize)
-    BreakpointSystem.getInstance().attach(this.SpeedfontSize12_14_14_16)
-    BreakpointSystem.getInstance().attach(this.gutterHomeGridcol_12_15)
-    BreakpointSystem.getInstance().attach(this.HomeCardAreaPadding)
-    BreakpointSystem.getInstance().attach(this.HomeCardTitleButtonPadding)
-    BreakpointSystem.getInstance().attach(this.HomeCardEditHeight)
-    BreakpointSystem.getInstance().attach(this.HomeCardCellularDataPadding)
-    BreakpointSystem.getInstance().start()
+    // 初始化断点系统
+    this.initBreakpointSystem()
+
     // TODO
     this.fetchProfiles()
     EventHub.on(EventKey.StartLog, async (enable: boolean) => {
@@ -787,8 +895,7 @@ struct Index {
     }
   }
 
-
-  // 规则选择数据变化监控
+  /**分流模式选择数据变化监控*/
   async switchMode() {
     if(this.clashConfig.mode==ProxyMode.Rule){
       this.theProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode = ProxyMode.Rule)
@@ -802,17 +909,6 @@ struct Index {
     }
   }
 
-  // 代理页分组数据（懒加载）
-  @Provide proxyGroups: ProxyGroupItemDataSource = new ProxyGroupItemDataSource()
-  // 节点数据
-  @Provide proxyLazyItems: ProxyItemDataSource = new ProxyItemDataSource()
-  // 代理页原始数据
-  @Provide theProxyGroups: ProxyGroup[] = []
-  @Provide("currentProfile") currentProfile: Profile | null = null
-  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-  @StorageLink('clashConfig') /*@Watch('switchMode')*/clashConfig: ClashConfig = new ClashConfig()
-  @StorageLink('uiConfig') @Watch('ShowPipChange')uiConfig: UIConfig = new UIConfig()
-
   aboutToDisappear() {
     hilog.info(0x1000, componentName, `#aboutToDisappear executed`)
     // 纪录软件关闭时间
@@ -823,10 +919,7 @@ struct Index {
     PipManager.getInstance().unregisterPipStateChangeListener()
     // 解绑listener中注册的回调函数
     // this.deviceHeightListener.off('change');
-    // this.tabletHeightListener.off('change')
-    // this.foldPhoneOpenListener.off('change')
   }
-
 
   /**
    * 画中画根据代理启动和后台按钮监听是否开启
@@ -852,15 +945,34 @@ struct Index {
     hilog.info(0xFF00, "PoptestTag", "startPop: %{private}d", this.uiConfig.ShowStartPop)
     hilog.info(0x0000, 'WindowLog #Index', '窗口顶部避让高度：%{public}d', px2vp(this.topRectHeight))
     // 刷新问候语
-    this.greetings = getGreeting()
     if (this.proxyEnabled) {
       this.theRestoreTime = new Date().getTime()
       hilog.info(0xFF00, "TimertestTag", "恢复的时刻： %{private}d", this.theRestoreTime)
     }
     this.isForeward = true
     this.ShowPipChange()
+    this.initLanguage()
     PipManager.getInstance().stopPip()
-    // 初始化应用语言
+    hilog.info(0x1000, componentName, `#aboutToAppear#Language 用户选择语言：${this.uiConfig.userLanguage}`)
+    hilog.info(0x1000, componentName, `#aboutToAppear#Language 当前语言文本：${getResourceString(this.currentLanguage, this)}`)
+    hilog.info(0x1000, componentName, `#aboutToAppear#Language 当前系统语言文本：${getResourceString(this.SystemLanguageSubtitle, this)}`)
+  }
+
+  onPageHide(): void {
+    PipManager.getInstance().setAutoStart(true)
+    hilog.info(0xFF00, "TimertestTag", "#onPageHide")
+    if (this.proxyEnabled) {
+      this.thePauseTime = new Date().getTime()
+      hilog.info(0xFF00, "TimertestTag", "暂停的时刻： %{private}d", this.thePauseTime)
+    }
+    this.isForeward = false
+    hilog.info(0xFF00, "PipTag", "代理启用状态： %{private}s", this.proxyEnabled)
+    hilog.info(0xFF00, "PipTag", "画中画启用状态： %{private}s", this.uiConfig.backgroundPiPModel)
+    this.ShowPipChange()
+  }
+
+  /**初始化应用语言*/
+  initLanguage() {
     const systemLanguage = i18n.System.getSystemLanguage()
     let currentLanguage = ''
     if (this.uiConfig.userLanguage !== 'default') {
@@ -917,25 +1029,9 @@ struct Index {
         break
       default:
         this.SystemLanguageSubtitle  =  $r('app.string.Language_Subtitle')
-        // 超出范围保存为系统返回值
+      // 超出范围保存为系统返回值
         this.uiConfig.systemLanguage = systemLanguage
     }
-    hilog.info(0x1000, componentName, `#aboutToAppear#Language 用户选择语言：${this.uiConfig.userLanguage}`)
-    hilog.info(0x1000, componentName, `#aboutToAppear#Language 当前语言文本：${getResourceString(this.currentLanguage, this)}`)
-    hilog.info(0x1000, componentName, `#aboutToAppear#Language 当前系统语言文本：${getResourceString(this.SystemLanguageSubtitle, this)}`)
-  }
-
-  onPageHide(): void {
-    PipManager.getInstance().setAutoStart(true)
-    hilog.info(0xFF00, "TimertestTag", "#onPageHide")
-    if (this.proxyEnabled) {
-      this.thePauseTime = new Date().getTime()
-      hilog.info(0xFF00, "TimertestTag", "暂停的时刻： %{private}d", this.thePauseTime)
-    }
-    this.isForeward = false
-    hilog.info(0xFF00, "PipTag", "代理启用状态： %{private}s", this.proxyEnabled)
-    hilog.info(0xFF00, "PipTag", "画中画启用状态： %{private}s", this.uiConfig.backgroundPiPModel)
-    this.ShowPipChange()
   }
 
   /**
@@ -959,9 +1055,7 @@ struct Index {
     }
   }
 
-  /**
-   * 切换按钮位置
-   */
+  /**切换按钮位置*/
   switchButtonPosition(index: number) {
     switch (index) {
       case 0:
@@ -982,9 +1076,7 @@ struct Index {
     }
   }
 
-  @State barHeight: string | number | undefined = this.compBarHeight.value
-  @State barWidth: string | number | undefined =this.tabBarWidth.value ?? '70vp'
-  // tab移动动画
+  /**tab移动开始动画*/
   startAnim() {
     indexController.setTabBarTranslate({ y: 0 })
     animateTo({
@@ -1008,6 +1100,7 @@ struct Index {
     })
   }
 
+  /**tab移动停止动画*/
   stopAnim() {
     animateTo({
       duration: this.uiConfig.animationSpeed,
@@ -1020,7 +1113,7 @@ struct Index {
           indexController.setTabBarTranslate(this.isLandscapePhone ? { x: 0 } : { y: 0 })
         }else{
           indexController.setTabBarTranslate(this.isLandscapePhone ? { x: 0 } : { y: 0 })
-          this.barHeight = this.compBarHeight.value
+          // this.barHeight = this.compBarHeight.value
         }
 
         if (this.isLandscapePhone || this.istabletLandscape ) {
@@ -1032,6 +1125,7 @@ struct Index {
     })
   }
 
+  /**是否进入主二级界面(更多页二级)*/
   isSecondaryChange() {
     // 监听二级页面布尔判定动画是否执行 监听小屏是否滚动
     if ((this.isSecondary && this.isSmallSquareScreen && !this.isRolling)|| (this.isSecondary && !this.isSmallSquareScreen )) {
@@ -1041,12 +1135,7 @@ struct Index {
     }
   }
 
-  /*
-    px外屏手势动画
-   */
-  @Provide heightTop: Length = TAB_CONTENT_TITLE_HEIGHT
-  @Provide curOffsetRemain: number = 0
-  @Provide paddingButtom:number|Resource = $r('app.integer.vp_proxy_start_button_left_right_margin')
+  /*px外屏手势动画*/
   // tab隐藏
   startAnimPX(){
     this.getUIContext().animateTo({
@@ -1084,7 +1173,8 @@ struct Index {
         this.heightTop = 0
       })
   }
-  // 监听上下滚动时，tab是否隐藏
+
+  /**监听上下滚动时，tab是否隐藏*/
   isHiddenChange(){
     if (this.isSmallSquareScreen && this.isRolling){
       this.startAnimPX()
@@ -1093,122 +1183,53 @@ struct Index {
     }
   }// px外屏手势动画 end
 
+  /**避让状态改变*/
   onAvoidAreaChange() {
     hilog.info(0x0000, 'Index', '#onAvoidAreaChange 动态避让高度 Top：%{public}d Bottom: %{public}i', this.topRectHeight, this.bottomRectHeight)
   }
 
+  /**初始化断点*/
+  initBreakpointSystem() {
+    BreakpointSystem.getInstance().start()
+    BreakpointSystem.getInstance().attach(this.compStr)
+    // BreakpointSystem.getInstance().attach(this.compBarPose)
+    // BreakpointSystem.getInstance().attach(this.compVertical)
+    // BreakpointSystem.getInstance().attach(this.tabBarWidth)
+    // BreakpointSystem.getInstance().attach(this.compBarHeight)
+    // BreakpointSystem.getInstance().attach(this.tabBarJustifyContent)
+    BreakpointSystem.getInstance().attach(this.ProxyListLanes)
+    BreakpointSystem.getInstance().attach(this.TabIconfontSize)
+    BreakpointSystem.getInstance().attach(this.TabTitlefontSize)
+    BreakpointSystem.getInstance().attach(this.breakPointStateHomeCardPadding)
+    BreakpointSystem.getInstance().attach(this.breakPointStateListLanes)
+    BreakpointSystem.getInstance().attach(this.breakPointStateListGutter)
+    BreakpointSystem.getInstance().attach(this.breakPointStateTabContentTitleMargin)
+    BreakpointSystem.getInstance().attach(this.breakPointStateNavigationListPadding)
+    BreakpointSystem.getInstance().attach(this.breakPointStatemorePagelistBottom)
+    BreakpointSystem.getInstance().attach(this.breakPointStateListHeight)
+    BreakpointSystem.getInstance().attach(this.breakPointStateSettingslistHeight)
+    BreakpointSystem.getInstance().attach(this.breakPointStateCellularDataChevronSize)
+    BreakpointSystem.getInstance().attach(this.breakPointStateCellularDataChevronRowMargin)
+    BreakpointSystem.getInstance().attach(this.breakPointStateHomeCardSwitchModeTextMargin)
+    BreakpointSystem.getInstance().attach(this.breakPointStateHomeCardTitleBottomMargin)
+    BreakpointSystem.getInstance().attach(this.breakPointStateHomeCardSwitchModeRowMargin)
+    BreakpointSystem.getInstance().attach(this.breakPointStateHomeCardSwitchModeFontSize)
+    BreakpointSystem.getInstance().attach(this.breakPointStateCellularDatabarMargin)
+    BreakpointSystem.getInstance().attach(this.breakPointStateCellularDatabarHeight)
+    BreakpointSystem.getInstance().attach(this.breakPointStateCellularDataFontSize)
+    BreakpointSystem.getInstance().attach(this.breakPointStateCardTitleFontSize)
+    BreakpointSystem.getInstance().attach(this.deleteButtonSize)
+    BreakpointSystem.getInstance().attach(this.HomeCardCellularDataSmFontSize)
+    BreakpointSystem.getInstance().attach(this.HomeCardPrpxySmFontSize)
+    BreakpointSystem.getInstance().attach(this.ProxyFontSize)
+    BreakpointSystem.getInstance().attach(this.HomeCardIPSmFontSize)
+    BreakpointSystem.getInstance().attach(this.IPfontSize)
+    BreakpointSystem.getInstance().attach(this.SpeedfontSize12_14_14_16)
+    BreakpointSystem.getInstance().attach(this.gutterHomeGridcol_12_15)
+    BreakpointSystem.getInstance().attach(this.HomeCardAreaPadding)
+    BreakpointSystem.getInstance().attach(this.HomeCardTitleButtonPadding)
 
-  build() {
-    if (!this.isPXSecScreen){
-    Stack() {
-        Tabs({
-          barPosition: this.isLandscapePhone || this.istabletLandscape? BarPosition.Start : this.isFoldStatus ? BarPosition.End: this.compBarPose.value,
-          index: this.IndexCurrentindex,
-          controller: indexController
-        })
-        {
-          TabContent() {
-            Home()
-          }
-          .tabBar(this.TabBarBuilder($r('app.string.Home'), 0, $r('sys.symbol.house_fill')))
-          .gesture(
-            // 二级Tabs第一个页签向左拖动时，触发手势事件
-            PanGesture({direction:this.isLandscapePhone||this.istabletLandscape?PanDirection.Down:PanDirection.None})
-              .onActionStart((event?: GestureEvent) => {
-                console.info('Pan start')
-              })// 通过父组件的TabsController的实例，改变其index，达到跳转一级Tabs（首页）的效果
-              .onActionEnd(() => {
-                if (this.isLandscapePhone||this.istabletLandscape) {
-                  if (this.selectedIndex === 0) {
-                    indexController.changeIndex(1)
-                    console.info('Pan end')
-                  }
-                }
-              })
-          )
-
-          TabContent() {
-              ProxyPage()
-          }
-          .tabBar(this.TabBarBuilder($r('app.string.Proxy'), 1, $r('sys.symbol.list_bullet_square_fill')))
-
-          TabContent() {
-            ConfigurationPage()
-          }
-          .tabBar(this.TabBarBuilder($r('app.string.Configuration'), 2, $r('sys.symbol.folder_fill')))
-
-          TabContent() {
-            MorePage()
-          }
-         .tabBar(this.TabBarBuilder($r('app.string.More'), 3, $r('sys.symbol.square_fill_grid_2x2')))
-        }
-        .zIndex(1)
-        .backgroundColor( $r('app.color.background'))
-       // .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Thin: null)
-       // .backgroundBrightness({rate:0.5,lightUpDegree:0.5})
-      //  .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
-        .barOverlap(this.uiConfig.isBlurr ? (this.isLandscapePhone || ( this.istabletLandscape && !this.isSecondary)  ? false : true) : false) //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
-        .scrollable(this.isSecondary ? false : true)
-        .vertical(this.isLandscapePhone || this.istabletLandscape ? true : this.isFoldStatus ? false : this.compVertical.value) /**/
-        .barWidth(this.isLandscapePhone || this.istabletLandscape ?  this.barWidth :
-          this.isFoldStatus ? '100%' :
-          this.tabBarWidth.value) /**/
-        .barHeight(this.isLandscapePhone || this.istabletLandscape ? '100%':
-          this.isFoldStatus ? '77vp' :
-          ((!this.uiConfig.isBlurr && this.isSecondary) || this.isSmallSquareScreen) ? this.barHeight :
-            this.bottomRectHeight === 0 ? 57 :
-          this.compBarHeight.value) /**/
-        .onChange((index: number) => {
-          this.IndexCurrentindex = index
-          if (index === 0) {
-            this.isHomePage = true
-          } else {
-            this.isHomePage = false
-          }
-        })
-        .onAnimationStart((index: number, targetIndex: number) => {
-          animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion(), }, () => {
-            if (index === targetIndex) {
-              return
-            }
-            this.selectedIndex = targetIndex;
-          })
-        })
-        .width('100%')
-        .height('100%')
-        .backgroundColor($r('app.color.background'))
-        .foregroundBlurStyle(
-          this.isEnableIndexForegroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
-          { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
-        )
-        .fadingEdge(true)
-        .padding({ top: this.topRectHeight })
-       // .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
-    }
-    .width('100%')
-    .height('100%')
-    .backgroundColor( $r('app.color.background'))
-    // 欢迎页&崩溃页
-    .bindSheet($$this.isShowWelcome, this.WelcomeSheet(), {
-      detents: [BIND_SHEET_CONTAINER_HEIGHT],
-      showClose: (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) ? true : false,
-      dragBar: false,
-      backgroundColor: $r('app.color.background'),
-      keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
-      scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-      preferType: SheetType.CENTER,
-      onWillDismiss: ((DismissSheetAction: DismissSheetAction) => {
-        if (!this.isShowWelcome || DismissSheetAction.reason === DismissReason.CLOSE_BUTTON) {
-          // 关闭背景模糊
-          this.isEnableIndexForegroundBlur = false
-          DismissSheetAction.dismiss()
-          hilog.info(0xFF00, "WelcomeTestTag", "欢迎页启用状态： %{private}s", this.isShowWelcome)
-        }
-      })
-    })
-    } else {
-      // PX外屏样式
-      PXSecScreen()
-    }
+    BreakpointSystem.getInstance().attach(this.HomeCardCellularDataPadding)
   }
+
 }

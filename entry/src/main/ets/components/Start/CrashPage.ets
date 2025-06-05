@@ -6,11 +6,12 @@ import { JSON } from '@kit.ArkTS';
 import { systemShare } from '@kit.ShareKit'
 import { uniformTypeDescriptor } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
-import { customAnimationUtil } from '../../utils/Animation';
+import { customAnimationUtil } from '../../common/utils/Animation';
 import { UIConfig } from '../../entryability/AppState';
-import { handleMail } from '../../utils/MailTwoUtil';
+import { handleMail } from '../../common/utils/MailTwoUtil';
+import { context } from '../Common/Common';
 
-const context = getContext() as common.UIAbilityContext
+
 const crashData: Array<hiAppEvent.AppEventGroup> | undefined = AppStorage.get<Array<hiAppEvent.AppEventGroup>>('crashEvent')
 
 @Component
@@ -18,7 +19,7 @@ export struct CrashPage {
   eventGroup?: hiAppEvent.AppEventGroup = undefined
   eventInfoList: Array<hiAppEvent.AppEventInfo> = this.eventGroup?.appEventInfos ?? []
   /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   windowClass = window.getLastWindow(context)
   @State topSafeHeight: number = 0;
   @State bottomSafeHeight: number = 0;

@@ -1,24 +1,24 @@
-import { BreakpointState } from "../../common/breakpointsystem"
-import { ExperimentalFunction, skipRowList } from "../Common"
+import { skipRowList } from "../Common/Common"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import {  UIConfig } from "../../entryability/AppState"
-import { customAnimationUtil } from "../../utils/Animation"
+import { customAnimationUtil } from "../../common/utils/Animation"
+import { PageMargin } from "../../common/breakpoint/BreakPoint"
 
 @Component
 struct Backup {
   // 设置 -> 备份与恢复 -> 是否启用云备份配置
   @Consume isShowCloudconfig: boolean
-  // 一级图标色，黑色
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 设置页路由表
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   // 实验功能提示框展示变量
   @Consume isShowExperimentalFunction: boolean
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  // 页面内边距
-  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   /**
    * 备份应用数据
    */
@@ -104,7 +104,7 @@ struct Backup {
       }
       .width('100%')
       .alignItems(HorizontalAlign.Center)
-      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+      .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
@@ -128,8 +128,10 @@ export struct CloudBackup {
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  // 页面内边距
-  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   build() {
@@ -259,7 +261,7 @@ export struct CloudBackup {
       }
       .width('100%')
       .alignItems(HorizontalAlign.Start)
-      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+      .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
     }
     .width('100%')
     .hideTitleBar(true)

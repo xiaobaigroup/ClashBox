@@ -1,7 +1,7 @@
 import { ClashConfig,  IpInfo, ProxyGroup, ProxyMode, ProxySort, SnifferDefault, Traffic, } from "proxy_core";
-import { CustomThemeName } from "../common/AppTheme";
-import { ANIMATION_DURATION_300, showHomeCard } from "../common/Constants";
-import { ProxyItem } from "../common/ProxyData";
+import { CustomThemeName } from "../common/utils/AppThemeManager";
+import { ANIMATION_DURATION_300, showHomeCard } from "../common/entity/Constants";
+import { ProxyItem } from "../common/datasources/ProxyData";
 import { resourcesBlankData, theResouresData } from "../components/More/Resources";
 import ClashViewModel from "./ClashViewModel";
 import { bundleManager } from "@kit.AbilityKit";

@@ -7,25 +7,27 @@ import {
   BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT,
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE,
   FONT_SIZE_16
-} from "../common/Constants"
-import { UIConfig } from "../entryability/AppState"
-import { customAnimationUtil, isON } from "../utils/Animation"
-import { getResourceString } from "../utils/ResourceStringUtil"
-import { KeyValueData } from "./More/Overwrite/EditArrayConfig"
+} from "../../common/entity/Constants"
+import { UIConfig } from "../../entryability/AppState"
+import { customAnimationUtil, isON } from "../../common/utils/Animation"
+import { getResourceString } from "../../common/utils/ResourceStringUtil"
+import { KeyValueData } from "../More/Overwrite/EditArrayConfig"
 import { Provider } from "proxy_core"
 import { common } from "@kit.AbilityKit"
-import { BreakpointState } from "../common/breakpointsystem"
-import { convertToSwitchNub, convertToSwitchNub1 } from "../utils/DataUnitConvertUtils"
+import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
+import { convertToSwitchNub, convertToSwitchNub1 } from "../../common/utils/DataUnitConvertUtils"
+import { window } from "@kit.ArkUI"
 
-const context = getContext(this) as common.UIAbilityContext
+export const context = getContext() as common.UIAbilityContext
+// 一级图标色，黑色
+export const icon_primary: ResourceColor = $r('sys.color.icon_primary')
+// 二级图标色
+export const icon_secondary: ResourceColor = $r('sys.color.icon_secondary')
+// 三级图标色，浅灰色
+export const icon_tertiary: ResourceColor = $r('sys.color.icon_tertiary')
+// 一级文本色，黑色
+export const font_primary: ResourceColor = $r('sys.color.font_primary')
 
-/* 通用属性 START */
-@Styles
-function outerLayerContainerCommonStyles(){
-  .padding( FONT_SIZE_16 )
-  .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
-}
-/* 通用属性 END */
 
 @Builder
 export function BackButton() {
@@ -91,12 +93,42 @@ export interface BindSheetTitleCustomBuilderParam{
   menus: Array<BindSheetTitleCustomBuilderMenu>
 }
 
+@Component
+export struct ButtonBuilder {
+
+  @Prop icon: Resource
+  @Prop iconWeight: number
+  @Prop iconSize: number = 24
+  @Prop iconColor: ResourceColor
+  @Prop enableTransition: boolean = true
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @StorageProp('WindowMode') windowMode: boolean = false
+  onCheck: () => void = () => {}
+
+  build() {
+    Button({ type: ButtonType.Circle, stateEffect: true }) {
+      SymbolGlyph(this.icon)
+        .fontWeight(this.iconWeight)
+        .fontColor([this.iconColor])
+        .fontSize(this.iconSize)
+    }
+    .width(40)
+    .height(40)
+    .backgroundColor(this.windowMode ? $r('app.color.background') : $r('app.color.settings_container_background'))
+    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+    .onClick(() => {
+      this.onCheck()
+    })
+    .transition(this.enableTransition ? customAnimationUtil.isSlide(100, this.uiConfig) : undefined)
+  }
+}
+
 /**
  * 使用
  * @param param Builder 组件参数
  */
 @Builder
-export function BindSheetTitleCustomBuilder(param: BindSheetTitleCustomBuilderParam){
+export function BindSheetTitleCustomBuilder(param: BindSheetTitleCustomBuilderParam) {
 
   Row(){
     // 返回按钮 START
@@ -120,7 +152,6 @@ export function BindSheetTitleCustomBuilder(param: BindSheetTitleCustomBuilderPa
 
     // 主副标题 START
     Column(){
-      // TODO 国际化
       Text(param.mainTitle)
         .fontWeight(param.mainTitleFontWeight?? FontWeight.Bold)
         .fontSize(param.mainTitleFontSize)
@@ -353,8 +384,6 @@ export struct CustomDownloadingDialog {
 export struct DisclaimerCustomDialog {
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  //一级图标色，黑色
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 是否为免责声明弹窗
   @State isDisclaimer: boolean = false
@@ -689,8 +718,7 @@ export struct ExperimentalFunction {
 export struct Nothing {
   // 是否为未启用样式
   @State isNotEnabled: boolean = false
-  // 一级图标色，黑色
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
+
   //二级文本色，深灰色
   @State font_secondary: ResourceColor = $r('sys.color.font_secondary')
   // 页面标题
@@ -701,7 +729,7 @@ export struct Nothing {
     Column() {
       SymbolGlyph($r('sys.symbol.doc'))
         .fontSize(32)
-        .fontColor([this.icon_primary])
+        .fontColor([icon_primary])
         .margin({bottom: 4 })
       Text(getResourceString(this.isNotEnabled ? $r('app.string.not_enabled') : $r('app.string.none'), this) + getResourceString(this.name, this))
         .fontSize(20)
@@ -744,8 +772,6 @@ export struct skipRowList {
   @State subtitle: ResourceStr = ''
   @State isPrimaryIcons: boolean = false
   @State isExperimentalFunction: boolean = false
-  // 一级图标色，黑色
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 跳转行提示文本项
@@ -766,7 +792,7 @@ export struct skipRowList {
       if(this.icons) {
         SymbolGlyph(this.icons)
           .fontSize(24)
-          .fontColor([this.isPrimaryIcons ? this.icon_primary : this.icon_emphasize])
+          .fontColor([this.isPrimaryIcons ? icon_primary : this.icon_emphasize])
           .transition(customAnimationUtil.isScaleTranIcon(10, this.uiConfig))
       }
       Column() {
@@ -794,7 +820,7 @@ export struct skipRowList {
       this.tips()
       SymbolGlyph($r('sys.symbol.chevron_right'))
         .fontSize(28)
-        .fontColor([this.icon_primary])
+        .fontColor([icon_primary])
     }
     .RowStyle()
     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
@@ -819,8 +845,6 @@ export struct toggleRowList {
   // 副标题
   @State subtitle: ResourceStr = ''
   @State isPrimaryIcons: boolean = false
-  // 一级图标色，黑色
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 实验功能标识
   @State isExperimentalFunction: boolean = false
@@ -840,7 +864,7 @@ export struct toggleRowList {
       if(this.icons) {
         SymbolGlyph(this.icons)
           .fontSize(24)
-          .fontColor([this.isPrimaryIcons ? this.icon_primary : this.icon_emphasize])
+          .fontColor([this.isPrimaryIcons ? icon_primary : this.icon_emphasize])
           .transition(customAnimationUtil.isScaleTranIcon(10,this.uiConfig))
       }
       Column() {
@@ -894,8 +918,6 @@ export struct menuRowList {
   @State isExperimentalFunction: boolean = false
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  // 一级图标色，黑色
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 菜单
   @BuilderParam menu: () => void = this.defaultMenuBuilder
@@ -922,7 +944,7 @@ export struct menuRowList {
       if(this.icons) {
         SymbolGlyph(this.icons)
           .fontSize(24)
-          .fontColor([this.isPrimaryIcons ? this.icon_primary : this.icon_emphasize])
+          .fontColor([this.isPrimaryIcons ? icon_primary : this.icon_emphasize])
           .transition(customAnimationUtil.isScaleTranIcon(10,this.uiConfig))
       }
       Column() {
@@ -952,7 +974,7 @@ export struct menuRowList {
         SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
           .fontSize(14)
           .margin({left: 7, right: 8})
-          .fontColor([this.icon_primary])
+          .fontColor([icon_primary])
       }.bindMenu(this.menu())
     }
     .RowStyle()
@@ -1025,17 +1047,7 @@ export struct CellularData {
 }
 
 
-// 副文本样式
-@Extend(Text)
-function smallText() {
-  .textOverflow({ overflow: TextOverflow.Ellipsis })
-  .fontWeight(FontWeight.Normal)
-  .fontSize(14)
-  .maxLines(1)
-  .fontColor($r('sys.color.font_secondary'))
-}
-
-//代理和配置右下角图标按钮
+// 代理和配置右下角图标按钮
 @Builder
 export function RightDownButton(s:Resource,a:SymbolEffect)  {
   Stack({ alignContent: Alignment.Center }) {
@@ -1049,15 +1061,13 @@ export function RightDownButton(s:Resource,a:SymbolEffect)  {
   .height('100%')
 }
 
-//代理页顶部半模拟态标题及按钮
+// 代理页顶部半模拟态标题及按钮
 @Component
 export struct proxyBindSheetTitleStyle {
   // 顶部标题区域
   // 内容外边距
   @Consume('breakPointStateTabContentTitleMargin')
   private breakPointStateTabContentTitleMargin: BreakpointState<number>
-  // 一级图标色，黑色
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 开关不触发list转场动画判定
   @State isON: isON = new isON()
@@ -1081,7 +1091,7 @@ export struct proxyBindSheetTitleStyle {
     Button({ type: ButtonType.Circle, stateEffect: true }) {
       SymbolGlyph(icon)
         .fontSize(24)//      .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_COLOR)//分层颜色
-        .fontColor([this.icon_primary])
+        .fontColor([icon_primary])
     }
     .width(40)
     .height(40)
@@ -1101,3 +1111,22 @@ export struct proxyBindSheetTitleStyle {
     .height(BIND_SHEET_TITLE_CONTAINER_HEIGHT)
   }
 }
+
+/* 通用属性 START */
+// 通用容器样式
+@Styles
+function outerLayerContainerCommonStyles(){
+  .padding( FONT_SIZE_16 )
+  .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
+}
+
+// 副文本样式
+@Extend(Text)
+function smallText() {
+  .textOverflow({ overflow: TextOverflow.Ellipsis })
+  .fontWeight(FontWeight.Normal)
+  .fontSize(14)
+  .maxLines(1)
+  .fontColor($r('sys.color.font_secondary'))
+}
+/* 通用属性 END */

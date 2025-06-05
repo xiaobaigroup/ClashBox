@@ -1,7 +1,7 @@
 /* 存放组件之间传输的实体类、需要持久化的数据对象 */
 import { SubscriptionInfo } from "proxy_core"
 
-// TODO 之后根据这些数据整理成用户首选项
+// 之后根据这些数据整理成用户首选项
 export interface UserPreferences{
   // 用户id
   userId: string
@@ -13,6 +13,21 @@ export interface UserPreferences{
 }
 
 
+/* Index */
+// Tab栏构建
+export interface TabBuild{
+  name: ResourceStr
+  icon: Resource
+}
+// 窗口控制器
+export interface FunctionInfo {
+  icon: Resource
+  name?: ResourceStr
+  subtitle?: ResourceStr
+  onClick?: () => void
+}
+/* Index */
+
 /* 主页 */
 export interface Shortcuts {
   readonly text: string
@@ -22,6 +37,15 @@ export interface Shortcuts {
   g?: string
   isShowFavoriteProxy?: boolean
 }
+
+export interface HomeCardInfo {
+  span_sm: number,
+  span_md: number,
+  span_lg: number,
+  order: number,
+  aspectRatio: number
+}
+/* 主页 */
 
 /* 代理 */
 

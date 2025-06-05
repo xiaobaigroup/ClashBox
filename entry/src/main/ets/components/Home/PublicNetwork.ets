@@ -1,13 +1,13 @@
-import { BreakpointState } from '../../common/breakpointsystem'
+import { BreakpointState } from '../../common/breakpoint/breakpointsystem'
 import { mediaquery, PromptAction } from '@kit.ArkUI'
-import { MarginGenerate } from '../../common/Constants'
+import { MarginGenerate } from '../../common/entity/Constants'
 import { CardTitle } from './CardTitleBuilder'
 import { AppFlowingState, UIConfig } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { IpInfo } from 'proxy_core'
 import { EventHub, EventKey } from '../../common/EventHub'
-import { customVibrator } from '../../utils/VibratorUtil'
-import { customAnimationUtil } from '../../utils/Animation'
+import { customVibrator } from '../../common/utils/VibratorUtil'
+import { customAnimationUtil } from '../../common/utils/Animation'
 
 @Component
 struct PublicNetwork {

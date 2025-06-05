@@ -1,8 +1,8 @@
 import { common } from '@kit.AbilityKit'
 import { UIConfig } from '../../entryability/AppState'
 import { CommonPage } from './CommonPage'
-import { customAnimationUtil } from '../../utils/Animation'
-import { BackButton } from '../Common'
+import { customAnimationUtil } from '../../common/utils/Animation'
+import { BackButton } from '../Common/Common'
 
 // 协议顶部标题
 @Builder

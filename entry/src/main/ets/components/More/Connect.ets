@@ -1,16 +1,17 @@
-import { BreakpointState } from "../../common/breakpointsystem"
+import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
 import { BIND_SHEET_TITLE_CONTAINER_HEIGHT, BORDER_RADIUS_20, CONTENT_END_OFFSET_150,
-  TAB_CONTENT_TITLE_HEIGHT } from "../../common/Constants"
+  TAB_CONTENT_TITLE_HEIGHT } from "../../common/entity/Constants"
 import { AppConfig, UIConfig } from "../../entryability/AppState"
-import { convertTime, timestampToDateTime } from "../../utils/TimeConvertUtil"
-import { Nothing } from "../Common"
+import { convertTime, timestampToDateTime } from "../../common/utils/TimeConvertUtil"
+import { Nothing } from "../Common/Common"
 import { MoreTop } from "./MoreTopBuilder"
 import { curves, LengthMetrics } from "@kit.ArkUI"
 import ClashViewModel from "../../entryability/ClashViewModel"
 import { ConnectionInfo, Metadata } from "proxy_core"
-import { customAnimationUtil } from "../../utils/Animation"
-import { ConnectItemDataSource } from "../../common/ConnectData"
+import { customAnimationUtil } from "../../common/utils/Animation"
+import { ConnectItemDataSource } from "../../common/datasources/ConnectData"
 import { hilog } from "@kit.PerformanceAnalysisKit"
+import { PageMargin } from "../../common/breakpoint/BreakPoint"
 
 
 export function  getRequestText(metadata: Metadata ) {
@@ -48,9 +49,12 @@ struct Connect {
   @Consume('NavPathStack') pageInfos: NavPathStack
   // 数据
   @State private connectListData: ConnectItemDataSource = new ConnectItemDataSource()
-  @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   // 一级图标色，黑色
@@ -256,7 +260,7 @@ struct Connect {
               }.width('100%')
               .height('100%')
               .cachedCount(5, true)
-              .padding({ right: this.morePageMargin.value, left: this.morePageMargin.value })
+              .padding({ right: PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp) })
               .contentEndOffset(CONTENT_END_OFFSET_150)
               .chainAnimation(true)
               .nestedScroll({

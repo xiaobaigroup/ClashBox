@@ -5,18 +5,18 @@ import {
   BIND_SHEET_DRAG_BAR_HEIGHT,
   BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT,
   RouteName,
-} from "../../common/Constants"
-import { BindSheetTitleCustomBuilder, BindSheetTitleCustomBuilderMenu, CustomDownloadingDialog } from "../Common"
+} from "../../common/entity/Constants"
+import { BindSheetTitleCustomBuilder, BindSheetTitleCustomBuilderMenu, CustomDownloadingDialog } from "../Common/Common"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { ConfigInfo } from "./ConfigInfo"
 import { PromptAction, window } from "@kit.ArkUI"
-import { ConfigData } from "../../common/PageArgumentEntity"
+import { ConfigData } from "../../common/entity/PageArgumentEntity"
 import { util } from "@kit.ArkTS"
-import { CustomConfirmDialog } from '../Common'
+import { CustomConfirmDialog } from '../Common/Common'
 import { BusinessError } from "@kit.BasicServicesKit"
 import { common } from "@kit.AbilityKit"
 import ClashViewModel from "../../entryability/ClashViewModel"
-import { getResourceString } from "../../utils/ResourceStringUtil"
+import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { UIConfig } from "../../entryability/AppState"
 
 

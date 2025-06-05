@@ -2,12 +2,13 @@ import { ClashConfig, Dns, DnsEnhancedMode, LogLevel, RouteMode,
   Sniff,
   Sniffer, SnifferDefault,
   TunStack } from "proxy_core";
-import { ArrayConfigParam } from "../components/More/Overwrite/EditArrayConfig";
-import { AppConfig, AppState, copy } from "../entryability/AppState";
-import { CustomThemeName } from "./AppTheme";
-import { BreakpointState } from "./breakpointsystem";
+import { ArrayConfigParam } from "../../components/More/Overwrite/EditArrayConfig";
+import { AppConfig, AppState, copy } from "../../entryability/AppState";
+import { CustomThemeName } from "../utils/AppThemeManager";
+import { BreakpointState } from "../breakpoint/breakpointsystem";
 import { promptAction } from "@kit.ArkUI";
 import { UpdateInfo } from "../utils/CheckUpdateUtil";
+import { ConfigData } from "./PageArgumentEntity";
 
 
 /* 基础 */
@@ -89,6 +90,16 @@ export const TheExperimentData: AboutListItemProp = {
       name: 'ExperimentalFunction',
       isOn: true },
   ]
+}
+
+export const NullConfigData: ConfigData = {
+  configId: 'e91a4efc-cf14-467d-90c2-fec156806bfa',
+  isNewConfig: false,
+  configName: '',
+  configUrl: '',
+  isConfigAutoUpdate: false,
+  lastUpdateDateTime: 0,
+  updateTime: 0,
 }
 
 // enum：routeName
@@ -938,54 +949,54 @@ export const TabIconfontSize_24_26: BreakpointState<number> = BreakpointState.of
   xl: 26
 })
 
-export const TabBarHeight: BreakpointState<string> = BreakpointState.of({
-  xs: `77vp`,
-  sm: `77vp`,
-  md: `77vp`,
-  lg: `77vp`,
-  xl: `77vp`
-})
+// export const TabBarHeight: BreakpointState<string> = BreakpointState.of({
+//   xs: `77vp`,
+//   sm: `77vp`,
+//   md: `77vp`,
+//   lg: `77vp`,
+//   xl: `77vp`
+// })
 
-export const TabBarWidth: BreakpointState<string> = BreakpointState.of({
-  xs: '100%',
-  sm: '100%',
-  md: '100%',
-  lg: '100%',
-  xl: '100%'
-})
+// export const TabBarWidth: BreakpointState<string> = BreakpointState.of({
+//   xs: '100%',
+//   sm: '100%',
+//   md: '100%',
+//   lg: '100%',
+//   xl: '100%'
+// })
 
-export const TabBarJustifyContent: BreakpointState<FlexAlign> = BreakpointState.of({
-  xs: FlexAlign.Start,
-  sm: FlexAlign.Start,
-  md: FlexAlign.Start,
-  lg: FlexAlign.Start,
-  xl: FlexAlign.Start
-})
+// export const TabBarJustifyContent: BreakpointState<FlexAlign> = BreakpointState.of({
+//   xs: FlexAlign.Start,
+//   sm: FlexAlign.Start,
+//   md: FlexAlign.Start,
+//   lg: FlexAlign.Start,
+//   xl: FlexAlign.Start
+// })
 
-export const TabBarAlignItems: BreakpointState<ItemAlign> = BreakpointState.of({
-  xs: ItemAlign.Start,
-  sm: ItemAlign.Start,
-  md: ItemAlign.Start,
-  lg: ItemAlign.Start,
-  xl: ItemAlign.Start
-})
+// export const TabBarAlignItems: BreakpointState<ItemAlign> = BreakpointState.of({
+//   xs: ItemAlign.Start,
+//   sm: ItemAlign.Start,
+//   md: ItemAlign.Start,
+//   lg: ItemAlign.Start,
+//   xl: ItemAlign.Start
+// })
 
 
-export const TabVertical: BreakpointState<boolean> = BreakpointState.of({
-  xs: false,
-  sm: false,
-  md: false,
-  lg: false,
-  xl: false
-})
+// export const TabVertical: BreakpointState<boolean> = BreakpointState.of({
+//   xs: false,
+//   sm: false,
+//   md: false,
+//   lg: false,
+//   xl: false
+// })
 
-export const TabBarPose: BreakpointState<BarPosition> = BreakpointState.of({
-  xs: BarPosition.End,
-  sm: BarPosition.End,
-  md: BarPosition.End,
-  lg: BarPosition.End,
-  xl: BarPosition.End
-})
+// export const TabBarPose: BreakpointState<BarPosition> = BreakpointState.of({
+//   xs: BarPosition.End,
+//   sm: BarPosition.End,
+//   md: BarPosition.End,
+//   lg: BarPosition.End,
+//   xl: BarPosition.End
+// })
 
 
 /**

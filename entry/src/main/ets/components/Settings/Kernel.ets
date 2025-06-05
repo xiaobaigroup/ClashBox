@@ -1,15 +1,16 @@
-import { BreakpointState } from "../../common/breakpointsystem"
-import { BORDER_RADIUS_20, ListMoreData, moreData } from "../../common/Constants"
+import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
+import { BORDER_RADIUS_20, ListMoreData, moreData } from "../../common/entity/Constants"
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { AppConfig, ClashCore, isEnd, UIConfig } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { promptAction } from "@kit.ArkUI"
-import { ExperimentalFunction } from "../Common"
-import { removeItemsByIndex } from "../../utils/RemoveItemsUtils"
-import { customAnimationUtil } from "../../utils/Animation"
-import { getResourceString } from "../../utils/ResourceStringUtil"
+import { ExperimentalFunction } from "../Common/Common"
+import { removeItemsByIndex } from "../../common/utils/RemoveItemsUtils"
+import { customAnimationUtil } from "../../common/utils/Animation"
+import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { common } from "@kit.AbilityKit"
+import { PageMargin } from "../../common/breakpoint/BreakPoint"
 
 interface KernelListItem {
   icons: Resource
@@ -28,8 +29,10 @@ struct Kernel {
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  // 页面内边距
-  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 实验功能展示变量
   @Consume isShowExperimentalFunction: boolean
@@ -161,7 +164,7 @@ struct Kernel {
           .fontSize(15)
 
       }.alignItems(HorizontalAlign.Start)
-      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value })
+      .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
     }
     .width('100%')
     .height('100%')

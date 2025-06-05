@@ -1,4 +1,4 @@
-import { BreakpointState } from "../../common/breakpointsystem"
+import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
 import {
   BIND_SHEET_MAIN_FONT_WEIGHT,
   BIND_SHEET_MAIN_FONTSIZE,
@@ -11,18 +11,18 @@ import {
   TEXT_INPUT_HEIGHT,
   RouteName,
   BORDER_RADIUS_20
-} from "../../common/Constants"
-import { BindSheetTitleCustomBuilder, BindSheetTitleCustomBuilderMenu, CustomConfirmDialog } from "../Common"
+} from "../../common/entity/Constants"
+import { BindSheetTitleCustomBuilder, BindSheetTitleCustomBuilderMenu, CustomConfirmDialog } from "../Common/Common"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { picker } from "@kit.CoreFileKit"
 import ClashViewModel from "../../entryability/ClashViewModel"
-import { getResourceString } from "../../utils/ResourceStringUtil"
-import { customVibrator } from "../../utils/VibratorUtil"
+import { getResourceString } from "../../common/utils/ResourceStringUtil"
+import { customVibrator } from "../../common/utils/VibratorUtil"
 import { util } from "@kit.ArkTS"
-import { ConfigData } from "../../common/PageArgumentEntity"
+import { ConfigData } from "../../common/entity/PageArgumentEntity"
 import { BusinessError } from "@kit.BasicServicesKit"
 import { UIConfig } from "../../entryability/AppState"
-import { customAnimationUtil } from "../../utils/Animation"
+import { customAnimationUtil } from "../../common/utils/Animation"
 
 
 // 关联：route_map.json

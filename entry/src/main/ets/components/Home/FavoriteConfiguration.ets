@@ -1,13 +1,13 @@
-import { BreakpointState } from '../../common/breakpointsystem'
+import { BreakpointState } from '../../common/breakpoint/breakpointsystem'
 import { mediaquery, PromptAction } from '@kit.ArkUI'
-import { MarginGenerate } from '../../common/Constants'
+import { MarginGenerate } from '../../common/entity/Constants'
 import { CardTitle } from './CardTitleBuilder'
 import { AppConfig, isEnd, UIConfig } from '../../entryability/AppState'
-import { customVibrator } from '../../utils/VibratorUtil'
-import { customAnimationUtil } from '../../utils/Animation'
+import { customVibrator } from '../../common/utils/VibratorUtil'
+import { customAnimationUtil } from '../../common/utils/Animation'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { EventHub, EventKey } from '../../common/EventHub'
-import { getResourceString } from '../../utils/ResourceStringUtil'
+import { getResourceString } from '../../common/utils/ResourceStringUtil'
 
 
 @Component

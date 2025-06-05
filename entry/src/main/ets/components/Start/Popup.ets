@@ -1,4 +1,4 @@
-import { getResourceString } from '../../utils/ResourceStringUtil'
+import { getResourceString } from '../../common/utils/ResourceStringUtil'
 
 const icon_emphasize: ResourceColor = $r('app.color.theme_color_main_yellow')
 

@@ -1,4 +1,4 @@
-import { BreakpointState } from "../../common/breakpointsystem"
+import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
 import {
   FONT_SIZE_16,
   BORDER_RADIUS_20,
@@ -10,14 +10,14 @@ import {
   FONT_SIZE_14,
   CONFIG_AUTO_UPDATE_TIME_GAT_STRING_ARR,
   LIST_ITEM_HEIGHT,
-} from "../../common/Constants"
+} from "../../common/entity/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { PromptAction } from "@kit.ArkUI"
-import { ConfigData } from "../../common/PageArgumentEntity"
-import { customVibrator } from "../../utils/VibratorUtil"
-import { customSound } from "../../utils/SoundPoolUtil"
+import { ConfigData } from "../../common/entity/PageArgumentEntity"
+import { customVibrator } from "../../common/utils/VibratorUtil"
+import { customSound } from "../../common/utils/SoundPoolUtil"
 import { UIConfig } from "../../entryability/AppState"
-import { customAnimationUtil } from "../../utils/Animation"
+import { customAnimationUtil } from "../../common/utils/Animation"
 
 @Component
 export struct ConfigInfo{

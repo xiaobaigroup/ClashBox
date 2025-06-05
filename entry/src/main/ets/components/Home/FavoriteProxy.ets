@@ -1,12 +1,12 @@
-import { BreakpointState } from '../../common/breakpointsystem'
+import { BreakpointState } from '../../common/breakpoint/breakpointsystem'
 import { mediaquery} from '@kit.ArkUI'
-import { MarginGenerate } from '../../common/Constants'
+import { MarginGenerate } from '../../common/entity/Constants'
 import { CardTitle } from './CardTitleBuilder'
-import { ProxyGroupItemDataSource, ProxyItem } from '../../common/ProxyData'
+import { ProxyGroupItemDataSource, ProxyItem } from '../../common/datasources/ProxyData'
 import { AppConfig, AppState, UIConfig } from '../../entryability/AppState'
 import { Profile, ProxyGroup } from 'proxy_core'
-import { customVibrator } from '../../utils/VibratorUtil'
-import { customAnimationUtil } from '../../utils/Animation'
+import { customVibrator } from '../../common/utils/VibratorUtil'
+import { customAnimationUtil } from '../../common/utils/Animation'
 import ClashViewModel from '../../entryability/ClashViewModel'
 
 

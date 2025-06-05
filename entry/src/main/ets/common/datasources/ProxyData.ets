@@ -1,7 +1,7 @@
 import { ProxyGroup, ProxySort } from "proxy_core"
 import { BaseDataSource } from "./BaseDataSource"
 import { intl } from "@kit.LocalizationKit"
-import ClashViewModel, { DelayInfo } from "../entryability/ClashViewModel"
+import ClashViewModel, { DelayInfo } from "../../entryability/ClashViewModel"
 
 // 定义一个接口来描述列表项的数据结构
 export interface ProxyItem {

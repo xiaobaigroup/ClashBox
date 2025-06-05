@@ -1,7 +1,7 @@
-import { BreakpointState } from "../../common/breakpointsystem"
+import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
 import {
   BORDER_RADIUS_20,
-  CONTENT_END_OFFSET_150, FONT_SIZE_16, settingsData, SettingsListItem } from "../../common/Constants"
+  CONTENT_END_OFFSET_150, FONT_SIZE_16, settingsData, SettingsListItem } from "../../common/entity/Constants"
 import settingsListItem from "./settingsListItem"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import Appearance from "./Appearance"
@@ -13,17 +13,18 @@ import WipeData from "./WipeData"
 import About, { AboutContributors, CheckUpdate, FAQ, ThirdServices, UseGuidance } from "./About"
 import Language from "./Language"
 import TopBuilder from "./TopBuilder"
-import { DisclaimerCustomDialog, Nothing, theRowCustomDialog } from "../Common"
+import { DisclaimerCustomDialog, Nothing, theRowCustomDialog } from "../Common/Common"
 import { AppState, UIConfig } from "../../entryability/AppState"
 import { promptAction } from "@kit.ArkUI"
-import { removeItemsByIndex } from "../../utils/RemoveItemsUtils"
+import { removeItemsByIndex } from "../../common/utils/RemoveItemsUtils"
 import ClashViewModel from "../../entryability/ClashViewModel"
-import { getResourceString } from "../../utils/ResourceStringUtil"
+import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { common } from "@kit.AbilityKit"
-import { timestampToDateTime } from "../../utils/TimeConvertUtil"
-import { ProxyGroupItemDataSource } from "../../common/ProxyData"
-import { ConfigData } from "../../common/PageArgumentEntity"
+import { timestampToDateTime } from "../../common/utils/TimeConvertUtil"
+import { ProxyGroupItemDataSource } from "../../common/datasources/ProxyData"
+import { ConfigData } from "../../common/entity/PageArgumentEntity"
 import { PrivacyPolicy, UserAgreement } from "./AgreementPrivacyPage"
+import { PageMargin } from "../../common/breakpoint/BreakPoint"
 
 const context = getContext(this) as common.UIAbilityContext
 
@@ -49,10 +50,12 @@ struct Settings {
   @Consume('breakPointStatemorePagelistBottom') private listBottom: BreakpointState<number>
   // 列表高度
   @Consume('breakPointStateSettingslistHeight') private SettingslistHeight: BreakpointState<number>
-  // 断点系统
-  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   // 免责声明弹窗控制器
   dialogController: CustomDialogController | null = new CustomDialogController({
     builder: DisclaimerCustomDialog({
@@ -264,7 +267,7 @@ struct Settings {
       .contentEndOffset(CONTENT_END_OFFSET_150 - 75)
       .borderRadius(18)
       .alignListItem(ListItemAlign.Center)
-      .padding({left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value})
+      .padding({left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp)})
     }
     .hideToolBar(true)
     .mode(this.isLandscapePhone ? NavigationMode.Stack : NavigationMode.Auto)
@@ -291,7 +294,10 @@ struct OfflineDetail {
 
   @State offline: number[] = []
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
 
   aboutToAppear(): void {
     this.offline = ClashViewModel.socketProxy.offlineTime.reverse()
@@ -342,7 +348,7 @@ struct OfflineDetail {
         .align(Alignment.Top)
         .edgeEffect(EdgeEffect.Spring)
         .contentEndOffset(CONTENT_END_OFFSET_150 - 85)
-        .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value, bottom: this.breakPointStatemorePageMargin.value })
+        .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp), bottom: PageMargin(this.widthBp, this.heightBp) })
 
       }
 

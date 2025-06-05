@@ -1,4 +1,4 @@
-import { BreakpointState } from "../../common/breakpointsystem"
+import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
 import {
   ANIMATION_DURATION_100,
   ANIMATION_DURATION_300,
@@ -6,15 +6,16 @@ import {
   AppearanceList,
   AppearanceListItemProp,
   CONTENT_END_OFFSET_150,
-} from "../../common/Constants"
+} from "../../common/entity/Constants"
 import TopBuilder from "./TopBuilder"
 import { curves, SymbolGlyphModifier } from "@kit.ArkUI"
 import { common } from "@kit.AbilityKit"
-import { setAutoColorMode, setDarkColorMode, setLightColorMode } from "../../utils/ChangeColorModeUtils"
-import { menuRowList, toggleRowList } from "../Common"
+import { setAutoColorMode, setDarkColorMode, setLightColorMode } from "../../common/utils/ChangeColorModeUtils"
+import { font_primary, menuRowList, toggleRowList } from "../Common/Common"
 import {  AppConfig, isEnd, UIConfig } from "../../entryability/AppState"
-import { changeThemeColor } from "../../utils/ChangeThemeColorUtil"
-import { customAnimationUtil } from "../../utils/Animation"
+import { changeThemeColor } from "../../common/utils/ChangeThemeColorUtil"
+import { customAnimationUtil } from "../../common/utils/Animation"
+import { PageMargin } from "../../common/breakpoint/BreakPoint"
 
 @Component
 struct Appearance {
@@ -22,23 +23,24 @@ struct Appearance {
   @Consume isShowExperimentalFunction: boolean
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @State appearanceList: AppearanceListItemProp[] = AppearanceList
-  @State font_primary: ResourceColor = $r('sys.color.font_primary')
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   //一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   // 应用上下文
   private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
-  // 断点系统
-  @Consume('breakPointStatemorePageMargin') breakPointStatemorePageMargin: BreakpointState<number>
   // 手机横屏判断
-  @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
   // 滚动列表高度
-  @Consume('breakPointStateSettingslistHeight') private SettingslistHeight: BreakpointState<number>
+  @Consume('breakPointStateSettingslistHeight') SettingslistHeight: BreakpointState<number>
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   // 按钮宽度
-  @State private proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
+  @State proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
   // 按钮高度
-  @State private proxyStartButtonHeight: Length = $r('app.integer.vp_proxy_not_start_button_height')
+  @State proxyStartButtonHeight: Length = $r('app.integer.vp_proxy_not_start_button_height')
   // 深色模式选中文本
   @State EnableDarkModeText: ResourceStr = $r('app.string.follow_system')
   // 主题色选中文本
@@ -323,7 +325,7 @@ struct Appearance {
                   .width(80)
                   .fontWeight(FontWeight.Bold)
                   .fontSize(16)
-                  .fontColor(this.font_primary)
+                  .fontColor(font_primary)
                 Radio({ value: 'preview', group: 'appearanceRadioGroup', })
                   .checked(true)
                   .radioStyle({
@@ -335,7 +337,7 @@ struct Appearance {
                   .fontWeight(FontWeight.Bold)
                   .width(80)
                   .fontSize(16)
-                  .fontColor(this.font_primary)
+                  .fontColor(font_primary)
                 Radio({ value: 'config', group: 'appearanceRadioGroup', })
                   .checked(false)
                   .radioStyle({
@@ -347,7 +349,7 @@ struct Appearance {
                   .fontWeight(FontWeight.Bold)
                   .width(80)
                   .fontSize(16)
-                  .fontColor(this.font_primary)
+                  .fontColor(font_primary)
                 Radio({ value: 'proxy', group: 'appearanceRadioGroup', })
                   .checked(false)
                   .radioStyle({
@@ -504,7 +506,7 @@ struct Appearance {
       .align(Alignment.Top)
       .edgeEffect(EdgeEffect.Spring)
       .contentEndOffset(CONTENT_END_OFFSET_150 - 85)
-      .padding({ left: this.breakPointStatemorePageMargin.value, right: this.breakPointStatemorePageMargin.value, bottom: this.breakPointStatemorePageMargin.value })
+      .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp), bottom: PageMargin(this.widthBp, this.heightBp) })
 
     }
     .width('100%')

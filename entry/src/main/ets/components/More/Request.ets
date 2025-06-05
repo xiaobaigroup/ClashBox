@@ -1,16 +1,17 @@
-import { BreakpointState } from "../../common/breakpointsystem"
-import { BORDER_RADIUS_20, CONTENT_END_OFFSET_150, TAB_CONTENT_TITLE_HEIGHT } from "../../common/Constants"
+import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
+import { BORDER_RADIUS_20, CONTENT_END_OFFSET_150, TAB_CONTENT_TITLE_HEIGHT } from "../../common/entity/Constants"
 import { MoreTop } from "./MoreTopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
-import { convertTime, timestampToDateTime } from "../../utils/TimeConvertUtil"
-import { Nothing } from "../Common"
+import { convertTime, timestampToDateTime } from "../../common/utils/TimeConvertUtil"
+import { Nothing } from "../Common/Common"
 import { AppConfig, UIConfig } from "../../entryability/AppState"
 import { curves } from "@kit.ArkUI"
-import { customAnimationUtil } from "../../utils/Animation"
+import { customAnimationUtil } from "../../common/utils/Animation"
 import ClashViewModel from "../../entryability/ClashViewModel"
 import { ConnectionInfo } from "proxy_core"
 import { getRequestText, getSourceText, getTheSourceText } from "./Connect"
-import { ConnectItemDataSource } from "../../common/ConnectData"
+import { ConnectItemDataSource } from "../../common/datasources/ConnectData"
+import { PageMargin } from "../../common/breakpoint/BreakPoint"
 
 
 @Component
@@ -18,9 +19,12 @@ struct RequestPage {
   @Consume isSecondary: boolean
   @State intervalId: number = 0
   @Consume('NavPathStack') pageInfos: NavPathStack
-  @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   // 一级图标色，黑色
@@ -191,7 +195,7 @@ struct RequestPage {
               .height('100%')
               .cachedCount(5, true)
               .contentEndOffset(CONTENT_END_OFFSET_150)
-              .padding({ right: this.morePageMargin.value, left: this.morePageMargin.value })
+              .padding({ right: PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp) })
               .chainAnimation(true)
               .nestedScroll({
                 scrollForward: NestedScrollMode.PARENT_FIRST,

@@ -1,18 +1,19 @@
-import { BreakpointState } from "../../common/breakpointsystem"
+import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
 import { BIND_SHEET_DRAG_BAR_HEIGHT, BORDER_RADIUS_20, CONTENT_END_OFFSET_150,
-  TAB_CONTENT_TITLE_HEIGHT } from "../../common/Constants"
-import { Nothing, theCustomDialog } from "../Common"
+  TAB_CONTENT_TITLE_HEIGHT } from "../../common/entity/Constants"
+import { Nothing, theCustomDialog } from "../Common/Common"
 import { MoreTop } from "./MoreTopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
-import { convertTime } from "../../utils/TimeConvertUtil"
+import { convertTime } from "../../common/utils/TimeConvertUtil"
 import { ClashConfig } from 'proxy_core'
 import { curves, promptAction } from '@kit.ArkUI'
 import { copy, UIConfig } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
-import { getResourceString } from "../../utils/ResourceStringUtil"
+import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { EventHub, EventKey } from "../../common/EventHub"
-import { customAnimationUtil, isON } from "../../utils/Animation"
+import { customAnimationUtil, isON } from "../../common/utils/Animation"
 import { i18n } from "@kit.LocalizationKit"
+import { PageMargin } from "../../common/breakpoint/BreakPoint"
 
 // 资源数据（假设）
 interface ResourcesData {
@@ -92,9 +93,12 @@ struct Resources {
   @State theNumberUpdated: number = 0
   @State isRefreshing: boolean = false
   @Consume('NavPathStack') pageInfos: NavPathStack
-  @Consume('breakPointStatemorePageMargin') morePageMargin: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
@@ -385,7 +389,7 @@ struct Resources {
               .height('100%')
               .alignListItem(ListItemAlign.Center)
               .contentEndOffset(CONTENT_END_OFFSET_150)
-              .padding({ right: this.morePageMargin.value, left: this.morePageMargin.value })
+              .padding({ right: PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp) })
               .chainAnimation(true)
               .nestedScroll({
                 scrollForward: NestedScrollMode.PARENT_FIRST,

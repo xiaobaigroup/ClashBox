@@ -1,15 +1,15 @@
-import { BreakpointState, BreakpointSystem } from '../common/breakpointsystem'
+import { BreakpointState, BreakpointSystem } from '../common/breakpoint/breakpointsystem'
 import {
   TAB_CONTENT_TITLE_HEIGHT,
   BIND_SHEET_CONTAINER_HEIGHT,
   TAB_CONTENT_TITLE_FONT_SIZE,
   BORDER_RADIUS_20,
   CONTENT_END_OFFSET_150,
-} from '../common/Constants'
+} from '../common/entity/Constants'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import ProxyGroupItem from '../components/Proxy/ProxyGroupItem'
 import ProxyArrangement from '../components/Proxy/ProxyArrangement'
-import { ProxyGroupItemDataSource, ProxyItem, ProxyItemDataSource } from '../common/ProxyData'
+import { ProxyGroupItemDataSource, ProxyItem, ProxyItemDataSource } from '../common/datasources/ProxyData'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { ClashConfig, Profile, ProxyGroup, ProxyType } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
@@ -17,12 +17,15 @@ import { AppConfig, ProxyGroupType, UIConfig } from '../entryability/AppState'
 import { curves, PromptAction } from '@kit.ArkUI'
 import { ProviderPage } from '../components/Proxy/Provider'
 import { indexController } from './Index'
-import { customAnimationUtil } from '../utils/Animation'
-import { Nothing, RightDownButton } from '../components/Common'
+import { customAnimationUtil } from '../common/utils/Animation'
+import { Nothing, RightDownButton } from '../components/Common/Common'
 import { StylesEdit } from '../components/Proxy/StylesEdit'
 import { PopTips, PopupBuilder } from '../components/Start/Popup'
 import { deviceInfo } from '@kit.BasicServicesKit'
-import { customVibrator } from '../utils/VibratorUtil'
+import { customVibrator } from '../common/utils/VibratorUtil'
+import { TabBarVertical } from '../common/breakpoint/BreakPoint'
+import { TopBar } from '../components/Common/TopBar'
+import { getResourceString } from '../common/utils/ResourceStringUtil'
 
 
 @Entry
@@ -51,6 +54,12 @@ struct ProxyPage {
 
   @Consume isRolling: boolean
   @Consume isSmallSquareScreen: boolean
+
+  @StorageProp('WindowMode') windowMode: boolean = false
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
 
   // 是否要打开样式编辑
   @State isStylesEdit: boolean = false
@@ -117,8 +126,6 @@ struct ProxyPage {
   @Consume isLatencySort: boolean
   // 代理页延迟按钮气泡提示
   @Consume isShowDelayPop: boolean
-  // Index页tab栏竖直状态
-  @Consume compVertical: BreakpointState<boolean>
   // px外屏隐藏top和tab偏移
   @Consume heightTop: number
   @Consume curOffsetRemain: number
@@ -229,43 +236,42 @@ struct ProxyPage {
   build() {
     Stack() {
       // 标题栏
-      if (!this.isPXSecScreen){
+      if (!this.isPXSecScreen) {
       Row({ space: this.HomeCardTitleButtonPadding.value }) {
-        Text($r('app.string.Proxy'))
-          .fontSize(this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset / 100 : TAB_CONTENT_TITLE_FONT_SIZE)
-          .fontWeight(FontWeight.Bold)
-          .textAlign(TextAlign.Center)
-          .transition(customAnimationUtil.isSlide(200, this.uiConfig))
-          .transition(customAnimationUtil.isScaleTran(0, this.uiConfig))
-        Blank()
-        // 一键取消所有收藏按钮 TODO 判定暂时有问题 不显示先
-        /*this.ButtonBuilder($r('sys.symbol.heart_slash'), () => {
-           this.favoriteProxys.clear()
-           this.showStart=true
-           this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_all_tip') })
-         })*/
-        // 提供者按钮
-        this.ButtonBuilder($r('sys.symbol.puzzle'), () => {
-          this.isStylesEdit = false
-          this.isShowProxyBindSheet = true
-          this.isEnableIndexForegroundBlur = true
-        })
-        // 编辑图标
-        this.ButtonBuilder($r('sys.symbol.square_and_pencil'), () => {
-          this.isStylesEdit = true
-          this.isShowProxyBindSheet = true
-          this.isEnableIndexForegroundBlur = true
+        TopBar({
+          title: getResourceString($r('app.string.Proxy'), this),
+          titleFontSize: this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE - this.curYOffset / 100 : TAB_CONTENT_TITLE_FONT_SIZE,
+          iconSize: this.windowMode ? 16 : 24,
+          icons: [$r('sys.symbol.puzzle'), $r('sys.symbol.square_and_pencil')],
+          // 一键取消所有收藏按钮 TODO 判定有误，搁置；启用时需将图标$r('sys.symbol.heart_slash')添加进数组并添加修改对应                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               点击事件
+          /* onFClick: () => {
+             this.favoriteProxys.clear()
+             this.showStart=true
+             this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_all_tip') })
+           }*/
+          // 提供者按钮
+          onFClick: () => {
+            this.isStylesEdit = false
+            this.isShowProxyBindSheet = true
+            this.isEnableIndexForegroundBlur = true
+          },
+          // 编辑图标
+          onSClick: () => {
+            this.isStylesEdit = true
+            this.isShowProxyBindSheet = true
+            this.isEnableIndexForegroundBlur = true
+          }
         })
       }
       .zIndex(1)
-      .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
+      // .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
       .position({x: 0,y:this.isRolling && this.isSmallSquareScreen?this.heightTop:0})
       .alignItems(VerticalAlign.Center)
       .width('100%')
-      .padding({
-        left: this.breakPointStateTabContentTitleMargin.value,
-        right: this.breakPointStateTabContentTitleMargin.value,
-      })
+      // .padding({
+      //   left: this.breakPointStateTabContentTitleMargin.value,
+      //   right: this.breakPointStateTabContentTitleMargin.value,
+      // })
       .transition(customAnimationUtil.isSlide(0, this.uiConfig))
       }
 
@@ -344,9 +350,9 @@ struct ProxyPage {
                     hilog.info(0xFF00, "ProxyPagePanTag", "currentOffset: %{private}d", extraInfo.currentOffset)
                     animateTo({ duration: this.uiConfig.animationSpeed }, () => {
                       // 当主tab栏竖排时不触发切换
-                      hilog.info(0xFF00, "ProxyLandscapeTag", "tab栏竖排状态: %{public}s", this.compVertical.value)
-                      hilog.info(0xFF00, "ProxyLandscapeTag", "手机横屏状态状态: %{public}s", this.isLandscapePhone)
-                      if ((deviceInfo.deviceType === 'tablet' ? false : !this.isLandscapePhone) || !this.compVertical.value) {
+                      // hilog.info(0xFF00, "ProxyLandscapeTag", "tab栏竖排状态: %{public}s", this.compVertical.value)
+                      // hilog.info(0xFF00, "ProxyLandscapeTag", "手机横屏状态状态: %{public}s", this.isLandscapePhone)
+                      if (TabBarVertical(this.widthBp, this.heightBp)) {
                         if (this.currentProxyIndex === 0 && extraInfo.currentOffset > 79) {
                           indexController.changeIndex(0)
                         } else if (this.currentProxyIndex === this.theProxyGroups.length - 1 && extraInfo.currentOffset < -79) {
@@ -442,9 +448,9 @@ struct ProxyPage {
             }
             this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
             await ClashViewModel.testAllDelay(this.theProxyGroups[this.currentProxyIndex].proxies as ProxyItem[])
-            //当延迟排序选中时，让ui可以刷新
+            // 当延迟排序选中时，让ui可以刷新
             this.isLatencySort = true
-            await this.isLatencySort == true
+            // await this.isLatencySort == true
             this.isLatencySort = false
             hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行1 %{public}s")
             if (this.uiConfig.isVibrate) {
