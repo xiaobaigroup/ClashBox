@@ -44,13 +44,10 @@ export struct ArrayConfigEditor {
   // 编辑路由地址弹窗标题
   @State ArrayConfigList: KeyValueData[] = []
   @Consume('NavPathStack') pageInfos: NavPathStack
-  // 列表高度
-  @Consume('breakPointStateListHeight') listHeight: BreakpointState<number>
-  @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
   // 平板竖屏判断
   // 平板竖屏判断变量
   @Consume istabletLandscape: boolean
-  @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   // 高度断点
@@ -302,7 +299,7 @@ export struct ArrayConfigEditor {
               .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
             } else {
               // 键值页
-              List({ space: this.listBottom.value }) {
+              List({ space: 12 }) {
                 ForEach(this.ArrayConfigList, (item: KeyValueData, index: number) => {
                   // 数据列表行
                   ListItem() {

@@ -1,14 +1,12 @@
 import {  BreakpointState } from '../../common/breakpoint/breakpointsystem'
-import { curves, mediaquery } from '@kit.ArkUI';
-import { ANIMATION_DURATION_300, MarginGenerate } from '../../common/entity/Constants';
+import { mediaquery } from '@kit.ArkUI';
 import { CardTitle } from './CardTitleBuilder';
-import { AppConfig, SwitchModeCard, UIConfig } from '../../entryability/AppState';
+import { AppConfig, UIConfig } from '../../entryability/AppState';
 import { EventHub, EventKey } from '../../common/EventHub';
-import { ClashConfig, ProxyGroup, ProxyMode } from 'proxy_core';
+import { ClashConfig, ProxyMode } from 'proxy_core';
 import { customVibrator } from '../../common/utils/VibratorUtil';
 import { customAnimationUtil } from '../../common/utils/Animation';
-import { ProxyGroupItemDataSource } from '../../common/datasources/ProxyData';
-import ClashViewModel from '../../entryability/ClashViewModel';
+import { HomeCardFontSize, HomeCardPadding } from '../../common/breakpoint/BreakPoint';
 
 @Component
 struct SwitchMode {
@@ -17,11 +15,11 @@ struct SwitchMode {
   @State font_primary: ResourceColor = $r('sys.color.font_primary')
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
-  // 内容文本字体大小
-  @Consume('breakPointStateHomeCardSwitchModeFontSize') private fontSize: BreakpointState<number>
-  // 卡片内边距
-  @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
   // 代理模式选中状态
   @State currentChecked: number = 0
   //编辑按钮点击后显示编辑状态判定
@@ -80,7 +78,7 @@ struct SwitchMode {
             Button(n["t"], { buttonStyle: ButtonStyleMode.TEXTUAL, stateEffect: false })
               .ButtonStyle()
               .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-              .fontSize(this.isLandscapePhone ? 14 : this.fontSize.value)
+              .fontSize(HomeCardFontSize(this.widthBp, this.heightBp))
               .fontColor(this.clashConfig.mode == n["v"] ? this.font_primary : $r('sys.color.font_secondary'))
               .onClick(() => {
                 //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
@@ -111,7 +109,7 @@ struct SwitchMode {
     }
     .width('100%')
     .height('100%')
-    .padding(this.cardPadding.value)
+    .padding(HomeCardPadding(this.widthBp, this.heightBp))
     .id('SwitchModeId')
   }
 }

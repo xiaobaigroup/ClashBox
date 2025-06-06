@@ -1065,9 +1065,6 @@ export function RightDownButton(s:Resource,a:SymbolEffect)  {
 @Component
 export struct proxyBindSheetTitleStyle {
   // 顶部标题区域
-  // 内容外边距
-  @Consume('breakPointStateTabContentTitleMargin')
-  private breakPointStateTabContentTitleMargin: BreakpointState<number>
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 开关不触发list转场动画判定
   @State isON: isON = new isON()

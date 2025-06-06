@@ -3,7 +3,7 @@ import { BIND_SHEET_CONTAINER_HEIGHT,
   BORDER_RADIUS_20,
   FONT_SIZE_14,
   FONT_SIZE_16,
-  MarginGenerate, TEXT_AREA_MAX_LENGTH,
+  TEXT_AREA_MAX_LENGTH,
   TEXT_INPUT_HEIGHT,
 } from '../../common/entity/Constants'
 import { CardTitle } from './CardTitleBuilder'
@@ -12,28 +12,25 @@ import { PromptAction } from '@kit.ArkUI'
 import { AppConfig, isEnd, UIConfig } from '../../entryability/AppState'
 import { customVibrator } from '../../common/utils/VibratorUtil'
 import { customAnimationUtil } from '../../common/utils/Animation'
+import { HomeCardFontSize, HomeCardPadding, TabContentTitleMargin } from '../../common/breakpoint/BreakPoint'
 
 @Component
 struct Shortcuts {
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
-  // 内容文本字体大小
-  @Consume('breakPointStateHomeCardSwitchModeFontSize') private fontSize: BreakpointState<number>
-  // 卡片内边距
-  @Consume('breakPointStateHomeCardPadding') private cardPadding: BreakpointState<MarginGenerate>
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur')
-  private isEnableIndexForegroundBlur: boolean
-  //编辑按钮点击后显示编辑状态判定
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
+  // 编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
   @State isShowShortcutsEdit: boolean = false
   /* 主题色 */
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
-  @Consume('breakPointStateTabContentTitleMargin')
-  private breakPointStateTabContentTitleMargin: BreakpointState<number>
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 折叠屏展开状态判定
-  @StorageLink ('isFoldStatus') private isFoldStatus: boolean = false
+  @StorageLink ('isFoldStatus') isFoldStatus: boolean = false
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
@@ -75,14 +72,11 @@ struct Shortcuts {
           { t: this.uiConfig.inputTitle3, w: this.uiConfig.inputWeb3 }
         ], (m: [Resource, number], i: number) => {
             Text(`${m["t"]}` != '' ? `${m["t"]}` : $r('app.string.long_press_modify'))
-             // .minFontSize(10)
-             // .maxFontSize(22)
-             // .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
-              .fontSize(this.isLandscapePhone ? 16 : this.fontSize.value)
+              .fontSize(HomeCardFontSize(this.widthBp, this.heightBp))
               .ShortcutsTextStyle()
               .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
               .onClick(() => {
-                //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+                // 在home页添加按钮的半模拟态里和在编辑状态时，无法操作
                 if (this.isShowHomeEdit === false) {
                   if (`${m["w"]}` != '') {
                     this.implicitStartAbility(`${m["w"]}`)
@@ -119,7 +113,7 @@ struct Shortcuts {
       .padding({ left: 5, right: 5 })
     }
     .id('ShortcutsId')
-    .padding(this.cardPadding.value)
+    .padding(HomeCardPadding(this.widthBp, this.heightBp))
     .width('100%')
     .height('100%')
     .bindSheet($$this.isShowShortcutsEdit, this.ShortcutsEdit(), {
@@ -417,8 +411,8 @@ struct Shortcuts {
       .width('100%')
       // .contentEndOffset(50)
       .padding({
-        left: this.breakPointStateTabContentTitleMargin.value,
-        right: this.breakPointStateTabContentTitleMargin.value,
+        left: TabContentTitleMargin(this.widthBp, this.heightBp),
+        right: TabContentTitleMargin(this.widthBp, this.heightBp),
       })
     }
   }

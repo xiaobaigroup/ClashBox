@@ -21,7 +21,6 @@ struct Overwrite {
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @State overwriteList: moreData[] = ListOverwriteData()
-  @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
   // 重置覆写提示弹窗标题
   @State theResetDialogTitle: ResourceStr = $r('app.string.override_reset_prompt')
   /**

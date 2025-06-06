@@ -179,7 +179,7 @@ struct Notice {
       uri: "application_info_entry", // 系统设置的界面 （固定）
       parameters: {
         // pushParams: 'cn.damai.hongmeng' // 包名
-        pushParams: "org.xbgroup.clashbox",
+        pushParams: "org.xbstudio.clashnext",
       }
     })
   }
@@ -521,8 +521,6 @@ export struct CellularDataReminder {
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
-  // 滚动列表高度
-  @Consume('breakPointStateSettingslistHeight') private SettingslistHeight: BreakpointState<number>
   // 每小时通知控制变量
   @State perHourNotice: boolean = false
   @State theHourNumber: number = 0

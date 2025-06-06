@@ -70,13 +70,20 @@ export function BreakpointFunction2D<T>(config: BreakpointConfig<T>) {
 
   // 返回可直接访问矩阵的函数
   return (widthBp: number, heightBp: number): T => {
+
+    // const defaultWidthBp: number = AppStorage.get<number>('currentWidthBreakpoint') as number
+    // const defaultHeightBp: number = AppStorage.get<number>('currentHeightBreakpoint') as number
+
+    const effectiveWidthBp = widthBp /*?? defaultWidthBp*/
+    const effectiveHeightBp = heightBp /*?? defaultHeightBp*/
+
     const widthIndex = Math.min(
-      Math.max(widthBp - 1, 0),
+      Math.max(effectiveWidthBp - 1, 0),
       WIDTH_BP_ORDER.length - 1
     )
 
     const heightIndex = Math.min(
-      Math.max(heightBp, 0),
+      Math.max(effectiveHeightBp, 0),
       HEIGHT_BP_ORDER.length - 1
     )
 
@@ -92,7 +99,8 @@ const getFontSize = BreakpointFunction2D<number>({
     ['xl']: {['hsm']: 23, ['hmd']: 24, ['hlg']: 25},
   })
 
-// getFontSize(this.widthBp, this.heightBp)
+// getFontSize(this.widthBp, this.heightBp) // 外部断点 推荐
+
 
 
 

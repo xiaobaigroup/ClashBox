@@ -1,11 +1,10 @@
 import {  BreakpointState } from '../../common/breakpoint/breakpointsystem'
-import { mediaquery } from '@kit.ArkUI'
-import { MarginGenerate } from '../../common/entity/Constants'
 import { CardTitle } from './CardTitleBuilder'
 import { ProxyItem, ProxyData  } from '../../common/datasources/ProxyData'
 import { AppConfig } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { delayText } from '../Proxy/ProxyNodeItem'
+import { HomeCardPadding, HomeCardPartSmFontSize, HomeCardProxyFontSize } from '../../common/breakpoint/BreakPoint'
 
 
 @Component
@@ -13,14 +12,12 @@ struct CurrentNode {
   @State font_primary: ResourceColor = $r('sys.color.font_primary')
   // 节点假数据组后期可改可删
   @Consume items: ProxyItem[]
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
-  // 卡片内边距
-  @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
-  //主页卡片内容当前延迟小字体大小（16,20,18,24）
-  @Consume('HomeCardPrpxySmFontSize') private HomeCardPrpxySmFontSize: BreakpointState<number>
-  //主页卡片内容当前节点字体大小
-  @Consume('ProxyFontSize') private ProxyFontSize: BreakpointState<number>
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
 
   build() {
@@ -29,26 +26,26 @@ struct CurrentNode {
       Column() {
         if (this.appConfig.currentProxyItem) {
           Text(`${this.appConfig.currentProxyName}`)
-            .fontSize(this.isLandscapePhone ? 18 : this.ProxyFontSize.value)
+            .fontSize(HomeCardProxyFontSize(this.widthBp, this.heightBp))
             .fontWeight(FontWeight.Bold)
             .fontColor(this.font_primary)
             .maxLines(2)
 
           Text('ping ' + `${delayText(ClashViewModel.delayMap.get(this.appConfig.currentProxyItem.name)?.delay ?? 0)}`)
-            .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)
+            .fontSize(HomeCardPartSmFontSize(this.widthBp, this.heightBp))
             .fontColor(ProxyData.getColorForLatency(ClashViewModel.delayMap.get(this.appConfig.currentProxyItem.name)?.delay ?? 0))
         } else {
           Text($r('app.string.proxy_name'))
-            .fontSize(this.isLandscapePhone ? 18 : this.ProxyFontSize.value)
+            .fontSize(HomeCardProxyFontSize(this.widthBp, this.heightBp))
             .fontWeight(FontWeight.Bold)
             .fontColor(this.font_primary)
 
           Row(){
             Text('ping ')
-              .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)
+              .fontSize(HomeCardPartSmFontSize(this.widthBp, this.heightBp))
               .fontColor('#64BB5C')
             Text($r('app.string.Delay'))
-              .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)
+              .fontSize(HomeCardPartSmFontSize(this.widthBp, this.heightBp))
               .fontColor('#64BB5C')
           }
         }
@@ -58,7 +55,7 @@ struct CurrentNode {
       .justifyContent(FlexAlign.SpaceBetween)
       .alignItems(HorizontalAlign.Start)
     }
-    .padding(this.cardPadding.value)
+    .padding(HomeCardPadding(this.widthBp, this.heightBp))
     .width('100%')
     .height('100%')
     .alignItems(HorizontalAlign.Start)

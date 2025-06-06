@@ -47,14 +47,14 @@ struct Connect {
   @Consume isSecondary: boolean
   @State intervalId: number = 0
   @Consume('NavPathStack') pageInfos: NavPathStack
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 数据
   @State private connectListData: ConnectItemDataSource = new ConnectItemDataSource()
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
-  // 高度断点
-  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
-  // 宽度断点
-  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   // 一级图标色，黑色

@@ -10,6 +10,7 @@ import { isEnd, UIConfig } from "../../entryability/AppState"
 import { picker } from "@kit.CoreFileKit"
 import { customAnimationUtil, isON } from "../../common/utils/Animation"
 import { icon_primary } from '../Common/Common'
+import { TabContentTitleMargin } from "../../common/breakpoint/BreakPoint"
 
 /**
  * 提供者
@@ -48,9 +49,6 @@ export struct ProviderPage {
   @State isON: isON = new isON()
   //副标题是否显示
   @State textTwoTitle: boolean = true
-  // 内容外边距
-  @Consume('breakPointStateTabContentTitleMargin')
-  private breakPointStateTabContentTitleMargin: BreakpointState<number>
 
   /**
    * 监听加载状态改变执行UI数组更新
@@ -126,8 +124,8 @@ export struct ProviderPage {
         otherButton: (): void => {
           this.titleButton()
         }
-      }).margin({ left: this.breakPointStateTabContentTitleMargin.value })
-      // this.titleStyle()
+      }).margin({ left: TabContentTitleMargin(this.widthBp, this.heightBp) })
+
       List() {
         ListItem() {
           // 代理提供者相关
@@ -372,8 +370,8 @@ export struct ProviderPage {
       }.width('100%')
       .contentEndOffset(this.providerListData.length === 0 ? null : CONTENT_END_OFFSET_150 - 65)
       .padding({
-        left: this.breakPointStateTabContentTitleMargin.value,
-        right: this.breakPointStateTabContentTitleMargin.value,
+        left: TabContentTitleMargin(this.widthBp, this.heightBp),
+        right: TabContentTitleMargin(this.widthBp, this.heightBp),
       })
       .scrollBar(BarState.Off)
     }

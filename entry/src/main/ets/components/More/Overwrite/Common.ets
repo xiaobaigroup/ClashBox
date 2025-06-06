@@ -19,7 +19,6 @@ const context = getContext(this) as common.UIAbilityContext
 @Component
 export struct ConfigList {
   @Prop configList: ConfigItemData[]
-  @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
@@ -180,7 +179,7 @@ export struct ConfigList {
     Column() {
       Blank().height(TAB_CONTENT_TITLE_HEIGHT + 6)
       Scroll() {
-        List({ space: this.listBottom.value }) {
+        List({ space: 12 }) {
           ForEach(this.configList, (item: ConfigItemData, index: number) => {
             if (item.sign === 0) {
               ListItem() {

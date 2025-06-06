@@ -1,12 +1,13 @@
 import { BreakpointState, BreakpointSystem } from '../../common/breakpoint/breakpointsystem';
 import { McLineChart, Options } from '@mcui/mccharts'
 import { CardTitle } from './CardTitleBuilder';
-import { CHART_NUMBER, MarginGenerate } from '../../common/entity/Constants';
+import { CHART_NUMBER } from '../../common/entity/Constants';
 import { AppFlowingState, getLast, UIConfig } from '../../entryability/AppState';
 import { JSON } from '@kit.ArkTS';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { convertDataArray, ConvertedUnit } from '../../common/utils/DataUnitConvertUtils';
 import { customAnimationUtil } from '../../common/utils/Animation';
+import { HomeCardPadding, HomeCardSpeedFontSize } from '../../common/breakpoint/BreakPoint';
 
 
 @Component
@@ -17,10 +18,10 @@ struct Speed {
   @Consume isForeward: boolean
   // 是否在主页
   @Consume isHomePage: boolean
-  // 卡片内边距
-  @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
-  //主页卡片内容网络测速字体大小
-  @Consume('SpeedfontSize12_14_14_16') private SpeedfontSize12_14_14_16: BreakpointState<number>
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
   @StorageProp("appFlowingState") appFlowingState: AppFlowingState = new AppFlowingState()
@@ -288,7 +289,7 @@ struct Speed {
         Column() {
           Row({space:5}) {
             Text(this.UploadSpeed.toString())
-              .fontSize(this.isLandscapePhone ? 12:this.SpeedfontSize12_14_14_16.value)
+              .fontSize(HomeCardSpeedFontSize(this.widthBp, this.heightBp))
               .fontColor($r('sys.color.font_primary'))
               .textAlign(TextAlign.End)
 
@@ -299,7 +300,7 @@ struct Speed {
 
           Row({space:5}) {
             Text(this.DownloadSpeed.toString())
-              .fontSize(this.isLandscapePhone ? 12:this.SpeedfontSize12_14_14_16.value)
+              .fontSize(HomeCardSpeedFontSize(this.widthBp, this.heightBp))
               .fontColor($r('sys.color.font_primary'))
               .textAlign(TextAlign.End)
 
@@ -323,7 +324,7 @@ struct Speed {
         }
       }.width('100%').height('100%').alignContent(Alignment.Bottom)
     }
-    .padding(this.cardPadding.value)
+    .padding(HomeCardPadding(this.widthBp, this.heightBp))
     .width('100%')
     .height('100%')
     .id('SpeedId')

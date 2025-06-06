@@ -3,23 +3,23 @@ import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
 import { HomeCardItem, HomeCardList } from "../../common/entity/Constants"
 import { AppConfig, UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../common/utils/Animation"
-
+import { TabContentTitleMargin } from "../../common/breakpoint/BreakPoint"
 
 
 @Component
 export struct CardEdit {
-  /*
-  grid网格组件相关数据,包含scroller控制器,regularSize参数指代组件布局大小为1:1,irregularIndexes参数指代0序号的组件占据整排
+  /**
+   * grid网格组件相关数据,包含scroller控制器,regularSize参数指代组件布局大小为1:1,irregularIndexes参数指代0序号的组件占据整排
    */
   scroller: Scroller = new Scroller()
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
-  /* 主页卡片高度*/
-  @Consume('HomeCardEditHeight') private HomeCardEditHeight: BreakpointState<number>
-  @Consume('breakPointStateTabContentTitleMargin')
-  private breakPointStateTabContentTitleMargin: BreakpointState<number>
+  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
   // 折叠屏展开状态判定
-  @StorageLink ('isFoldStatus') private isFoldStatus: boolean = false
+  @StorageLink ('isFoldStatus') isFoldStatus: boolean = false
 
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   // 当前主页布局
@@ -33,7 +33,7 @@ export struct CardEdit {
       Image(s)
         .width(w)
         .aspectRatio(a)
-        .height(this.HomeCardEditHeight.value)
+        .height(160)
         .ImageItemStyle()
         .transition(customAnimationUtil.isScaleTran(i, this.uiConfig))
         .onClick(() => {
@@ -55,7 +55,7 @@ export struct CardEdit {
       if (this.isFoldStatus && !this.is2in1 ? this.theCurrentHomeCard[9] : !this.theCurrentHomeCard[9]) {
         Image($r('app.media.Shortcuts'))
           .width('48.5%')
-          .height(this.HomeCardEditHeight.value)
+          .height(160)
           .aspectRatio(1)
           .ImageItemStyle()
           .transition(customAnimationUtil.isScaleTran(9,this.uiConfig))
@@ -68,8 +68,8 @@ export struct CardEdit {
     }
     .width('100%')
     .padding({
-      left: this.breakPointStateTabContentTitleMargin.value,
-      right: this.breakPointStateTabContentTitleMargin.value,
+      left: TabContentTitleMargin(this.widthBp, this.heightBp),
+      right: TabContentTitleMargin(this.widthBp, this.heightBp),
     bottom:30})
   }
 }

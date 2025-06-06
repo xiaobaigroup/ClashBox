@@ -23,7 +23,7 @@ import { StylesEdit } from '../components/Proxy/StylesEdit'
 import { PopTips, PopupBuilder } from '../components/Start/Popup'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { customVibrator } from '../common/utils/VibratorUtil'
-import { TabBarVertical } from '../common/breakpoint/BreakPoint'
+import { TabBarVertical, TabContentTitleMargin } from '../common/breakpoint/BreakPoint'
 import { TopBar } from '../components/Common/TopBar'
 import { getResourceString } from '../common/utils/ResourceStringUtil'
 
@@ -95,15 +95,8 @@ struct ProxyPage {
 
   // 收藏与ping延迟即时动作
   private ProxyPromptAction: PromptAction = this.getUIContext()?.getPromptAction()
-  /* 断点布局相关 相关作用看定义时候的注释 */
-  @Consume('breakPointStateListLanes')
-  private breakPointStateListLanes: BreakpointState<number>
-  @Consume('breakPointStateListGutter')
-  private breakPointStateListGutter: BreakpointState<number>
-  @Consume('breakPointStateTabContentTitleMargin')
-  private breakPointStateTabContentTitleMargin: BreakpointState<number>
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
+  @StorageLink('isLandscapePhone') isLandscapePhone: boolean = false
   // 按钮宽度
   private proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
   // 按钮高度
@@ -116,8 +109,6 @@ struct ProxyPage {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  /**主页卡片标题按钮间距*/
-  @Consume('HomeCardTitleButtonPadding') private HomeCardTitleButtonPadding: BreakpointState<number>
   // page内顶部标题偏移量
   @Consume curYOffset: number
   // 收藏显示判定
@@ -237,7 +228,7 @@ struct ProxyPage {
     Stack() {
       // 标题栏
       if (!this.isPXSecScreen) {
-      Row({ space: this.HomeCardTitleButtonPadding.value }) {
+      Row({ space: 12 }) {
         TopBar({
           title: getResourceString($r('app.string.Proxy'), this),
           titleFontSize: this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE - this.curYOffset / 100 : TAB_CONTENT_TITLE_FONT_SIZE,
@@ -268,10 +259,6 @@ struct ProxyPage {
       .position({x: 0,y:this.isRolling && this.isSmallSquareScreen?this.heightTop:0})
       .alignItems(VerticalAlign.Center)
       .width('100%')
-      // .padding({
-      //   left: this.breakPointStateTabContentTitleMargin.value,
-      //   right: this.breakPointStateTabContentTitleMargin.value,
-      // })
       .transition(customAnimationUtil.isSlide(0, this.uiConfig))
       }
 
@@ -390,7 +377,7 @@ struct ProxyPage {
             .scrollBar(BarState.Off)
             .enableScrollInteraction(this.isPXSecScreen ? false : true)
             .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring : null)
-            .padding({ left: this.breakPointStateTabContentTitleMargin.value, right: this.breakPointStateTabContentTitleMargin.value})
+            .padding({ left: TabContentTitleMargin(this.widthBp, this.heightBp), right: TabContentTitleMargin(this.widthBp, this.heightBp)})
             .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {
               // 累计计算当前父组件滚动在Y轴方向的偏移量
               if (this.uiConfig.isAnimation){

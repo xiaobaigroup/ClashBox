@@ -31,8 +31,6 @@ struct Appearance {
   private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
   // 手机横屏判断
   @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
-  // 滚动列表高度
-  @Consume('breakPointStateSettingslistHeight') SettingslistHeight: BreakpointState<number>
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点

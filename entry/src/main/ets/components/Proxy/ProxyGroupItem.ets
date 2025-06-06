@@ -15,17 +15,8 @@ import { customAnimationUtil } from '../../common/utils/Animation';
 import { customVibrator } from '../../common/utils/VibratorUtil';
 import ClashViewModel from '../../entryability/ClashViewModel';
 import { PopTips, PopupBuilder } from '../Start/Popup';
+import { ProxyListLanes } from '../../common/breakpoint/BreakPoint';
 
-
-//断点布局
-export const BPS_LIST_LANES_2_2_3_4_4: BreakpointState<number> = BreakpointState.of({
-  xs: 2,
-  sm: 2,
-  md: 3,
-  lg: 4,
-  xl: 4,
-  xxl: 5
-})
 
 /* 速度与延迟区别弹窗 */
 @CustomDialog
@@ -125,7 +116,7 @@ struct ProxyGroupItem {
   @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
 
   /* 断点布局相关 */
-  @Consume ProxyListLanes: BreakpointState<number>
+
   @Consume private breakPointStateListGutter: BreakpointState<number>
 
   // 主界面index
@@ -148,10 +139,14 @@ struct ProxyGroupItem {
   // 代理原始数据
   @Consume theProxyGroups: ProxyGroup[]
   @State proxyLazyItems: ProxyItemDataSource = new ProxyItemDataSource()
-  @Consume('currentProfile') private currentProfile: Profile | null
+  @Consume('currentProfile') currentProfile: Profile | null
   // 当前代理节点单选选择的值
   @Prop selectedProxy: string
   @Prop disabled: boolean
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
   @StorageLink('appConfig') @Watch('switchSort') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
@@ -371,17 +366,17 @@ struct ProxyGroupItem {
       }, (item: ProxyItem,i: number) => item.name + '-' + i.toString())
     }.cachedCount(4)
     .onScrollFrameBegin((offset: number) => {
-      this.curOffsetRemain  += offset
-      if (offset>0) {
+      this.curOffsetRemain += offset
+      if (offset > 0) {
         this.isRolling = true
-      }else if(offset<0){
+      } else if(offset < 0) {
         this.isRolling = false
         this.curOffsetRemain = 0
       }
       console.info("offsetRemain:" + offset + '/' +this.curOffsetRemain);
       return { offsetRemain: offset }
     })
-    .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : this.ProxyListLanes.value,
+    .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : ProxyListLanes(this.widthBp, this.heightBp),
       this.breakPointStateListGutter.value)
     .ListStyle()
     .nestedScroll({

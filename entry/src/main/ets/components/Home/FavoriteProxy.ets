@@ -1,6 +1,5 @@
 import { BreakpointState } from '../../common/breakpoint/breakpointsystem'
 import { mediaquery} from '@kit.ArkUI'
-import { MarginGenerate } from '../../common/entity/Constants'
 import { CardTitle } from './CardTitleBuilder'
 import { ProxyGroupItemDataSource, ProxyItem } from '../../common/datasources/ProxyData'
 import { AppConfig, AppState, UIConfig } from '../../entryability/AppState'
@@ -8,6 +7,8 @@ import { Profile, ProxyGroup } from 'proxy_core'
 import { customVibrator } from '../../common/utils/VibratorUtil'
 import { customAnimationUtil } from '../../common/utils/Animation'
 import ClashViewModel from '../../entryability/ClashViewModel'
+import { HomeCardDeleteButtonSize, HomeCardFontSize, HomeCardPadding,
+  HomeCardPartSmallFontSize } from '../../common/breakpoint/BreakPoint'
 
 
 @Component
@@ -18,20 +19,15 @@ struct FavoriteProxy {
   @Prop disabled: boolean
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
-  // 卡片内边距
-  @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
-  // 内容文本字体大小
-  @Consume('breakPointStateHomeCardSwitchModeFontSize') private fontSize: BreakpointState<number>
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
   //radio选中判定
   @State FavoriteProxyRadio :number =0
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  //主页卡片内容IP地址小字体大小
-  @Consume('HomeCardIPSmFontSize')
-  private HomeCardIPSmFontSize: BreakpointState<number>
-  /*编辑模式下右上角删除按钮*/
-  @Consume deleteButtonSize: BreakpointState<number>
   // 当前代理节点长按选择的值
   @Consume private FavoriteProxy: number
   // 当前代理节点长按选择的值
@@ -81,13 +77,13 @@ struct FavoriteProxy {
                     //  .minFontSize(10)
                     //  .maxFontSize(22)
                     //  .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
-                      .fontSize(this.isLandscapePhone ? 15 : this.fontSize.value)
+                      .fontSize(HomeCardFontSize(this.widthBp, this.heightBp))
                       .fontColor($r('sys.color.font_primary'))
                       .maxLines(1)
                       .width('80%')
                       .textOverflow({ overflow: TextOverflow.Ellipsis })
                     Radio({ value: 'FavoriteProxyRadio', group: 'FavoriteProxyGroup' })
-                      .width(this.isLandscapePhone ? 15 : this.fontSize.value)
+                      .width(HomeCardFontSize(this.widthBp, this.heightBp))
                       .checked(this.appConfig.currentProxyName === p[1])
                       .radioStyle({
                         checkedBackgroundColor: this.icon_emphasize,
@@ -118,19 +114,18 @@ struct FavoriteProxy {
         .backgroundColor($r('app.color.home_card_background'))
         .borderRadius(10)
         .padding({ left: 8, right: 5 })
-      }//拥有收藏节点的布局 end
+      }// 拥有收藏节点的布局 end
 
-      //没有收藏节点的布局 start
-      else
-      {
+      // 没有收藏节点的布局 start
+      else {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
           SymbolGlyph($r('sys.symbol.star'))
-            .fontSize(this.isLandscapePhone?20 :this.deleteButtonSize.value)
+            .fontSize(HomeCardDeleteButtonSize(this.widthBp, this.heightBp))
             .fontColor([$r('sys.color.font_secondary')])
             .padding({bottom:5})
 
           Text($r('app.string.favorite_proxy_tips'))
-            .fontSize(this.isLandscapePhone ? 12:this.HomeCardIPSmFontSize.value)
+            .fontSize(HomeCardPartSmallFontSize(this.widthBp, this.heightBp))
             .fontColor($r('sys.color.font_secondary'))
             .textAlign(TextAlign.Center)
         }
@@ -138,7 +133,7 @@ struct FavoriteProxy {
         .height("78%")
       }//没有收藏节点的布局 end
     }
-    .padding(this.cardPadding.value)
+    .padding(HomeCardPadding(this.widthBp, this.heightBp))
     .width('100%')
     .height('100%')
     .alignItems(HorizontalAlign.Start)

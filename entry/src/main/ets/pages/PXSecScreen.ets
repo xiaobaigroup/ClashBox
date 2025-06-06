@@ -9,13 +9,12 @@ import { customVibrator } from "../common/utils/VibratorUtil"
 import { ConfigData } from "../common/entity/PageArgumentEntity"
 import { Timer } from "../common/utils/HHmmssTimer"
 import {  ProxyGroup } from "proxy_core"
-import { BreakpointState } from "../common/breakpoint/breakpointsystem"
-import {  MarginGenerate } from "../common/entity/Constants"
 import ProxyPage from "./ProxyPage"
 import ConfigurationPage from "./ConfigurationPage"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { number2Time } from "../common/utils/TimeConvertUtil"
 import { getResourceString } from "../common/utils/ResourceStringUtil"
+import { HomeCardPadding } from "../common/breakpoint/BreakPoint"
 
 
 export enum SwiperPage{
@@ -44,8 +43,10 @@ export struct PXSecScreen{
   @Consume proxyStartedTimer: Timer
   //节点数据组后期
   @Consume theProxyGroups: ProxyGroup[]
-  // 卡片内边距
-  @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   // 收藏与ping延迟即时动作
   private PXPromptAction: PromptAction = this.getUIContext()?.getPromptAction()
   pageInfosPX: NavPathStack = new NavPathStack()
@@ -134,7 +135,7 @@ export struct PXSecScreen{
             }
             .width('100%')
             .height('100%')
-            .padding(this.cardPadding.value)
+            .padding(HomeCardPadding(this.widthBp, this.heightBp))
           }
           .aspectRatio(1)
           .width(141)

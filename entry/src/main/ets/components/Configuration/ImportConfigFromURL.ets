@@ -61,11 +61,6 @@ export struct ImportConfigFromURL{
     updateTime: 0,
   }
 
-  /* 断点相关 */
-  // NV容器的padding
-  // @Consume('breakPointStateNavigationListPadding')
-  // breakPointStateNavigationListPadding: BreakpointState<number>
-
   /* NV title Builder */
   @State
   private mainTitle: string = getResourceString($r('app.string.add_config'), this)
@@ -166,10 +161,8 @@ export struct ImportConfigFromURL{
         padding: {
           // 为什么设置`15`，看Builder的参数中`padding`的介绍：ConfigAddBindSheetTitleBuilderParam
           left: 15,
-          // left: this.breakPointStateNavigationListPadding.value,
           // 避让`bindSheet`右上角的叉号本身`40vp`、右`15vp`
           right: BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT + 15
-          // right: this.breakPointStateNavigationListPadding.value
         },
         menus: this.menus,
       })

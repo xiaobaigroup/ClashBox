@@ -1,12 +1,18 @@
 import { BreakpointState } from '../../common/breakpoint/breakpointsystem'
-import { ColorMetrics, mediaquery, SymbolGlyphModifier } from '@kit.ArkUI'
-import { FONT_SIZE_14, FONT_SIZE_16, MarginGenerate } from '../../common/entity/Constants'
+import { mediaquery } from '@kit.ArkUI'
+import { FONT_SIZE_14, FONT_SIZE_16 } from '../../common/entity/Constants'
 import { CardTitle } from './CardTitleBuilder'
 import { AppFlowingState, TrafficUnit, UIConfig } from '../../entryability/AppState'
 import { convertDataNumberT, convertToSwitchNub } from '../../common/utils/DataUnitConvertUtils'
 import { customVibrator } from '../../common/utils/VibratorUtil'
 import { JSON } from '@kit.ArkTS'
 import json from '@ohos.util.json'
+import { HomeCardCellularDataBarHeight,
+  HomeCardCellularDataChevronSize,
+  HomeCardCellularDataChevronSpace,
+  HomeCardCellularDataFontSize,
+  HomeCardCellularDataPadding,
+  HomeCardPadding } from '../../common/breakpoint/BreakPoint'
 
 
 /* 输入总流量自定义弹窗相关 */
@@ -149,33 +155,15 @@ struct CellularDataStat {
   @State totalData:number =0
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
   @State font_primary: ResourceColor = $r('sys.color.font_primary')
-
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
-  // 内容文本字体大小
-  @Consume('breakPointStateCardCellularDataFontSize') private fontSize: BreakpointState<number>
-  // 上下行箭头图标大小
-  @Consume('breakPointStateCardCellularDataChevronSize') private chevronSize: BreakpointState<number>
-  // 箭头组件部分间距
-  @Consume('breakPointStateCardCellularDataChevronRowMargin') private RowMargin: BreakpointState<number>
-  // 统计条高度
-  @Consume('breakPointStateCardCellularDatabarHeight') private barHeight: BreakpointState<number>
-  // 统计条边距
-  @Consume('breakPointStateCardCellularDatabarMargin') private barMargin: BreakpointState<MarginGenerate>
-  // 卡片内边距
-  @Consume('breakPointStateHomeCardPadding') private cardPadding: BreakpointState<MarginGenerate>
-  @Consume('breakPointStateHomeCardTitleBottomMargin') private titleBottomMargin: BreakpointState<number>
-
-//下部文字大小
-  @Consume('HomeCardCellularDataSmFontSize') private HomeCardCellularDataSmFontSize: BreakpointState<number>
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
-  /**
-   * 主页流量统计卡片padding高度
-   */
-  @Consume('HomeCardCellularDataPadding')
-  private HomeCardCellularDataPadding: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
   /* 主题色 */
@@ -248,33 +236,33 @@ struct CellularDataStat {
     Column() {
       CardTitle({title: $r('app.string.CellularData')})
 
-      Column({space:this.isLandscapePhone ? 3 :this.RowMargin.value}) {
+      Column({space: HomeCardCellularDataChevronSpace(this.widthBp, this.heightBp)}) {
         Row({ space: 10 }) {
-          //已使用上传流量
+          // 已使用上传流量
           Column() {
             Text() {
               SymbolSpan($r('sys.symbol.chevron_up'))
             }
-            .fontSize(this.isLandscapePhone ? 12 : this.chevronSize.value)
+            .fontSize(HomeCardCellularDataChevronSize(this.widthBp, this.heightBp))
             .fontColor(this.icon_primary)
 
             Text(this.appFlowingState.totalTraffic.up.toString())
-              .fontSize(this.isLandscapePhone ? 12 : this.fontSize.value)
+              .fontSize(HomeCardCellularDataFontSize(this.widthBp, this.heightBp))
               .fontColor(this.icon_primary)
               .maxLines(1)
               .textAlign(TextAlign.End)
           }
 
-          //已使用下载流量
+          // 已使用下载流量
           Column() {
             Text() {
               SymbolSpan($r('sys.symbol.chevron_down'))
             }
-            .fontSize(this.isLandscapePhone ? 12 : this.chevronSize.value)
+            .fontSize(HomeCardCellularDataChevronSize(this.widthBp, this.heightBp))
             .fontColor(this.icon_primary)
 
             Text(this.appFlowingState.totalTraffic.down.toString())
-              .fontSize(this.isLandscapePhone ? 12 : this.fontSize.value)
+              .fontSize(HomeCardCellularDataFontSize(this.widthBp, this.heightBp))
               .fontColor(this.icon_primary)
               .maxLines(1)
               .textAlign(TextAlign.End)
@@ -293,38 +281,38 @@ struct CellularDataStat {
             .style({ enableSmoothEffect: true, borderColor: '#00ffffff' })
             .color(this.icon_emphasize)
             .width('90%')
-            .height(this.barHeight.value)
+            .height(HomeCardCellularDataBarHeight(this.widthBp, this.heightBp))
 
           Column()
             .width('90%')
             .backgroundColor(this.icon_emphasize)
-            .height(this.barHeight.value)
-            .borderRadius(this.barHeight.value)
+            .height(HomeCardCellularDataBarHeight(this.widthBp, this.heightBp))
+            .borderRadius(HomeCardCellularDataBarHeight(this.widthBp, this.heightBp))
             .opacity(0.3)
         }
 
         Row({space:2}) {
           // 使用流量/总流量
           Text(convertDataNumberT(this.uiConfig.dataTotal) + ' / ' + this.uiConfig.inputTotal.toString())
-            .fontSize(this.isLandscapePhone ? 10 : this.HomeCardCellularDataSmFontSize.value)
+            .fontSize(HomeCardCellularDataFontSize(this.widthBp, this.heightBp) - 2)
             .fontColor($r('sys.color.font_secondary'))
 
           // 总量单位
           Text(this.uiConfig.switchUnit)
-            .fontSize(this.isLandscapePhone ? 10 : this.HomeCardCellularDataSmFontSize.value)
+            .fontSize(HomeCardCellularDataFontSize(this.widthBp, this.heightBp) - 2)
             .fontColor($r('sys.color.font_secondary'))
       }
 
       if( this.uiConfig.inputTotal === 0 ||this.uiConfig.inputTotal === undefined){
       Text($r('app.string.cellular_data_tips'))
-        .fontSize(this.isLandscapePhone ? 10 : this.HomeCardCellularDataSmFontSize.value)
+        .fontSize(HomeCardCellularDataFontSize(this.widthBp, this.heightBp) - 2)
         .fontColor($r('sys.color.font_secondary'))
         }
       }
       .width('100%')
       .height('100%')
       .justifyContent(FlexAlign.Center)
-      .padding({bottom:this.isLandscapePhone ? 30: this.HomeCardCellularDataPadding.value})
+      .padding({bottom: HomeCardCellularDataPadding(this.widthBp, this.heightBp)})
       .onClick(()=>{
         if (this.dialogController != null) {
           //  在home页编辑状态时，无法操作
@@ -340,7 +328,7 @@ struct CellularDataStat {
       })
 
     }
-    .padding(this.cardPadding.value)
+    .padding(HomeCardPadding(this.widthBp, this.heightBp))
     .width('100%')
     .height('100%')
     .id('CellularDataId')

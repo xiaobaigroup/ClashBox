@@ -29,11 +29,11 @@ struct Kernel {
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
-  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 实验功能展示变量
   @Consume isShowExperimentalFunction: boolean
   // 更多页列表数组

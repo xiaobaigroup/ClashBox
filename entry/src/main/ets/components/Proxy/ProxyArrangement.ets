@@ -32,8 +32,6 @@ struct ProxyArrangement {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
-  /* 断点布局相关 */
-  @Consume breakPointStateTabContentTitleMargin: BreakpointState<number>
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
 
   aboutToAppear(): void {

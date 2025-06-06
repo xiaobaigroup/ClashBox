@@ -1,6 +1,5 @@
 import { BreakpointState } from '../../common/breakpoint/breakpointsystem'
 import { mediaquery, PromptAction } from '@kit.ArkUI'
-import { MarginGenerate } from '../../common/entity/Constants'
 import { CardTitle } from './CardTitleBuilder'
 import { AppConfig, isEnd, UIConfig } from '../../entryability/AppState'
 import { customVibrator } from '../../common/utils/VibratorUtil'
@@ -8,6 +7,8 @@ import { customAnimationUtil } from '../../common/utils/Animation'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { EventHub, EventKey } from '../../common/EventHub'
 import { getResourceString } from '../../common/utils/ResourceStringUtil'
+import { HomeCardDeleteButtonSize, HomeCardFontSize, HomeCardPadding,
+  HomeCardPartSmallFontSize } from '../../common/breakpoint/BreakPoint'
 
 
 @Component
@@ -15,11 +16,11 @@ struct FavoriteConfiguration {
   //后端接入后此处应改为收藏的配置项
   @State FavoriteConfiguration: string [] = ['收藏配置1','收藏配置2','收藏配置3']
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
-  // 卡片内边距
-  @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
-  // 内容文本字体大小
-  @Consume('breakPointStateHomeCardSwitchModeFontSize') private fontSize: BreakpointState<number>
+  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
   //radio选中判定
   @State FavoriteConfigurationRadio :number =0
@@ -27,13 +28,6 @@ struct FavoriteConfiguration {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   //有无收藏代理节点判定
   @State isCheckFavoriteConfiguration:number=-1
-  //主页卡片内容IP地址小字体大小
-  @Consume('HomeCardIPSmFontSize')
-  private HomeCardIPSmFontSize: BreakpointState<number>
-  /*
-编辑模式下右上角删除按钮
- */
-  @Consume deleteButtonSize: BreakpointState<number>
   @StorageLink('favoriteProfiles') favoriteProfiles: Map<string, string> = new Map<string, string>([])
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   //编辑按钮点击后显示编辑状态判定
@@ -50,13 +44,13 @@ struct FavoriteConfiguration {
           ForEach(Array.from(this.favoriteProfiles.entries()), (f:[string, string], i: number)=>{
             Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
               Text(f[1])
-                .fontSize(this.isLandscapePhone ? 15 : this.fontSize.value)
+                .fontSize(HomeCardFontSize(this.widthBp, this.heightBp))
                 .fontColor($r('sys.color.font_primary'))
                 .maxLines(1)
                 .width('80%')
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
               Radio({ value: 'FavoriteConfigurationRadio1', group: 'FavoriteConfigurationRadioGroup' })
-                .width(this.isLandscapePhone ? 15 : this.fontSize.value)
+                .width(HomeCardFontSize(this.widthBp, this.heightBp))
                 .checked(f[0] === this.appConfig.currentProfileId)
                 .radioStyle({
                   checkedBackgroundColor: this.icon_emphasize,
@@ -101,12 +95,12 @@ struct FavoriteConfiguration {
       {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
           SymbolGlyph($r('sys.symbol.star'))
-            .fontSize(this.isLandscapePhone?20 :this.deleteButtonSize.value)
+            .fontSize(HomeCardDeleteButtonSize(this.widthBp, this.heightBp))
             .fontColor([$r('sys.color.font_secondary')])
             .padding({bottom:5})
 
           Text($r('app.string.favorite_configuration_tips'))
-            .fontSize(this.isLandscapePhone ? 12:this.HomeCardIPSmFontSize.value)
+            .fontSize(HomeCardPartSmallFontSize(this.widthBp, this.heightBp))
             .fontColor($r('sys.color.font_secondary'))
             .textAlign(TextAlign.Center)
         }
@@ -119,7 +113,7 @@ struct FavoriteConfiguration {
         })//为预览而设置的点击事件，后端接入修改或删除
       }//没有收藏配置时的布局 end
     }
-    .padding(this.cardPadding.value)
+    .padding(HomeCardPadding(this.widthBp, this.heightBp))
     .width('100%')
     .height('100%')
     .alignItems(HorizontalAlign.Start)
