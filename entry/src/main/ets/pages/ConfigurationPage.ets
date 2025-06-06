@@ -33,6 +33,7 @@ import { PopTips, PopupBuilder } from '../components/Start/Popup'
 import { ImportConfigFromURL } from '../components/Configuration/ImportConfigFromURL'
 import { ImportConfigFromFile } from '../components/Configuration/ImportConfigFromFile'
 import { TopBar } from '../components/Common/TopBar'
+import { ListGutter, ListLanes, TabContentTitleMargin } from '../common/breakpoint/BreakPoint'
 
 
 /**
@@ -74,17 +75,11 @@ struct ConfigurationPage {
   private promptAction:PromptAction = this.getUIContext()?.getPromptAction()
 
   /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur')
-  private isEnableIndexForegroundBlur: boolean
-
-
-  /* 断点布局相关 相关作用看定义时候的注释 */
-  @Consume('breakPointStateListLanes')
-  private breakPointStateListLanes: BreakpointState<number>
-  @Consume('breakPointStateListGutter')
-  private breakPointStateListGutter: BreakpointState<number>
-  @Consume('breakPointStateTabContentTitleMargin')
-  private breakPointStateTabContentTitleMargin: BreakpointState<number>
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
 
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageLink('isLandscapePhone') private isLandscapePhone: boolean = false
@@ -449,12 +444,12 @@ struct ConfigurationPage {
                 return { offsetRemain: offset }
               })
               .padding({
-                left: this.breakPointStateTabContentTitleMargin.value,
-                right: this.breakPointStateTabContentTitleMargin.value,
+                left: TabContentTitleMargin(this.widthBp, this.heightBp),
+                right: TabContentTitleMargin(this.widthBp, this.heightBp),
               })
               // 110 = app.integer.vp_proxy_start_button_margin *2 + app.integer.vp_proxy_not_start_button_width
               .contentEndOffset(this.isPXSecScreen? 65:CONTENT_END_OFFSET_150)
-              .lanes(this.breakPointStateListLanes.value, this.breakPointStateListGutter.value)
+              .lanes(ListLanes(this.widthBp, this.heightBp), ListGutter(this.widthBp, this.heightBp))
               .edgeEffect(EdgeEffect.Spring)
               .chainAnimation(true)
               .nestedScroll({

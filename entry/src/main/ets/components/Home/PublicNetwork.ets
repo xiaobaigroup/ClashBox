@@ -1,13 +1,15 @@
 import { BreakpointState } from '../../common/breakpoint/breakpointsystem'
 import { mediaquery, PromptAction } from '@kit.ArkUI'
-import { MarginGenerate } from '../../common/entity/Constants'
 import { CardTitle } from './CardTitleBuilder'
-import { AppFlowingState, UIConfig } from '../../entryability/AppState'
+import { UIConfig } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { IpInfo } from 'proxy_core'
 import { EventHub, EventKey } from '../../common/EventHub'
 import { customVibrator } from '../../common/utils/VibratorUtil'
 import { customAnimationUtil } from '../../common/utils/Animation'
+import { HomeCardFontSize,
+  HomeCardIPFontSize,
+  HomeCardPadding, HomeCardPartSmallFontSize } from '../../common/breakpoint/BreakPoint'
 
 @Component
 struct PublicNetwork {
@@ -18,17 +20,12 @@ struct PublicNetwork {
   @State IP: string = '255.255.255.255'
   phonelistener: mediaquery.MediaQueryListener =
     this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
-  //主页卡片内容IP地址小字体大小
-  @Consume('HomeCardIPSmFontSize')
-  private HomeCardIPSmFontSize: BreakpointState<number>
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
-  // 卡片内边距
-  @Consume('breakPointStateHomeCardPadding') private cardPadding: BreakpointState<MarginGenerate>
-  // 主页卡片内容IP地址字体大小
-  @Consume('IPfontSize') private IPfontSize: BreakpointState<number>
-  // 内容文本字体大小
-  @Consume('breakPointStateHomeCardSwitchModeFontSize') private fontSize: BreakpointState<number>
+  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
   // 折叠屏展开状态判定
@@ -49,12 +46,12 @@ struct PublicNetwork {
       Column() {
         if (this.remoteIp?.ip != undefined){
           Text(this.remoteIp?.country ?? " " )
-            .fontSize(this.isLandscapePhone ? 12 : this.HomeCardIPSmFontSize.value)
+            .fontSize(HomeCardPartSmallFontSize(this.widthBp, this.heightBp))
             .fontColor($r('sys.color.font_secondary'))
             .transition(customAnimationUtil.isOpacity(this.uiConfig))
 
           Text( this.remoteIp?.ip  ?? $r('app.string.loading'))
-            .fontSize(this.isLandscapePhone ? 16 :this.isFoldStatus ? 22: this.IPfontSize.value)
+            .fontSize(HomeCardIPFontSize(this.widthBp, this.heightBp))
             .textAlign(TextAlign.JUSTIFY)
             .fontColor($r('sys.color.font_primary'))
             .transition(customAnimationUtil.isOpacity(this.uiConfig))
@@ -65,7 +62,7 @@ struct PublicNetwork {
               .color(this.icon_emphasize)
 
             Text($r('app.string.loading'))
-              .fontSize(this.isLandscapePhone ? 15 : this.isFoldStatus ? 22: this.IPfontSize.value)
+              .fontSize(HomeCardIPFontSize(this.widthBp, this.heightBp))
               .textAlign(TextAlign.JUSTIFY)
               .fontColor($r('sys.color.font_primary'))
           }.transition(customAnimationUtil.isOpacity(this.uiConfig))
@@ -85,11 +82,10 @@ struct PublicNetwork {
             minFontSize: 6,
             maxFontSize: 18,
             font: {
-              size: this.fontSize.value,
+              size: HomeCardFontSize(this.widthBp, this.heightBp),
             }
           })
           .fontColor(this.icon_emphasize)
-          //.fontSize(this.isLandscapePhone ? 14 : this.fontSize.value)
           .backgroundColor($r('app.color.home_card_background'))
           .onClick(() => {
             // 在home页编辑卡片状态时，无法操作，点击回调写在if判定里
@@ -103,10 +99,9 @@ struct PublicNetwork {
           })
       }.width('100%').justifyContent(FlexAlign.End)
     }
-    .padding(this.cardPadding.value)
+    .padding(HomeCardPadding(this.widthBp, this.heightBp))
     .width('100%')
     .height('100%')
-    //.justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Start)
     .id('PublicNetworkId')
   }

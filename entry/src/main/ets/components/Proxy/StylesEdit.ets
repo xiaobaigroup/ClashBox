@@ -5,6 +5,7 @@ import { EventHub, EventKey } from '../../common/EventHub'
 import { AppConfig, isEnd, ProxyCardSize, ProxyGroupType, UIConfig } from '../../entryability/AppState'
 import { customAnimationUtil } from '../../common/utils/Animation'
 import { proxyBindSheetTitleStyle } from '../Common/Common'
+import { TabContentTitleMargin } from '../../common/breakpoint/BreakPoint'
 
 @Component
 export struct StylesEdit {
@@ -12,9 +13,10 @@ export struct StylesEdit {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-  // 内容外边距
-  @Consume('breakPointStateTabContentTitleMargin')
-  private breakPointStateTabContentTitleMargin: BreakpointState<number>
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
 
   // 编辑页标题
   @Builder
@@ -163,8 +165,8 @@ export struct StylesEdit {
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
     .padding({
-      left: this.breakPointStateTabContentTitleMargin.value,
-      right: this.breakPointStateTabContentTitleMargin.value,
+      left: TabContentTitleMargin(this.widthBp, this.heightBp),
+      right: TabContentTitleMargin(this.widthBp, this.heightBp),
     })
   }
 }

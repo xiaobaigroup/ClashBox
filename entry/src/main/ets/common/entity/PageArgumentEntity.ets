@@ -38,10 +38,11 @@ export interface Shortcuts {
   isShowFavoriteProxy?: boolean
 }
 
+
 export interface HomeCardInfo {
-  span_sm: number,
-  span_md: number,
-  span_lg: number,
+  span_sm?: number,
+  span_md?: number,
+  span_lg?: number,
   order: number,
   aspectRatio: number
 }

@@ -1,41 +1,36 @@
 import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
-import { MarginGenerate } from "../../common/entity/Constants"
 import { ProxyItem, ProxyData } from "../../common/datasources/ProxyData"
 import { AppConfig, AppFlowingState, UIConfig } from "../../entryability/AppState"
 import { CardTitle } from "./CardTitleBuilder"
-import { LengthMetrics, PromptAction } from "@kit.ArkUI"
+import { PromptAction } from "@kit.ArkUI"
 import ClashViewModel from "../../entryability/ClashViewModel"
-import { JSON } from "@kit.ArkTS"
 import { customVibrator } from "../../common/utils/VibratorUtil"
 import { delayText } from "../Proxy/ProxyNodeItem"
 import { IpInfo } from "proxy_core"
 import { EventHub, EventKey } from "../../common/EventHub"
 import { customAnimationUtil } from "../../common/utils/Animation"
+import { HomeCardFontSize,
+  HomeCardIPFontSize,
+  HomeCardPadding,
+  HomeCardPartSmallFontSize,
+  HomeCardPartSmFontSize,
+  HomeCardProxyFontSize,
+  HomeCardSpeedFontSize} from "../../common/breakpoint/BreakPoint"
 
 @Component
 struct ProxyINFO{
-  //自定义主题，颜色在AppTheme里面修改
+  // 自定义主题，颜色在AppTheme里面修改
   @Consume('icon_emphasize') icon_emphasize: ResourceColor //高亮图标,可在apptheme更换
-  // 卡片内边距
-  @Consume('breakPointStateHomeCardPadding')  private cardPadding: BreakpointState<MarginGenerate>
-  //节点假数据组后期可改可删
+  // 节点数据组
   @Consume items: ProxyItem[]
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
+  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
   // 折叠屏展开状态判定
-  @StorageLink ('isFoldStatus') private isFoldStatus: boolean = false
-  // 主页卡片内容IP地址字体大小
-  @Consume('IPfontSize') private IPfontSize: BreakpointState<number>
-  //主页卡片内容当前节点字体大小
-  @Consume('ProxyFontSize') private ProxyFontSize: BreakpointState<number>
-  //主页卡片内容IP地址小字体大小
-  @Consume('HomeCardIPSmFontSize') private HomeCardIPSmFontSize: BreakpointState<number>
-  //主页卡片内容当前延迟小字体大小（16,20,18,24）
-  @Consume('HomeCardPrpxySmFontSize') private HomeCardPrpxySmFontSize: BreakpointState<number>
-  //主页卡片内容网络测速字体大小
-  @Consume('SpeedfontSize12_14_14_16') private SpeedfontSize12_14_14_16: BreakpointState<number>
-  // 内容文本字体大小
-  @Consume('breakPointStateHomeCardSwitchModeFontSize') private fontSize: BreakpointState<number>
+  @StorageLink ('isFoldStatus') isFoldStatus: boolean = false
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
 
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
@@ -65,10 +60,10 @@ struct ProxyINFO{
               .fontWeight(FontWeight.Bold)
               .fontColor($r('sys.color.font_primary'))
               .textOverflow({ overflow: TextOverflow.Clip })
-              .fontSize(this.isLandscapePhone ? 18 : this.ProxyFontSize.value)
+              .fontSize(HomeCardProxyFontSize(this.widthBp, this.heightBp))
           } else {
             Text($r('app.string.proxy_name'))
-              .fontSize(this.isLandscapePhone ? 18 : this.ProxyFontSize.value)
+              .fontSize(HomeCardProxyFontSize(this.widthBp, this.heightBp))
               .fontWeight(FontWeight.Bold)
               .fontColor($r('sys.color.font_primary'))
           }
@@ -76,15 +71,15 @@ struct ProxyINFO{
           if (this.remoteIp?.ip != undefined){
             Row(){
               Text(this.remoteIp?.country ?? " " )
-                .fontSize(this.isPXSecScreen? 12 :this.isLandscapePhone ? 12 : this.HomeCardIPSmFontSize.value)
+                .fontSize(HomeCardPartSmallFontSize(this.widthBp, this.heightBp))
                 .fontColor($r('sys.color.font_secondary'))
 
               Text(' ')
-                .fontSize(this.isPXSecScreen? 12 :this.isLandscapePhone ? 12 : this.HomeCardIPSmFontSize.value)
+                .fontSize(HomeCardPartSmallFontSize(this.widthBp, this.heightBp))
                 .fontColor($r('sys.color.font_secondary'))
 
               Text( this.remoteIp?.ip  ?? $r('app.string.loading'))
-                .fontSize(this.isPXSecScreen? 12 :this.isLandscapePhone ? 12 :this.isFoldStatus ?22: this.IPfontSize.value)
+                .fontSize(HomeCardIPFontSize(this.widthBp, this.heightBp))
                 .fontColor($r('sys.color.font_secondary'))
             }.transition(customAnimationUtil.isOpacity(this.uiConfig))
           }else {
@@ -94,22 +89,22 @@ struct ProxyINFO{
                 .color(this.icon_emphasize)
 
               Text($r('app.string.loading'))
-                .fontSize(this.isPXSecScreen? 12 :this.isLandscapePhone ? 12 :this.isFoldStatus ?22: this.IPfontSize.value)
+                .fontSize(HomeCardIPFontSize(this.widthBp, this.heightBp))
                 .fontColor($r('sys.color.font_secondary'))
             } .transition(customAnimationUtil.isOpacity(this.uiConfig))
           }
         }
         if (this.appConfig.currentProxyItem) {
           Text('ping ' + `${delayText(ClashViewModel.delayMap.get(this.appConfig.currentProxyItem.name)?.delay ?? 0)}`)
-            .fontSize(this.isLandscapePhone ? 16 : this.HomeCardPrpxySmFontSize.value)
+            .fontSize(HomeCardPartSmFontSize(this.widthBp, this.heightBp))
             .fontColor(ProxyData.getColorForLatency(ClashViewModel.delayMap.get(this.appConfig.currentProxyItem.name)?.delay ?? 0))
         } else {
           Row() {
             Text('ping ')
-              .fontSize(this.isLandscapePhone ? 14 : this.HomeCardPrpxySmFontSize.value)
+              .fontSize(HomeCardPartSmFontSize(this.widthBp, this.heightBp))
               .fontColor('#64BB5C')
             Text($r('app.string.Delay'))
-              .fontSize(this.isLandscapePhone ? 14 : this.HomeCardPrpxySmFontSize.value)
+              .fontSize(HomeCardPartSmFontSize(this.widthBp, this.heightBp))
               .fontColor('#64BB5C')
           }
         }
@@ -118,7 +113,7 @@ struct ProxyINFO{
         Column() {
           Row({space: 5}) {
             Text(this.appFlowingState.traffics.getLast()?.up?.toString() ?? "0 kb")
-              .fontSize(this.isLandscapePhone ? 10:this.SpeedfontSize12_14_14_16.value)
+              .fontSize(HomeCardSpeedFontSize(this.widthBp, this.heightBp))
               .fontColor($r('sys.color.font_primary'))
               .textAlign(TextAlign.End)
 
@@ -128,7 +123,7 @@ struct ProxyINFO{
 
           Row({space: 5}) {
             Text(this.appFlowingState.traffics.getLast()?.down?.toString() ?? "0 kb")
-              .fontSize(this.isLandscapePhone ? 10:this.SpeedfontSize12_14_14_16.value)
+              .fontSize(HomeCardSpeedFontSize(this.widthBp, this.heightBp))
               .fontColor($r('sys.color.font_primary'))
               .textAlign(TextAlign.End)
 
@@ -145,11 +140,11 @@ struct ProxyINFO{
             minFontSize: 6,
             maxFontSize: 18,
             font: {
-              size: this.fontSize.value,
+              size: HomeCardFontSize(this.widthBp, this.heightBp),
             }
           })
           .fontColor(this.icon_emphasize)
-          .fontSize(this.isPXSecScreen? 14 : this.isLandscapePhone ? 14 : this.fontSize.value)
+          .fontSize(HomeCardFontSize(this.widthBp, this.heightBp))
           .backgroundColor($r('app.color.home_card_background'))
           .onClick(async () => {
             //在home页在编辑卡片状态时，无法操作，点击回调写在if判定里
@@ -166,7 +161,7 @@ struct ProxyINFO{
     }
     .width('100%')
     .height('100%')
-    .padding(this.cardPadding.value)
+    .padding(HomeCardPadding(this.widthBp, this.heightBp))
     .id('ProxyINFOId')
   }
 }

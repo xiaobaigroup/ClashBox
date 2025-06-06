@@ -110,8 +110,7 @@ export struct NetworkRouterAddress {
   @State theEditDialogTitle: ResourceStr = $r('app.string.edit_router_address')
   @State RouterAddressList: RouterAddressData[] = createRouterAddressData()
   @Consume('NavPathStack') pageInfos: NavPathStack
-  @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
-  @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
+  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   // 高度断点
@@ -221,7 +220,7 @@ export struct NetworkRouterAddress {
         Column() {
           Blank().height(TAB_CONTENT_TITLE_HEIGHT + 6)
           Scroll() {
-            List({ space: this.listBottom.value }) {
+            List({ space: 12 }) {
               ForEach(this.RouterAddressList, (item: RouterAddressData, index: number) => {
                 // 数据列表行
                 ListItem() {

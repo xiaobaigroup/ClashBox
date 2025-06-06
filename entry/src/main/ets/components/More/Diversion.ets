@@ -48,8 +48,6 @@ struct Diversion {
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
-  // 列表底边距
-  @Consume('breakPointStatemorePagelistBottom') listBottom: BreakpointState<number>
   // 是否开启 `Index` 页面的前景模糊
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
@@ -145,7 +143,7 @@ struct Diversion {
           Blank().height(TAB_CONTENT_TITLE_HEIGHT+6)
           Scroll() {
             // 数据列表行
-            List({space:this.listBottom.value}) {
+            List({space: 12}) {
               ForEach(this.DiversionList, (item: DiversionData, index: number) => {
                 ListItem() {
                   Row() {

@@ -10,6 +10,7 @@ import {
 import { BindSheetTitleCustomBuilder } from "../Common/Common"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { getResourceString } from "../../common/utils/ResourceStringUtil"
+import { NavigationListPadding } from "../../common/breakpoint/BreakPoint"
 
 
 // 关联：route_map.json
@@ -28,12 +29,10 @@ export struct CreateNewConfig{
   @Consume('configAddPageInfos')
   // 页面栈
   private configAddPageInfos: NavPathStack
-
-  /* 断点相关 */
-  // NV容器的padding
-  @Consume('breakPointStateNavigationListPadding')
-  breakPointStateNavigationListPadding: BreakpointState<number>
-
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   // NV title Builder
   @State
   private mainTitle: string = getResourceString($r('app.string.add_config'), this)
@@ -57,9 +56,7 @@ export struct CreateNewConfig{
         padding: {
           // 为什么设置`15`，看Builder的参数中`padding`的介绍：ConfigAddBindSheetTitleBuilderParam
           left: 15,
-          // left: this.breakPointStateNavigationListPadding.value,
           right: BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT + 15 * 2
-          // right: this.breakPointStateNavigationListPadding.value
         },
         menus: []
       })
@@ -68,7 +65,7 @@ export struct CreateNewConfig{
       // START
       Column() {
         Text(this.componentName).fontSize(50)
-        Text(`breakPointStateNavigationListPadding.value is [${this.breakPointStateNavigationListPadding.value?.toString()}]`)
+        Text(`NavigationListPadding(this.widthBp, this.heightBp) value is [${NavigationListPadding(this.widthBp, this.heightBp)}]`)
 
       }.width('100%').height('auto').backgroundColor('#ffac70e9').alignItems(HorizontalAlign.Start)
       // END

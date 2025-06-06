@@ -18,6 +18,7 @@ import { getResourceString } from "../../common/utils/ResourceStringUtil";
 import { UIConfig } from "../../entryability/AppState";
 import { customAnimationUtil } from "../../common/utils/Animation";
 import { removeItemsByIndex } from "../../common/utils/RemoveItemsUtils";
+import { NavigationListPadding } from "../../common/breakpoint/BreakPoint";
 
 interface ConfigAddType {
   symbolStart? : Resource,
@@ -29,21 +30,20 @@ interface ConfigAddType {
   symbolEnd?: Resource
 }
 
+const componentName: string = 'ConfigAdd'
+
 @Component
 export struct ConfigAdd {
 
-  private componentName: string = 'ConfigAdd';
-
-  /* 断点相关 */
-  @Consume('breakPointStateNavigationListPadding')
-  breakPointStateNavigationListPadding: BreakpointState<number>
-
   /* 是否开启 配置页 `bindSheet` 组件的前景模糊 */
   @Consume('isEnableConfigPageBindSheetForegroundBlur') isEnableConfigPageBindSheetForegroundBlur: boolean
-
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   /* List 相关 */
   private configAddTypeArray: Array<ConfigAddType> = [
@@ -55,12 +55,10 @@ export struct ConfigAdd {
 
   /* NV路由 相关 */
   // 路由栈
-  @Consume('configAddPageInfos')
-  private configAddPageInfos: NavPathStack
+  @Consume('configAddPageInfos') configAddPageInfos: NavPathStack
 
   // NV title Builder
-  @State
-  private subTitle: string | Resource = 'subTitle'
+  @State subTitle: string | Resource = 'subTitle'
 
   build() {
     Column(){
@@ -90,7 +88,7 @@ export struct ConfigAdd {
             .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
             .borderRadius(BORDER_RADIUS_20)
             .onClick( () => {
-              hilog.info(0xC020, this.componentName, `#ListItem#onClick(): NavPathStack.pushDestinationByName(${item?.navPathStackName}, null})`)
+              hilog.info(0xC020, componentName, `#ListItem#onClick(): NavPathStack.pushDestinationByName(${item?.navPathStackName}, null})`)
               if (this.uiConfig.isShowExperimentalFunction ? (index === 1 || index === 3) : index === 2) {
                 promptAction.showToast({message: getResourceString($r('app.string.developing'), this)})
               } else {
@@ -102,8 +100,8 @@ export struct ConfigAdd {
         .height(`${(LIST_ITEM_HEIGHT + LIST_SPACE) * this.configAddTypeArray.length + 20}`)
         .width('100%')
         .padding({
-          left: this.breakPointStateNavigationListPadding.value,
-          right: this.breakPointStateNavigationListPadding.value
+          left: NavigationListPadding(this.widthBp, this.heightBp),
+          right: NavigationListPadding(this.widthBp, this.heightBp)
         })
         // TODO下面这三个都不生效，bindSheet是用Scroll为根节点包裹的，但是nestedScroll也不生效 未知
         // .chainAnimation(true)
@@ -122,8 +120,8 @@ export struct ConfigAdd {
             mainTitleFontSize: BIND_SHEET_MAIN_FONTSIZE,
             subTitleFontSize: BIND_SHEET_SUB_FONTSIZE,
             padding: {
-              left: this.breakPointStateNavigationListPadding.value,
-              right: this.breakPointStateNavigationListPadding.value
+              left: NavigationListPadding(this.widthBp, this.heightBp),
+              right: NavigationListPadding(this.widthBp, this.heightBp)
             },
             menus: []
           }),
@@ -147,7 +145,7 @@ export struct ConfigAdd {
   }
 
   aboutToAppear(): void {
-    hilog.info(0xC020, this.componentName, `#aboutToAppear executed`)
+    hilog.info(0xC020, componentName, `#aboutToAppear executed`)
     if(!this.uiConfig.enabledADvanced || !this.uiConfig.isShowExperimentalFunction) {
       // 屏蔽分流策略
       this.configAddTypeArray = removeItemsByIndex(this.configAddTypeArray, [1,3])
@@ -155,9 +153,9 @@ export struct ConfigAdd {
   }
 
   aboutToDisappear(): void {
-    hilog.info(0xC020, this.componentName, `#aboutToDisappear executed`)
+    hilog.info(0xC020, componentName, `#aboutToDisappear executed`)
     this.configAddPageInfos.clear(true)
-    hilog.info(0xC020, this.componentName, `#aboutToDisappear#NV路由configAddPageInfos已清空！`)
+    hilog.info(0xC020, componentName, `#aboutToDisappear#NV路由configAddPageInfos已清空！`)
   }
 
 }

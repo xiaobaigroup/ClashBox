@@ -46,10 +46,6 @@ struct Settings {
   // 当前设备`height`是否符合(320vp< height <= 500vp)
   @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  // 列表底边距
-  @Consume('breakPointStatemorePagelistBottom') private listBottom: BreakpointState<number>
-  // 列表高度
-  @Consume('breakPointStateSettingslistHeight') private SettingslistHeight: BreakpointState<number>
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   // 高度断点
@@ -294,10 +290,11 @@ struct OfflineDetail {
 
   @State offline: number[] = []
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  // 高度断点
-  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+
 
   aboutToAppear(): void {
     this.offline = ClashViewModel.socketProxy.offlineTime.reverse()

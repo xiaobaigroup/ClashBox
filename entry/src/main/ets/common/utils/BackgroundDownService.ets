@@ -130,7 +130,7 @@ export class BackgroundDownService{
       wants: [
         {
           // bundleName: "cn.damai.hongmeng",
-          bundleName: "org.xbgroup.clashbox",
+          bundleName: "org.xbstudio.clashnext",
           abilityName: "EntryAbility"
         }
       ],

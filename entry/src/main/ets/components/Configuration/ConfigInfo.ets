@@ -18,6 +18,7 @@ import { customVibrator } from "../../common/utils/VibratorUtil"
 import { customSound } from "../../common/utils/SoundPoolUtil"
 import { UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../common/utils/Animation"
+import { NavigationListPadding } from "../../common/breakpoint/BreakPoint"
 
 @Component
 export struct ConfigInfo{
@@ -32,11 +33,6 @@ export struct ConfigInfo{
   // 配置详情
   @Link
   configData: ConfigData
-
-  /* 断点相关 */
-  // NV容器的padding
-  @Consume('breakPointStateNavigationListPadding')
-  breakPointStateNavigationListPadding: BreakpointState<number>
 
   /* List */
   // 配置是否自动更新
@@ -73,6 +69,10 @@ export struct ConfigInfo{
   // ListItem里自动更新间隔`TextPicker`组件的渐隐效果
   @State
   private gradientHeightOfTextPickerInTheListItem: number = FONT_SIZE_16
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   build() {
@@ -286,14 +286,14 @@ export struct ConfigInfo{
       .borderRadius(BORDER_RADIUS_20)
       .backgroundColor($r('app.color.container_background'))
       // // 配置自动更新 END
-      // Text(`breakPointStateNavigationListPadding.value is [${this.breakPointStateNavigationListPadding.value?.toString()}]`)
+      // Text(`NavigationListPadding(this.widthBp, this.heightBp) value is [${NavigationListPadding(this.widthBp, this.heightBp)}]`)
       // Text(`isNewConfig: ${this.configData.isNewConfig}`).fontSize(35)
     }
     .width('100%')
     .height('100%')
     .padding({
-      left: this.breakPointStateNavigationListPadding.value,
-      right: this.breakPointStateNavigationListPadding.value
+      left: NavigationListPadding(this.widthBp, this.heightBp),
+      right: NavigationListPadding(this.widthBp, this.heightBp)
     })
     .alignItems(HorizontalAlign.Start)
     .backgroundColor($r('app.color.background'))

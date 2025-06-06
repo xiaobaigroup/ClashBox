@@ -447,8 +447,6 @@ export struct AboutContributors {
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @StorageLink('isLandscapePhone')  private isLandscapePhone: boolean = false
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  // 列表高度
-  @Consume('breakPointStateSettingslistHeight') SettingslistHeight: BreakpointState<number>
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点

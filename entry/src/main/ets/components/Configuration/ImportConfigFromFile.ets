@@ -53,11 +53,6 @@ export struct ImportConfigFromFile{
   private configAddPageInfos: NavPathStack
   @State @Watch('configDataChanged') fileurl: string = ''
 
-  /* 断点相关 */
-  // NV容器的padding
-  @Consume('breakPointStateNavigationListPadding')
-  breakPointStateNavigationListPadding: BreakpointState<number>
-
   // NV title Builder
   @State
   private mainTitle: string = getResourceString($r('app.string.add_config'), this)
@@ -143,9 +138,7 @@ export struct ImportConfigFromFile{
         padding: {
           // 为什么设置`15`，看Builder的参数中`padding`的介绍：ConfigAddBindSheetTitleBuilderParam
           left: 15,
-          // left: this.breakPointStateNavigationListPadding.value,
           right: BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT + 15 * 2
-          // right: this.breakPointStateNavigationListPadding.value
         },
         menus: this.filemenus
       })
@@ -199,7 +192,7 @@ export struct ImportConfigFromFile{
           .fontWeight(FontWeight.Normal)
           .fontSize(15)
         // Text(this.componentName).fontSize(50)
-        // Text(`breakPointStateNavigationListPadding.value is [${this.breakPointStateNavigationListPadding.value?.toString()}]`)
+        // Text(`NavigationListPadding(this.widthBp, this.heightBp) value is [${NavigationListPadding(this.widthBp, this.heightBp)}]`)
 
       }.width('100%').height('auto')
       .alignItems(HorizontalAlign.Start)
