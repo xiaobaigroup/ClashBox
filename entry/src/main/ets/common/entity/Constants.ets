@@ -879,8 +879,8 @@ export const HomeCardList: HomeCardItem[] = [
   {image:$r('app.media.PublicNetwork'),aspectRatio:1,isShow:true,width:'48.5%'},
   {image:$r('app.media.FavoriteProxy'),aspectRatio:1,isShow:true,width:'48.5%'},
   {image:$r('app.media.FavoriteConfiguration'),aspectRatio:1,isShow:true,width:'48.5%'},
-  {image:$r('app.media.ProxyINFO'),aspectRatio:2.07,isShow:true,width:'100%'},
   {image:$r('app.media.CurrentConfiguration'),aspectRatio:1,isShow:true,width:'48.5%'},
+  {image:$r('app.media.ProxyINFO'),aspectRatio:2.07,isShow:true,width:'100%'},
 ]
 
 

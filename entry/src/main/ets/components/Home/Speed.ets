@@ -1,8 +1,7 @@
-import { BreakpointState, BreakpointSystem } from '../../common/breakpoint/breakpointsystem';
 import { McLineChart, Options } from '@mcui/mccharts'
 import { CardTitle } from './CardTitleBuilder';
 import { CHART_NUMBER } from '../../common/entity/Constants';
-import { AppFlowingState, getLast, UIConfig } from '../../entryability/AppState';
+import { AppFlowingState, UIConfig } from '../../entryability/AppState';
 import { JSON } from '@kit.ArkTS';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { convertDataArray, ConvertedUnit } from '../../common/utils/DataUnitConvertUtils';
@@ -12,25 +11,27 @@ import { HomeCardPadding, HomeCardSpeedFontSize } from '../../common/breakpoint/
 
 @Component
 struct Speed {
+
+  @StorageProp("appFlowingState") appFlowingState: AppFlowingState = new AppFlowingState()
+  @StorageLink('uiConfig') @Watch('colorTheme') uiConfig: UIConfig = new UIConfig()
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+  @Consume @Watch('proxyEnabledChanged') proxyEnabled: boolean
+  /* 主题色 */
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  @Consume ChartData: number[] | ConvertedUnit[]
+  @State lineStart: boolean = true
   @Consume DownloadSpeed: string
   @Consume UploadSpeed: string
   // 前台判断变量
   @Consume isForeward: boolean
   // 是否在主页
   @Consume isHomePage: boolean
-  // 高度断点
-  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
-  // 宽度断点
-  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
-  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
-  @StorageProp("appFlowingState") appFlowingState: AppFlowingState = new AppFlowingState()
-  @Consume
-  @Watch('proxyEnabledChanged') proxyEnabled: boolean
-  @StorageLink('uiConfig') @Watch('colorTheme')uiConfig: UIConfig = new UIConfig()
-  @Consume ChartData: number[] | ConvertedUnit[]
-  @State lineStart: boolean = true
-  //初始化图表数据
+  // 定时器ID，用于清除定时器
+  timerId: number = 0
+  // 初始化图表数据
   @State defOption: Options = new Options({
     //图例
     legend: {
@@ -94,10 +95,55 @@ struct Speed {
       },
     ]
   })
-  /* 主题色 */
-  @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  // 定时器ID，用于清除定时器
-  private timerId: number = 0;
+
+  build() {
+    Column() {
+      Flex() {
+        CardTitle({title: $r('app.string.Speed')})
+
+        Column() {
+          Row({space:5}) {
+            Text(this.UploadSpeed.toString())
+              .fontSize(HomeCardSpeedFontSize(this.widthBp, this.heightBp))
+              .fontColor($r('sys.color.font_primary'))
+              .textAlign(TextAlign.End)
+
+            SymbolGlyph($r('sys.symbol.chevron_up'))
+              .fontColor([$r('sys.color.font_primary')])
+
+          }.width('100%').justifyContent(FlexAlign.End)
+
+          Row({space:5}) {
+            Text(this.DownloadSpeed.toString())
+              .fontSize(HomeCardSpeedFontSize(this.widthBp, this.heightBp))
+              .fontColor($r('sys.color.font_primary'))
+              .textAlign(TextAlign.End)
+
+            SymbolGlyph($r('sys.symbol.chevron_down'))
+              .fontColor([$r('sys.color.font_primary')])
+
+          }.width('100%').justifyContent(FlexAlign.End)
+        }
+      }
+      .width('100%')
+
+      // 图表
+      Stack(){
+        if (this.lineStart){
+          Row().width('92%').height(3).backgroundColor(this.uiConfig.lineColor).margin({left:17,right:17,bottom:28.5})
+            .transition(customAnimationUtil.isOpacity(this.uiConfig))
+        }else {
+          McLineChart({
+            options: this.defOption
+          }).transition(customAnimationUtil.isOpacity(this.uiConfig))
+        }
+      }.width('100%').height('100%').alignContent(Alignment.Bottom)
+    }
+    .padding(HomeCardPadding(this.widthBp, this.heightBp))
+    .width('100%')
+    .height('100%')
+    .id('SpeedId')
+  }
 
   onSpeedData() {
     this.DownloadSpeed = this.appFlowingState.traffics.getLast()?.down?.toString() ?? "0 kb"
@@ -166,9 +212,7 @@ struct Speed {
     })
   }
 
-  /**
-   * @Watch监听事件：开启代理时启动定时器
-   */
+  /**@Watch监听事件：开启代理时启动定时器*/
   proxyEnabledChanged() {
     // 只有主页显示的时候启动
     animateTo({
@@ -281,54 +325,6 @@ struct Speed {
     }
   }
 
-  build() {
-    Column() {
-      Flex() {
-        CardTitle({title: $r('app.string.Speed')})
-
-        Column() {
-          Row({space:5}) {
-            Text(this.UploadSpeed.toString())
-              .fontSize(HomeCardSpeedFontSize(this.widthBp, this.heightBp))
-              .fontColor($r('sys.color.font_primary'))
-              .textAlign(TextAlign.End)
-
-            SymbolGlyph($r('sys.symbol.chevron_up'))
-              .fontColor([$r('sys.color.font_primary')])
-
-          }.width('100%').justifyContent(FlexAlign.End)
-
-          Row({space:5}) {
-            Text(this.DownloadSpeed.toString())
-              .fontSize(HomeCardSpeedFontSize(this.widthBp, this.heightBp))
-              .fontColor($r('sys.color.font_primary'))
-              .textAlign(TextAlign.End)
-
-            SymbolGlyph($r('sys.symbol.chevron_down'))
-              .fontColor([$r('sys.color.font_primary')])
-
-          }.width('100%').justifyContent(FlexAlign.End)
-        }
-      }
-      .width('100%')
-
-      // 图表
-      Stack(){
-        if (this.lineStart){
-          Row().width('92%').height(3).backgroundColor(this.uiConfig.lineColor).margin({left:17,right:17,bottom:28.5})
-            .transition(customAnimationUtil.isOpacity(this.uiConfig))
-        }else {
-          McLineChart({
-            options: this.defOption
-          }).transition(customAnimationUtil.isOpacity(this.uiConfig))
-        }
-      }.width('100%').height('100%').alignContent(Alignment.Bottom)
-    }
-    .padding(HomeCardPadding(this.widthBp, this.heightBp))
-    .width('100%')
-    .height('100%')
-    .id('SpeedId')
-  }
 }
 
 export default Speed

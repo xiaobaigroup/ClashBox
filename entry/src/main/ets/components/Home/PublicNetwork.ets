@@ -13,33 +13,23 @@ import { HomeCardFontSize,
 
 @Component
 struct PublicNetwork {
-  //下部文字大小
-  /* 主题色 */
-  @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  @State address: string = '中国大陆'
-  @State IP: string = '255.255.255.255'
-  phonelistener: mediaquery.MediaQueryListener =
-    this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
-  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
+
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
-  //编辑按钮点击后显示编辑状态判定
-  @Consume isShowHomeEdit: boolean
   // 折叠屏展开状态判定
   @StorageLink ('isFoldStatus') private isFoldStatus: boolean = false
-  // 收藏与ping延迟即时动作
-  private PromptAction: PromptAction = this.getUIContext()?.getPromptAction()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  /* 主题色 */
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  //编辑按钮点击后显示编辑状态判定
+  @Consume isShowHomeEdit: boolean
   @Consume remoteIp: IpInfo | null
-  aboutToAppear(): void {
-    EventHub.on(EventKey.checkIpInfo, async ()=>{
-      this.remoteIp = null
-      this.remoteIp = await ClashViewModel.checkIpInfo()
-    })
-  }
+
+  // 收藏与ping延迟即时动作
+  PromptAction: PromptAction = this.getUIContext()?.getPromptAction()
+
   build() {
     Column() {
       CardTitle({ title: $r('app.string.PublicNetwork') })
@@ -105,6 +95,14 @@ struct PublicNetwork {
     .alignItems(HorizontalAlign.Start)
     .id('PublicNetworkId')
   }
+
+  aboutToAppear(): void {
+    EventHub.on(EventKey.checkIpInfo, async ()=>{
+      this.remoteIp = null
+      this.remoteIp = await ClashViewModel.checkIpInfo()
+    })
+  }
+
 }
 
 export default PublicNetwork

@@ -13,55 +13,28 @@ import { AppConfig, isEnd, UIConfig } from '../../entryability/AppState'
 import { customVibrator } from '../../common/utils/VibratorUtil'
 import { customAnimationUtil } from '../../common/utils/Animation'
 import { HomeCardFontSize, HomeCardPadding, TabContentTitleMargin } from '../../common/breakpoint/BreakPoint'
+import { implicitStartAbility } from '../../common/utils/GoToWeb'
+import { context } from '../Common/Common'
 
 @Component
 struct Shortcuts {
-  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
+
+  /* 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
-  /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
-  // 编辑按钮点击后显示编辑状态判定
-  @Consume isShowHomeEdit: boolean
-  @State isShowShortcutsEdit: boolean = false
-  /* 主题色 */
-  @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  // 折叠屏展开状态判定
-  @StorageLink ('isFoldStatus') isFoldStatus: boolean = false
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-
-  aboutToAppear() {
-    let uiContextShortcuts: UIContext = this.getUIContext();
-  }
-
-  // 隐式 Want 跳转网站
-  async implicitStartAbility(url: string) {
-    try {
-      let want: Want = {
-        // 如果希望仅在特定包中隐式查询，请取消下面的注释行
-        // bundleName: "com.example.myapplication",
-        "action": "ohos.want.action.viewData",
-        // entities可以省略
-        //   "entities": [ "entity.system.browsable" ],
-        "uri": url,
-      }
-      let context = getContext(this) as common.UIAbilityContext;
-      await context.startAbility(want)
-      console.info(`explicit start ability succeed`)
-    } catch (error) {
-      console.info(`explicit start ability failed with ${error.code}`)
-    }
-  }
-
-  //无填写标题和网址即时动作
-  private ShortcutsPromptAction: PromptAction = this.getUIContext()?.getPromptAction()
+  /* 主题色 */
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  @State isShowShortcutsEdit: boolean = false
+  // 编辑按钮点击后显示编辑状态判定
+  @Consume isShowHomeEdit: boolean
 
   build() {
-    //快捷小卡片主体 start
+    // 快捷小卡片主体 start
     Column() {
       CardTitle({ title: $r('app.string.shortcuts') })
 
@@ -71,36 +44,36 @@ struct Shortcuts {
           { t: this.uiConfig.inputTitle2, w: this.uiConfig.inputWeb2 },
           { t: this.uiConfig.inputTitle3, w: this.uiConfig.inputWeb3 }
         ], (m: [Resource, number], i: number) => {
-            Text(`${m["t"]}` != '' ? `${m["t"]}` : $r('app.string.long_press_modify'))
-              .fontSize(HomeCardFontSize(this.widthBp, this.heightBp))
-              .ShortcutsTextStyle()
-              .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-              .onClick(() => {
-                // 在home页添加按钮的半模拟态里和在编辑状态时，无法操作
-                if (this.isShowHomeEdit === false) {
-                  if (`${m["w"]}` != '') {
-                    this.implicitStartAbility(`${m["w"]}`)
-                  } else {
-                    this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
-                  }
-                  if (this.uiConfig.isVibrate) {
-                    customVibrator.vibratorTriggerOfHapticClockTimer()
-                  }
+          Text(`${m["t"]}` != '' ? `${m["t"]}` : $r('app.string.long_press_modify'))
+            .fontSize(HomeCardFontSize(this.widthBp, this.heightBp))
+            .ShortcutsTextStyle()
+            .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+            .onClick(() => {
+              // 在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+              if (this.isShowHomeEdit === false) {
+                if (`${m["w"]}` != '') {
+                  implicitStartAbility(`${m["w"]}`, context)
+                } else {
+                  this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
                 }
-              })
-              .gesture(
-                LongPressGesture()
-                  .onAction(() => {
-                    //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
-                    if (this.isShowHomeEdit === false) {
-                      this.isShowShortcutsEdit = true
-                      this.isEnableIndexForegroundBlur = true
-                      if (this.uiConfig.isVibrate) {
-                        customVibrator.vibratorTriggerOfHapticClockTimer()
-                      }
+                if (this.uiConfig.isVibrate) {
+                  customVibrator.vibratorTriggerOfHapticClockTimer()
+                }
+              }
+            })
+            .gesture(
+              LongPressGesture()
+                .onAction(() => {
+                  //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+                  if (this.isShowHomeEdit === false) {
+                    this.isShowShortcutsEdit = true
+                    this.isEnableIndexForegroundBlur = true
+                    if (this.uiConfig.isVibrate) {
+                      customVibrator.vibratorTriggerOfHapticClockTimer()
                     }
-                  })
-              )
+                  }
+                })
+            )
           if (!isEnd(3, i)) {
             Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
           }
@@ -131,8 +104,11 @@ struct Shortcuts {
     })
   } //快捷小卡片主体 end
 
+  // 无填写标题和网址即时动作
+  private ShortcutsPromptAction: PromptAction = this.getUIContext()?.getPromptAction()
+
   /* web输入弹窗数据  */
-  //绑定第一个按钮弹窗
+  // 绑定第一个按钮弹窗
   WebDialogController1: CustomDialogController | null = new CustomDialogController({
     builder: WebCustomDialog1({
       cancel: () => {
@@ -162,7 +138,7 @@ struct Shortcuts {
     backgroundBlurStyle: BlurStyle.NONE,
  //   backgroundColor: $r('app.color.container_background')
   })
-  //绑定第二个按钮弹窗
+  // 绑定第二个按钮弹窗
   WebDialogController2: CustomDialogController | null = new CustomDialogController({
     builder: WebCustomDialog2({
       cancel: () => {
@@ -192,7 +168,7 @@ struct Shortcuts {
     backgroundBlurStyle: BlurStyle.NONE,
   //  backgroundColor: $r('app.color.container_background')
   })
-  //绑定第三个按钮弹窗
+  // 绑定第三个按钮弹窗
   WebDialogController3: CustomDialogController | null = new CustomDialogController({
     builder: WebCustomDialog3({
       cancel: () => {

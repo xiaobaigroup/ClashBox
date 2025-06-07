@@ -26,6 +26,7 @@ import { customVibrator } from '../common/utils/VibratorUtil'
 import { TabBarVertical, TabContentTitleMargin } from '../common/breakpoint/BreakPoint'
 import { TopBar } from '../components/Common/TopBar'
 import { getResourceString } from '../common/utils/ResourceStringUtil'
+import { RoundButton } from '../components/Common/RoundButton'
 
 
 @Entry
@@ -399,51 +400,32 @@ struct ProxyPage {
           }
 
           // 悬浮代理测速按钮 START
-          if (!this.isPXSecScreen){
-          Column() {
-            RightDownButton(
-              $r('sys.symbol.bolt_filled_on_circle'),
-              this.ReplaceSymbolEffect,
-            )
-          }
-          .backgroundColor(this.icon_emphasize)
-          .shadow({
-            radius: 10,
-            color: this.icon_emphasize,
-            offsetY: 4,
-            type: ShadowType.BLUR
-          })
-          .borderRadius(100)
-          .width(this.proxyStartButtonWidth)
-          .height(this.proxyStartButtonHeight)
-          .clip(true)
-          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-          .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
-          .animation(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed,curve:curves.springMotion() }:null)
-          .margin({bottom:this.isLandscapePhone || !this.uiConfig.isBlurr ? $r('app.integer.vp_proxy_start_button_left_right_margin') :(this.isRolling && this.isSmallSquareScreen) ?
-          this.paddingButtom: $r('app.integer.vp_proxy_start_button_bottom_margin'),right:$r('app.integer.vp_proxy_start_button_left_right_margin'),left:$r('app.integer.vp_proxy_start_button_left_right_margin')})
-          .bindPopup(!!this.isShowDelayPop, {
-            builder: PopupBuilder(this, PopTips[3], () => {
-              this.isShowDelayPop = false
-            }),
-            onWillDismiss: false,
-            autoCancel: false
-          })
-          .onClick(async () => {
-            if(this.isLatencySort){
-              return
-            }
-            this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
-            await ClashViewModel.testAllDelay(this.theProxyGroups[this.currentProxyIndex].proxies as ProxyItem[])
-            // 当延迟排序选中时，让ui可以刷新
-            this.isLatencySort = true
-            // await this.isLatencySort == true
-            this.isLatencySort = false
-            hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行1 %{public}s")
-            if (this.uiConfig.isVibrate) {
-              customVibrator.vibratorTriggerOfHapticClockTimer()
-            }
-          })
+          if (!this.isPXSecScreen) {
+            RoundButton({
+              Icon2: $r('sys.symbol.bolt_filled_on_circle')
+            })
+              .bindPopup(!!this.isShowDelayPop, {
+                builder: PopupBuilder(this, PopTips[3], () => {
+                  this.isShowDelayPop = false
+                }),
+                onWillDismiss: false,
+                autoCancel: false
+              })
+              .onClick(async () => {
+                if(this.isLatencySort){
+                  return
+                }
+                this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
+                await ClashViewModel.testAllDelay(this.theProxyGroups[this.currentProxyIndex].proxies as ProxyItem[])
+                // 当延迟排序选中时，让ui可以刷新
+                this.isLatencySort = true
+                // await this.isLatencySort == true
+                this.isLatencySort = false
+                hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行1 %{public}s")
+                if (this.uiConfig.isVibrate) {
+                  customVibrator.vibratorTriggerOfHapticClockTimer()
+                }
+              })
           }
           // 悬浮代理测速按钮 END
         }

@@ -99,7 +99,7 @@ export struct ButtonBuilder {
   @Prop icon: Resource
   @Prop iconWeight: number
   @Prop iconSize: number = 24
-  @Prop iconColor: ResourceColor
+  @Prop iconColor: ResourceColor = icon_primary
   @Prop enableTransition: boolean = true
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageProp('WindowMode') windowMode: boolean = false

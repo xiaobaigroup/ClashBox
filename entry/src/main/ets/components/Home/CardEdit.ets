@@ -47,18 +47,18 @@ export struct CardEdit {
 
   build() {
     Flex({ wrap: FlexWrap.Wrap,justifyContent:FlexAlign.SpaceBetween, space: { main: LengthMetrics.vp(10), cross: LengthMetrics.vp(10) } }) { // 子组件多行布局
-      ForEach(HomeCardList,(item:HomeCardItem,i:number)=> {
-        this.CardImage(item.image,item.aspectRatio,i,item.width,item.isShow)
+      ForEach(HomeCardList,(item: HomeCardItem, i: number)=> {
+        this.CardImage(item.image, item.aspectRatio, i, item.width,item.isShow)
       })
 
-      //快捷方式小卡片
+      // 快捷方式小卡片
       if (this.isFoldStatus && !this.is2in1 ? this.theCurrentHomeCard[9] : !this.theCurrentHomeCard[9]) {
         Image($r('app.media.Shortcuts'))
           .width('48.5%')
           .height(160)
           .aspectRatio(1)
           .ImageItemStyle()
-          .transition(customAnimationUtil.isScaleTran(9,this.uiConfig))
+          .transition(customAnimationUtil.isScaleTran(9, this.uiConfig))
           .onClick(() => {
             animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
               this.theCurrentHomeCard.splice(9, 1, this.isFoldStatus && !this.is2in1 ? false : true)
@@ -70,7 +70,7 @@ export struct CardEdit {
     .padding({
       left: TabContentTitleMargin(this.widthBp, this.heightBp),
       right: TabContentTitleMargin(this.widthBp, this.heightBp),
-    bottom:30})
+      bottom: 30 })
   }
 }
 

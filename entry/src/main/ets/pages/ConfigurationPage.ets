@@ -34,6 +34,7 @@ import { ImportConfigFromURL } from '../components/Configuration/ImportConfigFro
 import { ImportConfigFromFile } from '../components/Configuration/ImportConfigFromFile'
 import { TopBar } from '../components/Common/TopBar'
 import { ListGutter, ListLanes, TabContentTitleMargin } from '../common/breakpoint/BreakPoint'
+import { RoundButton } from '../components/Common/RoundButton'
 
 
 /**
@@ -478,32 +479,8 @@ struct ConfigurationPage {
 
         // 悬浮新增配置按钮 START
         if (!this.isPXSecScreen) {
-          Column() {
-            RightDownButton(
-              $r('sys.symbol.plus'),
-              this.ReplaceSymbolEffect,
-            )
-          }
-          .backgroundColor(this.icon_emphasize)
-          .shadow({
-            radius: 10,
-            color: this.icon_emphasize,
-            offsetY: 4,
-            type: ShadowType.BLUR
-          })
-          .borderRadius(100)
-          .width(this.proxyStartButtonWidth)
-          .height(this.proxyStartButtonHeight)
-          .clip(true)
-          .hoverEffect(HoverEffect.Scale)
-          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-          .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
-          .margin({
-            bottom: this.isLandscapePhone || this.istabletLandscape || !this.uiConfig.isBlurr ?
-            $r('app.integer.vp_proxy_start_button_left_right_margin') : (this.isRolling && this.isSmallSquareScreen) ?
-              this.paddingButtom : $r('app.integer.vp_proxy_start_button_bottom_margin'),
-            right: $r('app.integer.vp_proxy_start_button_left_right_margin'),
-            left: $r('app.integer.vp_proxy_start_button_left_right_margin')
+          RoundButton({
+            Icon2: $r('sys.symbol.plus')
           })
           .bindSheet(this.isShowConfigAddBindSheet, this.ConfigAddBindSheetBuilder, {
             detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,], // SheetSize.LARGE
