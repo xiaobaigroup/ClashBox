@@ -15,7 +15,7 @@ import { customAnimationUtil } from '../../common/utils/Animation';
 import { customVibrator } from '../../common/utils/VibratorUtil';
 import ClashViewModel from '../../entryability/ClashViewModel';
 import { PopTips, PopupBuilder } from '../Start/Popup';
-import { ProxyListLanes } from '../../common/breakpoint/BreakPoint';
+import { ListGutter, ProxyListLanes } from '../../common/breakpoint/BreakPoint';
 
 
 /* 速度与延迟区别弹窗 */
@@ -114,11 +114,6 @@ struct ProxyGroupItem {
     new SymbolGlyphModifier($r('sys.symbol.questionmark_circle')).fontSize('24vp');
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
-
-  /* 断点布局相关 */
-
-  @Consume private breakPointStateListGutter: BreakpointState<number>
-
   // 主界面index
   @Consume IndexCurrentindex: number
 
@@ -376,8 +371,7 @@ struct ProxyGroupItem {
       console.info("offsetRemain:" + offset + '/' +this.curOffsetRemain);
       return { offsetRemain: offset }
     })
-    .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : ProxyListLanes(this.widthBp, this.heightBp),
-      this.breakPointStateListGutter.value)
+    .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : ProxyListLanes(this.widthBp, this.heightBp), ListGutter(this.widthBp, this.heightBp))
     .ListStyle()
     .nestedScroll({
       scrollForward: this.isPXSecScreen ? NestedScrollMode.SELF_FIRST: NestedScrollMode.PARENT_FIRST,

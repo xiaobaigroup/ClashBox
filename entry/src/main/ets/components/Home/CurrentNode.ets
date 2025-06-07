@@ -5,19 +5,16 @@ import { AppConfig } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { delayText } from '../Proxy/ProxyNodeItem'
 import { HomeCardPadding, HomeCardPartSmFontSize, HomeCardProxyFontSize } from '../../common/breakpoint/BreakPoint'
+import { font_primary } from '../Common/Common'
 
 
 @Component
 struct CurrentNode {
-  @State font_primary: ResourceColor = $r('sys.color.font_primary')
-  // 节点假数据组后期可改可删
-  @Consume items: ProxyItem[]
+
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
-  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
 
   build() {
@@ -28,7 +25,7 @@ struct CurrentNode {
           Text(`${this.appConfig.currentProxyName}`)
             .fontSize(HomeCardProxyFontSize(this.widthBp, this.heightBp))
             .fontWeight(FontWeight.Bold)
-            .fontColor(this.font_primary)
+            .fontColor(font_primary)
             .maxLines(2)
 
           Text('ping ' + `${delayText(ClashViewModel.delayMap.get(this.appConfig.currentProxyItem.name)?.delay ?? 0)}`)
@@ -38,7 +35,7 @@ struct CurrentNode {
           Text($r('app.string.proxy_name'))
             .fontSize(HomeCardProxyFontSize(this.widthBp, this.heightBp))
             .fontWeight(FontWeight.Bold)
-            .fontColor(this.font_primary)
+            .fontColor(font_primary)
 
           Row(){
             Text('ping ')

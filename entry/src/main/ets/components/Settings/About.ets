@@ -28,6 +28,7 @@ import { handleMailto } from "../../common/utils/MailTwoUtil"
 import { copy } from "../../common/utils/ClipBoardUtil"
 import { PageMargin } from "../../common/breakpoint/BreakPoint"
 import { icon_primary } from '../Common/Common'
+import { implicitStartAbility } from "../../common/utils/GoToWeb"
 
 const context = getContext(this) as common.UIAbilityContext
 
@@ -37,10 +38,6 @@ struct About {
   @Consume isShowExperimentalFunction: boolean
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  // 一级图标色，黑色
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
-  // 二级图标色，黑色
-  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary')
   @State EnableUpdateChenChannels: number = 0
   @State aboutList: AboutListItemProp[] = []
   // 更多页列表数组
@@ -312,7 +309,7 @@ struct About {
                           .margin({right: 5})
                         SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
                           .fontSize(14)
-                          .fontColor([this.icon_primary])
+                          .fontColor([icon_primary])
                           .margin({left: 7})
                       }.margin({right: 20})
                        .bindMenu(this.UpdateMenu(itemChild.children, index))
@@ -359,7 +356,7 @@ struct About {
                         SymbolGlyph($r('sys.symbol.chevron_right'))
                           .fontSize(28)
                           .margin({right: 12})
-                          .fontColor([this.icon_primary])
+                          .fontColor([icon_primary])
                       } else if(itemChild.sign === 0) {
                         // 普通型
                         Text(itemChild.subtitle)
@@ -445,7 +442,6 @@ export struct AboutContributors {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State ContributorsList: ContributorsListItemProp[] = ContributorsList
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  @StorageLink('isLandscapePhone')  private isLandscapePhone: boolean = false
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
@@ -593,7 +589,6 @@ export struct ThirdServices {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State thirdServicesList: TCItemProp[] = ThirdServicesList
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
@@ -656,7 +651,6 @@ export struct UseGuidance {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State useGuidanceList: TCItemProp[] = UseGuidanceList
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
@@ -993,23 +987,4 @@ export struct CheckUpdate {
   }
 }
 
-/**
- * 隐式 Want 跳转网站
- */
-export async function implicitStartAbility(url: string, context: common.UIAbilityContext) {
-  try {
-    let want: Want = {
-      // 如果希望仅在特定包中隐式查询，请取消下面的注释行
-      // bundleName: "com.example.myapplication",
-      "action": "ohos.want.action.viewData",
-      // entities可以省略
-      "entities": [ "entity.system.browsable" ],
-      "uri": url,
-    }
-    await context.startAbility(want)
-    console.info(`explicit start ability succeed`)
-  } catch (error) {
-    console.info(`explicit start ability failed with ${error.code}`)
-  }
-}
 

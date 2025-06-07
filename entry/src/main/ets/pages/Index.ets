@@ -36,7 +36,6 @@ import { PipManager } from '../common/utils/PipManager'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { CrashPage } from '../components/Start/CrashPage'
 import { compareVersions, extractUpdateInfo, getUpdateInfo, UpdateInfo } from '../common/utils/CheckUpdateUtil'
-import { implicitStartAbility } from '../components/Settings/About'
 import { fileUri, picker } from '@kit.CoreFileKit'
 import { fileIo as fs } from '@kit.CoreFileKit';
 import { number2Time, timestampToDateTime } from '../common/utils/TimeConvertUtil'
@@ -48,13 +47,16 @@ import { ConvertedUnit } from '../common/utils/DataUnitConvertUtils'
 import { WelcomeUserAgreement } from '../components/Start/WelcomePage'
 import { i18n } from '@kit.LocalizationKit'
 import { TabBarAlignItems,
+  TabBarAvoidHeight,
   TabBarHeight,
   TabBarJustifyContent,
   TabBarPosition,
   TabBarVertical, TabBarWidth,
   TabIconFontSize,
-  TabTitleFontSize } from '../common/breakpoint/BreakPoint'
+  TabTitleFontSize,
+  WindowTabBarWidth} from '../common/breakpoint/BreakPoint'
 import { WindowTopBar } from '../components/Common/TopBar'
+import { implicitStartAbility } from '../common/utils/GoToWeb'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 const context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
@@ -264,12 +266,6 @@ struct Index {
   @Provide proxyStartedTimer: Timer = new Timer()
   @Provide proxyTime:number = 0
 
-
- /* // 当手机横屏时条件成立
-  deviceHeightListener: mediaquery.MediaQueryListener =
-    this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp) and (640vp< width <= 1000vp)');
-*/
-
   build() {
     if (!this.isPXSecScreen){
       Stack({alignContent: Alignment.TopEnd}) {
@@ -289,8 +285,8 @@ struct Index {
             TabContent() { this.TabContentBuilder(index) }
             .tabBar(this.TabBarBuilder(item.name, index, item.icon))
             .gesture(
-              // 二级Tabs第一个页签向左拖动时，触发手势事件
-              PanGesture({direction: this.isLandscapePhone || this.istabletLandscape ? PanDirection.Down : PanDirection.None})
+              // 二级Tabs第一个页签向左拖动时，触发手势事件，当Tab栏竖排时不触发
+              PanGesture({direction: !TabBarVertical(this.widthBp, this.heightBp) ? PanDirection.Down : PanDirection.None})
                 .onActionStart((event?: GestureEvent) => {
                   console.info('Pan start')
                 })// 通过父组件的TabsController的实例，改变其index，达到跳转一级Tabs（首页）的效果
@@ -310,11 +306,11 @@ struct Index {
         // .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Thin: null)
         // .backgroundBrightness({rate:0.5,lightUpDegree:0.5})
         //  .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
-        .barOverlap(this.uiConfig.isBlurr ? (this.isLandscapePhone || ( this.istabletLandscape && !this.isSecondary)  ? false : true) : false) //模糊效果，需要重新调整tab高度，此效果会加上tab的高度
+        .barOverlap(false)
         .scrollable(this.isSecondary ? false : true)
         .vertical(TabBarVertical(this.widthBp, this.heightBp))
-        .barWidth(TabBarWidth(this.widthBp, this.heightBp))
-        .barHeight(TabBarHeight(this.widthBp, this.heightBp))
+        .barWidth(this.windowMode ? WindowTabBarWidth(this.widthBp, this.heightBp) : TabBarWidth(this.widthBp, this.heightBp))
+        .barHeight(this.bottomRectHeight == 0 ? TabBarHeight(this.widthBp, this.heightBp) : TabBarAvoidHeight(this.widthBp, this.heightBp))
         .onChange((index: number) => {
           this.IndexCurrentindex = index
           if (index === 0) {
@@ -425,6 +421,49 @@ struct Index {
     }
   }
 
+  /* // 当手机横屏时条件成立
+  deviceHeightListener: mediaquery.MediaQueryListener =
+   this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp) and (640vp< width <= 1000vp)');
+  */
+
+  // 免责声明 & 检查更新 弹窗控制器
+  dialogController: CustomDialogController = new CustomDialogController({
+    builder: DisclaimerCustomDialog({
+      confirm: () => {
+        // 关闭背景模糊
+        this.isEnableIndexForegroundBlur = false
+        if (!this.isDisclaimer) {
+          implicitStartAbility(this.theAppVersionInfo.browser_download_url, context)
+        }
+      },
+      cancel: () => {
+        if (this.isDisclaimer) {
+          // 拒绝并退出
+          context.terminateSelf()
+        } else {
+          // 关闭背景模糊
+          this.isEnableIndexForegroundBlur = false
+        }
+      },
+      isDisclaimer: this.isDisclaimer,
+      version: this.isDisclaimer ? '' : this.theAppVersionInfo.tag_name,
+      body: this.theAppVersionInfo.body
+    }),
+    autoCancel: false,
+    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+      if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
+
+      } else if (dismissDialogAction.reason == DismissReason.TOUCH_OUTSIDE) {
+
+      } else {
+        dismissDialogAction.dismiss()
+        setTimeout(() => {
+          this.isDisclaimer = false
+        }, 20)
+      }
+    }
+  })
+
   // 获取配置列表
   async fetchProfiles() {
     const profiles = await ClashViewModel.getProfiles()
@@ -489,47 +528,9 @@ struct Index {
       this.isFoldStatus = false
       this.isPXSecScreen = false
       hilog.info(0xFF00, componentName,
-        `#WindowChange#设备高度改变 分屏窗口: ${this.isSmallSquareScreen}`)
+        `#WindowChange#设备高度改变，没有命中`)
     }
   }
-
-  // 免责声明 & 检查更新 弹窗控制器
-  dialogController: CustomDialogController = new CustomDialogController({
-    builder: DisclaimerCustomDialog({
-      confirm: () => {
-        // 关闭背景模糊
-        this.isEnableIndexForegroundBlur = false
-        if (!this.isDisclaimer) {
-          implicitStartAbility(this.theAppVersionInfo.browser_download_url, context)
-        }
-      },
-      cancel: () => {
-        if (this.isDisclaimer) {
-          // 拒绝并退出
-          context.terminateSelf()
-        } else {
-          // 关闭背景模糊
-          this.isEnableIndexForegroundBlur = false
-        }
-      },
-      isDisclaimer: this.isDisclaimer,
-      version: this.isDisclaimer ? '' : this.theAppVersionInfo.tag_name,
-      body: this.theAppVersionInfo.body
-    }),
-    autoCancel: false,
-    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-      if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
-
-      } else if (dismissDialogAction.reason == DismissReason.TOUCH_OUTSIDE) {
-
-      } else {
-        dismissDialogAction.dismiss()
-        setTimeout(() => {
-          this.isDisclaimer = false
-        }, 20)
-      }
-    }
-  })
 
   async aboutToAppear(): Promise<void> {
 

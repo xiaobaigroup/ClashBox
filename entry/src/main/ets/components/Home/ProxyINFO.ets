@@ -15,48 +15,44 @@ import { HomeCardFontSize,
   HomeCardPartSmallFontSize,
   HomeCardPartSmFontSize,
   HomeCardProxyFontSize,
-  HomeCardSpeedFontSize} from "../../common/breakpoint/BreakPoint"
+  HomeCardSpeedFontSize,
+  HomeCardTextMaxLines} from "../../common/breakpoint/BreakPoint"
 
 @Component
-struct ProxyINFO{
-  // 自定义主题，颜色在AppTheme里面修改
-  @Consume('icon_emphasize') icon_emphasize: ResourceColor //高亮图标,可在apptheme更换
-  // 节点数据组
-  @Consume items: ProxyItem[]
-  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
-  // 折叠屏展开状态判定
-  @StorageLink ('isFoldStatus') isFoldStatus: boolean = false
+struct ProxyINFO {
+
+  @StorageProp("appFlowingState") appFlowingState: AppFlowingState = new AppFlowingState()
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
-
-  //编辑按钮点击后显示编辑状态判定
-  @Consume isShowHomeEdit: boolean
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-  @StorageProp("appFlowingState") appFlowingState: AppFlowingState = new AppFlowingState()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  //收藏与ping延迟即时动作
-  private PromptAction:PromptAction = this.getUIContext()?.getPromptAction()
+  // 自定义主题，颜色在AppTheme里面修改
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  // 编辑按钮点击后显示编辑状态判定
+  @Consume isShowHomeEdit: boolean
   @Consume remoteIp: IpInfo | null
-  // px外屏
-  @Consume isPXSecScreen: boolean
-  aboutToAppear(): void {
-    EventHub.on(EventKey.checkIpInfo, async ()=>{
-      this.remoteIp = null
-      this.remoteIp = await ClashViewModel.checkIpInfo()
-    })
-  }
+
+  //收藏与ping延迟即时动作
+  PromptAction:PromptAction = this.getUIContext()?.getPromptAction()
 
   build() {
     Row() {
-      Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.SpaceBetween }) {
-        Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.Start}) {
+      Flex({
+        direction: FlexDirection.Column,
+        alignItems: ItemAlign.Start,
+        justifyContent: FlexAlign.SpaceBetween })
+      {
+        Flex({
+          direction: FlexDirection.Column,
+          alignItems: ItemAlign.Start,
+          justifyContent: FlexAlign.Start })
+        {
           CardTitle({ title: $r('app.string.proxy_info') })
           if (this.appConfig.currentProxyItem) {
             Text(`${this.appConfig.currentProxyName}`)
-              .maxLines(this.isLandscapePhone ? 1:2)
+              .maxLines(HomeCardTextMaxLines(this.widthBp, this.heightBp))
               .fontWeight(FontWeight.Bold)
               .fontColor($r('sys.color.font_primary'))
               .textOverflow({ overflow: TextOverflow.Clip })
@@ -109,7 +105,12 @@ struct ProxyINFO{
           }
         }
       }.width('60%')
-      Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.End, justifyContent: FlexAlign.SpaceBetween }) {
+
+      Flex({
+        direction: FlexDirection.Column,
+        alignItems: ItemAlign.End,
+        justifyContent: FlexAlign.SpaceBetween })
+      {
         Column() {
           Row({space: 5}) {
             Text(this.appFlowingState.traffics.getLast()?.up?.toString() ?? "0 kb")
@@ -133,8 +134,8 @@ struct ProxyINFO{
         }
 
         Button($r('app.string.refresh_IP2'))
-          .width(this.isPXSecScreen? 78 : this.isLandscapePhone ? '60%' : '55%')
-          .height(this.isPXSecScreen? 30 : this.isLandscapePhone ? '27%' : '25%')
+          .width(70)
+          .height(30)
           .labelStyle({ overflow: TextOverflow.Clip,
             maxLines: 1,
             minFontSize: 6,
@@ -164,6 +165,14 @@ struct ProxyINFO{
     .padding(HomeCardPadding(this.widthBp, this.heightBp))
     .id('ProxyINFOId')
   }
+
+  aboutToAppear(): void {
+    EventHub.on(EventKey.checkIpInfo, async ()=>{
+      this.remoteIp = null
+      this.remoteIp = await ClashViewModel.checkIpInfo()
+    })
+  }
+
 }
 
 export default ProxyINFO

@@ -10,7 +10,7 @@ export const TabBarJustifyContent = BreakpointFunction2D<number>({
 
 /**Tab栏横向方式-普通*/
 export const TabBarAlignItems = BreakpointFunction2D<number>({
-  ['sm']: {['hsm']: ItemAlign.End, ['hmd']: ItemAlign.Center, ['hlg']: ItemAlign.Center},
+  ['sm']: {['hsm']: ItemAlign.Center, ['hmd']: ItemAlign.Center, ['hlg']: ItemAlign.Center},
   ['md']: {['hsm']: ItemAlign.End, ['hmd']: ItemAlign.Center, ['hlg']: ItemAlign.Center},
   ['lg']: {['hsm']: ItemAlign.Center, ['hmd']: ItemAlign.Center, ['hlg']: ItemAlign.Center},
   ['xl']: {['hsm']: ItemAlign.Center, ['hmd']: ItemAlign.Center, ['hlg']: ItemAlign.Center},
@@ -18,33 +18,49 @@ export const TabBarAlignItems = BreakpointFunction2D<number>({
 
 /**Tab栏位置*/
 export const TabBarPosition = BreakpointFunction2D<number>({
-  ['sm']: {['hsm']: BarPosition.Start, ['hmd']: BarPosition.End, ['hlg']: BarPosition.End},
+  ['sm']: {['hsm']: BarPosition.End, ['hmd']: BarPosition.End, ['hlg']: BarPosition.End},
   ['md']: {['hsm']: BarPosition.Start, ['hmd']: BarPosition.End, ['hlg']: BarPosition.End},
-  ['lg']: {['hsm']: BarPosition.Start, ['hmd']: BarPosition.End, ['hlg']: BarPosition.End},
+  ['lg']: {['hsm']: BarPosition.Start, ['hmd']: BarPosition.Start, ['hlg']: BarPosition.Start},
   ['xl']: {['hsm']: BarPosition.Start, ['hmd']: BarPosition.Start, ['hlg']: BarPosition.Start},
 })
 
 /**Tab栏方向*/
 export const TabBarVertical = BreakpointFunction2D<boolean>({
-  ['sm']: {['hsm']: true, ['hmd']: false, ['hlg']: false},
+  ['sm']: {['hsm']: false, ['hmd']: false, ['hlg']: false},
   ['md']: {['hsm']: true, ['hmd']: false, ['hlg']: false},
-  ['lg']: {['hsm']: true, ['hmd']: false, ['hlg']: false},
+  ['lg']: {['hsm']: true, ['hmd']: true, ['hlg']: true},
   ['xl']: {['hsm']: true, ['hmd']: true, ['hlg']: true},
 })
 
 /**Tab栏宽度*/
 export const TabBarWidth = BreakpointFunction2D<string>({
-  ['sm']: {['hsm']: '67vp', ['hmd']: '100%', ['hlg']: '100%'},
+  ['sm']: {['hsm']: '100%', ['hmd']: '100%', ['hlg']: '100%'},
   ['md']: {['hsm']: '77vp', ['hmd']: '100%', ['hlg']: '100%'},
-  ['lg']: {['hsm']: '67vp', ['hmd']: '100%', ['hlg']: '100%'},
+  ['lg']: {['hsm']: '67vp', ['hmd']: '67vp', ['hlg']: '67vp'},
   ['xl']: {['hsm']: '67vp', ['hmd']: '67vp', ['hlg']: '67vp'},
 })
 
-/**Tab栏高度*/
-export const TabBarHeight = BreakpointFunction2D<string>({
-  ['sm']: {['hsm']: '100%', ['hmd']: '77vp', ['hlg']: '77vp'},
+/**Tab栏宽度-窗口*/
+export const WindowTabBarWidth = BreakpointFunction2D<string>({
+  ['sm']: {['hsm']: '100%', ['hmd']: '100%', ['hlg']: '100%'},
+  ['md']: {['hsm']: '57vp', ['hmd']: '100%', ['hlg']: '100%'},
+  ['lg']: {['hsm']: '57vp', ['hmd']: '57vp', ['hlg']: '57vp'},
+  ['xl']: {['hsm']: '57vp', ['hmd']: '57vp', ['hlg']: '57vp'},
+})
+
+/**Tab栏高度-避让底部*/
+export const TabBarAvoidHeight = BreakpointFunction2D<string>({
+  ['sm']: {['hsm']: '67vp', ['hmd']: '77vp', ['hlg']: '77vp'},
   ['md']: {['hsm']: '100%', ['hmd']: '77vp', ['hlg']: '77vp'},
-  ['lg']: {['hsm']: '100%', ['hmd']: '77vp', ['hlg']: '77vp'},
+  ['lg']: {['hsm']: '100%', ['hmd']: '100%', ['hlg']: '100%'},
+  ['xl']: {['hsm']: '100%', ['hmd']: '100%', ['hlg']: '100%'},
+})
+
+/**Tab栏高度-不避让底部*/
+export const TabBarHeight = BreakpointFunction2D<string>({
+  ['sm']: {['hsm']: '57vp', ['hmd']: '57vp', ['hlg']: '57vp'},
+  ['md']: {['hsm']: '100%', ['hmd']: '57vp', ['hlg']: '57vp'},
+  ['lg']: {['hsm']: '100%', ['hmd']: '100%', ['hlg']: '100%'},
   ['xl']: {['hsm']: '100%', ['hmd']: '100%', ['hlg']: '100%'},
 })
 
@@ -83,7 +99,7 @@ export const HomeCardSpan36sm = BreakpointFunction2D<number>({
 /**主页卡片Span-3-4-6_md*/
 export const HomeCardSpan346md = BreakpointFunction2D<number>({
   ['sm']: {['hsm']: 6, ['hmd']: 6, ['hlg']: 6},
-  ['md']: {['hsm']: 3, ['hmd']: 4, ['hlg']: 6},
+  ['md']: {['hsm']: 4, ['hmd']: 4, ['hlg']: 6},
   ['lg']: {['hsm']: 3, ['hmd']: 6, ['hlg']: 6},
   ['xl']: {['hsm']: 3, ['hmd']: 6, ['hlg']: 6},
 })
@@ -91,8 +107,8 @@ export const HomeCardSpan346md = BreakpointFunction2D<number>({
 /**主页卡片Span-3-4-6_lg*/
 export const HomeCardSpan346lg = BreakpointFunction2D<number>({
   ['sm']: {['hsm']: 6, ['hmd']: 6, ['hlg']: 6},
-  ['md']: {['hsm']: 3, ['hmd']: 4, ['hlg']: 6},
-  ['lg']: {['hsm']: 3, ['hmd']: 6, ['hlg']: 6},
+  ['md']: {['hsm']: 4, ['hmd']: 4, ['hlg']: 6},
+  ['lg']: {['hsm']: 3, ['hmd']: 4, ['hlg']: 6},
   ['xl']: {['hsm']: 3, ['hmd']: 6, ['hlg']: 6},
 })
 
@@ -120,6 +136,14 @@ export const HomeCardProxyFontSize = BreakpointFunction2D<number>({
   ['xl']: {['hsm']: 22, ['hmd']: 22, ['hlg']: 22},
 })
 
+/**主页代理信息卡片字体大小*/
+export const HomeTopBlank = BreakpointFunction2D<number>({
+  ['sm']: {['hsm']: 56, ['hmd']: 56, ['hlg']: 56},
+  ['md']: {['hsm']: 56, ['hmd']: 56, ['hlg']: 72},
+  ['lg']: {['hsm']: 72, ['hmd']: 72, ['hlg']: 72},
+  ['xl']: {['hsm']: 72, ['hmd']: 72, ['hlg']: 72},
+})
+
 /**主页卡片内边距*/
 export const HomeCardPadding = BreakpointFunction2D<Padding>({
   ['sm']: {['hsm']: { top: 12, bottom: 18, left: 14, right: 14 }, ['hmd']: { top: 12, bottom: 18, left: 14, right: 14 }, ['hlg']: { top: 12, bottom: 18, left: 14, right: 14 }},
@@ -134,6 +158,14 @@ export const HomeGridRowPadding = BreakpointFunction2D<Padding>({
   ['md']: {['hsm']: { top: 4, left: 25, right: 25 }, ['hmd']: { top: 4, left: 50, right: 50 }, ['hlg']: { top: 4, left: 100, right: 100 }},
   ['lg']: {['hsm']: { top: 4, left: 25, right: 25 }, ['hmd']: { top: 4, left: 50, right: 50 }, ['hlg']: { top: 4, left: 25, right: 25 }},
   ['xl']: {['hsm']: { top: 4, left: 25, right: 25 }, ['hmd']: { top: 4, left: 25, right: 25 }, ['hlg']: { top: 4, left: 25, right: 25 }},
+})
+
+/**主页栅格内边距-窗口*/
+export const WindowHomeGridRowPadding = BreakpointFunction2D<Padding>({
+  ['sm']: {['hsm']: { top: 4, left: 10, right: 14 }, ['hmd']: { top: 4, left: 25, right: 25 }, ['hlg']: {top: 4, left: 14, right: 14}},
+  ['md']: {['hsm']: { top: 4, left: 10, right: 25 }, ['hmd']: { top: 4, left: 50, right: 50 }, ['hlg']: { top: 4, left: 100, right: 100 }},
+  ['lg']: {['hsm']: { top: 4, left: 10, right: 25 }, ['hmd']: { top: 4, left: 10, right: 50 }, ['hlg']: { top: 4, left: 10, right: 25 }},
+  ['xl']: {['hsm']: { top: 4, left: 10, right: 25 }, ['hmd']: { top: 4, left: 10, right: 25 }, ['hlg']: { top: 4, left: 10, right: 25 }},
 })
 
 /**主页栅格列间距*/
@@ -230,6 +262,22 @@ export const HomeCardDeleteButtonSize = BreakpointFunction2D<number>({
   ['md']: {['hsm']: 20, ['hmd']: 24, ['hlg']: 32},
   ['lg']: {['hsm']: 32, ['hmd']: 32, ['hlg']: 32},
   ['xl']: {['hsm']: 32, ['hmd']: 32, ['hlg']: 32},
+})
+
+/**主页切换模式卡片按钮圆角*/
+export const HomeCardSwitchModeBorderRadius = BreakpointFunction2D<number>({
+  ['sm']: {['hsm']: 16, ['hmd']: 16, ['hlg']: 20},
+  ['md']: {['hsm']: 16, ['hmd']: 20, ['hlg']: 20},
+  ['lg']: {['hsm']: 20, ['hmd']: 20, ['hlg']: 20},
+  ['xl']: {['hsm']: 20, ['hmd']: 20, ['hlg']: 20},
+})
+
+/**主页卡片文本最大行数*/
+export const HomeCardTextMaxLines = BreakpointFunction2D<number>({
+  ['sm']: {['hsm']: 1, ['hmd']: 2, ['hlg']: 2},
+  ['md']: {['hsm']: 1, ['hmd']: 2, ['hlg']: 2},
+  ['lg']: {['hsm']: 2, ['hmd']: 2, ['hlg']: 2},
+  ['xl']: {['hsm']: 2, ['hmd']: 2, ['hlg']: 2},
 })
 
 /**页面外边距(更多、设置)*/

@@ -11,7 +11,7 @@ import { deviceInfo } from '@kit.BasicServicesKit';
 
 export default class EntryAbility extends UIAbility {
 
-  //   设备断点获取
+  // 设备断点获取
   private uiContext?: UIContext;
   private onWindowSizeChange: (windowSize: window.Size) => void = (windowSize: window.Size) => {
     let widthBp: WidthBreakpoint = this.uiContext!.getWindowWidthBreakpoint();
@@ -58,6 +58,7 @@ export default class EntryAbility extends UIAbility {
       hilog.error(0xFF00, "EntryAbility", 'Failed to set window rect auto-save. Cause code: %{public}s smessage: %{public}s', exception.code, exception.message)
     }
 
+    // 初始化
     await ClashViewModel.init(this.context)
 
     windowStage.loadContent('pages/Index', async (err) => {
@@ -65,6 +66,7 @@ export default class EntryAbility extends UIAbility {
         hilog.error(0x0000, 'EntryAbility', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
         return;
       }
+      this.onWindowModeChange(windowStage, windowClass)
       await AppState.init()
       let clashCore = AppStorage.get<AppConfig>("appConfig")?.clashCore
       await ClashViewModel.ChangeCore(clashCore)
@@ -107,17 +109,17 @@ export default class EntryAbility extends UIAbility {
 
       // 设备断点获取
       windowStage.getMainWindow().then((data: window.Window) => {
-        this.uiContext = data.getUIContext();
-        let widthBp: WidthBreakpoint = this.uiContext.getWindowWidthBreakpoint();
-        // let heightBp: HeightBreakpoint = this.uiContext.getWindowHeightBreakpoint();
-        AppStorage.setOrCreate('currentWidthBreakpoint', widthBp);
-        // AppStorage.setOrCreate('currentHeightBreakpoint', heightBp);
+        this.uiContext = data.getUIContext()
+        let widthBp: WidthBreakpoint = this.uiContext.getWindowWidthBreakpoint()
+        // let heightBp: HeightBreakpoint = this.uiContext.getWindowHeightBreakpoint()
+        AppStorage.setOrCreate('currentWidthBreakpoint', widthBp)
+        // AppStorage.setOrCreate('currentHeightBreakpoint', heightBp)
         // console.log(`断点测试 初始 widthBp: ${widthBp} heightBp: ${heightBp}`)
-        data.on('windowSizeChange', this.onWindowSizeChange);
-
+        data.on('windowSizeChange', this.onWindowSizeChange)
       }).catch((err: BusinessError) => {
         console.error(`Failed to obtain the main window. Cause code: ${err.code}, message: ${err.message}`);
-      });
+      })
+
     })
 
     // 获取应用主窗口

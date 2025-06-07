@@ -6,39 +6,24 @@ import { EventHub, EventKey } from '../../common/EventHub';
 import { ClashConfig, ProxyMode } from 'proxy_core';
 import { customVibrator } from '../../common/utils/VibratorUtil';
 import { customAnimationUtil } from '../../common/utils/Animation';
-import { HomeCardFontSize, HomeCardPadding } from '../../common/breakpoint/BreakPoint';
+import { HomeCardFontSize, HomeCardPadding, HomeCardSwitchModeBorderRadius } from '../../common/breakpoint/BreakPoint';
+import { font_primary } from '../Common/Common';
 
 @Component
 struct SwitchMode {
-  //自定义主题，颜色在AppTheme里面修改
-  @Consume('icon_emphasize') icon_emphasize: ResourceColor //高亮图标,可在apptheme更换
-  @State font_primary: ResourceColor = $r('sys.color.font_primary')
-  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
+
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
-  @State compStr: BreakpointState<string> = BreakpointState.of({ sm: "sm", md: "md", lg: "lg", xl: "xl" })
-  // 代理模式选中状态
-  @State currentChecked: number = 0
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
+
   // 手机横屏高度条件
   phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
-  // px外屏
-  @Consume isPXSecScreen: boolean
-  aboutToAppear() {
-  }
-  aboutToDisappear() {
-  }
-
-  onWillApplyTheme(theme: Theme) {
-    this.icon_emphasize = theme.colors.iconEmphasize
-  }
 
   //平移选择动画参数切换
   switchTranslateY(index: number) {
@@ -79,7 +64,7 @@ struct SwitchMode {
               .ButtonStyle()
               .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
               .fontSize(HomeCardFontSize(this.widthBp, this.heightBp))
-              .fontColor(this.clashConfig.mode == n["v"] ? this.font_primary : $r('sys.color.font_secondary'))
+              .fontColor(this.clashConfig.mode == n["v"] ? font_primary : $r('sys.color.font_secondary'))
               .onClick(() => {
                 //在home页编辑卡片状态时，无法操作，点击回调写在if判定里
                 if (this.isShowHomeEdit === false) {
@@ -103,9 +88,9 @@ struct SwitchMode {
       }
       .width('100%')
       .height('82%')
-      .padding({ top:2,bottom:2,left:3,right:3 })
+      .padding({ top: 2,bottom: 2,left: 3,right: 3 })
       .backgroundColor($r('app.color.home_card_background'))
-      .borderRadius(this.isPXSecScreen || this.isLandscapePhone ? 16 : 20)
+      .borderRadius(HomeCardSwitchModeBorderRadius(this.widthBp, this.heightBp))
     }
     .width('100%')
     .height('100%')

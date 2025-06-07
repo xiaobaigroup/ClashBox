@@ -8,20 +8,19 @@ import { HomeCardFontSize, HomeCardPadding, HomeCardProxyFontSize } from "../../
 
 @Component
 struct CurrentConfiguration {
-  /* 主题色 */
-  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
-  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
-  //编辑按钮点击后显示编辑状态判定
-  @Consume isShowHomeEdit: boolean
-  //收藏与ping延迟即时动作
-  private PromptAction:PromptAction = this.getUIContext()?.getPromptAction()
+  // 收藏与ping延迟即时动作
+  PromptAction:PromptAction = this.getUIContext()?.getPromptAction()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  /* 主题色 */
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  //编辑按钮点击后显示编辑状态判定
+  @Consume isShowHomeEdit: boolean
 
 
   build() {

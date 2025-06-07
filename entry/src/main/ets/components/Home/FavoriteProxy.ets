@@ -13,50 +13,21 @@ import { HomeCardDeleteButtonSize, HomeCardFontSize, HomeCardPadding,
 
 @Component
 struct FavoriteProxy {
-  //节点假数据组后期可改可删
-  @Consume items: ProxyItem[]
-  @Prop selectedProxy: string
-  @Prop disabled: boolean
-  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageLink ('isLandscapePhone')  private isLandscapePhone: boolean = false
+
+  @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
-  phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
-  //radio选中判定
-  @State FavoriteProxyRadio :number =0
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @StorageLink("proxyGroups") ProxyGroups: ProxyGroup[] = []
+  @Consume('currentProfile') currentProfile: Profile | null
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  // 当前代理节点长按选择的值
-  @Consume private FavoriteProxy: number
-  // 当前代理节点长按选择的值
-  @Consume private ProxyItemLongPressValue: number
-  //编辑按钮点击后显示编辑状态判定
-  @Consume isShowHomeEdit: boolean
   @Consume theProxyGroups: ProxyGroup[]
-  // 代理数据(懒加载)
-  @Consume proxyGroups: ProxyGroupItemDataSource
-  @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
-  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-  @StorageLink("proxyGroups") ProxyGroups: ProxyGroup[] = []
-  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  @Consume('currentProfile') currentProfile: Profile | null
-
-  changeProxy(g: string, item: ProxyItem){
-    if (this.currentProfile) {
-      ClashViewModel.changeProxy(this.currentProfile, g, item.name)
-    }
-  }
-
-  aboutToAppear(): void {
-    this.theProxyGroups = this.ProxyGroups
-  }
-
-  aboutToDisappear() {
-    this.ProxyGroups = this.theProxyGroups
-  }
-
+  // 编辑按钮点击后显示编辑状态判定
+  @Consume isShowHomeEdit: boolean
 
   build() {
     Column() {
@@ -74,9 +45,6 @@ struct FavoriteProxy {
                     justifyContent: FlexAlign.SpaceBetween
                   }) {
                     Text(`${p[1]}`)
-                    //  .minFontSize(10)
-                    //  .maxFontSize(22)
-                    //  .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
                       .fontSize(HomeCardFontSize(this.widthBp, this.heightBp))
                       .fontColor($r('sys.color.font_primary'))
                       .maxLines(1)
@@ -139,5 +107,20 @@ struct FavoriteProxy {
     .alignItems(HorizontalAlign.Start)
     .id('FavoriteProxyId')
   }
+
+  changeProxy(g: string, item: ProxyItem){
+    if (this.currentProfile) {
+      ClashViewModel.changeProxy(this.currentProfile, g, item.name)
+    }
+  }
+
+  aboutToAppear(): void {
+    this.theProxyGroups = this.ProxyGroups
+  }
+
+  aboutToDisappear() {
+    this.ProxyGroups = this.theProxyGroups
+  }
+
 }
 export default FavoriteProxy
