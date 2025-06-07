@@ -136,12 +136,12 @@ export const HomeCardProxyFontSize = BreakpointFunction2D<number>({
   ['xl']: {['hsm']: 22, ['hmd']: 22, ['hlg']: 22},
 })
 
-/**主页代理信息卡片字体大小*/
-export const HomeTopBlank = BreakpointFunction2D<number>({
-  ['sm']: {['hsm']: 56, ['hmd']: 56, ['hlg']: 56},
-  ['md']: {['hsm']: 56, ['hmd']: 56, ['hlg']: 72},
-  ['lg']: {['hsm']: 72, ['hmd']: 72, ['hlg']: 72},
-  ['xl']: {['hsm']: 72, ['hmd']: 72, ['hlg']: 72},
+/**主页标题栏顶部外边距*/
+export const HomeTopHeight = BreakpointFunction2D<number>({
+  ['sm']: {['hsm']: 0, ['hmd']: 0, ['hlg']: 0},
+  ['md']: {['hsm']: 6, ['hmd']: 0, ['hlg']: 0},
+  ['lg']: {['hsm']: 0, ['hmd']: 0, ['hlg']: 0},
+  ['xl']: {['hsm']: 0, ['hmd']: 0, ['hlg']: 0},
 })
 
 /**主页卡片内边距*/

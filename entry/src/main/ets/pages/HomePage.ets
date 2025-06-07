@@ -37,7 +37,7 @@ import {
   HomeCardGutter,
   HomeCardSpan346lg, HomeCardSpan346md, HomeCardSpan36sm,
   HomeGridRowPadding,
-  HomeTopBlank,
+  HomeTopHeight,
   WindowHomeGridRowPadding } from '../common/breakpoint/BreakPoint'
 import { RoundButton } from '../components/Common/RoundButton'
 
@@ -134,7 +134,7 @@ struct Home {
   // ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE
 
   build() {
-    Stack() {
+    Stack({ alignContent: Alignment.TopStart }) {
       // 标题栏
       Row() {
         if (!this.isShowHomeEdit) {
@@ -194,8 +194,8 @@ struct Home {
       .zIndex(1)
       .width('100%')
       .geometryTransition("Button")
-      // .margin({ top: this.topRectHeight})
-      .position({x: 0, y: this.isRolling && this.isSmallSquareScreen ? this.heightTop: 0})
+      .margin({ top: this.topRectHeight == 0 ? 0 : HomeTopHeight(this.widthBp, this.heightBp) })
+      // .position({x: 0, y: this.isRolling && this.isSmallSquareScreen ? this.heightTop: 0})
 
       // 内容区
       Stack({ alignContent: this.stackAlignContentAlignment }) {
@@ -203,7 +203,7 @@ struct Home {
         Scroll() {
           Column() {
             Row()
-              .height(56) // HomeTopBlank(this.widthBp, this.heightBp)
+              .height(56)
             GridRow({
               gutter: HomeCardGutter(this.widthBp, this.heightBp),
             })
