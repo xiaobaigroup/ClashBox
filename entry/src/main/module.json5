@@ -47,6 +47,10 @@
             ],
             "uris": [
               {
+                "scheme": "clash",
+                "host": "install-config"
+              },
+              {
                 "scheme": "clashbox",
                 "host": "install-config"
               }
