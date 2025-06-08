@@ -49,7 +49,7 @@ struct Shortcuts {
             .ShortcutsTextStyle()
             .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
             .onClick(() => {
-              // 在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+              // 在home页添加按钮的半模态里和在编辑状态时，无法操作
               if (this.isShowHomeEdit === false) {
                 if (`${m["w"]}` != '') {
                   implicitStartAbility(`${m["w"]}`, context)
@@ -74,7 +74,7 @@ struct Shortcuts {
       .padding({ left: 5, right: 5 })
       .gesture(LongPressGesture()
         .onAction(() => {
-          // 在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+          // 在home页添加按钮的半模态里和在编辑状态时，无法操作
           if (this.isShowHomeEdit === false) {
             this.isShowShortcutsEdit = true
             this.isEnableIndexForegroundBlur = true
@@ -85,7 +85,7 @@ struct Shortcuts {
         }))
       .onMouse((event) => {
         if (event.action == MouseAction.Press && event.button == MouseButton.Right) {
-          // 在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+          // 在home页添加按钮的半模态里和在编辑状态时，无法操作
           if (this.isShowHomeEdit === false) {
             this.isShowShortcutsEdit = true
             this.isEnableIndexForegroundBlur = true

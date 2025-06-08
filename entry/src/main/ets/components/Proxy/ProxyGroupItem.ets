@@ -142,12 +142,11 @@ struct ProxyGroupItem {
             this.isShowMenu = true
           }
         })
-        .onTouch((event: TouchEvent) => {
-          if (event.type === TouchType.Down) {
+        .gesture(LongPressGesture()
+          .onAction(() => {
             this.currentTouchIndex = index
             this.isShowMenu = true
-          }
-        })
+          }))
         .bindPopup((this.uiConfig.ShowProxyPop && this.proxyGroup === 0 && index === 0 && this.IndexCurrentindex === 1), {
           builder: PopupBuilder(this, PopTips[2], () => {
             this.uiConfig.ShowProxyPop = false

@@ -204,6 +204,8 @@ export default class EntryAbility extends UIAbility {
       windowClass.setWindowDecorVisible(false)
       // 设置默认标题栏功能按钮是否显示
       windowClass.setWindowTitleButtonVisible(false,false,false)
+      // 全屏时鼠标移动至顶部不显示标题栏和dock栏，平板自由多窗则是无法唤起状态栏
+      windowClass.setTitleAndDockHoverShown(false, false)
       // 设置标题栏高度
       // windowClass.setWindowDecorHeight(50)
       hilog.info(0xFF00, "EntryAbility", 'WindowMode 当前为PC窗口模式 Succeeded in setting window rect auto-save')
