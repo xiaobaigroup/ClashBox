@@ -17,111 +17,29 @@ import ClashViewModel from '../../entryability/ClashViewModel';
 import { PopTips, PopupBuilder } from '../Start/Popup';
 import { ListGutter, ProxyListLanes } from '../../common/breakpoint/BreakPoint';
 
-
-/* 速度与延迟区别弹窗 */
-@CustomDialog
-struct ProxyCustomDialog {
-  /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur')
-  private isEnableIndexForegroundBlur: boolean
-  /* 主题色 */
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
-
-  controller?: CustomDialogController
-  cancel: () => void = () => {
-  }
-  confirm: () => void = () => {
-  }
-
-  build() {
-    Column() {
-      Text($r('app.string.Speed_Delay'))
-        .fontSize(20)
-        .padding({ bottom: 15 })
-        .fontWeight(700)
-      Text($r('app.string.Speed_Delay_Content'))
-        .fontSize(16)
-        .padding({ bottom: 8 })
-
-      Button($r('app.string.Sure'))
-        .fontSize(16)
-        .width('100%')
-        .onClick(() => {
-          if (this.controller != undefined) {
-            this.controller.close()
-            this.isEnableIndexForegroundBlur=false
-          }
-        })
-        .backgroundColor(this.icon_emphasize)
-    }
-    .backgroundColor($r('app.color.container_background'))
-    .padding({
-      left: 24,
-      right: 24,
-      top: 16,
-      bottom: 16
-    })
-  }
-}
-
-//自定义弹窗内容end
-
+// 组件名
+const componentName: string = 'ProxyPage'
+// 长按菜单图标
+const startIconModifier1: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.bolt_filled_on_circle')).fontSize('24vp');
+const startIconModifier2: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.timer')).fontSize('24vp');
+const startIconModifier3: SymbolGlyphModifier = new SymbolGlyphModifier($r('sys.symbol.questionmark_circle')).fontSize('24vp');
 
 @Component
 struct ProxyGroupItem {
-  // 组件名
-  private componentName: string = 'ProxyPage'
+
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  /* 速度与延迟区别弹窗 */
-  ProxyDialogController: CustomDialogController | null = new CustomDialogController({
-    builder: ProxyCustomDialog({
-      cancel: () => {
-        this.onCancel()
-      },
-      confirm: () => {
-        this.onAccept()
-      },
-    }),
-    alignment: DialogAlignment.Center,
-    customStyle: false,
-    cornerRadius: 32,
-    gridCount: 4,
-    cancel: this.existApp,
-    autoCancel: true,
-    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-      console.info("reason=" + JSON.stringify(dismissDialogAction.reason))
-      console.log("dialog onWillDismiss")
-      if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
-        dismissDialogAction.dismiss()
-        this.isEnableIndexForegroundBlur = false
-      }
-      if (dismissDialogAction.reason == DismissReason.TOUCH_OUTSIDE) {
-        dismissDialogAction.dismiss()
-        this.isEnableIndexForegroundBlur = false
-      }
-    },
-  })
-
-  /*长按菜单相关参数  */
-  //长按菜单图标
-  @State startIconModifier1: SymbolGlyphModifier =
-    new SymbolGlyphModifier($r('sys.symbol.bolt_filled_on_circle')).fontSize('24vp');
-  @State startIconModifier2: SymbolGlyphModifier =
-    new SymbolGlyphModifier($r('sys.symbol.timer')).fontSize('24vp');
-  @State startIconModifier3: SymbolGlyphModifier =
-    new SymbolGlyphModifier($r('sys.symbol.questionmark_circle')).fontSize('24vp');
-  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
+  @State currentTouchIndex: number = 0
   // 主界面index
   @Consume IndexCurrentindex: number
+
 
   /* 本页布局相关参数 */
   // 定义ProxyGroupItemSelectedWide的值便于切换布局方式
   @Prop ProxyGroupItemSelected: ProxyCardSize
   //是否显示网络测速半模拟态判定
   @State isShowNetworkSpeed: boolean = false
+  @State isShowMenu: boolean = false
   //网络测速半模拟态web控制器
   controller: webview.WebviewController = new webview.WebviewController();
   /* 是否开启 `Index` 页面的前景模糊 */
@@ -170,8 +88,141 @@ struct ProxyGroupItem {
     isShowFavoriteProxy: false
   }
 
+  build() {
+    List({ space: 10, initialIndex: 0 }) {
+      LazyForEach(this.proxyLazyItems, (item: ProxyItem, index: number) => {
+        ListItem() {
+          ProxyNode({
+            itemSize: this.ProxyGroupItemSelected,
+            item: item,
+            disabled: this.disabled,
+            selected: this.selectedProxy,
+            selectProxy: (p: ProxyItem) => {
+              this.selectProxy(p)
+            },
+            onLatencyChange:(p:number) =>{
+              item.latency = p
+              // hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行3 延迟更新为%{public}d", p)
+              // const nodeItem = this.theProxyGroups[this.proxyGroup]
+              // nodeItem.proxies[index].latency = p
+              // this.theProxyGroups.splice(this.proxyGroup, 1, nodeItem)
+              // hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行3 %{public}s", JSON.stringify(nodeItem))
+            }
+          })
+        }
+        .transition(customAnimationUtil.isScaleTranFast(index, this.uiConfig))
+        .onClick(() => {
+          this.selectProxy(item)
+        })
+        .ListItemStyle()
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+        .height(LIST_ITEM_HEIGHT + (this.ProxyGroupItemSelected === ProxyCardSize.Small ? 32 : 0))
+        .bindContextMenu(this.isShowMenu && this.currentTouchIndex == index , this.isPXSecScreen ? null : this.MyMenu(item.isShowFavoriteProxy ?? false, item),
+          {
+            preview: MenuPreviewMode.IMAGE,
+            placement: Placement.BottomRight,
+            aboutToAppear: () => {
+              // js 闭包 在函数里只能拿到最后一个item的值
+              // ProxyGroupItem.currentTouchProxyData = item
+              if (this.uiConfig.isVibrate) {
+                customVibrator.vibratorTriggerOfHapticClockTimer()
+              }
+            },
+            previewAnimationOptions: {
+              scale: [1.0, 1.1],
+              transition: this.uiConfig.isAnimation ? TransitionEffect.prototype.animation({ tempo: 1.5 }) : undefined
+            },
+            aboutToDisappear: () => {
+              this.isShowMenu = false
+            }
+          })
+        .onMouse((event) => {
+          if (event.button == MouseButton.Right) {
+            this.currentTouchIndex = index
+            this.isShowMenu = true
+          }
+        })
+        .onTouch((event: TouchEvent) => {
+          if (event.type === TouchType.Down) {
+            this.currentTouchIndex = index
+            this.isShowMenu = true
+          }
+        })
+        .bindPopup((this.uiConfig.ShowProxyPop && this.proxyGroup === 0 && index === 0 && this.IndexCurrentindex === 1), {
+          builder: PopupBuilder(this, PopTips[2], () => {
+            this.uiConfig.ShowProxyPop = false
+            this.isShowDelayPop = true
+          }),
+          onWillDismiss: false,
+          autoCancel: false
+        })
+      }, (item: ProxyItem,i: number) => item.name + '-' + i.toString())
+    }.cachedCount(4)
+    .onScrollFrameBegin((offset: number) => {
+      this.curOffsetRemain += offset
+      if (offset > 0) {
+        this.isRolling = true
+      } else if(offset < 0) {
+        this.isRolling = false
+        this.curOffsetRemain = 0
+      }
+      console.info("offsetRemain:" + offset + '/' +this.curOffsetRemain);
+      return { offsetRemain: offset }
+    })
+    .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : ProxyListLanes(this.widthBp, this.heightBp), ListGutter(this.widthBp, this.heightBp))
+    .ListStyle()
+    .nestedScroll({
+      scrollForward: this.isPXSecScreen ? NestedScrollMode.SELF_FIRST: NestedScrollMode.PARENT_FIRST,
+      scrollBackward: this.isPXSecScreen ? NestedScrollMode.SELF_FIRST:NestedScrollMode.SELF_FIRST
+    })
+    .contentEndOffset(this.isPXSecScreen ? 65 : this.appConfig.proxyGroupType === ProxyGroupType.List ? 10 : CONTENT_END_OFFSET_150)
+    /* .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
+       detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
+       preferType: SheetType.CENTER,
+       backgroundColor: $r('app.color.settings_container_background'),
+       showClose: true,
+       scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+       title: { title: $r('app.string.Test_Speed'), subtitle: $r('app.string.Test_Speed_Explain') },
+       //  maskColor: $r('app.color.dialog_maskcolor'),
+       onWillDismiss: () => {
+         this.isShowNetworkSpeed = false
+         this.isEnableIndexForegroundBlur = false
+       }
+     })*/
+  }
+
+  /** 速度与延迟区别弹窗 */
+  ProxyDialogController: CustomDialogController | null = new CustomDialogController({
+    builder: ProxyCustomDialog({
+      cancel: () => {
+        this.onCancel()
+      },
+      confirm: () => {
+        this.onAccept()
+      },
+    }),
+    alignment: DialogAlignment.Center,
+    customStyle: false,
+    cornerRadius: 32,
+    gridCount: 4,
+    cancel: this.existApp,
+    autoCancel: true,
+    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+      console.info("reason=" + JSON.stringify(dismissDialogAction.reason))
+      console.log("dialog onWillDismiss")
+      if (dismissDialogAction.reason == DismissReason.PRESS_BACK) {
+        dismissDialogAction.dismiss()
+        this.isEnableIndexForegroundBlur = false
+      }
+      if (dismissDialogAction.reason == DismissReason.TOUCH_OUTSIDE) {
+        dismissDialogAction.dismiss()
+        this.isEnableIndexForegroundBlur = false
+      }
+    },
+  })
+
   async aboutToAppear(): Promise<void> {
-    hilog.info(0xB000, this.componentName, `#aboutToAppear`)
+    hilog.info(0xB000, componentName, `#aboutToAppear`)
     this.switchSort()
     /*EventHub.on(EventKey.ProxySort, async (sort: ProxySort) => {
       console.log("ProxySort", sort)
@@ -185,7 +236,7 @@ struct ProxyGroupItem {
       this.proxyLazyItems.DefaultSortItems(this.proxyitems)
     } else if (this.appConfig.proxySort == ProxySort.Title){
       this.proxyLazyItems.NameSortItems(this.proxyitems)
-    } else if (this.appConfig.proxySort == ProxySort.Delay ||(this.appConfig.proxySort == ProxySort.Delay && this.isLatencySort==true)){
+    } else if (this.appConfig.proxySort == ProxySort.Delay || (this.appConfig.proxySort == ProxySort.Delay && this.isLatencySort == true)){
       this.proxyLazyItems.LatencySortItems(this.proxyitems)
       hilog.info(0xFF00, "ProxySort ProxyPageLatencyTag", "延迟排序 %{public}s", this.appConfig.proxySort)
     }
@@ -231,7 +282,7 @@ struct ProxyGroupItem {
   }
 
   // 收藏与ping延迟即时动作
-  private ProxyPromptAction: PromptAction = this.getUIContext()?.getPromptAction()
+  ProxyPromptAction: PromptAction = this.getUIContext()?.getPromptAction()
 
   OnProxyChange: ((item: ProxyItem) => void) = () => {
 
@@ -271,19 +322,19 @@ struct ProxyGroupItem {
       }
       // ClashMeta内核时暂时不能测速及延迟  暂时先屏蔽
       if (this.appConfig.clashCore === ClashCore.mihomo) {
-        MenuItem({ symbolStartIcon: this.startIconModifier1, content: $r('app.string.Test_Delay') })
+        MenuItem({ symbolStartIcon: startIconModifier1, content: $r('app.string.Test_Delay') })
           .onClick(() => {
             ClashViewModel.testDelay(item.name)
           })
       }
-      //暂时先屏蔽网站测速功能
-      /* MenuItem({ symbolStartIcon: this.startIconModifier2, content: $r('app.string.Test_Speed') })
+      // 暂时先屏蔽网站测速功能
+      /* MenuItem({ symbolStartIcon: startIconModifier2, content: $r('app.string.Test_Speed') })
          .onClick(() => {
            this.isShowNetworkSpeed = true
            this.isEnableIndexForegroundBlur = true
          })
 
-      MenuItem({ symbolStartIcon: this.startIconModifier3, content: $r('app.string.Delay_Speed') })
+      MenuItem({ symbolStartIcon: startIconModifier3, content: $r('app.string.Delay_Speed') })
         .onClick(() => {
           if (this.ProxyDialogController != null) {
             this.ProxyDialogController.open()
@@ -304,93 +355,6 @@ struct ProxyGroupItem {
       this.appConfig.currentProxyItem = item
       this.OnProxyChange(item)
     }
-  }
-
-  build() {
-    List({ space: 10, initialIndex: 0 }) {
-      LazyForEach(this.proxyLazyItems, (item: ProxyItem, index: number) => {
-        ListItem() {
-          ProxyNode({
-            itemSize: this.ProxyGroupItemSelected,
-            item: item,
-            disabled: this.disabled,
-            selected: this.selectedProxy,
-            selectProxy: (p: ProxyItem) => {
-              this.selectProxy(p)
-            },
-            onLatencyChange:(p:number) =>{
-              item.latency = p
-              // hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行3 延迟更新为%{public}d", p)
-              // const nodeItem = this.theProxyGroups[this.proxyGroup]
-              // nodeItem.proxies[index].latency = p
-              // this.theProxyGroups.splice(this.proxyGroup, 1, nodeItem)
-              // hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行3 %{public}s", JSON.stringify(nodeItem))
-            }
-          })
-        }
-        .transition(customAnimationUtil.isScaleTranFast(index, this.uiConfig))
-        .onClick(() => {
-          this.selectProxy(item)
-        })
-        .ListItemStyle()
-        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-        .height(LIST_ITEM_HEIGHT + (this.ProxyGroupItemSelected === ProxyCardSize.Small ? 32 : 0))
-        .bindContextMenu(this.isPXSecScreen ? null : this.MyMenu(item.isShowFavoriteProxy ?? false, item), ResponseType.LongPress,
-          {
-            preview: MenuPreviewMode.IMAGE,
-            onAppear: (() => {
-              // js 闭包 在函数里只能拿到最后一个item的值
-              // ProxyGroupItem.currentTouchProxyData = item
-              if (this.uiConfig.isVibrate) {
-                customVibrator.vibratorTriggerOfHapticClockTimer()
-              }
-            }),
-            previewAnimationOptions: {
-              scale: [0.95, 1.0],
-              transition: this.uiConfig.isAnimation ? TransitionEffect.prototype.animation({ tempo: 1.5 }) : undefined
-            },
-          })
-        .bindPopup((this.uiConfig.ShowProxyPop && this.proxyGroup === 0 && index === 0 && this.IndexCurrentindex === 1), {
-          builder: PopupBuilder(this, PopTips[2], () => {
-            this.uiConfig.ShowProxyPop = false
-            this.isShowDelayPop = true
-          }),
-          onWillDismiss: false,
-          autoCancel: false
-        })
-      }, (item: ProxyItem,i: number) => item.name + '-' + i.toString())
-    }.cachedCount(4)
-    .onScrollFrameBegin((offset: number) => {
-      this.curOffsetRemain += offset
-      if (offset > 0) {
-        this.isRolling = true
-      } else if(offset < 0) {
-        this.isRolling = false
-        this.curOffsetRemain = 0
-      }
-      console.info("offsetRemain:" + offset + '/' +this.curOffsetRemain);
-      return { offsetRemain: offset }
-    })
-    .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : ProxyListLanes(this.widthBp, this.heightBp), ListGutter(this.widthBp, this.heightBp))
-    .ListStyle()
-    .nestedScroll({
-      scrollForward: this.isPXSecScreen ? NestedScrollMode.SELF_FIRST: NestedScrollMode.PARENT_FIRST,
-      scrollBackward: this.isPXSecScreen ? NestedScrollMode.SELF_FIRST:NestedScrollMode.SELF_FIRST
-    })
-    .contentEndOffset(this.isPXSecScreen ? 65 : this.appConfig.proxyGroupType === ProxyGroupType.List ? 10 : CONTENT_END_OFFSET_150)
-    /* .bindSheet($$this.isShowNetworkSpeed, this.BindSheetNetworkSpeed(), {
-       detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.FIT_CONTENT,],
-       preferType: SheetType.CENTER,
-       backgroundColor: $r('app.color.settings_container_background'),
-       showClose: true,
-       scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-       title: { title: $r('app.string.Test_Speed'), subtitle: $r('app.string.Test_Speed_Explain') },
-       //  maskColor: $r('app.color.dialog_maskcolor'),
-       onWillDismiss: () => {
-         this.isShowNetworkSpeed = false
-         this.isEnableIndexForegroundBlur = false
-       }
-     })*/
   }
 
   public proxyListLongPressCtxMenuForFavorite: LongPressContextMenuItem = {
@@ -436,6 +400,55 @@ struct ProxyGroupItem {
   }
 }
 
+
+/** 速度与延迟区别弹窗 */
+@CustomDialog
+struct ProxyCustomDialog {
+  /* 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur')
+  private isEnableIndexForegroundBlur: boolean
+  /* 主题色 */
+  @Consume('icon_emphasize')
+  icon_emphasize: ResourceColor
+
+  controller?: CustomDialogController
+  cancel: () => void = () => {
+  }
+  confirm: () => void = () => {
+  }
+
+  build() {
+    Column() {
+      Text($r('app.string.Speed_Delay'))
+        .fontSize(20)
+        .padding({ bottom: 15 })
+        .fontWeight(700)
+      Text($r('app.string.Speed_Delay_Content'))
+        .fontSize(16)
+        .padding({ bottom: 8 })
+
+      Button($r('app.string.Sure'))
+        .fontSize(16)
+        .width('100%')
+        .onClick(() => {
+          if (this.controller != undefined) {
+            this.controller.close()
+            this.isEnableIndexForegroundBlur=false
+          }
+        })
+        .backgroundColor(this.icon_emphasize)
+    }
+    .backgroundColor($r('app.color.container_background'))
+    .padding({
+      left: 24,
+      right: 24,
+      top: 16,
+      bottom: 16
+    })
+  }
+}
+
+// 自定义弹窗内容end
 
 /**
  * 长按菜单参数

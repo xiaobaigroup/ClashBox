@@ -237,11 +237,9 @@ struct MorePage {
   }
 
   aboutToAppear() {
-
   }
 
   aboutToDisappear() {
-
   }
 
   handleCheck(index: number) {
