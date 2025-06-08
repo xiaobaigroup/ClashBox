@@ -39,7 +39,7 @@ export struct TopBar {
         .transition(customAnimationUtil.isScaleTran(0, this.uiConfig))
         .fontSize(this.titleFontSize ?? calculateFontSizeLinear(this.title))
       // Text(`窗口模式 windowMode：${this.windowMode}`)
-      Row({space: this.windowMode ? 0 : 6}) {
+      Row({space: this.windowMode ? 0 : 10}) {
         // 按钮1
         if (this.icons.length >= 1) {
           ButtonBuilder({
@@ -66,13 +66,13 @@ export struct TopBar {
         }
         // 窗口控制按钮
         if (this.windowMode) {
-          Row().width(115)
+          Row().width(109)
         }
       }
       .alignItems(VerticalAlign.Center)
       // .justifyContent(FlexAlign.SpaceAround)
     }
-    .margin({ right: 9, left: 9})
+    .margin({ right: 12, left: 12})
   }
 
 }

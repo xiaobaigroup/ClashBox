@@ -357,7 +357,7 @@ struct Index {
         scrollSizeMode: ScrollSizeMode.CONTINUOUS,
         preferType: SheetType.CENTER,
         onWillDismiss: ((DismissSheetAction: DismissSheetAction) => {
-          if (!this.isShowWelcome || DismissSheetAction.reason === DismissReason.CLOSE_BUTTON) {
+          if (!this.isShowWelcome || DismissSheetAction.reason === DismissReason.CLOSE_BUTTON || this.openLinkConfigUrl != '') {
             // 关闭背景模糊
             this.isEnableIndexForegroundBlur = false
             DismissSheetAction.dismiss()

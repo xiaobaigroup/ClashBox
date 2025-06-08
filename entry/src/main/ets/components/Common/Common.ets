@@ -99,8 +99,9 @@ export struct ButtonBuilder {
   @Prop icon: Resource
   @Prop iconWeight: number
   @Prop iconSize: number = 24
-  @Prop iconColor: ResourceColor = icon_primary
   @Prop enableTransition: boolean = true
+  @Prop iconColor: ResourceColor = icon_primary
+  @Prop BackgroundColor: ResourceColor = Color.Transparent
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageProp('WindowMode') windowMode: boolean = false
   onCheck: () => void = () => {}
@@ -114,7 +115,7 @@ export struct ButtonBuilder {
     }
     .width(40)
     .height(40)
-    .backgroundColor(this.windowMode ? $r('app.color.background') : $r('app.color.settings_container_background'))
+    .backgroundColor(this.BackgroundColor)
     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
     .onClick(() => {
       this.onCheck()

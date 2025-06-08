@@ -3,8 +3,8 @@
     //"bundleName": "org.xbstudio.clashnext",
     "bundleName": "org.xbstudio.clashnext",
     "vendor": "example",
-    "versionCode": 1004007,
-    "versionName": "1.4.7",
+    "versionCode": 1005000,
+    "versionName": "1.5.0",
     "icon": "$media:layered_image",
     "label": "$string:app_name"
   }

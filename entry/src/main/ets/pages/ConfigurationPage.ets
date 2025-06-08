@@ -95,8 +95,6 @@ struct ConfigurationPage {
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @Consume paddingButtom: number | Resource
-  // 当前触摸的列表项
-  @State currentTouchIndex: number = 0
   // 主界面当前index
   @Consume IndexCurrentindex: number
   @Consume curOffsetRemain: number
@@ -212,7 +210,7 @@ struct ConfigurationPage {
                     this.isON.toggleAnim = true
                     // 更新当前选中
                     this.currentRadioConfigData = item
-                    await this.loadConfig(item)
+                    await this.loadConfig(item, true)
                   })
                   .onMouse((event) => {
                     if (event.action == MouseAction.Press && event.button == MouseButton.Right) {
@@ -220,15 +218,13 @@ struct ConfigurationPage {
                       this.isShowMenu = true
                     }
                   })
-                  .onTouch((event: TouchEvent) => {
-                    if (event.type == TouchType.Down) {
+                  .gesture(LongPressGesture()
+                    .onAction(() => {
                       // 赋值当前触摸列表项
                       this.currentTouchConfigData = item
-                      this.currentTouchIndex = index
                       // 显示菜单
                       this.isShowMenu = true
-                    }
-                  })
+                    }))
                   .bindPopup(!!this.uiConfig.ShowConfigPop, {
                     builder: PopupBuilder(this, PopTips[1], () => {
                       this.uiConfig.ShowConfigPop = false
@@ -407,7 +403,7 @@ struct ConfigurationPage {
       },
       { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.arrow_clockwise'))
         .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-        content: $r('app.string.update'), callback: () => { this.updateConfig(item.configId) }
+        content: $r('app.string.update'), callback: () => { this.updateConfig(this.currentTouchConfigData.configId) }
       },
     // TODO 配置分享、生成二维码、创建副本
     /* { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.share'))
@@ -546,8 +542,8 @@ struct ConfigurationPage {
     }
   }
 
-  async loadConfig(item: ConfigData, needUpdated = false){
-    hilog.info(0xC011, componentName, `EditConfig #loadConfig#加载配置: configName is [${this.currentTouchConfigData.configName}]`)
+  async loadConfig(item: ConfigData, needUpdated: boolean) {
+    hilog.info(0xC011, componentName, `EditConfig #loadConfig#加载配置: configName is [${this.currentTouchConfigData.configName}] 是否需要更新：${needUpdated} 更新时间：${item.updateTime}`)
     if (this.isLoading)
       return
     animateTo({
@@ -566,7 +562,8 @@ struct ConfigurationPage {
       }
       ClashViewModel.socketProxy.reset()
       await ClashViewModel.loadConfig(false)
-    }catch (e) {
+      hilog.info(0xC011, componentName, `EditConfig #loadConfig#更新并加载完成 configName is [${this.currentTouchConfigData.configName}]`)
+    } catch (e) {
       console.debug("loadConfigList", e.message, JSON.stringify(e))
       promptAction.showToast({message: `${getResourceString($r('app.string.failed_load_config'), context)}` + (e.message || e) })
     }
@@ -591,7 +588,7 @@ struct ConfigurationPage {
     // 首次导入配置自动选中
     if (this.configList.length === 1 && this.uiConfig.isFirstImportConfig) {
       this.isON.toggleAnim = true
-      await this.loadConfig(this.configList[0])
+      await this.loadConfig(this.configList[0], true)
       this.uiConfig.isFirstImportConfig = false
       hilog.info(0xC002, componentName,
         `EditConfig #onConfigListChange: 首次导入：${this.uiConfig.isFirstImportConfig} configName is [${this.configList[0].configName}]`)
@@ -670,12 +667,12 @@ struct ConfigurationPage {
   /**更新配置*/
   private async updateConfig(configId?: string): Promise<void> {
     this.promptAction.showToast({message: $r('app.string.updating_config')})
-    this.loadConfig(this.currentRadioConfigData)
+    this.loadConfig(this.currentRadioConfigData, true)
     if (configId){
       this.isRefreshing = false
       // 使开关点击时不触发转场动画
       this.isON.toggleAnim = true
-      await this.loadConfig(this.currentTouchConfigData, true)
+      await ClashViewModel.updateProfileConfig(configId)
       hilog.info(0xC012, componentName, `#updateConfig#更新配置{单个}: configUrl is [${this.currentTouchConfigData.configUrl}], configId is [${this.currentTouchConfigData.configId}]`)
       this.promptAction.showToast({message: $r('app.string.updated_success_config')})
     } else {
