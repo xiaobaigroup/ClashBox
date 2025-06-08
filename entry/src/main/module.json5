@@ -40,6 +40,17 @@
             "actions": [
               "action.system.home"
             ]
+          },
+          {
+            "actions": [
+              "ohos.want.action.viewData"
+            ],
+            "uris": [
+              {
+                "scheme": "clashbox",
+                "host": "install-config"
+              }
+            ]
           }
         ]
       }

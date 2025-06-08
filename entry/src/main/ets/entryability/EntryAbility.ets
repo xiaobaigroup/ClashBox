@@ -8,6 +8,7 @@ import { EventHub, EventKey } from '../common/EventHub';
 import { PipManager } from '../common/utils/PipManager';
 import { ClashConfig, SocketProxyService, SocketStubService } from 'proxy_core';
 import { deviceInfo } from '@kit.BasicServicesKit';
+import { url } from '@kit.ArkTS';
 
 export default class EntryAbility extends UIAbility {
 
@@ -20,6 +21,7 @@ export default class EntryAbility extends UIAbility {
     // AppStorage.setOrCreate('currentHeightBreakpoint', heightBp);
     console.log(`断点测试 widthBp: ${widthBp}`)
   };
+
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onCreate');
@@ -40,6 +42,16 @@ export default class EntryAbility extends UIAbility {
     })
     // 当前主题模式
     AppStorage.setOrCreate<ConfigurationConstant.ColorMode>('currentColorMode', this.context.config.colorMode)
+
+    // 从want中获取传入的链接信息
+    let uri = want?.uri
+    if (uri) {
+      let urlObject = url.URL.parseURL(want?.uri)
+      let configUrl = urlObject.params.get('url')
+      AppStorage.setOrCreate('openLinkConfigUrl', configUrl)
+      hilog.info(0x0000, 'EntryAbility', '接收的configUrl为：%{public}s', configUrl)
+    }
+
   }
   debugVpn: SocketStubService | null = null
 

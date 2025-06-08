@@ -31,8 +31,7 @@ export struct ConfigInfo{
   icon_emphasize: ResourceColor
 
   // 配置详情
-  @Link
-  configData: ConfigData
+  @Link configData: ConfigData
 
   /* List */
   // 配置是否自动更新

@@ -18,7 +18,7 @@ import {
   TAB_CONTENT_TITLE_HEIGHT,
   LogData,
   showHomeCard,
-  NullConfigData,
+  NewConfigData,
 } from '../common/entity/Constants'
 import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/datasources/ProxyData'
 import { ClashConfig, IpInfo, LogLevel, Profile, ProxyGroup, ProxyMode } from 'proxy_core'
@@ -57,6 +57,8 @@ import { TabBarAlignItems,
   WindowTabBarWidth} from '../common/breakpoint/BreakPoint'
 import { WindowTopBar } from '../components/Common/TopBar'
 import { implicitStartAbility } from '../common/utils/GoToWeb'
+import { ConfigAdd } from '../components/Configuration/ConfigAdd'
+import { ImportConfigFromURL } from '../components/Configuration/ImportConfigFromURL'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 const context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
@@ -118,6 +120,7 @@ struct Index {
   @StorageLink('uiConfig') @Watch('ShowPipChange')uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @Provide paddingButtom: number | Resource = $r('app.integer.vp_proxy_start_button_left_right_margin')
+  @StorageLink('openLinkConfigUrl') openLinkConfigUrl: string = ''
   // 系统语言显示副标题
   @Provide SystemLanguageSubtitle: ResourceStr = $r('app.string.SimplifiedChinese')
   @State barWidth: string | number | undefined = ''
@@ -210,10 +213,14 @@ struct Index {
    */
   // 配置页模糊变量
   @Provide('isEnableConfigPageBindSheetForegroundBlur') isEnableConfigPageBindSheetForegroundBlur: boolean = false
+  // 是否显示bindSheet
+  @Provide isShowConfigAddBindSheet: boolean = false
   // 当前触摸的配置行
-  @Provide('currentTouchConfigData') currentTouchConfigData: ConfigData = NullConfigData
+  @Provide('currentTouchConfigData') currentTouchConfigData: ConfigData = NewConfigData
   // 当前选中的配置行
-  @Provide currentConfigRadioCheckedConfigData: ConfigData = NullConfigData
+  @Provide currentConfigRadioCheckedConfigData: ConfigData = NewConfigData
+  // 路由栈
+  @Provide('configAddPageInfos') configAddPageInfos: NavPathStack = new NavPathStack()
   // 配置数据
   @Provide configList: Array<ConfigData> = []
 
@@ -343,7 +350,7 @@ struct Index {
       // 欢迎页&崩溃页
       .bindSheet($$this.isShowWelcome, this.WelcomeSheet(), {
         detents: [BIND_SHEET_CONTAINER_HEIGHT],
-        showClose: (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) ? true : false,
+        showClose: (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) || this.openLinkConfigUrl != '' ? true : false,
         dragBar: false,
         backgroundColor: $r('app.color.background'),
         keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
@@ -356,7 +363,9 @@ struct Index {
             DismissSheetAction.dismiss()
             hilog.info(0xFF00, "WelcomeTestTag", "欢迎页启用状态： %{private}s", this.isShowWelcome)
           }
-        })
+        }),
+        onDisappear: async () => {
+        }
       })
     } else {
       // PX外屏样式
@@ -416,6 +425,10 @@ struct Index {
   WelcomeSheet() {
     if (AppStorage.get<boolean>('crash') == true && !this.uiConfig.isFirstStart) {
       CrashPage()
+    } else if (this.openLinkConfigUrl != '') {
+      ImportConfigFromURL({
+        configData: this.currentTouchConfigData,
+      })
     } else {
       WelcomeUserAgreement()
     }
@@ -784,6 +797,16 @@ struct Index {
     hilog.info(0x1000, componentName, `#aboutToAppear#Language 用户选择语言：${this.uiConfig.userLanguage}`)
     hilog.info(0x1000, componentName, `#aboutToAppear#Language 当前语言文本：${getResourceString(this.currentLanguage, this)}`)
     hilog.info(0x1000, componentName, `#aboutToAppear#Language 当前系统语言文本：${getResourceString(this.SystemLanguageSubtitle, this)}`)
+    this.onOpenConfigLink()
+  }
+
+  /**通过openLink导入配置*/
+  onOpenConfigLink() {
+    if (this.openLinkConfigUrl != '') {
+      this.currentTouchConfigData.isNewConfig = true
+      this.currentTouchConfigData.configUrl = this.openLinkConfigUrl
+      this.isShowWelcome = true
+    }
   }
 
   onPageHide(): void {
