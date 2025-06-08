@@ -94,7 +94,7 @@ export const TheExperimentData: AboutListItemProp = {
 
 export const NullConfigData: ConfigData = {
   configId: 'e91a4efc-cf14-467d-90c2-fec156806bfa',
-  isNewConfig: false,
+  isNewConfig: true,
   configName: '',
   configUrl: '',
   isConfigAutoUpdate: false,

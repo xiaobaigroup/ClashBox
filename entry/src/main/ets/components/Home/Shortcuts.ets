@@ -61,19 +61,7 @@ struct Shortcuts {
                 }
               }
             })
-            .gesture(
-              LongPressGesture()
-                .onAction(() => {
-                  //在home页添加按钮的半模拟态里和在编辑状态时，无法操作
-                  if (this.isShowHomeEdit === false) {
-                    this.isShowShortcutsEdit = true
-                    this.isEnableIndexForegroundBlur = true
-                    if (this.uiConfig.isVibrate) {
-                      customVibrator.vibratorTriggerOfHapticClockTimer()
-                    }
-                  }
-                })
-            )
+
           if (!isEnd(3, i)) {
             Divider().strokeWidth(1).color($r('app.color.FavoriteProxyDivider'))
           }
@@ -84,6 +72,26 @@ struct Shortcuts {
       .backgroundColor($r('app.color.home_card_background'))
       .borderRadius(10)
       .padding({ left: 5, right: 5 })
+      .gesture(LongPressGesture()
+        .onAction(() => {
+          // 在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+          if (this.isShowHomeEdit === false) {
+            this.isShowShortcutsEdit = true
+            this.isEnableIndexForegroundBlur = true
+            if (this.uiConfig.isVibrate) {
+              customVibrator.vibratorTriggerOfHapticClockTimer()
+            }
+          }
+        }))
+      .onMouse((event) => {
+        if (event.action == MouseAction.Press && event.button == MouseButton.Right) {
+          // 在home页添加按钮的半模拟态里和在编辑状态时，无法操作
+          if (this.isShowHomeEdit === false) {
+            this.isShowShortcutsEdit = true
+            this.isEnableIndexForegroundBlur = true
+          }
+        }
+      })
     }
     .id('ShortcutsId')
     .padding(HomeCardPadding(this.widthBp, this.heightBp))

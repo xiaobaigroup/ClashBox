@@ -5,38 +5,6 @@ import ClashViewModel, { DelayInfo } from '../../entryability/ClashViewModel'
 import { customVibrator } from '../../common/utils/VibratorUtil'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 
-
-@Extend(Text)
-function ItemTextStyle() {
-  .fontColor(($r('sys.color.font_primary')))
-  .fontSize(16)
-  .fontWeight(FontWeight.Medium)
-  .maxLines(1)
-  .textOverflow({ overflow: TextOverflow.Ellipsis })
-}
-//Item中type（节点类型）公用样式
-@Extend(Text)
-function ItemTypeStyle() {
-  .fontColor($r('sys.color.font_secondary'))
-  .fontSize(12)
-}
-@Extend(Row)
-function ListRowStyle() {
-  .width('100%')
-  .padding({ left: 14, right: 8, top: 5, bottom: 5})
-// .alignItems(VerticalAlign.Center)
-}
-
-export function delayText(delay: number){
-  if (delay == 0) {
-    return ""
-  } else if(delay < 0){
-    return "timeout"
-  } else {
-    return delay + "ms"
-  }
-}
-
 @Component
 export struct ProxyNode {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
@@ -149,3 +117,35 @@ export struct ProxyNode {
     }
   }
 }
+
+@Extend(Text)
+function ItemTextStyle() {
+  .fontColor(($r('sys.color.font_primary')))
+  .fontSize(16)
+  .fontWeight(FontWeight.Medium)
+  .maxLines(1)
+  .textOverflow({ overflow: TextOverflow.Ellipsis })
+}
+//Item中type（节点类型）公用样式
+@Extend(Text)
+function ItemTypeStyle() {
+  .fontColor($r('sys.color.font_secondary'))
+  .fontSize(12)
+}
+@Extend(Row)
+function ListRowStyle() {
+  .width('100%')
+  .padding({ left: 14, right: 8, top: 5, bottom: 5})
+// .alignItems(VerticalAlign.Center)
+}
+
+export function delayText(delay: number){
+  if (delay == 0) {
+    return ""
+  } else if(delay < 0){
+    return "timeout"
+  } else {
+    return delay + "ms"
+  }
+}
+
