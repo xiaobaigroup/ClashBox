@@ -5,7 +5,7 @@ import {
   BIND_SHEET_DRAG_BAR_HEIGHT,
   BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT,
   RouteName,
-  NullConfigData,
+  NewConfigData,
 } from "../../common/entity/Constants"
 import { BindSheetTitleCustomBuilder, BindSheetTitleCustomBuilderMenu,
   context,
@@ -44,8 +44,9 @@ export struct ImportConfigFromURL{
   @State private customDownloadingDialogTitle: ResourceStr = $r('app.string.downloading_configuration_file')
   private promptAction:PromptAction = this.getUIContext()?.getPromptAction()
   // 配置详情（要添加到用户首选项里的数据）
-  @State @Watch('configDataChanged') configData: ConfigData = NullConfigData
+  @State @Watch('configDataChanged') configData: ConfigData = NewConfigData
   @Consume('currentTouchConfigData') currentTouchConfigData: ConfigData
+  @StorageLink('openLinkConfigUrl') openLinkConfigUrl: string = ''
   // 当前显示的工具集合 默认为空 待两个input都有值之后才加入保存按钮菜单
   @State private menus: Array<BindSheetTitleCustomBuilderMenu> = []
   // 页面栈
@@ -54,9 +55,11 @@ export struct ImportConfigFromURL{
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // [true: 都有值, false: 不是所有的input都有值]
-  @State private allInputHaveValue: boolean = false
+  @State allInputHaveValue: boolean = false
   // 模态弹窗显示变量
   @Consume isShowConfigAddBindSheet: boolean
+  // 欢迎页半模态窗口
+  @Consume isShowWelcome: boolean
   // 标题栏工具菜单
   // { symbol: $r('sys.symbol.star'), action: () => { this.menus.pop() } },
 
@@ -103,18 +106,26 @@ export struct ImportConfigFromURL{
         return false
       }
     })
-    .onReady( () => {
-      let paramJsonStr: string = JSON.stringify(this.configAddPageInfos.getParamByName(RouteName.IMPORT_CONFIG_FROM_URL))
-      hilog.info(0xCA11, componentName, `#aboutToAppear#NavPathStack.getParamByName(${RouteName.IMPORT_CONFIG_FROM_URL}), result is: ${paramJsonStr}`)
-
-      if( this.configAddPageInfos.getParamByName(RouteName.IMPORT_CONFIG_FROM_URL).length > 0 && this.configAddPageInfos.getParamByName(RouteName.IMPORT_CONFIG_FROM_URL)[0] !== null ) {
-        try {
-          this.configData = (JSON.parse(paramJsonStr) as Array<ConfigData>)[0]
-
-        } catch (e) {
-          let error = e as BusinessError;
-          hilog.error(0xCA11, componentName, `#aboutToAppear#JSON.parse(paramJsonStr) as ConfigData#ERROR: code is [${error.code}],message is [${error.message}]`)
+    .onReady( (ctx: NavDestinationContext) => {
+      // let paramJsonStr: string = JSON.stringify(this.configAddPageInfos.getParamByName(RouteName.IMPORT_CONFIG_FROM_URL))
+      // hilog.info(0xCA11, componentName, `#aboutToAppear#NavPathStack.getParamByName(${RouteName.IMPORT_CONFIG_FROM_URL}), result is: ${paramJsonStr}`)
+      // if( this.configAddPageInfos.getParamByName(RouteName.IMPORT_CONFIG_FROM_URL).length > 0 && this.configAddPageInfos.getParamByName(RouteName.IMPORT_CONFIG_FROM_URL)[0] !== null ) {
+      //   try {
+      //     this.configData = (JSON.parse(paramJsonStr) as Array<ConfigData>)[0]
+      //   } catch (e) {
+      //     let error = e as BusinessError;
+      //     hilog.error(0xCA11, componentName, `#aboutToAppear#JSON.parse(paramJsonStr) as ConfigData#ERROR: code is [${error.code}],message is [${error.message}]`)
+      //   }
+      // }
+      // 接收信息
+      try {
+        const params: ConfigData = ctx?.pathInfo?.param as ConfigData
+        console.log('ClashBox#ImportConfigFromUrl#onReady 版本详情页接收的params：', JSON.stringify(params))
+        if (params) {
+          this.configData = params
         }
+      } catch (e) {
+        console.log(`ClashBox#ImportConfigFromUrl#onReady Navigate onReady catch exception: ${JSON.stringify(e)}`)
       }
     })
     .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
@@ -129,6 +140,7 @@ export struct ImportConfigFromURL{
     action: () => {
       this.saveConfig(this.configData.isNewConfig)
       // 保存配置后关闭半模态窗口
+      this.isShowWelcome = false
       this.isShowConfigAddBindSheet = false
       this.isEnableIndexForegroundBlur = false
     }
@@ -146,6 +158,7 @@ export struct ImportConfigFromURL{
       // confirmButtonBackgroundColor: this.icon_emphasize,
       cancel: () => {
         // 取消保存配置后关闭半模态窗口
+        this.isShowWelcome = false
         this.isShowConfigAddBindSheet = false
         this.isEnableConfigPageBindSheetForegroundBlur = false
         this.isEnableIndexForegroundBlur = false
@@ -153,6 +166,7 @@ export struct ImportConfigFromURL{
       },
       confirm: () => {
         // 保存配置后关闭半模态窗口
+        this.isShowWelcome = false
         this.isShowConfigAddBindSheet = false
         this.isEnableConfigPageBindSheetForegroundBlur = false
         this.isEnableIndexForegroundBlur = false
@@ -185,6 +199,11 @@ export struct ImportConfigFromURL{
     hilog.info(0xCA10, componentName, `#aboutToAppear executed`)
     // XXX 没有写`this.icon_emphasize`的`Watch`事件，是因为如果在设置页面里设置了其他主题色时，这个页面一定不是打开的状态
     this.saveMenus.symbolBackgroundColor = this.icon_emphasize
+    this.isEnableIndexForegroundBlur = true
+    if (this.openLinkConfigUrl != '') {
+      hilog.info(0xCA10, componentName, `#aboutToAppear import 检查文本`)
+      this.configDataChanged()
+    }
   }
 
   aboutToDisappear(): void {
@@ -209,6 +228,9 @@ export struct ImportConfigFromURL{
       try {
         await ClashViewModel.addOrUpdateProfileByUrl(this.configData, null)
         this.configCustomDownloadingDialogController.close()
+        if (this.openLinkConfigUrl != '') {
+          this.openLinkConfigUrl = ''
+        }
         this.promptAction.showToast({message: getResourceString($r('app.string.download_success'), this)})
       } catch (e) {
         console.error("ClashBox", e.message, e.stack);

@@ -9,6 +9,7 @@ import {
   BORDER_RADIUS_20, LIST_ITEM_HEIGHT,
   LIST_ITEM_PADDING,
   LIST_SPACE,
+  NewConfigData,
   RouteName
 } from "../../common/entity/Constants";
 import { hilog } from "@kit.PerformanceAnalysisKit";
@@ -19,6 +20,7 @@ import { UIConfig } from "../../entryability/AppState";
 import { customAnimationUtil } from "../../common/utils/Animation";
 import { removeItemsByIndex } from "../../common/utils/RemoveItemsUtils";
 import { NavigationListPadding } from "../../common/breakpoint/BreakPoint";
+import { ConfigData } from "../../common/entity/PageArgumentEntity";
 
 interface ConfigAddType {
   symbolStart? : Resource,
@@ -92,7 +94,16 @@ export struct ConfigAdd {
               if (this.uiConfig.isShowExperimentalFunction ? (index === 1 || index === 3) : index === 2) {
                 promptAction.showToast({message: getResourceString($r('app.string.developing'), this)})
               } else {
-                this.configAddPageInfos.pushDestinationByName(item?.navPathStackName, null)
+                const params: ConfigData = {
+                  configId: 'new',
+                  isNewConfig: true,
+                  configName: '',
+                  configUrl: '',
+                  isConfigAutoUpdate: false,
+                  lastUpdateDateTime: 0,
+                  updateTime: 0,
+                }
+                this.configAddPageInfos.pushPathByName(item?.navPathStackName, params, true)
               }
             })
           })

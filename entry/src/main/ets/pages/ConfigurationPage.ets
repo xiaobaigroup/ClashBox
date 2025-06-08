@@ -10,7 +10,7 @@ import {
   LIST_ITEM_PADDING,
   RouteName,
   CONTENT_END_OFFSET_150,
-  NullConfigData,
+  NewConfigData,
 } from '../common/entity/Constants'
 import { LengthMetrics, promptAction, PromptAction, SymbolGlyphModifier } from '@kit.ArkUI'
 import { ConfigAdd } from '../components/Configuration/ConfigAdd'
@@ -55,10 +55,10 @@ const componentName:string = 'ConfigurationPage'
 struct ConfigurationPage {
 
   @StorageLink('favoriteProfiles') favoriteProfiles: Map<string, string> = new Map<string, string>([])
-  // 路由栈
-  @Provide('configAddPageInfos') configAddPageInfos: NavPathStack = new NavPathStack()
   // 所有子组件在容器内的对齐方式
   @Consume ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
+  // 路由栈
+  @Consume('configAddPageInfos') configAddPageInfos: NavPathStack
   promptAction:PromptAction = this.getUIContext()?.getPromptAction()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
@@ -68,8 +68,6 @@ struct ConfigurationPage {
   @State isON:isON = new isON()
 
   @StorageProp('WindowMode') windowMode: boolean = false
-  // 是否显示bindSheet
-  @Provide isShowConfigAddBindSheet: boolean = false
   // 是否为新建配置
   private isNewConfig: boolean = false
   @State isRefreshing: boolean = false
@@ -81,6 +79,8 @@ struct ConfigurationPage {
 
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
+  // 是否显示bindSheet
+  @Consume isShowConfigAddBindSheet: boolean
   // 是否小窗口
   @Consume isSmallSquareScreen: boolean
   // px外屏
@@ -108,7 +108,7 @@ struct ConfigurationPage {
   /* 配置页面内ListItem长按ContextMenu相关 */
   @Consume('currentTouchConfigData') currentTouchConfigData: ConfigData
   @Consume @Watch('onConfigListChange') configList: Array<ConfigData>
-  @State  currentRadioConfigData: ConfigData = NullConfigData
+  @State  currentRadioConfigData: ConfigData = NewConfigData
   @Consume proxyGroups: ProxyGroup[]
 
   build() {
@@ -290,7 +290,7 @@ struct ConfigurationPage {
           RoundButton({
             Icon2: $r('sys.symbol.plus')
           })
-            .bindSheet(this.isShowConfigAddBindSheet, this.ConfigAddBindSheetBuilder, {
+            .bindSheet($$this.isShowConfigAddBindSheet, this.ConfigAddBindSheetBuilder(), {
               detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,], // SheetSize.LARGE
               backgroundColor: $r('app.color.background'),
               showClose: true,
@@ -330,6 +330,7 @@ struct ConfigurationPage {
             .onClick(() => {
               // 新配置
               this.isNewConfig = true
+              this.currentTouchConfigData = NewConfigData
               this.isShowConfigAddBindSheet = true
               this.isEnableIndexForegroundBlur = true
               if (this.uiConfig.isVibrate) {
@@ -636,7 +637,6 @@ struct ConfigurationPage {
 
   /**收藏配置*/
   private favoriteConfig(): void {
-    // TODO 收藏配置 & 判断是否已经收藏
     if (this.favoriteProfiles.size<=3){
     this.promptAction.showToast({ message: $r('app.string.Collect_Tip') })
     hilog.info(0xC010, componentName, `#favoriteConfig#收藏配置: configName is [${this.currentTouchConfigData.configName}]`)
@@ -649,7 +649,6 @@ struct ConfigurationPage {
 
   /**取消收藏配置*/
   private cancelFavoriteConfig(): void {
-    // TODO 取消收藏配置 & 判断是否已经收藏
     this.promptAction.showToast({ message: $r('app.string.uncollected_tip') })
     hilog.info(0xC010, componentName, `#favoriteConfig#取消收藏配置: configName is [${this.currentTouchConfigData.configName}]`)
     this.currentTouchConfigData.isFavorite = false

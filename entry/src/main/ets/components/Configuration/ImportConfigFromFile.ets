@@ -11,7 +11,7 @@ import {
   TEXT_INPUT_HEIGHT,
   RouteName,
   BORDER_RADIUS_20,
-  NullConfigData
+  NewConfigData
 } from "../../common/entity/Constants"
 import { BindSheetTitleCustomBuilder, BindSheetTitleCustomBuilderMenu,
   context,
@@ -46,7 +46,7 @@ export struct ImportConfigFromFile{
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   // 配置详情
-  @State @Watch('configDataChanged') configData: ConfigData = NullConfigData
+  @State @Watch('configDataChanged') configData: ConfigData = NewConfigData
   @Consume('currentTouchConfigData') currentTouchConfigData: ConfigData
   // 当前显示的工具集合 默认为空 待两个input都有值之后才加入保存按钮菜单
   @State private filemenus: Array<BindSheetTitleCustomBuilderMenu> = []
@@ -152,6 +152,18 @@ export struct ImportConfigFromFile{
         return false
       }
     })
+    .onReady( (ctx: NavDestinationContext) => {
+      // 接收信息
+      try {
+        const params: ConfigData = ctx?.pathInfo?.param as ConfigData
+        console.log('ClashBox#ImportConfigFromFile#onReady 版本详情页接收的params：', JSON.stringify(params))
+        if (params) {
+          this.configData = params
+        }
+      } catch (e) {
+        console.log(`ClashBox#ImportConfigFromFile#onReady Navigate onReady catch exception: ${JSON.stringify(e)}`)
+      }
+    })
     .animation({ duration:  this.uiConfig.animationSpeed , curve: Curve.Ease })
 
   }
@@ -203,6 +215,7 @@ export struct ImportConfigFromFile{
 
   aboutToAppear(): void {
     hilog.info(0xCC10, componentName, `#aboutToAppear executed`)
+    this.saveMenus.symbolBackgroundColor = this.icon_emphasize
     // 若为编辑状态直接显示保存按钮
     if (!this.configData.isNewConfig) {
       this.filemenus.push(this.saveMenus)
