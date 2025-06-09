@@ -50,8 +50,6 @@ struct Notice {
   @State EnabledTimenotice: boolean = false
   // 通知权限跳转授权弹窗提示弹窗标题
   @State theToDialogTitle: ResourceStr = $r('app.string.notice_request_to_settings')
-  // 通知权限跳转授权弹窗提示弹窗内容文本
-  @State toContentText: ResourceStr = $r('app.string.notice_request_to_settings_text')
   @State currentNumber: number = 0
   private TimeUnitSelect: number = 1
   private TimeUnitFruits: string[] = [
@@ -82,7 +80,7 @@ struct Notice {
   toDialogController: CustomDialogController = new CustomDialogController({
     builder: theRowCustomDialog({
       theDialogTitle: this.theToDialogTitle,
-      contentText: this.toContentText,
+      contentText: $r('app.string.notice_request_to_settings_text'),
       cancel: ()=> { this.onCancel() },
       confirm: ()=> { this.onAccept() },
       leftButton: this.toBuilder
@@ -215,8 +213,7 @@ struct Notice {
           })
           // 震动反馈开关 End
           // 分割线
-        //  if(!isEnd(item.children!.length,i))
-            Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
+          Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
           // 声音反馈开关 Start
           Row() {
             toggleRowList({
@@ -243,7 +240,7 @@ struct Notice {
         }.ColumnStyle()
         // 反馈 End
         // 通知 Start
-        Column({space: 10}) {
+        Column() {
           // 通知总开关 Start
           Row() {
             toggleRowList({

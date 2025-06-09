@@ -790,7 +790,7 @@ export struct skipRowList {
 
   build() {
     Row({space: 12}) {
-      if(this.icons) {
+      if (this.icons) {
         SymbolGlyph(this.icons)
           .fontSize(24)
           .fontColor([this.isPrimaryIcons ? icon_primary : this.icon_emphasize])
