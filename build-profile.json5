@@ -7,11 +7,11 @@
         "material": {
           "certpath": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashBox_yddCSabCuwuRMJdsGZDxF2XpfNYkUl1fZVP3BG0cRCA=.cer",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001BF1F829C934F66A11F3A28836BAFAE55A403A58CC38F3A21C6F288C5868998DE70782EE637D134D",
+          "keyPassword": "0000001BBCA805A15639A2E57491C28BA2B4168E544F2CF0C472FD749F08B3D735E7B4065347B55BD65E79",
           "profile": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashBox_yddCSabCuwuRMJdsGZDxF2XpfNYkUl1fZVP3BG0cRCA=.p7b",
           "signAlg": "SHA256withECDSA",
           "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashBox_yddCSabCuwuRMJdsGZDxF2XpfNYkUl1fZVP3BG0cRCA=.p12",
-          "storePassword": "0000001B2EF668CE86016AE5F1990186E91AB1A71CB5CAF84E77A1B22C397120533D9D22239176D437F80B"
+          "storePassword": "0000001B9C304D5FD1281F3049D78C632F90FBDB21772D295413F8EFA6F2882F73F5655E15667A2ED8173E"
         }
       },
       {
