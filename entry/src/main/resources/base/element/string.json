@@ -1594,7 +1594,7 @@
     },
     {
       "name": "permission_reason_MICROPHONE",
-      "value": "长时任务音频录制"
+      "value": "长时任务模拟定位"
     },
     {
       "name": "bypass_private_route_address",
