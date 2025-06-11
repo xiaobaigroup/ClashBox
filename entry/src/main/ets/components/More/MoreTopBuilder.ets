@@ -3,7 +3,7 @@ import { TAB_CONTENT_TITLE_FONT_SIZE, TAB_CONTENT_TITLE_HEIGHT } from "../../com
 import { UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../common/utils/Animation"
 import { SymbolGlyphModifier } from "@kit.ArkUI"
-import { icon_primary } from '../Common/Common'
+import { ButtonBuilder, icon_primary } from '../Common/Common'
 import { PageMargin } from "../../common/breakpoint/BreakPoint"
 
 /**
@@ -14,6 +14,9 @@ import { PageMargin } from "../../common/breakpoint/BreakPoint"
  */
 @Component
 export struct MoreTop {
+
+  @Prop icon1: Resource
+  @Prop icon2: Resource
   // 是否进入二级界面
   @Consume isSecondary: boolean
   // 更多页路由表
@@ -27,10 +30,10 @@ export struct MoreTop {
   @Consume needSearch: boolean
   @Consume isSearching: boolean
   @Consume searchText: string
-  // 其它按钮
-  @BuilderParam otherButton: () => void = this.otherDefaultButton
   // page内顶部标题偏移量
   @Consume curYOffset: number
+  @Prop enableClick2: boolean = true
+  @BuilderParam theMenu: () => void = this.TheMenu
   @StorageProp('WindowMode') windowMode: boolean = false
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
@@ -39,35 +42,8 @@ export struct MoreTop {
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
-
-  @Builder searchButton() {
-    // 默认搜索按钮
-    Button({ type: ButtonType.Circle, stateEffect: true }) {
-      SymbolGlyph($r('sys.symbol.magnifyingglass'))
-        .fontSize(24)
-        .fontColor([icon_primary])
-    }
-    .backgroundColor($r('app.color.settings_container_background'))
-    .width(40)
-    .height(40)
-    .transition(customAnimationUtil.isSlide(100, this.uiConfig))
-    .onClick(() => {
-      this.isSearching = true
-    })
-  }
-  @Builder otherDefaultButton() {
-    // 默认功能按钮为更多
-    Button({ type: ButtonType.Circle, stateEffect: true }) {
-      SymbolGlyph($r('sys.symbol.dot_grid_2x2'))
-        .fontSize(24)
-        .fontColor([icon_primary])
-    }
-    .width(40)
-    .height(40)
-    .margin({ left: 10 })
-    .backgroundColor($r('app.color.settings_container_background'))
-    .transition(customAnimationUtil.isSlide(50, this.uiConfig))
-  }
+  onClick1: () => void = () => {}
+  onClick2: () => void = () => {}
 
   build() {
     Row() {
@@ -89,7 +65,7 @@ export struct MoreTop {
          Text($r('app.string.Cancel'))
         }
         .height(40)
-        .margin({ left: 10 })
+        // .margin({ left: 10 })
         .backgroundColor($r('app.color.background'))
         .transition(customAnimationUtil.isSlide(50, this.uiConfig))
         .onClick(() => {
@@ -118,7 +94,6 @@ export struct MoreTop {
             .geometryTransition(this.name)
             .fontWeight(FontWeight.Bold)
             .textAlign(TextAlign.Start)
-            .margin({left: 8})
           if(this.subtitle) {
             Text(this.subtitle)
               .fontWeight(FontWeight.Normal)
@@ -127,23 +102,64 @@ export struct MoreTop {
               .fontSize(14)
               .maxLines(1)
           }
-        }.layoutWeight(1)
+        }
+        .layoutWeight(1)
+        .margin({ left: 10 })
         .alignItems(HorizontalAlign.Start)
         .transition(customAnimationUtil.isSlide(150, this.uiConfig))
         Blank()
         if (this.needSearch) {
-          this.searchButton()
+          // 默认搜索按钮
+          ButtonBuilder({
+            icon: $r('sys.symbol.magnifyingglass'),
+            iconSize: this.windowMode ? 16 : 24,
+            onCheck: () => {
+              this.isSearching = true
+            }
+          })
         }
-        this.otherButton()
+        if (this.icon1) {
+          // 功能按钮1
+          Row() {
+            ButtonBuilder({
+              icon: this.icon1,
+              iconSize: this.windowMode ? 16 : 24,
+              onCheck: () => {
+                this.onClick1()
+              }
+            })
+          }.height('100%')
+          .margin({ right: this.windowMode ? 0 : 10})
+          .alignItems(this.windowMode ? VerticalAlign.Top : VerticalAlign.Center)
+        }
+        if (this.icon2) {
+          // 功能按钮2
+          Row() {
+            ButtonBuilder({
+              icon: this.icon2,
+              enableClick: this.enableClick2,
+              iconSize: this.windowMode ? 16 : 24,
+              onCheck: () => {
+                this.onClick2()
+              }
+            })
+          }.height('100%')
+          .alignItems(this.windowMode ? VerticalAlign.Top : VerticalAlign.Center)
+          .bindMenu(this.enableClick2 ? undefined : this.theMenu())
+        }
       }
-
-    }
-    .layoutWeight(1)
-    .alignItems(VerticalAlign.Center)
+    }.zIndex(1)
     .width('100%')
-    .position({x:0})
-    .height(this.curYOffset<0?TAB_CONTENT_TITLE_HEIGHT-this.curYOffset:TAB_CONTENT_TITLE_HEIGHT)
-    .zIndex(1)
-    .padding({right: this.windowMode ? 125 : PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp)})
+    .layoutWeight(1)
+    .position({x: 0})
+    .alignItems(VerticalAlign.Center)
+    .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
+    .padding({right: this.windowMode ? 120 : PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp)})
   }
+
+  @Builder
+  TheMenu() {
+    Menu()
+  }
+
 }

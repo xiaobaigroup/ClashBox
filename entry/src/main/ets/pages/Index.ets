@@ -144,16 +144,14 @@ struct Index {
   @Provide isForeward: boolean = false
   // 顶部Bar高度
   @Provide heightTop: Length = TAB_CONTENT_TITLE_HEIGHT
-  // PX外屏-偏移
-  @Provide curOffsetRemain: number = 0
   // 主界面当前index
   @Provide IndexCurrentindex: number = 0
+  // PX外屏-偏移
+  @Provide curOffsetRemain: number = 0
   // 恢复时刻
   @Provide theRestoreTime: number = 0
   // 暂停时刻
   @Provide thePauseTime: number = 0
-  // 主界面选择的index
-  @State selectedIndex: number = 0
   // 流量任务id
   @State trafficJob: number = 0
   @State
@@ -299,7 +297,7 @@ struct Index {
                 })// 通过父组件的TabsController的实例，改变其index，达到跳转一级Tabs（首页）的效果
                 .onActionEnd(() => {
                   if (this.isLandscapePhone || this.istabletLandscape) {
-                    if (this.selectedIndex == 0) {
+                    if (this.IndexCurrentindex == 0) {
                       indexController.changeIndex(1)
                       console.info('Pan end')
                     }
@@ -320,7 +318,7 @@ struct Index {
         .barHeight(this.bottomRectHeight == 0 ? TabBarHeight(this.widthBp, this.heightBp) : TabBarAvoidHeight(this.widthBp, this.heightBp))
         .onChange((index: number) => {
           this.IndexCurrentindex = index
-          if (index === 0) {
+          if (index == 0) {
             this.isHomePage = true
           } else {
             this.isHomePage = false
@@ -328,10 +326,10 @@ struct Index {
         })
         .onAnimationStart((index: number, targetIndex: number) => {
           animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion(), }, () => {
-            if (index === targetIndex) {
+            if (index == targetIndex) {
               return
             }
-            this.selectedIndex = targetIndex;
+            this.IndexCurrentindex = targetIndex;
           })
         })
         .width('100%')
@@ -383,15 +381,15 @@ struct Index {
     })
     {
       SymbolGlyph(TabIcon)
-        .fontColor([this.selectedIndex === index ? this.icon_emphasize : icon_tertiary])
+        .fontColor([this.IndexCurrentindex === index ? this.icon_emphasize : icon_tertiary])
         .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY) // 分层颜色
         .fontSize(TabIconFontSize(this.widthBp, this.heightBp))
           //.effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
         .transition(customAnimationUtil.isTranslate(this.uiConfig))
-        .translate({y: this.selectedIndex == index ? -3 : 0})
+        .translate({y: this.IndexCurrentindex == index ? -3 : 0})
 
       Text(title)
-        .fontColor(this.selectedIndex === index ? this.icon_emphasize : icon_tertiary)
+        .fontColor(this.IndexCurrentindex === index ? this.icon_emphasize : icon_tertiary)
         .fontWeight(FontWeight.Medium)
         .fontSize(TabTitleFontSize(this.widthBp, this.heightBp))
         .transition(customAnimationUtil.isTranslate(this.uiConfig))
@@ -546,7 +544,6 @@ struct Index {
   }
 
   async aboutToAppear(): Promise<void> {
-
     hilog.info(0x1000, componentName, `#aboutToAppear executed`)
     let appFlowingState = AppStorage.get<AppFlowingState>("appFlowingState") ?? new AppFlowingState()
     // 启动Clash
@@ -604,7 +601,7 @@ struct Index {
 
     // 首次启动打开欢迎页
     if (this.uiConfig.isFirstStart) {
-      this.isShowWelcome = true
+      this.isShowWelcome = false
     }
 
     let nowDate = new Date().getTime()

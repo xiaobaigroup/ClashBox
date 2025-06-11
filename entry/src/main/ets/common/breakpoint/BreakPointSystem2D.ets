@@ -99,7 +99,7 @@ const getFontSize = BreakpointFunction2D<number>({
     ['xl']: {['hsm']: 23, ['hmd']: 24, ['hlg']: 25},
   })
 
-// getFontSize(this.widthBp, this.heightBp) // 外部断点 推荐
+// getFontSize(this.widthBp, this.heightBp)
 
 
 

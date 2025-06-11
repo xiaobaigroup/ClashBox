@@ -64,6 +64,7 @@ struct Home {
   @Consume isPXSecScreen: boolean
   // 代理启动按钮状态
   @Consume proxyEnabled: boolean
+  @Consume isHomePage: boolean
   @Consume isRolling: boolean
 
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
@@ -113,7 +114,8 @@ struct Home {
   private componentName: string = 'HomePage'
   // 代理启动持续的时间
   @Consume proxyStartingDuration: string
-
+  // 主界面当前index
+  @Consume IndexCurrentindex: number
   @Consume curOffsetRemain: number
   // 恢复时刻
   @Consume theRestoreTime: number
@@ -350,6 +352,9 @@ struct Home {
     if (this.uiConfig.isShowHomeCard)
       this.theCurrentHomeCard = JSON.parse(this.uiConfig.isShowHomeCard)
     hilog.info(0xFF00, "HometestTag", "布局初始化为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
+    if (this.IndexCurrentindex == 0) {
+      this.isHomePage = true
+    }
     EventHub.on(EventKey.SwitchModeCard, async (mode: ProxyMode) => {
       // 清空数据
       this.proxyGroups.empty()

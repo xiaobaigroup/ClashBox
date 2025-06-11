@@ -57,7 +57,7 @@ struct Diversion {
   @Builder
   diversionOther() {
     Button({ type: ButtonType.Circle, stateEffect: true }) {
-      SymbolGlyph($r('sys.symbol.plus'))
+      SymbolGlyph()
         .fontSize(24)
         .fontColor([this.icon_primary])
     }
@@ -66,10 +66,7 @@ struct Diversion {
     .height(40)
     .backgroundColor($r('app.color.settings_container_background'))
     .onClick(() => {
-      this.isAdd = true
-      // 启用背景模糊
-      this.isEnableIndexForegroundBlur = true
-      this.isShowPolicy = true
+
     })
   }
 
@@ -134,8 +131,12 @@ struct Diversion {
       Stack() {
           MoreTop({
             title: $r('app.string.Diversion_Strategy'),
-            otherButton: () => {
-              this.diversionOther()
+            icon2: $r('sys.symbol.plus'),
+            onClick2: () => {
+              this.isAdd = true
+              // 启用背景模糊
+              this.isEnableIndexForegroundBlur = true
+              this.isShowPolicy = true
             }
           })
 

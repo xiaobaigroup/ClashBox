@@ -5,13 +5,13 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "storeFile": "D:/证书/.p12",
-          "storePassword": "0000001DBAF26BE583032B2A1E053326C91E45941DBD6A6534D8EF93C8B865BE8F49815368CA21E10708C6839F",
-          "keyAlias": "xiaobaituandui",
-          "keyPassword": "0000001D4E676F1950576ECA61283988EBB3BCEB5472923DBEB716A53DF2B7B34FC36AEDB56131A6C82DA1CBB6",
+          "certpath": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashBox_yddCSabCuwuRMJdsGZDxF2XpfNYkUl1fZVP3BG0cRCA=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001BE767AF61A945A4CE83C77BB174FCA0510EC8C47C239874D9C3D2593E7314A7F05BC0CADA1E39A7",
+          "profile": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashBox_yddCSabCuwuRMJdsGZDxF2XpfNYkUl1fZVP3BG0cRCA=.p7b",
           "signAlg": "SHA256withECDSA",
-          "profile": "D:/证书/xiaobaituanduiRelease.p7b",
-          "certpath": "D:/证书/小白团队.cer"
+          "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashBox_yddCSabCuwuRMJdsGZDxF2XpfNYkUl1fZVP3BG0cRCA=.p12",
+          "storePassword": "0000001B1EEB2BFE7E168A9680D414E602C8A4227038BF8ED460D8FFDA1B0E6D1F12A9322E5AE59296A8BF"
         }
       }
     ],

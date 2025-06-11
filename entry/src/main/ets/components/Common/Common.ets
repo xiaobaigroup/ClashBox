@@ -99,6 +99,7 @@ export struct ButtonBuilder {
   @Prop icon: Resource
   @Prop iconWeight: number
   @Prop iconSize: number = 24
+  @Prop enableClick: boolean = true
   @Prop enableTransition: boolean = true
   @Prop iconColor: ResourceColor = icon_primary
   @Prop BackgroundColor: ResourceColor = Color.Transparent
@@ -115,8 +116,9 @@ export struct ButtonBuilder {
     }
     .width(40)
     .height(40)
-    .backgroundColor(this.BackgroundColor)
+    .backgroundColor(this.windowMode ? Color.Transparent : $r('app.color.settings_container_background'))
     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+    .hitTestBehavior(this.enableClick ? HitTestMode.Default : HitTestMode.None)
     .onClick(() => {
       this.onCheck()
     })
@@ -962,7 +964,7 @@ export struct menuRowList {
           Text(this.subtitle)
             .fontWeight(FontWeight.Normal)
             .textOverflow({ overflow: this.uiConfig.stringDisplayIndex === 0 ? TextOverflow.Ellipsis : TextOverflow.Clip})
-            .maxLines(this.uiConfig.stringDisplayIndex === 0 ? 1 : 2)
+            .maxLines(this.uiConfig.stringDisplayIndex == 0 ? 1 : 2)
             .margin({ top: 2 })
             .fontSize(14)
         }

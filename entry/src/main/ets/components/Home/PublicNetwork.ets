@@ -45,7 +45,7 @@ struct PublicNetwork {
             .textAlign(TextAlign.JUSTIFY)
             .fontColor($r('sys.color.font_primary'))
             .transition(customAnimationUtil.isOpacity(this.uiConfig))
-        }else {
+        } else {
           Row(){
             LoadingProgress()
               .size({width:24,height:24})

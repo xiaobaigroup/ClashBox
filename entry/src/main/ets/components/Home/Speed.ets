@@ -221,80 +221,81 @@ struct Speed {
       playMode: PlayMode.Normal,
       curve:Curve.Ease,
     }, () => {
-    if(this.proxyEnabled && this.isForeward && this.isHomePage) {
-      // 设置定时器，每秒调用一次 onSpeedData 函数
-      this.timerId = setInterval( () => {
+      hilog.info(0xFF00, "HomeSpeedTestTag", `代理启用状态：${this.proxyEnabled} 是否前台：${this.isForeward} 是否位于主页: ${this.isHomePage}`)
+      if (this.proxyEnabled && this.isForeward && this.isHomePage) {
+        // 设置定时器，每秒调用一次 onSpeedData 函数
+        this.timerId = setInterval( () => {
           this.onSpeedData()
           this.lineStart = false
-      }, 1000)
-    } else {
-      // 清除定时器
-      clearInterval(this.timerId)
-      this.lineStart = true
-      this.defOption = new Options({
-        //图例
-        legend: {
-          show: false,
-          selectAble: false,
-        },
-        //图表位置
-        grid: {
-          top: 0,
-          left: 17,
-          right: 17,
-        },
-        //X轴
-        xAxis: {
-          data: ['', '', '', '', '', '', '', '', '', '', '', ''],
-          axisLine: {
-            // 轴线样式
-            show: true, // 是否显示
-          },
-          axisTick: {
+        }, 1000)
+      } else {
+        // 清除定时器
+        clearInterval(this.timerId)
+        this.lineStart = true
+        this.defOption = new Options({
+          //图例
+          legend: {
             show: false,
-            interval: 2
+            selectAble: false,
           },
-          //坐标轴两侧是否留白
-          boundaryGap: false
-        },
-        //Y轴
-        yAxis:
-        {
-          min: 0,
-          max: 1500,
-          //刻度线
-          axisTick: {
-            show: false
+          //图表位置
+          grid: {
+            top: 0,
+            left: 17,
+            right: 17,
           },
-          //轴线
-          axisLine: {
-            show: false
-          },
-          //Y轴分割线
-          splitLine: {
-            show: false
-          },
-          axisLabel: {
-            show: false
-          }
-        },
-        //动画
-        animation: false,
-        //初始折线
-        series: [
-          {
-            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            lineStyle: {
-              width: 3,
-              color: this.uiConfig.lineColor
+          //X轴
+          xAxis: {
+            data: ['', '', '', '', '', '', '', '', '', '', '', ''],
+            axisLine: {
+              // 轴线样式
+              show: true, // 是否显示
             },
-            label: {
+            axisTick: {
+              show: false,
+              interval: 2
+            },
+            //坐标轴两侧是否留白
+            boundaryGap: false
+          },
+          //Y轴
+          yAxis:
+          {
+            min: 0,
+            max: 1500,
+            //刻度线
+            axisTick: {
+              show: false
+            },
+            //轴线
+            axisLine: {
+              show: false
+            },
+            //Y轴分割线
+            splitLine: {
+              show: false
+            },
+            axisLabel: {
               show: false
             }
           },
-        ]
-      })
-    }
+          //动画
+          animation: false,
+          //初始折线
+          series: [
+            {
+              data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+              lineStyle: {
+                width: 3,
+                color: this.uiConfig.lineColor
+              },
+              label: {
+                show: false
+              }
+            },
+          ]
+        })
+      }
     })
   }
 

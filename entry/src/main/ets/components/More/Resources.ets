@@ -14,6 +14,7 @@ import { EventHub, EventKey } from "../../common/EventHub"
 import { customAnimationUtil, isON } from "../../common/utils/Animation"
 import { i18n } from "@kit.LocalizationKit"
 import { PageMargin } from "../../common/breakpoint/BreakPoint"
+import { icon_primary } from "../Common/Common"
 
 // 资源数据（假设）
 interface ResourcesData {
@@ -50,28 +51,28 @@ export const theResouresData: Array<ResourcesData> = [
     resourceName: 'GeoIp',
     fileName: "GeoIP.dat",
     resourceSize: 6543,
-    updateTime: 1736990475781,
+    updateTime: 1749640201580,
   },
   {
     key: "geosite",
     resourceName: 'GeoSite',
     fileName: "GeoSite.dat",
     resourceSize: 8654,
-    updateTime: 1736990575781,
+    updateTime: 1749640201580,
   },
   {
     key: "mmdb",
     resourceName: 'MMDB',
     fileName: "geoip.metadb",
     resourceSize: 8654,
-    updateTime: 1736990575781,
+    updateTime: 1749640201580,
   },
   {
     key: "asn",
     resourceName: 'ASN',
     fileName: "ASN.mmdb",
     resourceSize: 8654,
-    updateTime: 1736990575781,
+    updateTime: 1749640201580,
   }
 ]
 
@@ -100,8 +101,6 @@ struct Resources {
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  // 一级图标色，黑色
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 使用默认文本位置传递列表行的index
@@ -122,43 +121,6 @@ struct Resources {
   // page内顶部标题偏移量
   @Consume curYOffset: number
 
-  @Builder
-  reaourceOther() {
-    // 全部刷新按钮
-    Button({ type: ButtonType.Circle, stateEffect: true }) {
-      SymbolGlyph($r('sys.symbol.arrow_clockwise'))
-        .fontSize(24)
-        .fontColor([this.icon_primary])
-    }
-    .transition(customAnimationUtil.isSlide(0, this.uiConfig))
-    .width(40)
-    .height(40)
-    .margin({ left: 10 })
-    .backgroundColor($r('app.color.settings_container_background'))
-    .onClick(() => {
-      this.isON.toggleAnim = true
-      this.isLoadingAll = true
-      promptAction.showToast({ message: getResourceString($r('app.string.resource_updating'), this) })
-      this.updateGeoDate()
-    })
-
-    // 排序按钮
-    Button({ type: ButtonType.Circle, stateEffect: true }) {
-      SymbolGlyph($r('sys.symbol.sort'))
-        .fontSize(24)
-        .fontColor([this.icon_primary])
-    }
-    .transition(customAnimationUtil.isSlide(0, this.uiConfig))
-    .width(40)
-    .height(40)
-    .margin({ left: 10 })
-    .backgroundColor($r('app.color.settings_container_background'))
-    .onClick(() => {
-      this.isON.toggleAnim = true
-      this.isEnableIndexForegroundBlur = true
-      this.isShowGroupSort = true
-    })
-  }
   @Builder
   SortSheet() {
     Column() {
@@ -286,7 +248,19 @@ struct Resources {
       Stack() {
         MoreTop({
           title: $r('app.string.Resources'),
-          otherButton: (): void => { this.reaourceOther() }
+          icon1: $r('sys.symbol.arrow_clockwise'),
+          icon2: $r('sys.symbol.sort'),
+          onClick1: () => {
+            this.isON.toggleAnim = true
+            this.isLoadingAll = true
+            promptAction.showToast({ message: getResourceString($r('app.string.resource_updating'), this) })
+            this.updateGeoDate()
+          },
+          onClick2: () => {
+            this.isON.toggleAnim = true
+            this.isEnableIndexForegroundBlur = true
+            this.isShowGroupSort = true
+          },
         })
 
         Column() {
@@ -330,7 +304,7 @@ struct Resources {
                       Button({ type: ButtonType.Circle, stateEffect: true }) {
                         SymbolGlyph($r('sys.symbol.square_and_pencil'))
                           .fontSize(24)
-                          .fontColor([this.icon_primary])
+                          .fontColor([icon_primary])
                       }.ButtonStyle().margin({ right: 12 })
                       .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                       .onClick(() => {
@@ -352,7 +326,7 @@ struct Resources {
                         }else {
                           SymbolGlyph($r('sys.symbol.arrow_clockwise'))
                             .fontSize(24)
-                            .fontColor([this.icon_primary])
+                            .fontColor([icon_primary])
                             //.transition(customAnimationUtil.isOpacity(this.uiConfig))
                         }
                       }.ButtonStyle()

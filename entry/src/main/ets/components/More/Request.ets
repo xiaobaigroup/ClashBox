@@ -99,43 +99,28 @@ struct RequestPage {
     this.requestListData.pushData(RequestListData)
   }
 
-  @Builder
-  requestOther() {
-    // 启用按钮
-    Button({ type: ButtonType.Circle, stateEffect: true }) {
-      SymbolGlyph(!this.appConfig.enableRequest ? $r('sys.symbol.checkmark_circle') : $r('sys.symbol.checkmark_circle_fill'))
-        .fontSize(24)
-        .fontColor([this.icon_primary])
-    }.onClick(() => {
-      animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
-        this.appConfig.enableRequest = !this.appConfig.enableRequest
-        // this.needSearch = this.appConfig.enableRequest
-        if (!this.appConfig.enableRequest) {
-          clearInterval(this.intervalId)
-          this.requestListData.clear()
-        } else {
-          this.getRequest()
-          this.intervalId = setInterval(() => {
-            this.getRequest()
-          }, 9000)
-        }
-      })
-    })
-    .width(40)
-    .height(40)
-    .margin({ left: 10 })
-    .backgroundColor($r('app.color.settings_container_background'))
-    .transition(customAnimationUtil.isSlide(0, this.uiConfig))
-  }
-
   build() {
     NavDestination() {
       Stack() {
         // 标题栏
           MoreTop({
             title: $r('app.string.Request'),
-            otherButton: (): void => {
-              this.requestOther()
+            icon2: !this.appConfig.enableRequest ? $r('sys.symbol.checkmark_circle') : $r('sys.symbol.checkmark_circle_fill'),
+            onClick2: () => {
+              // 启用按钮
+              animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+                this.appConfig.enableRequest = !this.appConfig.enableRequest
+                // this.needSearch = this.appConfig.enableRequest
+                if (!this.appConfig.enableRequest) {
+                  clearInterval(this.intervalId)
+                  this.requestListData.clear()
+                } else {
+                  this.getRequest()
+                  this.intervalId = setInterval(() => {
+                    this.getRequest()
+                  }, 9000)
+                }
+              })
             }
           })
 

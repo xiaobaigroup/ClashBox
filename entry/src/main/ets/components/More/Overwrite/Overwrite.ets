@@ -71,11 +71,6 @@ struct Overwrite {
     this.isEnableIndexForegroundBlur = false
     // 重置覆写操作
     AppState.ResetClashConfig()
-
-  }
-
-  @Builder
-  overwriteOther() {
   }
 
   handleCheck(index: number) {
@@ -97,7 +92,6 @@ struct Overwrite {
       Stack() {
             MoreTop({
               title: $r('app.string.Overwrite'),
-              otherButton: this.overwriteOther
             })
 
         Column() {

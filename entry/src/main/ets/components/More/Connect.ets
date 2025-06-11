@@ -132,51 +132,6 @@ struct Connect {
     // console.log("#getConnections 去重后长度", uniqueMap.size)
   }
 
-  @Builder
-  connectOther() {
-    if (this.appConfig.enableConnect) {
-      // 清理按钮
-      Button({ type: ButtonType.Circle, stateEffect: true }) {
-        SymbolGlyph($r('sys.symbol.clean_fill'))
-          .fontSize(24)
-          .fontColor([this.icon_primary])
-      }.onClick(()=>{
-        this.connectListData.clear()
-        ClashViewModel.clearConnections()
-      })
-      .width(40)
-      .height(40)
-      .margin({ left: 10 })
-      .backgroundColor($r('app.color.settings_container_background'))
-      .transition(customAnimationUtil.isSlide(0, this.uiConfig))
-    }
-    // 启用按钮
-    Button({ type: ButtonType.Circle, stateEffect: true }) {
-      SymbolGlyph(!this.appConfig.enableConnect ? $r('sys.symbol.checkmark_circle') : $r('sys.symbol.checkmark_circle_fill'))
-        .fontSize(24)
-        .fontColor([this.icon_primary])
-    }.onClick(() => {
-      animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
-        this.appConfig.enableConnect = !this.appConfig.enableConnect
-        // this.needSearch = this.appConfig.enableConnect
-        if (!this.appConfig.enableConnect) {
-          clearInterval(this.intervalId)
-          this.connectListData.clear()
-        } else {
-          this.getConnections()
-          this.intervalId = setInterval(() => {
-            this.getConnections()
-          }, 9000)
-        }
-      })
-    })
-    .width(40)
-    .height(40)
-    .margin({ left: 10 })
-    .backgroundColor($r('app.color.settings_container_background'))
-    .transition(customAnimationUtil.isSlide(0, this.uiConfig))
-  }
-
   async getPackageIcon(connection: ConnectionInfo)  {
     return connection.metadata.process;
   }
@@ -187,7 +142,27 @@ struct Connect {
       Stack() {
           MoreTop({
             title: $r('app.string.Connect'),
-            otherButton: (): void => { this.connectOther() }
+            icon1: this.appConfig.enableConnect ? $r('sys.symbol.clean_fill') : undefined,
+            icon2: !this.appConfig.enableConnect ? $r('sys.symbol.checkmark_circle') : $r('sys.symbol.checkmark_circle_fill'),
+            onClick1: () => {
+              this.connectListData.clear()
+              ClashViewModel.clearConnections()
+            },
+            onClick2: () => {
+              animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+                this.appConfig.enableConnect = !this.appConfig.enableConnect
+                // this.needSearch = this.appConfig.enableConnect
+                if (!this.appConfig.enableConnect) {
+                  clearInterval(this.intervalId)
+                  this.connectListData.clear()
+                } else {
+                  this.getConnections()
+                  this.intervalId = setInterval(() => {
+                    this.getConnections()
+                  }, 9000)
+                }
+              })
+            }
           })
 
         Column() {

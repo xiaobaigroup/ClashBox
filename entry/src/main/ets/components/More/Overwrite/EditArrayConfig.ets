@@ -241,44 +241,28 @@ export struct ArrayConfigEditor {
     this.ArrayConfigList.splice(index, 1)
   }
 
-  @Builder
-  TopOtherButton() {
-    Button({ type: ButtonType.Circle, stateEffect: true }) {
-      SymbolGlyph(this.isEditPage ? $r('sys.symbol.save') : $r('sys.symbol.plus'))
-        .fontSize(24)
-        .fontColor([this.icon_primary])
-    }
-    .width(40)
-    .height(40)
-    .transition(customAnimationUtil.isSlide(0, this.uiConfig))
-    .backgroundColor($r('app.color.settings_container_background'))
-    .onClick(() => {
-      if (!this.isEditPage) {
-        // 启用背景模糊
-        this.isEnableIndexForegroundBlur = true
-        if(this.params.valueType == ValueType.Record) {
-          // 替换为添加标题
-          this.kvDialogTitle = getResourceString($r('app.string.Add'), this) + getResourceString(this.params.title, this)
-          this.kvDialogController.open()
-        }else{
-          this.dialogController.open()
-        }
-      } else {
-        // 编辑页时保存按钮
-        this.pageInfos.pop()
-
-      }
-    })
-  }
-
   build() {
     NavDestination() {
       Stack() {
         // 导航栏
         MoreTop({
           title: this.params.title as Resource,
-          otherButton: () => {
-            this.TopOtherButton()
+          icon2: this.isEditPage ? $r('sys.symbol.save') : $r('sys.symbol.plus'),
+          onClick2: () => {
+            if (!this.isEditPage) {
+              // 启用背景模糊
+              this.isEnableIndexForegroundBlur = true
+              if(this.params.valueType == ValueType.Record) {
+                // 替换为添加标题
+                this.kvDialogTitle = getResourceString($r('app.string.Add'), this) + getResourceString(this.params.title, this)
+                this.kvDialogController.open()
+              }else{
+                this.dialogController.open()
+              }
+            } else {
+              // 编辑页时保存按钮
+              this.pageInfos.pop()
+            }
           }
         })
 
