@@ -70,7 +70,7 @@ export async function checkIp() {
       continue
     return result
   }
-  return "unkown"
+  return "UnKnown"
 }
 
 export interface IpResolver{

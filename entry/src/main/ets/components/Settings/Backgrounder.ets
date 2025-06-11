@@ -245,8 +245,8 @@ struct Backgrounder {
       abilityName: 'com.huawei.hmos.settings.MainAbility', // 系统设置的Ability的名字（固定）
       uri: "application_info_entry", // 系统设置的界面 （固定）
       parameters: {
-        // pushParams: 'cn.damai.hongmeng' // 包名
-        pushParams: "org.xbgroup.clashbox",
+        // pushParams: 'org.xbgroup.clashbox' // 包名
+        pushParams: "org.xbgroup.clashboxb",
       }
     })
   }

@@ -2,6 +2,6 @@
   "layered-image":
   {
     "background" : "$media:background_warm",
-    "foreground" : "$media:panda"
+    "foreground" : "$media:app_icon_pre"
   }
 }

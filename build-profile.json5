@@ -5,26 +5,13 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashBox_yddCSabCuwuRMJdsGZDxF2XpfNYkUl1fZVP3BG0cRCA=.cer",
-          "keyAlias": "debugKey",
-          "keyPassword": "0000001BBCA805A15639A2E57491C28BA2B4168E544F2CF0C472FD749F08B3D735E7B4065347B55BD65E79",
-          "profile": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashBox_yddCSabCuwuRMJdsGZDxF2XpfNYkUl1fZVP3BG0cRCA=.p7b",
+          "storeFile": "D:/证书/.p12",
+          "storePassword": "0000001DBAF26BE583032B2A1E053326C91E45941DBD6A6534D8EF93C8B865BE8F49815368CA21E10708C6839F",
+          "keyAlias": "xiaobaituandui",
+          "keyPassword": "0000001D4E676F1950576ECA61283988EBB3BCEB5472923DBEB716A53DF2B7B34FC36AEDB56131A6C82DA1CBB6",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashBox_yddCSabCuwuRMJdsGZDxF2XpfNYkUl1fZVP3BG0cRCA=.p12",
-          "storePassword": "0000001B9C304D5FD1281F3049D78C632F90FBDB21772D295413F8EFA6F2882F73F5655E15667A2ED8173E"
-        }
-      },
-      {
-        "name": "usePX",
-        "type": "HarmonyOS",
-        "material": {
-          "certpath": "C:\\Users\\Administrator\\.ohos\\config\\usePX_ClashBox_Apnc9t_FUReHaFfg8Vz9lpnZZJ7DvWIe8Dh4lmf_dwI=.cer",
-          "keyAlias": "debugKey",
-          "keyPassword": "0000001A196067680FC1658D6627B8311B370BC1E703440E650E38BB094B9C7476BE3948029166ABD6DF",
-          "profile": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashBox_zL_lCO4bAvPSCUi1B2mkUCrHIVGxm3QDrMJXyoen8AI=.p7b",
-          "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\default_ClashBox_zL_lCO4bAvPSCUi1B2mkUCrHIVGxm3QDrMJXyoen8AI=.p12",
-          "storePassword": "0000001A08D13EA4DF4FEA7827F29C88EA42338282F04E69A7173A3D240867BECE8655C6A3476E9C92B3"
+          "profile": "D:/证书/xiaobaituanduiRelease.p7b",
+          "certpath": "D:/证书/小白团队.cer"
         }
       }
     ],

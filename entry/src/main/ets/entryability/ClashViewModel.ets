@@ -240,7 +240,8 @@ export class ClashViewModel {
     this.vpnRequestId = requestId;
     const vpnWant = {
       deviceId: "",
-      bundleName: "org.xbgroup.clashbox",
+      // bundleName: "org.xbgroup.clashbox",
+      bundleName: "org.xbgroup.clashboxb",
       abilityName: "ClashVpnAbility",
       parameters: { "ClashCore" : coreType, requestId }
     } as Want
