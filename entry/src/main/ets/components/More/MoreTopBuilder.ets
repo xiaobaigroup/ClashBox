@@ -118,6 +118,7 @@ export struct MoreTop {
             }
           })
             .margin({ right: this.windowMode ? 0 : 10})
+            .transition(customAnimationUtil.isSlide(50, this.uiConfig))
         }
         if (this.icon1) {
           // 功能按钮1
@@ -132,6 +133,7 @@ export struct MoreTop {
           }.height('100%')
           .margin({ right: this.windowMode ? 0 : 10})
           .alignItems(this.windowMode ? VerticalAlign.Top : VerticalAlign.Center)
+          .transition(customAnimationUtil.isSlide(50, this.uiConfig))
         }
         if (this.icon2) {
           // 功能按钮2
@@ -147,6 +149,7 @@ export struct MoreTop {
           }.height('100%')
           .alignItems(this.windowMode ? VerticalAlign.Top : VerticalAlign.Center)
           .bindMenu(this.enableClick2 ? undefined : this.theMenu())
+          .transition(customAnimationUtil.isSlide(0, this.uiConfig))
         }
       }
     }.zIndex(1)

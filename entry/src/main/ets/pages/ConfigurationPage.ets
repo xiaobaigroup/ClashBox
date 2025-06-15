@@ -118,7 +118,7 @@ struct ConfigurationPage {
             title: getResourceString($r('app.string.Configuration'), this),
             titleFontSize: this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE - this.curYOffset / 100 : TAB_CONTENT_TITLE_FONT_SIZE,
             icons: [$r('sys.symbol.arrow_clockwise')],
-            iconSize: this.windowMode ? 16 : 24,
+            iconSize: this.windowMode ? 16 : (this.curYOffset < 0 ? 24 - this.curYOffset / 100 : 24),
             // 刷新图标
             onFClick: () => {
               this.isON.toggleAnim = true
@@ -128,7 +128,8 @@ struct ConfigurationPage {
           })
         }
         .zIndex(1)
-        // .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
+        .backgroundColor($r('app.color.background'))
+        .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
         .position({ x: 0, y: this.isRolling && this.isSmallSquareScreen ? this.heightTop : 0 })
         .alignItems(VerticalAlign.Center)
         .width('100%')

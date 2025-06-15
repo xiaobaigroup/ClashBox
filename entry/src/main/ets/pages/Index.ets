@@ -934,12 +934,12 @@ struct Index {
       iterations: 1,
       playMode: PlayMode.Normal,
     }, () => {
-        if (this.uiConfig.isBlurr) {
-          indexController.setTabBarTranslate(this.isLandscapePhone ? { x: '-100%' } : { y: '100%' })
-        } else {
+    //    if (this.uiConfig.isBlurr) {
+     //     indexController.setTabBarTranslate(this.isLandscapePhone ? { x: '-100%' } : { y: '100%' })
+   //     } else {
           indexController.setTabBarTranslate(this.isLandscapePhone ? { x: '-100%' } : { y: '100%' })
           this.barHeight = 0
-        }
+     //   }
 
       if (this.isLandscapePhone || this.istabletLandscape ) {
         indexController.setTabBarTranslate({ x: '-100%' })
@@ -958,12 +958,12 @@ struct Index {
       playMode: PlayMode.Normal,
     }, async () => {
       if (!this.isSmallSquareScreen || !this.isRolling) {
-        if (this.uiConfig.isBlurr) {
-          indexController.setTabBarTranslate(this.isLandscapePhone ? { x: 0 } : { y: 0 })
-        } else {
+   //     if (this.uiConfig.isBlurr) {
+    //      indexController.setTabBarTranslate(this.isLandscapePhone ? { x: 0 } : { y: 0 })
+    //    } else {
           indexController.setTabBarTranslate(this.isLandscapePhone ? { x: 0 } : { y: 0 })
           // this.barHeight = this.compBarHeight.value
-        }
+    //    }
 
         if (this.isLandscapePhone || this.istabletLandscape ) {
           indexController.setTabBarTranslate({ x: 0 })
@@ -993,13 +993,13 @@ struct Index {
       iterations: 1,
       playMode: PlayMode.Normal,
     }, () => {
-      if (this.uiConfig.isBlurr) {
-        indexController.setTabBarTranslate({ y: '100%' })
-        this.paddingButtom = $r('app.integer.vp_proxy_start_button_left_right_margin')
-      }else {
+    //  if (this.uiConfig.isBlurr) {
+    //    indexController.setTabBarTranslate({ y: '100%' })
+   //     this.paddingButtom = $r('app.integer.vp_proxy_start_button_left_right_margin')
+    //  }else {
         indexController.setTabBarTranslate({ y: '100%' })
         this.barHeight = 0
-      }
+   //   }
       this.heightTop = -TAB_CONTENT_TITLE_HEIGHT
     })
   }
@@ -1014,9 +1014,9 @@ struct Index {
         onFinish:()=>{
         }
       }, () => {
-        if (this.uiConfig.isBlurr) {
-          this.paddingButtom = $r('app.integer.vp_proxy_start_button_bottom_margin')
-        }
+    //    if (this.uiConfig.isBlurr) {
+      //    this.paddingButtom = $r('app.integer.vp_proxy_start_button_bottom_margin')
+     //   }
         this.barHeight = '77vp'
         indexController.setTabBarTranslate({ y: 0 })
         this.heightTop = 0

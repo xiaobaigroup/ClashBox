@@ -233,7 +233,7 @@ struct ProxyPage {
         TopBar({
           title: getResourceString($r('app.string.Proxy'), this),
           titleFontSize: this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE - this.curYOffset / 100 : TAB_CONTENT_TITLE_FONT_SIZE,
-          iconSize: this.windowMode ? 16 : 24,
+          iconSize: this.windowMode ? 16 : (this.curYOffset < 0 ? 24 - this.curYOffset / 100 : 24),
           icons: [$r('sys.symbol.puzzle'), $r('sys.symbol.square_and_pencil')],
           // 一键取消所有收藏按钮 TODO 判定有误，搁置；启用时需将图标$r('sys.symbol.heart_slash')添加进数组并添加修改对应                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               点击事件
           /* onFClick: () => {
@@ -261,6 +261,8 @@ struct ProxyPage {
       .alignItems(VerticalAlign.Center)
       .width('100%')
       .transition(customAnimationUtil.isSlide(0, this.uiConfig))
+      .backgroundColor($r('app.color.background'))
+      .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
       }
 
       if (this.proxyGroups.totalCount() == 0) {

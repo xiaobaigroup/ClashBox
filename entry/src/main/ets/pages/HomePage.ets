@@ -145,7 +145,7 @@ struct Home {
           TopBar({
             title: this.uiConfig.isGreeting ? getResourceString(getGreeting(), this) : 'ClashBox',
             icons: [$r('sys.symbol.square_and_pencil'), $r('sys.symbol.gearshape')],
-            iconSize: this.windowMode ? 16 : 24,
+            iconSize: this.windowMode ? 16 : (this.curYOffset < 0 ? 24 - this.curYOffset / 100 : 24),
             // 编辑按钮
             onFClick: () => {
               this.isShowHomeEdit = true
@@ -196,6 +196,8 @@ struct Home {
       .zIndex(1)
       .width('100%')
       .geometryTransition("Button")
+      .backgroundColor($r('app.color.background'))
+      .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
       .margin({ top: this.topRectHeight == 0 ? 0 : HomeTopHeight(this.widthBp, this.heightBp) })
       // .position({x: 0, y: this.isRolling && this.isSmallSquareScreen ? this.heightTop: 0})
 
@@ -220,6 +222,8 @@ struct Home {
             Blank().height(100)
           }
         }
+        .height('100%')
+        .width("100%")
         .layoutWeight(1)
         .align(Alignment.Top)
         .scrollBar(BarState.Off)
@@ -287,6 +291,7 @@ struct Home {
         }
 
       }
+      .alignContent(Alignment.Top)
       .backgroundColor($r('app.color.background'))
       .height('100%')
       .width("100%")
@@ -415,12 +420,12 @@ struct Home {
         order: 9
       },
       { // 节点信息小卡片
-        order: 8/*HomeCardProxyInfoOrder(this.widthBp, this.heightBp)*/,
+        order: 10/*HomeCardProxyInfoOrder(this.widthBp, this.heightBp)*/,
         aspectRatio: 2.07,
       },
       { // 快捷方式小卡片
         aspectRatio: 1,
-        order: 10
+        order: 8
       }
     ]
   }
@@ -504,16 +509,12 @@ struct Home {
   /**卡片编辑页面显示监听*/
   ShowHomeEditChange() {
     hilog.info(0xFF00, "HometestTag", "进入卡片编辑页面显示监听  %{public}s")
-    // 展示编辑页时才触发
-    if (!this.isShowSettings) {
-      // 当编辑页面由 true -> false 时触发抖动动画刷新
-      if(this.isShowHomeEdit && !this.isShowSettings) {
-        hilog.info(0xFF00, "HometestTag", "进入卡片编辑页面显示监听，true -> false  %{public}s")
-        this.stopAnim()
-        this.startAnim()
-      } else {
-        this.stopAnim()
-      }
+    if(this.isShowHomeEdit && !this.isShowSettings) {
+      hilog.info(0xFF00, "HometestTag", "进入卡片编辑页面显示监听，true -> false  %{public}s")
+      this.stopAnim()
+      this.startAnim()
+    }else{
+      this.stopAnim()
     }
   }
 
@@ -560,7 +561,7 @@ struct HomeCard {
           md: HomeCardSpan346md(this.widthBp, this.heightBp) * (this.index == 0 || this.index == 8 ? 2 : 1),
           lg: HomeCardSpan346lg(this.widthBp, this.heightBp) * (this.index == 0 || this.index == 8 ? 2 : 1)
         },
-        // order: this.item.order
+         order: this.item.order
       })
       {
         Stack({ alignContent: Alignment.TopEnd }) {
@@ -570,7 +571,7 @@ struct HomeCard {
           this.HomeCardContent(this.index)
           if (this.isShowDeleteButton) {
             DeleteButton()
-              .position({ x: '95%', y: -4 })
+              .position({ x: this.item.order == 1 || this.item.order == 10 ? '95%' : '92%', y: -4 })
               .onClick(() => {
                 animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
                   this.theCurrentHomeCard.splice(this.index, 1, false)
@@ -584,7 +585,7 @@ struct HomeCard {
       .aspectRatio(this.item.aspectRatio)
       .backgroundColor($r('app.color.container_background'))/*.borderWidth(2).borderColor(Color.Red)*/
       .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-      .transition(customAnimationUtil.isScaleTran(1, this.uiConfig))
+      .transition(customAnimationUtil.isScaleTran(this.index, this.uiConfig))
       // 消失触发回调
       .onDetach(() => {})
       // 显示时触发回调

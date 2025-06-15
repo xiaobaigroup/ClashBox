@@ -120,7 +120,7 @@ export struct ButtonBuilder {
     .onClick(() => {
       this.onCheck()
     })
-    .transition(this.enableTransition ? customAnimationUtil.isSlide(100, this.uiConfig) : undefined)
+   // .transition(this.enableTransition ? customAnimationUtil.isSlide(100, this.uiConfig) : undefined)
   }
 }
 

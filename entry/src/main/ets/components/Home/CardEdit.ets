@@ -65,6 +65,15 @@ export struct CardEdit {
             })
           })
       }
+
+      Row(){
+        this.CardImage($r('app.media.ProxyINFO'), 2.07, 8, '100%', true)
+      }
+      .onClick(() => {
+        animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
+          this.theCurrentHomeCard.splice(8, 1, true)
+        })
+      })
     }
     .width('100%')
     .padding({

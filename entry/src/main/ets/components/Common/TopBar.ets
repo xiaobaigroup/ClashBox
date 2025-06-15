@@ -36,7 +36,7 @@ export struct TopBar {
         .margin({ top: this.windowMode ? 8 : 0})
         .textOverflow({ overflow: TextOverflow.Ellipsis })
         .transition(customAnimationUtil.isSlide(200, this.uiConfig))
-        .transition(customAnimationUtil.isScaleTran(0, this.uiConfig))
+      //  .transition(customAnimationUtil.isScaleTran(0, this.uiConfig))
         .fontSize(this.titleFontSize ?? calculateFontSizeLinear(this.title))
       // Text(`窗口模式 windowMode：${this.windowMode}`)
       Row({space: this.windowMode ? 0 : 10}) {
@@ -46,7 +46,7 @@ export struct TopBar {
             icon: this.icons[0],
             iconSize: this.iconSize,
             onCheck: () => { this.onFClick() }
-          })
+          }).transition(customAnimationUtil.isSlide(100, this.uiConfig))
         }
         // 按钮2
         if (this.icons.length >= 2) {
@@ -54,7 +54,7 @@ export struct TopBar {
             icon: this.icons[1],
             iconSize: this.iconSize,
             onCheck: () => { this.onSClick() }
-          })
+          }).transition(customAnimationUtil.isSlide(0, this.uiConfig))
         }
         // 按钮3
         if (this.icons.length >= 3) {
@@ -62,7 +62,7 @@ export struct TopBar {
             icon: this.icons[2],
             iconSize: this.iconSize,
             onCheck: () => { this.onTClick() }
-          })
+          }).transition(customAnimationUtil.isSlide(0, this.uiConfig))
         }
         // 窗口控制按钮
         if (this.windowMode) {
