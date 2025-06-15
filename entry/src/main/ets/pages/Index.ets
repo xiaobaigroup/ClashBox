@@ -314,7 +314,7 @@ struct Index {
         .scrollable(this.isSecondary ? false : true)
         .vertical(TabBarVertical(this.widthBp, this.heightBp))
         .barWidth(this.windowMode ? WindowTabBarWidth(this.widthBp, this.heightBp) : TabBarWidth(this.widthBp, this.heightBp))
-        .barHeight(this.bottomRectHeight == 0 ? TabBarHeight(this.widthBp, this.heightBp) : TabBarAvoidHeight(this.widthBp, this.heightBp))
+        .barHeight(this.isSecondary && this.widthBp <= 2 && !this.windowMode ? 0 : this.bottomRectHeight == 0 ? TabBarHeight(this.widthBp, this.heightBp) : TabBarAvoidHeight(this.widthBp, this.heightBp))
         .onChange((index: number) => {
           this.IndexCurrentindex = index
           if (index == 0) {
@@ -960,7 +960,7 @@ struct Index {
       if (!this.isSmallSquareScreen || !this.isRolling) {
         if (this.uiConfig.isBlurr) {
           indexController.setTabBarTranslate(this.isLandscapePhone ? { x: 0 } : { y: 0 })
-        }else{
+        } else {
           indexController.setTabBarTranslate(this.isLandscapePhone ? { x: 0 } : { y: 0 })
           // this.barHeight = this.compBarHeight.value
         }

@@ -117,6 +117,7 @@ export struct MoreTop {
               this.isSearching = true
             }
           })
+            .margin({ right: this.windowMode ? 0 : 10})
         }
         if (this.icon1) {
           // 功能按钮1

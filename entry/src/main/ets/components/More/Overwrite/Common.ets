@@ -256,7 +256,7 @@ export struct ConfigList {
         .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
         .borderRadius(18)
         .alignListItem(ListItemAlign.Center)
-        .contentEndOffset(this.uiConfig.isBlurr ? CONTENT_END_OFFSET_150 : 110)
+        .contentEndOffset(110)
         .chainAnimation(true)
         .nestedScroll({
           scrollForward: NestedScrollMode.PARENT_FIRST,

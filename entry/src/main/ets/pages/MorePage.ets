@@ -164,7 +164,7 @@ struct MorePage {
           .edgeEffect(EdgeEffect.Spring)
           .borderRadius(18)
           .alignListItem(ListItemAlign.Center)
-          .contentEndOffset(this.isLandscapePhone?10:CONTENT_END_OFFSET_150)
+          .contentEndOffset(this.isLandscapePhone ? 10 : CONTENT_END_OFFSET_150)
           .chainAnimation(true)
           .nestedScroll({
             scrollForward: NestedScrollMode.PARENT_FIRST,
