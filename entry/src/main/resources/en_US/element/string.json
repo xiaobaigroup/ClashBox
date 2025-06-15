@@ -653,8 +653,8 @@
       "value": "Enabling the experimental function may lead to application instability"
     },
     {
-      "name": "Contributors",
-      "value": "List of Contributors"
+      "name": "collaborators",
+      "value": "List of Collaborators"
     },
     {
       "name": "UseGuidance",
@@ -1987,6 +1987,10 @@
     {
       "name": "overwrite_dns_subtitle",
       "value": "When enabled, the DNS option in the configuration will be overwritten"
+    },
+    {
+      "name": "xb_studio",
+      "value": "XiaoBai Studio"
     }
   ]
 }

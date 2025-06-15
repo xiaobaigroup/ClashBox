@@ -12,10 +12,12 @@ import { curves, SymbolGlyphModifier } from "@kit.ArkUI"
 import { common } from "@kit.AbilityKit"
 import { setAutoColorMode, setDarkColorMode, setLightColorMode } from "../../common/utils/ChangeColorModeUtils"
 import { font_primary, menuRowList, toggleRowList } from "../Common/Common"
-import {  AppConfig, isEnd, UIConfig } from "../../entryability/AppState"
-import { changeThemeColor } from "../../common/utils/ChangeThemeColorUtil"
+import { UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../common/utils/Animation"
 import { PageMargin } from "../../common/breakpoint/BreakPoint"
+import { Xb_UIConfig } from "xb_components"
+import { Xb_ChangeThemeColor } from "xb_components/src/main/ets/utils/ChangeThemeColorUtil"
+
 
 @Component
 struct Appearance {
@@ -90,7 +92,8 @@ struct Appearance {
             this.uiConfig.themeColorIndex = index
             // 持久化主题色
             this.uiConfig.themeColor = menuItem?.customThemeName ?? 'blueAppTheme'
-            changeThemeColor(this.uiConfig.themeColor)
+            Xb_UIConfig.themeColor = menuItem?.customThemeName ?? 'blueAppTheme'
+            Xb_ChangeThemeColor(this.uiConfig.themeColor)
             // UI刷新
             this.EnableThemeColorText = menuItem.title
           })

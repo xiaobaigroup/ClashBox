@@ -1,6 +1,4 @@
-import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
-import { AboutListItemProp, BORDER_RADIUS_20, ContributorsListItemProp,
-  ContributorsList,
+import { AboutListItemProp, BORDER_RADIUS_20,
   CheckUpdateListItemProp,
   CONTENT_END_OFFSET_150,
   moreData,
@@ -12,8 +10,11 @@ import { AboutListItemProp, BORDER_RADIUS_20, ContributorsListItemProp,
   ThirdServicesList,
   UseGuidanceList,
   LinkList,
+  CollaboratorsList,
+  CollaboratorsListItemProp,
 } from "../../common/entity/Constants"
 import TopBuilder from "./TopBuilder"
+import { Xb_Studio } from "xb_components"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { common, Want } from "@kit.AbilityKit"
 import { LengthMetrics, promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
@@ -24,13 +25,10 @@ import { customVibrator } from "../../common/utils/VibratorUtil"
 import { customSound } from "../../common/utils/SoundPoolUtil"
 import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { extractUpdateInfo, getUpdateInfo, UpdateInfo } from "../../common/utils/CheckUpdateUtil"
-import { handleMailto } from "../../common/utils/MailTwoUtil"
-import { copy } from "../../common/utils/ClipBoardUtil"
 import { PageMargin } from "../../common/breakpoint/BreakPoint"
 import { icon_primary } from '../Common/Common'
-import { implicitStartAbility } from "../../common/utils/GoToWeb"
-
-const context = getContext(this) as common.UIAbilityContext
+import { Xb_GoToWeb, Xb_HandleMailto } from "xb_components/src/main/ets/utils/JumpTo"
+import { Xb_Copy } from "xb_components/src/main/ets/utils/ClipBoardUtil"
 
 @Component
 struct About {
@@ -92,24 +90,24 @@ struct About {
       case 'Telegram':
         // 跳转Telegram频道
         hilog.info(0xFF00, "AboutestTag", "Telegram")
-        implicitStartAbility('https://t.me/+ihe73JZWYb40NTY1', context)
+        Xb_GoToWeb('https://t.me/+ihe73JZWYb40NTY1')
 
       break
       case 'Discord':
         // 跳转Discord社区
         hilog.info(0xFF00, "AboutestTag", "Discord")
-        implicitStartAbility('https://discord.gg/mZarq2EQmm', context)
+        Xb_GoToWeb('https://discord.gg/mZarq2EQmm')
 
       break
       case 'Email':
         // 电子邮件
         hilog.info(0xFF00, "AboutestTag", "Email")
-        handleMailto('mailto:xfz347@gmail.com?subject=反馈&body=你的反馈内容...', context)
+        Xb_HandleMailto('mailto:xfz347@gmail.com?subject=反馈&body=你的反馈内容...')
       break
       case 'Repositories':
         // 跳转仓库
         // hilog.info(0xFF00, "AboutestTag", "仓库")
-        implicitStartAbility('https://github.com/xiaobaigroup/ClashBox', context)
+        Xb_GoToWeb('https://github.com/xiaobaigroup/ClashBox')
         // promptAction.showToast({message: $r('app.string.not_open'), duration: 2000 })
       break
       default :
@@ -250,6 +248,7 @@ struct About {
       this.aboutList = removeItemsByIndex(this.aboutList, [1])
     }
   }
+
   aboutToDisappear(): void {
     this.isShowExperimentalFunction = this.uiConfig.isShowExperimentalFunction
     customSound.destroySoundPool()
@@ -431,16 +430,45 @@ struct About {
 }
 export default About
 
-
-
 /**
- *  贡献者名单页面
+ * 小白工坊
  */
 @Component
-export struct AboutContributors {
+export struct AboutXBStudio {
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  @State ContributorsList: ContributorsListItemProp[] = ContributorsList
+  @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
+
+  build() {
+    NavDestination() {
+      TopBuilder({title: $r('app.string.About'), subtitle: $r('app.string.xb_studio')})
+      // 小白工坊
+      Xb_Studio({
+        route: undefined /*UIUtils.enableV2Compatibility(this.SettingsPageInfos)*/,
+        TopIcon2: undefined,
+        showTopTitle: false,
+        PageBackgroundColor: $r('app.color.background'),
+        ListItemBackgroundColor: $r('app.color.container_background')
+      })
+    }
+    .backgroundColor($r('app.color.background'))
+    .hideTitleBar(true)
+    .onBackPressed(() => {
+      this.SettingsPageInfos.pop(true)
+      return true
+    })
+  }
+
+}
+
+/**
+ *  协作者名单页面
+ */
+@Component
+export struct AboutCollaborators {
+  /* 主题色 */
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  @State CollaboratorsList: CollaboratorsListItemProp[] = CollaboratorsList
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 高度断点
@@ -448,57 +476,11 @@ export struct AboutContributors {
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
 
-  handleClick(index: number) {
-    switch (index) {
-      case 0:
-        // 小白
-        implicitStartAbility('https://github.com/likuai2010', context)
-      break
-      case 3:
-        // 船长
-        handleMailto('mailto:xfz347@gmail.com?subject=联系&body=你的内容...', context)
-      break
-      case 4:
-        // 柯蓝KL
-        implicitStartAbility('https://github.com/kelanKL', context)
-      break
-      case 5:
-        // 恩临大帝
-        handleMailto('mailto:ealion@outlook.com?subject=联系&body=你的内容...', context)
-      break
-      case 6:
-        // crazypig321
-        implicitStartAbility('https://github.com/crazypig321', context)
-      break
-      /*case 5:
-        // 鱼🐟
-        // implicitStartAbility('https://github.com/yu', context)
-        break*/
-      case 7:
-        // 小雅
-        handleMailto('mailto:xytdg520@qq.com?subject=联系&body=你的内容...', context)
-      break
-      case 1:
-        // mihomo
-        implicitStartAbility('https://github.com/MetaCubeX/mihomo', context)
-        break
-      case 2:
-        // FlClash
-        implicitStartAbility('https://github.com/chen08209/FlClash', context)
-      break
-      case 9:
-        // 交流群
-        copy('693903194')
-        promptAction.showToast({ message: `${getResourceString($r('app.string.qq_copy'), this)}：693903194`})
-      break
-    }
-  }
-
   build() {
     NavDestination() {
-      TopBuilder({title: $r('app.string.About'), subtitle: $r('app.string.Contributors')})
+      TopBuilder({title: $r('app.string.About'), subtitle: $r('app.string.collaborators')})
       List() {
-        ForEach(this.ContributorsList, (item: ContributorsListItemProp, index: number) => {
+        ForEach(this.CollaboratorsList, (item: CollaboratorsListItemProp, index: number) => {
           ListItem() {
             Column() {
               Row() {
@@ -536,7 +518,14 @@ export struct AboutContributors {
                     .width(90)
                     .height(26)
                     .onClick(() => {
-                      this.handleClick(index)
+                      if (item.sign == 0) {
+                        Xb_GoToWeb(item.link)
+                      } else if (item.sign == 1) {
+                        Xb_HandleMailto(item.link)
+                      } else if (item.sign == 2) {
+                        Xb_Copy(item.link)
+                        promptAction.showToast({ message: `${getResourceString($r('app.string.qq_copy'), this)}：${item.link}`})
+                      }
                     })
                   if(item.contact2) {
                     Button(item.contact2, { type: ButtonType.Capsule, stateEffect: true })
@@ -548,7 +537,7 @@ export struct AboutContributors {
                       .height(26)
                       .onClick(() => {
                         // 柯蓝KL Telegram
-                        implicitStartAbility('https://xxxx', context)
+                        Xb_GoToWeb('https://xxxx')
                       })
                   }
                 }
@@ -624,7 +613,7 @@ export struct ThirdServices {
           .width('100%')
           .padding({left: 12, top: 12, bottom: 12})
           .onClick(() => {
-            implicitStartAbility(getResourceString(item.content, this), context)
+            Xb_GoToWeb(getResourceString(item.content, this))
           })
         }, (item: TCItemProp) => getResourceString(item.title, this))
       }
@@ -816,7 +805,7 @@ export struct FAQ {
                    color: this.icon_emphasize
                  })
                  .onClick(() => {
-                   implicitStartAbility(item.content as string, context)
+                   Xb_GoToWeb(item.content as string)
                  })
              }.width('100%')
            }, (item: TCItemProp) => getResourceString(item.title, this))
@@ -935,7 +924,7 @@ export struct CheckUpdate {
                 if(index === 1) {
                   // 前往下载网页
                   hilog.info(0xFF00, "checkUpdateTest", "前往下载网页")
-                 implicitStartAbility('https://github.com/xiaobaigroup/ClashBox/releases', context)
+                  Xb_GoToWeb('https://github.com/xiaobaigroup/ClashBox/releases')
                 } else if(index === 3) {
                   // 忽略本次更新
                   promptAction.showToast({
@@ -950,7 +939,7 @@ export struct CheckUpdate {
                       duration: 2000
                     })
                   } else {
-                    implicitStartAbility(this.theAppVersionInfo.browser_download_url, context)
+                    Xb_GoToWeb(this.theAppVersionInfo.browser_download_url)
                   }
 
                 }
@@ -964,10 +953,10 @@ export struct CheckUpdate {
         // 提示
         Text() {
           Span($r('app.string.check_update_tips'))
-          Span(`Telegram${getResourceString($r('app.string.check_update_tips_2'), context)}`)
+          Span(`Telegram${getResourceString($r('app.string.check_update_tips_2'), this)}`)
             .fontColor(this.icon_emphasize)
             .onClick(() => {
-              implicitStartAbility('https://t.me/+ihe73JZWYb40NTY1', context)
+              Xb_GoToWeb('https://t.me/+ihe73JZWYb40NTY1')
             })
           Span($r('app.string.check_update_tips_1'))
         }

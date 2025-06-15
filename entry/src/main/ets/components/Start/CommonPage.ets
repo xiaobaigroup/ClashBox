@@ -2,6 +2,7 @@ import { UIConfig } from "../../entryability/AppState"
 import { common } from "@kit.AbilityKit"
 import { webview } from "@kit.ArkWeb"
 import { BusinessError } from "@kit.BasicServicesKit"
+import { context } from "../Common/Common"
 
 
 @Component
@@ -27,7 +28,6 @@ export struct CommonPage {
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   @State controller: webview.WebviewController = new webview.WebviewController()
-  private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
 
   aboutToAppear(): void {
     this.isEnableIndexForegroundBlur = true
@@ -142,7 +142,7 @@ export struct CommonPage {
           .onClick(() => {
             if (this.isWelcomeStack) {
               // 拒绝并退出
-              this.context.terminateSelf()
+              context.terminateSelf()
             } else {
               this.SettingsPageInfos.pop(true)
             }

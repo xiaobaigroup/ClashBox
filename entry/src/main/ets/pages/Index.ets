@@ -12,8 +12,7 @@ import {
   moreData,
   AboutListItemProp,
   BIND_SHEET_CONTAINER_HEIGHT,
-  DefaultUpdateInfo,
-  CompStr,CHART_NUMBER,
+  DefaultUpdateInfo,CHART_NUMBER,
   TheExperimentData,
   TAB_CONTENT_TITLE_HEIGHT,
   LogData,
@@ -24,8 +23,7 @@ import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } f
 import { ClashConfig, IpInfo, LogLevel, Profile, ProxyGroup, ProxyMode } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
-import { AppConfig, AppFlowingState, AppState, ClashCore, UIConfig } from '../entryability/AppState'
-import { changeThemeColor } from '../common/utils/ChangeThemeColorUtil'
+import { AppConfig, AppFlowingState, AppState, UIConfig } from '../entryability/AppState'
 import { common } from '@kit.AbilityKit'
 import { setAutoColorMode, setDarkColorMode, setLightColorMode } from '../common/utils/ChangeColorModeUtils'
 import { ChangeLanguage } from '../common/utils/ChangeLanguageUtil'
@@ -56,9 +54,10 @@ import { TabBarAlignItems,
   TabTitleFontSize,
   WindowTabBarWidth} from '../common/breakpoint/BreakPoint'
 import { WindowTopBar } from '../components/Common/TopBar'
-import { implicitStartAbility } from '../common/utils/GoToWeb'
-import { ConfigAdd } from '../components/Configuration/ConfigAdd'
 import { ImportConfigFromURL } from '../components/Configuration/ImportConfigFromURL'
+import { Xb_ChangeThemeColor } from 'xb_components/src/main/ets/utils/ChangeThemeColorUtil'
+import { Xb_Global, Xb_UIConfig } from 'xb_components'
+import { Xb_GoToWeb } from 'xb_components/src/main/ets/utils/JumpTo'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 const context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
@@ -444,7 +443,7 @@ struct Index {
         // 关闭背景模糊
         this.isEnableIndexForegroundBlur = false
         if (!this.isDisclaimer) {
-          implicitStartAbility(this.theAppVersionInfo.browser_download_url, context)
+          Xb_GoToWeb(this.theAppVersionInfo.browser_download_url)
         }
       },
       cancel: () => {
@@ -499,6 +498,8 @@ struct Index {
   onWillApplyTheme(theme: Theme) {
     hilog.info(0x1000, componentName, `#onWillApplyTheme`)
     this.icon_emphasize = theme.colors.iconEmphasize;
+    // 子模块主题色同步
+    Xb_Global.icon_emphasize = theme.colors.iconEmphasize;
   }
 
   /**窗口变化监听*/
@@ -613,7 +614,7 @@ struct Index {
     }
 
     // 在页面build前改变主题颜色
-    changeThemeColor(this.uiConfig.themeColor)
+    Xb_ChangeThemeColor(this.uiConfig.themeColor)
     hilog.info(0x1000, componentName, `#aboutToAppear#ThemeControl.setDefaultTheme(${this.uiConfig.themeColor})`)
     // 初始化切换颜色模式(深色模式)
     this.switchColorMode(this.uiConfig.darkModeIndex)

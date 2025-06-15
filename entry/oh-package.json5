@@ -6,7 +6,8 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "proxy_core": "file:../proxy_core"
+    "proxy_core": "file:../proxy_core",
+    "xb_components": "file:./../xb_components"
   }
 }
 

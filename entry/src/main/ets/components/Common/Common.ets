@@ -14,9 +14,7 @@ import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { KeyValueData } from "../More/Overwrite/EditArrayConfig"
 import { Provider } from "proxy_core"
 import { common } from "@kit.AbilityKit"
-import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
-import { convertToSwitchNub, convertToSwitchNub1 } from "../../common/utils/DataUnitConvertUtils"
-import { window } from "@kit.ArkUI"
+import { convertToSwitchNub1 } from "../../common/utils/DataUnitConvertUtils"
 
 export const context = getContext() as common.UIAbilityContext
 // 一级图标色，黑色

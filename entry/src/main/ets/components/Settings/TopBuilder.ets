@@ -1,6 +1,7 @@
 import { BIND_SHEET_DRAG_BAR_HEIGHT, BIND_SHEET_TITLE_CONTAINER_HEIGHT } from "../../common/entity/Constants"
 import { UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../common/utils/Animation"
+import { icon_primary } from "../Common/Common"
 
 @Preview
 @Component
@@ -10,7 +11,6 @@ struct TopBuilder {
   @State subtitle: ResourceStr = ''
   @State showBackButton: boolean = true
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary') //一级图标色，黑色
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   build() {
@@ -20,7 +20,7 @@ struct TopBuilder {
         Button({ type: ButtonType.Circle, stateEffect: true }) {
           SymbolGlyph($r('sys.symbol.chevron_left'))
             .fontSize(28)
-            .fontColor([this.icon_primary])
+            .fontColor([icon_primary])
         }
         .margin({left: 16, top: BIND_SHEET_DRAG_BAR_HEIGHT })
         .width(40)
@@ -36,7 +36,7 @@ struct TopBuilder {
           .fontSize(20)
           .fontWeight(FontWeight.Bold)
           .margin(this.showBackButton ? {left: 8, top: 21 } : {left: 16, top: 21 })
-        if(this.subtitle) {
+        if (this.subtitle) {
           Text(this.subtitle)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
             .maxLines(1)

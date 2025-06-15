@@ -13,8 +13,7 @@ import { AppConfig, isEnd, UIConfig } from '../../entryability/AppState'
 import { customVibrator } from '../../common/utils/VibratorUtil'
 import { customAnimationUtil } from '../../common/utils/Animation'
 import { HomeCardFontSize, HomeCardPadding, TabContentTitleMargin } from '../../common/breakpoint/BreakPoint'
-import { implicitStartAbility } from '../../common/utils/GoToWeb'
-import { context } from '../Common/Common'
+import { Xb_GoToWeb } from 'xb_components/src/main/ets/utils/JumpTo'
 
 @Component
 struct Shortcuts {
@@ -52,7 +51,7 @@ struct Shortcuts {
               // 在home页添加按钮的半模态里和在编辑状态时，无法操作
               if (this.isShowHomeEdit === false) {
                 if (`${m["w"]}` != '') {
-                  implicitStartAbility(`${m["w"]}`, context)
+                  Xb_GoToWeb(`${m["w"]}`)
                 } else {
                   this.ShortcutsPromptAction.showToast({ message: $r('app.string.null_title_tips') })
                 }

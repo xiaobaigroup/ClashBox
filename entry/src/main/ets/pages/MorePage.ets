@@ -151,7 +151,7 @@ struct MorePage {
               }
             })
 
-            /*ListItem() {
+          /*  ListItem() {
               Button("appCrash 测试按钮，请勿点击").onClick(()=>{
                 // 在按钮点击函数中构造一个crash场景，触发应用崩溃事件
                 let result: object = JSON.parse("");

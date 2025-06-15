@@ -653,8 +653,8 @@
       "value": "開啟實驗功能可能會導致應用不穩定"
     },
     {
-      "name": "Contributors",
-      "value": "貢獻者名單"
+      "name": "collaborators",
+      "value": "協作者名單"
     },
     {
       "name": "UseGuidance",
@@ -1987,6 +1987,10 @@
     {
       "name": "overwrite_dns_subtitle",
       "value": "開啓後將覆蓋配置中嘅DNS選項"
+    },
+    {
+      "name": "xb_studio",
+      "value": "小白工坊"
     }
   ]
 }

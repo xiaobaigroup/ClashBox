@@ -1,4 +1,4 @@
-import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
+import { UIUtils } from '@kit.ArkUI';
 import {
   BORDER_RADIUS_20,
   CONTENT_END_OFFSET_150, FONT_SIZE_16, settingsData, SettingsListItem } from "../../common/entity/Constants"
@@ -10,7 +10,7 @@ import Kernel from "./Kernel"
 import Notice, { CellularDataReminder } from "./Notice"
 import Backgrounder from "./Backgrounder"
 import WipeData from "./WipeData"
-import About, { AboutContributors, CheckUpdate, FAQ, ThirdServices, UseGuidance } from "./About"
+import About, { AboutCollaborators, AboutXBStudio, CheckUpdate, FAQ, ThirdServices, UseGuidance } from "./About"
 import Language from "./Language"
 import TopBuilder from "./TopBuilder"
 import { DisclaimerCustomDialog, Nothing, theRowCustomDialog } from "../Common/Common"
@@ -25,6 +25,7 @@ import { ProxyGroupItemDataSource } from "../../common/datasources/ProxyData"
 import { ConfigData } from "../../common/entity/PageArgumentEntity"
 import { PrivacyPolicy, UserAgreement } from "./AgreementPrivacyPage"
 import { PageMargin } from "../../common/breakpoint/BreakPoint"
+
 
 const context = getContext(this) as common.UIAbilityContext
 
@@ -190,8 +191,8 @@ struct Settings {
       if (name == 'Language') {
         Language()
       } else
-      if (name == 'Contributors') {
-        AboutContributors()
+      if (name == 'collaborators') {
+        AboutCollaborators()
       } else
       if (name == 'CloudBackup') {
         CloudBackup()
@@ -222,6 +223,9 @@ struct Settings {
       } else
       if (name == 'privacy-policy') {
         PrivacyPolicy()
+      } else
+      if (name == 'xb') {
+        AboutXBStudio()
       }
   }
 

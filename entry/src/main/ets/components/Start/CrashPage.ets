@@ -8,8 +8,8 @@ import { uniformTypeDescriptor } from '@kit.ArkData'
 import { promptAction } from '@kit.ArkUI'
 import { customAnimationUtil } from '../../common/utils/Animation';
 import { UIConfig } from '../../entryability/AppState';
-import { handleMail } from '../../common/utils/MailTwoUtil';
 import { context } from '../Common/Common';
+import { Xb_HandleMail } from 'xb_components/src/main/ets/utils/JumpTo';
 
 
 const crashData: Array<hiAppEvent.AppEventGroup> | undefined = AppStorage.get<Array<hiAppEvent.AppEventGroup>>('crashEvent')
@@ -103,7 +103,7 @@ export struct SwiperPage {
           Row({space: 10}) {
             // 邮件反馈
             this.ShareButton($r('app.string.email_feedback'), true, () => {
-              handleMail('xfz347@gmail.com', '反馈', this.shareLogContent, context)
+              Xb_HandleMail('xfz347@gmail.com', '反馈', this.shareLogContent)
             })
             // 导出分享
             this.ShareButton($r('app.string.export_share'), false, () => {

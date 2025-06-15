@@ -653,8 +653,8 @@
       "value": "开启实验功能可能会导致应用不稳定"
     },
     {
-      "name": "Contributors",
-      "value": "贡献者名单"
+      "name": "collaborators",
+      "value": "协作者名单"
     },
     {
       "name": "UseGuidance",
@@ -1987,6 +1987,10 @@
     {
       "name": "overwrite_dns_subtitle",
       "value": "开启后将覆盖配置中的DNS选项"
+    },
+    {
+      "name": "xb_studio",
+      "value": "小白工坊"
     }
   ]
 }
