@@ -123,7 +123,7 @@ struct Index {
   // 系统语言显示副标题
   @Provide SystemLanguageSubtitle: ResourceStr = $r('app.string.SimplifiedChinese')
   @State barWidth: string | number | undefined = ''
-  @State barHeight: string | number | undefined = ''
+  @State barHeight: string | number | undefined = 0
   @Provide("currentProfile") currentProfile: Profile | null = null
   @Provide remoteIp: IpInfo | null = null
   // 是否开启`Index`页面的前景模糊
@@ -314,7 +314,7 @@ struct Index {
         .scrollable(this.isSecondary ? false : true)
         .vertical(TabBarVertical(this.widthBp, this.heightBp))
         .barWidth(this.windowMode ? WindowTabBarWidth(this.widthBp, this.heightBp) : TabBarWidth(this.widthBp, this.heightBp))
-        .barHeight(this.isSecondary && this.widthBp <= 2 && !this.windowMode ? 0 : this.bottomRectHeight == 0 ? TabBarHeight(this.widthBp, this.heightBp) : TabBarAvoidHeight(this.widthBp, this.heightBp))
+        .barHeight((this.isSecondary && this.widthBp <= 2 && !this.windowMode) || this.isSmallSquareScreen ? this.barHeight : this.bottomRectHeight == 0 ? TabBarHeight(this.widthBp, this.heightBp) : TabBarAvoidHeight(this.widthBp, this.heightBp))
         .onChange((index: number) => {
           this.IndexCurrentindex = index
           if (index == 0) {
@@ -937,14 +937,13 @@ struct Index {
     //    if (this.uiConfig.isBlurr) {
      //     indexController.setTabBarTranslate(this.isLandscapePhone ? { x: '-100%' } : { y: '100%' })
    //     } else {
-          indexController.setTabBarTranslate(this.isLandscapePhone ? { x: '-100%' } : { y: '100%' })
+          indexController.setTabBarTranslate({ y: '100%' })
           this.barHeight = 0
      //   }
 
       if (this.isLandscapePhone || this.istabletLandscape ) {
         indexController.setTabBarTranslate({ x: '-100%' })
         this.barWidth = 0
-        this.barHeight = '100%'
       }
     })
   }
@@ -958,17 +957,12 @@ struct Index {
       playMode: PlayMode.Normal,
     }, async () => {
       if (!this.isSmallSquareScreen || !this.isRolling) {
-   //     if (this.uiConfig.isBlurr) {
-    //      indexController.setTabBarTranslate(this.isLandscapePhone ? { x: 0 } : { y: 0 })
-    //    } else {
-          indexController.setTabBarTranslate(this.isLandscapePhone ? { x: 0 } : { y: 0 })
-          // this.barHeight = this.compBarHeight.value
-    //    }
+        indexController.setTabBarTranslate({ y: 0 })
+        this.barHeight = TabBarHeight(this.widthBp, this.heightBp)
 
         if (this.isLandscapePhone || this.istabletLandscape ) {
           indexController.setTabBarTranslate({ x: 0 })
-          this.barWidth = '70vp'
-          this.barHeight = '100%'
+          this.barWidth = WindowTabBarWidth(this.widthBp, this.heightBp)
         }
       }
     })
@@ -993,13 +987,9 @@ struct Index {
       iterations: 1,
       playMode: PlayMode.Normal,
     }, () => {
-    //  if (this.uiConfig.isBlurr) {
-    //    indexController.setTabBarTranslate({ y: '100%' })
-   //     this.paddingButtom = $r('app.integer.vp_proxy_start_button_left_right_margin')
-    //  }else {
-        indexController.setTabBarTranslate({ y: '100%' })
-        this.barHeight = 0
-   //   }
+      indexController.setTabBarTranslate({ y: '100%' })
+      this.barHeight = 0
+
       this.heightTop = -TAB_CONTENT_TITLE_HEIGHT
     })
   }
@@ -1014,11 +1004,8 @@ struct Index {
         onFinish:()=>{
         }
       }, () => {
-    //    if (this.uiConfig.isBlurr) {
-      //    this.paddingButtom = $r('app.integer.vp_proxy_start_button_bottom_margin')
-     //   }
-        this.barHeight = '77vp'
         indexController.setTabBarTranslate({ y: 0 })
+        this.barHeight = TabBarHeight(this.widthBp, this.heightBp)
         this.heightTop = 0
       })
   }
@@ -1026,6 +1013,7 @@ struct Index {
   /**监听上下滚动时，tab是否隐藏*/
   isHiddenChange(){
     if (this.isSmallSquareScreen && this.isRolling){
+      this.stopAnimPX()
       this.startAnimPX()
     } else {
       this.stopAnimPX()

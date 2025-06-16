@@ -256,7 +256,6 @@ struct ProxyPage {
         })
       }
       .zIndex(1)
-      // .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
       .position({x: 0,y:this.isRolling && this.isSmallSquareScreen?this.heightTop:0})
       .alignItems(VerticalAlign.Center)
       .width('100%')

@@ -199,7 +199,7 @@ struct Home {
       .backgroundColor($r('app.color.background'))
       .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
       .margin({ top: this.topRectHeight == 0 ? 0 : HomeTopHeight(this.widthBp, this.heightBp) })
-      // .position({x: 0, y: this.isRolling && this.isSmallSquareScreen ? this.heightTop: 0})
+      .position({x: 0, y: this.isRolling && this.isSmallSquareScreen ? this.heightTop: 0})
 
       // 内容区
       Stack({ alignContent: this.stackAlignContentAlignment }) {
@@ -291,7 +291,6 @@ struct Home {
         }
 
       }
-      .alignContent(Alignment.Top)
       .backgroundColor($r('app.color.background'))
       .height('100%')
       .width("100%")
@@ -510,12 +509,12 @@ struct Home {
   ShowHomeEditChange() {
     hilog.info(0xFF00, "HometestTag", "进入卡片编辑页面显示监听  %{public}s")
     if(this.isShowHomeEdit && !this.isShowSettings) {
-      hilog.info(0xFF00, "HometestTag", "进入卡片编辑页面显示监听，true -> false  %{public}s")
       this.stopAnim()
       this.startAnim()
     }else{
       this.stopAnim()
     }
+    console.info('编辑按钮状况：', this.isShowHomeEdit)
   }
 
   onForeward() {
