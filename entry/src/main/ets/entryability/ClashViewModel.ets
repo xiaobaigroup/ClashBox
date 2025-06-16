@@ -340,7 +340,6 @@ export class ClashViewModel {
   async initGeoIp(){
     let geoIp = await readFile(this.context?.resourceDir + "/geoip.metadb")
     let home = await getHome(this.context)
-
     writeFile(home+ "/geoip.metadb", geoIp)
     let geoip = await readFile(this.context?.resourceDir + "/GeoIP.dat")
     writeFile(home + "/GeoIP.dat", geoip)
@@ -364,8 +363,11 @@ export async  function readFile(filePath: string): Promise<Uint8Array | null> {
 }
 export function writeFile(filePath: string, data: Uint8Array | null) {
   try {
+    // 防止资源被覆盖
+    if (fs.accessSync(filePath, fs.AccessModeType.EXIST))
+      return;
     if(data != null && data.byteLength > 0){
-      const file = fs.openSync(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE)
+      const file = fs.openSync(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE| fs.OpenMode.TRUNC)
       fs.writeSync(file.fd, data.buffer);
       fs.fsyncSync(file.fd)
       fs.closeSync(file);

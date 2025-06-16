@@ -290,7 +290,7 @@ func patchConfig() {
 }
 
 func updateListeners(force bool) {
-	if !isRunning {
+	if !isRunning || currentConfig == nil {
 		return
 	}
 	general := currentConfig.General

@@ -256,7 +256,7 @@ export class SocketProxyService implements IClashManager {
           reject("请求超时")
           client.close();
         }
-      }, 9000)
+      }, 10000)
       client.on("error", ()=>{
         reject("rpc client error")
       })

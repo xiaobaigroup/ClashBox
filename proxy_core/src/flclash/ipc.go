@@ -201,8 +201,6 @@ func handleRemoteRequest(request RpcRequest, fn func(RpcResult)) {
 	case HealthCheck:
 		name, _ := request.Params[0].(string)
 		timeout := anyToInt(request.Params[1])
-		log.Println("ipc_go", "HealthCheck", timeout)
-
 		testInfo := map[string]any{
 			"proxy-name": name,
 			"timeout":    timeout,
@@ -225,7 +223,6 @@ func handleRemoteRequest(request RpcRequest, fn func(RpcResult)) {
 		tunFd := anyToInt(request.Params[0])
 		log.Println("ipc_go", "tunFd", tunFd)
 		StartTUN(tunFd, func(fd Fd) {
-			log.Println("ipc_go", "procted", fd)
 			res, _ := json.Marshal(fd)
 			ret.Result = string(res)
 			fn(ret)

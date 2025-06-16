@@ -212,7 +212,8 @@ struct Resources {
       this.isLoading = -1
       this.isLoadingAll = false
       if (message != "") {
-        promptAction.showToast({ message: getResourceString($r('app.string.update_failed'), this) +" " + message })
+        console.error("updateGeoDateItem ", message)
+        promptAction.showToast({ message: getResourceString($r('app.string.update_failed'), this) + " " + message })
       }
       else {
         promptAction.showToast({ message: getResourceString($r('app.string.update_success'), this) })
@@ -220,7 +221,8 @@ struct Resources {
     } catch (e) {
       this.isLoading = -1
       this.isLoadingAll = false
-      promptAction.showToast({message: getResourceString($r('app.string.update_failed'), this) + (e.message | e)})
+      console.error("updateGeoDateItem error", e)
+      promptAction.showToast({message: getResourceString($r('app.string.update_failed'), this) + (e.message ?? e)})
     }
   }
 

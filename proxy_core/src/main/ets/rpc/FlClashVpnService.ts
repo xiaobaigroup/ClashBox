@@ -311,7 +311,7 @@ export interface Fd {
   value: number
 }
 
-export function ParseProxyGroup(mode, result: string) {
+export function ParseProxyGroup(mode, result: string): ProxyGroup[] {
   if (result == null)
     return []
   const map = JSON.parse(result) as Record<string, string | Record<string, string[] | string>>
@@ -349,7 +349,6 @@ export function ParseProxyGroup(mode, result: string) {
     } else {
       return null;
     }
-  
   })
   return groupsRaw.filter(g => g != null);
 }
