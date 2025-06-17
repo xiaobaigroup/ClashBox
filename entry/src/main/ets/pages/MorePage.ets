@@ -62,8 +62,6 @@ struct MorePage {
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
-  // 日志页详情页跳转角标
-  @Provide theLogSkipItem: number = 0
   @Consume curOffsetRemain: number
   // 更多页一级页面顶部标题偏移量
   @Consume curYOffsetMore: number

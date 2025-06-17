@@ -156,6 +156,13 @@ export interface LogData {
   logSkip: boolean
 }
 
+export const NullLogData: LogData = {
+  logType: LogLevel.Debug,
+  logTime: 0,
+  LogDetails: '',
+  logSkip: false
+}
+
 // 更多配置项列表类
 @Observed
 export class ConfigItemData{

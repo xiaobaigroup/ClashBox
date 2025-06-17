@@ -694,16 +694,16 @@ struct Index {
     EventHub.on(EventKey.ClearLog, () => {
       this.logListData = []
     })
-    EventHub.on(EventKey.ExportLog, (LogIndex?: number) => {
+    EventHub.on(EventKey.ExportLog, (LogData?: LogData) => {
       try {
         let filePicker = new picker.DocumentViewPicker(getContext(this))
         let options = new picker.DocumentSaveOptions()
-        options.newFileNames = LogIndex ? [`clash_next_${LogIndex}_${Date.now()}.log`] : ["clash_next.log"]
+        options.newFileNames = LogData ? [`clash_next_${LogData.logTime}_${Date.now()}.log`] : ["clash_next.log"]
         options.fileSuffixChoices = ["'文档|.txt'"]
         options.pickerMode = picker.DocumentPickerMode.DOWNLOAD
         filePicker.save(options).then(async (result)=>{
-          const path = new fileUri.FileUri(result[0] + '/' +`clash_next${LogIndex ? '_' + LogIndex + '_' +  Date.now() : ''}.txt`).path
-          await this.saveLog(path, LogIndex)
+          const path = new fileUri.FileUri(result[0] + '/' +`clash_next${LogData ? '_' + LogData.logTime + '_' +  Date.now() : ''}.txt`).path
+          await this.saveLog(path, LogData)
         }).catch((e:Error) =>{
           hilog.debug(0xFF00, 'ExportLog', 'err ', e)
         })
@@ -715,12 +715,12 @@ struct Index {
 
   }
 
-  async saveLog(uri: string, index?: number): Promise<void> {
+  async saveLog(uri: string, logDdata?: LogData): Promise<void> {
     try {
       const file = fs.openSync(uri, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE);
       // 生成日志内容
-      const message = index ?
-      [this.logListData[index]].map((d) => d.logType + " " + timestampToDateTime(d.logTime * 1000) + "\n" + d.LogDetails)
+      const message = logDdata ?
+      [logDdata].map((d) => d.logType + " " + timestampToDateTime(d.logTime * 1000) + "\n" + d.LogDetails)
         .join("\n") :
       this.logListData.map((d) => d.logType + " " + timestampToDateTime(d.logTime * 1000) + "\n" + d.LogDetails)
         .join("\n")
