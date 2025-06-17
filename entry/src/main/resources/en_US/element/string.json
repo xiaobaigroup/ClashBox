@@ -1698,11 +1698,11 @@
     },
     {
       "name": "function_q",
-      "value": "Why some functions are missing"
+      "value": "Why does the node flash after completing the speed measurement"
     },
     {
       "name": "function_a",
-      "value": "Affected by the system permissions, some functions cannot be realized temporarily, so they are shielded and hidden. Please look forward to subsequent version updates"
+      "value": "This is a normal phenomenon, and the purpose of doing so is to refresh the data in the list and minimize the possibility of memory leaks after speed measurement"
     },
     {
       "name": "link_q",
@@ -1714,11 +1714,27 @@
     },
     {
       "name": "node_q",
-      "value": "Why does the node flash after speed measurement"
+      "value": "Why do some people have fewer proxy nodes after importing configurations"
     },
     {
       "name": "node_a",
-      "value": "This is a normal phenomenon. The purpose of this is to refresh the data in the list and minimize the possible memory leakage after speed measurement"
+      "value": "Due to the fact that some service providers currently have very little UA support for ClashBox, it is recommended to add a&flag=meta after the subscription"
+    },
+    {
+      "name": "node_q2",
+      "value": "Part of the user agent nodes are reporting TIMEOUT for speed measurement"
+    },
+    {
+      "name": "node_a2",
+      "value": "Due to issues with some service providers' built-in DNS address resolution, you can enable the replication overwrite DNS function and restart ClashBox to ensure normal operation"
+    },
+    {
+      "name": "proxy_q",
+      "value": "Why is there no separate application proxy function"
+    },
+    {
+      "name": "proxy_a",
+      "value": "Due to the lack of official API for the corresponding function, it is currently not possible to implement such a feature. We will wait for the official API update before supporting it"
     },
     {
       "name": "config_q",

@@ -717,7 +717,7 @@ export struct FAQ {
           Row({space: 10}) {
             SymbolGlyph($r('sys.symbol.info_circle'))
               .fontSize(24)
-              .margin({left: 7})
+              //.margin({left: 7})
               .fontColor([icon_primary])
             Flex({
               alignContent: FlexAlign.Start,
@@ -732,7 +732,7 @@ export struct FAQ {
                     this.SettingsPageInfos.pushPathByName('Three', false)
                   })
                 Span($r('app.string.statement_1'))
-              }
+              }.textAlign(TextAlign.JUSTIFY)
             }.width('88%')
           }.width('100%')
           .justifyContent(FlexAlign.Start)
@@ -746,8 +746,9 @@ export struct FAQ {
             wrap: FlexWrap.Wrap,
           }) {
             Text($r('app.string.qa_tips'))
+              .textAlign(TextAlign.JUSTIFY)
               .margin({top: 5, bottom: 5})
-          }.margin({left: 11})
+          }//.margin({left: 11})
         }
 
         ListItem() {
@@ -755,7 +756,7 @@ export struct FAQ {
             Text('F&Q')
               .fontSize(16)
           }.width('100%')
-          .margin({left: 11})
+          //.margin({left: 11})
           .alignItems(HorizontalAlign.Start)
         }.width('100%')
         // F&Q
@@ -773,14 +774,18 @@ export struct FAQ {
                 Text('·')
                   .fontSize(32)
                   .fontWeight(FontWeight.Bolder)
+                  .textIndent(2)
                 Text(item.title)
                   .fontSize(17)
                   .fontWeight(FontWeight.Medium)
-              }.width('96%').margin({left: 8})
+                 // .copyOption(CopyOptions.LocalDevice)
+              }.width('96%')//.margin({left: 8})
               Text(item.content)
                 .fontSize(15)
-                .margin({left: 11})
+               // .margin({left: 11})
                 .fontWeight(FontWeight.Regular)
+                .copyOption(CopyOptions.LocalDevice)
+                .textAlign(TextAlign.JUSTIFY)
             }.width('100%')
           }
         }, (item: TCItemProp) => getResourceString(item.title, this))
@@ -800,6 +805,7 @@ export struct FAQ {
                  .fontSize(15)
                  .fontColor(this.icon_emphasize)
                  .fontWeight(FontWeight.Regular)
+                 .copyOption(CopyOptions.LocalDevice)
                  .decoration({
                    type: TextDecorationType.Underline,
                    color: this.icon_emphasize
@@ -810,7 +816,7 @@ export struct FAQ {
              }.width('100%')
            }, (item: TCItemProp) => getResourceString(item.title, this))
 
-         }.margin({left: 11})
+         }//.margin({left: 11})
           .alignItems(HorizontalAlign.Start)
         }.width('100%')
 
