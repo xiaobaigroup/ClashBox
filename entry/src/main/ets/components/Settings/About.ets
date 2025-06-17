@@ -174,6 +174,7 @@ struct About {
       this.aboutList.splice(4, 1, childItem)
     }
   }
+
   // 刷新实验功能启用开关状态
   refreshShowExperimentalFunction(isOn: boolean) {
     const showItem = this.aboutList[1]
@@ -203,6 +204,7 @@ struct About {
       this.aboutList.splice(0, 1, showItem)
     }
   }
+
   // 刷新自动检查更新启用开关状态
   refreshShowAutoUpdate(isOn: boolean) {
     const showItem = this.aboutList[4]
@@ -244,7 +246,7 @@ struct About {
     // 加载时初始化自动检查更新开关状态
     this.refreshShowAutoUpdate(this.uiConfig.autoCheckUpdate)
     hilog.info(0xFF00, "AboutClickTag", "高级功能: %{public}s", this.uiConfig.enabledADvanced)
-    if (this.uiConfig.enabledADvanced === false && this.aboutList.length === 7) {
+    if (this.uiConfig.enabledADvanced === false && this.aboutList.length === 6) {
       this.aboutList = removeItemsByIndex(this.aboutList, [1])
     }
   }
@@ -398,6 +400,7 @@ struct About {
                     } else if (itemChild.sign === 0) {
                      if (itemChild.name === 'ApplicationVersion') {
                        hilog.info(0xFF00, "AboutClickTag", "前: %{public}d", this.clickCount)
+                       // TODO 高级模式
                        // this.clickCount++
                        // this.onClickCount()
                        hilog.info(0xFF00, "AboutClickTag", "后: %{public}d", this.clickCount)
