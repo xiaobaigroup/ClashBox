@@ -445,10 +445,8 @@ export struct AboutXBStudio {
       // 小白工坊
       Xb_Studio({
         route: undefined /*UIUtils.enableV2Compatibility(this.SettingsPageInfos)*/,
-        TopIcon2: undefined,
         showTopTitle: false,
         PageBackgroundColor: $r('app.color.background'),
-        ListItemBackgroundColor: $r('app.color.container_background')
       })
     }
     .backgroundColor($r('app.color.background'))

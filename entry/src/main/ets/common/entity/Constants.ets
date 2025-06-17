@@ -707,20 +707,20 @@ export function getAboutList(): AboutListItemProp[] {
         { title: $r('app.string.FAQ'), subtitle: '', sign: 2, name: 'FAQ' },
       ]
     },
-    { title: 'Update',
-      subtitle: '',
-      name: '',
-      children: [
-        { title: $r('app.string.Check_Updates'), subtitle: '', sign: 2, name: 'CheckUpdate' },
-        { title: $r('app.string.UpdateChannels'), subtitle: $r('app.string.UpdateChannels_Subtitle1'), sign: 3, name: 'UpdateChannels',
-          children: [
-            { title: $r('app.string.UpdateChannels_Subtitle1'), name: 'Github', subtitle: '' },
-            // { title: 'Gitee', name: 'Gitee', subtitle: '' }
-          ]
-        },
-        { title: $r('app.string.Auto_Check_Updates'), subtitle: '', sign: 1, name: 'Auto', isOn: false },
-      ]
-    },
+    // { title: 'Update',
+    //   subtitle: '',
+    //   name: '',
+    //   children: [
+    //     { title: $r('app.string.Check_Updates'), subtitle: '', sign: 2, name: 'CheckUpdate' },
+    //     { title: $r('app.string.UpdateChannels'), subtitle: $r('app.string.UpdateChannels_Subtitle1'), sign: 3, name: 'UpdateChannels',
+    //       children: [
+    //         { title: $r('app.string.UpdateChannels_Subtitle1'), name: 'Github', subtitle: '' },
+    //         // { title: 'Gitee', name: 'Gitee', subtitle: '' }
+    //       ]
+    //     },
+    //     { title: $r('app.string.Auto_Check_Updates'), subtitle: '', sign: 1, name: 'Auto', isOn: false },
+    //   ]
+    // },
     {
       title: 'Contact',
       subtitle: '',

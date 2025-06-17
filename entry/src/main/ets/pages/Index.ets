@@ -602,7 +602,7 @@ struct Index {
 
     // 首次启动打开欢迎页
     if (this.uiConfig.isFirstStart) {
-      this.isShowWelcome = false
+      this.isShowWelcome = true
     }
 
     let nowDate = new Date().getTime()

@@ -1,4 +1,3 @@
-import {  BreakpointState } from '../../common/breakpoint/breakpointsystem'
 import { mediaquery } from '@kit.ArkUI';
 import { CardTitle } from './CardTitleBuilder';
 import { AppConfig, UIConfig } from '../../entryability/AppState';
@@ -21,9 +20,6 @@ struct SwitchMode {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
-
-  // 手机横屏高度条件
-  phonelistener:mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp)');
 
   //平移选择动画参数切换
   switchTranslateY(index: number) {
