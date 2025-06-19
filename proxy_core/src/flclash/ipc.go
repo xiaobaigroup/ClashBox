@@ -1,6 +1,7 @@
 package main
 
 import (
+	"core/state"
 	"encoding/json"
 	"log"
 	"net"
@@ -88,6 +89,7 @@ const (
 	SetLogObserver
 	StopLogObserver
 	VpnOptions
+	SetOptionState
 )
 
 func handleRemoteRequest(request RpcRequest, fn func(RpcResult)) {
@@ -232,6 +234,15 @@ func handleRemoteRequest(request RpcRequest, fn func(RpcResult)) {
 		fn(ret)
 	case VpnOptions:
 		ret.Result = GetVpnOptions()
+		fn(ret)
+	case SetOptionState:
+		paramsString, _ := request.Params[0].(string)
+		err := json.Unmarshal([]byte(paramsString), state.CurrentState)
+		if err != nil {
+			ret.Error = err.Error()
+		} else {
+			ret.Result = ""
+		}
 		fn(ret)
 	default:
 		ret.Error = "未知请求"

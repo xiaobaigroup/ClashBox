@@ -16,6 +16,7 @@ import { sleep } from "./EntryAbility";
 import { ProxyItem } from "../common/datasources/ProxyData";
 import { hilog } from "@kit.PerformanceAnalysisKit";
 import { readText } from "proxy_core/src/main/ets/fileUtils";
+import { VpnRawOptions } from "proxy_core/src/main/ets/rpc/IClashManager";
 
 export interface DelayInfo{
     name: string
@@ -116,6 +117,16 @@ export class ClashViewModel {
       promptAction.showToast({message: e.message, duration:3000})
     }
   }
+  async setVpnOptions(options: VpnRawOptions){
+    try {
+      let result = await this.socketProxy.setOptionStates(options)
+      console.log("setVpnOptions", result)
+    } catch (e) {
+      promptAction.showToast({message: e.message, duration:3000})
+    }
+  }
+
+
   delayMap: Map<string, DelayInfo> = new Map()
 
   async testDelay(proxyName: string): Promise<number>{

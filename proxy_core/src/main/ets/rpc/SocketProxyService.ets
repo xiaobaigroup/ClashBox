@@ -2,7 +2,7 @@ import { socket, vpnExtension } from '@kit.NetworkKit';
 import {  RpcResult } from './RpcRequest';
 import { JSON, util } from '@kit.ArkTS';
 import { common } from '@kit.AbilityKit';
-import { ClashRpcType, IClashManager } from './IClashManager';
+import { ClashRpcType, IClashManager, VpnRawOptions } from './IClashManager';
 import { ConnectionInfo, IpInfo, LogInfo, Provider, ProxyGroup, ProxyMode,
   Traffic } from '../models/Common';
 import  fs from  "@ohos.file.fs"
@@ -25,6 +25,8 @@ interface TrafficInfo{
   up: number
   down: number
 }
+
+
 
 export class SocketProxyService implements IClashManager {
   context?: common.Context
@@ -107,6 +109,10 @@ export class SocketProxyService implements IClashManager {
   async getVpnOptions(): Promise<VpnOptions> {
     let result = await this.sendMessageRequest(ClashRpcType.vpnOptions)
     return JSON.parse(result as string) as VpnOptions
+  }
+  async setOptionStates(options: VpnRawOptions): Promise<string> {
+    let result = await this.sendMessageRequest(ClashRpcType.setOptionState, [JSON.stringify(options)])
+    return result as string
   }
   async updateProvider(provider: Provider): Promise<string> {
     return  (await this.sendMessageRequest(ClashRpcType.updateProvider,[provider.name])) as string

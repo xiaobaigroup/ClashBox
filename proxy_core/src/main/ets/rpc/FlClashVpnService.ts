@@ -30,7 +30,6 @@ import { ConnectionInfo, LogInfo, Provider, ProxyGroup, ProxyMode, ProxyType, Tr
 import { getHome, getProfilePath } from '../appPath';
 import { Tun, UpdateConfigParams } from '../models/ClashConfig';
 import { readFile, readFileUri, readText } from '../fileUtils';
-import { startFlClash } from 'libproxy_core.so';
 
 export interface AccessControl {
   mode: string

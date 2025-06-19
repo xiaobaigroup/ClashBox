@@ -31,7 +31,18 @@ export enum ClashRpcType{
   setLogObserver,
   stopLogObserver,
   vpnOptions,
+  setOptionState
 }
+
+export interface AccessControl{
+  mode: string // AcceptSelected or other
+  acceptList: string[]
+  rejectList: string[]
+}
+export interface VpnRawOptions{
+  accessControl:AccessControl[]
+}
+
 
 export interface IClashManager {
 
