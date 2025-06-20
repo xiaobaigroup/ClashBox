@@ -4,7 +4,7 @@ import { UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../common/utils/Animation"
 import { SymbolGlyphModifier } from "@kit.ArkUI"
 import { ButtonBuilder, icon_primary } from '../Common/Common'
-import { PageMargin } from "../../common/breakpoint/BreakPoint"
+import { PageMargin, WindowModeMoreTitleFontSize } from "../../common/breakpoint/BreakPoint"
 
 /**
  * 更多页顶部导航栏
@@ -90,7 +90,7 @@ export struct MoreTop {
         })
         Column() {
           Text(this.title)
-            .fontSize(this.curYOffset<0?TAB_CONTENT_TITLE_FONT_SIZE-this.curYOffset/100:TAB_CONTENT_TITLE_FONT_SIZE)
+            .fontSize(WindowModeMoreTitleFontSize(this.widthBp, this.heightBp))
             .geometryTransition(this.name)
             .fontWeight(FontWeight.Bold)
             .textAlign(TextAlign.Start)
@@ -109,16 +109,20 @@ export struct MoreTop {
         .transition(customAnimationUtil.isSlide(150, this.uiConfig))
         Blank()
         if (this.needSearch) {
-          // 默认搜索按钮
-          ButtonBuilder({
-            icon: $r('sys.symbol.magnifyingglass'),
-            iconSize: this.windowMode ? 16 : 24,
-            onCheck: () => {
-              this.isSearching = true
-            }
-          })
-            .margin({ right: this.windowMode ? 0 : 10})
-            .transition(customAnimationUtil.isSlide(50, this.uiConfig))
+          Row() {
+            // 默认搜索按钮
+            ButtonBuilder({
+              icon: $r('sys.symbol.magnifyingglass'),
+              iconSize: this.windowMode ? 16 : 24,
+              iconWeight: this.windowMode ? FontWeight.Bold : undefined,
+              onCheck: () => {
+                this.isSearching = true
+              }
+            })
+              .margin({ right: this.windowMode ? 0 : 10})
+              .transition(customAnimationUtil.isSlide(50, this.uiConfig))
+          }.height('100%')
+          .alignItems(this.windowMode ? VerticalAlign.Top : VerticalAlign.Center)
         }
         if (this.icon1) {
           // 功能按钮1
@@ -126,6 +130,7 @@ export struct MoreTop {
             ButtonBuilder({
               icon: this.icon1,
               iconSize: this.windowMode ? 16 : 24,
+              iconWeight: this.windowMode ? FontWeight.Bold : undefined,
               onCheck: () => {
                 this.onClick1()
               }
@@ -142,6 +147,7 @@ export struct MoreTop {
               icon: this.icon2,
               enableClick: this.enableClick2,
               iconSize: this.windowMode ? 16 : 24,
+              iconWeight: this.windowMode ? FontWeight.Bold : undefined,
               onCheck: () => {
                 this.onClick2()
               }

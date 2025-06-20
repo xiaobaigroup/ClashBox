@@ -536,6 +536,8 @@ export struct KVCustomDialog {
   @State currentKeyInputValue: string = ""
   @State keyValue: string = ""
   @State currentValueInputValue: string = ""
+  @Prop keyPlaceholder: ResourceStr = $r('app.string.key')
+  @Prop valuePlaceholder: ResourceStr = $r('app.string.the_value')
   @State valueValue: string = ""
   cancel?: () => void
   confirm?: (value: KeyValueData) => void
@@ -561,37 +563,37 @@ export struct KVCustomDialog {
         .fontWeight(FontWeight.Medium)
         .fontSize(20)
         .margin({ bottom: 7 })
-      TextInput({placeholder: $r('app.string.key'), text: this.currentKeyInputValue })
+      TextInput({placeholder: this.keyPlaceholder, text: this.currentKeyInputValue })
         .onChange((value: string) => {
           this.currentKeyInputValue = value
         })
-      TextInput({placeholder: $r('app.string.the_value'), text: this.currentValueInputValue })
+      TextInput({placeholder: this.valuePlaceholder, text: this.currentValueInputValue })
         .onChange((value: string) => {
           this.currentValueInputValue = value
         })
       Row() {
+        Button($r('app.string.Cancel'))
+          .height(39)
+          .width('50%')
+          .fontColor(this.icon_emphasize)
+          .backgroundColor($r('app.color.container_background'))
+          .onClick(() => {
+            this.controller.close()
+            if (this.cancel) {
+              this.cancel()
+            }
+          })
         Button($r('app.string.Save'))
           .width('50%')
           .height(39)
-          .fontColor(this.icon_emphasize)
-          .backgroundColor($r('app.color.container_background'))
+          .fontColor(Color.White)
+          .backgroundColor(this.icon_emphasize)
           .onClick(() => {
             this.controller.close()
             if (this.confirm) {
               this.confirm(new KeyValueData(this.currentKeyInputValue, this.currentValueInputValue))
             }
             this.isEnableIndexForegroundBlur = false
-          })
-        Button($r('app.string.Cancel'))
-          .height(39)
-          .width('50%')
-          .fontColor(Color.White)
-          .backgroundColor(this.icon_emphasize)
-          .onClick(() => {
-            this.controller.close()
-            if (this.cancel) {
-              this.cancel()
-            }
           })
       }.width('100%')
     }
@@ -822,6 +824,58 @@ export struct skipRowList {
       SymbolGlyph($r('sys.symbol.chevron_right'))
         .fontSize(28)
         .fontColor([icon_primary])
+    }
+    .RowStyle()
+    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+  }
+}
+
+/**
+ * 多选框列表行通用组件
+ * @param icons SymbolGlyph对应的系统资源文件地址-Resource
+ * @param title 标题文本-ResourceStr
+ * @param subtitle 副标题文本-ResourceStr
+ */
+@Component
+export struct checkoutRowListItem {
+  @State icon?: Resource = undefined
+  @State name: string = ''
+  @State title: string = ''
+  @State subtitle: string = ''
+  @Prop isSelected: boolean = false
+  @State isPrimaryIcons: boolean = false
+  @State isExperimentalFunction: boolean = false
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+
+  build() {
+    Row({space: 12}) {
+      if (this.icon) {
+        Image(this.icon)
+      }
+      Column() {
+        Row() {
+          Text(this.title)
+            .fontWeight(FontWeight.Medium)
+            .geometryTransition(this.name)
+            .fontSize(16)
+        }
+        if(this.subtitle) {
+          Text(this.subtitle)
+            .fontWeight(FontWeight.Medium)
+            .textOverflow({ overflow: this.uiConfig.stringDisplayIndex === 0 ? TextOverflow.Ellipsis : TextOverflow.Clip})
+            .maxLines(this.uiConfig.stringDisplayIndex === 0 ? 1 : 2)
+            .margin({top: 2})
+            .fontSize(14)
+        }
+      }.layoutWeight(1)
+      .alignItems(HorizontalAlign.Start)
+      Blank()
+      Checkbox({ name: this.subtitle, group: 'App' })
+        .hitTestBehavior(HitTestMode.None)
+        .selectedColor(this.icon_emphasize)
+        .shape(CheckBoxShape.CIRCLE)
+        .select($$this.isSelected)
     }
     .RowStyle()
     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))

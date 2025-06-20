@@ -1,6 +1,6 @@
 import { SymbolGlyphModifier } from "@kit.ArkUI"
 import { MoreTop } from "./MoreTopBuilder"
-import { Nothing, skipRowList } from "../Common/Common"
+import { Nothing, skipRowList, icon_primary } from "../Common/Common"
 import { timestampToDateTime } from "../../common/utils/TimeConvertUtil"
 import { ClashConfig, LogLevel } from "proxy_core"
 import { AppConfig, UIConfig } from "../../entryability/AppState"
@@ -20,8 +20,6 @@ struct Log {
   @Consume('NavPathStack') pageInfos: NavPathStack
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State EnableLogger: boolean = false
-  // 一级图标色，黑色
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @State filterChecked: number = 0
   // 数据（数据本体在Index）
   @Consume logListData: Array<LogData>
@@ -54,13 +52,13 @@ struct Log {
         })
 
         Column() {
-          Blank().height(TAB_CONTENT_TITLE_HEIGHT+6)
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT + 6)
           // 主体
           if (this.appConfig.enableLogger === false) {
             Column() {
               SymbolGlyph($r('sys.symbol.checkmark_circle'))
                 .fontSize(24)
-                .fontColor([this.icon_primary])
+                .fontColor([icon_primary])
                 .margin({ bottom: 4 })
               Text($r('app.string.EnableLoggerPrompt'))
             }
@@ -93,7 +91,7 @@ struct Log {
                         Column() {
                           Text(`${item.logType} ${timestampToDateTime(item.logTime * 1000)}`)
                             .fontWeight(FontWeight.Medium)
-                            .fontColor(item.logType === LogLevel.Error ? Color.Red : this.icon_primary)
+                            .fontColor(item.logType === LogLevel.Error ? Color.Red : icon_primary)
                             .fontSize(16)
                           Text(`${item.LogDetails}`)
                             .fontWeight(FontWeight.Normal)

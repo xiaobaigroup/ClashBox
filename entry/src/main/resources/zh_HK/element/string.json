@@ -2007,6 +2007,34 @@
     {
       "name": "xb_studio",
       "value": "小白工坊"
+    },
+    {
+      "name": "access_control",
+      "value": "存取控制"
+    },
+    {
+      "name": "access_control_subtitle",
+      "value": "設定應用程式存取代理"
+    },
+    {
+      "name": "app_access_control",
+      "value": "應用存取控制"
+    },
+    {
+      "name": "blacklist",
+      "value": "黑名單模式"
+    },
+    {
+      "name": "white_list",
+      "value": "白名單模式"
+    },
+    {
+      "name": "white_list_tips",
+      "value": "選中應用將會被停用VPN"
+    },
+    {
+      "name": "blacklist_tips",
+      "value": "只允許選中嘅應用使用VPN"
     }
   ]
 }

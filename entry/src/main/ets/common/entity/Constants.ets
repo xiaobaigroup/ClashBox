@@ -348,6 +348,7 @@ export  const ListMoreData = (): moreData[] => {
     new moreData($r('sys.symbol.list_bullet'), 'Request', $r('app.string.Request'), '', 0, false),
     new moreData($r('sys.symbol.swap'), 'Connect', $r('app.string.Connect'), '', 0, false),
     new moreData($r('sys.symbol.pencil_line'), 'Overwrite', $r('app.string.Overwrite'), '', 0, false),
+    new moreData($r('sys.symbol.bolt_filled_on_circle'), 'AccessControl', $r('app.string.access_control'), '', 0, false),
     // new moreData($r('sys.symbol.navigation'), 'Diversion', $r('app.string.Diversion_Strategy'), '', 5, false),
     new moreData($r('sys.symbol.clean_fill'), 'QueryIP', $r('app.string.query_ip_region'), $r('app.string.query_ip_region_Subtitle'), 0, false),
   ]

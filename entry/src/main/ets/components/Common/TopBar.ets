@@ -36,7 +36,6 @@ export struct TopBar {
         .margin({ top: this.windowMode ? 8 : 0})
         .textOverflow({ overflow: TextOverflow.Ellipsis })
         .transition(customAnimationUtil.isSlide(200, this.uiConfig))
-      //  .transition(customAnimationUtil.isScaleTran(0, this.uiConfig))
         .fontSize(this.titleFontSize ?? calculateFontSizeLinear(this.title))
       // Text(`窗口模式 windowMode：${this.windowMode}`)
       Row({space: this.windowMode ? 0 : 10}) {
@@ -69,7 +68,7 @@ export struct TopBar {
           Row().width(109)
         }
       }
-      .alignItems(VerticalAlign.Center)
+      .alignItems(this.windowMode ? VerticalAlign.Top : VerticalAlign.Center)
       // .justifyContent(FlexAlign.SpaceAround)
     }
     .margin({ right: 12, left: 12})

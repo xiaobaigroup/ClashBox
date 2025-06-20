@@ -41,12 +41,17 @@ export class AppConfig{
   currentProxyName?: string
   currentProfileName?: string
   currentProxyItem?: ProxyItem
+  accessControlMode: string = 'RejectSelected'
+  accessControlSort: 'name' | 'time' = 'name'
+  accessControlAcceptList: string = JSON.stringify([])
+  accessControlRejectList: string = JSON.stringify([])
   proxySort: ProxySort = ProxySort.Default
   proxyGroupType: ProxyGroupType = ProxyGroupType.Tabs
   proxyCardSize: ProxyCardSize = ProxyCardSize.Mini
   enableLogger: boolean = false
   enableRequest: boolean = false
   enableConnect: boolean = false
+  accessControl: boolean = false
   testUrl: string = "https://www.gstatic.com/generate204"
   clashCore: ClashCore = ClashCore.mihomo
   switchMode: ProxyMode = ProxyMode.Rule

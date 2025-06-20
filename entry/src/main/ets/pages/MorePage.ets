@@ -29,6 +29,7 @@ import { AppConfig, UIConfig } from '../entryability/AppState';
 import { ArrayConfigEditor } from '../components/More/Overwrite/EditArrayConfig';
 import { customAnimationUtil } from '../common/utils/Animation';
 import { ListItemMarginValue } from '../common/breakpoint/BreakPoint';
+import { AccessControl } from '../components/More/AccessControl';
 
 const componentName: string = 'MorePage'
 
@@ -298,6 +299,9 @@ struct MorePage {
     } else
     if (name == 'compatible') {
       NetworkCompatible()
+    } else
+    if (name == 'AccessControl') {
+      AccessControl()
     }
   }
 

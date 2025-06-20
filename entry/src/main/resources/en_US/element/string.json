@@ -2007,6 +2007,38 @@
     {
       "name": "xb_studio",
       "value": "XiaoBai Studio"
+    },
+    {
+      "name": "access_control",
+      "value": "Access Control"
+    },
+    {
+      "name": "access_control_subtitle",
+      "value": "Configure application access proxy"
+    },
+    {
+      "name": "app_access_control",
+      "value": "Application Access Control"
+    },
+    {
+      "name": "white_list",
+      "value": "White list mode"
+    },
+    {
+      "name": "blacklist",
+      "value": "Blacklist mode"
+    },
+    {
+      "name": "white_list_tips",
+      "value": "The selected application will have VPN disabled"
+    },
+    {
+      "name": "blacklist_tips",
+      "value": "Only allow selected applications to use VPN"
+    },
+    {
+      "name": "selected",
+      "value": "Selected"
     }
   ]
 }

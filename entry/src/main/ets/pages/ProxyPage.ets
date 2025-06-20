@@ -256,7 +256,7 @@ struct ProxyPage {
         })
       }
       .zIndex(1)
-      .position({x: 0,y:this.isRolling && this.isSmallSquareScreen?this.heightTop:0})
+      .position({x: 0, y:this.isRolling && this.isSmallSquareScreen && !this.windowMode ? this.heightTop : 0})
       .alignItems(VerticalAlign.Center)
       .width('100%')
       .transition(customAnimationUtil.isSlide(0, this.uiConfig))

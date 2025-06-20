@@ -288,6 +288,14 @@ export const PageMargin = BreakpointFunction2D<number>({
   ['xl']: {['hsm']: 16, ['hmd']: 16, ['hlg']: 16},
 })
 
+/**窗口化更多标题字体大小*/
+export const WindowModeMoreTitleFontSize = BreakpointFunction2D<number>({
+  ['sm']: {['hsm']: 24, ['hmd']: 24, ['hlg']: 24},
+  ['md']: {['hsm']: 23, ['hmd']: 27, ['hlg']: 27},
+  ['lg']: {['hsm']: 27, ['hmd']: 30, ['hlg']: 30},
+  ['xl']: {['hsm']: 30, ['hmd']: 30, ['hlg']: 30},
+})
+
 /**列表列数（配置页）*/
 export const ListLanes = BreakpointFunction2D<number>({
   ['sm']: {['hsm']: 1, ['hmd']: 1, ['hlg']: 1},

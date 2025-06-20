@@ -20,8 +20,6 @@ export interface ArrayConfigParam{
   value: string[] | Record<string, string>
 }
 
-const context = getContext(this) as common.UIAbilityContext
-
 // 提取公共组件，复用
 @Component
 export struct ArrayConfigEditor {

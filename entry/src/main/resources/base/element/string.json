@@ -2007,6 +2007,62 @@
     {
       "name": "xb_studio",
       "value": "小白工坊"
+    },
+    {
+      "name": "access_control",
+      "value": "访问控制"
+    },
+    {
+      "name": "access_control_subtitle",
+      "value": "配置应用访问代理"
+    },
+    {
+      "name": "app_access_control",
+      "value": "应用访问控制"
+    },
+    {
+      "name": "white_list",
+      "value": "白名单模式"
+    },
+    {
+      "name": "blacklist",
+      "value": "黑名单模式"
+    },
+    {
+      "name": "white_list_tips",
+      "value": "选中的应用将会被禁用VPN"
+    },
+    {
+      "name": "blacklist_tips",
+      "value": "只允许选中的应用使用VPN"
+    },
+    {
+      "name": "selected",
+      "value": "已选择"
+    },
+    {
+      "name": "add_app",
+      "value": "添加应用"
+    },
+    {
+      "name": "edit_app",
+      "value": "编辑应用"
+    },
+    {
+      "name": "the_app_name",
+      "value": "应用名"
+    },
+    {
+      "name": "package_name",
+      "value": "包名"
+    },
+    {
+      "name": "mode",
+      "value": "模式"
+    },
+    {
+      "name": "access_control_tips",
+      "value": "添加或删除应用需要重启VPN后生效"
     }
   ]
 }

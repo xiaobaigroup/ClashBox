@@ -40,6 +40,7 @@ import {
   HomeTopHeight,
   WindowHomeGridRowPadding } from '../common/breakpoint/BreakPoint'
 import { RoundButton } from '../components/Common/RoundButton'
+import { AccessControl, VpnRawOptions } from 'proxy_core/src/main/ets/rpc/IClashManager'
 
 
 @Entry
@@ -197,9 +198,9 @@ struct Home {
       .width('100%')
       .geometryTransition("Button")
       .backgroundColor($r('app.color.background'))
-      .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
+      .height(this.windowMode ? undefined : (this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT))
       .margin({ top: this.topRectHeight == 0 ? 0 : HomeTopHeight(this.widthBp, this.heightBp) })
-      .position({x: 0, y: this.isRolling && this.isSmallSquareScreen ? this.heightTop: 0})
+      .position(this.windowMode ? undefined : {x: 0, y: this.isRolling && this.isSmallSquareScreen ? this.heightTop : 0})
 
       // 内容区
       Stack({ alignContent: this.stackAlignContentAlignment }) {
@@ -272,7 +273,20 @@ struct Home {
               hilog.info(0xA002, this.componentName, `主页按钮点击事件 代理启动按钮状态：${this.proxyEnabled}`)
               this.proxyEnabled = !this.proxyEnabled
               if (this.proxyEnabled) {
-                await ClashViewModel.StartVpn()
+                if (this.appConfig.accessControl) {
+                  const AccessControl: AccessControl = {
+                    mode: this.appConfig.accessControlMode,
+                    acceptList: JSON.parse(this.appConfig.accessControlAcceptList) as string[],
+                    rejectList: JSON.parse(this.appConfig.accessControlRejectList) as string[]
+                  }
+                  const VPNRawOptions: VpnRawOptions = { accessControl: [AccessControl] }
+                  hilog.info(0xA002, this.componentName, `主页按钮点击事件 AccessControl VPNRawOptions：${JSON.stringify(VPNRawOptions)}`)
+                  await ClashViewModel.setVpnOptions(VPNRawOptions)
+                  console.log(`AccessControl VPNRawOptions 执行完成`)
+                  await ClashViewModel.StartVpn()
+                } else {
+                  await ClashViewModel.StartVpn()
+                }
               } else {
                 await ClashViewModel.StopVpn()
               }
