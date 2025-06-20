@@ -256,8 +256,8 @@ struct ProxyPage {
         })
       }
       .zIndex(1)
-      .position({x: 0, y:this.isRolling && this.isSmallSquareScreen && !this.windowMode ? this.heightTop : 0})
-      .alignItems(VerticalAlign.Center)
+      .position({x: 0, y:this.isRolling && this.isSmallSquareScreen ? this.heightTop : 0})
+      .alignItems(this.windowMode ? VerticalAlign.Top : VerticalAlign.Center)
       .width('100%')
       .transition(customAnimationUtil.isSlide(0, this.uiConfig))
       .backgroundColor($r('app.color.background'))
@@ -438,6 +438,7 @@ struct ProxyPage {
     }
     .width('100%')
     .height('100%')
+    .alignContent(Alignment.Top)
     // 半模态页
     .bindSheet($$this.isShowProxyBindSheet, this.ProxyBindSheet(), {
       detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,],

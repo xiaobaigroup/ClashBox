@@ -131,7 +131,7 @@ struct ConfigurationPage {
         .backgroundColor($r('app.color.background'))
         .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
         .position({ x: 0, y: this.isRolling && this.isSmallSquareScreen && !this.windowMode ? this.heightTop : 0 })
-        .alignItems(VerticalAlign.Center)
+        .alignItems(this.windowMode ? VerticalAlign.Top : VerticalAlign.Center)
         .width('100%')
       }
       // 标题栏 END
@@ -344,6 +344,7 @@ struct ConfigurationPage {
     }
     .width('100%')
     .height('100%')
+    .alignContent(Alignment.Top)
     .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear, delay: 0 })
   }
 

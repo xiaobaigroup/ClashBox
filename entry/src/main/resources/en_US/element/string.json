@@ -2039,6 +2039,30 @@
     {
       "name": "selected",
       "value": "Selected"
+    },
+    {
+      "name": "add_app",
+      "value": "Add App"
+    },
+    {
+      "name": "edit_app",
+      "value": "Edit App"
+    },
+    {
+      "name": "the_app_name",
+      "value": "App name"
+    },
+    {
+      "name": "package_name",
+      "value": "Package name"
+    },
+    {
+      "name": "mode",
+      "value": "Mode"
+    },
+    {
+      "name": "access_control_tips",
+      "value": "Adding or deleting applications will take effect after restarting VPN"
     }
   ]
 }

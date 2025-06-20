@@ -44,6 +44,7 @@ export struct TopBar {
           ButtonBuilder({
             icon: this.icons[0],
             iconSize: this.iconSize,
+            iconWeight: this.windowMode ? FontWeight.Bold : undefined,
             onCheck: () => { this.onFClick() }
           }).transition(customAnimationUtil.isSlide(100, this.uiConfig))
         }
@@ -52,6 +53,7 @@ export struct TopBar {
           ButtonBuilder({
             icon: this.icons[1],
             iconSize: this.iconSize,
+            iconWeight: this.windowMode ? FontWeight.Bold : undefined,
             onCheck: () => { this.onSClick() }
           }).transition(customAnimationUtil.isSlide(0, this.uiConfig))
         }
@@ -60,6 +62,7 @@ export struct TopBar {
           ButtonBuilder({
             icon: this.icons[2],
             iconSize: this.iconSize,
+            iconWeight: this.windowMode ? FontWeight.Bold : undefined,
             onCheck: () => { this.onTClick() }
           }).transition(customAnimationUtil.isSlide(0, this.uiConfig))
         }

@@ -2035,6 +2035,34 @@
     {
       "name": "white_list",
       "value": "允許名單模式"
+    },
+    {
+      "name": "selected",
+      "value": "已選取"
+    },
+    {
+      "name": "add_app",
+      "value": "新增應用程式"
+    },
+    {
+      "name": "edit_app",
+      "value": "編輯應用程式"
+    },
+    {
+      "name": "the_app_name",
+      "value": "應用程式名稱"
+    },
+    {
+      "name": "package_name",
+      "value": "套件名稱"
+    },
+    {
+      "name": "mode",
+      "value": "模式"
+    },
+    {
+      "name": "access_control_tips",
+      "value": "新增或刪除應用程式需重新啟動VPN後生效"
     }
   ]
 }

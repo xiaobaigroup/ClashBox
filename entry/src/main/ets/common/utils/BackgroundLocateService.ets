@@ -12,7 +12,7 @@ import { geoLocationManager } from "@kit.LocationKit";
 /**
  * 模拟定位长时任务
  */
-export class BackgroundDownService{
+export class BackgroundLocateService{
   client = http.createHttp()
   notificationId ?: number = undefined
   ping: number = 0
@@ -69,7 +69,7 @@ export class BackgroundDownService{
     let now = appFlowingState.traffics.getLast()?.down?.toString()
     let result = appFlowingState.traffics.getLast()?.up?.toString()
     let message = `${result} ↑\t${now} ↓`
-    hilog.info(0xFF00, 'BackgroundDownService', "updateProcess %{public}s", message)
+    hilog.info(0xFF00, 'BackgroundLocateService', "updateProcess %{public}s", message)
     this.updateProcess(this.notificationId ?? 0, message )
   }
 
@@ -82,7 +82,7 @@ export class BackgroundDownService{
 
   updateProcess(id: number, message: string){
     notificationManager.isSupportTemplate('downloadTemplate').then((data:boolean) => {
-      hilog.info(0xFF00, 'BackgroundDownService', '当前设备支持下载进度条模板')
+      hilog.info(0xFF00, 'BackgroundLocateService', '当前设备支持下载进度条模板')
       let downLoadTemplate: notificationManager.NotificationTemplate = {
         name: 'downloadTemplate', // 当前只支持downloadTemplate，保持不变
         data: {
@@ -109,16 +109,16 @@ export class BackgroundDownService{
       // 发布通知
       try {
         notificationManager.publish(request).then(() => {
-          hilog.info(0xFF00, 'BackgroundDownService', "publish success, id = %{public}d", id)
+          hilog.info(0xFF00, 'BackgroundLocateService', "publish success, id = %{public}d", id)
         }).catch((err: BusinessError) => {
-          hilog.error(0xFF00, 'BackgroundDownService', `publish fail: ${JSON.stringify(err)}`)
+          hilog.error(0xFF00, 'BackgroundLocateService', `publish fail: ${JSON.stringify(err)}`)
         })
       } catch (err) {
-        hilog.error(0xFF00, 'BackgroundDownService', `publish fail: ${JSON.stringify(err)}`)
+        hilog.error(0xFF00, 'BackgroundLocateService', `publish fail: ${JSON.stringify(err)}`)
       }
 
     }).catch((err: BusinessError) => {
-      hilog.error(0xFF00, 'BackgroundDownService', `当前设备不支持下载进度条模板 Code is ${err.code}, message is ${err.message}`)
+      hilog.error(0xFF00, 'BackgroundLocateService', `当前设备不支持下载进度条模板 Code is ${err.code}, message is ${err.message}`)
     })
 
   }
@@ -147,10 +147,10 @@ export class BackgroundDownService{
       let res = await backgroundTaskManager.startBackgroundRunning(getContext(this), ["location"], wantAgentObj)
       return res.notificationId
     } catch (err) {
-      hilog.error(0xFF00, 'BackgroundDownService', `Failed to operation startBackgroundRunning. Code is ${err.code}, message is ${err.message}`)
+      hilog.error(0xFF00, 'BackgroundLocateService', `Failed to operation startBackgroundRunning. Code is ${err.code}, message is ${err.message}`)
       return -1
     }
   }
 }
 
-export default  new BackgroundDownService()
+export default  new BackgroundLocateService()

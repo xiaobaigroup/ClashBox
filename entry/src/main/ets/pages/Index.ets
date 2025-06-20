@@ -40,7 +40,7 @@ import { number2Time, timestampToDateTime } from '../common/utils/TimeConvertUti
 import { PXSecScreen } from './PXSecScreen'
 import { Timer } from '../common/utils/HHmmssTimer'
 import { getResourceString } from '../common/utils/ResourceStringUtil'
-import BackgroundDownService from '../common/utils/BackgroundDownService'
+import BackgroundLocateService from '../common/utils/BackgroundLocateService'
 import { ConvertedUnit } from '../common/utils/DataUnitConvertUtils'
 import { WelcomeUserAgreement } from '../components/Start/WelcomePage'
 import { i18n } from '@kit.LocalizationKit'
@@ -561,7 +561,7 @@ struct Index {
       this.trafficJob = setInterval(job, 1000)
       // 当模拟下载和通知均启用时
       if(this.uiConfig.backgroundLocateModel && this.uiConfig.Enablednotice) {
-        BackgroundDownService.start(getContext(this))
+        BackgroundLocateService.start(getContext(this))
       }
       // 启动前先初始化一下显示文本
       this.proxyStartingDuration = PROXY_STARTED_DURATION_INIT_VALUE
@@ -575,7 +575,7 @@ struct Index {
     EventHub.on(EventKey.StopedClash, ()=>{
       clearInterval(this.trafficJob)
       if(this.uiConfig.backgroundLocateModel) {
-        BackgroundDownService.stop(getContext(this))
+        BackgroundLocateService.stop(getContext(this))
       }
       // 代理计时器重置
       this.proxyStartedTimer.reset()

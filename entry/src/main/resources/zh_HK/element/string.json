@@ -2035,6 +2035,34 @@
     {
       "name": "blacklist_tips",
       "value": "只允許選中嘅應用使用VPN"
+    },
+    {
+      "name": "selected",
+      "value": "已選擇"
+    },
+    {
+      "name": "add_app",
+      "value": "新增應用"
+    },
+    {
+      "name": "edit_app",
+      "value": "編輯應用"
+    },
+    {
+      "name": "the_app_name",
+      "value": "應用名稱"
+    },
+    {
+      "name": "package_name",
+      "value": "套件名稱"
+    },
+    {
+      "name": "mode",
+      "value": "模式"
+    },
+    {
+      "name": "access_control_tips",
+      "value": "新增或刪除應用需要重新啟動VPN後生效"
     }
   ]
 }
