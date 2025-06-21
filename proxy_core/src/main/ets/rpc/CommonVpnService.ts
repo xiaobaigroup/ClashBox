@@ -25,7 +25,7 @@ export class VpnConfig {
   blockedApplications: string[] = []
   constructor(
     tunIp: Address = new Address("172.19.0.1", 1),
-    dnsAddresses: string[] = ["223.5.5.5", "223.6.6.6"]
+    dnsAddresses: string[] = ["172.19.0.2"]
   ) {
     this.addresses = [
       new AddressWithPrefix(tunIp, 24)
