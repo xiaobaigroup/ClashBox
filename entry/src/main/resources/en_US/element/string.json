@@ -2067,6 +2067,10 @@
     {
       "name": "exit",
       "value": "Exit"
+    },
+    {
+      "name": "app_already_exist",
+      "value": "The application already exists"
     }
   ]
 }

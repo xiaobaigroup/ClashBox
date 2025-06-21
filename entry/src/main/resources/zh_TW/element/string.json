@@ -2067,6 +2067,10 @@
     {
       "name": "exit",
       "value": "結束"
+    },
+    {
+      "name": "app_already_exist",
+      "value": "應用程式已存在"
     }
   ]
 }

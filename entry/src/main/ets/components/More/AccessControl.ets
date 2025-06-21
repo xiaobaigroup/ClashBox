@@ -5,7 +5,9 @@ import { ButtonBuilder, checkoutRowListItem, font_primary, KVCustomDialog, toggl
 import { PageMargin } from "../../common/breakpoint/BreakPoint"
 import { TAB_CONTENT_TITLE_HEIGHT } from "../../common/entity/Constants"
 import { AppConfig } from "../../entryability/AppState"
-import { ItemRestriction, LengthMetrics, SegmentButton, SegmentButtonOptions, SegmentButtonTextItem } from "@kit.ArkUI"
+import { ItemRestriction, LengthMetrics,
+  promptAction,
+  SegmentButton, SegmentButtonOptions, SegmentButtonTextItem } from "@kit.ArkUI"
 import { KeyValueData } from "./Overwrite/EditArrayConfig"
 import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { intl } from "@kit.LocalizationKit"
@@ -18,6 +20,7 @@ export struct AccessControl {
   @Consume needSearch: boolean
   // 是否进入二级界面
   @Consume isSecondary: boolean
+  @State isNewApp: boolean = true
   @State isShowSheet: boolean = false
   @State isDeleteing: boolean = false
   @State appListData: AppInfo[] = []
@@ -130,16 +133,13 @@ export struct AccessControl {
               // .width(22)
               .onChange((itemName: CheckboxGroupResult) => {
                 // console.info("AccessControl checkbox group content" + JSON.stringify(itemName))
-                if (this.isDeleteing) {
-                  this.nameStringData = itemName.name
+                this.nameStringData = itemName.name
+                if (this.appConfig.accessControlMode == 'AcceptSelected') {
+                  // 白名单
+                  this.appConfig.accessControlAcceptList = JSON.stringify(itemName.name)
                 } else {
-                  if (this.appConfig.accessControlMode == 'AcceptSelected') {
-                    // 白名单
-                    this.appConfig.accessControlAcceptList = JSON.stringify(itemName.name)
-                  } else {
-                    // 黑名单
-                    this.appConfig.accessControlRejectList = JSON.stringify(itemName.name)
-                  }
+                  // 黑名单
+                  this.appConfig.accessControlRejectList = JSON.stringify(itemName.name)
                 }
               })
           }
@@ -247,8 +247,12 @@ export struct AccessControl {
         const indexes = this.appListData.findIndex((d) => d.name == value.key)
         // console.log(`AccessControl kvCustomdialog 当前序号: ${indexes}`)
         if (indexes > -1) {
-          this.appListData[indexes].package_name = value.value as string
-          this.appListData = [... this.appListData]
+          if (!this.isNewApp) {
+            this.appListData[indexes].package_name = value.value as string
+            this.appListData = [... this.appListData]
+          } else {
+            promptAction.showToast({ message: $r('app.string.app_already_exist') })
+          }
         } else {
           const param: AppInfo = {
             name: value.key,
@@ -353,30 +357,26 @@ export struct AccessControl {
   }
 
   loadAppsInfo() {
-    this.appListData = JSON.parse(this.appConfig.accessControlAppInfo)
-    try {
-      if (this.appConfig.accessControlMode == 'AcceptSelected') {
-        // 白名单
-        this.modeTabSelectedIndexes.splice(0, 1, 0)
-        this.nameStringData = JSON.parse(this.appConfig.accessControlAcceptList ?? "[]")
-        console.log(`AccessControl #loadAppsInfo ${JSON.stringify(this.nameStringData)}`)
-      } else {
-        // 黑名单
-        this.modeTabSelectedIndexes.splice(0, 1, 1)
-        this.nameStringData = JSON.parse(this.appConfig.accessControlRejectList ?? "[]")
-        console.log(`AccessControl #loadAppsInfo ${JSON.stringify(this.nameStringData)}`)
+    if (this.appConfig.accessControlAppInfo != '[]') {
+      try {
+        this.appListData = JSON.parse(this.appConfig.accessControlAppInfo ?? "[]")
+        if (this.appConfig.accessControlMode == 'AcceptSelected') {
+          // 白名单
+          this.modeTabSelectedIndexes.splice(0, 1, 0)
+          this.nameStringData = JSON.parse(this.appConfig.accessControlAcceptList ?? "[]")
+          console.log(`AccessControl #loadAppsInfo ${JSON.stringify(this.nameStringData)}`)
+          this.selectedApp()
+        } else {
+          // 黑名单
+          this.modeTabSelectedIndexes.splice(0, 1, 1)
+          this.nameStringData = JSON.parse(this.appConfig.accessControlRejectList ?? "[]")
+          console.log(`AccessControl #loadAppsInfo ${JSON.stringify(this.nameStringData)}`)
+          this.selectedApp()
+        }
+      } catch (e) {
+        e
       }
-    } catch (e) {
-      e
     }
-    const selectedPackagesSet = new Set(this.nameStringData)
-    this.appListData = this.appListData.map((app): AppInfo => ({
-      name: app.name,
-      package_name: app.package_name,
-      time: app.time,
-      isSelected: selectedPackagesSet.has(app.package_name)
-    }))
-    console.log(`AccessControl #loadAppsInfo ${JSON.stringify(this.appListData)}`)
   }
 
   deleteApp(index?: number) {
@@ -402,17 +402,26 @@ export struct AccessControl {
     }))
   }
 
+  selectedApp() {
+    const selectedPackagesSet = new Set(this.nameStringData)
+    this.appListData = this.appListData.map((app): AppInfo => ({
+      name: app.name,
+      package_name: app.package_name,
+      time: app.time,
+      isSelected: selectedPackagesSet.has(app.package_name)
+    }))
+    console.log(`AccessControl #selectedApp ${JSON.stringify(this.appListData)}`)
+  }
+
   onModeChange() {
     if (this.modeTabSelectedIndexes[0] == 0) {
       // 白名单
       this.appConfig.accessControlMode = 'AcceptSelected'
-      // this.cancelSelected()
-      this.loadAppsInfo()
+      this.appConfig.accessControlAcceptList = JSON.stringify(this.nameStringData)
     } else {
       // 黑名单
       this.appConfig.accessControlMode = 'RejectSelected'
-      // this.cancelSelected()
-      this.loadAppsInfo()
+      this.appConfig.accessControlRejectList = JSON.stringify(this.nameStringData)
     }
   }
 
@@ -434,6 +443,7 @@ export struct AccessControl {
     const kvData: KeyValueData = new KeyValueData(item.name, item.package_name)
     this.keyValueData = kvData
     this.kvDialogTitle = getResourceString($r('app.string.edit_app'), this)
+    this.isNewApp = false
     this.kvDialogController.open()
   }
 
