@@ -41,14 +41,18 @@ export struct AccessControl {
   @State modeTabOptions: SegmentButtonOptions = SegmentButtonOptions.tab({
     buttons: [{ text: $r('app.string.white_list') }, { text: $r('app.string.blacklist')
     }] as ItemRestriction<SegmentButtonTextItem>,
+    selectedBackgroundColor: $r('app.color.container_background'),
     backgroundBlurStyle: BlurStyle.BACKGROUND_THICK,
     textPadding: { top: 5, bottom: 5 },
+    fontColor: font_primary,
   })
   @State sortTabOptions: SegmentButtonOptions = SegmentButtonOptions.tab({
     buttons: [{ text: $r('app.string.Name') }, { text: $r('app.string.time')
     }] as ItemRestriction<SegmentButtonTextItem>,
+    selectedBackgroundColor: $r('app.color.container_background'),
     backgroundBlurStyle: BlurStyle.BACKGROUND_THICK,
     textPadding: { top: 5, bottom: 5 },
+    fontColor: font_primary,
   })
   @State @Watch('onModeChange') modeTabSelectedIndexes: number[] = [1]
   @State @Watch('onSortChange') sortTabSelectedIndexes: number[] = [0]
