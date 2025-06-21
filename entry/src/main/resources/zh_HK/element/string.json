@@ -2062,7 +2062,7 @@
     },
     {
       "name": "access_control_tips",
-      "value": "新增或刪除應用需要重新啟動VPN後生效"
+      "value": "新增或刪除應用需要重新啟動VPN後生效，存取控制只能管理非容器應用"
     },
     {
       "name": "exit",

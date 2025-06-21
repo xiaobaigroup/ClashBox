@@ -2062,7 +2062,7 @@
     },
     {
       "name": "access_control_tips",
-      "value": "Adding or deleting applications will take effect after restarting VPN"
+      "value": "Adding or deleting applications will take effect after restarting VPN, access control can only manage non container applications"
     },
     {
       "name": "exit",

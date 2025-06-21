@@ -843,6 +843,7 @@ export struct checkoutRowListItem {
   @State title: string = ''
   @State subtitle: string = ''
   @Prop isSelected: boolean = false
+  @Prop enabledClick: boolean = true
   @State isPrimaryIcons: boolean = false
   @State isExperimentalFunction: boolean = false
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
@@ -875,6 +876,7 @@ export struct checkoutRowListItem {
         .hitTestBehavior(HitTestMode.None)
         .selectedColor(this.icon_emphasize)
         .shape(CheckBoxShape.CIRCLE)
+        .enabled(this.enabledClick)
         .select($$this.isSelected)
     }
     .RowStyle()

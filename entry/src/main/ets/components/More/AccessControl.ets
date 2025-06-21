@@ -5,13 +5,11 @@ import { ButtonBuilder, checkoutRowListItem, font_primary, KVCustomDialog, toggl
 import { PageMargin } from "../../common/breakpoint/BreakPoint"
 import { TAB_CONTENT_TITLE_HEIGHT } from "../../common/entity/Constants"
 import { AppConfig } from "../../entryability/AppState"
-import { ItemRestriction, LengthMetrics,
-  promptAction,
-  SegmentButton, SegmentButtonOptions, SegmentButtonTextItem } from "@kit.ArkUI"
+import { ItemRestriction,promptAction, SegmentButton, SegmentButtonOptions, SegmentButtonTextItem } from "@kit.ArkUI"
 import { KeyValueData } from "./Overwrite/EditArrayConfig"
 import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { intl } from "@kit.LocalizationKit"
-import { Xb_CapsuleButton, Xb_GetResourceString } from "xb_components"
+import { Xb_CapsuleButton, Xb_CircleButton, Xb_GetResourceString } from "xb_components"
 
 
 @Component
@@ -112,37 +110,38 @@ export struct AccessControl {
               }
             })
               .enabled(this.appConfig.accessControl)
-          }
-          if (this.appListData.length != 0) {
-            ButtonBuilder({
-              icon: this.isDeleteing ? $r('sys.symbol.trash_fill') : $r('sys.symbol.square_and_pencil'),
-              onCheck: () => {
-                if (this.isDeleteing) {
-                  this.deleteApp()
-                } else {
-                  this.isDeleteing = true
-                  this.cancelSelected()
-                }
-              }
-            })
-              .enabled(this.appConfig.accessControl)
-            CheckboxGroup({ group: 'App' })
-              .enabled(this.appConfig.accessControl)
-              .checkboxShape(CheckBoxShape.CIRCLE)
-              .selectedColor(this.icon_emphasize)
-              // .width(22)
-              .onChange((itemName: CheckboxGroupResult) => {
-                // console.info("AccessControl checkbox group content" + JSON.stringify(itemName))
-                this.nameStringData = itemName.name
-                if (this.appConfig.accessControlMode == 'AcceptSelected') {
-                  // 白名单
-                  this.appConfig.accessControlAcceptList = JSON.stringify(itemName.name)
-                } else {
-                  // 黑名单
-                  this.appConfig.accessControlRejectList = JSON.stringify(itemName.name)
+            if (this.appListData.length != 0) {
+              ButtonBuilder({
+                icon: this.isDeleteing ? $r('sys.symbol.trash_fill') : $r('sys.symbol.square_and_pencil'),
+                onCheck: () => {
+                  if (this.isDeleteing) {
+                    this.deleteApp()
+                  } else {
+                    this.isDeleteing = true
+                    this.cancelSelected()
+                  }
                 }
               })
+                .enabled(this.appConfig.accessControl)
+            }
           }
+          CheckboxGroup({ group: 'App' })
+            .enabled(this.appConfig.accessControl)
+            .checkboxShape(CheckBoxShape.CIRCLE)
+            .selectedColor(this.icon_emphasize)
+            .onChange((itemName: CheckboxGroupResult) => {
+              console.info("AccessControl checkbox group content" + JSON.stringify(itemName))
+              this.nameStringData = itemName.name
+              if (this.appConfig.accessControlMode == 'AcceptSelected') {
+                // 白名单
+                this.appConfig.accessControlAcceptList = JSON.stringify(itemName.name)
+                console.info("AccessControl  this.appConfig.accessControlAcceptList: " +  this.appConfig.accessControlAcceptList)
+              } else {
+                // 黑名单
+                this.appConfig.accessControlRejectList = JSON.stringify(itemName.name)
+                console.info("AccessControl this.appConfig.accessControlRejectList: " + this.appConfig.accessControlRejectList)
+              }
+            })
         }.width('100%')
         .padding({ right: PageMargin(this.widthBp, this.heightBp) + 12, left: PageMargin(this.widthBp, this.heightBp) + 12 })
 
@@ -152,12 +151,13 @@ export struct AccessControl {
               checkoutRowListItem({
                 title: item.name,
                 subtitle: item.package_name,
-                isSelected: item.isSelected
+                isSelected: item.isSelected,
+                enabledClick: this.appConfig.accessControl
               })
             }
             .swipeAction({
               end: {
-                builder: () => { this.swipeActionEnd(index) },
+                builder: () => { this.swipeActionEnd(index, item) },
                 // 侧滑到一定距离会触发 onAction
                 // onAction: () => {
                 //   animateTo({ duration: 1000 }, () => {
@@ -208,8 +208,8 @@ export struct AccessControl {
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
     .onShown(() => {
-      // 初始化搜索按钮
-      this.needSearch = true
+      // 初始化搜索按钮 TODO 暂时关闭搜索
+      this.needSearch = false
     })
     .onWillHide(() => {
       this.needSearch = false
@@ -319,15 +319,19 @@ export struct AccessControl {
   }
 
   @Builder
-  swipeActionEnd(id: number) {
+  swipeActionEnd(id: number, item: AppInfo) {
     Row() {
-      SymbolGlyph($r('sys.symbol.trash_fill'))
-        .fontColor([Color.Red])
-        .fontSize(24)
-        .onClick(() => {
+      Xb_CircleButton({
+        icon: $r('sys.symbol.trash_fill'),
+        iconColor: Color.Red,
+        iconBackgroundColor: undefined,
+        theBackgroundColor: $r('app.color.container_background'),
+        onCheck: () => {
+          console.log(`AccessControl 点击 #deleteApp ${id}`)
           // 删除列表行
           this.deleteApp(id)
-        })
+        }
+      })
     }
     .height('100%')
     .padding({ left: 12 })
@@ -348,6 +352,7 @@ export struct AccessControl {
     //   time: Date.now(),
     //   isSelected: false
     // })
+    console.info("AccessControl #aboutToAppear this.appConfig.accessControlRejectList: " + this.appConfig.accessControlRejectList)
     this.loadAppsInfo()
     this.sortTabSelectedIndexes.splice(0, 1, this.appConfig.accessControlSort == 'name' ? 0 : 1)
   }
@@ -357,39 +362,54 @@ export struct AccessControl {
   }
 
   loadAppsInfo() {
-    if (this.appConfig.accessControlAppInfo != '[]') {
-      try {
-        this.appListData = JSON.parse(this.appConfig.accessControlAppInfo ?? "[]")
-        if (this.appConfig.accessControlMode == 'AcceptSelected') {
-          // 白名单
-          this.modeTabSelectedIndexes.splice(0, 1, 0)
-          this.nameStringData = JSON.parse(this.appConfig.accessControlAcceptList ?? "[]")
-          console.log(`AccessControl #loadAppsInfo ${JSON.stringify(this.nameStringData)}`)
-          this.selectedApp()
-        } else {
-          // 黑名单
-          this.modeTabSelectedIndexes.splice(0, 1, 1)
-          this.nameStringData = JSON.parse(this.appConfig.accessControlRejectList ?? "[]")
-          console.log(`AccessControl #loadAppsInfo ${JSON.stringify(this.nameStringData)}`)
-          this.selectedApp()
-        }
-      } catch (e) {
-        e
+    try {
+      this.appListData = JSON.parse(this.appConfig.accessControlAppInfo ?? "[]")
+      if (this.appConfig.accessControlMode == 'AcceptSelected') {
+        // 白名单
+        this.modeTabSelectedIndexes.splice(0, 1, 0)
+        const packagenameStringData: string[] = JSON.parse(this.appConfig.accessControlAcceptList ?? "[]")
+        console.log(`AccessControl #loadAppsInfo ${JSON.stringify(packagenameStringData)}`)
+        this.selectedApp(packagenameStringData)
+      } else {
+        // 黑名单
+        this.modeTabSelectedIndexes.splice(0, 1, 1)
+        const packagenameStringData = JSON.parse(this.appConfig.accessControlRejectList ?? "[]") as string[]
+        console.log(`AccessControl #loadAppsInfo ${JSON.stringify(packagenameStringData)}`)
+        this.selectedApp(packagenameStringData)
       }
+    } catch (e) {
+      console.error(`AccessControl 错误: ${e}`)
     }
   }
 
-  deleteApp(index?: number) {
-    if (index) {
+  deleteApp(index?: number, item?: AppInfo) {
+    console.log(`AccessControl 进入删除 #deleteApp ${index}`)
+    console.log(`AccessControl #deleteApp 前 this.appConfig.accessControlAcceptList值：${this.appConfig.accessControlRejectList}`)
+    let rejectString = JSON.parse(this.appConfig.accessControlRejectList ?? "[]") as string[]
+    let acceptString = JSON.parse(this.appConfig.accessControlAcceptList ?? "[]") as string[]
+    if (index != undefined && item != undefined) {
+      console.log(`AccessControl #deleteApp 前 this.appListData值：${JSON.stringify(this.appListData)}`)
       this.appListData.splice(index, 1)
+      console.log(`AccessControl #deleteApp 后 this.appListData值：${JSON.stringify(this.appListData)}`)
       this.appConfig.accessControlAppInfo = JSON.stringify(this.appListData)
       console.log(`AccessControl #deleteApp ${index}`)
+      // 黑名单
+      rejectString = rejectString.filter(stringData => stringData != item.package_name)
+      // 白名单
+      acceptString = acceptString.filter(stringData => stringData != item.package_name)
     } else {
       // 批量删除
       const deleteSet = new Set(this.nameStringData)
       this.appListData = this.appListData.filter(app => !deleteSet.has(app.package_name))
       this.appConfig.accessControlAppInfo = JSON.stringify(this.appListData)
+      // 黑名单
+      rejectString = rejectString.filter(packageName => !deleteSet.has(packageName))
+      // 白名单
+      acceptString = acceptString.filter(packageName => !deleteSet.has(packageName))
     }
+    this.appConfig.accessControlRejectList = JSON.stringify(rejectString)
+    this.appConfig.accessControlAcceptList = JSON.stringify(acceptString)
+    console.log(`AccessControl #deleteApp 后 this.appConfig.accessControlAcceptList值：${this.appConfig.accessControlRejectList}`)
   }
 
   // 取消所有选中
@@ -402,26 +422,30 @@ export struct AccessControl {
     }))
   }
 
-  selectedApp() {
-    const selectedPackagesSet = new Set(this.nameStringData)
+  selectedApp(packageNames: string[]) {
+    const selectedPackagesSet = new Set(packageNames)
     this.appListData = this.appListData.map((app): AppInfo => ({
       name: app.name,
       package_name: app.package_name,
       time: app.time,
       isSelected: selectedPackagesSet.has(app.package_name)
     }))
-    console.log(`AccessControl #selectedApp ${JSON.stringify(this.appListData)}`)
+    console.log(`AccessControl #selectedApp 黑 列表数据：${JSON.stringify(this.appListData)} 包名数据：${JSON.stringify(packageNames)}`)
   }
 
   onModeChange() {
-    if (this.modeTabSelectedIndexes[0] == 0) {
-      // 白名单
-      this.appConfig.accessControlMode = 'AcceptSelected'
-      this.appConfig.accessControlAcceptList = JSON.stringify(this.nameStringData)
-    } else {
-      // 黑名单
-      this.appConfig.accessControlMode = 'RejectSelected'
-      this.appConfig.accessControlRejectList = JSON.stringify(this.nameStringData)
+    console.log(`AccessControl 运行 #onModeChange nameStringData值：${JSON.stringify(this.nameStringData)}`)
+    if (this.nameStringData[0]) {
+      console.log(`AccessControl 运行 #onModeChange-实际 nameStringData[0]值：${JSON.stringify(this.nameStringData[0])}`)
+      if (this.modeTabSelectedIndexes[0] == 0) {
+        // 白名单
+        this.appConfig.accessControlMode = 'AcceptSelected'
+        this.appConfig.accessControlAcceptList = JSON.stringify(this.nameStringData)
+      } else {
+        // 黑名单
+        this.appConfig.accessControlMode = 'RejectSelected'
+        this.appConfig.accessControlRejectList = JSON.stringify(this.nameStringData)
+      }
     }
   }
 

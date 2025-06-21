@@ -2062,7 +2062,7 @@
     },
     {
       "name": "access_control_tips",
-      "value": "添加或删除应用需要重启VPN后生效"
+      "value": "添加或删除应用需要重启VPN后生效，访问控制只能管理非容器应用"
     },
     {
       "name": "exit",
