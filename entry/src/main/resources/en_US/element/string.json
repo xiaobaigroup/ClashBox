@@ -2063,6 +2063,10 @@
     {
       "name": "access_control_tips",
       "value": "Adding or deleting applications will take effect after restarting VPN"
+    },
+    {
+      "name": "exit",
+      "value": "Exit"
     }
   ]
 }

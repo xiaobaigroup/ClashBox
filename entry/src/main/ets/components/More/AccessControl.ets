@@ -1,7 +1,7 @@
 import { MoreTop } from "./MoreTopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { universalSearch } from "../../common/utils/SmartSearchUtil"
-import { ButtonBuilder, checkoutRowListItem, KVCustomDialog, toggleRowList } from "../Common/Common"
+import { ButtonBuilder, checkoutRowListItem, font_primary, KVCustomDialog, toggleRowList } from "../Common/Common"
 import { PageMargin } from "../../common/breakpoint/BreakPoint"
 import { TAB_CONTENT_TITLE_HEIGHT } from "../../common/entity/Constants"
 import { AppConfig } from "../../entryability/AppState"
@@ -9,6 +9,7 @@ import { ItemRestriction, LengthMetrics, SegmentButton, SegmentButtonOptions, Se
 import { KeyValueData } from "./Overwrite/EditArrayConfig"
 import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { intl } from "@kit.LocalizationKit"
+import { Xb_CapsuleButton, Xb_GetResourceString } from "xb_components"
 
 
 @Component
@@ -17,9 +18,10 @@ export struct AccessControl {
   @Consume needSearch: boolean
   // 是否进入二级界面
   @Consume isSecondary: boolean
+  @State isShowSheet: boolean = false
+  @State isDeleteing: boolean = false
   @State appListData: AppInfo[] = []
   @State nameStringData: string[] = []
-  @State isShowSheet: boolean = false
   @State lastAppListData: AppInfo[] = []
   @State kvDialogTitle: ResourceStr = ''
   @Consume @Watch('applist') isSearching: boolean
@@ -72,45 +74,76 @@ export struct AccessControl {
           toggle: () => { this.controlBuilder() }
         })
           .margin({ right: PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp) })
-
-        Flex({
-          direction: FlexDirection.Row,
-          space: { main: LengthMetrics.vp(10) },
-          justifyContent: FlexAlign.SpaceBetween,
-          alignItems: ItemAlign.Center
-        })
-        {
-          Column() {
-            Text($r('app.string.selected'))
-            Text(this.appConfig.accessControlMode != 'AcceptSelected' ? $r('app.string.white_list_tips') : $r('app.string.blacklist_tips'))
-          }.width('100%')
-          .alignItems(HorizontalAlign.Start)
-          ButtonBuilder({
-            icon: $r('sys.symbol.plus'),
-            onCheck: () => {
-              this.kvDialogTitle = getResourceString($r('app.string.add_app'), this)
-              this.kvDialogController.open()
-            }
+          .onClick(() => {
+            this.appConfig.accessControl = !this.appConfig.accessControl
           })
-            .enabled(this.appConfig.accessControl)
+
+        Row({ space: 10}) {
+          Column() {
+            Text(`${Xb_GetResourceString($r('app.string.selected'), this)} ${this.nameStringData.length}`)
+            Text(this.isDeleteing ? `${Xb_GetResourceString($r('app.string.Edit'), this)}${Xb_GetResourceString($r('app.string.mode'), this)}`
+              : this.appConfig.accessControlMode != 'AcceptSelected' ? $r('app.string.white_list_tips') : $r('app.string.blacklist_tips'))
+          }
+          .alignItems(HorizontalAlign.Start)
+          if (this.isDeleteing) {
+            Xb_CapsuleButton({
+              icon: undefined,
+              fontSize: 16,
+              iconColor: font_primary,
+              text: $r('app.string.exit'),
+              theBackgroundColor: $r('app.color.settings_container_background'),
+              onCheck: () => {
+                this.isDeleteing = false
+                // this.cancelSelected()
+                this.loadAppsInfo()
+              }
+            })
+          }
+          Blank()
+          if (this.appConfig.accessControl) {
+            ButtonBuilder({
+              icon: $r('sys.symbol.plus'),
+              onCheck: () => {
+                this.kvDialogTitle = getResourceString($r('app.string.add_app'), this)
+                this.kvDialogController.open()
+              }
+            })
+              .enabled(this.appConfig.accessControl)
+          }
           if (this.appListData.length != 0) {
+            ButtonBuilder({
+              icon: this.isDeleteing ? $r('sys.symbol.trash_fill') : $r('sys.symbol.square_and_pencil'),
+              onCheck: () => {
+                if (this.isDeleteing) {
+                  this.deleteApp()
+                } else {
+                  this.isDeleteing = true
+                  this.cancelSelected()
+                }
+              }
+            })
+              .enabled(this.appConfig.accessControl)
             CheckboxGroup({ group: 'App' })
               .enabled(this.appConfig.accessControl)
               .checkboxShape(CheckBoxShape.CIRCLE)
               .selectedColor(this.icon_emphasize)
-              .width(24)
+              // .width(22)
               .onChange((itemName: CheckboxGroupResult) => {
                 // console.info("AccessControl checkbox group content" + JSON.stringify(itemName))
-                if (this.appConfig.accessControlMode == 'AcceptSelected') {
-                  // 白名单
-                  this.appConfig.accessControlAcceptList = JSON.stringify(itemName.name)
+                if (this.isDeleteing) {
+                  this.nameStringData = itemName.name
                 } else {
-                  // 黑名单
-                  this.appConfig.accessControlRejectList = JSON.stringify(itemName.name)
+                  if (this.appConfig.accessControlMode == 'AcceptSelected') {
+                    // 白名单
+                    this.appConfig.accessControlAcceptList = JSON.stringify(itemName.name)
+                  } else {
+                    // 黑名单
+                    this.appConfig.accessControlRejectList = JSON.stringify(itemName.name)
+                  }
                 }
               })
           }
-        }
+        }.width('100%')
         .padding({ right: PageMargin(this.widthBp, this.heightBp) + 12, left: PageMargin(this.widthBp, this.heightBp) + 12 })
 
         List({space: 8}) {
@@ -122,6 +155,21 @@ export struct AccessControl {
                 isSelected: item.isSelected
               })
             }
+            .swipeAction({
+              end: {
+                builder: () => { this.swipeActionEnd(index) },
+                // 侧滑到一定距离会触发 onAction
+                // onAction: () => {
+                //   animateTo({ duration: 1000 }, () => {
+                //     // 侧滑删除
+                //     this.deleteApp(index)
+                //   })
+                // },
+                // onAction 侧滑距离
+                actionAreaDistance: 56,
+              },
+              edgeEffect: SwipeEdgeEffect.None
+            })
             .enabled(this.appConfig.accessControl)
             .onClick(() => {
               const itemData = this.appListData[index]
@@ -168,9 +216,15 @@ export struct AccessControl {
       this.isSearching = false
     })
     .onBackPressed(() => {
-      if(this.isSearching) {
+      if (this.isSearching) {
         this.isSearching = false
         this.searchText = ''
+        return true
+      }
+      if (this.isDeleteing) {
+        this.isDeleteing = false
+        // this.cancelSelected()
+        this.loadAppsInfo()
         return true
       }
       this.pageInfos.clear()
@@ -203,6 +257,8 @@ export struct AccessControl {
             isSelected: false
           }
           this.appListData = [...this.appListData, param]
+          // 添加后保存数据
+          this.appConfig.accessControlAppInfo = JSON.stringify(this.appListData)
         }
         // 保存后重置数据
         this.keyValueData = new KeyValueData("")
@@ -251,40 +307,68 @@ export struct AccessControl {
   @Builder
   controlBuilder() {
     Toggle({ type: ToggleType.Switch, isOn: this.appConfig.accessControl })
+      .hitTestBehavior(HitTestMode.None)
       .selectedColor(this.icon_emphasize)
       .onChange((isOn) => {
         this.appConfig.accessControl = isOn
       })
   }
 
+  @Builder
+  swipeActionEnd(id: number) {
+    Row() {
+      SymbolGlyph($r('sys.symbol.trash_fill'))
+        .fontColor([Color.Red])
+        .fontSize(24)
+        .onClick(() => {
+          // 删除列表行
+          this.deleteApp(id)
+        })
+    }
+    .height('100%')
+    .padding({ left: 12 })
+    .justifyContent(FlexAlign.SpaceEvenly)
+  }
+
+
   aboutToAppear(): void {
-    this.appListData.push({
-      name: '哔哩哔哩',
-      package_name: 'yylx.danmaku.bili',
-      time: Date.now(),
-      isSelected: false
-    },
-      {
-      name: '浏览器',
-      package_name: 'com.huawei.hmos.browser',
-      time: Date.now(),
-      isSelected: false
-    })
+    // this.appListData.push({
+    //   name: '哔哩哔哩',
+    //   package_name: 'yylx.danmaku.bili',
+    //   time: Date.now(),
+    //   isSelected: false
+    // },
+    //   {
+    //   name: '浏览器',
+    //   package_name: 'com.huawei.hmos.browser',
+    //   time: Date.now(),
+    //   isSelected: false
+    // })
+    this.loadAppsInfo()
+    this.sortTabSelectedIndexes.splice(0, 1, this.appConfig.accessControlSort == 'name' ? 0 : 1)
+  }
+
+  aboutToDisappear(): void {
+    this.appConfig.accessControlAppInfo = JSON.stringify(this.appListData)
+  }
+
+  loadAppsInfo() {
+    this.appListData = JSON.parse(this.appConfig.accessControlAppInfo)
     try {
       if (this.appConfig.accessControlMode == 'AcceptSelected') {
         // 白名单
         this.modeTabSelectedIndexes.splice(0, 1, 0)
         this.nameStringData = JSON.parse(this.appConfig.accessControlAcceptList ?? "[]")
+        console.log(`AccessControl #loadAppsInfo ${JSON.stringify(this.nameStringData)}`)
       } else {
         // 黑名单
         this.modeTabSelectedIndexes.splice(0, 1, 1)
         this.nameStringData = JSON.parse(this.appConfig.accessControlRejectList ?? "[]")
+        console.log(`AccessControl #loadAppsInfo ${JSON.stringify(this.nameStringData)}`)
       }
-      console.log(`AccessControl #aboutToAppear ${JSON.stringify(this.nameStringData)}`)
-    }catch (e) {
+    } catch (e) {
       e
     }
-
     const selectedPackagesSet = new Set(this.nameStringData)
     this.appListData = this.appListData.map((app): AppInfo => ({
       name: app.name,
@@ -292,17 +376,43 @@ export struct AccessControl {
       time: app.time,
       isSelected: selectedPackagesSet.has(app.package_name)
     }))
-    console.log(`AccessControl #aboutToAppear ${JSON.stringify(this.appListData)}`)
-    this.sortTabSelectedIndexes.splice(0, 1, this.appConfig.accessControlSort == 'name' ? 0 : 1)
+    console.log(`AccessControl #loadAppsInfo ${JSON.stringify(this.appListData)}`)
+  }
+
+  deleteApp(index?: number) {
+    if (index) {
+      this.appListData.splice(index, 1)
+      this.appConfig.accessControlAppInfo = JSON.stringify(this.appListData)
+      console.log(`AccessControl #deleteApp ${index}`)
+    } else {
+      // 批量删除
+      const deleteSet = new Set(this.nameStringData)
+      this.appListData = this.appListData.filter(app => !deleteSet.has(app.package_name))
+      this.appConfig.accessControlAppInfo = JSON.stringify(this.appListData)
+    }
+  }
+
+  // 取消所有选中
+  cancelSelected() {
+    this.appListData = this.appListData.map((app): AppInfo => ({
+      name: app.name,
+      package_name: app.package_name,
+      time: app.time,
+      isSelected: false
+    }))
   }
 
   onModeChange() {
     if (this.modeTabSelectedIndexes[0] == 0) {
       // 白名单
       this.appConfig.accessControlMode = 'AcceptSelected'
+      // this.cancelSelected()
+      this.loadAppsInfo()
     } else {
       // 黑名单
       this.appConfig.accessControlMode = 'RejectSelected'
+      // this.cancelSelected()
+      this.loadAppsInfo()
     }
   }
 
@@ -358,7 +468,7 @@ export struct AccessControl {
 
 const nameSortCollator = new intl.Collator("zh-CN")
 
-interface AppInfo {
+export interface AppInfo {
   name: string
   package_name: string
   time: number

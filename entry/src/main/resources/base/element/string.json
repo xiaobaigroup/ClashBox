@@ -2063,6 +2063,10 @@
     {
       "name": "access_control_tips",
       "value": "添加或删除应用需要重启VPN后生效"
+    },
+    {
+      "name": "exit",
+      "value": "退出"
     }
   ]
 }

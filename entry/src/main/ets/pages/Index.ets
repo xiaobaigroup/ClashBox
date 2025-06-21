@@ -605,13 +605,13 @@ struct Index {
       this.isShowWelcome = false
     }
 
-    let nowDate = new Date().getTime()
+    // let nowDate = new Date().getTime()
     // 检查是否要弹出免责声明
-    if (nowDate - this.uiConfig.useTime >= 1296000000) {
-      this.isDisclaimer = true
-      // 大于等于15天打开弹窗
-      this.dialogController.open()
-    }
+    // if (nowDate - this.uiConfig.useTime >= 1296000000) {
+    //   this.isDisclaimer = true
+    //   // 大于等于15天打开弹窗
+    //   this.dialogController.open()
+    // }
 
     // 在页面build前改变主题颜色
     Xb_ChangeThemeColor(this.uiConfig.themeColor)
@@ -622,8 +622,9 @@ struct Index {
     this.switchButtonPosition(this.uiConfig.buttonPositionIndex)
     // 初始化实验功能显示状态
     this.isShowExperimentalFunction = this.uiConfig.isShowExperimentalFunction
+
     // 检查版本更新
-    if (this.uiConfig.autoCheckUpdate) {
+   /* if (this.uiConfig.autoCheckUpdate) {
       try {
         const updateInfo = await getUpdateInfo()
         hilog.info(0xFF00, "UpdatetestTag", "Update Info: %{public}s", JSON.stringify(updateInfo))
@@ -643,7 +644,8 @@ struct Index {
         const infoError = `Error:${JSON.stringify(err)}`
         hilog.info(0xFF00, "UpdatetestTag", "Info: %{public}s", infoError)
       }
-    }
+    }*/
+
     // if(!this.uiConfig.enabledADvanced || !this.uiConfig.isShowExperimentalFunction) {
     //   // 屏蔽分流策略
     //   this.moreList = removeItemsByIndex(this.moreList, [5])
