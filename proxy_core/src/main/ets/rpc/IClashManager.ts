@@ -40,7 +40,7 @@ export interface AccessControl{
   rejectList: string[]
 }
 export interface VpnRawOptions{
-  accessControl:AccessControl[]
+  accessControl: AccessControl
 }
 
 

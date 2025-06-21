@@ -16,7 +16,7 @@ import { sleep } from "./EntryAbility";
 import { ProxyItem } from "../common/datasources/ProxyData";
 import { hilog } from "@kit.PerformanceAnalysisKit";
 import { readText } from "proxy_core/src/main/ets/fileUtils";
-import { VpnRawOptions } from "proxy_core/src/main/ets/rpc/IClashManager";
+import { AccessControl, VpnRawOptions } from "proxy_core/src/main/ets/rpc/IClashManager";
 
 export interface DelayInfo{
     name: string
@@ -303,6 +303,7 @@ export class ClashViewModel {
   async ReStartVpn(){
     if(this.vpnStarted){
       await this.loadConfig(false)
+      await this.loadVpnOptions()
       await this.socketProxy.stopClash()
       await this.socketProxy.startClash()
     }
@@ -310,6 +311,7 @@ export class ClashViewModel {
   vpnStarted = false
   async StartVpn(){
     this.vpnStarted = true
+    await this.loadVpnOptions()
     let result = await this.socketProxy.startClash()
     // 核心崩溃 小钥匙一直在，要重启两量变
     if (!result){
@@ -319,6 +321,22 @@ export class ClashViewModel {
       EventHub.sendEvent(EventKey.StartedClash)
       EventHub.sendEvent(EventKey.checkIpInfo)
     }
+  }
+  async loadVpnOptions(){
+    let appConfig = AppStorage.get<AppConfig>("appConfig")
+    if (appConfig?.accessControl == null)
+      return
+    if(appConfig!.accessControl){
+      const acceptList = JSON.parse(appConfig?.accessControlAcceptList ?? "[]") as string[]
+      const rejectList = JSON.parse(appConfig?.accessControlRejectList ?? "[]") as string[]
+      const accessControl = { accessControl: { mode:appConfig?.accessControlMode ?? "", acceptList: acceptList, rejectList: rejectList } as AccessControl } as VpnRawOptions
+      this.socketProxy.setOptionStates(accessControl)
+    } else {
+      const accessControl = { accessControl: { mode:appConfig?.accessControlMode ?? "", acceptList: [], rejectList: [] } as AccessControl } as VpnRawOptions
+      this.socketProxy.setOptionStates(accessControl)
+    }
+    // 在日志控制台 过滤关键字 vpnConfig, 验证是否配置成功
+
   }
 
   async StopVpn(){

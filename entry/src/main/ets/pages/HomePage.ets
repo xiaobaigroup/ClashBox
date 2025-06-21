@@ -273,20 +273,7 @@ struct Home {
               hilog.info(0xA002, this.componentName, `主页按钮点击事件 代理启动按钮状态：${this.proxyEnabled}`)
               this.proxyEnabled = !this.proxyEnabled
               if (this.proxyEnabled) {
-                if (this.appConfig.accessControl) {
-                  const AccessControl: AccessControl = {
-                    mode: this.appConfig.accessControlMode,
-                    acceptList: JSON.parse(this.appConfig.accessControlAcceptList) as string[],
-                    rejectList: JSON.parse(this.appConfig.accessControlRejectList) as string[]
-                  }
-                  const VPNRawOptions: VpnRawOptions = { accessControl: [AccessControl] }
-                  hilog.info(0xA002, this.componentName, `主页按钮点击事件 AccessControl VPNRawOptions：${JSON.stringify(VPNRawOptions)}`)
-                  await ClashViewModel.setVpnOptions(VPNRawOptions)
-                  console.log(`AccessControl VPNRawOptions 执行完成`)
-                  await ClashViewModel.StartVpn()
-                } else {
-                  await ClashViewModel.StartVpn()
-                }
+                await ClashViewModel.StartVpn()
               } else {
                 await ClashViewModel.StopVpn()
               }

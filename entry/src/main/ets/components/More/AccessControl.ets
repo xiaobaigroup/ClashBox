@@ -270,17 +270,21 @@ export struct AccessControl {
       time: Date.now(),
       isSelected: false
     })
-
-    if (this.appConfig.accessControlMode == 'AcceptSelected') {
-      // 白名单
-      this.modeTabSelectedIndexes.splice(0, 1, 0)
-      this.nameStringData = JSON.parse(this.appConfig.accessControlAcceptList)
-    } else {
-      // 黑名单
-      this.modeTabSelectedIndexes.splice(0, 1, 1)
-      this.nameStringData = JSON.parse(this.appConfig.accessControlRejectList)
+    try {
+      if (this.appConfig.accessControlMode == 'AcceptSelected') {
+        // 白名单
+        this.modeTabSelectedIndexes.splice(0, 1, 0)
+        this.nameStringData = JSON.parse(this.appConfig.accessControlAcceptList ?? "[]")
+      } else {
+        // 黑名单
+        this.modeTabSelectedIndexes.splice(0, 1, 1)
+        this.nameStringData = JSON.parse(this.appConfig.accessControlRejectList ?? "[]")
+      }
+      console.log(`AccessControl #aboutToAppear ${JSON.stringify(this.nameStringData)}`)
+    }catch (e) {
+      e
     }
-    console.log(`AccessControl #aboutToAppear ${JSON.stringify(this.nameStringData)}`)
+
     const selectedPackagesSet = new Set(this.nameStringData)
     this.appListData = this.appListData.map((app): AppInfo => ({
       name: app.name,
