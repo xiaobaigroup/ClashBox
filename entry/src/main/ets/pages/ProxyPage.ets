@@ -1,4 +1,3 @@
-import { BreakpointState, BreakpointSystem } from '../common/breakpoint/breakpointsystem'
 import {
   TAB_CONTENT_TITLE_HEIGHT,
   BIND_SHEET_CONTAINER_HEIGHT,
@@ -125,7 +124,6 @@ struct ProxyPage {
   aboutToAppear(): void {
     hilog.info(0xB000, this.componentName, `#aboutToAppear`)
     this.isShowDelayPop = this.uiConfig.ShowDelayPop
-    BreakpointSystem.getInstance().start()
     /*if (this.currentProfile) {
       let tabIndex = this.theProxyGroups.findIndex((d) => d.name == this.currentProfile?.currentGroupName)
       setTimeout(() => {

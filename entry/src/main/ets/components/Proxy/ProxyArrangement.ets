@@ -1,5 +1,4 @@
 import { BORDER_RADIUS_20, CONTENT_END_OFFSET_150, FONT_SIZE_16, LIST_ITEM_HEIGHT} from '../../common/entity/Constants'
-import { BreakpointState, BreakpointSystem } from '../../common/breakpoint/breakpointsystem'
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import ProxyGroupItem from './ProxyGroupItem'
 import { Profile, ProxyGroup,ProxyType } from 'proxy_core'
@@ -36,7 +35,6 @@ struct ProxyArrangement {
 
   aboutToAppear(): void {
     hilog.info(0xB000, componentName, '#aboutToAppear 组1数组长度： %{public}d', this.theProxyGroups[0].proxies.length )
-    BreakpointSystem.getInstance().start()
     hilog.info(0xFF00, "ProxyPageGroupTag", "#ProxyArrangement#aboutToAppear 当前显示分组%{public}d", this.currentProxyIndex)
     if (this.currentProfile){
       let listIndexes = this.theProxyGroups.findIndex((d) => d.name == this.currentProfile?.currentGroupName)

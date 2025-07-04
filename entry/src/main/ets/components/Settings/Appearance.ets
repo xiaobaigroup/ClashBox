@@ -10,14 +10,14 @@ import {
 import TopBuilder from "./TopBuilder"
 import { curves, SymbolGlyphModifier } from "@kit.ArkUI"
 import { common } from "@kit.AbilityKit"
-import { setAutoColorMode, setDarkColorMode, setLightColorMode } from "../../common/utils/ChangeColorModeUtils"
 import { font_primary, menuRowList, toggleRowList } from "../Common/Common"
 import { UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../common/utils/Animation"
 import { PageMargin } from "../../common/breakpoint/BreakPoint"
-import { Xb_UIConfig } from "xb_components"
+import { Xb_ColorModeManager, Xb_UIConfig } from "xb_components"
 import { Xb_ChangeThemeColor } from "xb_components/src/main/ets/utils/ChangeThemeColorUtil"
 
+const context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
 
 @Component
 struct Appearance {
@@ -66,13 +66,12 @@ struct Appearance {
         ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
           MenuItem({
             content: menuItem.title,
-            symbolEndIcon: this.uiConfig.darkModeIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+            symbolEndIcon: this.uiConfig.darkMode === menuItem.colorMode ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
           })
-          .selected(this.uiConfig.darkModeIndex === index)
           .onChange((selected) => {
             // 持久化深色模式
-            this.uiConfig.darkModeIndex = index
-            this.switchColorMode(index)
+            this.uiConfig.darkMode = menuItem.colorMode!
+            Xb_ColorModeManager.setColorModeByString(context, this.uiConfig.darkMode)
             // UI刷新
             this.EnableDarkModeText = menuItem.title
           })
@@ -91,8 +90,8 @@ struct Appearance {
           .onChange((selected) => {
             this.uiConfig.themeColorIndex = index
             // 持久化主题色
-            this.uiConfig.themeColor = menuItem?.customThemeName ?? 'blueAppTheme'
-            Xb_UIConfig.themeColor = menuItem?.customThemeName ?? 'blueAppTheme'
+            this.uiConfig.themeColor = menuItem?.customThemeName ?? 'yellowAppTheme'
+            Xb_UIConfig.themeColor = menuItem?.customThemeName ?? 'yellowAppTheme'
             Xb_ChangeThemeColor(this.uiConfig.themeColor)
             // UI刷新
             this.EnableThemeColorText = menuItem.title
@@ -157,24 +156,6 @@ struct Appearance {
     }
   }
 
-  // 切换颜色模式
-  switchColorMode(index: number) {
-    switch (index) {
-      case 0:
-        // 跟随系统
-        setAutoColorMode(this.context)
-        break;
-      case 1:
-        // 始终浅色
-        setLightColorMode(this.context)
-        break
-      case 2:
-        // 始终深色
-        setDarkColorMode(this.context)
-        break
-    }
-  }
-
   // 切换按钮位置
   switchButtonPosition(index:number) {
     switch (index) {
@@ -229,7 +210,7 @@ struct Appearance {
     }
     // 初始化深色模式显示文本
     if (this.appearanceList && this.appearanceList[0].children) {
-      this.EnableDarkModeText = this.appearanceList[0].children[this.uiConfig.darkModeIndex].title
+      this.EnableDarkModeText = this.appearanceList[0].children.find(child => child.colorMode === this.uiConfig.darkMode)?.title!
     }
     // 初始化按钮位置显示文本
     if (this.appearanceList && this.appearanceList[2].children) {

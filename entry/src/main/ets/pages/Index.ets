@@ -1,11 +1,10 @@
 // Index
-import { BreakpointSystem, BreakpointState } from '../common/breakpoint/breakpointsystem'
 import { curves, LengthMetrics, promptAction } from '@kit.ArkUI'
 import Home from './HomePage'
 import ProxyPage from './ProxyPage'
 import ConfigurationPage from './ConfigurationPage'
 import MorePage from './MorePage'
-import { hiAppEvent, hilog } from '@kit.PerformanceAnalysisKit'
+import { hilog } from '@kit.PerformanceAnalysisKit'
 import {
   PROXY_STARTED_DURATION_INIT_VALUE,
   ListMoreData,
@@ -25,7 +24,6 @@ import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig, AppFlowingState, AppState, UIConfig } from '../entryability/AppState'
 import { common } from '@kit.AbilityKit'
-import { setAutoColorMode, setDarkColorMode, setLightColorMode } from '../common/utils/ChangeColorModeUtils'
 import { ChangeLanguage } from '../common/utils/ChangeLanguageUtil'
 import { ConfigData, TabBuild } from '../common/entity/PageArgumentEntity'
 import { customAnimationUtil } from '../common/utils/Animation'
@@ -33,7 +31,7 @@ import { DisclaimerCustomDialog, icon_tertiary } from '../components/Common/Comm
 import { PipManager } from '../common/utils/PipManager'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { CrashPage } from '../components/Start/CrashPage'
-import { compareVersions, extractUpdateInfo, getUpdateInfo, UpdateInfo } from '../common/utils/CheckUpdateUtil'
+import { UpdateInfo } from '../common/utils/CheckUpdateUtil'
 import { fileUri, picker } from '@kit.CoreFileKit'
 import { fileIo as fs } from '@kit.CoreFileKit';
 import { number2Time, timestampToDateTime } from '../common/utils/TimeConvertUtil'
@@ -56,7 +54,7 @@ import { TabBarAlignItems,
 import { WindowTopBar } from '../components/Common/TopBar'
 import { ImportConfigFromURL } from '../components/Configuration/ImportConfigFromURL'
 import { Xb_ChangeThemeColor } from 'xb_components/src/main/ets/utils/ChangeThemeColorUtil'
-import { Xb_Global, Xb_UIConfig } from 'xb_components'
+import { Xb_ColorModeManager, Xb_Global, Xb_UIConfig } from 'xb_components'
 import { Xb_GoToWeb } from 'xb_components/src/main/ets/utils/JumpTo'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
@@ -155,10 +153,10 @@ struct Index {
   @State trafficJob: number = 0
   @State
   tabList: TabBuild[] = [
-    { name: $r('app.string.Home'), icon: $r('sys.symbol.house_fill')},
-    { name: $r('app.string.Proxy'), icon: $r('sys.symbol.list_bullet_square_fill')},
-    { name: $r('app.string.Configuration'), icon: $r('sys.symbol.folder_fill')},
-    { name: $r('app.string.More'), icon: $r('sys.symbol.square_fill_grid_2x2')}
+    { name: $r('app.string.Home'), icon: $r('sys.symbol.house_fill') },
+    { name: $r('app.string.Proxy'), icon: $r('sys.symbol.list_bullet_square_fill') },
+    { name: $r('app.string.Configuration'), icon: $r('sys.symbol.folder_fill') },
+    { name: $r('app.string.More'), icon: $r('sys.symbol.square_fill_grid_2x2') }
   ]
 
   /**
@@ -617,7 +615,7 @@ struct Index {
     Xb_ChangeThemeColor(this.uiConfig.themeColor)
     hilog.info(0x1000, componentName, `#aboutToAppear#ThemeControl.setDefaultTheme(${this.uiConfig.themeColor})`)
     // 初始化切换颜色模式(深色模式)
-    this.switchColorMode(this.uiConfig.darkModeIndex)
+    Xb_ColorModeManager.setColorModeByString(context, this.uiConfig.darkMode)
     // 初始化切换按钮位置
     this.switchButtonPosition(this.uiConfig.buttonPositionIndex)
     // 初始化实验功能显示状态
@@ -754,8 +752,6 @@ struct Index {
     hilog.info(0x1000, componentName, `#aboutToDisappear executed`)
     // 纪录软件关闭时间
     this.uiConfig.useTime = new Date().getTime()
-    // 停止监听断点事件，并清空断点对应数据
-    BreakpointSystem.getInstance().stop()
     // 解注册画中画生命周期及状态回调
     PipManager.getInstance().unregisterPipStateChangeListener()
     // 解绑listener中注册的回调函数
@@ -882,27 +878,6 @@ struct Index {
         this.SystemLanguageSubtitle  =  $r('app.string.Language_Subtitle')
       // 超出范围保存为系统返回值
         this.uiConfig.systemLanguage = systemLanguage
-    }
-  }
-
-  /**
-   * 切换颜色模式
-   * @param index 颜色模式序号
-   */
-  switchColorMode(index: number) {
-    switch (index) {
-      case 0:
-        // 跟随系统
-        setAutoColorMode(context)
-        break;
-      case 1:
-        // 始终浅色
-        setLightColorMode(context)
-        break
-      case 2:
-        // 始终深色
-        setDarkColorMode(context)
-        break
     }
   }
 

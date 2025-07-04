@@ -607,6 +607,8 @@ export interface AppearanceListItemProp {
   title: string | Resource
   // 自定义主题的名字
   customThemeName?: CustomThemeName
+  // 颜色模式
+  colorMode?: ThemeColorMode
   // `start`方向上`Symbol`的颜色数组
   startSymbolFontColor?: Array<ResourceColor>
   children?: Array<AppearanceListItemProp>
@@ -617,9 +619,9 @@ export interface AppearanceListItemProp {
 export const AppearanceList: AppearanceListItemProp[] = [
   { title: $r('app.string.dark_mode'),
     children: [
-      { title: $r('app.string.follow_system') },
-      { title: $r('app.string.always_light') },
-      { title: $r('app.string.always_dark') },
+      { title: $r('app.string.follow_system'), colorMode: ThemeColorMode.SYSTEM },
+      { title: $r('app.string.always_light'), colorMode: ThemeColorMode.LIGHT },
+      { title: $r('app.string.always_dark'), colorMode: ThemeColorMode.DARK },
     ]
   },
   { title: $r('app.string.theme_color'),

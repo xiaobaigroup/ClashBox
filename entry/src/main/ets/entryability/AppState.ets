@@ -75,8 +75,8 @@ export class UIConfig{
   lineColor: ResourceColor = "#ff9926"
   // 主题色序号
   themeColorIndex: number = 0
-  // 深色模式序号
-  darkModeIndex: number = 0
+  // 颜色模式
+  darkMode: ThemeColorMode = ThemeColorMode.SYSTEM
   // 按钮位置序号
   buttonPositionIndex: number = 0
   // 动画速度序号
