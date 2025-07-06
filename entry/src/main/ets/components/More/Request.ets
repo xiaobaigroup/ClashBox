@@ -11,7 +11,7 @@ import ClashViewModel from "../../entryability/ClashViewModel"
 import { ConnectionInfo } from "proxy_core"
 import { getRequestText, getSourceText, getTheSourceText } from "./Connect"
 import { ConnectItemDataSource } from "../../common/datasources/ConnectData"
-import { PageMargin } from "../../common/breakpoint/BreakPoint"
+import { NeedClearMoreStack, PageMargin } from "../../common/breakpoint/BreakPoint"
 
 
 @Component
@@ -216,7 +216,9 @@ struct RequestPage {
         this.searchText = ''
         return true
       }
-      this.pageInfos.clear()
+      if (NeedClearMoreStack(this.widthBp, this.heightBp)) {
+        this.pageInfos.clear()
+      }
       this.isSecondary = false
       return true;
     })

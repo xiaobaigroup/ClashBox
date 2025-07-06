@@ -8,7 +8,7 @@ import { ClashConfig } from "proxy_core"
 import { curves } from "@kit.ArkUI"
 import { customAnimationUtil } from "../../../common/utils/Animation"
 import OverwriteTop from "./OverwriteTopBuilder"
-import { PageMargin } from "../../../common/breakpoint/BreakPoint"
+import { NeedClearMoreStack, PageMargin } from "../../../common/breakpoint/BreakPoint"
 
 @Component
 struct Overwrite {
@@ -147,7 +147,9 @@ struct Overwrite {
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
       if(this.pageInfos.size() === 1) {
-        this.pageInfos.clear()
+        if (NeedClearMoreStack(this.widthBp, this.heightBp)) {
+          this.pageInfos.clear()
+        }
         this.isSecondary = false
       } else {
         this.pageInfos.pop(true)

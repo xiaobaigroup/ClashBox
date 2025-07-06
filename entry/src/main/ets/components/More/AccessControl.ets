@@ -333,7 +333,7 @@ export struct AccessControl {
         onCheck: () => {
           console.log(`AccessControl 点击 #deleteApp ${id}`)
           // 删除列表行
-          this.deleteApp(id)
+          this.deleteApp(id, item)
         }
       })
     }

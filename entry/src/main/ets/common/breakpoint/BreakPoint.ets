@@ -328,10 +328,18 @@ export const NavigationListPadding = BreakpointFunction2D<number>({
   ['xl']: {['hsm']: 36, ['hmd']: 36, ['hlg']: 36},
 })
 
-/**路由主页列表内边距*/
+/**内容外边距*/
 export const TabContentTitleMargin = BreakpointFunction2D<number>({
   ['sm']: {['hsm']: 13, ['hmd']: 13, ['hlg']: 13},
   ['md']: {['hsm']: 28, ['hmd']: 28, ['hlg']: 28},
   ['lg']: {['hsm']: 36, ['hmd']: 36, ['hlg']: 36},
   ['xl']: {['hsm']: 36, ['hmd']: 36, ['hlg']: 36},
+})
+
+/**更多页是否清空路由*/
+export const NeedClearMoreStack = BreakpointFunction2D<boolean>({
+  ['sm']: {['hsm']: true, ['hmd']: true, ['hlg']: true},
+  ['md']: {['hsm']: false, ['hmd']: false, ['hlg']: false},
+  ['lg']: {['hsm']: false, ['hmd']: false, ['hlg']: false},
+  ['xl']: {['hsm']: false, ['hmd']: false, ['hlg']: false},
 })

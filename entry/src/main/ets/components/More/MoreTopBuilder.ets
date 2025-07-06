@@ -4,7 +4,7 @@ import { UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../common/utils/Animation"
 import { SymbolGlyphModifier } from "@kit.ArkUI"
 import { ButtonBuilder, icon_primary } from '../Common/Common'
-import { PageMargin, WindowModeMoreTitleFontSize } from "../../common/breakpoint/BreakPoint"
+import { NeedClearMoreStack, PageMargin, WindowModeMoreTitleFontSize } from "../../common/breakpoint/BreakPoint"
 
 /**
  * 更多页顶部导航栏
@@ -72,22 +72,25 @@ export struct MoreTop {
           this.isSearching = false
         })
       } else {
-        // 返回图标
-        Button({ type: ButtonType.Circle, stateEffect: true }) {
-          SymbolGlyph($r('sys.symbol.chevron_left'))
-            .fontSize(28)
-            .fontColor([icon_primary])
-        }
-        .transition(customAnimationUtil.isSlide(200, this.uiConfig))
-        .width(40)
-        .height(40)
-        .backgroundColor($r('app.color.settings_container_background'))
-        .onClick(() => {
-          this.pageInfos.pop(true)
-          if (this.pageInfos.size() <= 1) {
-            this.isSecondary = false
+        if (NeedClearMoreStack(this.widthBp, this.heightBp)) {
+          // 返回图标
+          Button({ type: ButtonType.Circle, stateEffect: true }) {
+            SymbolGlyph($r('sys.symbol.chevron_left'))
+              .fontSize(28)
+              .fontColor([icon_primary])
           }
-        })
+          .transition(customAnimationUtil.isSlide(200, this.uiConfig))
+          .width(40)
+          .height(40)
+          .backgroundColor($r('app.color.settings_container_background'))
+          .onClick(() => {
+            this.pageInfos.pop(true)
+            if (this.pageInfos.size() <= 1) {
+              this.isSecondary = false
+            }
+          })
+        }
+
         Column() {
           Text(this.title)
             .fontSize(WindowModeMoreTitleFontSize(this.widthBp, this.heightBp))

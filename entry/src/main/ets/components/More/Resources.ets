@@ -13,7 +13,7 @@ import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { EventHub, EventKey } from "../../common/EventHub"
 import { customAnimationUtil, isON } from "../../common/utils/Animation"
 import { i18n } from "@kit.LocalizationKit"
-import { PageMargin } from "../../common/breakpoint/BreakPoint"
+import { NeedClearMoreStack, PageMargin } from "../../common/breakpoint/BreakPoint"
 import { icon_primary } from "../Common/Common"
 
 // 资源数据（假设）
@@ -245,6 +245,7 @@ struct Resources {
     this.uiConfig.resourcesData = JSON.stringify(this.resourceListData)
   }
 
+
   build() {
     NavDestination() {
       Stack() {
@@ -412,7 +413,9 @@ struct Resources {
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
-      this.pageInfos.clear()
+      if (NeedClearMoreStack(this.widthBp, this.heightBp)) {
+        this.pageInfos.clear()
+      }
       this.isSecondary = false
       return true;
     })

@@ -10,7 +10,7 @@ import { curves, promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../common/utils/Animation"
-import { PageMargin } from "../../common/breakpoint/BreakPoint"
+import { NeedClearMoreStack, PageMargin } from "../../common/breakpoint/BreakPoint"
 
 /**
  *
@@ -244,7 +244,9 @@ struct Diversion {
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
-      this.pageInfos.clear();
+      if (NeedClearMoreStack(this.widthBp, this.heightBp)) {
+        this.pageInfos.clear()
+      }
       this.isSecondary = false
       return true;
     })

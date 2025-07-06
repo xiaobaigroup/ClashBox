@@ -11,7 +11,7 @@ import { BORDER_RADIUS_20, CONTENT_END_OFFSET_150, LogData,
 import { customAnimationUtil } from "../../common/utils/Animation"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { universalSearch } from "../../common/utils/SmartSearchUtil"
-import { PageMargin } from "../../common/breakpoint/BreakPoint"
+import { NeedClearMoreStack, PageMargin } from "../../common/breakpoint/BreakPoint"
 
 @Component
 struct Log {
@@ -164,7 +164,9 @@ struct Log {
         this.searchText = ''
         return true
       }
-      this.pageInfos.clear()
+      if (NeedClearMoreStack(this.widthBp, this.heightBp)) {
+        this.pageInfos.clear()
+      }
       this.isSecondary = false
       return true
     })

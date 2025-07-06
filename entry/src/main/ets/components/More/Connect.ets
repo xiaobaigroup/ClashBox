@@ -11,7 +11,7 @@ import { ConnectionInfo, Metadata } from "proxy_core"
 import { customAnimationUtil } from "../../common/utils/Animation"
 import { ConnectItemDataSource } from "../../common/datasources/ConnectData"
 import { hilog } from "@kit.PerformanceAnalysisKit"
-import { PageMargin } from "../../common/breakpoint/BreakPoint"
+import { NeedClearMoreStack, PageMargin } from "../../common/breakpoint/BreakPoint"
 
 
 export function  getRequestText(metadata: Metadata ) {
@@ -275,7 +275,9 @@ struct Connect {
         this.searchText = ''
         return true
       }
-      this.pageInfos.clear();
+      if (NeedClearMoreStack(this.widthBp, this.heightBp)) {
+        this.pageInfos.clear()
+      }
       this.isSecondary = false
       return true;
     })
