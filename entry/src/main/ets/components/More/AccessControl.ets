@@ -22,6 +22,7 @@ export struct AccessControl {
   // 是否进入二级界面
   @Consume isSecondary: boolean
   @State isNewApp: boolean = true
+  @State currentIndex: number = 0
   @State isShowSheet: boolean = false
   @State isDeleteing: boolean = false
   @State appListData: AppInfo[] = []
@@ -143,16 +144,16 @@ export struct AccessControl {
               .checkboxShape(CheckBoxShape.CIRCLE)
               .selectedColor(this.icon_emphasize)
               .onChange((itemName: CheckboxGroupResult) => {
-                console.info("AccessControl checkbox group content" + JSON.stringify(itemName))
+                console.info("AccessControl CheckBoxGroup#onChange checkbox group content" + JSON.stringify(itemName))
                 this.nameStringData = itemName.name
                 if (this.appConfig.accessControlMode == 'AcceptSelected') {
                   // 白名单
                   this.appConfig.accessControlAcceptList = JSON.stringify(itemName.name)
-                  console.info("AccessControl  this.appConfig.accessControlAcceptList: " +  this.appConfig.accessControlAcceptList)
+                  console.info("AccessControl CheckBoxGroup#onChange this.appConfig.accessControlAcceptList: " +  this.appConfig.accessControlAcceptList)
                 } else {
                   // 黑名单
                   this.appConfig.accessControlRejectList = JSON.stringify(itemName.name)
-                  console.info("AccessControl this.appConfig.accessControlRejectList: " + this.appConfig.accessControlRejectList)
+                  console.info("AccessControl CheckBoxGroup#onChange this.appConfig.accessControlRejectList: " + this.appConfig.accessControlRejectList)
                 }
               })
           }.width('100%')
@@ -202,18 +203,20 @@ export struct AccessControl {
                 })
                 .onMouse((event) => {
                   if (event.action == MouseAction.Press && event.button == MouseButton.Right) {
+                    this.currentIndex = index
                     this.openDialog(item)
                   }
                 })
                 .gesture(LongPressGesture()
                   .onAction(() => {
+                    this.currentIndex = index
                     this.openDialog(item)
                   }))
               })
             }
             .width('100%')
             .height('100%')
-            .contentEndOffset(66)
+            .contentEndOffset(195)
             .chainAnimation(true)
             .edgeEffect(EdgeEffect.Spring)
             .nestedScroll({
@@ -284,24 +287,35 @@ export struct AccessControl {
       confirm: (value) => {
         // 关闭背景模糊
         this.isEnableIndexForegroundBlur = false
-        // console.log(`AccessControl kvCustomdialog 当前value: ${JSON.stringify(value)}`)
+        console.log(`AccessControl kvCustomdialog 当前value: ${JSON.stringify(value)}`)
         const indexes = this.appListData.findIndex((d) => d.name == value.key)
-        // console.log(`AccessControl kvCustomdialog 当前序号: ${indexes}`)
-        if (indexes > -1) {
-          if (!this.isNewApp) {
-            this.appListData[indexes].package_name = value.value as string
-            this.appListData = [... this.appListData]
+        console.log(`AccessControl kvCustomdialog 当前indexes序号: ${indexes} 当前currentIndex序号: ${this.currentIndex}`)
+        if (this.isNewApp) {
+          console.log(`AccessControl kvCustomdialog 窗口为新增`)
+          // 应用为新增
+          if (indexes === -1) {
+            // 应用名称不存在
+            const param: AppInfo = {
+              name: value.key,
+              package_name: value.value as string,
+              time: Date.now(),
+              isSelected: false
+            }
+            this.appListData.push(param)
+            // 添加后保存数据
+            this.appConfig.accessControlAppInfo = JSON.stringify(this.appListData)
           } else {
+            // 应用名称存在
             promptAction.showToast({ message: $r('app.string.app_already_exist') })
           }
+
         } else {
-          const param: AppInfo = {
-            name: value.key,
-            package_name: value.value as string,
-            time: Date.now(),
-            isSelected: false
-          }
-          this.appListData.splice(indexes, 1, param)
+          console.log(`AccessControl kvCustomdialog 窗口为非新增`)
+          // 应用非新增
+          let data = this.appListData[this.currentIndex]
+          data.name = value.key
+          data.package_name = value.value as string
+          this.appListData.splice(this.currentIndex, 1, data)
           // 添加后保存数据
           this.appConfig.accessControlAppInfo = JSON.stringify(this.appListData)
         }
@@ -380,7 +394,7 @@ export struct AccessControl {
   }
 
   aboutToAppear(): void {
- /*   this.appListData.push(
+   /* this.appListData.push(
       {
       name: '哔哩哔哩',
       package_name: 'yylx.danmaku.bili',
