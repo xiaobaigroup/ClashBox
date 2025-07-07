@@ -149,12 +149,16 @@ struct Overwrite {
       if(this.pageInfos.size() === 1) {
         if (NeedClearMoreStack(this.widthBp, this.heightBp)) {
           this.pageInfos.clear()
+          this.isSecondary = false
+          return false
+        } else {
+          return false
         }
-        this.isSecondary = false
       } else {
         this.pageInfos.pop(true)
+        return false
       }
-      return true
+
     })
   }
 }

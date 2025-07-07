@@ -218,9 +218,11 @@ struct RequestPage {
       }
       if (NeedClearMoreStack(this.widthBp, this.heightBp)) {
         this.pageInfos.clear()
+        this.isSecondary = false
+        return false
+      } else {
+        return false
       }
-      this.isSecondary = false
-      return true;
     })
   }
 }

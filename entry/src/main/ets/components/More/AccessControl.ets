@@ -2,9 +2,9 @@ import { MoreTop } from "./MoreTopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { universalSearch } from "../../common/utils/SmartSearchUtil"
 import { ButtonBuilder, checkoutRowListItem, font_primary, KVCustomDialog, toggleRowList } from "../Common/Common"
-import { PageMargin } from "../../common/breakpoint/BreakPoint"
+import { NeedClearMoreStack, PageMargin } from "../../common/breakpoint/BreakPoint"
 import { TAB_CONTENT_TITLE_HEIGHT } from "../../common/entity/Constants"
-import { AppConfig } from "../../entryability/AppState"
+import { AppConfig, UIConfig } from "../../entryability/AppState"
 import { ItemRestriction,promptAction, SegmentButton, SegmentButtonOptions, SegmentButtonTextItem } from "@kit.ArkUI"
 import { KeyValueData } from "./Overwrite/EditArrayConfig"
 import { getResourceString } from "../../common/utils/ResourceStringUtil"
@@ -15,6 +15,8 @@ import { Xb_CapsuleButton, Xb_CircleButton, Xb_GetResourceString } from "xb_comp
 @Component
 export struct AccessControl {
 
+  // page内顶部标题偏移量
+  @Consume curYOffset: number
   @Consume needSearch: boolean
   // 是否进入二级界面
   @Consume isSecondary: boolean
@@ -31,6 +33,7 @@ export struct AccessControl {
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State keyValueData: KeyValueData = new KeyValueData("")
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
@@ -59,7 +62,7 @@ export struct AccessControl {
 
   build() {
     NavDestination() {
-      Column({ space: 10 }) {
+      Stack({ alignContent: Alignment.TopStart }) {
         MoreTop({
           title: $r('app.string.access_control'),
           name: 'AccessControl',
@@ -70,141 +73,154 @@ export struct AccessControl {
           },
           icon2: $r('sys.symbol.dot_grid_2x2'),
         })
-
-        Blank().height(TAB_CONTENT_TITLE_HEIGHT)
-
-        toggleRowList({
-          title: $r('app.string.app_access_control'),
-          subtitle: $r('app.string.access_control_tips'),
-          toggle: () => { this.controlBuilder() }
-        })
-          .margin({ right: PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp) })
-          .onClick(() => {
-            this.appConfig.accessControl = !this.appConfig.accessControl
+        // 控制区
+        Column({ space: 10}) {
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT - 12)
+          // 访问控制开关
+          toggleRowList({
+            title: $r('app.string.app_access_control'),
+            subtitle: $r('app.string.access_control_tips'),
+            toggle: () => { this.controlBuilder() }
           })
-
-        Row({ space: 10}) {
-          Column() {
-            Text(`${Xb_GetResourceString($r('app.string.selected'), this)} ${this.nameStringData.length}`)
-            Text(this.isDeleteing ? `${Xb_GetResourceString($r('app.string.Edit'), this)}${Xb_GetResourceString($r('app.string.mode'), this)}`
-              : this.appConfig.accessControlMode != 'AcceptSelected' ? $r('app.string.white_list_tips') : $r('app.string.blacklist_tips'))
-          }
-          .alignItems(HorizontalAlign.Start)
-          if (this.isDeleteing) {
-            Xb_CapsuleButton({
-              icon: undefined,
-              fontSize: 16,
-              iconColor: font_primary,
-              text: $r('app.string.exit'),
-              theBackgroundColor: $r('app.color.settings_container_background'),
-              onCheck: () => {
-                this.isDeleteing = false
-                // this.cancelSelected()
-                this.loadAppsInfo()
-              }
+            .margin({ right: PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp) })
+            .onClick(() => {
+              this.appConfig.accessControl = !this.appConfig.accessControl
             })
-          }
-          Blank()
-          if (this.appConfig.accessControl) {
-            ButtonBuilder({
-              icon: $r('sys.symbol.plus'),
-              onCheck: () => {
-                this.kvDialogTitle = getResourceString($r('app.string.add_app'), this)
-                this.kvDialogController.open()
-              }
-            })
-              .enabled(this.appConfig.accessControl)
-            if (this.appListData.length != 0) {
-              ButtonBuilder({
-                icon: this.isDeleteing ? $r('sys.symbol.trash_fill') : $r('sys.symbol.square_and_pencil'),
+          // 显示栏
+          Row({ space: 10}) {
+            Column() {
+              Text(`${Xb_GetResourceString($r('app.string.selected'), this)} ${this.nameStringData.length}`)
+              Text(this.isDeleteing ? `${Xb_GetResourceString($r('app.string.Edit'), this)}${Xb_GetResourceString($r('app.string.mode'), this)}`
+                : this.appConfig.accessControlMode != 'AcceptSelected' ? $r('app.string.white_list_tips') : $r('app.string.blacklist_tips'))
+            }
+            .alignItems(HorizontalAlign.Start)
+            if (this.isDeleteing) {
+              Xb_CapsuleButton({
+                icon: undefined,
+                fontSize: 16,
+                iconColor: font_primary,
+                text: $r('app.string.exit'),
+                theBackgroundColor: $r('app.color.settings_container_background'),
                 onCheck: () => {
-                  if (this.isDeleteing) {
-                    this.deleteApp()
-                  } else {
-                    this.isDeleteing = true
-                    this.cancelSelected()
-                  }
+                  this.isDeleteing = false
+                  // this.cancelSelected()
+                  this.loadAppsInfo()
+                }
+              })
+            }
+            Blank()
+            if (this.appConfig.accessControl) {
+              ButtonBuilder({
+                icon: $r('sys.symbol.plus'),
+                onCheck: () => {
+                  this.kvDialogTitle = getResourceString($r('app.string.add_app'), this)
+                  this.kvDialogController.open()
                 }
               })
                 .enabled(this.appConfig.accessControl)
-            }
-          }
-          CheckboxGroup({ group: 'App' })
-            .enabled(this.appConfig.accessControl)
-            .checkboxShape(CheckBoxShape.CIRCLE)
-            .selectedColor(this.icon_emphasize)
-            .onChange((itemName: CheckboxGroupResult) => {
-              console.info("AccessControl checkbox group content" + JSON.stringify(itemName))
-              this.nameStringData = itemName.name
-              if (this.appConfig.accessControlMode == 'AcceptSelected') {
-                // 白名单
-                this.appConfig.accessControlAcceptList = JSON.stringify(itemName.name)
-                console.info("AccessControl  this.appConfig.accessControlAcceptList: " +  this.appConfig.accessControlAcceptList)
-              } else {
-                // 黑名单
-                this.appConfig.accessControlRejectList = JSON.stringify(itemName.name)
-                console.info("AccessControl this.appConfig.accessControlRejectList: " + this.appConfig.accessControlRejectList)
+              if (this.appListData.length != 0) {
+                ButtonBuilder({
+                  icon: this.isDeleteing ? $r('sys.symbol.trash_fill') : $r('sys.symbol.square_and_pencil'),
+                  onCheck: () => {
+                    if (this.isDeleteing) {
+                      this.deleteApp()
+                    } else {
+                      this.isDeleteing = true
+                      this.cancelSelected()
+                    }
+                  }
+                })
+                  .enabled(this.appConfig.accessControl)
               }
-            })
-        }.width('100%')
-        .padding({ right: PageMargin(this.widthBp, this.heightBp) + 12, left: PageMargin(this.widthBp, this.heightBp) + 12 })
-
-        List({space: 8}) {
-          ForEach(this.appListData, (item: AppInfo, index) => {
-            ListItem() {
-              checkoutRowListItem({
-                title: item.name,
-                subtitle: item.package_name,
-                isSelected: item.isSelected,
-                enabledClick: this.appConfig.accessControl
+            }
+            CheckboxGroup({ group: 'App' })
+              .enabled(this.appConfig.accessControl)
+              .checkboxShape(CheckBoxShape.CIRCLE)
+              .selectedColor(this.icon_emphasize)
+              .onChange((itemName: CheckboxGroupResult) => {
+                console.info("AccessControl checkbox group content" + JSON.stringify(itemName))
+                this.nameStringData = itemName.name
+                if (this.appConfig.accessControlMode == 'AcceptSelected') {
+                  // 白名单
+                  this.appConfig.accessControlAcceptList = JSON.stringify(itemName.name)
+                  console.info("AccessControl  this.appConfig.accessControlAcceptList: " +  this.appConfig.accessControlAcceptList)
+                } else {
+                  // 黑名单
+                  this.appConfig.accessControlRejectList = JSON.stringify(itemName.name)
+                  console.info("AccessControl this.appConfig.accessControlRejectList: " + this.appConfig.accessControlRejectList)
+                }
               })
-            }
-            .swipeAction({
-              end: {
-                builder: () => { this.swipeActionEnd(index, item) },
-                // 侧滑到一定距离会触发 onAction
-                // onAction: () => {
-                //   animateTo({ duration: 1000 }, () => {
-                //     // 侧滑删除
-                //     this.deleteApp(index)
-                //   })
-                // },
-                // onAction 侧滑距离
-                actionAreaDistance: 56,
-              },
-              edgeEffect: SwipeEdgeEffect.None
-            })
-            .enabled(this.appConfig.accessControl)
-            .onClick(() => {
-              const itemData = this.appListData[index]
-              itemData.isSelected = !itemData.isSelected
-              this.appListData.splice(index, 1, itemData)
-            })
-            .onMouse((event) => {
-              if (event.action == MouseAction.Press && event.button == MouseButton.Right) {
-                this.openDialog(item)
+          }.width('100%')
+          .padding({ right: PageMargin(this.widthBp, this.heightBp) + 12, left: PageMargin(this.widthBp, this.heightBp) + 12 })
+        }
+        .hitTestBehavior(HitTestMode.Transparent)
+        .zIndex(2)
+        // .width('100%')
+        // .height('100%')
+        // 应用列表
+        Column() {
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT + 112)
+          List({space: 8}) {
+            ForEach(this.appListData, (item: AppInfo, index) => {
+              ListItem() {
+                checkoutRowListItem({
+                  title: item.name,
+                  subtitle: item.package_name,
+                  isSelected: item.isSelected,
+                  enabledClick: this.appConfig.accessControl
+                })
               }
+              .swipeAction({
+                end: {
+                  builder: () => { this.swipeActionEnd(index, item) },
+                  // 侧滑到一定距离会触发 onAction
+                  // onAction: () => {
+                  //   animateTo({ duration: 1000 }, () => {
+                  //     // 侧滑删除
+                  //     this.deleteApp(index)
+                  //   })
+                  // },
+                  // onAction 侧滑距离
+                  actionAreaDistance: 56,
+                },
+                edgeEffect: SwipeEdgeEffect.None
+              })
+              .enabled(this.appConfig.accessControl)
+              .onClick(() => {
+                const itemData = this.appListData[index]
+                itemData.isSelected = !itemData.isSelected
+                this.appListData.splice(index, 1, itemData)
+              })
+              .onMouse((event) => {
+                if (event.action == MouseAction.Press && event.button == MouseButton.Right) {
+                  this.openDialog(item)
+                }
+              })
+              .gesture(LongPressGesture()
+                .onAction(() => {
+                  this.openDialog(item)
+                }))
             })
-            .gesture(LongPressGesture()
-              .onAction(() => {
-                this.openDialog(item)
-              }))
+          }
+          .width('100%')
+          .layoutWeight(1)
+          .contentEndOffset(66)
+          .padding({ right: PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp) })
+          .bindSheet($$this.isShowSheet, this.SheetBuilder(), {
+            detents: [SheetSize.MEDIUM],
+            dragBar: false,
+            backgroundColor: $r('app.color.background'),
+            keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
+            scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+            preferType: SheetType.CENTER,
+            onWillDismiss: () => {
+              this.isShowSheet = false
+              this.isEnableIndexForegroundBlur = false
+            }
           })
         }
-        .padding({ right: PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp) })
-        .bindSheet($$this.isShowSheet, this.SheetBuilder(), {
-          detents: [SheetSize.MEDIUM],
-          dragBar: false,
-          backgroundColor: $r('app.color.background'),
-          keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
-          scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-          preferType: SheetType.CENTER,
-          onWillDismiss: () => {
-            this.isShowSheet = false
-            this.isEnableIndexForegroundBlur = false
-
-          }
-        })
+        // .width('100%')
+        // .height('100%')
       }
       .width('100%')
       .height('100%')
@@ -231,9 +247,13 @@ export struct AccessControl {
         this.loadAppsInfo()
         return true
       }
-      this.pageInfos.clear()
-      this.isSecondary = false
-      return true
+      if (NeedClearMoreStack(this.widthBp, this.heightBp)) {
+        this.pageInfos.clear()
+        this.isSecondary = false
+        return false
+      } else {
+        return false
+      }
     })
 
   }
@@ -342,20 +362,75 @@ export struct AccessControl {
     .justifyContent(FlexAlign.SpaceEvenly)
   }
 
-
   aboutToAppear(): void {
-    // this.appListData.push({
-    //   name: '哔哩哔哩',
-    //   package_name: 'yylx.danmaku.bili',
-    //   time: Date.now(),
-    //   isSelected: false
-    // },
-    //   {
-    //   name: '浏览器',
-    //   package_name: 'com.huawei.hmos.browser',
-    //   time: Date.now(),
-    //   isSelected: false
-    // })
+ /*   this.appListData.push(
+      {
+      name: '哔哩哔哩',
+      package_name: 'yylx.danmaku.bili',
+      time: Date.now(),
+      isSelected: false
+      },
+      {
+      name: '浏览器',
+      package_name: 'com.huawei.hmos.browser',
+      time: Date.now(),
+      isSelected: false
+    },
+      {
+        name: '1浏览器',
+        package_name: 'com.huawei.hmos.browser',
+        time: Date.now(),
+        isSelected: false
+      },
+      {
+        name: '浏览1器',
+        package_name: 'com.huawei.hmos.browser',
+        time: Date.now(),
+        isSelected: false
+      },
+      {
+        name: '浏览器8',
+        package_name: 'com.huawei.hmos.browser',
+        time: Date.now(),
+        isSelected: false
+      },
+      {
+        name: '浏览器8',
+        package_name: 'com.huawei.hmos.browser',
+        time: Date.now(),
+        isSelected: false
+      },
+      {
+        name: '浏览器8',
+        package_name: 'com.huawei.hmos.browser',
+        time: Date.now(),
+        isSelected: false
+      },
+      {
+        name: '浏览器8',
+        package_name: 'com.huawei.hmos.browser',
+        time: Date.now(),
+        isSelected: false
+      },
+      {
+        name: '浏览器8',
+        package_name: 'com.huawei.hmos.browser',
+        time: Date.now(),
+        isSelected: false
+      },
+      {
+        name: '浏览器8',
+        package_name: 'com.huawei.hmos.browser',
+        time: Date.now(),
+        isSelected: false
+      },
+      {
+        name: '浏览器8',
+        package_name: 'com.huawei.hmos.browser',
+        time: Date.now(),
+        isSelected: false
+      }
+    )*/
     console.info("AccessControl #aboutToAppear this.appConfig.accessControlRejectList: " + this.appConfig.accessControlRejectList)
     this.loadAppsInfo()
     this.sortTabSelectedIndexes.splice(0, 1, this.appConfig.accessControlSort == 'name' ? 0 : 1)
