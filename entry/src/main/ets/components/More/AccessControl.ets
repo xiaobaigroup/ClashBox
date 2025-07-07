@@ -321,6 +321,7 @@ export struct AccessControl {
         }
         // 保存后重置数据
         this.keyValueData = new KeyValueData("")
+        this.isNewApp = true
       },
       cancel: ()=> {
         // 关闭背景模糊
