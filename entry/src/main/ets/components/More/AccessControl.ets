@@ -10,6 +10,7 @@ import { KeyValueData } from "./Overwrite/EditArrayConfig"
 import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { intl } from "@kit.LocalizationKit"
 import { Xb_CapsuleButton, Xb_CircleButton, Xb_GetResourceString } from "xb_components"
+import { customAnimationUtil } from "../../common/utils/Animation"
 
 
 @Component
@@ -75,7 +76,7 @@ export struct AccessControl {
         })
         // 控制区
         Column({ space: 10}) {
-          Blank().height(TAB_CONTENT_TITLE_HEIGHT - 12)
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT - (this.uiConfig.stringDisplayIndex === 0 ? 12 : 6))
           // 访问控制开关
           toggleRowList({
             title: $r('app.string.app_access_control'),
@@ -83,6 +84,7 @@ export struct AccessControl {
             toggle: () => { this.controlBuilder() }
           })
             .margin({ right: PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp) })
+            .transition(customAnimationUtil.isScaleTran(0, this.uiConfig))
             .onClick(() => {
               this.appConfig.accessControl = !this.appConfig.accessControl
             })
@@ -92,7 +94,10 @@ export struct AccessControl {
               Text(`${Xb_GetResourceString($r('app.string.selected'), this)} ${this.nameStringData.length}`)
               Text(this.isDeleteing ? `${Xb_GetResourceString($r('app.string.Edit'), this)}${Xb_GetResourceString($r('app.string.mode'), this)}`
                 : this.appConfig.accessControlMode != 'AcceptSelected' ? $r('app.string.white_list_tips') : $r('app.string.blacklist_tips'))
+                .maxLines(this.uiConfig.stringDisplayIndex === 0 ? 1 : 2)
+                .textOverflow({ overflow: this.uiConfig.stringDisplayIndex === 0 ? TextOverflow.Ellipsis : TextOverflow.Clip })
             }
+            .width('56%')
             .alignItems(HorizontalAlign.Start)
             if (this.isDeleteing) {
               Xb_CapsuleButton({
@@ -151,73 +156,85 @@ export struct AccessControl {
                 }
               })
           }.width('100%')
+          .backgroundColor($r('app.color.background'))
+          .transition(customAnimationUtil.isScaleTran(1, this.uiConfig))
           .padding({ right: PageMargin(this.widthBp, this.heightBp) + 12, left: PageMargin(this.widthBp, this.heightBp) + 12 })
         }
         .hitTestBehavior(HitTestMode.Transparent)
+        .width('100%')
         .zIndex(2)
-        // .width('100%')
         // .height('100%')
         // 应用列表
         Column() {
-          Blank().height(TAB_CONTENT_TITLE_HEIGHT + 112)
-          List({space: 8}) {
-            ForEach(this.appListData, (item: AppInfo, index) => {
-              ListItem() {
-                checkoutRowListItem({
-                  title: item.name,
-                  subtitle: item.package_name,
-                  isSelected: item.isSelected,
-                  enabledClick: this.appConfig.accessControl
-                })
-              }
-              .swipeAction({
-                end: {
-                  builder: () => { this.swipeActionEnd(index, item) },
-                  // 侧滑到一定距离会触发 onAction
-                  // onAction: () => {
-                  //   animateTo({ duration: 1000 }, () => {
-                  //     // 侧滑删除
-                  //     this.deleteApp(index)
-                  //   })
-                  // },
-                  // onAction 侧滑距离
-                  actionAreaDistance: 56,
-                },
-                edgeEffect: SwipeEdgeEffect.None
-              })
-              .enabled(this.appConfig.accessControl)
-              .onClick(() => {
-                const itemData = this.appListData[index]
-                itemData.isSelected = !itemData.isSelected
-                this.appListData.splice(index, 1, itemData)
-              })
-              .onMouse((event) => {
-                if (event.action == MouseAction.Press && event.button == MouseButton.Right) {
-                  this.openDialog(item)
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT + (this.uiConfig.stringDisplayIndex === 0 ? 112 : 139))
+          Scroll() {
+            List({space: 8}) {
+              ForEach(this.appListData, (item: AppInfo, index) => {
+                ListItem() {
+                  checkoutRowListItem({
+                    title: item.name,
+                    subtitle: item.package_name,
+                    isSelected: item.isSelected,
+                    enabledClick: this.appConfig.accessControl
+                  })
                 }
+                .swipeAction({
+                  end: {
+                    builder: () => { this.swipeActionEnd(index, item) },
+                    // 侧滑到一定距离会触发 onAction
+                    // onAction: () => {
+                    //   animateTo({ duration: 1000 }, () => {
+                    //     // 侧滑删除
+                    //     this.deleteApp(index)
+                    //   })
+                    // },
+                    // onAction 侧滑距离
+                    actionAreaDistance: 56,
+                  },
+                  edgeEffect: SwipeEdgeEffect.None
+                })
+                .enabled(this.appConfig.accessControl)
+                .transition(customAnimationUtil.isScaleTran(index + 2, this.uiConfig))
+                .onClick(() => {
+                  const itemData = this.appListData[index]
+                  itemData.isSelected = !itemData.isSelected
+                  this.appListData.splice(index, 1, itemData)
+                })
+                .onMouse((event) => {
+                  if (event.action == MouseAction.Press && event.button == MouseButton.Right) {
+                    this.openDialog(item)
+                  }
+                })
+                .gesture(LongPressGesture()
+                  .onAction(() => {
+                    this.openDialog(item)
+                  }))
               })
-              .gesture(LongPressGesture()
-                .onAction(() => {
-                  this.openDialog(item)
-                }))
+            }
+            .width('100%')
+            .height('100%')
+            .contentEndOffset(66)
+            .chainAnimation(true)
+            .edgeEffect(EdgeEffect.Spring)
+            .nestedScroll({
+              scrollForward: NestedScrollMode.PARENT_FIRST,
+              scrollBackward: NestedScrollMode.SELF_FIRST
+            })
+            .padding({ right: PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp) })
+            .bindSheet($$this.isShowSheet, this.SheetBuilder(), {
+              detents: [SheetSize.MEDIUM],
+              dragBar: false,
+              backgroundColor: $r('app.color.background'),
+              keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
+              scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+              preferType: SheetType.CENTER,
+              onWillDismiss: () => {
+                this.isShowSheet = false
+                this.isEnableIndexForegroundBlur = false
+              }
             })
           }
-          .width('100%')
-          .layoutWeight(1)
-          .contentEndOffset(66)
-          .padding({ right: PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp) })
-          .bindSheet($$this.isShowSheet, this.SheetBuilder(), {
-            detents: [SheetSize.MEDIUM],
-            dragBar: false,
-            backgroundColor: $r('app.color.background'),
-            keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
-            scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-            preferType: SheetType.CENTER,
-            onWillDismiss: () => {
-              this.isShowSheet = false
-              this.isEnableIndexForegroundBlur = false
-            }
-          })
+          .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring : null)
         }
         // .width('100%')
         // .height('100%')
@@ -284,7 +301,7 @@ export struct AccessControl {
             time: Date.now(),
             isSelected: false
           }
-          this.appListData = [...this.appListData, param]
+          this.appListData.splice(indexes, 1, param)
           // 添加后保存数据
           this.appConfig.accessControlAppInfo = JSON.stringify(this.appListData)
         }
