@@ -7,6 +7,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { convertDataArray, ConvertedUnit } from '../../common/utils/DataUnitConvertUtils';
 import { customAnimationUtil } from '../../common/utils/Animation';
 import { HomeCardPadding, HomeCardSpeedFontSize } from '../../common/breakpoint/BreakPoint';
+import { LengthMetrics } from '@kit.ArkUI';
 
 
 @Component
@@ -98,11 +99,21 @@ struct Speed {
 
   build() {
     Column() {
-      Flex() {
+      Flex({
+        direction: FlexDirection.Row,
+        justifyContent: FlexAlign.SpaceBetween
+      }) {
         CardTitle({title: $r('app.string.Speed')})
 
         Column() {
-          Row({space:5}) {
+          Flex({
+            alignItems: ItemAlign.Center,
+            direction: FlexDirection.Row,
+            justifyContent: FlexAlign.End,
+
+            space: { main: LengthMetrics.vp(5) }
+          })
+          {
             Text(this.UploadSpeed.toString())
               .fontSize(HomeCardSpeedFontSize(this.widthBp, this.heightBp))
               .fontColor($r('sys.color.font_primary'))
@@ -111,9 +122,15 @@ struct Speed {
             SymbolGlyph($r('sys.symbol.chevron_up'))
               .fontColor([$r('sys.color.font_primary')])
 
-          }.width('100%').justifyContent(FlexAlign.End)
+          }
 
-          Row({space:5}) {
+          Flex({
+            alignItems: ItemAlign.Center,
+            direction: FlexDirection.Row,
+            justifyContent: FlexAlign.End,
+            space: { main: LengthMetrics.vp(5) }
+          })
+          {
             Text(this.DownloadSpeed.toString())
               .fontSize(HomeCardSpeedFontSize(this.widthBp, this.heightBp))
               .fontColor($r('sys.color.font_primary'))
@@ -122,8 +139,9 @@ struct Speed {
             SymbolGlyph($r('sys.symbol.chevron_down'))
               .fontColor([$r('sys.color.font_primary')])
 
-          }.width('100%').justifyContent(FlexAlign.End)
+          }
         }
+        .justifyContent(FlexAlign.End)
       }
       .width('100%')
 

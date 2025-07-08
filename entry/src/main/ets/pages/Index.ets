@@ -54,7 +54,7 @@ import { TabBarAlignItems,
 import { WindowTopBar } from '../components/Common/TopBar'
 import { ImportConfigFromURL } from '../components/Configuration/ImportConfigFromURL'
 import { Xb_ChangeThemeColor } from 'xb_components/src/main/ets/utils/ChangeThemeColorUtil'
-import { Xb_ColorModeManager, Xb_Global, Xb_UIConfig } from 'xb_components'
+import { Xb_ColorModeManager, Xb_Global, Xb_NotificationUtils, Xb_UIConfig } from 'xb_components'
 import { Xb_GoToWeb } from 'xb_components/src/main/ets/utils/JumpTo'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
@@ -112,6 +112,7 @@ struct Index {
   // 所有子组件在容器内的对齐方式
   @Provide('stackAlignContentAlignment') stackAlignContentAlignment: Alignment = Alignment.BottomEnd
   @StorageLink('clashConfig') /*@Watch('switchMode')*/clashConfig: ClashConfig = new ClashConfig()
+  @StorageProp("appFlowingState") appFlowingState: AppFlowingState = new AppFlowingState()
   // 欢迎页面栈
   @Provide('WelcomeNavPathStack') welcomePageInfos: NavPathStack = new NavPathStack()
   @StorageLink('uiConfig') @Watch('ShowPipChange')uiConfig: UIConfig = new UIConfig()
@@ -147,10 +148,14 @@ struct Index {
   @Provide curOffsetRemain: number = 0
   // 恢复时刻
   @Provide theRestoreTime: number = 0
+  // 通知更新任务id
+  @State updateNoticeJob: number = 0
   // 暂停时刻
   @Provide thePauseTime: number = 0
   // 流量任务id
   @State trafficJob: number = 0
+  // 通知任务id
+  @State noticeJob: number = 0
   @State
   tabList: TabBuild[] = [
     { name: $r('app.string.Home'), icon: $r('sys.symbol.house_fill') },
@@ -568,7 +573,48 @@ struct Index {
         this.proxyTime = time
         this.proxyStartingDuration = number2Time(time)
       })
+
+      // 发布通知
+      if (this.uiConfig.Enablednotice && this.uiConfig.EnabledPermanentnotice) {
+        this.noticeJob = Date.now()
+        let up = '0'
+        let down = '0'
+        try {
+          Xb_NotificationUtils.publishTextNotification(
+            context,
+            this.noticeJob,
+            {
+              title: `${this.appConfig.currentProxyName ?? 'ClashBox'}`,
+              text: `${up}/s ↑ ${down}/s ↓`,
+            },
+            {
+              abilityName: 'EntryAbility'
+            }
+            )
+        } catch (err) {
+          hilog.info(0xFF00, 'NotificationUtils', `文本通知ID: ${this.noticeJob}发布错误: ${err} `);
+        }
+        // 更新通知
+        this.updateNoticeJob = setInterval(async ()=> {
+          up = this.appFlowingState.traffics.getLast()?.up?.toString() ?? "0"
+          down = this.appFlowingState.traffics.getLast()?.down?.toString() ?? "0"
+          hilog.info(0xFF00, 'NotificationUtils', `文本通知ID: ${this.noticeJob}更新文本: ${up}/s ↑ ${down}/s ↓ `);
+          try {
+            Xb_NotificationUtils.updateTextNotification(
+              this.noticeJob,
+              {
+                title: `${this.appConfig.currentProxyName ?? 'ClashBox'}`,
+                text: `${up}/s ↑ ${down}/s ↓`,
+              }
+            )
+          } catch (err) {
+            hilog.info(0xFF00, 'NotificationUtils', `文本通知ID: ${this.noticeJob}更新错误: ${err} `);
+          }
+        }, 1500)
+      }
+
     })
+
     // 停止Clash
     EventHub.on(EventKey.StopedClash, ()=>{
       clearInterval(this.trafficJob)
@@ -582,6 +628,12 @@ struct Index {
       this.DownloadSpeed = ''
       this.UploadSpeed = ''
       this.ChartData = CHART_NUMBER
+      // 取消通知
+      if (this.uiConfig.Enablednotice && this.uiConfig.EnabledPermanentnotice) {
+        Xb_NotificationUtils.cancelNotification(this.noticeJob)
+        clearInterval(this.updateNoticeJob)
+      }
+
     })
     // 运行一次窗口检查
     this.onWindowChange()

@@ -42,8 +42,6 @@ struct Notice {
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   // UI控制变量
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  // 通知总开关变量
-  @State Enablednotice: boolean = false
   // 常驻通知开关变量
   @State EnabledPermanentnotice: boolean = true
   // 时间提醒开关变量
@@ -275,7 +273,7 @@ struct Notice {
                 subtitle: $r('app.string.background_notice_subtitle')
               }) {
                 // 常驻通知开关
-                Toggle({ type: ToggleType.Switch, isOn: $$this.EnabledPermanentnotice })
+                Toggle({ type: ToggleType.Switch, isOn: $$this.uiConfig.EnabledPermanentnotice })
                   .selectedColor(this.icon_emphasize)
                   .margin({right: 12})
                   .opacity(this.uiConfig.Enablebackgrounder ? 0.5 : 1)
@@ -287,7 +285,7 @@ struct Notice {
                         duration: this.uiConfig.animationSpeed,
                         curve: Curve.Ease
                       }, () => {
-                        this.EnabledPermanentnotice = isOn
+                        this.uiConfig.EnabledPermanentnotice = isOn
                       })
                     }
                   })

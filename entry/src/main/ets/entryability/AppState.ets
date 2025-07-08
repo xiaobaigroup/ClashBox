@@ -99,6 +99,8 @@ export class UIConfig{
   isSound: boolean = true
   // 通知总开关
   Enablednotice: boolean = false
+  // 常驻通知开关
+  EnabledPermanentnotice: boolean = true
   // 是否进行过通知授权
   isRequestNotification: boolean = false
   // 后台运行启用变量
