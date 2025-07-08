@@ -56,6 +56,7 @@ import { ImportConfigFromURL } from '../components/Configuration/ImportConfigFro
 import { Xb_ChangeThemeColor } from 'xb_components/src/main/ets/utils/ChangeThemeColorUtil'
 import { Xb_ColorModeManager, Xb_Global, Xb_NotificationUtils, Xb_UIConfig } from 'xb_components'
 import { Xb_GoToWeb } from 'xb_components/src/main/ets/utils/JumpTo'
+import { notificationManager } from '@kit.NotificationKit'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 const context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
@@ -587,6 +588,7 @@ struct Index {
               title: `${this.appConfig.currentProxyName ?? 'ClashBox'}`,
               text: `${up}/s ↑ ${down}/s ↓`,
             },
+            notificationManager.SlotType.SERVICE_INFORMATION, // 服务提醒类型
             {
               abilityName: 'EntryAbility'
             }
