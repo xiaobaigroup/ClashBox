@@ -468,7 +468,9 @@ export struct theRowCustomDialog {
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @BuilderParam leftButton: () => void = this.defaultBuilder
-  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+  // UI控制变量
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   // 默认的左按钮(蓝色字体开启)
   @Builder
   defaultBuilder() {
@@ -506,7 +508,7 @@ export struct theRowCustomDialog {
             this.confirm()
           }
         })
-        Button($r('app.string.Cancel'))
+        Button(this.uiConfig.EnabledStatusNotice ? $r('app.string.already_close') : $r('app.string.Cancel'))
           .height(39)
           .width('50%')
           .fontColor(Color.White)

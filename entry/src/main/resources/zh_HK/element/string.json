@@ -2071,6 +2071,18 @@
     {
       "name": "app_already_exist",
       "value": "應用已存在"
+    },
+    {
+      "name": "status_icon_notice",
+      "value": "常駐狀態欄"
+    },
+    {
+      "name": "status_icon_tips",
+      "value": "請先喺設定入面閂咗APP響鈴同震動，之後再開啓呀"
+    },
+    {
+      "name": "status_bar_to",
+      "value": "您已開啓常駐狀態欄，需要喺設定入面閂咗APP嘅響鈴同震動，係咪而家去設定睇吓呀？"
     }
   ]
 }

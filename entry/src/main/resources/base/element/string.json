@@ -2071,6 +2071,18 @@
     {
       "name": "app_already_exist",
       "value": "应用已存在"
+    },
+    {
+      "name": "status_icon_notice",
+      "value": "常驻状态栏"
+    },
+    {
+      "name": "status_icon_tips",
+      "value": "请设置里关闭应用响铃、振动后再开启"
+    },
+    {
+      "name": "status_bar_to",
+      "value": "您已开启常驻状态栏，需要在设置内关闭应用的响铃与振动，是否立即前往设置"
     }
   ]
 }

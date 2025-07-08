@@ -22,6 +22,7 @@ import { PageMargin } from "../../common/breakpoint/BreakPoint"
 
 const TAG: string = '[通知页]';
 const DOMAIN_NUMBER: number = 0xFF00;
+const context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
 
 /**
  * 通知页
@@ -78,7 +79,7 @@ struct Notice {
   toDialogController: CustomDialogController = new CustomDialogController({
     builder: theRowCustomDialog({
       theDialogTitle: this.theToDialogTitle,
-      contentText: $r('app.string.notice_request_to_settings_text'),
+      contentText: this.uiConfig.EnabledStatusNotice ? $r('app.string.status_bar_to') : $r('app.string.notice_request_to_settings_text'),
       cancel: ()=> { this.onCancel() },
       confirm: ()=> { this.onAccept() },
       leftButton: this.toBuilder
@@ -111,7 +112,9 @@ struct Notice {
   }
 
   onCancel() {
-    this.uiConfig.Enablednotice = false
+    if (!this.uiConfig.EnabledStatusNotice) {
+      this.uiConfig.Enablednotice = false
+    }
   }
   onAccept() {
     this.handleToSettings()
@@ -174,8 +177,7 @@ struct Notice {
       abilityName: 'com.huawei.hmos.settings.MainAbility', // 系统设置的Ability的名字（固定）
       uri: "application_info_entry", // 系统设置的界面 （固定）
       parameters: {
-        // pushParams: 'org.xbgroup.clashbox' // 包名
-        pushParams: "org.xbgroup.clashboxb",
+        pushParams: context.applicationInfo.name,
       }
     })
   }
@@ -299,6 +301,39 @@ struct Notice {
               }
             })
             // 常驻通知 End
+            // 常驻状态栏 Start
+            Row() {
+              toggleRowList({
+                title: $r('app.string.status_icon_notice'),
+                icons: $r('sys.symbol.star_circle_fill'),
+                subtitle: $r('app.string.status_icon_tips')
+              }) {
+                // 常驻状态栏开关
+                Toggle({ type: ToggleType.Switch, isOn: $$this.uiConfig.EnabledStatusNotice })
+                  .selectedColor(this.icon_emphasize)
+                  .margin({right: 12})
+                  .opacity(1)
+                  .hitTestBehavior(HitTestMode.Default)
+                  .onChange((isOn: boolean) => {
+                    // 显示后台通知设置 显式动画
+                    this.getUIContext()?.animateTo({
+                      duration: this.uiConfig.animationSpeed,
+                      curve: Curve.Ease
+                    }, () => {
+                      this.uiConfig.EnabledStatusNotice = isOn
+                      if (isOn) {
+                        this.toDialogController.open()
+                      }
+                    })
+                  })
+              }
+            }
+            .RowStyle()
+            .onClick( ()=> {
+              // 点击提示
+              promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
+            })
+            // 常驻状态栏 End
           }
         }.ColumnStyle()
         // 通知 End

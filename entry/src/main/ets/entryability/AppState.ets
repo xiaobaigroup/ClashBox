@@ -101,6 +101,8 @@ export class UIConfig{
   Enablednotice: boolean = false
   // 常驻通知开关
   EnabledPermanentnotice: boolean = true
+  // 常驻状态栏开关
+  EnabledStatusNotice: boolean = false
   // 是否进行过通知授权
   isRequestNotification: boolean = false
   // 后台运行启用变量

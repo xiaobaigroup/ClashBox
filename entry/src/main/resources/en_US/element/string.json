@@ -2071,6 +2071,18 @@
     {
       "name": "app_already_exist",
       "value": "The application already exists"
+    },
+    {
+      "name": "status_icon_notice",
+      "value": "Resident status bar"
+    },
+    {
+      "name": "status_icon_tips",
+      "value": "Please turn off the app's ringtone and vibration in the settings before turning it back on."
+    },
+    {
+      "name": "status_bar_to",
+      "value": "You have enabled the resident status bar and need to turn off the app's ringtone and vibration in the settings. Do you want to go to the settings now?"
     }
   ]
 }

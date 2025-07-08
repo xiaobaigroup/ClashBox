@@ -588,7 +588,7 @@ struct Index {
               title: `${this.appConfig.currentProxyName ?? 'ClashBox'}`,
               text: `${up}/s ↑ ${down}/s ↓`,
             },
-            notificationManager.SlotType.SERVICE_INFORMATION, // 服务提醒类型
+            this.uiConfig.EnabledStatusNotice ? notificationManager.SlotType.SERVICE_INFORMATION : notificationManager.SlotType.CONTENT_INFORMATION, // 服务提醒类型 -> LEVEL_HIGH; CONTENT_INFORMATION -> LEVEL_MIN
             {
               abilityName: 'EntryAbility'
             }
@@ -607,7 +607,8 @@ struct Index {
               {
                 title: `${this.appConfig.currentProxyName ?? 'ClashBox'}`,
                 text: `${up}/s ↑ ${down}/s ↓`,
-              }
+              },
+              this.uiConfig.EnabledStatusNotice ? notificationManager.SlotType.SERVICE_INFORMATION : notificationManager.SlotType.CONTENT_INFORMATION, // 服务提醒类型 -> LEVEL_HIGH; CONTENT_INFORMATION -> LEVEL_MIN
             )
           } catch (err) {
             hilog.info(0xFF00, 'NotificationUtils', `文本通知ID: ${this.noticeJob}更新错误: ${err} `);
