@@ -57,6 +57,7 @@ import { Xb_ChangeThemeColor } from 'xb_components/src/main/ets/utils/ChangeThem
 import { Xb_ColorModeManager, Xb_Global, Xb_NotificationUtils, Xb_UIConfig } from 'xb_components'
 import { Xb_GoToWeb } from 'xb_components/src/main/ets/utils/JumpTo'
 import { notificationManager } from '@kit.NotificationKit'
+import BackgroundDownService from '../common/utils/BackgroundDownService'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 const context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
@@ -581,18 +582,13 @@ struct Index {
         let up = '0'
         let down = '0'
         try {
-          Xb_NotificationUtils.publishTextNotification(
-            context,
-            this.noticeJob,
+          Xb_NotificationUtils.publishTextNotification(context, this.noticeJob,
             {
               title: `${this.appConfig.currentProxyName ?? 'ClashBox'}`,
               text: `${up}/s ↑ ${down}/s ↓`,
             },
             this.uiConfig.EnabledStatusNotice ? notificationManager.SlotType.SERVICE_INFORMATION : notificationManager.SlotType.CONTENT_INFORMATION, // 服务提醒类型 -> LEVEL_HIGH; CONTENT_INFORMATION -> LEVEL_MIN
-            {
-              abilityName: 'EntryAbility'
-            }
-            )
+            { abilityName: 'EntryAbility' })
         } catch (err) {
           hilog.info(0xFF00, 'NotificationUtils', `文本通知ID: ${this.noticeJob}发布错误: ${err} `);
         }
@@ -615,6 +611,9 @@ struct Index {
           }
         }, 1500)
       }
+      if (this.uiConfig.backgroundDownModel) {
+        BackgroundDownService.start(context)
+      }
 
     })
 
@@ -636,7 +635,9 @@ struct Index {
         Xb_NotificationUtils.cancelNotification(this.noticeJob)
         clearInterval(this.updateNoticeJob)
       }
-
+      if (this.uiConfig.backgroundDownModel) {
+        BackgroundDownService.stop(context)
+      }
     })
     // 运行一次窗口检查
     this.onWindowChange()

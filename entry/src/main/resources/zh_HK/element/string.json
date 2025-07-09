@@ -981,20 +981,20 @@
       "value": "透過啟用空白畫中畫以保留程式後台"
     },
     {
-      "name": "simulate_record",
-      "value": "模擬錄音"
+      "name": "simulate_down",
+      "value": "模擬下載"
     },
     {
-      "name": "simulate_record_subtitle",
-      "value": "透過模擬錄音以保留程式後台，本選項可能導致電量消耗更快"
+      "name": "simulate_down_subtitle",
+      "value": "透過模擬下載保留程式後台運作，本選項可能導致電量消耗更快"
     },
     {
       "name": "backgrounder_tips",
-      "value": "Tips：開啟後會導致應用耗電量增加"
+      "value": "提示：開啟後會導致應用耗電量增加"
     },
     {
       "name": "backgrounder_tips_2",
-      "value": "Tips：開啟後會導致應用耗電量增加，並且切換模擬定位後請重啟軟體；目前已知從自由多窗模式無法主動發起畫中畫窗口；畫中畫啟用後系統會鎖90幀"
+      "value": "提示：開啓後會增加應用耗電量，切換模擬定位後請重啓軟件；目前已知自由多視窗模式無法主動開啓子母畫面視窗；子母畫面開啓後系統會鎖定90幀率；模擬下載僅喺核心使用前台模式時效果顯著，請注意唔好清除模擬下載通知，否則會導致模擬失敗；通常建議開啓模擬下載後閂咗常駐狀態欄選項。"
     },
     {
       "name": "notice_main_switch",
@@ -1033,11 +1033,11 @@
       "value": "關閉此選項可能導致ClashBox無法在後台長時間運行"
     },
     {
-      "name": "simulate_record_open_tips",
+      "name": "simulate_down_open_tips",
       "value": "是否開啟？"
     },
     {
-      "name": "simulate_record_open_content_text",
+      "name": "simulate_down_open_content_text",
       "value": "建議使用“模擬定位”來保持應用的後台長時運行，本選項可能導致電量消耗更快"
     },
     {

@@ -977,12 +977,12 @@
       "value": "Simulated PiP"
     },
     {
-      "name": "simulate_record",
-      "value": "Simulated Recording"
+      "name": "simulate_down",
+      "value": "Simulated Download"
     },
     {
-      "name": "simulate_record_subtitle",
-      "value": "By simulating recordings to preserve the program background"
+      "name": "simulate_down_subtitle",
+      "value": "By simulate downloading to preserve the program backend"
     },
     {
       "name": "simulate_pip_subtitle",
@@ -994,7 +994,7 @@
     },
     {
       "name": "backgrounder_tips_2",
-      "value": "After opening, the power consumption of the application will increase, and please restart the software after the switch is simulated and positioned; At present, it is known that the picture in picture window cannot be initiated from the free multi window mode; After picture in picture is turned on, the system will lock 90 frames."
+      "value": "Tips: Enabling it will increase the power consumption of the application, and after simulating the positioning of the switch, please restart the software; At present, it is known that the free multi window mode cannot actively initiate a picture in picture window; After enabling picture in picture, the system will lock 90 frames; Simulated download is only effective when the kernel is in front-end mode, and be careful not to clear the simulated download notification, otherwise the simulation will fail; It is usually recommended to turn off the resident status bar option after enabling the simulation download."
     },
     {
       "name": "notice_main_switch",
@@ -1033,11 +1033,11 @@
       "value": "Turning off this option will result in ClashBox being unable to run in the background for extended periods of time."
     },
     {
-      "name": "simulate_record_open_tips",
+      "name": "simulate_down_open_tips",
       "value": "Is it enabled?"
     },
     {
-      "name": "simulate_record_open_content_text",
+      "name": "simulate_down_open_content_text",
       "value": "Suggest using 'simulated positioning' to keep the application running in the background for a long time, as this option may result in faster battery consumption."
     },
     {

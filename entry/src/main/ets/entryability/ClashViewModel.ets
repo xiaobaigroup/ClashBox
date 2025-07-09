@@ -251,8 +251,7 @@ export class ClashViewModel {
     this.vpnRequestId = requestId;
     const vpnWant = {
       deviceId: "",
-      // bundleName: "org.xbgroup.clashbox",
-      bundleName: "org.xbgroup.clashboxb",
+      bundleName: this.context?.applicationInfo.name, // release: org.xbgroup.clashbox, debug: org.xbgroup.clashboxb
       abilityName: "ClashVpnAbility",
       parameters: { "ClashCore" : coreType, requestId }
     } as Want
@@ -327,7 +326,8 @@ export class ClashViewModel {
     if (appConfig?.accessControl == null)
       return
     if(appConfig!.accessControl){
-      const acceptList = JSON.parse(appConfig?.accessControlAcceptList ?? "[]") as string[]
+      let acceptList = JSON.parse(appConfig?.accessControlAcceptList ?? "[]") as string[]
+      acceptList.push(this.context?.applicationInfo.name as string)
       const rejectList = JSON.parse(appConfig?.accessControlRejectList ?? "[]") as string[]
       const accessControl = { accessControl: { mode:appConfig?.accessControlMode ?? "", acceptList: acceptList, rejectList: rejectList } as AccessControl } as VpnRawOptions
       this.socketProxy.setOptionStates(accessControl)

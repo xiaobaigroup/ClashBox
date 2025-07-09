@@ -109,6 +109,8 @@ export class UIConfig{
   Enablebackgrounder: boolean = false
   // 模拟定位启用变量
   backgroundLocateModel: boolean = false
+  // 模拟下载启用变量
+  backgroundDownModel: boolean = false
   // 模拟画中画启用变量
   backgroundPiPModel: boolean = false
   /* 主页小卡片相关 */

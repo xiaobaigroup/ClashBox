@@ -981,20 +981,20 @@
       "value": "通过启用空白画中画以保留程序后台"
     },
     {
-      "name": "simulate_record",
-      "value": "模拟录音"
+      "name": "simulate_down",
+      "value": "模拟下载"
     },
     {
-      "name": "simulate_record_subtitle",
-      "value": "通过模拟录音以保留程序后台"
+      "name": "simulate_down_subtitle",
+      "value": "通过模拟下载以保留程序后台"
     },
     {
       "name": "backgrounder_tips",
-      "value": "Tips：开启后会导致应用耗电量增加"
+      "value": "提示：开启后会导致应用耗电量增加"
     },
     {
       "name": "backgrounder_tips_2",
-      "value": "Tips：开启后会导致应用耗电量增加，并且开关模拟定位后请重启软件；目前已知从自由多窗模式无法主动发起画中画窗口；画中画开启后系统会锁90帧"
+      "value": "提示：开启后会导致应用耗电量增加，并且开关模拟定位后请重启软件；目前已知从自由多窗模式无法主动发起画中画窗口；画中画开启后系统会锁90帧；模拟下载仅在内核使用前台模式时效果明显，并且注意不要清除模拟下载通知，否则将会模拟失败；通常建议开启模拟下载后关闭常驻状态栏选项。"
     },
     {
       "name": "notice_main_switch",
@@ -1033,11 +1033,11 @@
       "value": "关闭此选项可能会导致ClashBox无法在后台长时间运行"
     },
     {
-      "name": "simulate_record_open_tips",
+      "name": "simulate_down_open_tips",
       "value": "是否开启？"
     },
     {
-      "name": "simulate_record_open_content_text",
+      "name": "simulate_down_open_content_text",
       "value": "建议使用“模拟定位”来保持应用的后台长时运行，本选项可能会导致电量消耗更快"
     },
     {

@@ -1,7 +1,8 @@
 import { MoreTop } from "./MoreTopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { universalSearch } from "../../common/utils/SmartSearchUtil"
-import { ButtonBuilder, checkoutRowListItem, font_primary, KVCustomDialog, toggleRowList } from "../Common/Common"
+import { ButtonBuilder, checkoutRowListItem,
+  font_primary, KVCustomDialog, toggleRowList } from "../Common/Common"
 import { NeedClearMoreStack, PageMargin } from "../../common/breakpoint/BreakPoint"
 import { TAB_CONTENT_TITLE_HEIGHT } from "../../common/entity/Constants"
 import { AppConfig, UIConfig } from "../../entryability/AppState"
@@ -11,7 +12,9 @@ import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { intl } from "@kit.LocalizationKit"
 import { Xb_CapsuleButton, Xb_CircleButton, Xb_GetResourceString } from "xb_components"
 import { customAnimationUtil } from "../../common/utils/Animation"
+import { common } from "@kit.AbilityKit"
 
+const context = getContext() as common.UIAbilityContext
 
 @Component
 export struct AccessControl {
@@ -293,7 +296,7 @@ export struct AccessControl {
         if (this.isNewApp) {
           console.log(`AccessControl kvCustomdialog 窗口为新增`)
           // 应用为新增
-          if (indexes === -1) {
+          if (indexes === -1 && value.value !== context.applicationInfo.name) {
             // 应用名称不存在
             const param: AppInfo = {
               name: value.key,
@@ -546,17 +549,17 @@ export struct AccessControl {
 
   onModeChange() {
     console.log(`AccessControl 运行 #onModeChange nameStringData值：${JSON.stringify(this.nameStringData)}`)
-    if (this.nameStringData[0]) {
-      console.log(`AccessControl 运行 #onModeChange-实际 nameStringData[0]值：${JSON.stringify(this.nameStringData[0])}`)
-      if (this.modeTabSelectedIndexes[0] == 0) {
-        // 白名单
-        this.appConfig.accessControlMode = 'AcceptSelected'
-        this.appConfig.accessControlAcceptList = JSON.stringify(this.nameStringData)
-      } else {
-        // 黑名单
-        this.appConfig.accessControlMode = 'RejectSelected'
-        this.appConfig.accessControlRejectList = JSON.stringify(this.nameStringData)
-      }
+    console.log(`AccessControl 运行 #onModeChange-实际 nameStringData[0]值：${JSON.stringify(this.nameStringData[0])}`)
+    if (this.modeTabSelectedIndexes[0] == 0) {
+      // 白名单
+      this.appConfig.accessControlMode = 'AcceptSelected'
+      console.log(`AccessControl #onModeChange 模式：${ this.appConfig.accessControlMode}`)
+      this.appConfig.accessControlAcceptList = JSON.stringify(this.nameStringData)
+    } else {
+      // 黑名单
+      this.appConfig.accessControlMode = 'RejectSelected'
+      console.log(`AccessControl #onModeChange 模式：${ this.appConfig.accessControlMode}`)
+      this.appConfig.accessControlRejectList = JSON.stringify(this.nameStringData)
     }
   }
 
