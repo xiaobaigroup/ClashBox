@@ -611,7 +611,7 @@ struct Index {
           }
         }, 1500)
       }
-      if (this.uiConfig.backgroundDownModel) {
+      if (this.uiConfig.backgroundDownModel && this.uiConfig.Enablednotice) {
         BackgroundDownService.start(context)
       }
 
