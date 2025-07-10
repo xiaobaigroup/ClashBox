@@ -9,6 +9,7 @@ import { AppFlowingState, AppState } from "../../entryability/AppState";
 import { hilog } from "@kit.PerformanceAnalysisKit";
 import { geoLocationManager } from "@kit.LocationKit";
 
+
 /**
  * 模拟定位长时任务
  */
@@ -54,7 +55,7 @@ export class BackgroundLocateService{
     let request: geoLocationManager.LocationRequest = {
       priority: geoLocationManager.LocationRequestPriority.FIRST_FIX, // Quick location acquisition is preferred
       scenario: geoLocationManager.LocationRequestScenario.UNSET, // Indicates that no scenario information is set
-      timeInterval: 10, // Interval for reporting the location information
+      timeInterval: 7200, // Interval for reporting the location information
       distanceInterval: 0, // Distance for reporting location information
       maxAccuracy: 100 // The precision value required when the application requests location information from the system
     };
