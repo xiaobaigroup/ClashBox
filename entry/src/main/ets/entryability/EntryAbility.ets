@@ -9,6 +9,7 @@ import { PipManager } from '../common/utils/PipManager';
 import { ClashConfig, SocketProxyService, SocketStubService } from 'proxy_core';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { url } from '@kit.ArkTS';
+import { StatusBarUtils } from 'xb_components';
 
 export default class EntryAbility extends UIAbility {
 
@@ -51,7 +52,7 @@ export default class EntryAbility extends UIAbility {
       AppStorage.setOrCreate('openLinkConfigUrl', configUrl)
       hilog.info(0x0000, 'EntryAbility', '接收的configUrl为：%{public}s', configUrl)
     }
-
+    new StatusBarUtils().initStatusBar(this.context, $r("app.media.clashbox"), undefined)
   }
   debugVpn: SocketStubService | null = null
 

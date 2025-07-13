@@ -134,7 +134,6 @@ export struct WindowTopBar {
               } catch (err) {
                 console.error(`#WindowDecorButtonModel 最大化失败：${err.code}, message: ${err.message}`)
               }
-
             }
           } else {
             console.error(`#WindowDecorButtonModel WindowClass不存在`)
@@ -150,7 +149,7 @@ export struct WindowTopBar {
       {
         icon: $r('sys.symbol.xmark'),
         onClick: () => {
-          getContext().getApplicationContext().killAllProcesses()
+          this.windowClass.minimize()
         }
       }
     ]
