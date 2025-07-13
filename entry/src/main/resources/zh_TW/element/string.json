@@ -2083,6 +2083,14 @@
     {
       "name": "status_bar_to",
       "value": "您已啟用常駐狀態列，請先至設定中關閉應用程式的鈴聲和震動，是否立即前往設定？"
+    },
+    {
+      "name": "exit_window",
+      "value": "關閉視窗"
+    },
+    {
+      "name": "minimize_tray",
+      "value": "隱藏至選單列"
     }
   ]
 }

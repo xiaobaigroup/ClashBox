@@ -31,6 +31,8 @@ struct Appearance {
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   // 应用上下文
   private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+  // 窗口模式
+  @StorageProp('WindowMode') windowMode: boolean = false
   // 手机横屏判断
   @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
   // 高度断点
@@ -51,245 +53,13 @@ struct Appearance {
   @State EnableAnimationSpeedText: ResourceStr = $r('app.string.normal')
   // 字符串显示权重选中文本
   @State EnableStringDisplayText: ResourceStr = $r('app.string.appearance')
+  // 关闭窗口选中文本
+  @State EnableCloseWindowText: ResourceStr = $r('app.string.appearance')
   // 按钮位置偏移量（默认在右侧的偏移量）
   @Consume ButtonPositionOffset: number
   // 所有子组件在容器内的对齐方式
   @Consume ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-
-  // 切换菜单
-  @Builder
-  switchMenu(item: AppearanceListItemProp[], index: number) {
-    if(index === 0) {
-      // 切换深色模式
-      Menu() {
-        ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
-          MenuItem({
-            content: menuItem.title,
-            symbolEndIcon: this.uiConfig.darkMode === menuItem.colorMode ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
-          })
-          .onChange((selected) => {
-            // 持久化深色模式
-            this.uiConfig.darkMode = menuItem.colorMode!
-            Xb_ColorModeManager.setColorModeByString(context, this.uiConfig.darkMode)
-            // UI刷新
-            this.EnableDarkModeText = menuItem.title
-          })
-        }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
-      }
-    } else if(index === 1) {
-      // 切换主题色
-      Menu() {
-        ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
-          MenuItem({
-            content: menuItem.title,
-            symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.paintpalette_fill')).fontColor(menuItem.startSymbolFontColor),
-            symbolEndIcon: this.uiConfig.themeColorIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
-          })
-          .selected(this.uiConfig.themeColorIndex === index)
-          .onChange((selected) => {
-            this.uiConfig.themeColorIndex = index
-            // 持久化主题色
-            this.uiConfig.themeColor = menuItem?.customThemeName ?? 'yellowAppTheme'
-            Xb_UIConfig.themeColor = menuItem?.customThemeName ?? 'yellowAppTheme'
-            Xb_ChangeThemeColor(this.uiConfig.themeColor)
-            // UI刷新
-            this.EnableThemeColorText = menuItem.title
-          })
-        }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
-      }
-    } else if (index === 2) {
-      // 切换按钮位置
-      Menu() {
-        ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
-          MenuItem({
-            content: menuItem.title,
-            symbolEndIcon: this.uiConfig.buttonPositionIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
-          })
-            .selected(this.uiConfig.buttonPositionIndex === index)
-            .onChange((selected) => {
-              animateTo(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }:null, () => {
-                // 持久化按钮位置
-                this.uiConfig.buttonPositionIndex = index
-                this.switchButtonPosition(index)
-              })
-              // UI刷新
-              this.EnableButtonPositionText = menuItem.title
-            })
-        }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
-      }
-    } else if (index === 3) {
-      // 切换动画速度
-      Menu() {
-        ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
-          MenuItem({
-            content: menuItem.title,
-            symbolEndIcon: this.uiConfig.animationSpeedIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
-          })
-            .selected(this.uiConfig.animationSpeedIndex === index)
-            .onChange((selected) => {
-              // 持久化动画速度
-              this.uiConfig.animationSpeedIndex = index
-              this.switchAnimationSpeed(index)
-              // UI刷新
-              this.EnableAnimationSpeedText = menuItem.title
-            })
-        }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
-      }
-    } else if (index === 4) {
-      // 切换字符显示权重
-      Menu() {
-        ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
-          MenuItem({
-            content: menuItem.title,
-            symbolEndIcon: this.uiConfig.stringDisplayIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
-          })
-            .selected(this.uiConfig.stringDisplayIndex === index)
-            .onChange((selected) => {
-              // 持久化字符显示权重
-              this.uiConfig.stringDisplayIndex = index
-              // UI刷新
-              this.EnableStringDisplayText = menuItem.title
-            })
-        }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
-      }
-    }
-  }
-
-  // 切换按钮位置
-  switchButtonPosition(index:number) {
-    switch (index) {
-      case 0:
-        // 右侧
-        this.ButtonPositionOffset = 16
-        this.stackAlignContentAlignment = Alignment.BottomEnd
-      break
-      case 1:
-        // 中间
-        this.ButtonPositionOffset = 0
-        this.stackAlignContentAlignment = Alignment.Bottom
-      break
-      case 2:
-        // 左侧
-        this.ButtonPositionOffset = -16
-        this.stackAlignContentAlignment = Alignment.BottomStart
-      break
-    }
-  }
-
-  // 切换动画速度
-  switchAnimationSpeed(index: number) {
-    switch (index) {
-      case 0:
-        // 快速
-        this.uiConfig.isAnimation = true
-        this.uiConfig.animationSpeed = ANIMATION_DURATION_100
-        break
-      case 1:
-        // 正常
-        this.uiConfig.isAnimation = true
-        this.uiConfig.animationSpeed = ANIMATION_DURATION_300
-        break
-      case 2:
-        // 慢速
-        this.uiConfig.isAnimation = true
-        this.uiConfig.animationSpeed = ANIMATION_DURATION_500
-        break
-      case 3:
-        // 关闭
-        this.uiConfig.isAnimation = false
-        this.uiConfig.animationSpeed = 0
-        break
-    }
-  }
-
-  aboutToAppear(): void {
-    // 初始化主题色显示文本
-    if (this.appearanceList && this.appearanceList[1].children) {
-      this.EnableThemeColorText = this.appearanceList[1].children[this.uiConfig.themeColorIndex].title
-    }
-    // 初始化深色模式显示文本
-    if (this.appearanceList && this.appearanceList[0].children) {
-      this.EnableDarkModeText = this.appearanceList[0].children.find(child => child.colorMode === this.uiConfig.darkMode)?.title!
-    }
-    // 初始化按钮位置显示文本
-    if (this.appearanceList && this.appearanceList[2].children) {
-      this.EnableButtonPositionText = this.appearanceList[2].children[this.uiConfig.buttonPositionIndex].title
-    }
-    // 初始化动画速度显示文本
-    if (this.appearanceList && this.appearanceList[3].children) {
-      this.EnableAnimationSpeedText = this.appearanceList[3].children[this.uiConfig.animationSpeedIndex].title
-    }
-    // 初始化字符显示权重显示文本
-    if (this.appearanceList && this.appearanceList[4].children) {
-      this.EnableStringDisplayText = this.appearanceList[4].children[this.uiConfig.stringDisplayIndex].title
-    }
-  }
-
-  aboutToDisappear(): void {
-
-  }
-
-  @Builder
-  TipsText(index: number) {
-    if (index === 0) {
-      // 主题色
-      Text(this.EnableThemeColorText)
-        .tipsText()
-    } else if (index === 1) {
-      // 深色模式
-      Text(this.EnableDarkModeText)
-        .tipsText()
-    } else if (index === 2) {
-      // 按钮位置
-      Text(this.EnableButtonPositionText)
-        .tipsText()
-    } else if (index === 3) {
-      // 动画速度
-      Text(this.EnableAnimationSpeedText)
-        .tipsText()
-    } else if (index === 4) {
-      // 字符显示权重
-      Text(this.EnableStringDisplayText)
-        .tipsText()
-    }
-  }
-
-  @Builder
-  MenuEntrance(index: number) {
-    if (index === 0) {
-      // 主题色
-      // 确保children存在
-      if(this.appearanceList && this.appearanceList[1].children) {
-        this.switchMenu(this.appearanceList[1].children, 1)
-      }
-    } else if (index === 1) {
-      // 深色模式
-      // 确保children存在
-      if(this.appearanceList && this.appearanceList[0].children) {
-        this.switchMenu(this.appearanceList[0].children, 0)
-      }
-    } else if (index === 2) {
-      // 按钮位置
-      // 确保children存在
-      if(this.appearanceList && this.appearanceList[2].children) {
-        this.switchMenu(this.appearanceList[2].children, 2)
-      }
-    } else if (index === 3) {
-      // 动画速度
-      // 确保children存在
-      if(this.appearanceList && this.appearanceList[3].children) {
-        this.switchMenu(this.appearanceList[3].children, 3)
-      }
-    } else if (index === 4) {
-      // 字符显示权重
-      // 确保children存在
-      if(this.appearanceList && this.appearanceList[4].children) {
-        this.switchMenu(this.appearanceList[4].children, 4)
-      }
-    }
-  }
-
 
   build() {
     NavDestination() {
@@ -476,6 +246,18 @@ struct Appearance {
               tips: (): void => { this.TipsText(4) },
               menu: (): void => { this.MenuEntrance(4) }
             })
+            if (this.windowMode) {
+              // 分割线
+              Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
+              // 关闭窗口
+              menuRowList({
+                icons: $r('sys.symbol.wrench_and_screwdriver'),
+                title: $r('app.string.exit_window'),
+                // 确保this指向父组件
+                tips: (): void => { this.TipsText(5) },
+                menu: (): void => { this.MenuEntrance(5) }
+              })
+            }
           }
           .width('100%')
           .borderRadius(20)
@@ -500,6 +282,271 @@ struct Appearance {
     })
 
   }
+
+  // 切换菜单
+  @Builder
+  switchMenu(item: AppearanceListItemProp[], index: number) {
+    if(index === 0) {
+      // 切换深色模式
+      Menu() {
+        ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
+          MenuItem({
+            content: menuItem.title,
+            symbolEndIcon: this.uiConfig.darkMode === menuItem.colorMode ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+          })
+          .onChange((selected) => {
+            // 持久化深色模式
+            this.uiConfig.darkMode = menuItem.colorMode!
+            Xb_ColorModeManager.setColorModeByString(context, this.uiConfig.darkMode)
+            // UI刷新
+            this.EnableDarkModeText = menuItem.title
+          })
+        }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
+      }
+    } else if(index === 1) {
+      // 切换主题色
+      Menu() {
+        ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
+          MenuItem({
+            content: menuItem.title,
+            symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.paintpalette_fill')).fontColor(menuItem.startSymbolFontColor),
+            symbolEndIcon: this.uiConfig.themeColorIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+          })
+          .selected(this.uiConfig.themeColorIndex === index)
+          .onChange((selected) => {
+            this.uiConfig.themeColorIndex = index
+            // 持久化主题色
+            this.uiConfig.themeColor = menuItem?.customThemeName ?? 'yellowAppTheme'
+            Xb_UIConfig.themeColor = menuItem?.customThemeName ?? 'yellowAppTheme'
+            Xb_ChangeThemeColor(this.uiConfig.themeColor)
+            // UI刷新
+            this.EnableThemeColorText = menuItem.title
+          })
+        }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
+      }
+    } else if (index === 2) {
+      // 切换按钮位置
+      Menu() {
+        ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
+          MenuItem({
+            content: menuItem.title,
+            symbolEndIcon: this.uiConfig.buttonPositionIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+          })
+            .selected(this.uiConfig.buttonPositionIndex === index)
+            .onChange((selected) => {
+              animateTo(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }:null, () => {
+                // 持久化按钮位置
+                this.uiConfig.buttonPositionIndex = index
+                this.switchButtonPosition(index)
+              })
+              // UI刷新
+              this.EnableButtonPositionText = menuItem.title
+            })
+        }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
+      }
+    } else if (index === 3) {
+      // 切换动画速度
+      Menu() {
+        ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
+          MenuItem({
+            content: menuItem.title,
+            symbolEndIcon: this.uiConfig.animationSpeedIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+          })
+            .selected(this.uiConfig.animationSpeedIndex === index)
+            .onChange((selected) => {
+              // 持久化动画速度
+              this.uiConfig.animationSpeedIndex = index
+              this.switchAnimationSpeed(index)
+              // UI刷新
+              this.EnableAnimationSpeedText = menuItem.title
+            })
+        }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
+      }
+    } else if (index === 4) {
+      // 切换字符显示权重
+      Menu() {
+        ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
+          MenuItem({
+            content: menuItem.title,
+            symbolEndIcon: this.uiConfig.stringDisplayIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+          })
+            .selected(this.uiConfig.stringDisplayIndex === index)
+            .onChange((selected) => {
+              // 持久化字符显示权重
+              this.uiConfig.stringDisplayIndex = index
+              // UI刷新
+              this.EnableStringDisplayText = menuItem.title
+            })
+        }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
+      }
+    } else if (index === 5) {
+      // 关闭窗口
+      Menu() {
+        ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
+          MenuItem({
+            content: menuItem.title,
+            symbolEndIcon: this.uiConfig.stringDisplayIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+          })
+            .selected(this.uiConfig.stringDisplayIndex === index)
+            .onChange((selected) => {
+              // 持久化关闭窗口模式
+              this.uiConfig.exitWindowMode = index
+              // UI刷新
+              this.EnableCloseWindowText = menuItem.title
+            })
+        }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
+      }
+    }
+  }
+
+  @Builder
+  TipsText(index: number) {
+    if (index === 0) {
+      // 主题色
+      Text(this.EnableThemeColorText)
+        .tipsText()
+    } else if (index === 1) {
+      // 深色模式
+      Text(this.EnableDarkModeText)
+        .tipsText()
+    } else if (index === 2) {
+      // 按钮位置
+      Text(this.EnableButtonPositionText)
+        .tipsText()
+    } else if (index === 3) {
+      // 动画速度
+      Text(this.EnableAnimationSpeedText)
+        .tipsText()
+    } else if (index === 4) {
+      // 字符显示权重
+      Text(this.EnableStringDisplayText)
+        .tipsText()
+    } else if (index === 5) {
+      // 关闭窗口
+      Text(this.EnableCloseWindowText)
+        .tipsText()
+    }
+  }
+
+  @Builder
+  MenuEntrance(index: number) {
+    if (index === 0) {
+      // 主题色
+      // 确保children存在
+      if(this.appearanceList && this.appearanceList[1].children) {
+        this.switchMenu(this.appearanceList[1].children, 1)
+      }
+    } else if (index === 1) {
+      // 深色模式
+      // 确保children存在
+      if(this.appearanceList && this.appearanceList[0].children) {
+        this.switchMenu(this.appearanceList[0].children, 0)
+      }
+    } else if (index === 2) {
+      // 按钮位置
+      // 确保children存在
+      if(this.appearanceList && this.appearanceList[2].children) {
+        this.switchMenu(this.appearanceList[2].children, 2)
+      }
+    } else if (index === 3) {
+      // 动画速度
+      // 确保children存在
+      if(this.appearanceList && this.appearanceList[3].children) {
+        this.switchMenu(this.appearanceList[3].children, 3)
+      }
+    } else if (index === 4) {
+      // 字符显示权重
+      // 确保children存在
+      if(this.appearanceList && this.appearanceList[4].children) {
+        this.switchMenu(this.appearanceList[4].children, 4)
+      }
+    } else if (index === 5) {
+      // 关闭窗口
+      // 确保children存在
+      if(this.appearanceList && this.appearanceList[5].children) {
+        this.switchMenu(this.appearanceList[5].children, 5)
+      }
+    }
+  }
+
+  // 切换按钮位置
+  switchButtonPosition(index:number) {
+    switch (index) {
+      case 0:
+        // 右侧
+        this.ButtonPositionOffset = 16
+        this.stackAlignContentAlignment = Alignment.BottomEnd
+        break
+      case 1:
+        // 中间
+        this.ButtonPositionOffset = 0
+        this.stackAlignContentAlignment = Alignment.Bottom
+        break
+      case 2:
+        // 左侧
+        this.ButtonPositionOffset = -16
+        this.stackAlignContentAlignment = Alignment.BottomStart
+        break
+    }
+  }
+
+  // 切换动画速度
+  switchAnimationSpeed(index: number) {
+    switch (index) {
+      case 0:
+        // 快速
+        this.uiConfig.isAnimation = true
+        this.uiConfig.animationSpeed = ANIMATION_DURATION_100
+        break
+      case 1:
+        // 正常
+        this.uiConfig.isAnimation = true
+        this.uiConfig.animationSpeed = ANIMATION_DURATION_300
+        break
+      case 2:
+        // 慢速
+        this.uiConfig.isAnimation = true
+        this.uiConfig.animationSpeed = ANIMATION_DURATION_500
+        break
+      case 3:
+        // 关闭
+        this.uiConfig.isAnimation = false
+        this.uiConfig.animationSpeed = 0
+        break
+    }
+  }
+
+  aboutToAppear(): void {
+    // 初始化主题色显示文本
+    if (this.appearanceList && this.appearanceList[1].children) {
+      this.EnableThemeColorText = this.appearanceList[1].children[this.uiConfig.themeColorIndex].title
+    }
+    // 初始化深色模式显示文本
+    if (this.appearanceList && this.appearanceList[0].children) {
+      this.EnableDarkModeText = this.appearanceList[0].children.find(child => child.colorMode === this.uiConfig.darkMode)?.title!
+    }
+    // 初始化按钮位置显示文本
+    if (this.appearanceList && this.appearanceList[2].children) {
+      this.EnableButtonPositionText = this.appearanceList[2].children[this.uiConfig.buttonPositionIndex].title
+    }
+    // 初始化动画速度显示文本
+    if (this.appearanceList && this.appearanceList[3].children) {
+      this.EnableAnimationSpeedText = this.appearanceList[3].children[this.uiConfig.animationSpeedIndex].title
+    }
+    // 初始化字符显示权重显示文本
+    if (this.appearanceList && this.appearanceList[4].children) {
+      this.EnableStringDisplayText = this.appearanceList[4].children[this.uiConfig.stringDisplayIndex].title
+    }
+    // 初始化关闭窗口显示文本
+    if (this.appearanceList && this.appearanceList[5].children) {
+      this.EnableCloseWindowText = this.appearanceList[5].children[this.uiConfig.exitWindowMode].title
+    }
+  }
+
+  aboutToDisappear(): void {
+
+  }
+
 }
 
 export default Appearance

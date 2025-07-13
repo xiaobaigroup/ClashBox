@@ -1,9 +1,11 @@
-import { abilityAccessCtrl, Context,
+import { abilityAccessCtrl,
+  common,
+  Context,
   PermissionRequestResult,
   Permissions, WantAgent, wantAgent } from "@kit.AbilityKit";
 import { backgroundTaskManager } from "@kit.BackgroundTasksKit";
 import { notificationManager } from "@kit.NotificationKit";
-import { BusinessError } from "@kit.BasicServicesKit";
+import { BusinessError, request } from "@kit.BasicServicesKit";
 import { http } from "@kit.NetworkKit";
 import { AppConfig, AppFlowingState, AppState } from "../../entryability/AppState";
 import { hilog } from "@kit.PerformanceAnalysisKit";
@@ -16,130 +18,118 @@ import { rcp } from '@kit.RemoteCommunicationKit';
  * 模拟下载长时任务
  */
 export class BackgroundDownService {
+  notificationId?: number = undefined;
+  ping: number = 0;
+  notice: number = 0;
+  message: string = '';
+  downloadTask?: request.DownloadTask;
+  isLooping: boolean = false; // 新增循环控制标志
 
-  notificationId ?: number = undefined
-  ping: number = 0
-  notice:number = 0
-  downloader: ThrottledDownloader | null = null
-
-  async start(context: Context) {
-    if(this.notificationId)
-      return
-    let id = await this.startContinuousTask(context)
-    this.notificationId = id
-
-    clearInterval(this.notice)
-    this.downloader = new ThrottledDownloader('https://cn.download.nvidia.com/Windows/576.88/576.88-desktop-win10-win11-64bit-international-dch-whql.exe', {
-      speedLimitKBps: 20, // 限速20KB/s
-      chunkSizeKB: 10 // 每次处理10KB
-    })
-    try {
-      this.downloader.start()
-    } catch (err) {
-      console.error(`DownloadSync ${err}`)
-    }
-    this.updateTraffic()
-    this.notice = setInterval(async () => {
-      this.updateTraffic()
-    }, 2000)
-  }
-
-  async updateTraffic(): Promise<void>{
-    let message = ''
-    if (this.downloader)
-    // 注册进度回调
-    this.downloader.onProgress((progress) => {
-      message = `已下载: ${(progress.loadedBytes / 1024 / 1024).toFixed(2)}MB 剩余${progress.remainingSeconds.toFixed(1)}秒 ${progress.speedKBps.toFixed(1)}KB/s ↓`
-      console.log(`DownloadSync [${new Date().toLocaleTimeString()}] 下载进度: ${progress.percent.toFixed(1)}%`);
-      console.log(`DownloadSync 当前速度: ${progress.speedKBps.toFixed(1)} KB/s`);
-      console.log(`DownloadSync 已下载: ${(progress.loadedBytes / 1024 / 1024).toFixed(2)} MB`);
-      console.log(`DownloadSync 剩余时间: ${progress.remainingSeconds.toFixed(1)} 秒`);
-    })
-    hilog.info(0xFF00, 'BackgroundDownService', "updateProcess %{public}s", message)
-    let appConfig: AppConfig = AppStorage.get<AppConfig>("appConfig") ?? new AppConfig()
-    this.updateProcess(this.notificationId ?? 0, appConfig.currentProxyName ?? 'ClashBox', message )
+  async start(context: common.UIAbilityContext) {
+    this.isLooping = true; // 开启循环
+    this.downloadService(context);
   }
 
   stop(context: Context) {
-    this.notificationId = undefined
-    clearInterval(this.ping)
-    clearInterval(this.notice)
-    this.downloader?.cancel()
-    backgroundTaskManager.stopBackgroundRunning(context)
-  }
+    this.isLooping = false; // 停止循环
 
-  updateProcess(id: number, title: string, message: string) {
-    notificationManager.isSupportTemplate('downloadTemplate').then((data:boolean) => {
-      hilog.info(0xFF00, 'BackgroundDownService', '当前设备支持下载进度条模板')
-      let downLoadTemplate: notificationManager.NotificationTemplate = {
-        name: 'downloadTemplate', // 当前只支持downloadTemplate，保持不变
-        data: {
-          title: title, // 必填。
-          fileName: message, // 必填。
-          progressValue: (Math.random() * 100), // 应用更新进度值，自定义
-        }
+    this.downloadTask?.delete((err: BusinessError, result: boolean) => {
+      if (err) {
+        console.error(`SimulateDownload Failed to remove the download task. Code: ${err.code}, message: ${err.message}`);
+        return;
       }
-
-      let request: notificationManager.NotificationRequest = {
-        content: {
-          // 系统实况类型，保持不变
-          notificationContentType: notificationManager.ContentType.NOTIFICATION_CONTENT_SYSTEM_LIVE_VIEW,
-          systemLiveView: {
-            typeCode: 8, // 上传下载类型需要填写 8，当前仅支持此类型。保持不变
-            title: "clash", // 应用自定义
-            text: "clash", // 应用自定义
-          },
-        },
-        id: id, // 必须是申请长时任务返回的id，否则应用更新通知失败。
-        notificationSlotType: notificationManager.SlotType.LIVE_VIEW, // 实况窗类型，保持不变
-        template: downLoadTemplate,
-      }
-      // 发布通知
+      const filePath = context.filesDir + '/' + '模拟下载中';
       try {
-        notificationManager.publish(request).then(() => {
-          hilog.info(0xFF00, 'BackgroundDownService', "publish success, id = %{public}d", id)
-        }).catch((err: BusinessError) => {
-          hilog.error(0xFF00, 'BackgroundDownService', `publish fail: ${JSON.stringify(err)}`)
-        })
-      } catch (err) {
-        hilog.error(0xFF00, 'BackgroundDownService', `publish fail: ${JSON.stringify(err)}`)
+        if (fs.accessSync(filePath)) {
+          fs.unlinkSync(filePath);
+          console.info("SimulateDownload 文件存在，已删除");
+        }
+      } catch (e) {
+        console.error("SimulateDownload 删除文件失败:", e);
       }
-
-    }).catch((err: BusinessError) => {
-      hilog.error(0xFF00, 'BackgroundDownService', `当前设备不支持下载进度条模板 Code is ${err.code}, message is ${err.message}`)
-    })
-
+      console.info('SimulateDownload Succeeded in removing the download task.');
+    });
   }
 
-  async startContinuousTask(context: Context): Promise<number>{
-    let wantAgentInfo: wantAgent.WantAgentInfo = {
-      // 点击通知后，将要执行的动作列表
-      // 添加需要被拉起应用的bundleName和abilityName
-      wants: [
-        {
-          bundleName: context.applicationInfo.name, // release: org.xbgroup.clashbox, debug: org.xbgroup.clashboxb
-          abilityName: "EntryAbility"
-        }
-      ],
-      // 指定点击通知栏消息后的动作是拉起ability
-      actionType: wantAgent.OperationType.START_ABILITY,
-      // 使用者自定义的一个私有值
-      requestCode: 0,
-      // 点击通知后，动作执行属性
-      actionFlags: [wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG]
+  downloadService(context: common.UIAbilityContext) {
+    if (!this.isLooping) return; // 检查循环状态
+
+    const filePath = context.filesDir + '/' + '模拟下载中';
+    try {
+      if (fs.accessSync(filePath)) {
+        fs.unlinkSync(filePath);
+        console.info("SimulateDownload 文件存在，已删除");
+      }
+    } catch (e) {
+      console.warn("SimulateDownload 删除文件失败（可能不存在）:", e);
     }
 
     try {
-      // 通过wantAgent模块下getWantAgent方法获取WantAgent对象
-      let wantAgentObj: WantAgent =  await wantAgent.getWantAgent(wantAgentInfo)
-      let res = await backgroundTaskManager.startBackgroundRunning(getContext(this), ["dataTransfer"], wantAgentObj)
-      return res.notificationId
+      console.info("SimulateDownload 模拟下载开始");
+      request.downloadFile(context, {
+        url: 'https://dldir1v6.qq.com/qqfile/qq/QQNT/Windows/QQ_9.9.20_250710_x64_01.exe', // TODO 下载链接待替换
+        filePath: filePath,
+        background: true
+      }, (err: BusinessError, data: request.DownloadTask) => {
+        if (err) {
+          console.error(`SimulateDownload Failed to request the download. Code: ${err.code}, message: ${err.message}`);
+          this.retryDownload(context); // 错误时重试
+          return;
+        }
+        this.downloadTask = data;
+
+        // 进度回调保持不变
+        let progressCallback = (receivedSize: number, totalSize: number) => {
+          console.info("SimulateDownload receivedSize:" + receivedSize + " totalSize:" + totalSize);
+        };
+
+        // 修改完成回调：删除文件+重新下载
+        let completeCallback = () => {
+          console.info('SimulateDownload 模拟下载完成');
+          try {
+            if (fs.accessSync(filePath)) {
+              fs.unlinkSync(filePath);
+              console.info("SimulateDownload 下载后删除文件成功");
+            }
+          } catch (e) {
+            console.error("SimulateDownload 下载后删除文件失败:", e);
+          }
+
+          // 延迟1秒后重新开始下载
+          setTimeout(() => {
+            if (this.isLooping) {
+              this.downloadService(context);
+            }
+          }, 1000);
+        };
+
+        // 失败回调：重试下载
+        let failCallback = (errCode: number) => {
+          console.error(`SimulateDownload Failed to download the task. Code: ${errCode}`);
+          this.retryDownload(context);
+        };
+
+        this.downloadTask.on('progress', progressCallback);
+        this.downloadTask.on('complete', completeCallback);
+        this.downloadTask.on('fail', failCallback);
+      });
     } catch (err) {
-      hilog.error(0xFF00, 'BackgroundDownService', `长时任务启动失败. Code is ${err.code}, message is ${err.message}`)
-      return -1
+      console.error(`SimulateDownload Failed to request the download. err: ${JSON.stringify(err)}`);
+      this.retryDownload(context);
     }
   }
 
+  // 新增重试方法
+  private retryDownload(context: common.UIAbilityContext) {
+    if (!this.isLooping) return;
+
+    console.info("SimulateDownload 5秒后重试下载...");
+    setTimeout(() => {
+      if (this.isLooping) {
+        this.downloadService(context);
+      }
+    }, 5000);
+  }
 }
 
 export default  new BackgroundDownService()

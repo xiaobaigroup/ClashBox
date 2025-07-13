@@ -2083,6 +2083,14 @@
     {
       "name": "status_bar_to",
       "value": "您已開啓常駐狀態欄，需要喺設定入面閂咗APP嘅響鈴同震動，係咪而家去設定睇吓呀？"
+    },
+    {
+      "name": "exit_window",
+      "value": "關閉視窗"
+    },
+    {
+      "name": "minimize_tray",
+      "value": "縮到系統列"
     }
   ]
 }

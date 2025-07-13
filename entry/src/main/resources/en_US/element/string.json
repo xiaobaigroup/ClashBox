@@ -1830,7 +1830,7 @@
     },
     {
       "name": "string_display_preferences",
-      "value": "String display preferences"
+      "value": "String Display Preferences"
     },
     {
       "name": "information",
@@ -2083,6 +2083,14 @@
     {
       "name": "status_bar_to",
       "value": "You have enabled the resident status bar and need to turn off the app's ringtone and vibration in the settings. Do you want to go to the settings now?"
+    },
+    {
+      "name": "exit_window",
+      "value": "Close Window"
+    },
+    {
+      "name": "minimize_tray",
+      "value": "Minimize to tray"
     }
   ]
 }

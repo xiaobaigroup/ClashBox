@@ -2083,6 +2083,14 @@
     {
       "name": "status_bar_to",
       "value": "您已开启常驻状态栏，需要在设置内关闭应用的响铃与振动，是否立即前往设置"
+    },
+    {
+      "name": "exit_window",
+      "value": "关闭窗口"
+    },
+    {
+      "name": "minimize_tray",
+      "value": "最小化到托盘"
     }
   ]
 }

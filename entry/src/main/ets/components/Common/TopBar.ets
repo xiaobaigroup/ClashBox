@@ -84,6 +84,7 @@ export struct WindowTopBar {
 
   @State WindowMaximize: boolean = false
   @State windowClass: window.Window = theWindowClass
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   build() {
     Row() {
@@ -149,7 +150,7 @@ export struct WindowTopBar {
       {
         icon: $r('sys.symbol.xmark'),
         onClick: () => {
-          this.windowClass.minimize()
+          this.uiConfig.exitWindowMode === 1 ? getContext().getApplicationContext().killAllProcesses() : this.windowClass.minimize()
         }
       }
     ]

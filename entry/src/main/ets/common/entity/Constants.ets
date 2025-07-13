@@ -656,6 +656,12 @@ export const AppearanceList: AppearanceListItemProp[] = [
       { title: $r('app.string.information') },
     ]
   },
+  { title: $r('app.string.exit_window'),
+    children: [
+      { title: $r('app.string.minimize_tray') },
+      { title: $r('app.string.exit') },
+    ]
+  }
 ]
 
 /**

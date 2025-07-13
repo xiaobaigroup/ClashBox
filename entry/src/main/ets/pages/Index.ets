@@ -612,6 +612,7 @@ struct Index {
         }, 1500)
       }
       if (this.uiConfig.backgroundDownModel && this.uiConfig.Enablednotice) {
+        let context = this.getUIContext().getHostContext() as common.UIAbilityContext
         BackgroundDownService.start(context)
       }
 
