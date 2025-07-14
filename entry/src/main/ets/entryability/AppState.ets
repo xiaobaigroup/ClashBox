@@ -70,7 +70,7 @@ export class UIConfig{
   // 主页问候语
   isGreeting?: boolean = true
   // 主题色
-  themeColor: CustomThemeName = 'yellowAppTheme'
+  themeColor: CustomThemeName = 'blueAppTheme'
   // 图表颜色
   lineColor: ResourceColor = "#ff9926"
   // 主题色序号
@@ -138,7 +138,7 @@ export class UIConfig{
   proxyEnabled: boolean = false
   // 高级功能启用状态
   enabledADvanced: boolean = false
-  // 是否第一次启动应用
+  // 是否第一次启动应用 TODO debug时为false release时为true
   isFirstStart: boolean = true
   // 应用使用时间记录
   useTime: number = new Date().getTime()

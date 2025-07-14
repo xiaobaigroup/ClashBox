@@ -86,7 +86,7 @@ struct Backgrounder {
           }
         })
         // 模拟下载
-        Row() {
+        /*Row() {
           toggleRowList({
             icons: $r('sys.symbol.circle_and_arrow_down'),
             title: $r('app.string.simulate_down'),
@@ -105,7 +105,7 @@ struct Backgrounder {
             // 打开模拟下载启用提示弹窗
             this.openDialogController.open()
           }
-        })
+        })*/
         // 提示
         Text($r('app.string.backgrounder_tips_2'))
           .fontWeight(FontWeight.Normal)

@@ -19,7 +19,7 @@
         "description": "$string:EntryAbility_desc",
         "icon": "$media:layered_image",
         "label": "$string:EntryAbility_label",
-        "startWindowIcon": "$media:panda",
+        "startWindowIcon": "$media:foreground_box_cat",
         "startWindowBackground": "$color:start_window_background",
         "orientation": "auto_rotation_restricted",
         "supportWindowMode": ["floating","split","fullscreen"],
@@ -29,8 +29,6 @@
           // 数据传输
           "dataTransfer",
           "location",
-          // 音频录制
-          "audioRecording"
         ],
         "skills": [
           {
@@ -71,11 +69,6 @@
         // 长时后台
         "name": "ohos.permission.KEEP_BACKGROUND_RUNNING"
       },
-//      {
-//        "name": "ohos.permission.MICROPHONE",
-//        "reason": "$string:permission_reason_MICROPHONE",
-//        "usedScene": {}
-//      },
       {
         "name": "ohos.permission.LOCATION",
         "reason":  "$string:permission_reason_MICROPHONE",

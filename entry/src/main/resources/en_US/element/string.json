@@ -994,7 +994,7 @@
     },
     {
       "name": "backgrounder_tips_2",
-      "value": "Tips: Enabling it will increase the power consumption of the application, and after simulating the positioning of the switch, please restart the software; At present, it is known that the free multi window mode cannot actively initiate a picture in picture window; After enabling picture in picture, the system will lock 90 frames; Simulated download is only effective when the kernel is in front-end mode, and be careful not to clear the simulated download notification, otherwise the simulation will fail; It is usually recommended to turn off the resident status bar option after enabling the simulation download."
+      "value": "Tips: Enabling it will increase the power consumption of the application, and after simulating the positioning of the switch, please restart the software; At present, it is known that the free multi window mode cannot actively initiate a picture in picture window; After enabling picture in picture, the system will lock 90 frames."
     },
     {
       "name": "notice_main_switch",

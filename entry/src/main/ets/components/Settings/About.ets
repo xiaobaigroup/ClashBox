@@ -267,16 +267,16 @@ struct About {
           Column({space: 15}) {
             // logo
             Stack() {
-              Image($r('app.media.background_warm'))
+              Image($r('app.media.background_white'))
                 .borderRadius(25)
                 .height(106)
                 .zIndex(1)
-              Image($r("app.media.panda"))
+              Image($r("app.media.fore_box_cat"))
                 .height(106)
                 .zIndex(2)
             }
             // 名称
-            Image($r('app.media.clashbox'))
+            Image($r("app.media.clash_box_blue"))
               .width(192)
           }
           .justifyContent(FlexAlign.Center)

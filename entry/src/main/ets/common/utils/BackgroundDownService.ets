@@ -67,7 +67,7 @@ export class BackgroundDownService {
     try {
       console.info("SimulateDownload 模拟下载开始");
       request.downloadFile(context, {
-        url: 'https://dldir1v6.qq.com/qqfile/qq/QQNT/Windows/QQ_9.9.20_250710_x64_01.exe', // TODO 下载链接待替换
+        url: 'http://47.95.208.112/mockfile',
         filePath: filePath,
         background: true
       }, (err: BusinessError, data: request.DownloadTask) => {

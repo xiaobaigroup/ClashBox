@@ -12,7 +12,7 @@ class Params {
 function PipBackgroundBuilder(params: Params) {
   Row() {
     Stack() {
-      Image($r('app.media.clashbox'))
+      Image($r("app.media.clash_box_yellow"))
         .width(384)
         .zIndex(1)
       Image($r('app.media.pip_background'))
