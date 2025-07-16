@@ -2091,6 +2091,22 @@
     {
       "name": "minimize_tray",
       "value": "縮到系統列"
+    },
+    {
+      "name": "widget_display_name",
+      "value": "卡片顯示名稱"
+    },
+    {
+      "name": "EntryFormAbility_desc",
+      "value": "卡片生命週期描述"
+    },
+    {
+      "name": "EntryFormAbility_label",
+      "value": "卡片生命週期名"
+    },
+    {
+      "name": "widget_desc",
+      "value": "卡片描述"
     }
   ]
 }

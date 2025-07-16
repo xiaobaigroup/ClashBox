@@ -2091,6 +2091,22 @@
     {
       "name": "minimize_tray",
       "value": "Minimize to tray"
+    },
+    {
+      "name": "EntryFormAbility_desc",
+      "value": "Card lifecycle description"
+    },
+    {
+      "name": "EntryFormAbility_label",
+      "value": "Card lifecycle name"
+    },
+    {
+      "name": "widget_desc",
+      "value": "Card description"
+    },
+    {
+      "name": "widget_display_name",
+      "value": "Widget display name"
     }
   ]
 }
