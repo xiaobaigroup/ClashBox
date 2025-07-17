@@ -143,11 +143,11 @@ export struct Welcome {
     Column({space: 15}) {
       // logo
       Stack() {
-        Image($r('app.media.background_white'))
+        Image($r('app.media.background_white_large'))
           .borderRadius(25)
           .height(106)
           .zIndex(1)
-        Image($r("app.media.fore_box_cat"))
+        Image($r("app.media.foreground_box_cat_large"))
           .height(106)
           .zIndex(2)
       }

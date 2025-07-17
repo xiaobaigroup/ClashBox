@@ -1,7 +1,7 @@
 {
   "layered-image":
   {
-    "background" : "$media:background_white",
-    "foreground" : "$media:fore_box_cat"
+    "background" : "$media:background_white_medium",
+    "foreground" : "$media:foreground_box_cat_medium"
   }
 }
