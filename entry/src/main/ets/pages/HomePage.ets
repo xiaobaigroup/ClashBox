@@ -41,6 +41,7 @@ import {
   WindowHomeGridRowPadding } from '../common/breakpoint/BreakPoint'
 import { RoundButton } from '../components/Common/RoundButton'
 import { AccessControl, VpnRawOptions } from 'proxy_core/src/main/ets/rpc/IClashManager'
+import { cardIdManager } from '../common/utils/CardIdManagerUtils'
 
 
 @Entry
@@ -132,6 +133,31 @@ struct Home {
   // 定时器Controller
   @Consume proxyStartedTimer: Timer
 
+  /** @description 切换代理模式 */
+  async switchProxyMode() {
+    if (this.configList.length === 0 || this.theProxyGroups.length === 0) {
+      if (this.uiConfig.isVibrate) {
+        customVibrator.vibratorTriggerOfHapticClockTimer()
+      }
+      // 配置页没有数据，或者代理节点未加载
+      this.promptAction.showToast({
+        message: `${getContext().resourceManager.getStringSync($r('app.string.start_prompt'))}`
+      })
+      // vpn小钥匙可能卡死，关闭vpn小钥匙
+      await ClashViewModel.StopVpn()
+    } else {
+      hilog.info(0xA002, this.componentName, `主页按钮点击事件 代理启动按钮状态：${this.proxyEnabled}`)
+      this.proxyEnabled = !this.proxyEnabled
+      if (this.proxyEnabled) {
+        await ClashViewModel.StartVpn()
+      } else {
+        await ClashViewModel.StopVpn()
+      }
+      if (this.uiConfig.isVibrate) {
+        customVibrator.vibratorTriggerOfHapticClockTimer()
+      }
+    }
+  }
 
   // 按钮前Symbol动效
   // ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE
@@ -260,35 +286,16 @@ struct Home {
             Switch: this.proxyEnabled,
             SubText: this.proxyStartingDuration
           })
-          .onClick(async () => {
-            if(this.configList.length === 0 || this.theProxyGroups.length === 0) {
-              if (this.uiConfig.isVibrate) {
-                customVibrator.vibratorTriggerOfHapticClockTimer()
-              }
-              // 配置页没有数据，或者代理节点未加载
-              this.promptAction.showToast({ message: `${getContext().resourceManager.getStringSync($r('app.string.start_prompt'))}` })
-              // vpn小钥匙可能卡死，关闭vpn小钥匙
-              await ClashViewModel.StopVpn()
-            } else {
-              hilog.info(0xA002, this.componentName, `主页按钮点击事件 代理启动按钮状态：${this.proxyEnabled}`)
-              this.proxyEnabled = !this.proxyEnabled
-              if (this.proxyEnabled) {
-                await ClashViewModel.StartVpn()
-              } else {
-                await ClashViewModel.StopVpn()
-              }
-              if (this.uiConfig.isVibrate) {
-                customVibrator.vibratorTriggerOfHapticClockTimer()
-              }
-            }
-          })
-          .bindPopup(!!this.uiConfig.ShowStartPop, {
-            builder: PopupBuilder(this, PopTips[0], () => {
-              this.uiConfig.ShowStartPop = false
-            }),
-            onWillDismiss: false,
-            autoCancel: false
-          })
+            .onClick(async () => {
+              this.switchProxyMode()
+            })
+            .bindPopup(!!this.uiConfig.ShowStartPop, {
+              builder: PopupBuilder(this, PopTips[0], () => {
+                this.uiConfig.ShowStartPop = false
+              }),
+              onWillDismiss: false,
+              autoCancel: false
+            })
         }
 
       }
@@ -377,12 +384,18 @@ struct Home {
       // 更新PC布局持久化, 避免二次启动重复调用覆盖
       this.uiConfig.isShowHomeCard = JSON.stringify(showHomeCardPC)
     }
+    // 监听卡片切换代理模式
+    EventHub.on(EventKey.CardChangeProxy, async () => {
+      await this.switchProxyMode()
+      cardIdManager.pushCartProxyMode(this.proxyEnabled)
+    })
   }
 
   aboutToDisappear() {
     // 将dialogController置空
     this.SaveDialogController = null
     EventHub.off(EventKey.SwitchModeCard)
+    EventHub.off(EventKey.CardChangeProxy)
   }
 
   homeCardList(): HomeCardInfo[] {

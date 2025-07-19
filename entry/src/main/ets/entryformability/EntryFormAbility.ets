@@ -1,11 +1,15 @@
 import { formBindingData, FormExtensionAbility, formInfo } from '@kit.FormKit';
 import { Want } from '@kit.AbilityKit';
+import { preferences } from '@kit.ArkData';
 
 export default class EntryFormAbility extends FormExtensionAbility {
+  /** @description 卡片添加生命周期 */
   onAddForm(want: Want) {
     // Called to return a FormBindingData object.
-    const formData = '';
-    return formBindingData.createFormBindingData(formData);
+    const formId = want.parameters![formInfo.FormParam.IDENTITY_KEY] as string;
+    return formBindingData.createFormBindingData({
+      formId
+    });
   }
 
   onCastToNormalForm(formId: string) {
@@ -21,8 +25,16 @@ export default class EntryFormAbility extends FormExtensionAbility {
     // Called when a specified message event defined by the form provider is triggered.
   }
 
+  /** @description 卡片删除生命周期 */
   onRemoveForm(formId: string) {
     // Called to notify the form provider that a specified form has been destroyed.
+    const store = preferences.getPreferencesSync(this.context, { name: 'cardPreference' })
+    let list = store.getSync('formId', []) as string[]
+    // 移除卡片ID
+    list = list.filter(id => id !== formId)
+    // 持久化存储
+    store.putSync('formId', list)
+    store.flushSync()
   }
 
   onAcquireFormState(want: Want) {

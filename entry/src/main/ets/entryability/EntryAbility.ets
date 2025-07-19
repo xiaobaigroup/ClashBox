@@ -10,6 +10,18 @@ import { ClashConfig, SocketProxyService, SocketStubService } from 'proxy_core';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { url } from '@kit.ArkTS';
 import { StatusBarUtils } from 'xb_components';
+import { cardIdManager } from '../common/utils/CardIdManagerUtils';
+import { rpc } from '@kit.IPCKit';
+
+class Params implements rpc.Parcelable {
+  marshalling(dataOut: rpc.MessageSequence): boolean {
+    return true
+  }
+
+  unmarshalling(dataIn: rpc.MessageSequence): boolean {
+    return true
+  }
+}
 
 export default class EntryAbility extends UIAbility {
 
@@ -53,11 +65,39 @@ export default class EntryAbility extends UIAbility {
       hilog.info(0x0000, 'EntryAbility', '接收的configUrl为：%{public}s', configUrl)
     }
     new StatusBarUtils().initStatusBar(this.context, $r("app.media.clash_box_blue"), undefined)
+
+    // 卡片Id持久化管理 并 监听卡片事件
+    cardIdManager.init(this.context)
+    this.registerCardEvent()
   }
+
+  /** @description 注册卡片监听事件 */
+  registerCardEvent() {
+    this.callee.on('updateFormId', (indata: rpc.MessageSequence) => {
+      // 获取formId
+      const obj = JSON.parse(indata.readString()) as object
+      const formId = obj['formId'] as string
+      // 持久化卡片Id
+      cardIdManager.addCardId(formId)
+      // 触发卡片更新事件
+      return new Params()
+    })
+
+    this.callee.on('cardChangeProxy', (indata: rpc.MessageSequence) => {
+      EventHub.sendEvent(EventKey.CardChangeProxy)
+      // 触发卡片更新事件
+      return new Params()
+    })
+  }
+
   debugVpn: SocketStubService | null = null
 
   onDestroy(): void {
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onDestroy');
+
+    // 移除卡片监听事件
+    this.callee.off('updateFormId');
+    this.callee.off('cardChangeProxy');
   }
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     // Main window is created, set main page for this ability

@@ -2094,7 +2094,7 @@
     },
     {
       "name": "widget_display_name",
-      "value": "卡片顯示名稱"
+      "value": "開關卡片"
     },
     {
       "name": "EntryFormAbility_desc",
@@ -2106,7 +2106,7 @@
     },
     {
       "name": "widget_desc",
-      "value": "卡片描述"
+      "value": "卡片大小: 1×2"
     }
   ]
 }

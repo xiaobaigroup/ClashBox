@@ -2102,11 +2102,11 @@
     },
     {
       "name": "widget_desc",
-      "value": "Card description"
+      "value": "Card size: 1×2"
     },
     {
       "name": "widget_display_name",
-      "value": "Widget display name"
+      "value": "Switch card"
     }
   ]
 }

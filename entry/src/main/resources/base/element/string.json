@@ -2102,11 +2102,11 @@
     },
     {
       "name": "widget_display_name",
-      "value": "卡片名"
+      "value": "开关卡片"
     },
     {
       "name": "widget_desc",
-      "value": "卡片描述"
+      "value": "卡片大小: 1×2"
     }
   ]
 }
