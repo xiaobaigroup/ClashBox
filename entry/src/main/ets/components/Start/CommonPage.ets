@@ -27,12 +27,17 @@ export struct CommonPage {
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
-  @State controller: webview.WebviewController = new webview.WebviewController()
+
+  private controller: webview.WebviewController = new webview.WebviewController()
 
   aboutToAppear(): void {
     this.isEnableIndexForegroundBlur = true
     // 配置Web开启调试模式
-    webview.WebviewController.setWebDebuggingAccess(true);
+    try {
+      webview.WebviewController.setWebDebuggingAccess(true);
+    } catch (error) {
+      console.error(`ErrorCode: ${(error as BusinessError).code},  Message: ${(error as BusinessError).message}`);
+    }
   }
 
   createPorts() {
@@ -102,7 +107,7 @@ export struct CommonPage {
             scrollBackward: NestedScrollMode.SELF_ONLY,
           })
          // .layoutMode(WebLayoutMode.FIT_CONTENT)
-          .backgroundColor('#00ffffff')
+          .backgroundColor(Color.Transparent)
           .onPageBegin((event) => {
             console.log(`CommonPage #webviewBuilder ${JSON.stringify(event)}`)
           })
@@ -112,16 +117,6 @@ export struct CommonPage {
           })
           .onScroll(() => {
             this.getWebScrollEnd()
-          })
-          .onControllerAttached(() => {
-            try {
-              // 设置允许可以跨域访问的路径列表
-              this.controller.setPathAllowingUniversalAccess([
-                getContext().resourceDir,
-              ])
-            } catch (error) {
-              console.error(`#Webview ErrorCode: ${(error as BusinessError).code},  Message: ${(error as BusinessError).message}`);
-            }
           })
           .onAlert((event) => {
             console.log('#Webview event.message:' + event.message)
@@ -140,11 +135,11 @@ export struct CommonPage {
           .margin({ right: 16})
           .backgroundColor($r('app.color.container_background'))
           .onClick(() => {
-            if (this.isWelcomeStack) {
+            if (!this.isWelcomeStack && !this.uiConfig.isFirstStart) {
+              this.SettingsPageInfos.pop(true)
+            } else {
               // 拒绝并退出
               context.terminateSelf()
-            } else {
-              this.SettingsPageInfos.pop(true)
             }
           })
         Button(this.isEnd ? $r('app.string.complete') : $r('app.string.agree_continue'))

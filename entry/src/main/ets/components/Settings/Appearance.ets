@@ -21,24 +21,7 @@ const context: common.UIAbilityContext = getContext(this) as common.UIAbilityCon
 
 @Component
 struct Appearance {
-  // 实验功能提示框展示变量
-  @Consume isShowExperimentalFunction: boolean
-  @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  @State appearanceList: AppearanceListItemProp[] = AppearanceList
-  /* 主题色 */
-  @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  //一级图标色，黑色
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
-  // 应用上下文
-  private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
-  // 窗口模式
-  @StorageProp('WindowMode') windowMode: boolean = false
-  // 手机横屏判断
-  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
-  // 高度断点
-  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
-  // 宽度断点
-  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+
   // 按钮宽度
   @State proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
   // 按钮高度
@@ -46,20 +29,38 @@ struct Appearance {
   // 深色模式选中文本
   @State EnableDarkModeText: ResourceStr = $r('app.string.follow_system')
   // 主题色选中文本
-  @State EnableThemeColorText: ResourceStr = $r('app.string.yellow')
-  // 按钮位置选中文本
-  @State EnableButtonPositionText: ResourceStr = $r('app.string.right')
+  @State EnableThemeColorText: ResourceStr = $r('app.string.xb_star_river_blue')
   // 动画速度选中文本
   @State EnableAnimationSpeedText: ResourceStr = $r('app.string.normal')
   // 字符串显示权重选中文本
   @State EnableStringDisplayText: ResourceStr = $r('app.string.appearance')
   // 关闭窗口选中文本
   @State EnableCloseWindowText: ResourceStr = $r('app.string.appearance')
+  // 按钮位置选中文本
+  @State EnableButtonPositionText: ResourceStr = $r('app.string.right')
+  // 列表
+  @State appearanceList: AppearanceListItemProp[] = AppearanceList
+
   // 按钮位置偏移量（默认在右侧的偏移量）
   @Consume ButtonPositionOffset: number
+  // 实验功能提示框展示变量
+  @Consume isShowExperimentalFunction: boolean
+  /* 主题色 */
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   // 所有子组件在容器内的对齐方式
   @Consume ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
+
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  // 窗口模式
+  @StorageProp('WindowMode') windowMode: boolean = false
+  // 手机横屏判断
+  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+
 
   build() {
     NavDestination() {
@@ -537,9 +538,12 @@ struct Appearance {
     if (this.appearanceList && this.appearanceList[4].children) {
       this.EnableStringDisplayText = this.appearanceList[4].children[this.uiConfig.stringDisplayIndex].title
     }
-    // 初始化关闭窗口显示文本
-    if (this.appearanceList && this.appearanceList[5].children) {
-      this.EnableCloseWindowText = this.appearanceList[5].children[this.uiConfig.exitWindowMode].title
+    // 窗口模式时才处理
+    if (this.windowMode) {
+      // 初始化关闭窗口显示文本
+      if (this.appearanceList && this.appearanceList[5].children) {
+        this.EnableCloseWindowText = this.appearanceList[5].children[this.uiConfig.exitWindowMode].title
+      }
     }
   }
 
