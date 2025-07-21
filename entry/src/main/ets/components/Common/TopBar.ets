@@ -150,7 +150,9 @@ export struct WindowTopBar {
       {
         icon: $r('sys.symbol.xmark'),
         onClick: () => {
-          this.uiConfig.exitWindowMode === 1 ? getContext().getApplicationContext().killAllProcesses() : this.windowClass.minimize()
+          this.uiConfig.exitWindowMode === 1 ?
+          this.getUIContext()?.getHostContext()?.getApplicationContext().killAllProcesses()
+            : this.windowClass.minimize()
         }
       }
     ]

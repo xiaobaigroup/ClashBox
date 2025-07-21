@@ -139,7 +139,7 @@ export struct CommonPage {
               this.SettingsPageInfos.pop(true)
             } else {
               // 拒绝并退出
-              context.terminateSelf()
+              this.getUIContext()?.getHostContext()?.getApplicationContext().killAllProcesses()
             }
           })
         Button(this.isEnd ? $r('app.string.complete') : $r('app.string.agree_continue'))
