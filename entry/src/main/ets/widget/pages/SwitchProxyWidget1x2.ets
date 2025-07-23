@@ -1,6 +1,6 @@
 @Entry
 @Component
-struct WidgetCard {
+struct SwitchProxyWidget1x2 {
   /** @description 开关变量 */
   @LocalStorageProp('proxyEnabled')
   proxyEnabled: boolean = false
@@ -41,6 +41,7 @@ struct WidgetCard {
           SymbolGlyph(this.proxyEnabled ? this.icon1 : this.icon2)
             .fontColor([Color.White])
             .fontSize(18)
+            .symbolEffect(new ReplaceSymbolEffect(EffectScope.WHOLE), true)
         }
         .align(Alignment.Center)
         .width(32)

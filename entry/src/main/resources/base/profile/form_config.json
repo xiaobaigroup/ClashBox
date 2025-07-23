@@ -1,10 +1,10 @@
 {
   "forms": [
     {
-      "name": "widget",
-      "displayName": "$string:widget_display_name",
-      "description": "$string:widget_desc",
-      "src": "./ets/widget/pages/WidgetCard1-2.ets",
+      "name": "SwitchProxyWidget1x2",
+      "displayName": "$string:SwitchProxyWidget1x2_display_name",
+      "description": "$string:SwitchProxyWidget1x2_desc",
+      "src": "./ets/widget/pages/SwitchProxyWidget1x2.ets",
       "uiSyntax": "arkts",
       "window": {
         "designWidth": 720,
@@ -19,6 +19,69 @@
       "defaultDimension": "1*2",
       "supportDimensions": [
         "1*2"
+      ]
+    },
+    {
+      "name": "SwitchProxyWidget2x2",
+      "displayName": "$string:SwitchProxyWidget2x2_display_name",
+      "description": "$string:SwitchProxyWidget2x2_desc",
+      "src": "./ets/widget/pages/SwitchProxyWidget2x2.ets",
+      "uiSyntax": "arkts",
+      "window": {
+        "designWidth": 720,
+        "autoDesignWidth": true
+      },
+      "colorMode": "auto",
+      "isDynamic": true,
+      "isDefault": false,
+      "updateEnabled": false,
+      "scheduledUpdateTime": "10:30",
+      "updateDuration": 1,
+      "defaultDimension": "2*2",
+      "supportDimensions": [
+        "2*2"
+      ]
+    },
+    {
+      "name": "CurrentNodeWidget2x2",
+      "displayName": "$string:CurrentNodeWidget2x2_display_name",
+      "description": "$string:CurrentNodeWidget2x2_desc",
+      "src": "./ets/widget/pages/CurrentNodeWidget2x2.ets",
+      "uiSyntax": "arkts",
+      "window": {
+        "designWidth": 720,
+        "autoDesignWidth": true
+      },
+      "colorMode": "auto",
+      "isDynamic": true,
+      "isDefault": false,
+      "updateEnabled": false,
+      "scheduledUpdateTime": "10:30",
+      "updateDuration": 1,
+      "defaultDimension": "2*2",
+      "supportDimensions": [
+        "2*2"
+      ]
+    },
+    {
+      "name": "IPAddressWidget2x2",
+      "displayName": "$string:IPAddressWidget2x2_display_name",
+      "description": "$string:IPAddressWidget2x2_desc",
+      "src": "./ets/widget/pages/IPAddressWidget2x2Card.ets",
+      "uiSyntax": "arkts",
+      "window": {
+        "designWidth": 720,
+        "autoDesignWidth": true
+      },
+      "colorMode": "auto",
+      "isDynamic": true,
+      "isDefault": false,
+      "updateEnabled": false,
+      "scheduledUpdateTime": "10:30",
+      "updateDuration": 1,
+      "defaultDimension": "2*2",
+      "supportDimensions": [
+        "2*2"
       ]
     }
   ]

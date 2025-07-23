@@ -2101,12 +2101,36 @@
       "value": "Card lifecycle name"
     },
     {
-      "name": "widget_desc",
-      "value": "Card size: 1×2"
+      "name": "SwitchProxyWidget1x2_desc",
+      "value": "Card Size: 1×2"
     },
     {
-      "name": "widget_display_name",
-      "value": "Switch card"
+      "name": "SwitchProxyWidget1x2_display_name",
+      "value": "Switch Card"
+    },
+    {
+      "name": "SwitchProxyWidget2x2_display_name",
+      "value": "Switch Card"
+    },
+    {
+      "name": "SwitchProxyWidget2x2_desc",
+      "value": "Card Size: 2×2"
+    },
+    {
+      "name": "CurrentNodeWidget2x2_desc",
+      "value": "Card Size: 2×2"
+    },
+    {
+      "name": "IPAddressWidget2x2_desc",
+      "value": "Card Size: 2×2"
+    },
+    {
+      "name": "CurrentNodeWidget2x2_display_name",
+      "value": "Current Node Card"
+    },
+    {
+      "name": "IPAddressWidget2x2_display_name",
+      "value": "IP Address Card"
     }
   ]
 }

@@ -2101,12 +2101,36 @@
       "value": "卡片生命周期名"
     },
     {
-      "name": "widget_display_name",
+      "name": "SwitchProxyWidget1x2_display_name",
       "value": "开关卡片"
     },
     {
-      "name": "widget_desc",
+      "name": "SwitchProxyWidget1x2_desc",
       "value": "卡片大小: 1×2"
+    },
+    {
+      "name": "SwitchProxyWidget2x2_display_name",
+      "value": "开关卡片"
+    },
+    {
+      "name": "SwitchProxyWidget2x2_desc",
+      "value": "卡片大小: 2×2"
+    },
+    {
+      "name": "CurrentNodeWidget2x2_desc",
+      "value": "当前节点卡片"
+    },
+    {
+      "name": "CurrentNodeWidget2x2_display_name",
+      "value": "当前节点卡片"
+    },
+    {
+      "name": "IPAddressWidget2x2_desc",
+      "value": "卡片大小: 2×2"
+    },
+    {
+      "name": "IPAddressWidget2x2_display_name",
+      "value": "IP地址卡片"
     }
   ]
 }

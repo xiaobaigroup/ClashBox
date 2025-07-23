@@ -91,8 +91,10 @@
     {
       "name": "px_sec_screen_dot",
       "value": "#FFE5E5EA"
+    },
+    {
+      "name": "item_title_font",
+      "value": "#E6000000"
     }
   ]
 }
-
-

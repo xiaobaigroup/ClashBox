@@ -2093,7 +2093,7 @@
       "value": "縮到系統列"
     },
     {
-      "name": "widget_display_name",
+      "name": "SwitchProxyWidget1x2_display_name",
       "value": "開關卡片"
     },
     {
@@ -2105,8 +2105,32 @@
       "value": "卡片生命週期名"
     },
     {
-      "name": "widget_desc",
+      "name": "SwitchProxyWidget1x2_desc",
       "value": "卡片大小: 1×2"
+    },
+    {
+      "name": "SwitchProxyWidget2x2_display_name",
+      "value": "開關卡片"
+    },
+    {
+      "name": "SwitchProxyWidget2x2_desc",
+      "value": "卡片大小: 2×2"
+    },
+    {
+      "name": "CurrentNodeWidget2x2_desc",
+      "value": "卡片大小: 2×2"
+    },
+    {
+      "name": "IPAddressWidget2x2_desc",
+      "value": "卡片大小: 2×2"
+    },
+    {
+      "name": "IPAddressWidget2x2_display_name",
+      "value": "IP位址卡片"
+    },
+    {
+      "name": "CurrentNodeWidget2x2_display_name",
+      "value": "當前節點卡片"
     }
   ]
 }
