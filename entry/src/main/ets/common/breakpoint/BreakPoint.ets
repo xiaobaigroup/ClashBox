@@ -67,7 +67,7 @@ export const TabBarHeight = BreakpointFunction2D<string>({
 /**Tab栏字体大小*/
 export const TabTitleFontSize = BreakpointFunction2D<number>({
   ['sm']: {['hsm']: 12, ['hmd']: 12, ['hlg']: 12},
-  ['md']: {['hsm']: 12, ['hmd']: 16, ['hlg']: 16},
+  ['md']: {['hsm']: 12, ['hmd']: 14, ['hlg']: 16},
   ['lg']: {['hsm']: 16, ['hmd']: 16, ['hlg']: 16},
   ['xl']: {['hsm']: 16, ['hmd']: 16, ['hlg']: 16},
 })
@@ -123,7 +123,7 @@ export const HomeCardProxyInfoOrder = BreakpointFunction2D<number>({
 /**主页卡片字体大小*/
 export const HomeCardFontSize = BreakpointFunction2D<number>({
   ['sm']: {['hsm']: 16, ['hmd']: 14, ['hlg']: 16},
-  ['md']: {['hsm']: 14, ['hmd']: 20, ['hlg']: 20},
+  ['md']: {['hsm']: 14, ['hmd']: 19, ['hlg']: 20},
   ['lg']: {['hsm']: 22, ['hmd']: 22, ['hlg']: 22},
   ['xl']: {['hsm']: 22, ['hmd']: 22, ['hlg']: 22},
 })
@@ -227,7 +227,7 @@ export const HomeCardCellularDataPadding = BreakpointFunction2D<number>({
 /**主页卡片部分内容文本（当前节点、代理信息）二级字体大小*/
 export const HomeCardPartSmFontSize = BreakpointFunction2D<number>({
   ['sm']: {['hsm']: 14, ['hmd']: 16, ['hlg']: 16},
-  ['md']: {['hsm']: 16, ['hmd']: 20, ['hlg']: 20},
+  ['md']: {['hsm']: 16, ['hmd']: 19, ['hlg']: 20},
   ['lg']: {['hsm']: 20, ['hmd']: 20, ['hlg']: 22},
   ['xl']: {['hsm']: 22, ['hmd']: 22, ['hlg']: 22},
 })
@@ -235,7 +235,7 @@ export const HomeCardPartSmFontSize = BreakpointFunction2D<number>({
 /**主页卡片部分内容文本二级字体大小*/
 export const HomeCardPartSmallFontSize = BreakpointFunction2D<number>({
   ['sm']: {['hsm']: 12, ['hmd']: 12, ['hlg']: 12},
-  ['md']: {['hsm']: 12, ['hmd']: 18, ['hlg']: 18},
+  ['md']: {['hsm']: 12, ['hmd']: 14, ['hlg']: 18},
   ['lg']: {['hsm']: 16, ['hmd']: 18, ['hlg']: 18},
   ['xl']: {['hsm']: 18, ['hmd']: 18, ['hlg']: 18},
 })
@@ -243,7 +243,7 @@ export const HomeCardPartSmallFontSize = BreakpointFunction2D<number>({
 /**主页卡片IP文本字体大小*/
 export const HomeCardIPFontSize = BreakpointFunction2D<number>({
   ['sm']: {['hsm']: 12, ['hmd']: 15, ['hlg']: 16},
-  ['md']: {['hsm']: 15, ['hmd']: 22, ['hlg']: 20},
+  ['md']: {['hsm']: 15, ['hmd']: 19, ['hlg']: 20},
   ['lg']: {['hsm']: 22, ['hmd']: 20, ['hlg']: 24},
   ['xl']: {['hsm']: 22, ['hmd']: 24, ['hlg']: 24},
 })
