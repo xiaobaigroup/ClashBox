@@ -4,6 +4,7 @@ interface GeneratedUnitInterface {
   GB: number
   MB: number
   KB: number
+  B: number
 }
 
 export interface ConvertedUnit {
@@ -16,6 +17,7 @@ const conversionFactors: GeneratedUnitInterface = {
   GB: 1024 ** 3,
   MB: 1024 ** 2,
   KB: 1024,
+  B: 1,
 }
 
 /**
@@ -77,6 +79,8 @@ export function convertToSwitchNub(value: number, unit: keyof GeneratedUnitInter
       return value / Math.pow(1024, 2);
     case 'KB':
       return value / Math.pow(1024, 1);
+    case 'B':
+      return value / Math.pow(1024, 1);
     default:
       throw new Error(`Unsupported unit: ${unit}`);
   }
@@ -126,6 +130,18 @@ export function convertToSwitchNub1(value: number, unitT: TrafficUnit,unitU:Traf
         return  value
       } ;
     case 'KB':
+      if (unitU=='TB'){
+        return  value * Math.pow(1024, 3)
+      }else if (unitU=='GB'){
+        return  value * Math.pow(1024, 2)
+      }else if(unitU=='MB'){
+        return  value * Math.pow(1024, 1)
+      }else if(unitU=='B'){
+        return  value / Math.pow(1024, 1)
+      }else {
+        return  value
+      } ;
+    case 'B':
       if (unitU=='TB'){
         return  value * Math.pow(1024, 3)
       }else if (unitU=='GB'){
