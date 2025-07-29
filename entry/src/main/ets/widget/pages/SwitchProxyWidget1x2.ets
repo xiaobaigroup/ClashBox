@@ -1,3 +1,6 @@
+import ActionUtils from '../model/ActionUtils'
+import { ProxyActionType } from '../model/FormCardConstant'
+
 @Entry
 @Component
 struct SwitchProxyWidget1x2 {
@@ -21,15 +24,7 @@ struct SwitchProxyWidget1x2 {
   icon_emphasize: ResourceColor = '#0A59F7'
 
   updateFormId() {
-    postCardAction(this, {
-      action: 'call',
-      bundleName: 'org.xbgroup.clashboxb',
-      abilityName: 'EntryAbility',
-      params: {
-        method: 'updateFormId',
-        formId: this.formId
-      }
-    })
+    ActionUtils.updateCardIdAction(this, this.formId)
   }
 
   build() {
@@ -58,15 +53,7 @@ struct SwitchProxyWidget1x2 {
         .height(32)
         .clip(true)
         .onClick(() => {
-          postCardAction(this, {
-            action: 'call',
-            bundleName: 'org.xbgroup.clashboxb',
-            abilityName: 'EntryAbility',
-            params: {
-              method: 'cardChangeProxy',
-              formId: this.formId
-            }
-          })
+          ActionUtils.SwitchProxyAction(this, this.proxyEnabled ? ProxyActionType.STOP : ProxyActionType.START, this.formId)
         })
       }
       .width(this.fullWidthPercent)
@@ -76,5 +63,8 @@ struct SwitchProxyWidget1x2 {
     .width(this.fullWidthPercent)
     .height(this.fullHeightPercent)
     .justifyContent(FlexAlign.Center)
+    .onClick(()=>{
+      ActionUtils.jumpApp(this)
+    })
   }
 }
