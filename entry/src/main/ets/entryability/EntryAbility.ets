@@ -12,6 +12,7 @@ import { url } from '@kit.ArkTS';
 import { StatusBarUtils } from 'xb_components';
 import { cardIdManager } from '../common/utils/CardIdManagerUtils';
 import { rpc } from '@kit.IPCKit';
+import { ProxyActionType } from '../widget/model/FormCardConstant';
 
 class Params implements rpc.Parcelable {
   marshalling(dataOut: rpc.MessageSequence): boolean {
@@ -34,9 +35,96 @@ export default class EntryAbility extends UIAbility {
     // AppStorage.setOrCreate('currentHeightBreakpoint', heightBp);
     console.log(`断点测试 widthBp: ${widthBp}`)
   };
+  /** @description ClashCore是否初始化过 */
+  private clashCoreInitialized: boolean = false
 
+  /** @description 注册卡片监听事件 */
+  registerCardEvent() {
+    // 卡片持久化ID
+    this.callee.on('updateFormId', (indata: rpc.MessageSequence) => {
+      // 获取formId
+      const obj = JSON.parse(indata.readString()) as object
+      const formId = obj['formId'] as string
+      // 持久化卡片Id
+      cardIdManager.addCardId(formId)
+      // 触发卡片更新事件
+      return new Params()
+    })
 
-  onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+    // 卡片切换代理
+    this.callee.on('cardChangeProxy', (indata: rpc.MessageSequence) => {
+      // EventHub.sendEvent(EventKey.CardChangeProxy)
+      const obj = JSON.parse(indata.readString()) as object
+      const proxyActionType = obj['proxyActionType'] as ProxyActionType
+
+      console.log(`后台拉起切换代理模式 - EntryAbility函数${proxyActionType}`)
+      const clashCore = 0
+      console.log(`后台拉起切换代理模式 - EntryAbility函数,${clashCore}`)
+
+      this.CardClashCoreEvent(clashCore, proxyActionType)
+
+      return null
+    })
+  }
+
+  /** @description 初始化Clash核心 */
+  private async ClashCoreInit() {
+      let clashCore = AppStorage.get<AppConfig>("appConfig")?.clashCore;
+      console.log(`后台拉起切换代理模式 - EntryAbility函数,${clashCore}`);
+      await ClashViewModel.ChangeCore(clashCore);
+      if (clashCore != ClashCore.mihomo) {
+        let service = new SocketStubService(this.context);
+        service.startService();
+      }
+      ClashViewModel.initProfile();
+      EventHub.on(EventKey.LoadClashConfig, (isPatch: boolean) => {
+        ClashViewModel.loadConfig(isPatch);
+      });
+      // 监测vpn服务是否被回收，并且重新启动
+      setInterval(async () => {
+        if (!ClashViewModel.socketProxy.active) {
+          ClashViewModel.socketProxy.active = true;
+          ClashViewModel.socketProxy.offlineTime.push(Date.now());
+          promptAction.showToast({ message: `核心恢复中(${ClashViewModel.socketProxy.offlineTime.length})...` });
+          let clashCore = AppStorage.get<AppConfig>("appConfig")?.clashCore;
+          let result = await ClashViewModel.ChangeCore(clashCore);
+          if (result) {
+            await ClashViewModel.ReStartVpn();
+          }
+        }
+      }, 1000);
+      EventHub.sendEvent(EventKey.checkIpInfo);
+      hilog.info(0x0000, 'EntryAbility', 'Succeeded in loading the content.');
+
+      this.clashCoreInitialized = true
+  }
+
+  /** @description 卡片Clash核心触发事件 */
+  private async CardClashCoreEvent(clashCore: number, proxyActionType: ProxyActionType) {
+    // 初始化核心
+    if (!this.clashCoreInitialized) {
+      await ClashViewModel.init(this.context)
+      await this.ClashCoreInit()
+      const proxyNodeInfo = cardIdManager.getSelectedProxyNode()
+      if (proxyNodeInfo) {
+        console.log('CardClashCoreEvent',JSON.stringify(proxyNodeInfo))
+        ClashViewModel.changeProxy(proxyNodeInfo.profile, proxyNodeInfo.g, proxyNodeInfo.p)
+      }
+    }
+
+    console.log('启动/停止代理', proxyActionType)
+
+    // 启动/停止代理
+    if (proxyActionType === ProxyActionType.START) {
+      // TODO 可能会启动失败，启动成功后未走流
+      ClashViewModel.StartVpn()
+    } else {
+      ClashViewModel.StopVpn()
+    }
+  }
+
+  // 卡片在后台执行
+  async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onCreate');
     // 添加崩溃监听
     hiAppEvent.addWatcher({
@@ -98,6 +186,7 @@ export default class EntryAbility extends UIAbility {
     // 移除卡片监听事件
     this.callee.off('updateFormId');
     this.callee.off('cardChangeProxy');
+    cardIdManager.pushCartProxyMode(false)
   }
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     // Main window is created, set main page for this ability
@@ -111,8 +200,10 @@ export default class EntryAbility extends UIAbility {
       hilog.error(0xFF00, "EntryAbility", 'Failed to set window rect auto-save. Cause code: %{public}s smessage: %{public}s', exception.code, exception.message)
     }
 
-    // 初始化
-    await ClashViewModel.init(this.context)
+    // 卡片初始化过就无须再次初始化
+    if (!this.clashCoreInitialized) {
+      await ClashViewModel.init(this.context)
+    }
 
     windowStage.loadContent('pages/Index', async (err) => {
       if (err.code) {
@@ -121,31 +212,10 @@ export default class EntryAbility extends UIAbility {
       }
       this.onWindowModeChange(windowStage, windowClass)
       await AppState.init()
-      let clashCore = AppStorage.get<AppConfig>("appConfig")?.clashCore
-      await ClashViewModel.ChangeCore(clashCore)
-      if(clashCore != ClashCore.mihomo){
-        let service = new SocketStubService(this.context);
-        service.startService()
+      // 卡片初始化过就无须再次初始化
+      if (!this.clashCoreInitialized) {
+        await this.ClashCoreInit();
       }
-      ClashViewModel.initProfile()
-      EventHub.on(EventKey.LoadClashConfig, (isPatch: boolean)=>{
-        ClashViewModel.loadConfig(isPatch)
-      })
-      // 监测vpn服务是否被回收，并且重新启动
-      setInterval(async () => {
-        if(!ClashViewModel.socketProxy.active){
-          ClashViewModel.socketProxy.active = true
-          ClashViewModel.socketProxy.offlineTime.push(Date.now())
-          promptAction.showToast({message: `核心恢复中(${ClashViewModel.socketProxy.offlineTime.length})...`})
-          let clashCore = AppStorage.get<AppConfig>("appConfig")?.clashCore
-          let result = await ClashViewModel.ChangeCore(clashCore)
-          if (result){
-            await ClashViewModel.ReStartVpn()
-          }
-        }
-      }, 1000)
-      EventHub.sendEvent(EventKey.checkIpInfo)
-      hilog.info(0x0000, 'EntryAbility', 'Succeeded in loading the content.');
     });
 
     windowStage.getMainWindow().then((window: window.Window) => {

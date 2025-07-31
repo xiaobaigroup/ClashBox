@@ -26,6 +26,7 @@ import { TabBarVertical, TabContentTitleMargin } from '../common/breakpoint/Brea
 import { TopBar } from '../components/Common/TopBar'
 import { getResourceString } from '../common/utils/ResourceStringUtil'
 import { RoundButton } from '../components/Common/RoundButton'
+import { cardIdManager } from '../common/utils/CardIdManagerUtils'
 
 
 @Entry
@@ -151,6 +152,8 @@ struct ProxyPage {
   changeProxy(group: string, item: ProxyItem) {
     if (this.currentProfile) {
       ClashViewModel.changeProxy(this.currentProfile, group, item.name)
+      // 首选项持久化存储 -> 供卡片使用
+      cardIdManager.addSelectedProxyNode(this.currentProfile, group, item.name)
     }
   }
 

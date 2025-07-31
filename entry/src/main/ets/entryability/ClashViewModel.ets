@@ -17,6 +17,7 @@ import { ProxyItem } from "../common/datasources/ProxyData";
 import { hilog } from "@kit.PerformanceAnalysisKit";
 import { readText } from "proxy_core/src/main/ets/fileUtils";
 import { AccessControl, VpnRawOptions } from "proxy_core/src/main/ets/rpc/IClashManager";
+import { cardIdManager } from "../common/utils/CardIdManagerUtils";
 
 export interface DelayInfo{
     name: string
@@ -320,6 +321,7 @@ export class ClashViewModel {
       EventHub.sendEvent(EventKey.StartedClash)
       EventHub.sendEvent(EventKey.checkIpInfo)
     }
+    cardIdManager.pushCartProxyMode(this.vpnStarted)
   }
   async loadVpnOptions(){
     let appConfig = AppStorage.get<AppConfig>("appConfig")
@@ -344,6 +346,7 @@ export class ClashViewModel {
     this.socketProxy.stopClash()
     EventHub.sendEvent(EventKey.StopedClash)
     EventHub.sendEvent(EventKey.checkIpInfo)
+    cardIdManager.pushCartProxyMode(this.vpnStarted)
   }
 
   async initProfile(){
