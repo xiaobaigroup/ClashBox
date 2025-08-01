@@ -324,6 +324,7 @@ export class ClashViewModel {
     cardIdManager.pushCartProxyMode(this.vpnStarted)
   }
   async loadVpnOptions(){
+    // TODO 使用首选项做一层适配层以获取应用的配置信息和代理信息
     let appConfig = AppStorage.get<AppConfig>("appConfig")
     if (appConfig?.accessControl == null)
       return
