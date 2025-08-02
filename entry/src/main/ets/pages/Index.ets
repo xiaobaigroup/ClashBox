@@ -843,6 +843,7 @@ struct Index {
       this.theRestoreTime = new Date().getTime()
       hilog.info(0xFF00, "TimertestTag", "恢复的时刻： %{private}d", this.theRestoreTime)
     }
+    this.proxyEnabled = ClashViewModel.vpnStarted
     this.isForeward = true
     this.ShowPipChange()
     this.initLanguage()
