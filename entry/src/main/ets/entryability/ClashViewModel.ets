@@ -306,6 +306,7 @@ export class ClashViewModel {
       await this.loadVpnOptions()
       await this.socketProxy.stopClash()
       await this.socketProxy.startClash()
+      cardIdManager.pushCartProxyMode(this.vpnStarted)
     }
   }
   vpnStarted = false
@@ -323,9 +324,9 @@ export class ClashViewModel {
     }
     cardIdManager.pushCartProxyMode(this.vpnStarted)
   }
-  async loadVpnOptions(){
-    // TODO 使用首选项做一层适配层以获取应用的配置信息和代理信息
-    let appConfig = AppStorage.get<AppConfig>("appConfig")
+    async loadVpnOptions(){
+    // 使用首选项持久化单个节点信息供卡片拉起服务
+    let appConfig = AppStorage.get<AppConfig>("appConfig") || cardIdManager.getAppConfig()
     if (appConfig?.accessControl == null)
       return
     if(appConfig!.accessControl){
@@ -351,7 +352,7 @@ export class ClashViewModel {
   }
 
   async initProfile(){
-    let appConfig = AppStorage.get<AppConfig>("appConfig")
+    let appConfig = AppStorage.get<AppConfig>("appConfig") || cardIdManager.getAppConfig()
     EventHub.sendEvent(EventKey.StartLog, appConfig?.enableLogger)
     await this.loadConfig(false)
     EventHub.sendEvent(EventKey.FetchProxyGroup)
@@ -359,8 +360,8 @@ export class ClashViewModel {
 
   proxyGroups :ProxyGroup[] = []
   async loadConfig(patch: boolean = true){
-    let appConfig = AppStorage.get<AppConfig>("appConfig")
-    let clashConfig = AppStorage.get<ClashConfig>("clashConfig")
+    let appConfig = AppStorage.get<AppConfig>("appConfig") || cardIdManager.getAppConfig()
+    let clashConfig = AppStorage.get<ClashConfig>("clashConfig") || cardIdManager.getClashConfig()
     const profile = await this.profileRepo.query(appConfig?.currentProfileId)
     await this.loadProfileAndConfig(appConfig?.currentProfileId ?? "", clashConfig, {
       "is-patch": patch,

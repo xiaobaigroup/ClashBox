@@ -153,7 +153,7 @@ struct ProxyPage {
     if (this.currentProfile) {
       ClashViewModel.changeProxy(this.currentProfile, group, item.name)
       // 首选项持久化存储 -> 供卡片使用
-      cardIdManager.addSelectedProxyNode(this.currentProfile, group, item.name)
+      cardIdManager.setSelectedProxyNode(this.currentProfile, group, item.name)
     }
   }
 

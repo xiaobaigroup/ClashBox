@@ -1,7 +1,8 @@
 import { Context } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { formBindingData, formProvider } from '@kit.FormKit';
-import { Profile } from 'proxy_core';
+import { ClashConfig, Profile } from 'proxy_core';
+import { AppConfig } from '../../entryability/AppState';
 
 /** @description 切换代理参数 */
 class changeProxyParams {
@@ -26,6 +27,8 @@ class CardIdManager {
   private storeName: string = 'cardPreference'
   private formIdKey: string = 'formId'
   private selectedProxyNodeKey: string = 'selectedProxyNode'
+  private appConfigKey: string = 'appConfig'
+  private clashConfigKey: string = 'clashConfig'
 
   /** @description 初始化 */
   init(context: Context) {
@@ -45,9 +48,11 @@ class CardIdManager {
   addCardId(formId: string) {
     if (this.store) {
       const list = this.getCardIdList()
-      list.push(formId)
-      this.store.putSync(this.formIdKey, list)
-      this.store.flushSync()
+      if (!list.includes(formId)) {
+        list.push(formId)
+        this.store.putSync(this.formIdKey, list)
+        this.store.flushSync()
+      }
     }
   }
 
@@ -85,12 +90,49 @@ class CardIdManager {
   }
 
   /** @description 存储选中的代理节点信息 */
-  addSelectedProxyNode(profile: Profile, g: string, p: string) {
+  setSelectedProxyNode(profile: Profile, g: string, p: string) {
     if (this.store) {
       const newInfo = new changeProxyParams(profile, g, p)
       let proxyNodeInfo = this.getSelectedProxyNode()
       proxyNodeInfo = newInfo
       this.store.putSync(this.selectedProxyNodeKey, proxyNodeInfo)
+      this.store.flushSync()
+    }
+  }
+
+  // 适配层 -> 适配 appConfig 和 clashConfig 持久化的问题
+  /** @description 获取App配置 */
+  getAppConfig() {
+    if (this.store) {
+      return this.store.getSync(this.appConfigKey, new AppConfig()) as AppConfig
+    }
+    return null
+  }
+
+  /** @description 存储App配置 */
+  setAppConfig(appConfig: AppConfig) {
+    if (this.store) {
+      let newConfig = new AppConfig()
+      newConfig = appConfig
+      this.store.putSync(this.appConfigKey, newConfig)
+      this.store.flushSync()
+    }
+  }
+
+  /** @description 获取Clash配置 */
+  getClashConfig() {
+    if (this.store) {
+      return this.store.getSync(this.clashConfigKey, new ClashConfig()) as ClashConfig
+    }
+    return null
+  }
+
+  /** @description 存储Clash配置 */
+  setClashConfig(clashConfig: ClashConfig) {
+    if (this.store) {
+      let newConfig = new ClashConfig()
+      newConfig = clashConfig
+      this.store.putSync(this.clashConfigKey, newConfig)
       this.store.flushSync()
     }
   }

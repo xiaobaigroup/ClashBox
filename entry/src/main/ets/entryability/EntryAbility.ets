@@ -1,7 +1,7 @@
-import { AbilityConstant,  ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
+import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hiAppEvent, hilog } from '@kit.PerformanceAnalysisKit';
 import { promptAction, window } from '@kit.ArkUI';
-import { BusinessError } from '@kit.BasicServicesKit';
+import { BusinessError, emitter } from '@kit.BasicServicesKit';
 import ClashViewModel from './ClashViewModel';
 import { AppConfig, AppFlowingState, AppState, ClashCore } from './AppState';
 import { EventHub, EventKey } from '../common/EventHub';
@@ -25,7 +25,6 @@ class Params implements rpc.Parcelable {
 }
 
 export default class EntryAbility extends UIAbility {
-
   // 设备断点获取
   private uiContext?: UIContext;
   private onWindowSizeChange: (windowSize: window.Size) => void = (windowSize: window.Size) => {
@@ -53,15 +52,10 @@ export default class EntryAbility extends UIAbility {
 
     // 卡片切换代理
     this.callee.on('cardChangeProxy', (indata: rpc.MessageSequence) => {
-      // EventHub.sendEvent(EventKey.CardChangeProxy)
       const obj = JSON.parse(indata.readString()) as object
       const proxyActionType = obj['proxyActionType'] as ProxyActionType
 
-      console.log(`后台拉起切换代理模式 - EntryAbility函数${proxyActionType}`)
-      const clashCore = 0
-      console.log(`后台拉起切换代理模式 - EntryAbility函数,${clashCore}`)
-
-      this.CardClashCoreEvent(clashCore, proxyActionType)
+      this.CardClashCoreEvent(proxyActionType)
 
       return null
     })
@@ -69,8 +63,7 @@ export default class EntryAbility extends UIAbility {
 
   /** @description 初始化Clash核心 */
   private async ClashCoreInit() {
-      let clashCore = AppStorage.get<AppConfig>("appConfig")?.clashCore;
-      console.log(`后台拉起切换代理模式 - EntryAbility函数,${clashCore}`);
+      const clashCore = (AppStorage.get<AppConfig>("appConfig") || cardIdManager.getAppConfig())?.clashCore
       await ClashViewModel.ChangeCore(clashCore);
       if (clashCore != ClashCore.mihomo) {
         let service = new SocketStubService(this.context);
@@ -100,23 +93,22 @@ export default class EntryAbility extends UIAbility {
   }
 
   /** @description 卡片Clash核心触发事件 */
-  private async CardClashCoreEvent(clashCore: number, proxyActionType: ProxyActionType) {
+  private async CardClashCoreEvent(proxyActionType: ProxyActionType) {
     // 初始化核心
     if (!this.clashCoreInitialized) {
       await ClashViewModel.init(this.context)
       await this.ClashCoreInit()
       const proxyNodeInfo = cardIdManager.getSelectedProxyNode()
       if (proxyNodeInfo) {
-        console.log('CardClashCoreEvent',JSON.stringify(proxyNodeInfo))
         ClashViewModel.changeProxy(proxyNodeInfo.profile, proxyNodeInfo.g, proxyNodeInfo.p)
       }
     }
 
-    console.log('启动/停止代理', proxyActionType)
+    console.log('卡片 - 启动/停止代理', proxyActionType)
 
     // 启动/停止代理
     if (proxyActionType === ProxyActionType.START) {
-      // TODO 可能会启动失败，启动成功后未走流
+      // TODO 可能会启动失败
       ClashViewModel.StartVpn()
     } else {
       ClashViewModel.StopVpn()
@@ -159,35 +151,26 @@ export default class EntryAbility extends UIAbility {
     this.registerCardEvent()
   }
 
-  /** @description 注册卡片监听事件 */
-  registerCardEvent() {
-    this.callee.on('updateFormId', (indata: rpc.MessageSequence) => {
-      // 获取formId
-      const obj = JSON.parse(indata.readString()) as object
-      const formId = obj['formId'] as string
-      // 持久化卡片Id
-      cardIdManager.addCardId(formId)
-      // 触发卡片更新事件
-      return new Params()
-    })
-
-    this.callee.on('cardChangeProxy', (indata: rpc.MessageSequence) => {
-      EventHub.sendEvent(EventKey.CardChangeProxy)
-      // 触发卡片更新事件
-      return new Params()
-    })
-  }
-
   debugVpn: SocketStubService | null = null
+
+  /** @description 存储配置文件到首选项 */
+  private saveConfigThePreferences() {
+    const appConfig = AppStorage.get<AppConfig>("appConfig");
+    const clashConfig = AppStorage.get<ClashConfig>("clashConfig");
+    appConfig && cardIdManager.setAppConfig(appConfig);
+    clashConfig && cardIdManager.setClashConfig(clashConfig);
+  }
 
   onDestroy(): void {
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onDestroy');
 
+    this.saveConfigThePreferences()
     // 移除卡片监听事件
     this.callee.off('updateFormId');
     this.callee.off('cardChangeProxy');
     cardIdManager.pushCartProxyMode(false)
   }
+
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     // Main window is created, set main page for this ability
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onWindowStageCreate');
@@ -197,7 +180,9 @@ export default class EntryAbility extends UIAbility {
       await windowStage.setWindowRectAutoSave(true);
       hilog.info(0xFF00, "EntryAbility", 'Succeeded in setting window rect auto-save')
     } catch (exception) {
-      hilog.error(0xFF00, "EntryAbility", 'Failed to set window rect auto-save. Cause code: %{public}s smessage: %{public}s', exception.code, exception.message)
+      hilog.error(0xFF00, "EntryAbility",
+        'Failed to set window rect auto-save. Cause code: %{public}s smessage: %{public}s', exception.code,
+        exception.message)
     }
 
     // 卡片初始化过就无须再次初始化
@@ -268,7 +253,8 @@ export default class EntryAbility extends UIAbility {
     avoidArea = windowClass.getWindowAvoidArea(type);
     let topRectHeight = avoidArea.topRect.height; // 获取状态栏区域高度
     AppStorage.setOrCreate('topRectHeight', px2vp(topRectHeight));
-    hilog.info(0x0000, 'EntryAbility', '初始避让高度 Top：%{public}d Bottom: %{public}i', px2vp(topRectHeight), px2vp(bottomRectHeight));
+    hilog.info(0x0000, 'EntryAbility', '初始避让高度 Top：%{public}d Bottom: %{public}i', px2vp(topRectHeight),
+      px2vp(bottomRectHeight));
     // 3. 注册监听函数，动态获取避让区域数据
     windowClass.on('avoidAreaChange', (data) => {
       let topRectActiveHeight = 0
@@ -280,7 +266,8 @@ export default class EntryAbility extends UIAbility {
         bottomRectActiveHeight = data.area.bottomRect.height;
         AppStorage.setOrCreate('bottomRectHeight', px2vp(bottomRectActiveHeight));
       }
-      hilog.info(0x0000, 'EntryAbility', '动态避让高度 Top：%{public}d Bottom: %{public}i', px2vp(topRectActiveHeight), px2vp(bottomRectActiveHeight));
+      hilog.info(0x0000, 'EntryAbility', '动态避让高度 Top：%{public}d Bottom: %{public}i', px2vp(topRectActiveHeight),
+        px2vp(bottomRectActiveHeight));
     });
 
     // 应用窗口初始高度和宽度
@@ -296,7 +283,8 @@ export default class EntryAbility extends UIAbility {
       windowClass.on('windowSizeChange', (data) => {
         // 动态监听设备窗口模式
         this.onWindowModeChange(windowStage, windowClass)
-        console.info('#WindowChange Succeeded in enabling the listener for window size changes. Data: ' + JSON.stringify(data))
+        console.info('#WindowChange Succeeded in enabling the listener for window size changes. Data: ' +
+        JSON.stringify(data))
         WindowWidth = px2vp(data.width)
         WindowHeight = px2vp(data.height)
         AppStorage.setOrCreate('windowWidth', WindowWidth)
@@ -314,7 +302,7 @@ export default class EntryAbility extends UIAbility {
       // 设置默认标题栏是否显示
       windowClass.setWindowDecorVisible(false)
       // 设置默认标题栏功能按钮是否显示
-      windowClass.setWindowTitleButtonVisible(false,false,false)
+      windowClass.setWindowTitleButtonVisible(false, false, false)
       // 全屏时鼠标移动至顶部不显示标题栏和dock栏，平板自由多窗则是无法唤起状态栏
       windowClass.setTitleAndDockHoverShown(false, false)
       // 设置标题栏高度
@@ -322,14 +310,16 @@ export default class EntryAbility extends UIAbility {
       hilog.info(0xFF00, "EntryAbility", 'WindowMode 当前为PC窗口模式 Succeeded in setting window rect auto-save')
       AppStorage.setOrCreate('WindowMode', true)
     } catch (exception) {
-      hilog.error(0xFF00, "EntryAbility", 'WindowMode 当前为普通模式 Failed to set window rect auto-save. Cause code: %{public}s smessage: %{public}s', exception.code, exception.message)
+      hilog.error(0xFF00, "EntryAbility",
+        'WindowMode 当前为普通模式 Failed to set window rect auto-save. Cause code: %{public}s smessage: %{public}s',
+        exception.code, exception.message)
       AppStorage.setOrCreate('WindowMode', false)
     }
   }
 
   onHeightBpChange(WindowHeight: number, WindowWidth: number) {
-    let heightBp= 0
-    const WindowAspectRatio = WindowHeight / WindowWidth  // 重写高度断点
+    let heightBp = 0
+    const WindowAspectRatio = WindowHeight / WindowWidth // 重写高度断点
     if (WindowAspectRatio < 0.79) {
       heightBp = 0
       AppStorage.setOrCreate('currentHeightBreakpoint', heightBp)
@@ -358,13 +348,14 @@ export default class EntryAbility extends UIAbility {
   onBackground(): void {
     // Ability has back to background
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onBackground');
+    this.saveConfigThePreferences();
   }
 }
 
-export function sleep(timeout: number): Promise<void>{
-  return new Promise((resolve, reject)=>{
-      setTimeout(()=>{
-        resolve()
-      }, timeout)
+export function sleep(timeout: number): Promise<void> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve()
+    }, timeout)
   })
 }

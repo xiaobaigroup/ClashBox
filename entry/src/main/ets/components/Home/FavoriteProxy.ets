@@ -113,7 +113,7 @@ struct FavoriteProxy {
     if (this.currentProfile) {
       ClashViewModel.changeProxy(this.currentProfile, g, item.name)
       // 首选项持久化存储 -> 供卡片使用
-      cardIdManager.addSelectedProxyNode(this.currentProfile, g, item.name)
+      cardIdManager.setSelectedProxyNode(this.currentProfile, g, item.name)
     }
   }
 
