@@ -2131,6 +2131,14 @@
     {
       "name": "CurrentNodeWidget2x2_display_name",
       "value": "當前節點卡片"
+    },
+    {
+      "name": "switch_proxy_title",
+      "value": "VPN開關"
+    },
+    {
+      "name": "click",
+      "value": "點擊"
     }
   ]
 }

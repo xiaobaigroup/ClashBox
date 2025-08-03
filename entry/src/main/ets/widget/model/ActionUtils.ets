@@ -42,6 +42,18 @@ class ActionUtils {
       },
     });
   }
+  
+  /** @description 刷新IP地址 */
+  public refreshIPAddress(component: Object) {
+    postCardAction(component, {
+      action: FormCarAction.CALL,
+      bundleName: BUNDLE_NAME,
+      abilityName: ENTRY_ABILITY,
+      params: {
+        method: CallMethod.REFRESH_IPADDRESS,
+      },
+    });
+  }
 
   /** @description 卡片跳转页面 */
   jumpPage(component: Object) {

@@ -2131,6 +2131,14 @@
     {
       "name": "IPAddressWidget2x2_display_name",
       "value": "IP地址卡片"
+    },
+    {
+      "name": "click",
+      "value": "点击"
+    },
+    {
+      "name": "switch_proxy_title",
+      "value": "VPN开关"
     }
   ]
 }

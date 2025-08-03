@@ -44,4 +44,5 @@ export enum RouterType {
 export enum CallMethod {
   UPDATE_CARD_ID = 'updateFormId',
   CHANGE_PROXY = 'cardChangeProxy',
+  REFRESH_IPADDRESS = 'refreshIPAddress',
 }

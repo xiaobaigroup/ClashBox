@@ -2131,6 +2131,14 @@
     {
       "name": "IPAddressWidget2x2_display_name",
       "value": "IP Address Card"
+    },
+    {
+      "name": "switch_proxy_title",
+      "value": "VPN Switch"
+    },
+    {
+      "name": "click",
+      "value": "Click"
     }
   ]
 }
