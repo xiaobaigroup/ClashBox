@@ -15,7 +15,6 @@ export enum EventKey{
   StopedClash = 10011,
   checkIpInfo = 10012,
   LoadClashConfig = 10013,
-  CardChangeProxy = 10014,
 }
 
 export class EventHub{

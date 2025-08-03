@@ -384,18 +384,12 @@ struct Home {
       // 更新PC布局持久化, 避免二次启动重复调用覆盖
       this.uiConfig.isShowHomeCard = JSON.stringify(showHomeCardPC)
     }
-    // 监听卡片切换代理模式
-    EventHub.on(EventKey.CardChangeProxy, async () => {
-      await this.switchProxyMode()
-      cardIdManager.pushCartProxyMode(this.proxyEnabled)
-    })
   }
 
   aboutToDisappear() {
     // 将dialogController置空
     this.SaveDialogController = null
     EventHub.off(EventKey.SwitchModeCard)
-    EventHub.off(EventKey.CardChangeProxy)
   }
 
   homeCardList(): HomeCardInfo[] {
