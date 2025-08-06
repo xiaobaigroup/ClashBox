@@ -42,9 +42,20 @@ struct IPAddressWidget2x2 {
           .fontSize(12)
           .fontColor($r('sys.color.font_secondary'))
 
-        Text(this.remoteIp.ip)
-          .fontSize(14)
-          .fontWeight(FontWeight.Medium)
+        if (this.remoteIp.ip === undefined) {
+          Row() {
+            LoadingProgress()
+              .size({ width: 18, height: 18 })
+              .color(this.icon_emphasize)
+
+            Text($r('app.string.loading'))
+              .fontSize(16)
+          }.transition(TransitionEffect.OPACITY.animation({ duration: 300, curve: Curve.Ease, delay: 0 }))
+        } else {
+          Text(this.remoteIp.ip)
+            .fontSize(14)
+            .fontWeight(FontWeight.Medium)
+        }
       }
       .alignItems(HorizontalAlign.Start)
       .id('title')
@@ -78,6 +89,10 @@ struct IPAddressWidget2x2 {
         })
         .clip(true)
         .onClick(() => {
+          this.remoteIp = {
+            ip: undefined,
+            country: '',
+          }
           ActionUtils.refreshIPAddress(this)
         })
       }
