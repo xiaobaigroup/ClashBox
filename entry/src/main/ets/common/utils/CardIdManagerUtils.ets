@@ -1,7 +1,7 @@
 import { Context } from '@kit.AbilityKit'
 import { preferences } from '@kit.ArkData'
 import { formBindingData, formProvider } from '@kit.FormKit';
-import { ClashConfig, Profile } from 'proxy_core';
+import { ClashConfig, IpInfo, Profile } from 'proxy_core';
 import { AppConfig } from '../../entryability/AppState';
 
 /** @description 切换代理参数 */
@@ -69,11 +69,23 @@ class CardIdManager {
     }
   }
 
-  /** @description 推送内容到所有卡片 */
+  /** @description 推送代理状态到所有卡片 */
   pushCartProxyMode(proxyEnabled: boolean) {
     // 创建推送数据
     const data = formBindingData.createFormBindingData({
       proxyEnabled
+    })
+    this.getCardIdList().forEach(formId => {
+      // 推送到卡片
+      formProvider.updateForm(formId, data)
+    })
+  }
+  
+  /** @description 推送IP地址到所有卡片 */
+  pushCartProxyIpInfo(remoteIp: IpInfo) {
+    // 创建推送数据
+    const data = formBindingData.createFormBindingData({
+      remoteIp
     })
     this.getCardIdList().forEach(formId => {
       // 推送到卡片

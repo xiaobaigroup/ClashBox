@@ -44,8 +44,12 @@ struct SwitchProxyWidget2x2 {
 
       // 运行时间
       Text() {
-        Span($r('app.string.px_sec_screen_use_time'))
-        Span(': xx:xx:xx')
+        if (this.proxyEnabled) {
+          Span($r('app.string.px_sec_screen_use_time'))
+          Span(': xx:xx:xx')
+        } else {
+          Span($r('app.string.not_enabled'))
+        }
       }
       .fontSize(10)
       .fontColor($r('sys.color.font_secondary'))

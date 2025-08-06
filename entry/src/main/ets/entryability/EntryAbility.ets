@@ -59,37 +59,49 @@ export default class EntryAbility extends UIAbility {
 
       return null
     })
+
+    // 刷新IP地址
+    this.callee.on('refreshIPAddress', (indata: rpc.MessageSequence) => {
+      ClashViewModel.checkIpInfo().then((remoteIp) => {
+        cardIdManager.pushCartProxyIpInfo(remoteIp)
+        hilog.info(0x0000, 'EntryAbility', 'remoteIp - success : ' + JSON.stringify(remoteIp))
+      }).catch((e: Error) => {
+        hilog.info(0x0000, 'EntryAbility', 'remoteIp - error: ' + JSON.stringify(e))
+      })
+
+      return null
+    })
   }
 
   /** @description 初始化Clash核心 */
   private async ClashCoreInit() {
-      const clashCore = (AppStorage.get<AppConfig>("appConfig") || cardIdManager.getAppConfig())?.clashCore
-      await ClashViewModel.ChangeCore(clashCore);
-      if (clashCore != ClashCore.mihomo) {
-        let service = new SocketStubService(this.context);
-        service.startService();
-      }
-      ClashViewModel.initProfile();
-      EventHub.on(EventKey.LoadClashConfig, (isPatch: boolean) => {
-        ClashViewModel.loadConfig(isPatch);
-      });
-      // 监测vpn服务是否被回收，并且重新启动
-      setInterval(async () => {
-        if (!ClashViewModel.socketProxy.active) {
-          ClashViewModel.socketProxy.active = true;
-          ClashViewModel.socketProxy.offlineTime.push(Date.now());
-          promptAction.showToast({ message: `核心恢复中(${ClashViewModel.socketProxy.offlineTime.length})...` });
-          let clashCore = AppStorage.get<AppConfig>("appConfig")?.clashCore;
-          let result = await ClashViewModel.ChangeCore(clashCore);
-          if (result) {
-            await ClashViewModel.ReStartVpn();
-          }
+    const clashCore = (AppStorage.get<AppConfig>("appConfig") || cardIdManager.getAppConfig())?.clashCore
+    await ClashViewModel.ChangeCore(clashCore);
+    if (clashCore != ClashCore.mihomo) {
+      let service = new SocketStubService(this.context);
+      service.startService();
+    }
+    ClashViewModel.initProfile();
+    EventHub.on(EventKey.LoadClashConfig, (isPatch: boolean) => {
+      ClashViewModel.loadConfig(isPatch);
+    });
+    // 监测vpn服务是否被回收，并且重新启动
+    setInterval(async () => {
+      if (!ClashViewModel.socketProxy.active) {
+        ClashViewModel.socketProxy.active = true;
+        ClashViewModel.socketProxy.offlineTime.push(Date.now());
+        promptAction.showToast({ message: `核心恢复中(${ClashViewModel.socketProxy.offlineTime.length})...` });
+        let clashCore = AppStorage.get<AppConfig>("appConfig")?.clashCore;
+        let result = await ClashViewModel.ChangeCore(clashCore);
+        if (result) {
+          await ClashViewModel.ReStartVpn();
         }
-      }, 1000);
-      EventHub.sendEvent(EventKey.checkIpInfo);
-      hilog.info(0x0000, 'EntryAbility', 'Succeeded in loading the content.');
+      }
+    }, 1000);
+    EventHub.sendEvent(EventKey.checkIpInfo);
+    hilog.info(0x0000, 'EntryAbility', 'Succeeded in loading the content.');
 
-      this.clashCoreInitialized = true
+    this.clashCoreInitialized = true
   }
 
   /** @description 卡片Clash核心触发事件 */

@@ -1,11 +1,10 @@
+import { IpInfo } from 'proxy_core';
 import ActionUtils from '../model/ActionUtils'
 import { ProxyActionType } from '../model/FormCardConstant'
 
 @Entry
 @Component
 struct IPAddressWidget2x2 {
-  /** @description 主标题 */
-  readonly title: string = '255.255.255.255';
   /** @description 副标题 */
   readonly subTitle: Resource = $r('app.string.PublicNetwork');
   /** @description 卡片宽度 */
@@ -21,6 +20,12 @@ struct IPAddressWidget2x2 {
   /** @description 开关变量 */
   @LocalStorageProp('proxyEnabled')
   proxyEnabled: boolean = false
+  /** @description IP地址信息 */
+  @LocalStorageProp('remoteIp')
+  remoteIp: IpInfo = {
+    ip: 'Unknown',
+    country: '',
+  }
   /** @description TODO 主题色 */
   @LocalStorageProp('icon_emphasize')
   icon_emphasize: ResourceColor = '#0A59F7'
@@ -37,7 +42,7 @@ struct IPAddressWidget2x2 {
           .fontSize(12)
           .fontColor($r('sys.color.font_secondary'))
 
-        Text(this.title)
+        Text(this.remoteIp.ip)
           .fontSize(14)
           .fontWeight(FontWeight.Medium)
       }
@@ -45,14 +50,14 @@ struct IPAddressWidget2x2 {
       .id('title')
 
       // 地理位置
-        Text() {
-          Span('中国大陆')
-        }
-        .fontSize(10)
-        .fontColor($r('sys.color.font_secondary'))
-        .alignRules({
-          top: { anchor: 'title', align: VerticalAlign.Bottom }
-        })
+      if (this.remoteIp.country) {
+        Text(this.remoteIp.country)
+          .fontSize(10)
+          .fontColor($r('sys.color.font_secondary'))
+          .alignRules({
+            top: { anchor: 'title', align: VerticalAlign.Bottom }
+          })
+      }
 
       // 按钮
       Row() {
