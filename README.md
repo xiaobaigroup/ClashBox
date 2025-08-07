@@ -5,7 +5,7 @@
 
 [![Channel](https://img.shields.io/badge/Telegram-Channel-blue?style=flat-square&logo=telegram)](https://t.me/+aYziOyq-ZhUyNjRl)
 
-目前正在整理源码，源码将会在这里进行开源
+本项目的大部分代码均已开源，若要查看本项目的开源代码，请前往[Master分支](https://github.com/xiaobaigroup/ClashBox/tree/master)。
 #### 介绍
 
 ClashBox是首个基于Navigation框架的HarmonyOS NEXT(OpenHarmony)平台的代理软件，使用改版的[Mihomo(ClashMeta)](https://github.com/MetaCubeX/mihomo)内核。
