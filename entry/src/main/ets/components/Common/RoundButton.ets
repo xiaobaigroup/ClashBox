@@ -46,7 +46,7 @@ export struct RoundButton {
     .width(this.Switch ? $r('app.integer.vp_proxy_started_button_width') : $r('app.integer.vp_proxy_not_start_button_width'))
     .height($r('app.integer.vp_proxy_not_start_button_height'))
     .clip(true)
-    .animation(this.uiConfig.isAnimation ? { duration: this.uiConfig.animationSpeed,curve: curves.springMotion() } : null)
+    .animation({ duration: this.uiConfig.animationSpeed,curve: curves.springMotion() })
     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
   }
 
