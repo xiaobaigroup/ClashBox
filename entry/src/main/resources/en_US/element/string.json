@@ -1494,11 +1494,11 @@
     },
     {
       "name": "switch_core_prompt",
-      "value": "Note: After switching the kernel, you need to restart the VPN service. Enabling the foreground mode will automatically enable the picture in picture function"
+      "value": "Note: After switching the kernel, you need to restart the VPN service.After enabling the foreground mode, After enabling the foreground mode, go to the background operation option and select a simulated background function to start"
     },
     {
       "name": "switch_core_foreground_prompt",
-      "value": "Note that the background operation service or small window foreground operation should be enabled."
+      "value": "Make sure to enable the background running function, otherwise the proxy function will fail."
     },
     {
       "name": "loading",

@@ -1494,11 +1494,11 @@
     },
     {
       "name": "switch_core_prompt",
-      "value": "註：切換核心後需要重啟VPN服務，啟用前台模式會自動啟用畫中畫功能"
+      "value": "註：切換核心後需要重啟VPN服務，啟用前臺模式後自行去後臺運行選項裏面選擇一個模擬後臺功能啟動"
     },
     {
       "name": "switch_core_foreground_prompt",
-      "value": "注意要開啟後台運行服務或小窗前台運行"
+      "value": "註意要開啟後臺運行功能，否則代理功能失效"
     },
     {
       "name": "loading",

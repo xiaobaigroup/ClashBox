@@ -1494,11 +1494,11 @@
     },
     {
       "name": "switch_core_prompt",
-      "value": "注：切换内核后需要重启VPN服务，启用前台模式会自动启用画中画功能"
+      "value": "注：切换内核后需要重启VPN服务，启用前台模式后自行去后台运行选项里面选择一个模拟后台功能启动"
     },
     {
       "name": "switch_core_foreground_prompt",
-      "value": "注意要开启后台运行服务或者小窗前台运行"
+      "value": "注意要开启后台运行功能，否则代理功能失效"
     },
     {
       "name": "loading",
