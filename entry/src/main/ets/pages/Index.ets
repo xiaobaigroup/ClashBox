@@ -611,10 +611,10 @@ struct Index {
           }
         }, 1500)
       }
-      // if (this.uiConfig.backgroundDownModel && this.uiConfig.Enablednotice) {
-      //   let context = this.getUIContext().getHostContext() as common.UIAbilityContext
-      //   BackgroundDownService.start(context)
-      // }
+      if (this.uiConfig.backgroundDownModel && this.uiConfig.Enablednotice) {
+        let context = this.getUIContext().getHostContext() as common.UIAbilityContext
+        BackgroundDownService.start(context)
+      }
 
     })
 
@@ -636,9 +636,9 @@ struct Index {
         Xb_NotificationUtils.cancelNotification(this.noticeJob)
         clearInterval(this.updateNoticeJob)
       }
-      // if (this.uiConfig.backgroundDownModel) {
-      //   BackgroundDownService.stop(context)
-      // }
+      if (this.uiConfig.backgroundDownModel) {
+        BackgroundDownService.stop(context)
+      }
     })
     // 运行一次窗口检查
     this.onWindowChange()

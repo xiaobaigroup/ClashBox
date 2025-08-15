@@ -10,7 +10,7 @@
     },
     {
       "name": "EntryAbility_label",
-      "value": "ClashBox"
+      "value": "ClashBoxb"
     },
     {
       "name": "Home",
@@ -994,7 +994,7 @@
     },
     {
       "name": "backgrounder_tips_2",
-      "value": "注意：啟用後將增加應用程式耗電量，切換模擬定位後請重新啓動軟體；目前已知自由多視窗模式無法主動啓動畫中畫視窗；畫中畫啓用後系統將鎖定90FPS。"
+      "value": "注意：啟用後將增加應用程式耗電量，切換模擬定位後請重新啓動軟體；目前已知自由多視窗模式無法主動啓動畫中畫視窗；畫中畫啓用後系統將鎖定90FPS,模擬下載通知不能刪除，否則模擬下載會失效。"
     },
     {
       "name": "notice_main_switch",

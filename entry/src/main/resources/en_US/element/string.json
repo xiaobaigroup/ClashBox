@@ -10,7 +10,7 @@
     },
     {
       "name": "EntryAbility_label",
-      "value": "ClashBox"
+      "value": "ClashBoxb"
     },
     {
       "name": "Speed",
@@ -994,7 +994,7 @@
     },
     {
       "name": "backgrounder_tips_2",
-      "value": "Tips: Enabling it will increase the power consumption of the application, and after simulating the positioning of the switch, please restart the software; At present, it is known that the free multi window mode cannot actively initiate a picture in picture window; After enabling picture in picture, the system will lock 90 frames."
+      "value": "Tips: Enabling it will increase the power consumption of the application, and after simulating the positioning of the switch, please restart the software; At present, it is known that the free multi window mode cannot actively initiate a picture in picture window; After enabling picture in picture, the system will lock 90 frames,The simulated download notification cannot be deleted; otherwise, the simulated download will become invalid."
     },
     {
       "name": "notice_main_switch",
