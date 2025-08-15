@@ -42,7 +42,9 @@ import BackgroundLocateService from '../common/utils/BackgroundLocateService'
 import { ConvertedUnit } from '../common/utils/DataUnitConvertUtils'
 import { WelcomeUserAgreement } from '../components/Start/WelcomePage'
 import { i18n } from '@kit.LocalizationKit'
-import { TabBarAlignItems,
+import {
+  NeedClearMoreStack,
+  TabBarAlignItems,
   TabBarAvoidHeight,
   TabBarHeight,
   TabBarJustifyContent,
@@ -320,16 +322,19 @@ struct Index {
         .vertical(TabBarVertical(this.widthBp, this.heightBp))
         .barWidth(this.windowMode ? WindowTabBarWidth(this.widthBp, this.heightBp) : TabBarWidth(this.widthBp, this.heightBp))
         .barHeight((this.isSecondary && this.widthBp <= 2 && !this.windowMode) || this.isSmallSquareScreen ? this.barHeight : this.bottomRectHeight == 0 ? TabBarHeight(this.widthBp, this.heightBp) : TabBarAvoidHeight(this.widthBp, this.heightBp))
-        .onChange((index: number) => {
-          this.IndexCurrentindex = index
-          if (index == 0) {
-            this.isHomePage = true
-          } else {
-            this.isHomePage = false
-          }
+        .onTabBarClick((index: number) => {
+          this.getUIContext().animateTo({ duration: this.uiConfig.animationSpeed,
+            curve: Curve.Linear, }, () => {
+            this.IndexCurrentindex = index
+            if (index == 0) {
+              this.isHomePage = true
+            } else {
+              this.isHomePage = false
+            }
+          })
         })
         .onAnimationStart((index: number, targetIndex: number) => {
-          animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion(), }, () => {
+          this.getUIContext().animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear, }, () => {
             if (index == targetIndex) {
               return
             }
@@ -404,7 +409,7 @@ struct Index {
     .animation(this.isSecondary === true ? {
       duration: this.uiConfig.animationSpeed,
       tempo: 0.3,
-      curve: curves.springMotion(),
+      curve: Curve.Linear,
       iterations: 1,
       playMode: PlayMode.Normal
     } : null)
@@ -972,14 +977,11 @@ struct Index {
     //    if (this.uiConfig.isBlurr) {
      //     indexController.setTabBarTranslate(this.isLandscapePhone ? { x: '-100%' } : { y: '100%' })
    //     } else {
-          indexController.setTabBarTranslate({ y: '100%' })
-          this.barHeight = 0
-     //   }
+        indexController.setTabBarTranslate({ y: '100%' })
+        this.barHeight = 0
 
-      if (this.isLandscapePhone || this.istabletLandscape ) {
-        indexController.setTabBarTranslate({ x: '-100%' })
-        this.barWidth = 0
-      }
+      console.info('tab横竖：',`${TabBarVertical(this.widthBp, this.heightBp)}`)
+     //   }
     })
   }
 
@@ -994,11 +996,6 @@ struct Index {
       if (!this.isSmallSquareScreen || !this.isRolling) {
         indexController.setTabBarTranslate({ y: 0 })
         this.barHeight = TabBarHeight(this.widthBp, this.heightBp)
-
-        if (this.isLandscapePhone || this.istabletLandscape ) {
-          indexController.setTabBarTranslate({ x: 0 })
-          this.barWidth = WindowTabBarWidth(this.widthBp, this.heightBp)
-        }
       }
     })
   }
@@ -1006,7 +1003,8 @@ struct Index {
   /**是否进入主二级界面(更多页二级)*/
   isSecondaryChange() {
     // 监听二级页面布尔判定动画是否执行 监听小屏是否滚动
-    if ((this.isSecondary && this.isSmallSquareScreen && !this.isRolling)|| (this.isSecondary && !this.isSmallSquareScreen )) {
+    if ((this.isSecondary && this.isSmallSquareScreen && !this.isRolling) ||
+      (this.isSecondary && !this.isSmallSquareScreen )) {
       this.startAnim()
     } else {
       this.stopAnim()

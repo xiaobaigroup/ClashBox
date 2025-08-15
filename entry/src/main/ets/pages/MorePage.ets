@@ -28,7 +28,7 @@ import { skipRowList } from '../components/Common/Common';
 import { AppConfig, UIConfig } from '../entryability/AppState';
 import { ArrayConfigEditor } from '../components/More/Overwrite/EditArrayConfig';
 import { customAnimationUtil } from '../common/utils/Animation';
-import { ListItemMarginValue } from '../common/breakpoint/BreakPoint';
+import { ListItemMarginValue, TabBarVertical } from '../common/breakpoint/BreakPoint';
 import { AccessControl } from '../components/More/AccessControl';
 
 const componentName: string = 'MorePage'
@@ -254,7 +254,7 @@ struct MorePage {
       hilog.info(0xFF00, "MoretestTag", itemData.name)
       hilog.info(0xFF00, "MoretestTag", "isCheck状态: %{public}s", itemData.isCheck)
       this.pageInfos.replacePathByName(itemData.name, false)
-      this.isSecondary = this.istabletLandscape || this.windowMode ? false : true
+      this.isSecondary = TabBarVertical(this.widthBp, this.heightBp) ? false : true
     }
   }
 
