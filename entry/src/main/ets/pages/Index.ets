@@ -74,9 +74,9 @@ struct Index {
    * 窗口
    */
   // 高度断点
-  @StorageLink ('currentHeightBreakpoint') @Watch('onWindowChange') heightBp: HeightBreakpoint = 0
+  @StorageLink ('currentHeightBreakpoint') @Watch('onWindowChange')  @Watch('isSecondaryChange')heightBp: HeightBreakpoint = 0
   // 宽度断点
-  @StorageLink ('currentWidthBreakpoint') @Watch('onWindowChange') widthBp: WidthBreakpoint = 1
+  @StorageLink ('currentWidthBreakpoint') @Watch('onWindowChange') @Watch('isSecondaryChange')widthBp: WidthBreakpoint = 1
   // 导航条区域的高度
   @StorageProp('bottomRectHeight') @Watch('onAvoidAreaChange') bottomRectHeight: number = 0
   // 状态栏高度
@@ -1003,8 +1003,7 @@ struct Index {
   /**是否进入主二级界面(更多页二级)*/
   isSecondaryChange() {
     // 监听二级页面布尔判定动画是否执行 监听小屏是否滚动
-    if ((this.isSecondary && this.isSmallSquareScreen && !this.isRolling) ||
-      (this.isSecondary && !this.isSmallSquareScreen )) {
+    if (this.isSecondary && TabBarVertical(this.widthBp, this.heightBp) == false) {
       this.startAnim()
     } else {
       this.stopAnim()

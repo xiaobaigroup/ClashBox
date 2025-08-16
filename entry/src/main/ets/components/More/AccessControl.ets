@@ -275,6 +275,7 @@ export struct AccessControl {
         this.isSecondary = false
         return false
       } else {
+        this.isSecondary = false
         return false
       }
     })

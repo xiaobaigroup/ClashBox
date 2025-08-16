@@ -254,7 +254,7 @@ struct MorePage {
       hilog.info(0xFF00, "MoretestTag", itemData.name)
       hilog.info(0xFF00, "MoretestTag", "isCheck状态: %{public}s", itemData.isCheck)
       this.pageInfos.replacePathByName(itemData.name, false)
-      this.isSecondary = TabBarVertical(this.widthBp, this.heightBp) ? false : true
+      this.isSecondary = true//TabBarVertical(this.widthBp, this.heightBp) ? false : true
     }
   }
 
