@@ -43,6 +43,7 @@ import { ConvertedUnit } from '../common/utils/DataUnitConvertUtils'
 import { WelcomeUserAgreement } from '../components/Start/WelcomePage'
 import { i18n } from '@kit.LocalizationKit'
 import {
+  MoreNavMode,
   NeedClearMoreStack,
   TabBarAlignItems,
   TabBarAvoidHeight,
@@ -406,13 +407,6 @@ struct Index {
     .width('100%')
     .height('100%')
     .padding({top: 8})
-    .animation(this.isSecondary === true ? {
-      duration: this.uiConfig.animationSpeed,
-      tempo: 0.3,
-      curve: Curve.Linear,
-      iterations: 1,
-      playMode: PlayMode.Normal
-    } : null)
   }
 
   @Builder
@@ -995,7 +989,7 @@ struct Index {
     }, async () => {
       if (!this.isSmallSquareScreen || !this.isRolling) {
         indexController.setTabBarTranslate({ y: 0 })
-        this.barHeight = TabBarHeight(this.widthBp, this.heightBp)
+        this.barHeight = this.bottomRectHeight == 0 ? TabBarHeight(this.widthBp, this.heightBp) : TabBarAvoidHeight(this.widthBp, this.heightBp)
       }
     })
   }
@@ -1003,7 +997,8 @@ struct Index {
   /**是否进入主二级界面(更多页二级)*/
   isSecondaryChange() {
     // 监听二级页面布尔判定动画是否执行 监听小屏是否滚动
-    if (this.isSecondary && TabBarVertical(this.widthBp, this.heightBp) == false) {
+    if (this.isSecondary && MoreNavMode(this.widthBp, this.heightBp) === NavigationMode.Stack ) {
+      this.stopAnim()
       this.startAnim()
     } else {
       this.stopAnim()

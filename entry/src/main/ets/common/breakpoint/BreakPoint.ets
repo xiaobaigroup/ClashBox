@@ -343,3 +343,11 @@ export const NeedClearMoreStack = BreakpointFunction2D<boolean>({
   ['lg']: {['hsm']: false, ['hmd']: false, ['hlg']: false},
   ['xl']: {['hsm']: false, ['hmd']: false, ['hlg']: false},
 })
+
+/**更多页路由是否分栏*/
+export const MoreNavMode = BreakpointFunction2D<NavigationMode>({
+  ['sm']: {['hsm']: NavigationMode.Stack, ['hmd']: NavigationMode.Stack, ['hlg']: NavigationMode.Stack},
+  ['md']: {['hsm']: NavigationMode.Split, ['hmd']: NavigationMode.Split, ['hlg']: NavigationMode.Split},
+  ['lg']: {['hsm']: NavigationMode.Split, ['hmd']: NavigationMode.Split, ['hlg']: NavigationMode.Split},
+  ['xl']: {['hsm']: NavigationMode.Split, ['hmd']: NavigationMode.Split, ['hlg']: NavigationMode.Split},
+})

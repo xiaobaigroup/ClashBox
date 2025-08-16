@@ -28,7 +28,7 @@ import { skipRowList } from '../components/Common/Common';
 import { AppConfig, UIConfig } from '../entryability/AppState';
 import { ArrayConfigEditor } from '../components/More/Overwrite/EditArrayConfig';
 import { customAnimationUtil } from '../common/utils/Animation';
-import { ListItemMarginValue, TabBarVertical } from '../common/breakpoint/BreakPoint';
+import { ListItemMarginValue, MoreNavMode, NeedClearMoreStack, TabBarVertical } from '../common/breakpoint/BreakPoint';
 import { AccessControl } from '../components/More/AccessControl';
 
 const componentName: string = 'MorePage'
@@ -197,7 +197,7 @@ struct MorePage {
       }.height('100%').width('100%')
     }
     .hideToolBar(true)
-    .mode(this.isLandscapePhone ? NavigationMode.Stack : NavigationMode.Auto)
+    .mode(MoreNavMode(this.widthBp, this.heightBp))
     .navBarWidth(330)
     .navDestination(this.PagesMap)
     .width('100%')
@@ -254,7 +254,7 @@ struct MorePage {
       hilog.info(0xFF00, "MoretestTag", itemData.name)
       hilog.info(0xFF00, "MoretestTag", "isCheck状态: %{public}s", itemData.isCheck)
       this.pageInfos.replacePathByName(itemData.name, false)
-      this.isSecondary = true//TabBarVertical(this.widthBp, this.heightBp) ? false : true
+      this.isSecondary = true //TabBarVertical(this.widthBp, this.heightBp) ? false : true
     }
   }
 

@@ -280,7 +280,7 @@ struct Connect {
         this.isSecondary = false
         return false
       } else {
-        this.isSecondary = false
+      //  this.isSecondary = false
         return false
       }
     })
