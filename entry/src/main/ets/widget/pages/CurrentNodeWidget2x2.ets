@@ -1,11 +1,10 @@
+import { IpInfo } from 'proxy_core';
 import ActionUtils from '../model/ActionUtils'
 import { ProxyActionType } from '../model/FormCardConstant'
 
 @Entry
 @Component
 struct CurrentNodeWidget2x2 {
-  /** @description 主标题 */
-  readonly title: string = '节点名';
   /** @description 副标题 */
   readonly subTitle: Resource = $r('app.string.CurrentNode');
   /** @description 卡片宽度 */
@@ -23,6 +22,15 @@ struct CurrentNodeWidget2x2 {
   /** @description 开关变量 */
   @LocalStorageProp('proxyEnabled')
   proxyEnabled: boolean = false
+  /** @description IP地址信息 */
+  @LocalStorageProp('remoteIp')
+  remoteIp: IpInfo = {
+    ip: 'Unknown',
+    country: '',
+  }
+  /** @description 节点名 */
+  @LocalStorageProp('currentProxyName')
+  currentProxyName: string = '节点名'
   /** @description TODO 主题色 */
   @LocalStorageProp('icon_emphasize')
   icon_emphasize: ResourceColor = '#0A59F7'
@@ -57,7 +65,7 @@ struct CurrentNodeWidget2x2 {
           .fontSize(12)
           .fontColor($r('sys.color.font_secondary'))
 
-        Text(this.title)
+        Text(this.currentProxyName)
           .fontSize(18)
           .fontWeight(FontWeight.Medium)
       }
@@ -68,7 +76,7 @@ struct CurrentNodeWidget2x2 {
       if (this.proxyEnabled) {
         Text() {
           Span('IP ')
-          Span('255.255.255.255')
+          Span(this.remoteIp.ip)
         }
         .fontSize(10)
         .fontColor($r('sys.color.font_secondary'))
