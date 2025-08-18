@@ -207,10 +207,14 @@ export default class EntryAbility extends UIAbility {
       }
       this.onWindowModeChange(windowStage, windowClass)
       await AppState.init()
+
       // 卡片初始化过就无须再次初始化
       if (!this.clashCoreInitialized) {
         await this.ClashCoreInit();
+        return
       }
+      // 卡片初始化过打开应用获取一次代理节点
+      ClashViewModel.loadConfig()
     });
 
     windowStage.getMainWindow().then((window: window.Window) => {
