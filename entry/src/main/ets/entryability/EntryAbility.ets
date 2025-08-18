@@ -62,12 +62,7 @@ export default class EntryAbility extends UIAbility {
 
     // 刷新IP地址
     this.callee.on('refreshIPAddress', (indata: rpc.MessageSequence) => {
-      ClashViewModel.checkIpInfo().then((remoteIp) => {
-        cardIdManager.pushCartProxyIpInfo(remoteIp)
-        hilog.info(0x0000, 'EntryAbility', 'remoteIp - success : ' + JSON.stringify(remoteIp))
-      }).catch((e: Error) => {
-        hilog.info(0x0000, 'EntryAbility', 'remoteIp - error: ' + JSON.stringify(e))
-      })
+      refreshIPAddress();
 
       return null
     })
@@ -122,6 +117,9 @@ export default class EntryAbility extends UIAbility {
     if (proxyActionType === ProxyActionType.START) {
       // TODO 可能会启动失败
       ClashViewModel.StartVpn()
+      setTimeout(() => {
+        refreshIPAddress()
+      }, 1000)
     } else {
       ClashViewModel.StopVpn()
     }
@@ -209,10 +207,14 @@ export default class EntryAbility extends UIAbility {
       }
       this.onWindowModeChange(windowStage, windowClass)
       await AppState.init()
+
       // 卡片初始化过就无须再次初始化
       if (!this.clashCoreInitialized) {
         await this.ClashCoreInit();
+        return
       }
+      // 卡片初始化过打开应用获取一次代理节点
+      ClashViewModel.loadConfig()
     });
 
     windowStage.getMainWindow().then((window: window.Window) => {
@@ -362,6 +364,15 @@ export default class EntryAbility extends UIAbility {
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onBackground');
     this.saveConfigThePreferences();
   }
+}
+
+function refreshIPAddress() {
+  ClashViewModel.checkIpInfo().then((remoteIp) => {
+    cardIdManager.pushCartProxyIpInfo(remoteIp);
+    hilog.info(0x0000, 'EntryAbility', 'remoteIp - success : ' + JSON.stringify(remoteIp));
+  }).catch((e: Error) => {
+    hilog.info(0x0000, 'EntryAbility', 'remoteIp - error: ' + JSON.stringify(e));
+  });
 }
 
 export function sleep(timeout: number): Promise<void> {

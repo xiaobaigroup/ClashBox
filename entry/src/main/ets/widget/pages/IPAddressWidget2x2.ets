@@ -42,7 +42,7 @@ struct IPAddressWidget2x2 {
           .fontSize(12)
           .fontColor($r('sys.color.font_secondary'))
 
-        if (this.remoteIp.ip === undefined) {
+        if (this.remoteIp.ip === '') {
           Row() {
             LoadingProgress()
               .size({ width: 18, height: 18 })
@@ -90,7 +90,7 @@ struct IPAddressWidget2x2 {
         .clip(true)
         .onClick(() => {
           this.remoteIp = {
-            ip: undefined,
+            ip: '',
             country: '',
           }
           ActionUtils.refreshIPAddress(this)

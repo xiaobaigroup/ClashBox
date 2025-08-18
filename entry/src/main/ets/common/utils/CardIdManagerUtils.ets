@@ -92,6 +92,17 @@ class CardIdManager {
       formProvider.updateForm(formId, data)
     })
   }
+  
+  /** @description 推送当前节点名称到所有卡片 */
+  pushCartCurrentProxyName(currentProxyName: string) {
+    const data = formBindingData.createFormBindingData({
+      currentProxyName
+    })
+    this.getCardIdList().forEach(formId => {
+      // 推送到卡片
+      formProvider.updateForm(formId, data)
+    })
+  }
 
   /** @description 获取选中的代理节点信息 */
   getSelectedProxyNode() {
