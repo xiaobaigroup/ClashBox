@@ -318,7 +318,7 @@ struct Appearance {
             this.uiConfig.themeColorIndex = index
             // 持久化主题色
             this.uiConfig.themeColor = menuItem?.customThemeName ?? 'yellowAppTheme'
-            Xb_UIConfig.themeColor = menuItem?.customThemeName ?? 'yellowAppTheme'
+            //Xb_UIConfig.themeColor = menuItem?.customThemeName ?? 'yellowAppTheme'
             Xb_ChangeThemeColor(this.uiConfig.themeColor)
             // UI刷新
             this.EnableThemeColorText = menuItem.title
