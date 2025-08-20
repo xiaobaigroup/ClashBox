@@ -27,7 +27,7 @@ struct ProxyArrangement {
   @Consume theProxyGroups: ProxyGroup[]
   @Consume proxyGroups: ProxyGroupItemDataSource
   @State isContentShow: boolean | undefined = false
-  @Consume('currentProfile') private currentProfile: Profile
+  @Consume('currentProfile') currentProfile: Profile
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
@@ -99,7 +99,7 @@ struct ProxyArrangement {
               proxyitems: group.proxies as ProxyItem[],
               ProxyGroupItemSelected: this.appConfig.proxyCardSize,
               disabled: group.type !== ProxyType.Selector,
-              selectedProxy: this.currentProfile.getSelectedProxy(group) ?? this.appConfig.currentProxyName ?? '',
+              selectedProxy: this.getCurrentProxyName(group),
               OnProxyChange: (item) => {
                 this.changeProxy(group.name, item)
               }
@@ -153,6 +153,16 @@ struct ProxyArrangement {
     .width('100%')
 
   }
+
+  /** 获取当前分组名 */
+  getCurrentProxyName(group: ProxyGroup): string {
+    if (!this.currentProfile) {
+      return ''
+    } else {
+      return this.currentProfile.getSelectedProxy(group) ?? this.appConfig.currentProxyName ?? ''
+    }
+  }
+
 }
 
 export default ProxyArrangement

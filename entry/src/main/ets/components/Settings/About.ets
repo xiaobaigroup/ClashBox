@@ -85,19 +85,16 @@ struct About {
       case 'Update':
         // 检查更新
         hilog.info(0xFF00, "AboutestTag", "检查更新")
-
       break
       case 'Telegram':
         // 跳转Telegram频道
         hilog.info(0xFF00, "AboutestTag", "Telegram")
         Xb_GoToWeb('https://t.me/+ihe73JZWYb40NTY1')
-
       break
       case 'Discord':
         // 跳转Discord社区
         hilog.info(0xFF00, "AboutestTag", "Discord")
         Xb_GoToWeb('https://discord.gg/mZarq2EQmm')
-
       break
       case 'Email':
         // 电子邮件
@@ -108,7 +105,6 @@ struct About {
         // 跳转仓库
         // hilog.info(0xFF00, "AboutestTag", "仓库")
         Xb_GoToWeb('https://github.com/xiaobaigroup/ClashBox')
-        // promptAction.showToast({message: $r('app.string.not_open'), duration: 2000 })
       break
       default :
         this.SettingsPageInfos.pushPathByName(name, false)
