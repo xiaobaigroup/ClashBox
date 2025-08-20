@@ -34,57 +34,7 @@ struct ProxyArrangement {
   @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
 
-  aboutToAppear(): void {
-    hilog.info(0xB000, componentName, '#aboutToAppear 组1数组长度： %{public}d', this.theProxyGroups[0].proxies.length )
-    hilog.info(0xFF00, "ProxyPageGroupTag", "#ProxyArrangement#aboutToAppear 当前显示分组%{public}d", this.currentProxyIndex)
-    if (this.currentProfile){
-      let listIndexes = this.theProxyGroups.findIndex((d) => d.name == this.currentProfile?.currentGroupName)
-      setTimeout(() => {
-        if(listIndexes > -1 && this.currentProxyIndex === 0) {
-          this.currentProxyIndex = listIndexes
-          this.selectItem = listIndexes
-          this.proxyScroller.scrollToItemInGroup(0, this.currentProxyIndex)
-        } else {
-          this.proxyScroller.scrollToItemInGroup(0, this.currentProxyIndex)
-          this.selectItem = this.currentProxyIndex
-        }
-      }, 200)
-    }
-    if(this.currentProfile && this.currentProfile?.proxySelected){
-      console.log("proxySelected", this.currentProfile?.proxySelected.size)
-    }
-  }
-
-  changeProxy(g: string, item: ProxyItem){
-    if (this.currentProfile) {
-      ClashViewModel.changeProxy(this.currentProfile, g, item.name)
-      // 首选项持久化存储 -> 供卡片使用
-      cardIdManager.setSelectedProxyNode(this.currentProfile, g, item.name)
-    }
-  }
-
-  //分组标签
-  @Builder
-  itemHead(text: string, icon: Resource) {
-      Row() {
-        Text(text)
-          .fontSize(FONT_SIZE_16)
-          .fontColor($r('sys.color.font_primary'))
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
-        SymbolGlyph(icon)
-          .fontSize(25).fontColor([$r('sys.color.icon_primary')])
-      }
-      .width('100%')
-      .justifyContent(FlexAlign.SpaceBetween)
-      .padding({ left: 10, right: 10 })
-      .borderRadius(BORDER_RADIUS_20)
-      .backgroundColor($r('app.color.container_background'))
-      .height(LIST_ITEM_HEIGHT)
-      .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-  }
-
-  proxyScroller: ListScroller = new ListScroller()
+  private  proxyScroller: ListScroller = new ListScroller()
 
   build() {
     List({ initialIndex: 0, scroller: this.proxyScroller}) {
@@ -96,7 +46,7 @@ struct ProxyArrangement {
           // 展开后内容显示区域
           if (!this.isContentShow && this.selectItem === index) {
             ProxyGroupItem({
-              proxyitems: group.proxies as ProxyItem[],
+              proxyitems: group.proxies as ProxyItem[] ?? [],
               ProxyGroupItemSelected: this.appConfig.proxyCardSize,
               disabled: group.type !== ProxyType.Selector,
               selectedProxy: this.getCurrentProxyName(group),
@@ -108,7 +58,8 @@ struct ProxyArrangement {
               .padding({ top: 10})
               .borderRadius(BORDER_RADIUS_20)
           }
-        }.margin({bottom: (!this.isContentShow && this.selectItem === index) ? 0 : 10})
+        }
+        .margin({bottom: (!this.isContentShow && this.selectItem === index) ? 0 : 10})
         .clickEffect(this.isContentShow?customAnimationUtil.isClickEffect(this.uiConfig):null)
         .transition(customAnimationUtil.isScaleTranFast(index, this.uiConfig))
         .onClick(() => {
@@ -118,7 +69,11 @@ struct ProxyArrangement {
             }
           }, () => {
             if (!this.isContentShow) {
-              this.proxyScroller.scrollToItemInGroup(index, 0, true, ScrollAlign.START)
+              try {
+                this.proxyScroller.scrollToItemInGroup(index, 0, true, ScrollAlign.START)
+              } catch (error) {
+                console.error(`ListItemGroup #onClick 滚动失败：error: ${error}`)
+              }
             }
             this.isContentShow = !this.isContentShow
             this.selectItem = index
@@ -126,7 +81,6 @@ struct ProxyArrangement {
         })
         .width('100%')
         .borderRadius(BORDER_RADIUS_20)
-     //   .constraintSize({maxHeight: 300})
       }, (item: ProxyGroup) => item.name)
     }
     .contentEndOffset(this.isLandscapePhone?80:CONTENT_END_OFFSET_150)
@@ -135,9 +89,9 @@ struct ProxyArrangement {
     .edgeEffect(EdgeEffect.Spring)
     .onScrollFrameBegin((offset: number) => {
       this.curOffsetRemain  += offset
-      if (offset>0) {
+      if (offset > 0) {
         this.isRolling = true
-      }else if(offset<0){
+      } else if(offset < 0) {
         this.isRolling = false
         this.curOffsetRemain = 0
       }
@@ -154,6 +108,38 @@ struct ProxyArrangement {
 
   }
 
+  aboutToAppear(): void {
+    hilog.info(0xB000, componentName, '#aboutToAppear 组1数组长度： %{public}d', this.theProxyGroups[0].proxies.length )
+    hilog.info(0xFF00, "ProxyPageGroupTag", "#ProxyArrangement#aboutToAppear 当前显示分组%{public}d", this.currentProxyIndex)
+    if (this.currentProfile){
+      let listIndexes = this.theProxyGroups.findIndex((d) => d.name == this.currentProfile?.currentGroupName)
+      setTimeout(() => {
+        if (listIndexes > -1 && this.currentProxyIndex === 0) {
+          this.currentProxyIndex = listIndexes
+          this.selectItem = listIndexes
+        } else {
+          this.selectItem = this.currentProxyIndex
+        }
+        try {
+          this.proxyScroller.scrollToItemInGroup(0, this.currentProxyIndex)
+        } catch (error) {
+          console.error(`#aboutToAppear 滚动失败：error: ${error}`)
+        }
+      }, 200)
+    }
+    if(this.currentProfile && this.currentProfile?.proxySelected){
+      console.log("proxySelected", this.currentProfile?.proxySelected.size)
+    }
+  }
+
+  changeProxy(g: string, item: ProxyItem){
+    if (this.currentProfile) {
+      ClashViewModel.changeProxy(this.currentProfile, g, item.name)
+      // 首选项持久化存储 -> 供卡片使用
+      cardIdManager.setSelectedProxyNode(this.currentProfile, g, item.name)
+    }
+  }
+
   /** 获取当前分组名 */
   getCurrentProxyName(group: ProxyGroup): string {
     if (!this.currentProfile) {
@@ -162,6 +148,28 @@ struct ProxyArrangement {
       return this.currentProfile.getSelectedProxy(group) ?? this.appConfig.currentProxyName ?? ''
     }
   }
+
+  //分组标签
+  @Builder
+  itemHead(text: string, icon: Resource) {
+    Row() {
+      Text(text)
+        .fontSize(FONT_SIZE_16)
+        .fontColor($r('sys.color.font_primary'))
+        .maxLines(1)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
+      SymbolGlyph(icon)
+        .fontSize(25).fontColor([$r('sys.color.icon_primary')])
+    }
+    .width('100%')
+    .justifyContent(FlexAlign.SpaceBetween)
+    .padding({ left: 10, right: 10 })
+    .borderRadius(BORDER_RADIUS_20)
+    .backgroundColor($r('app.color.container_background'))
+    .height(LIST_ITEM_HEIGHT)
+    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+  }
+
 
 }
 

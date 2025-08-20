@@ -231,10 +231,12 @@ struct ProxyGroupItem {
     })*/
   }
 
-  switchSort(){
-    if (this.appConfig.proxySort == ProxySort.Default){
+  switchSort() {
+    if (!this.proxyitems)
+      return
+    if (this.appConfig.proxySort == ProxySort.Default) {
       this.proxyLazyItems.DefaultSortItems(this.proxyitems)
-    } else if (this.appConfig.proxySort == ProxySort.Title){
+    } else if (this.appConfig.proxySort == ProxySort.Title) {
       this.proxyLazyItems.NameSortItems(this.proxyitems)
     } else if (this.appConfig.proxySort == ProxySort.Delay || (this.appConfig.proxySort == ProxySort.Delay && this.isLatencySort == true)){
       this.proxyLazyItems.LatencySortItems(this.proxyitems)
