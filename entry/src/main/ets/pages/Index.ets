@@ -133,7 +133,7 @@ struct Index {
   // 是否开启`Index`页面的前景模糊
   @Provide('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean = false
   // 代理启动变量
-  @Provide @Watch('ShowPipChange')proxyEnabled: boolean = false
+  @Provide @Watch('ShowPipChange') proxyEnabled: boolean = false
   @StorageProp('WindowMode') windowMode: boolean = false
   // 设置模态页控制变量
   @Provide isShowSettings: boolean = false
@@ -719,7 +719,6 @@ struct Index {
       })
     }*/
 
-    // TODO
     this.fetchProfiles()
     EventHub.on(EventKey.StartLog, async (enable: boolean) => {
       ClashViewModel.startLog(enable, (log) => {
@@ -826,8 +825,8 @@ struct Index {
       PipManager.getInstance().init(getContext(this))
       // 禁用自动启用
       PipManager.getInstance().setAutoStart(true)
-      hilog.info(0xFF00, "PipTag", "代理启用状态： %{private}s", this.proxyEnabled)
-      hilog.info(0xFF00, "PipTag", "画中画启用状态： %{private}s", this.uiConfig.backgroundPiPModel)
+      hilog.info(0xFF00, "PipTag", "代理启用状态： %{public}s", this.proxyEnabled)
+      hilog.info(0xFF00, "PipTag", "画中画启用状态： %{public}s", this.uiConfig.backgroundPiPModel)
     } else {
       PipManager.getInstance().setAutoStart(false)
     }
@@ -835,12 +834,11 @@ struct Index {
 
   onPageShow(): void {
     hilog.info(0xFF00, "TimertestTag", "#onPageShow")
-    hilog.info(0xFF00, "PoptestTag", "startPop: %{private}d", this.uiConfig.ShowStartPop)
+    hilog.info(0xFF00, "PoptestTag", "startPop: %{public}d", this.uiConfig.ShowStartPop)
     hilog.info(0x0000, 'WindowLog #Index', '窗口顶部避让高度：%{public}d', px2vp(this.topRectHeight))
-    // 刷新问候语
     if (this.proxyEnabled) {
       this.theRestoreTime = new Date().getTime()
-      hilog.info(0xFF00, "TimertestTag", "恢复的时刻： %{private}d", this.theRestoreTime)
+      hilog.info(0xFF00, "TimertestTag", "恢复的时刻： %{public}d", this.theRestoreTime)
     }
     this.proxyEnabled = ClashViewModel.vpnStarted
     this.isForeward = true
@@ -867,11 +865,11 @@ struct Index {
     hilog.info(0xFF00, "TimertestTag", "#onPageHide")
     if (this.proxyEnabled) {
       this.thePauseTime = new Date().getTime()
-      hilog.info(0xFF00, "TimertestTag", "暂停的时刻： %{private}d", this.thePauseTime)
+      hilog.info(0xFF00, "TimertestTag", "暂停的时刻： %{public}d", this.thePauseTime)
     }
     this.isForeward = false
-    hilog.info(0xFF00, "PipTag", "代理启用状态： %{private}s", this.proxyEnabled)
-    hilog.info(0xFF00, "PipTag", "画中画启用状态： %{private}s", this.uiConfig.backgroundPiPModel)
+    hilog.info(0xFF00, "PipTag", "代理启用状态： %{public}s", this.proxyEnabled)
+    hilog.info(0xFF00, "PipTag", "画中画启用状态： %{public}s", this.uiConfig.backgroundPiPModel)
     this.ShowPipChange()
   }
 
@@ -968,14 +966,9 @@ struct Index {
       iterations: 1,
       playMode: PlayMode.Normal,
     }, () => {
-    //    if (this.uiConfig.isBlurr) {
-     //     indexController.setTabBarTranslate(this.isLandscapePhone ? { x: '-100%' } : { y: '100%' })
-   //     } else {
-        indexController.setTabBarTranslate({ y: '100%' })
-        this.barHeight = 0
-
+      indexController.setTabBarTranslate({ y: '100%' })
+      this.barHeight = 0
       console.info('tab横竖：',`${TabBarVertical(this.widthBp, this.heightBp)}`)
-     //   }
     })
   }
 

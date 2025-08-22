@@ -1,7 +1,6 @@
-import { BreakpointState } from '../common/breakpoint/breakpointsystem'
+
 import {
   TAB_CONTENT_TITLE_FONT_SIZE,
-  TAB_CONTENT_TITLE_FONT_WEIGHT,
   TAB_CONTENT_TITLE_HEIGHT,
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE,
   LIST_SPACE,
@@ -12,16 +11,14 @@ import {
   CONTENT_END_OFFSET_150,
   NewConfigData,
 } from '../common/entity/Constants'
-import { LengthMetrics, promptAction, PromptAction, SymbolGlyphModifier } from '@kit.ArkUI'
+import { LengthMetrics, PromptAction, SymbolGlyphModifier } from '@kit.ArkUI'
 import { ConfigAdd } from '../components/Configuration/ConfigAdd'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
 import { ConfigData, ConfigDataSourceType } from '../common/entity/PageArgumentEntity'
-import { CellularData, context, CustomConfirmDialog, Nothing, RightDownButton } from '../components/Common/Common'
+import { CellularData, context, CustomConfirmDialog, Nothing } from '../components/Common/Common'
 import { customVibrator } from "../common/utils/VibratorUtil"
-import { common } from '@kit.AbilityKit'
 import { configShare } from '../common/utils/SystemShareUtil'
-import { showFileNameListOfFileDir } from '../common/utils/FileUtil'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig, UIConfig } from '../entryability/AppState'
 import { EventHub, EventKey } from '../common/EventHub'
@@ -29,7 +26,6 @@ import { getResourceString } from '../common/utils/ResourceStringUtil'
 import { convertTime } from '../common/utils/TimeConvertUtil'
 import { customAnimationUtil, isON } from '../common/utils/Animation'
 import { ProxyGroup } from 'proxy_core'
-import { ProxyItem } from '../common/datasources/ProxyData'
 import { PopTips, PopupBuilder } from '../components/Start/Popup'
 import { ImportConfigFromURL } from '../components/Configuration/ImportConfigFromURL'
 import { ImportConfigFromFile } from '../components/Configuration/ImportConfigFromFile'
@@ -59,7 +55,7 @@ struct ConfigurationPage {
   @Consume ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
   // 路由栈
   @Consume('configAddPageInfos') configAddPageInfos: NavPathStack
-  promptAction:PromptAction = this.getUIContext()?.getPromptAction()
+  promptAction: PromptAction = this.getUIContext()?.getPromptAction()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   /* 主题色 */
@@ -155,6 +151,8 @@ struct ConfigurationPage {
                       // 名称
                       Column({ space: 2 }) {
                         Text(item.configName).fontColor(($r('sys.color.font_primary'))).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+                        // Text(`当前id：${item.configId}`)
+                        // Text(`当前选中：${this.appConfig.currentProfileId}`)
                         Row() {
                           Text($r('app.string.update_by'))
                             .fontColor($r('sys.color.font_secondary')).fontSize(14)
@@ -269,16 +267,7 @@ struct ConfigurationPage {
             .onRefreshing(() => {
               this.updateConfig()
             })
-            /*Scroll() {
-            }
-            .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)//,{alwaysEnabled:true})
-            .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {
-              // 累计计算当前父组件滚动在Y轴方向的偏移量
-              if (this.uiConfig.isAnimation){
-                this.curYOffset += yOffset
-              }
-              console.info("yOffset" + this.curYOffset);
-            })*/
+
           }
         }
 
@@ -462,7 +451,7 @@ struct ConfigurationPage {
         // 根据当前配置信息来判断显示[收藏 /取消收藏] 单独处理 END
 
         // 遍历其他菜单 START
-        ForEach(this.configListLongPressCtxMenus(data), (item: LongPressContextMenuItem, index: number) => {
+        ForEach(this.configListLongPressCtxMenus(data), (item: LongPressContextMenuItem) => {
           MenuItem({ symbolStartIcon: item?.symbolStartIcon, content: item?.content })
             .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
             .contentFontColor($r('sys.color.font_primary'))
@@ -530,8 +519,8 @@ struct ConfigurationPage {
 
   aboutToAppear(): void {
     hilog.info(0xC000, componentName, `#aboutToAppear executed`)
-    // // XXX 删除 这里模拟获取所有hap沙箱路径配置文件的文件名
-    // showFileNameListOfFileDir(context.filesDir)
+    // 初始化当前选中项数据
+    this.currentRadioConfigData = this.configList.find((data: ConfigData) => data.configId === this.appConfig.currentProfileId) as ConfigData
     EventHub.on(EventKey.FetchProfile, () => {
       this.fetchProfiles()
     })
@@ -567,7 +556,7 @@ struct ConfigurationPage {
       hilog.info(0xC011, componentName, `EditConfig #loadConfig#更新并加载完成 configName is [${this.currentTouchConfigData.configName}]`)
     } catch (e) {
       console.debug("loadConfigList", e.message, JSON.stringify(e))
-      promptAction.showToast({message: `${getResourceString($r('app.string.failed_load_config'), context)}` + (e.message || e) })
+      this.promptAction.showToast({message: `${getResourceString($r('app.string.failed_load_config'), context)}` + (e.message || e) })
     }
     animateTo({
       duration: this.uiConfig.animationSpeed,
@@ -670,7 +659,7 @@ struct ConfigurationPage {
   private async updateConfig(configId?: string): Promise<void> {
     this.promptAction.showToast({message: $r('app.string.updating_config')})
     this.loadConfig(this.currentRadioConfigData, true)
-    if (configId){
+    if (configId) {
       this.isRefreshing = false
       // 使开关点击时不触发转场动画
       this.isON.toggleAnim = true

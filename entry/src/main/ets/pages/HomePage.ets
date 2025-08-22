@@ -530,11 +530,11 @@ struct Home {
       if(!this.isForeward) {
         // 页面不处于前台时暂停计时
         this.proxyStartedTimer.pause()
-        hilog.info(0xFF00, "TimertestTag", "计时器暂停此时的时间：%{private}s", this.proxyStartingDuration)
+        hilog.info(0xFF00, "TimertestTag", "计时器暂停此时的时间：%{public}s", this.proxyStartingDuration)
       } else {
         // 二次启动计时
         let gapTime = this.theRestoreTime - this.thePauseTime
-        hilog.info(0xFF00, "TimertestTag", "需要增加的时间： %{private}d", gapTime)
+        hilog.info(0xFF00, "TimertestTag", "需要增加的时间： %{public}d", gapTime)
         this.proxyStartedTimer.resumeWithExtraTime(gapTime)
       }
     }

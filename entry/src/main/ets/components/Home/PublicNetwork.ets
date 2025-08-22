@@ -27,14 +27,11 @@ struct PublicNetwork {
   @Consume isShowHomeEdit: boolean
   @Consume remoteIp: IpInfo | null
 
-  // 收藏与ping延迟即时动作
-  PromptAction: PromptAction = this.getUIContext()?.getPromptAction()
-
   build() {
     Column() {
       CardTitle({ title: $r('app.string.PublicNetwork') })
       Column() {
-        if (this.remoteIp?.ip != undefined){
+        if (this.remoteIp?.ip) {
           Text(this.remoteIp?.country ?? " " )
             .fontSize(HomeCardPartSmallFontSize(this.widthBp, this.heightBp))
             .fontColor($r('sys.color.font_secondary'))
