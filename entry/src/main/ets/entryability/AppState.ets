@@ -71,8 +71,6 @@ export class UIConfig{
   isGreeting?: boolean = true
   // 主题色
   themeColor: CustomThemeName = 'blueAppTheme'
-  // 图表颜色
-  lineColor: ResourceColor = "#ff9926"
   // 主题色序号
   themeColorIndex: number = 0
   // 颜色模式

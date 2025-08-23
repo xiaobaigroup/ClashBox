@@ -356,11 +356,13 @@ export default class EntryAbility extends UIAbility {
 
   onForeground(): void {
     // Ability has brought to foreground
-    hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onForeground');
+    AppStorage.setOrCreate('ForewardState', true)
+    hilog.info(0x0000, 'c', '%{public}s', 'Ability onForeground');
   }
 
   onBackground(): void {
     // Ability has back to background
+    AppStorage.setOrCreate('ForewardState', false)
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onBackground');
     this.saveConfigThePreferences();
   }

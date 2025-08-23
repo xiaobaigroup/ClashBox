@@ -67,9 +67,10 @@ export class SocketProxyService implements IClashManager {
 
   async checkIpInfo(): Promise<IpInfo> {
     let result = await checkIp()
-    let country = await this.sendMessageRequest(ClashRpcType.getCountryCode, [result])
+    let country = await queryIpInfo(result)
+    console.log(`IPtest SocketProxyService#checkIpInfo country: ${country}`)
     if (country == "")
-      country = await queryIpInfo(result)
+      country = await this.sendMessageRequest(ClashRpcType.getCountryCode, [result]) as string
     return {
       ip: result,
       country: country

@@ -8,6 +8,7 @@ import { convertDataArray, ConvertedUnit } from '../../common/utils/DataUnitConv
 import { customAnimationUtil } from '../../common/utils/Animation';
 import { HomeCardPadding, HomeCardSpeedFontSize } from '../../common/breakpoint/BreakPoint';
 import { LengthMetrics } from '@kit.ArkUI';
+import { Xb_ResourceColorUtil } from 'xb_components';
 
 
 @Component
@@ -22,18 +23,18 @@ struct Speed {
   @Consume @Watch('proxyEnabledChanged') proxyEnabled: boolean
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  // 前台判断变量
+  @StorageProp('ForewardState') isForeward: boolean = true
   @Consume ChartData: number[] | ConvertedUnit[]
   @State lineStart: boolean = true
   @Consume DownloadSpeed: string
   @Consume UploadSpeed: string
-  // 前台判断变量
-  @Consume isForeward: boolean
   // 是否在主页
   @Consume isHomePage: boolean
   // 定时器ID，用于清除定时器
-  timerId: number = 0
+  private timerId: number = 0
   // 初始化图表数据
-  @State defOption: Options = new Options({
+  private defOption: Options = new Options({
     //图例
     legend: {
       show: false,
@@ -88,7 +89,7 @@ struct Speed {
         data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         lineStyle: {
           width: 2,
-          color: this.uiConfig.lineColor
+          color: this.colorTheme()
         },
         label: {
           show: false
@@ -148,7 +149,7 @@ struct Speed {
       // 图表
       Stack(){
         if (this.lineStart){
-          Row().width('92%').height(3).backgroundColor(this.uiConfig.lineColor).margin({left:17,right:17,bottom:28.5})
+          Row().width('92%').height(3).backgroundColor(this.colorTheme()).margin({left:17,right:17,bottom:28.5})
             .transition(customAnimationUtil.isOpacity(this.uiConfig))
         }else {
           McLineChart({
@@ -204,7 +205,7 @@ struct Speed {
           data: this.ChartData,
           label: {
             show: false,
-            color: this.uiConfig.lineColor,
+            color: this.colorTheme(),
             offset: [0, 0]
           },
           endLabel:{
@@ -212,18 +213,18 @@ struct Speed {
           },
           //折线拐点配置
           itemStyle: {
-            symbol: this.uiConfig.lineColor,
+            symbol: this.colorTheme(),
             symbolSize: 2,
             borderWidth: 1
           },
           lineStyle: {
             width: 3,
-            color: this.uiConfig.lineColor
+            color: this.colorTheme()
           },
           // 区域颜色，线性渐变
           areaStyle: {
             show: true,
-            gradient: [this.uiConfig.lineColor]
+            gradient: [this.colorTheme()]
           },
         }
       ]
@@ -305,7 +306,7 @@ struct Speed {
               data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
               lineStyle: {
                 width: 3,
-                color: this.uiConfig.lineColor
+                color: this.colorTheme()
               },
               label: {
                 show: false
@@ -318,30 +319,18 @@ struct Speed {
   }
 
   aboutToAppear() {
-    this.colorTheme()
+    console.log(`Speed 网络速率卡片已注册`)
   }
 
   aboutToDisappear() {
     // 清除定时器
     clearInterval(this.timerId);
+    console.log(`Speed 网络速率卡片已销毁`)
   }
   
-  colorTheme(){
-    if (this.uiConfig.themeColor == 'yellowAppTheme') {
-      this.uiConfig.lineColor = '#ff9926'
-    }else if (this.uiConfig.themeColor == 'blueAppTheme'){
-      this.uiConfig.lineColor = '#ff759bf5'
-    }else if (this.uiConfig.themeColor == 'catBlueAppTheme'){
-      this.uiConfig.lineColor = '#E61E4377'
-    }else if (this.uiConfig.themeColor == 'redAppTheme'){
-      this.uiConfig.lineColor = '#E6D41C26'
-    }else if (this.uiConfig.themeColor == 'purpleAppTheme'){
-      this.uiConfig.lineColor = '#E6722ED1'
-    }else if (this.uiConfig.themeColor == 'pinkAppTheme'){
-      this.uiConfig.lineColor = '#E6FB7299'
-    }else if (this.uiConfig.themeColor == 'greenAppTheme'){
-      this.uiConfig.lineColor = '#E682D41C'
-    }
+  colorTheme() {
+    let colorValue = Xb_ResourceColorUtil(this.icon_emphasize, this.getUIContext().getHostContext()!)
+    return colorValue
   }
 
 }

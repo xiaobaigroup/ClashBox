@@ -54,7 +54,7 @@ struct Home {
   // 编辑按钮点击后显示编辑状态判定
   @Consume @Watch('ShowHomeEditChange') isShowHomeEdit: boolean
   // 前台判断变量
-  @Consume @Watch('onForeward') isForeward: boolean
+  @StorageProp('ForewardState') isForeward: boolean = true
   @Consume isSmallSquareScreen: boolean
   // 删除按钮是否出现判定
   @Consume isShowDeleteButton: boolean
@@ -549,11 +549,14 @@ struct HomeCard {
 
   @Prop index: number
   @Prop item: HomeCardInfo
+  @Consume isHomePage: boolean
   @Consume rotateAngle : number
   // 删除按钮是否出现判定
   @Consume isShowDeleteButton: boolean
   // 当前主页布局
   @Consume theCurrentHomeCard: boolean[]
+  // 前台判断变量
+  @StorageProp('ForewardState') isForeward: boolean = true
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
@@ -561,7 +564,7 @@ struct HomeCard {
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
 
   build() {
-    if (this.theCurrentHomeCard[this.index]) {
+    if (this.theCurrentHomeCard[this.index] && this.isForeward && this.isHomePage) {
       GridCol({
         span: {
           sm: HomeCardSpan36sm(this.widthBp, this.heightBp) * (this.index == 0 || this.index == 8 ? 2 : 1),
@@ -587,16 +590,22 @@ struct HomeCard {
               })
           }
         }
-      }.height(160)
+      }
+      .height(160)
       .borderRadius(20)
       .aspectRatio(this.item.aspectRatio)
-      .backgroundColor($r('app.color.container_background'))/*.borderWidth(2).borderColor(Color.Red)*/
+      .backgroundColor($r('app.color.container_background'))
+      // .borderWidth(2).borderColor(Color.Red)
       .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
       .transition(customAnimationUtil.isScaleTran(this.index, this.uiConfig))
       // 消失触发回调
-      .onDetach(() => {})
+      // .onDetach(() => {
+      //   console.log(`HomeCard 前后台状态：${this.isForeward} 当前注销：${this.index}`)
+      // })
       // 显示时触发回调
-      .onAttach(() => {})
+      // .onAttach(() => {
+      //   console.log(`HomeCard 前后台状态：${this.isForeward} 当前显示：${this.index}`)
+      // })
       // 编辑模式下跳动动画
       .rotate({ angle: this.uiConfig.isAnimation ? this.rotateAngle : null })
     }

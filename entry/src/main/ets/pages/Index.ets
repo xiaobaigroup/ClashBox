@@ -134,6 +134,9 @@ struct Index {
   @Provide('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean = false
   // 代理启动变量
   @Provide @Watch('ShowPipChange') proxyEnabled: boolean = false
+  // 前台判断变量
+  @StorageProp('ForewardState') isForeward: boolean = true
+  // 窗口模式
   @StorageProp('WindowMode') windowMode: boolean = false
   // 设置模态页控制变量
   @Provide isShowSettings: boolean = false
@@ -143,8 +146,6 @@ struct Index {
   @Provide isDisclaimer: boolean = false
   // 是否在主页
   @Provide isHomePage: boolean = false
-  // 前台判断变量
-  @Provide isForeward: boolean = false
   // 顶部Bar高度
   @Provide heightTop: Length = TAB_CONTENT_TITLE_HEIGHT
   // 主界面当前index
@@ -158,11 +159,10 @@ struct Index {
   // 暂停时刻
   @Provide thePauseTime: number = 0
   // 流量任务id
-  @State trafficJob: number = 0
+  private trafficJob: number = 0
   // 通知任务id
   @State noticeJob: number = 0
-  @State
-  tabList: TabBuild[] = [
+  private tabList: TabBuild[] = [
     { name: $r('app.string.Home'), icon: $r('sys.symbol.house_fill') },
     { name: $r('app.string.Proxy'), icon: $r('sys.symbol.list_bullet_square_fill') },
     { name: $r('app.string.Configuration'), icon: $r('sys.symbol.folder_fill') },
@@ -841,7 +841,7 @@ struct Index {
       hilog.info(0xFF00, "TimertestTag", "恢复的时刻： %{public}d", this.theRestoreTime)
     }
     this.proxyEnabled = ClashViewModel.vpnStarted
-    this.isForeward = true
+    console.log(`HomeCard 前后台状态：${this.isForeward}`)
     this.ShowPipChange()
     this.initLanguage()
     PipManager.getInstance().stopPip()
@@ -867,7 +867,7 @@ struct Index {
       this.thePauseTime = new Date().getTime()
       hilog.info(0xFF00, "TimertestTag", "暂停的时刻： %{public}d", this.thePauseTime)
     }
-    this.isForeward = false
+    console.log(`HomeCard 前后台状态：${this.isForeward}`)
     hilog.info(0xFF00, "PipTag", "代理启用状态： %{public}s", this.proxyEnabled)
     hilog.info(0xFF00, "PipTag", "画中画启用状态： %{public}s", this.uiConfig.backgroundPiPModel)
     this.ShowPipChange()
