@@ -1062,10 +1062,11 @@ struct Index {
   jumpAccessControl(bundleName: string) {
     this.IndexCurrentindex = 3
     const path = this.pageInfos.getAllPathName()
-    // if (path[0] !== 'AccessControl' ) {
-    // TODO 跳转优化
-    this.pageInfos.replacePathByName('AccessControl', false)
-    // }
+    if (path[0] !== 'AccessControl' || path.length === 0) {
+      setTimeout(() => {
+        this.pageInfos.replacePathByName('AccessControl', false)
+      })
+    }
     setTimeout(() => {
       EventHub.sendEvent(EventKey.AddAPP, bundleName)
     }, 400)
