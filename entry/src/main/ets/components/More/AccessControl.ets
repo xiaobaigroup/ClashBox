@@ -551,16 +551,20 @@ export struct AccessControl {
   onModeChange() {
     console.log(`AccessControl 运行 #onModeChange nameStringData值：${JSON.stringify(this.nameStringData)}`)
     console.log(`AccessControl 运行 #onModeChange-实际 nameStringData[0]值：${JSON.stringify(this.nameStringData[0])}`)
-    if (!this.nameStringData[0])
-      return
     if (this.modeTabSelectedIndexes[0] == 0) {
       // 白名单
       this.appConfig.accessControlMode = 'AcceptSelected'
+    } else {
+      // 黑名单
+      this.appConfig.accessControlMode = 'RejectSelected'
+    }
+    if (!this.nameStringData[0])
+      return
+    if (this.modeTabSelectedIndexes[0] == 0) {
       console.log(`AccessControl #onModeChange 模式：${ this.appConfig.accessControlMode}`)
       this.appConfig.accessControlAcceptList = JSON.stringify(this.nameStringData)
     } else {
       // 黑名单
-      this.appConfig.accessControlMode = 'RejectSelected'
       console.log(`AccessControl #onModeChange 模式：${ this.appConfig.accessControlMode}`)
       this.appConfig.accessControlRejectList = JSON.stringify(this.nameStringData)
     }
