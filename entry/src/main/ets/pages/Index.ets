@@ -120,7 +120,7 @@ struct Index {
   @StorageProp("appFlowingState") appFlowingState: AppFlowingState = new AppFlowingState()
   // 欢迎页面栈
   @Provide('WelcomeNavPathStack') welcomePageInfos: NavPathStack = new NavPathStack()
-  @StorageLink('uiConfig') @Watch('ShowPipChange')uiConfig: UIConfig = new UIConfig()
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @Provide paddingButtom: number | Resource = $r('app.integer.vp_proxy_start_button_left_right_margin')
   @StorageLink('openLinkConfigUrl') openLinkConfigUrl: string = ''
@@ -327,12 +327,14 @@ struct Index {
           this.getUIContext().animateTo({ duration: this.uiConfig.animationSpeed,
             curve: Curve.Linear, }, () => {
             this.IndexCurrentindex = index
-            if (index == 0) {
-              this.isHomePage = true
-            } else {
-              this.isHomePage = false
-            }
           })
+        })
+        .onChange((index) => {
+          if (index == 0) {
+            this.isHomePage = true
+          } else {
+            this.isHomePage = false
+          }
         })
         .onAnimationStart((index: number, targetIndex: number) => {
           this.getUIContext().animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear, }, () => {
