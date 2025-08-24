@@ -99,6 +99,8 @@ export struct AccessControl {
               Text(this.isDeleteing ? `${Xb_GetResourceString($r('app.string.Edit'), this)}${Xb_GetResourceString($r('app.string.mode'), this)}`
                 : this.appConfig.accessControlMode != 'AcceptSelected' ? $r('app.string.white_list_tips') : $r('app.string.blacklist_tips'))
                 .maxLines(this.uiConfig.stringDisplayIndex === 0 ? 1 : 2)
+                .fontColor($r('sys.color.font_secondary'))
+                .fontSize(14)
                 .textOverflow({ overflow: this.uiConfig.stringDisplayIndex === 0 ? TextOverflow.Ellipsis : TextOverflow.Clip })
             }
             .width('56%')
