@@ -15,6 +15,8 @@ export enum EventKey{
   StopedClash = 10011,
   checkIpInfo = 10012,
   LoadClashConfig = 10013,
+  ShareBundle = 10014,
+  AddAPP = 10015,
 }
 
 export class EventHub{

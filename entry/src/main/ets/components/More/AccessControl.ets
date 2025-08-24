@@ -13,6 +13,7 @@ import { intl } from "@kit.LocalizationKit"
 import { Xb_CapsuleButton, Xb_CircleButton, Xb_GetResourceString } from "xb_components"
 import { customAnimationUtil } from "../../common/utils/Animation"
 import { common } from "@kit.AbilityKit"
+import { EventHub, EventKey } from '../../common/EventHub'
 
 const context = getContext() as common.UIAbilityContext
 
@@ -122,8 +123,7 @@ export struct AccessControl {
               ButtonBuilder({
                 icon: $r('sys.symbol.plus'),
                 onCheck: () => {
-                  this.kvDialogTitle = getResourceString($r('app.string.add_app'), this)
-                  this.kvDialogController.open()
+                  this.addApp()
                 }
               })
                 .enabled(this.appConfig.accessControl)
@@ -282,6 +282,11 @@ export struct AccessControl {
 
   }
 
+  addApp() {
+    this.kvDialogTitle = getResourceString($r('app.string.add_app'), this)
+    this.kvDialogController.open()
+  }
+
   kvDialogController = new CustomDialogController({
     builder: KVCustomDialog({
       value: $keyValueData,
@@ -399,6 +404,10 @@ export struct AccessControl {
   }
 
   aboutToAppear(): void {
+    EventHub.on(EventKey.AddAPP, (bundleName: string) => {
+      this.keyValueData = new KeyValueData('', bundleName)
+      this.addApp()
+    })
    /* this.appListData.push(
       {
       name: '哔哩哔哩',
