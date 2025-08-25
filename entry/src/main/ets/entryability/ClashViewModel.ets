@@ -3,7 +3,8 @@ import { Context, Want } from "@kit.AbilityKit";
 import { SocketProxyService, Profile, ProfileType, UpdateConfigParams, ClashConfig, getHome,
   LogInfo,
   Provider,
-  ProxyMode} from "proxy_core";
+  ProxyMode,
+  ProxySort} from "proxy_core";
 import { vpnExtension } from "@kit.NetworkKit";
 import { ConfigData } from "../common/entity/PageArgumentEntity";
 import { promptAction } from "@kit.ArkUI";
@@ -142,10 +143,13 @@ export class ClashViewModel {
     }
     return -1;
   }
-  async testAllDelay(list: ProxyItem[]): Promise<number[]>{
 
+  async testAllDelay(list: ProxyItem[]): Promise<number[]>{
     const result = await Promise.all(list.map((l)=> this.testDelay(l.name)))
-    EventHub.sendEvent(EventKey.FetchProxyGroup)
+    let appConfig = AppStorage.get<AppConfig>("appConfig")
+    if (appConfig?.proxySort === ProxySort.Delay) {
+      EventHub.sendEvent(EventKey.FetchProxyGroup)
+    }
     return result;
   }
 

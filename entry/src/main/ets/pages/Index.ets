@@ -201,8 +201,6 @@ struct Index {
   @Provide theProxyGroups: ProxyGroup[] = []
   // 代理页延迟按钮气泡提示
   @Provide isShowDelayPop: boolean = false
-  // 延迟排序判定
-  @Provide isLatencySort: boolean = false
   // 当前代理节点长按选择的值
   @Provide ProxyItemLongPressValue: number = -1
   // 当前显示的代理分组
