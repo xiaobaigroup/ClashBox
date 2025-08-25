@@ -10,7 +10,7 @@ import ProxyGroupItem from '../components/Proxy/ProxyGroupItem'
 import ProxyArrangement from '../components/Proxy/ProxyArrangement'
 import { ProxyGroupItemDataSource, ProxyItem, ProxyItemDataSource } from '../common/datasources/ProxyData'
 import ClashViewModel from '../entryability/ClashViewModel'
-import { ClashConfig, Profile, ProxyGroup, ProxyType } from 'proxy_core'
+import { ClashConfig, Profile, ProxyGroup, ProxySort, ProxyType } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import { AppConfig, ProxyGroupType, UIConfig } from '../entryability/AppState'
 import { curves, PromptAction } from '@kit.ArkUI'
@@ -113,8 +113,6 @@ struct ProxyPage {
   @Consume curYOffset: number
   // 收藏显示判定
   @Provide showStart: boolean = false
-  //延迟排序判定
-  @Consume isLatencySort: boolean
   // 代理页延迟按钮气泡提示
   @Consume isShowDelayPop: boolean
   // px外屏隐藏top和tab偏移
@@ -411,15 +409,8 @@ struct ProxyPage {
                 autoCancel: false
               })
               .onClick(async () => {
-                if(this.isLatencySort){
-                  return
-                }
                 this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
                 await ClashViewModel.testAllDelay(this.theProxyGroups[this.currentProxyIndex].proxies as ProxyItem[])
-                // 当延迟排序选中时，让ui可以刷新
-                this.isLatencySort = true
-                // await this.isLatencySort == true
-                this.isLatencySort = false
                 hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行1 %{public}s")
                 if (this.uiConfig.isVibrate) {
                   customVibrator.vibratorTriggerOfHapticClockTimer()
