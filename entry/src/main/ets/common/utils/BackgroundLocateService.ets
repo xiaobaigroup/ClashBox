@@ -53,8 +53,7 @@ export class BackgroundLocateService{
   async getLocation(context: Context) {
     await this.requestPermissionsFromUser(context)
     let request: geoLocationManager.LocationRequest = {
-      priority: geoLocationManager.LocationRequestPriority.FIRST_FIX, // Quick location acquisition is preferred
-      scenario: geoLocationManager.LocationRequestScenario.UNSET, // Indicates that no scenario information is set
+      scenario: geoLocationManager.LocationRequestScenario.NO_POWER, // Indicates that no scenario information is set
       timeInterval: 7200, // Interval for reporting the location information
       distanceInterval: 10000, // Distance for reporting location information
       maxAccuracy: 1000 // The precision value required when the application requests location information from the system
