@@ -41,7 +41,8 @@
           },
           {
             "actions": [
-              "ohos.want.action.viewData"
+              "ohos.want.action.viewData",
+              "ohos.want.action.sendData"
             ],
             "uris": [
               {
@@ -51,6 +52,11 @@
               {
                 "scheme": "clashbox",
                 "host": "install-config"
+              },
+              {
+                "scheme": "file",
+                "utd": "general.text",
+                "maxFileSupported": 1
               }
             ]
           }

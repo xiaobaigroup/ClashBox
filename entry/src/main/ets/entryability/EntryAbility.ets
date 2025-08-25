@@ -1,18 +1,21 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hiAppEvent, hilog } from '@kit.PerformanceAnalysisKit';
 import { promptAction, window } from '@kit.ArkUI';
-import { BusinessError, emitter } from '@kit.BasicServicesKit';
+import { BusinessError } from '@kit.BasicServicesKit';
 import ClashViewModel from './ClashViewModel';
-import { AppConfig, AppFlowingState, AppState, ClashCore } from './AppState';
+import { AppConfig, AppState, ClashCore } from './AppState';
 import { EventHub, EventKey } from '../common/EventHub';
 import { PipManager } from '../common/utils/PipManager';
-import { ClashConfig, SocketProxyService, SocketStubService } from 'proxy_core';
+import { ClashConfig, SocketStubService } from 'proxy_core';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { url } from '@kit.ArkTS';
 import { StatusBarUtils } from 'xb_components';
 import { cardIdManager } from '../common/utils/CardIdManagerUtils';
 import { rpc } from '@kit.IPCKit';
 import { ProxyActionType } from '../widget/model/FormCardConstant';
+import { systemShare } from '@kit.ShareKit';
+import { uniformTypeDescriptor as utd } from '@kit.ArkData';
+import { UrlUtils } from '../common/utils/UrlUtils';
 
 class Params implements rpc.Parcelable {
   marshalling(dataOut: rpc.MessageSequence): boolean {
@@ -36,6 +39,8 @@ export default class EntryAbility extends UIAbility {
   };
   /** @description ClashCore是否初始化过 */
   private clashCoreInitialized: boolean = false
+  /** @description 包名 */
+  private bundleName: string = ''
 
   /** @description 注册卡片监听事件 */
   registerCardEvent() {
@@ -106,6 +111,7 @@ export default class EntryAbility extends UIAbility {
       await ClashViewModel.init(this.context)
       await this.ClashCoreInit()
       const proxyNodeInfo = cardIdManager.getSelectedProxyNode()
+      hilog.info(0x0000, 'EntryAbility', '%{public}s', JSON.stringify(proxyNodeInfo))
       if (proxyNodeInfo) {
         ClashViewModel.changeProxy(proxyNodeInfo.profile, proxyNodeInfo.g, proxyNodeInfo.p)
       }
@@ -125,8 +131,46 @@ export default class EntryAbility extends UIAbility {
     }
   }
 
-  // 卡片在后台执行
+  /**
+   * @description 获取分享的包名信息
+   * @param want want
+   * @param launchMode false 热启动 true 冷启动
+   * */
+  private async getShareData(want: Want, launchMode: boolean = false) {
+    try {
+      // 获取共享数据
+      const sharedData = await systemShare.getSharedData(want);
+      hilog.info(0x0000, 'EntryAbility', '%{public}s', 'getSharedData success:', JSON.stringify(sharedData));
+
+      // 处理包名
+      let records: systemShare.SharedRecord[] = sharedData.getRecords();
+      records.forEach(async (record: systemShare.SharedRecord) => {
+        switch (record.utd) {
+          // 文本类型
+          case utd.UniformDataType.TEXT:
+            record.content && (this.bundleName = UrlUtils.extractPackageName(record.content));
+            break;
+          // 超链接类型
+          case utd.UniformDataType.HYPERLINK:
+            record.content && (this.bundleName = UrlUtils.extractPackageName(record.content));
+            break;
+          default:
+            break;
+        }
+      })
+      if (this.bundleName && launchMode) {
+          EventHub.sendEvent(EventKey.ShareBundle, this.bundleName)
+      }
+    } catch (e) {
+      hilog.error(0x0000, 'EntryAbility', '%{public}s', 'getSharedData error: ', JSON.stringify(e));
+    }
+  }
+
+  // 冷启动
   async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
+    // 获取分享的包名信息
+    await this.getShareData(want);
+
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onCreate');
     // 添加崩溃监听
     hiAppEvent.addWatcher({
@@ -159,6 +203,11 @@ export default class EntryAbility extends UIAbility {
     // 卡片Id持久化管理 并 监听卡片事件
     cardIdManager.init(this.context)
     this.registerCardEvent()
+  }
+
+  // 热启动
+  async onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
+    await this.getShareData(want, true);
   }
 
   debugVpn: SocketStubService | null = null
@@ -199,8 +248,9 @@ export default class EntryAbility extends UIAbility {
     if (!this.clashCoreInitialized) {
       await ClashViewModel.init(this.context)
     }
-
-    windowStage.loadContent('pages/Index', async (err) => {
+    const storage = new LocalStorage()
+    storage.setOrCreate('bundleName', this.bundleName)
+    windowStage.loadContent('pages/Index', storage, async (err) => {
       if (err.code) {
         hilog.error(0x0000, 'EntryAbility', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
         return;

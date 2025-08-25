@@ -11,7 +11,8 @@ import {
   moreData,
   AboutListItemProp,
   BIND_SHEET_CONTAINER_HEIGHT,
-  DefaultUpdateInfo,CHART_NUMBER,
+  DefaultUpdateInfo,
+  CHART_NUMBER,
   TheExperimentData,
   TAB_CONTENT_TITLE_HEIGHT,
   LogData,
@@ -50,10 +51,12 @@ import {
   TabBarHeight,
   TabBarJustifyContent,
   TabBarPosition,
-  TabBarVertical, TabBarWidth,
+  TabBarVertical,
+  TabBarWidth,
   TabIconFontSize,
   TabTitleFontSize,
-  WindowTabBarWidth} from '../common/breakpoint/BreakPoint'
+  WindowTabBarWidth
+} from '../common/breakpoint/BreakPoint'
 import { WindowTopBar } from '../components/Common/TopBar'
 import { ImportConfigFromURL } from '../components/Configuration/ImportConfigFromURL'
 import { Xb_ChangeThemeColor } from 'xb_components/src/main/ets/utils/ChangeThemeColorUtil'
@@ -641,6 +644,14 @@ struct Index {
         BackgroundDownService.stop(context)
       }
     })
+
+    // 分享包名
+    const localStorage = this.getUIContext().getSharedLocalStorage()
+    const bundleName = localStorage?.get<string>('bundleName')
+    bundleName && this.jumpAccessControl(bundleName)
+    EventHub.on(EventKey.ShareBundle, (bundleName: string) => {
+      this.jumpAccessControl(bundleName)
+    })
     // 运行一次窗口检查
     this.onWindowChange()
 
@@ -1047,4 +1058,17 @@ struct Index {
     hilog.info(0x0000, 'Index', '#onAvoidAreaChange 动态避让高度 Top：%{public}d Bottom: %{public}i', this.topRectHeight, this.bottomRectHeight)
   }
 
+  /** @description 跳转到访问控制添加包名 */
+  jumpAccessControl(bundleName: string) {
+    this.IndexCurrentindex = 3
+    const path = this.pageInfos.getAllPathName()
+    if (path[0] !== 'AccessControl' || path.length === 0) {
+      setTimeout(() => {
+        this.pageInfos.replacePathByName('AccessControl', false)
+      })
+    }
+    setTimeout(() => {
+      EventHub.sendEvent(EventKey.AddAPP, bundleName)
+    }, 400)
+  }
 }

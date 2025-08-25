@@ -30,6 +30,7 @@ import { ArrayConfigEditor } from '../components/More/Overwrite/EditArrayConfig'
 import { customAnimationUtil } from '../common/utils/Animation';
 import { ListItemMarginValue, MoreNavMode, NeedClearMoreStack, TabBarVertical } from '../common/breakpoint/BreakPoint';
 import { AccessControl } from '../components/More/AccessControl';
+import { EventKey, EventHub } from '../common/EventHub';
 
 const componentName: string = 'MorePage'
 
@@ -239,6 +240,7 @@ struct MorePage {
   }
 
   aboutToDisappear() {
+    EventHub.off(EventKey.AddAPP)
   }
 
   handleCheck(index: number) {
