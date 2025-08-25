@@ -7,7 +7,7 @@ import {
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE } from '../../common/entity/Constants'
 import { LengthMetrics, SymbolGlyphModifier,PromptAction, curves } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
-import { ProxyItem, ProxyItemDataSource } from '../../common/datasources/ProxyData';
+import { ProxyGroupItemDataSource, ProxyItem, ProxyItemDataSource } from '../../common/datasources/ProxyData';
 import { Profile, ProxyGroup, ProxySort } from 'proxy_core';
 import { AppConfig, AppState, ClashCore, ProxyCardSize, ProxyGroupType, UIConfig } from '../../entryability/AppState';
 import { ProxyNode } from './ProxyNodeItem';
@@ -50,8 +50,8 @@ struct ProxyGroupItem {
   @Prop proxyitems: ProxyItem[]
   // 代理分组序号[0 ~ +∞]
   @Prop proxyGroup: number
-  // 代理原始数据
-  @Consume theProxyGroups: ProxyGroup[]
+  // 代理数据(懒加载)
+  @Consume proxyGroups: ProxyGroupItemDataSource
   @State proxyLazyItems: ProxyItemDataSource = new ProxyItemDataSource()
   @Consume('currentProfile') currentProfile: Profile | null
   // 当前代理节点单选选择的值
@@ -379,7 +379,7 @@ struct ProxyGroupItem {
   private favoriteProxy(): void {
     //  收藏节点 & 判断是否已经收藏
     const p = ProxyGroupItem.currentTouchProxyData
-    if (!p.isShowFavoriteProxy && AppState.fetchFavoriteProxys(this.favoriteProxys, this.theProxyGroups).length<3){
+    if (!p.isShowFavoriteProxy && AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups.getDataset()).length<3){
       this.ProxyPromptAction.showToast({ message: $r('app.string.Collect_Tip') })
       p.isShowFavoriteProxy = true
       this.favoriteProxys.set(p.g + '|' + p.name, this.appConfig.currentProfileId ?? "")

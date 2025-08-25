@@ -572,6 +572,7 @@ export struct AccessControl {
     if (!this.nameStringData[0])
       return
     if (this.modeTabSelectedIndexes[0] == 0) {
+      // 白名单
       console.log(`AccessControl #onModeChange 模式：${ this.appConfig.accessControlMode}`)
       this.appConfig.accessControlAcceptList = JSON.stringify(this.nameStringData)
     } else {

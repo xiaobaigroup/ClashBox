@@ -24,7 +24,6 @@ struct ProxyArrangement {
   // 当前代理分组
   @Consume currentProxyIndex: number
   // 代理原始数据
-  @Consume theProxyGroups: ProxyGroup[]
   @Consume proxyGroups: ProxyGroupItemDataSource
   @State isContentShow: boolean | undefined = false
   @Consume('currentProfile') currentProfile: Profile
@@ -109,10 +108,11 @@ struct ProxyArrangement {
   }
 
   aboutToAppear(): void {
-    hilog.info(0xB000, componentName, '#aboutToAppear 组1数组长度： %{public}d', this.theProxyGroups[0].proxies.length )
+    hilog.info(0xB000, componentName, '#aboutToAppear 组1数组长度： %{public}d', this.proxyGroups.getData(0).proxies.length )
     hilog.info(0xFF00, "ProxyPageGroupTag", "#ProxyArrangement#aboutToAppear 当前显示分组%{public}d", this.currentProxyIndex)
-    if (this.currentProfile){
-      let listIndexes = this.theProxyGroups.findIndex((d) => d.name == this.currentProfile?.currentGroupName)
+    if (this.currentProfile) {
+      const theProxyGroups = this.proxyGroups.getDataset()
+      let listIndexes = theProxyGroups.findIndex((d) => d.name == this.currentProfile?.currentGroupName)
       setTimeout(() => {
         if (listIndexes > -1 && this.currentProxyIndex === 0) {
           this.currentProxyIndex = listIndexes

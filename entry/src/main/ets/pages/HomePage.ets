@@ -42,6 +42,7 @@ import {
 import { RoundButton } from '../components/Common/RoundButton'
 import { AccessControl, VpnRawOptions } from 'proxy_core/src/main/ets/rpc/IClashManager'
 import { cardIdManager } from '../common/utils/CardIdManagerUtils'
+import { Xb_GetResourceString } from 'xb_components'
 
 
 @Entry
@@ -96,11 +97,9 @@ struct Home {
   // 节点数据
   @Consume proxyLazyItems: ProxyItemDataSource
   // 配置页数据表
-  @Consume configList: Array<ConfigData>
+  @Consume('Configuration') configList: Array<ConfigData>
   // 当前主页布局
   @Consume theCurrentHomeCard: boolean[]
-  // 节点数据组
-  @Consume theProxyGroups: ProxyGroup[]
   // 上一次主页布局
   @Consume theLastHomeCard: boolean[]
 
@@ -135,13 +134,13 @@ struct Home {
 
   /** @description 切换代理模式 */
   async switchProxyMode() {
-    if (this.configList.length === 0 || this.theProxyGroups.length === 0) {
+    if (this.configList.length === 0 || this.proxyGroups.totalCount() === 0) {
       if (this.uiConfig.isVibrate) {
         customVibrator.vibratorTriggerOfHapticClockTimer()
       }
       // 配置页没有数据，或者代理节点未加载
       this.promptAction.showToast({
-        message: `${getContext().resourceManager.getStringSync($r('app.string.start_prompt'))}`
+        message: `${Xb_GetResourceString($r('app.string.start_prompt'), this.getUIContext().getHostContext())}`
       })
       // vpn小钥匙可能卡死，关闭vpn小钥匙
       await ClashViewModel.StopVpn()
@@ -374,8 +373,8 @@ struct Home {
       if (this.currentProfile) {
         await ClashViewModel.loadConfig(true)
         // 写入数据
-        this.theProxyGroups = await ClashViewModel.getProxyGroups(mode)
-        this.proxyGroups.pushData(this.theProxyGroups)
+        const proxyData = await ClashViewModel.getProxyGroups(mode)
+        this.proxyGroups.pushData(proxyData)
       }
     })
     // 只有当PC首次启动时重置主页布局

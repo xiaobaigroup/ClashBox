@@ -82,9 +82,6 @@ struct ProxyPage {
   @State currentRadioValue3: number = 0 // 卡片尺寸切换
 
   /*节点相关数据以及排序 */
-  // 代理原始数据
-  @Consume theProxyGroups: ProxyGroup[]
-  // @StorageProp("proxyGroups") theProxyGroups: ProxyGroup[] = []
   @Prop proxyitems: ProxyItem[]
   // 代理数据(懒加载)
   @Consume proxyGroups: ProxyGroupItemDataSource
@@ -343,7 +340,7 @@ struct ProxyPage {
                       if (TabBarVertical(this.widthBp, this.heightBp)) {
                         if (this.currentProxyIndex === 0 && extraInfo.currentOffset > 79) {
                           indexController.changeIndex(0)
-                        } else if (this.currentProxyIndex === this.theProxyGroups.length - 1 && extraInfo.currentOffset < -79) {
+                        } else if (this.currentProxyIndex === this.proxyGroups.totalCount() - 1 && extraInfo.currentOffset < -79) {
                           indexController.changeIndex(2)
                         }
                       }
@@ -355,7 +352,7 @@ struct ProxyPage {
                     //  this.tabsController.changeIndex(targetIndex)
                       this.currentProxyIndex = targetIndex
                       if (this.currentProfile) {
-                        this.currentProfile.currentGroupName = this.theProxyGroups[this.currentProxyIndex].name
+                        this.currentProfile.currentGroupName = this.proxyGroups.getData(this.currentProxyIndex).name
                         ClashViewModel.updateProfile(this.currentProfile)
                       }
                     })
@@ -413,7 +410,7 @@ struct ProxyPage {
               })
               .onClick(async () => {
                 this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
-                await ClashViewModel.testAllDelay(this.theProxyGroups[this.currentProxyIndex].proxies as ProxyItem[])
+                await ClashViewModel.testAllDelay(this.proxyGroups.getData(this.currentProxyIndex).proxies as ProxyItem[])
                 hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行1 %{public}s")
                 if (this.uiConfig.isVibrate) {
                   customVibrator.vibratorTriggerOfHapticClockTimer()

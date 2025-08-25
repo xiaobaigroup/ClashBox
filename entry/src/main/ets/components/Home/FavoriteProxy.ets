@@ -22,11 +22,11 @@ struct FavoriteProxy {
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  @StorageLink("proxyGroups") ProxyGroups: ProxyGroup[] = []
   @Consume('currentProfile') currentProfile: Profile | null
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  @Consume theProxyGroups: ProxyGroup[]
+  // 代理数据(懒加载)
+  @Consume proxyGroups: ProxyGroupItemDataSource
   // 编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
 
@@ -34,10 +34,10 @@ struct FavoriteProxy {
     Column() {
       CardTitle({ title: $r('app.string.FavoriteProxy') })
       //拥有收藏节点的布局 start
-      if (AppState.fetchFavoriteProxys(this.favoriteProxys, this.theProxyGroups).length > 0 ) {
+      if (AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups.getDataset()).length > 0 ) {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceEvenly }) {
           List({}) {
-            ForEach(AppState.fetchFavoriteProxys(this.favoriteProxys, this.theProxyGroups),
+            ForEach(AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups.getDataset()),
               (p: [string, string], i: number) => {
                 ListItem() {
                   Flex({
@@ -63,7 +63,7 @@ struct FavoriteProxy {
                     // 在home页编辑状态时，无法操作
                     if (this.isShowHomeEdit === false) {
                       this.appConfig.currentProxyName = p[1]
-                      this.appConfig.currentProxyItem = AppState.fetchProxyItem(this.theProxyGroups, p[0], p[1])
+                      this.appConfig.currentProxyItem = AppState.fetchProxyItem(this.proxyGroups.getDataset(), p[0], p[1])
                       // 对应切换代理页节点
                       this.changeProxy(p[0], this.appConfig.currentProxyItem)
                       if (this.uiConfig.isVibrate) {
@@ -72,7 +72,7 @@ struct FavoriteProxy {
                     }
                   })
                   .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                }.height(AppState.fetchFavoriteProxys(this.favoriteProxys, this.theProxyGroups).length - 1 == 1 ? '50%' : '32%')
+                }.height(AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups.getDataset()).length - 1 == 1 ? '50%' : '32%')
               })
           }.divider({ strokeWidth: 1, color: $r('app.color.FavoriteProxyDivider') })
           .scrollBar(BarState.Off)
@@ -118,11 +118,9 @@ struct FavoriteProxy {
   }
 
   aboutToAppear(): void {
-    this.theProxyGroups = this.ProxyGroups
   }
 
   aboutToDisappear() {
-    this.ProxyGroups = this.theProxyGroups
   }
 
 }

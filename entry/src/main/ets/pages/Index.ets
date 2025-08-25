@@ -203,8 +203,6 @@ struct Index {
   @Provide proxyLazyItems: ProxyItemDataSource = new ProxyItemDataSource()
   // 节点数据组
   @Provide items: ProxyItem[] = ProxyData.ProxyItems();
-  // 代理页原始数据
-  @Provide theProxyGroups: ProxyGroup[] = []
   // 代理页延迟按钮气泡提示
   @Provide isShowDelayPop: boolean = false
   // 当前代理节点长按选择的值
@@ -228,7 +226,7 @@ struct Index {
   // 路由栈
   @Provide('configAddPageInfos') configAddPageInfos: NavPathStack = new NavPathStack()
   // 配置数据
-  @Provide configList: Array<ConfigData> = []
+  @Provide('Configuration') configList: Array<ConfigData> = []
 
   /**
    * 更多页相关变量
@@ -456,7 +454,9 @@ struct Index {
       cancel: () => {
         if (this.isDisclaimer) {
           // 拒绝并退出
-          context.terminateSelf()
+          context.terminateSelf().catch(() => {
+            console.log(`#DisclaimerCustomDialog 应用已退出`)
+          })
         } else {
           // 关闭背景模糊
           this.isEnableIndexForegroundBlur = false
@@ -747,10 +747,9 @@ struct Index {
         if (this.currentProfile) {
           // 写入数据
           this.proxyGroups.empty()
-          this.theProxyGroups = []
-          let TheProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode ?? ProxyMode.Rule)
-          this.theProxyGroups = TheProxyGroups.filter(item => item.hidden !== true)
-          this.proxyGroups.pushData(this.theProxyGroups)
+          const rawProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode ?? ProxyMode.Rule)
+          const ProxyGroups = rawProxyGroups.filter(item => item.hidden !== true)
+          this.proxyGroups.pushData(ProxyGroups)
           this.proxyGroups.refresh()
         }
       } else {
@@ -802,16 +801,7 @@ struct Index {
 
   /**分流模式选择数据变化监控*/
   async switchMode() {
-    if(this.clashConfig.mode==ProxyMode.Rule){
-      this.theProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode = ProxyMode.Rule)
-      this.proxyGroups.refresh()
-    }else if(this.clashConfig.mode==ProxyMode.Global){
-      this.theProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode = ProxyMode.Global)
-      this.proxyGroups.refresh()
-    }else if(this.clashConfig.mode==ProxyMode.Direct){
-      this.theProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode = ProxyMode.Direct)
-      this.proxyGroups.refresh()
-    }
+    this.proxyGroups.refresh()
   }
 
   aboutToDisappear() {

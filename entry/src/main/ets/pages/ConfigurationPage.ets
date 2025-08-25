@@ -101,9 +101,9 @@ struct ConfigurationPage {
 
   /* 配置页面内ListItem长按ContextMenu相关 */
   @Consume('currentTouchConfigData') currentTouchConfigData: ConfigData
-  @Consume @Watch('onConfigListChange') configList: Array<ConfigData>
+  @Consume('Configuration') @Watch('onConfigListChange') configList: Array<ConfigData>
   @State  currentRadioConfigData: ConfigData = NewConfigData
-  @Consume proxyGroups: ProxyGroup[]
+
 
   build() {
     Stack() {
