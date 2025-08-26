@@ -922,3 +922,24 @@ export const LIST_ITEM_PADDING: Padding = { left: 12, right: 12 }
 // 自动更新间隔 乐行
 // 配置自动更新的间隔`TextPicker`组件显示文本默认值，用于获取string_array.json资源异常的时候显示
 export const CONFIG_AUTO_UPDATE_TIME_GAT_STRING_ARR: Array<string> = [ 'Minute', 'Hour', 'Day', ]
+
+/** @description 包名信息 */
+export class BundleInfo {
+  /** @description 包名 */
+  bundleName?: string
+  /** @description 应用名 */
+  appName?: string
+
+  constructor(bundleName?: string, appName?: string) {
+    this.bundleName = bundleName;
+    this.appName = appName;
+  }
+
+  /**
+   * @returns false -> 空
+   * @returns true -> 不为空
+   * */
+  static isEmpty(bundleInfo: BundleInfo): boolean {
+    return !(bundleInfo.bundleName === '' || bundleInfo.bundleName === undefined || bundleInfo.bundleName === null || bundleInfo.appName === '' || bundleInfo.appName === undefined || bundleInfo.appName === null)
+  }
+}

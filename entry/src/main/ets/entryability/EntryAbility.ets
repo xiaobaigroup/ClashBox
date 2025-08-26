@@ -16,6 +16,7 @@ import { ProxyActionType } from '../widget/model/FormCardConstant';
 import { systemShare } from '@kit.ShareKit';
 import { uniformTypeDescriptor as utd } from '@kit.ArkData';
 import { UrlUtils } from '../common/utils/UrlUtils';
+import { BundleInfo } from '../common/entity/Constants'
 
 class Params implements rpc.Parcelable {
   marshalling(dataOut: rpc.MessageSequence): boolean {
@@ -39,8 +40,8 @@ export default class EntryAbility extends UIAbility {
   };
   /** @description ClashCore是否初始化过 */
   private clashCoreInitialized: boolean = false
-  /** @description 包名 */
-  private bundleName: string = ''
+  /** @description 包名信息 */
+  private bundleInfo: BundleInfo = new BundleInfo()
 
   /** @description 注册卡片监听事件 */
   registerCardEvent() {
@@ -148,18 +149,24 @@ export default class EntryAbility extends UIAbility {
         switch (record.utd) {
           // 文本类型
           case utd.UniformDataType.TEXT:
-            record.content && (this.bundleName = UrlUtils.extractPackageName(record.content));
+            if (record.content) {
+              const bundleName = UrlUtils.extractPackageName(record.content)
+              this.bundleInfo = new BundleInfo(bundleName, record.title ?? '')
+            }
             break;
           // 超链接类型
           case utd.UniformDataType.HYPERLINK:
-            record.content && (this.bundleName = UrlUtils.extractPackageName(record.content));
+            if (record.content) {
+              const bundleName = UrlUtils.extractPackageName(record.content)
+              this.bundleInfo = new BundleInfo(bundleName, record.title ?? '')
+            }
             break;
           default:
             break;
         }
       })
-      if (this.bundleName && launchMode) {
-          EventHub.sendEvent(EventKey.ShareBundle, this.bundleName)
+      if (BundleInfo.isEmpty(this.bundleInfo) && launchMode) {
+          EventHub.sendEvent(EventKey.ShareBundle, this.bundleInfo)
       }
     } catch (e) {
       hilog.error(0x0000, 'EntryAbility', '%{public}s', 'getSharedData error: ', JSON.stringify(e));
@@ -167,7 +174,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   // 冷启动
-  async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
+  async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam) {
     // 获取分享的包名信息
     await this.getShareData(want);
 
@@ -206,8 +213,8 @@ export default class EntryAbility extends UIAbility {
   }
 
   // 热启动
-  async onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
-    await this.getShareData(want, true);
+  onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam) {
+    this.getShareData(want, true);
   }
 
   debugVpn: SocketStubService | null = null
@@ -249,7 +256,7 @@ export default class EntryAbility extends UIAbility {
       await ClashViewModel.init(this.context)
     }
     const storage = new LocalStorage()
-    storage.setOrCreate('bundleName', this.bundleName)
+    storage.setOrCreate<BundleInfo>('bundleInfo', this.bundleInfo)
     windowStage.loadContent('pages/Index', storage, async (err) => {
       if (err.code) {
         hilog.error(0x0000, 'EntryAbility', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');

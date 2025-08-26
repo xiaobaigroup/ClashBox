@@ -18,6 +18,7 @@ import {
   LogData,
   showHomeCard,
   NewConfigData,
+  BundleInfo,
 } from '../common/entity/Constants'
 import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/datasources/ProxyData'
 import { ClashConfig, IpInfo, LogLevel, Profile, ProxyGroup, ProxyMode } from 'proxy_core'
@@ -67,20 +68,23 @@ import BackgroundDownService from '../common/utils/BackgroundDownService'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 const context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
+
 export const indexController: TabsController = new TabsController()
+
 const componentName: string = 'Index'
 
 @Entry
 @Component
 struct Index {
-
   /**
    * 窗口
    */
   // 高度断点
-  @StorageLink ('currentHeightBreakpoint') @Watch('onWindowChange')  @Watch('isSecondaryChange')heightBp: HeightBreakpoint = 0
+  @StorageLink('currentHeightBreakpoint') @Watch('onWindowChange') @Watch('isSecondaryChange') heightBp: HeightBreakpoint =
+    0
   // 宽度断点
-  @StorageLink ('currentWidthBreakpoint') @Watch('onWindowChange') @Watch('isSecondaryChange')widthBp: WidthBreakpoint = 1
+  @StorageLink('currentWidthBreakpoint') @Watch('onWindowChange') @Watch('isSecondaryChange') widthBp: WidthBreakpoint =
+    1
   // 导航条区域的高度
   @StorageProp('bottomRectHeight') @Watch('onAvoidAreaChange') bottomRectHeight: number = 0
   // 状态栏高度
@@ -90,18 +94,17 @@ struct Index {
   // 应用窗口宽度
   @StorageLink('windowWidth') @Watch('onWindowChange') windowWidth: number = 0
   // 分屏（正方形窗口）
-  @Provide @Watch('isHiddenChange')isSmallSquareScreen: boolean = false
+  @Provide @Watch('isHiddenChange') isSmallSquareScreen: boolean = false
   // 手机横屏判断
-  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
+  @StorageLink('isLandscapePhone') isLandscapePhone: boolean = false
   // 折叠展开状态判断变量
-  @StorageLink ('isFoldStatus') isFoldStatus: boolean = false
+  @StorageLink('isFoldStatus') isFoldStatus: boolean = false
   // 平板竖屏判断变量
   @Provide istabletLandscape: boolean = false
   // PC判定
-  @StorageLink ('2in1') is2in1: boolean = false
+  @StorageLink('2in1') is2in1: boolean = false
   // px外屏判定
   @Provide isPXSecScreen: boolean = false
-
   /**
    * 颜色相关变量
    *    示例中主题配置里配置了一个颜色，所以只用`ResourceColor`类型的变量来接收色值，
@@ -171,11 +174,10 @@ struct Index {
     { name: $r('app.string.Configuration'), icon: $r('sys.symbol.folder_fill') },
     { name: $r('app.string.More'), icon: $r('sys.symbol.square_fill_grid_2x2') }
   ]
-
   /**
    * 主页相关变量
    */
-  @Provide rotateAngle : number  = 0
+  @Provide rotateAngle: number = 0
   // 编辑按钮点击后显示编辑状态判定
   @Provide isShowHomeEdit: boolean = false
   // 主页删除按钮是否出现判定
@@ -191,7 +193,6 @@ struct Index {
   // 速度卡片
   @Provide DownloadSpeed: string = ""
   @Provide UploadSpeed: string = ""
-
   /**
    * 代理页Provide相关变量
    */
@@ -211,7 +212,6 @@ struct Index {
   @Provide currentProxyIndex: number = 0
   // 当前代理节点收藏的值
   @Provide FavoriteProxy: number = -1
-
   /**
    * 配置页相关变量
    */
@@ -227,7 +227,6 @@ struct Index {
   @Provide('configAddPageInfos') configAddPageInfos: NavPathStack = new NavPathStack()
   // 配置数据
   @Provide('Configuration') configList: Array<ConfigData> = []
-
   /**
    * 更多页相关变量
    */
@@ -246,7 +245,6 @@ struct Index {
   @Provide curYOffset: number = 0
   // 更多页标题搜索文本
   @Provide searchText: string = ''
-
   /**
    * 设置页变量
    */
@@ -272,14 +270,13 @@ struct Index {
   @Provide isClearData: boolean = false
   // 设置 -> 外观 -> 按钮位置变量
   @Provide ButtonPositionOffset: number = 0
-
   // 代理计时器Controller
   @Provide proxyStartedTimer: Timer = new Timer()
-  @Provide proxyTime:number = 0
+  @Provide proxyTime: number = 0
 
   build() {
-    if (!this.isPXSecScreen){
-      Stack({alignContent: Alignment.TopEnd}) {
+    if (!this.isPXSecScreen) {
+      Stack({ alignContent: Alignment.TopEnd }) {
         // 窗口控制器(窗口模式显示)
         if (this.windowMode) {
           WindowTopBar()
@@ -290,14 +287,17 @@ struct Index {
           barPosition: TabBarPosition(this.widthBp, this.heightBp),
           index: this.IndexCurrentindex,
           controller: indexController
-        })
-        {
+        }) {
           ForEach(this.tabList, (item: TabBuild, index: number) => {
-            TabContent() { this.TabContentBuilder(index) }
+            TabContent() {
+              this.TabContentBuilder(index)
+            }
             .tabBar(this.TabBarBuilder(item.name, index, item.icon))
             .gesture(
               // 二级Tabs第一个页签向左拖动时，触发手势事件，当Tab栏竖排时不触发
-              PanGesture({direction: !TabBarVertical(this.widthBp, this.heightBp) ? PanDirection.Down : PanDirection.None})
+              PanGesture({
+                direction: !TabBarVertical(this.widthBp, this.heightBp) ? PanDirection.Down : PanDirection.None
+              })
                 .onActionStart((event?: GestureEvent) => {
                   console.info('Pan start')
                 })// 通过父组件的TabsController的实例，改变其index，达到跳转一级Tabs（首页）的效果
@@ -313,18 +313,23 @@ struct Index {
 
         }
         .zIndex(1)
-        .backgroundColor( $r('app.color.background'))
+        .backgroundColor($r('app.color.background'))
         // .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Thin: null)
         // .backgroundBrightness({rate:0.5,lightUpDegree:0.5})
         //  .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
         .barOverlap(false)
         .scrollable(this.isSecondary ? false : true)
         .vertical(TabBarVertical(this.widthBp, this.heightBp))
-        .barWidth(this.windowMode ? WindowTabBarWidth(this.widthBp, this.heightBp) : TabBarWidth(this.widthBp, this.heightBp))
-        .barHeight((this.isSecondary && this.widthBp <= 2 && !this.windowMode) || this.isSmallSquareScreen ? this.barHeight : this.bottomRectHeight == 0 ? TabBarHeight(this.widthBp, this.heightBp) : TabBarAvoidHeight(this.widthBp, this.heightBp))
+        .barWidth(this.windowMode ? WindowTabBarWidth(this.widthBp, this.heightBp) :
+          TabBarWidth(this.widthBp, this.heightBp))
+        .barHeight((this.isSecondary && this.widthBp <= 2 && !this.windowMode) || this.isSmallSquareScreen ?
+          this.barHeight : this.bottomRectHeight == 0 ? TabBarHeight(this.widthBp, this.heightBp) :
+            TabBarAvoidHeight(this.widthBp, this.heightBp))
         .onTabBarClick((index: number) => {
-          this.getUIContext().animateTo({ duration: this.uiConfig.animationSpeed,
-            curve: Curve.Linear, }, () => {
+          this.getUIContext().animateTo({
+            duration: this.uiConfig.animationSpeed,
+            curve: Curve.Linear,
+          }, () => {
             this.IndexCurrentindex = index
           })
         })
@@ -355,18 +360,20 @@ struct Index {
       }
       .width('100%')
       .height('100%')
-      .backgroundColor( $r('app.color.background'))
+      .backgroundColor($r('app.color.background'))
       // 欢迎页&崩溃页
       .bindSheet($$this.isShowWelcome, this.WelcomeSheet(), {
         detents: [BIND_SHEET_CONTAINER_HEIGHT],
-        showClose: (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) || this.openLinkConfigUrl != '' ? true : false,
+        showClose: (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) ||
+          this.openLinkConfigUrl != '' ? true : false,
         dragBar: false,
         backgroundColor: $r('app.color.background'),
         keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
         scrollSizeMode: ScrollSizeMode.CONTINUOUS,
         preferType: SheetType.CENTER,
         onWillDismiss: ((DismissSheetAction: DismissSheetAction) => {
-          if (!this.isShowWelcome || DismissSheetAction.reason === DismissReason.CLOSE_BUTTON || this.openLinkConfigUrl != '') {
+          if (!this.isShowWelcome || DismissSheetAction.reason === DismissReason.CLOSE_BUTTON ||
+            this.openLinkConfigUrl != '') {
             // 关闭背景模糊
             this.isEnableIndexForegroundBlur = false
             DismissSheetAction.dismiss()
@@ -388,16 +395,15 @@ struct Index {
       direction: FlexDirection.Column,
       justifyContent: TabBarJustifyContent(this.widthBp, this.heightBp),
       alignItems: this.windowMode ? ItemAlign.Center : TabBarAlignItems(this.widthBp, this.heightBp),
-      space: {main: LengthMetrics.vp(3)}
-    })
-    {
+      space: { main: LengthMetrics.vp(3) }
+    }) {
       SymbolGlyph(TabIcon)
         .fontColor([this.IndexCurrentindex === index ? this.icon_emphasize : icon_tertiary])
         .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY) // 分层颜色
         .fontSize(TabIconFontSize(this.widthBp, this.heightBp))
-          //.effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
+        //.effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
         .transition(customAnimationUtil.isTranslate(this.uiConfig))
-        .translate({y: this.IndexCurrentindex == index ? -3 : 0})
+        .translate({ y: this.IndexCurrentindex == index ? -3 : 0 })
 
       Text(title)
         .fontColor(this.IndexCurrentindex === index ? this.icon_emphasize : icon_tertiary)
@@ -407,7 +413,7 @@ struct Index {
     }
     .width('100%')
     .height('100%')
-    .padding({top: 8})
+    .padding({ top: 8 })
   }
 
   @Builder
@@ -500,7 +506,7 @@ struct Index {
 
   /**
    *  预留自定义主题，颜色在AppTheme里面修改
-   *  @param theme
+   * @param theme
    */
   onWillApplyTheme(theme: Theme) {
     hilog.info(0x1000, componentName, `#onWillApplyTheme`)
@@ -512,7 +518,8 @@ struct Index {
   /**窗口变化监听*/
   onWindowChange() {
     hilog.info(0xFF00, componentName,
-      `#WindowChange#应用窗口状态 width: ${this.windowWidth} height: ${this.windowHeight} `+' tab宽度:'+ this.barWidth?.toString())
+      `#WindowChange#应用窗口状态 width: ${this.windowWidth} height: ${this.windowHeight} ` + ' tab宽度:' +
+      this.barWidth?.toString())
     if (this.windowWidth > 328 || this.windowHeight > 328) {
       if (this.windowHeight === this.windowWidth) {
         hilog.info(0xFF00, componentName,
@@ -524,7 +531,8 @@ struct Index {
       this.isLandscapePhone = true
       hilog.info(0x1000, componentName,
         `#WindowChange#应用窗口状态改变#(320vp< height <= 500vp) and (640vp< width <= 1000vp)手机横屏结果: ${this.isLandscapePhone}`)
-    } else if ((640 < this.windowWidth && this.windowWidth < 1000 && 640 < this.windowHeight && this.windowHeight < 1000)) {
+    } else if ((640 < this.windowWidth && this.windowWidth < 1000 && 640 < this.windowHeight &&
+      this.windowHeight < 1000)) {
       this.isFoldStatus = true
       hilog.info(0xFF00, componentName,
         `#WindowChange#设备折叠状态改变#(640vp< height <= 1000vp) and (640vp< width <= 1000vp)折叠展开结果: ${this.isFoldStatus}`)
@@ -532,7 +540,8 @@ struct Index {
       this.istabletLandscape = true
       hilog.info(0xFF00, componentName,
         `#WindowChange#应用窗口状态改变#(1000vp< width)平板横屏结果: ${this.istabletLandscape}`)
-    } else if (328<this.windowHeight && this.windowHeight < 440 && 328<this.windowWidth && this.windowWidth <= 440) {
+    } else if (328 < this.windowHeight && this.windowHeight < 440 && 328 < this.windowWidth &&
+      this.windowWidth <= 440) {
       this.isSmallSquareScreen = true
       hilog.info(0xFF00, componentName,
         `#WindowChange#应用窗口状态改变#(1000vp< width)分屏窗口结果: ${this.isSmallSquareScreen}`)
@@ -555,8 +564,8 @@ struct Index {
     hilog.info(0x1000, componentName, `#aboutToAppear executed`)
     let appFlowingState = AppStorage.get<AppFlowingState>("appFlowingState") ?? new AppFlowingState()
     // 启动Clash
-    EventHub.on(EventKey.StartedClash, ()=>{
-      const job = async ()=>{
+    EventHub.on(EventKey.StartedClash, () => {
+      const job = async () => {
         let onlyProxy = AppStorage.get<ClashConfig>("clashConfig")?.['only-proxy'] as boolean ?? true
         hilog.info(0xFF00, "EntryAbilityTestTag", 'onlyProxy: %{public}s', onlyProxy)
         let now = await ClashViewModel.getTraffic(onlyProxy)
@@ -567,7 +576,7 @@ struct Index {
       job()
       this.trafficJob = setInterval(job, 1000)
       // 当模拟下载和通知均启用时
-      if(this.uiConfig.backgroundLocateModel && this.uiConfig.Enablednotice) {
+      if (this.uiConfig.backgroundLocateModel && this.uiConfig.Enablednotice) {
         BackgroundLocateService.start(getContext(this))
       }
       // 启动前先初始化一下显示文本
@@ -589,13 +598,15 @@ struct Index {
               title: `${this.appConfig.currentProxyName ?? 'ClashBox'}`,
               text: `${up}/s ↑ ${down}/s ↓`,
             },
-            this.uiConfig.EnabledStatusNotice ? notificationManager.SlotType.SERVICE_INFORMATION : notificationManager.SlotType.CONTENT_INFORMATION, // 服务提醒类型 -> LEVEL_HIGH; CONTENT_INFORMATION -> LEVEL_MIN
+            this.uiConfig.EnabledStatusNotice ? notificationManager.SlotType.SERVICE_INFORMATION :
+              notificationManager.SlotType.CONTENT_INFORMATION,
+            // 服务提醒类型 -> LEVEL_HIGH; CONTENT_INFORMATION -> LEVEL_MIN
             { abilityName: 'EntryAbility' })
         } catch (err) {
           hilog.info(0xFF00, 'NotificationUtils', `文本通知ID: ${this.noticeJob}发布错误: ${err} `);
         }
         // 更新通知
-        this.updateNoticeJob = setInterval(async ()=> {
+        this.updateNoticeJob = setInterval(async () => {
           up = this.appFlowingState.traffics.getLast()?.up?.toString() ?? "0"
           down = this.appFlowingState.traffics.getLast()?.down?.toString() ?? "0"
           hilog.info(0xFF00, 'NotificationUtils', `文本通知ID: ${this.noticeJob}更新文本: ${up}/s ↑ ${down}/s ↓ `);
@@ -606,7 +617,8 @@ struct Index {
                 title: `${this.appConfig.currentProxyName ?? 'ClashBox'}`,
                 text: `${up}/s ↑ ${down}/s ↓`,
               },
-              this.uiConfig.EnabledStatusNotice ? notificationManager.SlotType.SERVICE_INFORMATION : notificationManager.SlotType.CONTENT_INFORMATION, // 服务提醒类型 -> LEVEL_HIGH; CONTENT_INFORMATION -> LEVEL_MIN
+              this.uiConfig.EnabledStatusNotice ? notificationManager.SlotType.SERVICE_INFORMATION :
+                notificationManager.SlotType.CONTENT_INFORMATION, // 服务提醒类型 -> LEVEL_HIGH; CONTENT_INFORMATION -> LEVEL_MIN
             )
           } catch (err) {
             hilog.info(0xFF00, 'NotificationUtils', `文本通知ID: ${this.noticeJob}更新错误: ${err} `);
@@ -621,9 +633,9 @@ struct Index {
     })
 
     // 停止Clash
-    EventHub.on(EventKey.StopedClash, ()=>{
+    EventHub.on(EventKey.StopedClash, () => {
       clearInterval(this.trafficJob)
-      if(this.uiConfig.backgroundLocateModel) {
+      if (this.uiConfig.backgroundLocateModel) {
         BackgroundLocateService.stop(getContext(this))
       }
       // 代理计时器重置
@@ -645,10 +657,14 @@ struct Index {
 
     // 分享包名
     const localStorage = this.getUIContext().getSharedLocalStorage()
-    const bundleName = localStorage?.get<string>('bundleName')
-    bundleName && this.jumpAccessControl(bundleName)
-    EventHub.on(EventKey.ShareBundle, (bundleName: string) => {
-      this.jumpAccessControl(bundleName)
+    const bundleInfo = localStorage?.get<BundleInfo>('bundleInfo') || new BundleInfo()
+    //  冷启动 -> 触发
+    if (BundleInfo.isEmpty(bundleInfo)) {
+      this.jumpAccessControl(bundleInfo)
+    }
+    // 热启动 -> 通过事件监听触发
+    EventHub.on(EventKey.ShareBundle, (bundleInfo: BundleInfo) => {
+      this.jumpAccessControl(bundleInfo)
     })
     // 运行一次窗口检查
     this.onWindowChange()
@@ -689,27 +705,27 @@ struct Index {
     this.isShowExperimentalFunction = this.uiConfig.isShowExperimentalFunction
 
     // 检查版本更新
-   /* if (this.uiConfig.autoCheckUpdate) {
-      try {
-        const updateInfo = await getUpdateInfo()
-        hilog.info(0xFF00, "UpdatetestTag", "Update Info: %{public}s", JSON.stringify(updateInfo))
-        const theLatest = extractUpdateInfo(updateInfo)
-        if (theLatest) {
-          // 查询完成
-          if (compareVersions(theLatest.tag_name, AppState.versionName)) {
-            this.theAppVersionInfo = theLatest
-            this.isDisclaimer = false
-            this.dialogController.open()
-          }
-        } else {
-          hilog.info(0xFF00, "UpdatetestTag", "提取更新信息失败")
-        }
-      } catch (err) {
-        // 处理错误情况
-        const infoError = `Error:${JSON.stringify(err)}`
-        hilog.info(0xFF00, "UpdatetestTag", "Info: %{public}s", infoError)
-      }
-    }*/
+    /* if (this.uiConfig.autoCheckUpdate) {
+       try {
+         const updateInfo = await getUpdateInfo()
+         hilog.info(0xFF00, "UpdatetestTag", "Update Info: %{public}s", JSON.stringify(updateInfo))
+         const theLatest = extractUpdateInfo(updateInfo)
+         if (theLatest) {
+           // 查询完成
+           if (compareVersions(theLatest.tag_name, AppState.versionName)) {
+             this.theAppVersionInfo = theLatest
+             this.isDisclaimer = false
+             this.dialogController.open()
+           }
+         } else {
+           hilog.info(0xFF00, "UpdatetestTag", "提取更新信息失败")
+         }
+       } catch (err) {
+         // 处理错误情况
+         const infoError = `Error:${JSON.stringify(err)}`
+         hilog.info(0xFF00, "UpdatetestTag", "Info: %{public}s", infoError)
+       }
+     }*/
 
     // if(!this.uiConfig.enabledADvanced || !this.uiConfig.isShowExperimentalFunction) {
     //   // 屏蔽分流策略
@@ -766,13 +782,14 @@ struct Index {
         options.newFileNames = LogData ? [`clash_next_${LogData.logTime}_${Date.now()}.log`] : ["clash_next.log"]
         options.fileSuffixChoices = ["'文档|.txt'"]
         options.pickerMode = picker.DocumentPickerMode.DOWNLOAD
-        filePicker.save(options).then(async (result)=>{
-          const path = new fileUri.FileUri(result[0] + '/' +`clash_next${LogData ? '_' + LogData.logTime + '_' +  Date.now() : ''}.txt`).path
+        filePicker.save(options).then(async (result) => {
+          const path = new fileUri.FileUri(result[0] + '/' +
+            `clash_next${LogData ? '_' + LogData.logTime + '_' + Date.now() : ''}.txt`).path
           await this.saveLog(path, LogData)
-        }).catch((e:Error) =>{
+        }).catch((e: Error) => {
           hilog.debug(0xFF00, 'ExportLog', 'err ', e)
         })
-      }catch (e) {
+      } catch (e) {
         hilog.info(0xFF00, "ExportLog", "err %{public}s", e)
       }
 
@@ -785,16 +802,19 @@ struct Index {
       const file = fs.openSync(uri, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE);
       // 生成日志内容
       const message = logDdata ?
-      [logDdata].map((d) => d.logType + " " + timestampToDateTime(d.logTime * 1000) + "\n" + d.LogDetails)
-        .join("\n") :
-      this.logListData.map((d) => d.logType + " " + timestampToDateTime(d.logTime * 1000) + "\n" + d.LogDetails)
-        .join("\n")
+        [logDdata].map((d) => d.logType + " " + timestampToDateTime(d.logTime * 1000) + "\n" + d.LogDetails)
+          .join("\n") :
+        this.logListData.map((d) => d.logType + " " + timestampToDateTime(d.logTime * 1000) + "\n" + d.LogDetails)
+          .join("\n")
       // hilog.info(0xFF00, "ExportLog", "保存内容: %{public}s", message)
       fs.writeSync(file.fd, message);
       fs.fsync(file.fd);
-      promptAction.showToast({message: $r('app.string.saved_download')})
+      promptAction.showToast({ message: $r('app.string.saved_download') })
     } catch (e) {
-      promptAction.showToast({message: `${getResourceString($r('app.string.export_failed'), this)} ${e.message}`, duration: 3000})
+      promptAction.showToast({
+        message: `${getResourceString($r('app.string.export_failed'), this)} ${e.message}`,
+        duration: 3000
+      })
       hilog.info(0xFF00, "ExportLog", "Err: %{public}s", e.message)
     }
   }
@@ -821,7 +841,7 @@ struct Index {
     if (deviceInfo.deviceType === 'tablet') {
       PipManager.getInstance().updateContentSize(80, 30)
     }
-    if(this.uiConfig.backgroundPiPModel && this.proxyEnabled) {
+    if (this.uiConfig.backgroundPiPModel && this.proxyEnabled) {
       // 创建画中画控制器
       PipManager.getInstance().init(getContext(this))
       // 禁用自动启用
@@ -847,8 +867,10 @@ struct Index {
     this.initLanguage()
     PipManager.getInstance().stopPip()
     hilog.info(0x1000, componentName, `#aboutToAppear#Language 用户选择语言：${this.uiConfig.userLanguage}`)
-    hilog.info(0x1000, componentName, `#aboutToAppear#Language 当前语言文本：${getResourceString(this.currentLanguage, this)}`)
-    hilog.info(0x1000, componentName, `#aboutToAppear#Language 当前系统语言文本：${getResourceString(this.SystemLanguageSubtitle, this)}`)
+    hilog.info(0x1000, componentName,
+      `#aboutToAppear#Language 当前语言文本：${getResourceString(this.currentLanguage, this)}`)
+    hilog.info(0x1000, componentName,
+      `#aboutToAppear#Language 当前系统语言文本：${getResourceString(this.SystemLanguageSubtitle, this)}`)
     this.onOpenConfigLink()
   }
 
@@ -905,7 +927,7 @@ struct Index {
         this.currentLanguage = $r('app.string.TraditionalChinese_TW_Subtitle')
         break
       default:
-        this.currentLanguage =  $r('app.string.Language_Subtitle')
+        this.currentLanguage = $r('app.string.Language_Subtitle')
     }
     // 标准化系统语言
     switch (systemLanguage) {
@@ -916,7 +938,7 @@ struct Index {
         break
       case 'en-Latn-US':
       case 'en-Latn':
-        this.SystemLanguageSubtitle  = $r('app.string.English_Subtitle')
+        this.SystemLanguageSubtitle = $r('app.string.English_Subtitle')
         this.uiConfig.systemLanguage = 'en-Latn'
         break
       case 'zh-Hant-HK':
@@ -927,11 +949,11 @@ struct Index {
         break
       case 'zh-Hant-TW':
       case 'zh-TW':
-        this.SystemLanguageSubtitle  = $r('app.string.TraditionalChinese_TW_Subtitle')
+        this.SystemLanguageSubtitle = $r('app.string.TraditionalChinese_TW_Subtitle')
         this.uiConfig.systemLanguage = 'zh-TW'
         break
       default:
-        this.SystemLanguageSubtitle  =  $r('app.string.Language_Subtitle')
+        this.SystemLanguageSubtitle = $r('app.string.Language_Subtitle')
       // 超出范围保存为系统返回值
         this.uiConfig.systemLanguage = systemLanguage
     }
@@ -969,7 +991,7 @@ struct Index {
     }, () => {
       indexController.setTabBarTranslate({ y: '100%' })
       this.barHeight = 0
-      console.info('tab横竖：',`${TabBarVertical(this.widthBp, this.heightBp)}`)
+      console.info('tab横竖：', `${TabBarVertical(this.widthBp, this.heightBp)}`)
     })
   }
 
@@ -983,7 +1005,8 @@ struct Index {
     }, async () => {
       if (!this.isSmallSquareScreen || !this.isRolling) {
         indexController.setTabBarTranslate({ y: 0 })
-        this.barHeight = this.bottomRectHeight == 0 ? TabBarHeight(this.widthBp, this.heightBp) : TabBarAvoidHeight(this.widthBp, this.heightBp)
+        this.barHeight = this.bottomRectHeight == 0 ? TabBarHeight(this.widthBp, this.heightBp) :
+          TabBarAvoidHeight(this.widthBp, this.heightBp)
       }
     })
   }
@@ -991,7 +1014,7 @@ struct Index {
   /**是否进入主二级界面(更多页二级)*/
   isSecondaryChange() {
     // 监听二级页面布尔判定动画是否执行 监听小屏是否滚动
-    if (this.isSecondary && MoreNavMode(this.widthBp, this.heightBp) === NavigationMode.Stack ) {
+    if (this.isSecondary && MoreNavMode(this.widthBp, this.heightBp) === NavigationMode.Stack) {
       this.stopAnim()
       this.startAnim()
     } else {
@@ -1001,7 +1024,7 @@ struct Index {
 
   /*px外屏手势动画*/
   // tab隐藏
-  startAnimPX(){
+  startAnimPX() {
     this.getUIContext().animateTo({
       duration: this.uiConfig.animationSpeed,
       curve: Curve.Linear,
@@ -1016,38 +1039,39 @@ struct Index {
   }
 
   // tab显示
-  stopAnimPX(){
-      this.getUIContext().animateTo({
-        duration: this.uiConfig.animationSpeed,
-        curve: Curve.EaseOut,
-        iterations: 1,
-        playMode: PlayMode.Normal,
-        onFinish:()=>{
-        }
-      }, () => {
-        indexController.setTabBarTranslate({ y: 0 })
-        this.barHeight = TabBarHeight(this.widthBp, this.heightBp)
-        this.heightTop = 0
-      })
+  stopAnimPX() {
+    this.getUIContext().animateTo({
+      duration: this.uiConfig.animationSpeed,
+      curve: Curve.EaseOut,
+      iterations: 1,
+      playMode: PlayMode.Normal,
+      onFinish: () => {
+      }
+    }, () => {
+      indexController.setTabBarTranslate({ y: 0 })
+      this.barHeight = TabBarHeight(this.widthBp, this.heightBp)
+      this.heightTop = 0
+    })
   }
 
   /**监听上下滚动时，tab是否隐藏*/
-  isHiddenChange(){
-    if (this.isSmallSquareScreen && this.isRolling){
+  isHiddenChange() {
+    if (this.isSmallSquareScreen && this.isRolling) {
       this.stopAnimPX()
       this.startAnimPX()
     } else {
       this.stopAnimPX()
     }
-  }// px外屏手势动画 end
+  } // px外屏手势动画 end
 
   /**避让状态改变*/
   onAvoidAreaChange() {
-    hilog.info(0x0000, 'Index', '#onAvoidAreaChange 动态避让高度 Top：%{public}d Bottom: %{public}i', this.topRectHeight, this.bottomRectHeight)
+    hilog.info(0x0000, 'Index', '#onAvoidAreaChange 动态避让高度 Top：%{public}d Bottom: %{public}i', this.topRectHeight,
+      this.bottomRectHeight)
   }
 
   /** @description 跳转到访问控制添加包名 */
-  jumpAccessControl(bundleName: string) {
+  jumpAccessControl(bundleInfo: BundleInfo) {
     this.IndexCurrentindex = 3
     const path = this.pageInfos.getAllPathName()
     if (path[0] !== 'AccessControl' || path.length === 0) {
@@ -1056,7 +1080,7 @@ struct Index {
       })
     }
     setTimeout(() => {
-      EventHub.sendEvent(EventKey.AddAPP, bundleName)
+      EventHub.sendEvent(EventKey.AddAPP, { bundleName: bundleInfo.bundleName, appName: bundleInfo.appName })
     }, 400)
   }
 }

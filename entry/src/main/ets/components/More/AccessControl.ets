@@ -4,7 +4,7 @@ import { universalSearch } from "../../common/utils/SmartSearchUtil"
 import { ButtonBuilder, checkoutRowListItem,
   font_primary, KVCustomDialog, toggleRowList } from "../Common/Common"
 import { NeedClearMoreStack, PageMargin } from "../../common/breakpoint/BreakPoint"
-import { TAB_CONTENT_TITLE_HEIGHT } from "../../common/entity/Constants"
+import { BundleInfo, TAB_CONTENT_TITLE_HEIGHT } from "../../common/entity/Constants"
 import { AppConfig, UIConfig } from "../../entryability/AppState"
 import { ItemRestriction,promptAction, SegmentButton, SegmentButtonOptions, SegmentButtonTextItem } from "@kit.ArkUI"
 import { KeyValueData } from "./Overwrite/EditArrayConfig"
@@ -406,8 +406,8 @@ export struct AccessControl {
   }
 
   aboutToAppear(): void {
-    EventHub.on(EventKey.AddAPP, (bundleName: string) => {
-      this.keyValueData = new KeyValueData('', bundleName)
+    EventHub.on(EventKey.AddAPP, (bundleInfo: BundleInfo) => {
+      this.keyValueData = new KeyValueData(bundleInfo?.appName || '', bundleInfo?.bundleName || '')
       this.addApp()
     })
    /* this.appListData.push(
