@@ -22,6 +22,7 @@ import { ClashRpcType } from './IClashManager';
 import { getHome, getProfileDir, getProfilePath } from '../appPath';
 import { UpdateConfigParams } from '../models/ClashConfig';
 import { LogInfo, OverrideSlot, Provider, Proxy, ProxyGroup, ProxyMode, Traffic } from '../models/Common';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 
 
 export class ClashMetaVpnService extends CommonVpnService{
@@ -30,6 +31,8 @@ export class ClashMetaVpnService extends CommonVpnService{
   vpnConnection : vpnExtension.VpnConnection | undefined
   public configPath: string = ""
   protectSocketPath: string = ""
+  timer: number = -1
+  time: number = 0
 
   override async onRemoteMessageRequest(client: socket.LocalSocketConnection, message: socket.LocalSocketMessageInfo): Promise<void>{
     let decoder = new util.TextDecoder()
@@ -185,6 +188,8 @@ export class ClashMetaVpnService extends CommonVpnService{
         case ClashRpcType.stopClash:{
           nativeStopTun()
           super.stopVpn()
+          clearInterval(this.timer)
+          this.time = 0
           resolve(true)
           break;
         }
@@ -201,6 +206,11 @@ export class ClashMetaVpnService extends CommonVpnService{
           this.vpnConnection?.protect(fd)
         })
       }
+      // TODO 开始计算运行时间
+      this.timer = setInterval(()=>{
+        this.time = this.time + 1
+        hilog.info(0x001, "ClashBox", `运行时间：${this.time}`)
+      }, 1000)
       return tunFd > -1;
     } catch (error) {
       return false

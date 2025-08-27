@@ -30,6 +30,7 @@ import { ConnectionInfo, LogInfo, Provider, ProxyGroup, ProxyMode, ProxyType, Tr
 import { getHome, getProfilePath } from '../appPath';
 import { Tun, UpdateConfigParams } from '../models/ClashConfig';
 import { readFile, readFileUri, readText } from '../fileUtils';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 
 export interface AccessControl {
   mode: string
@@ -57,6 +58,8 @@ export class FlClashVpnService extends CommonVpnService {
   vpnConnection: vpnExtension.VpnConnection | undefined
   public configPath: string = ""
   protectSocketPath: string = ""
+  timer: number = -1
+  time: number = 0
 
   override async onRemoteMessageRequest(client: socket.LocalSocketConnection, message: socket.LocalSocketMessageInfo): Promise<void> {
     let decoder = new util.TextDecoder()
@@ -258,6 +261,11 @@ export class FlClashVpnService extends CommonVpnService {
       if (tunFd > -1) {
         this.startClash(tunFd)
       }
+      // TODO 开始计算运行时间
+      this.timer = setInterval(()=>{
+        this.time = this.time + 1
+        hilog.info(0x001, "ClashBox", `运行时间：${this.time}`)
+      }, 1000)
       return tunFd > -1;
     } catch (error) {
       console.error("ClashVPN  error ", error)
@@ -299,6 +307,8 @@ export class FlClashVpnService extends CommonVpnService {
   stopVpn() {
     stopTun()
     super.stopVpn()
+    clearInterval(this.timer)
+    this.time = 0
   }
   override async init() {
     initClash(await getHome(this.context), "1.0.0")
