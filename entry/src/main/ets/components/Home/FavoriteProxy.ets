@@ -34,10 +34,10 @@ struct FavoriteProxy {
     Column() {
       CardTitle({ title: $r('app.string.FavoriteProxy') })
       //拥有收藏节点的布局 start
-      if (AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups.getDataset()).length > 0 ) {
+      if (AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups.getDatas()).length > 0 ) {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceEvenly }) {
           List({}) {
-            ForEach(AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups.getDataset()),
+            ForEach(AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups.getDatas()),
               (p: [string, string], i: number) => {
                 ListItem() {
                   Flex({
@@ -63,7 +63,7 @@ struct FavoriteProxy {
                     // 在home页编辑状态时，无法操作
                     if (this.isShowHomeEdit === false) {
                       this.appConfig.currentProxyName = p[1]
-                      this.appConfig.currentProxyItem = AppState.fetchProxyItem(this.proxyGroups.getDataset(), p[0], p[1])
+                      this.appConfig.currentProxyItem = AppState.fetchProxyItem(this.proxyGroups.getDatas(), p[0], p[1])
                       // 对应切换代理页节点
                       this.changeProxy(p[0], this.appConfig.currentProxyItem)
                       if (this.uiConfig.isVibrate) {
@@ -72,7 +72,7 @@ struct FavoriteProxy {
                     }
                   })
                   .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                }.height(AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups.getDataset()).length - 1 == 1 ? '50%' : '32%')
+                }.height(AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups.getDatas()).length - 1 == 1 ? '50%' : '32%')
               })
           }.divider({ strokeWidth: 1, color: $r('app.color.FavoriteProxyDivider') })
           .scrollBar(BarState.Off)

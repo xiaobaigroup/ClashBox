@@ -379,7 +379,7 @@ struct ProxyGroupItem {
   private favoriteProxy(): void {
     //  收藏节点 & 判断是否已经收藏
     const p = ProxyGroupItem.currentTouchProxyData
-    if (!p.isShowFavoriteProxy && AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups.getDataset()).length<3){
+    if (!p.isShowFavoriteProxy && AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups.getDatas()).length<3){
       this.ProxyPromptAction.showToast({ message: $r('app.string.Collect_Tip') })
       p.isShowFavoriteProxy = true
       this.favoriteProxys.set(p.g + '|' + p.name, this.appConfig.currentProfileId ?? "")

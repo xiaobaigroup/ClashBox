@@ -58,6 +58,10 @@ export class ProxyGroupItemDataSource extends BaseDataSource<ProxyGroup> {
     return this.dataArray[index]
   }
 
+  public getDatas(): ProxyGroup[] {
+    return this.dataArray
+  }
+
   public addData(index: number, data: ProxyGroup): void {
     this.dataArray.splice(index, 0, data)
     this.notifyDataAdd(index)
