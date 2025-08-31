@@ -188,16 +188,14 @@ export struct ConfigAdd {
               return;
             }
             // 解析码值结果跳转应用服务页
-            hilog.info(0x0001, '[Scan CPSample]',
-              `Succeeded in getting ScanResult by callback with options, result is ${JSON.stringify(result)}`);
-            const url = result.originalValue.split('?')[0]
-            hilog.info(0x0001, '[Scan CPSample]',
-              `Succeeded in getting import url, url is ${url}`);
+            hilog.info(0x0001, '[Scan CPSample]', `Succeeded in getting import origin url, origin url is ${result.originalValue}`);
+            const newUrl = this.processUrlByQueryIdentifier(result.originalValue)
+            hilog.info(0x0001, '[Scan CPSample]', `Succeeded in process origin url, newUrl is ${newUrl}`);
             const params: ConfigData = {
               configId: 'newQR',
               isNewConfig: true,
               configName: '',
-              configUrl: url,
+              configUrl: newUrl,
               isConfigAutoUpdate: false,
               lastUpdateDateTime: 0,
               updateTime: 0,
@@ -212,6 +210,82 @@ export struct ConfigAdd {
       hilog.error(0x0001, '[Scan CPSample]',
         `Failed to start the scanning service. Code:${error.code}, message: ${error.message}`);
     }
+  }
+
+  /**
+   * 根据查询参数识别码处理URL
+   * @param url 原始URL
+   * @returns 处理后的URL
+   */
+  processUrlByQueryIdentifier(url: string): string {
+    // 查找查询字符串起始位置
+    const queryStartIndex = url.indexOf('?');
+
+    // 如果没有查询参数，直接返回原URL
+    if (queryStartIndex === -1) {
+      return url;
+    }
+
+    // 查找片段标识符位置
+    const fragmentStartIndex = url.indexOf('#', queryStartIndex);
+
+    // 提取查询字符串部分
+    const queryString = fragmentStartIndex === -1
+      ? url.substring(queryStartIndex + 1)
+      : url.substring(queryStartIndex + 1, fragmentStartIndex);
+
+    // 解析查询参数
+    const params = this.parseQueryString(queryString);
+
+    // 检查是否存在flag参数（不区分大小写）
+    const hasFlag = Object.keys(params).some(
+      key => key.toLowerCase() === 'flag'
+    );
+
+    if (hasFlag) {
+      // 删除整个查询字符串
+      const baseUrl = url.substring(0, queryStartIndex);
+
+      // 保留片段标识符（如果有）
+      if (fragmentStartIndex !== -1) {
+        return baseUrl + url.substring(fragmentStartIndex);
+      }
+
+      return baseUrl;
+    }
+
+    // 没有flag参数，保留原URL
+    return url;
+  }
+
+  /**
+   * 解析查询字符串
+   * @param queryString 查询字符串（不包含?）
+   * @returns 参数键值对对象
+   */
+  parseQueryString(queryString: string): Record<string, string> {
+    const params: Record<string, string> = {};
+
+    if (!queryString) {
+      return params;
+    }
+
+    // 分割参数对
+    const pairs = queryString.split('&');
+
+    for (const pair of pairs) {
+      // 分割键值
+      const GeneratedDestructArray = pair.split('=', 2);
+      const key = GeneratedDestructArray[0];
+      const value = GeneratedDestructArray[1];
+
+      if (key) {
+        // 处理键值对（没有值时设为空字符串）
+        params[key] = value !== undefined ? value : '';
+      }
+    }
+
+    return params;
   }
 
 }
