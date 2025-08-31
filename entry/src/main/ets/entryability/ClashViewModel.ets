@@ -18,7 +18,7 @@ import { ProxyItem } from "../common/datasources/ProxyData";
 import { hilog } from "@kit.PerformanceAnalysisKit";
 import { readText } from "proxy_core/src/main/ets/fileUtils";
 import { AccessControl, VpnRawOptions } from "proxy_core/src/main/ets/rpc/IClashManager";
-import { cardIdManager } from "../common/utils/CardIdManagerUtils";
+import { cardManager } from "../common/utils/CardManageUtil";
 
 export interface DelayInfo{
     name: string
@@ -310,7 +310,7 @@ export class ClashViewModel {
       await this.loadVpnOptions()
       await this.socketProxy.stopClash()
       await this.socketProxy.startClash()
-      cardIdManager.pushCartProxyMode(this.vpnStarted)
+      cardManager.pushCartProxyMode(this.vpnStarted)
     }
   }
   vpnStarted = false
@@ -326,11 +326,11 @@ export class ClashViewModel {
       EventHub.sendEvent(EventKey.StartedClash)
       EventHub.sendEvent(EventKey.checkIpInfo)
     }
-    cardIdManager.pushCartProxyMode(this.vpnStarted)
+    cardManager.pushCartProxyMode(this.vpnStarted)
   }
     async loadVpnOptions(){
     // 使用首选项持久化单个节点信息供卡片拉起服务
-    let appConfig = AppStorage.get<AppConfig>("appConfig") || cardIdManager.getAppConfig()
+    let appConfig = AppStorage.get<AppConfig>("appConfig") || cardManager.getAppConfig()
     if (appConfig?.accessControl == null)
       return
     if(appConfig!.accessControl){
@@ -352,11 +352,11 @@ export class ClashViewModel {
     this.socketProxy.stopClash()
     EventHub.sendEvent(EventKey.StopedClash)
     EventHub.sendEvent(EventKey.checkIpInfo)
-    cardIdManager.pushCartProxyMode(this.vpnStarted)
+    cardManager.pushCartProxyMode(this.vpnStarted)
   }
 
   async initProfile(){
-    let appConfig = AppStorage.get<AppConfig>("appConfig") || cardIdManager.getAppConfig()
+    let appConfig = AppStorage.get<AppConfig>("appConfig") || cardManager.getAppConfig()
     EventHub.sendEvent(EventKey.StartLog, appConfig?.enableLogger)
     await this.loadConfig(false)
     EventHub.sendEvent(EventKey.FetchProxyGroup)
@@ -364,8 +364,8 @@ export class ClashViewModel {
 
   proxyGroups :ProxyGroup[] = []
   async loadConfig(patch: boolean = true){
-    let appConfig = AppStorage.get<AppConfig>("appConfig") || cardIdManager.getAppConfig()
-    let clashConfig = AppStorage.get<ClashConfig>("clashConfig") || cardIdManager.getClashConfig()
+    let appConfig = AppStorage.get<AppConfig>("appConfig") || cardManager.getAppConfig()
+    let clashConfig = AppStorage.get<ClashConfig>("clashConfig") || cardManager.getClashConfig()
     const profile = await this.profileRepo.query(appConfig?.currentProfileId)
     await this.loadProfileAndConfig(appConfig?.currentProfileId ?? "", clashConfig, {
       "is-patch": patch,

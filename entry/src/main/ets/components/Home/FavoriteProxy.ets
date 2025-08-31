@@ -9,7 +9,7 @@ import { customAnimationUtil } from '../../common/utils/Animation'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { HomeCardDeleteButtonSize, HomeCardFontSize, HomeCardPadding,
   HomeCardPartSmallFontSize } from '../../common/breakpoint/BreakPoint'
-import { cardIdManager } from '../../common/utils/CardIdManagerUtils'
+import { cardManager } from '../../common/utils/CardManageUtil'
 
 
 @Component
@@ -113,7 +113,7 @@ struct FavoriteProxy {
     if (this.currentProfile) {
       ClashViewModel.changeProxy(this.currentProfile, g, item.name)
       // 首选项持久化存储 -> 供卡片使用
-      cardIdManager.setSelectedProxyNode(this.currentProfile, g, item.name)
+      cardManager.setSelectedProxyNode(this.currentProfile, g, item.name)
     }
   }
 

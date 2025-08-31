@@ -10,7 +10,7 @@ import { ClashConfig, SocketStubService } from 'proxy_core';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { url } from '@kit.ArkTS';
 import { StatusBarUtils } from 'xb_components';
-import { cardIdManager } from '../common/utils/CardIdManagerUtils';
+import { cardManager } from '../common/utils/CardManageUtil';
 import { rpc } from '@kit.IPCKit';
 import { ProxyActionType } from '../widget/model/FormCardConstant';
 import { systemShare } from '@kit.ShareKit';
@@ -51,7 +51,7 @@ export default class EntryAbility extends UIAbility {
       const obj = JSON.parse(indata.readString()) as object
       const formId = obj['formId'] as string
       // 持久化卡片Id
-      cardIdManager.addCardId(formId)
+      cardManager.addCardId(formId)
       // 触发卡片更新事件
       return new Params()
     })
@@ -76,7 +76,7 @@ export default class EntryAbility extends UIAbility {
 
   /** @description 初始化Clash核心 */
   private async ClashCoreInit() {
-    const clashCore = (AppStorage.get<AppConfig>("appConfig") || cardIdManager.getAppConfig())?.clashCore
+    const clashCore = (AppStorage.get<AppConfig>("appConfig") || cardManager.getAppConfig())?.clashCore
     await ClashViewModel.ChangeCore(clashCore);
     if (clashCore != ClashCore.mihomo) {
       let service = new SocketStubService(this.context);
@@ -111,7 +111,7 @@ export default class EntryAbility extends UIAbility {
     if (!this.clashCoreInitialized) {
       await ClashViewModel.init(this.context)
       await this.ClashCoreInit()
-      const proxyNodeInfo = cardIdManager.getSelectedProxyNode()
+      const proxyNodeInfo = cardManager.getSelectedProxyNode()
       hilog.info(0x0000, 'EntryAbility', '%{public}s', JSON.stringify(proxyNodeInfo))
       if (proxyNodeInfo) {
         ClashViewModel.changeProxy(proxyNodeInfo.profile, proxyNodeInfo.g, proxyNodeInfo.p)
@@ -208,7 +208,7 @@ export default class EntryAbility extends UIAbility {
     new StatusBarUtils().initStatusBar(this.context, $r("app.media.clash_box_blue"), undefined)
 
     // 卡片Id持久化管理 并 监听卡片事件
-    cardIdManager.init(this.context)
+    cardManager.init(this.context)
     this.registerCardEvent()
   }
 
@@ -223,8 +223,8 @@ export default class EntryAbility extends UIAbility {
   private saveConfigThePreferences() {
     const appConfig = AppStorage.get<AppConfig>("appConfig");
     const clashConfig = AppStorage.get<ClashConfig>("clashConfig");
-    appConfig && cardIdManager.setAppConfig(appConfig);
-    clashConfig && cardIdManager.setClashConfig(clashConfig);
+    appConfig && cardManager.setAppConfig(appConfig);
+    clashConfig && cardManager.setClashConfig(clashConfig);
   }
 
   onDestroy(): void {
@@ -234,7 +234,7 @@ export default class EntryAbility extends UIAbility {
     // 移除卡片监听事件
     this.callee.off('updateFormId');
     this.callee.off('cardChangeProxy');
-    cardIdManager.pushCartProxyMode(false)
+    cardManager.pushCartProxyMode(false)
   }
 
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
@@ -427,7 +427,7 @@ export default class EntryAbility extends UIAbility {
 
 function refreshIPAddress() {
   ClashViewModel.checkIpInfo().then((remoteIp) => {
-    cardIdManager.pushCartProxyIpInfo(remoteIp);
+    cardManager.pushCartProxyIpInfo(remoteIp);
     hilog.info(0x0000, 'EntryAbility', 'remoteIp - success : ' + JSON.stringify(remoteIp));
   }).catch((e: Error) => {
     hilog.info(0x0000, 'EntryAbility', 'remoteIp - error: ' + JSON.stringify(e));

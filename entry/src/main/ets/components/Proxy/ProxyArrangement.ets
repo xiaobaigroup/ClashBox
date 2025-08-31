@@ -6,7 +6,7 @@ import { ProxyItem, ProxyGroupItemDataSource } from '../../common/datasources/Pr
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { AppConfig, UIConfig } from '../../entryability/AppState'
 import { customAnimationUtil } from '../../common/utils/Animation'
-import { cardIdManager } from '../../common/utils/CardIdManagerUtils'
+import { cardManager } from '../../common/utils/CardManageUtil'
 
 const  componentName: string = 'ProxyPageArrangement'
 
@@ -136,7 +136,7 @@ struct ProxyArrangement {
     if (this.currentProfile) {
       ClashViewModel.changeProxy(this.currentProfile, g, item.name)
       // 首选项持久化存储 -> 供卡片使用
-      cardIdManager.setSelectedProxyNode(this.currentProfile, g, item.name)
+      cardManager.setSelectedProxyNode(this.currentProfile, g, item.name)
     }
   }
 

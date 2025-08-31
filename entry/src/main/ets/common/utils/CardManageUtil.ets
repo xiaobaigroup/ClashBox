@@ -21,7 +21,7 @@ class changeProxyParams {
  * @author: SummerKaze
  * @description: 卡片ID持久化管理
  */
-class CardIdManager {
+class CardManager {
   private ctx?: Context
   private store?: preferences.Preferences
   private storeName: string = 'cardPreference'
@@ -104,6 +104,18 @@ class CardIdManager {
     })
   }
 
+  /** @description 推送VPN服务运行时间到所有卡片 */
+  pushCartVpnServiceTime(time: number) {
+    const data = formBindingData.createFormBindingData({
+      time
+    })
+
+    this.getCardIdList().forEach(formId => {
+      // 推送到卡片
+      formProvider.updateForm(formId, data)
+    })
+  }
+
   /** @description 获取选中的代理节点信息 */
   getSelectedProxyNode() {
     if (this.store) {
@@ -161,4 +173,4 @@ class CardIdManager {
   }
 }
 
-export const cardIdManager = new CardIdManager()
+export const cardManager = new CardManager()

@@ -41,7 +41,6 @@ import {
   WindowHomeGridRowPadding } from '../common/breakpoint/BreakPoint'
 import { RoundButton } from '../components/Common/RoundButton'
 import { AccessControl, VpnRawOptions } from 'proxy_core/src/main/ets/rpc/IClashManager'
-import { cardIdManager } from '../common/utils/CardIdManagerUtils'
 import { Xb_GetResourceString } from 'xb_components'
 
 

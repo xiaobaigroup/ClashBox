@@ -16,7 +16,7 @@ import { customVibrator } from '../../common/utils/VibratorUtil';
 import ClashViewModel from '../../entryability/ClashViewModel';
 import { PopTips, PopupBuilder } from '../Start/Popup';
 import { ListGutter, ProxyListLanes } from '../../common/breakpoint/BreakPoint';
-import { cardIdManager } from '../../common/utils/CardIdManagerUtils';
+import { cardManager } from '../../common/utils/CardManageUtil';
 
 // 组件名
 const componentName: string = 'ProxyPage'
@@ -352,7 +352,7 @@ struct ProxyGroupItem {
   selectProxy(item: ProxyItem) {
     if (!this.disabled) {
       this.appConfig.currentProxyName = item.name
-      cardIdManager.pushCartCurrentProxyName(item.name)
+      cardManager.pushCartCurrentProxyName(item.name)
       this.appConfig.currentProxyItem = item
       this.OnProxyChange(item)
     }
