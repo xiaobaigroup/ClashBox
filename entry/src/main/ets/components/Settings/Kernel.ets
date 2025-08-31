@@ -20,8 +20,6 @@ interface KernelListItem {
   ClashCore: number
 }
 
-const context = getContext(this) as common.UIAbilityContext
-
 @Component
 struct Kernel {
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack

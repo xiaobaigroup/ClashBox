@@ -31,7 +31,6 @@ export function ImportConfigFromURLBuilder(name: string, param: Object){
 
 const componentName: string = 'ImportConfigFromURL'
 const mainTitle: string = getResourceString($r('app.string.add_config'), context)
-const subTitle: string = getResourceString($r('app.string.Import_from_url'), context)
 
 @Component
 export struct ImportConfigFromURL{
@@ -42,6 +41,7 @@ export struct ImportConfigFromURL{
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   // 配置下载弹框 title动态值
   @State private customDownloadingDialogTitle: ResourceStr = $r('app.string.downloading_configuration_file')
+  @State private subTitle: ResourceStr = $r('app.string.Import_from_url')
   private promptAction:PromptAction = this.getUIContext()?.getPromptAction()
   // 配置详情（要添加到用户首选项里的数据）
   @State @Watch('configDataChanged') configData: ConfigData = NewConfigData
@@ -72,7 +72,7 @@ export struct ImportConfigFromURL{
         isSubPage: this.configData.isNewConfig,
         titlePaddingLeft: BIND_SHEET_DRAG_BAR_HEIGHT / 2,
         mainTitle: this.configData.isNewConfig ? mainTitle : getResourceString($r('app.string.edit_config'), this),
-        subTitle: this.configData.isNewConfig ? subTitle : '',
+        subTitle: this.configData.isNewConfig ? this.subTitle : '',
         mainTitleFontWeight: BIND_SHEET_MAIN_FONT_WEIGHT,
         mainTitleFontSize: BIND_SHEET_MAIN_FONTSIZE,
         subTitleFontSize: BIND_SHEET_SUB_FONTSIZE,
@@ -123,6 +123,9 @@ export struct ImportConfigFromURL{
         console.log('ClashBox#ImportConfigFromUrl#onReady 版本详情页接收的params：', JSON.stringify(params))
         if (params) {
           this.configData = params
+          if (params.configId === 'newQR') {
+            this.subTitle = $r('app.string.import_from_QR_code')
+          }
         }
       } catch (e) {
         console.log(`ClashBox#ImportConfigFromUrl#onReady Navigate onReady catch exception: ${JSON.stringify(e)}`)

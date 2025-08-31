@@ -21,6 +21,8 @@ import { customAnimationUtil } from "../../common/utils/Animation";
 import { removeItemsByIndex } from "../../common/utils/RemoveItemsUtils";
 import { NavigationListPadding } from "../../common/breakpoint/BreakPoint";
 import { ConfigData } from "../../common/entity/PageArgumentEntity";
+import { scanCore, scanBarcode } from '@kit.ScanKit'; // 导入默认界面扫码
+import { BusinessError } from '@kit.BasicServicesKit';
 
 interface ConfigAddType {
   symbolStart? : Resource,
@@ -50,7 +52,7 @@ export struct ConfigAdd {
   /* List 相关 */
   private configAddTypeArray: Array<ConfigAddType> = [
     { symbolStart: $r('sys.symbol.paperclip'), text: $r('app.string.Import_from_url'), navPathStackName: RouteName.IMPORT_CONFIG_FROM_URL, isExperimentalFunction: false,symbolEnd: $r('sys.symbol.chevron_right')},
-    { symbolStart: $r('sys.symbol.qrcode'), text: $r('app.string.import_from_QR_code'), navPathStackName: RouteName.IMPORT_CONFIG_FROM_QR_CODE, isExperimentalFunction: true, symbolEnd: $r('sys.symbol.chevron_right')},
+    { symbolStart: $r('sys.symbol.qrcode'), text: $r('app.string.import_from_QR_code'), navPathStackName: RouteName.IMPORT_CONFIG_FROM_QR_CODE, isExperimentalFunction: false, symbolEnd: $r('sys.symbol.chevron_right')},
     { symbolStart: $r('sys.symbol.doc_text_fill'), text: $r('app.string.import_from_file'), navPathStackName: RouteName.IMPORT_CONFIG_FROM_FILE, isExperimentalFunction: false, symbolEnd: $r('sys.symbol.chevron_right')},
     // { symbolStart: $r('sys.symbol.doc'), text: $r('app.string.new_blank_configuration'), navPathStackName: RouteName.CREATE_NEW_CONFIG, isExperimentalFunction: true, symbolEnd: $r('sys.symbol.chevron_right')},
   ]
@@ -69,8 +71,8 @@ export struct ConfigAdd {
         // 添加配置几种方式的ListItem START
         List({ space: LIST_SPACE }){
           ForEach( this.configAddTypeArray, (item: ConfigAddType, index: number)=> {
-            ListItem(){
-              Row(){
+            ListItem() {
+              Row() {
                 SymbolGlyph(item.symbolStart).fontSize(24).fontColor([this.icon_emphasize]).margin({ right: 20 })
                   .transition(customAnimationUtil.isScaleTranIcon(10,this.uiConfig))
                 Text(item.text).fontSize(16).fontColor($r('sys.color.font_primary'))
@@ -91,8 +93,8 @@ export struct ConfigAdd {
             .borderRadius(BORDER_RADIUS_20)
             .onClick( () => {
               hilog.info(0xC020, componentName, `#ListItem#onClick(): NavPathStack.pushDestinationByName(${item?.navPathStackName}, null})`)
-              if (this.uiConfig.isShowExperimentalFunction ? (index === 1 || index === 3) : index === 2) {
-                promptAction.showToast({message: getResourceString($r('app.string.developing'), this)})
+              if (this.uiConfig.isShowExperimentalFunction ? (index === 1 || index === 3) : index === 1) {
+                this.importFromQR()
               } else {
                 const params: ConfigData = {
                   configId: 'new',
@@ -158,8 +160,8 @@ export struct ConfigAdd {
   aboutToAppear(): void {
     hilog.info(0xC020, componentName, `#aboutToAppear executed`)
     if(!this.uiConfig.enabledADvanced || !this.uiConfig.isShowExperimentalFunction) {
-      // 屏蔽分流策略
-      this.configAddTypeArray = removeItemsByIndex(this.configAddTypeArray, [1,3])
+      // 屏蔽未开发
+      this.configAddTypeArray = removeItemsByIndex(this.configAddTypeArray, [3])
     }
   }
 
@@ -167,6 +169,49 @@ export struct ConfigAdd {
     hilog.info(0xC020, componentName, `#aboutToDisappear executed`)
     this.configAddPageInfos.clear(true)
     hilog.info(0xC020, componentName, `#aboutToDisappear#NV路由configAddPageInfos已清空！`)
+  }
+
+  importFromQR() {
+    // 定义扫码参数options
+    let options: scanBarcode.ScanOptions = {
+      scanTypes: [scanCore.ScanType.ALL],
+      enableMultiMode: true,
+      enableAlbum: true
+    };
+    try {
+      if (canIUse("SystemCapability.Multimedia.Scan.ScanBarcode")) {
+        scanBarcode.startScanForResult(this.getUIContext().getHostContext(), options,
+          (error: BusinessError, result: scanBarcode.ScanResult) => {
+            if (error) {
+              hilog.error(0x0001, '[Scan CPSample]',
+                `Failed to get ScanResult by callback with options. Code: ${error.code}, message: ${error.message}`);
+              return;
+            }
+            // 解析码值结果跳转应用服务页
+            hilog.info(0x0001, '[Scan CPSample]',
+              `Succeeded in getting ScanResult by callback with options, result is ${JSON.stringify(result)}`);
+            const url = result.originalValue.split('?')[0]
+            hilog.info(0x0001, '[Scan CPSample]',
+              `Succeeded in getting import url, url is ${url}`);
+            const params: ConfigData = {
+              configId: 'newQR',
+              isNewConfig: true,
+              configName: '',
+              configUrl: url,
+              isConfigAutoUpdate: false,
+              lastUpdateDateTime: 0,
+              updateTime: 0,
+            }
+            this.configAddPageInfos.pushPathByName('ImportConfigFromURL', params, true)
+          })
+      } else {
+        hilog.error(0x0001, '[Scan CPSample]',
+          `Failed to get ScanResult by callback with options, because unsupported SystemCapability.`);
+      }
+    } catch (error) {
+      hilog.error(0x0001, '[Scan CPSample]',
+        `Failed to start the scanning service. Code:${error.code}, message: ${error.message}`);
+    }
   }
 
 }

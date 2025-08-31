@@ -55,7 +55,7 @@ struct Home {
   // 编辑按钮点击后显示编辑状态判定
   @Consume @Watch('ShowHomeEditChange') isShowHomeEdit: boolean
   // 前台判断变量
-  @StorageProp('ForewardState') isForeward: boolean = true
+  @StorageProp('ForewardState') @Watch('onForeward') isForeward: boolean = true
   @Consume isSmallSquareScreen: boolean
   // 删除按钮是否出现判定
   @Consume isShowDeleteButton: boolean

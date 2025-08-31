@@ -10,14 +10,6 @@
       }
     },
     {
-      "name": "ImportConfigFromQRcode",
-      "pageSourceFile": "src/main/ets/components/Configuration/ImportConfigFromQRcode.ets",
-      "buildFunction": "ImportConfigFromQRcodeBuilder",
-      "data": {
-        "description": "配置页 -> bindSheet -> 从二维码导入"
-      }
-    },
-    {
       "name": "ImportConfigFromFile",
       "pageSourceFile": "src/main/ets/components/Configuration/ImportConfigFromFile.ets",
       "buildFunction": "ImportConfigFromFileBuilder",
