@@ -39,7 +39,7 @@ export class BackgroundDownService {
     let result = appFlowingState.traffics.getLast()?.up?.toString()
     let message = `${result}/s ↑ ${now}/s ↓`
     hilog.info(0xFF00, 'BackgroundDownService', "updateProcess %{public}s", message)
-    this.updateProcess(this.notificationId ?? 0, appConfig.currentProxyName ?? 'ClashBox', message )
+    this.updateProcess(this.notificationId ?? 0, appConfig.currentProxyName ?? 'ClashBox', message, 99.9 )
   }
 
   stop(context: Context){
@@ -49,15 +49,15 @@ export class BackgroundDownService {
     backgroundTaskManager.stopBackgroundRunning(context)
   }
 
-  updateProcess(id: number, title: string, message: string){
+  updateProcess(id: number, title: string, message: string,Process: number){
     notificationManager.isSupportTemplate('downloadTemplate').then((data:boolean) => {
       hilog.info(0xFF00, 'BackgroundDownService', '当前设备支持下载进度条模板')
       let downLoadTemplate: notificationManager.NotificationTemplate = {
         name: 'downloadTemplate', // 当前只支持downloadTemplate，保持不变
         data: {
-          title: title, // 必填。
-          fileName: message, // 必填。
-          progressValue: (Math.random() * 10), // 应用更新进度值，自定义
+          title: message, // 必填。
+          fileName: '正在运行数据传输任务，删除通知后任务将停止', // 必填。
+          progressValue: Process, // 应用更新进度值，自定义
         }
       }
 
