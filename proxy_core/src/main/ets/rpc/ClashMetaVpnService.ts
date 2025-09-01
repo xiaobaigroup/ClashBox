@@ -23,6 +23,7 @@ import { getHome, getProfileDir, getProfilePath } from '../appPath';
 import { UpdateConfigParams } from '../models/ClashConfig';
 import { LogInfo, OverrideSlot, Provider, Proxy, ProxyGroup, ProxyMode, Traffic } from '../models/Common';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { BusinessError, commonEventManager, emitter } from '@kit.BasicServicesKit';
 
 
 export class ClashMetaVpnService extends CommonVpnService{
@@ -31,8 +32,6 @@ export class ClashMetaVpnService extends CommonVpnService{
   vpnConnection : vpnExtension.VpnConnection | undefined
   public configPath: string = ""
   protectSocketPath: string = ""
-  timer: number = -1
-  time: number = 0
 
   override async onRemoteMessageRequest(client: socket.LocalSocketConnection, message: socket.LocalSocketMessageInfo): Promise<void>{
     let decoder = new util.TextDecoder()
@@ -188,8 +187,6 @@ export class ClashMetaVpnService extends CommonVpnService{
         case ClashRpcType.stopClash:{
           nativeStopTun()
           super.stopVpn()
-          clearInterval(this.timer)
-          this.time = 0
           resolve(true)
           break;
         }
@@ -206,11 +203,19 @@ export class ClashMetaVpnService extends CommonVpnService{
           this.vpnConnection?.protect(fd)
         })
       }
-      // TODO 开始计算运行时间
-      this.timer = setInterval(()=>{
-        this.time = this.time + 1
-        hilog.info(0x001, "ClashBox", `运行时间：${this.time}`)
-      }, 1000)
+      hilog.info(0x001, "ClashBox", `运行时间：${Date.now().toString()}`)
+      const options: commonEventManager.CommonEventPublishData = {
+        code: 0,
+        data: Date.now().toString(),
+        isOrdered: false // 无序公共事件
+      }
+      commonEventManager.publish("VpnServiceTimeEvent", options, (err: BusinessError) => {
+        if (err) {
+          console.error(`Failed to publish common event. Code is ${err.code}, message is ${err.message}`);
+        } else {
+          console.info(`Succeeded in publishing common event.`);
+        }
+      });
       return tunFd > -1;
     } catch (error) {
       return false

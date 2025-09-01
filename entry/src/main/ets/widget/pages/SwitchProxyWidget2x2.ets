@@ -19,8 +19,11 @@ struct SwitchProxyWidget2x2 {
   /** @description 开关变量 */
   @LocalStorageProp('proxyEnabled')
   proxyEnabled: boolean = false
-  /** @description 代理启动的计时文本 TODO 和页面UI时间统一 */
-  proxyStartingDuration: string = ''
+  /** @description 服务启动时间戳 */
+  @LocalStorageProp('proxyStartingDuration')
+  proxyStartingDuration: string = '00:00:00'
+  /** @description 代理启动的计时文本 */
+  // proxyStartedTimer: Timer = timerUtil
   /** @description TODO 主题色 */
   @LocalStorageProp('icon_emphasize')
   icon_emphasize: ResourceColor = '#0A59F7'
@@ -65,8 +68,8 @@ struct SwitchProxyWidget2x2 {
         Text(this.proxyEnabled ? $r('app.string.close') : $r('app.string.open'))
           .fontColor(Color.White)
       }
-      .width(this.fullWidthPercent)
-      .aspectRatio(3.22)
+      .width('100%')
+      .aspectRatio(3.4)
       .align(Alignment.Center)
       .backgroundColor(this.icon_emphasize)
       .shadow({

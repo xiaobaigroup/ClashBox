@@ -42,7 +42,7 @@ export struct PXSecScreen{
   // 代理数据(懒加载)
   @Consume proxyGroups: ProxyGroupItemDataSource
   // 定时器Controller
-  @Consume proxyStartedTimer: Timer
+  // @Consume proxyStartedTimer: Timer
   @Consume isPXSecScreen: boolean
   // 代理启动按钮状态
   @Consume proxyEnabled: boolean

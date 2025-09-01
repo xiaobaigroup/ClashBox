@@ -129,7 +129,7 @@ struct Home {
 
   @Consume ("currentProfile") currentProfile: Profile | null
   // 定时器Controller
-  @Consume proxyStartedTimer: Timer
+  // @Consume proxyStartedTimer: Timer
 
   /** @description 切换代理模式 */
   async switchProxyMode() {
@@ -524,18 +524,18 @@ struct Home {
   }
 
   onForeward() {
-    if (this.proxyEnabled) {
-      if(!this.isForeward) {
-        // 页面不处于前台时暂停计时
-        this.proxyStartedTimer.pause()
-        hilog.info(0xFF00, "TimertestTag", "计时器暂停此时的时间：%{public}s", this.proxyStartingDuration)
-      } else {
-        // 二次启动计时
-        let gapTime = this.theRestoreTime - this.thePauseTime
-        hilog.info(0xFF00, "TimertestTag", "需要增加的时间： %{public}d", gapTime)
-        this.proxyStartedTimer.resumeWithExtraTime(gapTime)
-      }
-    }
+    // if (this.proxyEnabled) {
+    //   if(!this.isForeward) {
+    //     // 页面不处于前台时暂停计时
+    //     this.proxyStartedTimer.pause()
+    //     hilog.info(0xFF00, "TimertestTag", "计时器暂停此时的时间：%{public}s", this.proxyStartingDuration)
+    //   } else {
+    //     // 二次启动计时
+    //     let gapTime = this.theRestoreTime - this.thePauseTime
+    //     hilog.info(0xFF00, "TimertestTag", "需要增加的时间： %{public}d", gapTime)
+    //     this.proxyStartedTimer.resumeWithExtraTime(gapTime)
+    //   }
+    // }
   }
 
 }

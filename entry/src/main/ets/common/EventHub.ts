@@ -17,6 +17,7 @@ export enum EventKey{
   LoadClashConfig = 10013,
   ShareBundle = 10014,
   AddAPP = 10015,
+  ProxyDuration = 10016,
 }
 
 export class EventHub{

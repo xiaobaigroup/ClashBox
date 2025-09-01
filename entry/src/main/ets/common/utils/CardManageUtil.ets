@@ -105,9 +105,9 @@ class CardManager {
   }
 
   /** @description 推送VPN服务运行时间到所有卡片 */
-  pushCartVpnServiceTime(time: number) {
+  pushCartVpnServiceTime(proxyStartingDuration: string) {
     const data = formBindingData.createFormBindingData({
-      time
+      proxyStartingDuration
     })
 
     this.getCardIdList().forEach(formId => {

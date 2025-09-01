@@ -31,6 +31,7 @@ import { getHome, getProfilePath } from '../appPath';
 import { Tun, UpdateConfigParams } from '../models/ClashConfig';
 import { readFile, readFileUri, readText } from '../fileUtils';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { BusinessError, commonEventManager } from '@kit.BasicServicesKit';
 
 export interface AccessControl {
   mode: string
@@ -58,8 +59,6 @@ export class FlClashVpnService extends CommonVpnService {
   vpnConnection: vpnExtension.VpnConnection | undefined
   public configPath: string = ""
   protectSocketPath: string = ""
-  timer: number = -1
-  time: number = 0
 
   override async onRemoteMessageRequest(client: socket.LocalSocketConnection, message: socket.LocalSocketMessageInfo): Promise<void> {
     let decoder = new util.TextDecoder()
@@ -261,11 +260,19 @@ export class FlClashVpnService extends CommonVpnService {
       if (tunFd > -1) {
         this.startClash(tunFd)
       }
-      // TODO 开始计算运行时间
-      this.timer = setInterval(()=>{
-        this.time = this.time + 1
-        hilog.info(0x001, "ClashBox", `运行时间：${this.time}`)
-      }, 1000)
+      hilog.info(0x001, "ClashBox", `运行时间：${Date.now().toString()}`)
+      const options: commonEventManager.CommonEventPublishData = {
+        code: 0,
+        data: Date.now().toString(),
+        isOrdered: false // 无序公共事件
+      }
+      commonEventManager.publish("VpnServiceTimeEvent", options, (err: BusinessError) => {
+        if (err) {
+          console.error(`Failed to publish common event. Code is ${err.code}, message is ${err.message}`);
+        } else {
+          console.info(`Succeeded in publishing common event.`);
+        }
+      });
       return tunFd > -1;
     } catch (error) {
       console.error("ClashVPN  error ", error)
@@ -307,8 +314,6 @@ export class FlClashVpnService extends CommonVpnService {
   stopVpn() {
     stopTun()
     super.stopVpn()
-    clearInterval(this.timer)
-    this.time = 0
   }
   override async init() {
     initClash(await getHome(this.context), "1.0.0")

@@ -271,8 +271,9 @@ struct Index {
   // 设置 -> 外观 -> 按钮位置变量
   @Provide ButtonPositionOffset: number = 0
   // 代理计时器Controller
-  @Provide proxyStartedTimer: Timer = new Timer()
+  // @Provide proxyStartedTimer: Timer = new Timer()
   @Provide proxyTime: number = 0
+  @StorageProp('VpnServiceStartTime') VpnServiceStartTime: number = 0
 
   build() {
     if (!this.isPXSecScreen) {
@@ -580,12 +581,13 @@ struct Index {
         BackgroundLocateService.start(getContext(this))
       }
       // 启动前先初始化一下显示文本
+      // TODO 卡片后台启动服务后拉起应用关闭再开启会出现一秒的时间显示错误
       this.proxyStartingDuration = PROXY_STARTED_DURATION_INIT_VALUE
       // 启动代理计时器, 启用时间样式 XX小时XX分 或 XX:XX:XX
-      this.proxyStartedTimer.start(time => {
-        this.proxyTime = time
-        this.proxyStartingDuration = number2Time(time)
-      })
+      // this.proxyStartedTimer.start(time => {
+      //   this.proxyTime = time
+      //   this.proxyStartingDuration = number2Time(time)
+      // }, this.VpnServiceStartTime)
 
       // 发布通知
       if (this.uiConfig.Enablednotice && this.uiConfig.EnabledPermanentnotice) {
@@ -632,6 +634,12 @@ struct Index {
 
     })
 
+    // 代理时长
+    EventHub.on(EventKey.ProxyDuration, (time:number) => {
+      this.proxyTime = time
+      this.proxyStartingDuration = number2Time(time)
+    })
+
     // 停止Clash
     EventHub.on(EventKey.StopedClash, () => {
       clearInterval(this.trafficJob)
@@ -639,7 +647,7 @@ struct Index {
         BackgroundLocateService.stop(getContext(this))
       }
       // 代理计时器重置
-      this.proxyStartedTimer.reset()
+      // this.proxyStartedTimer.reset()
       this.proxyStartingDuration = ''
       // 速度卡片重置
       this.DownloadSpeed = ''

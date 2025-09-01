@@ -19,9 +19,13 @@ export class Timer {
     this.timerId = undefined
   }
 
-  public start(callback?: (time: number) => void): void {
+  public start(callback?: (time: number) => void, startTime?: number): void {
     this.callback = callback
-    this.startTime = Date.now() - this.elapsed
+    if (startTime) {
+      this.startTime = startTime
+    } else {
+      this.startTime = Date.now() - this.elapsed
+    }
     this.timerId = setInterval(() => this.updateTimer(), 900)
   }
 
