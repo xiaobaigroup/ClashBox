@@ -16,10 +16,8 @@ import { ProxyActionType } from '../widget/model/FormCardConstant';
 import { systemShare } from '@kit.ShareKit';
 import { uniformTypeDescriptor as utd } from '@kit.ArkData';
 import { UrlUtils } from '../common/utils/UrlUtils';
-import { BundleInfo } from '../common/entity/Constants'
 import { BundleInfo, PROXY_STARTED_DURATION_INIT_VALUE } from '../common/entity/Constants'
 import { commonEventManager } from '@kit.BasicServicesKit';
-import { notificationManager } from '@kit.NotificationKit';
 import { Timer } from '../common/utils/HHmmssTimer';
 import { number2Time } from '../common/utils/TimeConvertUtil';
 
