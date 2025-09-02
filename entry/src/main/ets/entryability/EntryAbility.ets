@@ -47,6 +47,11 @@ export default class EntryAbility extends UIAbility {
   private clashCoreInitialized: boolean = false
   /** @description 包名信息 */
   private bundleInfo: BundleInfo = new BundleInfo()
+  private subscriber: commonEventManager.CommonEventSubscriber | null = null;
+  private subscribeInfo: commonEventManager.CommonEventSubscribeInfo = {
+    events: ["VpnServiceTimeEvent"]
+  };
+  private proxyStartedTimer = new Timer()
 
   /** @description 注册卡片监听事件 */
   private registerCardEvent() {
