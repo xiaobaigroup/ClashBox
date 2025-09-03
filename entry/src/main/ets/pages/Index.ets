@@ -1,5 +1,5 @@
 // Index
-import { curves, LengthMetrics, promptAction } from '@kit.ArkUI'
+import { LengthMetrics } from '@kit.ArkUI'
 import Home from './HomePage'
 import ProxyPage from './ProxyPage'
 import ConfigurationPage from './ConfigurationPage'
@@ -21,7 +21,7 @@ import {
   BundleInfo,
 } from '../common/entity/Constants'
 import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/datasources/ProxyData'
-import { ClashConfig, IpInfo, LogLevel, Profile, ProxyGroup, ProxyMode } from 'proxy_core'
+import { ClashConfig, IpInfo, Profile, ProxyMode } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig, AppFlowingState, AppState, UIConfig } from '../entryability/AppState'
@@ -29,7 +29,7 @@ import { common } from '@kit.AbilityKit'
 import { ChangeLanguage } from '../common/utils/ChangeLanguageUtil'
 import { ConfigData, TabBuild } from '../common/entity/PageArgumentEntity'
 import { customAnimationUtil } from '../common/utils/Animation'
-import { DisclaimerCustomDialog, icon_tertiary } from '../components/Common/Common'
+import { DisclaimerCustomDialog, icon_tertiary, theRowCustomDialog } from '../components/Common/Common'
 import { PipManager } from '../common/utils/PipManager'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { CrashPage } from '../components/Start/CrashPage'
@@ -38,7 +38,6 @@ import { fileUri, picker } from '@kit.CoreFileKit'
 import { fileIo as fs } from '@kit.CoreFileKit';
 import { number2Time, timestampToDateTime } from '../common/utils/TimeConvertUtil'
 import { PXSecScreen } from './PXSecScreen'
-import { Timer } from '../common/utils/HHmmssTimer'
 import { getResourceString } from '../common/utils/ResourceStringUtil'
 import BackgroundLocateService from '../common/utils/BackgroundLocateService'
 import { ConvertedUnit } from '../common/utils/DataUnitConvertUtils'
@@ -46,7 +45,6 @@ import { WelcomeUserAgreement } from '../components/Start/WelcomePage'
 import { i18n } from '@kit.LocalizationKit'
 import {
   MoreNavMode,
-  NeedClearMoreStack,
   TabBarAlignItems,
   TabBarAvoidHeight,
   TabBarHeight,
@@ -63,11 +61,11 @@ import { ImportConfigFromURL } from '../components/Configuration/ImportConfigFro
 import { Xb_ChangeThemeColor } from 'xb_components/src/main/ets/utils/ChangeThemeColorUtil'
 import { Xb_ColorModeManager, Xb_Global, Xb_NotificationUtils, Xb_UIConfig } from 'xb_components'
 import { Xb_GoToWeb } from 'xb_components/src/main/ets/utils/JumpTo'
-import { notificationManager } from '@kit.NotificationKit'
 import BackgroundDownService from '../common/utils/BackgroundDownService'
+import { notificationManager } from '@kit.NotificationKit'
+import { BusinessError } from '@kit.BasicServicesKit'
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
-const context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
 
 export const indexController: TabsController = new TabsController()
 
@@ -132,6 +130,8 @@ struct Index {
   @StorageLink('openLinkConfigUrl') openLinkConfigUrl: string = ''
   // 系统语言显示副标题
   @Provide SystemLanguageSubtitle: ResourceStr = $r('app.string.SimplifiedChinese')
+  // 通知权限跳转授权弹窗提示弹窗标题
+  @State theToDialogTitle: ResourceStr = $r('app.string.notice_request_to_settings')
   @State barWidth: string | number | undefined = ''
   @State barHeight: string | number | undefined = 0
   @Provide("currentProfile") currentProfile: Profile | null = null
@@ -174,6 +174,9 @@ struct Index {
     { name: $r('app.string.Configuration'), icon: $r('sys.symbol.folder_fill') },
     { name: $r('app.string.More'), icon: $r('sys.symbol.square_fill_grid_2x2') }
   ]
+  private context = this.getUIContext().getHostContext()! as common.UIAbilityContext
+  private promptAction = this.getUIContext().getPromptAction()
+  private UIcontext = this.getUIContext()
   /**
    * 主页相关变量
    */
@@ -327,7 +330,7 @@ struct Index {
           this.barHeight : this.bottomRectHeight == 0 ? TabBarHeight(this.widthBp, this.heightBp) :
             TabBarAvoidHeight(this.widthBp, this.heightBp))
         .onTabBarClick((index: number) => {
-          this.getUIContext().animateTo({
+          this.UIcontext.animateTo({
             duration: this.uiConfig.animationSpeed,
             curve: Curve.Linear,
           }, () => {
@@ -342,7 +345,7 @@ struct Index {
           }
         })
         .onAnimationStart((index: number, targetIndex: number) => {
-          this.getUIContext().animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear, }, () => {
+          this.UIcontext.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear, }, () => {
             if (index == targetIndex) {
               return
             }
@@ -443,6 +446,15 @@ struct Index {
     }
   }
 
+  @Builder
+  toNoticeSettingsBuilder() {
+    Button($r('app.string.to'))
+      .backgroundColor($r('app.color.container_background'))
+      .width('100%')
+      .height(39)
+      .fontColor(this.icon_emphasize)
+  }
+
   /* // 当手机横屏时条件成立
   deviceHeightListener: mediaquery.MediaQueryListener =
    this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp) and (640vp< width <= 1000vp)');
@@ -461,7 +473,7 @@ struct Index {
       cancel: () => {
         if (this.isDisclaimer) {
           // 拒绝并退出
-          context.terminateSelf().catch(() => {
+          this.context.terminateSelf().catch(() => {
             console.log(`#DisclaimerCustomDialog 应用已退出`)
           })
         } else {
@@ -488,7 +500,34 @@ struct Index {
     }
   })
 
-  // 获取配置列表
+  // 前往通知设置弹窗
+  toDialogController: CustomDialogController = new CustomDialogController({
+    builder: theRowCustomDialog({
+      theDialogTitle: this.theToDialogTitle,
+      contentText: this.uiConfig.EnabledStatusNotice ? $r('app.string.status_bar_to') : $r('app.string.notice_request_to_settings_text'),
+      cancel: ()=> {
+        if (!this.uiConfig.EnabledStatusNotice) {
+          this.uiConfig.Enablednotice = false
+        }
+      },
+      confirm: () => {
+        // 跳转至设置界面开启通知权限
+        this.context.startAbility({
+          bundleName: 'com.huawei.hmos.settings', // 系统设置界面的包名 （固定）
+          abilityName: 'com.huawei.hmos.settings.MainAbility', // 系统设置的Ability的名字（固定）
+          uri: "application_info_entry", // 系统设置的界面 （固定）
+          parameters: {
+            pushParams: this.context.applicationInfo.name,
+          }
+        }).catch(() => {
+          console.error(`跳蛛通知权限设置失败`)
+        })
+      },
+      leftButton: this.toNoticeSettingsBuilder
+    }),
+  })
+
+  /** 获取配置列表 */
   async fetchProfiles() {
     const profiles = await ClashViewModel.getProfiles()
     this.configList = profiles.map((d) => {
@@ -576,26 +615,15 @@ struct Index {
       }
       job()
       this.trafficJob = setInterval(job, 1000)
-      // 当模拟下载和通知均启用时
-      if (this.uiConfig.backgroundLocateModel && this.uiConfig.Enablednotice) {
-        BackgroundLocateService.start(getContext(this))
-      }
-      // 启动前先初始化一下显示文本
       // TODO 卡片后台启动服务后拉起应用关闭再开启会出现一秒的时间显示错误
       this.proxyStartingDuration = PROXY_STARTED_DURATION_INIT_VALUE
-      // 启动代理计时器, 启用时间样式 XX小时XX分 或 XX:XX:XX
-      // this.proxyStartedTimer.start(time => {
-      //   this.proxyTime = time
-      //   this.proxyStartingDuration = number2Time(time)
-      // }, this.VpnServiceStartTime)
-
-      // 发布通知
-      if (this.uiConfig.Enablednotice && this.uiConfig.EnabledPermanentnotice) {
+      // 发布常驻通知(当未启用长时后台运行时)
+      if (this.uiConfig.Enablednotice && this.uiConfig.EnabledPermanentnotice && !this.uiConfig.Enablebackgrounder) {
         this.noticeJob = Date.now()
         let up = '0'
         let down = '0'
         try {
-          Xb_NotificationUtils.publishTextNotification(context, this.noticeJob,
+          Xb_NotificationUtils.publishTextNotification(this.context, this.noticeJob,
             {
               title: `${this.appConfig.currentProxyName ?? 'ClashBox'}`,
               text: `${up}/s ↑ ${down}/s ↓`,
@@ -627,19 +655,16 @@ struct Index {
           }
         }, 1500)
       }
+      // 发布模拟下载通知
       if (this.uiConfig.backgroundDownModel && this.uiConfig.Enablednotice) {
-        let context = this.getUIContext().getHostContext() as common.UIAbilityContext
-        BackgroundDownService.start(context)
+        BackgroundDownService.start(this.getUIContext().getHostContext()!)
+      }
+      // 发布模拟定位通知
+      if (this.uiConfig.backgroundLocateModel && this.uiConfig.Enablednotice) {
+        BackgroundLocateService.start(this.getUIContext().getHostContext()!)
       }
 
     })
-
-    // 代理时长
-    EventHub.on(EventKey.ProxyDuration, (time:number) => {
-      this.proxyTime = time
-      this.proxyStartingDuration = number2Time(time)
-    })
-
     // 停止Clash
     EventHub.on(EventKey.StopedClash, () => {
       clearInterval(this.trafficJob)
@@ -647,7 +672,6 @@ struct Index {
         BackgroundLocateService.stop(getContext(this))
       }
       // 代理计时器重置
-      // this.proxyStartedTimer.reset()
       this.proxyStartingDuration = ''
       // 速度卡片重置
       this.DownloadSpeed = ''
@@ -659,9 +683,64 @@ struct Index {
         clearInterval(this.updateNoticeJob)
       }
       if (this.uiConfig.backgroundDownModel) {
-        BackgroundDownService.stop(context)
+        BackgroundDownService.stop(this.context)
       }
     })
+    // 代理时长
+    EventHub.on(EventKey.ProxyDuration, (time:number) => {
+      this.proxyTime = time
+      this.proxyStartingDuration = number2Time(time)
+    })
+    // 通知事件
+    EventHub.on(EventKey.EnabledNotice, async () => {
+      try {
+        // 先获取最新权限状态
+        const currentStatus = await notificationManager.isNotificationEnabled()
+        if (currentStatus) {
+          // 已有权限时通知开关启用或关闭
+          // 显示通知设置 显式动画
+          this.uiConfig.Enablednotice = !this.uiConfig.Enablednotice
+        } else {
+          // 没有授权时
+          if (!this.uiConfig.isRequestNotification) {
+            // 首次请求权限
+            try {
+              await notificationManager.requestEnableNotification(this.context)
+              this.uiConfig.isRequestNotification = true
+              this.uiConfig.Enablednotice = true
+            } catch (err) {
+              if ((err as BusinessError).code === 1600004) {
+                hilog.error(0xFF00, 'Index-Notice', '用户拒绝授权')
+                // 关闭总通知
+                this.uiConfig.Enablednotice = false
+                // 关闭模拟下载
+                this.uiConfig.backgroundDownModel = false
+                // 标记已经请求过授权
+                this.uiConfig.isRequestNotification = true
+                this.promptAction.showToast({ message: $r('app.string.enable_notice_failed') })
+              }
+            }
+          } else {
+            // 已请求过权限且通知开关未启用，进入跳转设置
+            if(!this.uiConfig.Enablednotice) {
+              this.toDialogController.open()
+            }
+          }
+        }
+      } catch (err) {
+        hilog.error(0xFF00, 'Index', `Toggle Error: ${(err as BusinessError).code}, ${(err as BusinessError).message}`);
+      }
+    })
+    // 首次启动启用通知
+    if (!this.uiConfig.isRequestNotification) {
+      EventHub.sendEvent(EventKey.EnabledNotice)
+    }
+    // 检查后台运行全局变量的状态
+    if(this.uiConfig.backgroundLocateModel || this.uiConfig.backgroundDownModel || this.uiConfig.backgroundPiPModel) {
+      this.uiConfig.Enablebackgrounder = true
+    } else {
+      this.uiConfig.Enablebackgrounder = false
+    }
 
     // 分享包名
     const localStorage = this.getUIContext().getSharedLocalStorage()
@@ -676,37 +755,24 @@ struct Index {
     })
     // 运行一次窗口检查
     this.onWindowChange()
-
-
     // 除手机外更多页均默认跳转覆写
     if (500 < this.windowWidth && !this.isLandscapePhone) {
       this.pageInfos.pushPathByName(this.moreList[4].name, false)
     }
-
     // 启动时检查上一次是否崩溃
     if (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) {
       hilog.info(0x1000, componentName, `进入崩溃日志`)
       this.isShowWelcome = true
     }
-
     // 首次启动打开欢迎页
     if (this.uiConfig.isFirstStart) {
       this.isShowWelcome = true
     }
-
-    // let nowDate = new Date().getTime()
-    // 检查是否要弹出免责声明
-    // if (nowDate - this.uiConfig.useTime >= 1296000000) {
-    //   this.isDisclaimer = true
-    //   // 大于等于15天打开弹窗
-    //   this.dialogController.open()
-    // }
-
     // 在页面build前改变主题颜色
     Xb_ChangeThemeColor(this.uiConfig.themeColor)
     hilog.info(0x1000, componentName, `#aboutToAppear#ThemeControl.setDefaultTheme(${this.uiConfig.themeColor})`)
     // 初始化切换颜色模式(深色模式)
-    Xb_ColorModeManager.setColorModeByString(context, this.uiConfig.darkMode)
+    Xb_ColorModeManager.setColorModeByString(this.context, this.uiConfig.darkMode)
     // 初始化切换按钮位置
     this.switchButtonPosition(this.uiConfig.buttonPositionIndex)
     // 初始化实验功能显示状态
@@ -754,7 +820,9 @@ struct Index {
       })
     }*/
 
+    // 获取配置列表
     this.fetchProfiles()
+    // 日志启用事件
     EventHub.on(EventKey.StartLog, async (enable: boolean) => {
       ClashViewModel.startLog(enable, (log) => {
         this.logListData.push({
@@ -765,6 +833,7 @@ struct Index {
         })
       })
     })
+    // 获取代理分组事件
     EventHub.on(EventKey.FetchProxyGroup, async () => {
       if (this.appConfig.currentProfileId) {
         this.currentProfile = await ClashViewModel.getProfile(this.appConfig.currentProfileId)
@@ -780,9 +849,11 @@ struct Index {
         this.proxyGroups = new ProxyGroupItemDataSource([])
       }
     })
+    // 清理日志事件
     EventHub.on(EventKey.ClearLog, () => {
       this.logListData = []
     })
+    // 导出日志事件
     EventHub.on(EventKey.ExportLog, (LogData?: LogData) => {
       try {
         let filePicker = new picker.DocumentViewPicker(getContext(this))
@@ -817,9 +888,9 @@ struct Index {
       // hilog.info(0xFF00, "ExportLog", "保存内容: %{public}s", message)
       fs.writeSync(file.fd, message);
       fs.fsync(file.fd);
-      promptAction.showToast({ message: $r('app.string.saved_download') })
+      this.promptAction.showToast({ message: $r('app.string.saved_download') })
     } catch (e) {
-      promptAction.showToast({
+      this.promptAction.showToast({
         message: `${getResourceString($r('app.string.export_failed'), this)} ${e.message}`,
         duration: 3000
       })
@@ -991,7 +1062,7 @@ struct Index {
   /**tab移动开始动画*/
   startAnim() {
     indexController.setTabBarTranslate({ y: 0 })
-    animateTo({
+    this.UIcontext.animateTo({
       duration: this.uiConfig.animationSpeed,
       curve: Curve.Linear,
       iterations: 1,
@@ -1005,7 +1076,7 @@ struct Index {
 
   /**tab移动停止动画*/
   stopAnim() {
-    animateTo({
+    this.UIcontext.animateTo({
       duration: this.uiConfig.animationSpeed,
       curve: Curve.Linear,
       iterations: 1,
@@ -1033,7 +1104,7 @@ struct Index {
   /*px外屏手势动画*/
   // tab隐藏
   startAnimPX() {
-    this.getUIContext().animateTo({
+    this.UIcontext.animateTo({
       duration: this.uiConfig.animationSpeed,
       curve: Curve.Linear,
       iterations: 1,
@@ -1048,7 +1119,7 @@ struct Index {
 
   // tab显示
   stopAnimPX() {
-    this.getUIContext().animateTo({
+    this.UIcontext.animateTo({
       duration: this.uiConfig.animationSpeed,
       curve: Curve.EaseOut,
       iterations: 1,

@@ -1,4 +1,4 @@
-import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
+
 import {
   FONT_SIZE_14,
   FONT_SIZE_16,
@@ -11,18 +11,14 @@ import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { customVibrator } from "../../common/utils/VibratorUtil"
 import { customSound } from "../../common/utils/SoundPoolUtil"
-import { promptAction } from "@kit.ArkUI"
-import { ExperimentalFunction, theRowCustomDialog, toggleRowList } from "../Common/Common"
+import { ExperimentalFunction, toggleRowList } from "../Common/Common"
 import { UIConfig } from "../../entryability/AppState"
-import { notificationManager } from '@kit.NotificationKit'
-import { BusinessError } from '@kit.BasicServicesKit'
-import { common } from '@kit.AbilityKit'
 import { customAnimationUtil } from "../../common/utils/Animation"
 import { PageMargin } from "../../common/breakpoint/BreakPoint"
+import { EventHub, EventKey } from "../../common/EventHub"
 
 const TAG: string = '[通知页]';
 const DOMAIN_NUMBER: number = 0xFF00;
-const context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
 
 /**
  * 通知页
@@ -47,8 +43,7 @@ struct Notice {
   @State EnabledPermanentnotice: boolean = true
   // 时间提醒开关变量
   @State EnabledTimenotice: boolean = false
-  // 通知权限跳转授权弹窗提示弹窗标题
-  @State theToDialogTitle: ResourceStr = $r('app.string.notice_request_to_settings')
+
   @State currentNumber: number = 0
   private TimeUnitSelect: number = 1
   private TimeUnitFruits: string[] = [
@@ -56,6 +51,7 @@ struct Notice {
     getResourceString($r('app.string.hour'), this),
     getResourceString($r('app.string.day'), this)
   ]
+  private promptAction = this.getUIContext().getPromptAction()
   @State
   private heightOfTextPickerInTheListItem: number = LIST_ITEM_HEIGHT_45
   // ListItem里自动更新间隔`TextPicker`组件的`fontSize`
@@ -73,31 +69,11 @@ struct Notice {
   // ListItem里自动更新间隔`TextPicker`组件的渐隐效果
   @State
   private gradientHeightOfTextPickerInTheListItem: number = FONT_SIZE_16
-  private context = getContext(this) as common.UIAbilityContext
-  private isDeveloping: boolean = true
 
-  toDialogController: CustomDialogController = new CustomDialogController({
-    builder: theRowCustomDialog({
-      theDialogTitle: this.theToDialogTitle,
-      contentText: this.uiConfig.EnabledStatusNotice ? $r('app.string.status_bar_to') : $r('app.string.notice_request_to_settings_text'),
-      cancel: ()=> { this.onCancel() },
-      confirm: ()=> { this.onAccept() },
-      leftButton: this.toBuilder
-    }),
-  })
-
-  @Builder
-  toBuilder() {
-    Button($r('app.string.to'))
-      .backgroundColor($r('app.color.container_background'))
-      .width('100%')
-      .height(39)
-      .fontColor(this.icon_emphasize)
-  }
 
   aboutToAppear() {
     hilog.info(0xFF00, this.componentName, `#aboutToAppear executed`)
-    if(this.uiConfig.isSound) {
+    if (this.uiConfig.isSound) {
       customSound.initSoundPool(3, 'beat_short.wav')
     }
   }
@@ -109,77 +85,6 @@ struct Notice {
 
   onPageShow(): void {
     hilog.debug(DOMAIN_NUMBER, TAG, '页面显示')
-  }
-
-  onCancel() {
-    if (!this.uiConfig.EnabledStatusNotice) {
-      this.uiConfig.Enablednotice = false
-    }
-  }
-  onAccept() {
-    this.handleToSettings()
-  }
-
-  /**
-   * 通知启用操作
-   */
-  async EnabledNotification() {
-    try {
-      // 先获取最新权限状态
-      const currentStatus = await notificationManager.isNotificationEnabled()
-      if (currentStatus) {
-        // 已有权限时通知开关启用或关闭
-        // 显示通知设置 显式动画
-        this.getUIContext()?.animateTo({
-          duration: this.uiConfig.animationSpeed,
-        }, () => {
-          this.uiConfig.Enablednotice = !this.uiConfig.Enablednotice
-        })
-
-      } else {
-        // 没有授权时
-        if (!this.uiConfig.isRequestNotification) {
-          // 首次请求权限
-          try {
-            await notificationManager.requestEnableNotification(this.context)
-            this.uiConfig.isRequestNotification = true
-            // 显示通知设置 显式动画
-            this.getUIContext()?.animateTo({
-              duration: this.uiConfig.animationSpeed,
-            }, () => {
-              this.uiConfig.Enablednotice = true
-            })
-          } catch (err) {
-            if ((err as BusinessError).code === 1600004) {
-              hilog.error(DOMAIN_NUMBER, TAG, '用户拒绝授权')
-              this.uiConfig.Enablednotice = false
-              this.uiConfig.isRequestNotification = true
-            }
-          }
-        } else {
-          // 已请求过权限且通知开关未启用，进入跳转设置
-          if(!this.uiConfig.Enablednotice) {
-            this.toDialogController.open()
-          }
-        }
-      }
-    } catch (err) {
-      hilog.error(DOMAIN_NUMBER, TAG, `Toggle Error: ${(err as BusinessError).code}, ${(err as BusinessError).message}`);
-    }
-  }
-
-  /**
-   *  跳转至设置界面开启通知权限
-   */
-  handleToSettings() {
-    this.context.startAbility({
-      bundleName: 'com.huawei.hmos.settings', // 系统设置界面的包名 （固定）
-      abilityName: 'com.huawei.hmos.settings.MainAbility', // 系统设置的Ability的名字（固定）
-      uri: "application_info_entry", // 系统设置的界面 （固定）
-      parameters: {
-        pushParams: context.applicationInfo.name,
-      }
-    })
   }
 
 
@@ -250,18 +155,21 @@ struct Notice {
               Row() {
                 // 通知总开关
                 Toggle({ type: ToggleType.Switch, isOn: $$this.uiConfig.Enablednotice })
+                  .opacity(this.uiConfig.Enablebackgrounder ? 0.5 : 1)
                   .selectedColor(this.icon_emphasize)
-                  .margin({right: 12})
                   .hitTestBehavior(HitTestMode.None)
-              }.onClick(() => {
-                this.EnabledNotification()
+                  .margin({right: 12})
+              }.hitTestBehavior(this.uiConfig.Enablebackgrounder ? HitTestMode.None : HitTestMode.Default)
+              .onClick(() => {
+                // 触发总通知启用
+                EventHub.sendEvent(EventKey.EnabledNotice)
               })
             }
           }
           .RowStyle()
           .onClick( ()=> {
             // 点击提示 防误触
-            promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
+            this.promptAction.showToast({message: this.uiConfig.Enablebackgrounder ? $r('app.string.notice_not_close_tips') : $r('app.string.click_prompt'), duration: 2000 })
           })
           // 通知总开关 End
           if (this.uiConfig.Enablednotice) {
@@ -297,7 +205,7 @@ struct Notice {
             .onClick( ()=> {
               if(!this.uiConfig.Enablebackgrounder) {
                 // 点击提示
-                promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
+                this.promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
               }
             })
             // 常驻通知 End
@@ -321,9 +229,6 @@ struct Notice {
                       curve: Curve.Ease
                     }, () => {
                       this.uiConfig.EnabledStatusNotice = isOn
-                      if (isOn) {
-                        this.toDialogController.open()
-                      }
                     })
                   })
               }
@@ -331,7 +236,7 @@ struct Notice {
             .RowStyle()
             .onClick( ()=> {
               // 点击提示
-              promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
+              this.promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
             })
             // 常驻状态栏 End
           }

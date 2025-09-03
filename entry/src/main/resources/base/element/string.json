@@ -2139,6 +2139,14 @@
     {
       "name": "switch_proxy_title",
       "value": "VPN开关"
+    },
+    {
+      "name": "enable_notice_failed",
+      "value": "通知权限授权失败，通知及其关联功能已关闭"
+    },
+    {
+      "name": "notice_not_close_tips",
+      "value": "通知无法关闭了哦"
     }
   ]
 }

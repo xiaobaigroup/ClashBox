@@ -2139,6 +2139,14 @@
     {
       "name": "click",
       "value": "Click"
+    },
+    {
+      "name": "enable_notice_failed",
+      "value": "Notification permission authorization failed, notification and its associated functions have been disabled"
+    },
+    {
+      "name": "notice_not_close_tips",
+      "value": "The notification cannot be closed"
     }
   ]
 }

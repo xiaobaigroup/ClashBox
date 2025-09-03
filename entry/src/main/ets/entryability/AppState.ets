@@ -54,7 +54,7 @@ export class AppConfig{
   enableConnect: boolean = false
   accessControl: boolean = true
   testUrl: string = "https://www.gstatic.com/generate204"
-  clashCore: ClashCore = ClashCore.mihomo
+  clashCore: ClashCore = ClashCore.ClashMeta
   switchMode: ProxyMode = ProxyMode.Rule
   constructor() {
   }
@@ -98,7 +98,7 @@ export class UIConfig{
   // 声音反馈变量
   isSound: boolean = true
   // 通知总开关
-  Enablednotice: boolean = false
+  Enablednotice: boolean = true
   // 常驻通知开关
   EnabledPermanentnotice: boolean = true
   // 常驻状态栏开关
@@ -110,7 +110,7 @@ export class UIConfig{
   // 模拟定位启用变量
   backgroundLocateModel: boolean = false
   // 模拟下载启用变量
-  backgroundDownModel: boolean = false
+  backgroundDownModel: boolean = true
   // 模拟画中画启用变量
   backgroundPiPModel: boolean = false
   /* 主页小卡片相关 */

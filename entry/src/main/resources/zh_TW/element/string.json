@@ -2139,6 +2139,14 @@
     {
       "name": "click",
       "value": "點擊"
+    },
+    {
+      "name": "enable_notice_failed",
+      "value": "通知權限授權失敗，通知及相關功能已關閉"
+    },
+    {
+      "name": "notice_not_close_tips",
+      "value": "通知無法關閉喔"
     }
   ]
 }
