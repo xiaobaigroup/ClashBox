@@ -80,7 +80,7 @@ export function convertToSwitchNub(value: number, unit: keyof GeneratedUnitInter
     case 'KB':
       return value / Math.pow(1024, 1);
     case 'B':
-      return value / Math.pow(1024, 1);
+      return value;
     default:
       throw new Error(`Unsupported unit: ${unit}`);
   }

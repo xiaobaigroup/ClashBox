@@ -14,6 +14,7 @@ import { HomeCardCellularDataBarHeight,
   HomeCardCellularDataPadding,
   HomeCardPadding } from '../../common/breakpoint/BreakPoint'
 import { icon_primary } from '../Common/Common'
+import { Xb_DataSwitch } from 'xb_components'
 
 
 @Component
@@ -75,7 +76,7 @@ struct CellularDataStat {
         // 使用流量进度条
         Stack(){
           Progress({
-            value: convertToSwitchNub(this.uiConfig.dataTotal,this.uiConfig.switchUnit),
+            value: Xb_DataSwitch.ConvertData(this.uiConfig.dataTotal,this.uiConfig.switchUnit),
             total: this.uiConfig.inputTotal,
             type: ProgressType.Capsule
           })// value为使用流量的值
