@@ -149,6 +149,7 @@ struct Home {
       if (this.proxyEnabled) {
         await ClashViewModel.StartVpn()
       } else {
+        console.log(`Home BackgroundDownService Clash已经停止`)
         await ClashViewModel.StopVpn()
       }
       if (this.uiConfig.isVibrate) {

@@ -15,7 +15,6 @@ import { geoLocationManager } from "@kit.LocationKit";
 export class BackgroundDownService {
 
   notificationId ?: number = undefined
-  ping: number = 0
   notice:number = 0
 
   async start(context: Context){
@@ -42,11 +41,16 @@ export class BackgroundDownService {
     this.updateProcess(this.notificationId ?? 0, appConfig.currentProxyName ?? 'ClashBox', message, 99.9 )
   }
 
-  stop(context: Context){
-    this.notificationId = undefined
-    clearInterval(this.ping)
+  stop(context: Context) {
     clearInterval(this.notice)
-    backgroundTaskManager.stopBackgroundRunning(context)
+    this.notificationId = undefined
+    console.log(`BackgroundDownService 开始执行模拟下载停止`)
+    backgroundTaskManager.stopBackgroundRunning(context).then(() => {
+      console.log(`BackgroundDownService 模拟下载停止成功`)
+    })
+      .catch((err: Error) => {
+        console.error(`BackgroundDownService 模拟下载停止失败：err：${JSON.stringify(err)}`)
+      })
   }
 
   updateProcess(id: number, title: string, message: string,Process: number){

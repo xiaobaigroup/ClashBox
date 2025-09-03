@@ -243,7 +243,7 @@ export default class EntryAbility extends UIAbility {
                     cardManager.pushCartVpnServiceTime(number2Time(time))
                   },vpnServiceStartTime)
 
-                  EventHub.on(EventKey.StopedClash,()=>{
+                  EventHub.on(EventKey.StopedClashEntry,()=>{
                     this.proxyStartedTimer.reset()
                   })
                 }

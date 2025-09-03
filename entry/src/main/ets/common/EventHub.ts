@@ -18,7 +18,8 @@ export enum EventKey{
   ShareBundle = 10014,
   AddAPP = 10015,
   ProxyDuration = 10016,
-  EnabledNotice = 10017
+  EnabledNotice = 10017,
+  StopedClashEntry = 10018,
 }
 
 export class EventHub{

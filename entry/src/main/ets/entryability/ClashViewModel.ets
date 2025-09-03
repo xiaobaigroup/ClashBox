@@ -350,7 +350,10 @@ export class ClashViewModel {
   async StopVpn(){
     this.vpnStarted = false
     this.socketProxy.stopClash()
+    // Index里的停止后操作
     EventHub.sendEvent(EventKey.StopedClash)
+    // EntryAbility里的停止后操作
+    EventHub.sendEvent(EventKey.StopedClashEntry)
     EventHub.sendEvent(EventKey.checkIpInfo)
     cardManager.pushCartProxyMode(this.vpnStarted)
   }

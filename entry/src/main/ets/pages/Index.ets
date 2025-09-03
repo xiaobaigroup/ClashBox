@@ -603,7 +603,7 @@ struct Index {
   async aboutToAppear(): Promise<void> {
     hilog.info(0x1000, componentName, `#aboutToAppear executed`)
     let appFlowingState = AppStorage.get<AppFlowingState>("appFlowingState") ?? new AppFlowingState()
-    // 启动Clash
+    // 启动Clash后
     EventHub.on(EventKey.StartedClash, () => {
       const job = async () => {
         let onlyProxy = AppStorage.get<ClashConfig>("clashConfig")?.['only-proxy'] as boolean ?? true
@@ -665,11 +665,21 @@ struct Index {
       }
 
     })
-    // 停止Clash
+    // 停止Clash后
     EventHub.on(EventKey.StopedClash, () => {
+      // 停止模拟下载
+      if (this.uiConfig.backgroundDownModel) {
+        console.log(`BackgroundDownService 即将执行模拟下载停止`)
+        BackgroundDownService.stop(this.context)
+      }
       clearInterval(this.trafficJob)
       if (this.uiConfig.backgroundLocateModel) {
-        BackgroundLocateService.stop(getContext(this))
+        BackgroundLocateService.stop(this.context)
+      }
+      // 取消通知
+      if (this.uiConfig.Enablednotice && this.uiConfig.EnabledPermanentnotice) {
+        Xb_NotificationUtils.cancelNotification(this.noticeJob)
+        clearInterval(this.updateNoticeJob)
       }
       // 代理计时器重置
       this.proxyStartingDuration = ''
@@ -677,14 +687,6 @@ struct Index {
       this.DownloadSpeed = ''
       this.UploadSpeed = ''
       this.ChartData = CHART_NUMBER
-      // 取消通知
-      if (this.uiConfig.Enablednotice && this.uiConfig.EnabledPermanentnotice) {
-        Xb_NotificationUtils.cancelNotification(this.noticeJob)
-        clearInterval(this.updateNoticeJob)
-      }
-      if (this.uiConfig.backgroundDownModel) {
-        BackgroundDownService.stop(this.context)
-      }
     })
     // 代理时长
     EventHub.on(EventKey.ProxyDuration, (time:number) => {
