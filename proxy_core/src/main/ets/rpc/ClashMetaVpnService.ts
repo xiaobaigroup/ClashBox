@@ -188,6 +188,7 @@ export class ClashMetaVpnService extends CommonVpnService{
           nativeStopTun()
           super.stopVpn()
           resolve(true)
+          this.running = false
           break;
         }
       }
@@ -204,18 +205,21 @@ export class ClashMetaVpnService extends CommonVpnService{
         })
       }
       hilog.info(0x001, "ClashBox", `运行时间：${Date.now().toString()}`)
-      const options: commonEventManager.CommonEventPublishData = {
-        code: 0,
-        data: Date.now().toString(),
-        isOrdered: false // 无序公共事件
-      }
-      commonEventManager.publish("VpnServiceTimeEvent", options, (err: BusinessError) => {
-        if (err) {
-          console.error(`Failed to publish common event. Code is ${err.code}, message is ${err.message}`);
-        } else {
-          console.info(`Succeeded in publishing common event.`);
+      if (!this.running) {
+        const options: commonEventManager.CommonEventPublishData = {
+          code: 0,
+          data: Date.now().toString(),
+          isOrdered: false // 无序公共事件
         }
-      });
+        commonEventManager.publish("VpnServiceTimeEvent", options, (err: BusinessError) => {
+          if (err) {
+            console.error(`Failed to publish common event. Code is ${err.code}, message is ${err.message}`);
+          } else {
+            console.info(`Succeeded in publishing common event.`);
+          }
+        });
+        this.running = true
+      }
       return tunFd > -1;
     } catch (error) {
       return false

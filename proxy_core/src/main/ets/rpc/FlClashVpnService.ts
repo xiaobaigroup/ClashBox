@@ -217,6 +217,7 @@ export class FlClashVpnService extends CommonVpnService {
           stopListener()
           this.stopVpn()
           resolve(true)
+          this.running = false
           break;
         }
         default: {
@@ -261,18 +262,21 @@ export class FlClashVpnService extends CommonVpnService {
         this.startClash(tunFd)
       }
       hilog.info(0x001, "ClashBox", `运行时间：${Date.now().toString()}`)
-      const options: commonEventManager.CommonEventPublishData = {
-        code: 0,
-        data: Date.now().toString(),
-        isOrdered: false // 无序公共事件
-      }
-      commonEventManager.publish("VpnServiceTimeEvent", options, (err: BusinessError) => {
-        if (err) {
-          console.error(`Failed to publish common event. Code is ${err.code}, message is ${err.message}`);
-        } else {
-          console.info(`Succeeded in publishing common event.`);
+      if (!this.running) {
+        const options: commonEventManager.CommonEventPublishData = {
+          code: 0,
+          data: Date.now().toString(),
+          isOrdered: false // 无序公共事件
         }
-      });
+        commonEventManager.publish("VpnServiceTimeEvent", options, (err: BusinessError) => {
+          if (err) {
+            console.error(`Failed to publish common event. Code is ${err.code}, message is ${err.message}`);
+          } else {
+            console.info(`Succeeded in publishing common event.`);
+          }
+        });
+        this.running = true
+      }
       return tunFd > -1;
     } catch (error) {
       console.error("ClashVPN  error ", error)
@@ -314,6 +318,7 @@ export class FlClashVpnService extends CommonVpnService {
   stopVpn() {
     stopTun()
     super.stopVpn()
+    this.running = false
   }
   override async init() {
     initClash(await getHome(this.context), "1.0.0")
