@@ -337,7 +337,7 @@ export class ClashViewModel {
       return
     if(appConfig!.accessControl){
       let acceptList = JSON.parse(appConfig?.accessControlAcceptList ?? "[]") as string[]
-      acceptList.push(this.context?.applicationInfo.name as string)
+      acceptList.push(...[this.context?.applicationInfo.name as string, 'com.atomicservice.5765880207855877209'])
       const rejectList = JSON.parse(appConfig?.accessControlRejectList ?? "[]") as string[]
       const accessControl = { accessControl: { mode:appConfig?.accessControlMode ?? "", acceptList: acceptList, rejectList: rejectList } as AccessControl } as VpnRawOptions
       this.socketProxy.setOptionStates(accessControl)
