@@ -1,4 +1,4 @@
-import { promptAction } from "@kit.ArkUI";
+import { PromptAction } from "@kit.ArkUI";
 
 export class UrlUtils {
   /**
@@ -10,10 +10,10 @@ export class UrlUtils {
    * 输入: "https://appgallery.huawei.com/app/detail?id=yylx.danmaku.bili&channelId=SHARE"
    * 输出: "yylx.danmaku.bili"
    */
-  static extractPackageName(url: string): string {
+  static extractPackageName(url: string, promptAction: PromptAction): string {
     try {
       // 判断是否为华为应用商店URL
-      if (!UrlUtils.isValidAppGalleryUrl(url)) {
+      if (!UrlUtils.isValidAppGalleryUrl(url, promptAction)) {
         return '';
       }
 
@@ -41,7 +41,7 @@ export class UrlUtils {
    * @param url 待验证的URL字符串
    * @returns 如果是有效的华为应用商店URL返回true，否则返回false
    */
-  static isValidAppGalleryUrl(url: string): boolean {
+  static isValidAppGalleryUrl(url: string, promptAction: PromptAction): boolean {
     try {
       return url.startsWith('https://appgallery.huawei.com/app/detail');
     } catch (error) {

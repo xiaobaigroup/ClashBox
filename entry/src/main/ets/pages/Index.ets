@@ -59,7 +59,7 @@ import {
 import { WindowTopBar } from '../components/Common/TopBar'
 import { ImportConfigFromURL } from '../components/Configuration/ImportConfigFromURL'
 import { Xb_ChangeThemeColor } from 'xb_components/src/main/ets/utils/ChangeThemeColorUtil'
-import { Xb_ColorModeManager, Xb_Global, Xb_NotificationUtils, Xb_UIConfig } from 'xb_components'
+import { Xb_ColorModeManager, Xb_Global, Xb_NotificationUtils, Xb_StatusBarUtils, Xb_UIConfig } from 'xb_components'
 import { Xb_GoToWeb } from 'xb_components/src/main/ets/utils/JumpTo'
 import BackgroundDownService from '../common/utils/BackgroundDownService'
 import { notificationManager } from '@kit.NotificationKit'
@@ -602,6 +602,10 @@ struct Index {
 
   async aboutToAppear(): Promise<void> {
     hilog.info(0x1000, componentName, `#aboutToAppear executed`)
+    // 初始化状态栏工具(仅PC设备)
+    if (this.windowMode) {
+      Xb_StatusBarUtils.initStatusBar(this.context, $rawfile('clash_status.svg'), undefined)
+    }
     let appFlowingState = AppStorage.get<AppFlowingState>("appFlowingState") ?? new AppFlowingState()
     // 启动Clash后
     EventHub.on(EventKey.StartedClash, () => {

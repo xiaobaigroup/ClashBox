@@ -1,4 +1,4 @@
-import { BreakpointState } from "../../common/breakpoint/breakpointsystem";
+
 import {
   BIND_SHEET_CONTAINER_HEIGHT,
   BIND_SHEET_DRAG_BAR_HEIGHT,
@@ -9,13 +9,10 @@ import {
   BORDER_RADIUS_20, LIST_ITEM_HEIGHT,
   LIST_ITEM_PADDING,
   LIST_SPACE,
-  NewConfigData,
   RouteName
 } from "../../common/entity/Constants";
 import { hilog } from "@kit.PerformanceAnalysisKit";
 import { BindSheetTitleCustomBuilder, ExperimentalFunction } from "../Common/Common";
-import { promptAction } from "@kit.ArkUI";
-import { getResourceString } from "../../common/utils/ResourceStringUtil";
 import { UIConfig } from "../../entryability/AppState";
 import { customAnimationUtil } from "../../common/utils/Animation";
 import { removeItemsByIndex } from "../../common/utils/RemoveItemsUtils";

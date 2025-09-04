@@ -7,7 +7,7 @@ import { ConnectionInfo, IpInfo, LogInfo, Provider, ProxyGroup, ProxyMode,
   Traffic } from '../models/Common';
 import  fs from  "@ohos.file.fs"
 import { fileIo, fileUri } from "@kit.CoreFileKit";
-import { promptAction } from '@kit.ArkUI';
+import { PromptAction } from '@kit.ArkUI';
 import { UpdateConfigParams } from '../models/ClashConfig';
 import { checkIp, queryIpInfo } from '../Request';
 import { Fd, ParseProxyGroup, VpnOptions } from './FlClashVpnService';
@@ -32,8 +32,10 @@ export class SocketProxyService implements IClashManager {
   context?: common.Context
   active: boolean = false
   offlineTime: number[] = []
-  init(context: common.Context) {
+  static promptAction: PromptAction
+  init(context: common.Context, promptAction: PromptAction) {
     this.context = context
+    SocketProxyService.promptAction = promptAction
   }
   async setLogObserver(observer: (message: LogInfo) => void): Promise<()=>void> {
     return this.callbackRequest(ClashRpcType.setLogObserver, [], (message)=>{
@@ -228,7 +230,7 @@ export class SocketProxyService implements IClashManager {
       if (!json.error || json.error == "")
         resolve(json.result)
       else{
-        promptAction.showToast({message: json.error})
+        SocketProxyService.promptAction.showToast({message: JSON.stringify(json.error)})
         resolve(json.error)
       }
     } catch (e) {
@@ -274,7 +276,11 @@ export class SocketProxyService implements IClashManager {
       }
       if(!await fileIo.access(socketPath, fs.AccessModeType.EXIST))
       {
-        promptAction.showToast({message: "VPN服务启动失败"})
+        try {
+          SocketProxyService.promptAction.showToast({ message: "VPN服务启动失败" })
+        } catch (error) {
+          console.error(`VPN服务启动失败提示弹窗error：${JSON.stringify(error)}`)
+        }
         reject("")
         return;
       }
@@ -284,10 +290,18 @@ export class SocketProxyService implements IClashManager {
       }).catch((e:Error)=>{
         this.active = false
         console.error("vpn服务启动失败", e.message, e.stack)
-        if(e.message == "Connection refused"){
-          promptAction.showToast({message: "VPN服务被系统干掉了"})
-        }else{
-          promptAction.showToast({message: "vpn服务失败: " + e.message})
+        if (e.message == "Connection refused"){
+          try {
+            SocketProxyService.promptAction.showToast({ message: "VPN服务被系统干掉了" })
+          } catch (error) {
+            console.error(`VPN服务断开提示弹窗error：${JSON.stringify(error)}`)
+          }
+        } else {
+          try {
+            SocketProxyService.promptAction.showToast({ message: "vpn服务失败: " + e.message })
+          } catch (error) {
+            console.error(`VPN服务失败提示弹窗error：${JSON.stringify(error)}`)
+          }
         }
         reject(e)
       });

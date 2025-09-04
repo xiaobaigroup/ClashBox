@@ -7,7 +7,7 @@ import { SocketProxyService, Profile, ProfileType, UpdateConfigParams, ClashConf
   ProxySort} from "proxy_core";
 import { vpnExtension } from "@kit.NetworkKit";
 import { ConfigData } from "../common/entity/PageArgumentEntity";
-import { promptAction } from "@kit.ArkUI";
+import { PromptAction } from "@kit.ArkUI";
 import { ProxyGroup } from "proxy_core/src/main/ets/models/Common";
 import { ConfigExtendedParams } from "proxy_core/src/main/ets/models/ClashConfig";
 import { EventHub, EventKey } from "../common/EventHub";
@@ -30,13 +30,15 @@ export class ClashViewModel {
   profileRepo = new ProfileRepo()
   socketProxy = new SocketProxyService()
   context: Context | undefined
-  async init(context: Context) {
+  static promptAction: PromptAction
+  async init(context: Context, promptAction: PromptAction) {
     const packageInfo = await getPackageInfo()
     AppState.versionName = packageInfo.versionName
     AppState.globalUA =  "clash.meta/1.18.7"
     this.context = context
+    ClashViewModel.promptAction = promptAction
     await this.profileRepo.init(context)
-    this.socketProxy.init(context)
+    this.socketProxy.init(context, ClashViewModel.promptAction)
     await this.initGeoIp()
     await this.ChangeCore(undefined, false)
   }
@@ -62,7 +64,7 @@ export class ClashViewModel {
           EventHub.sendEvent(EventKey.FetchProfile, null)
         })
     } else {
-      promptAction.showToast({message: "文件保存失败！"})
+      ClashViewModel.promptAction.showToast({message: "文件保存失败！"})
     }
   }
   async addOrUpdateProfileByFile(name: string, path: string, id: string | null){
@@ -83,7 +85,7 @@ export class ClashViewModel {
           EventHub.sendEvent(EventKey.FetchProfile, null)
         })
     } else {
-      promptAction.showToast({message: "文件保存失败！"})
+      ClashViewModel.promptAction.showToast({message: "文件保存失败！"})
     }
   }
 
@@ -116,7 +118,7 @@ export class ClashViewModel {
       await this.socketProxy.changeProxy(g, p)
       EventHub.sendEvent(EventKey.checkIpInfo)
     } catch (e) {
-      promptAction.showToast({message: e.message, duration:3000})
+      ClashViewModel.promptAction.showToast({message: e.message, duration:3000})
     }
   }
   async setVpnOptions(options: VpnRawOptions){
@@ -124,7 +126,7 @@ export class ClashViewModel {
       let result = await this.socketProxy.setOptionStates(options)
       console.log("setVpnOptions", result)
     } catch (e) {
-      promptAction.showToast({message: e.message, duration:3000})
+      ClashViewModel.promptAction.showToast({message: e.message, duration:3000})
     }
   }
 
@@ -140,7 +142,7 @@ export class ClashViewModel {
       this.delayMap.set(proxyName, { name: proxyName, delay: delay } as DelayInfo)
       return delay;
     } catch (e) {
-      promptAction.showToast({message: e.message, duration: 3000})
+      ClashViewModel.promptAction.showToast({message: e.message, duration: 3000})
     }
     return -1;
   }
@@ -175,7 +177,7 @@ export class ClashViewModel {
   async updateProvider(provider: Provider){
     let result = await this.socketProxy.updateProvider(provider)
     if(result && result != ""){
-      promptAction.showToast({message: provider.name + ":" + result})
+      ClashViewModel.promptAction.showToast({message: provider.name + ":" + result})
     }
   }
   async upLoadProvider(provider: Provider, fileUri: string) {
@@ -184,7 +186,7 @@ export class ClashViewModel {
     }
     let result = await this.socketProxy.upLoadProvider(provider, fileUri)
     if (result && result != ""){
-      promptAction.showToast({message: provider.name + ":" + result})
+      ClashViewModel.promptAction.showToast({message: provider.name + ":" + result})
     }
   }
 
@@ -245,7 +247,7 @@ export class ClashViewModel {
       return groups
     } catch (e) {
       console.error("获取代理失败: ", e.stack)
-      promptAction.showToast({message: "获取代理失败: " + (e.message || e) + e.stack})
+      ClashViewModel.promptAction.showToast({message: "获取代理失败: " + (e.message || e) + e.stack})
     }
     return []
   }
@@ -279,7 +281,7 @@ export class ClashViewModel {
     await sleep(600)
     let result = await this.checkVpnVpnAbility(requestId)
     if(!result){
-        promptAction.showToast({message:"VpnAbility请求失败! 请重启应用"})
+      ClashViewModel.promptAction.showToast({message:"VpnAbility请求失败! 请重启应用"})
     }
     return result;
   }
@@ -300,7 +302,7 @@ export class ClashViewModel {
       params: params ?? {} as ConfigExtendedParams
     } as UpdateConfigParams)
     if (result != ""){
-      promptAction.showToast({message: result, duration: 3000 })
+      ClashViewModel.promptAction.showToast({message: result, duration: 3000 })
     }
     EventHub.sendEvent(EventKey.FetchProxyGroup, null)
   }

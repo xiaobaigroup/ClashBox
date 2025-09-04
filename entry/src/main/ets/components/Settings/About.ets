@@ -16,8 +16,7 @@ import { AboutListItemProp, BORDER_RADIUS_20,
 import TopBuilder from "./TopBuilder"
 import { Xb_Studio } from "xb_components"
 import { hilog } from "@kit.PerformanceAnalysisKit"
-import { common, Want } from "@kit.AbilityKit"
-import { LengthMetrics, promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
+import { LengthMetrics, PromptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 import { AppConfig, ClashCore, isEnd, UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../common/utils/Animation"
 import { removeItemsByIndex } from "../../common/utils/RemoveItemsUtils"
@@ -48,6 +47,7 @@ struct About {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
+  private promptAction: PromptAction = this.getUIContext().getPromptAction()
   // 点击次数
   @State clickCount: number = 0
   // 实验功能开关列表行数据
@@ -61,7 +61,7 @@ struct About {
     }
     hilog.info(0xFF00, "AboutClickTag", "点击次数: %{public}d", this.clickCount)
     if(this.uiConfig.enabledADvanced) {
-      promptAction.showToast({message: '已处于高级模式' /*$r('app.string.click_prompt')*/, duration: 2000 })
+      this.promptAction.showToast({message: '已处于高级模式' /*$r('app.string.click_prompt')*/, duration: 2000 })
     } else {
       if (this.clickCount >= 5) {
         this.uiConfig.enabledADvanced = true
@@ -70,11 +70,11 @@ struct About {
         this.aboutList.splice(1, 0, this.ExperimentData)
         // 刷新更多页面数据
         this.moreList = ListMoreData()
-        promptAction.showToast({message: '高级模式已开启' /*$r('app.string.click_prompt')*/, duration: 2000 })
+        this.promptAction.showToast({message: '高级模式已开启' /*$r('app.string.click_prompt')*/, duration: 2000 })
         //音效触发
         customSound.playAudioForSoundPool()
       } else if (this.clickCount === 3) {
-        promptAction.showToast({message: '什么东西闪过去了' /*$r('app.string.click_prompt')*/, duration: 1000 })
+        this.promptAction.showToast({message: '什么东西闪过去了' /*$r('app.string.click_prompt')*/, duration: 1000 })
       }
     }
   }
@@ -372,7 +372,7 @@ struct About {
                   .onClick(() => {
                    if(itemChild.sign === 1) {
                      // 点击提示 防误触
-                     promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
+                     this.promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
                       if (itemChild.name === 'ExperimentalFunction') {
 
                       // } else {
@@ -467,6 +467,7 @@ export struct AboutCollaborators {
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State CollaboratorsList: CollaboratorsListItemProp[] = CollaboratorsList
+  private promptAction: PromptAction = this.getUIContext().getPromptAction()
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 高度断点
@@ -522,7 +523,7 @@ export struct AboutCollaborators {
                         Xb_HandleMailto(item.link)
                       } else if (item.sign == 2) {
                         Xb_Copy(item.link)
-                        promptAction.showToast({ message: `${getResourceString($r('app.string.qq_copy'), this)}：${item.link}`})
+                        this.promptAction.showToast({ message: `${getResourceString($r('app.string.qq_copy'), this)}：${item.link}`})
                       }
                     })
                   if(item.contact2) {
@@ -844,6 +845,7 @@ export struct CheckUpdate {
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+  private promptAction: PromptAction = this.getUIContext().getPromptAction()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
@@ -863,7 +865,7 @@ export struct CheckUpdate {
       hilog.info(0xFF00, "UpdatetestTag", "Update Info: %{public}s", JSON.stringify(updateInfo))
       const theLatest = extractUpdateInfo(updateInfo)
       if (theLatest !== null) {
-        promptAction.showToast({message: $r('app.string.query_success'), duration: 2000 })
+        this.promptAction.showToast({message: $r('app.string.query_success'), duration: 2000 })
         // 查询完成
         this.theAppVersionInfo = theLatest
       } else {
@@ -931,14 +933,14 @@ export struct CheckUpdate {
                   Xb_GoToWeb('https://github.com/xiaobaigroup/ClashBox/releases')
                 } else if(index === 3) {
                   // 忽略本次更新
-                  promptAction.showToast({
+                  this.promptAction.showToast({
                     message: $r('app.string.developing'),
                     duration: 2000
                   })
                 } else if(index === 2) {
                   // 前往下载
                   if (this.theAppVersionInfo.browser_download_url === '') {
-                    promptAction.showToast({
+                    this.promptAction.showToast({
                       message: $r('app.string.no_link'),
                       duration: 2000
                     })

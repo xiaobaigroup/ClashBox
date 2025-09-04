@@ -1,18 +1,17 @@
-import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
-import { BIND_SHEET_DRAG_BAR_HEIGHT, BORDER_RADIUS_20, CONTENT_END_OFFSET_150,
+
+import { BORDER_RADIUS_20, CONTENT_END_OFFSET_150,
   TAB_CONTENT_TITLE_HEIGHT } from "../../common/entity/Constants"
 import { Nothing, theCustomDialog } from "../Common/Common"
 import { MoreTop } from "./MoreTopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { convertTime } from "../../common/utils/TimeConvertUtil"
 import { ClashConfig } from 'proxy_core'
-import { curves, promptAction } from '@kit.ArkUI'
+import { PromptAction } from '@kit.ArkUI'
 import { copy, UIConfig } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { EventHub, EventKey } from "../../common/EventHub"
 import { customAnimationUtil, isON } from "../../common/utils/Animation"
-import { i18n } from "@kit.LocalizationKit"
 import { NeedClearMoreStack, PageMargin } from "../../common/breakpoint/BreakPoint"
 import { icon_primary } from "../Common/Common"
 
@@ -115,6 +114,7 @@ struct Resources {
   @State isLoadingAll: boolean = false
   @Provide isShowGroupSort: Boolean = false
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
+  private promptAction: PromptAction = this.getUIContext().getPromptAction()
   @Provide resourceListData: Array<ResourcesData> = theResouresData
   // 开关不触发list转场动画判定
   @State isON:isON = new isON()
@@ -213,16 +213,16 @@ struct Resources {
       this.isLoadingAll = false
       if (message != "") {
         console.error("updateGeoDateItem ", message)
-        promptAction.showToast({ message: getResourceString($r('app.string.update_failed'), this) + " " + message })
+        this.promptAction.showToast({ message: getResourceString($r('app.string.update_failed'), this) + " " + message })
       }
       else {
-        promptAction.showToast({ message: getResourceString($r('app.string.update_success'), this) })
+        this.promptAction.showToast({ message: getResourceString($r('app.string.update_success'), this) })
       }
     } catch (e) {
       this.isLoading = -1
       this.isLoadingAll = false
       console.error("updateGeoDateItem error", e)
-      promptAction.showToast({message: getResourceString($r('app.string.update_failed'), this) + (e.message ?? e)})
+      this.promptAction.showToast({message: getResourceString($r('app.string.update_failed'), this) + (e.message ?? e)})
     }
   }
 
@@ -256,7 +256,7 @@ struct Resources {
           onClick1: () => {
             this.isON.toggleAnim = true
             this.isLoadingAll = true
-            promptAction.showToast({ message: getResourceString($r('app.string.resource_updating'), this) })
+            this.promptAction.showToast({ message: getResourceString($r('app.string.resource_updating'), this) })
             this.updateGeoDate()
           },
           onClick2: () => {
@@ -429,80 +429,24 @@ export default Resources
 
 @Component
 struct Sort {
-  @Consume isShowGroupSort: Boolean
-  @Consume resourceListData: Array<ResourcesData>
-  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  /* 主题色 */
-  @Consume('icon_emphasize')
-  icon_emphasize: ResourceColor
-  @State lastSortList: string = ''
-  @State SortHideList: Array<ResourcesData> = resourcesBlankData
-  // 拖拽项
-  @State dragItem: ResourcesData | null = null
-  // 被拖拽项的原始索引
-  @State dragItemIndex: number = -1
+
   // 1表示GroupSortList，2表示GroupSortHideList
   @State currentList: number = 0
   @State isSave: boolean = false
+  @State lastSortList: string = ''
+  @Consume isShowGroupSort: Boolean
+  // 被拖拽项的原始索引
+  @State dragItemIndex: number = -1
+  // 拖拽项
+  @State dragItem: ResourcesData | null = null
+  @Consume resourceListData: Array<ResourcesData>
+  /** 主题色 */
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @State SortHideList: Array<ResourcesData> = resourcesBlankData
+  private promptAction: PromptAction = this.getUIContext().getPromptAction()
   /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
-
-  // 定义一个空白的GroupSortListItemType作为占位符
-  private placeholderItem: ResourcesData = {
-    key: "NN",
-    resourceName: '',
-    fileName: "",
-    resourceSize: 0,
-    updateTime: 0,
-  }
-
-  aboutToAppear(): void {
-    const lastData = JSON.stringify(this.resourceListData)
-    this.lastSortList = lastData
-    hilog.info(0xFF00, "ResourcestestTag", "上一次布局：%{public}s", this.lastSortList)
-    this.SortHideList = JSON.parse(this.uiConfig.resourcesHideData)
-  }
-  aboutToDisappear(): void {
-    if(!this.isSave) {
-      hilog.info(0xFF00, "ResourcestestTag", "布局：%{public}s", this.lastSortList)
-      this.resourceListData = JSON.parse(this.lastSortList)
-      hilog.info(0xFF00, "ResourcestestTag", "布局：%{public}s", JSON.stringify(this.resourceListData))
-    }
-  }
-
-  // 列表项Builder
-  @Builder
-  listItemBuilder(item: ResourcesData) {
-    Row() {
-      Text(item.resourceName)
-        .fontWeight(FontWeight.Medium)
-        .fontColor($r('sys.color.font_primary'))
-      Blank()
-      SymbolGlyph(item.key=== 'NN' ? undefined : $r('sys.symbol.sort'))
-        .fontSize(24)
-        .fontColor([$r('sys.color.font_primary')])
-    }
-    .width('100%')
-    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-    .padding({left: 12, right: 12, top: 16, bottom: 16})
-  }
-
-  // 拖拽预览Builder（与列表项相同）
-  @Builder
-  dragPreviewBuilder(text: string) {
-    Row() {
-      Text(text)
-        .fontWeight(FontWeight.Medium)
-      Blank()
-      SymbolGlyph($r('sys.symbol.sort'))
-        .fontSize(24)
-    }
-    .width(450)
-    .borderRadius(BORDER_RADIUS_20)
-    .backgroundColor($r('app.color.container_background'))
-    .padding({left: 12, right: 12, top: 16, bottom: 16})
-  }
-
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
 
   build() {
     Column({space: 8}) {
@@ -524,7 +468,7 @@ struct Sort {
           this.uiConfig.resourcesHideData = JSON.stringify(this.SortHideList)
           this.isShowGroupSort = false
           this.isEnableIndexForegroundBlur = false
-          promptAction.showToast({message: $r('app.string.saved'), duration: 2000 })
+          this.promptAction.showToast({message: $r('app.string.saved'), duration: 2000 })
         })
         Text(`${getResourceString($r('app.string.Resources'), this)}${getResourceString($r('app.string.sort'), this)}`)
           .fontSize(20)
@@ -628,6 +572,63 @@ struct Sort {
 
   }
 
+  // 列表项Builder
+  @Builder
+  listItemBuilder(item: ResourcesData) {
+    Row() {
+      Text(item.resourceName)
+        .fontWeight(FontWeight.Medium)
+        .fontColor($r('sys.color.font_primary'))
+      Blank()
+      SymbolGlyph(item.key=== 'NN' ? undefined : $r('sys.symbol.sort'))
+        .fontSize(24)
+        .fontColor([$r('sys.color.font_primary')])
+    }
+    .width('100%')
+    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+    .padding({left: 12, right: 12, top: 16, bottom: 16})
+  }
+
+  // 拖拽预览Builder（与列表项相同）
+  @Builder
+  dragPreviewBuilder(text: string) {
+    Row() {
+      Text(text)
+        .fontWeight(FontWeight.Medium)
+      Blank()
+      SymbolGlyph($r('sys.symbol.sort'))
+        .fontSize(24)
+    }
+    .width(450)
+    .borderRadius(BORDER_RADIUS_20)
+    .backgroundColor($r('app.color.container_background'))
+    .padding({left: 12, right: 12, top: 16, bottom: 16})
+  }
+
+  // 定义一个空白的GroupSortListItemType作为占位符
+  private placeholderItem: ResourcesData = {
+    key: "NN",
+    resourceName: '',
+    fileName: "",
+    resourceSize: 0,
+    updateTime: 0,
+  }
+
+  aboutToAppear(): void {
+    const lastData = JSON.stringify(this.resourceListData)
+    this.lastSortList = lastData
+    hilog.info(0xFF00, "ResourcestestTag", "上一次布局：%{public}s", this.lastSortList)
+    this.SortHideList = JSON.parse(this.uiConfig.resourcesHideData)
+  }
+
+  aboutToDisappear(): void {
+    if(!this.isSave) {
+      hilog.info(0xFF00, "ResourcestestTag", "布局：%{public}s", this.lastSortList)
+      this.resourceListData = JSON.parse(this.lastSortList)
+      hilog.info(0xFF00, "ResourcestestTag", "布局：%{public}s", JSON.stringify(this.resourceListData))
+    }
+  }
+
   // 移除占位符项
   private removePlaceholderItem(currentList: number) {
     const targetArray = currentList === 1 ? this.resourceListData : this.SortHideList
@@ -636,6 +637,7 @@ struct Sort {
       targetArray.splice(placeholderIndex, 1)
     }
   }
+
   // 更新占位符位置
   private updatePlaceholder(currentList: number, insertIndex: number) {
     // 首先移除旧的占位符
@@ -644,6 +646,7 @@ struct Sort {
     // 插入新的占位符
     targetArray.splice(insertIndex, 0, this.placeholderItem)
   }
+
   // 处理拖拽释放的事件
   private handleDrop(currentList: number, insertIndex: number) {
     if (this.dragItem) {

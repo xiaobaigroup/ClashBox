@@ -1,11 +1,9 @@
 import TopBuilder from "./TopBuilder"
-import { i18n } from "@kit.LocalizationKit"
 import { LanguageData, LanguageListItem } from "../../common/entity/Constants"
-import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
-import { promptAction } from "@kit.ArkUI"
+import { PromptAction } from "@kit.ArkUI"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { ChangeLanguage } from "../../common/utils/ChangeLanguageUtil"
-import { AppConfig, UIConfig } from "../../entryability/AppState"
+import { UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../common/utils/Animation"
 import { PageMargin } from "../../common/breakpoint/BreakPoint"
 
@@ -21,6 +19,7 @@ struct Language {
   //一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
+  private promptAction: PromptAction = this.getUIContext().getPromptAction()
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
@@ -57,7 +56,7 @@ struct Language {
         this.currentLanguage = $r('app.string.TraditionalChinese_TW_Subtitle')
         break
       default:
-        promptAction.showToast({message: `切换错误，当前系统语言：${this.uiConfig.systemLanguage}`, duration: 2000 })
+        this.promptAction.showToast({message: `切换错误，当前系统语言：${this.uiConfig.systemLanguage}`, duration: 2000 })
         this.currentLanguage =  $r('app.string.Language_Subtitle')
     }
     ChangeLanguage(this.uiConfig.systemLanguage)

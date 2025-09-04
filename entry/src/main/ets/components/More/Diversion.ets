@@ -6,7 +6,7 @@ import {
   TAB_CONTENT_TITLE_HEIGHT } from "../../common/entity/Constants"
 import { skipRowList, toggleRowList } from "../Common/Common"
 import { MoreTop } from "./MoreTopBuilder"
-import { curves, promptAction, SymbolGlyphModifier } from "@kit.ArkUI"
+import { PromptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../common/utils/Animation"
@@ -278,6 +278,7 @@ struct Policy {
   @State EnabledInsertResource: boolean = false
   // 一级图标色，黑色
   @State save_icon: ResourceColor = $r('app.color.container_background')
+  private promptAction: PromptAction = this.getUIContext().getPromptAction()
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 是否开启 `Index` 页面的前景模糊
@@ -333,7 +334,7 @@ struct Policy {
           // 置空文本保存变量
           this.SaveNameInputValue = ''
           this.SavePathInputValue = ''
-          promptAction.showToast({message: $r('app.string.saved'), duration: 2000 })
+          this.promptAction.showToast({message: $r('app.string.saved'), duration: 2000 })
         })
         Text(this.isAdd ? $r('app.string.add_policy') : $r('app.string.edit_policy'))
           .fontSize(20)

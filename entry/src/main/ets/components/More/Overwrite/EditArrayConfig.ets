@@ -1,7 +1,7 @@
-import { BreakpointState } from "../../../common/breakpoint/breakpointsystem"
+
 import { MoreTop } from "../MoreTopBuilder"
 import { KVCustomDialog, theCustomDialog } from "../../Common/Common"
-import { curves, promptAction } from "@kit.ArkUI"
+import { PromptAction } from "@kit.ArkUI"
 import { EventHub, EventKey } from "../../../common/EventHub"
 import { UIConfig } from "../../../entryability/AppState"
 import {
@@ -9,7 +9,6 @@ import {
   ConfigItemData, CONTENT_END_OFFSET_150, TAB_CONTENT_TITLE_HEIGHT, ValueType } from "../../../common/entity/Constants"
 import { getResourceString } from "../../../common/utils/ResourceStringUtil"
 import { customAnimationUtil } from "../../../common/utils/Animation"
-import { common } from "@kit.AbilityKit"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { Sniff } from "proxy_core"
 import { PageMargin } from "../../../common/breakpoint/BreakPoint"
@@ -39,6 +38,7 @@ export struct ArrayConfigEditor {
   // 编辑弹窗当前输入文本
   @State currentEditInputValue: string = ''
   @State keyValueData: KeyValueData = new KeyValueData("")
+  private promptAction: PromptAction = this.getUIContext().getPromptAction()
   // 编辑路由地址弹窗标题
   @State ArrayConfigList: KeyValueData[] = []
   @Consume('NavPathStack') pageInfos: NavPathStack
@@ -93,8 +93,8 @@ export struct ArrayConfigEditor {
     if(this.params.valueType == ValueType.Sniff){
       try {
         EventHub.sendEvent(EventKey.ArrayConfigChanged, {key: this.params.name, value: JSON.parse(this.content)})
-      }catch (e) {
-        promptAction.showToast({message:'格式不正确'})
+      } catch (e) {
+        this.promptAction.showToast({ message: $r('app.string.incorrect_format') })
       }
     }else{
       // string[]

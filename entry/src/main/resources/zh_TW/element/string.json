@@ -2147,6 +2147,10 @@
     {
       "name": "notice_not_close_tips",
       "value": "通知無法關閉喔"
+    },
+    {
+      "name": "incorrect_format",
+      "value": "格式不正確喔"
     }
   ]
 }

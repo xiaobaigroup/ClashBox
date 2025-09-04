@@ -15,7 +15,7 @@ import Language from "./Language"
 import TopBuilder from "./TopBuilder"
 import { DisclaimerCustomDialog, Nothing, theRowCustomDialog } from "../Common/Common"
 import { AppState, UIConfig } from "../../entryability/AppState"
-import { promptAction } from "@kit.ArkUI"
+import { PromptAction } from "@kit.ArkUI"
 import { removeItemsByIndex } from "../../common/utils/RemoveItemsUtils"
 import ClashViewModel from "../../entryability/ClashViewModel"
 import { getResourceString } from "../../common/utils/ResourceStringUtil"
@@ -53,6 +53,7 @@ struct Settings {
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+  private promptAction: PromptAction = this.getUIContext().getPromptAction()
   // 免责声明弹窗控制器
   dialogController: CustomDialogController | null = new CustomDialogController({
     builder: DisclaimerCustomDialog({
@@ -114,13 +115,13 @@ struct Settings {
     try {
       await AppState.ResetConfig(getContext(this))
     }catch (e) {
-      promptAction.showToast({message: "清理配置失败!"})
+      this.promptAction.showToast({message: "清理配置失败!"})
     }
     this.proxyGroups.clear()
     this.isClearData = true
     this.configList = []
     hilog.info(0xC011, 'Settings', `EditConfig #onConfigListChange#配置列表: ${JSON.stringify(this.configList)}`)
-    promptAction.showToast({message: $r('app.string.settings_reset_tips')})
+    this.promptAction.showToast({message: $r('app.string.settings_reset_tips')})
     // 关闭背景模糊
     this.isEnableIndexForegroundBlur = false
     // 关闭设置页
@@ -133,7 +134,7 @@ struct Settings {
       this.resetDialogController.open()
     } else if (index === (this.uiConfig.isShowExperimentalFunction ? 2 : -1)) {
       // 备份
-      promptAction.showToast({message: $r('app.string.developing')})
+      this.promptAction.showToast({message: $r('app.string.developing')})
     } else {
       // 列表项路由跳转
       let itemSettingsData = this.settingsList[index]

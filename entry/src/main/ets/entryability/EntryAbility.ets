@@ -1,6 +1,6 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want, WantAgent, wantAgent } from '@kit.AbilityKit';
 import { hiAppEvent, hilog } from '@kit.PerformanceAnalysisKit';
-import { promptAction, window } from '@kit.ArkUI';
+import { window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import ClashViewModel from './ClashViewModel';
 import { AppConfig, AppState, ClashCore } from './AppState';
@@ -9,7 +9,7 @@ import { PipManager } from '../common/utils/PipManager';
 import { ClashConfig, SocketStubService } from 'proxy_core';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { url } from '@kit.ArkTS';
-import { StatusBarUtils } from 'xb_components';
+import { Xb_StatusBarUtils } from 'xb_components';
 import { cardManager } from '../common/utils/CardManageUtil';
 import { rpc } from '@kit.IPCKit';
 import { ProxyActionType } from '../widget/model/FormCardConstant';
@@ -99,7 +99,7 @@ export default class EntryAbility extends UIAbility {
       if (!ClashViewModel.socketProxy.active) {
         ClashViewModel.socketProxy.active = true;
         ClashViewModel.socketProxy.offlineTime.push(Date.now());
-        promptAction.showToast({ message: `核心恢复中(${ClashViewModel.socketProxy.offlineTime.length})...` });
+        this.uiContext?.getPromptAction().showToast({ message: `核心恢复中(${ClashViewModel.socketProxy.offlineTime.length})...` });
         let clashCore = AppStorage.get<AppConfig>("appConfig")?.clashCore;
         let result = await ClashViewModel.ChangeCore(clashCore);
         if (result) {
@@ -117,7 +117,7 @@ export default class EntryAbility extends UIAbility {
   private async CardClashCoreEvent(proxyActionType: ProxyActionType) {
     // 初始化核心
     if (!this.clashCoreInitialized) {
-      await ClashViewModel.init(this.context)
+      await ClashViewModel.init(this.context, this.uiContext?.getPromptAction()!)
       await this.ClashCoreInit()
       const proxyNodeInfo = cardManager.getSelectedProxyNode()
       hilog.info(0x0000, 'EntryAbility', '%{public}s', JSON.stringify(proxyNodeInfo))
@@ -159,14 +159,14 @@ export default class EntryAbility extends UIAbility {
           // 文本类型
           case utd.UniformDataType.TEXT:
             if (record.content) {
-              const bundleName = UrlUtils.extractPackageName(record.content)
+              const bundleName = UrlUtils.extractPackageName(record.content, this.uiContext?.getPromptAction()!)
               this.bundleInfo = new BundleInfo(bundleName, record.title ?? '')
             }
             break;
           // 超链接类型
           case utd.UniformDataType.HYPERLINK:
             if (record.content) {
-              const bundleName = UrlUtils.extractPackageName(record.content)
+              const bundleName = UrlUtils.extractPackageName(record.content, this.uiContext?.getPromptAction()!)
               this.bundleInfo = new BundleInfo(bundleName, record.title ?? '')
             }
             break;
@@ -214,8 +214,6 @@ export default class EntryAbility extends UIAbility {
       AppStorage.setOrCreate('openLinkConfigUrl', configUrl)
       hilog.info(0x0000, 'EntryAbility', '接收的configUrl为：%{public}s', configUrl)
     }
-    new StatusBarUtils().initStatusBar(this.context, $r("app.media.clash_box_blue"), undefined)
-
     // 卡片Id持久化管理 并 监听卡片事件
     cardManager.init(this.context)
     this.registerCardEvent()
@@ -300,7 +298,7 @@ export default class EntryAbility extends UIAbility {
 
     // 卡片初始化过就无须再次初始化
     if (!this.clashCoreInitialized) {
-      await ClashViewModel.init(this.context)
+      await ClashViewModel.init(this.context, this.uiContext?.getPromptAction()!)
     }
     const storage = new LocalStorage()
     storage.setOrCreate<BundleInfo>('bundleInfo', this.bundleInfo)
@@ -309,7 +307,9 @@ export default class EntryAbility extends UIAbility {
         hilog.error(0x0000, 'EntryAbility', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
         return;
       }
-      this.onWindowModeChange(windowStage, windowClass)
+      // 执行首次窗口检测
+      // this.onWindowModeChange(windowStage, windowClass)
+      // 初始化应用配置
       await AppState.init()
 
       // 卡片初始化过就无须再次初始化
@@ -398,7 +398,7 @@ export default class EntryAbility extends UIAbility {
     AppStorage.setOrCreate('windowWidth', WindowWidth)
     // 监听窗口大小变化
     try {
-      windowClass.on('windowSizeChange', (data) => {
+      windowClass.on('windowSizeChange', async (data) => {
         // 动态监听设备窗口模式
         this.onWindowModeChange(windowStage, windowClass)
         console.info('#WindowChange Succeeded in enabling the listener for window size changes. Data: ' +
@@ -425,12 +425,11 @@ export default class EntryAbility extends UIAbility {
       windowClass.setTitleAndDockHoverShown(false, false)
       // 设置标题栏高度
       // windowClass.setWindowDecorHeight(50)
-      hilog.info(0xFF00, "EntryAbility", 'WindowMode 当前为PC窗口模式 Succeeded in setting window rect auto-save')
+      hilog.info(0xFF00, "EntryAbility", 'WindowMode 当前为PC窗口模式')
       AppStorage.setOrCreate('WindowMode', true)
     } catch (exception) {
       hilog.error(0xFF00, "EntryAbility",
-        'WindowMode 当前为普通模式 Failed to set window rect auto-save. Cause code: %{public}s smessage: %{public}s',
-        exception.code, exception.message)
+        'WindowMode 当前为普通模式 Cause code: %{public}s smessage: %{public}s', exception.code, exception.message)
       AppStorage.setOrCreate('WindowMode', false)
     }
   }

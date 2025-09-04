@@ -6,16 +6,14 @@ import { ButtonBuilder, checkoutRowListItem,
 import { NeedClearMoreStack, PageMargin } from "../../common/breakpoint/BreakPoint"
 import { BundleInfo, TAB_CONTENT_TITLE_HEIGHT } from "../../common/entity/Constants"
 import { AppConfig, UIConfig } from "../../entryability/AppState"
-import { ItemRestriction,promptAction, SegmentButton, SegmentButtonOptions, SegmentButtonTextItem } from "@kit.ArkUI"
+import { ItemRestriction, SegmentButton, SegmentButtonOptions, SegmentButtonTextItem } from "@kit.ArkUI"
 import { KeyValueData } from "./Overwrite/EditArrayConfig"
 import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { intl } from "@kit.LocalizationKit"
 import { Xb_CapsuleButton, Xb_CircleButton, Xb_GetResourceString } from "xb_components"
 import { customAnimationUtil } from "../../common/utils/Animation"
-import { common } from "@kit.AbilityKit"
 import { EventHub, EventKey } from '../../common/EventHub'
 
-const context = getContext() as common.UIAbilityContext
 
 @Component
 export struct AccessControl {
@@ -304,7 +302,7 @@ export struct AccessControl {
         if (this.isNewApp) {
           console.log(`AccessControl kvCustomdialog 窗口为新增`)
           // 应用为新增
-          if (indexes === -1 && value.value !== context.applicationInfo.name) {
+          if (indexes === -1 && value.value !== this.getUIContext().getHostContext()!.applicationInfo.name) {
             // 应用名称不存在
             const param: AppInfo = {
               name: value.key,
@@ -317,7 +315,7 @@ export struct AccessControl {
             this.appConfig.accessControlAppInfo = JSON.stringify(this.appListData)
           } else {
             // 应用名称存在
-            promptAction.showToast({ message: $r('app.string.app_already_exist') })
+            this.getUIContext().getPromptAction().showToast({ message: $r('app.string.app_already_exist') })
           }
 
         } else {

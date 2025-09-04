@@ -23,7 +23,7 @@ import DNS from '../components/More/Overwrite/DNS';
 import Network, { NetworkCompatible, NetworkRouterAddress } from '../components/More/Overwrite/Network';
 import { getResourceString } from '../common/utils/ResourceStringUtil';
 import { extractLocationInfo, getIpInfo, mapLocation } from '../common/utils/GetIpInfo';
-import {  promptAction } from '@kit.ArkUI';
+import {  PromptAction } from '@kit.ArkUI';
 import { skipRowList } from '../components/Common/Common';
 import { AppConfig, UIConfig } from '../entryability/AppState';
 import { ArrayConfigEditor } from '../components/More/Overwrite/EditArrayConfig';
@@ -337,6 +337,7 @@ export struct theQueryIPDialog {
   controller: CustomDialogController
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  private promptAction: PromptAction = this.getUIContext().getPromptAction()
 
   async fetchIpInfo(IP: string) {
     try {
@@ -346,7 +347,7 @@ export struct theQueryIPDialog {
       const locationInfo = extractLocationInfo(ipInfo)
       if (locationInfo) {
         // 查询完成提示
-        promptAction.showToast({message: $r('app.string.ip_address_query_success_tips'), duration: 2000 })
+        this.promptAction.showToast({message: $r('app.string.ip_address_query_success_tips'), duration: 2000 })
         // 使用模板字符串来只输出值，不输出键名
         hilog.info(0xFF00, "MoreIPtestTag", "IP地址: %{public}s", `${locationInfo.country},${locationInfo.province}, ${locationInfo.city}`)
         const theIPaddress = mapLocation(locationInfo)
@@ -354,7 +355,7 @@ export struct theQueryIPDialog {
         hilog.info(0xFF00, "MoreIPtestTag", "IP地址(完整): %{public}s", this.IPaddressinfo)
       } else {
         hilog.info(0xFF00, "MoreIPtestTag", "提取位置信息失败")
-        promptAction.showToast({message: $r('app.string.ip_address_query_fail_tips'), duration: 5000 })
+        this.promptAction.showToast({message: $r('app.string.ip_address_query_fail_tips'), duration: 5000 })
       }
     } catch (err) {
       // 处理错误情况
@@ -377,7 +378,7 @@ export struct theQueryIPDialog {
         .onSubmit((enterKey: EnterKeyType, event: SubmitEvent) => {
           this.SubmitInputValue = this.currentInputValue
           // 查询开始提示
-          promptAction.showToast({message: $r('app.string.ip_address_query_tips'), duration: 1600 })
+          this.promptAction.showToast({message: $r('app.string.ip_address_query_tips'), duration: 1600 })
           this.fetchIpInfo(this.SubmitInputValue)
         })
       if(this.SubmitInputValue != '') {
