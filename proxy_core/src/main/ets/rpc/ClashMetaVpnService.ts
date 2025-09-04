@@ -22,8 +22,6 @@ import { ClashRpcType } from './IClashManager';
 import { getHome, getProfileDir, getProfilePath } from '../appPath';
 import { UpdateConfigParams } from '../models/ClashConfig';
 import { LogInfo, OverrideSlot, Provider, Proxy, ProxyGroup, ProxyMode, Traffic } from '../models/Common';
-import { hilog } from '@kit.PerformanceAnalysisKit';
-import { BusinessError, commonEventManager, emitter } from '@kit.BasicServicesKit';
 
 
 export class ClashMetaVpnService extends CommonVpnService{
@@ -188,7 +186,10 @@ export class ClashMetaVpnService extends CommonVpnService{
           nativeStopTun()
           super.stopVpn()
           resolve(true)
-          this.running = false
+          break;
+        }
+        case ClashRpcType.getRuntime:{
+          resolve(Date.now())
           break;
         }
       }
@@ -203,22 +204,6 @@ export class ClashMetaVpnService extends CommonVpnService{
         nativeStartTun(tunFd, (fd)=>{
           this.vpnConnection?.protect(fd)
         })
-      }
-      hilog.info(0x001, "ClashBox", `运行时间：${Date.now().toString()}`)
-      if (!this.running) {
-        const options: commonEventManager.CommonEventPublishData = {
-          code: 0,
-          data: Date.now().toString(),
-          isOrdered: false // 无序公共事件
-        }
-        commonEventManager.publish("VpnServiceTimeEvent", options, (err: BusinessError) => {
-          if (err) {
-            console.error(`Failed to publish common event. Code is ${err.code}, message is ${err.message}`);
-          } else {
-            console.info(`Succeeded in publishing common event.`);
-          }
-        });
-        this.running = true
       }
       return tunFd > -1;
     } catch (error) {

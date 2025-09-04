@@ -30,8 +30,6 @@ import { ConnectionInfo, LogInfo, Provider, ProxyGroup, ProxyMode, ProxyType, Tr
 import { getHome, getProfilePath } from '../appPath';
 import { Tun, UpdateConfigParams } from '../models/ClashConfig';
 import { readFile, readFileUri, readText } from '../fileUtils';
-import { hilog } from '@kit.PerformanceAnalysisKit';
-import { BusinessError, commonEventManager } from '@kit.BasicServicesKit';
 
 export interface AccessControl {
   mode: string
@@ -220,6 +218,10 @@ export class FlClashVpnService extends CommonVpnService {
           this.running = false
           break;
         }
+        case ClashRpcType.getRuntime:{
+          resolve(Date.now())
+          break;
+        }
         default: {
           resolve("不支持当前操作")
         }
@@ -260,22 +262,6 @@ export class FlClashVpnService extends CommonVpnService {
       tunFd = await super.getTunFd(config)
       if (tunFd > -1) {
         this.startClash(tunFd)
-      }
-      hilog.info(0x001, "ClashBox", `运行时间：${Date.now().toString()}`)
-      if (!this.running) {
-        const options: commonEventManager.CommonEventPublishData = {
-          code: 0,
-          data: Date.now().toString(),
-          isOrdered: false // 无序公共事件
-        }
-        commonEventManager.publish("VpnServiceTimeEvent", options, (err: BusinessError) => {
-          if (err) {
-            console.error(`Failed to publish common event. Code is ${err.code}, message is ${err.message}`);
-          } else {
-            console.info(`Succeeded in publishing common event.`);
-          }
-        });
-        this.running = true
       }
       return tunFd > -1;
     } catch (error) {
@@ -318,7 +304,6 @@ export class FlClashVpnService extends CommonVpnService {
   stopVpn() {
     stopTun()
     super.stopVpn()
-    this.running = false
   }
   override async init() {
     initClash(await getHome(this.context), "1.0.0")

@@ -19,6 +19,9 @@ import { hilog } from "@kit.PerformanceAnalysisKit";
 import { readText } from "proxy_core/src/main/ets/fileUtils";
 import { AccessControl, VpnRawOptions } from "proxy_core/src/main/ets/rpc/IClashManager";
 import { cardManager } from "../common/utils/CardManageUtil";
+import { PROXY_STARTED_DURATION_INIT_VALUE } from "../common/entity/Constants";
+import { Timer } from "../common/utils/HHmmssTimer";
+import { number2Time } from "../common/utils/TimeConvertUtil";
 
 export interface DelayInfo{
     name: string
@@ -30,6 +33,7 @@ export class ClashViewModel {
   profileRepo = new ProfileRepo()
   socketProxy = new SocketProxyService()
   context: Context | undefined
+  proxyStartedTimer = new Timer()
   static promptAction: PromptAction
   async init(context: Context, promptAction: PromptAction) {
     const packageInfo = await getPackageInfo()
@@ -328,6 +332,21 @@ export class ClashViewModel {
       EventHub.sendEvent(EventKey.StartedClash)
       EventHub.sendEvent(EventKey.checkIpInfo)
     }
+    const runTime = await this.getRuntime()
+    hilog.info(0x001, "EntryAbility", "StartVpn时间戳: " + runTime)
+    // 启动前先初始化卡片显示文本
+    cardManager.pushCartVpnServiceTime(PROXY_STARTED_DURATION_INIT_VALUE)
+    // 计算时间
+    const vpnServiceStartTime = Number(runTime)
+    this.proxyStartedTimer.start((time)=>{
+      EventHub.sendEvent(EventKey.ProxyDuration, time)
+      cardManager.pushCartVpnServiceTime(number2Time(time))
+    },vpnServiceStartTime)
+
+    EventHub.on(EventKey.StopedClashEntry,()=>{
+      this.proxyStartedTimer.reset()
+    })
+
     cardManager.pushCartProxyMode(this.vpnStarted)
   }
     async loadVpnOptions(){
@@ -358,6 +377,11 @@ export class ClashViewModel {
     EventHub.sendEvent(EventKey.StopedClashEntry)
     EventHub.sendEvent(EventKey.checkIpInfo)
     cardManager.pushCartProxyMode(this.vpnStarted)
+    this.proxyStartedTimer.reset()
+  }
+
+  async getRuntime(){
+    return await this.socketProxy.getRuntime()
   }
 
   async initProfile(){

@@ -16,10 +16,7 @@ import { ProxyActionType } from '../widget/model/FormCardConstant';
 import { systemShare } from '@kit.ShareKit';
 import { uniformTypeDescriptor as utd } from '@kit.ArkData';
 import { UrlUtils } from '../common/utils/UrlUtils';
-import { BundleInfo, PROXY_STARTED_DURATION_INIT_VALUE } from '../common/entity/Constants'
-import { commonEventManager } from '@kit.BasicServicesKit';
-import { Timer } from '../common/utils/HHmmssTimer';
-import { number2Time } from '../common/utils/TimeConvertUtil';
+import { BundleInfo } from '../common/entity/Constants'
 
 class Params implements rpc.Parcelable {
   marshalling(dataOut: rpc.MessageSequence): boolean {
@@ -45,11 +42,6 @@ export default class EntryAbility extends UIAbility {
   private clashCoreInitialized: boolean = false
   /** @description 包名信息 */
   private bundleInfo: BundleInfo = new BundleInfo()
-  private subscriber: commonEventManager.CommonEventSubscriber | null = null;
-  private subscribeInfo: commonEventManager.CommonEventSubscribeInfo = {
-    events: ["VpnServiceTimeEvent"]
-  };
-  private proxyStartedTimer = new Timer()
 
   /** @description 注册卡片监听事件 */
   private registerCardEvent() {
@@ -137,7 +129,6 @@ export default class EntryAbility extends UIAbility {
       }, 1000)
     } else {
       ClashViewModel.StopVpn()
-      this.proxyStartedTimer.reset()
     }
   }
 
@@ -217,44 +208,6 @@ export default class EntryAbility extends UIAbility {
     // 卡片Id持久化管理 并 监听卡片事件
     cardManager.init(this.context)
     this.registerCardEvent()
-
-    // 订阅ClashVpnAbility中的事件
-    commonEventManager.createSubscriber(this.subscribeInfo, (err: BusinessError, commonEventSubscriber: commonEventManager.CommonEventSubscriber) => {
-      if (!err) {
-        console.info(`Succeeded in creating subscriber.`);
-        this.subscriber = commonEventSubscriber;
-        try {
-          commonEventManager.subscribe(this.subscriber,
-            (err: BusinessError, data: commonEventManager.CommonEventData) => {
-              if (err) {
-                console.error(`Failed to subscribe. Code is ${err.code}, message is ${err.message}`);
-              } else {
-                // TODO 将运行时间同步显示在 卡片
-                console.info(`Succeeded in subscribing, data is ` + JSON.stringify(data));
-                if (data.code === 0) {
-                  // 计算时间
-                  const vpnServiceStartTime = Number(data.data)
-                  // 启动前先初始化卡片显示文本
-                  cardManager.pushCartVpnServiceTime(PROXY_STARTED_DURATION_INIT_VALUE)
-                  this.proxyStartedTimer.start((time)=>{
-                    EventHub.sendEvent(EventKey.ProxyDuration, time)
-                    cardManager.pushCartVpnServiceTime(number2Time(time))
-                  },vpnServiceStartTime)
-
-                  EventHub.on(EventKey.StopedClashEntry,()=>{
-                    this.proxyStartedTimer.reset()
-                  })
-                }
-              }
-            });
-        } catch (error) {
-          let err: BusinessError = error as BusinessError;
-          console.error(`Failed to subscribe. Code is ${err.code}, message is ${err.message}`);
-        }
-      } else {
-        console.error(`Failed to create subscriber. Code is ${err.code}, message is ${err.message}`);
-      }
-    });
   }
 
   // 热启动

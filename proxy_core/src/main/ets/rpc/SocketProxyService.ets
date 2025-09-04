@@ -142,6 +142,10 @@ export class SocketProxyService implements IClashManager {
     let json = await this.sendMessageRequest(ClashRpcType.startClash, [])
     return json as boolean
   }
+  async getRuntime(): Promise<number> {
+    let result = await this.sendMessageRequest(ClashRpcType.getRuntime)
+    return result as number
+  }
   // async startClash(){
   //   let config = await this.ParseConfig();
   //   let tunFd = await this.getTunFd(config)
@@ -255,7 +259,7 @@ export class SocketProxyService implements IClashManager {
         fullMessage = ''
         client.close()
       }, 200)
-      client.on('message', async (value: socket.LocalSocketMessageInfo) => {
+        client.on('message', async (value: socket.LocalSocketMessageInfo) => {
         let chunk = text.decodeToString(new Uint8Array(value.message),  { stream: true })
         fullMessage += chunk;
         parseMessage(fullMessage)
@@ -271,7 +275,7 @@ export class SocketProxyService implements IClashManager {
       })
       // {"proxy-name":"♻️自动选择","timeout":3000}
       let socketPath = this.context?.filesDir + '/clash_go.sock'
-      if (method == ClashRpcType.startClash || method == ClashRpcType.stopClash){
+      if (method == ClashRpcType.startClash || method == ClashRpcType.stopClash || method == ClashRpcType.getRuntime){
         socketPath = this.context?.filesDir + '/ClashBox.sock'
       }
       if(!await fileIo.access(socketPath, fs.AccessModeType.EXIST))
