@@ -882,15 +882,17 @@ struct Index {
 
     })
 
-    this.awaitInit()
+    await this.awaitInit()
+    // ClashViewModel.loadConfig(true, 'Index-aboutToAppear')
   }
 
   // 等待配置数据库初始化完成
-  awaitInit() {
+  async awaitInit() {
     const checkInterval = setInterval(() => {
       if (this.theAwaitInit) {
         // 获取配置列表
         this.fetchProfiles()
+        clearInterval(checkInterval)
       }
     }, 100);
   }

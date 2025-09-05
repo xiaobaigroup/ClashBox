@@ -292,7 +292,7 @@ export class ClashViewModel {
     })
     await sleep(600)
     let result = await this.checkVpnVpnAbility(requestId)
-    if (!result) {
+    if (!result && restart) {
       ClashViewModel.promptAction.showToast({message:"VpnAbility请求失败! 请重启应用"})
     }
     return result;
@@ -328,7 +328,7 @@ export class ClashViewModel {
   }
   async ReStartVpn(){
     if(this.vpnStarted){
-      await this.loadConfig(false)
+      await this.loadConfig(false, 'ReStartVpn')
       await this.loadVpnOptions()
       await this.socketProxy.stopClash()
       await this.socketProxy.startClash()
@@ -403,22 +403,29 @@ export class ClashViewModel {
   async initProfile() {
     let appConfig = AppStorage.get<AppConfig>("appConfig") || cardManager.getAppConfig()
     EventHub.sendEvent(EventKey.StartLog, appConfig?.enableLogger)
-    await this.loadConfig(false)
+    await this.loadConfig(false, 'initProfile')
     EventHub.sendEvent(EventKey.FetchProxyGroup)
     console.error("ClashViewModel.initProfile 初始化成功");
   }
 
   proxyGroups :ProxyGroup[] = []
-  async loadConfig(patch: boolean = true){
+
+  async loadConfig(patch: boolean = true, name?: string) {
+    console.error(`ClashViewModel.loadConfig 调用方：${name} patch：${patch} 配置开始加载`)
     let appConfig = AppStorage.get<AppConfig>("appConfig") || cardManager.getAppConfig()
     let clashConfig = AppStorage.get<ClashConfig>("clashConfig") || cardManager.getClashConfig()
     const profile = await this.profileRepo.query(appConfig?.currentProfileId)
-    await this.loadProfileAndConfig(appConfig?.currentProfileId ?? "", clashConfig, {
-      "is-patch": patch,
-      "is-compatible": true,
-      "override-dns": clashConfig?.overrideDns,
-      "selected-map": profile?.getSelectedMap()
-    } as ConfigExtendedParams)
+    try {
+      await this.loadProfileAndConfig(appConfig?.currentProfileId ?? "", clashConfig, {
+        "is-patch": patch,
+        "is-compatible": true,
+        "override-dns": clashConfig?.overrideDns,
+        "selected-map": profile?.getSelectedMap()
+      } as ConfigExtendedParams)
+      console.log(`ClashViewModel.loadConfig 调用方：${name} patch：${patch} 配加载成功`)
+    } catch (e) {
+      console.error('ClashViewModel.loadConfig 配置加载失败：', e)
+    }
   }
 
   async initGeoIp(){

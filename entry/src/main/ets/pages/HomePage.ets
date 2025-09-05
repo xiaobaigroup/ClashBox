@@ -371,7 +371,7 @@ struct Home {
       this.proxyGroups.empty()
       this.proxyLazyItems.empty()
       if (this.currentProfile) {
-        await ClashViewModel.loadConfig(true)
+        await ClashViewModel.loadConfig(true, 'HomePage-EventKey.SwitchModeCard')
         // 写入数据
         const proxyData = await ClashViewModel.getProxyGroups(mode)
         this.proxyGroups.pushData(proxyData)

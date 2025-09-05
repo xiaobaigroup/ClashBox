@@ -552,7 +552,7 @@ struct ConfigurationPage {
         ClashViewModel.updateProfileConfig(item.configId)
       }
       ClashViewModel.socketProxy.reset()
-      await ClashViewModel.loadConfig(false)
+      await ClashViewModel.loadConfig(false, '配置页-加载')
       hilog.info(0xC011, componentName, `EditConfig #loadConfig#更新并加载完成 configName is [${this.currentTouchConfigData.configName}]`)
     } catch (e) {
       console.debug("loadConfigList", e.message, JSON.stringify(e))

@@ -9,7 +9,6 @@ import { PipManager } from '../common/utils/PipManager';
 import { ClashConfig, SocketStubService } from 'proxy_core';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { url } from '@kit.ArkTS';
-import { Xb_StatusBarUtils } from 'xb_components';
 import { cardManager } from '../common/utils/CardManageUtil';
 import { rpc } from '@kit.IPCKit';
 import { ProxyActionType } from '../widget/model/FormCardConstant';
@@ -22,19 +21,10 @@ import { Timer } from '../common/utils/HHmmssTimer';
 import { number2Time } from '../common/utils/TimeConvertUtil';
 
 
-class Params implements rpc.Parcelable {
-  marshalling(dataOut: rpc.MessageSequence): boolean {
-    return true
-  }
-
-  unmarshalling(dataIn: rpc.MessageSequence): boolean {
-    return true
-  }
-}
-
 export default class EntryAbility extends UIAbility {
 
   private want?: Want
+  private isChangeCore = false
   // 设备断点获取
   private uiContext?: UIContext;
   private debugVpn: SocketStubService | null = null
@@ -45,6 +35,8 @@ export default class EntryAbility extends UIAbility {
   };
   /** @description ClashCore是否初始化过 */
   private clashCoreInitialized: boolean = false
+  /** @description ClashCore是否初始化过 */
+  private cardCoreInitialized: boolean = false
   /** @description 包名信息 */
   private bundleInfo: BundleInfo = new BundleInfo()
   private subscriber: commonEventManager.CommonEventSubscriber | null = null;
@@ -185,7 +177,9 @@ export default class EntryAbility extends UIAbility {
         }
 
         // 卡片初始化过打开应用获取一次代理节点
-        ClashViewModel.loadConfig()
+        if (this.cardCoreInitialized) {
+          ClashViewModel.loadConfig(true, '卡片初始化过打开应用获取一次代理节点')
+        }
 
         // 获取分享的包名信息(初始)
         await this.getShareData(this.want!);
@@ -284,13 +278,14 @@ export default class EntryAbility extends UIAbility {
   private async ClashCoreInit() {
     const clashCore = (AppStorage.get<AppConfig>("appConfig") || cardManager.getAppConfig())?.clashCore
     await ClashViewModel.ChangeCore(clashCore);
+    this.isChangeCore = true
     if (clashCore != ClashCore.mihomo) {
       let service = new SocketStubService(this.context);
       service.startService();
     }
     ClashViewModel.initProfile();
     EventHub.on(EventKey.LoadClashConfig, (isPatch: boolean) => {
-      ClashViewModel.loadConfig(isPatch);
+      ClashViewModel.loadConfig(isPatch, 'ClashCoreInit-EventKey.LoadClashConfig');
     });
     // 监测vpn服务是否被回收，并且重新启动
     setInterval(async () => {
@@ -298,10 +293,14 @@ export default class EntryAbility extends UIAbility {
         ClashViewModel.socketProxy.active = true;
         ClashViewModel.socketProxy.offlineTime.push(Date.now());
         this.uiContext?.getPromptAction().showToast({ message: `核心恢复中(${ClashViewModel.socketProxy.offlineTime.length})...` });
-        let clashCore = AppStorage.get<AppConfig>("appConfig")?.clashCore;
-        let result = await ClashViewModel.ChangeCore(clashCore);
-        if (result) {
-          await ClashViewModel.ReStartVpn();
+        // let clashCore = AppStorage.get<AppConfig>("appConfig")?.clashCore;
+        if (!this.isChangeCore) {
+          let result = await ClashViewModel.ChangeCore(clashCore);
+          if (result) {
+            await ClashViewModel.ReStartVpn();
+          }
+        } else {
+          this.isChangeCore = false
         }
       }
     }, 1000);
@@ -317,6 +316,7 @@ export default class EntryAbility extends UIAbility {
     if (!this.clashCoreInitialized) {
       await ClashViewModel.init(this.context, this.uiContext?.getPromptAction()!)
       await this.ClashCoreInit()
+      this.cardCoreInitialized = true
       const proxyNodeInfo = cardManager.getSelectedProxyNode()
       hilog.info(0x0000, 'EntryAbility', '%{public}s', JSON.stringify(proxyNodeInfo))
       if (proxyNodeInfo) {
@@ -483,6 +483,16 @@ export default class EntryAbility extends UIAbility {
     }
   }
 
+}
+
+class Params implements rpc.Parcelable {
+  marshalling(dataOut: rpc.MessageSequence): boolean {
+    return true
+  }
+
+  unmarshalling(dataIn: rpc.MessageSequence): boolean {
+    return true
+  }
 }
 
 function refreshIPAddress() {
