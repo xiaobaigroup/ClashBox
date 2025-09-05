@@ -19,10 +19,12 @@ struct PublicNetwork {
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   // 折叠屏展开状态判定
-  @StorageLink ('isFoldStatus') private isFoldStatus: boolean = false
+  @StorageLink ('isFoldStatus') isFoldStatus: boolean = false
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  // 是否检查过IP地址
+  @StorageLink('isCheckIP') isCheckIP: boolean = false
   //编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
   @Consume remoteIp: IpInfo | null
@@ -94,10 +96,14 @@ struct PublicNetwork {
   }
 
   aboutToAppear(): void {
-    EventHub.on(EventKey.checkIpInfo, async ()=>{
-      this.remoteIp = null
-      this.remoteIp = await ClashViewModel.checkIpInfo()
-    })
+    // 检查IP事件(按需执行)
+    if (!this.isCheckIP) {
+      this.isCheckIP = true
+      EventHub.on(EventKey.checkIpInfo, async ()=>{
+        this.remoteIp = null
+        this.remoteIp = await ClashViewModel.checkIpInfo()
+      })
+    }
   }
 
 }

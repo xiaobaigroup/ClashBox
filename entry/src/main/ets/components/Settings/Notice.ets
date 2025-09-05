@@ -239,6 +239,29 @@ struct Notice {
               this.promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
             })
             // 常驻状态栏 End
+            Row() {
+              toggleRowList({
+                title: $r('app.string.coexist_notice'),
+                icons: $r('sys.symbol.forum_fill'),
+                subtitle: $r('app.string.coexist_notice_tips')
+              }) {
+                // 通知共存开关
+                Toggle({ type: ToggleType.Switch, isOn: $$this.uiConfig.EnabledCoexistNotice })
+                  .selectedColor(this.icon_emphasize)
+                  .margin({right: 12})
+                  .opacity(1)
+                  .hitTestBehavior(HitTestMode.None)
+              }
+            }
+            .RowStyle()
+            .onClick( ()=> {
+              this.getUIContext().animateTo({
+                duration: this.uiConfig.animationSpeed,
+                curve: Curve.Ease
+              }, () => {
+                this.uiConfig.EnabledCoexistNotice = !this.uiConfig.EnabledCoexistNotice
+              })
+            })
           }
         }.ColumnStyle()
         // 通知 End
@@ -784,7 +807,7 @@ export struct CellularDataReminder {
 @Extend(Row)
 function RowStyle() {
   .width('100%')
-  .height(53)
+  // .height(53)
   .borderRadius(20)
   .backgroundColor($r('app.color.container_background'))
 }

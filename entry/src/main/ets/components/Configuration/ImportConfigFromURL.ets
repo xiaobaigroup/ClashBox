@@ -220,7 +220,7 @@ export struct ImportConfigFromURL{
   /**
    * 保存配置
    */
-  async saveConfig(isNewConfig: boolean){
+  async saveConfig(isNewConfig: boolean) {
     this.currentTouchConfigData = this.configData
     hilog.info(0xFF00, "EditConfig #saveConfig configSaveTestTag", `URL新文件保存：${isNewConfig}`)
     hilog.info(0xC002, componentName,
@@ -236,7 +236,7 @@ export struct ImportConfigFromURL{
         }
         this.promptAction.showToast({message: getResourceString($r('app.string.download_success'), this)})
       } catch (e) {
-        console.error("ClashBox", e.message, e.stack);
+        console.error("ClashBox下载配置失败：", e.message, e.stack);
         this.configCustomDownloadingDialogController.close()
         this.promptAction.showToast({message: getResourceString($r('app.string.download_failed'), this) + e.message || e})
       }
@@ -248,7 +248,7 @@ export struct ImportConfigFromURL{
         await ClashViewModel.addOrUpdateProfileByUrl(this.configData, this.configData.configId)
         this.configCustomDownloadingDialogController.close()
       } catch (e) {
-        console.error("ClashBox", e.message, e.stack);
+        console.error("ClashBox下载配置失败：", e.message, e.stack);
         this.configCustomDownloadingDialogController.close()
         this.promptAction.showToast({message: getResourceString($r('app.string.download_failed'), this) + e.message || e})
       }

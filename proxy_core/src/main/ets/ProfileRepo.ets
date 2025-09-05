@@ -2,23 +2,31 @@ import { relationalStore, ValuesBucket } from '@kit.ArkData'
 import { common } from '@kit.AbilityKit';
 import { Profile } from './Profile';
 import { SubscriptionInfo } from './models/Common';
+import { BusinessError } from '@kit.BasicServicesKit';
 
 export class ProfileRepo {
   store: relationalStore.RdbStore | undefined
   constructor() {
   }
+
   async init(context: common.Context) {
     const STORE_CONFIG: relationalStore.StoreConfig = {
       name: 'fsclash.db', // 数据库文件名
       securityLevel: relationalStore.SecurityLevel.S1 // 数据库安全级别
     };
-    this.store = await relationalStore.getRdbStore(context, STORE_CONFIG)
-    this.initDb()
+    try {
+      this.store = await relationalStore.getRdbStore(context, STORE_CONFIG)
+      this.initDb()
+    } catch (error) {
+      console.error(`ProfileRepo.queryAll 获取store失败, code is ${error.code}, message is ${error.message}`);
+    }
   }
+
   initDb() {
     try {
       const SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS Profiles(id TEXT PRIMARY KEY, name TEXT, type INTEGER NOT NULL, url TEXT, currentGroupName TEXT, isUpdating INTEGER,autoUpdate INTEGER, lastUpdateDate INTEGER, autoUpdateDuration INTEGER, subscriptionInfo TEXT, proxySelected Text)"
       this.store?.executeSql(SQL_CREATE_TABLE); // 创建数据表
+      console.error("ProfileRepo.initDb初始化成功");
     } catch (e) {
       console.error("initDb failure", e)
     }
@@ -49,17 +57,33 @@ export class ProfileRepo {
       return null;
     }
   }
-  async queryAll(): Promise<Profile[]> {
-    const predicates = new relationalStore.RdbPredicates('Profiles')
-    const cursor = await this.store!.query(predicates)
-    const list: Profile[] = []
-    cursor.goToNextRow()
-    while (cursor.rowIndex >= 0 && cursor.rowIndex < cursor.rowCount) {
-      list.push(this.getFromCursor(cursor))
-      cursor.goToNextRow()
+
+  queryAll(): Promise<Profile[]> {
+    const predicates = new relationalStore.RdbPredicates('Profiles');
+    console.error(`ProfileRepo.queryAll 谓词已创建`);
+    const list: Profile[] = [];
+    if (this.store) {
+      return this.store.query(predicates)
+        .then((cursor) => {
+          try {
+            while (cursor.goToNextRow()) {
+              list.push(this.getFromCursor(cursor));
+            }
+            return list;
+          } finally {
+            cursor.close();
+          }
+        })
+        .catch((err: BusinessError) => {
+          console.error(`ProfileRepo.queryAll failed, code is ${err.code}, message is ${err.message}`);
+          return [];
+        })
+    } else {
+      console.error(`ProfileRepo.queryAll store 不存在`);
+      return Promise.resolve([])
     }
-    return list;
   }
+
 
   async addOrUpdate(details: Profile): Promise<number> {
     const predicates = new relationalStore.RdbPredicates('Profiles')

@@ -80,7 +80,7 @@ export class UIConfig{
   // 动画速度序号
   animationSpeedIndex: number = 1
   // 字符显示权重序号
-  stringDisplayIndex: number = 0
+  stringDisplayIndex: number = 1
   /** 退出窗口模式 1为直接退出，0为进入托盘*/
   exitWindowMode: number = 0
   // 背景模糊变量
@@ -103,6 +103,8 @@ export class UIConfig{
   EnabledPermanentnotice: boolean = true
   // 常驻状态栏开关
   EnabledStatusNotice: boolean = false
+  // 允行通知共存
+  EnabledCoexistNotice: boolean = false
   // 是否进行过通知授权
   isRequestNotification: boolean = false
   // 后台运行启用变量

@@ -13,28 +13,19 @@ import { geoLocationManager } from "@kit.LocationKit";
 /**
  * 模拟定位长时任务
  */
-export class BackgroundLocateService{
+export class BackgroundLocateService {
   client = http.createHttp()
   notificationId ?: number = undefined
-  ping: number = 0
-  notice:number = 0
 
-
-  async start(context: Context){
-    if(this.notificationId)
+  async start(context: Context) {
+    if (this.notificationId)
       return
     let id = await this.startContinuousTask(context)
     this.notificationId = id
     // 启动后台定位
     this.getLocation(context)
-
-    clearInterval(this.notice)
-    // 定位需要另一种通知
-    // this.updateTraffic()
-    // this.notice = setInterval(async ()=> {
-    //   this.updateTraffic()
-    // }, 2000)
   }
+
   async requestPermissionsFromUser(context: Context): Promise<boolean> {
     let atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
     let permissionList: Permissions[] = [
@@ -50,6 +41,7 @@ export class BackgroundLocateService{
     }
 
   }
+
   async getLocation(context: Context) {
     await this.requestPermissionsFromUser(context)
     let request: geoLocationManager.LocationRequest = {
@@ -61,38 +53,33 @@ export class BackgroundLocateService{
     geoLocationManager.on('locationChange', request, ()=>{ });
   }
 
-
-
-  async updateTraffic(): Promise<void>{
-
-    let appFlowingState: AppFlowingState = AppStorage.get<AppFlowingState>("appFlowingState") ?? new AppFlowingState()
-    let now = appFlowingState.traffics.getLast()?.down?.toString()
-    let result = appFlowingState.traffics.getLast()?.up?.toString()
-    let message = `${result} ↑\t${now} ↓`
-    hilog.info(0xFF00, 'BackgroundLocateService', "updateProcess %{public}s", message)
-    this.updateProcess(this.notificationId ?? 0, message )
-  }
-
   stop(context: Context){
     this.notificationId = undefined
-    clearInterval(this.ping)
-    clearInterval(this.notice)
-    backgroundTaskManager.stopBackgroundRunning(context)
+    backgroundTaskManager.stopBackgroundRunning(context).catch((err: Error) => {
+      console.error(`BackgroundLocateService 后台定位长时任务关闭失败：${err}`)
+    })
   }
 
-  updateProcess(id: number, message: string){
+  // 不可用
+  updateProcess(id: number, message: string) {
+    // 副文本赋值
+    const appFlowingState: AppFlowingState = AppStorage.get<AppFlowingState>("appFlowingState") ?? new AppFlowingState()
+    const now = appFlowingState.traffics.getLast()?.down?.toString()
+    const result = appFlowingState.traffics.getLast()?.up?.toString()
+    const newContent = `${result} ↑\t${now} ↓`
     notificationManager.isSupportTemplate('downloadTemplate').then((data:boolean) => {
       hilog.info(0xFF00, 'BackgroundLocateService', '当前设备支持下载进度条模板')
-      let downLoadTemplate: notificationManager.NotificationTemplate = {
+
+      const downLoadTemplate: notificationManager.NotificationTemplate = {
         name: 'downloadTemplate', // 当前只支持downloadTemplate，保持不变
         data: {
-          title: getContext().resourceManager.getStringSync($r('app.string.runing_download_background')), // 必填。
+          title: newContent, // 必填。
           fileName: message, // 必填。
           progressValue: (Math.random() * 100), // 应用更新进度值，自定义
         }
       }
 
-      let request: notificationManager.NotificationRequest = {
+      const request: notificationManager.NotificationRequest = {
         content: {
           // 系统实况类型，保持不变
           notificationContentType: notificationManager.ContentType.NOTIFICATION_CONTENT_SYSTEM_LIVE_VIEW,
@@ -120,7 +107,6 @@ export class BackgroundLocateService{
     }).catch((err: BusinessError) => {
       hilog.error(0xFF00, 'BackgroundLocateService', `当前设备不支持下载进度条模板 Code is ${err.code}, message is ${err.message}`)
     })
-
   }
 
   async startContinuousTask(context: Context): Promise<number>{
@@ -150,6 +136,7 @@ export class BackgroundLocateService{
       return -1
     }
   }
+
 }
 
 export default  new BackgroundLocateService()

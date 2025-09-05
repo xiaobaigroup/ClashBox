@@ -2074,7 +2074,7 @@
     },
     {
       "name": "status_icon_notice",
-      "value": "Resident status bar"
+      "value": "Resident Status Bar"
     },
     {
       "name": "status_icon_tips",
@@ -2151,6 +2151,14 @@
     {
       "name": "incorrect_format",
       "value": "Incorrect format"
+    },
+    {
+      "name": "coexist_notice",
+      "value": "Notification Coexistence"
+    },
+    {
+      "name": "coexist_notice_tips",
+      "value": "Allow coexistence of regular and backend notifications"
     }
   ]
 }

@@ -142,6 +142,8 @@ struct Index {
   @Provide @Watch('ShowPipChange') proxyEnabled: boolean = false
   // 前台判断变量
   @StorageProp('ForewardState') isForeward: boolean = true
+  // 初始化是否完成
+  @StorageProp('awaitInit') theAwaitInit: boolean = false
   // 窗口模式
   @StorageProp('WindowMode') windowMode: boolean = false
   // 设置模态页控制变量
@@ -529,7 +531,9 @@ struct Index {
 
   /** 获取配置列表 */
   async fetchProfiles() {
+    console.error(`开始获取配置`)
     const profiles = await ClashViewModel.getProfiles()
+    console.error(`配置已获取：${JSON.stringify(profiles)}`)
     this.configList = profiles.map((d) => {
       return {
         configId: d.id,
@@ -621,8 +625,8 @@ struct Index {
       this.trafficJob = setInterval(job, 1000)
       // TODO 卡片后台启动服务后拉起应用关闭再开启会出现一秒的时间显示错误
       this.proxyStartingDuration = PROXY_STARTED_DURATION_INIT_VALUE
-      // 发布常驻通知(当未启用长时后台运行时)
-      if (this.uiConfig.Enablednotice && this.uiConfig.EnabledPermanentnotice && !this.uiConfig.Enablebackgrounder) {
+      // 发布常驻通知(默认为当未启用长时后台运行时)
+      if (this.uiConfig.Enablednotice && this.uiConfig.EnabledPermanentnotice && (!this.uiConfig.Enablebackgrounder || this.uiConfig.EnabledCoexistNotice)) {
         this.noticeJob = Date.now()
         let up = '0'
         let down = '0'
@@ -826,8 +830,6 @@ struct Index {
       })
     }*/
 
-    // 获取配置列表
-    this.fetchProfiles()
     // 日志启用事件
     EventHub.on(EventKey.StartLog, async (enable: boolean) => {
       ClashViewModel.startLog(enable, (log) => {
@@ -880,6 +882,17 @@ struct Index {
 
     })
 
+    this.awaitInit()
+  }
+
+  // 等待配置数据库初始化完成
+  awaitInit() {
+    const checkInterval = setInterval(() => {
+      if (this.theAwaitInit) {
+        // 获取配置列表
+        this.fetchProfiles()
+      }
+    }, 100);
   }
 
   async saveLog(uri: string, logDdata?: LogData): Promise<void> {

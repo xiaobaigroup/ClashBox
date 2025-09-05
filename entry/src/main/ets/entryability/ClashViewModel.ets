@@ -36,6 +36,7 @@ export class ClashViewModel {
   proxyStartedTimer = new Timer()
   static promptAction: PromptAction
   async init(context: Context, promptAction: PromptAction) {
+    console.error("ClashViewModel开始初始化");
     const packageInfo = await getPackageInfo()
     AppState.versionName = packageInfo.versionName
     AppState.globalUA =  "clash.meta/1.18.7"
@@ -45,6 +46,7 @@ export class ClashViewModel {
     this.socketProxy.init(context, ClashViewModel.promptAction)
     await this.initGeoIp()
     await this.ChangeCore(undefined, false)
+    console.error("ClashViewModel初始化成功");
   }
   // 添加配置 url
   async addOrUpdateProfileByUrl(data: ConfigData, id: string | null){
@@ -68,6 +70,7 @@ export class ClashViewModel {
           EventHub.sendEvent(EventKey.FetchProfile, null)
         })
     } else {
+      console.error("ClashBox文件保存失败");
       ClashViewModel.promptAction.showToast({message: "文件保存失败！"})
     }
   }
@@ -257,7 +260,7 @@ export class ClashViewModel {
   }
   //BUG 第一次启动，参数传不过去
   // 第一次要权限弹窗
-  async ChangeCore(coreType: ClashCore | undefined = undefined, restart: boolean = true){
+  async ChangeCore(coreType: ClashCore | undefined = undefined, restart: boolean = true) {
     let requestId = Date.now();
     this.vpnRequestId = requestId;
     const vpnWant = {
@@ -267,15 +270,21 @@ export class ClashViewModel {
       parameters: { "ClashCore" : coreType, requestId }
     } as Want
     // 若vpn进程没启动直接停止，会导致卡死或闪退， 不同系统不同现象
-    if (restart){
+    if (restart) {
       // 停止vpn进程
-      await vpnExtension.stopVpnExtensionAbility(vpnWant)
+      try {
+        await vpnExtension.stopVpnExtensionAbility(vpnWant)
+      } catch (error) {
+        console.error(`ClashViewModel.ChangeCore restart过程中VPN进程终止失败: ${JSON.stringify(error)}`)
+      }
     }
     await new Promise<boolean>( async (resolve, reject)=>{
       try {
         await vpnExtension.startVpnExtensionAbility(vpnWant)
-      }catch(e){
-        this.context?.getApplicationContext().killAllProcesses()
+      } catch(e) {
+        this.context?.getApplicationContext().killAllProcesses().catch((err: Error) => {
+          console.error(`ClashViewModel.ChangeCore 应用进程终止失败: ${JSON.stringify(err)}`)
+        })
       }
       resolve(true)
       setTimeout(() =>{
@@ -284,18 +293,25 @@ export class ClashViewModel {
     })
     await sleep(600)
     let result = await this.checkVpnVpnAbility(requestId)
-    if(!result){
+    if (!result) {
       ClashViewModel.promptAction.showToast({message:"VpnAbility请求失败! 请重启应用"})
     }
     return result;
   }
   private async checkVpnVpnAbility(reqId: number): Promise<boolean>{
     let lockPath = this.context?.filesDir + '/vpn_ipc.lock';
-    if (!await fs.access(lockPath, fs.AccessModeType.EXIST)) {
+    try {
+      if (!await fs.access(lockPath, fs.AccessModeType.EXIST)) {
+        console.log('ClashViewModel.checkVpnVpnAbility 检查文件vpn_ipc.lock是否存在 access成功：', true)
         return true;
-    } else {
+      } else {
         let requestId = await readText(lockPath)
+        console.log('ClashViewModel.checkVpnVpnAbility 检查文件vpn_ipc.lock是否存在 readText成功：', requestId == reqId + "")
         return requestId == reqId + "";
+      }
+    } catch (error) {
+      console.error('ClashViewModel.checkVpnVpnAbility 检查文件vpn_ipc.lock是否存在失败：', error)
+      return false
     }
   }
 
@@ -384,11 +400,12 @@ export class ClashViewModel {
     return await this.socketProxy.getRuntime()
   }
 
-  async initProfile(){
+  async initProfile() {
     let appConfig = AppStorage.get<AppConfig>("appConfig") || cardManager.getAppConfig()
     EventHub.sendEvent(EventKey.StartLog, appConfig?.enableLogger)
     await this.loadConfig(false)
     EventHub.sendEvent(EventKey.FetchProxyGroup)
+    console.error("ClashViewModel.initProfile 初始化成功");
   }
 
   proxyGroups :ProxyGroup[] = []

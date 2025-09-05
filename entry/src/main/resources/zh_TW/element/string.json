@@ -2151,6 +2151,14 @@
     {
       "name": "incorrect_format",
       "value": "格式不正確喔"
+    },
+    {
+      "name": "coexist_notice",
+      "value": "通知並存"
+    },
+    {
+      "name": "coexist_notice_tips",
+      "value": "允許一般通知與後台通知並存"
     }
   ]
 }

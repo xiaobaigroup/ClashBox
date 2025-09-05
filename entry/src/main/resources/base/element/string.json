@@ -2151,6 +2151,14 @@
     {
       "name": "incorrect_format",
       "value": "格式不正确"
+    },
+    {
+      "name": "coexist_notice",
+      "value": "通知共存"
+    },
+    {
+      "name": "coexist_notice_tips",
+      "value": "允许普通与后台通知共存"
     }
   ]
 }

@@ -537,7 +537,7 @@ struct ConfigurationPage {
     hilog.info(0xC011, componentName, `EditConfig #loadConfig#加载配置: configName is [${this.currentTouchConfigData.configName}] 是否需要更新：${needUpdated} 更新时间：${item.updateTime}`)
     if (this.isLoading)
       return
-    animateTo({
+    this.getUIContext().animateTo({
       duration: this.uiConfig.animationSpeed,
       iterations: 1,
       playMode: PlayMode.Normal,
@@ -548,7 +548,7 @@ struct ConfigurationPage {
     this.appConfig.currentProfileName = item.configName
     this.appConfig.currentProfileId = item.configId
     try {
-      if(needUpdated){
+      if(needUpdated) {
         ClashViewModel.updateProfileConfig(item.configId)
       }
       ClashViewModel.socketProxy.reset()
@@ -558,7 +558,7 @@ struct ConfigurationPage {
       console.debug("loadConfigList", e.message, JSON.stringify(e))
       this.promptAction.showToast({message: `${getResourceString($r('app.string.failed_load_config'), context)}` + (e.message || e) })
     }
-    animateTo({
+    this.getUIContext().animateTo({
       duration: this.uiConfig.animationSpeed,
       iterations: 1,
       playMode: PlayMode.Normal,

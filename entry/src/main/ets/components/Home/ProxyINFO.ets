@@ -30,6 +30,8 @@ struct ProxyINFO {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 自定义主题，颜色在AppTheme里面修改
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  // 是否检查过IP地址
+  @StorageLink('isCheckIP') isCheckIP: boolean = false
   // 编辑按钮点击后显示编辑状态判定
   @Consume isShowHomeEdit: boolean
   @Consume remoteIp: IpInfo | null
@@ -167,10 +169,14 @@ struct ProxyINFO {
   }
 
   aboutToAppear(): void {
-    EventHub.on(EventKey.checkIpInfo, async ()=>{
-      this.remoteIp = null
-      this.remoteIp = await ClashViewModel.checkIpInfo()
-    })
+    // 检查IP事件(按需执行)
+    if (!this.isCheckIP) {
+      this.isCheckIP = true
+      EventHub.on(EventKey.checkIpInfo, async ()=>{
+        this.remoteIp = null
+        this.remoteIp = await ClashViewModel.checkIpInfo()
+      })
+    }
   }
 
 }
