@@ -31,6 +31,11 @@ ClashBox是首个基于Navigation框架的HarmonyOS NEXT(OpenHarmony)平台的�
 > [!NOTE]
 > 在HarmonyOS NEXT使用自签名的方式进行侧载的App默认只有14天的有效期，进行[开发者实名认证](https://developer.huawei.com/consumer/cn/verified/enrollment)后即可将有效期提升至180天。
 
+#### 未来计划
+
+ - [ ] 添加实况窗功能
+ - [ ] 卡片主题色的同步
+
 #### 赞助&联系我们
 
 我们已入驻爱发电，支持我们项目的朋友可以前往爱发电赞助我们：
