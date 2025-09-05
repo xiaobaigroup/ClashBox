@@ -57,7 +57,8 @@ export default class EntryAbility extends UIAbility {
   async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam) {
     // 赋值临时储存want
     this.want = want
-
+    // 优先级最高-初始化内核
+    await ClashViewModel.ChangeCore(undefined, false)
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onCreate');
     // 添加崩溃监听
     hiAppEvent.addWatcher({

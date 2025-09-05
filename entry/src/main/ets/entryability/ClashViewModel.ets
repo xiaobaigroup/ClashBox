@@ -45,7 +45,6 @@ export class ClashViewModel {
     await this.profileRepo.init(context)
     this.socketProxy.init(context, ClashViewModel.promptAction)
     await this.initGeoIp()
-    await this.ChangeCore(undefined, false)
     console.error("ClashViewModel初始化成功");
   }
   // 添加配置 url
@@ -298,6 +297,7 @@ export class ClashViewModel {
     }
     return result;
   }
+
   private async checkVpnVpnAbility(reqId: number): Promise<boolean>{
     let lockPath = this.context?.filesDir + '/vpn_ipc.lock';
     try {
