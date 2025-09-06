@@ -106,6 +106,7 @@ export default class EntryAbility extends UIAbility {
                   },vpnServiceStartTime)
 
                   EventHub.on(EventKey.StopedClashEntry,()=>{
+                    hilog.info(0x001, "EntryAbility", "StopedClashEntry" )
                     this.proxyStartedTimer.reset()
                   })
                 }

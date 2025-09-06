@@ -680,10 +680,12 @@ struct Index {
         console.log(`BackgroundDownService 即将执行模拟下载停止`)
         BackgroundDownService.stop(this.context)
       }
-      clearInterval(this.trafficJob)
+      // 停止模拟定位
       if (this.uiConfig.backgroundLocateModel) {
+        console.log(`BackgroundLocateService 即将执行模拟定位停止`)
         BackgroundLocateService.stop(this.context)
       }
+      clearInterval(this.trafficJob)
       // 取消通知
       if (this.uiConfig.Enablednotice && this.uiConfig.EnabledPermanentnotice) {
         Xb_NotificationUtils.cancelNotification(this.noticeJob)

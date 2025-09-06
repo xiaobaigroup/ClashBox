@@ -144,8 +144,8 @@ struct Home {
       // vpn小钥匙可能卡死，关闭vpn小钥匙
       await ClashViewModel.StopVpn()
     } else {
-      hilog.info(0xA002, this.componentName, `主页按钮点击事件 代理启动按钮状态：${this.proxyEnabled}`)
       this.proxyEnabled = !this.proxyEnabled
+      hilog.info(0xA002, this.componentName, `主页按钮点击后 代理启动按钮状态：${this.proxyEnabled}`)
       if (this.proxyEnabled) {
         await ClashViewModel.StartVpn()
       } else {

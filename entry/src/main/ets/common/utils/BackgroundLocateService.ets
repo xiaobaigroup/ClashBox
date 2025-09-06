@@ -55,7 +55,9 @@ export class BackgroundLocateService {
 
   stop(context: Context){
     this.notificationId = undefined
-    backgroundTaskManager.stopBackgroundRunning(context).catch((err: Error) => {
+    backgroundTaskManager.stopBackgroundRunning(context).then(() => {
+      console.log(`BackgroundDownService 模拟定位停止成功`)
+    }).catch((err: Error) => {
       console.error(`BackgroundLocateService 后台定位长时任务关闭失败：${err}`)
     })
   }

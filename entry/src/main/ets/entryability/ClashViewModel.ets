@@ -360,6 +360,7 @@ export class ClashViewModel {
     },vpnServiceStartTime)
 
     EventHub.on(EventKey.StopedClashEntry,()=>{
+      hilog.info(0x001, "ClashViewModel", "StopedClashEntry事件")
       this.proxyStartedTimer.reset()
     })
 
