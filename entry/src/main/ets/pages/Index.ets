@@ -24,7 +24,7 @@ import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } f
 import { ClashConfig, IpInfo, Profile, ProxyMode } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
-import { AppConfig, AppFlowingState, AppState, UIConfig } from '../entryability/AppState'
+import { AppConfig, AppFlowingState, AppState, ClashCore, UIConfig } from '../entryability/AppState'
 import { common } from '@kit.AbilityKit'
 import { ChangeLanguage } from '../common/utils/ChangeLanguageUtil'
 import { ConfigData, TabBuild } from '../common/entity/PageArgumentEntity'
@@ -59,11 +59,15 @@ import {
 import { WindowTopBar } from '../components/Common/TopBar'
 import { ImportConfigFromURL } from '../components/Configuration/ImportConfigFromURL'
 import { Xb_ChangeThemeColor } from 'xb_components/src/main/ets/utils/ChangeThemeColorUtil'
-import { Xb_ColorModeManager, Xb_Global, Xb_NotificationUtils, Xb_StatusBarUtils, Xb_UIConfig } from 'xb_components'
+import { Xb_ColorModeManager, Xb_Global, Xb_NotificationUtils,
+  Xb_ResourceColorUtil,
+  Xb_StatusBarUtils, Xb_UIConfig } from 'xb_components'
 import { Xb_GoToWeb } from 'xb_components/src/main/ets/utils/JumpTo'
 import BackgroundDownService from '../common/utils/BackgroundDownService'
 import { notificationManager } from '@kit.NotificationKit'
 import { BusinessError } from '@kit.BasicServicesKit'
+import LiveViewUtil from '../common/utils/LiveViewUtil'
+
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 
@@ -109,7 +113,8 @@ struct Index {
    *    如果有多个颜色，就把这个变量换成`CustomTheme`类型的变量）
    */
   // 主题色
-  @Provide('icon_emphasize') icon_emphasize: ResourceColor = $r('app.color.theme_color_main_yellow')
+  @Provide('icon_emphasize') icon_emphasize: ResourceColor = $r('app.color.theme_color_main_cat_blue')
+  @StorageLink('ThemeColor') themeColor: string = "#E61E4377"
   // tabs图标文字颜色，修改resources/base(dark)/element/color.json中tabs_icon_text配置选中图标文字深浅模式颜色
   // app.color.tabs_icon_text1配置非选中图标和文字深浅模式颜色
   //  @State fontColorValue:ResourceColor = ($r('app.color.tabs_icon_text'));
@@ -194,7 +199,7 @@ struct Index {
   // 速度卡片图表数据
   @Provide ChartData: number[] | ConvertedUnit[] = []
   // 代理启动的计时文本
-  @Provide proxyStartingDuration: string = ''
+  @StorageLink('proxyStartingDuration') proxyStartingDuration: string = ''
   // 速度卡片
   @Provide DownloadSpeed: string = ""
   @Provide UploadSpeed: string = ""
@@ -555,6 +560,8 @@ struct Index {
   onWillApplyTheme(theme: Theme) {
     hilog.info(0x1000, componentName, `#onWillApplyTheme`)
     this.icon_emphasize = theme.colors.iconEmphasize;
+    // 全局变量同步
+    this.themeColor = Xb_ResourceColorUtil(theme.colors.iconEmphasize, this.getUIContext().getHostContext()!)
     // 子模块主题色同步
     Xb_Global.icon_emphasize = theme.colors.iconEmphasize;
   }
@@ -671,6 +678,12 @@ struct Index {
       if (this.uiConfig.backgroundLocateModel && this.uiConfig.Enablednotice) {
         BackgroundLocateService.start(this.getUIContext().getHostContext()!)
       }
+      // 发布实况窗
+      LiveViewUtil.startLiveView().then((result) => {
+        console.log(`LiveViewUtil 实况窗启动 result: ${result.resultCode} message: ${result.message}`)
+      }).catch((err: BusinessError) => {
+        console.error(`LiveViewUtil 实况窗启动失败：name: ${err.name} message: ${err.message} code: ${err.code}`)
+      })
 
     })
     // 停止Clash后
@@ -691,6 +704,12 @@ struct Index {
         Xb_NotificationUtils.cancelNotification(this.noticeJob)
         clearInterval(this.updateNoticeJob)
       }
+      // 关闭实况窗
+      LiveViewUtil.stopLiveView().then((result) => {
+        console.log(`LiveViewUtil 实况窗停止 result: ${result.resultCode} message: ${result.message}`)
+      }).catch((err: BusinessError) => {
+        console.error(`LiveViewUtil 实况窗停止失败：name: ${err.name} message: ${err.message} code: ${err.code}`)
+      })
       // 代理计时器重置
       this.proxyStartingDuration = ''
       // 速度卡片重置
@@ -884,8 +903,38 @@ struct Index {
 
     })
 
+    // 初始化配置列表
     await this.awaitInit()
-    // ClashViewModel.loadConfig(true, 'Index-aboutToAppear')
+
+    // 初始化实况窗
+    const isLive = await LiveViewUtil.init(this.getUIContext().getHostContext()!)
+    if (isLive) {
+      console.log(`LiveViewUtil 实况窗初始化成功`)
+    } else {
+      console.error(`LiveViewUtil 实况窗初始化失败`)
+    }
+
+    // 强制更新一次数据
+    if (!this.uiConfig.isUpdateData) {
+      this.updateData()
+    }
+
+  }
+
+  // 更新后直接赋值一次
+  updateData() {
+    // 总通知
+    this.uiConfig.Enablednotice = true
+    // 后台运行
+    this.uiConfig.Enablebackgrounder = true
+    // 定位为默认
+    this.uiConfig.backgroundLocateModel = true
+    this.uiConfig.backgroundDownModel = false
+    this.uiConfig.backgroundPiPModel = false
+    // 前台模式
+    this.appConfig.clashCore = ClashCore.ClashMeta
+    // 标记
+    this.uiConfig.isUpdateData = true
   }
 
   // 等待配置数据库初始化完成

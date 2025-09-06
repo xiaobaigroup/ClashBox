@@ -113,7 +113,7 @@ struct Home {
   // 页面名称 主页
   private componentName: string = 'HomePage'
   // 代理启动持续的时间
-  @Consume proxyStartingDuration: string
+  @StorageProp('proxyStartingDuration') proxyStartingDuration: string = ''
   // 主界面当前index
   @Consume IndexCurrentindex: number
   @Consume curOffsetRemain: number

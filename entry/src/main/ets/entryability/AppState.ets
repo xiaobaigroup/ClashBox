@@ -110,14 +110,16 @@ export class UIConfig{
   // 后台运行启用变量
   Enablebackgrounder: boolean = false
   // 模拟定位启用变量
-  backgroundLocateModel: boolean = false
+  backgroundLocateModel: boolean = true
   // 模拟下载启用变量
-  backgroundDownModel: boolean = true
+  backgroundDownModel: boolean = false
   // 模拟画中画启用变量
   backgroundPiPModel: boolean = false
+  // 是否更新过数据
+  isUpdateData: boolean = false
   /* 主页小卡片相关 */
   // 分流模式小卡片  平移属性参数
-  translateY:number|string='-100%'
+  translateY: number | string = '-100%'
   // 快捷方式小卡片
   inputTitle1: string = ''
   inputTitle2: string = ''
