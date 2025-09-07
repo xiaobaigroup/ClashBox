@@ -24,7 +24,7 @@ import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } f
 import { ClashConfig, IpInfo, Profile, ProxyMode } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
-import { AppConfig, AppFlowingState, AppState, ClashCore, UIConfig } from '../entryability/AppState'
+import { AppConfig, AppFlowingState, AppState, ClashCore, getPackageInfo, UIConfig } from '../entryability/AppState'
 import { common } from '@kit.AbilityKit'
 import { ChangeLanguage } from '../common/utils/ChangeLanguageUtil'
 import { ConfigData, TabBuild } from '../common/entity/PageArgumentEntity'
@@ -68,6 +68,7 @@ import { notificationManager } from '@kit.NotificationKit'
 import { BusinessError } from '@kit.BasicServicesKit'
 import { cardManager } from '../common/utils/CardManageUtil'
 import LiveViewUtil from '../common/utils/LiveViewUtil'
+import { UpdateLog } from '../components/Start/UpdateLog'
 
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
@@ -217,8 +218,6 @@ struct Index {
   @Provide items: ProxyItem[] = ProxyData.ProxyItems();
   // 代理页延迟按钮气泡提示
   @Provide isShowDelayPop: boolean = false
-  // 是否注册排序监听
-  @Provide isRegisterSort: boolean = false
   // 当前代理节点长按选择的值
   @Provide ProxyItemLongPressValue: number = -1
   // 当前显示的代理分组
@@ -379,7 +378,7 @@ struct Index {
       .bindSheet($$this.isShowWelcome, this.WelcomeSheet(), {
         detents: [BIND_SHEET_CONTAINER_HEIGHT],
         showClose: (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) ||
-          this.openLinkConfigUrl != '' ? true : false,
+          this.openLinkConfigUrl != '' || this.uiConfig.oldVersionName !== AppState.versionName,
         dragBar: false,
         backgroundColor: $r('app.color.background'),
         keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
@@ -387,7 +386,7 @@ struct Index {
         preferType: SheetType.CENTER,
         onWillDismiss: ((DismissSheetAction: DismissSheetAction) => {
           if (!this.isShowWelcome || DismissSheetAction.reason === DismissReason.CLOSE_BUTTON ||
-            this.openLinkConfigUrl != '') {
+            this.openLinkConfigUrl != '' || this.uiConfig.oldVersionName !== AppState.versionName) {
             // 关闭背景模糊
             this.isEnableIndexForegroundBlur = false
             DismissSheetAction.dismiss()
@@ -395,6 +394,8 @@ struct Index {
           }
         }),
         onDisappear: async () => {
+          this.uiConfig.oldVersionName = AppState.versionName
+          console.error(`Update 历史应用版本更新为：${this.uiConfig.oldVersionName}`)
         }
       })
     } else {
@@ -451,8 +452,11 @@ struct Index {
       ImportConfigFromURL({
         configData: this.currentTouchConfigData,
       })
-    } else {
+    } else if (this.uiConfig.isFirstStart) {
       WelcomeUserAgreement()
+    } else {
+      // 版本更新后显示更新日志
+      UpdateLog()
     }
   }
 
@@ -919,9 +923,15 @@ struct Index {
       console.error(`LiveViewUtil 实况窗初始化失败`)
     }
 
-    // 强制更新一次数据
-    if (!this.uiConfig.isUpdateData) {
-      this.updateData()
+    // 更新应用版本号
+    const packageInfo = await getPackageInfo()
+    AppState.versionName = packageInfo.versionName
+    console.error(`Update 历史应用版本：${this.uiConfig.oldVersionName} 当前应用版本：${AppState.versionName}`)
+
+    if (this.uiConfig.oldVersionName !== AppState.versionName) {
+      this.isEnableIndexForegroundBlur = true
+      this.isShowWelcome = true
+      this.updateData()   // TODO 仅更新一次数据，下次更新版本需要删掉
     }
 
   }
@@ -956,8 +966,6 @@ struct Index {
     this.uiConfig.backgroundPiPModel = false
     // 前台模式
     this.appConfig.clashCore = ClashCore.ClashMeta
-    // 标记
-    this.uiConfig.isUpdateData = true
   }
 
   // 等待配置数据库初始化完成

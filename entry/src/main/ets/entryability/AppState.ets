@@ -69,6 +69,8 @@ export enum TrafficUnit{
 export class UIConfig{
   // 主页问候语
   isGreeting?: boolean = true
+  // 历史版本名
+  oldVersionName: string = '1.6.0'
   // 主题色
   themeColor: CustomThemeName = 'blueAppTheme'
   // 主题色序号
@@ -117,8 +119,6 @@ export class UIConfig{
   backgroundDownModel: boolean = false
   // 模拟画中画启用变量
   backgroundPiPModel: boolean = false
-  // 是否更新过数据
-  isUpdateData: boolean = false
   /* 主页小卡片相关 */
   // 分流模式小卡片  平移属性参数
   translateY: number | string = '-100%'

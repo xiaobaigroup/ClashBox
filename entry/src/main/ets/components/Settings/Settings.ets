@@ -25,6 +25,7 @@ import { ProxyGroupItemDataSource } from "../../common/datasources/ProxyData"
 import { ConfigData } from "../../common/entity/PageArgumentEntity"
 import { PrivacyPolicy, UserAgreement } from "./AgreementPrivacyPage"
 import { PageMargin } from "../../common/breakpoint/BreakPoint"
+import { UpdateLog } from '../Start/UpdateLog';
 
 
 const context = getContext(this) as common.UIAbilityContext
@@ -227,6 +228,11 @@ struct Settings {
       } else
       if (name == 'xb') {
         AboutXBStudio()
+      } else
+      if (name == 'UpdateLog') {
+        UpdateLog({
+          showBackButton: true
+        })
       }
   }
 

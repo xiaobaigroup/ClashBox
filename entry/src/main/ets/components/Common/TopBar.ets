@@ -13,7 +13,7 @@ export struct TopBar {
 
   @Prop title: string
   @Prop iconSize: number
-  @Prop icons: Resource[]
+  @Prop icons: Resource[] = []
   @Prop titleFontSize: number
 
   @StorageProp('WindowMode') windowMode: boolean = false

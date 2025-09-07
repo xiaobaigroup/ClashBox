@@ -2167,6 +2167,10 @@
     {
       "name": "card_tips",
       "value": "首次需\\n啟動兩次"
+    },
+    {
+      "name": "update_log",
+      "value": "更新日誌"
     }
   ]
 }

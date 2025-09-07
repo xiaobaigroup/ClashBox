@@ -106,7 +106,7 @@ struct About {
         // hilog.info(0xFF00, "AboutestTag", "仓库")
         Xb_GoToWeb('https://github.com/xiaobaigroup/ClashBox')
       break
-      default :
+      default:
         this.SettingsPageInfos.pushPathByName(name, false)
     }
   }

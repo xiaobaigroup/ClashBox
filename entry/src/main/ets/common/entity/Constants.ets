@@ -714,6 +714,7 @@ export function getAboutList(): AboutListItemProp[] {
       children: [
         { title: $r('app.string.UseGuidance'), subtitle: '', sign: 2, name: 'UseGuidance' },
         { title: $r('app.string.FAQ'), subtitle: '', sign: 2, name: 'FAQ' },
+        { title: $r('app.string.update_log'), subtitle: '', sign: 2, name: 'UpdateLog' },
       ]
     },
     // { title: 'Update',

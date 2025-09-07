@@ -377,21 +377,25 @@ struct ProxyPage {
     })
     .onClick(async () => {
       this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
+      let results: number[] = []
       try {
-        const results = await ClashViewModel.testAllDelay(this.proxyGroups.getData(this.currentProxyIndex).proxies as ProxyItem[])
+        results = await ClashViewModel.testAllDelay(this.proxyGroups.getData(this.currentProxyIndex).proxies as ProxyItem[])
         console.log(`ProxySort results: ${JSON.stringify(results)}`)
         // 测速完成后如果配置为延迟排序则触发一次排序事件
-        if (this.appConfig.proxySort === ProxySort.Delay) {
+        if (this.appConfig.proxySort === ProxySort.Delay && results) {
           this.needChangeSort = true
         }
         // 卡片延迟
         const delay = ClashViewModel.delayMap.get(this.appConfig.currentProxyItem?.name ?? '')?.delay ?? 0
         cardManager.pushCartDelay(delay)
       } catch (err) {
-        if (this.appConfig.proxySort === ProxySort.Delay) {
+        if (this.appConfig.proxySort === ProxySort.Delay && results) {
           this.needChangeSort = true
         }
         console.error(`ProxySort message: ${err.message}, code: ${err.code}`)
+      }
+      if (!results) {
+        this.getUIContext().getPromptAction().showToast({ message: `延迟测试失败，请检查测试用链接`, duration: 3000})
       }
       if (this.uiConfig.isVibrate) {
         customVibrator.vibratorTriggerOfHapticClockTimer()

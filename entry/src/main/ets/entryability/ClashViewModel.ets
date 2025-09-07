@@ -37,8 +37,6 @@ export class ClashViewModel {
   static promptAction: PromptAction
   async init(context: Context, promptAction: PromptAction) {
     console.error("ClashViewModel开始初始化");
-    const packageInfo = await getPackageInfo()
-    AppState.versionName = packageInfo.versionName
     AppState.globalUA =  "clash.meta/1.18.7"
     this.context = context
     ClashViewModel.promptAction = promptAction
