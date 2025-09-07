@@ -95,6 +95,7 @@ func handleUpdateConfig(bytes []byte) string {
 	configParams = params.Params
 	prof := decorationConfig(params.ProfileId, params.Config)
 	fmt.Println("ipc_go", "handleUpdateConfig before", params.Config.DNS)
+	prof.DNS.NameServerPolicy = nil
 	fmt.Println("ipc_go", "handleUpdateConfig affer", prof.DNS)
 	err = applyConfig(prof)
 	if err != nil {
