@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { BUNDLE_NAME, CallMethod, ENTRY_ABILITY, FormCarAction, ProxyActionType, RouterType } from './FormCardConstant';
+import { BUNDLE_NAME, CallMethod, ENTRY_ABILITY, FormCarAction, ProxyActionType, RouterType } from '../model/FormCardConstant';
 
 class ActionUtils {
   /** @description 卡片切换代理 */

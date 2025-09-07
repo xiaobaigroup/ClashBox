@@ -1,5 +1,5 @@
 import { IpInfo } from 'proxy_core';
-import ActionUtils from '../model/ActionUtils'
+import ActionUtils from '../utils/ActionUtils'
 import { ProxyActionType } from '../model/FormCardConstant'
 
 @Entry
