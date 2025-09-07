@@ -20,7 +20,7 @@
         "name": "default",
         "signingConfig": "default",
         "compatibleSdkVersion": "5.0.5(17)",
-        "targetSdkVersion": "5.1.1(19)",
+        "targetSdkVersion": "5.1.0(18)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
