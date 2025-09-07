@@ -9,6 +9,9 @@ export struct RoundButton {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  @Prop buttonColor?: ResourceColor = undefined
+  @Prop buttonSize?: Length = undefined
+  @Prop needMargin: boolean = true
   @Prop Switch: boolean = false
   @Prop SubText: string = ''
   @Prop Icon1: Resource
@@ -34,17 +37,17 @@ export struct RoundButton {
       }.width('100%')
     }
     .borderRadius(100)
+    .margin(this.needMargin ? { bottom: $r('app.integer.vp_proxy_start_button_left_right_margin'), right: $r('app.integer.vp_proxy_start_button_left_right_margin'), left: $r('app.integer.vp_proxy_start_button_left_right_margin') } : undefined)
     .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
-    .backgroundColor(this.icon_emphasize)
+    .backgroundColor(this.buttonColor ?? this.icon_emphasize)
     .shadow({
       radius: 10,
       color: this.icon_emphasize,
       offsetY: 4,
       type: ShadowType.BLUR
     })
-    .margin({ bottom: $r('app.integer.vp_proxy_start_button_left_right_margin'), right: $r('app.integer.vp_proxy_start_button_left_right_margin'), left: $r('app.integer.vp_proxy_start_button_left_right_margin') })
-    .width(this.Switch ? $r('app.integer.vp_proxy_started_button_width') : $r('app.integer.vp_proxy_not_start_button_width'))
-    .height($r('app.integer.vp_proxy_not_start_button_height'))
+    .width(this.Switch ? $r('app.integer.vp_proxy_started_button_width') : this.buttonSize ?? $r('app.integer.vp_proxy_not_start_button_width'))
+    .height(this.buttonSize ?? $r('app.integer.vp_proxy_not_start_button_height'))
     .clip(true)
     .animation({ duration: this.uiConfig.animationSpeed,curve: curves.springMotion() })
     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))

@@ -131,33 +131,6 @@ struct Home {
   // 定时器Controller
   // @Consume proxyStartedTimer: Timer
 
-  /** @description 切换代理模式 */
-  async switchProxyMode() {
-    if (this.configList.length === 0 || this.proxyGroups.totalCount() === 0) {
-      if (this.uiConfig.isVibrate) {
-        customVibrator.vibratorTriggerOfHapticClockTimer()
-      }
-      // 配置页没有数据，或者代理节点未加载
-      this.promptAction.showToast({
-        message: `${Xb_GetResourceString($r('app.string.start_prompt'), this.getUIContext().getHostContext())}`
-      })
-      // vpn小钥匙可能卡死，关闭vpn小钥匙
-      await ClashViewModel.StopVpn()
-    } else {
-      this.proxyEnabled = !this.proxyEnabled
-      hilog.info(0xA002, this.componentName, `主页按钮点击后 代理启动按钮状态：${this.proxyEnabled}`)
-      if (this.proxyEnabled) {
-        await ClashViewModel.StartVpn()
-      } else {
-        console.log(`Home BackgroundDownService Clash已经停止`)
-        await ClashViewModel.StopVpn()
-      }
-      if (this.uiConfig.isVibrate) {
-        customVibrator.vibratorTriggerOfHapticClockTimer()
-      }
-    }
-  }
-
   // 按钮前Symbol动效
   // ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE
 
@@ -286,7 +259,8 @@ struct Home {
             SubText: this.proxyStartingDuration
           })
             .onClick(async () => {
-              this.switchProxyMode()
+              // 触发代理启动事件
+              EventHub.sendEvent(EventKey.ChangeProxy)
             })
             .bindPopup(!!this.uiConfig.ShowStartPop, {
               builder: PopupBuilder(this, PopTips[0], () => {
@@ -377,6 +351,10 @@ struct Home {
         this.proxyGroups.pushData(proxyData)
       }
     })
+    // 注册代理启动事件
+    EventHub.on(EventKey.ChangeProxy, () => {
+      this.switchProxyMode()
+    })
     // 只有当PC首次启动时重置主页布局
     if (this.is2in1 && this.uiConfig.isShowHomeCard === JSON.stringify(showHomeCard)) {
       this.theCurrentHomeCard = showHomeCardPC
@@ -389,6 +367,34 @@ struct Home {
     // 将dialogController置空
     this.SaveDialogController = null
     EventHub.off(EventKey.SwitchModeCard)
+    EventHub.off(EventKey.ChangeProxy)
+  }
+
+  /** @description 切换代理状态 */
+  async switchProxyMode() {
+    if (this.configList.length === 0 || this.proxyGroups.totalCount() === 0) {
+      if (this.uiConfig.isVibrate) {
+        customVibrator.vibratorTriggerOfHapticClockTimer()
+      }
+      // 配置页没有数据，或者代理节点未加载
+      this.promptAction.showToast({
+        message: `${Xb_GetResourceString($r('app.string.start_prompt'), this.getUIContext().getHostContext())}`
+      })
+      // vpn小钥匙可能卡死，关闭vpn小钥匙
+      await ClashViewModel.StopVpn()
+    } else {
+      this.proxyEnabled = !this.proxyEnabled
+      hilog.info(0xA002, this.componentName, `主页按钮点击后 代理启动按钮状态：${this.proxyEnabled}`)
+      if (this.proxyEnabled) {
+        await ClashViewModel.StartVpn()
+      } else {
+        console.log(`Home BackgroundDownService Clash已经停止`)
+        await ClashViewModel.StopVpn()
+      }
+      if (this.uiConfig.isVibrate) {
+        customVibrator.vibratorTriggerOfHapticClockTimer()
+      }
+    }
   }
 
   homeCardList(): HomeCardInfo[] {

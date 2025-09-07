@@ -102,8 +102,10 @@ export struct StylesEdit {
               .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
               .onClick(() => {
                 // EventHub.sendEvent(EventKey.ProxySort, n["v"])
-                animateTo({ duration: this.uiConfig.animationSpeed }, () => {
+                this.getUIContext().animateTo({ duration: this.uiConfig.animationSpeed }, () => {
                   this.appConfig.proxySort = n["v"]
+                  // 触发排序事件
+                  EventHub.sendEvent(EventKey.ProxySort)
                 })
               })
 

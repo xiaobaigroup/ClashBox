@@ -17,6 +17,7 @@ import ClashViewModel from '../../entryability/ClashViewModel';
 import { PopTips, PopupBuilder } from '../Start/Popup';
 import { ListGutter, ProxyListLanes } from '../../common/breakpoint/BreakPoint';
 import { cardManager } from '../../common/utils/CardManageUtil';
+import { EventKey, EventHub } from '../../common/EventHub';
 
 // 组件名
 const componentName: string = 'ProxyPage'
@@ -46,7 +47,7 @@ struct ProxyGroupItem {
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
   /* 代理节点数据相关参数  */
-  //节点数据组
+  // 节点数据组
   @Prop proxyitems: ProxyItem[]
   // 代理分组序号[0 ~ +∞]
   @Prop proxyGroup: number
@@ -62,7 +63,7 @@ struct ProxyGroupItem {
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
-  @StorageLink('appConfig') @Watch('switchSort') appConfig: AppConfig = new AppConfig()
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 收藏显示判定
   @Consume showStart:boolean
@@ -220,30 +221,25 @@ struct ProxyGroupItem {
   })
 
   async aboutToAppear(): Promise<void> {
-    hilog.info(0xB000, componentName, `#aboutToAppear`)
-    this.switchSort()
-    /*EventHub.on(EventKey.ProxySort, async (sort: ProxySort) => {
-      console.log("ProxySort", sort)
-      // hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行4 %{public}s")
-      // hilog.info(0xFF00, "ProxyPageLatencyTag", "this.proxyitems %{public}s", JSON.stringify(this.proxyitems))
-    })*/
-  }
-
-  switchSort() {
-    if (!this.proxyitems)
-      return
-    if (this.appConfig.proxySort == ProxySort.Default) {
-      this.proxyLazyItems.DefaultSortItems(this.proxyitems)
-    } else if (this.appConfig.proxySort == ProxySort.Title) {
-      this.proxyLazyItems.NameSortItems(this.proxyitems)
-    } else if (this.appConfig.proxySort == ProxySort.Delay){
-      this.proxyLazyItems.LatencySortItems(this.proxyitems)
-      hilog.info(0xFF00, "ProxySort ProxyPageLatencyTag", "延迟排序 %{public}s", this.appConfig.proxySort)
-    }
+    hilog.info(0xB000, componentName, `ProxySort #ProxyGroupItem 代理节点：%{public}s`, JSON.stringify(this.proxyitems))
+    EventHub.on(EventKey.ProxySort, () => {
+      console.log("ProxySort 排序类型：%{public}s", this.appConfig.proxySort)
+      if (!this.proxyitems)
+        return
+      if (this.appConfig.proxySort == ProxySort.Default) {
+        this.proxyLazyItems.DefaultSortItems(this.proxyitems)
+      } else if (this.appConfig.proxySort == ProxySort.Title) {
+        this.proxyLazyItems.NameSortItems(this.proxyitems)
+      } else if (this.appConfig.proxySort == ProxySort.Delay) {
+        this.proxyLazyItems.LatencySortItems(this.proxyitems)
+        hilog.info(0xFF00, "ProxySort ProxyPageLatencyTag", "延迟排序成功 %{public}s", this.appConfig.proxySort)
+      }
+    })
+    EventHub.sendEvent(EventKey.ProxySort)
   }
 
   aboutToDisappear() {
-    // EventHub.off(EventKey.ProxySort)
+    EventHub.off(EventKey.ProxySort)
   }
 
   /**
@@ -281,7 +277,6 @@ struct ProxyGroupItem {
     console.info('Click the callback in the blank area')
   }
 
-  // 收藏与ping延迟即时动作
   ProxyPromptAction: PromptAction = this.getUIContext()?.getPromptAction()
 
   OnProxyChange: ((item: ProxyItem) => void) = () => {

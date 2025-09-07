@@ -252,7 +252,7 @@ export class ClashViewModel {
       })
       return groups
     } catch (e) {
-      console.error("获取代理失败: ", e.stack)
+      console.error(" 获取代理失败: ", e.stack)
       ClashViewModel.promptAction.showToast({message: "获取代理失败: " + (e.message || e) + e.stack})
     }
     return []

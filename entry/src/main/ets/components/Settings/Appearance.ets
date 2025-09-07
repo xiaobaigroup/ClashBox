@@ -229,6 +229,28 @@ struct Appearance {
             })
             // 分割线
             Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
+            // 代理页按钮
+            Row() {
+              toggleRowList({
+                icons: $r('sys.symbol.circle_filled_and_circle'),
+                title: $r('app.string.proxy_open_button'),
+              }) {
+                // 代理页按钮开关
+                Toggle({ type: ToggleType.Switch, isOn: $$this.uiConfig.needProxyStart })
+                  .selectedColor(this.icon_emphasize)
+                  .hitTestBehavior(HitTestMode.None)
+                  .margin({right: 12})
+              }
+            }.onClick(()=> {
+              // 打开代理页按钮 显式动画
+              this.getUIContext()?.animateTo({
+                duration: ANIMATION_DURATION_300
+              }, () => {
+                this.uiConfig.needProxyStart = !this.uiConfig.needProxyStart
+              })
+            })
+            // 分割线
+            Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
             // 悬浮按钮位置
             menuRowList({
               icons: $r('sys.symbol.local_fill'),

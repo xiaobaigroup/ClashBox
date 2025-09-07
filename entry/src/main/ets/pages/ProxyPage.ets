@@ -17,7 +17,7 @@ import { curves, PromptAction } from '@kit.ArkUI'
 import { ProviderPage } from '../components/Proxy/Provider'
 import { indexController } from './Index'
 import { customAnimationUtil } from '../common/utils/Animation'
-import { Nothing, RightDownButton } from '../components/Common/Common'
+import { ButtonBuilder, Nothing, RightDownButton } from '../components/Common/Common'
 import { StylesEdit } from '../components/Proxy/StylesEdit'
 import { PopTips, PopupBuilder } from '../components/Start/Popup'
 import { deviceInfo } from '@kit.BasicServicesKit'
@@ -28,51 +28,62 @@ import { getResourceString } from '../common/utils/ResourceStringUtil'
 import { RoundButton } from '../components/Common/RoundButton'
 import { cardManager } from '../common/utils/CardManageUtil'
 
+// 定义日志组件名
+const componentName: string = 'ProxyPage'
+// 一级文本色，黑色
+const font_primary: ResourceColor = $r('sys.color.font_primary')
+// 一级图标色，黑色
+const icon_primary: ResourceColor = $r('sys.color.icon_primary')
+// 二级图标色，深灰色
+const icon_secondary: ResourceColor = $r('sys.color.icon_secondary')
+// 二级文本色，深灰色
+const font_secondary: ResourceColor = $r('sys.color.font_secondary')
+// 一级文本反色，白色
+const font_on_primary: ResourceColor = $r('sys.color.font_on_primary')
+// 卡片颜色
+const container_background: ResourceColor = ($r('app.color.container_background'))
 
 @Entry
 @Component
 struct ProxyPage {
-  //系统颜色调用
-  /* 主题色 */
-  @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+
+  /** 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   // 所有子组件在容器内的对齐方式
   @Consume('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
-  //一级文本色，黑色
-  @State font_primary: ResourceColor = $r('sys.color.font_primary')
-  //二级文本色，深灰色
-  @State font_secondary: ResourceColor = $r('sys.color.font_secondary')
-  //卡片颜色
-  @State container_background: ResourceColor = ($r('app.color.container_background'))
-  //一级文本反色，白色
-  @State font_on_primary: ResourceColor = $r('sys.color.font_on_primary')
-  //一级图标色，黑色
-  @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
-  //二级图标色，深灰色
-  @State icon_secondary: ResourceColor = $r('sys.color.icon_secondary')
-  /* Stack层叠布局 */
+  /** 主题色 */
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
 
-  @Consume isRolling: boolean
-  @Consume isSmallSquareScreen: boolean
-
-  @StorageProp('WindowMode') windowMode: boolean = false
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
-
-  // 是否要打开样式编辑
-  @State isStylesEdit: boolean = false
+  // 代理启动持续的时间
+  @StorageProp('proxyStartingDuration') proxyStartingDuration: string = ''
+  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
+  @StorageLink('isLandscapePhone') isLandscapePhone: boolean = false
+  // 窗口模式
+  @StorageProp('WindowMode') windowMode: boolean = false
   // 半模态页
   @State isShowProxyBindSheet: boolean = false
-  // 当前代理分组
-  @Consume currentProxyIndex: number
-  // 假数据延迟颜色设置
-  @State color: ResourceColor = $r('sys.color.font_secondary')
+  @Consume isSmallSquareScreen: boolean
+  // 是否要打开样式编辑
+  @State isStylesEdit: boolean = false
+  // 收藏显示判定
+  @Provide showStart: boolean = false
+  // 代理页延迟按钮气泡提示
+  @Consume isShowDelayPop: boolean
+  // px外屏
+  @Consume isPXSecScreen: boolean
+  // 代理启动按钮状态
+  @Consume proxyEnabled: boolean
+  // 是否滚动
+  @Consume isRolling: boolean
+
   // 定义ProxyArrangementSelected的值便于切换分组方式
   @State ProxyArrangementSelected: string = 'ProxyArrangementSelected1';
   @State ProxyArrangementChecked: boolean = true;
+
   // 定义ProxyGroupItemSelected的值便于切换布局方式
   @Provide ProxyGroupItemSelected: string = 'ProxyGroupItemSelectedWide'
   @State ProxyGroupItemChecked: boolean = true;
@@ -82,182 +93,67 @@ struct ProxyPage {
   @State currentRadioValue3: number = 0 // 卡片尺寸切换
 
   /*节点相关数据以及排序 */
-  @Prop proxyitems: ProxyItem[]
+  @Consume('currentProfile') currentProfile: Profile | null
   // 代理数据(懒加载)
   @Consume proxyGroups: ProxyGroupItemDataSource
-  // 代理分组tabs控制器
-  private ListScroller: Scroller = new Scroller()
-  //private tabsController: TabsController = new TabsController();
-  // 代理节点Swiper控制器
-  private SwiperController: SwiperController = new SwiperController()
-
-  // 收藏与ping延迟即时动作
-  private ProxyPromptAction: PromptAction = this.getUIContext()?.getPromptAction()
-  /* 当前设备`height`是否符合(320vp< height <= 500vp) */
-  @StorageLink('isLandscapePhone') isLandscapePhone: boolean = false
-  // 按钮宽度
-  private proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
-  // 按钮高度
-  private proxyStartButtonHeight: Length = $r('app.integer.vp_proxy_not_start_button_height')
-  // 按钮前Symbol动效
-  private ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE
-  //定义组件名
-  private componentName: string = 'ProxyPage'
-  @Consume('currentProfile') currentProfile: Profile | null
-  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-  @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
-  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @Consume proxyLazyItems: ProxyItemDataSource
+  @Consume paddingButtom: number | Resource
+  // 当前代理分组
+  @Consume currentProxyIndex: number
+  @Consume curOffsetRemain: number
   // page内顶部标题偏移量
   @Consume curYOffset: number
-  // 收藏显示判定
-  @Provide showStart: boolean = false
-  // 代理页延迟按钮气泡提示
-  @Consume isShowDelayPop: boolean
   // px外屏隐藏top和tab偏移
   @Consume heightTop: number
-  @Consume curOffsetRemain: number
 
-  aboutToAppear(): void {
-    hilog.info(0xB000, this.componentName, `#aboutToAppear`)
-    this.isShowDelayPop = this.uiConfig.ShowDelayPop
-    /*if (this.currentProfile) {
-      let tabIndex = this.theProxyGroups.findIndex((d) => d.name == this.currentProfile?.currentGroupName)
-      setTimeout(() => {
-        if (tabIndex > -1 && this.currentProxyIndex === 0) {
-          this.ListScroller.scrollToIndex(tabIndex)
-          this.currentProxyIndex = tabIndex
-          this.SwiperController.changeIndex(this.currentProxyIndex)
-        } else {
-          this.ListScroller.scrollToIndex(this.currentProxyIndex)
-          this.SwiperController.changeIndex(this.currentProxyIndex)
-        }
-      }, 200)
-    }*/
-  }
-  @Consume proxyLazyItems: ProxyItemDataSource
+  @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
+  private ProxyPromptAction: PromptAction = this.getUIContext()?.getPromptAction()
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
+  // 代理节点Swiper控制器
+  private SwiperController: SwiperController = new SwiperController()
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  // 代理分组tabs控制器
+  private ListScroller: Scroller = new Scroller()
 
-  aboutToDisappear() {
-    EventHub.off(EventKey.FetchProxyGroup)
-    // EventHub.off(EventKey.ProxySort)
-    EventHub.off(EventKey.TestDelay)
-    this.uiConfig.ShowDelayPop = this.isShowDelayPop
-  }
-
-  changeProxy(group: string, item: ProxyItem) {
-    if (this.currentProfile) {
-      ClashViewModel.changeProxy(this.currentProfile, group, item.name)
-      // 首选项持久化存储 -> 供卡片使用
-      cardManager.setSelectedProxyNode(this.currentProfile, group, item.name)
-    }
-  }
-
-  // 标题按钮
-  @Builder
-  ButtonBuilder(icons: Resource, onCheck: () => void ) {
-    Button({ type: ButtonType.Circle, stateEffect: true }) {
-      SymbolGlyph(icons)
-        .fontSize(24)
-        .fontColor([this.icon_primary])
-    }
-    .width(40)
-    .height(40)
-    .backgroundColor($r('app.color.settings_container_background'))
-    //.visibility((this.isRolling && this.isSmallSquareScreen) ? Visibility.Hidden : Visibility.Visible)
-    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-    .onClick(() => {
-      onCheck()
-    })
-    .transition(customAnimationUtil.isSlide(100, this.uiConfig))
-  }
-  // 标签列表样式标签
-  @Builder
-  TabBuilder(title: ResourceStr, targetIndex: number) {
-    Column() {
-      Flex({
-        direction: FlexDirection.Row,
-        justifyContent: FlexAlign.Center,
-        alignItems: ItemAlign.Center
-      }) {
-        Text(`${title}`) // ${targetIndex}
-          .fontColor(this.currentProxyIndex === targetIndex ? this.font_on_primary : this.font_secondary)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .padding({left: 6, right: 6})
-          .fontSize(14)
-          .maxLines(1)
-      }
-      .borderRadius(BORDER_RADIUS_20)
-      .constraintSize({minWidth: 86})
-      .height(this.currentProxyIndex === targetIndex ? 36 : 32)
-      .backgroundColor(this.currentProxyIndex === targetIndex ? this.icon_emphasize : this.container_background)
-    }
-    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-    .height(55)
-    .margin({ right: 8, bottom: 10 })
-    .onClick(() => {
-      animateTo({ duration: this.uiConfig.animationSpeed }, () => {
-        this.currentProxyIndex = targetIndex
-      })
-      this.SwiperController.changeIndex(targetIndex, this.uiConfig.animationSpeed != 0 ? true : false)
-    })
-    .justifyContent(FlexAlign.Center)
-    .alignItems(HorizontalAlign.Start)
-  }
-  // 半模态页面
-  @Builder
-  ProxyBindSheet() {
-    Column() {
-      if (this.isStylesEdit) {
-        // 样式编辑
-        StylesEdit()
-      } else {
-        // 提供者
-        ProviderPage()
-      }
-    }
-    .width('100%')
-  }
-  @Consume paddingButtom: number | Resource
-  // px外屏
-  @Consume isPXSecScreen: boolean
 
   build() {
     Stack() {
       // 标题栏
       if (!this.isPXSecScreen) {
-      Row({ space: 12 }) {
-        TopBar({
-          title: getResourceString($r('app.string.Proxy'), this),
-          titleFontSize: this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE - this.curYOffset / 100 : TAB_CONTENT_TITLE_FONT_SIZE,
-          iconSize: this.windowMode ? 16 : (this.curYOffset < 0 ? 24 - this.curYOffset / 100 : 24),
-          icons: [$r('sys.symbol.puzzle'), $r('sys.symbol.square_and_pencil')],
-          // 一键取消所有收藏按钮 TODO 判定有误，搁置；启用时需将图标$r('sys.symbol.heart_slash')添加进数组并添加修改对应                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               点击事件
-          /* onFClick: () => {
-             this.favoriteProxys.clear()
-             this.showStart=true
-             this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_all_tip') })
-           }*/
-          // 提供者按钮
-          onFClick: () => {
-            this.isStylesEdit = false
-            this.isShowProxyBindSheet = true
-            this.isEnableIndexForegroundBlur = true
-          },
-          // 编辑图标
-          onSClick: () => {
-            this.isStylesEdit = true
-            this.isShowProxyBindSheet = true
-            this.isEnableIndexForegroundBlur = true
-          }
-        })
-      }
-      .zIndex(1)
-      .position({x: 0, y:this.isRolling && this.isSmallSquareScreen ? this.heightTop : 0})
-      .alignItems(this.windowMode ? VerticalAlign.Top : VerticalAlign.Center)
-      .width('100%')
-      .transition(customAnimationUtil.isSlide(0, this.uiConfig))
-      .backgroundColor($r('app.color.background'))
-      .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
+        Row({ space: 12 }) {
+          TopBar({
+            title: getResourceString($r('app.string.Proxy'), this),
+            titleFontSize: this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE - this.curYOffset / 100 : TAB_CONTENT_TITLE_FONT_SIZE,
+            iconSize: this.windowMode ? 16 : (this.curYOffset < 0 ? 24 - this.curYOffset / 100 : 24),
+            icons: [$r('sys.symbol.puzzle'), $r('sys.symbol.square_and_pencil')],
+            // 一键取消所有收藏按钮 TODO 判定有误，搁置；启用时需将图标$r('sys.symbol.heart_slash')添加进数组并添加修改对应                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               点击事件
+            /* onFClick: () => {
+               this.favoriteProxys.clear()
+               this.showStart=true
+               this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_all_tip') })
+             }*/
+            // 提供者按钮
+            onFClick: () => {
+              this.isStylesEdit = false
+              this.isShowProxyBindSheet = true
+              this.isEnableIndexForegroundBlur = true
+            },
+            // 编辑图标
+            onSClick: () => {
+              this.isStylesEdit = true
+              this.isShowProxyBindSheet = true
+              this.isEnableIndexForegroundBlur = true
+            }
+          })
+        }
+        .zIndex(1)
+        .position({x: 0, y:this.isRolling && this.isSmallSquareScreen ? this.heightTop : 0})
+        .alignItems(this.windowMode ? VerticalAlign.Top : VerticalAlign.Center)
+        .width('100%')
+        .transition(customAnimationUtil.isSlide(0, this.uiConfig))
+        .backgroundColor($r('app.color.background'))
+        .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
       }
 
       if (this.proxyGroups.totalCount() == 0) {
@@ -276,7 +172,7 @@ struct ProxyPage {
                   // 代理分组List Start
                   List({scroller: this.ListScroller,initialIndex:this.currentProxyIndex}) {
                     LazyForEach(this.proxyGroups, (group: ProxyGroup, index: number) => {
-                        this.TabBuilder(group.name, index)
+                      this.TabBuilder(group.name, index)
                     }, (item: ProxyGroup) => item.name)
                   }
                   .height(55)
@@ -285,17 +181,17 @@ struct ProxyPage {
                   .listDirection(Axis.Horizontal)
 
                   //此处可以直接用tabs懒加载+swiper懒加载并行实现 tabs start
-                 /* Tabs({ barPosition: BarPosition.Start,index:this.currentProxyIndex, controller: this.tabsController }) {
-                    LazyForEach(this.proxyGroups, (group: ProxyGroup, index: number) => {
-                      TabContent().tabBar(this.TabBuilder(group.name, index))
-                    }, (item: ProxyGroup) => item.name)
-                  }
-                  .barMode(BarMode.Scrollable)
-                  .height(55)
-                  .width('100%')
-                  .animationDuration(this.uiConfig.animationSpeed)
-                  .fadingEdge(false)
-                  .scrollable(false)*/
+                  /* Tabs({ barPosition: BarPosition.Start,index:this.currentProxyIndex, controller: this.tabsController }) {
+                     LazyForEach(this.proxyGroups, (group: ProxyGroup, index: number) => {
+                       TabContent().tabBar(this.TabBuilder(group.name, index))
+                     }, (item: ProxyGroup) => item.name)
+                   }
+                   .barMode(BarMode.Scrollable)
+                   .height(55)
+                   .width('100%')
+                   .animationDuration(this.uiConfig.animationSpeed)
+                   .fadingEdge(false)
+                   .scrollable(false)*/
                   // 代理分组tabs End
 
                   // 代理节点Swiper Start
@@ -303,7 +199,7 @@ struct ProxyPage {
                     LazyForEach(this.proxyGroups, (group: ProxyGroup, index: number) => {
                       ProxyGroupItem({
                         proxyGroup: index,
-                        proxyitems: group.proxies as ProxyItem[],
+                        proxyitems: group.proxies as ProxyItem[] ?? [],
                         ProxyGroupItemSelected: this.appConfig.proxyCardSize,
                         disabled: group.type !== ProxyType.Selector,
                         selectedProxy: this.currentProfile?.getSelectedProxy(group) ?? this.appConfig.currentProxyName ?? '',
@@ -314,14 +210,14 @@ struct ProxyPage {
                         .width('100%')
                         .height('100%')
                         .padding({ bottom:  this.isPXSecScreen || (this.isSmallSquareScreen && this.isRolling) ? 0 : !this.uiConfig.isBlurr  ? CONTENT_END_OFFSET_150 - 100 : CONTENT_END_OFFSET_150 - 50 })
-                        // .onAppear(() => {
-                        //promptAction.showToast({message: `当前选中：${this.currentProfile?.getSelectedProxy(group) ?? ""}`, duration: 2000 })
-                         //  hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear %{public}s", group.proxies.toString())
-                          // hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear hidden: %{public}s %{public}d", group.hidden, index)
-                         //})
-                        // .onDisAppear(() => {
-                        //   hilog.info(0xFF00, "ProxyPageGroupTag", "#onDisAppear %{public}s", group.toString())
-                        // })
+                      // .onAppear(() => {
+                      //promptAction.showToast({message: `当前选中：${this.currentProfile?.getSelectedProxy(group) ?? ""}`, duration: 2000 })
+                      //  hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear %{public}s", group.proxies.toString())
+                      // hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear hidden: %{public}s %{public}d", group.hidden, index)
+                      //})
+                      // .onDisAppear(() => {
+                      //   hilog.info(0xFF00, "ProxyPageGroupTag", "#onDisAppear %{public}s", group.toString())
+                      // })
                     }, (item: ProxyGroup) => item.name + Date.now())
                   }
                   .index(this.currentProxyIndex)
@@ -333,7 +229,7 @@ struct ProxyPage {
                   .alignSelf(ItemAlign.Center)
                   .onGestureSwipe((index: number, extraInfo: SwiperAnimationEvent) => {
                     hilog.info(0xFF00, "ProxyPagePanTag", "currentOffset: %{private}d", extraInfo.currentOffset)
-                    animateTo({ duration: this.uiConfig.animationSpeed }, () => {
+                    this.getUIContext().animateTo({ duration: this.uiConfig.animationSpeed }, () => {
                       // 当主tab栏竖排时不触发切换
                       // hilog.info(0xFF00, "ProxyLandscapeTag", "tab栏竖排状态: %{public}s", this.compVertical.value)
                       // hilog.info(0xFF00, "ProxyLandscapeTag", "手机横屏状态状态: %{public}s", this.isLandscapePhone)
@@ -347,9 +243,9 @@ struct ProxyPage {
                     })
                   })
                   .onAnimationStart((index: number,targetIndex: number) => {
-                    animateTo({ duration: this.uiConfig.animationSpeed }, () => {
+                    this.getUIContext().animateTo({ duration: this.uiConfig.animationSpeed }, () => {
                       this.ListScroller.scrollToIndex(targetIndex)
-                    //  this.tabsController.changeIndex(targetIndex)
+                      //  this.tabsController.changeIndex(targetIndex)
                       this.currentProxyIndex = targetIndex
                       if (this.currentProfile) {
                         this.currentProfile.currentGroupName = this.proxyGroups.getData(this.currentProxyIndex).name
@@ -384,10 +280,10 @@ struct ProxyPage {
               hilog.info(0xFF00, "ProxyPageTag", "yOffset: %{public}d", this.curYOffset)
             })
             .onScrollFrameBegin((offset: number) => {
-              this.curOffsetRemain  += offset
-              if (offset>0) {
+              this.curOffsetRemain += offset
+              if (offset > 0) {
                 this.isRolling = true
-              }else if(offset<0){
+              } else if(offset < 0) {
                 this.isRolling = false
                 this.curOffsetRemain = 0
               }
@@ -398,30 +294,26 @@ struct ProxyPage {
 
           // 悬浮代理测速按钮 START
           if (!this.isPXSecScreen) {
-            RoundButton({
-              Icon2: $r('sys.symbol.bolt_filled_on_circle')
-            })
-              .bindPopup(!!this.isShowDelayPop, {
-                builder: PopupBuilder(this, PopTips[3], () => {
-                  this.isShowDelayPop = false
-                }),
-                onWillDismiss: false,
-                autoCancel: false
-              })
-              .onClick(async () => {
-                this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
-                await ClashViewModel.testAllDelay(this.proxyGroups.getData(this.currentProxyIndex).proxies as ProxyItem[])
-                hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行1 %{public}s")
-                if (this.uiConfig.isVibrate) {
-                  customVibrator.vibratorTriggerOfHapticClockTimer()
-                }
-              })
+            Row({space: 7}) {
+              if (this.uiConfig.buttonPositionIndex === 0 && this.uiConfig.needProxyStart) {
+                this.delayButton()
+                this.startButton()
+              } else if (this.uiConfig.buttonPositionIndex === 2 && this.uiConfig.needProxyStart) {
+                this.startButton()
+                this.delayButton()
+              } else {
+                this.delayButton()
+              }
+            }.height(50)
+            .alignItems(VerticalAlign.Center)
+            .backgroundColor(Color.Transparent)
+            .margin({ bottom: $r('app.integer.vp_proxy_start_button_left_right_margin'), right: $r('app.integer.vp_proxy_start_button_left_right_margin'), left: $r('app.integer.vp_proxy_start_button_left_right_margin') })
           }
           // 悬浮代理测速按钮 END
         }
         .backgroundColor($r('app.color.background'))
         .width('100%')
-        .height( '100%' )
+        .height('100%')
         // 主体 END
       }
     }
@@ -444,6 +336,165 @@ struct ProxyPage {
       }
     })
   }
+
+  // 测速按钮
+  @Builder
+  delayButton() {
+    Column() {
+      if (this.uiConfig.buttonPositionIndex === 1 || !this.uiConfig.needProxyStart) {
+        RoundButton({
+          needMargin: false,
+          Icon2: $r('sys.symbol.bolt_filled_on_circle'),
+        })
+      } else {
+        ButtonBuilder({ icon: $r('sys.symbol.bolt_filled_on_circle') })
+          .offset({y: 3})
+      }
+    }
+    .bindPopup(!!this.isShowDelayPop, {
+      builder: PopupBuilder(this, PopTips[3], () => {
+        this.isShowDelayPop = false
+      }),
+      onWillDismiss: false,
+      autoCancel: false
+    })
+    .onClick(async () => {
+      this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
+      try {
+        const results = await ClashViewModel.testAllDelay(this.proxyGroups.getData(this.currentProxyIndex).proxies as ProxyItem[])
+        console.log(`ProxySort results: ${JSON.stringify(results)}`)
+        // 测速完成后如果配置为延迟排序则触发一次排序事件
+        if (this.appConfig.proxySort === ProxySort.Delay && results) {
+          EventHub.sendEvent(EventKey.ProxySort)
+        }
+      } catch (err) {
+        console.error(`ProxySort results: ${JSON.stringify(err)}`)
+      }
+      if (this.uiConfig.isVibrate) {
+        customVibrator.vibratorTriggerOfHapticClockTimer()
+      }
+    })
+  }
+  // 开始按钮
+  @Builder
+  startButton() {
+    RoundButton({
+      needMargin: false,
+      Icon1: $r('sys.symbol.pause'),
+      Icon2: $r('sys.symbol.play_fill'),
+      Switch: this.proxyEnabled,
+      SubText: this.proxyStartingDuration
+    })
+      .onClick(async () => {
+        // 触发代理启动事件
+        EventHub.sendEvent(EventKey.ChangeProxy)
+      })
+      .bindPopup(!!this.uiConfig.ShowStartPop, {
+        builder: PopupBuilder(this, PopTips[0], () => {
+          this.uiConfig.ShowStartPop = false
+        }),
+        onWillDismiss: false,
+        autoCancel: false
+      })
+  }
+  // 标题按钮
+  @Builder
+  ButtonBuilder(icons: Resource, onCheck: () => void ) {
+    Button({ type: ButtonType.Circle, stateEffect: true }) {
+      SymbolGlyph(icons)
+        .fontSize(24)
+        .fontColor([icon_primary])
+    }
+    .width(40)
+    .height(40)
+    .backgroundColor($r('app.color.settings_container_background'))
+    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+    .onClick(() => {
+      onCheck()
+    })
+    .transition(customAnimationUtil.isSlide(100, this.uiConfig))
+  }
+  // 标签列表样式标签
+  @Builder
+  TabBuilder(title: ResourceStr, targetIndex: number) {
+    Column() {
+      Flex({
+        direction: FlexDirection.Row,
+        justifyContent: FlexAlign.Center,
+        alignItems: ItemAlign.Center
+      })
+      {
+        Text(`${title}`) // ${targetIndex}
+          .fontColor(this.currentProxyIndex === targetIndex ? font_on_primary : font_secondary)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .padding({left: 6, right: 6})
+          .fontSize(14)
+          .maxLines(1)
+      }
+      .borderRadius(BORDER_RADIUS_20)
+      .constraintSize({minWidth: 86})
+      .height(this.currentProxyIndex === targetIndex ? 36 : 32)
+      .backgroundColor(this.currentProxyIndex === targetIndex ? this.icon_emphasize : container_background)
+    }
+    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+    .height(55)
+    .margin({ right: 8, bottom: 10 })
+    .onClick(() => {
+      this.getUIContext().animateTo({ duration: this.uiConfig.animationSpeed }, () => {
+        this.currentProxyIndex = targetIndex
+      })
+      this.SwiperController.changeIndex(targetIndex, this.uiConfig.animationSpeed != 0 ? true : false)
+    })
+    .justifyContent(FlexAlign.Center)
+    .alignItems(HorizontalAlign.Start)
+  }
+  // 半模态页面
+  @Builder
+  ProxyBindSheet() {
+    Column() {
+      if (this.isStylesEdit) {
+        // 样式编辑
+        StylesEdit()
+      } else {
+        // 提供者
+        ProviderPage()
+      }
+    }
+    .width('100%')
+  }
+
+  aboutToAppear(): void {
+    hilog.info(0xB000, componentName, `#aboutToAppear`)
+    this.isShowDelayPop = this.uiConfig.ShowDelayPop
+    /*if (this.currentProfile) {
+      let tabIndex = this.theProxyGroups.findIndex((d) => d.name == this.currentProfile?.currentGroupName)
+      setTimeout(() => {
+        if (tabIndex > -1 && this.currentProxyIndex === 0) {
+          this.ListScroller.scrollToIndex(tabIndex)
+          this.currentProxyIndex = tabIndex
+          this.SwiperController.changeIndex(this.currentProxyIndex)
+        } else {
+          this.ListScroller.scrollToIndex(this.currentProxyIndex)
+          this.SwiperController.changeIndex(this.currentProxyIndex)
+        }
+      }, 200)
+    }*/
+  }
+
+  aboutToDisappear() {
+    EventHub.off(EventKey.FetchProxyGroup)
+    EventHub.off(EventKey.TestDelay)
+    this.uiConfig.ShowDelayPop = this.isShowDelayPop
+  }
+
+  changeProxy(group: string, item: ProxyItem) {
+    if (this.currentProfile) {
+      ClashViewModel.changeProxy(this.currentProfile, group, item.name)
+      // 首选项持久化存储 -> 供卡片使用
+      cardManager.setSelectedProxyNode(this.currentProfile, group, item.name)
+    }
+  }
+
 }
 
 export default ProxyPage

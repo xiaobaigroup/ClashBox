@@ -2159,6 +2159,10 @@
     {
       "name": "coexist_notice_tips",
       "value": "允許普通通知與背景通知並存"
+    },
+    {
+      "name": "proxy_open_button",
+      "value": "代理頁啟動按鈕"
     }
   ]
 }

@@ -99,6 +99,8 @@ export class UIConfig{
   isSound: boolean = true
   // 通知总开关
   Enablednotice: boolean = true
+  // 启用代理页开关
+  needProxyStart: boolean = false
   // 常驻通知开关
   EnabledPermanentnotice: boolean = true
   // 常驻状态栏开关

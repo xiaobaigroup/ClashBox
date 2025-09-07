@@ -348,9 +348,9 @@ struct Index {
         .onChange((index) => {
           if (index == 0) {
             this.isHomePage = true
-          } else {
-            this.isHomePage = false
+            return
           }
+          this.isHomePage = false
         })
         .onAnimationStart((index: number, targetIndex: number) => {
           this.UIcontext.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear, }, () => {
@@ -873,6 +873,7 @@ struct Index {
           this.proxyGroups.empty()
           const rawProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode ?? ProxyMode.Rule)
           const ProxyGroups = rawProxyGroups.filter(item => item.hidden !== true)
+          // hilog.info(0xB000, componentName, `ProxySort #Index 节点数据：${JSON.stringify(rawProxyGroups[0].proxies[0])}`)
           this.proxyGroups.pushData(ProxyGroups)
           this.proxyGroups.refresh()
         }
@@ -921,6 +922,24 @@ struct Index {
       this.updateData()
     }
 
+  }
+
+  aboutToDisappear() {
+    hilog.info(0x1000, componentName, `#aboutToDisappear executed`)
+    // 纪录软件关闭时间
+    this.uiConfig.useTime = new Date().getTime()
+    // 解注册画中画生命周期及状态回调
+    PipManager.getInstance().unregisterPipStateChangeListener()
+    EventHub.off(EventKey.FetchProxyGroup)
+    EventHub.off(EventKey.ShareBundle)
+    EventHub.off(EventKey.EnabledNotice)
+    EventHub.off(EventKey.StopedClash)
+    EventHub.off(EventKey.StartedClash)
+    EventHub.off(EventKey.ExportLog)
+    EventHub.off(EventKey.ClearLog)
+    EventHub.off(EventKey.StartLog)
+    // 解绑listener中注册的回调函数
+    // this.deviceHeightListener.off('change');
   }
 
   // 更新后直接赋值一次
@@ -975,16 +994,6 @@ struct Index {
   /**分流模式选择数据变化监控*/
   async switchMode() {
     this.proxyGroups.refresh()
-  }
-
-  aboutToDisappear() {
-    hilog.info(0x1000, componentName, `#aboutToDisappear executed`)
-    // 纪录软件关闭时间
-    this.uiConfig.useTime = new Date().getTime()
-    // 解注册画中画生命周期及状态回调
-    PipManager.getInstance().unregisterPipStateChangeListener()
-    // 解绑listener中注册的回调函数
-    // this.deviceHeightListener.off('change');
   }
 
   /**

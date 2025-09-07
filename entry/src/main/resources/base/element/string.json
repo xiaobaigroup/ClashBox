@@ -2159,6 +2159,10 @@
     {
       "name": "coexist_notice_tips",
       "value": "允许普通与后台通知共存"
+    },
+    {
+      "name": "proxy_open_button",
+      "value": "代理页开始按钮"
     }
   ]
 }
