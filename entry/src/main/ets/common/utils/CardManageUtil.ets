@@ -80,7 +80,7 @@ class CardManager {
       formProvider.updateForm(formId, data)
     })
   }
-  
+
   /** @description 推送IP地址到所有卡片 */
   pushCartProxyIpInfo(remoteIp: IpInfo) {
     // 创建推送数据
@@ -92,7 +92,7 @@ class CardManager {
       formProvider.updateForm(formId, data)
     })
   }
-  
+
   /** @description 推送当前节点名称到所有卡片 */
   pushCartCurrentProxyName(currentProxyName: string) {
     const data = formBindingData.createFormBindingData({
@@ -108,6 +108,18 @@ class CardManager {
   pushCartVpnServiceTime(proxyStartingDuration: string) {
     const data = formBindingData.createFormBindingData({
       proxyStartingDuration
+    })
+
+    this.getCardIdList().forEach(formId => {
+      // 推送到卡片
+      formProvider.updateForm(formId, data)
+    })
+  }
+
+  /** @description 推送主题色到所有卡片 */
+  pushCartThemeColor(themeColor: ResourceColor) {
+    const data = formBindingData.createFormBindingData({
+      themeColor
     })
 
     this.getCardIdList().forEach(formId => {

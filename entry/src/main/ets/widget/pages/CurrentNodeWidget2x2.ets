@@ -31,9 +31,9 @@ struct CurrentNodeWidget2x2 {
   /** @description 节点名 */
   @LocalStorageProp('currentProxyName')
   currentProxyName: string = '节点名'
-  /** @description TODO 主题色 */
-  @LocalStorageProp('icon_emphasize')
-  icon_emphasize: ResourceColor = '#0A59F7'
+  /** @description 主题色 */
+  @LocalStorageProp('themeColor')
+  themeColor: ResourceColor = '#0A59F7'
 
   updateFormId() {
     ActionUtils.updateCardIdAction(this, this.formId)
@@ -108,10 +108,10 @@ struct CurrentNodeWidget2x2 {
         .align(Alignment.Center)
         .width(36)
         .aspectRatio(1)
-        .backgroundColor(this.icon_emphasize)
+        .backgroundColor(this.themeColor)
         .shadow({
           radius: 10,
-          color: this.icon_emphasize,
+          color: this.themeColor,
           offsetY: 4,
         })
         .clip(true)

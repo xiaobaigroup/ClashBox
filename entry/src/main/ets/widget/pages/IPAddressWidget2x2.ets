@@ -26,9 +26,9 @@ struct IPAddressWidget2x2 {
     ip: 'Unknown',
     country: '',
   }
-  /** @description TODO 主题色 */
-  @LocalStorageProp('icon_emphasize')
-  icon_emphasize: ResourceColor = '#0A59F7'
+  /** @description 主题色 */
+  @LocalStorageProp('themeColor')
+  themeColor: ResourceColor = '#0A59F7'
 
   updateFormId() {
     ActionUtils.updateCardIdAction(this, this.formId)
@@ -46,7 +46,7 @@ struct IPAddressWidget2x2 {
           Row() {
             LoadingProgress()
               .size({ width: 18, height: 18 })
-              .color(this.icon_emphasize)
+              .color(this.themeColor)
 
             Text($r('app.string.loading'))
               .fontSize(16)
@@ -81,10 +81,10 @@ struct IPAddressWidget2x2 {
         .align(Alignment.Center)
         .width(36)
         .aspectRatio(1)
-        .backgroundColor(this.icon_emphasize)
+        .backgroundColor(this.themeColor)
         .shadow({
           radius: 10,
-          color: this.icon_emphasize,
+          color: this.themeColor,
           offsetY: 4,
         })
         .clip(true)
@@ -112,7 +112,8 @@ struct IPAddressWidget2x2 {
     .width(this.fullWidthPercent)
     .height(this.fullHeightPercent)
     .onClick(() => {
-      ActionUtils.jumpApp(this)
+      // ActionUtils.jumpApp(this)
+      ActionUtils.refreshIPAddress(this)
     })
   }
 }

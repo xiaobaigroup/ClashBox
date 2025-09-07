@@ -66,6 +66,7 @@ import { Xb_GoToWeb } from 'xb_components/src/main/ets/utils/JumpTo'
 import BackgroundDownService from '../common/utils/BackgroundDownService'
 import { notificationManager } from '@kit.NotificationKit'
 import { BusinessError } from '@kit.BasicServicesKit'
+import { cardManager } from '../common/utils/CardManageUtil'
 import LiveViewUtil from '../common/utils/LiveViewUtil'
 
 
@@ -564,6 +565,7 @@ struct Index {
     this.themeColor = Xb_ResourceColorUtil(theme.colors.iconEmphasize, this.getUIContext().getHostContext()!)
     // 子模块主题色同步
     Xb_Global.icon_emphasize = theme.colors.iconEmphasize;
+    cardManager.pushCartThemeColor(theme.colors.iconEmphasize)
   }
 
   /**窗口变化监听*/
