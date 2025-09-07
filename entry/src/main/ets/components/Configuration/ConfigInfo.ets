@@ -335,7 +335,6 @@ export struct ConfigInfo{
       let configAutoUpdateTimeGapStringArr = resourceManager?.getStringArrayValueSync($r('app.strarray.config_auto_update_text_picker').id) as Array<string>
       hilog.info(0xCA1A, this.componentName, `#aboutToAppear#getStringArrayValueSync($r('app.strarray.config_auto_update_menu')#configAutoUpdateMenuStringArr: index[${configAutoUpdateTimeGapStringArr.length}], value [${configAutoUpdateTimeGapStringArr}])}`)
       if (configAutoUpdateTimeGapStringArr.length <= 0) {
-        // TODO 国际化
         this.promptAction.showToast({message: `菜单数据获取失败！`})
         hilog.error(0xCA1A, this.componentName, `#aboutToAppear#getStringArrayValueSync($r('app.strarray.config_auto_update_menu')#ERROR: 配置自动更新时间间隔菜单数据获取数据为空！`)
       } else {

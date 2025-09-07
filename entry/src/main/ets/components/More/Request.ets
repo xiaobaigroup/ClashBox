@@ -105,10 +105,11 @@ struct RequestPage {
         // 标题栏
           MoreTop({
             title: $r('app.string.Request'),
+            icon1: this.appConfig.enableConnect ? $r('sys.symbol.clean_fill') : undefined,
             icon2: !this.appConfig.enableRequest ? $r('sys.symbol.checkmark_circle') : $r('sys.symbol.checkmark_circle_fill'),
             onClick2: () => {
               // 启用按钮
-              animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+              this.getUIContext().animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
                 this.appConfig.enableRequest = !this.appConfig.enableRequest
                 // this.needSearch = this.appConfig.enableRequest
                 if (!this.appConfig.enableRequest) {
@@ -132,7 +133,7 @@ struct RequestPage {
               name: $r('app.string.Request'),
               isNotEnabled: true
             })
-          } else  if (this.requestListData.totalCount() === 0) {
+          } else if (this.requestListData.totalCount() === 0) {
            Nothing({ name: $r('app.string.Request') })
          } else {
             Scroll() {

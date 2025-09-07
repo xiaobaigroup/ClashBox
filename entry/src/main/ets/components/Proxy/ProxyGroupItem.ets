@@ -45,7 +45,9 @@ struct ProxyGroupItem {
   //网络测速半模拟态web控制器
   controller: webview.WebviewController = new webview.WebviewController();
   /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
+  // 是否需要改变排列顺序
+  @StorageLink('SortChange') @Watch('onSortChange') needChangeSort: boolean = false
   /* 代理节点数据相关参数  */
   // 节点数据组
   @Prop proxyitems: ProxyItem[]
@@ -222,24 +224,26 @@ struct ProxyGroupItem {
 
   async aboutToAppear(): Promise<void> {
     hilog.info(0xB000, componentName, `ProxySort #ProxyGroupItem 代理节点：%{public}s`, JSON.stringify(this.proxyitems))
-    EventHub.on(EventKey.ProxySort, () => {
-      console.log("ProxySort 排序类型：%{public}s", this.appConfig.proxySort)
-      if (!this.proxyitems)
-        return
-      if (this.appConfig.proxySort == ProxySort.Default) {
-        this.proxyLazyItems.DefaultSortItems(this.proxyitems)
-      } else if (this.appConfig.proxySort == ProxySort.Title) {
-        this.proxyLazyItems.NameSortItems(this.proxyitems)
-      } else if (this.appConfig.proxySort == ProxySort.Delay) {
-        this.proxyLazyItems.LatencySortItems(this.proxyitems)
-        hilog.info(0xFF00, "ProxySort ProxyPageLatencyTag", "延迟排序成功 %{public}s", this.appConfig.proxySort)
-      }
-    })
-    EventHub.sendEvent(EventKey.ProxySort)
+    // 进入时排序
+    this.onSortChange()
   }
 
-  aboutToDisappear() {
-    EventHub.off(EventKey.ProxySort)
+  onSortChange() {
+    if (!this.proxyitems) {
+      console.error(`ProxySort 节点数据不存在`)
+      return
+    }
+    this.proxyLazyItems.clear()
+    if (this.appConfig.proxySort == ProxySort.Default) {
+      this.proxyLazyItems.DefaultSortItems(this.proxyitems)
+    } else if (this.appConfig.proxySort == ProxySort.Title) {
+      this.proxyLazyItems.NameSortItems(this.proxyitems)
+    } else if (this.appConfig.proxySort == ProxySort.Delay) {
+      this.proxyLazyItems.LatencySortItems(this.proxyitems)
+      hilog.info(0xFF00, "ProxySort ProxyPageLatencyTag", "延迟排序成功 %{public}s", this.appConfig.proxySort)
+    }
+    console.log(`ProxySort 排序类型：${this.appConfig.proxySort}, 节点数量：${this.proxyLazyItems.totalCount()}个`)
+    this.needChangeSort = false
   }
 
   /**

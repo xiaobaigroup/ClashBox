@@ -62,6 +62,8 @@ struct ProxyPage {
   @StorageProp('proxyStartingDuration') proxyStartingDuration: string = ''
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageLink('isLandscapePhone') isLandscapePhone: boolean = false
+  // 是否需要改变节点排列顺序
+  @StorageLink('SortChange') needChangeSort: boolean = false
   // 窗口模式
   @StorageProp('WindowMode') windowMode: boolean = false
   // 半模态页
@@ -130,7 +132,7 @@ struct ProxyPage {
             // 一键取消所有收藏按钮 TODO 判定有误，搁置；启用时需将图标$r('sys.symbol.heart_slash')添加进数组并添加修改对应                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               点击事件
             /* onFClick: () => {
                this.favoriteProxys.clear()
-               this.showStart=true
+               this.showStart = true
                this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_all_tip') })
              }*/
             // 提供者按钮
@@ -364,11 +366,14 @@ struct ProxyPage {
         const results = await ClashViewModel.testAllDelay(this.proxyGroups.getData(this.currentProxyIndex).proxies as ProxyItem[])
         console.log(`ProxySort results: ${JSON.stringify(results)}`)
         // 测速完成后如果配置为延迟排序则触发一次排序事件
-        if (this.appConfig.proxySort === ProxySort.Delay && results) {
-          EventHub.sendEvent(EventKey.ProxySort)
+        if (this.appConfig.proxySort === ProxySort.Delay) {
+          this.needChangeSort = true
         }
       } catch (err) {
-        console.error(`ProxySort results: ${JSON.stringify(err)}`)
+        if (this.appConfig.proxySort === ProxySort.Delay) {
+          this.needChangeSort = true
+        }
+        console.error(`ProxySort message: ${err.message}, code: ${err.code}`)
       }
       if (this.uiConfig.isVibrate) {
         customVibrator.vibratorTriggerOfHapticClockTimer()
@@ -431,8 +436,8 @@ struct ProxyPage {
           .fontSize(14)
           .maxLines(1)
       }
-      .borderRadius(BORDER_RADIUS_20)
       .constraintSize({minWidth: 86})
+      .borderRadius(BORDER_RADIUS_20)
       .height(this.currentProxyIndex === targetIndex ? 36 : 32)
       .backgroundColor(this.currentProxyIndex === targetIndex ? this.icon_emphasize : container_background)
     }

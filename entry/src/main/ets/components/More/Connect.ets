@@ -149,7 +149,7 @@ struct Connect {
               ClashViewModel.clearConnections()
             },
             onClick2: () => {
-              animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+              this.getUIContext().animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
                 this.appConfig.enableConnect = !this.appConfig.enableConnect
                 // this.needSearch = this.appConfig.enableConnect
                 if (!this.appConfig.enableConnect) {

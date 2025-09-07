@@ -17,6 +17,8 @@ export struct StylesEdit {
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+  // 是否需要改变节点排列顺序
+  @StorageLink('SortChange') needChangeSort: boolean = false
 
   // 编辑页标题
   @Builder
@@ -62,7 +64,7 @@ export struct StylesEdit {
               .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
               // 点击后改变ProxyArrangementSelected状态为 标签
               .onClick(() => {
-                animateTo({ duration: this.uiConfig.animationSpeed }, () => {
+                this.getUIContext().animateTo({ duration: this.uiConfig.animationSpeed }, () => {
                   this.appConfig.proxyGroupType = n["v"]
                 })
               })
@@ -101,11 +103,9 @@ export struct StylesEdit {
               .EditRow()
               .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
               .onClick(() => {
-                // EventHub.sendEvent(EventKey.ProxySort, n["v"])
                 this.getUIContext().animateTo({ duration: this.uiConfig.animationSpeed }, () => {
                   this.appConfig.proxySort = n["v"]
-                  // 触发排序事件
-                  EventHub.sendEvent(EventKey.ProxySort)
+                  this.needChangeSort = true
                 })
               })
 

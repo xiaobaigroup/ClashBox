@@ -25,7 +25,7 @@ export class ProxyData {
     return ProxyData.items;
   }
 
-  public static getColorForLatency(latency: number): string | ResourceColor {
+  public static getColorForLatency(latency: number): ResourceColor {
     if (latency >= 0 && latency <= 500) {
       return '#64BB5C'; // 绿色，表示低延迟
     }
@@ -36,6 +36,10 @@ export class ProxyData {
 
     if (latency > 1000) {
       return '#e84026'; // 红色，表示高延迟
+    }
+
+    if (latency < 0) {
+      return Color.Red // 超时也是红色
     }
 
     // 默认情况下，返回系统定义的次要字体颜色，适用于无效或未知的延迟值
@@ -110,7 +114,7 @@ export class ProxyItemDataSource extends BaseDataSource<ProxyItem> {
     this.dataArray = data
     this.notifyDataAdd(this.dataArray.length - 1)
   }
-  //删除全部数据
+  // 删除全部数据
   public clear(): void {
     this.empty()
     this.refresh()

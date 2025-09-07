@@ -217,6 +217,8 @@ struct Index {
   @Provide items: ProxyItem[] = ProxyData.ProxyItems();
   // 代理页延迟按钮气泡提示
   @Provide isShowDelayPop: boolean = false
+  // 是否注册排序监听
+  @Provide isRegisterSort: boolean = false
   // 当前代理节点长按选择的值
   @Provide ProxyItemLongPressValue: number = -1
   // 当前显示的代理分组
