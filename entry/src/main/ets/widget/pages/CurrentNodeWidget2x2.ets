@@ -16,45 +16,29 @@ struct CurrentNodeWidget2x2 {
   /** @description 开启Icon */
   readonly icon2: Resource = $r('sys.symbol.play_fill')
   /** @description 卡片ID */
-  @Watch('updateFormId')
-  @LocalStorageProp('formId')
-  formId: string = ''
+  @Watch('updateFormId') @LocalStorageProp('formId') formId: string = ''
   /** @description 开关变量 */
-  @LocalStorageProp('proxyEnabled')
-  proxyEnabled: boolean = false
+  @LocalStorageProp('proxyEnabled') @Watch('changeProxyEnabled') proxyEnabled: boolean = false
   /** @description IP地址信息 */
-  @LocalStorageProp('remoteIp')
-  remoteIp: IpInfo = {
+  @LocalStorageProp('remoteIp') remoteIp: IpInfo = {
     ip: 'Unknown',
     country: '',
   }
   /** @description 节点名 */
-  @LocalStorageProp('currentProxyName')
-  currentProxyName: string = '节点名'
+  @LocalStorageProp('currentProxyName') currentProxyName: string = '节点名'
   /** @description 主题色 */
-  @LocalStorageProp('themeColor')
-  themeColor: ResourceColor = '#0A59F7'
+  @LocalStorageProp('themeColor') themeColor: ResourceColor = '#0A59F7'
+  /** @description 当前节点延迟 */
+  @LocalStorageProp('delay') delay: number = 0
+  // TODO 统一loading
+  @State loading: boolean = false
 
   updateFormId() {
     ActionUtils.updateCardIdAction(this, this.formId)
   }
 
-  /** @description 根据延迟计算颜色 */
-  getColorForLatency(latency: number): string | ResourceColor {
-    if (latency >= 0 && latency <= 500) {
-      return '#64BB5C'; // 绿色，表示低延迟
-    }
-
-    if (latency > 500 && latency <= 1000) {
-      return '#f7ce00'; // 黄色，表示中等延迟
-    }
-
-    if (latency > 1000) {
-      return '#e84026'; // 红色，表示高延迟
-    }
-
-    // 默认情况下，返回系统定义的次要字体颜色，适用于无效或未知的延迟值
-    return $r('sys.color.font_secondary');
+  changeProxyEnabled() {
+    this.loading = false
   }
 
   build() {
@@ -90,20 +74,26 @@ struct CurrentNodeWidget2x2 {
         Text() {
           if (this.proxyEnabled) {
             Span($r('app.string.Delay'))
-            Span(': xx ')
-            Span('ms')
+            Span(`: ${this.delayText(this.delay)}`)
           } else {
             Span($r('app.string.not_enabled'))
           }
         }
         .fontSize(12)
-        .fontColor(this.proxyEnabled ? this.getColorForLatency(1) : $r('sys.color.font_secondary'))
+        .fontColor(this.proxyEnabled ? this.getColorForLatency(this.delay) : $r('sys.color.font_secondary'))
 
         Button() {
-          SymbolGlyph(this.proxyEnabled ? this.icon1 : this.icon2)
-            .fontColor([Color.White])
-            .fontSize(21)
-            .symbolEffect(new ReplaceSymbolEffect(EffectScope.WHOLE), true)
+          if (this.loading) {
+            LoadingProgress()
+              .width(28)
+              .aspectRatio(1)
+              .color(Color.White)
+          } else {
+            SymbolGlyph(this.proxyEnabled ? this.icon1 : this.icon2)
+              .fontColor([Color.White])
+              .fontSize(21)
+              .symbolEffect(new ReplaceSymbolEffect(EffectScope.WHOLE), true)
+          }
         }
         .align(Alignment.Center)
         .width(36)
@@ -116,8 +106,7 @@ struct CurrentNodeWidget2x2 {
         })
         .clip(true)
         .onClick(() => {
-          ActionUtils.SwitchProxyAction(this, this.proxyEnabled ? ProxyActionType.STOP : ProxyActionType.START,
-            this.formId)
+          this.switchProxy();
         })
       }
       .width(this.fullWidthPercent)
@@ -137,5 +126,40 @@ struct CurrentNodeWidget2x2 {
     .onClick(() => {
       ActionUtils.jumpApp(this)
     })
+  }
+
+  private switchProxy() {
+    ActionUtils.SwitchProxyAction(this, this.proxyEnabled ? ProxyActionType.STOP : ProxyActionType.START,
+      this.formId);
+    this.loading = true
+  }
+
+  /** @description 延迟文本 */
+  delayText(delay: number) {
+    if (delay == 0) {
+      return "unknown"
+    } else if (delay < 0) {
+      return "timeout"
+    } else {
+      return delay + " ms"
+    }
+  }
+
+  /** @description 根据延迟计算颜色 */
+  getColorForLatency(latency: number): string | ResourceColor {
+    if (latency > 0 && latency <= 500) {
+      return '#64BB5C'; // 绿色，表示低延迟
+    }
+
+    if (latency > 500 && latency <= 1000) {
+      return '#f7ce00'; // 黄色，表示中等延迟
+    }
+
+    if (latency > 1000) {
+      return '#e84026'; // 红色，表示高延迟
+    }
+
+    // 默认情况下，返回系统定义的次要字体颜色，适用于无效或未知的延迟值
+    return $r('sys.color.font_secondary');
   }
 }

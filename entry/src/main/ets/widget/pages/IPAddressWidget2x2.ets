@@ -14,21 +14,17 @@ struct IPAddressWidget2x2 {
   /** @description 刷新Icon */
   readonly icon: Resource = $r('sys.symbol.arrow_clockwise')
   /** @description 卡片ID */
-  @Watch('updateFormId')
-  @LocalStorageProp('formId')
-  formId: string = ''
+  @Watch('updateFormId') @LocalStorageProp('formId') formId: string = ''
   /** @description 开关变量 */
-  @LocalStorageProp('proxyEnabled')
-  proxyEnabled: boolean = false
+  @LocalStorageProp('proxyEnabled') proxyEnabled: boolean = false
   /** @description IP地址信息 */
-  @LocalStorageProp('remoteIp')
-  remoteIp: IpInfo = {
+  @LocalStorageProp('remoteIp') remoteIp: IpInfo = {
     ip: 'Unknown',
     country: '',
   }
   /** @description 主题色 */
-  @LocalStorageProp('themeColor')
-  themeColor: ResourceColor = '#0A59F7'
+  @LocalStorageProp('themeColor') themeColor: ResourceColor = '#0A59F7'
+  @State loading: boolean = false
 
   updateFormId() {
     ActionUtils.updateCardIdAction(this, this.formId)
@@ -77,6 +73,7 @@ struct IPAddressWidget2x2 {
             .fontColor([Color.White])
             .fontSize(21)
             .symbolEffect(new ReplaceSymbolEffect(EffectScope.WHOLE), true)
+           // TODO 动画
         }
         .align(Alignment.Center)
         .width(36)
@@ -93,7 +90,7 @@ struct IPAddressWidget2x2 {
             ip: '',
             country: '',
           }
-          ActionUtils.refreshIPAddress(this)
+          ActionUtils.refreshState(this)
         })
       }
       .alignItems(VerticalAlign.Bottom)
@@ -113,7 +110,7 @@ struct IPAddressWidget2x2 {
     .height(this.fullHeightPercent)
     .onClick(() => {
       ActionUtils.jumpApp(this)
-      // ActionUtils.refreshIPAddress(this)
+      // ActionUtils.refreshState(this)
     })
   }
 }

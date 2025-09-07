@@ -13,23 +13,24 @@ struct SwitchProxyWidget2x2 {
   /** @description 卡片高度 */
   readonly fullHeightPercent: string = '100%';
   /** @description 卡片ID */
-  @Watch('updateFormId')
-  @LocalStorageProp('formId')
-  formId: string = ''
+  @Watch('updateFormId') @LocalStorageProp('formId') formId: string = ''
   /** @description 开关变量 */
-  @LocalStorageProp('proxyEnabled')
-  proxyEnabled: boolean = false
+  @LocalStorageProp('proxyEnabled') @Watch('changeProxyEnabled') proxyEnabled: boolean = false
   /** @description 服务启动时间戳 */
-  @LocalStorageProp('proxyStartingDuration')
-  proxyStartingDuration: string = '00:00:00'
+  @LocalStorageProp('proxyStartingDuration') proxyStartingDuration: string = '00:00:00'
   /** @description 代理启动的计时文本 */
   // proxyStartedTimer: Timer = timerUtil
   /** @description 主题色 */
-  @LocalStorageProp('themeColor')
-  themeColor: ResourceColor = '#0A59F7'
+  @LocalStorageProp('themeColor') themeColor: ResourceColor = '#0A59F7'
+  // TODO 统一loading
+  @State loading: boolean = false
 
   updateFormId() {
     ActionUtils.updateCardIdAction(this, this.formId)
+  }
+
+  changeProxyEnabled() {
+    this.loading = false
   }
 
   build() {
@@ -65,8 +66,14 @@ struct SwitchProxyWidget2x2 {
 
       // 开关按钮
       Button() {
-        Text(this.proxyEnabled ? $r('app.string.close') : $r('app.string.open'))
-          .fontColor(Color.White)
+        if (this.loading) {
+          LoadingProgress()
+            .layoutWeight(1)
+            .color(Color.White)
+        } else {
+          Text(this.proxyEnabled ? $r('app.string.close') : $r('app.string.open'))
+            .fontColor(Color.White)
+        }
       }
       .width('100%')
       .aspectRatio(3.4)
@@ -79,8 +86,7 @@ struct SwitchProxyWidget2x2 {
       })
       .clip(true)
       .onClick(() => {
-        ActionUtils.SwitchProxyAction(this, this.proxyEnabled ? ProxyActionType.STOP : ProxyActionType.START,
-          this.formId)
+        this.switchProxy()
       })
       .alignRules({
         bottom: { anchor: '__container__', align: VerticalAlign.Bottom }
@@ -91,8 +97,15 @@ struct SwitchProxyWidget2x2 {
     .height(this.fullHeightPercent)
     .onClick(() => {
       // ActionUtils.jumpApp(this)
+      this.switchProxy()
+    })
+  }
+
+  private switchProxy() {
+    if (!this.loading) {
       ActionUtils.SwitchProxyAction(this, this.proxyEnabled ? ProxyActionType.STOP : ProxyActionType.START,
         this.formId)
-    })
+      this.loading = true
+    }
   }
 }

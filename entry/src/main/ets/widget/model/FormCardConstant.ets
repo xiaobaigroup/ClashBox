@@ -14,6 +14,7 @@
  */
 
 export const ENTRY_ABILITY = 'EntryAbility';
+
 export const BUNDLE_NAME = 'org.xbgroup.clashbox'
 
 /** @description 卡片拉起方式 */
@@ -44,5 +45,5 @@ export enum RouterType {
 export enum CallMethod {
   UPDATE_CARD_ID = 'updateFormId',
   CHANGE_PROXY = 'cardChangeProxy',
-  REFRESH_IPADDRESS = 'refreshIPAddress',
+  REFRESH_STATE = 'refreshState',
 }
