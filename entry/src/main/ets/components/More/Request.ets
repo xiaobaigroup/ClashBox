@@ -84,7 +84,6 @@ struct RequestPage {
   }
 
   async getRequest() {
-    // TODO  ClashViewModel.clearRequestList()
     let requestLatestListData = await ClashViewModel.getRequestList()
 
     // 合并后去重
@@ -107,6 +106,10 @@ struct RequestPage {
             title: $r('app.string.Request'),
             icon1: this.appConfig.enableConnect ? $r('sys.symbol.clean_fill') : undefined,
             icon2: !this.appConfig.enableRequest ? $r('sys.symbol.checkmark_circle') : $r('sys.symbol.checkmark_circle_fill'),
+            onClick1: () => {
+              this.requestListData.clear()
+              ClashViewModel.clearRequestList()
+            },
             onClick2: () => {
               // 启用按钮
               this.getUIContext().animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
