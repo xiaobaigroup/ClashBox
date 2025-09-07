@@ -104,7 +104,7 @@ struct RequestPage {
         // 标题栏
           MoreTop({
             title: $r('app.string.Request'),
-            icon1: this.appConfig.enableConnect ? $r('sys.symbol.clean_fill') : undefined,
+            icon1: this.appConfig.enableRequest ? $r('sys.symbol.clean_fill') : undefined,
             icon2: !this.appConfig.enableRequest ? $r('sys.symbol.checkmark_circle') : $r('sys.symbol.checkmark_circle_fill'),
             onClick1: () => {
               this.requestListData.clear()
