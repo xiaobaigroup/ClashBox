@@ -1,7 +1,9 @@
 import ActionUtils from '../utils/ActionUtils'
 import { ProxyActionType } from '../model/FormCardConstant'
 
-@Entry
+const localStorage = new LocalStorage()
+
+@Entry(localStorage)
 @Component
 struct SwitchProxyWidget1x2 {
   /** @description 卡片宽度 */
@@ -17,9 +19,8 @@ struct SwitchProxyWidget1x2 {
   /** @description 开关变量 */
   @LocalStorageProp('proxyEnabled') @Watch('changeProxyEnabled') proxyEnabled: boolean = false
   /** @description 主题色 */
-  @LocalStorageProp('themeColor') themeColor: ResourceColor = '#0A59F7'
-  // TODO 统一loading
-  @State loading: boolean = false
+  @LocalStorageProp('themeColor') themeColor: ResourceColor = $r('sys.color.icon_emphasize')
+  @LocalStorageProp('loading') loading: boolean = false
 
   updateFormId() {
     ActionUtils.updateCardIdAction(this, this.formId)
@@ -34,9 +35,15 @@ struct SwitchProxyWidget1x2 {
       Row() {
         // 文字内容
         Row() {
-          Text($r('app.string.click'))
-          Text(this.proxyEnabled ? $r('app.string.close') : $r('app.string.open'))
+          if (this.loading) {
+            Text($r('app.string.card_tips'))
+              .fontSize(12)
+          } else {
+            Text($r('app.string.click'))
+            Text(this.proxyEnabled ? $r('app.string.close') : $r('app.string.open'))
+          }
         }
+        .width(50)
 
         // 开关按钮
         Button() {
@@ -67,7 +74,7 @@ struct SwitchProxyWidget1x2 {
         })
       }
       .width(this.fullWidthPercent)
-      .justifyContent(FlexAlign.SpaceAround)
+      .justifyContent(FlexAlign.SpaceBetween)
     }
     .padding(12)
     .width(this.fullWidthPercent)
@@ -80,10 +87,8 @@ struct SwitchProxyWidget1x2 {
   }
 
   private switchProxy() {
-    if (!this.loading) {
-      ActionUtils.SwitchProxyAction(this, this.proxyEnabled ? ProxyActionType.STOP : ProxyActionType.START,
-        this.formId)
-      this.loading = true
-    }
+    ActionUtils.SwitchProxyAction(this, this.proxyEnabled ? ProxyActionType.STOP : ProxyActionType.START,
+      this.formId)
+    this.loading = true
   }
 }

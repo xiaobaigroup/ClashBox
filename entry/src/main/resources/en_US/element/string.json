@@ -2163,6 +2163,10 @@
     {
       "name": "proxy_open_button",
       "value": "Proxy page Start button"
+    },
+    {
+      "name": "card_tips",
+      "value": "First start-up requires two starts"
     }
   ]
 }

@@ -2,7 +2,9 @@ import { IpInfo } from 'proxy_core';
 import ActionUtils from '../utils/ActionUtils'
 import { ProxyActionType } from '../model/FormCardConstant'
 
-@Entry
+const localStorage = new LocalStorage()
+
+@Entry(localStorage)
 @Component
 struct IPAddressWidget2x2 {
   /** @description 副标题 */

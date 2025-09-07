@@ -19,10 +19,9 @@ import { BundleInfo, PROXY_STARTED_DURATION_INIT_VALUE } from '../common/entity/
 import { commonEventManager } from '@kit.BasicServicesKit';
 import { Timer } from '../common/utils/HHmmssTimer';
 import { number2Time } from '../common/utils/TimeConvertUtil';
-
+import { customVibrator } from '../common/utils/VibratorUtil';
 
 export default class EntryAbility extends UIAbility {
-
   private want?: Want
   private isChangeCore = false
   // 设备断点获取
@@ -52,6 +51,11 @@ export default class EntryAbility extends UIAbility {
     // 优先级最高-初始化内核
     await ClashViewModel.ChangeCore(undefined, false)
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onCreate');
+
+    // 卡片Id持久化管理 并 监听卡片事件
+    cardManager.init(this.context)
+    this.registerCardEvent()
+
     // 添加崩溃监听
     hiAppEvent.addWatcher({
       name: "watcher",
@@ -78,48 +82,46 @@ export default class EntryAbility extends UIAbility {
       AppStorage.setOrCreate('openLinkConfigUrl', configUrl)
       hilog.info(0x0000, 'EntryAbility', '接收的configUrl为：%{public}s', configUrl)
     }
-    // 卡片Id持久化管理 并 监听卡片事件
-    cardManager.init(this.context)
-    this.registerCardEvent()
 
     // 订阅ClashVpnAbility中的事件
-    commonEventManager.createSubscriber(this.subscribeInfo, (err: BusinessError, commonEventSubscriber: commonEventManager.CommonEventSubscriber) => {
-      if (!err) {
-        console.info(`Succeeded in creating subscriber.`);
-        this.subscriber = commonEventSubscriber;
-        try {
-          commonEventManager.subscribe(this.subscriber,
-            (err: BusinessError, data: commonEventManager.CommonEventData) => {
-              if (err) {
-                console.error(`Failed to subscribe. Code is ${err.code}, message is ${err.message}`);
-              } else {
-                // TODO 将运行时间同步显示在 卡片
-                console.info(`Succeeded in subscribing, data is ` + JSON.stringify(data));
-                if (data.code === 0) {
-                  // 计算时间
-                  const vpnServiceStartTime = Number(data.data)
-                  // 启动前先初始化卡片显示文本
-                  cardManager.pushCartVpnServiceTime(PROXY_STARTED_DURATION_INIT_VALUE)
-                  this.proxyStartedTimer.start((time)=>{
-                    EventHub.sendEvent(EventKey.ProxyDuration, time)
-                    cardManager.pushCartVpnServiceTime(number2Time(time))
-                  },vpnServiceStartTime)
+    commonEventManager.createSubscriber(this.subscribeInfo,
+      (err: BusinessError, commonEventSubscriber: commonEventManager.CommonEventSubscriber) => {
+        if (!err) {
+          console.info(`Succeeded in creating subscriber.`);
+          this.subscriber = commonEventSubscriber;
+          try {
+            commonEventManager.subscribe(this.subscriber,
+              (err: BusinessError, data: commonEventManager.CommonEventData) => {
+                if (err) {
+                  console.error(`Failed to subscribe. Code is ${err.code}, message is ${err.message}`);
+                } else {
+                  // TODO 将运行时间同步显示在 卡片
+                  console.info(`Succeeded in subscribing, data is ` + JSON.stringify(data));
+                  if (data.code === 0) {
+                    // 计算时间
+                    const vpnServiceStartTime = Number(data.data)
+                    // 启动前先初始化卡片显示文本
+                    cardManager.pushCartVpnServiceTime(PROXY_STARTED_DURATION_INIT_VALUE)
+                    this.proxyStartedTimer.start((time) => {
+                      EventHub.sendEvent(EventKey.ProxyDuration, time)
+                      cardManager.pushCartVpnServiceTime(number2Time(time))
+                    }, vpnServiceStartTime)
 
-                  EventHub.on(EventKey.StopedClashEntry,()=>{
-                    hilog.info(0x001, "EntryAbility", "StopedClashEntry" )
-                    this.proxyStartedTimer.reset()
-                  })
+                    EventHub.on(EventKey.StopedClashEntry, () => {
+                      hilog.info(0x001, "EntryAbility", "StopedClashEntry")
+                      this.proxyStartedTimer.reset()
+                    })
+                  }
                 }
-              }
-            });
-        } catch (error) {
-          let err: BusinessError = error as BusinessError;
-          console.error(`Failed to subscribe. Code is ${err.code}, message is ${err.message}`);
+              });
+          } catch (error) {
+            let err: BusinessError = error as BusinessError;
+            console.error(`Failed to subscribe. Code is ${err.code}, message is ${err.message}`);
+          }
+        } else {
+          console.error(`Failed to create subscriber. Code is ${err.code}, message is ${err.message}`);
         }
-      } else {
-        console.error(`Failed to create subscriber. Code is ${err.code}, message is ${err.message}`);
-      }
-    });
+      });
 
   }
 
@@ -231,8 +233,7 @@ export default class EntryAbility extends UIAbility {
 
     this.saveConfigThePreferences()
     // 移除卡片监听事件
-    this.callee.off('updateFormId');
-    this.callee.off('cardChangeProxy');
+    this.unRegisterCardEvent()
     cardManager.pushCartProxyMode(false)
   }
 
@@ -246,33 +247,44 @@ export default class EntryAbility extends UIAbility {
 
   /** @description 注册卡片监听事件 */
   private registerCardEvent() {
-    // 卡片持久化ID
-    this.callee.on('updateFormId', (indata: rpc.MessageSequence) => {
-      // 获取formId
-      const obj = JSON.parse(indata.readString()) as object
-      const formId = obj['formId'] as string
-      // 持久化卡片Id
-      cardManager.addCardId(formId)
-      // 触发卡片更新事件
-      return new Params()
-    })
+    try { // 卡片持久化ID
+      this.callee.on('updateFormId', (indata: rpc.MessageSequence) => {
+        // 获取formId
+        const obj = JSON.parse(indata.readString()) as object
+        const formId = obj['formId'] as string
+        // 持久化卡片Id
+        cardManager.addCardId(formId)
+        // 触发卡片更新事件
+        return new Params()
+      })
 
-    // 卡片切换代理
-    this.callee.on('cardChangeProxy', (indata: rpc.MessageSequence) => {
-      const obj = JSON.parse(indata.readString()) as object
-      const proxyActionType = obj['proxyActionType'] as ProxyActionType
+      // 卡片切换代理
+      this.callee.on('cardChangeProxy', (indata: rpc.MessageSequence) => {
+        hilog.info(0x0000, 'EntryAbility', 'cardChangeProxy');
+        const obj = JSON.parse(indata.readString()) as object
+        const proxyActionType = obj['proxyActionType'] as ProxyActionType
 
-      this.CardClashCoreEvent(proxyActionType)
+        this.CardClashCoreEvent(proxyActionType)
 
-      return null
-    })
+        return null
+      })
 
-    // 刷新IP地址
-    this.callee.on('refreshIPAddress', (indata: rpc.MessageSequence) => {
-      refreshIPAddress();
+      // 刷新节点状态
+      this.callee.on('refreshState', (indata: rpc.MessageSequence) => {
+        refreshState();
 
-      return null
-    })
+        return new Params()
+      })
+    } catch (e) {
+      hilog.error(0x0000, 'EntryAbility', 'Failed to register card event. Cause: %{public}s', JSON.stringify(e) ?? '');
+    }
+  }
+
+  /** @description 取消注册卡片监听事件 */
+  private unRegisterCardEvent() {
+    this.callee.off('updateFormId')
+    this.callee.off('cardChangeProxy')
+    this.callee.off('refreshState')
   }
 
   /** @description 初始化Clash核心 */
@@ -293,7 +305,9 @@ export default class EntryAbility extends UIAbility {
       if (!ClashViewModel.socketProxy.active) {
         ClashViewModel.socketProxy.active = true;
         ClashViewModel.socketProxy.offlineTime.push(Date.now());
-        this.uiContext?.getPromptAction().showToast({ message: `核心恢复中(${ClashViewModel.socketProxy.offlineTime.length})...` });
+        this.uiContext?.getPromptAction().showToast({
+          message: `核心恢复中(${ClashViewModel.socketProxy.offlineTime.length})...`
+        });
         // let clashCore = AppStorage.get<AppConfig>("appConfig")?.clashCore;
         if (!this.isChangeCore) {
           let result = await ClashViewModel.ChangeCore(clashCore);
@@ -313,29 +327,34 @@ export default class EntryAbility extends UIAbility {
 
   /** @description 卡片Clash核心触发事件 */
   private async CardClashCoreEvent(proxyActionType: ProxyActionType) {
+    hilog.info(0x0000, 'EntryAbility', '%{public}s', 'CardClashCoreEvent');
     // 初始化核心
     if (!this.clashCoreInitialized) {
       await ClashViewModel.init(this.context, this.uiContext?.getPromptAction()!)
       await this.ClashCoreInit()
       this.cardCoreInitialized = true
-      const proxyNodeInfo = cardManager.getSelectedProxyNode()
-      hilog.info(0x0000, 'EntryAbility', '%{public}s', JSON.stringify(proxyNodeInfo))
-      if (proxyNodeInfo) {
-        ClashViewModel.changeProxy(proxyNodeInfo.profile, proxyNodeInfo.g, proxyNodeInfo.p)
-      }
     }
 
-    console.log('卡片 - 启动/停止代理', proxyActionType)
+    const proxyNodeInfo = cardManager.getSelectedProxyNode()
+    hilog.info(0x0000, 'EntryAbility', '%{public}s', JSON.stringify(proxyNodeInfo))
 
     // 启动/停止代理
-    if (proxyActionType === ProxyActionType.START) {
-      // TODO 可能会启动失败
-      ClashViewModel.StartVpn()
-      setTimeout(() => {
-        refreshIPAddress()
-      }, 1000)
-    } else {
-      ClashViewModel.StopVpn()
+    if (proxyNodeInfo) {
+      ClashViewModel.changeProxy(proxyNodeInfo.profile, proxyNodeInfo.g, proxyNodeInfo.p)
+
+      console.log('卡片 - 启动/停止代理', proxyActionType)
+
+      if (proxyActionType === ProxyActionType.START) {
+        await ClashViewModel.StartVpn()
+        setTimeout(() => {
+          refreshState()
+        }, 1000)
+      } else {
+        await ClashViewModel.StopVpn()
+      }
+      // if (this.uiConfig.isVibrate) {
+      customVibrator.vibratorTriggerOfHapticClockTimer()
+      // }
     }
   }
 
@@ -405,7 +424,8 @@ export default class EntryAbility extends UIAbility {
     avoidArea = windowClass.getWindowAvoidArea(type);
     let topRectHeight = this.uiContext?.px2vp(avoidArea.topRect.height); // 获取状态栏区域高度
     AppStorage.setOrCreate('topRectHeight', topRectHeight);
-    hilog.info(0x0000, 'EntryAbility', '初始避让高度 Top：%{public}d Bottom: %{public}i', topRectHeight, bottomRectHeight);
+    hilog.info(0x0000, 'EntryAbility', '初始避让高度 Top：%{public}d Bottom: %{public}i', topRectHeight,
+      bottomRectHeight);
     // 注册监听函数，动态获取避让区域数据
     windowClass.on('avoidAreaChange', (data) => {
       let topRectActiveHeight = 0
@@ -417,7 +437,8 @@ export default class EntryAbility extends UIAbility {
         bottomRectActiveHeight = this.uiContext?.px2vp(data.area.bottomRect.height)!;
         AppStorage.setOrCreate('bottomRectHeight', bottomRectActiveHeight);
       }
-      hilog.info(0x0000, 'EntryAbility', '动态避让高度 Top：%{public}d Bottom: %{public}i', topRectActiveHeight, bottomRectActiveHeight);
+      hilog.info(0x0000, 'EntryAbility', '动态避让高度 Top：%{public}d Bottom: %{public}i', topRectActiveHeight,
+        bottomRectActiveHeight);
     });
 
     // 应用窗口初始高度和宽度
@@ -483,7 +504,6 @@ export default class EntryAbility extends UIAbility {
       console.log(`断点测试 heightBp: ${heightBp} 高宽比：${WindowAspectRatio}`)
     }
   }
-
 }
 
 class Params implements rpc.Parcelable {
@@ -496,13 +516,12 @@ class Params implements rpc.Parcelable {
   }
 }
 
-function refreshIPAddress() {
-  ClashViewModel.checkIpInfo().then((remoteIp) => {
-    cardManager.pushCartProxyIpInfo(remoteIp);
-    hilog.info(0x0000, 'EntryAbility', 'remoteIp - success : ' + JSON.stringify(remoteIp));
-  }).catch((e: Error) => {
-    hilog.info(0x0000, 'EntryAbility', 'remoteIp - error: ' + JSON.stringify(e));
-  });
+async function refreshState() {
+  // 刷新IP地址
+  const remoteIp = await ClashViewModel.checkIpInfo()
+  cardManager.pushCartProxyIpInfo(remoteIp);
+  // TODO 卡片主动刷新节点延迟
+  // await ClashViewModel.testAllDelay(this.proxyGroups.getData(this.currentProxyIndex).proxies as ProxyItem[])
 }
 
 export function sleep(timeout: number): Promise<void> {

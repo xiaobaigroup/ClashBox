@@ -2,7 +2,9 @@ import { IpInfo } from 'proxy_core';
 import ActionUtils from '../utils/ActionUtils'
 import { ProxyActionType } from '../model/FormCardConstant'
 
-@Entry
+const localStorage = new LocalStorage()
+
+@Entry(localStorage)
 @Component
 struct CurrentNodeWidget2x2 {
   /** @description 副标题 */
@@ -27,11 +29,10 @@ struct CurrentNodeWidget2x2 {
   /** @description 节点名 */
   @LocalStorageProp('currentProxyName') currentProxyName: string = '节点名'
   /** @description 主题色 */
-  @LocalStorageProp('themeColor') themeColor: ResourceColor = '#0A59F7'
+  @LocalStorageProp('themeColor') themeColor: ResourceColor = $r('sys.color.icon_emphasize')
   /** @description 当前节点延迟 */
   @LocalStorageProp('delay') delay: number = 0
-  // TODO 统一loading
-  @State loading: boolean = false
+  @LocalStorageProp('loading') loading: boolean = false
 
   updateFormId() {
     ActionUtils.updateCardIdAction(this, this.formId)

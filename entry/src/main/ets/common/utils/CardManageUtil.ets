@@ -73,7 +73,8 @@ class CardManager {
   pushCartProxyMode(proxyEnabled: boolean) {
     // 创建推送数据
     const data = formBindingData.createFormBindingData({
-      proxyEnabled
+      proxyEnabled,
+      loading: true
     })
     this.getCardIdList().forEach(formId => {
       // 推送到卡片
@@ -122,6 +123,17 @@ class CardManager {
       themeColor
     })
 
+    this.getCardIdList().forEach(formId => {
+      // 推送到卡片
+      formProvider.updateForm(formId, data)
+    })
+  }
+
+  /** @description 推送延迟 */
+  pushCartDelay(delay: number) {
+    const data = formBindingData.createFormBindingData({
+      delay
+    })
     this.getCardIdList().forEach(formId => {
       // 推送到卡片
       formProvider.updateForm(formId, data)

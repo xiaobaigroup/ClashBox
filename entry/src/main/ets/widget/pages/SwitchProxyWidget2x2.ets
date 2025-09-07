@@ -1,7 +1,9 @@
 import ActionUtils from '../utils/ActionUtils'
 import { ProxyActionType } from '../model/FormCardConstant'
 
-@Entry
+const localStorage = new LocalStorage()
+
+@Entry(localStorage)
 @Component
 struct SwitchProxyWidget2x2 {
   /** @description 主标题 */
@@ -21,9 +23,8 @@ struct SwitchProxyWidget2x2 {
   /** @description 代理启动的计时文本 */
   // proxyStartedTimer: Timer = timerUtil
   /** @description 主题色 */
-  @LocalStorageProp('themeColor') themeColor: ResourceColor = '#0A59F7'
-  // TODO 统一loading
-  @State loading: boolean = false
+  @LocalStorageProp('themeColor') themeColor: ResourceColor = $r('sys.color.icon_emphasize')
+  @LocalStorageProp('loading') loading: boolean = false
 
   updateFormId() {
     ActionUtils.updateCardIdAction(this, this.formId)
@@ -41,9 +42,14 @@ struct SwitchProxyWidget2x2 {
           .fontSize(12)
           .fontColor($r('sys.color.font_secondary'))
 
-        Text(this.title)
-          .fontSize(18)
-          .fontWeight(FontWeight.Medium)
+        if (this.loading) {
+          Text($r('app.string.card_tips'))
+            .fontSize(12)
+        } else {
+          Text(this.title)
+            .fontSize(18)
+            .fontWeight(FontWeight.Medium)
+        }
       }
       .alignItems(HorizontalAlign.Start)
       .id('title')
@@ -102,10 +108,8 @@ struct SwitchProxyWidget2x2 {
   }
 
   private switchProxy() {
-    if (!this.loading) {
-      ActionUtils.SwitchProxyAction(this, this.proxyEnabled ? ProxyActionType.STOP : ProxyActionType.START,
-        this.formId)
-      this.loading = true
-    }
+    ActionUtils.SwitchProxyAction(this, this.proxyEnabled ? ProxyActionType.STOP : ProxyActionType.START,
+      this.formId)
+    this.loading = true
   }
 }

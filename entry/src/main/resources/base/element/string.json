@@ -2163,6 +2163,10 @@
     {
       "name": "proxy_open_button",
       "value": "代理页开始按钮"
+    },
+    {
+      "name": "card_tips",
+      "value": "首次需\n启动两次"
     }
   ]
 }

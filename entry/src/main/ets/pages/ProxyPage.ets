@@ -172,7 +172,7 @@ struct ProxyPage {
                 // 根据ProxyArrangementSelected的状态决定是否显示
                 if (this.appConfig.proxyGroupType === ProxyGroupType.Tabs) {
                   // 代理分组List Start
-                  List({scroller: this.ListScroller,initialIndex:this.currentProxyIndex}) {
+                  List({ scroller: this.ListScroller, initialIndex: this.currentProxyIndex }) {
                     LazyForEach(this.proxyGroups, (group: ProxyGroup, index: number) => {
                       this.TabBuilder(group.name, index)
                     }, (item: ProxyGroup) => item.name)
@@ -204,14 +204,18 @@ struct ProxyPage {
                         proxyitems: group.proxies as ProxyItem[] ?? [],
                         ProxyGroupItemSelected: this.appConfig.proxyCardSize,
                         disabled: group.type !== ProxyType.Selector,
-                        selectedProxy: this.currentProfile?.getSelectedProxy(group) ?? this.appConfig.currentProxyName ?? '',
+                        selectedProxy: this.currentProfile?.getSelectedProxy(group) ??
+                        this.appConfig.currentProxyName ?? '',
                         OnProxyChange: (item) => {
                           this.changeProxy(group.name, item)
                         }
                       })
                         .width('100%')
                         .height('100%')
-                        .padding({ bottom:  this.isPXSecScreen || (this.isSmallSquareScreen && this.isRolling) ? 0 : !this.uiConfig.isBlurr  ? CONTENT_END_OFFSET_150 - 100 : CONTENT_END_OFFSET_150 - 50 })
+                        .padding({
+                          bottom: this.isPXSecScreen || (this.isSmallSquareScreen && this.isRolling) ? 0 :
+                            !this.uiConfig.isBlurr ? CONTENT_END_OFFSET_150 - 100 : CONTENT_END_OFFSET_150 - 50
+                        })
                       // .onAppear(() => {
                       //promptAction.showToast({message: `当前选中：${this.currentProfile?.getSelectedProxy(group) ?? ""}`, duration: 2000 })
                       //  hilog.info(0xFF00, "ProxyPageGroupTag", "#onAppear %{public}s", group.proxies.toString())
@@ -238,13 +242,14 @@ struct ProxyPage {
                       if (TabBarVertical(this.widthBp, this.heightBp)) {
                         if (this.currentProxyIndex === 0 && extraInfo.currentOffset > 79) {
                           indexController.changeIndex(0)
-                        } else if (this.currentProxyIndex === this.proxyGroups.totalCount() - 1 && extraInfo.currentOffset < -79) {
+                        } else if (this.currentProxyIndex === this.proxyGroups.totalCount() - 1 &&
+                          extraInfo.currentOffset < -79) {
                           indexController.changeIndex(2)
                         }
                       }
                     })
                   })
-                  .onAnimationStart((index: number,targetIndex: number) => {
+                  .onAnimationStart((index: number, targetIndex: number) => {
                     this.getUIContext().animateTo({ duration: this.uiConfig.animationSpeed }, () => {
                       this.ListScroller.scrollToIndex(targetIndex)
                       //  this.tabsController.changeIndex(targetIndex)
@@ -255,17 +260,19 @@ struct ProxyPage {
                       }
                     })
                   })
+
                   // 代理节点Swiper End
                 }
                 // 标签分组页 End
                 // 列表分组页 Start
                 else if (this.appConfig.proxyGroupType === ProxyGroupType.List) {
                   ProxyArrangement()
-                    .padding({ bottom:!this.uiConfig.isBlurr?20:50 })
+                    .padding({ bottom: !this.uiConfig.isBlurr ? 20 : 50 })
                 }
               }.width('100%')
               .height('100%')
               .alignItems(HorizontalAlign.Center)
+
               // 列表排列页 End
             }
             .width('100%')
@@ -273,10 +280,13 @@ struct ProxyPage {
             .scrollBar(BarState.Off)
             .enableScrollInteraction(this.isPXSecScreen ? false : true)
             .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring : null)
-            .padding({ left: TabContentTitleMargin(this.widthBp, this.heightBp), right: TabContentTitleMargin(this.widthBp, this.heightBp)})
+            .padding({
+              left: TabContentTitleMargin(this.widthBp, this.heightBp),
+              right: TabContentTitleMargin(this.widthBp, this.heightBp)
+            })
             .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {
               // 累计计算当前父组件滚动在Y轴方向的偏移量
-              if (this.uiConfig.isAnimation){
+              if (this.uiConfig.isAnimation) {
                 this.curYOffset += yOffset
               }
               hilog.info(0xFF00, "ProxyPageTag", "yOffset: %{public}d", this.curYOffset)
@@ -285,18 +295,18 @@ struct ProxyPage {
               this.curOffsetRemain += offset
               if (offset > 0) {
                 this.isRolling = true
-              } else if(offset < 0) {
+              } else if (offset < 0) {
                 this.isRolling = false
                 this.curOffsetRemain = 0
               }
-              console.info("offsetRemain:" + offset + '/' +this.curOffsetRemain);
+              console.info("offsetRemain:" + offset + '/' + this.curOffsetRemain);
               return { offsetRemain: offset }
             })
           }
 
           // 悬浮代理测速按钮 START
           if (!this.isPXSecScreen) {
-            Row({space: 7}) {
+            Row({ space: 7 }) {
               if (this.uiConfig.buttonPositionIndex === 0 && this.uiConfig.needProxyStart) {
                 this.delayButton()
                 this.startButton()
@@ -309,13 +319,18 @@ struct ProxyPage {
             }.height(50)
             .alignItems(VerticalAlign.Center)
             .backgroundColor(Color.Transparent)
-            .margin({ bottom: $r('app.integer.vp_proxy_start_button_left_right_margin'), right: $r('app.integer.vp_proxy_start_button_left_right_margin'), left: $r('app.integer.vp_proxy_start_button_left_right_margin') })
+            .margin({
+              bottom: $r('app.integer.vp_proxy_start_button_left_right_margin'),
+              right: $r('app.integer.vp_proxy_start_button_left_right_margin'),
+              left: $r('app.integer.vp_proxy_start_button_left_right_margin')
+            })
           }
           // 悬浮代理测速按钮 END
         }
         .backgroundColor($r('app.color.background'))
         .width('100%')
         .height('100%')
+
         // 主体 END
       }
     }
@@ -369,6 +384,9 @@ struct ProxyPage {
         if (this.appConfig.proxySort === ProxySort.Delay) {
           this.needChangeSort = true
         }
+        // 卡片延迟
+        const delay = ClashViewModel.delayMap.get(this.appConfig.currentProxyItem?.name ?? '')?.delay ?? 0
+        cardManager.pushCartDelay(delay)
       } catch (err) {
         if (this.appConfig.proxySort === ProxySort.Delay) {
           this.needChangeSort = true
