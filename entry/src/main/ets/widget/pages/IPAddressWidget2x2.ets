@@ -112,8 +112,8 @@ struct IPAddressWidget2x2 {
     .width(this.fullWidthPercent)
     .height(this.fullHeightPercent)
     .onClick(() => {
-      // ActionUtils.jumpApp(this)
-      ActionUtils.refreshIPAddress(this)
+      ActionUtils.jumpApp(this)
+      // ActionUtils.refreshIPAddress(this)
     })
   }
 }
