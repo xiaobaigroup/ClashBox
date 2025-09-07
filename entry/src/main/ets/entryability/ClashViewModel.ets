@@ -5,7 +5,7 @@ import { SocketProxyService, Profile, ProfileType, UpdateConfigParams, ClashConf
   Provider,
   ProxyMode,
   ProxySort} from "proxy_core";
-import { vpnExtension } from "@kit.NetworkKit";
+import { socket, vpnExtension } from "@kit.NetworkKit";
 import { ConfigData } from "../common/entity/PageArgumentEntity";
 import { PromptAction } from "@kit.ArkUI";
 import { ProxyGroup } from "proxy_core/src/main/ets/models/Common";
@@ -336,6 +336,9 @@ export class ClashViewModel {
     }
   }
   vpnStarted = false
+
+  // 启动前要加载配置
+  // loadConfig
   async StartVpn(){
     this.vpnStarted = true
     await this.loadVpnOptions()
@@ -366,7 +369,7 @@ export class ClashViewModel {
 
     cardManager.pushCartProxyMode(this.vpnStarted)
   }
-    async loadVpnOptions(){
+  async loadVpnOptions(){
     // 使用首选项持久化单个节点信息供卡片拉起服务
     let appConfig = AppStorage.get<AppConfig>("appConfig") || cardManager.getAppConfig()
     if (appConfig?.accessControl == null)

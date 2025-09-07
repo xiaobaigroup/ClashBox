@@ -282,9 +282,9 @@ export default class EntryAbility extends UIAbility {
     this.isChangeCore = true
     if (clashCore != ClashCore.mihomo) {
       let service = new SocketStubService(this.context);
-      service.startService();
+      await service.startService();
     }
-    ClashViewModel.initProfile();
+    await ClashViewModel.initProfile();
     EventHub.on(EventKey.LoadClashConfig, (isPatch: boolean) => {
       ClashViewModel.loadConfig(isPatch, 'ClashCoreInit-EventKey.LoadClashConfig');
     });

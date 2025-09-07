@@ -52,8 +52,6 @@ export interface VpnOptions {
 
 
 export class FlClashVpnService extends CommonVpnService {
-  noVpn: boolean = false // 模拟器开启
-  running: boolean = false
   vpnConnection: vpnExtension.VpnConnection | undefined
   public configPath: string = ""
   protectSocketPath: string = ""
@@ -63,145 +61,18 @@ export class FlClashVpnService extends CommonVpnService {
     let request = JSON.parse(decoder.decodeToString(new Uint8Array(message.message))) as RpcRequest
     let code = request.method
     let params = request.params
-    console.log(`socket stub ${code} request: `, params)
-    if (code == ClashRpcType.setLogObserver) {
-      // 订阅日志，需要持续输出
-      startLog((message: string, value: string) => {
-        if (typeof value === "string") {
-          try {
-            const log = JSON.parse(value)
-            this.sendClient(client, JSON.stringify({
-              logLevel: log["data"]["LogLevel"],
-              payload: log["data"]["Payload"],
-              time: new Date().getTime(),
-            } as LogInfo))
-          } catch (e) {
-            console.error("log error", value)
-          }
-        }
-      })
-    } else {
-      try {
-        console.log(`socket stub ${code} onRemoteMessage: `)
-        let result = await this.onRemoteMessage(code, params)
-        console.log(`socket stub ${code} result: `, result)
-        this.sendClient(client, JSON.stringify({ result: result, error: undefined }))
-      } catch (e) {
-        console.error(`socket stub ${code} result: `, e.message ?? e, e.stack)
-        this.sendClient(client, JSON.stringify({ error: e.message ?? e }))
-      }
+    try {
+      let result = await this.onRemoteMessage(code, params)
+      this.sendClient(client, JSON.stringify({ result: result, error: undefined }))
+    } catch (e) {
+      console.error(`socket stub ${code} result: `, e.message ?? e, e.stack)
+      this.sendClient(client, JSON.stringify({ error: e.message ?? e }))
     }
   }
-
   onRemoteMessage(code: number, data: (string | number | boolean)[]): Promise<string | number | boolean> {
     // 根据code处理客户端的请求
     return new Promise(async (resolve, reject) => {
       switch (code) {
-        case ClashRpcType.queryTrafficTotal: {
-          resolve(getTotalTraffic())
-          break;
-        }
-        case ClashRpcType.queryTrafficNow: {
-          resolve(getTraffic())
-          break;
-        }
-        case ClashRpcType.queryProxyGroup: {
-          let result = getProxies()
-          resolve(result)
-          break;
-        }
-        case ClashRpcType.getRequestList: {
-          resolve(getRequestList())
-          break;
-        }
-        case ClashRpcType.clearRequestList: {
-          clearRequestList()
-          resolve(true)
-          break;
-        }
-        case ClashRpcType.changeProxy: {
-          resolve(changeProxy(JSON.stringify({
-            "group-name": data[0] as string,
-            "proxy-name": data[1] as string,
-          })))
-          break;
-        }
-        case ClashRpcType.healthCheck: {
-          asyncTestDelay(JSON.stringify({
-            "proxy-name": data[0] as string,
-            timeout: data[1] as string,
-          })).then((v) => {
-            resolve(v)
-          }).catch((e) => {
-            console.error("healthCheck error", e)
-            resolve(0)
-          })
-          break;
-        }
-        case ClashRpcType.queryProviders: {
-          const provider = getExternalProviders()
-          resolve(provider)
-          break;
-        }
-        case ClashRpcType.updateProvider: {
-          const params = JSON.parse(data[0] as string)
-          updateExternalProvider(params["name"]).then((v) => {
-            resolve(v)
-          })
-          break;
-        }
-        case ClashRpcType.uploadProvider: {
-          let provider = data[0] as string
-          let pathUri = data[1] as string
-          const buffer = await readFile(pathUri)
-          sideLoadExternalProvider(provider, buffer).then((v) => {
-            resolve(v)
-          })
-          break;
-        }
-        case ClashRpcType.queryConnections: {
-          let v = await getConnections()
-          resolve(v)
-          break;
-        }
-        case ClashRpcType.closeConnection: {
-          resolve(closeConnection(data[0] as string))
-          break;
-        }
-        case ClashRpcType.clearConnections: {
-          resolve(closeConnections())
-          break;
-        }
-        case ClashRpcType.updateGeoData: {
-          updateGeoData(data[0] as string, data[1] as string).then((v) => {
-            resolve(v)
-          })
-          break;
-        }
-        case ClashRpcType.getCountryCode: {
-          getCountryCode(data[0] as string).then((v) => {
-            resolve(v)
-          })
-          break;
-        }
-        case ClashRpcType.load: {
-          const parms = JSON.parse(data[0] as string) as UpdateConfigParams
-          updateConfig(JSON.stringify(parms)).then(e => {
-            resolve(e)
-          })
-          break;
-        }
-        case ClashRpcType.reset: {
-          forceGc()
-          resolve(true)
-          break;
-        }
-        case ClashRpcType.validConfig: {
-          const filePath = data[0] as string
-          let raw = await readText(filePath)
-          resolve(await validateConfig(raw))
-          break;
-        }
         case ClashRpcType.startClash: {
           startListener()
           this.startVpn().then((r) => {
@@ -215,7 +86,6 @@ export class FlClashVpnService extends CommonVpnService {
           stopListener()
           this.stopVpn()
           resolve(true)
-          this.running = false
           break;
         }
         case ClashRpcType.getRuntime:{
@@ -256,6 +126,7 @@ export class FlClashVpnService extends CommonVpnService {
     return vpnConfig;
   }
   override async startVpn(): Promise<boolean> {
+
     let config = this.ParseConfig();
     let tunFd = -1
     try {
