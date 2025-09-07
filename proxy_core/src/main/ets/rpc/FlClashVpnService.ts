@@ -88,10 +88,6 @@ export class FlClashVpnService extends CommonVpnService {
           resolve(true)
           break;
         }
-        case ClashRpcType.getRuntime:{
-          resolve(Date.now())
-          break;
-        }
         default: {
           resolve("不支持当前操作")
         }

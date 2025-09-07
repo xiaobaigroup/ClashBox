@@ -32,7 +32,8 @@ export enum ClashRpcType{
   stopLogObserver,
   vpnOptions,
   setOptionState,
-  getRuntime
+  GetVpnRunTime,
+  VpnConfigInited
 }
 
 export interface AccessControl{

@@ -142,19 +142,17 @@ export class SocketProxyService implements IClashManager {
     let json = await this.sendMessageRequest(ClashRpcType.startClash, [])
     return json as boolean
   }
+  // TODO 返回运行时间,卡片和ui统一使用 需要测试,
   async getRuntime(): Promise<number> {
-    let result = await this.sendMessageRequest(ClashRpcType.getRuntime)
+    let result = await this.sendMessageRequest(ClashRpcType.GetVpnRunTime)
     return result as number
   }
-  // async startClash(){
-  //   let config = await this.ParseConfig();
-  //   let tunFd = await this.getTunFd(config)
-  //   // this.callbackRequest(ClashRpcType.startClash, [tunFd], (res)=>{
-  //   //   console.log("ClashVPN", `startClash : ${res}`)
-  //   // })
-  //   //this.startClashNew(tunFd);
-  //   return true
-  // }
+  // TODO startClash前需要调用判断, clash配置是否加载完成,
+  // 没有加载,做友好提示,或则先加载clash配置,在启动
+  async vpnConfigIsLoad(): Promise<boolean> {
+    let result = await this.sendMessageRequest(ClashRpcType.VpnConfigInited)
+    return result  == "true"
+  }
   vpnConnection : vpnExtension.VpnConnection | undefined
   async getTunFd(config: VpnConfig): Promise<number> {
     let tunFd = -1
@@ -169,57 +167,6 @@ export class SocketProxyService implements IClashManager {
       return -1
     }
   }
-  //
-  // async ParseConfig(): Promise<VpnConfig> {
-  //   let vpnConfig = new VpnConfig();
-  //   let option = await this.getVpnOptions()
-  //   if (option.ipv4Address != "") {
-  //     vpnConfig.addresses[0].address = new Address(option.ipv4Address.split("/")[0], 1)
-  //     option.routeAddress?.filter((a:string) => isIpv4(a)).map((f:string) => f.split("/")[0])
-  //   }
-  //   if (option.ipv6Address != ""){
-  //     vpnConfig.addresses[0].address = new Address(option.ipv6Address.split("/")[0], 2)
-  //     option.routeAddress?.filter((a:string) => isIpv6(a)).map((f:string) => f.split("/")[0])
-  //   }
-  //   if(option.accessControl?.mode){
-  //     if(option.accessControl?.mode == "AcceptSelected"){
-  //       vpnConfig.trustedApplications = option.accessControl?.acceptList
-  //     }else{
-  //       vpnConfig.blockedApplications = option.accessControl?.rejectList
-  //     }
-  //   }
-  //   if(option.systemProxy || option.allowBypass){
-  //     // TODO ohos 不支持
-  //     // not use option.bypassDomain option.port
-  //   }
-  //   console.debug("vpnConfig", JSON.stringify(vpnConfig))
-  //   return vpnConfig;
-  // }
-
-  // startClashNew(tunFd:number){
-  //   let tcp: socket.LocalSocket = socket.constructLocalSocketInstance();
-  //   tcp.on('message', async (value: socket.LocalSocketMessageInfo) => {
-  //     let text = new util.TextDecoder()
-  //     let dd = text.decodeToString(new Uint8Array(value.message))
-  //     console.log("ClashVPN", `protect: ${dd}`)
-  //     try {
-  //       let json = JSON.parse(dd) as RpcResult
-  //       //let fd = JSON.parse(json.result as string) as Fd
-  //       // await this.vpnConnection?.protect(fd.value)
-  //       // setFdMap(fd.id)
-  //     }catch (e) {
-  //       console.error("ClashVPN protect error", e.message, dd)
-  //     }
-  //   })
-  //   const socketPath = this.context?.filesDir + '/clash_go.sock'
-  //   console.log("ClashVPN", `connect: ${socketPath}}`)
-  //   tcp.connect({address: { address: socketPath }, timeout:1000}).then(()=>{
-  //     console.log("ClashVPN", `connect: ${tunFd}`)
-  //     tcp.send({ data: JSON.stringify({method: ClashRpcType.startClash, params:[tunFd]}) });
-  //   }).catch((e: Error)=>{
-  //     console.error("ClashVPN", `error: ${e}`)
-  //   })
-  // }
   async stopClash():Promise<boolean>{
     let json = await this.sendMessageRequest(ClashRpcType.stopClash, [])
     return json as boolean
@@ -275,7 +222,8 @@ export class SocketProxyService implements IClashManager {
       })
       // {"proxy-name":"♻️自动选择","timeout":3000}
       let socketPath = this.context?.filesDir + '/clash_go.sock'
-      if (method == ClashRpcType.startClash || method == ClashRpcType.stopClash || method == ClashRpcType.getRuntime){
+      // || method == ClashRpcType.getRuntime 在clash_go里已实现,
+      if (method == ClashRpcType.startClash || method == ClashRpcType.stopClash){
         socketPath = this.context?.filesDir + '/ClashBox.sock'
       }
       if(!await fileIo.access(socketPath, fs.AccessModeType.EXIST))

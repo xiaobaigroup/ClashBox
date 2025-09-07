@@ -96,11 +96,14 @@ func StartTUN(fd int, markSocket func(Fd)) {
 	}()
 }
 
-func GetRunTime() *C.char {
-	if runTime == nil {
-		return C.CString("")
+func GetRunTime() string {
+	return strconv.FormatInt(runTime.UnixMilli(), 10)
+}
+func ConfigInited() string {
+	if currentConfig != nil {
+		return "true"
 	}
-	return C.CString(strconv.FormatInt(runTime.UnixMilli(), 10))
+	return "false"
 }
 
 func StopTun() {

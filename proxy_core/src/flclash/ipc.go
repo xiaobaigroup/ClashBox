@@ -90,6 +90,8 @@ const (
 	StopLogObserver
 	VpnOptions
 	SetOptionState
+	GetVpnRunTime
+	VpnConfigInited
 )
 
 func handleRemoteRequest(request RpcRequest, fn func(RpcResult)) {
@@ -243,6 +245,12 @@ func handleRemoteRequest(request RpcRequest, fn func(RpcResult)) {
 		} else {
 			ret.Result = ""
 		}
+		fn(ret)
+	case GetVpnRunTime:
+		ret.Result = GetRunTime()
+		fn(ret)
+	case VpnConfigInited:
+		ret.Result = ConfigInited()
 		fn(ret)
 	default:
 		ret.Error = "未知请求"
