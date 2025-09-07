@@ -6,7 +6,7 @@ target="aarch64"  # 可选值：x86_64, aarch64
 outdir="arm64-v8a"  # 可选值：x86_64, arm64-v8a
 
 # 设置 OHOS_NATIVE_HOME
-OHOS_NATIVE_HOME="/Volumes/MacintoshHD2/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/native"
+OHOS_NATIVE_HOME="/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/native"
 
 # 基础编译标志
 BASE_FLAGS="-Wno-error --sysroot=$OHOS_NATIVE_HOME/sysroot "
@@ -26,14 +26,14 @@ export GOARM=""
 export CGO_ENABLED="1"
 export CGO_CXXFLAGS=""
 export CGO_CFLAGS="-Wno-error --target=$target-linux-ohos $BASE_FLAGS"
-export CGO_LDFLAGS="-extld=$LD --sysroot=$OHOS_NATIVE_HOME/sysroot --target=$target-linux-ohos"
+export CGO_LDFLAGS=" --sysroot=$OHOS_NATIVE_HOME/sysroot --target=$target-linux-ohos"
 
 # 源文件和输出文件
 sourceFile="./"
 outputFile="libflclash.so"
 
 # 构建命令，生成共享库
-/Users/fiber/git/golang_go/bin/go build -tlsmodegd  -buildmode c-shared -tags "ohos with_gvisor"   -gcflags="all=-N -l" -o $outputFile $sourceFile
+/Users/xiaobai/git/go-ohos/bin/go  build -tlsmodegd  -buildmode c-shared -tags "ohos with_gvisor"   -gcflags="all=-N -l" -o $outputFile $sourceFile
 
 # 检查编译结果
 if [ -f "$outputFile" ]; then

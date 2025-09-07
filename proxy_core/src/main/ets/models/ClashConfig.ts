@@ -201,8 +201,8 @@ export class Dns {
 }
 
 export class DnsFallbackFilter {
-  geoIp?: boolean = true;
-  geoIpCode?: string = "CN";
+  geoip?: boolean = true;
+  "geoip-code"?: string = "CN";
   geosite?: string[] = ["gfw"]
   ipcidr?: string[] = ["240.0.0.0/4"];
   domain?: string[] = [
