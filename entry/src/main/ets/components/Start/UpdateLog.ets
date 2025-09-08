@@ -8,7 +8,7 @@ import TopBuilder from "../Settings/TopBuilder"
 @Component
 export struct UpdateLog {
 
-  @State showGroup: boolean = false
+  @State showGroup: boolean = true
   @State currentGroup: ResourceStr = ''
   @State showBackButton: boolean = false
   @State updateLog: TCItemProp[] = UpdateLogData
@@ -121,6 +121,10 @@ export struct UpdateLog {
     .padding({ left: 10, right: 10 })
     .justifyContent(FlexAlign.SpaceBetween)
     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+  }
+
+  aboutToAppear(): void {
+    this.currentGroup = this.updateLog[0].title
   }
 
 }

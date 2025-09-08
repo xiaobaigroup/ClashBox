@@ -200,6 +200,8 @@ struct Index {
   @Provide theLastHomeCard: boolean[] = showHomeCard
   // 速度卡片图表数据
   @Provide ChartData: number[] | ConvertedUnit[] = []
+  // 显示的是更新日志
+  @StorageLink('ShowUpdateLog') showUpdateLog: boolean = false
   // 代理启动的计时文本
   @StorageLink('proxyStartingDuration') proxyStartingDuration: string = ''
   // 速度卡片
@@ -378,7 +380,7 @@ struct Index {
       .bindSheet($$this.isShowWelcome, this.WelcomeSheet(), {
         detents: [BIND_SHEET_CONTAINER_HEIGHT],
         showClose: (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) ||
-          this.openLinkConfigUrl != '' || this.uiConfig.oldVersionName !== AppState.versionName,
+          this.openLinkConfigUrl != '' || (this.uiConfig.oldVersionName !== AppState.versionName && !this.uiConfig.isFirstStart) || this.showUpdateLog,
         dragBar: false,
         backgroundColor: $r('app.color.background'),
         keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
@@ -386,16 +388,23 @@ struct Index {
         preferType: SheetType.CENTER,
         onWillDismiss: ((DismissSheetAction: DismissSheetAction) => {
           if (!this.isShowWelcome || DismissSheetAction.reason === DismissReason.CLOSE_BUTTON ||
-            this.openLinkConfigUrl != '' || this.uiConfig.oldVersionName !== AppState.versionName) {
+            this.openLinkConfigUrl != '' || (this.uiConfig.oldVersionName !== AppState.versionName && !this.uiConfig.isFirstStart) || this.showUpdateLog) {
+            this.showUpdateLog = false
+            this.isShowWelcome = false
+            this.uiConfig.oldVersionName = AppState.versionName
+            console.error(`Update 历史应用版本更新为：${this.uiConfig.oldVersionName} showUpdateLog: ${this.showUpdateLog}`)
             // 关闭背景模糊
             this.isEnableIndexForegroundBlur = false
             DismissSheetAction.dismiss()
             hilog.info(0xFF00, "WelcomeTestTag", "欢迎页启用状态： %{private}s", this.isShowWelcome)
           }
         }),
+        onWillAppear: () => {
+          // 启用背景模糊
+          this.isEnableIndexForegroundBlur = true
+          console.error(`Update Index isShowWelcome：${this.isShowWelcome} showUpdateLog: ${this.showUpdateLog}`)
+        },
         onDisappear: async () => {
-          this.uiConfig.oldVersionName = AppState.versionName
-          console.error(`Update 历史应用版本更新为：${this.uiConfig.oldVersionName}`)
         }
       })
     } else {
@@ -938,6 +947,11 @@ struct Index {
 
   aboutToDisappear() {
     hilog.info(0x1000, componentName, `#aboutToDisappear executed`)
+    // 取消通知
+    if (this.uiConfig.Enablednotice && this.uiConfig.EnabledPermanentnotice) {
+      Xb_NotificationUtils.cancelNotification(this.noticeJob)
+      clearInterval(this.updateNoticeJob)
+    }
     // 纪录软件关闭时间
     this.uiConfig.useTime = new Date().getTime()
     // 解注册画中画生命周期及状态回调

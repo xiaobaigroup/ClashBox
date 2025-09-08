@@ -108,9 +108,11 @@ export struct Welcome {
   @Consume('WelcomeNavPathStack') welcomePageInfos: NavPathStack
   //一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
-  /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
-  private context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
+  // 显示的是更新日志
+  @StorageLink('ShowUpdateLog') showUpdateLog: boolean = false
+  /** 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
+
 
   aboutToAppear(): void {
     this.isEnableIndexForegroundBlur = true
@@ -190,6 +192,7 @@ export struct Welcome {
             this.uiConfig.isFirstStart = false
             // 关闭模态页
             this.isShowWelcome = false
+            this.tryShowUpdateLog()
           })
         Button($r('app.string.welcome_go'))
           .width('50%')
@@ -206,6 +209,7 @@ export struct Welcome {
             this.uiConfig.ShowProxyPop = true
             // 关闭模态页
             this.isShowWelcome = false
+            this.tryShowUpdateLog()
           })
       }.width('90%')
       .margin({ top: 12, bottom: 5 })
@@ -213,6 +217,14 @@ export struct Welcome {
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Center)
     .padding({left: 5, right: 5, bottom: 15})
+  }
+
+  tryShowUpdateLog() {
+    setTimeout(() => {
+      this.showUpdateLog = true
+      this.isShowWelcome = true
+      console.error(`Update WelcomePage isShowWelcome：${this.isShowWelcome} showUpdateLog: ${this.showUpdateLog}`)
+    }, 500)
   }
 
 }
