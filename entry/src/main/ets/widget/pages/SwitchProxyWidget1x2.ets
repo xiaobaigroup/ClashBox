@@ -17,33 +17,35 @@ struct SwitchProxyWidget1x2 {
   /** @description 卡片ID */
   @Watch('updateFormId') @LocalStorageProp('formId') formId: string = ''
   /** @description 开关变量 */
-  @LocalStorageProp('proxyEnabled') @Watch('changeProxyEnabled') proxyEnabled: boolean = false
+  @LocalStorageProp('proxyEnabled') proxyEnabled: boolean = false
   /** @description 主题色 */
   @LocalStorageProp('themeColor') themeColor: ResourceColor = $r('sys.color.icon_emphasize')
   @LocalStorageProp('loading') loading: boolean = false
+  @LocalStorageProp('tips') tips: string = ''
 
   updateFormId() {
     ActionUtils.updateCardIdAction(this, this.formId)
   }
-
-  changeProxyEnabled() {
-    this.loading = false
-  }
-
   build() {
     Column() {
       Row() {
         // 文字内容
         Row() {
           if (this.loading) {
+            // 加载文本
             Text($r('app.string.card_tips'))
               .fontSize(12)
+          } else if (this.tips) {
+            // 提示文本
+            Text(this.tips)
+              .fontSize(12)
           } else {
+            // 默认切换文本
             Text($r('app.string.click'))
             Text(this.proxyEnabled ? $r('app.string.close') : $r('app.string.open'))
           }
         }
-        .width(50)
+        .width(70)
 
         // 开关按钮
         Button() {

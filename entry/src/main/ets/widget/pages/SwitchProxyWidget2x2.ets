@@ -17,7 +17,7 @@ struct SwitchProxyWidget2x2 {
   /** @description 卡片ID */
   @Watch('updateFormId') @LocalStorageProp('formId') formId: string = ''
   /** @description 开关变量 */
-  @LocalStorageProp('proxyEnabled') @Watch('changeProxyEnabled') proxyEnabled: boolean = false
+  @LocalStorageProp('proxyEnabled') proxyEnabled: boolean = false
   /** @description 服务启动时间戳 */
   @LocalStorageProp('proxyStartingDuration') proxyStartingDuration: string = '00:00:00'
   /** @description 代理启动的计时文本 */
@@ -25,27 +25,26 @@ struct SwitchProxyWidget2x2 {
   /** @description 主题色 */
   @LocalStorageProp('themeColor') themeColor: ResourceColor = $r('sys.color.icon_emphasize')
   @LocalStorageProp('loading') loading: boolean = false
+  @LocalStorageProp('tips') tips: string = ''
 
   updateFormId() {
     ActionUtils.updateCardIdAction(this, this.formId)
   }
 
-  changeProxyEnabled() {
-    this.loading = false
-  }
-
   build() {
     RelativeContainer() {
-      // 标题
       Column({ space: 3.5 }) {
+        // 应用名
         Text(this.subTitle)
           .fontSize(12)
           .fontColor($r('sys.color.font_secondary'))
 
-        if (this.loading) {
-          Text($r('app.string.card_tips'))
+        // 提示文本
+        if (this.tips) {
+          Text(this.tips)
             .fontSize(12)
         } else {
+          // 卡片名
           Text(this.title)
             .fontSize(18)
             .fontWeight(FontWeight.Medium)
@@ -60,6 +59,9 @@ struct SwitchProxyWidget2x2 {
           Span($r('app.string.px_sec_screen_use_time'))
           Span(': ')
           Span(this.proxyStartingDuration)
+        } else if (this.loading) {
+          // 加载文本
+          Span($r('app.string.card_tips'))
         } else {
           Span($r('app.string.not_enabled'))
         }

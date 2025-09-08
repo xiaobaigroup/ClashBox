@@ -260,6 +260,9 @@ export default class EntryAbility extends UIAbility {
 
       // 卡片切换代理
       this.callee.on('cardChangeProxy', (indata: rpc.MessageSequence) => {
+        // TODO 卡片开启服务后打开UI会显示 is not callable
+        // TODO 后台卡片不走流
+        cardManager.pushCartLoading(true)
         hilog.info(0x0000, 'EntryAbility', 'cardChangeProxy');
         const obj = JSON.parse(indata.readString()) as object
         const proxyActionType = obj['proxyActionType'] as ProxyActionType
@@ -326,7 +329,7 @@ export default class EntryAbility extends UIAbility {
   }
 
   /** @description 卡片Clash核心触发事件 */
-  private async CardClashCoreEvent(proxyActionType: ProxyActionType) {
+  private async CardClashCoreEvent(proxyActionType: ProxyActionType): Promise<void> {
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'CardClashCoreEvent');
     // 初始化核心
     if (!this.clashCoreInitialized) {
@@ -335,11 +338,17 @@ export default class EntryAbility extends UIAbility {
       this.cardCoreInitialized = true
     }
 
+    const flag = await ClashViewModel.vpnConfigIsLoad()
+    if (!flag) {
+      cardManager.pushCartProxyMode(false, '核心配置未加载成功,请重新启动')
+      return
+    }
+
     const proxyNodeInfo = cardManager.getSelectedProxyNode()
     hilog.info(0x0000, 'EntryAbility', '%{public}s', JSON.stringify(proxyNodeInfo))
 
     // 启动/停止代理
-    if (proxyNodeInfo) {
+    if (proxyNodeInfo?.profile) {
       ClashViewModel.changeProxy(proxyNodeInfo.profile, proxyNodeInfo.g, proxyNodeInfo.p)
 
       console.log('卡片 - 启动/停止代理', proxyActionType)
@@ -355,6 +364,9 @@ export default class EntryAbility extends UIAbility {
       // if (this.uiConfig.isVibrate) {
       customVibrator.vibratorTriggerOfHapticClockTimer()
       // }
+    } else {
+      cardManager.pushCartProxyMode(false, '请先选中一个节点')
+      return
     }
   }
 

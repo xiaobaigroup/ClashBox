@@ -330,7 +330,6 @@ export class ClashViewModel {
       await this.loadVpnOptions()
       await this.socketProxy.stopClash()
       await this.socketProxy.startClash()
-      cardManager.pushCartProxyMode(this.vpnStarted)
     }
   }
   vpnStarted = false
@@ -400,6 +399,11 @@ export class ClashViewModel {
 
   async getRuntime(){
     return await this.socketProxy.getRuntime()
+  }
+  // 校验是否配置成功
+  async vpnConfigIsLoad(){
+    const flag = await this.socketProxy.vpnConfigIsLoad()
+    return flag
   }
 
   async initProfile() {

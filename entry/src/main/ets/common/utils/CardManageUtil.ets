@@ -70,11 +70,24 @@ class CardManager {
   }
 
   /** @description 推送代理状态到所有卡片 */
-  pushCartProxyMode(proxyEnabled: boolean) {
+  pushCartProxyMode(proxyEnabled: boolean, tips: string = '') {
     // 创建推送数据
     const data = formBindingData.createFormBindingData({
       proxyEnabled,
-      loading: true
+      loading: false,
+      tips,
+    })
+    this.getCardIdList().forEach(formId => {
+      // 推送到卡片
+      formProvider.updateForm(formId, data)
+    })
+  }
+  
+  /** @description 推送loading状态到所有卡片 */
+  pushCartLoading(loading: boolean) {
+    // 创建推送数据
+    const data = formBindingData.createFormBindingData({
+      loading,
     })
     this.getCardIdList().forEach(formId => {
       // 推送到卡片

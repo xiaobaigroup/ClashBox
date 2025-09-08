@@ -20,7 +20,7 @@ struct CurrentNodeWidget2x2 {
   /** @description 卡片ID */
   @Watch('updateFormId') @LocalStorageProp('formId') formId: string = ''
   /** @description 开关变量 */
-  @LocalStorageProp('proxyEnabled') @Watch('changeProxyEnabled') proxyEnabled: boolean = false
+  @LocalStorageProp('proxyEnabled') proxyEnabled: boolean = false
   /** @description IP地址信息 */
   @LocalStorageProp('remoteIp') remoteIp: IpInfo = {
     ip: 'Unknown',
@@ -33,26 +33,31 @@ struct CurrentNodeWidget2x2 {
   /** @description 当前节点延迟 */
   @LocalStorageProp('delay') delay: number = 0
   @LocalStorageProp('loading') loading: boolean = false
+  @LocalStorageProp('tips') tips: string = ''
 
   updateFormId() {
     ActionUtils.updateCardIdAction(this, this.formId)
   }
 
-  changeProxyEnabled() {
-    this.loading = false
-  }
-
   build() {
     RelativeContainer() {
-      // 标题
       Column({ space: 3.5 }) {
+        // 卡片名
         Text(this.subTitle)
           .fontSize(12)
           .fontColor($r('sys.color.font_secondary'))
 
+        // 当前节点名
         Text(this.currentProxyName)
           .fontSize(18)
           .fontWeight(FontWeight.Medium)
+
+        // 提示文本
+        if (this.tips) {
+          Text(this.tips)
+            .fontSize(12)
+            .fontColor($r('sys.color.font_secondary'))
+        }
       }
       .alignItems(HorizontalAlign.Start)
       .id('title')
@@ -76,12 +81,17 @@ struct CurrentNodeWidget2x2 {
           if (this.proxyEnabled) {
             Span($r('app.string.Delay'))
             Span(`: ${this.delayText(this.delay)}`)
+          } else if (this.loading) {
+            // 加载文本
+            Span($r('app.string.card_tips'))
           } else {
             Span($r('app.string.not_enabled'))
           }
         }
         .fontSize(12)
         .fontColor(this.proxyEnabled ? this.getColorForLatency(this.delay) : $r('sys.color.font_secondary'))
+        .padding({ right: 32 })
+        .layoutWeight(1)
 
         Button() {
           if (this.loading) {
