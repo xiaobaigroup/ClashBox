@@ -11,7 +11,7 @@ export struct CardEdit {
   /**
    * grid网格组件相关数据,包含scroller控制器,regularSize参数指代组件布局大小为1:1,irregularIndexes参数指代0序号的组件占据整排
    */
-  scroller: Scroller = new Scroller()
+  private scroller: Scroller = new Scroller()
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
@@ -27,6 +27,7 @@ export struct CardEdit {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // PC判定
   @StorageLink ('2in1') is2in1: boolean = false
+  private uiContext = this.getUIContext()!
 
   @Builder CardImage(s:Resource,a:number,i:number,w:ResourceStr,isShow:boolean){
     if (this.theCurrentHomeCard[i] === false) {
@@ -37,7 +38,7 @@ export struct CardEdit {
         .ImageItemStyle()
         .transition(customAnimationUtil.isScaleTran(i, this.uiConfig))
         .onClick(() => {
-          animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
+          this.uiContext.animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
             this.theCurrentHomeCard.splice(i, 1, isShow)
           })
         })
@@ -60,7 +61,7 @@ export struct CardEdit {
           .ImageItemStyle()
           .transition(customAnimationUtil.isScaleTran(9, this.uiConfig))
           .onClick(() => {
-            animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
+            this.uiContext.animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
               this.theCurrentHomeCard.splice(9, 1, this.isFoldStatus && !this.is2in1 ? false : true)
             })
           })
@@ -70,7 +71,7 @@ export struct CardEdit {
         this.CardImage($r('app.media.ProxyINFO'), 2.07, 8, '100%', true)
       }
       .onClick(() => {
-        animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
+        this.uiContext.animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
           this.theCurrentHomeCard.splice(8, 1, true)
         })
       })

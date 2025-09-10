@@ -42,6 +42,7 @@ import {
 import { RoundButton } from '../components/Common/RoundButton'
 import { AccessControl, VpnRawOptions } from 'proxy_core/src/main/ets/rpc/IClashManager'
 import { Xb_GetResourceString } from 'xb_components'
+import { common } from '@kit.AbilityKit'
 
 
 @Entry
@@ -60,8 +61,8 @@ struct Home {
   @Consume isShowDeleteButton: boolean
   // 平板横屏
   @Consume istabletLandscape: boolean
-  // 设置模态页控制变量
-  @Consume @Watch('ShowHomeEditChange') isShowSettings: boolean
+  // 编辑卡片半模态页控制变量
+  @Consume @Watch('ShowHomeEditChange') isShowCardEdit: boolean
   // 是否为PX外屏
   @Consume isPXSecScreen: boolean
   // 代理启动按钮状态
@@ -90,6 +91,7 @@ struct Home {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 滚动控制
   private scrollerForScroll: Scroller = new Scroller()
+  private uiContext = this.getUIContext()!
 
   // 代理页分组数据（懒加载）
   @Consume proxyGroups: ProxyGroupItemDataSource
@@ -148,12 +150,13 @@ struct Home {
             // 编辑按钮
             onFClick: () => {
               this.isShowHomeEdit = true
+              this.isShowCardEdit = true
               // 编辑布局前储存之前的布局变量
               hilog.info(0xFF00, "HometestTag", "上一次布局1： %{public}s", JSON.stringify(this.theLastHomeCard))
               this.theLastHomeCard = JSON.parse(this.uiConfig.isShowHomeCard)
               hilog.info(0xFF00, "HometestTag", "上一次布局2： %{public}s", JSON.stringify(this.theLastHomeCard))
               if (this.uiConfig.isAnimation) {
-                animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+                this.uiContext.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
                   this.isShowDeleteButton = true
                 })
               } else {
@@ -162,7 +165,7 @@ struct Home {
             },
             // 设置按钮
             onSClick: () => {
-              this.isShowSettings = true
+              this.isShowCardEdit = false
               this.showHomeSheet = true
               this.isEnableIndexForegroundBlur = true
             }
@@ -175,7 +178,7 @@ struct Home {
             icons: [$r('sys.symbol.plus'), $r('sys.symbol.save'), $r('sys.symbol.xmark')],
             // 添加按钮
             onFClick: () => {
-              this.isShowSettings = false
+              this.isShowCardEdit = true
               this.showHomeSheet = true
               this.isEnableIndexForegroundBlur = true
             },
@@ -281,10 +284,10 @@ struct Home {
         scrollSizeMode: ScrollSizeMode.CONTINUOUS,
         backgroundColor: $r('app.color.background'),
         dragBar: false,
-        title: this.isShowSettings ? undefined : { title: $r('app.string.add_home_card') },
+        title: this.isShowCardEdit ? { title: $r('app.string.add_home_card') } : undefined,
         keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
         onWillDismiss: () => {
-          this.isShowSettings = false
+          this.isShowCardEdit = false
           this.showHomeSheet = false
           this.isEnableIndexForegroundBlur = false
           this.SettingsPageInfos.clear()
@@ -296,16 +299,16 @@ struct Home {
 
   @Builder
   HomeSheet() {
-    if (this.isShowSettings) {
+    if (this.isShowCardEdit) {
+      // 卡片编辑半模态
+      CardEdit()
+    } else {
       // 设置模态界面
       Column() {
         Settings()
       }
       .width('100%')
       .height('100%')
-    } else {
-      // 卡片编辑半模态
-      CardEdit()
     }
   }
 
@@ -314,13 +317,13 @@ struct Home {
     builder: SaveCustomDialog({
       cancel: () => {
         this.onCancel()
-        animateTo({ duration: 0,iterations:0 }, () => {
+        this.uiContext.animateTo({ duration: 0,iterations:0 }, () => {
           this.rotateAngle = 0
         })
       },
       confirm: () => {
         this.onAccept()
-        animateTo({ duration: 0,iterations:0 }, () => {
+        this.uiContext.animateTo({ duration: 0,iterations:0 }, () => {
           this.rotateAngle = 0
         })
       }
@@ -470,7 +473,7 @@ struct Home {
   // 卡片摇摆动画
   startAnim() {
     this.rotateAngle = 0
-    animateTo({
+    this.uiContext.animateTo({
       duration: this.uiConfig.animationSpeed,
       curve: Curve.Linear,
       iterations:-1,
@@ -481,7 +484,7 @@ struct Home {
   }
 
   stopAnim() {
-    animateTo({
+    this.uiContext.animateTo({
       delay: 0,
       duration: 0,
       iterations: 0,
@@ -496,10 +499,10 @@ struct Home {
     // 保存布局
     this.uiConfig.isShowHomeCard = JSON.stringify(this.theCurrentHomeCard)
     hilog.info(0xFF00, "HometestTag", "保存的布局： %{public}s", this.uiConfig.isShowHomeCard)
-    this.promptAction.showToast({ message: `${getContext().resourceManager.getStringSync($r('app.string.layout_saved'))}💾` })
+    this.promptAction.showToast({ message: `${Xb_GetResourceString($r('app.string.layout_saved'), this)}💾` })
     this.isShowHomeEdit = false
     if (this.uiConfig.isAnimation) {
-      animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+      this.uiContext.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
         this.isShowDeleteButton = false
       })
     } else { this.isShowDeleteButton = false }
@@ -511,9 +514,9 @@ struct Home {
     this.theCurrentHomeCard = this.theLastHomeCard
     this.uiConfig.isShowHomeCard = JSON.stringify(this.theLastHomeCard)
     hilog.info(0xFF00, "HometestTag", "布局还原为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
-    this.promptAction.showToast({ message: `${getContext().resourceManager.getStringSync($r('app.string.layout_restored'))}🫡` })
+    this.promptAction.showToast({ message: `${Xb_GetResourceString($r('app.string.layout_restored'), this)}🫡` })
     this.isShowHomeEdit = false
-    animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+    this.uiContext.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
       this.isShowDeleteButton = false
     })
   }
@@ -521,7 +524,7 @@ struct Home {
   /**卡片编辑页面显示监听*/
   ShowHomeEditChange() {
     hilog.info(0xFF00, "HometestTag", "进入卡片编辑页面显示监听  %{public}s")
-    if(this.isShowHomeEdit && !this.isShowSettings) {
+    if(this.isShowHomeEdit && !this.isShowCardEdit) {
       this.stopAnim()
       this.startAnim()
     }else{
@@ -560,9 +563,11 @@ struct HomeCard {
   @Consume isShowDeleteButton: boolean
   // 当前主页布局
   @Consume theCurrentHomeCard: boolean[]
+  private uiContext = this.getUIContext()!
   // 前台判断变量
   @StorageProp('ForewardState') isForeward: boolean = true
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   // 高度断点
@@ -588,7 +593,7 @@ struct HomeCard {
             DeleteButton()
               .position({ x: this.item.order == 1 || this.item.order == 10 ? '95%' : '92%', y: -4 })
               .onClick(() => {
-                animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+                this.uiContext.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
                   this.theCurrentHomeCard.splice(this.index, 1, false)
                 })
                 hilog.info(0xFF00, "HometestTag", "网络速率卡片: %{public}s", this.uiConfig.isShowHomeCard[this.index])

@@ -7,8 +7,7 @@ import { BusinessError } from "@kit.BasicServicesKit"
 import { notificationManager } from "@kit.NotificationKit"
 import { common } from "@kit.AbilityKit"
 import { PageMargin } from "../../common/breakpoint/BreakPoint"
-
-const context = getContext(this) as common.UIAbilityContext
+import { PromptAction } from "@kit.ArkUI"
 
 @Component
 struct Backgrounder {
@@ -36,6 +35,8 @@ struct Backgrounder {
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+
+  private context = this.getUIContext().getHostContext()! as common.UIAbilityContext
 
   build() {
     NavDestination() {
@@ -259,7 +260,7 @@ struct Backgrounder {
         if (!this.uiConfig.isRequestNotification) {
           // 首次请求权限
           try {
-            await notificationManager.requestEnableNotification(context)
+            await notificationManager.requestEnableNotification(this.context)
             this.uiConfig.isRequestNotification = true
             // 显示通知设置 显式动画
             this.getUIContext()?.animateTo({
@@ -298,7 +299,7 @@ struct Backgrounder {
    *  跳转至设置界面开启通知权限
    */
   handleToSettings() {
-    context.startAbility({
+    this.context.startAbility({
       bundleName: 'com.huawei.hmos.settings', // 系统设置界面的包名 （固定）
       abilityName: 'com.huawei.hmos.settings.MainAbility', // 系统设置的Ability的名字（固定）
       uri: "application_info_entry", // 系统设置的界面 （固定）

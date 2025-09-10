@@ -72,7 +72,7 @@ struct Notice {
 
 
   aboutToAppear() {
-    hilog.info(0xFF00, this.componentName, `#aboutToAppear executed`)
+    hilog.info(0xFF00, this.componentName, `#Notice 通知总开关 ${this.uiConfig.Enablednotice}`)
     if (this.uiConfig.isSound) {
       customSound.initSoundPool(3, 'beat_short.wav')
     }

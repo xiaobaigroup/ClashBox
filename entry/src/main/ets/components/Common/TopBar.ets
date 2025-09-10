@@ -5,6 +5,7 @@ import { UIConfig } from "../../entryability/AppState";
 import { ButtonBuilder, context, font_primary, icon_primary } from "./Common";
 import { BusinessError } from "@kit.BasicServicesKit";
 import { calculateFontSizeLinear } from "../../common/utils/CalculateFontSizeUtil";
+import { common } from "@kit.AbilityKit";
 
 let theWindowClass: window.Window
 
@@ -85,6 +86,7 @@ export struct WindowTopBar {
   @State WindowMaximize: boolean = false
   @State windowClass: window.Window = theWindowClass
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  private context = this.getUIContext().getHostContext()! as common.UIAbilityContext
 
   build() {
     Row() {
@@ -103,7 +105,7 @@ export struct WindowTopBar {
   }
 
   aboutToAppear(): void {
-    window.getLastWindow(getContext(this), (err, WindowClass) => {
+    window.getLastWindow(this.context, (err, WindowClass) => {
       // 初始化WindowClass
       this.windowClass = WindowClass
     })

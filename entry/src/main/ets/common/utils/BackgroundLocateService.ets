@@ -131,7 +131,7 @@ export class BackgroundLocateService {
     // 通过wantAgent模块下getWantAgent方法获取WantAgent对象
     try {
       let wantAgentObj: WantAgent =  await wantAgent.getWantAgent(wantAgentInfo)
-      let res = await backgroundTaskManager.startBackgroundRunning(getContext(this), ["location"], wantAgentObj)
+      let res = await backgroundTaskManager.startBackgroundRunning(context, ["location"], wantAgentObj)
       return res.notificationId
     } catch (err) {
       hilog.error(0xFF00, 'BackgroundLocateService', `Failed to operation startBackgroundRunning. Code is ${err.code}, message is ${err.message}`)

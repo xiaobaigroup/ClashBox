@@ -118,7 +118,7 @@ export struct ImportConfigFromFile{
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .backgroundColor($r('app.color.container_background'))
         .onClick(() => {
-          let filePicker = new picker.DocumentViewPicker(getContext(this))
+          let filePicker = new picker.DocumentViewPicker(this.getUIContext().getHostContext()!)
           let options = new picker.DocumentSelectOptions()
           filePicker.select(options).then((documentSelectResult)=>{
             this.fileurl = documentSelectResult[0];

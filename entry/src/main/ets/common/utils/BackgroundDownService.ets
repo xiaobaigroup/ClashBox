@@ -17,7 +17,7 @@ export class BackgroundDownService {
   notificationId ?: number = undefined
   notice:number = 0
 
-  async start(context: Context){
+  async start(context: Context) {
     if(this.notificationId)
       return
     let id = await this.startContinuousTask(context)
@@ -117,7 +117,7 @@ export class BackgroundDownService {
     try {
       // 通过wantAgent模块下getWantAgent方法获取WantAgent对象
       let wantAgentObj: WantAgent =  await wantAgent.getWantAgent(wantAgentInfo)
-      let res = await backgroundTaskManager.startBackgroundRunning(getContext(this), ["dataTransfer"], wantAgentObj)
+      let res = await backgroundTaskManager.startBackgroundRunning(context, ["dataTransfer"], wantAgentObj)
       return res.notificationId
     } catch (err) {
       hilog.error(0xFF00, 'BackgroundDownService', `长时任务启动失败. Code is ${err.code}, message is ${err.message}`)

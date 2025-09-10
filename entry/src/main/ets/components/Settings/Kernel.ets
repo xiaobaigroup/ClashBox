@@ -4,7 +4,7 @@ import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { AppConfig, ClashCore, isEnd, UIConfig } from '../../entryability/AppState'
 import ClashViewModel from '../../entryability/ClashViewModel'
-import { promptAction } from "@kit.ArkUI"
+import { PromptAction, promptAction } from "@kit.ArkUI"
 import { ExperimentalFunction } from "../Common/Common"
 import { removeItemsByIndex } from "../../common/utils/RemoveItemsUtils"
 import { customAnimationUtil } from "../../common/utils/Animation"
@@ -37,6 +37,9 @@ struct Kernel {
   // 更多页列表数组
   @Consume moreList: moreData[]
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+
+  private promptAction: PromptAction = this.getUIContext().getPromptAction()
+  private context = this.getUIContext().getHostContext()! as common.UIAbilityContext
   @State private kernel: KernelListItem[] = [
     {icons: $rawfile('mihomo.png'), title: 'mihomo', subtitle: $r('app.string.new_kernel'), isExperimental: false, ClashCore: ClashCore.mihomo},
     {icons: $rawfile('mihomo.png'), title: "前台模式(mihomo)", subtitle: $r('app.string.switch_core_foreground_prompt'), isExperimental: false, ClashCore: ClashCore.ClashMeta},
@@ -50,9 +53,9 @@ struct Kernel {
         this.appConfig.clashCore = ClashCore.mihomo
         ClashViewModel.ChangeCore(ClashCore.mihomo)
         hilog.info(0xFF00, "SettingsKerneltestTag", "当前内核：%{public}d", this.appConfig.clashCore)
-        promptAction.showToast({message: $r('app.string.restart_tips'), duration: 2000 })
+        this.promptAction.showToast({message: $r('app.string.restart_tips'), duration: 2000 })
         setTimeout(() => {
-          getContext(this)?.getApplicationContext().killAllProcesses()
+          this.context.getApplicationContext().killAllProcesses()
         }, 2000)
         // 恢复更多页列表
         this.moreList = ListMoreData()
@@ -68,9 +71,9 @@ struct Kernel {
         // this.uiConfig.backgroundPiPModel = false
         // promptAction.showToast({message: $r('app.string.restart_tips'), duration: 2000 })
         // setTimeout(() => {
-        promptAction.showToast({message: "应用即将退出，请重新打开", duration: 2000 })
+        this.promptAction.showToast({message: "应用即将退出，请重新打开", duration: 2000 })
         setTimeout(()=>{
-          getContext(this)?.getApplicationContext().killAllProcesses()
+          this.context.getApplicationContext().killAllProcesses()
         }, 2000)
 
         // ClashRS

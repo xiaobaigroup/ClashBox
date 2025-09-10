@@ -14,8 +14,6 @@ import { customAnimationUtil, isON } from '../../../common/utils/Animation'
 import { common } from '@kit.AbilityKit'
 import { PageMargin } from '../../../common/breakpoint/BreakPoint'
 
-const context = getContext(this) as common.UIAbilityContext
-
 @Component
 export struct ConfigList {
   @Prop configList: ConfigItemData[]

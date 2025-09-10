@@ -190,6 +190,8 @@ struct Index {
    * 主页相关变量
    */
   @Provide rotateAngle: number = 0
+  // 编辑卡片半模态页控制变量
+  @Provide isShowCardEdit: boolean = false
   // 编辑按钮点击后显示编辑状态判定
   @Provide isShowHomeEdit: boolean = false
   // 主页删除按钮是否出现判定
@@ -903,7 +905,7 @@ struct Index {
     // 导出日志事件
     EventHub.on(EventKey.ExportLog, (LogData?: LogData) => {
       try {
-        let filePicker = new picker.DocumentViewPicker(getContext(this))
+        let filePicker = new picker.DocumentViewPicker(this.context)
         let options = new picker.DocumentSaveOptions()
         options.newFileNames = LogData ? [`clash_next_${LogData.logTime}_${Date.now()}.log`] : ["clash_next.log"]
         options.fileSuffixChoices = ["'文档|.txt'"]
@@ -1029,7 +1031,7 @@ struct Index {
     }
     if (this.uiConfig.backgroundPiPModel && this.proxyEnabled) {
       // 创建画中画控制器
-      PipManager.getInstance().init(getContext(this))
+      PipManager.getInstance().init(this.context)
       // 禁用自动启用
       PipManager.getInstance().setAutoStart(true)
       hilog.info(0xFF00, "PipTag", "代理启用状态： %{public}s", this.proxyEnabled)

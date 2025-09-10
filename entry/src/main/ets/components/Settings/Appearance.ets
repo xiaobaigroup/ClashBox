@@ -17,7 +17,6 @@ import { PageMargin } from "../../common/breakpoint/BreakPoint"
 import { Xb_ColorModeManager, Xb_UIConfig } from "xb_components"
 import { Xb_ChangeThemeColor } from "xb_components/src/main/ets/utils/ChangeThemeColorUtil"
 
-const context: common.UIAbilityContext = getContext(this) as common.UIAbilityContext
 
 @Component
 struct Appearance {
@@ -61,6 +60,7 @@ struct Appearance {
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
 
+  private context = this.getUIContext().getHostContext()! as common.UIAbilityContext
 
   build() {
     NavDestination() {
@@ -320,7 +320,7 @@ struct Appearance {
           .onChange((selected) => {
             // 持久化深色模式
             this.uiConfig.darkMode = menuItem.colorMode!
-            Xb_ColorModeManager.setColorModeByString(context, this.uiConfig.darkMode)
+            Xb_ColorModeManager.setColorModeByString(this.context, this.uiConfig.darkMode)
             // UI刷新
             this.EnableDarkModeText = menuItem.title
           })

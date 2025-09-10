@@ -11,6 +11,7 @@ import { picker } from "@kit.CoreFileKit"
 import { customAnimationUtil, isON } from "../../common/utils/Animation"
 import { icon_primary } from '../Common/Common'
 import { TabContentTitleMargin } from "../../common/breakpoint/BreakPoint"
+import { common } from "@kit.AbilityKit"
 
 /**
  * 提供者
@@ -50,6 +51,8 @@ export struct ProviderPage {
   //副标题是否显示
   @State textTwoTitle: boolean = true
 
+  private context = this.getUIContext().getHostContext()! as common.UIAbilityContext
+
   /**
    * 监听加载状态改变执行UI数组更新
    */
@@ -69,7 +72,7 @@ export struct ProviderPage {
   }
 
   uploadProvider(item: Provider) {
-    let filePicker = new picker.DocumentViewPicker(getContext(this))
+    let filePicker = new picker.DocumentViewPicker(this.context)
     let options = new picker.DocumentSelectOptions()
     filePicker.select(options).then((documentSelectResult) => {
       const fileUrl = documentSelectResult[0];

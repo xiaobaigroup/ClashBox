@@ -28,16 +28,12 @@ import { PageMargin } from "../../common/breakpoint/BreakPoint"
 import { UpdateLog } from '../Start/UpdateLog';
 
 
-const context = getContext(this) as common.UIAbilityContext
-
 @Entry
 @Component
 struct Settings {
   @Consume isDisclaimer: boolean
   // 判断设置是否清楚数据
   @Consume isClearData: boolean
-  // 设置模态页控制变量
-  @Consume isShowSettings: boolean
   @Consume currentLanguage: ResourceStr
   @Consume configList: Array<ConfigData>
   @Consume proxyGroups: ProxyGroupItemDataSource
@@ -54,7 +50,10 @@ struct Settings {
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+
   private promptAction: PromptAction = this.getUIContext().getPromptAction()
+  private context = this.getUIContext().getHostContext()! as common.UIAbilityContext
+
   // 免责声明弹窗控制器
   dialogController: CustomDialogController | null = new CustomDialogController({
     builder: DisclaimerCustomDialog({
@@ -114,19 +113,22 @@ struct Settings {
   async onresetAccept() {
     // 清空应用设置操作
     try {
-      await AppState.ResetConfig(getContext(this))
-    }catch (e) {
+      await AppState.ResetConfig(this.getUIContext().getHostContext()!)
+      setTimeout(() => {
+        this.context.getApplicationContext().killAllProcesses()
+      }, 2000)
+      this.proxyGroups.clear()
+      this.isClearData = true
+      this.configList = []
+      hilog.info(0xC011, 'Settings', `EditConfig #onConfigListChange#配置列表: ${JSON.stringify(this.configList)}`)
+      this.promptAction.showToast({message: $r('app.string.settings_reset_tips')})
+      this.promptAction.showToast({message: $r('app.string.restart_tips'), duration: 2000 })
+      // 关闭背景模糊
+      this.isEnableIndexForegroundBlur = false
+    } catch (e) {
       this.promptAction.showToast({message: "清理配置失败!"})
     }
-    this.proxyGroups.clear()
-    this.isClearData = true
-    this.configList = []
-    hilog.info(0xC011, 'Settings', `EditConfig #onConfigListChange#配置列表: ${JSON.stringify(this.configList)}`)
-    this.promptAction.showToast({message: $r('app.string.settings_reset_tips')})
-    // 关闭背景模糊
-    this.isEnableIndexForegroundBlur = false
-    // 关闭设置页
-    this.isShowSettings = false
+
   }
 
   handleCheck(index: number) {
@@ -258,7 +260,7 @@ struct Settings {
           Text() {
             Span($r('app.string.settings_count_vpn'))
             Span(`${ClashViewModel.socketProxy.offlineTime.length}`)
-            Span(`${getResourceString($r('app.string.times'), context)}, `)
+            Span(`${getResourceString($r('app.string.times'), this.context)}, `)
             Span($r('app.string.view_detail'))
               .fontColor(this.icon_emphasize)
               .onClick(() => {
