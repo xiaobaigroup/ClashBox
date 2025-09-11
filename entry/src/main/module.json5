@@ -22,10 +22,15 @@
         "startWindowIcon": "$media:foreground_box_cat_large",
         "startWindowBackground": "$color:start_window_background",
         "orientation": "auto_rotation_restricted",
-        "supportWindowMode": ["floating","split","fullscreen"],
+        "supportWindowMode": [
+          "floating",
+          "split",
+          "fullscreen"
+        ],
         "minWindowWidth": 332,
         "exported": true,
-        "backgroundModes": [ // 长时任务类型的配置项
+        "backgroundModes": [
+          // 长时任务类型的配置项
           // 数据传输
           "dataTransfer",
           "location",
@@ -57,13 +62,18 @@
                 "scheme": "file",
                 "utd": "general.text",
                 "maxFileSupported": 1
+              },
+              {
+                "scheme": "https",
+                "host": "https://xbstudio.top",
               }
-            ]
+            ],
+            "domainVerify": true
           }
         ]
       }
     ],
-    "requestPermissions":[
+    "requestPermissions": [
       {
         "name": "ohos.permission.INTERNET",
       },
@@ -77,7 +87,7 @@
       },
       {
         "name": "ohos.permission.LOCATION",
-        "reason":  "$string:permission_reason_MICROPHONE",
+        "reason": "$string:permission_reason_MICROPHONE",
         "usedScene": {
           "abilities": [
             "EntryAbility"
