@@ -335,7 +335,7 @@ struct Index {
         // .backgroundBrightness({rate:0.5,lightUpDegree:0.5})
         //  .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
         .barOverlap(false)
-        .scrollable(this.isSecondary ? false : true)
+        .scrollable(!this.isSecondary)
         .vertical(TabBarVertical(this.widthBp, this.heightBp))
         .barWidth(this.windowMode ? WindowTabBarWidth(this.widthBp, this.heightBp) :
           TabBarWidth(this.widthBp, this.heightBp))
@@ -368,12 +368,10 @@ struct Index {
         .width('100%')
         .height('100%')
         .backgroundColor($r('app.color.background'))
-        .foregroundBlurStyle(
-          this.isEnableIndexForegroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
-          { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 }
-        )
+        .foregroundBlurStyle(this.isEnableIndexForegroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
+          { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 })
         .fadingEdge(true)
-        .padding({ top: this.topRectHeight })
+        .padding({ top: this.topRectHeight, bottom: this.bottomRectHeight == 0 ? this.bottomRectHeight / 2 : 0 })
       }
       .width('100%')
       .height('100%')
