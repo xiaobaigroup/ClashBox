@@ -117,11 +117,11 @@ struct Settings {
       setTimeout(() => {
         this.context.getApplicationContext().killAllProcesses()
       }, 2000)
-      this.proxyGroups.clear()
-      this.isClearData = true
-      this.configList = []
-      hilog.info(0xC011, 'Settings', `EditConfig #onConfigListChange#配置列表: ${JSON.stringify(this.configList)}`)
-      this.promptAction.showToast({message: $r('app.string.settings_reset_tips')})
+      // this.proxyGroups.clear()
+      // this.isClearData = true
+      // this.configList = []
+      // hilog.info(0xC011, 'Settings', `EditConfig #onConfigListChange#配置列表: ${JSON.stringify(this.configList)}`)
+      // this.promptAction.showToast({message: $r('app.string.settings_reset_tips')})
       this.promptAction.showToast({message: $r('app.string.restart_tips'), duration: 2000 })
       // 关闭背景模糊
       this.isEnableIndexForegroundBlur = false

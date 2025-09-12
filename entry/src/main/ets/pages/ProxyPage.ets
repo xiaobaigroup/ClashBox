@@ -364,7 +364,10 @@ struct ProxyPage {
           Icon2: $r('sys.symbol.bolt_filled_on_circle'),
         })
       } else {
-        ButtonBuilder({ icon: $r('sys.symbol.bolt_filled_on_circle') })
+        ButtonBuilder({
+          enableClick: false,
+          icon: $r('sys.symbol.bolt_filled_on_circle')
+        })
           .offset({y: 3})
       }
     }
