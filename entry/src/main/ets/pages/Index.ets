@@ -742,14 +742,14 @@ struct Index {
       this.proxyStartingDuration = number2Time(time)
     })
     // 通知事件
-    EventHub.on(EventKey.EnabledNotice, async () => {
+    EventHub.on(EventKey.EnabledNotice, async (enadblNotice: boolean) => {
       try {
         // 先获取最新权限状态
         const currentStatus = await notificationManager.isNotificationEnabled()
         if (currentStatus) {
-          // 已有权限时通知开关启用或关闭
+          // 已有权限时
           // 显示通知设置 显式动画
-          this.uiConfig.Enablednotice = !this.uiConfig.Enablednotice
+          this.uiConfig.Enablednotice = enadblNotice ?? true
         } else {
           // 没有授权时
           if (!this.uiConfig.isRequestNotification) {
@@ -783,7 +783,7 @@ struct Index {
     })
     // 首次启动启用通知
     if (!this.uiConfig.isRequestNotification) {
-      EventHub.sendEvent(EventKey.EnabledNotice)
+      EventHub.sendEvent(EventKey.EnabledNotice, true)
     }
     // 检查后台运行全局变量的状态
     if(this.uiConfig.backgroundLocateModel || this.uiConfig.backgroundDownModel || this.uiConfig.backgroundPiPModel) {

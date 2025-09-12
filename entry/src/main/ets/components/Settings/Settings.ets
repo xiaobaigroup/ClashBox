@@ -115,13 +115,10 @@ struct Settings {
     try {
       await AppState.ResetConfig(this.getUIContext().getHostContext()!)
       setTimeout(() => {
-        this.context.getApplicationContext().killAllProcesses()
+        this.context.getApplicationContext().killAllProcesses().catch(() => {
+          console.error(`Settings 清空数据 关闭进程失败`)
+        })
       }, 2000)
-      // this.proxyGroups.clear()
-      // this.isClearData = true
-      // this.configList = []
-      // hilog.info(0xC011, 'Settings', `EditConfig #onConfigListChange#配置列表: ${JSON.stringify(this.configList)}`)
-      // this.promptAction.showToast({message: $r('app.string.settings_reset_tips')})
       this.promptAction.showToast({message: $r('app.string.restart_tips'), duration: 2000 })
       // 关闭背景模糊
       this.isEnableIndexForegroundBlur = false

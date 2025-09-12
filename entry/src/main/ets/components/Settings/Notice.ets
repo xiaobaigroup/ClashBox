@@ -161,8 +161,8 @@ struct Notice {
                   .margin({right: 12})
               }.hitTestBehavior(this.uiConfig.Enablebackgrounder ? HitTestMode.None : HitTestMode.Default)
               .onClick(() => {
-                // 触发总通知启用
-                EventHub.sendEvent(EventKey.EnabledNotice)
+                // 触发总通知启用, 非 上一次状态
+                EventHub.sendEvent(EventKey.EnabledNotice, !this.uiConfig.Enablednotice)
               })
             }
           }
