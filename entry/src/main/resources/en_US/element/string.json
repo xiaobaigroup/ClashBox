@@ -2171,6 +2171,30 @@
     {
       "name": "update_log",
       "value": "Update Log"
+    },
+    {
+      "name": "operation",
+      "value": "Operation"
+    },
+    {
+      "name": "export_success",
+      "value": "Export successful"
+    },
+    {
+      "name": "import_success",
+      "value": "Import successful"
+    },
+    {
+      "name": "import_access",
+      "value": "Import access configuration"
+    },
+    {
+      "name": "export_access",
+      "value": "Export access configuration"
+    },
+    {
+      "name": "import_failed",
+      "value": "Import failed"
     }
   ]
 }

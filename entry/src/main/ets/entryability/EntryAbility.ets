@@ -20,6 +20,7 @@ import { commonEventManager } from '@kit.BasicServicesKit';
 import { Timer } from '../common/utils/HHmmssTimer';
 import { number2Time } from '../common/utils/TimeConvertUtil';
 import { customVibrator } from '../common/utils/VibratorUtil';
+import { Xb_ToastUtil } from 'xb_components';
 
 export default class EntryAbility extends UIAbility {
   private want?: Want
@@ -160,7 +161,8 @@ export default class EntryAbility extends UIAbility {
         const data = await windowStage.getMainWindow()
         // 确保UI上下文被赋值
         this.uiContext = data.getUIContext()
-
+        // 初始化通知工具
+        Xb_ToastUtil.initContext(this.uiContext)
         // 初始化窗口避让属性
         this.intRectWindow(windowStage)
 

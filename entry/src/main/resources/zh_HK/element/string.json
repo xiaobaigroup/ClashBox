@@ -2171,6 +2171,30 @@
     {
       "name": "update_log",
       "value": "更新日誌"
+    },
+    {
+      "name": "operation",
+      "value": "操作"
+    },
+    {
+      "name": "export_success",
+      "value": "匯出成功"
+    },
+    {
+      "name": "import_success",
+      "value": "匯入成功"
+    },
+    {
+      "name": "import_access",
+      "value": "匯入存取配置"
+    },
+    {
+      "name": "export_access",
+      "value": "匯出存取配置"
+    },
+    {
+      "name": "import_failed",
+      "value": "匯入失敗"
     }
   ]
 }

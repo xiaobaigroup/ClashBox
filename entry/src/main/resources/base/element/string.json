@@ -2171,6 +2171,30 @@
     {
       "name": "update_log",
       "value": "更新日志"
+    },
+    {
+      "name": "operation",
+      "value": "操作"
+    },
+    {
+      "name": "export_success",
+      "value": "导出成功"
+    },
+    {
+      "name": "import_success",
+      "value": "导入成功"
+    },
+    {
+      "name": "import_access",
+      "value": "导入访问配置"
+    },
+    {
+      "name": "export_access",
+      "value": "导出访问配置"
+    },
+    {
+      "name": "import_failed",
+      "value": "导入失败"
     }
   ]
 }

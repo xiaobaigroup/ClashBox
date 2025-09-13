@@ -10,7 +10,7 @@ import { ItemRestriction, SegmentButton, SegmentButtonOptions, SegmentButtonText
 import { KeyValueData } from "./Overwrite/EditArrayConfig"
 import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { intl } from "@kit.LocalizationKit"
-import { Xb_CapsuleButton, Xb_CircleButton, Xb_GetResourceString } from "xb_components"
+import { Xb_CapsuleButton, Xb_CircleButton, Xb_FileUtils, Xb_GetResourceString, Xb_ToastUtil } from "xb_components"
 import { customAnimationUtil } from "../../common/utils/Animation"
 import { EventHub, EventKey } from '../../common/EventHub'
 
@@ -282,11 +282,6 @@ export struct AccessControl {
 
   }
 
-  addApp() {
-    this.kvDialogTitle = getResourceString($r('app.string.add_app'), this)
-    this.kvDialogController.open()
-  }
-
   kvDialogController = new CustomDialogController({
     builder: KVCustomDialog({
       value: $keyValueData,
@@ -371,6 +366,32 @@ export struct AccessControl {
     }
     .padding({ top: 56, bottom: 12, left: 12, right: 12})
     .alignItems(HorizontalAlign.Start)
+    // 操作
+    Text($r('app.string.operation'))
+    Row({space: 7}) {
+      Xb_CapsuleButton({
+        fontSize: 15,
+        icon: undefined,
+        buttonHeight: 40,
+        iconColor: $r('sys.color.font_primary'),
+        theBackgroundColor: $r('app.color.container_background'),
+        text: $r('app.string.export_access'),
+        onCheck: () => {
+          this.exportAccessConfig()
+        }
+      })
+      Xb_CapsuleButton({
+        fontSize: 15,
+        icon: undefined,
+        buttonHeight: 40,
+        theBackgroundColor: $r('app.color.container_background'),
+        text: $r('app.string.import_access'),
+        iconColor: $r('sys.color.font_primary'),
+        onCheck: () => {
+          this.importAccessConfig()
+        }
+      })
+    }
   }
 
   @Builder
@@ -408,74 +429,6 @@ export struct AccessControl {
       this.keyValueData = new KeyValueData(bundleInfo?.appName || '', bundleInfo?.bundleName || '')
       this.addApp()
     })
-   /* this.appListData.push(
-      {
-      name: '哔哩哔哩',
-      package_name: 'yylx.danmaku.bili',
-      time: Date.now(),
-      isSelected: false
-      },
-      {
-      name: '浏览器',
-      package_name: 'com.huawei.hmos.browser',
-      time: Date.now(),
-      isSelected: false
-    },
-      {
-        name: '1浏览器',
-        package_name: 'com.huawei.hmos.browser',
-        time: Date.now(),
-        isSelected: false
-      },
-      {
-        name: '浏览1器',
-        package_name: 'com.huawei.hmos.browser',
-        time: Date.now(),
-        isSelected: false
-      },
-      {
-        name: '浏览器8',
-        package_name: 'com.huawei.hmos.browser',
-        time: Date.now(),
-        isSelected: false
-      },
-      {
-        name: '浏览器8',
-        package_name: 'com.huawei.hmos.browser',
-        time: Date.now(),
-        isSelected: false
-      },
-      {
-        name: '浏览器8',
-        package_name: 'com.huawei.hmos.browser',
-        time: Date.now(),
-        isSelected: false
-      },
-      {
-        name: '浏览器8',
-        package_name: 'com.huawei.hmos.browser',
-        time: Date.now(),
-        isSelected: false
-      },
-      {
-        name: '浏览器8',
-        package_name: 'com.huawei.hmos.browser',
-        time: Date.now(),
-        isSelected: false
-      },
-      {
-        name: '浏览器8',
-        package_name: 'com.huawei.hmos.browser',
-        time: Date.now(),
-        isSelected: false
-      },
-      {
-        name: '浏览器8',
-        package_name: 'com.huawei.hmos.browser',
-        time: Date.now(),
-        isSelected: false
-      }
-    )*/
     console.info("AccessControl #aboutToAppear this.appConfig.accessControlRejectList: " + this.appConfig.accessControlRejectList)
     this.loadAppsInfo()
     this.sortTabSelectedIndexes.splice(0, 1, this.appConfig.accessControlSort == 'name' ? 0 : 1)
@@ -483,6 +436,11 @@ export struct AccessControl {
 
   aboutToDisappear(): void {
     this.appConfig.accessControlAppInfo = JSON.stringify(this.appListData)
+  }
+
+  addApp() {
+    this.kvDialogTitle = getResourceString($r('app.string.add_app'), this)
+    this.kvDialogController.open()
   }
 
   loadAppsInfo() {
@@ -555,6 +513,51 @@ export struct AccessControl {
       isSelected: selectedPackagesSet.has(app.package_name)
     }))
     console.log(`AccessControl #selectedApp 黑 列表数据：${JSON.stringify(this.appListData)} 包名数据：${JSON.stringify(packageNames)}`)
+  }
+
+  // 导出配置
+  exportAccessConfig() {
+    const config: AccessConfig = {
+      enable: this.appConfig.accessControl,
+      mode: this.appConfig.accessControlMode,
+      sort: this.appConfig.accessControlSort,
+      appList: this.appConfig.accessControlAppInfo,
+      acceptList: this.appConfig.accessControlAcceptList,
+      rejectList: this.appConfig.accessControlRejectList
+    }
+    Xb_FileUtils.exportDataByFile<AccessConfig>('ClashBox AccessControlConfig', config, this.getUIContext().getHostContext()!).then(() => {
+      Xb_ToastUtil.showToast({ message: $r('app.string.export_success') })
+      console.log(`AccessControl 配置文件导出成功`)
+    }).catch(() => {
+      Xb_ToastUtil.showToast({ message: $r('app.string.export_failed') })
+      console.error(`AccessControl 配置文件导出失败`)
+    })
+  }
+
+  // 导入配置
+  async importAccessConfig() {
+    let config: AccessConfig | null
+    Xb_FileUtils.openFile(this.getUIContext().getHostContext()!).then(async (uri) => {
+      if (uri) {
+        config = await Xb_FileUtils.importDataByFile<AccessConfig>(uri)
+        if (config) {
+          this.appConfig.accessControl = config.enable
+          this.appConfig.accessControlMode = config.mode
+          this.appConfig.accessControlSort = config.sort as "name" | "time"
+          this.appConfig.accessControlAppInfo = config.appList
+          this.appConfig.accessControlAcceptList = config.acceptList
+          this.appConfig.accessControlRejectList = config.rejectList
+          this.loadAppsInfo()
+          Xb_ToastUtil.showToast({ message: $r('app.string.import_success') })
+        } else {
+          console.error(`AccessControl 配置解析失败`)
+          Xb_ToastUtil.showToast({ message: Xb_GetResourceString($r('app.string.import_failed'), this) + '配置解析失败' })
+        }
+      } else {
+        Xb_ToastUtil.showToast({ message: Xb_GetResourceString($r('app.string.import_failed'), this) + '文件uri不存在' })
+        console.error(`AccessControl 文件uri不存在`)
+      }
+    })
   }
 
   onModeChange() {
@@ -633,10 +636,19 @@ export struct AccessControl {
 
 const nameSortCollator = new intl.Collator("zh-CN")
 
-export interface AppInfo {
+interface AppInfo {
   name: string
   package_name: string
   time: number
   icon?: Resource,
   isSelected: boolean
+}
+
+interface AccessConfig {
+  enable: boolean
+  mode: string
+  sort: string
+  appList: string
+  acceptList: string
+  rejectList: string
 }
