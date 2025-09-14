@@ -54,6 +54,63 @@ struct Settings {
   private promptAction: PromptAction = this.getUIContext().getPromptAction()
   private context = this.getUIContext().getHostContext()! as common.UIAbilityContext
 
+  build() {
+    Navigation(this.SettingsPageInfos) {
+      TopBuilder({
+        showBackButton: false,
+        title: $r('app.string.Settings'),
+      })
+      List({space: 10}) {
+        ForEach(this.settingsList, (item: settingsData, index: number) => {
+          ListItem() {
+            settingsListItem({
+              index: index,
+              itemObj: item,
+              onCheck: (index: number) => {
+                this.handleCheck(index)
+              }
+            })
+          }
+        })
+        ListItem() {
+          Text() {
+            Span($r('app.string.settings_count_vpn'))
+            Span(`${ClashViewModel.socketProxy.offlineTime.length}`)
+            Span(`${getResourceString($r('app.string.times'), this.context)}, `)
+            Span($r('app.string.view_detail'))
+              .fontColor(this.icon_emphasize)
+              .onClick(() => {
+                this.SettingsPageInfos.pushPathByName('offline-detail', false)
+              })
+          }
+          .fontColor($r('sys.color.font_secondary'))
+          .maxLines(1)
+          .fontSize(14)
+        }
+      }
+      .width('100%')
+      .contentEndOffset(CONTENT_END_OFFSET_150 - 75)
+      .borderRadius(18)
+      .alignListItem(ListItemAlign.Center)
+      .padding({left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp)})
+    }
+    .hideToolBar(true)
+    .mode(this.isLandscapePhone ? NavigationMode.Stack : NavigationMode.Auto)
+    .navDestination(this.SettingsPagesMap)
+    .width('100%')
+    .height('100%')
+    .onNavBarStateChange((isVisible: boolean) => {
+      // 刷新备份行显示
+      if (this.uiConfig.isShowExperimentalFunction) {
+        this.settingsList = SettingsListItem()
+      }
+      // 刷新语言行的语言提示
+      const itemData = this.settingsList[0]
+      itemData.hint = this.currentLanguage
+      this.settingsList.splice(0, 1, itemData)
+    })
+  }
+
   // 免责声明弹窗控制器
   dialogController: CustomDialogController | null = new CustomDialogController({
     builder: DisclaimerCustomDialog({
@@ -129,12 +186,9 @@ struct Settings {
   }
 
   handleCheck(index: number) {
-    if(index == (this.uiConfig.isShowExperimentalFunction ? 6 : 5)) {
+    if(index == (6)) {
       // 清空应用设置弹窗
       this.resetDialogController.open()
-    } else if (index === (this.uiConfig.isShowExperimentalFunction ? 2 : -1)) {
-      // 备份
-      this.promptAction.showToast({message: $r('app.string.developing')})
     } else {
       // 列表项路由跳转
       let itemSettingsData = this.settingsList[index]
@@ -235,62 +289,6 @@ struct Settings {
       }
   }
 
-  build() {
-    Navigation(this.SettingsPageInfos) {
-      TopBuilder({
-        showBackButton: false,
-        title: $r('app.string.Settings'),
-      })
-      List({space: 10}) {
-        ForEach(this.settingsList, (item: settingsData, index: number) => {
-          ListItem() {
-            settingsListItem({
-              index: index,
-              itemObj: item,
-              onCheck: (index: number) => {
-                this.handleCheck(index)
-              }
-            })
-          }
-        })
-        ListItem() {
-          Text() {
-            Span($r('app.string.settings_count_vpn'))
-            Span(`${ClashViewModel.socketProxy.offlineTime.length}`)
-            Span(`${getResourceString($r('app.string.times'), this.context)}, `)
-            Span($r('app.string.view_detail'))
-              .fontColor(this.icon_emphasize)
-              .onClick(() => {
-                this.SettingsPageInfos.pushPathByName('offline-detail', false)
-              })
-          }
-            .fontColor($r('sys.color.font_secondary'))
-            .maxLines(1)
-            .fontSize(14)
-        }
-      }
-      .width('100%')
-      .contentEndOffset(CONTENT_END_OFFSET_150 - 75)
-      .borderRadius(18)
-      .alignListItem(ListItemAlign.Center)
-      .padding({left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp)})
-    }
-    .hideToolBar(true)
-    .mode(this.isLandscapePhone ? NavigationMode.Stack : NavigationMode.Auto)
-    .navDestination(this.SettingsPagesMap)
-    .width('100%')
-    .height('100%')
-    .onNavBarStateChange((isVisible: boolean) => {
-      // 刷新备份行显示
-      if (this.uiConfig.isShowExperimentalFunction) {
-        this.settingsList = SettingsListItem()
-      }
-      // 刷新语言行的语言提示
-      const itemData = this.settingsList[0]
-      itemData.hint = this.currentLanguage
-      this.settingsList.splice(0, 1, itemData)
-    })
-  }
 }
 export default Settings
 
