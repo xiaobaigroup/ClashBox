@@ -21,6 +21,8 @@ import { Timer } from '../common/utils/HHmmssTimer';
 import { number2Time } from '../common/utils/TimeConvertUtil';
 import { customVibrator } from '../common/utils/VibratorUtil';
 import { Xb_ToastUtil } from 'xb_components';
+import BackupRestoreUtil from '../common/utils/BackupRestoreUtil';
+
 
 export default class EntryAbility extends UIAbility {
   private want?: Want
@@ -56,6 +58,9 @@ export default class EntryAbility extends UIAbility {
     // 卡片Id持久化管理 并 监听卡片事件
     cardManager.init(this.context)
     this.registerCardEvent()
+
+    // 备份恢复工具初始化
+    BackupRestoreUtil.init(this.context)
 
     // 添加崩溃监听
     hiAppEvent.addWatcher({

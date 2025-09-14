@@ -22,6 +22,7 @@ import { cardManager } from "../common/utils/CardManageUtil";
 import { PROXY_STARTED_DURATION_INIT_VALUE } from "../common/entity/Constants";
 import { Timer } from "../common/utils/HHmmssTimer";
 import { number2Time } from "../common/utils/TimeConvertUtil";
+import { picker } from "@kit.CoreFileKit"
 
 export interface DelayInfo{
     name: string
@@ -71,7 +72,66 @@ export class ClashViewModel {
       ClashViewModel.promptAction.showToast({message: "文件保存失败！"})
     }
   }
-  async addOrUpdateProfileByFile(name: string, path: string, id: string | null){
+
+  // 批量插入配置
+  async addOrUpdateProfiles(data: Profile[]) {
+    for (const profile of data) {
+      let newProfile = new Profile(profile.type, profile.url)
+      const old = await this.profileRepo.query(profile.id)
+      console.log(`old配置 ${old ? old.name : '本地没有old配置'}`)
+      if (old) {
+        console.log(`配置${profile.name}在数据库中已存在`)
+        newProfile = old
+      }
+      if (profile.type === ProfileType.Url) {
+        // URL配置
+        newProfile.loadContext(this.context)
+        newProfile.name = profile.name
+        newProfile.autoUpdate = profile.autoUpdate
+        newProfile.autoUpdateDuration = profile.autoUpdateDuration ?? 10
+        console.log(`配置${profile.name}基础设置完成`)
+        await newProfile.checkAndUpdate((c)=>this.VailConfig(c))
+      } else {
+        // 本地文件配置
+        try {
+          let filePicker = new picker.DocumentViewPicker(this.context!)
+          let options = new picker.DocumentSelectOptions()
+          const documentSelectResult = await filePicker.select(options)
+          newProfile.url = documentSelectResult[0]
+          newProfile.name = decodeURIComponent(newProfile.url.substring(newProfile.url.lastIndexOf('/') + 1)) ?? profile.name
+          console.log(`ClashBox Restore 配置${newProfile.name} 地址: ${newProfile.url} 选择完成`)
+        } catch (err) {
+          console.error(`ClashBox Restore 文件选择失败 ${err.name} ${err.message}`)
+          // 导入失败后跳过
+          continue
+        }
+        newProfile.loadContext(this.context)
+        console.log(`配置${profile.name}基础设置完成`)
+        try {
+          await newProfile.saveByUri(profile.url)
+        } catch (err) {
+          console.error(`ClashBox Restore 配置移动读取失败 ${err.name} ${err.message}`)
+        }
+      }
+      const isExists = await newProfile.check();
+      if (isExists) {
+        console.log(`配置${newProfile.name}已发现`)
+        this.profileRepo.addOrUpdate(newProfile)
+          .then((value) => {
+            hilog.info(0xFF00, "Restore configSaveTestTag", `文件名${newProfile.name} URL: ${newProfile.url} 保存结果${value}`)
+            EventHub.sendEvent(EventKey.FetchProfile, null)
+          })
+          .catch((err: Error) => {
+            console.error(`ClashBox Restore 配置插入失败 ${err.name} ${err.message}`)
+          })
+      } else {
+        console.error("ClashBox 配置文件不存在，保存失败");
+        ClashViewModel.promptAction.showToast({message: "文件保存失败！"})
+      }
+    }
+  }
+
+  async addOrUpdateProfileByFile(name: string, path: string, id: string | null) {
     let profile = new Profile(ProfileType.File, path)
     if (id) {
       const old = await this.profileRepo.query(id)

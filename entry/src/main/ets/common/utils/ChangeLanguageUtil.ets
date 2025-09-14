@@ -4,5 +4,9 @@ import { i18n } from "@kit.LocalizationKit";
  * @param areaID 地区代码
  */
 export function ChangeLanguage(areaID: string) {
-  i18n.System.setAppPreferredLanguage(areaID)
+  try {
+    i18n.System.setAppPreferredLanguage(areaID)
+  } catch (error) {
+    console.error(`#ChangeLanguage 语言切换错误 code：${error.code} message: ${error.message}`)
+  }
 }

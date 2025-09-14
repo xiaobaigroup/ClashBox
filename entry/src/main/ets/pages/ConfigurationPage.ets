@@ -521,9 +521,6 @@ struct ConfigurationPage {
     hilog.info(0xC000, componentName, `#aboutToAppear executed`)
     // 初始化当前选中项数据
     this.currentRadioConfigData = this.configList.find((data: ConfigData) => data.configId === this.appConfig.currentProfileId) as ConfigData
-    EventHub.on(EventKey.FetchProfile, () => {
-      this.fetchProfiles()
-    })
   }
 
   async onIndexChange() {
@@ -587,7 +584,7 @@ struct ConfigurationPage {
   }
 
   // 获取完整配置列表
-  async fetchProfiles(){
+  async fetchProfiles() {
     const profiles = await ClashViewModel.getProfiles()
     this.configList = profiles.map((d)=>{
       return {

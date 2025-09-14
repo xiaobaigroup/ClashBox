@@ -923,7 +923,11 @@ struct Index {
 
     // 初始化配置列表
     await this.awaitInit()
-
+    // 注册配置加载事件
+    EventHub.on(EventKey.FetchProfile, async () => {
+      console.log(`开始获取配置信息`)
+      this.fetchProfiles()
+    })
     // 初始化实况窗
     const isLive = await LiveViewUtil.init(this.getUIContext().getHostContext()!)
     if (isLive) {

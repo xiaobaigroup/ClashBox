@@ -4,6 +4,7 @@ import { hilog } from "@kit.PerformanceAnalysisKit"
 import {  UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../common/utils/Animation"
 import { PageMargin } from "../../common/breakpoint/BreakPoint"
+import BackupRestoreUtil from '../../common/utils/BackupRestoreUtil';
 
 @Component
 struct Backup {
@@ -19,36 +20,6 @@ struct Backup {
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
-  /**
-   * 备份应用数据
-   */
-  onBackupData() {
-    hilog.info(0xFF00, "BackupTag", "开始备份应用数据")
-
-  }
-  /**
-   * 从备份文件恢复应用数据
-   */
-  onRestoreData() {
-    hilog.info(0xFF00, "BackupTag", "开始从备份文件恢复应用数据")
-
-  }
-
-  @Builder
-  CloudBackupTipsText() {
-    Text(this.isShowCloudconfig ? $r('app.string.enabled') : $r('app.string.not_enabled'))
-      .fontWeight(FontWeight.Normal)
-      .textOverflow({ overflow: TextOverflow.Ellipsis })
-      .maxLines(1)
-      .margin({top: 2 })
-      .fontSize(14)
-  }
-  @Builder
-  BackupTipsText() {
-  }
-  @Builder
-  RestoreTipsText() {
-  }
 
   build() {
     NavDestination() {
@@ -82,8 +53,7 @@ struct Backup {
               this.onBackupData()
             })
           // 分割线
-        //  if(!isEnd(item.children!.length,i))
-            Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
+          Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
           // 恢复
           skipRowList({
             icons: $r('sys.symbol.arrowshape_down_to_line_fill'),
@@ -96,11 +66,19 @@ struct Backup {
               // 恢复数据
               this.onRestoreData()
             })
+
         }
         .width('100%')
         .borderRadius(20)
+        .alignItems(HorizontalAlign.Center)
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .backgroundColor($r('app.color.container_background'))
+        // 恢复提示
+        Text() {
+          Span('      ')
+          Span($r('app.string.file_config_restore_tips'))
+        }
+          .fontColor(Color.Red)
       }
       .width('100%')
       .alignItems(HorizontalAlign.Center)
@@ -113,6 +91,38 @@ struct Backup {
       return true;
     })
   }
+
+  @Builder
+  CloudBackupTipsText() {
+    Text(this.isShowCloudconfig ? $r('app.string.enabled') : $r('app.string.not_enabled'))
+      .fontWeight(FontWeight.Normal)
+      .textOverflow({ overflow: TextOverflow.Ellipsis })
+      .maxLines(1)
+      .margin({top: 2 })
+      .fontSize(14)
+  }
+  @Builder
+  BackupTipsText() {
+  }
+  @Builder
+  RestoreTipsText() {
+  }
+
+  /**
+   * 备份应用数据
+   */
+  onBackupData() {
+    hilog.info(0xFF00, "BackupTag", "开始备份应用数据")
+    BackupRestoreUtil.backup()
+  }
+  /**
+   * 从备份文件恢复应用数据
+   */
+  onRestoreData() {
+    hilog.info(0xFF00, "BackupTag", "开始从备份文件恢复应用数据")
+    BackupRestoreUtil.restore()
+  }
+
 }
 export default Backup
 

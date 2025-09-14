@@ -111,7 +111,11 @@ export class Profile {
   }
   async saveByUri(uri: string): Promise<Profile>{
     const filePath = await getProfilePath(this.context, this.id)
-    await fs.copy(uri, fileUri.getUriFromPath(filePath))
+    try {
+      await fs.copy(uri, fileUri.getUriFromPath(filePath))
+    } catch (error) {
+      throw error as Error
+    }
     return this
   }
   getSelectedProxy(g: ProxyGroup): string | undefined{

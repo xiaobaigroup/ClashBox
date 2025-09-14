@@ -158,9 +158,9 @@ struct Settings {
   }
 
   aboutToAppear(): void {
-    if (!this.uiConfig.isShowExperimentalFunction) {
-      this.settingsList = removeItemsByIndex(this.settingsList, [2])
-    }
+    // if (!this.uiConfig.isShowExperimentalFunction) {
+    //   this.settingsList = removeItemsByIndex(this.settingsList, [2])
+    // }
   }
 
   // 在自定义组件即将析构销毁时将dialogController置空

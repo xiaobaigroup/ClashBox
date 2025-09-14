@@ -36,7 +36,7 @@ export class AppFlowingState{
 
 }
 
-export class AppConfig{
+export class AppConfig {
   currentProfileId?: string
   currentProxyName?: string
   currentProfileName?: string
@@ -66,7 +66,7 @@ export enum TrafficUnit{
   TB = "TB",
 }
 
-export class UIConfig{
+export class UIConfig {
   // 主页问候语
   isGreeting?: boolean = true
   // 历史版本名

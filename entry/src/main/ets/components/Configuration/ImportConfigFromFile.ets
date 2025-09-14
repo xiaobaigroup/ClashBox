@@ -1,15 +1,13 @@
-import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
+
 import {
   BIND_SHEET_MAIN_FONT_WEIGHT,
   BIND_SHEET_MAIN_FONTSIZE,
   BIND_SHEET_SUB_FONTSIZE,
-  BIND_SHEET_TITLE_CONTAINER_HEIGHT,
   BIND_SHEET_DRAG_BAR_HEIGHT,
   BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT,
   TEXT_AREA_MAX_LENGTH,
   FONT_SIZE_16,
   TEXT_INPUT_HEIGHT,
-  RouteName,
   BORDER_RADIUS_20,
   NewConfigData
 } from "../../common/entity/Constants"
@@ -20,10 +18,7 @@ import { hilog } from "@kit.PerformanceAnalysisKit"
 import { picker } from "@kit.CoreFileKit"
 import ClashViewModel from "../../entryability/ClashViewModel"
 import { getResourceString } from "../../common/utils/ResourceStringUtil"
-import { customVibrator } from "../../common/utils/VibratorUtil"
-import { util } from "@kit.ArkTS"
 import { ConfigData } from "../../common/entity/PageArgumentEntity"
-import { BusinessError } from "@kit.BasicServicesKit"
 import { UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../common/utils/Animation"
 
@@ -122,7 +117,7 @@ export struct ImportConfigFromFile{
           let options = new picker.DocumentSelectOptions()
           filePicker.select(options).then((documentSelectResult)=>{
             this.fileurl = documentSelectResult[0];
-            this.configData.configName =  decodeURIComponent(this.fileurl.substring(this.fileurl.lastIndexOf('/') + 1))
+            this.configData.configName = decodeURIComponent(this.fileurl.substring(this.fileurl.lastIndexOf('/') + 1))
             hilog.debug(0xFF00, componentName, 'FileUrl: %{public}s', this.fileurl)
           })
         })
