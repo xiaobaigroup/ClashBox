@@ -7,6 +7,7 @@
   "description": "Please describe the basic information.",
   "dynamicDependencies": {},
   "dependencies": {
-    "@mcui/mccharts": "^2.8.5"
+    "@mcui/mccharts": "^2.8.5",
+    "@dove/webdav": "^0.2.3"
   }
 }
