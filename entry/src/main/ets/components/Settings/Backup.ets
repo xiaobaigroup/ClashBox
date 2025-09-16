@@ -115,7 +115,6 @@ struct Backup {
         // 恢复提示
         ListItem() {
           Text() {
-            Span('      ')
             Span($r('app.string.file_config_restore_tips'))
           }
           .fontColor(Color.Red)
@@ -213,6 +212,12 @@ struct Backup {
     console.log(`Backup 备份的文件为：${file_path}`)
     if (this.uiConfig.isShowCloudBackupConfig && this.isLogin) {
       // 云备份
+      try {
+        const value = await this.webdavClient.mkdir('/ClashBox')
+        console.log(`Backup 创建状态: ${value}`)
+      } catch (err) {
+        console.error(`Backup 创建失败 name: ${err.name} message: ${err.message}`)
+      }
       await this.cloudBackup(file_path)
       Xb_ToastUtil.showToast({ message: $r('app.string.export_success') })
     } else {
