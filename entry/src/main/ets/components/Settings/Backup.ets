@@ -243,6 +243,7 @@ struct Backup {
       const value = await this.webdavClient.put(remotePath, file_path)
       console.log(`云备份状态：${value}`)
     } catch (err) {
+      Xb_ToastUtil.showToast({ message: `云备份失败 name: ${err.name} message: ${err.message}`, duration: 3000 })
       console.error(`WebDav 备份失败 name: ${err.name} message: ${err.message}`)
     }
   }
@@ -255,6 +256,7 @@ struct Backup {
         console.log(`#cloudRestore 获取文件列表状态: ${JSON.stringify(this.rawFiles)}`)
         this.cloudFilesController.open()
       } catch (err) {
+        Xb_ToastUtil.showToast({ message: `云恢复获取文件失败 name: ${err.name} message: ${err.message}`, duration: 3000 })
         console.error(`获取文件列表失败 name: ${err.name} message: ${err.message}`)
       }
     }
@@ -270,9 +272,11 @@ struct Backup {
         console.log(`获取文件流状态: ${JSON.stringify(str)}`)
         const config = JSON.parse(str) as BackupConfig
         BackupRestoreUtil.restore(config).catch((err: Error) => {
-          console.error(`云备份失败 name: ${err.name} message: ${err.message}`)
+          Xb_ToastUtil.showToast({ message: `云恢复失败 name: ${err.name} message: ${err.message}`, duration: 3000 })
+          console.error(`云恢复失败 name: ${err.name} message: ${err.message}`)
         })
       } catch (err) {
+        Xb_ToastUtil.showToast({ message: `云恢复文件流获取失败 name: ${err.name} message: ${err.message}`, duration: 3000 })
         console.error(`获取文件流失败 name: ${err.name} message: ${err.message}`)
       }
     }
@@ -430,15 +434,24 @@ export struct CloudBackup {
                 .width('100%')
                 .type(InputType.URL)
                 .enterKeyType(EnterKeyType.Next)
+                .onChange(() => {
+                  this.isLogin = false
+                })
               TextInput({ text: $$this.user, placeholder: $r('app.string.account_name') })
                 .height(40)
                 .width('100%')
                 .enterKeyType(EnterKeyType.Next)
+                .onChange(() => {
+                  this.isLogin = false
+                })
               TextInput({ text: $$this.password, placeholder: $r('app.string.password') })
                 .height(40)
                 .width('100%')
                 .type(InputType.Password)
                 .enterKeyType(EnterKeyType.Done)
+                .onChange(() => {
+                  this.isLogin = false
+                })
                 .onSubmit(async (enterKey: EnterKeyType, event: SubmitEvent) => {
                   // 按下输入法回车键时登录WebDav
                   await this.save()
@@ -464,9 +477,16 @@ export struct CloudBackup {
                   .backgroundColor(this.icon_emphasize)
                   .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                   .enabled(this.isLogin ? true : false)
-                  .onClick(() => {
+                  .onClick(async () => {
                     // 连接测试
-                    EventHub.sendEvent(EventKey.LoginWebDav, true)
+                    try {
+                      const value = await this.webdavClient.list('/ClashBox')
+                      console.log(`test #cloudRestore 获取文件列表状态: ${JSON.stringify(value)}`)
+                      Xb_ToastUtil.showToast({ message: `云恢复可用` })
+                    } catch (err) {
+                      Xb_ToastUtil.showToast({ message: `文件列表获取失败，云恢复不可用 name: ${err.name} message: ${err.message}`, duration: 3000 })
+                      console.error(`获取文件列表失败 name: ${err.name} message: ${err.message}`)
+                    }
                   })
               }
               .justifyContent(FlexAlign.Center)

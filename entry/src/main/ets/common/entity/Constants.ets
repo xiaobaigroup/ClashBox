@@ -789,12 +789,13 @@ export interface TCItemProp {
  * 三方库与服务
  */
 export const ThirdServicesList: TCItemProp[] = [
-  {title: 'mcCharts(莓创图表)', content: 'http://meichuangit.net.cn/GettingStarted'},
-  {title: 'VORE-API', content: 'https://api.vore.top/doc/IPdata.html'},
-  {title: 'IP-API', content: 'https://ip-api.com/'},
-  {title: 'IPWHOIS.IO', content: 'https://ipwhois.io/'},
-  {title: 'IPinfo', content: 'https://ipinfo.io/'},
-  {title: 'ifconfig.me', content: 'https://ifconfig.me/'},
+  { title: 'mcCharts(莓创图表)', content: 'http://meichuangit.net.cn/GettingStarted' },
+  { title: 'webdav', content: 'https://ohpm.openharmony.cn/#/cn/detail/@dove%2Fwebdav' },
+  { title: 'VORE-API', content: 'https://api.vore.top/doc/IPdata.html' },
+  { title: 'IP-API', content: 'https://ip-api.com/' },
+  { title: 'IPWHOIS.IO', content: 'https://ipwhois.io/' },
+  { title: 'IPinfo', content: 'https://ipinfo.io/' },
+  { title: 'ifconfig.me', content: 'https://ifconfig.me/' },
 ]
 
 /**
