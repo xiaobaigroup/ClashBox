@@ -2199,6 +2199,35 @@
     {
       "name": "file_config_restore_tips",
       "value": "請注意，若待還原的檔案包含本機設定，系統將逐一顯示檔案選擇視窗，請耐心選擇正確的設定檔以確保還原成功；此外，還原完成後請記得前往設定頁面選取所需的設定，完成設定載入。"
+    },
+    {
+      "name": "file_config_restore_toast_1",
+      "value": "請選擇"
+    },
+    {
+      "name": "login_failed",
+      "value": "登入失敗"
+    },
+    {
+      "name": "login_success",
+      "value": "登入成功"
+    },
+    {
+      "name": "not_login",
+      "value": "未登入"
+    },
+    {
+      "name": "logined_backup_subtitle",
+      "value": "本地與WebDav同步備份"
+    },
+    {
+      "name": "logined_restore_subtitle",
+      "value": "優先從WebDav還原，長按從本地還原"
+    },
+    {
+      "name": "cloud_files_title",
+      "value": "選取要還原的備份檔案"
+
     }
   ]
 }

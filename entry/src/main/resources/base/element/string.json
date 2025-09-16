@@ -2199,6 +2199,34 @@
     {
       "name": "file_config_restore_tips",
       "value": "请注意，如果待恢复的文件里包含本地配置，将会有文件选择弹窗逐一弹出，请您耐心地选择正确的配置文件以确保恢复成功；另外，恢复完成后请您主动前往配置页选中想要的配置，完成配置加载。"
+    },
+    {
+      "name": "file_config_restore_toast_1",
+      "value": "请选择"
+    },
+    {
+      "name": "login_failed",
+      "value": "登录失败"
+    },
+    {
+      "name": "login_success",
+      "value": "登录成功"
+    },
+    {
+      "name": "not_login",
+      "value": "未登录"
+    },
+    {
+      "name": "logined_backup_subtitle",
+      "value": "本地和WebDav一起备份"
+    },
+    {
+      "name": "logined_restore_subtitle",
+      "value": "优先从WebDav恢复，长按从本地恢复"
+    },
+    {
+      "name": "cloud_files_title",
+      "value": "选择想要恢复的备份文件"
     }
   ]
 }

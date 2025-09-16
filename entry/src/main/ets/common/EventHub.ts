@@ -20,6 +20,7 @@ export enum EventKey{
   ProxyDuration = 10016,
   EnabledNotice = 10017,
   StopedClashEntry = 10018,
+  LoginWebDav = 10019
 }
 
 export class EventHub{

@@ -72,6 +72,8 @@ struct Home {
 
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
   @StorageLink ('isLandscapePhone') @Watch('isLandscapePhoneScrollTo') isLandscapePhone: boolean = false
+  // 弹窗时背景模糊
+  @StorageLink('CustomDialog') showCustomDialogBackgroundBlur: boolean = false
   // 折叠屏展开状态判定
   @StorageLink ('isFoldStatus') isFoldStatus: boolean = false
   // 窗口模式区分，true为窗口式，false为普通式
@@ -309,6 +311,8 @@ struct Home {
       }
       .width('100%')
       .height('100%')
+      .foregroundBlurStyle(this.showCustomDialogBackgroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
+        { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 })
     }
   }
 

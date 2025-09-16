@@ -625,16 +625,18 @@ export struct theCustomDialog {
   controller: CustomDialogController
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
 
   aboutToAppear(): void {
     // 开启背景模糊
     this.isEnableIndexForegroundBlur = true
   }
+
   aboutToDisappear(): void {
     // 关闭背景模糊
     this.isEnableIndexForegroundBlur = false
   }
+
   build() {
     Column() {
       Text(this.theDialogTitle)
@@ -771,10 +773,11 @@ function RowStyle() {
  */
 @Component
 export struct skipRowList {
+
   @State icons?: Resource = undefined
   @State name: string = ''
   @State title: ResourceStr = ''
-  @State subtitle: ResourceStr = ''
+  @Prop subtitle: ResourceStr = ''
   @State isPrimaryIcons: boolean = false
   @State isExperimentalFunction: boolean = false
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()

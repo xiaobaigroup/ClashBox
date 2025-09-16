@@ -2199,6 +2199,34 @@
     {
       "name": "file_config_restore_tips",
       "value": "Please note that if the files to be recovered contain local configurations, file selection pop ups will appear one by one. Please be patient in selecting the correct configuration file to ensure successful recovery; In addition, after the recovery is completed, please proactively go to the configuration page to select the desired configuration and complete the configuration loading."
+    },
+    {
+      "name": "file_config_restore_toast_1",
+      "value": "Please select"
+    },
+    {
+      "name": "login_failed",
+      "value": "Login failed"
+    },
+    {
+      "name": "login_success",
+      "value": "Login successful"
+    },
+    {
+      "name": "not_login",
+      "value": "Not logged in"
+    },
+    {
+      "name": "logined_backup_subtitle",
+      "value": "Backup both locally and with WebDav"
+    },
+    {
+      "name": "logined_restore_subtitle",
+      "value": "Prioritize recovery from WebView, long press to restore locally"
+    },
+    {
+      "name": "cloud_files_title",
+      "value": "Select the backup file you want to restore"
     }
   ]
 }

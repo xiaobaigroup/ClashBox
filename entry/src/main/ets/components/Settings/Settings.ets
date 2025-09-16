@@ -26,6 +26,8 @@ import { ConfigData } from "../../common/entity/PageArgumentEntity"
 import { PrivacyPolicy, UserAgreement } from "./AgreementPrivacyPage"
 import { PageMargin } from "../../common/breakpoint/BreakPoint"
 import { UpdateLog } from '../Start/UpdateLog';
+import { EventHub, EventKey } from '../../common/EventHub';
+import { Client } from '@dove/webdav';
 
 
 @Entry
@@ -40,6 +42,8 @@ struct Settings {
   @State settingsList: settingsData[] = SettingsListItem()
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  // WebDav
+  @StorageLink('Client') webdavClient: Client = new Client('')
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 当前设备`height`是否符合(320vp< height <= 500vp)
   @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false
@@ -220,6 +224,10 @@ struct Settings {
   // 在自定义组件即将析构销毁时将dialogController置空
   aboutToDisappear() {
     this.dialogController = null
+    // 注销WebDav登录事件
+    EventHub.off(EventKey.LoginWebDav)
+    // 释放WebDav连接
+    this.webdavClient.close()
   }
 
   // 设置页路由表

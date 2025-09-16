@@ -89,6 +89,8 @@ export class UIConfig {
   isBlurr: boolean = true
   // 实验功能显示变量
   isShowExperimentalFunction: boolean = false
+  // 是否启用云备份配置
+  isShowCloudBackupConfig: boolean = false
   // 主页卡片显示变量
   isShowHomeCard: string = JSON.stringify(showHomeCard)
   // 用户选择的语言

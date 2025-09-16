@@ -20,7 +20,7 @@ import { commonEventManager } from '@kit.BasicServicesKit';
 import { Timer } from '../common/utils/HHmmssTimer';
 import { number2Time } from '../common/utils/TimeConvertUtil';
 import { customVibrator } from '../common/utils/VibratorUtil';
-import { Xb_ToastUtil } from 'xb_components';
+import { Xb_KVdbUtil, Xb_ToastUtil } from 'xb_components';
 import BackupRestoreUtil from '../common/utils/BackupRestoreUtil';
 
 
@@ -58,6 +58,9 @@ export default class EntryAbility extends UIAbility {
     // 卡片Id持久化管理 并 监听卡片事件
     cardManager.init(this.context)
     this.registerCardEvent()
+
+    // 初始化KV数据库
+    Xb_KVdbUtil.initKVManager(this.context, 'clash_box')
 
     // 备份恢复工具初始化
     BackupRestoreUtil.init(this.context)

@@ -280,8 +280,6 @@ struct Index {
   @Provide EnableCellularDataReminder: boolean = false
   // 设置页实验功能提示框显示变量
   @Provide isShowExperimentalFunction: boolean = true
-  // 设置 -> 备份与恢复 -> 是否启用云备份配置
-  @Provide isShowCloudconfig: boolean = false
   // 判断设置是否清楚数据
   @Provide isClearData: boolean = false
   // 设置 -> 外观 -> 按钮位置变量

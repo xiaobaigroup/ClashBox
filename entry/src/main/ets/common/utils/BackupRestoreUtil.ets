@@ -4,7 +4,7 @@ import { AppConfig, UIConfig } from "../../entryability/AppState";
 import ClashViewModel from "../../entryability/ClashViewModel";
 
 
-interface BackupConfig {
+export interface BackupConfig {
   appConfig: AppConfig
   uiConfig: UIConfig
   clashConfig: ClashConfig
@@ -19,7 +19,7 @@ class BackupRestoreUtil {
     BackupRestoreUtil.context = context
   }
 
-  public async backup() {
+  public async backup(): Promise<string> {
     try {
       const appConfig: AppConfig = AppStorage.get<AppConfig>("appConfig") ?? new AppConfig()
       const uiConfig: UIConfig = AppStorage.get<UIConfig>("uiConfig") ?? new UIConfig()
@@ -31,39 +31,54 @@ class BackupRestoreUtil {
         clashConfig: clashConfig,
         configList: configList
       }
-      await Xb_FileUtils.exportDataByFile<BackupConfig>('ClashBoxConfig', backupConfig, BackupRestoreUtil.context)
-      Xb_ToastUtil.showToast({ message: $r('app.string.export_success') })
-      console.log(`ClashBoxConfig.backup 配置文件导出成功`)
+      const file_path = await Xb_FileUtils.exportDataByFile<BackupConfig>('ClashBoxConfig', backupConfig, BackupRestoreUtil.context, false)
+      console.log(`ClashBoxConfig.backup 配置文件导出成功 备份的文件为：${file_path}`)
+      return file_path
     } catch (err) {
       Xb_ToastUtil.showToast({ message: $r('app.string.export_failed') })
       console.error(`ClashBoxConfig.backup 配置文件导出失败 code: ${err.code} message: ${err.message}`)
+      return ''
     }
   }
 
-  public async restore() {
-    Xb_FileUtils.openFile(BackupRestoreUtil.context).then(async (uri) => {
-      if (uri) {
-        const config = await Xb_FileUtils.importDataByFile<BackupConfig>(uri)
-        if (config) {
-          AppStorage.set("appConfig", config.appConfig)
-          AppStorage.set("uiConfig",  config.uiConfig)
-          AppStorage.set("clashConfig", config.clashConfig)
-          console.info(`ClashBoxConfig.restore 配置列表：${JSON.stringify(config.configList)}`)
-          ClashViewModel.addOrUpdateProfiles(config.configList).then(() => {
-            Xb_ToastUtil.showToast({ message: $r('app.string.import_success') })
-          })
-            .catch((err: Error) => {
-              console.error(`ClashBox Restore 配置恢复失败 ${err.name} ${err.message}`)
+  public async restore(config: BackupConfig | null = null) {
+    if (config === null) {
+      Xb_FileUtils.openFile(BackupRestoreUtil.context).then(async (uri) => {
+        if (uri) {
+          config = await Xb_FileUtils.importDataByFile<BackupConfig>(uri)
+          if (config) {
+            AppStorage.set("appConfig", config.appConfig)
+            AppStorage.set("uiConfig",  config.uiConfig)
+            AppStorage.set("clashConfig", config.clashConfig)
+            console.info(`ClashBoxConfig.restore 配置列表：${JSON.stringify(config.configList)}`)
+            ClashViewModel.addOrUpdateProfiles(config.configList).then(() => {
+              Xb_ToastUtil.showToast({ message: $r('app.string.import_success') })
             })
+              .catch((err: Error) => {
+                console.error(`ClashBox Restore 配置恢复失败 ${err.name} ${err.message}`)
+              })
+          } else {
+            console.error(`ClashBoxConfig.restore 配置解析失败`)
+            Xb_ToastUtil.showToast({ message: Xb_GetResourceString($r('app.string.import_failed'), this) + '配置解析失败' })
+          }
         } else {
-          console.error(`ClashBoxConfig.restore 配置解析失败`)
-          Xb_ToastUtil.showToast({ message: Xb_GetResourceString($r('app.string.import_failed'), this) + '配置解析失败' })
+          Xb_ToastUtil.showToast({ message: Xb_GetResourceString($r('app.string.import_failed'), BackupRestoreUtil.context) + '文件uri不存在' })
+          console.error(`ClashBoxConfig.restore 文件uri不存在`)
         }
-      } else {
-        Xb_ToastUtil.showToast({ message: Xb_GetResourceString($r('app.string.import_failed'), BackupRestoreUtil.context) + '文件uri不存在' })
-        console.error(`ClashBoxConfig.restore 文件uri不存在`)
-      }
-    })
+      })
+    } else {
+      // 外部提供config
+      AppStorage.set("appConfig", config.appConfig)
+      AppStorage.set("uiConfig",  config.uiConfig)
+      AppStorage.set("clashConfig", config.clashConfig)
+      console.info(`ClashBoxConfig.restore 配置列表：${JSON.stringify(config.configList)}`)
+      ClashViewModel.addOrUpdateProfiles(config.configList).then(() => {
+        Xb_ToastUtil.showToast({ message: $r('app.string.import_success') })
+      })
+        .catch((err: Error) => {
+          console.error(`ClashBox Restore 配置恢复失败 ${err.name} ${err.message}`)
+        })
+    }
 
   }
 

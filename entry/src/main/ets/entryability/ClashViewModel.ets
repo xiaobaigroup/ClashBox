@@ -23,6 +23,7 @@ import { PROXY_STARTED_DURATION_INIT_VALUE } from "../common/entity/Constants";
 import { Timer } from "../common/utils/HHmmssTimer";
 import { number2Time } from "../common/utils/TimeConvertUtil";
 import { picker } from "@kit.CoreFileKit"
+import { Xb_GetResourceString } from "xb_components";
 
 export interface DelayInfo{
     name: string
@@ -96,6 +97,7 @@ export class ClashViewModel {
         try {
           let filePicker = new picker.DocumentViewPicker(this.context!)
           let options = new picker.DocumentSelectOptions()
+          ClashViewModel.promptAction.showToast({ message: `${Xb_GetResourceString($r('app.string.file_config_restore_toast_1'), this.context)} ${profile.name}` })
           const documentSelectResult = await filePicker.select(options)
           newProfile.url = documentSelectResult[0]
           newProfile.name = decodeURIComponent(newProfile.url.substring(newProfile.url.lastIndexOf('/') + 1)) ?? profile.name
