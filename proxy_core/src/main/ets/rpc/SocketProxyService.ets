@@ -228,14 +228,11 @@ export class SocketProxyService implements IClashManager {
       }
       if(!await fileIo.access(socketPath, fs.AccessModeType.EXIST))
       {
-        try {
-          SocketProxyService.promptAction.showToast({ message: "VPN服务启动失败" })
-        } catch (error) {
-          console.error(`VPN服务启动失败提示弹窗error：${JSON.stringify(error)}`)
-        }
-        reject("")
+        SocketProxyService.promptAction.showToast({message: "VPN服务启动失败"})
+        reject(new Error("VPN服务未启动"))
         return;
       }
+
       client.connect({address: { address: socketPath }, timeout:1000}).then(async ()=>{
         this.active = true
         client.send({ data: JSON.stringify({method, params}) });
