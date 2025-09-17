@@ -41,6 +41,8 @@ export default class EntryAbility extends UIAbility {
   private cardCoreInitialized: boolean = false
   /** @description 包名信息 */
   private bundleInfo: BundleInfo = new BundleInfo()
+  /** @description 卡片延迟定时器 */
+  private cardDelayTimer: number = -1
   private subscriber: commonEventManager.CommonEventSubscriber | null = null;
   private subscribeInfo: commonEventManager.CommonEventSubscribeInfo = {
     events: ["VpnServiceTimeEvent"]
@@ -284,7 +286,10 @@ export default class EntryAbility extends UIAbility {
 
       // 刷新节点状态
       this.callee.on('refreshState', (indata: rpc.MessageSequence) => {
-        refreshState();
+        clearTimeout(this.cardDelayTimer)
+
+        const proxyNodeInfo = cardManager.getSelectedProxyNode()
+        this.refreshState(proxyNodeInfo?.p ?? '')
 
         return new Params()
       })
@@ -366,10 +371,11 @@ export default class EntryAbility extends UIAbility {
       if (proxyActionType === ProxyActionType.START) {
         await ClashViewModel.StartVpn()
         setTimeout(() => {
-          refreshState()
-        }, 1000)
+          this.refreshState(proxyNodeInfo?.p ?? '')
+        }, 500)
       } else {
         await ClashViewModel.StopVpn()
+        clearTimeout(this.cardDelayTimer)
       }
       // if (this.uiConfig.isVibrate) {
       customVibrator.vibratorTriggerOfHapticClockTimer()
@@ -378,6 +384,24 @@ export default class EntryAbility extends UIAbility {
       cardManager.pushCartProxyMode(false, '请先选中一个节点')
       return
     }
+  }
+
+  async refreshState(proxyName: string) {
+    // 刷新IP地址
+    const remoteIp = await ClashViewModel.checkIpInfo()
+    cardManager.pushCartProxyIpInfo(remoteIp);
+
+    // 首次获取延迟
+    const delay = await ClashViewModel.testDelay(proxyName)
+    hilog.info(0x0000, 'EntryAbility', '延迟：%{public}d ms', delay)
+    cardManager.pushCartDelay(delay)
+
+    this.cardDelayTimer = setInterval(async () => {
+      // 卡片主动刷新节点延迟
+      const delay = await ClashViewModel.testDelay(proxyName)
+      hilog.info(0x0000, 'EntryAbility', '延迟：%{public}d ms', delay)
+      cardManager.pushCartDelay(delay)
+    }, 800)
   }
 
   /**
@@ -536,14 +560,6 @@ class Params implements rpc.Parcelable {
   unmarshalling(dataIn: rpc.MessageSequence): boolean {
     return true
   }
-}
-
-async function refreshState() {
-  // 刷新IP地址
-  const remoteIp = await ClashViewModel.checkIpInfo()
-  cardManager.pushCartProxyIpInfo(remoteIp);
-  // TODO 卡片主动刷新节点延迟
-  // await ClashViewModel.testAllDelay(this.proxyGroups.getData(this.currentProxyIndex).proxies as ProxyItem[])
 }
 
 export function sleep(timeout: number): Promise<void> {
