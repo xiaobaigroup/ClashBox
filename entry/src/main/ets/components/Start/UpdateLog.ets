@@ -21,7 +21,7 @@ export struct UpdateLog {
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 是否开启`Index`页面的前景模糊
-  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean 
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
 
   build() {
     Xb_UpdateLog({
