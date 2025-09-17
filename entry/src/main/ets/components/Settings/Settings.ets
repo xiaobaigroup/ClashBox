@@ -227,7 +227,7 @@ struct Settings {
     // 注销WebDav登录事件
     EventHub.off(EventKey.LoginWebDav)
     // 释放WebDav连接
-    this.webdavClient.close()
+    // this.webdavClient.close()
   }
 
   // 设置页路由表
