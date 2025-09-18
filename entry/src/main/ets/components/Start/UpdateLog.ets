@@ -22,6 +22,8 @@ export struct UpdateLog {
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 是否开启`Index`页面的前景模糊
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
+  // 显示的是更新日志
+  @StorageLink('ShowUpdateLog') showUpdateLog: boolean = false
 
   build() {
     Xb_UpdateLog({
@@ -31,6 +33,12 @@ export struct UpdateLog {
       listItemGroupBgColor: $r('app.color.container_background'),
       versionName: AppState.versionName,
       updateLog: UpdateLogData,
+      alignRow: VerticalAlign.Bottom,
+      marginTitle: 8,
+      isBackPress: this.showUpdateLog ? false : true,
+      isShowClose: false,
+      backPressColor: $r('app.color.back'),
+      iconSize: 28,
       isShowAnimation: this.uiConfig.isAnimation,
       animationSpeed: this.uiConfig.animationSpeed,
       widthBp: this.widthBp,
