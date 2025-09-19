@@ -34,6 +34,8 @@ import { ListGutter, ListLanes, TabContentTitleMargin } from '../common/breakpoi
 import { RoundButton } from '../components/Common/RoundButton'
 import { harmonyShare, systemShare } from '@kit.ShareKit'
 import { uniformTypeDescriptor as utd } from '@kit.ArkData'
+import { resourceManager } from '@kit.LocalizationKit';
+import { Context } from '@kit.AbilityKit'
 
 /**
  * 长按菜单参数
@@ -518,20 +520,31 @@ struct ConfigurationPage {
       .margin({bottom: 15})
   }
 
-  aboutToAppear(): void {
+  async aboutToAppear(): Promise<void> {
     hilog.info(0xC000, componentName, `#aboutToAppear executed`)
     // 初始化当前选中项数据
     this.currentRadioConfigData = this.configList.find((data: ConfigData) => data.configId === this.appConfig.currentProfileId) as ConfigData
 
     // 碰一碰监听
     if (canIUse('SystemCapability.Collaboration.HarmonyShare')) {
+      let fileData: Uint8Array | undefined = undefined
+
+      // 获取应用图标
+      try {
+        const resourceMgr: resourceManager.ResourceManager = (this.getUIContext().getHostContext() as Context).resourceManager
+        fileData = await resourceMgr.getMediaContent($r('app.media.layered_image').id)
+      } catch (error) {
+        hilog.error(0xC000, componentName, `getMediaContent error. Code: ${error?.code}, message: ${error?.message}`)
+      }
+
       harmonyShare.on('knockShare', (sharableTarget: harmonyShare.SharableTarget) => {
         // TODO 构造分享数据 AppLink 携带订阅 URL 完成 => 应用直达订阅分享
         let shareData: systemShare.SharedData = new systemShare.SharedData({
           utd: utd.UniformDataType.HYPERLINK,
           content: 'https://xbstudio.top',
-          title: 'App Name',
-          description: 'App Description',
+          title: 'ClashBox',
+          description: 'URL分享',
+          thumbnail: fileData
         });
         // 发起分享
         sharableTarget.share(shareData)
