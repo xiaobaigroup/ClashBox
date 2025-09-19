@@ -541,7 +541,7 @@ struct ConfigurationPage {
         // TODO 构造分享数据 AppLink 携带订阅 URL 完成 => 应用直达订阅分享
         let shareData: systemShare.SharedData = new systemShare.SharedData({
           utd: utd.UniformDataType.HYPERLINK,
-          content: 'https://xbstudio.top',
+          content: 'https://xbstudio.top/clashbox',
           title: 'ClashBox',
           description: 'URL分享',
           thumbnail: fileData
