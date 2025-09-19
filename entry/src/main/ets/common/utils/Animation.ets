@@ -29,9 +29,8 @@ class AnimationUtil{
   public isScaleTranFast(i:number,uiConfig:UIConfig){
     effectEvent=
       uiConfig.isAnimation ?
-      TransitionEffect.OPACITY
-        .combine(TransitionEffect.scale({x: 0, y: 0}))
-        .animation({ duration: uiConfig.animationSpeed,curve:curves.springMotion(),delay: i*5+30 })
+      TransitionEffect.scale({x: 0.7, y: 0.7})
+        .animation({ duration: uiConfig.animationSpeed,curve:curves.springMotion(),delay: i*2+10 })
         :null
 
     return effectEvent
