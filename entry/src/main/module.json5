@@ -38,7 +38,8 @@
         "skills": [
           {
             "entities": [
-              "entity.system.home"
+              "entity.system.home",
+              "entity.system.browsable"
             ],
             "actions": [
               "action.system.home"
@@ -66,6 +67,7 @@
               {
                 "scheme": "https",
                 "host": "https://xbstudio.top",
+                "pathStartWith": "clashbox/"
               }
             ],
             "domainVerify": true
