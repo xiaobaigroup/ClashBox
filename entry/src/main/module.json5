@@ -66,8 +66,8 @@
               },
               {
                 "scheme": "https",
-                "host": "https://xbstudio.top",
-                "pathStartWith": "clashbox/"
+                "host": "xbstudio.top",
+                "pathStartWith": "clashbox"
               }
             ],
             "domainVerify": true
