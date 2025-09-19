@@ -27,7 +27,7 @@ export class BackgroundDownService {
     this.updateTraffic()
     this.notice = setInterval(async () => {
       this.updateTraffic()
-    }, 2000)
+    }, 10000)
   }
 
 
@@ -60,7 +60,7 @@ export class BackgroundDownService {
         name: 'downloadTemplate', // 当前只支持downloadTemplate，保持不变
         data: {
           title: message, // 必填。
-          fileName: '正在运行数据传输任务，删除通知后任务将停止', // 必填。
+          fileName: 'VPN隧道数据传输中,删除通知隧道失效', // 必填。
           progressValue: Process, // 应用更新进度值，自定义
         }
       }
