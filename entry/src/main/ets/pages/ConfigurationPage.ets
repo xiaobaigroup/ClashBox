@@ -32,7 +32,8 @@ import { ImportConfigFromFile } from '../components/Configuration/ImportConfigFr
 import { TopBar } from '../components/Common/TopBar'
 import { ListGutter, ListLanes, TabContentTitleMargin } from '../common/breakpoint/BreakPoint'
 import { RoundButton } from '../components/Common/RoundButton'
-
+import { harmonyShare, systemShare } from '@kit.ShareKit'
+import { uniformTypeDescriptor as utd } from '@kit.ArkData'
 
 /**
  * 长按菜单参数
@@ -521,6 +522,21 @@ struct ConfigurationPage {
     hilog.info(0xC000, componentName, `#aboutToAppear executed`)
     // 初始化当前选中项数据
     this.currentRadioConfigData = this.configList.find((data: ConfigData) => data.configId === this.appConfig.currentProfileId) as ConfigData
+
+    // 碰一碰监听
+    if (canIUse('SystemCapability.Collaboration.HarmonyShare')) {
+      harmonyShare.on('knockShare', (sharableTarget: harmonyShare.SharableTarget) => {
+        // TODO 构造分享数据 AppLink 携带订阅 URL 完成 => 应用直达订阅分享
+        let shareData: systemShare.SharedData = new systemShare.SharedData({
+          utd: utd.UniformDataType.HYPERLINK,
+          content: 'https://xbstudio.top',
+          title: 'App Name',
+          description: 'App Description',
+        });
+        // 发起分享
+        sharableTarget.share(shareData)
+      })
+    }
   }
 
   async onIndexChange() {
@@ -606,6 +622,7 @@ struct ConfigurationPage {
     this.configCustomDialogController = null
     this.isEnableIndexForegroundBlur = false
     hilog.info(0xC000, componentName, `#aboutToDisappear#置空[配置页\`bindSheet\`内提示是否删除配置信息的自定义弹框]`)
+    harmonyShare.off('knockShare');
   }
 
   /**
