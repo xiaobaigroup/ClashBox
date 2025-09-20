@@ -26,28 +26,48 @@ export struct UpdateLog {
   @StorageLink('ShowUpdateLog') showUpdateLog: boolean = false
 
   build() {
-    Xb_UpdateLog({
-      logoImage: $r('app.media.background_white_large'),
-      logoImageBg: $r("app.media.foreground_box_cat_large"),
-      appNameImage: $r("app.media.clash_box_blue"),
-      listItemGroupBgColor: $r('app.color.container_background'),
-      versionName: AppState.versionName,
-      updateLog: UpdateLogData,
-      alignRow: VerticalAlign.Bottom,
-      marginTitle: 8,
-      isBackPress: this.showUpdateLog ? false : true,
-      isShowClose: false,
-      backPressColor: $r('app.color.back'),
-      iconSize: 28,
-      isShowAnimation: this.uiConfig.isAnimation,
-      animationSpeed: this.uiConfig.animationSpeed,
-      widthBp: this.widthBp,
-      heightBp: this.heightBp,
-      pageInfos: this.SettingsPageInfos,
-      closeUse: () => {
-        this.isShowWelcome = false
-        this.isEnableIndexForegroundBlur = false
+    NavDestination() {
+      Column() {
+        TopBuilder({
+          title: $r('app.string.update_log'),
+          showBackButton: this.showBackButton
+        })
+        Xb_UpdateLog({
+          logoImage: $r('app.media.background_white_large'),
+          logoImageBg: $r("app.media.foreground_box_cat_large"),
+          appNameImage: $r("app.media.clash_box_blue"),
+          listItemGroupBgColor: $r('app.color.container_background'),
+          versionName: AppState.versionName,
+          updateLog: UpdateLogData,
+          alignRow: VerticalAlign.Bottom,
+          marginTitle: 8,
+          isBackPress: !this.showUpdateLog,
+          isShowClose: false,
+          needTopTitle: false,
+          backPressColor: $r('app.color.back'),
+          iconSize: 28,
+          isShowAnimation: this.uiConfig.isAnimation,
+          animationSpeed: this.uiConfig.animationSpeed,
+          widthBp: this.widthBp,
+          heightBp: this.heightBp,
+          closeUse: () => {
+            this.isShowWelcome = false
+            this.isEnableIndexForegroundBlur = false
+          }
+        })
       }
+      .width('100%')
+      .height('100%')
+    }
+    .width('100%')
+    .height('100%')
+    .hideTitleBar(true)
+    .hideBackButton(true)
+    .hideToolBar(true)
+    .backgroundColor($r('app.color.background'))
+    .onBackPressed(() => {
+      this.SettingsPageInfos.pop()
+      return true
     })
   }
 
