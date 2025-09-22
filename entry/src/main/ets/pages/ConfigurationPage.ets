@@ -400,11 +400,11 @@ struct ConfigurationPage {
         content: $r('app.string.update'), callback: () => { this.updateConfig(this.currentTouchConfigData.configId) }
       },
     // TODO 配置分享、生成二维码、创建副本
-    /* { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.share'))
+     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.share'))
        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-       content: $r('app.string.share'), callback: ()=>{ this.shareConfigUrl() }
+       content: $r('app.string.share'), callback: ()=>{ this.shareConfigUrl(this.currentTouchConfigData.configUrl) }
      },
-     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.qrcode'))
+    /* { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.qrcode'))
        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
        content: $r('app.string.generate_QR_code'), callback: ()=>{ this.generateQRcode() }
      },*/
@@ -706,12 +706,53 @@ struct ConfigurationPage {
   }
 
   /**分享配置的URL*/
-  private shareConfigUrl(): void {
+  private async shareConfigUrl(configUrl: string): Promise<void> {
     // TODO 处理待分享数据 并调用系统分享接口 只有URL导入的配置才可以分享链接
-    hilog.info(0xC013, componentName, `#shareConfig#分享配置: configName is [${this.currentTouchConfigData.configName}]`)
-    let systemShareResult: boolean = configShare(context, this.currentTouchConfigData.configUrl, this.currentTouchConfigData.configId)
-    if (!systemShareResult) {
-      this.promptAction.showToast({ message: `分享错误，请联系开发者！🐛` })
+    // hilog.info(0xC013, componentName,
+    //   `#shareConfig#分享配置: configName is [${this.currentTouchConfigData.configName}]`)
+    // let systemShareResult: boolean =
+    //   configShare(context, this.currentTouchConfigData.configUrl, this.currentTouchConfigData.configId)
+    // if (!systemShareResult) {
+    //   this.promptAction.showToast({ message: `分享错误，请联系开发者！🐛` })
+    // }
+    if (canIUse('SystemCapability.Collaboration.HarmonyShare')) {
+      // 碰一碰监听
+      let fileData: Uint8Array | undefined = undefined
+
+      const configUrl = this.currentTouchConfigData.configUrl
+
+      // 获取应用图标
+      try {
+        const resourceMgr: resourceManager.ResourceManager = (this.getUIContext().getHostContext() as Context).resourceManager
+        fileData = await resourceMgr.getMediaContent($r('app.media.layered_image').id)
+      } catch (error) {
+        hilog.error(0xC000, componentName, `getMediaContent error. Code: ${error?.code}, message: ${error?.message}`)
+      }
+
+      harmonyShare.on('knockShare', (sharableTarget: harmonyShare.SharableTarget) => {
+        // TODO 构造分享数据 AppLink 携带订阅 URL 完成 => 应用直达订阅分享
+        let shareData: systemShare.SharedData = new systemShare.SharedData({
+          utd: utd.UniformDataType.HYPERLINK,
+          content: `https://xbstudio.top/clashbox?configUrl=${configUrl}`,
+          title: 'ClashBox',
+          description: 'URL分享',
+          thumbnail: fileData
+        });
+
+        // 发起分享
+        sharableTarget.share(shareData)
+      })
+
+      hilog.info(0xC014, componentName, `碰一碰 - 分享的 configUrl: ${configUrl}`)
+
+      new PromptAction().showToast({
+        message: '碰一碰，分享当前配置！📄',
+        duration: 3000
+      })
+    } else {
+      new PromptAction().showToast({
+        message: '当前设备暂不支持此功能！'
+      })
     }
   }
 

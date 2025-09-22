@@ -134,7 +134,7 @@ struct Index {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @Provide paddingButtom: number | Resource = $r('app.integer.vp_proxy_start_button_left_right_margin')
-  @StorageLink('openLinkConfigUrl') openLinkConfigUrl: string = ''
+  @StorageLink('openLinkConfigUrl') @Watch('onOpenConfigLink') openLinkConfigUrl: string = ''
   // 系统语言显示副标题
   @Provide SystemLanguageSubtitle: ResourceStr = $r('app.string.SimplifiedChinese')
   // 通知权限跳转授权弹窗提示弹窗标题

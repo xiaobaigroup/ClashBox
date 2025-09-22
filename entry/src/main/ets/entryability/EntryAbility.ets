@@ -86,13 +86,7 @@ export default class EntryAbility extends UIAbility {
     AppStorage.setOrCreate<ConfigurationConstant.ColorMode>('currentColorMode', this.context.config.colorMode)
 
     // 从want中获取传入的链接信息
-    let uri = want?.uri
-    if (uri) {
-      let urlObject = url.URL.parseURL(want?.uri)
-      let configUrl = urlObject.params.get('url')
-      AppStorage.setOrCreate('openLinkConfigUrl', configUrl)
-      hilog.info(0x0000, 'EntryAbility', '接收的configUrl为：%{public}s', configUrl)
-    }
+    this.getSharedConfigUrl(want)
 
     // 订阅ClashVpnAbility中的事件
     commonEventManager.createSubscriber(this.subscribeInfo,
@@ -139,6 +133,9 @@ export default class EntryAbility extends UIAbility {
   // 热启动
   onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam) {
     this.getShareData(want, true);
+
+    // 从want中获取传入的链接信息
+    this.getSharedConfigUrl(want);
   }
 
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
@@ -247,6 +244,18 @@ export default class EntryAbility extends UIAbility {
     // 移除卡片监听事件
     this.unRegisterCardEvent()
     cardManager.pushCartProxyMode(false)
+  }
+  
+  /** @description 获取分享的配置URL */
+  private getSharedConfigUrl(want: Want) {
+    let uri = want?.uri;
+    if (uri) {
+      let urlObject = url.URL.parseURL(want?.uri);
+      let configUrl = urlObject.params.get('configUrl');
+      // TODO 处理分享的配置链接
+      AppStorage.setOrCreate('openLinkConfigUrl', configUrl);
+      hilog.info(0x0000, 'EntryAbility', '接收的configUrl为：%{public}s', configUrl);
+    }
   }
 
   /** @description 存储配置文件到首选项 */
