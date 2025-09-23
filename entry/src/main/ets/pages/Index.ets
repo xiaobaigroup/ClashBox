@@ -148,7 +148,7 @@ struct Index {
   // 代理启动变量
   @Provide @Watch('ShowPipChange') proxyEnabled: boolean = false
   // 前台判断变量
-  @StorageProp('ForewardState') isForeward: boolean = true
+  @StorageProp('ForwardState') isForward: boolean = true
   // 初始化是否完成
   @StorageProp('awaitInit') theAwaitInit: boolean = false
   // 窗口模式
@@ -927,12 +927,12 @@ struct Index {
       this.fetchProfiles()
     })
     // 初始化实况窗
-    const isLive = await LiveViewUtil.init(this.getUIContext().getHostContext()!)
+/*    const isLive = await LiveViewUtil.init(this.getUIContext().getHostContext()!)
     if (isLive) {
       console.log(`LiveViewUtil 实况窗初始化成功`)
     } else {
       console.error(`LiveViewUtil 实况窗初始化失败`)
-    }
+    }*/
 
     // 更新应用版本号
     const packageInfo = await getPackageInfo()
@@ -942,7 +942,7 @@ struct Index {
     if (this.uiConfig.oldVersionName !== AppState.versionName) {
       this.isEnableIndexForegroundBlur = true
       this.isShowWelcome = true
-      this.updateData()   // TODO 仅更新一次数据，下次更新版本需要删掉
+      // this.updateData()   // TODO 强制更新数据函数
     }
 
   }
@@ -1050,7 +1050,7 @@ struct Index {
       hilog.info(0xFF00, "TimertestTag", "恢复的时刻： %{public}d", this.theRestoreTime)
     }
     this.proxyEnabled = ClashViewModel.vpnStarted
-    console.log(`HomeCard 前后台状态：${this.isForeward}`)
+    console.log(`HomeCard 前后台状态：${this.isForward}`)
     this.ShowPipChange()
     this.initLanguage()
     PipManager.getInstance().stopPip()
@@ -1078,7 +1078,7 @@ struct Index {
       this.thePauseTime = new Date().getTime()
       hilog.info(0xFF00, "TimertestTag", "暂停的时刻： %{public}d", this.thePauseTime)
     }
-    console.log(`HomeCard 前后台状态：${this.isForeward}`)
+    console.log(`HomeCard 前后台状态：${this.isForward}`)
     hilog.info(0xFF00, "PipTag", "代理启用状态： %{public}s", this.proxyEnabled)
     hilog.info(0xFF00, "PipTag", "画中画启用状态： %{public}s", this.uiConfig.backgroundPiPModel)
     this.ShowPipChange()

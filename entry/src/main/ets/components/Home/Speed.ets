@@ -24,7 +24,7 @@ struct Speed {
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 前台判断变量
-  @StorageProp('ForewardState') isForeward: boolean = true
+  @StorageProp('ForwardState') isForward: boolean = true
   @Consume ChartData: number[] | ConvertedUnit[]
   @State lineStart: boolean = true
   @Consume DownloadSpeed: string
@@ -240,8 +240,8 @@ struct Speed {
       playMode: PlayMode.Normal,
       curve:Curve.Ease,
     }, () => {
-      hilog.info(0xFF00, "HomeSpeedTestTag", `代理启用状态：${this.proxyEnabled} 是否前台：${this.isForeward} 是否位于主页: ${this.isHomePage}`)
-      if (this.proxyEnabled && this.isForeward && this.isHomePage) {
+      hilog.info(0xFF00, "HomeSpeedTestTag", `代理启用状态：${this.proxyEnabled} 是否前台：${this.isForward} 是否位于主页: ${this.isHomePage}`)
+      if (this.proxyEnabled && this.isForward && this.isHomePage) {
         // 设置定时器，每秒调用一次 onSpeedData 函数
         this.timerId = setInterval( () => {
           this.onSpeedData()

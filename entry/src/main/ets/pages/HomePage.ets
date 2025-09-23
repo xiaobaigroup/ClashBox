@@ -55,7 +55,7 @@ struct Home {
   // 编辑按钮点击后显示编辑状态判定
   @Consume @Watch('ShowHomeEditChange') isShowHomeEdit: boolean
   // 前台判断变量
-  @StorageProp('ForewardState') @Watch('onForeward') isForeward: boolean = true
+  @StorageProp('ForwardState') @Watch('onForward') isForward: boolean = true
   @Consume isSmallSquareScreen: boolean
   // 删除按钮是否出现判定
   @Consume isShowDeleteButton: boolean
@@ -537,9 +537,9 @@ struct Home {
     console.info('编辑按钮状况：', this.isShowHomeEdit)
   }
 
-  onForeward() {
+  onForward() {
     // if (this.proxyEnabled) {
-    //   if(!this.isForeward) {
+    //   if(!this.isForward) {
     //     // 页面不处于前台时暂停计时
     //     this.proxyStartedTimer.pause()
     //     hilog.info(0xFF00, "TimertestTag", "计时器暂停此时的时间：%{public}s", this.proxyStartingDuration)
@@ -569,7 +569,7 @@ struct HomeCard {
   @Consume theCurrentHomeCard: boolean[]
   private uiContext = this.getUIContext()!
   // 前台判断变量
-  @StorageProp('ForewardState') isForeward: boolean = true
+  @StorageProp('ForwardState') isForward: boolean = true
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   // 宽度断点
@@ -578,7 +578,7 @@ struct HomeCard {
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
 
   build() {
-    if (this.theCurrentHomeCard[this.index] && this.isForeward && this.isHomePage) {
+    if (this.theCurrentHomeCard[this.index] && this.isForward && this.isHomePage) {
       GridCol({
         span: {
           sm: HomeCardSpan36sm(this.widthBp, this.heightBp) * (this.index == 0 || this.index == 8 ? 2 : 1),
@@ -614,11 +614,11 @@ struct HomeCard {
       .transition(customAnimationUtil.isScaleTran(this.index, this.uiConfig))
       // 消失触发回调
       // .onDetach(() => {
-      //   console.log(`HomeCard 前后台状态：${this.isForeward} 当前注销：${this.index}`)
+      //   console.log(`HomeCard 前后台状态：${this.isForward} 当前注销：${this.index}`)
       // })
       // 显示时触发回调
       // .onAttach(() => {
-      //   console.log(`HomeCard 前后台状态：${this.isForeward} 当前显示：${this.index}`)
+      //   console.log(`HomeCard 前后台状态：${this.isForward} 当前显示：${this.index}`)
       // })
       // 编辑模式下跳动动画
       .rotate({ angle: this.uiConfig.isAnimation ? this.rotateAngle : null })

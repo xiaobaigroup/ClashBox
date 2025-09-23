@@ -16,7 +16,7 @@ import { ConfigAdd } from '../components/Configuration/ConfigAdd'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
 import { ConfigData, ConfigDataSourceType } from '../common/entity/PageArgumentEntity'
-import { CellularData, context, CustomConfirmDialog, Nothing } from '../components/Common/Common'
+import { CellularData, CustomConfirmDialog, Nothing } from '../components/Common/Common'
 import { customVibrator } from "../common/utils/VibratorUtil"
 import { configShare } from '../common/utils/SystemShareUtil'
 import ClashViewModel from '../entryability/ClashViewModel'
@@ -35,7 +35,8 @@ import { RoundButton } from '../components/Common/RoundButton'
 import { harmonyShare, systemShare } from '@kit.ShareKit'
 import { uniformTypeDescriptor as utd } from '@kit.ArkData'
 import { resourceManager } from '@kit.LocalizationKit';
-import { Context } from '@kit.AbilityKit'
+import { common, Context } from '@kit.AbilityKit'
+import { BusinessError } from '@kit.BasicServicesKit';
 
 /**
  * 长按菜单参数
@@ -63,9 +64,14 @@ struct ConfigurationPage {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  // 主窗口ID
+  @StorageProp('MainWindowId') mainWindowId: number = 1
   // 开关不触发list转场动画判定
   @State isON:isON = new isON()
 
+  // 前台判断变量
+  @StorageProp('ForwardState') @Watch('onForwardChange')  isForward: boolean = false
+  // 窗口模式
   @StorageProp('WindowMode') windowMode: boolean = false
   // 是否为新建配置
   private isNewConfig: boolean = false
@@ -295,6 +301,7 @@ struct ConfigurationPage {
               onWillAppear: () => {
                 hilog.info(0xC020, componentName, `#button#bindSheet#onWillAppear() executed`)
                 this.isEnableIndexForegroundBlur = true
+                this.onForwardChange()
               },
               // 半模态页面交互式关闭回调函数
               onWillDismiss: async (dismissSheet: DismissSheetAction) => {
@@ -311,6 +318,7 @@ struct ConfigurationPage {
               onWillDisappear: async () => {},
               onDisappear: () => {
                 this.isNewConfig = false
+                this.onForwardChange()
               },
               onWillSpringBackWhenDismiss: (springBack: SpringBackAction) => {
                 springBack.springBack()
@@ -402,7 +410,7 @@ struct ConfigurationPage {
     // TODO 配置分享、生成二维码、创建副本
      { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.share'))
        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-       content: $r('app.string.share'), callback: ()=>{ this.shareConfigUrl(this.currentTouchConfigData.configUrl) }
+       content: $r('app.string.share'), callback: ()=>{ this.shareConfigUrl(this.currentTouchConfigData) }
      },
     /* { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.qrcode'))
        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
@@ -556,7 +564,7 @@ struct ConfigurationPage {
       hilog.info(0xC011, componentName, `EditConfig #loadConfig#更新并加载完成 configName is [${this.currentTouchConfigData.configName}]`)
     } catch (e) {
       console.debug("loadConfigList", e.message, JSON.stringify(e))
-      this.promptAction.showToast({message: `${getResourceString($r('app.string.failed_load_config'), context)}` + (e.message || e) })
+      this.promptAction.showToast({message: `${getResourceString($r('app.string.failed_load_config'), this)}` + (e.message || e) })
     }
     this.getUIContext().animateTo({
       duration: this.uiConfig.animationSpeed,
@@ -612,18 +620,6 @@ struct ConfigurationPage {
     harmonyShare.off('knockShare');
   }
 
-  /**
-   * 页面内通用 `配置NV路由` push方法
-   * @param routeName 将要路由的页面名称
-   * @param param     路由参数
-   * @param animated  是否启用转场动画
-   */
-  pushDestinationByName(routeName: RouteName, param: Object | null, animated?: boolean): void {
-    this.configAddPageInfos.pushDestinationByName(routeName, param, animated)
-    hilog.info(0xC000, componentName, `#pushDestinationByName#NavPathStack.pushDestinationByName(${routeName}, ${JSON.stringify(param)}, ${animated})`)
-
-  }
-
   /**收藏配置*/
   private favoriteConfig(): void {
     if (this.favoriteProfiles.size<=3){
@@ -671,30 +667,62 @@ struct ConfigurationPage {
       // 使开关点击时不触发转场动画
       this.isON.toggleAnim = true
       hilog.info(0xC012, componentName, `#updateConfig#更新配置{所有}`)
-      // TODO loading and try
       await ClashViewModel.updateProfileConfig(null)
       this.isRefreshing = false
       this.promptAction.showToast({message: $r('app.string.updated_success_config')})
     }
-
   }
 
   /**分享配置的URL*/
-  private async shareConfigUrl(configUrl: string): Promise<void> {
-    // TODO 处理待分享数据 并调用系统分享接口 只有URL导入的配置才可以分享链接
-    // hilog.info(0xC013, componentName,
-    //   `#shareConfig#分享配置: configName is [${this.currentTouchConfigData.configName}]`)
-    // let systemShareResult: boolean =
-    //   configShare(context, this.currentTouchConfigData.configUrl, this.currentTouchConfigData.configId)
-    // if (!systemShareResult) {
-    //   this.promptAction.showToast({ message: `分享错误，请联系开发者！🐛` })
-    // }
+  private async shareConfigUrl(configData: ConfigData): Promise<void> {
+    // 处理待分享数据 并调用系统分享接口 只有URL导入的配置才可以分享链接
+    // 进行分享面板分享
+    const shareData = await this.getShareData(configData)
+    if (shareData) {
+      let controller: systemShare.ShareController = new systemShare.ShareController(shareData);
+      let context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
+      controller.show(context, {
+        previewMode: systemShare.SharePreviewMode.DEFAULT,
+        selectionMode: systemShare.SelectionMode.SINGLE
+      }).then(() => {
+        console.info('ShareController show success.');
+      }).catch((error: BusinessError) => {
+        console.error(`ShareController show error. code: ${error.code}, message: ${error.message}`);
+      });
+    }
+  }
+
+  // TODO 待最低版本兼容为6.0后需绑定窗口ID
+  async onForwardChange() {
+    if (this.isForward && this.IndexCurrentindex === 2) {
+      // 前台时注册碰一碰分享事件
+      harmonyShare.off('knockShare');
+      const capabilityRegistry: harmonyShare.SendCapabilityRegistry = {
+        windowId: this.mainWindowId
+      }
+      const shareData = await this.getShareData(this.isShowConfigAddBindSheet ? this.currentTouchConfigData : this.currentRadioConfigData)
+      if (shareData) {
+        console.log(`onForwardChange 注册碰一碰事件`)
+        harmonyShare.on('knockShare', (sharableTarget: harmonyShare.SharableTarget) => {
+          // 发起分享
+          sharableTarget.share(shareData)
+        })
+      }
+    } else {
+      // 后台时解除
+      const capabilityRegistry: harmonyShare.SendCapabilityRegistry = {
+        windowId: this.mainWindowId
+      }
+      // 解除碰一碰分享'knockShare'监听事件
+      harmonyShare.off('knockShare');
+      console.log(`onForwardChange 解除碰一碰事件`)
+    }
+  }
+
+  private async getShareData(configData: ConfigData): Promise<systemShare.SharedData | null> {
+    let shareData: systemShare.SharedData | null = null
     if (canIUse('SystemCapability.Collaboration.HarmonyShare')) {
-      // 碰一碰监听
       let fileData: Uint8Array | undefined = undefined
-
-      const configUrl = this.currentTouchConfigData.configUrl
-
       // 获取应用图标
       try {
         const resourceMgr: resourceManager.ResourceManager = (this.getUIContext().getHostContext() as Context).resourceManager
@@ -702,32 +730,25 @@ struct ConfigurationPage {
       } catch (error) {
         hilog.error(0xC000, componentName, `getMediaContent error. Code: ${error?.code}, message: ${error?.message}`)
       }
-
-      harmonyShare.on('knockShare', (sharableTarget: harmonyShare.SharableTarget) => {
-        // TODO 构造分享数据 AppLink 携带订阅 URL 完成 => 应用直达订阅分享
-        let shareData: systemShare.SharedData = new systemShare.SharedData({
-          utd: utd.UniformDataType.HYPERLINK,
-          content: `https://xbstudio.top/clashbox?configUrl=${configUrl}`,
-          title: 'ClashBox',
-          description: 'URL分享',
-          thumbnail: fileData
-        });
-
-        // 发起分享
-        sharableTarget.share(shareData)
-      })
-
-      hilog.info(0xC014, componentName, `碰一碰 - 分享的 configUrl: ${configUrl}`)
-
-      new PromptAction().showToast({
-        message: '碰一碰，分享当前配置！📄',
-        duration: 3000
-      })
+      // 构造分享数据 AppLink 携带订阅 URL 完成 => 应用直达订阅分享
+      shareData = new systemShare.SharedData({
+        utd: utd.UniformDataType.HYPERLINK,
+        content: `https://xbstudio.top/clashbox?configUrl=${configData.configUrl}`,
+        title: `${configData.configName}`,
+        description: 'URL分享',
+        thumbnail: fileData
+      });
+      hilog.info(0xC014, componentName, `碰一碰 - 分享的 configUrl: ${configData.configUrl}`)
+      // new PromptAction().showToast({
+      //   message: '碰一碰，分享当前配置！📄',
+      //   duration: 3000
+      // })
     } else {
       new PromptAction().showToast({
-        message: '当前设备暂不支持此功能！'
+        message: '当前设备暂不支持系统分享功能！'
       })
     }
+    return shareData
   }
 
   /**

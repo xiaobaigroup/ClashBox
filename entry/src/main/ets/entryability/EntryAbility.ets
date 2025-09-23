@@ -155,6 +155,16 @@ export default class EntryAbility extends UIAbility {
     const storage = new LocalStorage()
     storage.setOrCreate<BundleInfo>('bundleInfo', this.bundleInfo)
 
+    windowStage.getMainWindow((err, mainWindow) => {
+      if (err) return;
+      try {
+        const mainWindowId = mainWindow.getWindowProperties().id;
+        AppStorage.setOrCreate('MainWindowId', mainWindowId) // ✅ 主窗口ID
+      } catch (error) {
+        console.error(`主窗口ID获取失败, name: ${error.name} message: ${error.message}`)
+      }
+    })
+
     windowStage.loadContent('pages/Index', storage, async (err) => {
       if (err.code) {
         hilog.error(0x0000, 'EntryAbility', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
@@ -226,13 +236,13 @@ export default class EntryAbility extends UIAbility {
 
   onForeground(): void {
     // Ability has brought to foreground
-    AppStorage.setOrCreate('ForewardState', true)
+    AppStorage.setOrCreate('ForwardState', true)
     hilog.info(0x0000, 'c', '%{public}s', 'Ability onForeground');
   }
 
   onBackground(): void {
     // Ability has back to background
-    AppStorage.setOrCreate('ForewardState', false)
+    AppStorage.setOrCreate('ForwardState', false)
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onBackground');
     this.saveConfigThePreferences();
   }
