@@ -7,7 +7,6 @@ import {
   BORDER_RADIUS_20,
   BIND_SHEET_CONTAINER_HEIGHT,
   LIST_ITEM_PADDING,
-  RouteName,
   CONTENT_END_OFFSET_150,
   NewConfigData,
 } from '../common/entity/Constants'
@@ -15,17 +14,16 @@ import { LengthMetrics, PromptAction, SymbolGlyphModifier } from '@kit.ArkUI'
 import { ConfigAdd } from '../components/Configuration/ConfigAdd'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
-import { ConfigData, ConfigDataSourceType } from '../common/entity/PageArgumentEntity'
+import { ConfigData } from '../common/entity/PageArgumentEntity'
 import { CellularData, CustomConfirmDialog, Nothing } from '../components/Common/Common'
 import { customVibrator } from "../common/utils/VibratorUtil"
-import { configShare } from '../common/utils/SystemShareUtil'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig, UIConfig } from '../entryability/AppState'
 import { EventHub, EventKey } from '../common/EventHub'
 import { getResourceString } from '../common/utils/ResourceStringUtil'
 import { convertTime } from '../common/utils/TimeConvertUtil'
 import { customAnimationUtil, isON } from '../common/utils/Animation'
-import { ProxyGroup } from 'proxy_core'
+import { ProfileType } from 'proxy_core'
 import { PopTips, PopupBuilder } from '../components/Start/Popup'
 import { ImportConfigFromURL } from '../components/Configuration/ImportConfigFromURL'
 import { ImportConfigFromFile } from '../components/Configuration/ImportConfigFromFile'
@@ -70,7 +68,7 @@ struct ConfigurationPage {
   @State isON:isON = new isON()
 
   // 前台判断变量
-  @StorageProp('ForwardState') @Watch('onForwardChange')  isForward: boolean = false
+  @StorageProp('ForwardState') @Watch('onForwardChange') isForward: boolean = false
   // 窗口模式
   @StorageProp('WindowMode') windowMode: boolean = false
   // 是否为新建配置
@@ -101,7 +99,7 @@ struct ConfigurationPage {
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @Consume paddingButtom: number | Resource
   // 主界面当前index
-  @Consume IndexCurrentindex: number
+  @Consume @Watch('onForwardChange') IndexCurrentindex: number
   @Consume curOffsetRemain: number
   // px外屏隐藏top和tab偏移
   @Consume heightTop: number
@@ -167,6 +165,7 @@ struct ConfigurationPage {
                             .fontColor($r('sys.color.font_secondary')).fontSize(14)
                           Text(convertTime(item.lastUpdateDateTime))
                             .fontColor($r('sys.color.font_secondary')).fontSize(14).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+                          // Text(`type: ${item.sourceType}`)
                         }
 
                         // 进度条组件: 使用流量 / 总流量
@@ -174,7 +173,10 @@ struct ConfigurationPage {
                           CellularData({ info: item.subscriptionInfo })
                         }
 
-                      }.alignItems(HorizontalAlign.Start).width('100%').padding({top:10,bottom:10})
+                      }
+                      .width('100%')
+                      .padding({top: 10, bottom: 10})
+                      .alignItems(HorizontalAlign.Start)
                       // 进度条 & 单选框
                       Row() {
                         if (item.configId === this.appConfig.currentProfileId && this.isLoading){
@@ -375,7 +377,7 @@ struct ConfigurationPage {
         this.isEnableIndexForegroundBlur = false
         this.deleteConfig()
       },
-      confirm: ()=> {
+      confirm: () => {
         this.isEnableIndexForegroundBlur = false
         this.promptAction.showToast({ message: $r('app.string.click_error_prompt') })
       }
@@ -392,26 +394,23 @@ struct ConfigurationPage {
   /**ContextMenu列表项集合*/
   configListLongPressCtxMenus(item: ConfigData): Array<LongPressContextMenuItem> {
     return [
-    // { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.star'))
-    //     .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-    //   content: '收藏', callback: ()=>{this.favoriteConfig()}
-    // },
-      { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.square_and_pencil'))
-        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-        content: $r('app.string.Edit'), callback: () => {
-        this.isNewConfig = false
-        this.editConfig()
-      }
+      { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.square_and_pencil')).fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
+        content: $r('app.string.Edit'),
+        callback: () => {
+         this.isNewConfig = false
+         this.editConfig()
+        }
       },
       { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.arrow_clockwise'))
         .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
         content: $r('app.string.update'), callback: () => { this.updateConfig(this.currentTouchConfigData.configId) }
       },
-    // TODO 配置分享、生成二维码、创建副本
-     { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.share'))
-       .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-       content: $r('app.string.share'), callback: ()=>{ this.shareConfigUrl(this.currentTouchConfigData) }
-     },
+      ...(this.currentTouchConfigData.sourceType === ProfileType.Url ? [
+        { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.share'))
+        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
+        content: $r('app.string.share'), callback: () => { this.shareConfigUrl(this.currentTouchConfigData) }
+      } as LongPressContextMenuItem ] : [])
+      // TODO 生成二维码、创建副本
     /* { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.qrcode'))
        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
        content: $r('app.string.generate_QR_code'), callback: ()=>{ this.generateQRcode() }
@@ -473,7 +472,6 @@ struct ConfigurationPage {
         })
         // 遍历其他菜单 END
 
-        // 删除配置 文字红色 单独处理 START
         // 删除配置 文字红色 单独处理 START
         MenuItem({
           symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.trash_fill'))
@@ -594,23 +592,6 @@ struct ConfigurationPage {
     }
   }
 
-  // 获取完整配置列表
-  async fetchProfiles() {
-    const profiles = await ClashViewModel.getProfiles()
-    this.configList = profiles.map((d)=>{
-      return {
-        configId: d.id,
-        configName: d.name,
-        isFavorite: this.favoriteProfiles.has(d.id) ?? false,
-        configUrl: d.url,
-        isConfigAutoUpdate: d.autoUpdate,
-        configAutoUpdateTimeGapValue: d.autoUpdateDuration,
-        lastUpdateDateTime: d.lastUpdateDate,
-        subscriptionInfo: d.subscriptionInfo
-      } as ConfigData
-    })
-  }
-
   aboutToDisappear(): void {
     hilog.info(0xC000, componentName, `#aboutToDisappear executed`)
     EventHub.off(EventKey.FetchProfile)
@@ -622,12 +603,12 @@ struct ConfigurationPage {
 
   /**收藏配置*/
   private favoriteConfig(): void {
-    if (this.favoriteProfiles.size<=3){
+    if (this.favoriteProfiles.size <= 3) {
     this.promptAction.showToast({ message: $r('app.string.Collect_Tip') })
     hilog.info(0xC010, componentName, `#favoriteConfig#收藏配置: configName is [${this.currentTouchConfigData.configName}]`)
     this.currentTouchConfigData.isFavorite = true
     this.favoriteProfiles.set(this.currentTouchConfigData.configId, this.currentTouchConfigData.configName)
-    }else {
+    } else {
       this.promptAction.showToast({ message: $r('app.string.favorite_config_no') })
     }
   }
@@ -758,10 +739,7 @@ struct ConfigurationPage {
    */
   private generateQRcode(): void {
     // TODO 弹框CustomDialog，在其中实现“配置url”生成二维码的功能
-    if (this.currentTouchConfigData.sourceType !== ConfigDataSourceType.URL &&
-      this.currentTouchConfigData.sourceType !== ConfigDataSourceType.QR_CODE ) {
-      this.promptAction.showToast({ message: `${getResourceString($r('app.string.config_share_prompt'), this)}~🫡` })
-    }
+    this.promptAction.showToast({ message: `${getResourceString($r('app.string.config_share_prompt'), this)}~🫡` })
     hilog.info(0xC014, componentName, `#generateQRcode#生成二维码: configName is [${this.currentTouchConfigData.configName}]`)
   }
 
@@ -776,9 +754,10 @@ struct ConfigurationPage {
     this.promptAction.showToast({ message: `${getResourceString($r('app.string.configuration_deleted'), this)}💔` })
     hilog.info(0xC016, componentName, `#deleteConfig#删除配置: configName is [${this.currentTouchConfigData.configName}]`)
     await ClashViewModel.deleteProfile(this.currentTouchConfigData.configId)
-    this.appConfig.currentProxyName=undefined
-    this.appConfig.currentProfileName=undefined
-    this.fetchProfiles()
+    this.appConfig.currentProxyName = undefined
+    this.appConfig.currentProfileName = undefined
+    // 加载配置
+    EventHub.sendEvent(EventKey.FetchProfile)
   }
 
 }

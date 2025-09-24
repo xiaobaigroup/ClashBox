@@ -559,6 +559,7 @@ struct Index {
         configName: d.name,
         isFavorite: this.favoriteProfiles.has(d.id) ?? false,
         configUrl: d.url,
+        sourceType: d.type,
         isConfigAutoUpdate: d.autoUpdate,
         configAutoUpdateTimeGapValue: d.autoUpdateDuration,
         lastUpdateDateTime: d.lastUpdateDate,

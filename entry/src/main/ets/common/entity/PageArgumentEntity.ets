@@ -1,5 +1,5 @@
 /* 存放组件之间传输的实体类、需要持久化的数据对象 */
-import { SubscriptionInfo } from "proxy_core"
+import { ProfileType, SubscriptionInfo } from "proxy_core"
 
 // 之后根据这些数据整理成用户首选项
 export interface UserPreferences{
@@ -52,14 +52,6 @@ export interface HomeCardInfo {
 
 
 /* 配置 */
-// 配置来源类型
-export enum ConfigDataSourceType{
-  URL,
-  QR_CODE,
-  FILE,
-  BLANK_FILE,
-  COPY
-}
 
 // 配置 -> 新增配置时的传输数据
 export interface ConfigData{
@@ -88,7 +80,7 @@ export interface ConfigData{
   // 配置是否收藏
   isFavorite?: boolean
   // 配置来源类型
-  sourceType?: ConfigDataSourceType
+  sourceType?: ProfileType
   // 如果是副本配置，对应源配置id
   copySourceConfigId?: string
   updateTime: number
