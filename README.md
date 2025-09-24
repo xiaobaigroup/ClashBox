@@ -8,7 +8,7 @@
 本项目的大部分代码均已开源，若要查看本项目的开源代码，请前往[Master分支](https://github.com/xiaobaigroup/ClashBox/tree/master)。
 #### 介绍
 
-ClashBox是首个基于Navigation框架的HarmonyOS NEXT(OpenHarmony)平台的代理软件，使用改版的[Mihomo(ClashMeta)](https://github.com/MetaCubeX/mihomo)内核。
+ClashBox是首个基于Navigation框架的HarmonyOS NEXT平台的代理软件，使用改版的[Mihomo(ClashMeta)](https://github.com/MetaCubeX/mihomo)内核。
 使用前请仔细阅读免责声明和常见问题。
 
 #### 软件特色
