@@ -15,7 +15,7 @@ Most of the code of this project is open source. To view it, please go to the [M
 
 #### Introduction
 
-ClashBox is the first proxy software for the HarmonyOS NEXT (OpenHarmony) platform based on the Navigation framework, using the modified [Mihomo (ClashMeta)](https://github.com/MetaCubeX/mihomo) kernel.
+ClashBox is the first proxy software for the HarmonyOS NEXT platform based on the Navigation framework, using the modified [Mihomo (ClashMeta)](https://github.com/MetaCubeX/mihomo) kernel.
 
 Please read the disclaimer and FAQ carefully before use.
 
