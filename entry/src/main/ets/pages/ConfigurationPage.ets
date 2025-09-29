@@ -35,6 +35,7 @@ import { uniformTypeDescriptor as utd } from '@kit.ArkData'
 import { resourceManager } from '@kit.LocalizationKit';
 import { common, Context } from '@kit.AbilityKit'
 import { BusinessError } from '@kit.BasicServicesKit';
+import { fileUri, fileIo as fs } from '@kit.CoreFileKit'
 
 /**
  * 长按菜单参数
@@ -532,6 +533,27 @@ struct ConfigurationPage {
     this.currentRadioConfigData = this.configList.find((data: ConfigData) => data.configId === this.appConfig.currentProfileId) as ConfigData
   }
 
+  async onDidBuild(): Promise<void> {
+    if (canIUse('SystemCapability.Collaboration.HarmonyShare')) {
+      const shareData = await this.getShareData()
+
+      // 碰一碰监听
+      harmonyShare.on('knockShare', (sharableTarget: harmonyShare.SharableTarget) => {
+        // 发起分享
+        sharableTarget.share(shareData)
+      })
+
+      this.getUIContext().getPromptAction().showToast({
+        message: '碰一碰，分享当前配置！📄',
+        duration: 3000
+      })
+    } else {
+      this.getUIContext().getPromptAction().showToast({
+        message: '当前设备暂不支持系统分享功能！'
+      })
+    }
+  }
+
   async onIndexChange() {
     if (this.configList.length !== 0 && this.IndexCurrentindex === 2) {
       await ClashViewModel.updateProfileConfig(null)
@@ -658,7 +680,7 @@ struct ConfigurationPage {
   private async shareConfigUrl(configData: ConfigData): Promise<void> {
     // 处理待分享数据 并调用系统分享接口 只有URL导入的配置才可以分享链接
     // 进行分享面板分享
-    const shareData = await this.getShareData(configData)
+    const shareData = await this.getShareData()
     if (shareData) {
       let controller: systemShare.ShareController = new systemShare.ShareController(shareData);
       let context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
@@ -681,14 +703,6 @@ struct ConfigurationPage {
       const capabilityRegistry: harmonyShare.SendCapabilityRegistry = {
         windowId: this.mainWindowId
       }
-      const shareData = await this.getShareData(this.isShowConfigAddBindSheet ? this.currentTouchConfigData : this.currentRadioConfigData)
-      if (shareData) {
-        console.log(`onForwardChange 注册碰一碰事件`)
-        harmonyShare.on('knockShare', (sharableTarget: harmonyShare.SharableTarget) => {
-          // 发起分享
-          sharableTarget.share(shareData)
-        })
-      }
     } else {
       // 后台时解除
       const capabilityRegistry: harmonyShare.SendCapabilityRegistry = {
@@ -700,35 +714,35 @@ struct ConfigurationPage {
     }
   }
 
-  private async getShareData(configData: ConfigData): Promise<systemShare.SharedData | null> {
-    let shareData: systemShare.SharedData | null = null
-    if (canIUse('SystemCapability.Collaboration.HarmonyShare')) {
-      let fileData: Uint8Array | undefined = undefined
-      // 获取应用图标
-      try {
-        const resourceMgr: resourceManager.ResourceManager = (this.getUIContext().getHostContext() as Context).resourceManager
-        fileData = await resourceMgr.getMediaContent($r('app.media.layered_image').id)
-      } catch (error) {
-        hilog.error(0xC000, componentName, `getMediaContent error. Code: ${error?.code}, message: ${error?.message}`)
-      }
-      // 构造分享数据 AppLink 携带订阅 URL 完成 => 应用直达订阅分享
-      shareData = new systemShare.SharedData({
-        utd: utd.UniformDataType.HYPERLINK,
-        content: `https://xbstudio.top/clashbox?configUrl=${configData.configUrl}`,
-        title: `${configData.configName}`,
-        description: 'URL分享',
-        thumbnail: fileData
-      });
-      hilog.info(0xC014, componentName, `碰一碰 - 分享的 configUrl: ${configData.configUrl}`)
-      // new PromptAction().showToast({
-      //   message: '碰一碰，分享当前配置！📄',
-      //   duration: 3000
-      // })
-    } else {
-      new PromptAction().showToast({
-        message: '当前设备暂不支持系统分享功能！'
-      })
+  /** @description 获取分享的数据 */
+  private async getShareData(): Promise<systemShare.SharedData> {
+    const currentConfigData = this.isShowConfigAddBindSheet ? this.currentTouchConfigData : this.currentRadioConfigData
+
+    // 将背景图写入沙箱中并获取
+    const ctx: Context = this.getUIContext().getHostContext() as Context;
+    const filePath = ctx.filesDir + '/shared.jpg';
+    // 获取应用图标
+    try {
+      let file = fs.openSync(filePath, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
+      fs.writeSync(file.fd,
+        (ctx.resourceManager.getMediaContentSync($r('app.media.shared').id) as Uint8Array).buffer);
+      fs.closeSync(file);
+      hilog.info(0xC014, componentName, `将背景图写入沙箱中并获取: ${filePath}`)
+    } catch (e) {
+      hilog.error(0xC014, componentName, `error: ${JSON.stringify(e)}`)
     }
+
+    // TODO 构造分享数据 AppLink 携带订阅 URL 完成 => 应用直达订阅分享
+    const shareData: systemShare.SharedData = new systemShare.SharedData({
+      utd: utd.UniformDataType.HYPERLINK,
+      content: `https://xbstudio.top/clashbox?configUrl=${currentConfigData.configUrl}?configName=${currentConfigData.configName}`,
+      thumbnailUri: fileUri.getUriFromPath(filePath),
+      title: ctx.resourceManager.getStringSync($r('app.string.ConfigurationShared').id),
+      description: currentConfigData.configName
+    });
+
+    hilog.info(0xC014, componentName, `碰一碰 - 分享的 configUrl: ${JSON.stringify(currentConfigData)}`)
+
     return shareData
   }
 
