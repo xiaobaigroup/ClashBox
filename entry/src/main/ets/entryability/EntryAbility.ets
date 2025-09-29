@@ -88,7 +88,7 @@ export default class EntryAbility extends UIAbility {
     // 从want中获取传入的链接信息
     this.getSharedConfigUrl(want)
 
-    // 订阅ClashVpnAbility中的事件
+    // 订阅ClashVpnAbility中的事件 -> 将运行时间同步显示在 卡片
     commonEventManager.createSubscriber(this.subscribeInfo,
       (err: BusinessError, commonEventSubscriber: commonEventManager.CommonEventSubscriber) => {
         if (!err) {
@@ -100,7 +100,6 @@ export default class EntryAbility extends UIAbility {
                 if (err) {
                   console.error(`Failed to subscribe. Code is ${err.code}, message is ${err.message}`);
                 } else {
-                  // TODO 将运行时间同步显示在 卡片
                   console.info(`Succeeded in subscribing, data is ` + JSON.stringify(data));
                   if (data.code === 0) {
                     // 计算时间
@@ -262,8 +261,10 @@ export default class EntryAbility extends UIAbility {
     if (uri) {
       let urlObject = url.URL.parseURL(want?.uri);
       let configUrl = urlObject.params.get('configUrl');
-      // TODO 处理分享的配置链接
-      AppStorage.setOrCreate('openLinkConfigUrl', configUrl);
+      let configName = urlObject.params.get('configName');
+      // 处理分享的配置链接
+      AppStorage.setOrCreate('appLinkConfigUrl', configUrl);
+      AppStorage.setOrCreate('appLinkConfigName', configName);
       hilog.info(0x0000, 'EntryAbility', '接收的configUrl为：%{public}s', configUrl);
     }
   }
