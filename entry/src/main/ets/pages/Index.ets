@@ -134,7 +134,8 @@ struct Index {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @Provide paddingButtom: number | Resource = $r('app.integer.vp_proxy_start_button_left_right_margin')
-  @StorageLink('openLinkConfigUrl') @Watch('onOpenConfigLink') openLinkConfigUrl: string = ''
+  @StorageLink('appLinkConfigUrl') @Watch('onOpenConfigLink') appLinkConfigUrl: string = ''
+  @StorageLink('appLinkConfigName') appLinkConfigName: string = ''
   // 系统语言显示副标题
   @Provide SystemLanguageSubtitle: ResourceStr = $r('app.string.SimplifiedChinese')
   // 通知权限跳转授权弹窗提示弹窗标题
@@ -378,7 +379,7 @@ struct Index {
       .bindSheet($$this.isShowWelcome, this.WelcomeSheet(), {
         detents: [BIND_SHEET_CONTAINER_HEIGHT],
         showClose: (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) ||
-          this.openLinkConfigUrl != '' || (this.uiConfig.oldVersionName !== AppState.versionName && !this.uiConfig.isFirstStart) || this.showUpdateLog,
+          this.appLinkConfigUrl != '' || (this.uiConfig.oldVersionName !== AppState.versionName && !this.uiConfig.isFirstStart) || this.showUpdateLog,
         dragBar: false,
         backgroundColor: $r('app.color.background'),
         keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
@@ -386,7 +387,7 @@ struct Index {
         preferType: SheetType.CENTER,
         onWillDismiss: ((DismissSheetAction: DismissSheetAction) => {
           if (!this.isShowWelcome || DismissSheetAction.reason === DismissReason.CLOSE_BUTTON ||
-            this.openLinkConfigUrl != '' || (this.uiConfig.oldVersionName !== AppState.versionName && !this.uiConfig.isFirstStart) || this.showUpdateLog) {
+            this.appLinkConfigUrl != '' || (this.uiConfig.oldVersionName !== AppState.versionName && !this.uiConfig.isFirstStart) || this.showUpdateLog) {
             this.showUpdateLog = false
             this.isShowWelcome = false
             this.uiConfig.oldVersionName = AppState.versionName
@@ -455,7 +456,7 @@ struct Index {
   WelcomeSheet() {
     if (AppStorage.get<boolean>('crash') == true && !this.uiConfig.isFirstStart) {
       CrashPage()
-    } else if (this.openLinkConfigUrl != '') {
+    } else if (this.appLinkConfigUrl != '') {
       ImportConfigFromURL({
         configData: this.currentTouchConfigData,
       })
@@ -1065,10 +1066,12 @@ struct Index {
 
   /**通过openLink导入配置*/
   onOpenConfigLink() {
-    if (this.openLinkConfigUrl != '') {
+    // TODO 模态框只能拉起一次
+    if (this.appLinkConfigUrl != '' && this.appLinkConfigUrl != '') {
       this.currentTouchConfigData.isNewConfig = true
-      this.currentTouchConfigData.configUrl = this.openLinkConfigUrl
-      this.isShowWelcome = true
+      this.currentTouchConfigData.configUrl = this.appLinkConfigUrl
+      this.currentTouchConfigData.configName = this.appLinkConfigName
+      // this.isShowWelcome = true
     }
   }
 

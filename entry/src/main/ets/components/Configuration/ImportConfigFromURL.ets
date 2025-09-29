@@ -46,7 +46,7 @@ export struct ImportConfigFromURL{
   // 配置详情（要添加到用户首选项里的数据）
   @State @Watch('configDataChanged') configData: ConfigData = NewConfigData
   @Consume('currentTouchConfigData') currentTouchConfigData: ConfigData
-  @StorageLink('openLinkConfigUrl') openLinkConfigUrl: string = ''
+  @StorageLink('appLinkConfigUrl') appLinkConfigUrl: string = ''
   // 当前显示的工具集合 默认为空 待两个input都有值之后才加入保存按钮菜单
   @State private menus: Array<BindSheetTitleCustomBuilderMenu> = []
   // 页面栈
@@ -203,7 +203,7 @@ export struct ImportConfigFromURL{
     // XXX 没有写`this.icon_emphasize`的`Watch`事件，是因为如果在设置页面里设置了其他主题色时，这个页面一定不是打开的状态
     this.saveMenus.symbolBackgroundColor = this.icon_emphasize
     this.isEnableIndexForegroundBlur = true
-    if (this.openLinkConfigUrl != '') {
+    if (this.appLinkConfigUrl != '') {
       hilog.info(0xCA10, componentName, `#aboutToAppear import 检查文本`)
       this.configDataChanged()
     }
@@ -231,8 +231,8 @@ export struct ImportConfigFromURL{
       try {
         await ClashViewModel.addOrUpdateProfileByUrl(this.configData, null)
         this.configCustomDownloadingDialogController.close()
-        if (this.openLinkConfigUrl != '') {
-          this.openLinkConfigUrl = ''
+        if (this.appLinkConfigUrl != '') {
+          this.appLinkConfigUrl = ''
         }
         this.promptAction.showToast({message: getResourceString($r('app.string.download_success'), this)})
       } catch (e) {
