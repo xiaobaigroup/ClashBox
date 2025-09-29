@@ -427,13 +427,13 @@ export default class EntryAbility extends UIAbility {
   /**
    * @description 获取分享的包名信息
    * @param want want
-   * @param launchMode false 热启动 true 冷启动
+   * @param launchMode true 热启动 false 冷启动
    * */
   private async getShareData(want: Want, launchMode: boolean = false) {
     try {
       // 获取共享数据
       const sharedData = await systemShare.getSharedData(want);
-      hilog.info(0x0000, 'EntryAbility', '%{public}s', 'getSharedData success:', JSON.stringify(sharedData));
+      hilog.info(0x0000, 'EntryAbility', '%{public}s', `getSharedData success: ${JSON.stringify(sharedData)}`);
 
       // 处理包名
       let records: systemShare.SharedRecord[] = sharedData.getRecords();
@@ -457,8 +457,16 @@ export default class EntryAbility extends UIAbility {
             break;
         }
       })
-      if (BundleInfo.isEmpty(this.bundleInfo) && launchMode) {
-        EventHub.sendEvent(EventKey.ShareBundle, this.bundleInfo)
+      if (BundleInfo.isEmpty(this.bundleInfo)) {
+        // 热启动 - 处理方式
+        if (launchMode) {
+          EventHub.sendEvent(EventKey.ShareBundle, this.bundleInfo)
+        } else {
+          // 冷启动 - 处理方式
+          setTimeout(() => {
+            EventHub.sendEvent(EventKey.ShareBundle, this.bundleInfo)
+          })
+        }
       }
     } catch (e) {
       hilog.error(0x0000, 'EntryAbility', '%{public}s', 'getSharedData error: ', JSON.stringify(e));
