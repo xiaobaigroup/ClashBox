@@ -320,9 +320,6 @@ export default class EntryAbility extends UIAbility {
 
   /** @description 取消注册卡片监听事件 */
   private unRegisterCardEvent() {
-    this.callee.off('updateFormId')
-    this.callee.off('cardChangeProxy')
-    this.callee.off('refreshState')
     try {
       this.callee.off('updateFormId')
       this.callee.off('cardChangeProxy')

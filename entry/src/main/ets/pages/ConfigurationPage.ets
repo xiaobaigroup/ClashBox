@@ -36,6 +36,7 @@ import { resourceManager } from '@kit.LocalizationKit';
 import { common, Context } from '@kit.AbilityKit'
 import { BusinessError } from '@kit.BasicServicesKit';
 import { fileUri, fileIo as fs } from '@kit.CoreFileKit'
+import { Xb_ToastUtil } from 'xb_components'
 
 /**
  * 长按菜单参数
@@ -537,18 +538,25 @@ struct ConfigurationPage {
     if (canIUse('SystemCapability.Collaboration.HarmonyShare')) {
       const shareData = await this.getShareData()
 
+      // TODO 复用组件
       // 碰一碰监听
       harmonyShare.on('knockShare', (sharableTarget: harmonyShare.SharableTarget) => {
         // 发起分享
         sharableTarget.share(shareData)
       })
 
-      this.getUIContext().getPromptAction().showToast({
+      // 隔空传送
+      harmonyShare.on('gesturesShare', (sharableTarget: harmonyShare.SharableTarget) => {
+        // 发起分享
+        sharableTarget.share(shareData)
+      })
+
+      Xb_ToastUtil.showToast({
         message: '碰一碰，分享当前配置！📄',
         duration: 3000
       })
     } else {
-      this.getUIContext().getPromptAction().showToast({
+      Xb_ToastUtil.showToast({
         message: '当前设备暂不支持系统分享功能！'
       })
     }
