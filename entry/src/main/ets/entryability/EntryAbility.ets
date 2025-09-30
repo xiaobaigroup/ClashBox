@@ -323,6 +323,13 @@ export default class EntryAbility extends UIAbility {
     this.callee.off('updateFormId')
     this.callee.off('cardChangeProxy')
     this.callee.off('refreshState')
+    try {
+      this.callee.off('updateFormId')
+      this.callee.off('cardChangeProxy')
+      this.callee.off('refreshState')
+    } catch (e) {
+      hilog.error(0x0000, 'EntryAbility', 'Failed to unregister card event. Cause: %{public}s', JSON.stringify(e) ?? '');
+    }
   }
 
   /** @description 初始化Clash核心 */
