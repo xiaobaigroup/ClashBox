@@ -119,7 +119,7 @@ struct Home {
   // 代理启动持续的时间
   @StorageProp('proxyStartingDuration') proxyStartingDuration: string = ''
   // 主界面当前index
-  @Consume IndexCurrentindex: number
+  @Consume tabCurrentPage: number
   @Consume curOffsetRemain: number
   // 恢复时刻
   @Consume theRestoreTime: number
@@ -344,7 +344,7 @@ struct Home {
     if (this.uiConfig.isShowHomeCard)
       this.theCurrentHomeCard = JSON.parse(this.uiConfig.isShowHomeCard)
     hilog.info(0xFF00, "HometestTag", "布局初始化为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
-    if (this.IndexCurrentindex == 0) {
+    if (this.tabCurrentPage == 0) {
       this.isHomePage = true
     }
     EventHub.on(EventKey.SwitchModeCard, async (mode: ProxyMode) => {

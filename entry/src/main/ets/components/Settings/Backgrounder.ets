@@ -1,4 +1,4 @@
-import { BreakpointState } from "../../common/breakpoint/breakpointsystem"
+
 import TopBuilder from "./TopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { theRowCustomDialog, toggleRowList } from "../Common/Common"
@@ -7,20 +7,20 @@ import { BusinessError } from "@kit.BasicServicesKit"
 import { notificationManager } from "@kit.NotificationKit"
 import { common } from "@kit.AbilityKit"
 import { PageMargin } from "../../common/breakpoint/BreakPoint"
-import { PromptAction } from "@kit.ArkUI"
+import { deviceInfo } from '@kit.BasicServicesKit';
 
 @Component
 struct Backgrounder {
   // UI控制变量
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 模拟下载控制变量
-  @State isDown: boolean = false
+  @State @Watch('onBackgroundValueChange') isDown: boolean = false
   // 模拟画中画控制变量
-  @State isPiP: boolean = false
+  @State @Watch('onBackgroundValueChange') isPiP: boolean = false
   // 模拟定位控制变量
-  @State isLocate: boolean = false
-  // 实验功能展示变量
-  @Consume isShowExperimentalFunction: boolean
+  @State @Watch('onBackgroundValueChange') isLocate: boolean = false
+  // 后台保持控制变量
+  @State @Watch('onBackgroundValueChange') isKeepTask: boolean = false
   // 模拟定位关闭提示弹窗标题
   @State theColsedDialogTitle: ResourceStr = $r('app.string.simulate_locate_closed_tips')
   // 模拟定位关闭提示弹窗内容文本
@@ -41,18 +41,43 @@ struct Backgrounder {
   build() {
     NavDestination() {
       TopBuilder({title: $r('app.string.Backgrounder')})
-      Column({space: 10}) {
+      List({space: 10}) {
+        // 任务保持
+        if (deviceInfo.deviceType === 'tablet' || deviceInfo.deviceType === '2in1') {
+          ListItem() {
+            Row() {
+              toggleRowList({
+                icons: $r('sys.symbol.lock_filled_arrow_counterclockwise'),
+                title: $r('app.string.keep_task'),
+              }) {
+                Toggle({ type: ToggleType.Switch, isOn: $$this.isKeepTask })
+                  .selectedColor(this.icon_emphasize)
+                  .margin({right: 12})
+                  .hitTestBehavior(HitTestMode.None)
+              }
+            }
+          }
+          .onClick(() => {
+            // 开启任务保持并关闭模拟定位
+            this.isKeepTask = !this.isKeepTask
+            if (this.isKeepTask) {
+              this.isLocate = false
+            }
+          })
+        }
         // 模拟定位
-        Row() {
-          toggleRowList({
-            icons: $r('sys.symbol.compass_circle'),
-            title: $r('app.string.simulate_locate'),
-            subtitle: $r('app.string.simulate_locate_subtitle')
-          }) {
-            Toggle({ type: ToggleType.Switch, isOn: $$this.isLocate })
-              .selectedColor(this.icon_emphasize)
-              .margin({right: 12})
-              .hitTestBehavior(HitTestMode.None)
+        ListItem() {
+          Row() {
+            toggleRowList({
+              icons: $r('sys.symbol.compass_circle'),
+              title: $r('app.string.simulate_locate'),
+              subtitle: $r('app.string.simulate_locate_subtitle')
+            }) {
+              Toggle({ type: ToggleType.Switch, isOn: $$this.isLocate })
+                .selectedColor(this.icon_emphasize)
+                .margin({right: 12})
+                .hitTestBehavior(HitTestMode.None)
+            }
           }
         }.onClick(() => {
           if(this.isLocate) {
@@ -63,20 +88,23 @@ struct Backgrounder {
           } else {
             // 关闭模拟下载并开启模拟定位
             this.isDown = false
+            this.isKeepTask = false
             this.noticePermission('locate')
           }
         })
         // 模拟画中画
-        Row() {
-          toggleRowList({
-            icons: $r('sys.symbol.media_center'),
-            title: $r('app.string.simulate_pip'),
-            subtitle: $r('app.string.simulate_pip_subtitle'),
-          }) {
-            Toggle({ type: ToggleType.Switch, isOn: $$this.isPiP })
-              .selectedColor(this.icon_emphasize)
-              .hitTestBehavior(HitTestMode.None)
-              .margin({right: 12})
+        ListItem() {
+          Row() {
+            toggleRowList({
+              icons: $r('sys.symbol.media_center'),
+              title: $r('app.string.simulate_pip'),
+              subtitle: $r('app.string.simulate_pip_subtitle'),
+            }) {
+              Toggle({ type: ToggleType.Switch, isOn: $$this.isPiP })
+                .selectedColor(this.icon_emphasize)
+                .hitTestBehavior(HitTestMode.None)
+                .margin({right: 12})
+            }
           }
         }.onClick(() => {
           if (this.isPiP) {
@@ -87,16 +115,18 @@ struct Backgrounder {
           }
         })
         // 模拟下载
-        Row() {
-          toggleRowList({
-            icons: $r('sys.symbol.circle_and_arrow_down'),
-            title: $r('app.string.simulate_down'),
-            subtitle: $r('app.string.simulate_down_subtitle'),
-          }) {
-            Toggle({ type: ToggleType.Switch, isOn: $$this.isDown })
-              .selectedColor(this.icon_emphasize)
-              .hitTestBehavior(HitTestMode.None)
-              .margin({right: 12})
+        ListItem() {
+          Row() {
+            toggleRowList({
+              icons: $r('sys.symbol.circle_and_arrow_down'),
+              title: $r('app.string.simulate_down'),
+              subtitle: $r('app.string.simulate_down_subtitle'),
+            }) {
+              Toggle({ type: ToggleType.Switch, isOn: $$this.isDown })
+                .selectedColor(this.icon_emphasize)
+                .hitTestBehavior(HitTestMode.None)
+                .margin({right: 12})
+            }
           }
         }.onClick(() => {
           if(this.isDown) {
@@ -108,12 +138,20 @@ struct Backgrounder {
           }
         })
         // 提示
-        Text($r('app.string.backgrounder_tips_2'))
+        ListItem() {
+          Text() {
+            Span($r('app.string.backgrounder_tips'))
+            if (deviceInfo.deviceType === 'tablet' || deviceInfo.deviceType === '2in1') {
+              Span($r('app.string.backgrounder_tips_2'))
+            }
+          }
           .fontWeight(FontWeight.Normal)
           .fontSize(15)
+        }
       }
       .width('100%')
-      .alignItems(HorizontalAlign.Start)
+      .contentEndOffset(72)
+      .alignListItem(ListItemAlign.Center)
       .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
     }
     .hideTitleBar(true)
@@ -218,21 +256,27 @@ struct Backgrounder {
   aboutToAppear(): void {
     // 初始化开关状态
     this.isLocate = this.uiConfig.backgroundLocateModel
+    this.isKeepTask = this.uiConfig.backgroundKeepTask
     this.isDown = this.uiConfig.backgroundDownModel
     this.isPiP = this.uiConfig.backgroundPiPModel
   }
 
   aboutToDisappear(): void {
+    this.onBackgroundValueChange()
+  }
+
+  onBackgroundValueChange() {
+    // 持久化开关状态
+    this.uiConfig.backgroundLocateModel = this.isLocate
+    this.uiConfig.backgroundKeepTask = this.isKeepTask
+    this.uiConfig.backgroundDownModel = this.isDown
+    this.uiConfig.backgroundPiPModel = this.isPiP
     // 改变后台运行全局变量的状态
-    if(this.uiConfig.backgroundLocateModel || this.isDown || this.isPiP || this.isLocate) {
+    if(this.isKeepTask || this.isDown || this.isPiP || this.isLocate) {
       this.uiConfig.Enablebackgrounder = true
     } else {
       this.uiConfig.Enablebackgrounder = false
     }
-    // 持久化开关状态
-    this.uiConfig.backgroundLocateModel = this.isLocate
-    this.uiConfig.backgroundDownModel = this.isDown
-    this.uiConfig.backgroundPiPModel = this.isPiP
   }
 
   async noticePermission(id: 'down' | 'locate') {
@@ -304,9 +348,10 @@ struct Backgrounder {
       abilityName: 'com.huawei.hmos.settings.MainAbility', // 系统设置的Ability的名字（固定）
       uri: "application_info_entry", // 系统设置的界面 （固定）
       parameters: {
-        pushParams: 'org.xbgroup.clashbox' // 包名
-        //pushParams: "org.xbgroup.clashboxb",
+        pushParams: this.context.applicationInfo.name // 包名
       }
+    }).catch((err: BusinessError) => {
+      console.error(`跳转至设置失败, code：${err.code} message: ${err.message}`)
     })
   }
 

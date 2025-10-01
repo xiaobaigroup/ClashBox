@@ -195,21 +195,12 @@ struct Settings {
       this.resetDialogController.open()
     } else {
       // 列表项路由跳转
-      let itemSettingsData = this.settingsList[index]
+      const itemSettingsData = this.settingsList[index]
       this.SettingsPageInfos.pushPathByName(itemSettingsData.name, false)
       hilog.isLoggable(0xFF00, "SettingstestTag", hilog.LogLevel.INFO);
       hilog.info(0xFF00, "SettingstestTag", itemSettingsData.name)
     }
   }
-
-/*  handleMenuCheck(index: number) {
-    // 语言菜单项点击
-    let menuItemData = this.LanguageList[index]
-    menuItemData.isCheck = !menuItemData.isCheck
-    this.LanguageList.splice(index, 1, menuItemData)
-    hilog.isLoggable(0xFF00, "menutestTag", hilog.LogLevel.INFO);
-    hilog.info(0xFF00, "menutestTag", "%{public}s", menuItemData.isCheck)
-  }*/
 
   onLanguageChanged() {
     hilog.info(0xFF00, "SettingsTestTag", "设置页页面栈：%{public}d", this.SettingsPageInfos.size())

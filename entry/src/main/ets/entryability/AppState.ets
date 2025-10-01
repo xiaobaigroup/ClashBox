@@ -117,6 +117,8 @@ export class UIConfig {
   Enablebackgrounder: boolean = false
   // 模拟定位启用变量
   backgroundLocateModel: boolean = true
+  // 后台保持变量
+  backgroundKeepTask: boolean = false
   // 模拟下载启用变量
   backgroundDownModel: boolean = false
   // 模拟画中画启用变量

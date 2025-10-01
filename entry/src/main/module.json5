@@ -28,12 +28,16 @@
           "fullscreen"
         ],
         "minWindowWidth": 332,
+        "maxWindowHeight": 4800,
         "exported": true,
         "backgroundModes": [
           // 长时任务类型的配置项
           // 数据传输
           "dataTransfer",
+          // 定位
           "location",
+          // 任务保持
+          "taskKeeping"
         ],
         "skills": [
           {

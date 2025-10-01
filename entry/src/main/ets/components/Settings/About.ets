@@ -31,8 +31,7 @@ import { Xb_Copy } from "xb_components/src/main/ets/utils/ClipBoardUtil"
 
 @Component
 struct About {
-  // 实验功能提示框展示变量
-  @Consume isShowExperimentalFunction: boolean
+
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State EnableUpdateChenChannels: number = 0
@@ -120,11 +119,11 @@ struct About {
         this.uiConfig.isShowExperimentalFunction = isOn
         hilog.info(0xFF00, "AboutestTag", "实验功能")
         if(isOn) {
-          this.isShowExperimentalFunction = true
+          this.uiConfig.isShowExperimentalFunction = true
           // 显示分流策略
           this.moreList = ListMoreData()
         } else {
-          this.isShowExperimentalFunction = false
+          this.uiConfig.isShowExperimentalFunction = false
           // 屏蔽分流策略
           // this.moreList = removeItemsByIndex(this.moreList, [5])
         }
@@ -248,7 +247,6 @@ struct About {
   }
 
   aboutToDisappear(): void {
-    this.isShowExperimentalFunction = this.uiConfig.isShowExperimentalFunction
     customSound.destroySoundPool()
   }
 

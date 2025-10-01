@@ -15,7 +15,7 @@ struct Backup {
 
   @State rawFiles: string[] = []
   // 实验功能提示框展示变量
-  @Consume isShowExperimentalFunction: boolean
+
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 选中的文件
@@ -336,7 +336,7 @@ struct CloudFiles {
 export struct CloudBackup {
 
   // 实验功能提示框展示变量
-  @Consume isShowExperimentalFunction: boolean
+
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
@@ -373,7 +373,7 @@ export struct CloudBackup {
                 Text($r('app.string.cloud_backup'))
                   .fontWeight(FontWeight.Medium)
                   .fontSize(16)
-                if(this.isShowExperimentalFunction) {
+                if(this.uiConfig.isShowExperimentalFunction) {
                   // 实验功能提示框
                   Column() {
                     Text($r('app.string.experimental_function'))

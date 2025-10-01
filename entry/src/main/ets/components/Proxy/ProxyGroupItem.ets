@@ -33,7 +33,7 @@ struct ProxyGroupItem {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State currentTouchIndex: number = 0
   // 主界面index
-  @Consume IndexCurrentindex: number
+  @Consume tabCurrentPage: number
 
 
   /* 本页布局相关参数 */
@@ -149,7 +149,7 @@ struct ProxyGroupItem {
             this.currentTouchIndex = index
             this.isShowMenu = true
           }))
-        .bindPopup((this.uiConfig.ShowProxyPop && this.proxyGroup === 0 && index === 0 && this.IndexCurrentindex === 1), {
+        .bindPopup((this.uiConfig.ShowProxyPop && this.proxyGroup === 0 && index === 0 && this.tabCurrentPage === 1), {
           builder: PopupBuilder(this, PopTips[2], () => {
             this.uiConfig.ShowProxyPop = false
             this.isShowDelayPop = true

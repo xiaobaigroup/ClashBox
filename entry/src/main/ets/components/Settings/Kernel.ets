@@ -33,7 +33,7 @@ struct Kernel {
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   // 实验功能展示变量
-  @Consume isShowExperimentalFunction: boolean
+
   // 更多页列表数组
   @Consume moreList: moreData[]
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
@@ -85,7 +85,7 @@ struct Kernel {
   }
 
   aboutToAppear(): void {
-    if(!this.isShowExperimentalFunction) {
+    if(!this.uiConfig.isShowExperimentalFunction) {
       // 话说好像我只用删除一个用splice好像也行
       //this.kernel = removeItemsByIndex(this.kernel, [1])
     }
@@ -142,7 +142,7 @@ struct Kernel {
             .onClick(() => {
               this.handleClick(index)
             })
-            if ((this.isShowExperimentalFunction && (index === 0 || index === 1) || (index === 0 && this.isShowExperimentalFunction === false) )) {
+            if ((this.uiConfig.isShowExperimentalFunction && (index === 0 || index === 1) || (index === 0 && this.uiConfig.isShowExperimentalFunction === false) )) {
               if(!isEnd(this.kernel!.length,index))
                 Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
             }
@@ -153,7 +153,7 @@ struct Kernel {
         .borderRadius(BORDER_RADIUS_20)
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
 
-        // if(!this.isShowExperimentalFunction) {
+        // if(!this.uiConfig.isShowExperimentalFunction) {
         //   // 启用提示
         //   Text($r('app.string.open_core_prompt'))
         //     .fontWeight(FontWeight.Normal)

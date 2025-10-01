@@ -32,7 +32,6 @@ import { ListGutter, ListLanes, TabContentTitleMargin } from '../common/breakpoi
 import { RoundButton } from '../components/Common/RoundButton'
 import { harmonyShare, systemShare } from '@kit.ShareKit'
 import { uniformTypeDescriptor as utd } from '@kit.ArkData'
-import { resourceManager } from '@kit.LocalizationKit';
 import { common, Context } from '@kit.AbilityKit'
 import { BusinessError } from '@kit.BasicServicesKit';
 import { fileUri, fileIo as fs } from '@kit.CoreFileKit'
@@ -101,7 +100,7 @@ struct ConfigurationPage {
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @Consume paddingButtom: number | Resource
   // 主界面当前index
-  @Consume @Watch('onForwardChange') IndexCurrentindex: number
+  @Consume @Watch('onForwardChange') tabCurrentPage: number
   @Consume curOffsetRemain: number
   // px外屏隐藏top和tab偏移
   @Consume heightTop: number
@@ -253,7 +252,7 @@ struct ConfigurationPage {
                 this.curOffsetRemain += offset
                 if (offset > 0) {
                   this.isRolling = true
-                } else if(offset < 0){
+                } else if(offset < 0) {
                   this.isRolling = false
                   this.curOffsetRemain = 0
                 }
@@ -541,9 +540,9 @@ struct ConfigurationPage {
   }
 
   async onIndexChange() {
-    if (this.configList.length !== 0 && this.IndexCurrentindex === 2) {
+    if (this.configList.length !== 0 && this.tabCurrentPage === 2) {
       await ClashViewModel.updateProfileConfig(null)
-      this.promptAction.showToast({message: '更新所有配置成功'})
+      Xb_ToastUtil.showToast({ message: '更新所有配置成功' })
     }
   }
 
@@ -683,7 +682,7 @@ struct ConfigurationPage {
 
   // TODO 待最低版本兼容为6.0后需绑定窗口ID
   async onForwardChange() {
-    if (this.isForward && this.IndexCurrentindex === 2) {
+    if (this.isForward && this.tabCurrentPage === 2) {
       // 前台时注册碰一碰分享事件
       Xb_Share.immersiveListening('all')
       const capabilityRegistry: harmonyShare.SendCapabilityRegistry = {
@@ -725,7 +724,7 @@ struct ConfigurationPage {
       utd: utd.UniformDataType.HYPERLINK,
       content: `https://xbstudio.top/clashbox?configUrl=${currentConfigData.configUrl}&configName=${currentConfigData.configName}`,
       thumbnailUri: fileUri.getUriFromPath(filePath),
-      title: ctx.resourceManager.getStringSync($r('app.string.ConfigurationShared').id),
+      title: $r('app.string.configuration_shared'),
       description: currentConfigData.configName,
       label: '',
       uri: ''

@@ -25,7 +25,7 @@
       "value": "配置"
     },
     {
-      "name": "ConfigurationShared",
+      "name": "configuration_shared",
       "value": "配置分享"
     },
     {
@@ -973,6 +973,10 @@
       "value": "模拟定位"
     },
     {
+      "name": "keep_task",
+      "value": "任务保持"
+    },
+    {
       "name": "simulate_locate_subtitle",
       "value": "通过模拟定位以保留程序后台"
     },
@@ -993,12 +997,12 @@
       "value": "通过模拟下载以保留程序后台"
     },
     {
-      "name": "backgrounder_tips",
-      "value": "提示：开启后会导致应用耗电量增加"
+      "name": "backgrounder_tips_2",
+      "value": " ⑤平板及电脑建议使用任务保持"
     },
     {
-      "name": "backgrounder_tips_2",
-      "value": "提示：\n ①开启后会导致应用耗电量增加，并且开关模拟定位后请重启软件；\n ②目前已知从自由多窗模式无法主动发起画中画窗口且画中画开启后系统会锁90帧；\n ③模拟下载通知不能删除，否则模拟下载会失效；\n ④模拟下载通知可能会被系统杀死通知而导致模拟下载功能失效，非必要建议使用模拟定位或者画中画功能。"
+      "name": "backgrounder_tips",
+      "value": "提示：\n ①开启后会导致应用耗电量增加，并且开关模拟定位后请重启软件；\n ②目前已知从自由多窗模式无法主动发起画中画窗口且画中画开启后系统会锁90帧；\n ③模拟下载通知不能删除，否则模拟下载会失效；\n ④模拟下载通知可能会被系统杀死通知而导致模拟下载功能失效，非必要建议使用模拟定位或者画中画功能；\n"
     },
     {
       "name": "notice_main_switch",

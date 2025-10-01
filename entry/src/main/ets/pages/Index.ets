@@ -59,7 +59,9 @@ import {
 import { WindowTopBar } from '../components/Common/TopBar'
 import { ImportConfigFromURL } from '../components/Configuration/ImportConfigFromURL'
 import { Xb_ChangeThemeColor } from 'xb_components/src/main/ets/utils/ChangeThemeColorUtil'
-import { Xb_ColorModeManager, Xb_Global, Xb_NotificationUtils,
+import {
+  Xb_BackgroundRunning,
+  Xb_ColorModeManager, Xb_Global, Xb_NotificationUtils,
   Xb_ResourceColorUtil,
   Xb_StatusBarUtils, Xb_UIConfig } from 'xb_components'
 import { Xb_GoToWeb } from 'xb_components/src/main/ets/utils/JumpTo'
@@ -165,7 +167,7 @@ struct Index {
   // 顶部Bar高度
   @Provide heightTop: Length = TAB_CONTENT_TITLE_HEIGHT
   // 主界面当前index
-  @Provide IndexCurrentindex: number = 0
+  @Provide tabCurrentPage: number = 0
   // PX外屏-偏移
   @Provide curOffsetRemain: number = 0
   // 恢复时刻
@@ -279,16 +281,13 @@ struct Index {
   @Provide @Watch('isHiddenChange') isRolling: boolean = false
   // 设置 -> 通知 -> 流量提醒启用状态变量
   @Provide EnableCellularDataReminder: boolean = false
-  // 设置页实验功能提示框显示变量
-  @Provide isShowExperimentalFunction: boolean = true
   // 判断设置是否清楚数据
   @Provide isClearData: boolean = false
+  @StorageProp('VpnServiceStartTime') VpnServiceStartTime: number = 0
   // 设置 -> 外观 -> 按钮位置变量
   @Provide ButtonPositionOffset: number = 0
-  // 代理计时器Controller
-  // @Provide proxyStartedTimer: Timer = new Timer()
   @Provide proxyTime: number = 0
-  @StorageProp('VpnServiceStartTime') VpnServiceStartTime: number = 0
+
 
   build() {
     if (!this.isPXSecScreen) {
@@ -301,7 +300,7 @@ struct Index {
         // 主界面
         Tabs({
           barPosition: TabBarPosition(this.widthBp, this.heightBp),
-          index: this.IndexCurrentindex,
+          index: this.tabCurrentPage,
           controller: indexController
         }) {
           ForEach(this.tabList, (item: TabBuild, index: number) => {
@@ -319,7 +318,7 @@ struct Index {
                 })// 通过父组件的TabsController的实例，改变其index，达到跳转一级Tabs（首页）的效果
                 .onActionEnd(() => {
                   if (this.isLandscapePhone || this.istabletLandscape) {
-                    if (this.IndexCurrentindex == 0) {
+                    if (this.tabCurrentPage == 0) {
                       indexController.changeIndex(1)
                       console.info('Pan end')
                     }
@@ -346,7 +345,7 @@ struct Index {
             duration: this.uiConfig.animationSpeed,
             curve: Curve.Linear,
           }, () => {
-            this.IndexCurrentindex = index
+            this.tabCurrentPage = index
           })
         })
         .onChange((index) => {
@@ -361,7 +360,7 @@ struct Index {
             if (index == targetIndex) {
               return
             }
-            this.IndexCurrentindex = targetIndex;
+            this.tabCurrentPage = targetIndex;
           })
         })
         .width('100%')
@@ -404,19 +403,6 @@ struct Index {
           this.isEnableIndexForegroundBlur = false
           DismissSheetAction.dismiss()
           hilog.info(0xFF00, "WelcomeTestTag", "欢迎页启用状态： %{private}s", this.isShowWelcome)
-
-          // TODO 测试完成后删除
-          // if (!this.isShowWelcome || DismissSheetAction.reason === DismissReason.CLOSE_BUTTON ||
-          //   this.appLinkConfigUrl != '' || (this.uiConfig.oldVersionName !== AppState.versionName && !this.uiConfig.isFirstStart) || this.showUpdateLog) {
-          //   this.showUpdateLog = false
-          //   this.isShowWelcome = false
-          //   this.uiConfig.oldVersionName = AppState.versionName
-          //   console.error(`Update 历史应用版本更新为：${this.uiConfig.oldVersionName} showUpdateLog: ${this.showUpdateLog}`)
-          //   // 关闭背景模糊
-          //   this.isEnableIndexForegroundBlur = false
-          //   DismissSheetAction.dismiss()
-          //   hilog.info(0xFF00, "WelcomeTestTag", "欢迎页启用状态： %{private}s", this.isShowWelcome)
-          // }
         }),
         onWillAppear: () => {
           // 启用背景模糊
@@ -441,15 +427,15 @@ struct Index {
       space: { main: LengthMetrics.vp(3) }
     }) {
       SymbolGlyph(TabIcon)
-        .fontColor([this.IndexCurrentindex === index ? this.icon_emphasize : icon_tertiary])
+        .fontColor([this.tabCurrentPage === index ? this.icon_emphasize : icon_tertiary])
         .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY) // 分层颜色
         .fontSize(TabIconFontSize(this.widthBp, this.heightBp))
         //.effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
         .transition(customAnimationUtil.isTranslate(this.uiConfig))
-        .translate({ y: this.IndexCurrentindex == index ? -3 : 0 })
+        .translate({ y: this.tabCurrentPage == index ? -3 : 0 })
 
       Text(title)
-        .fontColor(this.IndexCurrentindex === index ? this.icon_emphasize : icon_tertiary)
+        .fontColor(this.tabCurrentPage === index ? this.icon_emphasize : icon_tertiary)
         .fontWeight(FontWeight.Medium)
         .fontSize(TabTitleFontSize(this.widthBp, this.heightBp))
         .transition(customAnimationUtil.isTranslate(this.uiConfig))
@@ -654,14 +640,20 @@ struct Index {
     if (this.windowMode) {
       Xb_StatusBarUtils.initStatusBar(this.context, $rawfile('clash_status.svg'), undefined)
     }
-    let appFlowingState = AppStorage.get<AppFlowingState>("appFlowingState") ?? new AppFlowingState()
+    // 检查后台运行全局变量的状态
+    if(this.uiConfig.backgroundLocateModel || this.uiConfig.backgroundDownModel || this.uiConfig.backgroundPiPModel || this.uiConfig.backgroundKeepTask) {
+      this.uiConfig.Enablebackgrounder = true
+    } else {
+      this.uiConfig.Enablebackgrounder = false
+    }
+    const appFlowingState = AppStorage.get<AppFlowingState>("appFlowingState") ?? new AppFlowingState()
     // 启动Clash后
     EventHub.on(EventKey.StartedClash, () => {
       const job = async () => {
-        let onlyProxy = AppStorage.get<ClashConfig>("clashConfig")?.['only-proxy'] as boolean ?? true
+        const onlyProxy = AppStorage.get<ClashConfig>("clashConfig")?.['only-proxy'] as boolean ?? true
         hilog.info(0xFF00, "EntryAbilityTestTag", 'onlyProxy: %{public}s', onlyProxy)
-        let now = await ClashViewModel.getTraffic(onlyProxy)
-        let total = await ClashViewModel.getTotalTraffic(onlyProxy)
+        const now = await ClashViewModel.getTraffic(onlyProxy)
+        const total = await ClashViewModel.getTotalTraffic(onlyProxy)
         appFlowingState.traffics.enqueue(now)
         appFlowingState.totalTraffic = total
       }
@@ -712,8 +704,12 @@ struct Index {
         BackgroundDownService.start(this.getUIContext().getHostContext()!)
       }
       // 发布模拟定位通知
-      if (this.uiConfig.backgroundLocateModel && this.uiConfig.Enablednotice) {
+      if (this.uiConfig.backgroundLocateModel && !this.uiConfig.backgroundKeepTask && this.uiConfig.Enablednotice) {
         BackgroundLocateService.start(this.getUIContext().getHostContext()!)
+      }
+      // 发布任务保持通知
+      if (!this.uiConfig.backgroundLocateModel && this.uiConfig.backgroundKeepTask && this.uiConfig.Enablednotice) {
+        Xb_BackgroundRunning.start(this.getUIContext().getHostContext()!)
       }
       // 发布实况窗
       LiveViewUtil.startLiveView().then((result) => {
@@ -734,6 +730,11 @@ struct Index {
       if (this.uiConfig.backgroundLocateModel) {
         console.log(`BackgroundLocateService 即将执行模拟定位停止`)
         BackgroundLocateService.stop(this.context)
+      }
+      // 停止任务保持
+      if (this.uiConfig.backgroundKeepTask) {
+        console.log(`BackgroundLocateService 即将执行任务保持停止`)
+        Xb_BackgroundRunning.stop(this.context)
       }
       clearInterval(this.trafficJob)
       // 取消通知
@@ -803,12 +804,6 @@ struct Index {
     if (!this.uiConfig.isRequestNotification) {
       EventHub.sendEvent(EventKey.EnabledNotice, true)
     }
-    // 检查后台运行全局变量的状态
-    if(this.uiConfig.backgroundLocateModel || this.uiConfig.backgroundDownModel || this.uiConfig.backgroundPiPModel) {
-      this.uiConfig.Enablebackgrounder = true
-    } else {
-      this.uiConfig.Enablebackgrounder = false
-    }
 
     // 分享包名
     const localStorage = this.getUIContext().getSharedLocalStorage()
@@ -824,7 +819,7 @@ struct Index {
     // 运行一次窗口检查
     this.onWindowChange()
     // 除手机外更多页均默认跳转覆写
-    if (500 < this.windowWidth && !this.isLandscapePhone) {
+    if (this.widthBp > 1) {
       this.pageInfos.pushPathByName(this.moreList[4].name, false)
     }
     // 启动时检查上一次是否崩溃
@@ -843,8 +838,6 @@ struct Index {
     Xb_ColorModeManager.setColorModeByString(this.context, this.uiConfig.darkMode)
     // 初始化切换按钮位置
     this.switchButtonPosition(this.uiConfig.buttonPositionIndex)
-    // 初始化实验功能显示状态
-    this.isShowExperimentalFunction = this.uiConfig.isShowExperimentalFunction
 
     // 检查版本更新
     /* if (this.uiConfig.autoCheckUpdate) {
@@ -933,7 +926,7 @@ struct Index {
             `clash_next${LogData ? '_' + LogData.logTime + '_' + Date.now() : ''}.txt`).path
           await this.saveLog(path, LogData)
         }).catch((e: Error) => {
-          hilog.debug(0xFF00, 'ExportLog', 'err ', e)
+          hilog.debug(0xFF00, 'ExportLog', 'err： ', e)
         })
       } catch (e) {
         hilog.info(0xFF00, "ExportLog", "err %{public}s", e)
@@ -1287,7 +1280,7 @@ struct Index {
 
   /** @description 跳转到访问控制添加包名 */
   jumpAccessControl(bundleInfo: BundleInfo) {
-    this.IndexCurrentindex = 3
+    this.tabCurrentPage = 3
     const path = this.pageInfos.getAllPathName()
     if (path[0] !== 'AccessControl' || path.length === 0) {
       setTimeout(() => {
