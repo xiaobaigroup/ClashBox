@@ -42,7 +42,6 @@ struct Appearance {
 
   // 按钮位置偏移量（默认在右侧的偏移量）
   @Consume ButtonPositionOffset: number
-  // 实验功能提示框展示变量
 
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor

@@ -957,7 +957,7 @@ struct Index {
     if (this.uiConfig.oldVersionName !== AppState.versionName) {
       this.isEnableIndexForegroundBlur = true
       this.isShowWelcome = true
-      // this.updateData()   // TODO 强制更新数据函数
+      this.updateData()   // TODO 强制更新数据函数
     }
 
   }
@@ -985,18 +985,9 @@ struct Index {
     // this.deviceHeightListener.off('change');
   }
 
-  // 更新后直接赋值一次
+  // 更新后强化赋值一次
   updateData() {
-    // 总通知
-    this.uiConfig.Enablednotice = true
-    // 后台运行
-    this.uiConfig.Enablebackgrounder = true
-    // 定位为默认
-    this.uiConfig.backgroundLocateModel = true
-    this.uiConfig.backgroundDownModel = false
-    this.uiConfig.backgroundPiPModel = false
-    // 前台模式
-    this.appConfig.clashCore = ClashCore.ClashMeta
+
   }
 
   // 等待配置数据库初始化完成

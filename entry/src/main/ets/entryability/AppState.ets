@@ -52,7 +52,7 @@ export class AppConfig {
   enableLogger: boolean = false
   enableRequest: boolean = false
   enableConnect: boolean = false
-  accessControl: boolean = true
+  accessControl: boolean = false
   testUrl: string = "https://www.gstatic.com/generate204"
   clashCore: ClashCore = ClashCore.ClashMeta
   switchMode: ProxyMode = ProxyMode.Rule

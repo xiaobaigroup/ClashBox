@@ -14,8 +14,6 @@ import { util } from '@kit.ArkTS'
 struct Backup {
 
   @State rawFiles: string[] = []
-  // 实验功能提示框展示变量
-
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 选中的文件
@@ -334,8 +332,6 @@ struct CloudFiles {
 
 @Component
 export struct CloudBackup {
-
-  // 实验功能提示框展示变量
 
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
