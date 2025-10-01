@@ -47,13 +47,6 @@ You can install ClashBox using [Auto-installer](https://github.com/likuai2010/au
 
 ---
 
-#### Future Plans
-
-- [ ] Add Live Window support  
-- [ ] Sync card theme color  
-
----
-
 #### Sponsorship & Contact
 
 We are now on Afdian! If you’d like to support our project, you can sponsor us here:  
