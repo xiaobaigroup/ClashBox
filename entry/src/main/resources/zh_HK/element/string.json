@@ -2227,6 +2227,10 @@
     {
       "name": "cloud_files_title",
       "value": "選擇想要恢復嘅備份文件"
+    },
+    {
+      "name": "ConfigurationShared",
+      "value": "設置分享"
     }
   ]
 }

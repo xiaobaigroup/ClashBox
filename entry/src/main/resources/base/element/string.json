@@ -25,6 +25,10 @@
       "value": "配置"
     },
     {
+      "name": "ConfigurationShared",
+      "value": "配置分享"
+    },
+    {
       "name": "More",
       "value": "更多"
     },

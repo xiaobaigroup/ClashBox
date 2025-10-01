@@ -2227,6 +2227,10 @@
     {
       "name": "cloud_files_title",
       "value": "Select the backup file you want to restore"
+    },
+    {
+      "name": "ConfigurationShared",
+      "value": "Configuration Sharing"
     }
   ]
 }

@@ -2228,6 +2228,10 @@
       "name": "cloud_files_title",
       "value": "選取要還原的備份檔案"
 
+    },
+    {
+      "name": "ConfigurationShared",
+      "value": "設置分享"
     }
   ]
 }
