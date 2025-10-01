@@ -36,7 +36,7 @@ import { resourceManager } from '@kit.LocalizationKit';
 import { common, Context } from '@kit.AbilityKit'
 import { BusinessError } from '@kit.BasicServicesKit';
 import { fileUri, fileIo as fs } from '@kit.CoreFileKit'
-import { Xb_ToastUtil } from 'xb_components'
+import { ShareData, Xb_Share, Xb_ToastUtil } from 'xb_components'
 
 /**
  * 长按菜单参数
@@ -60,7 +60,7 @@ struct ConfigurationPage {
   // 路由栈
   @Consume('configAddPageInfos') configAddPageInfos: NavPathStack
   promptAction: PromptAction = this.getUIContext()?.getPromptAction()
-  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @StorageLink('appConfig') @Watch('onChangeConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
@@ -532,34 +532,12 @@ struct ConfigurationPage {
     hilog.info(0xC000, componentName, `#aboutToAppear executed`)
     // 初始化当前选中项数据
     this.currentRadioConfigData = this.configList.find((data: ConfigData) => data.configId === this.appConfig.currentProfileId) as ConfigData
+    // 初始化分享工具
+    Xb_Share.inputInfo(this.getUIContext())
   }
 
   async onDidBuild(): Promise<void> {
-    if (canIUse('SystemCapability.Collaboration.HarmonyShare')) {
-      const shareData = await this.getShareData()
-
-      // TODO 复用组件
-      // 碰一碰监听
-      harmonyShare.on('knockShare', (sharableTarget: harmonyShare.SharableTarget) => {
-        // 发起分享
-        sharableTarget.share(shareData)
-      })
-
-      // 隔空传送
-      harmonyShare.on('gesturesShare', (sharableTarget: harmonyShare.SharableTarget) => {
-        // 发起分享
-        sharableTarget.share(shareData)
-      })
-
-      Xb_ToastUtil.showToast({
-        message: '碰一碰，分享当前配置！📄',
-        duration: 3000
-      })
-    } else {
-      Xb_ToastUtil.showToast({
-        message: '当前设备暂不支持系统分享功能！'
-      })
-    }
+    await this.openShare()
   }
 
   async onIndexChange() {
@@ -628,7 +606,7 @@ struct ConfigurationPage {
     this.configCustomDialogController = null
     this.isEnableIndexForegroundBlur = false
     hilog.info(0xC000, componentName, `#aboutToDisappear#置空[配置页\`bindSheet\`内提示是否删除配置信息的自定义弹框]`)
-    harmonyShare.off('knockShare');
+    Xb_Share.immersiveDisablingListening('all')
   }
 
   /**收藏配置*/
@@ -687,19 +665,19 @@ struct ConfigurationPage {
   /**分享配置的URL*/
   private async shareConfigUrl(): Promise<void> {
     // 处理待分享数据 并调用系统分享接口 只有URL导入的配置才可以分享链接
-    // 进行分享面板分享
-    const shareData = await this.getShareData()
+    let shareData = await this.getShareData('touch')
+
     if (shareData) {
-      let controller: systemShare.ShareController = new systemShare.ShareController(shareData);
-      let context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
-      controller.show(context, {
-        previewMode: systemShare.SharePreviewMode.DEFAULT,
-        selectionMode: systemShare.SelectionMode.SINGLE
-      }).then(() => {
-        console.info('ShareController show success.');
-      }).catch((error: BusinessError) => {
-        console.error(`ShareController show error. code: ${error.code}, message: ${error.message}`);
-      });
+      const context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
+      Xb_Share.shareData = shareData
+      // 进行分享面板分享
+      try {
+        await Xb_Share.sharePlant(context)
+      } finally {
+        // TODO 现存问题，分享后的碰一碰，隔空投递的配置项会被覆盖。下面逻辑是临时解决办法
+        shareData = await this.getShareData('radio')
+        Xb_Share.shareData = shareData
+      }
     }
   }
 
@@ -707,7 +685,7 @@ struct ConfigurationPage {
   async onForwardChange() {
     if (this.isForward && this.IndexCurrentindex === 2) {
       // 前台时注册碰一碰分享事件
-      harmonyShare.off('knockShare');
+      Xb_Share.immersiveListening('all')
       const capabilityRegistry: harmonyShare.SendCapabilityRegistry = {
         windowId: this.mainWindowId
       }
@@ -716,15 +694,17 @@ struct ConfigurationPage {
       const capabilityRegistry: harmonyShare.SendCapabilityRegistry = {
         windowId: this.mainWindowId
       }
-      // 解除碰一碰分享'knockShare'监听事件
-      harmonyShare.off('knockShare');
+      // 解除隔空投递、碰一碰 分享监听事件
+      Xb_Share.immersiveDisablingListening('all')
       console.log(`onForwardChange 解除碰一碰事件`)
     }
   }
 
-  /** @description 获取分享的数据 */
-  private async getShareData(): Promise<systemShare.SharedData> {
-    const currentConfigData = this.isShowConfigAddBindSheet ? this.currentTouchConfigData : this.currentRadioConfigData
+  /** @description 获取分享的数据
+   *  @param type touch | radio -> touch 长按选中的配置项，radio 当前选中的配置项
+   * */
+  private async getShareData(type: 'touch' | 'radio' = 'radio'): Promise<ShareData> {
+    const currentConfigData = type === 'touch' ? this.currentTouchConfigData : this.currentRadioConfigData
 
     // 将背景图写入沙箱中并获取
     const ctx: Context = this.getUIContext().getHostContext() as Context;
@@ -741,17 +721,40 @@ struct ConfigurationPage {
     }
 
     // TODO 构造分享数据 AppLink 携带订阅 URL 完成 => 应用直达订阅分享
-    const shareData: systemShare.SharedData = new systemShare.SharedData({
+    const shareData: ShareData = {
       utd: utd.UniformDataType.HYPERLINK,
       content: `https://xbstudio.top/clashbox?configUrl=${currentConfigData.configUrl}&configName=${currentConfigData.configName}`,
       thumbnailUri: fileUri.getUriFromPath(filePath),
       title: ctx.resourceManager.getStringSync($r('app.string.ConfigurationShared').id),
-      description: currentConfigData.configName
-    });
+      description: currentConfigData.configName,
+      label: '',
+      uri: ''
+    };
 
     hilog.info(0xC014, componentName, `碰一碰 - 分享的 configUrl: ${JSON.stringify(currentConfigData)}`)
 
     return shareData
+  }
+  
+  /** @description 开启 隔空投递、碰一碰 分享监听 */
+  private async openShare() {
+    if (canIUse('SystemCapability.Collaboration.HarmonyShare')) {
+      const shareData = await this.getShareData('radio')
+      if (shareData) {
+        Xb_Share.shareData = shareData
+        // 隔空投递、碰一碰 分享监听
+        Xb_Share.immersiveListening('all')
+
+        Xb_ToastUtil.showToast({
+          message: '碰一碰，分享当前配置！📄',
+          duration: 3000
+        })
+      }
+    } else {
+      Xb_ToastUtil.showToast({
+        message: '当前设备暂不支持系统分享功能！'
+      })
+    }
   }
 
   /**
@@ -782,6 +785,17 @@ struct ConfigurationPage {
     EventHub.sendEvent(EventKey.FetchProfile)
   }
 
+  /** @description 监听选中的配置项变化 */
+  async onChangeConfig() {
+    // 选中项变更重新监听分享
+    try {
+      Xb_Share.immersiveDisablingListening('all')
+    } catch (e) {
+      hilog.error(0xC014, componentName, `选中项变更取消监听分享 - error: ${JSON.stringify(e)}`)
+    }
+
+    await this.openShare()
+  }
 }
 
 
