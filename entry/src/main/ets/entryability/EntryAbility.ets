@@ -265,7 +265,8 @@ export default class EntryAbility extends UIAbility {
       // 处理分享的配置链接
       AppStorage.setOrCreate('appLinkConfigUrl', configUrl);
       AppStorage.setOrCreate('appLinkConfigName', configName);
-      hilog.info(0x0000, 'EntryAbility', '接收的configUrl为：%{public}s', configUrl);
+      hilog.info(0x0000, 'EntryAbility', 'AppLink - 接收的configUrl为：%{public}s', configUrl);
+      hilog.info(0x0000, 'EntryAbility', 'AppLink - 接收的configName为：%{public}s', configName);
     }
   }
 

@@ -410,7 +410,7 @@ struct ConfigurationPage {
       ...(this.currentTouchConfigData.sourceType === ProfileType.Url ? [
         { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.share'))
         .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-        content: $r('app.string.share'), callback: () => { this.shareConfigUrl(this.currentTouchConfigData) }
+        content: $r('app.string.share'), callback: () => { this.shareConfigUrl() }
       } as LongPressContextMenuItem ] : [])
       // TODO 生成二维码、创建副本
     /* { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.qrcode'))
@@ -685,7 +685,7 @@ struct ConfigurationPage {
   }
 
   /**分享配置的URL*/
-  private async shareConfigUrl(configData: ConfigData): Promise<void> {
+  private async shareConfigUrl(): Promise<void> {
     // 处理待分享数据 并调用系统分享接口 只有URL导入的配置才可以分享链接
     // 进行分享面板分享
     const shareData = await this.getShareData()
@@ -743,7 +743,7 @@ struct ConfigurationPage {
     // TODO 构造分享数据 AppLink 携带订阅 URL 完成 => 应用直达订阅分享
     const shareData: systemShare.SharedData = new systemShare.SharedData({
       utd: utd.UniformDataType.HYPERLINK,
-      content: `https://xbstudio.top/clashbox?configUrl=${currentConfigData.configUrl}?configName=${currentConfigData.configName}`,
+      content: `https://xbstudio.top/clashbox?configUrl=${currentConfigData.configUrl}&configName=${currentConfigData.configName}`,
       thumbnailUri: fileUri.getUriFromPath(filePath),
       title: ctx.resourceManager.getStringSync($r('app.string.ConfigurationShared').id),
       description: currentConfigData.configName

@@ -44,7 +44,7 @@ export struct ImportConfigFromURL{
   @State private subTitle: ResourceStr = $r('app.string.Import_from_url')
   private promptAction:PromptAction = this.getUIContext()?.getPromptAction()
   // 配置详情（要添加到用户首选项里的数据）
-  @State @Watch('configDataChanged') configData: ConfigData = NewConfigData
+  @Prop @Watch('configDataChanged') configData: ConfigData = NewConfigData
   @Consume('currentTouchConfigData') currentTouchConfigData: ConfigData
   @StorageLink('appLinkConfigUrl') appLinkConfigUrl: string = ''
   // 当前显示的工具集合 默认为空 待两个input都有值之后才加入保存按钮菜单

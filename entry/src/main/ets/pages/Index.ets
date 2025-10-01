@@ -135,7 +135,7 @@ struct Index {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @Provide paddingButtom: number | Resource = $r('app.integer.vp_proxy_start_button_left_right_margin')
   @StorageLink('appLinkConfigUrl') @Watch('onOpenConfigLink') appLinkConfigUrl: string = ''
-  @StorageLink('appLinkConfigName') appLinkConfigName: string = ''
+  @StorageLink('appLinkConfigName') @Watch('onOpenConfigLink') appLinkConfigName: string = ''
   // 系统语言显示副标题
   @Provide SystemLanguageSubtitle: ResourceStr = $r('app.string.SimplifiedChinese')
   // 通知权限跳转授权弹窗提示弹窗标题
@@ -386,17 +386,37 @@ struct Index {
         scrollSizeMode: ScrollSizeMode.CONTINUOUS,
         preferType: SheetType.CENTER,
         onWillDismiss: ((DismissSheetAction: DismissSheetAction) => {
-          if (!this.isShowWelcome || DismissSheetAction.reason === DismissReason.CLOSE_BUTTON ||
-            this.appLinkConfigUrl != '' || (this.uiConfig.oldVersionName !== AppState.versionName && !this.uiConfig.isFirstStart) || this.showUpdateLog) {
-            this.showUpdateLog = false
-            this.isShowWelcome = false
-            this.uiConfig.oldVersionName = AppState.versionName
-            console.error(`Update 历史应用版本更新为：${this.uiConfig.oldVersionName} showUpdateLog: ${this.showUpdateLog}`)
-            // 关闭背景模糊
-            this.isEnableIndexForegroundBlur = false
-            DismissSheetAction.dismiss()
-            hilog.info(0xFF00, "WelcomeTestTag", "欢迎页启用状态： %{private}s", this.isShowWelcome)
+          hilog.debug(0xFF00, "WelcomeTestTag", "弹窗关闭原因：%{public}d", DismissSheetAction.reason)
+
+          // 无论什么原因关闭，都重置状态
+          this.showUpdateLog = false
+          this.isShowWelcome = false
+          this.uiConfig.oldVersionName = AppState.versionName
+          
+          // 清空 AppLink 相关状态，避免重复导入
+          if (this.appLinkConfigUrl != '') {
+            this.appLinkConfigUrl = ''
+            this.appLinkConfigName = ''
           }
+
+          hilog.error(0xFF00, "WelcomeTestTag", `Update 历史应用版本更新为：${this.uiConfig.oldVersionName} showUpdateLog: ${this.showUpdateLog}`)
+          // 关闭背景模糊
+          this.isEnableIndexForegroundBlur = false
+          DismissSheetAction.dismiss()
+          hilog.info(0xFF00, "WelcomeTestTag", "欢迎页启用状态： %{private}s", this.isShowWelcome)
+
+          // TODO 测试完成后删除
+          // if (!this.isShowWelcome || DismissSheetAction.reason === DismissReason.CLOSE_BUTTON ||
+          //   this.appLinkConfigUrl != '' || (this.uiConfig.oldVersionName !== AppState.versionName && !this.uiConfig.isFirstStart) || this.showUpdateLog) {
+          //   this.showUpdateLog = false
+          //   this.isShowWelcome = false
+          //   this.uiConfig.oldVersionName = AppState.versionName
+          //   console.error(`Update 历史应用版本更新为：${this.uiConfig.oldVersionName} showUpdateLog: ${this.showUpdateLog}`)
+          //   // 关闭背景模糊
+          //   this.isEnableIndexForegroundBlur = false
+          //   DismissSheetAction.dismiss()
+          //   hilog.info(0xFF00, "WelcomeTestTag", "欢迎页启用状态： %{private}s", this.isShowWelcome)
+          // }
         }),
         onWillAppear: () => {
           // 启用背景模糊
@@ -1064,14 +1084,17 @@ struct Index {
     this.onOpenConfigLink()
   }
 
-  /**通过openLink导入配置*/
+  /**通过AppLink导入配置*/
   onOpenConfigLink() {
-    // TODO 模态框只能拉起一次
-    if (this.appLinkConfigUrl != '' && this.appLinkConfigUrl != '') {
+    // 赋值配置链接
+    if (this.appLinkConfigUrl != '') {
       this.currentTouchConfigData.isNewConfig = true
       this.currentTouchConfigData.configUrl = this.appLinkConfigUrl
+      this.isShowWelcome = true
+    }
+    // 赋值配置名称
+    if ( this.appLinkConfigName != '') {
       this.currentTouchConfigData.configName = this.appLinkConfigName
-      // this.isShowWelcome = true
     }
   }
 
