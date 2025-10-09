@@ -744,10 +744,10 @@ struct ConfigurationPage {
         // 隔空投递、碰一碰 分享监听
         Xb_Share.immersiveListening('all')
 
-        Xb_ToastUtil.showToast({
-          message: '碰一碰，分享当前配置！📄',
-          duration: 3000
-        })
+        // Xb_ToastUtil.showToast({
+        //   message: '碰一碰，分享当前配置！📄',
+        //   duration: 3000
+        // })
       }
     } else {
       Xb_ToastUtil.showToast({
