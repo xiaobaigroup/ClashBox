@@ -1,130 +1,199 @@
-import { abilityAccessCtrl, Context,
-  PermissionRequestResult,
-  Permissions, WantAgent, wantAgent } from "@kit.AbilityKit";
+import { Context, WantAgent, wantAgent } from "@kit.AbilityKit";
 import { backgroundTaskManager } from "@kit.BackgroundTasksKit";
 import { notificationManager } from "@kit.NotificationKit";
 import { BusinessError } from "@kit.BasicServicesKit";
-import { http } from "@kit.NetworkKit";
-import { AppConfig, AppFlowingState, AppState } from "../../entryability/AppState";
 import { hilog } from "@kit.PerformanceAnalysisKit";
-import { geoLocationManager } from "@kit.LocationKit";
+import { AppConfig, AppFlowingState } from "../../entryability/AppState";
 
 /**
- * 模拟下载长时任务
+ * 长时后台下载服务
+ * 负责展示持续的下载进度通知（例如 VPN 流量监控）
  */
 export class BackgroundDownService {
+  private notificationId?: number = undefined;
+  private noticeTimer?: number;
 
-  notificationId ?: number = undefined
-  notice:number = 0
-
-  async start(context: Context) {
-    if(this.notificationId)
-      return
-    let id = await this.startContinuousTask(context)
-    this.notificationId = id
-
-    clearInterval(this.notice)
-    this.updateTraffic()
-    this.notice = setInterval(async () => {
-      this.updateTraffic()
-    }, 10000)
-  }
-
-
-  async updateTraffic(): Promise<void>{
-    let appConfig: AppConfig = AppStorage.get<AppConfig>("appConfig") ?? new AppConfig()
-    let appFlowingState: AppFlowingState = AppStorage.get<AppFlowingState>("appFlowingState") ?? new AppFlowingState()
-    let now = appFlowingState.traffics.getLast()?.down?.toString()
-    let result = appFlowingState.traffics.getLast()?.up?.toString()
-    let message = `${result}/s ↑ ${now}/s ↓`
-    hilog.info(0xFF00, 'BackgroundDownService', "updateProcess %{public}s", message)
-    this.updateProcess(this.notificationId ?? 0, appConfig.currentProxyName ?? 'ClashBox', message, 99.9 )
-  }
-
-  stop(context: Context) {
-    clearInterval(this.notice)
-    this.notificationId = undefined
-    console.log(`BackgroundDownService 开始执行模拟下载停止`)
-    backgroundTaskManager.stopBackgroundRunning(context).then(() => {
-      console.log(`BackgroundDownService 模拟下载停止成功`)
-    })
-      .catch((err: Error) => {
-        console.error(`BackgroundDownService 模拟下载停止失败：err：${JSON.stringify(err)}`)
-      })
-  }
-
-  updateProcess(id: number, title: string, message: string,Process: number){
-    notificationManager.isSupportTemplate('downloadTemplate').then((data:boolean) => {
-      hilog.info(0xFF00, 'BackgroundDownService', '当前设备支持下载进度条模板')
-      let downLoadTemplate: notificationManager.NotificationTemplate = {
-        name: 'downloadTemplate', // 当前只支持downloadTemplate，保持不变
-        data: {
-          title: message, // 必填。
-          fileName: 'VPN隧道数据传输中,删除通知隧道失效', // 必填。
-          progressValue: Process, // 应用更新进度值，自定义
-        }
-      }
-
-      let request: notificationManager.NotificationRequest = {
-        content: {
-          // 系统实况类型，保持不变
-          notificationContentType: notificationManager.ContentType.NOTIFICATION_CONTENT_SYSTEM_LIVE_VIEW,
-          systemLiveView: {
-            typeCode: 8, // 上传下载类型需要填写 8，当前仅支持此类型。保持不变
-            title: "clash", // 应用自定义
-            text: "clash", // 应用自定义
-          },
-        },
-        id: id, // 必须是申请长时任务返回的id，否则应用更新通知失败。
-        notificationSlotType: notificationManager.SlotType.LIVE_VIEW, // 实况窗类型，保持不变
-        template: downLoadTemplate,
-      }
-      // 发布通知
-      try {
-        notificationManager.publish(request).then(() => {
-          hilog.info(0xFF00, 'BackgroundDownService', "publish success, id = %{public}d", id)
-        }).catch((err: BusinessError) => {
-          hilog.error(0xFF00, 'BackgroundDownService', `publish fail: ${JSON.stringify(err)}`)
-        })
-      } catch (err) {
-        hilog.error(0xFF00, 'BackgroundDownService', `publish fail: ${JSON.stringify(err)}`)
-      }
-
-    }).catch((err: BusinessError) => {
-      hilog.error(0xFF00, 'BackgroundDownService', `当前设备不支持下载进度条模板 Code is ${err.code}, message is ${err.message}`)
-    })
-
-  }
-
-  async startContinuousTask(context: Context): Promise<number>{
-    let wantAgentInfo: wantAgent.WantAgentInfo = {
-      // 点击通知后，将要执行的动作列表
-      // 添加需要被拉起应用的bundleName和abilityName
-      wants: [
-        {
-          bundleName: context.applicationInfo.name, // release: org.xbgroup.clashbox, debug: org.xbgroup.clashboxb
-          abilityName: "EntryAbility"
-        }
-      ],
-      // 指定点击通知栏消息后的动作是拉起ability
-      actionType: wantAgent.OperationType.START_ABILITY,
-      // 使用者自定义的一个私有值
-      requestCode: 0,
-      // 点击通知后，动作执行属性
-      actionFlags: [wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG]
+  /**
+   * 启动后台任务与通知
+   */
+  async start(context: Context): Promise<void> {
+    if (this.notificationId) {
+      hilog.info(0xFF00, "BackgroundDownService", "任务已在运行，无需重复启动");
+      return;
     }
+
+    const id = await this.startContinuousTask(context);
+    if (id < 0) {
+      hilog.error(0xFF00, "BackgroundDownService", "无法启动后台长时任务");
+      return;
+    }
+
+    this.notificationId = id;
+
+    clearInterval(this.noticeTimer);
+    await this.updateTraffic();
+
+    // 定期更新通知内容
+    this.noticeTimer = setInterval(async () => {
+      await this.updateTraffic();
+    }, 10000);
+
+    hilog.info(0xFF00, "BackgroundDownService", "后台长时任务已启动");
+  }
+
+  /**
+   * 停止后台任务
+   */
+  async stop(context: Context): Promise<void> {
+    clearInterval(this.noticeTimer);
+    this.noticeTimer = undefined;
+
+    this.notificationId = undefined;
+    hilog.info(0xFF00, "BackgroundDownService", "准备停止后台任务");
 
     try {
-      // 通过wantAgent模块下getWantAgent方法获取WantAgent对象
-      let wantAgentObj: WantAgent =  await wantAgent.getWantAgent(wantAgentInfo)
-      let res = await backgroundTaskManager.startBackgroundRunning(context, ["dataTransfer"], wantAgentObj)
-      return res.notificationId
+      await backgroundTaskManager.stopBackgroundRunning(context);
+      hilog.info(0xFF00, "BackgroundDownService", "后台任务停止成功");
     } catch (err) {
-      hilog.error(0xFF00, 'BackgroundDownService', `长时任务启动失败. Code is ${err.code}, message is ${err.message}`)
-      return -1
+      hilog.error(
+        0xFF00,
+        "BackgroundDownService",
+        `后台任务停止失败：${JSON.stringify(err)}`
+      );
     }
   }
 
+  /**
+   * 定时更新下载进度通知
+   */
+  async updateTraffic(): Promise<void> {
+    try {
+      const appConfig: AppConfig =
+        AppStorage.get<AppConfig>("appConfig") ?? new AppConfig();
+      const appFlowingState: AppFlowingState =
+        AppStorage.get<AppFlowingState>("appFlowingState") ?? new AppFlowingState();
+
+      const lastTraffic = appFlowingState.traffics.getLast?.();
+      const downSpeed = lastTraffic?.down?.toString() ?? "0";
+      const upSpeed = lastTraffic?.up?.toString() ?? "0";
+
+      const message = `${upSpeed}/s ↑ ${downSpeed}/s ↓`;
+      const proxyName = appConfig.currentProxyName ?? "ClashBox";
+
+      hilog.info(
+        0xFF00,
+        "BackgroundDownService",
+        `updateTraffic -> ${message}`
+      );
+
+      if (this.notificationId) {
+        this.updateProcess(this.notificationId, proxyName, message, 99.9);
+      }
+    } catch (err) {
+      hilog.error(
+        0xFF00,
+        "BackgroundDownService",
+        `updateTraffic 异常: ${JSON.stringify(err)}`
+      );
+    }
+  }
+
+  /**
+   * 更新系统下载通知进度条
+   */
+  private updateProcess(id: number, title: string, message: string, progress: number): void {
+    notificationManager
+      .isSupportTemplate("downloadTemplate")
+      .then((supported: boolean) => {
+        if (!supported) {
+          hilog.error(0xFF00, "BackgroundDownService", "设备不支持下载模板通知");
+          return;
+        }
+
+        const template: notificationManager.NotificationTemplate = {
+          name: "downloadTemplate",
+          data: {
+            title: message,
+            fileName: "VPN隧道数据传输中,删除通知隧道失效",
+            progressValue: progress,
+          },
+        };
+
+        const request: notificationManager.NotificationRequest = {
+          id,
+          notificationSlotType: notificationManager.SlotType.LIVE_VIEW,
+          template,
+          content: {
+            notificationContentType:
+            notificationManager.ContentType.NOTIFICATION_CONTENT_SYSTEM_LIVE_VIEW,
+            systemLiveView: {
+              typeCode: 8,
+              title,
+              text: message,
+            },
+          },
+        };
+
+        notificationManager
+          .publish(request)
+          .then(() => {
+            hilog.info(0xFF00, "BackgroundDownService", `通知更新成功 id=${id}`);
+          })
+          .catch((err: BusinessError) => {
+            hilog.error(
+              0xFF00,
+              "BackgroundDownService",
+              `通知发布失败: ${JSON.stringify(err)}`
+            );
+          });
+      })
+      .catch((err: BusinessError) => {
+        hilog.error(
+          0xFF00,
+          "BackgroundDownService",
+          `不支持模板通知: Code=${err.code}, Msg=${err.message}`
+        );
+      });
+  }
+
+  /**
+   * 启动 HarmonyOS 后台长时任务
+   */
+  private async startContinuousTask(context: Context): Promise<number> {
+    const wantAgentInfo: wantAgent.WantAgentInfo = {
+      wants: [
+        {
+          bundleName: context.applicationInfo.name,
+          abilityName: "EntryAbility",
+        },
+      ],
+      actionType: wantAgent.OperationType.START_ABILITY,
+      requestCode: 0,
+      actionFlags: [wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG],
+    };
+
+    try {
+      const wantAgentObj: WantAgent = await wantAgent.getWantAgent(wantAgentInfo);
+      const result = await backgroundTaskManager.startBackgroundRunning(
+        context,
+        ["dataTransfer"],
+        wantAgentObj
+      );
+      hilog.info(
+        0xFF00,
+        "BackgroundDownService",
+        `长时任务启动成功 notificationId=${result.notificationId}`
+      );
+      return result.notificationId;
+    } catch (err) {
+      hilog.error(
+        0xFF00,
+        "BackgroundDownService",
+        `长时任务启动失败: Code=${err.code}, Msg=${err.message}`
+      );
+      return -1;
+    }
+  }
 }
 
-export default  new BackgroundDownService()
+export default new BackgroundDownService();
