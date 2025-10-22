@@ -133,6 +133,8 @@ struct Index {
   @StorageProp("appFlowingState") appFlowingState: AppFlowingState = new AppFlowingState()
   // 欢迎页面栈
   @Provide('WelcomeNavPathStack') welcomePageInfos: NavPathStack = new NavPathStack()
+  // 主页面栈
+  @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @Provide paddingButtom: number | Resource = $r('app.integer.vp_proxy_start_button_left_right_margin')
@@ -249,8 +251,6 @@ struct Index {
   /**
    * 更多页相关变量
    */
-  // 更多页面栈
-  @Provide('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   // 更多页面数据
   @Provide moreList: moreData[] = ListMoreData()
   // 日志数据
@@ -291,131 +291,149 @@ struct Index {
 
   build() {
     if (!this.isPXSecScreen) {
-      Stack({ alignContent: Alignment.TopEnd }) {
-        // 窗口控制器(窗口模式显示)
-        if (this.windowMode) {
-          WindowTopBar()
-            .zIndex(2)
+      if (this.widthBp < 2) {
+        // 手机及以下宽度 或 处于配置页
+        Navigation(this.pageInfos) {
+          this.MainContent()
         }
-        // 主界面
-        Tabs({
-          barPosition: TabBarPosition(this.widthBp, this.heightBp),
-          index: this.tabCurrentPage,
-          controller: indexController
-        }) {
-          ForEach(this.tabList, (item: TabBuild, index: number) => {
-            TabContent() {
-              this.TabContentBuilder(index)
-            }
-            .tabBar(this.TabBarBuilder(item.name, index, item.icon))
-            .gesture(
-              // 二级Tabs第一个页签向左拖动时，触发手势事件，当Tab栏竖排时不触发
-              PanGesture({
-                direction: !TabBarVertical(this.widthBp, this.heightBp) ? PanDirection.Down : PanDirection.None
-              })
-                .onActionStart((event?: GestureEvent) => {
-                  console.info('Pan start')
-                })// 通过父组件的TabsController的实例，改变其index，达到跳转一级Tabs（首页）的效果
-                .onActionEnd(() => {
-                  if (this.isLandscapePhone || this.istabletLandscape) {
-                    if (this.tabCurrentPage == 0) {
-                      indexController.changeIndex(1)
-                      console.info('Pan end')
-                    }
-                  }
-                }))
-          })
-
-        }
-        .zIndex(1)
-        .backgroundColor($r('app.color.background'))
-        // .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Thin: null)
-        // .backgroundBrightness({rate:0.5,lightUpDegree:0.5})
-        //  .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
-        .barOverlap(false)
-        .scrollable(!this.isSecondary)
-        .vertical(TabBarVertical(this.widthBp, this.heightBp))
-        .barWidth(this.windowMode ? WindowTabBarWidth(this.widthBp, this.heightBp) :
-          TabBarWidth(this.widthBp, this.heightBp))
-        .barHeight((this.isSecondary && this.widthBp <= 2 && !this.windowMode) || this.isSmallSquareScreen ?
-          this.barHeight : this.bottomRectHeight == 0 ? TabBarHeight(this.widthBp, this.heightBp) :
-            TabBarAvoidHeight(this.widthBp, this.heightBp))
-        .onTabBarClick((index: number) => {
-          this.UIcontext.animateTo({
-            duration: this.uiConfig.animationSpeed,
-            curve: Curve.Linear,
-          }, () => {
-            this.tabCurrentPage = index
-          })
-        })
-        .onChange((index) => {
-          if (index == 0) {
-            this.isHomePage = true
-            return
-          }
-          this.isHomePage = false
-        })
-        .onAnimationStart((index: number, targetIndex: number) => {
-          this.UIcontext.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear, }, () => {
-            if (index == targetIndex) {
-              return
-            }
-            this.tabCurrentPage = targetIndex;
-          })
-        })
-        .width('100%')
+        .mode(NavigationMode.Stack)
+        .hideTitleBar(true)
+        .hideToolBar(true)
         .height('100%')
-        .backgroundColor($r('app.color.background'))
-        .foregroundBlurStyle(this.isEnableIndexForegroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
-          { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 })
-        .fadingEdge(true)
-        .padding({ top: this.topRectHeight, bottom: this.bottomRectHeight == 0 ? this.bottomRectHeight / 2 : 0 })
+        .width('100%')
+      } else {
+        // md及以上除配置页外
+        this.MainContent()
       }
-      .width('100%')
-      .height('100%')
-      .backgroundColor($r('app.color.background'))
-      // 欢迎页&崩溃页
-      .bindSheet($$this.isShowWelcome, this.WelcomeSheet(), {
-        detents: [BIND_SHEET_CONTAINER_HEIGHT],
-        showClose: (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) ||
-          this.appLinkConfigUrl != '' || (this.uiConfig.oldVersionName !== AppState.versionName && !this.uiConfig.isFirstStart) || this.showUpdateLog,
-        dragBar: false,
-        backgroundColor: $r('app.color.background'),
-        keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
-        scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-        preferType: SheetType.CENTER,
-        onWillDismiss: ((DismissSheetAction: DismissSheetAction) => {
-          hilog.debug(0xFF00, "WelcomeTestTag", "弹窗关闭原因：%{public}d", DismissSheetAction.reason)
-
-          // 无论什么原因关闭，都重置状态
-          this.showUpdateLog = false
-          this.isShowWelcome = false
-          this.uiConfig.oldVersionName = AppState.versionName
-          
-          // 清空 AppLink 相关状态，避免重复导入
-          if (this.appLinkConfigUrl != '') {
-            this.appLinkConfigUrl = ''
-            this.appLinkConfigName = ''
-          }
-
-          hilog.error(0xFF00, "WelcomeTestTag", `Update 历史应用版本更新为：${this.uiConfig.oldVersionName} showUpdateLog: ${this.showUpdateLog}`)
-          // 关闭背景模糊
-          this.isEnableIndexForegroundBlur = false
-          DismissSheetAction.dismiss()
-          hilog.info(0xFF00, "WelcomeTestTag", "欢迎页启用状态： %{private}s", this.isShowWelcome)
-        }),
-        onWillAppear: () => {
-          // 启用背景模糊
-          this.isEnableIndexForegroundBlur = true
-          console.error(`Update Index isShowWelcome：${this.isShowWelcome} showUpdateLog: ${this.showUpdateLog}`)
-        },
-        onDisappear: async () => {
-        }
-      })
     } else {
       // PX外屏样式
       PXSecScreen()
     }
+  }
+
+  @Builder
+  MainContent() {
+    Stack({ alignContent: Alignment.TopEnd }) {
+      // 窗口控制器(窗口模式显示)
+      if (this.windowMode) {
+        WindowTopBar()
+          .zIndex(2)
+      }
+      // 主界面
+      Tabs({
+        barPosition: TabBarPosition(this.widthBp, this.heightBp),
+        index: this.tabCurrentPage,
+        controller: indexController
+      }) {
+        ForEach(this.tabList, (item: TabBuild, index: number) => {
+          TabContent() {
+            this.TabContentBuilder(index)
+          }
+          .tabBar(this.TabBarBuilder(item.name, index, item.icon))
+          .gesture(
+            // 二级Tabs第一个页签向左拖动时，触发手势事件，当Tab栏竖排时不触发
+            PanGesture({
+              direction: !TabBarVertical(this.widthBp, this.heightBp) ? PanDirection.Down : PanDirection.None
+            })
+              .onActionStart((event?: GestureEvent) => {
+                console.info('Pan start')
+              })// 通过父组件的TabsController的实例，改变其index，达到跳转一级Tabs（首页）的效果
+              .onActionEnd(() => {
+                if (this.isLandscapePhone || this.istabletLandscape) {
+                  if (this.tabCurrentPage == 0) {
+                    indexController.changeIndex(1)
+                    console.info('Pan end')
+                  }
+                }
+              }))
+        })
+
+      }
+      .zIndex(1)
+      .backgroundColor($r('app.color.background'))
+      // .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Thin: null)
+      // .backgroundBrightness({rate:0.5,lightUpDegree:0.5})
+      //  .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
+      .barOverlap(false)
+      .scrollable(!this.isSecondary)
+      .vertical(TabBarVertical(this.widthBp, this.heightBp))
+      .barWidth(this.windowMode ? WindowTabBarWidth(this.widthBp, this.heightBp) :
+        TabBarWidth(this.widthBp, this.heightBp))
+      .barHeight((this.isSecondary && this.widthBp <= 2 && !this.windowMode) || this.isSmallSquareScreen ?
+        this.barHeight : this.bottomRectHeight == 0 ? TabBarHeight(this.widthBp, this.heightBp) :
+          TabBarAvoidHeight(this.widthBp, this.heightBp))
+      .onTabBarClick((index: number) => {
+        this.UIcontext.animateTo({
+          duration: this.uiConfig.animationSpeed,
+          curve: Curve.Linear,
+        }, () => {
+          this.tabCurrentPage = index
+        })
+      })
+      .onChange((index) => {
+        if (index == 0) {
+          this.isHomePage = true
+          return
+        }
+        this.isHomePage = false
+      })
+      .onAnimationStart((index: number, targetIndex: number) => {
+        this.UIcontext.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear, }, () => {
+          if (index == targetIndex) {
+            return
+          }
+          this.tabCurrentPage = targetIndex;
+        })
+      })
+      .width('100%')
+      .height('100%')
+      .backgroundColor($r('app.color.background'))
+      .foregroundBlurStyle(this.isEnableIndexForegroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
+        { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 })
+      .fadingEdge(true)
+      .padding({ top: this.topRectHeight, bottom: this.bottomRectHeight == 0 ? this.bottomRectHeight / 2 : 0 })
+    }
+    .width('100%')
+    .height('100%')
+    .backgroundColor($r('app.color.background'))
+    // 欢迎页&崩溃页
+    .bindSheet($$this.isShowWelcome, this.WelcomeSheet(), {
+      detents: [BIND_SHEET_CONTAINER_HEIGHT],
+      showClose: (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) ||
+        this.appLinkConfigUrl != '' || (this.uiConfig.oldVersionName !== AppState.versionName && !this.uiConfig.isFirstStart) || this.showUpdateLog,
+      dragBar: false,
+      backgroundColor: $r('app.color.background'),
+      keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
+      scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+      preferType: SheetType.CENTER,
+      onWillDismiss: ((DismissSheetAction: DismissSheetAction) => {
+        hilog.debug(0xFF00, "WelcomeTestTag", "弹窗关闭原因：%{public}d", DismissSheetAction.reason)
+
+        // 无论什么原因关闭，都重置状态
+        this.showUpdateLog = false
+        this.isShowWelcome = false
+        this.uiConfig.oldVersionName = AppState.versionName
+
+        // 清空 AppLink 相关状态，避免重复导入
+        if (this.appLinkConfigUrl != '') {
+          this.appLinkConfigUrl = ''
+          this.appLinkConfigName = ''
+        }
+
+        hilog.error(0xFF00, "WelcomeTestTag", `Update 历史应用版本更新为：${this.uiConfig.oldVersionName} showUpdateLog: ${this.showUpdateLog}`)
+        // 关闭背景模糊
+        this.isEnableIndexForegroundBlur = false
+        DismissSheetAction.dismiss()
+        hilog.info(0xFF00, "WelcomeTestTag", "欢迎页启用状态： %{private}s", this.isShowWelcome)
+      }),
+      onWillAppear: () => {
+        // 启用背景模糊
+        this.isEnableIndexForegroundBlur = true
+        console.error(`Update Index isShowWelcome：${this.isShowWelcome} showUpdateLog: ${this.showUpdateLog}`)
+      },
+      onDisappear: async () => {
+      }
+    })
   }
 
   @Builder
@@ -1269,7 +1287,9 @@ struct Index {
       this.bottomRectHeight)
   }
 
-  /** @description 跳转到访问控制添加包名 */
+  /**
+   * @description 跳转到访问控制添加包名
+   */
   jumpAccessControl(bundleInfo: BundleInfo) {
     this.tabCurrentPage = 3
     const path = this.pageInfos.getAllPathName()

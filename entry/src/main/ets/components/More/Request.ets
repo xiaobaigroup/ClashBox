@@ -13,12 +13,16 @@ import { getRequestText, getSourceText, getTheSourceText } from "./Connect"
 import { ConnectItemDataSource } from "../../common/datasources/ConnectData"
 import { NeedClearMoreStack, PageMargin } from "../../common/breakpoint/BreakPoint"
 
+@Builder
+export function RequestBuilder(name: string, param: Object){
+  RequestPage()
+}
 
 @Component
 struct RequestPage {
   @Consume isSecondary: boolean
   @State intervalId: number = 0
-  @Consume('NavPathStack') pageInfos: NavPathStack
+  @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   // 高度断点

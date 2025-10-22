@@ -24,6 +24,126 @@
       "data": {
         "description": "配置页 -> bindSheet -> 新建空白配置"
       }
+    },
+    {
+      "name": "EditConfigContent",
+      "pageSourceFile": "src/main/ets/components/Configuration/EditConfigContent.ets",
+      "buildFunction": "EditConfigContentBuilder",
+      "data": {
+        "description": "配置页 -> bindSheet -> 编辑配置内容"
+      }
+    },
+    {
+      "name": "Log",
+      "pageSourceFile": "src/main/ets/components/More/Log.ets",
+      "buildFunction": "LogBuilder",
+      "data": {
+        "description": "日志页面"
+      }
+    },
+    {
+      "name": "Resources",
+      "pageSourceFile": "src/main/ets/components/More/Resources.ets",
+      "buildFunction": "ResourcesBuilder",
+      "data": {
+        "description": "资源管理页面"
+      }
+    },
+    {
+      "name": "Request",
+      "pageSourceFile": "src/main/ets/components/More/Request.ets",
+      "buildFunction": "RequestBuilder",
+      "data": {
+        "description": "请求管理页面"
+      }
+    },
+    {
+      "name": "Connect",
+      "pageSourceFile": "src/main/ets/components/More/Connect.ets",
+      "buildFunction": "ConnectBuilder",
+      "data": {
+        "description": "连接管理页面"
+      }
+    },
+    {
+      "name": "Overwrite",
+      "pageSourceFile": "src/main/ets/components/More/Overwrite/Overwrite.ets",
+      "buildFunction": "OverwriteBuilder",
+      "data": {
+        "description": "覆写规则页面"
+      }
+    },
+    {
+      "name": "Diversion",
+      "pageSourceFile": "src/main/ets/components/More/Diversion.ets",
+      "buildFunction": "DiversionBuilder",
+      "data": {
+        "description": "分流规则页面"
+      }
+    },
+    {
+      "name": "Basic",
+      "pageSourceFile": "src/main/ets/components/More/Overwrite/Basic.ets",
+      "buildFunction": "BasicBuilder",
+      "data": {
+        "description": "基础设置页面"
+      }
+    },
+    {
+      "name": "DNS",
+      "pageSourceFile": "src/main/ets/components/More/Overwrite/DNS.ets",
+      "buildFunction": "DNSBuilder",
+      "data": {
+        "description": "DNS设置页面"
+      }
+    },
+    {
+      "name": "Network",
+      "pageSourceFile": "src/main/ets/components/More/Overwrite/Network.ets",
+      "buildFunction": "NetworkBuilder",
+      "data": {
+        "description": "网络设置页面"
+      }
+    },
+    {
+      "name": "Route-Address",
+      "pageSourceFile": "src/main/ets/components/More/Overwrite/Network.ets",
+      "buildFunction": "NetworkRouterAddressBuilder",
+      "data": {
+        "description": "网络路由地址配置页面"
+      }
+    },
+    {
+      "name": "EditArrayConfig",
+      "pageSourceFile": "src/main/ets/components/More/Overwrite/EditArrayConfig.ets",
+      "buildFunction": "ArrayConfigEditorBuilder",
+      "data": {
+        "description": "复用编辑页面"
+      }
+    },
+    {
+      "name": "LogDetails",
+      "pageSourceFile": "src/main/ets/components/More/Log.ets",
+      "buildFunction": "LogDetailsBuilder",
+      "data": {
+        "description": "日志详情页面"
+      }
+    },
+    {
+      "name": "compatible",
+      "pageSourceFile": "src/main/ets/components/More/Overwrite/Network.ets",
+      "buildFunction": "NetworkCompatibleBuilder",
+      "data": {
+        "description": "网络兼容性设置页面"
+      }
+    },
+    {
+      "name": "AccessControl",
+      "pageSourceFile": "src/main/ets/components/More/AccessControl.ets",
+      "buildFunction": "AccessControlBuilder",
+      "data": {
+        "description": "访问控制页面"
+      }
     }
   ]
 }

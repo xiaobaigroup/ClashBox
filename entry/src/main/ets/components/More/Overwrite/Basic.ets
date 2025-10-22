@@ -4,17 +4,21 @@ import { ClashConfig } from 'proxy_core'
 import { AppConfig, UIConfig } from '../../../entryability/AppState'
 import { ConfigList } from "./Common"
 
+@Builder
+export function BasicBuilder(name: string, param: Object){
+  Basic()
+}
 
 @Component
 struct Basic {
 
-  @Consume('NavPathStack') pageInfos: NavPathStack
-  @State overwriteBasicList: ConfigItemData[] = []
+  @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-  //page内顶部标题偏移量
-  @Consume curYOffset: number
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+
+  @State overwriteBasicList: ConfigItemData[] = []
+
   aboutToAppear(): void {
     this.overwriteBasicList = ListOverwriteBasicData(this.clashConfig, this.appConfig)
   }

@@ -39,6 +39,11 @@ export function  getTheSourceText( connection: ConnectionInfo) {
   return `${metadata.process}`;
 }
 
+@Builder
+export function ConnectBuilder(name: string, param: Object){
+  Connect()
+}
+
 @Component
 struct Connect {
   // page内顶部标题偏移量
@@ -46,7 +51,7 @@ struct Connect {
   // 是否进入二级界面
   @Consume isSecondary: boolean
   @State intervalId: number = 0
-  @Consume('NavPathStack') pageInfos: NavPathStack
+  @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   // 高度断点
@@ -249,7 +254,7 @@ struct Connect {
               if (this.uiConfig.isAnimation){
                 this.curYOffset += yOffset
               }
-              console.info("yOffset" + this.curYOffset);
+              console.debug("yOffset" + this.curYOffset);
             })
           }
         }

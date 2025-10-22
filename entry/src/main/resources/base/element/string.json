@@ -2235,6 +2235,10 @@
     {
       "name": "cloud_files_title",
       "value": "选择想要恢复的备份文件"
+    },
+    {
+      "name": "export_config_file",
+      "value": "导出配置文件"
     }
   ]
 }

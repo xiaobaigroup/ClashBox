@@ -5,13 +5,18 @@ import { ClashConfig, Dns } from 'proxy_core'
 import { AppConfig } from '../../../entryability/AppState'
 import { ConfigList } from "./Common"
 
+@Builder
+export function DNSBuilder(name: string, param: Object){
+  DNS()
+}
 
 @Component
 struct DNS {
-  @Consume('NavPathStack') pageInfos: NavPathStack
-  @State overwriteDNSList: ConfigItemData[] = []
+  @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+
+  @State overwriteDNSList: ConfigItemData[] = []
 
   aboutToAppear(): void {
     this.overwriteDNSList = ListOverwriteDNSData(this.clashConfig, this.appConfig)

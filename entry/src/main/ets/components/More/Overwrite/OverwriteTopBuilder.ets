@@ -9,14 +9,20 @@ struct OverwriteTop {
 
   @State title: ResourceStr = ''
   @State subtitle: ResourceStr = ''
-  @Consume('NavPathStack') pageInfos: NavPathStack
+
+  @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
-  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  //page内顶部标题偏移量
+  // 状态栏高度
+  @StorageProp('topRectHeight') topRectHeight: number = 0
+
+  // page内顶部标题偏移量
   @Consume curYOffset: number
+
   build() {
     Row() {
       //返回图标
@@ -50,11 +56,12 @@ struct OverwriteTop {
       .alignItems(HorizontalAlign.Center)
       Blank()
     }
-    .width('100%')
-    .alignItems(VerticalAlign.Center)
-    .height(this.curYOffset<0?TAB_CONTENT_TITLE_HEIGHT-this.curYOffset:TAB_CONTENT_TITLE_HEIGHT)
     .zIndex(1)
-    .position({x:0})
+    .width('100%')
+    .position({x: 0})
+    .alignItems(VerticalAlign.Center)
+    .margin({ top: this.widthBp < 2 ? this.topRectHeight : 0 })
+    .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT  -this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
   }
 }
 

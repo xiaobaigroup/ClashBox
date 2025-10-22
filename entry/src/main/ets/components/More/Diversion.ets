@@ -12,10 +12,13 @@ import { UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../common/utils/Animation"
 import { NeedClearMoreStack, PageMargin } from "../../common/breakpoint/BreakPoint"
 
+@Builder
+export function DiversionBuilder(name: string, param: Object){
+  Diversion()
+}
+
 /**
- *
  * 暂时屏蔽，等待API更新支持
- *
  */
 @Component
 struct Diversion {
@@ -29,7 +32,7 @@ struct Diversion {
   @State SelectedListItem: number = 0
   // 添加&编辑策略半模态页展示变量
   @State isShowPolicy: boolean = false
-  @Consume('NavPathStack') pageInfos: NavPathStack
+  @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   // 保存的分流策略名
   @State SaveNameInputValue: string = ''
   // 保存的资源路径

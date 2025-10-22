@@ -4,30 +4,36 @@ import { hilog } from "@kit.PerformanceAnalysisKit"
 import { skipRowList, theRowCustomDialog } from "../../Common/Common"
 import { MoreTop } from "../MoreTopBuilder"
 import { AppState, UIConfig } from "../../../entryability/AppState"
-import { ClashConfig } from "proxy_core"
-import { curves } from "@kit.ArkUI"
 import { customAnimationUtil } from "../../../common/utils/Animation"
-import OverwriteTop from "./OverwriteTopBuilder"
 import { NeedClearMoreStack, PageMargin } from "../../../common/breakpoint/BreakPoint"
+
+@Builder
+export function OverwriteBuilder(name: string, param: Object){
+  Overwrite()
+}
 
 @Component
 struct Overwrite {
-  // 是否进入二级界面
-  @Consume isSecondary: boolean
-  @Consume('NavPathStack') pageInfos: NavPathStack
+
+  @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @State overwriteList: moreData[] = ListOverwriteData()
+
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
-  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  @State overwriteList: moreData[] = ListOverwriteData()
+  @StorageProp('topRectHeight') topRectHeight: number = 0
+
   // 重置覆写提示弹窗标题
   @State theResetDialogTitle: ResourceStr = $r('app.string.override_reset_prompt')
   /**
    * 是否开启 `Index` 页面的前景模糊
    */
-  @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
-  //page内顶部标题偏移量
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
+  // 是否进入二级界面
+  @Consume isSecondary: boolean
+  // page内顶部标题偏移量
   @Consume curYOffset: number
 
   /**
@@ -80,22 +86,23 @@ struct Overwrite {
       this.resetDialogController.open()
     } else {
       // 跳转
-      let itemData = this.overwriteList[index]
-      this.pageInfos.pushPathByName(itemData.name, false)
-      hilog.isLoggable(0xFF00, "OverwritetestTag", hilog.LogLevel.INFO);
-      hilog.info(0xFF00, "OverwritetestTag", itemData.name)
+      const itemData = this.overwriteList[index]
+      this.pageInfos.pushPathByName(itemData.name, null, true)
+      hilog.isLoggable(0xFF00, "Overwrite testTag", hilog.LogLevel.INFO);
+      hilog.info(0xFF00, "Overwrite testTag", `跳转至：${itemData.name} pageInfos：${this.pageInfos.size()}`)
     }
   }
 
   build() {
     NavDestination() {
       Stack() {
-            MoreTop({
-              title: $r('app.string.Overwrite'),
-            })
+        MoreTop({
+          title: $r('app.string.Overwrite'),
+        })
 
         Column() {
-          Blank().height(TAB_CONTENT_TITLE_HEIGHT + 6)
+          Blank()
+            .height(TAB_CONTENT_TITLE_HEIGHT + (this.widthBp < 2 ? this.topRectHeight : 0) + 6)
           Scroll() {
             List({ space: 10 }) {
               ForEach(this.overwriteList, (item: moreData, index: number) => {

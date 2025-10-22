@@ -6,18 +6,21 @@ import { customAnimationUtil } from "../../common/utils/Animation"
 import { PageMargin } from "../../common/breakpoint/BreakPoint"
 import BackupRestoreUtil, { BackupConfig } from '../../common/utils/BackupRestoreUtil';
 import { Xb_GetResourceString, Xb_KVdbUtil, Xb_ToastUtil } from "xb_components"
-import { Client } from "@dove/webdav"
 import { EventHub, EventKey } from "../../common/EventHub"
-import { util } from '@kit.ArkTS'
+// import { FileInfo, WebDavClient, WebDavConfig, WebDavManager } from "@ya520/webdav"
+import { WebDavManager } from "../../common/utils/webdav/manager"
+import { WebDavClient } from "../../common/utils/webdav/client"
+import { FileInfo, WebDavConfig } from "../../common/utils/webdav/config"
+
 
 @Component
 struct Backup {
 
-  @State rawFiles: string[] = []
+  @State rawFiles: FileInfo[] = []
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 选中的文件
-  @State @Watch('onSelectFileChange') selectFile: string = ''
+  @State @Watch('onSelectFileChange') selectFilePath: string = ''
   // 设置页路由表
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
 
@@ -30,7 +33,7 @@ struct Backup {
   // 服务器地址
   @StorageLink('Server') server_address: string = ''
   // WebDav
-  @StorageLink('Client') webdavClient: Client = new Client('')
+  @StorageLink('WebDAVManager') webdavManager: WebDavManager | null = null
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 弹窗时背景模糊
   @StorageLink('CustomDialog') showCustomDialogBackgroundBlur: boolean = false
@@ -132,7 +135,7 @@ struct Backup {
 
   cloudFilesController: CustomDialogController = new CustomDialogController({
     builder: CloudFiles({
-      selectFile: $selectFile,
+      selectFilePath: $selectFilePath,
       rawFiles: $rawFiles
     }),
     onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
@@ -160,12 +163,20 @@ struct Backup {
   async aboutToAppear(): Promise<void> {
     // WebDav登录事件
     EventHub.on(EventKey.LoginWebDav, async (showToast: boolean = false) => {
-      this.webdavClient = new Client(this.server_address, this.user, this.password)
+      const config: WebDavConfig = {
+        baseUrl: this.server_address,
+        username: this.user,
+        password: this.password,
+        authType: 'basic'
+      }
+      this.webdavManager = new WebDavManager(
+        new WebDavClient(config),
+        this.getUIContext().getHostContext()!
+      )
       try {
-        await this.webdavClient.connect(true, true)
         this.isLogin = true
         console.log(`WebDav 链接成功`)
-        if (showToast) {
+        if (showToast || this.webdavManager) {
           Xb_ToastUtil.showToast({ message: $r('app.string.login_success') })
         }
       } catch (err) {
@@ -189,7 +200,7 @@ struct Backup {
     this.user = await Xb_KVdbUtil.getData('webdav_user') as string ?? ''
     this.password = await Xb_KVdbUtil.getData('webdav_password') as string ?? ''
     this.server_address = await Xb_KVdbUtil.getData('webdav_server_address') as string ?? ''
-    console.log(`WebDav 配置信息：user: ${this.user}, password: ${this.password}, server: ${this.server_address}`)
+    console.debug(`WebDav 配置信息：user: ${this.user}, password: ${this.password}, server: ${this.server_address}`)
   }
 
   getBackupSubtitle(): ResourceStr {
@@ -207,12 +218,13 @@ struct Backup {
     hilog.info(0xFF00, "BackupTag", "开始备份应用数据")
     // 本地备份
     const file_path = await BackupRestoreUtil.backup()
-    console.log(`Backup 备份的文件为：${file_path}`)
+    console.log(`Backup 备份文件的缓存为：${file_path}`)
     if (this.uiConfig.isShowCloudBackupConfig && this.isLogin) {
       // 云备份
       try {
-        const value = await this.webdavClient.mkdir('/ClashBox')
-        console.log(`Backup 创建状态: ${value}`)
+        const value = await this.webdavManager?.createDirectory('/ClashBox')
+        if (value)
+        console.log(`Backup 创建状态: ${value.statusCode === 201}`)
       } catch (err) {
         console.error(`Backup 创建失败 name: ${err.name} message: ${err.message}`)
       }
@@ -233,13 +245,12 @@ struct Backup {
 
   async cloudBackup(file_path: string) {
     try {
-      console.log(`待备份文件的路径是: ${file_path}`)
-      const file_name = file_path.slice(file_path.lastIndexOf('/') + 1)
-      console.log(`待备份文件是: ${file_name}`)
-      const remotePath = '/ClashBox/' + file_name
-      console.log(`待上传的远端路径是: ${remotePath}`)
-      const value = await this.webdavClient.put(remotePath, file_path)
-      console.log(`云备份状态：${value}`)
+      if (this.webdavManager) {
+        console.log(`待备份文件的路径是: ${file_path}`)
+        const remotePath = '/ClashBox/'
+        const value = await this.webdavManager.upload(remotePath, file_path)
+        console.log(`云备份状态：${value.statusCode}`)
+      }
     } catch (err) {
       Xb_ToastUtil.showToast({ message: `云备份失败 name: ${err.name} message: ${err.message}`, duration: 3000 })
       console.error(`WebDav 备份失败 name: ${err.name} message: ${err.message}`)
@@ -247,10 +258,10 @@ struct Backup {
   }
 
   async cloudRestore() {
-    if (this.uiConfig.isShowCloudBackupConfig && this.isLogin) {
+    if (this.uiConfig.isShowCloudBackupConfig && this.isLogin && this.webdavManager) {
       try {
-        const value = await this.webdavClient.list('/ClashBox')
-        this.rawFiles = value.map(file => file.href).map(path => path.replace(/\/dav/g, '')).filter(item => item !== '/ClashBox/')
+        const value = await this.webdavManager.listDirectory('/ClashBox')
+        this.rawFiles = value.filter(item => item.path !== '/ClashBox/')
         console.log(`#cloudRestore 获取文件列表状态: ${JSON.stringify(this.rawFiles)}`)
         this.cloudFilesController.open()
       } catch (err) {
@@ -261,13 +272,12 @@ struct Backup {
   }
 
   async onSelectFileChange() {
-    console.log(`#cloudRestore 获取文件: ${this.selectFile}`)
+    console.log(`#cloudRestore 获取文件远端路径: ${this.selectFilePath}`)
     if (this.uiConfig.isShowCloudBackupConfig && this.isLogin) {
       try {
-        const value = await this.webdavClient.get(this.selectFile)
-        const textDecoder = util.TextDecoder.create("UTF-8", { ignoreBOM: false })
-        const str = textDecoder.decodeToString(new Uint8Array(value))
-        console.log(`获取文件流状态: ${JSON.stringify(str)}`)
+        const str = await this.webdavManager?.getTextFileContent(this.selectFilePath)
+        console.log(`获取文件文本状态: ${str}`)
+        if (!str) return
         const config = JSON.parse(str) as BackupConfig
         BackupRestoreUtil.restore(config).catch((err: Error) => {
           Xb_ToastUtil.showToast({ message: `云恢复失败 name: ${err.name} message: ${err.message}`, duration: 3000 })
@@ -287,8 +297,8 @@ export default Backup
 @CustomDialog
 struct CloudFiles {
 
-  @Link selectFile: string
-  @Link rawFiles: string[]
+  @Link selectFilePath: string
+  @Link rawFiles: FileInfo[]
   private controller: CustomDialogController
   // 弹窗时背景模糊
   @StorageLink('CustomDialog') showCustomDialogBackgroundBlur: boolean = false
@@ -299,13 +309,13 @@ struct CloudFiles {
         .fontWeight(FontWeight.Medium)
         .fontSize(20)
       List({space: 8}) {
-        ForEach(this.rawFiles, (item: string) => {
+        ForEach(this.rawFiles, (item: FileInfo) => {
           ListItem() {
-            Text(item.replace(/^\/ClashBox\//, ''))
+            Text(item.name.replace(/^\/ClashBox\//, ''))
               .fontWeight(FontWeight.Normal)
-          }
+          }.height(20)
           .onClick(() => {
-            this.selectFile = item
+            this.selectFilePath = item.path.replace(/^\/dav/, '')
             this.showCustomDialogBackgroundBlur = false
             this.controller.close()
           })
@@ -346,7 +356,7 @@ export struct CloudBackup {
   // 服务器地址
   @StorageLink('Server') server_address: string = ''
   // WebDav
-  @StorageLink('Client') webdavClient: Client = new Client('')
+  @StorageLink('WebDAVManager') webdavManager: WebDavManager | null = null
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
@@ -476,11 +486,10 @@ export struct CloudBackup {
                   .onClick(async () => {
                     // 连接测试
                     try {
-                      const value = await this.webdavClient.list('/ClashBox')
-                      console.log(`test #cloudRestore 获取文件列表状态: ${JSON.stringify(value)}`)
-                      Xb_ToastUtil.showToast({ message: `云恢复可用` })
+                      const value = await this.webdavManager?.linkTest()
+                      console.log(`test #cloudRestore 获取文件列表状态: ${JSON.stringify(value, null, 2)}`)
                     } catch (err) {
-                      Xb_ToastUtil.showToast({ message: `文件列表获取失败，云恢复不可用 name: ${err.name} message: ${err.message}`, duration: 3000 })
+                      // Xb_ToastUtil.showToast({ message: `文件列表获取失败，云恢复不可用 name: ${err.name} message: ${err.message}`, duration: 3000 })
                       console.error(`获取文件列表失败 name: ${err.name} message: ${err.message}`)
                     }
                   })

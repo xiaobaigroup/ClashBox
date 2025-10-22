@@ -54,7 +54,7 @@ export interface HomeCardInfo {
 /* 配置 */
 
 // 配置 -> 新增配置时的传输数据
-export interface ConfigData{
+export interface ConfigData {
   // 配置id
   readonly configId: string
   // 是否为新配置（非已有配置进入编辑状态）

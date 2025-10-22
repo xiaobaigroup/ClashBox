@@ -19,6 +19,11 @@ export interface ArrayConfigParam{
   value: string[] | Record<string, string>
 }
 
+@Builder
+export function ArrayConfigEditorBuilder(name: string, param: Object){
+  ArrayConfigEditor({ params: param as ConfigItemData })
+}
+
 // 提取公共组件，复用
 @Component
 export struct ArrayConfigEditor {
@@ -41,7 +46,7 @@ export struct ArrayConfigEditor {
   private promptAction: PromptAction = this.getUIContext().getPromptAction()
   // 编辑路由地址弹窗标题
   @State ArrayConfigList: KeyValueData[] = []
-  @Consume('NavPathStack') pageInfos: NavPathStack
+  @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
   // 平板竖屏判断
   // 平板竖屏判断变量

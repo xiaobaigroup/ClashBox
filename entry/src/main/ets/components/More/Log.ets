@@ -13,11 +13,16 @@ import { hilog } from "@kit.PerformanceAnalysisKit"
 import { universalSearch } from "../../common/utils/SmartSearchUtil"
 import { NeedClearMoreStack, PageMargin } from "../../common/breakpoint/BreakPoint"
 
+@Builder
+export function LogBuilder(name: string, param: Object){
+  Log()
+}
+
 @Component
 struct Log {
   // 是否进入二级界面
   @Consume isSecondary: boolean
-  @Consume('NavPathStack') pageInfos: NavPathStack
+  @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State EnableLogger: boolean = false
   @State filterChecked: number = 0
@@ -321,12 +326,17 @@ struct Log {
 }
 export default Log
 
+@Builder
+export function LogDetailsBuilder(name: string, param: Object){
+  LogDetails()
+}
+
 @Component
-export struct LogDetils {
+export struct LogDetails {
 
   @Consume logListData: Array<LogData>
   @State theLogSkipItem: LogData = NullLogData
-  @Consume('NavPathStack') pageInfos: NavPathStack
+  @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点

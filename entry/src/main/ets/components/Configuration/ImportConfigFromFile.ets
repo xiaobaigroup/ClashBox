@@ -31,10 +31,10 @@ export function ImportConfigFromFileBuilder(name: string, param: Object){
 
 const componentName: string = 'ImportConfigFromFile'
 const mainTitle: string = getResourceString($r('app.string.add_config'), context)
-const  subTitle: string = getResourceString($r('app.string.import_from_file'), context)
+const subTitle: string = getResourceString($r('app.string.import_from_file'), context)
 
 @Component
-export struct ImportConfigFromFile{
+export struct ImportConfigFromFile {
 
   /* 是否开启 配置页 `bindSheet` 组件的前景模糊 */
   @Consume('isEnableConfigPageBindSheetForegroundBlur') isEnableConfigPageBindSheetForegroundBlur: boolean
@@ -57,110 +57,150 @@ export struct ImportConfigFromFile{
   @Consume isShowConfigAddBindSheet: boolean
 
   build() {
-    NavDestination() {
-      // 替代`NavDestination`的标题栏 START
-      BindSheetTitleCustomBuilder({
-        pageInfos: this.configAddPageInfos,
-        isSubPage: this.configData.isNewConfig,
-        titlePaddingLeft: BIND_SHEET_DRAG_BAR_HEIGHT / 2,
-        mainTitle: this.configData.isNewConfig ? mainTitle : getResourceString($r('app.string.edit_config'), this),
-        subTitle: this.configData.isNewConfig ? subTitle : '',
-        mainTitleFontWeight: BIND_SHEET_MAIN_FONT_WEIGHT,
-        mainTitleFontSize: BIND_SHEET_MAIN_FONTSIZE,
-        subTitleFontSize: BIND_SHEET_SUB_FONTSIZE,
-        titleBackgroundColor: $r('app.color.background'),
-        padding: {
-          // 为什么设置`15`，看Builder的参数中`padding`的介绍：ConfigAddBindSheetTitleBuilderParam
-          left: 15,
-          right: BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT + 15 * 2
-        },
-        menus: this.filemenus
+    if (this.configData.configId !== 'new') {
+      // 编辑配置
+      Navigation(this.configAddPageInfos) {
+        this.content()
+      }
+      .height('100%')
+      .hideToolBar(true)
+      .hideTitleBar(true)
+      .backgroundColor($r('app.color.background'))
+    } else {
+      // 新增配置
+      NavDestination() {
+        this.content()
+      }
+      .height('100%')
+      .hideTitleBar(true)
+      .backgroundColor($r('app.color.background'))
+      .onBackPressed(() => {
+        if (this.allInputHaveValue) {
+          // 弹框是否保存已经编辑好的配置
+          this.configCustomConfirmDialogController?.open()
+          // 更改bindSheet的前景模糊
+          this.isEnableConfigPageBindSheetForegroundBlur = true
+          return true
+        } else {
+          return false
+        }
       })
-      // 替代`NavDestination`的标题栏 END
+      .onReady( (ctx: NavDestinationContext) => {
+        // 接收信息
+        try {
+          const params: ConfigData = ctx?.pathInfo?.param as ConfigData
+          console.log('ClashBox#ImportConfigFromFile#onReady 版本详情页接收的params：', JSON.stringify(params))
+          if (params) {
+            this.configData = params
+          }
+        } catch (e) {
+          console.log(`ClashBox#ImportConfigFromFile#onReady Navigate onReady catch exception: ${JSON.stringify(e)}`)
+        }
+      })
+      .animation({ duration:  this.uiConfig.animationSpeed , curve: Curve.Ease })
+    }
 
-      // START
-      Column({space: 10}) {
-        // 配置名input
-        Text($r('app.string.config_name')).fontColor($r('sys.color.font_secondary')).fontSize(FONT_SIZE_16)
-        TextInput(
-          { text: $$this.configData.configName,
-            placeholder: $r('app.string.enter_configuration_name')
-          }).width('100%')
-          .height(TEXT_INPUT_HEIGHT)
-          .borderRadius(BORDER_RADIUS_20)
-          .id('text_input_config_name')
-          .caretColor(this.icon_emphasize)
-          .maxLength(TEXT_AREA_MAX_LENGTH)
-          .enterKeyType(EnterKeyType.Next)
-          // .defaultFocus(true)
-          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+  }
 
-        // 导入文件
+  @Builder
+  content() {
+    // 替代`NavDestination`的标题栏 START
+    BindSheetTitleCustomBuilder({
+      pageInfos: this.configAddPageInfos,
+      isSubPage: this.configData.isNewConfig,
+      titlePaddingLeft: BIND_SHEET_DRAG_BAR_HEIGHT / 2,
+      mainTitle: this.configData.isNewConfig ? mainTitle : getResourceString($r('app.string.edit_config'), this),
+      subTitle: this.configData.isNewConfig ? subTitle : '',
+      mainTitleFontWeight: BIND_SHEET_MAIN_FONT_WEIGHT,
+      mainTitleFontSize: BIND_SHEET_MAIN_FONTSIZE,
+      subTitleFontSize: BIND_SHEET_SUB_FONTSIZE,
+      titleBackgroundColor: $r('app.color.background'),
+      padding: {
+        // 为什么设置`15`，看Builder的参数中`padding`的介绍：ConfigAddBindSheetTitleBuilderParam
+        left: 15,
+        right: BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT + 15 * 2
+      },
+      menus: this.filemenus
+    })
+    // 替代`NavDestination`的标题栏 END
+
+    // START
+    Column({space: 10}) {
+      // 配置名input
+      Text($r('app.string.config_name')).fontColor($r('sys.color.font_secondary')).fontSize(FONT_SIZE_16)
+      TextInput(
+        { text: $$this.configData.configName,
+          placeholder: $r('app.string.enter_configuration_name')
+        }).width('100%')
+        .height(TEXT_INPUT_HEIGHT)
+        .borderRadius(BORDER_RADIUS_20)
+        .id('text_input_config_name')
+        .caretColor(this.icon_emphasize)
+        .maxLength(TEXT_AREA_MAX_LENGTH)
+        .enterKeyType(EnterKeyType.Next)
+        // .defaultFocus(true)
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+
+      // 导入文件
+      Row() {
+        SymbolGlyph($r('sys.symbol.folder'))
+          .fontSize(24)
+          .margin({left: 12})
+          .fontColor([this.icon_emphasize])
+          .transition(customAnimationUtil.isScaleTranIcon(10,this.uiConfig))
+        Text($r('app.string.browse_local_files'))
+          .fontWeight(FontWeight.Medium)
+          .fontSize(16)
+          .margin({ left: 12 })
+        Blank()
+      }.width('100%')
+      .height(53)
+      .borderRadius(20)
+      .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+      .backgroundColor($r('app.color.container_background'))
+      .onClick(() => {
+        let filePicker = new picker.DocumentViewPicker(this.getUIContext().getHostContext()!)
+        let options = new picker.DocumentSelectOptions()
+        filePicker.select(options).then((documentSelectResult) => {
+          this.fileurl = documentSelectResult[0];
+          this.configData.configName = decodeURIComponent(this.fileurl.substring(this.fileurl.lastIndexOf('/') + 1))
+          hilog.debug(0xFF00, componentName, '选取的FileUrl: %{public}s', this.fileurl)
+        })
+      })
+      // 提示
+      Text($r('app.string.import_config_file_tips'))
+        .fontWeight(FontWeight.Normal)
+        .fontSize(15)
+
+      // 编辑配置内容
+      if (this.configData.configId !== 'new') {
         Row() {
           SymbolGlyph($r('sys.symbol.folder'))
             .fontSize(24)
             .margin({left: 12})
             .fontColor([this.icon_emphasize])
             .transition(customAnimationUtil.isScaleTranIcon(10,this.uiConfig))
-          Text($r('app.string.browse_local_files'))
+          Text($r('app.string.edit_config'))
             .fontWeight(FontWeight.Medium)
             .fontSize(16)
             .margin({ left: 12 })
           Blank()
-        }.width('100%')
-        .height(53)
-        .borderRadius(20)
-        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-        .backgroundColor($r('app.color.container_background'))
-        .onClick(() => {
-          let filePicker = new picker.DocumentViewPicker(this.getUIContext().getHostContext()!)
-          let options = new picker.DocumentSelectOptions()
-          filePicker.select(options).then((documentSelectResult)=>{
-            this.fileurl = documentSelectResult[0];
-            this.configData.configName = decodeURIComponent(this.fileurl.substring(this.fileurl.lastIndexOf('/') + 1))
-            hilog.debug(0xFF00, componentName, 'FileUrl: %{public}s', this.fileurl)
-          })
-        })
-        // 提示
-        Text($r('app.string.import_config_file_tips'))
-          .fontWeight(FontWeight.Normal)
-          .fontSize(15)
-        // Text(this.componentName).fontSize(50)
-        // Text(`NavigationListPadding(this.widthBp, this.heightBp) value is [${NavigationListPadding(this.widthBp, this.heightBp)}]`)
-
-      }.width('100%').height('auto')
-      .alignItems(HorizontalAlign.Start)
-      .padding({left: 12, right: 12})
-      // END
-    }
-    .height('100%')
-    .hideTitleBar(true)
-    .backgroundColor($r('app.color.background'))
-    .onBackPressed(() => {
-      if (this.allInputHaveValue) {
-        // 弹框是否保存已经编辑好的配置
-        this.configCustomConfirmDialogController?.open()
-        // 更改bindSheet的前景模糊
-        this.isEnableConfigPageBindSheetForegroundBlur = true
-        return true
-      } else {
-        return false
-      }
-    })
-    .onReady( (ctx: NavDestinationContext) => {
-      // 接收信息
-      try {
-        const params: ConfigData = ctx?.pathInfo?.param as ConfigData
-        console.log('ClashBox#ImportConfigFromFile#onReady 版本详情页接收的params：', JSON.stringify(params))
-        if (params) {
-          this.configData = params
         }
-      } catch (e) {
-        console.log(`ClashBox#ImportConfigFromFile#onReady Navigate onReady catch exception: ${JSON.stringify(e)}`)
+        .height(53)
+        .width('100%')
+        .borderRadius(20)
+        .backgroundColor($r('app.color.container_background'))
+        .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+        .onClick(() => {
+          this.configAddPageInfos.pushPathByName('EditConfigContent', this.configData.configId, true)
+        })
       }
-    })
-    .animation({ duration:  this.uiConfig.animationSpeed , curve: Curve.Ease })
 
+    }
+    .width('100%').height('auto')
+    .alignItems(HorizontalAlign.Start)
+    .padding({left: 12, right: 12})
+    // END
   }
 
   // 保存按钮

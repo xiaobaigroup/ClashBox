@@ -27,7 +27,6 @@ import { PrivacyPolicy, UserAgreement } from "./AgreementPrivacyPage"
 import { PageMargin } from "../../common/breakpoint/BreakPoint"
 import { UpdateLog } from '../Start/UpdateLog';
 import { EventHub, EventKey } from '../../common/EventHub';
-import { Client } from '@dove/webdav';
 
 
 @Entry
@@ -42,8 +41,6 @@ struct Settings {
   @State settingsList: settingsData[] = SettingsListItem()
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  // WebDav
-  @StorageLink('Client') webdavClient: Client = new Client('')
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 当前设备`height`是否符合(320vp< height <= 500vp)
   @StorageLink ('isLandscapePhone') private isLandscapePhone: boolean = false

@@ -32,7 +32,7 @@ class BackupRestoreUtil {
         configList: configList
       }
       const file_path = await Xb_FileUtils.exportDataByFile<BackupConfig>('ClashBoxConfig', backupConfig, BackupRestoreUtil.context, false)
-      console.log(`ClashBoxConfig.backup 配置文件导出成功 备份的文件为：${file_path}`)
+      console.log(`ClashBoxConfig.backup 配置文件导出成功 备份文件的缓存路径为：${file_path}`)
       return file_path
     } catch (err) {
       Xb_ToastUtil.showToast({ message: $r('app.string.export_failed') })

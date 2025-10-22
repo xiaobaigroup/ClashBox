@@ -13,10 +13,15 @@ import { ClashConfig } from "proxy_core"
 import { customAnimationUtil } from "../../../common/utils/Animation"
 import { PageMargin } from "../../../common/breakpoint/BreakPoint"
 
+@Builder
+export function NetworkBuilder(name: string, param: Object){
+  Network()
+}
+
 @Component
 struct Network {
 
-  @Consume('NavPathStack') pageInfos: NavPathStack
+  @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   @State overwriteNetworkList: ConfigItemData[] = []
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
@@ -48,11 +53,16 @@ struct Network {
 }
 export default Network
 
+@Builder
+export function NetworkCompatibleBuilder(name: string, param: Object){
+  NetworkCompatible()
+}
+
 // 网络 -> 兼容模式
 @Component
 export struct NetworkCompatible {
 
-  @Consume('NavPathStack') pageInfos: NavPathStack
+  @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   @State networkCompatibleList: ConfigItemData[] = []
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
@@ -87,6 +97,11 @@ export struct NetworkCompatible {
   }
 }
 
+@Builder
+export function NetworkRouterAddressBuilder(name: string, param: Object){
+  NetworkRouterAddress()
+}
+
 // 网络 -> 路由地址
 @Component
 export struct NetworkRouterAddress {
@@ -109,7 +124,7 @@ export struct NetworkRouterAddress {
   // 编辑路由地址弹窗标题
   @State theEditDialogTitle: ResourceStr = $r('app.string.edit_router_address')
   @State RouterAddressList: RouterAddressData[] = createRouterAddressData()
-  @Consume('NavPathStack') pageInfos: NavPathStack
+  @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean

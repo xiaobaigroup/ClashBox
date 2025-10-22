@@ -10,8 +10,7 @@ import { BIND_SHEET_CONTAINER_HEIGHT,
   TAB_CONTENT_TITLE_FONT_SIZE,
   TAB_CONTENT_TITLE_HEIGHT } from '../common/entity/Constants';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import Log from '../components/More/Log';
-import { LogDetils } from '../components/More/Log';
+import Log, { LogDetails } from '../components/More/Log';
 import Resources from '../components/More/Resources';
 import RequestPage from '../components/More/Request';
 import Connect from '../components/More/Connect';
@@ -75,81 +74,96 @@ struct MorePage {
   // 添加路由地址弹窗标题
   @State QueryIPDialogTitle: ResourceStr = $r('app.string.query_ip_region')
 
+  // 主页面栈
+  @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   // 设置页面栈
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
-  // 主页面栈
-  @Consume('NavPathStack') pageInfos: NavPathStack
-
   // 更多页列表数组
   @Consume moreList: moreData[]
 
 
-
   build() {
-    Navigation(this.pageInfos) {
-      Stack() {
-        // 顶部导航栏
-        Row() {
-          Text($r('app.string.More'))
-            .fontSize(this.curYOffsetMore < 0 ? TAB_CONTENT_TITLE_FONT_SIZE - this.curYOffsetMore / 100 : TAB_CONTENT_TITLE_FONT_SIZE)
-            .fontWeight(FontWeight.Bold)
-            .textAlign(TextAlign.Start)
-        }
-        .width('100%')
-        .zIndex(1)
-        .height(this.curYOffsetMore < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffsetMore : TAB_CONTENT_TITLE_HEIGHT)
-        .position({x: 0,y:this.isRolling && this.isSmallSquareScreen?this.heightTop:0})
-        .backgroundColor($r('app.color.background'))
-        .transition(customAnimationUtil.isSlide(0, this.uiConfig))
-        .padding({ left: 9, right: 9 })
+    if (this.widthBp >= 2) {
+      Navigation(this.pageInfos) {
+        // md及以上宽度
+        this.MoreContent()
+      }
+      .mode(MoreNavMode(this.widthBp, this.heightBp))
+      .hideToolBar(true)
+      .navBarWidth(330)
+      .width('100%')
+      .height('100%')
+    } else {
+     // 手机及以下宽度
+     this.MoreContent()
+    }
+  }
 
-        Scroll() {
-          List({ space: 10 }) {
-            ForEach(this.moreList, (item: moreData, index: number) => {
-              ListItem() {
-                skipRowList({
-                  icons: item.icons,
-                  name: item.name,
-                  title: item.title,
-                  subtitle: item.subtitle,
-                  isPrimaryIcons: true
-                })
-              }.margin({ left: ListItemMarginValue(this.widthBp, this.heightBp), right: ListItemMarginValue(this.widthBp, this.heightBp) })
-              .onClick(() => {
-                this.handleCheck(index)
-              })
-              .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
-            })
-            // 设置行
+  @Builder
+  MoreContent() {
+    Stack() {
+      // 顶部导航栏
+      Row() {
+        Text($r('app.string.More'))
+          .fontSize(this.curYOffsetMore < 0 ? TAB_CONTENT_TITLE_FONT_SIZE - this.curYOffsetMore / 100 : TAB_CONTENT_TITLE_FONT_SIZE)
+          .fontWeight(FontWeight.Bold)
+          .textAlign(TextAlign.Start)
+      }
+      .width('100%')
+      .zIndex(1)
+      .height(this.curYOffsetMore < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffsetMore : TAB_CONTENT_TITLE_HEIGHT)
+      .position({x: 0, y: this.isRolling && this.isSmallSquareScreen ? this.heightTop : 0})
+      .backgroundColor($r('app.color.background'))
+      .transition(customAnimationUtil.isSlide(0, this.uiConfig))
+      .padding({ left: 9, right: 9 })
+
+      Scroll() {
+        List({ space: 10 }) {
+          ForEach(this.moreList, (item: moreData, index: number) => {
             ListItem() {
               skipRowList({
-                icons: $r('sys.symbol.gearshape'),
-                title: $r('app.string.Settings'),
+                icons: item.icons,
+                name: item.name,
+                title: item.title,
+                subtitle: item.subtitle,
                 isPrimaryIcons: true
               })
             }.margin({ left: ListItemMarginValue(this.widthBp, this.heightBp), right: ListItemMarginValue(this.widthBp, this.heightBp) })
             .onClick(() => {
-              this.isShowSettings = true
-              this.isEnableIndexForegroundBlur = true
+              this.handleCheck(index)
             })
-            .transition(customAnimationUtil.isScaleTran(6, this.uiConfig))
-            // 设置页半模态窗口
-            .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
-              detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE],
-              dragBar: false,
-              backgroundColor: $r('app.color.background'),
-              keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
-              scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-              preferType: SheetType.CENTER,
-              onWillDismiss: () => {
-                this.isShowSettings = false
-                this.isEnableIndexForegroundBlur = false
-                this.SettingsPageInfos.clear()
-              }
+            .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
+          })
+          // 设置行
+          ListItem() {
+            skipRowList({
+              icons: $r('sys.symbol.gearshape'),
+              title: $r('app.string.Settings'),
+              isPrimaryIcons: true
             })
+          }.margin({ left: ListItemMarginValue(this.widthBp, this.heightBp), right: ListItemMarginValue(this.widthBp, this.heightBp) })
+          .onClick(() => {
+            this.isShowSettings = true
+            this.isEnableIndexForegroundBlur = true
+          })
+          .transition(customAnimationUtil.isScaleTran(6, this.uiConfig))
+          // 设置页半模态窗口
+          .bindSheet($$this.isShowSettings, this.SettingsSheet(), {
+            detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE],
+            dragBar: false,
+            backgroundColor: $r('app.color.background'),
+            keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
+            scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+            preferType: SheetType.CENTER,
+            onWillDismiss: () => {
+              this.isShowSettings = false
+              this.isEnableIndexForegroundBlur = false
+              this.SettingsPageInfos.clear()
+            }
+          })
 
           /*  ListItem() {
               Button("appCrash 测试按钮，请勿点击").onClick(()=>{
@@ -158,51 +172,44 @@ struct MorePage {
               })
             }*/
 
-          }
-          .width('100%')
-          .height('100%')
-          .edgeEffect(EdgeEffect.Spring)
-          .borderRadius(18)
-          .alignListItem(ListItemAlign.Center)
-          .contentEndOffset(this.isLandscapePhone ? 10 : CONTENT_END_OFFSET_150)
-          .chainAnimation(true)
-          .nestedScroll({
-            scrollForward: NestedScrollMode.PARENT_FIRST,
-            scrollBackward: NestedScrollMode.SELF_FIRST
-          })
-          .onScrollStart(() => {
-            hilog.info(0xFF00, "MorePagetestTag", "#onScrollStart 是否二级页面: %{public}s", this.isSecondary)
-          })
         }
-        .padding({top: (this.isRolling && this.isSmallSquareScreen) ? this.heightTop : TAB_CONTENT_TITLE_HEIGHT})
+        .width('100%')
         .height('100%')
-        .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring: null)
-        .onScrollFrameBegin((offset: number) => {
-          this.curOffsetRemain  += offset
-          if (offset > 0) {
-            this.isRolling = true
-          } else if (offset < 0){
-            this.isRolling = false
-            this.curOffsetRemain = 0
-          }
-          console.info("offsetRemain:" + offset + '/' +this.curOffsetRemain);
-          return { offsetRemain: offset }
+        .edgeEffect(EdgeEffect.Spring)
+        .borderRadius(18)
+        .alignListItem(ListItemAlign.Center)
+        .contentEndOffset(this.isLandscapePhone ? 10 : CONTENT_END_OFFSET_150)
+        .chainAnimation(true)
+        .nestedScroll({
+          scrollForward: NestedScrollMode.PARENT_FIRST,
+          scrollBackward: NestedScrollMode.SELF_FIRST
         })
-        .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {
-          // 累计计算当前父组件滚动在Y轴方向的偏移量
-          if (this.uiConfig.isAnimation){
-            this.curYOffsetMore += yOffset
-          }
-          console.info("yOffset" + this.curYOffsetMore);
+        .onScrollStart(() => {
+          hilog.info(0xFF00, "MorePagetestTag", "#onScrollStart 是否二级页面: %{public}s", this.isSecondary)
         })
-      }.height('100%').width('100%')
-    }
-    .hideToolBar(true)
-    .mode(MoreNavMode(this.widthBp, this.heightBp))
-    .navBarWidth(330)
-    .navDestination(this.PagesMap)
-    .width('100%')
-    .height('100%')
+      }
+      .padding({top: (this.isRolling && this.isSmallSquareScreen) ? this.heightTop : TAB_CONTENT_TITLE_HEIGHT})
+      .height('100%')
+      .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring: null)
+      .onScrollFrameBegin((offset: number) => {
+        this.curOffsetRemain  += offset
+        if (offset > 0) {
+          this.isRolling = true
+        } else if (offset < 0){
+          this.isRolling = false
+          this.curOffsetRemain = 0
+        }
+        console.info("offsetRemain:" + offset + '/' +this.curOffsetRemain);
+        return { offsetRemain: offset }
+      })
+      .onDidScroll((xOffset: number, yOffset: number, scrollState: ScrollState): void => {
+        // 累计计算当前父组件滚动在Y轴方向的偏移量
+        if (this.uiConfig.isAnimation){
+          this.curYOffsetMore += yOffset
+        }
+        console.debug("yOffset" + this.curYOffsetMore);
+      })
+    }.height('100%').width('100%')
   }
 
   /**
@@ -255,55 +262,8 @@ struct MorePage {
       hilog.isLoggable(0xFF00, "MoretestTag", hilog.LogLevel.INFO);
       hilog.info(0xFF00, "MoretestTag", itemData.name)
       hilog.info(0xFF00, "MoretestTag", "isCheck状态: %{public}s", itemData.isCheck)
-      this.pageInfos.replacePathByName(itemData.name, false)
+      this.pageInfos.replacePathByName(itemData.name, null, true)
       this.isSecondary = true //TabBarVertical(this.widthBp, this.heightBp) ? false : true
-    }
-  }
-
-  // 更多页路由表
-  @Builder
-  PagesMap(name: string, params: string | ConfigItemData) {
-    if (name == 'Log') {
-      Log()
-    } else
-    if (name == 'Resources') {
-      Resources()
-    } else
-    if (name == 'Request') {
-      RequestPage()
-    } else
-    if (name == 'Connect') {
-      Connect()
-    } else
-    if (name == 'Overwrite') {
-      Overwrite()
-    } else
-    if (name == 'Diversion') {
-      Diversion()
-    } else
-    if (name == 'Basic') {
-      Basic()
-    } else
-    if (name == 'DNS') {
-      DNS()
-    } else
-    if (name == 'Network') {
-      Network()
-    } else
-    if (name == 'Route-Address') {
-      NetworkRouterAddress()
-    } else
-    if (name == 'EditArrayConfig') {
-      ArrayConfigEditor({params: params as ConfigItemData})
-    } else
-    if (name == 'LogDetils') {
-      LogDetils()
-    } else
-    if (name == 'compatible') {
-      NetworkCompatible()
-    } else
-    if (name == 'AccessControl') {
-      AccessControl()
     }
   }
 

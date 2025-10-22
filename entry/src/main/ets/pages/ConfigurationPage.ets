@@ -34,7 +34,7 @@ import { harmonyShare, systemShare } from '@kit.ShareKit'
 import { uniformTypeDescriptor as utd } from '@kit.ArkData'
 import { common, Context } from '@kit.AbilityKit'
 import { BusinessError } from '@kit.BasicServicesKit';
-import { fileUri, fileIo as fs } from '@kit.CoreFileKit'
+import { fileUri, fileIo as fs, fileIo, picker } from '@kit.CoreFileKit'
 import { ShareData, Xb_Share, Xb_ToastUtil } from 'xb_components'
 
 /**
@@ -380,7 +380,7 @@ struct ConfigurationPage {
       },
       confirm: () => {
         this.isEnableIndexForegroundBlur = false
-        this.promptAction.showToast({ message: $r('app.string.click_error_prompt') })
+        Xb_ToastUtil.showToast({ message: $r('app.string.click_error_prompt') })
       }
     }),
     cancel: () => {
@@ -410,17 +410,17 @@ struct ConfigurationPage {
         { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.share'))
         .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
         content: $r('app.string.share'), callback: () => { this.shareConfigUrl() }
-      } as LongPressContextMenuItem ] : [])
+      } as LongPressContextMenuItem ] : []),
       // TODO 生成二维码、创建副本
     /* { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.qrcode'))
        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
        content: $r('app.string.generate_QR_code'), callback: ()=>{ this.generateQRcode() }
      },*/
-    // XXX 分享链接和导出配置文件都已经集成到了“分享”菜单里
-    /*    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.doc_text'))
-          .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-          content: '导出配置文件', callback: ()=>{ this.generateQRcode() }
-        },*/
+      // 导出配置文件
+      { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.doc_text'))
+        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
+        content: $r('app.string.export_config_file'), callback: () => { this.exportConfig() }
+      },
     /* { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.plus_square_on_square'))
        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
        content: $r('app.string.create_copy'), callback: ()=>{ this.generateQRcode() }
@@ -429,7 +429,9 @@ struct ConfigurationPage {
 
   }
 
-  /**配置页面ListItem的长按ContextMenu的Builder*/
+  /**
+   * 配置页面ListItem的长按ContextMenu的Builder
+   */
   @Builder
   configListLongPressCtxMenuBuilder(isFavorite: boolean, data: ConfigData) {
     // 当菜单过多（横屏时），自身的滚动条不支持回弹，套一层Scroll
@@ -608,27 +610,33 @@ struct ConfigurationPage {
     Xb_Share.immersiveDisablingListening('all')
   }
 
-  /**收藏配置*/
+  /**
+   * 收藏配置
+   */
   private favoriteConfig(): void {
     if (this.favoriteProfiles.size <= 3) {
-    this.promptAction.showToast({ message: $r('app.string.Collect_Tip') })
+      Xb_ToastUtil.showToast({ message: $r('app.string.Collect_Tip') })
     hilog.info(0xC010, componentName, `#favoriteConfig#收藏配置: configName is [${this.currentTouchConfigData.configName}]`)
     this.currentTouchConfigData.isFavorite = true
     this.favoriteProfiles.set(this.currentTouchConfigData.configId, this.currentTouchConfigData.configName)
     } else {
-      this.promptAction.showToast({ message: $r('app.string.favorite_config_no') })
+      Xb_ToastUtil.showToast({ message: $r('app.string.favorite_config_no') })
     }
   }
 
-  /**取消收藏配置*/
+  /**
+   * 取消收藏配置
+   */
   private cancelFavoriteConfig(): void {
-    this.promptAction.showToast({ message: $r('app.string.uncollected_tip') })
+    Xb_ToastUtil.showToast({ message: $r('app.string.uncollected_tip') })
     hilog.info(0xC010, componentName, `#favoriteConfig#取消收藏配置: configName is [${this.currentTouchConfigData.configName}]`)
     this.currentTouchConfigData.isFavorite = false
     this.favoriteProfiles.delete(this.currentTouchConfigData.configId)
   }
 
-  /**编辑配置*/
+  /**
+   * 编辑配置
+   */
   private editConfig(): void {
     hilog.info(0xC011, componentName, `#editConfig#编辑配置: configName is [${this.currentTouchConfigData.configName}]`)
     // 识别配置导入途径
@@ -642,7 +650,7 @@ struct ConfigurationPage {
 
   /**更新配置*/
   private async updateConfig(configId?: string): Promise<void> {
-    this.promptAction.showToast({message: $r('app.string.updating_config')})
+    Xb_ToastUtil.showToast({message: $r('app.string.updating_config')})
     this.loadConfig(this.currentRadioConfigData, true)
     if (configId) {
       this.isRefreshing = false
@@ -650,14 +658,14 @@ struct ConfigurationPage {
       this.isON.toggleAnim = true
       await ClashViewModel.updateProfileConfig(configId)
       hilog.info(0xC012, componentName, `#updateConfig#更新配置{单个}: configUrl is [${this.currentTouchConfigData.configUrl}], configId is [${this.currentTouchConfigData.configId}]`)
-      this.promptAction.showToast({message: $r('app.string.updated_success_config')})
+      Xb_ToastUtil.showToast({message: $r('app.string.updated_success_config')})
     } else {
       // 使开关点击时不触发转场动画
       this.isON.toggleAnim = true
       hilog.info(0xC012, componentName, `#updateConfig#更新配置{所有}`)
       await ClashViewModel.updateProfileConfig(null)
       this.isRefreshing = false
-      this.promptAction.showToast({message: $r('app.string.updated_success_config')})
+      Xb_ToastUtil.showToast({message: $r('app.string.updated_success_config')})
     }
   }
 
@@ -699,9 +707,10 @@ struct ConfigurationPage {
     }
   }
 
-  /** @description 获取分享的数据
+  /**
+   *  @description 获取分享的数据
    *  @param type touch | radio -> touch 长按选中的配置项，radio 当前选中的配置项
-   * */
+   */
   private async getShareData(type: 'touch' | 'radio' = 'radio'): Promise<ShareData> {
     const currentConfigData = type === 'touch' ? this.currentTouchConfigData : this.currentRadioConfigData
 
@@ -735,7 +744,9 @@ struct ConfigurationPage {
     return shareData
   }
   
-  /** @description 开启 隔空投递、碰一碰 分享监听 */
+  /**
+   * @description 开启 隔空投递、碰一碰 分享监听
+   */
   private async openShare() {
     if (canIUse('SystemCapability.Collaboration.HarmonyShare')) {
       const shareData = await this.getShareData('radio')
@@ -762,20 +773,45 @@ struct ConfigurationPage {
    *    2. 其他方式导入的配置不能生成二维码
    */
   private generateQRcode(): void {
-    // TODO 弹框CustomDialog，在其中实现“配置url”生成二维码的功能
-    this.promptAction.showToast({ message: `${getResourceString($r('app.string.config_share_prompt'), this)}~🫡` })
+    Xb_ToastUtil.showToast({ message: `${getResourceString($r('app.string.config_share_prompt'), this)}~🫡` })
     hilog.info(0xC014, componentName, `#generateQRcode#生成二维码: configName is [${this.currentTouchConfigData.configName}]`)
   }
 
-  /**导出配置*/
-  private exportConfig(): void {
-    // TODO 导出配置
-    hilog.info(0xC015, componentName, `#deleteConfig#删除配置: configName is [${this.currentTouchConfigData.configName}]`)
+  /**
+   * 导出配置文件
+   */
+  private async exportConfig(): Promise<void> {
+    hilog.info(0xC015, componentName, `#exportConfig #导出配置文件: configName is [${this.currentTouchConfigData.configName}]`)
+    const context = this.getUIContext().getHostContext()!
+    // 提取配置名称
+    const fileNameDotIndex = this.currentTouchConfigData.configName.lastIndexOf('.')
+    const fileName = (fileNameDotIndex == -1 || fileNameDotIndex == 0) ? this.currentTouchConfigData.configName : this.currentTouchConfigData.configName.slice(0, fileNameDotIndex)
+    console.debug(`待导出配置文件的 fileName: ${fileName}`)
+    const sandPath = context.filesDir + `/ClashBox/profiles/` + this.currentTouchConfigData.configId + '/config.yaml'
+    const sandUri = fileUri.getUriFromPath(sandPath)
+    const filePicker = new picker.DocumentViewPicker(context)
+    const options = new picker.DocumentSaveOptions()
+    options.newFileNames = [fileName]
+    options.fileSuffixChoices = ["'文档|.yaml'"]
+    options.pickerMode = picker.DocumentPickerMode.DOWNLOAD
+    const result = await filePicker.save(options)
+    const exportUri = fileUri.getUriFromPath(result[0] + `/${fileName}.yaml`)
+    console.debug(`待导出配置文件的 沙箱目录Uri: ${sandUri} 下载目录Uri: ${exportUri}`)
+    try {
+      // 导出至下载文件夹
+      fs.copy(sandUri, exportUri).then(()=>{
+        console.info("Succeeded in copying.");
+      }).catch((err: BusinessError)=>{
+        console.error(`Failed to copy. Code: ${err.code}, message: ${err.message}`);
+      })
+    } catch (error) {
+      console.error(`配置文件导出失败，name：${error.name} message：${error.message}`)
+    }
   }
 
   /**删除配置*/
   private async  deleteConfig(): Promise<void> {
-    this.promptAction.showToast({ message: `${getResourceString($r('app.string.configuration_deleted'), this)}💔` })
+    Xb_ToastUtil.showToast({ message: `${getResourceString($r('app.string.configuration_deleted'), this)}💔` })
     hilog.info(0xC016, componentName, `#deleteConfig#删除配置: configName is [${this.currentTouchConfigData.configName}]`)
     await ClashViewModel.deleteProfile(this.currentTouchConfigData.configId)
     this.appConfig.currentProxyName = undefined
@@ -784,7 +820,9 @@ struct ConfigurationPage {
     EventHub.sendEvent(EventKey.FetchProfile)
   }
 
-  /** @description 监听选中的配置项变化 */
+  /**
+   * @description 监听选中的配置项变化
+   */
   async onChangeConfig() {
     // 选中项变更重新监听分享
     try {
@@ -792,9 +830,9 @@ struct ConfigurationPage {
     } catch (e) {
       hilog.error(0xC014, componentName, `选中项变更取消监听分享 - error: ${JSON.stringify(e)}`)
     }
-
     await this.openShare()
   }
+
 }
 
 

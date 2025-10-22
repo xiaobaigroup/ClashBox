@@ -2235,6 +2235,10 @@
     {
       "name": "configuration_shared",
       "value": "Configuration Sharing"
+    },
+    {
+      "name": "export_config_file",
+      "value": "Export configuration file"
     }
   ]
 }

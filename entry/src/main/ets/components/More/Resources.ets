@@ -85,6 +85,10 @@ export const resourcesBlankData: Array<ResourcesData> = [
   }
 ]
 
+@Builder
+export function ResourcesBuilder(name: string, param: Object){
+  Resources()
+}
 
 @Component
 struct Resources {
@@ -92,7 +96,7 @@ struct Resources {
   @Consume isSecondary: boolean
   @State theNumberUpdated: number = 0
   @State isRefreshing: boolean = false
-  @Consume('NavPathStack') pageInfos: NavPathStack
+  @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   // 高度断点

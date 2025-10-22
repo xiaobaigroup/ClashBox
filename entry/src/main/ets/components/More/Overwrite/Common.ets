@@ -18,14 +18,21 @@ import { PageMargin } from '../../../common/breakpoint/BreakPoint'
 export struct ConfigList {
   @Prop configList: ConfigItemData[]
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
+
+  @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  // 开关不触发list转场动画判定
+  @State isON:isON = new isON()
+
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
-  @Consume('NavPathStack') pageInfos: NavPathStack
+  // 状态栏高度
+  @StorageProp('topRectHeight') topRectHeight: number = 0
+
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State isShowIcons: boolean = true
   @State theplaceholder: string = ''
@@ -34,10 +41,9 @@ export struct ConfigList {
   @State SaveInputValue: string = ''
   @State theDialogTitle: ResourceStr = ''
   @State theUnit: ResourceStr = ''
-  //page内顶部标题偏移量
+  // page内顶部标题偏移量
   @Consume curYOffset: number
-  //开关不触发list转场动画判定
-  @State isON:isON = new isON()
+
 
   dialogController: CustomDialogController = new CustomDialogController({
     builder: theCustomDialog({
@@ -175,7 +181,8 @@ export struct ConfigList {
 
   build() {
     Column() {
-      Blank().height(TAB_CONTENT_TITLE_HEIGHT + 6)
+      Blank()
+        .height(TAB_CONTENT_TITLE_HEIGHT + (this.widthBp < 2 ? this.topRectHeight : 0) + 6)
       Scroll() {
         List({ space: 12 }) {
           ForEach(this.configList, (item: ConfigItemData, index: number) => {

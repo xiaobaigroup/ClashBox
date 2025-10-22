@@ -17,31 +17,40 @@ export struct MoreTop {
 
   @Prop icon1: Resource
   @Prop icon2: Resource
-  // 是否进入二级界面
-  @Consume isSecondary: boolean
-  // 更多页路由表
-  @Consume('NavPathStack') pageInfos: NavPathStack
+
   // 标题
   @State title?: Resource = undefined
-  // 元素名称标识
-  @State name: string = ''
   // 副标题
   @State subtitle: ResourceStr = ''
-  @Consume needSearch: boolean
-  @Consume isSearching: boolean
   @Consume searchText: string
+  // 元素名称标识
+  @State name: string = ''
+
+  @Consume isSearching: boolean
+  // 是否进入二级界面
+  @Consume isSecondary: boolean
+  @Consume needSearch: boolean
+
   // page内顶部标题偏移量
   @Consume curYOffset: number
-  @Prop enableClick2: boolean = true
+
   @BuilderParam theMenu: () => void = this.TheMenu
+
   @StorageProp('WindowMode') windowMode: boolean = false
-  /* 主题色 */
+  @Prop enableClick2: boolean = true
+  /** 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
+
+  // 更多页路由表
+  @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+  // 状态栏高度
+  @StorageProp('topRectHeight') topRectHeight: number = 0
+
   onClick1: () => void = () => {}
   onClick2: () => void = () => {}
 
@@ -166,6 +175,7 @@ export struct MoreTop {
     .layoutWeight(1)
     .position({x: 0})
     .alignItems(VerticalAlign.Center)
+    .margin({ top: this.widthBp < 2 ? this.topRectHeight : 0 })
     .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
     .padding({right: this.windowMode ? 120 : PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp)})
   }

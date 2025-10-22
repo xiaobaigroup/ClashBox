@@ -2235,6 +2235,10 @@
     {
       "name": "keep_task",
       "value": "任務保持"
+    },
+    {
+      "name": "export_config_file",
+      "value": "匯出設定檔"
     }
   ]
 }

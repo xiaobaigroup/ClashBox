@@ -66,7 +66,7 @@ export struct ConfigAdd {
       // NV路由 START
       Navigation(this.configAddPageInfos){
         // 添加配置几种方式的ListItem START
-        List({ space: LIST_SPACE }){
+        List({ space: LIST_SPACE }) {
           ForEach( this.configAddTypeArray, (item: ConfigAddType, index: number)=> {
             ListItem() {
               Row() {

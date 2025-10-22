@@ -14,6 +14,10 @@ import { Xb_CapsuleButton, Xb_CircleButton, Xb_FileUtils, Xb_GetResourceString, 
 import { customAnimationUtil } from "../../common/utils/Animation"
 import { EventHub, EventKey } from '../../common/EventHub'
 
+@Builder
+export function AccessControlBuilder(name: string, param: Object){
+  AccessControl()
+}
 
 @Component
 export struct AccessControl {
@@ -33,7 +37,7 @@ export struct AccessControl {
   @State kvDialogTitle: ResourceStr = ''
   @Consume @Watch('applist') isSearching: boolean
   @Consume @Watch('searchApps') searchText: string
-  @Consume('NavPathStack') pageInfos: NavPathStack
+  @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State keyValueData: KeyValueData = new KeyValueData("")
