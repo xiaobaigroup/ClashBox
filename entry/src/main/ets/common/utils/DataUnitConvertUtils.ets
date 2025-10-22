@@ -12,6 +12,11 @@ export interface ConvertedUnit {
   unit: 'TB' | 'GB' | 'MB' | 'KB' | 'B';
 }
 
+export interface NormalizedDataResult {
+  normalizedData: number[];
+  maxValue: number;
+}
+
 const conversionFactors: GeneratedUnitInterface = {
   TB: 1024 ** 4,
   GB: 1024 ** 3,
@@ -192,4 +197,123 @@ export function convertDataNumberT(bNumber: number): string {
     return "--"
     // 如果小于1KB，则保持为B
   return (show.toFixed(0)  + " " + unit).toString()
+}
+
+/**
+ * @description 将带单位的数据数组标准化为统一单位的数字数组
+ * 该方法会自动识别数据中的最高单位，并将所有数据统一转换为该单位
+ * 
+ * @param data - 带单位的数据数组 ConvertedUnit[] 或 number[]
+ * @returns 标准化后的数据和最大值
+ * 
+ * @example
+ * // 输入示例：混合单位的流量数据
+ * const inputData = [
+ *   {"value": 0, "unit": "B"},
+ *   {"value": 421.99, "unit": "KB"},
+ *   {"value": 3.44, "unit": "MB"},
+ *   {"value": 4.46, "unit": "MB"},
+ *   {"value": 4.50, "unit": "MB"},
+ *   {"value": 4.40, "unit": "MB"},
+ *   {"value": 3.99, "unit": "MB"},
+ *   {"value": 4.13, "unit": "MB"},
+ *   {"value": 4.15, "unit": "MB"},
+ *   {"value": 4.57, "unit": "MB"},
+ *   {"value": 3.63, "unit": "MB"},
+ *   {"value": 238.94, "unit": "KB"}
+ * ]
+ * 
+ * // 输出示例：统一转换为 MB 单位的数值数组
+ * const result = normalizeChartData(inputData)
+ *  result = {
+ *    normalizedData: [0, 0.412, 3.44, 4.46, 4.50, 4.40, 3.99, 4.13, 4.15, 4.57, 3.63, 0.233],
+ *    maxValue: 4.57
+ *  }
+ */
+export function normalizeChartData(data: ConvertedUnit[] | number[]): NormalizedDataResult {
+  // 如果是纯数字数组，直接返回
+  if (typeof data[0] === 'number') {
+    const numData = data as number[]
+    const result: NormalizedDataResult = {
+      normalizedData: numData,
+      maxValue: Math.max(...numData)
+    }
+    return result
+  }
+  
+  const convertedData = data as ConvertedUnit[]
+  
+  // 单位优先级权重（用于确定基准单位）
+  const unitPriority: Record<string, number> = {
+    'B': 1,
+    'KB': 2,
+    'MB': 3,
+    'GB': 4,
+    'TB': 5
+  }
+  
+  // 找出数据中最高优先级的单位（通常是最大值的单位）
+  let targetUnit: keyof GeneratedUnitInterface = 'KB' // 默认使用 KB
+  let maxPriority = 0
+  
+  convertedData.forEach(item => {
+    const priority = unitPriority[item.unit] || 0
+    if (priority > maxPriority) {
+      maxPriority = priority
+      targetUnit = item.unit as keyof GeneratedUnitInterface
+    }
+  })
+  
+  // 将所有数据转换为目标单位
+  const normalizedData = convertedData.map((item): number => {
+    // 先转换为字节
+    let itemBytes: number = 0
+    switch (item.unit) {
+      case 'TB':
+        itemBytes = item.value * conversionFactors.TB
+        break
+      case 'GB':
+        itemBytes = item.value * conversionFactors.GB
+        break
+      case 'MB':
+        itemBytes = item.value * conversionFactors.MB
+        break
+      case 'KB':
+        itemBytes = item.value * conversionFactors.KB
+        break
+      case 'B':
+        itemBytes = item.value * conversionFactors.B
+        break
+    }
+    
+    // 再转换为目标单位
+    let targetFactor: number = conversionFactors.KB // 默认
+    switch (targetUnit) {
+      case 'TB':
+        targetFactor = conversionFactors.TB
+        break
+      case 'GB':
+        targetFactor = conversionFactors.GB
+        break
+      case 'MB':
+        targetFactor = conversionFactors.MB
+        break
+      case 'KB':
+        targetFactor = conversionFactors.KB
+        break
+      case 'B':
+        targetFactor = conversionFactors.B
+        break
+    }
+    
+    return itemBytes / targetFactor
+  })
+  
+  const maxValue = Math.max(...normalizedData)
+  
+  const finalResult: NormalizedDataResult = {
+    normalizedData,
+    maxValue
+  }
+  return finalResult
 }

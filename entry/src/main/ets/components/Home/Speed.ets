@@ -4,7 +4,12 @@ import { CHART_NUMBER } from '../../common/entity/Constants';
 import { AppFlowingState, UIConfig } from '../../entryability/AppState';
 import { JSON } from '@kit.ArkTS';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { convertDataArray, ConvertedUnit } from '../../common/utils/DataUnitConvertUtils';
+import {
+  convertDataArray,
+  ConvertedUnit,
+  NormalizedDataResult,
+  normalizeChartData
+} from '../../common/utils/DataUnitConvertUtils';
 import { customAnimationUtil } from '../../common/utils/Animation';
 import { HomeCardPadding, HomeCardSpeedFontSize } from '../../common/breakpoint/BreakPoint';
 import { LengthMetrics } from '@kit.ArkUI';
@@ -13,13 +18,12 @@ import { Xb_ResourceColorUtil } from 'xb_components';
 
 @Component
 struct Speed {
-
   @StorageProp("appFlowingState") appFlowingState: AppFlowingState = new AppFlowingState()
   @StorageLink('uiConfig') @Watch('colorTheme') uiConfig: UIConfig = new UIConfig()
   // 高度断点
-  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  @StorageLink('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
-  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+  @StorageLink('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @Consume @Watch('proxyEnabledChanged') proxyEnabled: boolean
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
@@ -34,7 +38,7 @@ struct Speed {
   // 定时器ID，用于清除定时器
   private timerId: number = 0
   // 初始化图表数据
-  private defOption: Options = new Options({
+  @State defOption: Options = new Options({
     //图例
     legend: {
       show: false,
@@ -88,7 +92,7 @@ struct Speed {
       {
         data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         lineStyle: {
-          width: 2,
+          width: 3,
           color: this.colorTheme()
         },
         label: {
@@ -104,7 +108,7 @@ struct Speed {
         direction: FlexDirection.Row,
         justifyContent: FlexAlign.SpaceBetween
       }) {
-        CardTitle({title: $r('app.string.Speed')})
+        CardTitle({ title: $r('app.string.Speed') })
 
         Column() {
           Flex({
@@ -172,37 +176,35 @@ struct Speed {
     // Tip 如果是一条曲线 合成一个 up + down
     this.ChartData = this.proxyEnabled ? convertDataArray(this.appFlowingState.traffics.getData()) : CHART_NUMBER
     hilog.info(0xFF00, "HomeSpeedTestTag", "data: %{public}s", JSON.stringify(this.ChartData))
+
+    // 将带单位的数据转换为统一单位的数字数组
+    const result: NormalizedDataResult = normalizeChartData(this.ChartData)
+    const normalizedData: number[] = result.normalizedData
+    const maxValue: number = result.maxValue
+
+    // 更新图表配置
     this.defOption.setVal({
+      yAxis: {
+        min: 0,
+        max: Math.max(maxValue * 1.2, 10), // 最大值增加 20% 作为上限，最小为 10
+        axisTick: {
+          show: false
+        },
+        axisLine: {
+          show: false
+        },
+        splitLine: {
+          show: false
+        },
+        axisLabel: {
+          show: false
+        }
+      },
       series: [
-      /*{
-         smooth: false, //平滑曲线
-         name: '上行速度(Kb/s)',
-         data: this.appFlowingState.traffics.map((d) => d.up.value),
-         label: {
-           show: false,
-           color: '#FFF7980A',
-           offset: [-10, -10]//线条标签偏移量
-         },
-         //折线拐点配置
-         itemStyle: {
-           symbol: 'solidCircle',
-           symbolSize: 2,
-           borderWidth: 1
-         },
-         lineStyle: {
-           width: 3,
-           color: '#FFF7980A'
-         },
-         // 区域颜色，线性渐变
-         areaStyle: {
-           show: true,
-           gradient: ['#99f7980a']
-         },
-       },*/
         {
           smooth: true, //平滑曲线
           name: '',
-          data: this.ChartData,
+          data: normalizedData, // 使用转换后的纯数字数组
           label: {
             show: false,
             color: this.colorTheme(),
@@ -229,12 +231,45 @@ struct Speed {
         }
       ]
     })
+
+    /*this.defOption.setVal({
+     series: [
+      {
+        smooth: true, //平滑曲线
+        name: '',
+        data: this.ChartData,
+        label: {
+          show: false,
+          color: this.colorTheme(),
+          offset: [0, 0]
+        },
+        endLabel:{
+          show:false
+        },
+        //折线拐点配置
+        itemStyle: {
+          symbol: this.colorTheme(),
+          symbolSize: 2,
+          borderWidth: 1
+        },
+        lineStyle: {
+          width: 3,
+          color: this.colorTheme()
+        },
+        // 区域颜色，线性渐变
+        areaStyle: {
+          show: true,
+          gradient: [this.colorTheme()]
+        },
+      }
+    ]
+  })*/
   }
 
   /**@Watch监听事件：开启代理时启动定时器*/
   proxyEnabledChanged() {
     // 只有主页显示的时候启动
-    animateTo({
+    this.getUIContext().animateTo({
       duration: this.uiConfig.animationSpeed,
       iterations: 1,
       playMode: PlayMode.Normal,
@@ -243,8 +278,11 @@ struct Speed {
       hilog.info(0xFF00, "HomeSpeedTestTag", `代理启用状态：${this.proxyEnabled} 是否前台：${this.isForward} 是否位于主页: ${this.isHomePage}`)
       if (this.proxyEnabled && this.isForward && this.isHomePage) {
         // 设置定时器，每秒调用一次 onSpeedData 函数
-        this.timerId = setInterval( () => {
+        this.timerId = setInterval(() => {
           this.onSpeedData()
+        }, 1000)
+
+        setTimeout(()=>{
           this.lineStart = false
         }, 1000)
       } else {
@@ -332,7 +370,6 @@ struct Speed {
     let colorValue = Xb_ResourceColorUtil(this.icon_emphasize, this.getUIContext().getHostContext()!)
     return colorValue
   }
-
 }
 
 export default Speed
