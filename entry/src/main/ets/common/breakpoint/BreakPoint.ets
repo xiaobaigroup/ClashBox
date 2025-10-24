@@ -339,7 +339,7 @@ export const TabContentTitleMargin = BreakpointFunction2D<number>({
 /**更多页是否清空路由*/
 export const NeedClearMoreStack = BreakpointFunction2D<boolean>({
   ['sm']: {['hsm']: true, ['hmd']: true, ['hlg']: true},
-  ['md']: {['hsm']: false, ['hmd']: false, ['hlg']: false},
+  ['md']: {['hsm']: true, ['hmd']: false, ['hlg']: false},
   ['lg']: {['hsm']: false, ['hmd']: false, ['hlg']: false},
   ['xl']: {['hsm']: false, ['hmd']: false, ['hlg']: false},
 })

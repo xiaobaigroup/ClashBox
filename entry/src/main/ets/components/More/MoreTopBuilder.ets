@@ -17,6 +17,7 @@ export struct MoreTop {
 
   @Prop icon1: Resource
   @Prop icon2: Resource
+  @Prop needBackButton: boolean = false
 
   // 标题
   @State title?: Resource = undefined
@@ -81,7 +82,7 @@ export struct MoreTop {
           this.isSearching = false
         })
       } else {
-        if (NeedClearMoreStack(this.widthBp, this.heightBp)) {
+        if (NeedClearMoreStack(this.widthBp, this.heightBp) || this.needBackButton) {
           // 返回图标
           Button({ type: ButtonType.Circle, stateEffect: true }) {
             SymbolGlyph($r('sys.symbol.chevron_left'))

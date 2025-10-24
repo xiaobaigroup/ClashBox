@@ -16,6 +16,7 @@ import { PageMargin } from '../../../common/breakpoint/BreakPoint'
 
 @Component
 export struct ConfigList {
+
   @Prop configList: ConfigItemData[]
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
 

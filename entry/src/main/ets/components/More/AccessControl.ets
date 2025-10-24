@@ -49,6 +49,8 @@ export struct AccessControl {
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+  // 状态栏高度
+  @StorageProp('topRectHeight') topRectHeight: number = 0
   @State modeTabOptions: SegmentButtonOptions = SegmentButtonOptions.tab({
     buttons: [{ text: $r('app.string.white_list') }, { text: $r('app.string.blacklist')
     }] as ItemRestriction<SegmentButtonTextItem>,
@@ -83,7 +85,7 @@ export struct AccessControl {
         })
         // 控制区
         Column({ space: 10}) {
-          Blank().height(TAB_CONTENT_TITLE_HEIGHT - (this.uiConfig.stringDisplayIndex === 0 ? 12 : 6))
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT - (this.uiConfig.stringDisplayIndex === 0 ? 12 : 6) + this.topRectHeight)
           // 访问控制开关
           toggleRowList({
             title: $r('app.string.app_access_control'),

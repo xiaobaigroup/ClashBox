@@ -117,6 +117,8 @@ struct Resources {
   @State isLoading: number = -1
   @State isLoadingAll: boolean = false
   @Provide isShowGroupSort: Boolean = false
+  // 状态栏高度
+  @StorageProp('topRectHeight') topRectHeight: number = 0
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   private promptAction: PromptAction = this.getUIContext().getPromptAction()
   @Provide resourceListData: Array<ResourcesData> = theResouresData
@@ -271,7 +273,7 @@ struct Resources {
         })
 
         Column() {
-          Blank().height(TAB_CONTENT_TITLE_HEIGHT+6)
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT + (this.widthBp < 2 ? this.topRectHeight : 0) + 6)
           // 页面
           if (this.resourceListData.length === 0) {
             Nothing({ name: $r('app.string.Resources') })

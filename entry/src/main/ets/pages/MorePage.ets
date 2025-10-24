@@ -86,20 +86,15 @@ struct MorePage {
 
 
   build() {
-    if (this.widthBp >= 2) {
-      Navigation(this.pageInfos) {
-        // md及以上宽度
-        this.MoreContent()
-      }
-      .mode(MoreNavMode(this.widthBp, this.heightBp))
-      .hideToolBar(true)
-      .navBarWidth(330)
-      .width('100%')
-      .height('100%')
-    } else {
-     // 手机及以下宽度
-     this.MoreContent()
+    Navigation(this.pageInfos) {
+      // md及以上宽度
+      this.MoreContent()
     }
+    .mode(MoreNavMode(this.widthBp, this.heightBp))
+    .hideToolBar(true)
+    .navBarWidth(330)
+    .width('100%')
+    .height('100%')
   }
 
   @Builder

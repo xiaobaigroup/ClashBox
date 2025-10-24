@@ -45,7 +45,7 @@ struct OverwriteTop {
           .fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Start)
           .margin({left: 8})
-        if(this.subtitle) {
+        if (this.subtitle) {
           Text(this.subtitle)
             .fontWeight(FontWeight.Normal)
             .margin({top: 2, left: 8})

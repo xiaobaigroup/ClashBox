@@ -341,6 +341,8 @@ export struct LogDetails {
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+  // 状态栏高度
+  @StorageProp('topRectHeight') topRectHeight: number = 0
   // 一级图标色，黑色
   @State icon_primary: ResourceColor = $r('sys.color.icon_primary')
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
@@ -375,7 +377,7 @@ export struct LogDetails {
         Scroll() {
           // 文本显示区域
           Column() {
-            Blank().height(TAB_CONTENT_TITLE_HEIGHT+6)
+            Blank().height(TAB_CONTENT_TITLE_HEIGHT + (this.widthBp < 2 ? this.topRectHeight : 0) + 6)
             RichEditor(this.options)
               .onReady(() => {
                 this.controller.addTextSpan(`${this.theLogSkipItem.LogDetails}`,

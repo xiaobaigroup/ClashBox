@@ -52,6 +52,8 @@ struct Connect {
   @Consume isSecondary: boolean
   @State intervalId: number = 0
   @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
+  // 状态栏高度
+  @StorageProp('topRectHeight') topRectHeight: number = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   // 高度断点
@@ -171,7 +173,7 @@ struct Connect {
           })
 
         Column() {
-          Blank().height(TAB_CONTENT_TITLE_HEIGHT+6)
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT + (this.widthBp < 2 ? this.topRectHeight : 0) + 6)
           // 页面
           if (!this.appConfig.enableConnect) {
             Nothing({
@@ -248,7 +250,7 @@ struct Connect {
                 scrollBackward: NestedScrollMode.SELF_FIRST
               })
             }
-            .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)//,{alwaysEnabled:true})
+            .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring : null)//,{alwaysEnabled:true})
             .onDidScroll((xOffset: number, yOffset: number): void => {
               // 累计计算当前父组件滚动在Y轴方向的偏移量
               if (this.uiConfig.isAnimation){

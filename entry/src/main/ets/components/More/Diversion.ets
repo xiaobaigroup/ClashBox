@@ -51,6 +51,9 @@ struct Diversion {
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+  // 状态栏高度
+  @StorageProp('topRectHeight') topRectHeight: number = 0
+
   // 是否开启 `Index` 页面的前景模糊
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
@@ -144,7 +147,7 @@ struct Diversion {
           })
 
         Column() {
-          Blank().height(TAB_CONTENT_TITLE_HEIGHT+6)
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT + (this.widthBp < 2 ? this.topRectHeight : 0) + 6)
           Scroll() {
             // 数据列表行
             List({space: 12}) {

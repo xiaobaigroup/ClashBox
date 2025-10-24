@@ -249,6 +249,7 @@ export struct ArrayConfigEditor {
       Stack() {
         // 导航栏
         MoreTop({
+          needBackButton: true,
           title: this.params.title as Resource,
           icon2: this.isEditPage ? $r('sys.symbol.save') : $r('sys.symbol.plus'),
           onClick2: () => {

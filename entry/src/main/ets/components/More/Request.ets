@@ -29,6 +29,8 @@ struct RequestPage {
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+  // 状态栏高度
+  @StorageProp('topRectHeight') topRectHeight: number = 0
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   // 一级图标色，黑色
@@ -133,7 +135,7 @@ struct RequestPage {
           })
 
         Column() {
-          Blank().height(TAB_CONTENT_TITLE_HEIGHT + 6)
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT + (this.widthBp < 2 ? this.topRectHeight : 0) + 6)
           // 页面
          if (!this.appConfig.enableRequest) {
             Nothing({
