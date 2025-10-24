@@ -20,6 +20,8 @@ export struct ConfigList {
   @Prop configList: ConfigItemData[]
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
 
+  // 更多页面栈
+  @StorageLink('MoreNavPathStack') morePageInfos: NavPathStack = new NavPathStack()
   @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
@@ -99,9 +101,17 @@ export struct ConfigList {
       this.isEnableIndexForegroundBlur = true
       this.dialogController.open()
     } else if (index === 5 && this.configList[5].name === 'compatible') {
-      this.pageInfos.pushPathByName("compatible", true)
+      if (this.widthBp <2 ) {
+        this.pageInfos.pushPathByName("compatible", true)
+      } else {
+        this.morePageInfos.pushPathByName("compatible", true)
+      }
     } else {
-      this.pageInfos.pushPathByName("EditArrayConfig", itemData, true)
+      if (this.widthBp <2 ) {
+        this.pageInfos.pushPathByName("EditArrayConfig", itemData, true)
+      } else {
+        this.morePageInfos.pushPathByName("EditArrayConfig", itemData, true)
+      }
     }
   }
 

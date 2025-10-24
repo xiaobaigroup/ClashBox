@@ -14,6 +14,7 @@ import { EventHub, EventKey } from "../../common/EventHub"
 import { customAnimationUtil, isON } from "../../common/utils/Animation"
 import { NeedClearMoreStack, PageMargin } from "../../common/breakpoint/BreakPoint"
 import { icon_primary } from "../Common/Common"
+import { Xb_ToastUtil } from "xb_components"
 
 // 资源数据（假设）
 interface ResourcesData {
@@ -96,6 +97,9 @@ struct Resources {
   @Consume isSecondary: boolean
   @State theNumberUpdated: number = 0
   @State isRefreshing: boolean = false
+
+  // 更多页面栈
+  @StorageLink('MoreNavPathStack') morePageInfos: NavPathStack = new NavPathStack()
   @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
@@ -120,7 +124,7 @@ struct Resources {
   // 状态栏高度
   @StorageProp('topRectHeight') topRectHeight: number = 0
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
-  private promptAction: PromptAction = this.getUIContext().getPromptAction()
+
   @Provide resourceListData: Array<ResourcesData> = theResouresData
   // 开关不触发list转场动画判定
   @State isON:isON = new isON()
@@ -219,16 +223,16 @@ struct Resources {
       this.isLoadingAll = false
       if (message != "") {
         console.error("updateGeoDateItem ", message)
-        this.promptAction.showToast({ message: getResourceString($r('app.string.update_failed'), this) + " " + message })
+        Xb_ToastUtil.showToast({ message: getResourceString($r('app.string.update_failed'), this) + " " + message })
       }
       else {
-        this.promptAction.showToast({ message: getResourceString($r('app.string.update_success'), this) })
+        Xb_ToastUtil.showToast({ message: getResourceString($r('app.string.update_success'), this) })
       }
     } catch (e) {
       this.isLoading = -1
       this.isLoadingAll = false
       console.error("updateGeoDateItem error", e)
-      this.promptAction.showToast({message: getResourceString($r('app.string.update_failed'), this) + (e.message ?? e)})
+      Xb_ToastUtil.showToast({message: getResourceString($r('app.string.update_failed'), this) + (e.message ?? e)})
     }
   }
 
@@ -255,6 +259,7 @@ struct Resources {
   build() {
     NavDestination() {
       Stack() {
+        // 标题栏
         MoreTop({
           title: $r('app.string.Resources'),
           icon1: $r('sys.symbol.arrow_clockwise'),
@@ -262,7 +267,7 @@ struct Resources {
           onClick1: () => {
             this.isON.toggleAnim = true
             this.isLoadingAll = true
-            this.promptAction.showToast({ message: getResourceString($r('app.string.resource_updating'), this) })
+            Xb_ToastUtil.showToast({ message: getResourceString($r('app.string.resource_updating'), this) })
             this.updateGeoDate()
           },
           onClick2: () => {
@@ -271,7 +276,7 @@ struct Resources {
             this.isShowGroupSort = true
           },
         })
-
+        // 资源列表
         Column() {
           Blank().height(TAB_CONTENT_TITLE_HEIGHT + (this.widthBp < 2 ? this.topRectHeight : 0) + 6)
           // 页面
@@ -421,6 +426,7 @@ struct Resources {
     .onBackPressed(() => {
       if (NeedClearMoreStack(this.widthBp, this.heightBp)) {
         this.pageInfos.clear()
+        this.morePageInfos.clear()
         this.isSecondary = false
         return false
       } else {

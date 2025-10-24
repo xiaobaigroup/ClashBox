@@ -12,6 +12,7 @@ import { customAnimationUtil } from "../../../common/utils/Animation"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { Sniff } from "proxy_core"
 import { PageMargin } from "../../../common/breakpoint/BreakPoint"
+import { Xb_ToastUtil } from "xb_components"
 
 export interface ArrayConfigParam{
   label?: string | ResourceStr
@@ -43,9 +44,10 @@ export struct ArrayConfigEditor {
   // 编辑弹窗当前输入文本
   @State currentEditInputValue: string = ''
   @State keyValueData: KeyValueData = new KeyValueData("")
-  private promptAction: PromptAction = this.getUIContext().getPromptAction()
   // 编辑路由地址弹窗标题
   @State ArrayConfigList: KeyValueData[] = []
+  // 更多页面栈
+  @StorageLink('MoreNavPathStack') morePageInfos: NavPathStack = new NavPathStack()
   @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
   // 平板竖屏判断
@@ -99,7 +101,7 @@ export struct ArrayConfigEditor {
       try {
         EventHub.sendEvent(EventKey.ArrayConfigChanged, {key: this.params.name, value: JSON.parse(this.content)})
       } catch (e) {
-        this.promptAction.showToast({ message: $r('app.string.incorrect_format') })
+        Xb_ToastUtil.showToast({ message: $r('app.string.incorrect_format') })
       }
     }else{
       // string[]
@@ -266,6 +268,7 @@ export struct ArrayConfigEditor {
             } else {
               // 编辑页时保存按钮
               this.pageInfos.pop()
+              this.morePageInfos.pop()
             }
           }
         })
@@ -371,6 +374,7 @@ export struct ArrayConfigEditor {
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
       this.pageInfos.pop(true);
+      this.morePageInfos.pop(true)
       return true;
     })
   }

@@ -12,11 +12,15 @@ export function BasicBuilder(name: string, param: Object){
 @Component
 struct Basic {
 
+  // 更多页面栈
+  @StorageLink('MoreNavPathStack') morePageInfos: NavPathStack = new NavPathStack()
   @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @State overwriteBasicList: ConfigItemData[] = []
 
   aboutToAppear(): void {
@@ -40,10 +44,10 @@ struct Basic {
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
-      if(this.pageInfos.size() === 1) {
-        this.pageInfos.clear()
-      } else {
+      if (this.widthBp < 2) {
         this.pageInfos.pop(true)
+      } else {
+        this.morePageInfos.pop(true)
       }
       return true
     })

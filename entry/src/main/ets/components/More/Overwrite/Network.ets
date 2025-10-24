@@ -21,10 +21,14 @@ export function NetworkBuilder(name: string, param: Object){
 @Component
 struct Network {
 
+  // 更多页面栈
+  @StorageLink('MoreNavPathStack') morePageInfos: NavPathStack = new NavPathStack()
   @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   @State overwriteNetworkList: ConfigItemData[] = []
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
 
   aboutToAppear(): void {
     this.overwriteNetworkList = ListOverwriteNetworkData(this.clashConfig, this.appConfig)
@@ -42,10 +46,10 @@ struct Network {
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
-      if(this.pageInfos.size() === 1) {
-        this.pageInfos.clear()
-      } else {
+      if (this.widthBp < 2) {
         this.pageInfos.pop(true)
+      } else {
+        this.morePageInfos.pop(true)
       }
       return true
     })

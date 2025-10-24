@@ -10,6 +10,8 @@ struct OverwriteTop {
   @State title: ResourceStr = ''
   @State subtitle: ResourceStr = ''
 
+  // 更多页面栈
+  @StorageLink('MoreNavPathStack') morePageInfos: NavPathStack = new NavPathStack()
   @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
@@ -34,7 +36,12 @@ struct OverwriteTop {
       .transition(customAnimationUtil.isSlide(200, this.uiConfig))
       .margin({left: PageMargin(this.widthBp, this.heightBp)})
       .onClick(() => {
-        this.pageInfos.pop(true)
+        console.log(`点击返回，pageInfos：${this.pageInfos.size()}，morePageInfos：${this.morePageInfos.size()}`)
+        if (this.widthBp < 2) {
+          this.pageInfos.pop(true)
+        } else {
+          this.morePageInfos.pop(true)
+        }
       })
       .width(40)
       .height(40)

@@ -108,7 +108,7 @@ struct RequestPage {
     NavDestination() {
       Stack() {
         // 标题栏
-          MoreTop({
+        MoreTop({
             title: $r('app.string.Request'),
             icon1: this.appConfig.enableRequest ? $r('sys.symbol.clean_fill') : undefined,
             icon2: !this.appConfig.enableRequest ? $r('sys.symbol.checkmark_circle') : $r('sys.symbol.checkmark_circle_fill'),
@@ -133,7 +133,7 @@ struct RequestPage {
               })
             }
           })
-
+        // 请求列表
         Column() {
           Blank().height(TAB_CONTENT_TITLE_HEIGHT + (this.widthBp < 2 ? this.topRectHeight : 0) + 6)
           // 页面

@@ -54,13 +54,14 @@ const componentName:string = 'ConfigurationPage'
 struct ConfigurationPage {
 
   @StorageLink('favoriteProfiles') favoriteProfiles: Map<string, string> = new Map<string, string>([])
+  @StorageLink('appConfig') @Watch('onChangeConfig') appConfig: AppConfig = new AppConfig()
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+
   // 所有子组件在容器内的对齐方式
   @Consume ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
   // 路由栈
   @Consume('configAddPageInfos') configAddPageInfos: NavPathStack
-  promptAction: PromptAction = this.getUIContext()?.getPromptAction()
-  @StorageLink('appConfig') @Watch('onChangeConfig') appConfig: AppConfig = new AppConfig()
-  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 主窗口ID
@@ -107,11 +108,10 @@ struct ConfigurationPage {
   // page内顶部标题偏移量
   @Consume curYOffset: number
 
-  /* 配置页面内ListItem长按ContextMenu相关 */
+  /** 配置页面内ListItem长按ContextMenu相关 */
   @Consume('currentTouchConfigData') currentTouchConfigData: ConfigData
   @Consume('Configuration') @Watch('onConfigListChange') configList: Array<ConfigData>
   @State  currentRadioConfigData: ConfigData = NewConfigData
-
 
   build() {
     Stack() {
@@ -392,7 +392,9 @@ struct ConfigurationPage {
     backgroundColor: $r('app.color.list_item_background_color'),
   })
 
-  /**ContextMenu列表项集合*/
+  /**
+   * ContextMenu列表项集合
+   */
   configListLongPressCtxMenus(item: ConfigData): Array<LongPressContextMenuItem> {
     return [
       { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.square_and_pencil')).fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
@@ -571,7 +573,7 @@ struct ConfigurationPage {
       hilog.info(0xC011, componentName, `EditConfig #loadConfig#更新并加载完成 configName is [${this.currentTouchConfigData.configName}]`)
     } catch (e) {
       console.debug("loadConfigList", e.message, JSON.stringify(e))
-      this.promptAction.showToast({message: `${getResourceString($r('app.string.failed_load_config'), this)}` + (e.message || e) })
+      Xb_ToastUtil.showToast({message: `${getResourceString($r('app.string.failed_load_config'), this)}` + (e.message || e) })
     }
     this.getUIContext().animateTo({
       duration: this.uiConfig.animationSpeed,

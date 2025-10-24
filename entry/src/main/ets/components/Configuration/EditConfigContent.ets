@@ -25,8 +25,8 @@ struct EditConfigContent {
   @State configStr: string = ''
   private contentChange: boolean = false
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  // 页面栈
-  @Consume('configAddPageInfos') configAddPageInfos: NavPathStack
+  // 主页面栈
+  @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   // 当前显示的工具集合 默认为空 待发生编辑事件之后才加入保存按钮菜单
   @State private fileMenus: Array<BindSheetTitleCustomBuilderMenu> = []
   // 宽度断点
@@ -40,7 +40,7 @@ struct EditConfigContent {
     NavDestination() {
       // 标题栏
       BindSheetTitleCustomBuilder({
-        pageInfos: this.configAddPageInfos,
+        pageInfos: this.pageInfos,
         isSubPage: true,
         titlePaddingLeft: BIND_SHEET_DRAG_BAR_HEIGHT / 2,
         mainTitle: $r('app.string.edit_config'),
@@ -163,16 +163,16 @@ struct EditConfigContent {
       confirmText: $r('app.string.Save'),
       cancelButtonBackgroundColor: Color.Transparent,
       cancel: () => {
-        this.configAddPageInfos.pop(true)
+        this.pageInfos.pop(true)
       },
       confirm: ()=> {
         // 保存配置
         this.saveConfigContent()
-        this.configAddPageInfos.pop(true)
+        this.pageInfos.pop(true)
       }
     }),
     cancel: () => {
-      this.configAddPageInfos.pop(true)
+      this.pageInfos.pop(true)
     },
     alignment: DialogAlignment.Center,
     width: 328,
@@ -188,7 +188,7 @@ struct EditConfigContent {
     action: () => {
       this.saveConfigContent()
       // 保存配置后返回上一页
-      this.configAddPageInfos.pop(true)
+      this.pageInfos.pop(true)
     }
   }
 

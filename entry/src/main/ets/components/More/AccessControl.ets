@@ -73,6 +73,7 @@ export struct AccessControl {
   build() {
     NavDestination() {
       Stack({ alignContent: Alignment.TopStart }) {
+        // 标题栏
         MoreTop({
           title: $r('app.string.access_control'),
           name: 'AccessControl',
@@ -85,7 +86,7 @@ export struct AccessControl {
         })
         // 控制区
         Column({ space: 10}) {
-          Blank().height(TAB_CONTENT_TITLE_HEIGHT - (this.uiConfig.stringDisplayIndex === 0 ? 12 : 6) + this.topRectHeight)
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT - (this.uiConfig.stringDisplayIndex === 0 ? 12 : 6) + (this.widthBp < 2 ? this.topRectHeight : 0))
           // 访问控制开关
           toggleRowList({
             title: $r('app.string.app_access_control'),
@@ -176,7 +177,7 @@ export struct AccessControl {
         // .height('100%')
         // 应用列表
         Column() {
-          Blank().height(TAB_CONTENT_TITLE_HEIGHT + (this.uiConfig.stringDisplayIndex === 0 ? 112 : 139))
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT + (this.uiConfig.stringDisplayIndex === 0 ? 112 : 139) + (this.widthBp < 2 ? this.topRectHeight : 0))
           Scroll() {
             List({space: 8}) {
               ForEach(this.appListData, (item: AppInfo, index) => {

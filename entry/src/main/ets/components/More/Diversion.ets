@@ -135,7 +135,8 @@ struct Diversion {
   build() {
     NavDestination() {
       Stack() {
-          MoreTop({
+        // 标题
+        MoreTop({
             title: $r('app.string.Diversion_Strategy'),
             icon2: $r('sys.symbol.plus'),
             onClick2: () => {
@@ -145,7 +146,7 @@ struct Diversion {
               this.isShowPolicy = true
             }
           })
-
+        // 数据
         Column() {
           Blank().height(TAB_CONTENT_TITLE_HEIGHT + (this.widthBp < 2 ? this.topRectHeight : 0) + 6)
           Scroll() {

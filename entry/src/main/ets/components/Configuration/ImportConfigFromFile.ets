@@ -47,6 +47,8 @@ export struct ImportConfigFromFile {
   @State private filemenus: Array<BindSheetTitleCustomBuilderMenu> = []
   // 页面栈
   @Consume('configAddPageInfos') configAddPageInfos: NavPathStack
+  // 主页面栈
+  @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
@@ -192,7 +194,7 @@ export struct ImportConfigFromFile {
         .backgroundColor($r('app.color.container_background'))
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .onClick(() => {
-          this.configAddPageInfos.pushPathByName('EditConfigContent', this.configData.configId, true)
+          this.pageInfos.pushPathByName('EditConfigContent', this.configData.configId, true)
         })
       }
 

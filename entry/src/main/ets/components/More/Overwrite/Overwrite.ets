@@ -15,6 +15,8 @@ export function OverwriteBuilder(name: string, param: Object){
 @Component
 struct Overwrite {
 
+  // 更多页面栈
+  @StorageLink('MoreNavPathStack') morePageInfos: NavPathStack = new NavPathStack()
   @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @State overwriteList: moreData[] = ListOverwriteData()
@@ -87,9 +89,16 @@ struct Overwrite {
     } else {
       // 跳转
       const itemData = this.overwriteList[index]
-      this.pageInfos.pushPathByName(itemData.name, null, true)
-      hilog.isLoggable(0xFF00, "Overwrite testTag", hilog.LogLevel.INFO);
-      hilog.info(0xFF00, "Overwrite testTag", `跳转至：${itemData.name} pageInfos：${this.pageInfos.size()}`)
+      if (this.widthBp < 2) {
+        // 手机及以下界面推送主页面栈
+        this.pageInfos.pushPathByName(itemData.name, null, true)
+        hilog.isLoggable(0xFF00, "Overwrite testTag", hilog.LogLevel.INFO);
+        hilog.info(0xFF00, "Overwrite testTag", `pageInfos跳转至：${itemData.name} pageInfos：${this.pageInfos.size()}`)
+      } else {
+        this.morePageInfos.pushPathByName(itemData.name, null, true)
+        hilog.isLoggable(0xFF00, "Overwrite testTag", hilog.LogLevel.INFO);
+        hilog.info(0xFF00, "Overwrite testTag", `morePageInfos跳转至：${itemData.name} morePageInfos：${this.morePageInfos.size()}`)
+      }
     }
   }
 

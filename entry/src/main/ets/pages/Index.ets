@@ -191,6 +191,7 @@ struct Index {
   private context = this.getUIContext().getHostContext()! as common.UIAbilityContext
   private promptAction = this.getUIContext().getPromptAction()
   private UIcontext = this.getUIContext()
+
   /**
    * 主页相关变量
    */
@@ -251,6 +252,8 @@ struct Index {
   /**
    * 更多页相关变量
    */
+  // 更多页面栈
+  @StorageLink('MoreNavPathStack') morePageInfos: NavPathStack = new NavPathStack()
   // 更多页面数据
   @Provide moreList: moreData[] = ListMoreData()
   // 日志数据
@@ -291,20 +294,14 @@ struct Index {
 
   build() {
     if (!this.isPXSecScreen) {
-      if (this.widthBp < 2) {
-        // 手机及以下宽度 或 处于配置页
-        Navigation(this.pageInfos) {
-          this.MainContent()
-        }
-        .mode(NavigationMode.Stack)
-        .hideTitleBar(true)
-        .hideToolBar(true)
-        .height('100%')
-        .width('100%')
-      } else {
-        // md及以上除配置页外
+      Navigation(this.pageInfos) {
         this.MainContent()
       }
+      .mode(NavigationMode.Stack)
+      .hideTitleBar(true)
+      .hideToolBar(true)
+      .height('100%')
+      .width('100%')
     } else {
       // PX外屏样式
       PXSecScreen()
@@ -609,9 +606,9 @@ struct Index {
 
   /**窗口变化监听*/
   onWindowChange() {
-    hilog.info(0xFF00, componentName,
-      `#WindowChange#应用窗口状态 width: ${this.windowWidth} height: ${this.windowHeight} ` + ' tab宽度:' +
-      this.barWidth?.toString())
+    hilog.info(0xFF00, componentName, `#WindowChange#应用窗口状态 width: ${this.windowWidth} height: ${this.windowHeight} ` + ' tab宽度:' + this.barWidth?.toString())
+    // 当窗口变化时清除更多页路由
+    this.morePageInfos.clear(true)
     if (this.windowWidth > 328 || this.windowHeight > 328) {
       if (this.windowHeight === this.windowWidth) {
         hilog.info(0xFF00, componentName,
@@ -838,7 +835,7 @@ struct Index {
     this.onWindowChange()
     // 除手机外更多页均默认跳转覆写
     if (this.widthBp > 1) {
-      this.pageInfos.pushPathByName(this.moreList[4].name, false)
+      this.morePageInfos.pushPathByName('Overwrite', null, false)
     }
     // 启动时检查上一次是否崩溃
     if (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) {
@@ -1041,7 +1038,9 @@ struct Index {
     }
   }
 
-  /**分流模式选择数据变化监控*/
+  /**
+   * 分流模式选择数据变化监控
+   */
   async switchMode() {
     this.proxyGroups.refresh()
   }
@@ -1283,8 +1282,7 @@ struct Index {
 
   /**避让状态改变*/
   onAvoidAreaChange() {
-    hilog.info(0x0000, 'Index', '#onAvoidAreaChange 动态避让高度 Top：%{public}d Bottom: %{public}i', this.topRectHeight,
-      this.bottomRectHeight)
+    hilog.info(0x0000, 'Index', '#onAvoidAreaChange 动态避让高度 Top：%{public}d Bottom: %{public}i', this.topRectHeight, this.bottomRectHeight)
   }
 
   /**
@@ -1302,4 +1300,5 @@ struct Index {
       EventHub.sendEvent(EventKey.AddAPP, { bundleName: bundleInfo.bundleName, appName: bundleInfo.appName })
     }, 400)
   }
+
 }

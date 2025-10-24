@@ -74,6 +74,8 @@ struct MorePage {
   // 添加路由地址弹窗标题
   @State QueryIPDialogTitle: ResourceStr = $r('app.string.query_ip_region')
 
+  // 更多页面栈
+  @StorageLink('MoreNavPathStack') morePageInfos: NavPathStack = new NavPathStack()
   // 主页面栈
   @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
@@ -86,7 +88,7 @@ struct MorePage {
 
 
   build() {
-    Navigation(this.pageInfos) {
+    Navigation(this.morePageInfos) {
       // md及以上宽度
       this.MoreContent()
     }
@@ -117,6 +119,9 @@ struct MorePage {
 
       Scroll() {
         List({ space: 10 }) {
+          // ListItem() {
+          //   Text(`当前stack类型：${MoreNavMode(this.widthBp, this.heightBp)}`)
+          // }
           ForEach(this.moreList, (item: moreData, index: number) => {
             ListItem() {
               skipRowList({
@@ -255,10 +260,15 @@ struct MorePage {
       // 列表行点击处理
       let itemData = this.moreList[index]
       hilog.isLoggable(0xFF00, "MoretestTag", hilog.LogLevel.INFO);
-      hilog.info(0xFF00, "MoretestTag", itemData.name)
-      hilog.info(0xFF00, "MoretestTag", "isCheck状态: %{public}s", itemData.isCheck)
-      this.pageInfos.replacePathByName(itemData.name, null, true)
-      this.isSecondary = true //TabBarVertical(this.widthBp, this.heightBp) ? false : true
+      if (this.widthBp < 2) {
+        // 手机及以下界面推送主页面栈
+        this.pageInfos.pushPathByName(itemData.name, null, true)
+      } else {
+        this.morePageInfos.replacePathByName(itemData.name, null, true)
+      }
+      console.log(`点击跳转，pageInfos：${this.pageInfos.size()}，morePageInfos：${this.morePageInfos.size()}`)
+      // this.isSecondary = true
+      // TabBarVertical(this.widthBp, this.heightBp) ? false : true
     }
   }
 
@@ -271,8 +281,6 @@ struct MorePage {
     .width('100%')
     .height('100%')
   }
-
-
 
 }
 

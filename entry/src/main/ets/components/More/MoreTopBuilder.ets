@@ -42,7 +42,9 @@ export struct MoreTop {
   /** 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
 
-  // 更多页路由表
+  // 更多页面栈
+  @StorageLink('MoreNavPathStack') morePageInfos: NavPathStack = new NavPathStack()
+  // 主路由表
   @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 高度断点
@@ -94,7 +96,11 @@ export struct MoreTop {
           .height(40)
           .backgroundColor($r('app.color.settings_container_background'))
           .onClick(() => {
-            this.pageInfos.pop(true)
+            if (this.widthBp < 2) {
+              this.pageInfos.pop(true)
+            } else {
+              this.morePageInfos.pop(true)
+            }
             if (this.pageInfos.size() <= 1) {
               this.isSecondary = false
             }
@@ -165,7 +171,8 @@ export struct MoreTop {
                 this.onClick2()
               }
             })
-          }.height('100%')
+          }
+          .height('100%')
           .alignItems(this.windowMode ? VerticalAlign.Top : VerticalAlign.Center)
           .bindMenu(this.enableClick2 ? undefined : this.theMenu())
           .transition(customAnimationUtil.isSlide(0, this.uiConfig))
