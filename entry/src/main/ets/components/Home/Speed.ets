@@ -166,6 +166,18 @@ struct Speed {
     .width('100%')
     .height('100%')
     .id('SpeedId')
+    .onAppear(() => {
+      hilog.info(0xFF00, "HomeSpeedTestTag", "Speed Card onAppear")
+      // 后台切回前台 -> 代理开启时，折线图显示
+      if (this.proxyEnabled) {
+        this.proxyEnabledChanged()
+      }
+    })
+    .onDisAppear(() => {
+      hilog.info(0xFF00, "HomeSpeedTestTag", "Speed Card onDisAppear")
+      // 关闭折线图
+      this.proxyEnabledChanged()
+    })
   }
 
   onSpeedData() {
