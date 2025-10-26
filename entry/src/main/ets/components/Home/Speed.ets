@@ -170,7 +170,10 @@ struct Speed {
       hilog.info(0xFF00, "HomeSpeedTestTag", "Speed Card onAppear")
       // 后台切回前台 -> 代理开启时，折线图显示
       if (this.proxyEnabled && this.isForward && this.isHomePage) {
-        this.lineRenderStart();
+        // 延迟 0.5 秒启动折线图渲染
+        setTimeout(() => {
+          this.lineRenderStart();
+        }, 500)
       }
     })
     .onDisAppear(() => {
@@ -296,7 +299,7 @@ struct Speed {
       }
     // })
   }
-  
+
   /** @description 停止渲染折线图 */
   private lineRenderStop() {
     // 清除定时器
@@ -387,7 +390,7 @@ struct Speed {
     clearInterval(this.timerId);
     console.log(`Speed 网络速率卡片已销毁`)
   }
-  
+
   colorTheme() {
     let colorValue = Xb_ResourceColorUtil(this.icon_emphasize, this.getUIContext().getHostContext()!)
     return colorValue
