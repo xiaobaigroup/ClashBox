@@ -169,14 +169,14 @@ struct Speed {
     .onAppear(() => {
       hilog.info(0xFF00, "HomeSpeedTestTag", "Speed Card onAppear")
       // 后台切回前台 -> 代理开启时，折线图显示
-      if (this.proxyEnabled) {
-        this.proxyEnabledChanged()
+      if (this.proxyEnabled && this.isForward && this.isHomePage) {
+        this.lineRenderStart();
       }
     })
     .onDisAppear(() => {
       hilog.info(0xFF00, "HomeSpeedTestTag", "Speed Card onDisAppear")
-      // 关闭折线图
-      this.proxyEnabledChanged()
+      // 停止渲染折线图
+      this.lineRenderStop();
     })
   }
 
@@ -281,91 +281,101 @@ struct Speed {
   /**@Watch监听事件：开启代理时启动定时器*/
   proxyEnabledChanged() {
     // 只有主页显示的时候启动
-    this.getUIContext().animateTo({
+    // TODO 待测试 -> 此处动画会造成 UI 卡顿
+    /*this.getUIContext().animateTo({
       duration: this.uiConfig.animationSpeed,
       iterations: 1,
       playMode: PlayMode.Normal,
       curve:Curve.Ease,
-    }, () => {
+    }, () => {*/
       hilog.info(0xFF00, "HomeSpeedTestTag", `代理启用状态：${this.proxyEnabled} 是否前台：${this.isForward} 是否位于主页: ${this.isHomePage}`)
       if (this.proxyEnabled && this.isForward && this.isHomePage) {
-        // 设置定时器，每秒调用一次 onSpeedData 函数
-        this.timerId = setInterval(() => {
-          this.onSpeedData()
-        }, 1000)
-
-        setTimeout(()=>{
-          this.lineStart = false
-        }, 1000)
+        this.lineRenderStart();
       } else {
-        // 清除定时器
-        clearInterval(this.timerId)
-        this.lineStart = true
-        this.defOption = new Options({
-          //图例
-          legend: {
-            show: false,
-            selectAble: false,
-          },
-          //图表位置
-          grid: {
-            top: 0,
-            left: 17,
-            right: 17,
-          },
-          //X轴
-          xAxis: {
-            data: ['', '', '', '', '', '', '', '', '', '', '', ''],
-            axisLine: {
-              // 轴线样式
-              show: true, // 是否显示
-            },
-            axisTick: {
-              show: false,
-              interval: 2
-            },
-            //坐标轴两侧是否留白
-            boundaryGap: false
-          },
-          //Y轴
-          yAxis:
-          {
-            min: 0,
-            max: 1500,
-            //刻度线
-            axisTick: {
-              show: false
-            },
-            //轴线
-            axisLine: {
-              show: false
-            },
-            //Y轴分割线
-            splitLine: {
-              show: false
-            },
-            axisLabel: {
-              show: false
-            }
-          },
-          //动画
-          animation: false,
-          //初始折线
-          series: [
-            {
-              data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-              lineStyle: {
-                width: 3,
-                color: this.colorTheme()
-              },
-              label: {
-                show: false
-              }
-            },
-          ]
-        })
+        this.lineRenderStop();
       }
-    })
+    // })
+  }
+  
+  /** @description 停止渲染折线图 */
+  private lineRenderStop() {
+    // 清除定时器
+    clearInterval(this.timerId);
+    this.lineStart = true;
+    this.defOption = new Options({
+      //图例
+      legend: {
+        show: false,
+        selectAble: false,
+      },
+      //图表位置
+      grid: {
+        top: 0,
+        left: 17,
+        right: 17,
+      },
+      //X轴
+      xAxis: {
+        data: ['', '', '', '', '', '', '', '', '', '', '', ''],
+        axisLine: {
+          // 轴线样式
+          show: true, // 是否显示
+        },
+        axisTick: {
+          show: false,
+          interval: 2
+        },
+        //坐标轴两侧是否留白
+        boundaryGap: false
+      },
+      //Y轴
+      yAxis: {
+        min: 0,
+        max: 1500,
+        //刻度线
+        axisTick: {
+          show: false
+        },
+        //轴线
+        axisLine: {
+          show: false
+        },
+        //Y轴分割线
+        splitLine: {
+          show: false
+        },
+        axisLabel: {
+          show: false
+        }
+      },
+      //动画
+      animation: false,
+      //初始折线
+      series: [
+        {
+          data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          lineStyle: {
+            width: 3,
+            color: this.colorTheme()
+          },
+          label: {
+            show: false
+          }
+        },
+      ]
+    });
+  }
+
+  /** @description 开始渲染折线图 */
+  private lineRenderStart() {
+    // 设置定时器，每秒调用一次 onSpeedData 函数
+    this.timerId = setInterval(() => {
+      this.onSpeedData();
+    }, 1000);
+
+    setTimeout(() => {
+      this.lineStart = false;
+    }, 1000);
   }
 
   aboutToAppear() {
