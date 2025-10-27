@@ -28,7 +28,7 @@ struct Speed {
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 前台判断变量
-  @StorageProp('ForwardState') isForward: boolean = true
+  @StorageProp('ForwardState') @Watch('proxyEnabledChanged') isForward: boolean = true
   @Consume ChartData: number[] | ConvertedUnit[]
   @State lineStart: boolean = true
   @Consume DownloadSpeed: string
@@ -166,7 +166,7 @@ struct Speed {
     .width('100%')
     .height('100%')
     .id('SpeedId')
-    .onAppear(() => {
+    /*.onAppear(() => {
       hilog.info(0xFF00, "HomeSpeedTestTag", "Speed Card onAppear")
       // 后台切回前台 -> 代理开启时，折线图显示
       if (this.proxyEnabled && this.isForward && this.isHomePage) {
@@ -180,7 +180,7 @@ struct Speed {
       hilog.info(0xFF00, "HomeSpeedTestTag", "Speed Card onDisAppear")
       // 停止渲染折线图
       this.lineRenderStop();
-    })
+    })*/
   }
 
   onSpeedData() {

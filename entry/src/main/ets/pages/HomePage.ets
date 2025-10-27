@@ -578,7 +578,7 @@ struct HomeCard {
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
 
   build() {
-    if (this.theCurrentHomeCard[this.index] && this.isForward && this.isHomePage) {
+    // if (this.theCurrentHomeCard[this.index] && this.isForward && this.isHomePage) {
       GridCol({
         span: {
           sm: HomeCardSpan36sm(this.widthBp, this.heightBp) * (this.index == 0 || this.index == 8 ? 2 : 1),
@@ -623,7 +623,7 @@ struct HomeCard {
       // 编辑模式下跳动动画
       .rotate({ angle: this.uiConfig.isAnimation ? this.rotateAngle : null })
     }
-  }
+  // }
 
   @Builder
   HomeCardContent(index: number) {
