@@ -9,7 +9,7 @@ import  fs from  "@ohos.file.fs"
 import { fileIo, fileUri } from "@kit.CoreFileKit";
 import { PromptAction } from '@kit.ArkUI';
 import { UpdateConfigParams } from '../models/ClashConfig';
-import { checkIp, queryIpInfo } from '../Request';
+import { checkIp, queryCurrentIpInfo } from '../Request';
 import { Fd, ParseProxyGroup, VpnOptions } from './FlClashVpnService';
 import { getVpnOptions, setFdMap } from 'libflclash.so';
 import { Address, isIpv4, isIpv6, VpnConfig } from './CommonVpnService';
@@ -68,11 +68,27 @@ export class SocketProxyService implements IClashManager {
   }
 
   async checkIpInfo(): Promise<IpInfo> {
-    let result = await checkIp()
-    let country = await queryIpInfo(result)
-    console.log(`IPtest SocketProxyService#checkIpInfo country: ${country}`)
-    if (country == "")
-      country = await this.sendMessageRequest(ClashRpcType.getCountryCode, [result]) as string
+    // let result = await checkIp()
+    // let country = await queryIpInfo(result)
+    // console.log(`IPtest SocketProxyService#checkIpInfo country: ${country}`)
+    // if (country == "")
+    //   country = await this.sendMessageRequest(ClashRpcType.getCountryCode, [result]) as string
+
+    const ipInfo = await queryCurrentIpInfo()
+    
+    if (ipInfo) {
+      console.log(`IPtest SocketProxyService#checkIpInfo IP: ${ipInfo.ip}, Country: ${ipInfo.country}`)
+      return {
+        ip: ipInfo.ip,
+        country: ipInfo.country
+      } as IpInfo
+    }
+    
+    // 如果所有 API 都失败，尝试使用本地方法获取
+    console.warn(`IPtest SocketProxyService#checkIpInfo 所有 API 请求失败，尝试本地方法`)
+    const result = await checkIp()
+    const country = await this.sendMessageRequest(ClashRpcType.getCountryCode, [result]) as string
+
     return {
       ip: result,
       country: country
