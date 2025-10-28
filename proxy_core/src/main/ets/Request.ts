@@ -190,14 +190,38 @@ type IpInfoParser = (json: Record<string, any>) => IpInfo | null;
 
 /** IP 信息来源配置 */
 const ipInfoSources: Record<string, IpInfoParser> = {
+  'https://ipapi.co/json': fromIpApiCoJson, // 此源支持 IPv6 的查询
+  'https://api.vore.top/api/IPdata': fromIpDataJson, // 此源是之前默认的源
   'https://ipwho.is': fromIpWhoIsJson,
   'https://api.myip.com': fromMyIpJson,
-  'https://ipapi.co/json': fromIpApiCoJson,
   'https://ident.me/json': fromIdentMeJson,
   'http://ip-api.com/json': fromIpAPIJson,
   'https://api.ip.sb/geoip': fromIpSbJson,
   'https://ipinfo.io/json': fromIpInfoIoJson,
 };
+
+function fromIpDataJson(json: Record<string, any>): IpInfo | null {
+  try {
+    const ip = json['ipinfo']['text'] as string;
+    const ipdata = json['ipdata'] as object;
+
+    let country = '';
+    if (ipdata['info3']) {
+      country = ipdata['info3'] as string;
+    } else if (ipdata['info2']) {
+      country = ipdata['info2'] as string;
+    } else if (ipdata['info1']) {
+      country = ipdata['info1'] as string;
+    }
+
+    if (ip && country) {
+      return { ip, country };
+    }
+  } catch (e) {
+    console.error('fromIpWhoIsJson error:', e);
+  }
+  return null;
+}
 
 function fromIpInfoIoJson(json: Record<string, any>): IpInfo | null {
   try {
