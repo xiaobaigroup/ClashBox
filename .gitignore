@@ -23,3 +23,8 @@
 **/build
 /.hvigor
 proxy_core/src/flclash/libflclash.so
+/key
+/.*
+run.sh
+internalTesting
+profiler
