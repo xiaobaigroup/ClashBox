@@ -21,6 +21,7 @@ import { common } from "@kit.AbilityKit"
 import ClashViewModel from "../../entryability/ClashViewModel"
 import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { UIConfig } from "../../entryability/AppState"
+import { Xb_ToastUtil } from "xb_components"
 
 
 // 关联：route_map.json
@@ -33,7 +34,7 @@ const componentName: string = 'ImportConfigFromURL'
 const mainTitle: string = getResourceString($r('app.string.add_config'), context)
 
 @Component
-export struct ImportConfigFromURL{
+export struct ImportConfigFromURL {
 
   /* 是否开启 配置页 `bindSheet` 组件的前景模糊 */
   @Consume('isEnableConfigPageBindSheetForegroundBlur') isEnableConfigPageBindSheetForegroundBlur: boolean
@@ -42,26 +43,26 @@ export struct ImportConfigFromURL{
   // 配置下载弹框 title动态值
   @State private customDownloadingDialogTitle: ResourceStr = $r('app.string.downloading_configuration_file')
   @State private subTitle: ResourceStr = $r('app.string.Import_from_url')
-  private promptAction:PromptAction = this.getUIContext()?.getPromptAction()
+
   // 配置详情（要添加到用户首选项里的数据）
   @Prop @Watch('configDataChanged') configData: ConfigData = NewConfigData
-  @Consume('currentTouchConfigData') currentTouchConfigData: ConfigData
+  @StorageLink('currentTouchConfigData') currentTouchConfigData: ConfigData = NewConfigData
   @StorageLink('appLinkConfigUrl') appLinkConfigUrl: string = ''
   // 当前显示的工具集合 默认为空 待两个input都有值之后才加入保存按钮菜单
   @State private menus: Array<BindSheetTitleCustomBuilderMenu> = []
   // 页面栈
   @Consume('configAddPageInfos') configAddPageInfos: NavPathStack
+
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
+
+  // 是否显示bindSheet
+  @StorageLink('ShowConfigBindSheet') isShowConfigAddBindSheet: boolean = false
   // [true: 都有值, false: 不是所有的input都有值]
   @State allInputHaveValue: boolean = false
-  // 模态弹窗显示变量
-  @Consume isShowConfigAddBindSheet: boolean
   // 欢迎页半模态窗口
   @Consume isShowWelcome: boolean
-  // 标题栏工具菜单
-  // { symbol: $r('sys.symbol.star'), action: () => { this.menus.pop() } },
 
   build() {
     NavDestination() {
@@ -234,11 +235,11 @@ export struct ImportConfigFromURL{
         if (this.appLinkConfigUrl != '') {
           this.appLinkConfigUrl = ''
         }
-        this.promptAction.showToast({message: getResourceString($r('app.string.download_success'), this)})
+        Xb_ToastUtil.showToast({message: getResourceString($r('app.string.download_success'), this)})
       } catch (e) {
         console.error("ClashBox下载配置失败：", e.message, e.stack);
         this.configCustomDownloadingDialogController.close()
-        this.promptAction.showToast({message: getResourceString($r('app.string.download_failed'), this) + e.message || e})
+        Xb_ToastUtil.showToast({message: getResourceString($r('app.string.download_failed'), this) + e.message || e})
       }
     } else {
       this.customDownloadingDialogTitle = $r('app.string.updating_configuration_file')
@@ -250,7 +251,7 @@ export struct ImportConfigFromURL{
       } catch (e) {
         console.error("ClashBox下载配置失败：", e.message, e.stack);
         this.configCustomDownloadingDialogController.close()
-        this.promptAction.showToast({message: getResourceString($r('app.string.download_failed'), this) + e.message || e})
+        Xb_ToastUtil.showToast({message: getResourceString($r('app.string.download_failed'), this) + e.message || e})
       }
 
     }

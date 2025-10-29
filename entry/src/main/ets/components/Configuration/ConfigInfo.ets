@@ -73,6 +73,10 @@ export struct ConfigInfo{
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  // 主页面栈
+  @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
+  // 是否显示bindSheet
+  @StorageLink('ShowConfigBindSheet') isShowConfigAddBindSheet: boolean = false
 
   build() {
     Column({ space: 10 }) {
@@ -272,13 +276,43 @@ export struct ConfigInfo{
           // 自动更新间隔 END
 
         }
-        .margin({right: 0, left:0 })
+        .margin({right: 0, left: 0 })
         .divider({
           strokeWidth: 0.4,
           color: $r('sys.color.comp_divider'),
           startMargin: LIST_ITEM_PADDING.left,
           endMargin: LIST_ITEM_PADDING.right
         })
+
+        // 编辑配置内容
+        if (this.configData.configId !== 'new') {
+          ListItem() {
+            Row() {
+              SymbolGlyph($r('sys.symbol.doc_plaintext_and_pencil'))
+                .fontSize(24)
+                .margin({left: 12})
+                .fontColor([this.icon_emphasize])
+                .transition(customAnimationUtil.isScaleTranIcon(10, this.uiConfig))
+              Text($r('app.string.edit_config'))
+                .fontWeight(FontWeight.Medium)
+                .fontSize(16)
+                .margin({ left: 12 })
+              Blank()
+            }
+            .height(53)
+            .width('100%')
+            .borderRadius(20)
+            .backgroundColor($r('app.color.container_background'))
+            .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+            .onClick(() => {
+              // 关闭编辑配置页
+              this.isShowConfigAddBindSheet = false
+              // 跳转编辑文本页
+              this.pageInfos.pushPathByName('EditConfigContent', this.configData.configId, true)
+            })
+          }
+        }
+
       }
       .width('100%')
       .height('auto')

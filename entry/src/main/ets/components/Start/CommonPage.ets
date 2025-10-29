@@ -16,7 +16,7 @@ export struct CommonPage {
   @State isWebAtEnd:boolean = false
   @State docSrc: Resource | string = ''
   @State isWelcomeStack: boolean = false
-  // 单前通信端口
+  // 当前通信端口
   @State currentPorts: webview.WebMessagePort[]  = []
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor

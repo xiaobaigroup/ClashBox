@@ -89,6 +89,8 @@ export interface BindSheetTitleCustomBuilderParam{
   padding?: Padding
   // 菜单Symbol按钮集合（定义顺序就是从左至右的显示顺序）
   menus: Array<BindSheetTitleCustomBuilderMenu>
+  back?: () => void
+  needSetHeight?: boolean
 }
 
 @Component
@@ -147,6 +149,9 @@ export function BindSheetTitleCustomBuilder(param: BindSheetTitleCustomBuilderPa
       .onClick(() => {
         // 弹出页面栈
         param.pageInfos.pop(true)
+        if (param.back) {
+          param.back()
+        }
       })
     }
     // 返回按钮 END
@@ -211,7 +216,7 @@ export function BindSheetTitleCustomBuilder(param: BindSheetTitleCustomBuilderPa
     }
     // 菜单按钮 END
   }
-  .height(BIND_SHEET_TITLE_CONTAINER_HEIGHT + BIND_SHEET_DRAG_BAR_HEIGHT)
+  .height(param.needSetHeight ? (BIND_SHEET_TITLE_CONTAINER_HEIGHT + BIND_SHEET_DRAG_BAR_HEIGHT) : undefined)
   .width('100%')
   .alignItems(VerticalAlign.Center)
   // 为什么设置`15`，看参数类型中`padding`的介绍

@@ -1,7 +1,8 @@
 // Index
-import { LengthMetrics } from '@kit.ArkUI'
+import { LengthMetrics, mediaquery } from '@kit.ArkUI'
 import Home from './HomePage'
 import ProxyPage from './ProxyPage'
+import { util } from "@kit.ArkTS";
 import ConfigurationPage from './ConfigurationPage'
 import MorePage from './MorePage'
 import { hilog } from '@kit.PerformanceAnalysisKit'
@@ -34,7 +35,7 @@ import { PipManager } from '../common/utils/PipManager'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { CrashPage } from '../components/Start/CrashPage'
 import { UpdateInfo } from '../common/utils/CheckUpdateUtil'
-import { fileUri, picker } from '@kit.CoreFileKit'
+import { fileUri, picker, ReadOptions } from '@kit.CoreFileKit'
 import { fileIo as fs } from '@kit.CoreFileKit';
 import { number2Time, timestampToDateTime } from '../common/utils/TimeConvertUtil'
 import { PXSecScreen } from './PXSecScreen'
@@ -103,6 +104,7 @@ struct Index {
   @Provide @Watch('isHiddenChange') isSmallSquareScreen: boolean = false
   // 手机横屏判断
   @StorageLink('isLandscapePhone') isLandscapePhone: boolean = false
+  @Provide('currentColorMode') currentColorMode: boolean = false
   // 折叠展开状态判断变量
   @StorageLink('isFoldStatus') isFoldStatus: boolean = false
   // 平板竖屏判断变量
@@ -239,17 +241,16 @@ struct Index {
    */
   // 配置页模糊变量
   @Provide('isEnableConfigPageBindSheetForegroundBlur') isEnableConfigPageBindSheetForegroundBlur: boolean = false
-  // 是否显示bindSheet
-  @Provide isShowConfigAddBindSheet: boolean = false
   // 当前触摸的配置行
-  @Provide('currentTouchConfigData') currentTouchConfigData: ConfigData = NewConfigData
+  @StorageLink('currentTouchConfigData') currentTouchConfigData: ConfigData = NewConfigData
   // 当前选中的配置行
   @Provide currentConfigRadioCheckedConfigData: ConfigData = NewConfigData
   // 路由栈
   @Provide('configAddPageInfos') configAddPageInfos: NavPathStack = new NavPathStack()
   // 配置数据
   @Provide('Configuration') configList: Array<ConfigData> = []
-  /**
+  @StorageLink('ConfigContent') configStr: string = ''
+    /**
    * 更多页相关变量
    */
   // 更多页面栈
@@ -502,6 +503,7 @@ struct Index {
   deviceHeightListener: mediaquery.MediaQueryListener =
    this.getUIContext().getMediaQuery().matchMediaSync('(320vp< height <= 500vp) and (640vp< width <= 1000vp)');
   */
+  private colorModeListener: mediaquery.MediaQueryListener = this.getUIContext().getMediaQuery().matchMediaSync('(dark-mode: true)')
 
   // 免责声明 & 检查更新 弹窗控制器
   dialogController: CustomDialogController = new CustomDialogController({
@@ -895,6 +897,10 @@ struct Index {
           `#媒体查询#设备高度改变#(320vp< height <= 500vp) and (640vp< width <= 1000vp)手机横屏结果: ${this.isLandscapePhone}`)
       })
     }*/
+    this.colorModeListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
+      this.currentColorMode = mediaQueryResult.matches
+      hilog.info(0x1000, 'Index', `#媒体查询 #深色模式: ${this.currentColorMode}`)
+    })
 
     // 日志启用事件
     EventHub.on(EventKey.StartLog, async (enable: boolean) => {
@@ -964,6 +970,39 @@ struct Index {
       console.error(`LiveViewUtil 实况窗初始化失败`)
     }*/
 
+    // 注册配置详情加载事件
+    EventHub.on(EventKey.LoadConfigStr, () => {
+      const context = this.getUIContext().getHostContext()!
+      const sandPath = context.filesDir + `/ClashBox/profiles/` + this.currentTouchConfigData.configId + '/config.yaml'
+      const sandUri = fileUri.getUriFromPath(sandPath)
+      try {
+        const file = fs.openSync(sandUri, fs.OpenMode.READ_ONLY);
+        try {
+          console.log('#EditConfigContent.loadConfigContent file fd:', file.fd);
+          const stats = fs.statSync(file.path);
+          const fileSize = stats.size;
+          console.log('#EditConfigContent.loadConfigContentile fileSize:', fileSize);
+          let buffer = new ArrayBuffer(fileSize);
+          const readOptions: ReadOptions = {
+            offset: 0,
+            length: fileSize
+          };
+          console.log('#EditConfigContent.loadConfigContent readOptions:', JSON.stringify(readOptions));
+          fs.readSync(file.fd, buffer, readOptions);
+          let textDecoder = util.TextDecoder.create("UTF-8", { ignoreBOM: false });
+          this.configStr = textDecoder.decodeToString(new Uint8Array(buffer));
+          console.debug(`读取到的配置内容：${this.configStr}`)
+        } catch (err) {
+          console.error(`读取配置文件失败，name: ${err.name} message: ${err.message}`)
+        } finally {
+          // 关闭文件
+          fs.closeSync(file)
+        }
+      } catch (error) {
+        console.error(`打开配置文件失败，name: ${error.name} message: ${error.message}`)
+      }
+    })
+
     // 更新应用版本号
     const packageInfo = await getPackageInfo()
     AppState.versionName = packageInfo.versionName
@@ -996,6 +1035,7 @@ struct Index {
     EventHub.off(EventKey.ExportLog)
     EventHub.off(EventKey.ClearLog)
     EventHub.off(EventKey.StartLog)
+    EventHub.off(EventKey.LoadConfigStr)
     // 解绑listener中注册的回调函数
     // this.deviceHeightListener.off('change');
   }

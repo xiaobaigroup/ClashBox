@@ -37,6 +37,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { fileUri, fileIo as fs, fileIo, picker } from '@kit.CoreFileKit'
 import { ShareData, Xb_Share, Xb_ToastUtil } from 'xb_components'
 
+
 /**
  * 长按菜单参数
  */
@@ -82,10 +83,10 @@ struct ConfigurationPage {
   //loading动画
   @State isLoading : boolean = false
 
+  // 是否显示bindSheet
+  @StorageLink('ShowConfigBindSheet') isShowConfigAddBindSheet: boolean = false
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
-  // 是否显示bindSheet
-  @Consume isShowConfigAddBindSheet: boolean
   // 是否小窗口
   @Consume isSmallSquareScreen: boolean
   // px外屏
@@ -108,8 +109,10 @@ struct ConfigurationPage {
   // page内顶部标题偏移量
   @Consume curYOffset: number
 
-  /** 配置页面内ListItem长按ContextMenu相关 */
-  @Consume('currentTouchConfigData') currentTouchConfigData: ConfigData
+  /**
+   * 配置页面内长按触摸项
+   */
+  @StorageLink('currentTouchConfigData') currentTouchConfigData: ConfigData = NewConfigData
   @Consume('Configuration') @Watch('onConfigListChange') configList: Array<ConfigData>
   @State  currentRadioConfigData: ConfigData = NewConfigData
 
@@ -647,6 +650,9 @@ struct ConfigurationPage {
     this.isNewConfig = false
     // 赋值为false
     this.currentTouchConfigData.isNewConfig = false
+    // 提前加载配置文本
+    EventHub.sendEvent(EventKey.LoadConfigStr)
+    // 显示半模态编辑弹窗
     this.isShowConfigAddBindSheet = true
   }
 

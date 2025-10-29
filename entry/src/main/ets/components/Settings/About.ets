@@ -616,7 +616,7 @@ export struct ThirdServices {
       }
       .width('100%')
       .alignListItem(ListItemAlign.Center)
-      .contentEndOffset(CONTENT_END_OFFSET_150 - 85)
+      .contentEndOffset(CONTENT_END_OFFSET_150 - 65)
       .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
     }.width('100%')
     .backgroundColor($r('app.color.background'))

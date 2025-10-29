@@ -20,29 +20,36 @@ export function LogBuilder(name: string, param: Object){
 
 @Component
 struct Log {
-  // 是否进入二级界面
-  @Consume isSecondary: boolean
+
+  // 更多页面栈
+  @StorageLink('MoreNavPathStack') morePageInfos: NavPathStack = new NavPathStack()
   @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
+  @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
+  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  @State EnableLogger: boolean = false
-  @State filterChecked: number = 0
+  @Consume @Watch('searchLogs') searchText: string
+  @State lastLogListData: Array<LogData> = []
   // 数据（数据本体在Index）
   @Consume logListData: Array<LogData>
-  @State lastLogListData: Array<LogData> = []
+
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
-  @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
-  @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @StorageProp('topRectHeight') topRectHeight: number = 0
+  @State filterChecked: number = 0
+
+  @Consume @Watch('loglist') isSearching: boolean
   // 临时名称正序变量
   @State theSortNameUp: boolean = false
+  @State EnableLogger: boolean = false
+  // 是否进入二级界面
+  @Consume isSecondary: boolean
+  @Consume needSearch: boolean
   // page内顶部标题偏移量
   @Consume curYOffset: number
-  @Consume needSearch: boolean
-  @Consume @Watch('loglist') isSearching: boolean
-  @Consume @Watch('searchLogs') searchText: string
 
   build() {
     NavDestination() {
@@ -57,7 +64,7 @@ struct Log {
         })
 
         Column() {
-          Blank().height(TAB_CONTENT_TITLE_HEIGHT + 6)
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT + (this.widthBp < 2 ? this.topRectHeight : 0) + 6)
           // 主体
           if (this.appConfig.enableLogger === false) {
             Column() {
@@ -88,7 +95,11 @@ struct Log {
                         tips: this.logTipsBuilder
                       }).onClick(() => {
                         // 跳转至详情页
-                        this.pageInfos.pushPathByName('LogDetils', item, true)
+                        if (this.widthBp < 2) {
+                          this.pageInfos.pushPathByName('LogDetails', item, true)
+                        } else {
+                          this.morePageInfos.pushPathByName('LogDetails', item, true)
+                        }
                       })
                     } else {
                       // 无跳转
@@ -117,7 +128,8 @@ struct Log {
                   .transition(customAnimationUtil.isScaleTranFast(index, this.uiConfig))
                 })
 
-              }.width('100%')
+              }
+              .width('100%')
               .height('100%')
               .contentEndOffset(CONTENT_END_OFFSET_150)
               .padding({ right: PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp) })
@@ -171,6 +183,7 @@ struct Log {
       }
       if (NeedClearMoreStack(this.widthBp, this.heightBp)) {
         this.pageInfos.clear()
+        this.morePageInfos.clear()
         this.isSecondary = false
         return false
       } else {
@@ -336,6 +349,8 @@ export struct LogDetails {
 
   @Consume logListData: Array<LogData>
   @State theLogSkipItem: LogData = NullLogData
+  // 更多页面栈
+  @StorageLink('MoreNavPathStack') morePageInfos: NavPathStack = new NavPathStack()
   @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
@@ -358,6 +373,7 @@ export struct LogDetails {
         // 导航区
         MoreTop({
           title: $r('app.string.Log'),
+          needBackButton: true,
           subtitle: `${this.theLogSkipItem.logType} ${timestampToDateTime(this.theLogSkipItem.logTime * 1000)}`,
           icon1: $r('sys.symbol.arrowshape_down_to_line_fill'),
           icon2: $r('sys.symbol.trash_fill'),
@@ -413,6 +429,7 @@ export struct LogDetails {
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
       this.pageInfos.pop()
+      this.morePageInfos.pop()
       return true
     })
     .onReady(async (ctx: NavDestinationContext) => {

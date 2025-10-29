@@ -21,6 +21,8 @@ import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { ConfigData } from "../../common/entity/PageArgumentEntity"
 import { UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../common/utils/Animation"
+import { EventHub } from "xb_components"
+
 
 
 // 关联：route_map.json
@@ -42,7 +44,8 @@ export struct ImportConfigFromFile {
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   // 配置详情
   @State @Watch('configDataChanged') configData: ConfigData = NewConfigData
-  @Consume('currentTouchConfigData') currentTouchConfigData: ConfigData
+  // 当前触摸的配置行
+  @StorageLink('currentTouchConfigData') currentTouchConfigData: ConfigData = NewConfigData
   // 当前显示的工具集合 默认为空 待两个input都有值之后才加入保存按钮菜单
   @State private filemenus: Array<BindSheetTitleCustomBuilderMenu> = []
   // 页面栈
@@ -53,10 +56,12 @@ export struct ImportConfigFromFile {
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @State @Watch('configDataChanged') fileurl: string = ''
+
+  // 是否显示bindSheet
+  @StorageLink('ShowConfigBindSheet') isShowConfigAddBindSheet: boolean = false
   // [true: 都有值, false: 不是所有的input都有值]
   @State private allInputHaveValue: boolean = false
-  // 模态弹窗显示变量
-  @Consume isShowConfigAddBindSheet: boolean
+
 
   build() {
     if (this.configData.configId !== 'new') {
@@ -177,11 +182,11 @@ export struct ImportConfigFromFile {
       // 编辑配置内容
       if (this.configData.configId !== 'new') {
         Row() {
-          SymbolGlyph($r('sys.symbol.folder'))
+          SymbolGlyph($r('sys.symbol.doc_plaintext_and_pencil'))
             .fontSize(24)
             .margin({left: 12})
             .fontColor([this.icon_emphasize])
-            .transition(customAnimationUtil.isScaleTranIcon(10,this.uiConfig))
+            .transition(customAnimationUtil.isScaleTranIcon(10, this.uiConfig))
           Text($r('app.string.edit_config'))
             .fontWeight(FontWeight.Medium)
             .fontSize(16)
@@ -194,6 +199,9 @@ export struct ImportConfigFromFile {
         .backgroundColor($r('app.color.container_background'))
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .onClick(() => {
+          // 关闭编辑配置页
+          this.isShowConfigAddBindSheet = false
+          // 跳转编辑文本页
           this.pageInfos.pushPathByName('EditConfigContent', this.configData.configId, true)
         })
       }

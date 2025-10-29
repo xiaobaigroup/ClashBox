@@ -1,4 +1,4 @@
-import { AbilityConstant, ConfigurationConstant, UIAbility, Want, WantAgent, wantAgent } from '@kit.AbilityKit';
+import { AbilityConstant, ConfigurationConstant, UIAbility, Want, Configuration } from '@kit.AbilityKit';
 import { hiAppEvent, hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
@@ -127,6 +127,10 @@ export default class EntryAbility extends UIAbility {
         }
       });
 
+  }
+
+  // 实时监听系统系统配置更新状态
+  onConfigurationUpdate(Config: Configuration): void {
   }
 
   // 热启动

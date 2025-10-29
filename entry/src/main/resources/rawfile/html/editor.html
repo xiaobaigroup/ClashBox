@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Editor</title>
+    <!--<link rel="stylesheet" href="./css/editor.css">-->
+    <style>
+        html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: sans-serif;
+}
+.editor-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+.main-editor {
+    flex: 1;
+    height: 100%;
+    overflow: hidden;
+}
+.cm-editor {
+    height: 100%;
+}
+.cm-scroller {
+    height: 100%;
+    overflow: auto;
+}
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #666;
+    font-size: 16px;
+}
+    </style>
+</head>
+<body>
+    <div class="editor-container">
+        <div id="editor" class="main-editor">
+            <div class="loading">Initializing Code Editor...</div>
+        </div>
+        <div id="minimap" class="minimap"></div>
+    </div>
+
+    <script type="importmap">
+        {
+          "imports": {
+            "codemirror": "./js/codemirror.js",
+            "@codemirror/state": "./js/state.js",
+            "@codemirror/view": "./js/view.js",
+            "@codemirror/commands": "./js/commands.js",
+            "@codemirror/language": "./js/language.js",
+            "@codemirror/autocomplete": "./js/autocomplete.js",
+            "@codemirror/search": "./js/search.js",
+            "@codemirror/lint": "./js/lint.js",
+            "@lezer/highlight": "./js/highlight.js",
+            "@lezer/common": "./js/common.js",
+            "@lezer/lr": "./js/lr.js",
+            "@lezer/javascript": "./js/lazer-javascript.js",
+            "@codemirror/theme-one-dark": "./js/theme-one-dark.js",
+            "@codemirror/lang-javascript": "./js/lang-javascript.js",
+            "@replit/codemirror-minimap": "./js/codemirror-minimap.js",
+            "@marijn/find-cluster-break": "./js/find-cluster-break.js",
+            "style-mod": "./js/style-mod.js",
+            "w3c-keyname": "./js/w3c-keyname.js",
+            "crelt": "./js/crelt.js"
+          }
+        }
+    </script>
+
+    <script type="module" src="https://localhost.localdomain/js/editor-core.js"></script>
+</body>
+</html>
