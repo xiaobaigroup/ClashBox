@@ -46,6 +46,7 @@ export struct CreateNewConfig{
       BindSheetTitleCustomBuilder({
         pageInfos: this.configAddPageInfos,
         isSubPage: true,
+        needSetHeight: true,
         titlePaddingLeft: BIND_SHEET_DRAG_BAR_HEIGHT / 2,
         mainTitle: this.mainTitle,
         subTitle: this.subTitle,

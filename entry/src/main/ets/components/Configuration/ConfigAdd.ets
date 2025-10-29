@@ -125,7 +125,7 @@ export struct ConfigAdd {
             pageInfos: this.configAddPageInfos,
             isSubPage: false,
             mainTitle: $r('app.string.add_config'),
-            // subTitle: '',
+            needSetHeight: true,
             mainTitleFontWeight: BIND_SHEET_MAIN_FONT_WEIGHT,
             mainTitleFontSize: BIND_SHEET_MAIN_FONTSIZE,
             subTitleFontSize: BIND_SHEET_SUB_FONTSIZE,

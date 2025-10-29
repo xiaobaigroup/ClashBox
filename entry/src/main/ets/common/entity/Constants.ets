@@ -444,6 +444,7 @@ export  const ListOverwriteNetworkData = (clashConfig: ClashConfig, appConfig: A
     new ConfigItemData($r('sys.symbol.satellite_map_fill'), 'stack', $r('app.string.stack_mode'), '', 'gvisor', 0).bindClashConfigBy(clashConfig, "tun").bindOption(StackMenu),
     new ConfigItemData($r('sys.symbol.slider_horizontal_2'), 'route-mode', $r('app.string.route_mode'), '', $r('app.string.using_configuration'), 0)
       .bindClashConfig(clashConfig).bindOption(RouteMenu),
+    new ConfigItemData($r('sys.symbol.fast'), 'tun-ip', $r('app.string.tun_ip'), '', '172.19.0.1', 1).bindClashConfigBy(clashConfig, "tun").bindType(ValueType.String),
     new ConfigItemData($r('sys.symbol.local_fill'), 'route-address', $r('app.string.Routing_Address'), $r('app.string.Routing_Address_Subtitle'), '', 1).bindClashConfig(clashConfig),
     new ConfigItemData($r('sys.symbol.network_acceleration'), 'compatible', $r('app.string.compatibility_mode'), $r('app.string.compatibility_mode_subtitle'), '', 1),
   ]

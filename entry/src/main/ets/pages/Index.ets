@@ -87,11 +87,9 @@ struct Index {
    * 窗口
    */
   // 高度断点
-  @StorageLink('currentHeightBreakpoint') @Watch('onWindowChange') @Watch('isSecondaryChange') heightBp: HeightBreakpoint =
-    0
+  @StorageLink('currentHeightBreakpoint') @Watch('onWindowChange') @Watch('isSecondaryChange') heightBp: HeightBreakpoint = 0
   // 宽度断点
-  @StorageLink('currentWidthBreakpoint') @Watch('onWindowChange') @Watch('isSecondaryChange') widthBp: WidthBreakpoint =
-    1
+  @StorageLink('currentWidthBreakpoint') @Watch('onWindowChange') @Watch('isSecondaryChange') widthBp: WidthBreakpoint = 1
   // 导航条区域的高度
   @StorageProp('bottomRectHeight') @Watch('onAvoidAreaChange') bottomRectHeight: number = 0
   // 状态栏高度
@@ -250,7 +248,7 @@ struct Index {
   // 配置数据
   @Provide('Configuration') configList: Array<ConfigData> = []
   @StorageLink('ConfigContent') configStr: string = ''
-    /**
+   /**
    * 更多页相关变量
    */
   // 更多页面栈
@@ -398,7 +396,7 @@ struct Index {
     .bindSheet($$this.isShowWelcome, this.WelcomeSheet(), {
       detents: [BIND_SHEET_CONTAINER_HEIGHT],
       showClose: (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) ||
-        this.appLinkConfigUrl != '' || (this.uiConfig.oldVersionName !== AppState.versionName && !this.uiConfig.isFirstStart) || this.showUpdateLog,
+        this.appLinkConfigUrl != '' || (this.uiConfig.oldVersionCode !== AppState.versionCode && !this.uiConfig.isFirstStart) || this.showUpdateLog,
       dragBar: false,
       backgroundColor: $r('app.color.background'),
       keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
@@ -410,7 +408,7 @@ struct Index {
         // 无论什么原因关闭，都重置状态
         this.showUpdateLog = false
         this.isShowWelcome = false
-        this.uiConfig.oldVersionName = AppState.versionName
+        this.uiConfig.oldVersionCode = AppState.versionCode
 
         // 清空 AppLink 相关状态，避免重复导入
         if (this.appLinkConfigUrl != '') {
@@ -418,7 +416,7 @@ struct Index {
           this.appLinkConfigName = ''
         }
 
-        hilog.error(0xFF00, "WelcomeTestTag", `Update 历史应用版本更新为：${this.uiConfig.oldVersionName} showUpdateLog: ${this.showUpdateLog}`)
+        hilog.error(0xFF00, "WelcomeTestTag", `Update 历史应用版本更新为：${this.uiConfig.oldVersionCode} showUpdateLog: ${this.showUpdateLog}`)
         // 关闭背景模糊
         this.isEnableIndexForegroundBlur = false
         DismissSheetAction.dismiss()
@@ -611,6 +609,10 @@ struct Index {
     hilog.info(0xFF00, componentName, `#WindowChange#应用窗口状态 width: ${this.windowWidth} height: ${this.windowHeight} ` + ' tab宽度:' + this.barWidth?.toString())
     // 当窗口变化时清除更多页路由
     this.morePageInfos.clear(true)
+    // 当处于更多页时清理主路由
+    if (this.tabCurrentPage === 3) {
+      this.pageInfos.clear(true)
+    }
     if (this.windowWidth > 328 || this.windowHeight > 328) {
       if (this.windowHeight === this.windowWidth) {
         hilog.info(0xFF00, componentName,
@@ -1005,10 +1007,11 @@ struct Index {
 
     // 更新应用版本号
     const packageInfo = await getPackageInfo()
+    AppState.versionCode = packageInfo.versionCode
     AppState.versionName = packageInfo.versionName
-    console.error(`Update 历史应用版本：${this.uiConfig.oldVersionName} 当前应用版本：${AppState.versionName}`)
+    console.error(`Update 历史应用版本：${this.uiConfig.oldVersionCode} 当前应用版本：${AppState.versionCode}`)
 
-    if (this.uiConfig.oldVersionName !== AppState.versionName) {
+    if (this.uiConfig.oldVersionCode !== AppState.versionCode) {
       this.isEnableIndexForegroundBlur = true
       this.isShowWelcome = true
       this.updateData()   // TODO 强制更新数据函数
@@ -1042,7 +1045,9 @@ struct Index {
 
   // 更新后强化赋值一次
   updateData() {
-
+    if (this.clashConfig.tun && this.clashConfig.tun['tun-ip']) {
+      this.clashConfig.tun['tun-ip'] = '172.19.0.1'
+    }
   }
 
   // 等待配置数据库初始化完成

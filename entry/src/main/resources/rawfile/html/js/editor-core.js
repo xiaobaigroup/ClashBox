@@ -620,9 +620,7 @@ class HarmonyCodeEditor {
     setupEditorEvents() {
         // 内容变化事件
         this.editor.contentDOM.addEventListener('input', () => {
-            this.sendEvent('contentChange', {
-                content: this.getContent()
-            });
+            this.sendEvent('contentChange', this.getContent());
         });
 
         // 选择变化事件

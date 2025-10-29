@@ -24,11 +24,12 @@ struct Network {
   // 更多页面栈
   @StorageLink('MoreNavPathStack') morePageInfos: NavPathStack = new NavPathStack()
   @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
-  @State overwriteNetworkList: ConfigItemData[] = []
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+
+  @State overwriteNetworkList: ConfigItemData[] = []
 
   aboutToAppear(): void {
     this.overwriteNetworkList = ListOverwriteNetworkData(this.clashConfig, this.appConfig)
@@ -65,11 +66,14 @@ export function NetworkCompatibleBuilder(name: string, param: Object){
 // 网络 -> 兼容模式
 @Component
 export struct NetworkCompatible {
-
+  // 更多页面栈
+  @StorageLink('MoreNavPathStack') morePageInfos: NavPathStack = new NavPathStack()
+  // 主路由
   @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
-  @State networkCompatibleList: ConfigItemData[] = []
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+
+  @State networkCompatibleList: ConfigItemData[] = []
 
   aboutToAppear(): void {
     this.networkCompatibleList = OverwriteNetworkCompatible(this.clashConfig, this.appConfig)
@@ -91,11 +95,8 @@ export struct NetworkCompatible {
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
-      if(this.pageInfos.size() === 1) {
-        this.pageInfos.clear()
-      } else {
-        this.pageInfos.pop(true)
-      }
+      this.pageInfos.pop(true)
+      this.morePageInfos.pop(true)
       return true
     })
   }
@@ -215,8 +216,6 @@ export struct NetworkRouterAddress {
     this.RouterAddressList.splice(this.theEditPlaceholder, 1, editItem)
   }
 
-
-
   // 列表行删除
   handleDelete(index: number) {
     hilog.info(0xFF00, "NetworkRoutertestTag", "%{public}d", index)
@@ -225,7 +224,6 @@ export struct NetworkRouterAddress {
     hilog.info(0xFF00, "NetworkRoutertestTag", "2%{public}s", JSON.stringify(this.RouterAddressList))
 
   }
-
 
   build() {
     NavDestination() {
@@ -328,7 +326,7 @@ export struct NetworkRouterAddress {
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
-      if(this.pageInfos.size() === 1) {
+      if (this.pageInfos.size() === 1) {
         this.pageInfos.clear()
       } else {
         this.pageInfos.pop(true)

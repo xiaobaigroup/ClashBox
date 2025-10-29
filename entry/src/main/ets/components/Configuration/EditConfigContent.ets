@@ -3,7 +3,8 @@ import { BindSheetTitleCustomBuilderMenu, CustomConfirmDialog } from "../Common/
 import {
   BIND_SHEET_DRAG_BAR_HEIGHT,
   BIND_SHEET_MAIN_FONTSIZE,
-  BIND_SHEET_MAIN_FONT_WEIGHT, BIND_SHEET_SUB_FONTSIZE,} from "../../common/entity/Constants";
+  BIND_SHEET_MAIN_FONT_WEIGHT, BIND_SHEET_SUB_FONTSIZE,
+  NewConfigData,} from "../../common/entity/Constants";
 import { BindSheetTitleCustomBuilder } from "../Common/Common"
 import { HMCodeEditor } from 'hm_code_editor';
 import { EventHub, EventKey } from "../../common/EventHub";
@@ -11,6 +12,8 @@ import { WebCodeEditor } from "../Common/CodeEditor";
 import { EditorCommunicationManager, WebCodeEditorOptions } from "../../common/entity/WebCodeEditor";
 import { webview } from "@kit.ArkWeb";
 import { hilog } from "@kit.PerformanceAnalysisKit";
+import { fileIo, fileUri } from "@kit.CoreFileKit";
+import { ConfigData } from "../../common/entity/PageArgumentEntity";
 
 @Builder
 export function EditConfigContentBuilder(name: string, param: Object){
@@ -28,12 +31,15 @@ struct EditConfigContent {
   @Consume('currentColorMode') currentColorMode: boolean
 
   @StorageLink('ConfigContent') configStr: string = ''
+  @State lastConfigStr: string = ''
 
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 主页面栈
   @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   // 当前显示的工具集合 默认为空 待发生编辑事件之后才加入保存按钮菜单
   @State private fileMenus: Array<BindSheetTitleCustomBuilderMenu> = []
+  // 当前触摸的配置行
+  @StorageLink('currentTouchConfigData') currentTouchConfigData: ConfigData = NewConfigData
 
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
@@ -55,10 +61,24 @@ struct EditConfigContent {
     language: 'javascript',  // 语言：'javascript' | 'typescript' | 'css' | 'html' | 'json' | 'python' | 'java'
     fontSize: '14px',
     showMinimap: true,
-
     // 回调函数
     onContentChange: (content: string) => {
       this.configStr = content;
+      console.log(`WebCodeEditor 初始文本长度：${this.lastConfigStr.length}，编辑文本：${JSON.stringify(content)}`)
+      if (this.lastConfigStr.length !== content.length) {
+        if (this.fileMenus.filter(i => i === this.saveMenus).length <= 0) {
+          // 新增`保存配置`菜单按钮
+          this.fileMenus.push(this.saveMenus)
+        }
+      } else {
+        // 移除`保存配置`菜单按钮
+        for (let i = 0; i < this.fileMenus.length; i++) {
+          if (this.fileMenus[i] === this.saveMenus) {
+            this.fileMenus.splice(i, 1)
+            break
+          }
+        }
+      }
       console.info('WebCodeEditor 内容已更新');
     },
     onEditingChange: (isEditing: boolean) => {
@@ -69,7 +89,8 @@ struct EditConfigContent {
     },
     onSave: () => {
       console.info('WebCodeEditor 保存操作触发');
-      this.saveConfigContent();
+      // 这里其实在网页内没写 (
+      // this.saveConfigContent()
     },
     // 就绪回调
     onReady: () => {
@@ -84,6 +105,7 @@ struct EditConfigContent {
   aboutToAppear(): void {
     this.editorOptions.theme = this.currentColorMode ? 'dark' : 'light'
     hilog.info(0x0000, 'WebCodeEditor', `初始要传递的 theme: ${this.editorOptions.theme}`);
+    this.lastConfigStr = this.configStr
   }
 
   aboutToDisappear(): void {
@@ -158,12 +180,24 @@ struct EditConfigContent {
         console.log(`ClashBox#ImportConfigFromFile#onReady Navigate onReady catch exception: ${JSON.stringify(e)}`)
       }
     })
-    .animation({ duration:  this.uiConfig.animationSpeed , curve: Curve.Ease })
+    .animation({ duration: this.uiConfig.animationSpeed , curve: Curve.Ease })
   }
 
   /** 保存配置 */
   saveConfigContent() {
-
+    try {
+      const context = this.getUIContext().getHostContext()!
+      const sandPath = context.filesDir + `/ClashBox/profiles/` + this.currentTouchConfigData.configId + '/config.yaml'
+      const sandboxUri = fileUri.getUriFromPath(sandPath)
+      // 写入配置文件
+      const fileModify = fileIo.openSync(sandboxUri, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE);
+      fileIo.writeSync(fileModify.fd, this.configStr);
+      fileIo.close(fileModify).catch(() => {
+        console.error(`saveConfigContent 文件关闭失败`)
+      })
+    } catch (error) {
+      console.error(`保存配置文本错误，message: ${error.message}`)
+    }
   }
 
   // 配置是否保存弹框 Controller定义
@@ -203,6 +237,7 @@ struct EditConfigContent {
       this.saveConfigContent()
       // 保存配置后返回上一页
       this.pageInfos.pop(true)
+      this.isShowConfigAddBindSheet = true
     }
   }
 }

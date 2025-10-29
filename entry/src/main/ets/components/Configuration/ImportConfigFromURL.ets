@@ -69,7 +69,7 @@ export struct ImportConfigFromURL {
       // 替代`NavDestination`的标题栏 START
       BindSheetTitleCustomBuilder({
         pageInfos: this.configAddPageInfos,
-        // isSubPage: true,
+        needSetHeight: true,
         isSubPage: this.configData.isNewConfig,
         titlePaddingLeft: BIND_SHEET_DRAG_BAR_HEIGHT / 2,
         mainTitle: this.configData.isNewConfig ? mainTitle : getResourceString($r('app.string.edit_config'), this),

@@ -2239,6 +2239,10 @@
     {
       "name": "export_config_file",
       "value": "匯出設定檔"
+    },
+    {
+      "name": "tun_ip",
+      "value": "虛擬IP地址"
     }
   ]
 }

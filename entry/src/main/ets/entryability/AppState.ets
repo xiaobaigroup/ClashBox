@@ -70,7 +70,7 @@ export class UIConfig {
   // 主页问候语
   isGreeting?: boolean = true
   // 历史版本名
-  oldVersionName: string = '1.6.0'
+  oldVersionCode: number = 1006056
   // 主题色
   themeColor: CustomThemeName = 'blueAppTheme'
   // 主题色序号
@@ -185,7 +185,8 @@ export function getPackageInfo(){
 export class AppState {
   static externalController = "0.0.0.0:9090"
   static globalUA = "clash.meta/1.18.7"
-  static versionName = ""
+  static versionName = ''
+  static versionCode = 1006056
   static coreVersion = "Prerelease-Alpha"
   static async init(){
 

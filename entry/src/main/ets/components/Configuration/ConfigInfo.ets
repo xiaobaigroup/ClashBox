@@ -21,7 +21,7 @@ import { customAnimationUtil } from "../../common/utils/Animation"
 import { NavigationListPadding } from "../../common/breakpoint/BreakPoint"
 
 @Component
-export struct ConfigInfo{
+export struct ConfigInfo {
 
   private componentName: string = 'ConfigInfo'
   private promptAction:PromptAction = this.getUIContext()?.getPromptAction()
@@ -82,7 +82,10 @@ export struct ConfigInfo{
     Column({ space: 10 }) {
       // 配置名input
       Text($r('app.string.config_name')).fontColor($r('sys.color.font_secondary')).fontSize(FONT_SIZE_16)
-      TextInput({ text: $$this.configData.configName, placeholder: $r('app.string.enter_configuration_name') }).width('100%').height(TEXT_INPUT_HEIGHT).borderRadius(BORDER_RADIUS_20)
+      TextInput({ text: $$this.configData.configName, placeholder: $r('app.string.enter_configuration_name') })
+        .width('100%')
+        .height(TEXT_INPUT_HEIGHT)
+        .borderRadius(BORDER_RADIUS_20)
         .id('text_input_config_name')
         .caretColor(this.icon_emphasize)
         .maxLength(TEXT_AREA_MAX_LENGTH)

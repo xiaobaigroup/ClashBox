@@ -513,6 +513,10 @@
       "value": "使用配置"
     },
     {
+      "name": "tun_ip",
+      "value": "虚拟IP地址"
+    },
+    {
       "name": "Routing_Address",
       "value": "路由地址"
     },

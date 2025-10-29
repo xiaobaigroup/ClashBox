@@ -28,7 +28,7 @@ import { RpcRequest, RpcResult } from './RpcRequest';
 import { ClashRpcType } from './IClashManager';
 import { ConnectionInfo, LogInfo, Provider, ProxyGroup, ProxyMode, ProxyType, Traffic } from '../models/Common';
 import { getHome, getProfilePath } from '../appPath';
-import { Tun, UpdateConfigParams } from '../models/ClashConfig';
+import { ClashConfig, Tun, UpdateConfigParams } from '../models/ClashConfig';
 import { readFile, readFileUri, readText } from '../fileUtils';
 
 export interface AccessControl {
@@ -97,10 +97,11 @@ export class FlClashVpnService extends CommonVpnService {
 
   ParseConfig(): VpnConfig {
     let vpnConfig = new VpnConfig();
+    let clashConfig = new ClashConfig()
     let option = JSON.parse(getVpnOptions()) as VpnOptions
     console.debug("ParseConfig", JSON.stringify(option))
     if (option.ipv4Address != "") {
-      vpnConfig.addresses[0].address = new Address(option.ipv4Address.split("/")[0], 1)
+      vpnConfig.addresses[0].address = new Address(clashConfig.tun?.['tun-ip']/*option.ipv4Address.split("/")[0]*/, 1)
       option.routeAddress?.filter(a => isIpv4(a)).map(f => f.split("/")[0])
     }
     if (option.ipv6Address != "") {

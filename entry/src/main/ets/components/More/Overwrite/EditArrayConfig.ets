@@ -43,24 +43,27 @@ export struct ArrayConfigEditor {
   @State SaveEditInputValue: string = ''
   // 编辑弹窗当前输入文本
   @State currentEditInputValue: string = ''
-  @State keyValueData: KeyValueData = new KeyValueData("")
+
   // 编辑路由地址弹窗标题
   @State ArrayConfigList: KeyValueData[] = []
   // 更多页面栈
   @StorageLink('MoreNavPathStack') morePageInfos: NavPathStack = new NavPathStack()
   @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
-  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
-  // 平板竖屏判断
-  // 平板竖屏判断变量
-  @Consume istabletLandscape: boolean
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @State keyValueData: KeyValueData = new KeyValueData("")
+
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
+  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
+
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+  // 状态栏高度
+  @StorageProp('topRectHeight') topRectHeight: number = 0
+
   @Prop params: ConfigItemData
-  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   //page内顶部标题偏移量
   @Consume curYOffset: number
   @State content: string = ""
@@ -274,7 +277,7 @@ export struct ArrayConfigEditor {
         })
 
         Column() {
-          Blank().height(TAB_CONTENT_TITLE_HEIGHT + 6)
+          Blank().height(TAB_CONTENT_TITLE_HEIGHT + (this.widthBp < 2 ? this.topRectHeight : 0) + 6)
           Scroll() {
             if (this.isEditPage) {
               // 文本编辑页

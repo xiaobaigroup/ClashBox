@@ -47,7 +47,7 @@ export struct ImportConfigFromFile {
   // 当前触摸的配置行
   @StorageLink('currentTouchConfigData') currentTouchConfigData: ConfigData = NewConfigData
   // 当前显示的工具集合 默认为空 待两个input都有值之后才加入保存按钮菜单
-  @State private filemenus: Array<BindSheetTitleCustomBuilderMenu> = []
+  @State private fileMenus: Array<BindSheetTitleCustomBuilderMenu> = []
   // 页面栈
   @Consume('configAddPageInfos') configAddPageInfos: NavPathStack
   // 主页面栈
@@ -122,12 +122,13 @@ export struct ImportConfigFromFile {
       mainTitleFontSize: BIND_SHEET_MAIN_FONTSIZE,
       subTitleFontSize: BIND_SHEET_SUB_FONTSIZE,
       titleBackgroundColor: $r('app.color.background'),
+      needSetHeight: true,
       padding: {
         // 为什么设置`15`，看Builder的参数中`padding`的介绍：ConfigAddBindSheetTitleBuilderParam
         left: 15,
         right: BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT + 15 * 2
       },
-      menus: this.filemenus
+      menus: this.fileMenus
     })
     // 替代`NavDestination`的标题栏 END
 
@@ -263,7 +264,7 @@ export struct ImportConfigFromFile {
     this.saveMenus.symbolBackgroundColor = this.icon_emphasize
     // 若为编辑状态直接显示保存按钮
     if (!this.configData.isNewConfig) {
-      this.filemenus.push(this.saveMenus)
+      this.fileMenus.push(this.saveMenus)
       // 赋予初始值
       this.fileurl = this.configData.configUrl
     }
@@ -298,15 +299,15 @@ export struct ImportConfigFromFile {
     this.checkTheInputHaveValue()
     if (this.configData.isNewConfig) {
       if (this.allInputHaveValue) {
-        if (this.filemenus.filter(i => i === this.saveMenus).length <= 0) {
+        if (this.fileMenus.filter(i => i === this.saveMenus).length <= 0) {
           // 新增`保存配置`菜单按钮
-          this.filemenus.push(this.saveMenus)
+          this.fileMenus.push(this.saveMenus)
         }
       } else {
         // 移除`保存配置`菜单按钮
-        for (let i = 0; i < this.filemenus.length; i++) {
-          if (this.filemenus[i] === this.saveMenus) {
-            this.filemenus.splice(i, 1)
+        for (let i = 0; i < this.fileMenus.length; i++) {
+          if (this.fileMenus[i] === this.saveMenus) {
+            this.fileMenus.splice(i, 1)
             break
           }
         }

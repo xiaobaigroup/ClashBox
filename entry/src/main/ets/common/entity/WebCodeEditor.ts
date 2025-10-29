@@ -146,7 +146,7 @@ export class EditorCommunicationManager {
   }
 
   /**
-   * 初始化通信端口（增强版）
+   * 初始化通信端口
    */
   initializePorts(): boolean {
     try {
@@ -331,7 +331,7 @@ export class EditorCommunicationManager {
   }
 
   /**
-   * 发送事件到Web端（修复版）
+   * 发送事件到Web端
    */
   sendEvent(event: string, data?: EditorSelection | boolean | string | EditorConfig): void {
     // 检查端口有效性
@@ -339,7 +339,6 @@ export class EditorCommunicationManager {
       hilog.warn(0x0000, TAG, 'Cannot send event: communication port not ready');
       return;
     }
-
     // 检查是否是重复的配置事件
     if (event === 'config') {
       const configData = data as EditorConfig;

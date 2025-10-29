@@ -2239,6 +2239,10 @@
     {
       "name": "export_config_file",
       "value": "Export configuration file"
+    },
+    {
+      "name": "tun_ip",
+      "value": "Virtual IP address"
     }
   ]
 }

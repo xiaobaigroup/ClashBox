@@ -41,7 +41,7 @@ import {
   WindowHomeGridRowPadding } from '../common/breakpoint/BreakPoint'
 import { RoundButton } from '../components/Common/RoundButton'
 import { AccessControl, VpnRawOptions } from 'proxy_core/src/main/ets/rpc/IClashManager'
-import { Xb_GetResourceString } from 'xb_components'
+import { Xb_GetResourceString, Xb_ToastUtil } from 'xb_components'
 import { common } from '@kit.AbilityKit'
 
 
@@ -88,7 +88,6 @@ struct Home {
   // 设置页面栈
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
 
-  private promptAction: PromptAction = this.getUIContext()?.getPromptAction()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 滚动控制
@@ -110,14 +109,13 @@ struct Home {
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
-  // 按钮宽度
-  // @State  proxyStartButtonWidth: Length = $r('app.integer.vp_proxy_not_start_button_width')
   // 状态栏高度
   @StorageProp('topRectHeight') topRectHeight: number = 0
   // 页面名称 主页
   private componentName: string = 'HomePage'
   // 代理启动持续的时间
   @StorageProp('proxyStartingDuration') proxyStartingDuration: string = ''
+  @Consume ("currentProfile") currentProfile: Profile | null
   // 主界面当前index
   @Consume tabCurrentPage: number
   @Consume curOffsetRemain: number
@@ -130,13 +128,6 @@ struct Home {
   @Consume curYOffset: number
   // 小窗口隐藏top和tab偏移
   @Consume heightTop: number
-
-  @Consume ("currentProfile") currentProfile: Profile | null
-  // 定时器Controller
-  // @Consume proxyStartedTimer: Timer
-
-  // 按钮前Symbol动效
-  // ReplaceSymbolEffect: SymbolEffect = EffectScope.WHOLE
 
   build() {
     Stack({ alignContent: Alignment.TopStart }) {
@@ -154,9 +145,9 @@ struct Home {
               this.isShowHomeEdit = true
               this.isShowCardEdit = true
               // 编辑布局前储存之前的布局变量
-              hilog.info(0xFF00, "HometestTag", "上一次布局1： %{public}s", JSON.stringify(this.theLastHomeCard))
+              hilog.info(0xFF00, "HomeTestTag", "上一次布局1： %{public}s", JSON.stringify(this.theLastHomeCard))
               this.theLastHomeCard = JSON.parse(this.uiConfig.isShowHomeCard)
-              hilog.info(0xFF00, "HometestTag", "上一次布局2： %{public}s", JSON.stringify(this.theLastHomeCard))
+              hilog.info(0xFF00, "HomeTestTag", "上一次布局2： %{public}s", JSON.stringify(this.theLastHomeCard))
               if (this.uiConfig.isAnimation) {
                 this.uiContext.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
                   this.isShowDeleteButton = true
@@ -343,7 +334,7 @@ struct Home {
     // 初始化主页卡片布局
     if (this.uiConfig.isShowHomeCard)
       this.theCurrentHomeCard = JSON.parse(this.uiConfig.isShowHomeCard)
-    hilog.info(0xFF00, "HometestTag", "布局初始化为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
+    hilog.info(0xFF00, "HomeTestTag", "布局初始化为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
     if (this.tabCurrentPage == 0) {
       this.isHomePage = true
     }
@@ -384,9 +375,7 @@ struct Home {
         customVibrator.vibratorTriggerOfHapticClockTimer()
       }
       // 配置页没有数据，或者代理节点未加载
-      this.promptAction.showToast({
-        message: `${Xb_GetResourceString($r('app.string.start_prompt'), this.getUIContext().getHostContext())}`
-      })
+      Xb_ToastUtil.showToast({message: $r('app.string.start_prompt')})
       // vpn小钥匙可能卡死，关闭vpn小钥匙
       await ClashViewModel.StopVpn()
     } else {
@@ -405,7 +394,7 @@ struct Home {
   }
 
   homeCardList(): HomeCardInfo[] {
-    return [
+    const cardList: HomeCardInfo[] = [
       { // 网络速度小卡片
         aspectRatio: 2.07,
         order: 1
@@ -447,6 +436,8 @@ struct Home {
         order: 8
       }
     ]
+    const newCardList = cardList.filter((obj, index) => this.theCurrentHomeCard[index])
+    return newCardList
   }
 
   // 在自定义组件即将析构销毁时将dialogController置空
@@ -502,8 +493,8 @@ struct Home {
   saveHomeLayout() {
     // 保存布局
     this.uiConfig.isShowHomeCard = JSON.stringify(this.theCurrentHomeCard)
-    hilog.info(0xFF00, "HometestTag", "保存的布局： %{public}s", this.uiConfig.isShowHomeCard)
-    this.promptAction.showToast({ message: `${Xb_GetResourceString($r('app.string.layout_saved'), this)}💾` })
+    hilog.info(0xFF00, "HomeTestTag", "保存的布局： %{public}s", this.uiConfig.isShowHomeCard)
+    Xb_ToastUtil.showToast({ message: `${Xb_GetResourceString($r('app.string.layout_saved'), this)}💾` })
     this.isShowHomeEdit = false
     if (this.uiConfig.isAnimation) {
       this.uiContext.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
@@ -517,8 +508,8 @@ struct Home {
     // 还原布局
     this.theCurrentHomeCard = this.theLastHomeCard
     this.uiConfig.isShowHomeCard = JSON.stringify(this.theLastHomeCard)
-    hilog.info(0xFF00, "HometestTag", "布局还原为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
-    this.promptAction.showToast({ message: `${Xb_GetResourceString($r('app.string.layout_restored'), this)}🫡` })
+    hilog.info(0xFF00, "HomeTestTag", "布局还原为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
+    Xb_ToastUtil.showToast({ message: `${Xb_GetResourceString($r('app.string.layout_restored'), this)}🫡` })
     this.isShowHomeEdit = false
     this.uiContext.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
       this.isShowDeleteButton = false
@@ -527,7 +518,7 @@ struct Home {
 
   /**卡片编辑页面显示监听*/
   ShowHomeEditChange() {
-    hilog.info(0xFF00, "HometestTag", "进入卡片编辑页面显示监听  %{public}s")
+    hilog.info(0xFF00, "HomeTestTag", "进入卡片编辑页面显示监听  %{public}s")
     if(this.isShowHomeEdit && !this.isShowCardEdit) {
       this.stopAnim()
       this.startAnim()
@@ -538,18 +529,6 @@ struct Home {
   }
 
   onForward() {
-    // if (this.proxyEnabled) {
-    //   if(!this.isForward) {
-    //     // 页面不处于前台时暂停计时
-    //     this.proxyStartedTimer.pause()
-    //     hilog.info(0xFF00, "TimertestTag", "计时器暂停此时的时间：%{public}s", this.proxyStartingDuration)
-    //   } else {
-    //     // 二次启动计时
-    //     let gapTime = this.theRestoreTime - this.thePauseTime
-    //     hilog.info(0xFF00, "TimertestTag", "需要增加的时间： %{public}d", gapTime)
-    //     this.proxyStartedTimer.resumeWithExtraTime(gapTime)
-    //   }
-    // }
   }
 
 }
@@ -578,7 +557,6 @@ struct HomeCard {
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
 
   build() {
-    // if (this.theCurrentHomeCard[this.index] && this.isForward && this.isHomePage) {
       GridCol({
         span: {
           sm: HomeCardSpan36sm(this.widthBp, this.heightBp) * (this.index == 0 || this.index == 8 ? 2 : 1),
@@ -589,9 +567,6 @@ struct HomeCard {
       })
       {
         Stack({ alignContent: Alignment.TopEnd }) {
-          // Column() {
-          //   Text(`序号：${this.index} 比例：${this.item.aspectRatio} 实际sm: ${HomeCardSpan36sm(this.widthBp, this.heightBp)} 实际md: ${HomeCardSpan346md(this.widthBp, this.heightBp)} 实际lg: ${HomeCardSpan346lg(this.widthBp, this.heightBp)}`)
-          // }
           this.HomeCardContent(this.index)
           if (this.isShowDeleteButton) {
             DeleteButton()
@@ -600,7 +575,7 @@ struct HomeCard {
                 this.uiContext.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
                   this.theCurrentHomeCard.splice(this.index, 1, false)
                 })
-                hilog.info(0xFF00, "HometestTag", "网络速率卡片: %{public}s", this.uiConfig.isShowHomeCard[this.index])
+                hilog.info(0xFF00, "HomeTestTag", "网络速率卡片: %{public}s", this.uiConfig.isShowHomeCard[this.index])
               })
           }
         }
@@ -623,7 +598,6 @@ struct HomeCard {
       // 编辑模式下跳动动画
       .rotate({ angle: this.uiConfig.isAnimation ? this.rotateAngle : null })
     }
-  // }
 
   @Builder
   HomeCardContent(index: number) {
