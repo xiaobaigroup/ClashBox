@@ -106,7 +106,7 @@
       }
     },
     {
-      "name": "Route-Address",
+      "name": "route-address",
       "pageSourceFile": "src/main/ets/components/More/Overwrite/Network.ets",
       "buildFunction": "NetworkRouterAddressBuilder",
       "data": {

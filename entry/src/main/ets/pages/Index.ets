@@ -20,6 +20,7 @@ import {
   showHomeCard,
   NewConfigData,
   BundleInfo,
+  HomeCards,
 } from '../common/entity/Constants'
 import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/datasources/ProxyData'
 import { ClashConfig, IpInfo, Profile, ProxyMode } from 'proxy_core'
@@ -28,7 +29,7 @@ import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig, AppFlowingState, AppState, ClashCore, getPackageInfo, UIConfig } from '../entryability/AppState'
 import { common } from '@kit.AbilityKit'
 import { ChangeLanguage } from '../common/utils/ChangeLanguageUtil'
-import { ConfigData, TabBuild } from '../common/entity/PageArgumentEntity'
+import { ConfigData, HomeCardInfo, TabBuild } from '../common/entity/PageArgumentEntity'
 import { customAnimationUtil } from '../common/utils/Animation'
 import { DisclaimerCustomDialog, icon_tertiary, theRowCustomDialog } from '../components/Common/Common'
 import { PipManager } from '../common/utils/PipManager'
@@ -203,9 +204,9 @@ struct Index {
   // 主页删除按钮是否出现判定
   @Provide isShowDeleteButton: boolean = false
   // 当前主页布局
-  @Provide theCurrentHomeCard: boolean[] = showHomeCard
+  @Provide theCurrentHomeCard: string[] = showHomeCard
   // 上一次主页布局
-  @Provide theLastHomeCard: boolean[] = showHomeCard
+  @Provide theLastHomeCard: string[] = showHomeCard
   // 速度卡片图表数据
   @Provide ChartData: number[] | ConvertedUnit[] = []
   // 显示的是更新日志
@@ -215,6 +216,7 @@ struct Index {
   // 速度卡片
   @Provide DownloadSpeed: string = ""
   @Provide UploadSpeed: string = ""
+  @Provide homeCardList: HomeCardInfo[] = HomeCards
   /**
    * 代理页Provide相关变量
    */

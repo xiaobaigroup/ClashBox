@@ -660,6 +660,7 @@ export struct theCustomDialog {
           TextInput({placeholder: this.theplaceholder, text: this.currentInputValue })
             .onChange((value: string) => {
               this.currentInputValue = value
+              console.log(`currentInputValue: ${this.currentInputValue}`)
             })
         }
         if(this.Unit) {

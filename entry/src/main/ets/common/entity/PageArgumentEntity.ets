@@ -43,7 +43,10 @@ export interface HomeCardInfo {
   span_sm?: number,
   span_md?: number,
   span_lg?: number,
+  key: string,
   order: number,
+  isShow: boolean,
+  spanMultiple: number,
   aspectRatio: number
 }
 /* 主页 */

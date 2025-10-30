@@ -13,6 +13,7 @@ import { JSON } from '@kit.ArkTS'
 import { customAnimationUtil, isON } from '../../../common/utils/Animation'
 import { common } from '@kit.AbilityKit'
 import { PageMargin } from '../../../common/breakpoint/BreakPoint'
+import { Xb_ToastUtil } from 'xb_components'
 
 @Component
 export struct ConfigList {
@@ -93,25 +94,27 @@ export struct ConfigList {
   handleCheck(index: number) {
     this.currentItemIndex = index
     let itemData = this.configList[index]
-    if(itemData.isEditType()){
+    if(itemData.isEditType()) {
       this.theUnit = itemData.name === 'keep-alive-interval' ? getResourceString($r('app.string.s'), this) : ''
       this.theplaceholder = `${getResourceString($r('app.string.example'), this)}: ${getResourceString(itemData.theSubtitle(), this)}`
       this.currentInputValue = (itemData.value + "") as string
       this.theDialogTitle =  getResourceString($r('app.string.Edit'), this) +  getResourceString(itemData.title, this)
       this.isEnableIndexForegroundBlur = true
       this.dialogController.open()
-    } else if (index === 5 && this.configList[5].name === 'compatible') {
-      if (this.widthBp <2 ) {
-        this.pageInfos.pushPathByName("compatible", true)
-      } else {
-        this.morePageInfos.pushPathByName("compatible", true)
-      }
+    } else if (index === 6 && this.configList[6].name === 'compatible') {
+      this.push('compatible')
+    } else if (index === 5 && this.configList[5].name === 'route-address') {
+      this.push('route-address')
     } else {
-      if (this.widthBp <2 ) {
-        this.pageInfos.pushPathByName("EditArrayConfig", itemData, true)
-      } else {
-        this.morePageInfos.pushPathByName("EditArrayConfig", itemData, true)
-      }
+      this.push('EditArrayConfig', itemData)
+    }
+  }
+
+  push(name: string, itemData?: ConfigItemData) {
+    if (this.widthBp < 2 ) {
+      this.pageInfos.pushPathByName(name, itemData, true)
+    } else {
+      this.morePageInfos.pushPathByName(name, itemData, true)
     }
   }
 
@@ -243,7 +246,7 @@ export struct ConfigList {
               }
               .transition(this.isON.toggleAnim ? null : customAnimationUtil.isScaleTran(index, this.uiConfig))
               .onClick(() => {
-                this.getUIContext()?.animateTo({
+                Xb_ToastUtil.animateTo({
                   duration: this.uiConfig.animationSpeed
                 }, () => {
                   this.currentItemIndex = index
@@ -282,7 +285,7 @@ export struct ConfigList {
       .edgeEffect(this.uiConfig.isAnimation?EdgeEffect.Spring:null)//,{alwaysEnabled:true})
       .onDidScroll((xOffset: number, yOffset: number): void => {
         // 累计计算当前父组件滚动在Y轴方向的偏移量
-        if (this.uiConfig.isAnimation){
+        if (this.uiConfig.isAnimation) {
           this.curYOffset += yOffset
         }
         console.info("yOffset" + this.curYOffset);

@@ -124,21 +124,29 @@ export struct NetworkRouterAddress {
   @State theplaceholder: string = '请输入地址'
   // 编辑路由地址弹窗默认输入框文本值
   @State theEditPlaceholder: number = 0
+  @State routeAddressList: string[] = []
   // 添加路由地址弹窗标题
   @State theDialogTitle: ResourceStr = $r('app.string.Add_Router_Address')
   // 编辑路由地址弹窗标题
   @State theEditDialogTitle: ResourceStr = $r('app.string.edit_router_address')
-  @State RouterAddressList: RouterAddressData[] = createRouterAddressData()
+
+  // 更多页面栈
+  @StorageLink('MoreNavPathStack') morePageInfos: NavPathStack = new NavPathStack()
   @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
-  @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
+  @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
+
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
-  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  //page内顶部标题偏移量
+  // 状态栏高度
+  @StorageProp('topRectHeight') topRectHeight: number = 0
+
+  // page内顶部标题偏移量
   @Consume curYOffset: number
   /**
    * 添加路由地址弹窗控制器
@@ -174,8 +182,16 @@ export struct NetworkRouterAddress {
     // 关闭背景模糊
     this.isEnableIndexForegroundBlur = false
     // 在UI数组末尾添加对应元素
-    const newItem: RouterAddressData = new RouterAddressData(this.SaveInputValue, false)
-    this.RouterAddressList = [...this.RouterAddressList, newItem]
+    console.log(`保存的值：${JSON.stringify(this.SaveInputValue)}`);
+    this.routeAddressList.push(this.SaveInputValue)
+    console.log(`保存后的列表数组值：${JSON.stringify(this.routeAddressList)}`);
+    if (this.SaveInputValue) {
+      if (!Array.isArray(this.clashConfig["route-address"])) {
+        this.clashConfig["route-address"] = [];
+      }
+      this.clashConfig["route-address"] = this.routeAddressList
+      console.log(`保存后的数组值：${JSON.stringify(this.clashConfig["route-address"])}`);
+    }
   }
 
   /**
@@ -212,17 +228,41 @@ export struct NetworkRouterAddress {
     // 关闭背景模糊
     this.isEnableIndexForegroundBlur = false
     // 更新UI数组中对应元素
-    const editItem: RouterAddressData = new RouterAddressData(this.SaveEditInputValue, false)
-    this.RouterAddressList.splice(this.theEditPlaceholder, 1, editItem)
+    console.log(`编辑后保存的值：${JSON.stringify(this.SaveEditInputValue)}`);
+    // 首先判断输入值是否有效
+    if (this.SaveEditInputValue) {
+      // 然后判断编辑的索引是否有效
+      const index = this.theEditPlaceholder;
+      if (index >= 0 && index < this.routeAddressList.length) {
+        // 更新本地列表
+        this.routeAddressList.splice(index, 1, this.SaveEditInputValue);
+        console.log(`编辑后保存的列表数组值：${JSON.stringify(this.routeAddressList)}`);
+        // 同步到配置对象 确保配置中的属性是数组
+        if (!Array.isArray(this.clashConfig["route-address"])) {
+          this.clashConfig["route-address"] = [];
+        }
+        this.clashConfig["route-address"] = [...this.routeAddressList];
+        console.log(`编辑后保存的列表值：${JSON.stringify(this.clashConfig["route-address"])}`);
+      } else {
+        console.error(`错误：编辑索引 ${index} 无效！`);
+      }
+    } else {
+      console.log("输入值为空，不执行保存操作。");
+    }
   }
 
   // 列表行删除
   handleDelete(index: number) {
     hilog.info(0xFF00, "NetworkRoutertestTag", "%{public}d", index)
-    hilog.info(0xFF00, "NetworkRoutertestTag", "1%{public}s", JSON.stringify(this.RouterAddressList))
-    this.RouterAddressList.splice(index, 1)
-    hilog.info(0xFF00, "NetworkRoutertestTag", "2%{public}s", JSON.stringify(this.RouterAddressList))
-
+    hilog.info(0xFF00, "NetworkRoutertestTag", "1%{public}s", JSON.stringify(this.clashConfig["route-address"]))
+    this.routeAddressList.splice(index, 1)
+    if (this.SaveInputValue) {
+      if (!Array.isArray(this.clashConfig["route-address"])) {
+        this.clashConfig["route-address"] = [];
+      }
+      this.clashConfig["route-address"] = this.routeAddressList
+      console.log(`删除后保存的列表值：${JSON.stringify(this.clashConfig["route-address"])}`)
+    }
   }
 
   build() {
@@ -235,46 +275,47 @@ export struct NetworkRouterAddress {
         })
 
         Column() {
-          Blank().height(TAB_CONTENT_TITLE_HEIGHT + 6)
+          Blank()
+            .height(TAB_CONTENT_TITLE_HEIGHT + (this.widthBp < 2 ? this.topRectHeight : 0) + 6)
           Scroll() {
             List({ space: 12 }) {
-              ForEach(this.RouterAddressList, (item: RouterAddressData, index: number) => {
-                // 数据列表行
-                ListItem() {
-                  Row() {
+              if (this.routeAddressList.length > 0) {
+                ForEach(this.routeAddressList, (item: string, index: number) => {
+                  // 数据列表行
+                  ListItem() {
                     Row() {
-                      Text(item.name)
-                        .fontWeight(FontWeight.Medium)
-                        .fontSize(16)
-                        .margin({ left: 12 })
-                      Blank()
-                      SymbolGlyph($r('sys.symbol.trash_fill'))
-                        .fontColor([this.icon_primary])
-                        .fontSize(28)
-                        .margin({ right: 12 })
-                        .onClick(() => {
-                          // 进去列表行删除
-                          this.handleDelete(index)
-                        })
+                      Row() {
+                        Text(item)
+                          .fontWeight(FontWeight.Medium)
+                          .fontSize(16)
+                          .margin({ left: 12 })
+                        Blank()
+                        SymbolGlyph($r('sys.symbol.trash_fill'))
+                          .fontColor([this.icon_primary])
+                          .fontSize(28)
+                          .margin({ right: 12 })
+                          .onClick(() => {
+                            // 进去列表行删除
+                            this.handleDelete(index)
+                          })
+                      }
+                      .width('100%')
+                      .height(53)
+                      .borderRadius(BORDER_RADIUS_20)
+                      .backgroundColor($r('app.color.container_background'))
                     }
-                    .width('100%')
-                    .height(53)
-                    .borderRadius(BORDER_RADIUS_20)
-                    .backgroundColor($r('app.color.container_background'))
                   }
-
-                }
-                .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
-                .onClick(() => {
-                  // 启用背景模糊
-                  this.isEnableIndexForegroundBlur = true
-                  // 进入列表行数据编辑
-                  this.currentEditInputValue = item.name
-                  this.theEditPlaceholder = index
-                  this.editDialogController.open()
+                  .transition(customAnimationUtil.isScaleTran(index, this.uiConfig))
+                  .onClick(() => {
+                    // 启用背景模糊
+                    this.isEnableIndexForegroundBlur = true
+                    // 进入列表行数据编辑
+                    this.currentEditInputValue = item
+                    this.theEditPlaceholder = index
+                    this.editDialogController.open()
+                  })
                 })
-              })
-
+              }
               // 添加栏
               ListItem() {
                 Row() {
@@ -295,6 +336,7 @@ export struct NetworkRouterAddress {
               .onClick(() => {
                 // 启用背景模糊
                 this.isEnableIndexForegroundBlur = true
+                this.SaveInputValue = ''
                 this.addDialogController.open()
               })
             }
@@ -316,7 +358,7 @@ export struct NetworkRouterAddress {
             if (this.uiConfig.isAnimation) {
               this.curYOffset += yOffset
             }
-            console.info("yOffset" + this.curYOffset);
+            // console.debug("yOffset" + this.curYOffset);
           })
         }
       }
@@ -326,36 +368,20 @@ export struct NetworkRouterAddress {
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
     .onBackPressed(() => {
-      if (this.pageInfos.size() === 1) {
-        this.pageInfos.clear()
-      } else {
-        this.pageInfos.pop(true)
-      }
+      this.pageInfos.pop(true)
+      this.morePageInfos.pop(true)
       return true
     })
   }
-}
 
-/**
- * 路由地址列表数据类
- */
-class RouterAddressData {
-  name: string
-  isCheck: boolean
-
-  constructor(name: string, isCheck:boolean) {
-    this.name = name
-    this.isCheck = isCheck
+  aboutToAppear(): void {
+    const addressFromConfig = this.clashConfig?.["route-address"];
+    if (Array.isArray(addressFromConfig)) {
+      this.routeAddressList = addressFromConfig;
+    } else {
+      this.routeAddressList = [];
+    }
+    console.log(`初始化的值：${JSON.stringify(this.routeAddressList)}`);
   }
-}
 
-// 数据
-const createRouterAddressData = (): RouterAddressData[] => {
-  let result: RouterAddressData[] = new Array()
-  result = [
-    new RouterAddressData('123', false),
-    new RouterAddressData('值', false),
-
-  ]
-  return result
 }

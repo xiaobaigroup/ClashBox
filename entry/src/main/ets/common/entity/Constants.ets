@@ -5,7 +5,7 @@ import { CustomThemeName } from "xb_components/src/main/ets/utils/AppThemeManage
 import { AppConfig, AppState, copy } from "../../entryability/AppState";
 import { BreakpointState } from "../breakpoint/breakpointsystem";
 import { UpdateInfo } from "../utils/CheckUpdateUtil";
-import { ConfigData } from "./PageArgumentEntity";
+import { ConfigData, HomeCardInfo } from "./PageArgumentEntity";
 
 
 /* 基础 */
@@ -111,29 +111,26 @@ export enum RouteName {
  * 主页卡片显示变量
  */
 export let showHomeCard = [
-  true,
-  true,
-  true,
-  true,
-  true,
-  true,
-  true,
-  false,
-  false,
-  false
+  'speed',
+  'mode',
+  'data',
+  'node',
+  'ip',
+  'f_node',
+  'f_config',
 ]
 
 export let showHomeCardPC = [
-  true,
-  true,
-  true,
-  true,
-  true,
-  true,
-  true,
-  true,
-  true,
-  true
+  'speed',
+  'mode',
+  'data',
+  'node',
+  'ip',
+  'f_node',
+  'f_config',
+  'fast',
+  'config',
+  'node_info'
 ]
 export enum ValueType {
   Number,
@@ -884,6 +881,7 @@ export function getCheckUpdateList(updateInfo: UpdateInfo): CheckUpdateListItemP
  * 主页卡片编辑半模态里列表
  */
 export interface HomeCardItem {
+  key: string
   image:Resource
   aspectRatio:number
   isShow:boolean
@@ -891,15 +889,89 @@ export interface HomeCardItem {
 }
 
 export const HomeCardList: HomeCardItem[] = [
-  {image:$r('app.media.Speed'),aspectRatio:2.07,isShow:true,width:'100%'},
-  {image:$r('app.media.SwitchMode'),aspectRatio:1,isShow:true,width:'48.5%'},
-  {image:$r('app.media.CellularData'),aspectRatio:1,isShow:true,width:'48.5%'},
-  {image:$r('app.media.CurrentNode'),aspectRatio:1,isShow:true,width:'48.5%'},
-  {image:$r('app.media.PublicNetwork'),aspectRatio:1,isShow:true,width:'48.5%'},
-  {image:$r('app.media.FavoriteProxy'),aspectRatio:1,isShow:true,width:'48.5%'},
-  {image:$r('app.media.FavoriteConfiguration'),aspectRatio:1,isShow:true,width:'48.5%'},
-  {image:$r('app.media.CurrentConfiguration'),aspectRatio:1,isShow:true,width:'48.5%'},
- // {image:$r('app.media.ProxyINFO'),aspectRatio:2.07,isShow:true,width:'100%'},
+  {key: 'speed', image: $r('app.media.Speed'), aspectRatio: 2.07, isShow: true, width: '100%' },
+  {key: 'mode', image:$r('app.media.SwitchMode'),aspectRatio:1,isShow:true,width:'48.5%'},
+  {key: 'data', image:$r('app.media.CellularData'),aspectRatio:1,isShow:true,width:'48.5%'},
+  {key: 'node', image:$r('app.media.CurrentNode'),aspectRatio:1,isShow:true,width:'48.5%'},
+  {key: 'ip', image:$r('app.media.PublicNetwork'),aspectRatio:1,isShow:true,width:'48.5%'},
+  {key: 'f_node', image:$r('app.media.FavoriteProxy'),aspectRatio:1,isShow:true,width:'48.5%'},
+  {key: 'f_config', image:$r('app.media.FavoriteConfiguration'),aspectRatio:1,isShow:true,width:'48.5%'},
+  {key: 'config', image:$r('app.media.CurrentConfiguration'),aspectRatio:1,isShow:true,width:'48.5%'},
+  {key: 'fast', image:$r('app.media.Shortcuts'),aspectRatio:1,isShow:true,width:'48.5%'},
+  {key: 'node_info', image:$r('app.media.ProxyINFO'),aspectRatio:2.07,isShow:true,width:'100%'},
+]
+
+export const HomeCards: HomeCardInfo[] = [
+  { // 网络速度小卡片
+    aspectRatio: 2.07,
+    spanMultiple: 2,
+    key: 'speed',
+    isShow: true,
+    order: 1
+  },
+  { // 分流模式小卡片
+    aspectRatio: 1,
+    spanMultiple: 1,
+    key: 'mode',
+    isShow: true,
+    order: 2
+  },
+  { // 流量统计小卡片
+    aspectRatio: 1,
+    spanMultiple: 1,
+    isShow: true,
+    key: 'data',
+    order: 3
+  },
+  { // 当前节点小卡片
+    aspectRatio: 1,
+    spanMultiple: 1,
+    isShow: true,
+    key: 'node',
+    order: 4
+  },
+  { // IP地址小卡片
+    aspectRatio: 1,
+    spanMultiple: 1,
+    isShow: true,
+    key: 'ip',
+    order: 5
+  },
+  { // 收藏节点小卡片
+    aspectRatio: 1,
+    spanMultiple: 1,
+    isShow: true,
+    key: 'f_node',
+    order: 6
+  },
+  { // 收藏配置小卡片
+    aspectRatio: 1,
+    spanMultiple: 1,
+    key: 'f_config',
+    isShow: true,
+    order: 7
+  },
+  { // 快捷方式小卡片
+    aspectRatio: 1,
+    spanMultiple: 1,
+    isShow: false,
+    key: 'fast',
+    order: 8
+  },
+  { // 当前配置小卡片
+    aspectRatio: 1,
+    spanMultiple: 1,
+    isShow: false,
+    key: 'config',
+    order: 9
+  },
+  { // 节点信息小卡片
+    order: 10,
+    isShow: false,
+    key: 'node_info',
+    spanMultiple: 2,
+    aspectRatio: 2.07,
+  }
 ]
 
 

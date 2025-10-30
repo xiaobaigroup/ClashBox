@@ -12,6 +12,7 @@ import {
   TAB_CONTENT_TITLE_HEIGHT,
   showHomeCard,
   showHomeCardPC,
+  HomeCards,
 } from '../common/entity/Constants'
 import Settings from '../components/Settings/Settings'
 import CurrentNode from '../components/Home/CurrentNode'
@@ -101,9 +102,9 @@ struct Home {
   // 配置页数据表
   @Consume('Configuration') configList: Array<ConfigData>
   // 当前主页布局
-  @Consume theCurrentHomeCard: boolean[]
+  @Consume theCurrentHomeCard: string[]
   // 上一次主页布局
-  @Consume theLastHomeCard: boolean[]
+  @Consume theLastHomeCard: string[]
 
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
@@ -128,6 +129,7 @@ struct Home {
   @Consume curYOffset: number
   // 小窗口隐藏top和tab偏移
   @Consume heightTop: number
+  @Consume homeCardList: HomeCardInfo[]
 
   build() {
     Stack({ alignContent: Alignment.TopStart }) {
@@ -207,12 +209,12 @@ struct Home {
               gutter: HomeCardGutter(this.widthBp, this.heightBp),
             })
             {
-              ForEach(this.homeCardList(), (item: HomeCardInfo, index: number) => {
+              ForEach(this.homeCardList, (item: HomeCardInfo, index: number) => {
                 HomeCard({
                   item: item,
                   index: index
                 })
-              }, (item: HomeCardInfo, index: number) => `${item.order}${index}`)
+              }, (item: HomeCardInfo) => item.key)
             }
             Blank().height(100)
           }
@@ -289,7 +291,6 @@ struct Home {
     }.width('100%').height('100%')
   }
 
-
   @Builder
   HomeSheet() {
     if (this.isShowCardEdit) {
@@ -335,6 +336,7 @@ struct Home {
     if (this.uiConfig.isShowHomeCard)
       this.theCurrentHomeCard = JSON.parse(this.uiConfig.isShowHomeCard)
     hilog.info(0xFF00, "HomeTestTag", "布局初始化为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
+    this.homeCardList = HomeCards.filter(value => this.theCurrentHomeCard.includes(value.key))
     if (this.tabCurrentPage == 0) {
       this.isHomePage = true
     }
@@ -393,53 +395,6 @@ struct Home {
     }
   }
 
-  homeCardList(): HomeCardInfo[] {
-    const cardList: HomeCardInfo[] = [
-      { // 网络速度小卡片
-        aspectRatio: 2.07,
-        order: 1
-      },
-      { // 分流模式小卡片
-        aspectRatio: 1,
-        order: 2
-      },
-      { // 流量统计小卡片
-        aspectRatio: 1,
-        order: 3
-      },
-      { // 当前节点小卡片
-        aspectRatio: 1,
-        order: 4
-      },
-      { // IP地址小卡片
-        aspectRatio: 1,
-        order: 5
-      },
-      { // 收藏节点小卡片
-        aspectRatio: 1,
-        order: 6
-      },
-      { // 收藏配置小卡片
-        aspectRatio: 1,
-        order: 7
-      },
-      { // 当前配置小卡片
-        aspectRatio: 1,
-        order: 9
-      },
-      { // 节点信息小卡片
-        order: 10/*HomeCardProxyInfoOrder(this.widthBp, this.heightBp)*/,
-        aspectRatio: 2.07,
-      },
-      { // 快捷方式小卡片
-        aspectRatio: 1,
-        order: 8
-      }
-    ]
-    const newCardList = cardList.filter((obj, index) => this.theCurrentHomeCard[index])
-    return newCardList
-  }
-
   // 在自定义组件即将析构销毁时将dialogController置空
   onCancel() {
     this.restoreLayout()
@@ -468,7 +423,7 @@ struct Home {
   // 卡片摇摆动画
   startAnim() {
     this.rotateAngle = 0
-    this.uiContext.animateTo({
+    Xb_ToastUtil.animateTo({
       duration: this.uiConfig.animationSpeed,
       curve: Curve.Linear,
       iterations:-1,
@@ -479,7 +434,7 @@ struct Home {
   }
 
   stopAnim() {
-    this.uiContext.animateTo({
+    Xb_ToastUtil.animateTo({
       delay: 0,
       duration: 0,
       iterations: 0,
@@ -497,7 +452,7 @@ struct Home {
     Xb_ToastUtil.showToast({ message: `${Xb_GetResourceString($r('app.string.layout_saved'), this)}💾` })
     this.isShowHomeEdit = false
     if (this.uiConfig.isAnimation) {
-      this.uiContext.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+      Xb_ToastUtil.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
         this.isShowDeleteButton = false
       })
     } else { this.isShowDeleteButton = false }
@@ -508,10 +463,11 @@ struct Home {
     // 还原布局
     this.theCurrentHomeCard = this.theLastHomeCard
     this.uiConfig.isShowHomeCard = JSON.stringify(this.theLastHomeCard)
+    this.homeCardList = HomeCards.filter(value => this.theCurrentHomeCard.includes(value.key))
     hilog.info(0xFF00, "HomeTestTag", "布局还原为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
     Xb_ToastUtil.showToast({ message: `${Xb_GetResourceString($r('app.string.layout_restored'), this)}🫡` })
     this.isShowHomeEdit = false
-    this.uiContext.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+    Xb_ToastUtil.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
       this.isShowDeleteButton = false
     })
   }
@@ -542,11 +498,11 @@ struct HomeCard {
   @Prop item: HomeCardInfo
   @Consume isHomePage: boolean
   @Consume rotateAngle : number
+  @Consume homeCardList: HomeCardInfo[]
   // 删除按钮是否出现判定
   @Consume isShowDeleteButton: boolean
   // 当前主页布局
-  @Consume theCurrentHomeCard: boolean[]
-  private uiContext = this.getUIContext()!
+  @Consume theCurrentHomeCard: string[]
   // 前台判断变量
   @StorageProp('ForwardState') isForward: boolean = true
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
@@ -557,70 +513,72 @@ struct HomeCard {
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
 
   build() {
-      GridCol({
-        span: {
-          sm: HomeCardSpan36sm(this.widthBp, this.heightBp) * (this.index == 0 || this.index == 8 ? 2 : 1),
-          md: HomeCardSpan346md(this.widthBp, this.heightBp) * (this.index == 0 || this.index == 8 ? 2 : 1),
-          lg: HomeCardSpan346lg(this.widthBp, this.heightBp) * (this.index == 0 || this.index == 8 ? 2 : 1)
-        },
-         order: this.item.order
-      })
-      {
-        Stack({ alignContent: Alignment.TopEnd }) {
-          this.HomeCardContent(this.index)
-          if (this.isShowDeleteButton) {
-            DeleteButton()
-              .position({ x: this.item.order == 1 || this.item.order == 10 ? '95%' : '92%', y: -4 })
-              .onClick(() => {
-                this.uiContext.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
-                  this.theCurrentHomeCard.splice(this.index, 1, false)
-                })
-                hilog.info(0xFF00, "HomeTestTag", "网络速率卡片: %{public}s", this.uiConfig.isShowHomeCard[this.index])
+    GridCol({
+      span: {
+        sm: HomeCardSpan36sm(this.widthBp, this.heightBp) * this.item.spanMultiple,
+        md: HomeCardSpan346md(this.widthBp, this.heightBp) * this.item.spanMultiple,
+        lg: HomeCardSpan346lg(this.widthBp, this.heightBp) * this.item.spanMultiple
+      },
+      order: this.item.order
+    })
+    {
+      Stack({ alignContent: Alignment.TopEnd }) {
+        this.HomeCardContent(this.item.key)
+        if (this.isShowDeleteButton) {
+          DeleteButton()
+            .position({ x: /*this.item.order == 1 || this.item.order == 8 ? '95%' : */'92%', y: -4 })
+            .onClick(() => {
+              Xb_ToastUtil.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+                const index = this.homeCardList.findIndex(value => this.item.key == value.key)
+                this.homeCardList.splice(index, 1)
+                const keyIndex = this.theCurrentHomeCard.findIndex(value => this.item.key == value)
+                this.theCurrentHomeCard.splice(keyIndex, 1)
               })
-          }
+            })
         }
       }
-      .height(160)
-      .borderRadius(20)
-      .aspectRatio(this.item.aspectRatio)
-      .backgroundColor($r('app.color.container_background'))
-      // .borderWidth(2).borderColor(Color.Red)
-      .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-      .transition(customAnimationUtil.isScaleTran(this.index, this.uiConfig))
-      // 消失触发回调
-      // .onDetach(() => {
-      //   console.log(`HomeCard 前后台状态：${this.isForward} 当前注销：${this.index}`)
-      // })
-      // 显示时触发回调
-      // .onAttach(() => {
-      //   console.log(`HomeCard 前后台状态：${this.isForward} 当前显示：${this.index}`)
-      // })
-      // 编辑模式下跳动动画
-      .rotate({ angle: this.uiConfig.isAnimation ? this.rotateAngle : null })
     }
+    .height(160)
+    .borderRadius(20)
+    .aspectRatio(this.item.aspectRatio)
+    .backgroundColor($r('app.color.container_background'))
+    // .borderWidth(2).borderColor(Color.Red)
+    .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+    .transition(customAnimationUtil.isScaleTran(this.index, this.uiConfig))
+    // 消失触发回调
+    // .onDetach(() => {
+    //   console.log(`HomeCard 前后台状态：${this.isForward} 当前注销：${this.index}`)
+    // })
+    // 显示时触发回调
+    // .onAttach(() => {
+    //   console.log(`HomeCard 前后台状态：${this.isForward} 当前显示：${this.index}`)
+    // })
+    // 编辑模式下跳动动画
+    .rotate({ angle: this.uiConfig.isAnimation ? this.rotateAngle : null })
+  }
 
   @Builder
-  HomeCardContent(index: number) {
-    if (index == 0) {
+  HomeCardContent(key: string) {
+    if (key === 'speed') {
       Speed()
-    } else if (index == 1) {
+    } else if (key === 'mode') {
       SwitchMode()
-    } else if (index == 2) {
+    } else if (key === 'data') {
       CellularData()
-    } else if (index == 3) {
+    } else if (key === 'node') {
       CurrentNode()
-    } else if (index == 4) {
+    } else if (key === 'ip') {
       PublicNetwork()
-    } else if (index == 5) {
+    } else if (key === 'f_node') {
       FavoriteProxy()
-    } else if (index == 6) {
+    } else if (key === 'f_config') {
       FavoriteConfiguration()
-    } else if (index == 7) {
+    } else if (key === 'config') {
       CurrentConfiguration()
-    } else if (index == 8) {
-      ProxyINFO()
-    } else if (index == 9) {
+    } else if (key === 'fast') {
       Shortcuts()
+    } else if (key === 'node_info') {
+      ProxyINFO()
     }
   }
 
@@ -681,8 +639,6 @@ struct SaveCustomDialog {
     .backgroundColor($r('app.color.container_background'))
     .padding({ top: 16, bottom: 16 })
   }
-
-
 
 }
 
