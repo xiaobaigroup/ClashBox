@@ -42,6 +42,7 @@ export interface AccessControl{
   rejectList: string[]
 }
 export interface VpnRawOptions{
+  tunIp: string
   accessControl: AccessControl
 }
 

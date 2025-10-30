@@ -37,6 +37,7 @@ type AndroidVpnRawOptions struct {
 }
 
 type State struct {
+    TunIp string `json:"tunIp"`
 	AndroidVpnRawOptions
 	CurrentProfileName string `json:"currentProfileName"`
 }

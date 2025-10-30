@@ -27,20 +27,26 @@ type Props struct {
 
 func Start(fd int, device string, stack constant.TUNStack) (*sing_tun.Listener, error) {
 	var prefix4 []netip.Prefix
-	tempPrefix4, err := netip.ParsePrefix(state.DefaultIpv4Address)
-	if err != nil {
-		log.Errorln("startTUN tempPrefix4 error:", err)
-		return nil, err
+	inet4Prefix4, err := netip.ParsePrefix(state.CurrentState.TunIp)
+	if (err == nil){
+	    prefix4 = append(prefix4, inet4Prefix4)
+	} else {
+	    tempPrefix4, err := netip.ParsePrefix(state.DefaultIpv4Address)
+    	if err != nil {
+    		log.Errorln("startTUN tempPrefix4 error:", err)
+    		return nil, err
+    	}
+    	prefix4 = append(prefix4, tempPrefix4)
 	}
-	prefix4 = append(prefix4, tempPrefix4)
 	var prefix6 []netip.Prefix
+
 	if state.CurrentState.Ipv6 {
-		tempPrefix6, err := netip.ParsePrefix(state.DefaultIpv6Address)
-		if err != nil {
-			log.Errorln("startTUN  tempPrefix6 error:", err)
-			return nil, err
-		}
-		prefix6 = append(prefix6, tempPrefix6)
+        tempPrefix6, err := netip.ParsePrefix(state.DefaultIpv6Address)
+       if err != nil {
+           log.Errorln("startTUN  tempPrefix6 error:", err)
+           return nil, err
+       }
+       prefix6 = append(prefix6, tempPrefix6)
 	}
 
 	var dnsHijack []string

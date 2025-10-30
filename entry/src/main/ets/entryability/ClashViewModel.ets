@@ -431,16 +431,22 @@ export class ClashViewModel {
   async loadVpnOptions(){
     // 使用首选项持久化单个节点信息供卡片拉起服务
     let appConfig = AppStorage.get<AppConfig>("appConfig") || cardManager.getAppConfig()
-    if (appConfig?.accessControl == null)
+    let clashConfig = AppStorage.get<ClashConfig>("clashConfig") || cardManager.getClashConfig()
+    if (appConfig == null)
       return
     if(appConfig!.accessControl){
       let acceptList = JSON.parse(appConfig?.accessControlAcceptList ?? "[]") as string[]
       acceptList.push(...[this.context?.applicationInfo.name as string, 'com.atomicservice.5765880207855877209'])
       const rejectList = JSON.parse(appConfig?.accessControlRejectList ?? "[]") as string[]
-      const accessControl = { accessControl: { mode:appConfig?.accessControlMode ?? "", acceptList: acceptList, rejectList: rejectList } as AccessControl } as VpnRawOptions
+      const accessControl = {
+        tunIp : clashConfig?.tun?.["tun-ip"],
+        accessControl: { mode:appConfig?.accessControlMode ?? "", acceptList: acceptList, rejectList: rejectList } as AccessControl
+      } as VpnRawOptions
       this.socketProxy.setOptionStates(accessControl)
     } else {
-      const accessControl = { accessControl: { mode:appConfig?.accessControlMode ?? "", acceptList: [], rejectList: [] } as AccessControl } as VpnRawOptions
+      const accessControl = {
+        tunIp : clashConfig?.tun?.["tun-ip"],
+        accessControl: { mode:appConfig?.accessControlMode ?? "", acceptList: [], rejectList: [] } as AccessControl } as VpnRawOptions
       this.socketProxy.setOptionStates(accessControl)
     }
     // 在日志控制台 过滤关键字 vpnConfig, 验证是否配置成功

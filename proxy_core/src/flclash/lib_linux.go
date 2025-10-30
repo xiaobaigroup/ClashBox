@@ -219,7 +219,7 @@ func GetVpnOptions() string {
 	options := state.AndroidVpnOptions{
 		Enable:           state.CurrentState.Enable,
 		Port:             currentConfig.General.MixedPort,
-		Ipv4Address:      state.DefaultIpv4Address,
+		Ipv4Address:      state.CurrentState.TunIp,
 		Ipv6Address:      state.GetIpv6Address(),
 		AccessControl:    state.CurrentState.AccessControl,
 		SystemProxy:      state.CurrentState.SystemProxy,
