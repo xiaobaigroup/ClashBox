@@ -1046,7 +1046,7 @@ struct Index {
   // 更新后强化赋值一次
   updateData() {
     if (this.clashConfig.tun && this.clashConfig.tun['tun-ip']) {
-      this.clashConfig.tun['tun-ip'] = '172.19.0.1'
+      this.clashConfig.tun['tun-ip'] = '172.19.0.1/30'
     }
   }
 

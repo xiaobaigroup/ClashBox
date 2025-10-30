@@ -28,7 +28,7 @@ export class VpnConfig {
     dnsAddresses: string[] = ["172.19.0.2"]
   ) {
     this.addresses = [
-      new AddressWithPrefix(tunIp, 24)
+      new AddressWithPrefix(tunIp, 30)
     ];
     this.mtu = 1400;
     this.dnsAddresses = dnsAddresses;

@@ -97,6 +97,9 @@ func StartTUN(fd int, markSocket func(Fd)) {
 }
 
 func GetRunTime() string {
+    if runTime == nil {
+		return "clash服务未启动"
+	}
 	return strconv.FormatInt(runTime.UnixMilli(), 10)
 }
 func ConfigInited() string {
@@ -216,9 +219,13 @@ func GetCurrentProfileName() string {
 func GetVpnOptions() string {
 	tunLock.Lock()
 	defer tunLock.Unlock()
+	port := 7980
+	if (currentConfig != nil){
+	    port = currentConfig.General.MixedPort
+	}
 	options := state.AndroidVpnOptions{
 		Enable:           state.CurrentState.Enable,
-		Port:             currentConfig.General.MixedPort,
+		Port:             port,
 		Ipv4Address:      state.CurrentState.TunIp,
 		Ipv6Address:      state.GetIpv6Address(),
 		AccessControl:    state.CurrentState.AccessControl,

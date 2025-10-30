@@ -99,8 +99,14 @@ export class FlClashVpnService extends CommonVpnService {
     let vpnConfig = new VpnConfig();
     let option = JSON.parse(getVpnOptions()) as VpnOptions
     if (option.ipv4Address != "") {
-      console.debug("tunIp ", option.ipv4Address)
-      vpnConfig.addresses[0].address = new Address(option.ipv4Address.split("/")[0], 1)
+      const ips = option.ipv4Address.split("/")
+      console.debug("tunIp ", ips)
+      if(ips.length > 1){
+        vpnConfig.addresses[0].address = new Address(ips[0], 1)
+        vpnConfig.addresses[0].prefixLength = parseInt(ips[1])
+      }else{
+        vpnConfig.addresses[0].address = new Address(ips[0], 1)
+      }
       option.routeAddress?.filter(a => isIpv4(a)).map(f => f.split("/")[0])
     }
     if (option.ipv6Address != "") {

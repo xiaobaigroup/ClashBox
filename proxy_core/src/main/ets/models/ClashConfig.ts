@@ -156,7 +156,7 @@ export enum TunStack { Gvisor = "gVisor", System = "System", Mixed = "Mixed" }
 
 export class Tun {
   enable: boolean = true
-  "tun-ip": string = "172.19.0.1"
+  "tun-ip": string = "172.19.0.1/30"
   device: string = ""
   stack: TunStack.Gvisor
   "dns-hijack": string[] = ["any:53"]
