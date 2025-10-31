@@ -44,6 +44,7 @@ import { RoundButton } from '../components/Common/RoundButton'
 import { AccessControl, VpnRawOptions } from 'proxy_core/src/main/ets/rpc/IClashManager'
 import { Xb_GetResourceString, Xb_ToastUtil } from 'xb_components'
 import { common } from '@kit.AbilityKit'
+import { animationStyle } from 'xb_components/src/main/ets/components/Animation'
 
 
 @Entry
@@ -145,7 +146,6 @@ struct Home {
             // 编辑按钮
             onFClick: () => {
               this.isShowHomeEdit = true
-              this.isShowCardEdit = true
               // 编辑布局前储存之前的布局变量
               hilog.info(0xFF00, "HomeTestTag", "上一次布局1： %{public}s", JSON.stringify(this.theLastHomeCard))
               this.theLastHomeCard = JSON.parse(this.uiConfig.isShowHomeCard)
@@ -423,7 +423,7 @@ struct Home {
   // 卡片摇摆动画
   startAnim() {
     this.rotateAngle = 0
-    Xb_ToastUtil.animateTo({
+    animationStyle.animToCustomAPI18({
       duration: this.uiConfig.animationSpeed,
       curve: Curve.Linear,
       iterations:-1,
@@ -434,7 +434,7 @@ struct Home {
   }
 
   stopAnim() {
-    Xb_ToastUtil.animateTo({
+    animationStyle.animToCustomAPI18({
       delay: 0,
       duration: 0,
       iterations: 0,
@@ -452,9 +452,9 @@ struct Home {
     Xb_ToastUtil.showToast({ message: `${Xb_GetResourceString($r('app.string.layout_saved'), this)}💾` })
     this.isShowHomeEdit = false
     if (this.uiConfig.isAnimation) {
-      Xb_ToastUtil.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+      animationStyle.animToAPI18(() => {
         this.isShowDeleteButton = false
-      })
+      }, this.uiConfig.animationSpeed, 'app', 0, Curve.Linear)
     } else { this.isShowDeleteButton = false }
   }
 
@@ -467,9 +467,9 @@ struct Home {
     hilog.info(0xFF00, "HomeTestTag", "布局还原为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
     Xb_ToastUtil.showToast({ message: `${Xb_GetResourceString($r('app.string.layout_restored'), this)}🫡` })
     this.isShowHomeEdit = false
-    Xb_ToastUtil.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+    animationStyle.animToAPI18(() => {
       this.isShowDeleteButton = false
-    })
+    }, this.uiConfig.animationSpeed, 'app', 0, Curve.Linear)
   }
 
   /**卡片编辑页面显示监听*/
@@ -526,14 +526,14 @@ struct HomeCard {
         this.HomeCardContent(this.item.key)
         if (this.isShowDeleteButton) {
           DeleteButton()
-            .position({ x: /*this.item.order == 1 || this.item.order == 8 ? '95%' : */'92%', y: -4 })
+            .position({ x: this.item.key == 'speed' || this.item.key == 'node_info' ? '95%' : '92%', y: -4 })
             .onClick(() => {
-              Xb_ToastUtil.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear }, () => {
+              animationStyle.animToAPI18(() => {
                 const index = this.homeCardList.findIndex(value => this.item.key == value.key)
                 this.homeCardList.splice(index, 1)
                 const keyIndex = this.theCurrentHomeCard.findIndex(value => this.item.key == value)
                 this.theCurrentHomeCard.splice(keyIndex, 1)
-              })
+              }, this.uiConfig.animationSpeed, 'app', 0, Curve.Linear)
             })
         }
       }

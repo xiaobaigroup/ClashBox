@@ -6,6 +6,7 @@ import { customAnimationUtil } from "../../common/utils/Animation"
 import { TabContentTitleMargin } from "../../common/breakpoint/BreakPoint"
 import { Xb_ToastUtil } from "xb_components"
 import { HomeCardInfo } from "../../common/entity/PageArgumentEntity"
+import { animationStyle } from "xb_components/src/main/ets/components/Animation"
 
 
 @Component
@@ -30,12 +31,12 @@ export struct CardEdit {
       .ImageItemStyle()
       .transition(customAnimationUtil.isScaleTran(i, this.uiConfig))
       .onClick(() => {
-        Xb_ToastUtil.animateTo({ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }, () => {
+        animationStyle.animToAPI18(() => {
           const index = HomeCards.findIndex(value => key == value.key)
           const data = HomeCards[index]
           this.homeCardList.push(data)
           this.theCurrentHomeCard.push(key)
-        })
+        }, this.uiConfig.animationSpeed, 'app', 0, curves.springMotion())
       })
   }
 

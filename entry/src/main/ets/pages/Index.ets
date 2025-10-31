@@ -73,6 +73,7 @@ import { BusinessError } from '@kit.BasicServicesKit'
 import { cardManager } from '../common/utils/CardManageUtil'
 import LiveViewUtil from '../common/utils/LiveViewUtil'
 import { UpdateLog } from '../components/Start/UpdateLog'
+import { animationStyle } from 'xb_components/src/main/ets/components/Animation';
 
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
@@ -320,7 +321,7 @@ struct Index {
       // 主界面
       Tabs({
         barPosition: TabBarPosition(this.widthBp, this.heightBp),
-        index: this.tabCurrentPage,
+       // index: this.tabCurrentPage,onchange里面有了 不需要这里再赋值
         controller: indexController
       }) {
         ForEach(this.tabList, (item: TabBuild, index: number) => {
@@ -361,27 +362,28 @@ struct Index {
         this.barHeight : this.bottomRectHeight == 0 ? TabBarHeight(this.widthBp, this.heightBp) :
           TabBarAvoidHeight(this.widthBp, this.heightBp))
       .onTabBarClick((index: number) => {
-        this.UIcontext.animateTo({
-          duration: this.uiConfig.animationSpeed,
-          curve: Curve.Linear,
-        }, () => {
+        animationStyle.animToAPI18(()=>{
           this.tabCurrentPage = index
-        })
+        },this.uiConfig.animationSpeed, 'app', 0)
       })
       .onChange((index) => {
-        if (index == 0) {
-          this.isHomePage = true
-          return
-        }
-        this.isHomePage = false
+        animationStyle.animToAPI18(()=>{
+          if (index == 0) {
+            this.isHomePage = true
+            return
+          }
+          this.isHomePage = false
+
+          this.tabCurrentPage = index
+        },this.uiConfig.animationSpeed, 'app', 0)
       })
       .onAnimationStart((index: number, targetIndex: number) => {
-        this.UIcontext.animateTo({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear, }, () => {
+        animationStyle.animToAPI18(()=>{
           if (index == targetIndex) {
             return
           }
           this.tabCurrentPage = targetIndex;
-        })
+        },this.uiConfig.animationSpeed, 'app', 0)
       })
       .width('100%')
       .height('100%')
@@ -1019,6 +1021,7 @@ struct Index {
       this.updateData()   // TODO 强制更新数据函数
     }
 
+    animationStyle.setContext(this.UIcontext)
   }
 
   aboutToDisappear() {
@@ -1246,32 +1249,22 @@ struct Index {
   /**tab移动开始动画*/
   startAnim() {
     indexController.setTabBarTranslate({ y: 0 })
-    this.UIcontext.animateTo({
-      duration: this.uiConfig.animationSpeed,
-      curve: Curve.Linear,
-      iterations: 1,
-      playMode: PlayMode.Normal,
-    }, () => {
+    animationStyle.animToAPI18(()=>{
       indexController.setTabBarTranslate({ y: '100%' })
       this.barHeight = 0
       console.info('tab横竖：', `${TabBarVertical(this.widthBp, this.heightBp)}`)
-    })
+    },this.uiConfig.animationSpeed, 'app', 0)
   }
 
   /**tab移动停止动画*/
   stopAnim() {
-    this.UIcontext.animateTo({
-      duration: this.uiConfig.animationSpeed,
-      curve: Curve.Linear,
-      iterations: 1,
-      playMode: PlayMode.Normal,
-    }, async () => {
+    animationStyle.animToAPI18(()=>{
       if (!this.isSmallSquareScreen || !this.isRolling) {
         indexController.setTabBarTranslate({ y: 0 })
         this.barHeight = this.bottomRectHeight == 0 ? TabBarHeight(this.widthBp, this.heightBp) :
           TabBarAvoidHeight(this.widthBp, this.heightBp)
       }
-    })
+    },this.uiConfig.animationSpeed, 'app', 0)
   }
 
   /**是否进入主二级界面(更多页二级)*/
@@ -1288,33 +1281,21 @@ struct Index {
   /*px外屏手势动画*/
   // tab隐藏
   startAnimPX() {
-    this.UIcontext.animateTo({
-      duration: this.uiConfig.animationSpeed,
-      curve: Curve.Linear,
-      iterations: 1,
-      playMode: PlayMode.Normal,
-    }, () => {
+    animationStyle.animToAPI18(()=>{
       indexController.setTabBarTranslate({ y: '100%' })
       this.barHeight = 0
 
       this.heightTop = -TAB_CONTENT_TITLE_HEIGHT
-    })
+    },this.uiConfig.animationSpeed, 'app', 0)
   }
 
   // tab显示
   stopAnimPX() {
-    this.UIcontext.animateTo({
-      duration: this.uiConfig.animationSpeed,
-      curve: Curve.EaseOut,
-      iterations: 1,
-      playMode: PlayMode.Normal,
-      onFinish: () => {
-      }
-    }, () => {
+    animationStyle.animToAPI18(()=>{
       indexController.setTabBarTranslate({ y: 0 })
       this.barHeight = TabBarHeight(this.widthBp, this.heightBp)
       this.heightTop = 0
-    })
+    },this.uiConfig.animationSpeed, 'app', 0)
   }
 
   /**监听上下滚动时，tab是否隐藏*/

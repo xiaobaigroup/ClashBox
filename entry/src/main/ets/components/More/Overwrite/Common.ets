@@ -14,6 +14,7 @@ import { customAnimationUtil, isON } from '../../../common/utils/Animation'
 import { common } from '@kit.AbilityKit'
 import { PageMargin } from '../../../common/breakpoint/BreakPoint'
 import { Xb_ToastUtil } from 'xb_components'
+import { animationStyle } from 'xb_components/src/main/ets/components/Animation'
 
 @Component
 export struct ConfigList {
@@ -246,12 +247,10 @@ export struct ConfigList {
               }
               .transition(this.isON.toggleAnim ? null : customAnimationUtil.isScaleTran(index, this.uiConfig))
               .onClick(() => {
-                Xb_ToastUtil.animateTo({
-                  duration: this.uiConfig.animationSpeed
-                }, () => {
+                animationStyle.animToAPI18(()=>{
                   this.currentItemIndex = index
                   this.handleToggle(index)
-                })
+                },this.uiConfig.animationSpeed, 'app', 0)
                 //使开关点击时不触发转场动画
                 this.isON.toggleAnim = true
               })
