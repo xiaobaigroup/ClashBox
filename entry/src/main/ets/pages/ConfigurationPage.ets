@@ -35,7 +35,7 @@ import { uniformTypeDescriptor as utd } from '@kit.ArkData'
 import { common, Context } from '@kit.AbilityKit'
 import { BusinessError } from '@kit.BasicServicesKit';
 import { fileUri, fileIo as fs, fileIo, picker } from '@kit.CoreFileKit'
-import { ShareData, Xb_Share, Xb_ToastUtil } from 'xb_components'
+import { ShareData, Xb_GetResourceString, Xb_Share, Xb_ToastUtil } from 'xb_components'
 
 
 /**
@@ -807,13 +807,16 @@ struct ConfigurationPage {
     console.debug(`待导出配置文件的 沙箱目录Uri: ${sandUri} 下载目录Uri: ${exportUri}`)
     try {
       // 导出至下载文件夹
-      fs.copy(sandUri, exportUri).then(()=>{
+      fs.copy(sandUri, exportUri).then(() => {
         console.info("Succeeded in copying.");
-      }).catch((err: BusinessError)=>{
+        Xb_ToastUtil.showToast({ message: Xb_GetResourceString($r('app.string.export_config_file_success'), this) + `: ${result[0] + `/${fileName}.yaml`}`})
+      }).catch((err: BusinessError) => {
         console.error(`Failed to copy. Code: ${err.code}, message: ${err.message}`);
+        Xb_ToastUtil.showToast({ message: `配置文件导出失败. Code: ${err.code}, message: ${err.message}`})
       })
     } catch (error) {
       console.error(`配置文件导出失败，name：${error.name} message：${error.message}`)
+      Xb_ToastUtil.showToast({ message: `配置文件导出失败. Code: ${error.code}, message: ${error.message}`})
     }
   }
 

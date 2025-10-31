@@ -132,6 +132,41 @@ export let showHomeCardPC = [
   'config',
   'node_info'
 ]
+
+/**
+ * 根据布尔数组过滤字符串数组
+ * @param booleanJsonStr 布尔数组的JSON字符串
+ * @returns 过滤后的字符串数组的JSON字符串
+ */
+export function filterStringsByBooleans(booleanJsonStr: string, mode: 'string' | 'array'): string | string[] {
+  try {
+    // 解析布尔JSON字符串
+    const booleanArray: boolean[] = JSON.parse(booleanJsonStr);
+    const stringArray: string[] = showHomeCardPC;
+
+    // 检查数组长度是否一致，防止逻辑错误
+    if (booleanArray.length !== stringArray.length) {
+      console.error("Error: 数组长度不一致，无法进行对应过滤。");
+      return JSON.stringify(showHomeCard); // 返回默认数组
+    }
+    // 过滤逻辑
+    // 使用filter方法，遍历stringArray，回调函数接收元素和索引
+    // 如果booleanArray中对应索引的值为true，则保留该元素
+    const filteredArray: string[] = stringArray.filter((element: string, index: number) => {
+      return booleanArray[index] === true;
+    });
+    if (mode === 'string') {
+      // 将结果数组转换回JSON字符串
+      return JSON.stringify(filteredArray);
+    } else {
+      return filteredArray
+    }
+  } catch (error) {
+    console.error("处理JSON字符串时发生错误:", error);
+    return JSON.stringify(showHomeCard); // 发生异常时返回默认数组
+  }
+}
+
 export enum ValueType {
   Number,
   Boolean,

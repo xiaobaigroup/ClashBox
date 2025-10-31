@@ -1,4 +1,4 @@
-import { AbilityConstant, ConfigurationConstant, UIAbility, Want, Configuration } from '@kit.AbilityKit';
+import { AbilityConstant, ConfigurationConstant, UIAbility, Want, Configuration, common } from '@kit.AbilityKit';
 import { hiAppEvent, hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
@@ -182,7 +182,7 @@ export default class EntryAbility extends UIAbility {
         // 确保UI上下文被赋值
         this.uiContext = data.getUIContext()
         // 初始化通知工具
-        Xb_ToastUtil.initContext(this.uiContext)
+        Xb_ToastUtil.initContext(this.uiContext, data.getUIContext().getHostContext() as common.UIAbilityContext)
         // 初始化窗口避让属性
         this.intRectWindow(windowStage)
 

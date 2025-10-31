@@ -2202,7 +2202,7 @@
     },
     {
       "name": "file_config_restore_tips",
-      "value": "Please note that: ① the local backup folder is Download > ClashBox; \n ② If the files to be recovered contain local configurations, file selection pop ups will appear one by one. Please be patient in selecting the correct configuration file to ensure successful recovery; \n ③ After the recovery is completed, please proactively go to the configuration page to select the desired configuration and complete the configuration loading; \n ④ Currently, only Nut Cloud has passed the test, please test the rest yourself."
+      "value": "Please note that: ① The local backup folder is Download > ClashBox; \n ② If the files to be recovered contain local configurations, file selection pop ups will appear one by one. Please be patient in selecting the correct configuration file to ensure successful recovery; \n ③ After the recovery is completed, please proactively go to the configuration page to select the desired configuration and complete the configuration loading; \n ④ Currently, only Nut Cloud has passed the test, please test the rest yourself."
     },
     {
       "name": "file_config_restore_toast_1",
@@ -2243,6 +2243,14 @@
     {
       "name": "tun_ip",
       "value": "Virtual IP address"
+    },
+    {
+      "name": "restore_tips",
+      "value": "\n ⑤ After successful data recovery, the application will automatically restart"
+    },
+    {
+      "name": "export_config_file_success",
+      "value": "Configuration file successfully exported to"
     }
   ]
 }

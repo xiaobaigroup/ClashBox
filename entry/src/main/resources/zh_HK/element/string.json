@@ -2243,6 +2243,14 @@
     {
       "name": "tun_ip",
       "value": "虛擬IP地址"
+    },
+    {
+      "name": "restore_tips",
+      "value": "\n ⑤ 數據恢復成功後會自動重啓應用程式"
+    },
+    {
+      "name": "export_config_file_success",
+      "value": "設定檔成功匯出至"
     }
   ]
 }

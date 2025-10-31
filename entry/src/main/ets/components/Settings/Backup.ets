@@ -117,8 +117,9 @@ struct Backup {
         ListItem() {
           Text() {
             Span($r('app.string.file_config_restore_tips'))
+            Span($r('app.string.restore_tips'))
+              .fontColor(Color.Red)
           }
-          .fontColor(Color.Red)
         }
       }
       .width('100%')

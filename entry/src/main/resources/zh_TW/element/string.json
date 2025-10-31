@@ -2244,6 +2244,14 @@
     {
       "name": "tun_ip",
       "value": "虛擬IP位址"
+    },
+    {
+      "name": "restore_tips",
+      "value": "\n ⑤ 資料還原成功後將自動重新啟動應用程式"
+    },
+    {
+      "name": "export_config_file_success",
+      "value": "設定檔成功匯出至"
     }
   ]
 }

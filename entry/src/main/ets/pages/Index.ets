@@ -21,6 +21,7 @@ import {
   NewConfigData,
   BundleInfo,
   HomeCards,
+  filterStringsByBooleans,
 } from '../common/entity/Constants'
 import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/datasources/ProxyData'
 import { ClashConfig, IpInfo, Profile, ProxyMode } from 'proxy_core'
@@ -74,6 +75,7 @@ import { cardManager } from '../common/utils/CardManageUtil'
 import LiveViewUtil from '../common/utils/LiveViewUtil'
 import { UpdateLog } from '../components/Start/UpdateLog'
 import { animationStyle } from 'xb_components/src/main/ets/components/Animation';
+import { getJsonArrayType } from '../common/entity/utils';
 
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
@@ -1052,6 +1054,13 @@ struct Index {
   updateData() {
     if (this.clashConfig.tun && this.clashConfig.tun['tun-ip']) {
       this.clashConfig.tun['tun-ip'] = '172.19.0.1/30'
+    }
+    const type = getJsonArrayType(this.uiConfig.isShowHomeCard)
+    if (type === 'boolean') {
+      const str = this.uiConfig.isShowHomeCard
+      // 转化字符串
+      this.uiConfig.isShowHomeCard = filterStringsByBooleans(str, 'string') as string
+      this.theCurrentHomeCard = filterStringsByBooleans(str, 'array') as string[]
     }
   }
 

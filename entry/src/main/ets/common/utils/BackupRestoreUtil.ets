@@ -2,6 +2,8 @@ import { ClashConfig, Profile } from "proxy_core";
 import { Xb_FileUtils, Xb_GetResourceString, Xb_ToastUtil } from "xb_components";
 import { AppConfig, UIConfig } from "../../entryability/AppState";
 import ClashViewModel from "../../entryability/ClashViewModel";
+import { filterStringsByBooleans } from "../entity/Constants";
+import { getJsonArrayType } from "../entity/utils";
 
 
 export interface BackupConfig {
@@ -48,11 +50,23 @@ class BackupRestoreUtil {
           config = await Xb_FileUtils.importDataByFile<BackupConfig>(uri)
           if (config) {
             AppStorage.set("appConfig", config.appConfig)
+            const type = getJsonArrayType(config.uiConfig.isShowHomeCard)
+            if (type === 'boolean') {
+              console.log(`检查到旧版本数据，开始兼容`)
+              const str = config.uiConfig.isShowHomeCard
+              // 转化字符串
+              config.uiConfig.isShowHomeCard = filterStringsByBooleans(str, 'string') as string
+              console.log(`旧版本数据转化为：${config.uiConfig.isShowHomeCard}`)
+            }
             AppStorage.set("uiConfig",  config.uiConfig)
             AppStorage.set("clashConfig", config.clashConfig)
             console.info(`ClashBoxConfig.restore 配置列表：${JSON.stringify(config.configList)}`)
             ClashViewModel.addOrUpdateProfiles(config.configList).then(() => {
               Xb_ToastUtil.showToast({ message: $r('app.string.import_success') })
+              // 重启应用
+              setTimeout(() => {
+                Xb_ToastUtil.restartApp()
+              }, 2000)
             })
               .catch((err: Error) => {
                 console.error(`ClashBox Restore 配置恢复失败 ${err.name} ${err.message}`)
@@ -69,17 +83,28 @@ class BackupRestoreUtil {
     } else {
       // 外部提供config
       AppStorage.set("appConfig", config.appConfig)
+      const type = getJsonArrayType(config.uiConfig.isShowHomeCard)
+      if (type === 'boolean') {
+        console.log(`检查到旧版本数据，开始兼容`)
+        const str = config.uiConfig.isShowHomeCard
+        // 转化字符串
+        config.uiConfig.isShowHomeCard = filterStringsByBooleans(str, 'string') as string
+        console.log(`旧版本数据转化为：${config.uiConfig.isShowHomeCard}`)
+      }
       AppStorage.set("uiConfig",  config.uiConfig)
       AppStorage.set("clashConfig", config.clashConfig)
       console.info(`ClashBoxConfig.restore 配置列表：${JSON.stringify(config.configList)}`)
       ClashViewModel.addOrUpdateProfiles(config.configList).then(() => {
         Xb_ToastUtil.showToast({ message: $r('app.string.import_success') })
+        // 重启应用
+        setTimeout(() => {
+          Xb_ToastUtil.restartApp()
+        }, 2000)
       })
         .catch((err: Error) => {
           console.error(`ClashBox Restore 配置恢复失败 ${err.name} ${err.message}`)
         })
     }
-
   }
 
 }
