@@ -147,7 +147,7 @@ export class  ClashConfig {
   overrideDns: boolean = false
   overwriteNetwork: boolean = true
   snifferDefault?: SnifferDefault = new SnifferDefault()
-  constructor(ua: string = "clash.meta/1.18.7") {
+  constructor(ua: string = "clash.meta/1.19.5") {
     this["global-ua"] = ua
     this.sniffer = this.snifferDefault
   }

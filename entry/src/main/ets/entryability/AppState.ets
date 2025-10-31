@@ -184,7 +184,7 @@ export function getPackageInfo(){
 // use @StorageLink('appConfig')
 export class AppState {
   static externalController = "0.0.0.0:9090"
-  static globalUA = "clash.meta/1.18.7"
+  static globalUA = "clash.meta/1.19.5"
   static versionName = ''
   static versionCode = 1006056
   static coreVersion = "Prerelease-Alpha"

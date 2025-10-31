@@ -39,7 +39,7 @@ export class ClashViewModel {
   static promptAction: PromptAction
   async init(context: Context, promptAction: PromptAction) {
     console.error("ClashViewModel开始初始化");
-    AppState.globalUA =  "clash.meta/1.18.7"
+    AppState.globalUA =  "clash.meta/1.19.5"
     this.context = context
     ClashViewModel.promptAction = promptAction
     await this.profileRepo.init(context)

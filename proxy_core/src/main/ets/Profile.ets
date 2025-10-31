@@ -44,8 +44,8 @@ export class Profile {
     this.lastUpdateDate = new Date().getTime()
     this.subscriptionInfo = null
   }
-  private globalUa: string = "clash.meta/1.18.7"
-  loadContext(context: Context | undefined, globalUa: string | undefined = "clash.meta/1.18.7"){
+  private globalUa: string = "clash.meta/1.19.5"
+  loadContext(context: Context | undefined, globalUa: string | undefined = "clash.meta/1.19.5"){
     this.context = context
     this.globalUa = globalUa
   }
@@ -73,7 +73,7 @@ export class Profile {
   async update(vailConfig: (config: string) =>Promise<string>): Promise<boolean>{
     let httpRequest = http.createHttp()
     const resp = await httpRequest.request(this.url, { header: {
-      "User-Agent": this.globalUa ?? "clash.meta/1.18.7"
+      "User-Agent": this.globalUa ?? "clash.meta/1.19.5"
     },connectTimeout: 20000, readTimeout: 20000, })
     const disposition = resp.header["content-disposition"] as string
     const userinfo = resp.header["subscription-userinfo"] as string
