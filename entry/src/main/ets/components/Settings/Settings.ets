@@ -27,6 +27,7 @@ import { PrivacyPolicy, UserAgreement } from "./AgreementPrivacyPage"
 import { PageMargin } from "../../common/breakpoint/BreakPoint"
 import { UpdateLog } from '../Start/UpdateLog';
 import { EventHub, EventKey } from '../../common/EventHub';
+import { Xb_ToastUtil } from 'xb_components';
 
 
 @Entry
@@ -173,9 +174,7 @@ struct Settings {
     try {
       await AppState.ResetConfig(this.getUIContext().getHostContext()!)
       setTimeout(() => {
-        this.context.getApplicationContext().killAllProcesses().catch(() => {
-          console.error(`Settings 清空数据 关闭进程失败`)
-        })
+        Xb_ToastUtil.restartApp()
       }, 2000)
       this.promptAction.showToast({message: $r('app.string.restart_tips'), duration: 2000 })
       // 关闭背景模糊
