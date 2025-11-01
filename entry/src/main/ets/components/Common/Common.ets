@@ -764,7 +764,7 @@ function RowStyle() {
   .width('100%')
   .borderRadius(20)
   .constraintSize({minHeight: 53})
-  .padding({left: 12, right: 12, top: 6, bottom: 6})
+  .padding(12)
   .backgroundColor($r('app.color.container_background'))
 }
 

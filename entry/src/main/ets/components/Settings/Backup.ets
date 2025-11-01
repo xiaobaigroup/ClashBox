@@ -11,6 +11,7 @@ import { EventHub, EventKey } from "../../common/EventHub"
 import { WebDavManager } from "../../common/utils/webdav/manager"
 import { WebDavClient } from "../../common/utils/webdav/client"
 import { FileInfo, WebDavConfig } from "../../common/utils/webdav/config"
+import { animationStyle } from "xb_components/src/main/ets/components/Animation"
 
 
 @Component
@@ -305,18 +306,18 @@ struct CloudFiles {
   @StorageLink('CustomDialog') showCustomDialogBackgroundBlur: boolean = false
 
   build() {
-    Column({space: 8}) {
+    Column({space: 10}) {
       Text($r('app.string.cloud_files_title'))
         .fontWeight(FontWeight.Medium)
         .fontSize(20)
-      List({space: 8}) {
+      List({space: 12}) {
         ForEach(this.rawFiles, (item: FileInfo) => {
           ListItem() {
             Text(item.name.replace(/^\/ClashBox\//, ''))
               .fontWeight(FontWeight.Normal)
           }.height(20)
           .onClick(() => {
-            this.selectFilePath = item.path.replace(/^\/dav/, '')
+            this.selectFilePath = 'ClashBox/' + item.name.replace(/.*?(ClashBox\/)/, "$1");
             this.showCustomDialogBackgroundBlur = false
             this.controller.close()
           })
@@ -324,6 +325,12 @@ struct CloudFiles {
       }
       .width('100%')
       .contentEndOffset(25)
+      .divider({
+        strokeWidth: '100%',
+        color: $r('app.color.divider'),
+        startMargin: 12,
+        endMargin: 12
+      })
     }
     .padding(16)
     .width('100%')
@@ -413,20 +420,19 @@ export struct CloudBackup {
               .margin({right: 12})
           }
           .width('100%')
-          .height(53)
           .borderRadius(20)
           .margin({bottom: 10})
+          .padding({ top: 12, bottom: 12})
           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .backgroundColor($r('app.color.container_background'))
           .onClick( ()=> {
             // 显式动画
-            this.getUIContext()?.animateTo({
-              duration: this.uiConfig.animationSpeed
-            }, () => {
+            animationStyle.animToAPI18(()=>{
               this.uiConfig.isShowCloudBackupConfig = !this.uiConfig.isShowCloudBackupConfig
-            })
+            }, this.uiConfig.animationSpeed, 'app')
           })
         }
+
         // WebDav服务器配置区
         if (this.uiConfig.isShowCloudBackupConfig) {
           ListItem() {
@@ -498,7 +504,7 @@ export struct CloudBackup {
               .justifyContent(FlexAlign.Center)
               .alignItems(VerticalAlign.Center)
             }
-            .padding(10)
+            .padding(16)
             .width('100%')
             .borderRadius(20)
             .backgroundColor($r('app.color.container_background'))
