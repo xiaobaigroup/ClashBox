@@ -310,12 +310,19 @@ struct CloudFiles {
       Text($r('app.string.cloud_files_title'))
         .fontWeight(FontWeight.Medium)
         .fontSize(20)
-      List({space: 12}) {
+
+      List({space: 10}) {
         ForEach(this.rawFiles, (item: FileInfo) => {
           ListItem() {
             Text(item.name.replace(/^\/ClashBox\//, ''))
               .fontWeight(FontWeight.Normal)
-          }.height(20)
+          }
+          .width('100%')
+          .align(Alignment.Start)
+          .backgroundColor($r('app.color.list_item_background_color'))
+          .clickEffect(animationStyle.isClick())
+          .padding({ top: 16, bottom: 16, left: 12, right: 12 })
+          .borderRadius(20)
           .onClick(() => {
             this.selectFilePath = 'ClashBox/' + item.name.replace(/.*?(ClashBox\/)/, "$1");
             this.showCustomDialogBackgroundBlur = false
@@ -324,17 +331,13 @@ struct CloudFiles {
         })
       }
       .width('100%')
-      .contentEndOffset(25)
-      .divider({
-        strokeWidth: '100%',
-        color: $r('app.color.divider'),
-        startMargin: 12,
-        endMargin: 12
-      })
+      .padding({ top: 12, bottom: 12})
+      .contentEndOffset(20)
+      .scrollBar(BarState.Off)
     }
     .padding(16)
     .width('100%')
-    .alignItems(HorizontalAlign.Start)
+    .alignItems(HorizontalAlign.Center)
     .backgroundColor($r('app.color.background'))
   }
 
