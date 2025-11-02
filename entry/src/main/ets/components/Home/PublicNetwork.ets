@@ -10,6 +10,7 @@ import { customAnimationUtil } from '../../common/utils/Animation'
 import { HomeCardFontSize,
   HomeCardIPFontSize,
   HomeCardPadding, HomeCardPartSmallFontSize } from '../../common/breakpoint/BreakPoint'
+import { updateGeoData } from 'proxy_core/src/main/cpp/types/libflclash/Index'
 
 @Component
 struct PublicNetwork {
@@ -93,6 +94,14 @@ struct PublicNetwork {
     .height('100%')
     .alignItems(HorizontalAlign.Start)
     .id('PublicNetworkId')
+    .onVisibleAreaChange([0],(isExpanding: boolean, currentRatio: number) => {
+      console.debug('显示 PublicNetwork -', isExpanding, currentRatio)
+
+      // 当组件显示的时候 -> 执行一次 IP刷新
+      if (isExpanding) {
+        EventHub.sendEvent(EventKey.checkIpInfo)
+      }
+    })
   }
 
   aboutToAppear(): void {
