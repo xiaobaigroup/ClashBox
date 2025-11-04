@@ -287,7 +287,7 @@ export struct ConfigList {
         if (this.uiConfig.isAnimation) {
           this.curYOffset += yOffset
         }
-        console.info("yOffset" + this.curYOffset);
+        // console.info("yOffset" + this.curYOffset);
       })
     }
   }

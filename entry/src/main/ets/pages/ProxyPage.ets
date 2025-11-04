@@ -289,7 +289,7 @@ struct ProxyPage {
               if (this.uiConfig.isAnimation) {
                 this.curYOffset += yOffset
               }
-              hilog.info(0xFF00, "ProxyPageTag", "yOffset: %{public}d", this.curYOffset)
+              // hilog.info(0xFF00, "ProxyPageTag", "yOffset: %{public}d", this.curYOffset)
             })
             .onScrollFrameBegin((offset: number) => {
               this.curOffsetRemain += offset

@@ -244,7 +244,7 @@ struct Home {
             if (this.uiConfig.isAnimation){
               this.curYOffset += yOffset
             }
-            console.info("yOffset:" + yOffset)
+            // console.info("yOffset:" + yOffset)
           }
         })
 

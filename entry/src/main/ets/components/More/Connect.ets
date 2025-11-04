@@ -256,7 +256,7 @@ struct Connect {
               if (this.uiConfig.isAnimation){
                 this.curYOffset += yOffset
               }
-              console.debug("yOffset" + this.curYOffset);
+              // console.debug("yOffset" + this.curYOffset);
             })
           }
         }

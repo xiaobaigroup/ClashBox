@@ -207,7 +207,7 @@ struct MorePage {
         if (this.uiConfig.isAnimation){
           this.curYOffsetMore += yOffset
         }
-        console.debug("yOffset" + this.curYOffsetMore);
+        // console.debug("yOffset" + this.curYOffsetMore);
       })
     }.height('100%').width('100%')
   }

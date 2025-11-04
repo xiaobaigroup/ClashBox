@@ -243,7 +243,7 @@ struct Diversion {
             if (this.uiConfig.isAnimation){
               this.curYOffset += yOffset
             }
-            console.info("yOffset" + this.curYOffset);
+            // console.info("yOffset" + this.curYOffset);
           })
         }
       }

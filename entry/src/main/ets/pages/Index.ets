@@ -1326,12 +1326,14 @@ struct Index {
    * @description 跳转到访问控制添加包名
    */
   jumpAccessControl(bundleInfo: BundleInfo) {
-    this.tabCurrentPage = 3
+    indexController.changeIndex(3)
     const path = this.pageInfos.getAllPathName()
     if (path[0] !== 'AccessControl' || path.length === 0) {
-      setTimeout(() => {
-        this.pageInfos.replacePathByName('AccessControl', false)
-      })
+      if (this.widthBp > 1) {
+        this.morePageInfos.replacePathByName('AccessControl', false)
+      } else {
+        this.pageInfos.pushPathByName('AccessControl', false)
+      }
     }
     setTimeout(() => {
       EventHub.sendEvent(EventKey.AddAPP, { bundleName: bundleInfo.bundleName, appName: bundleInfo.appName })
