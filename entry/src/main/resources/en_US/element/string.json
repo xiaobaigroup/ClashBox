@@ -2251,6 +2251,14 @@
     {
       "name": "export_config_file_success",
       "value": "Configuration file successfully exported to"
+    },
+    {
+      "name": "appName_isEmpty",
+      "value": "Application name cannot be empty"
+    },
+    {
+      "name": "appPackageName_isEmpty",
+      "value": "Application package name cannot be empty"
     }
   ]
 }

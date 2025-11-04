@@ -301,6 +301,15 @@ export struct AccessControl {
         console.log(`AccessControl kvCustomdialog 当前value: ${JSON.stringify(value)}`)
         const indexes = this.appListData.findIndex((d) => d.name == value.key)
         console.log(`AccessControl kvCustomdialog 当前indexes序号: ${indexes} 当前currentIndex序号: ${this.currentIndex}`)
+
+        // 非空处理
+        if (value.key.toString().trim() !== '') {
+          Xb_ToastUtil.showToast({ message: $r('app.string.appName_isEmpty') })
+        }
+        if ((value.value as string).trim() !== '') {
+          Xb_ToastUtil.showToast({ message: $r('app.string.appPackageName_isEmpty') })
+        }
+
         if (this.isNewApp) {
           console.log(`AccessControl kvCustomdialog 窗口为新增`)
           // 应用为新增

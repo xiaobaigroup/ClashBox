@@ -2227,7 +2227,6 @@
     {
       "name": "cloud_files_title",
       "value": "選取要還原的備份檔案"
-
     },
     {
       "name": "configuration_shared",
@@ -2252,6 +2251,14 @@
     {
       "name": "export_config_file_success",
       "value": "設定檔成功匯出至"
+    },
+    {
+      "name": "appName_isEmpty",
+      "value": "應用名稱不可為空"
+    },
+    {
+      "name": "appPackageName_isEmpty",
+      "value": "應用包名不可為空"
     }
   ]
 }

@@ -2251,6 +2251,14 @@
     {
       "name": "export_config_file_success",
       "value": "配置文件成功导出至"
+    },
+    {
+      "name": "appName_isEmpty",
+      "value": "应用名称不能为空"
+    },
+    {
+      "name": "appPackageName_isEmpty",
+      "value": "应用包名不能为空"
     }
   ]
 }
