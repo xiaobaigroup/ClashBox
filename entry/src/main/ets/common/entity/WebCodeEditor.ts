@@ -89,6 +89,7 @@ export interface EditorConfig {
   tabSize: number;
   content: string;
   minimap: boolean;
+  wordWrap?: boolean;
 }
 
 /**
@@ -417,7 +418,7 @@ export class EditorCommunicationManager {
     this.pendingRequests.clear();
     this.eventCallbacks.clear();
 
-    // ✅ 清理端口
+    // 清理端口
     if (this.messagePort) {
       try {
         this.messagePort.close();

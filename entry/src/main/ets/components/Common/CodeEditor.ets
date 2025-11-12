@@ -245,11 +245,10 @@ export struct WebCodeEditor {
       fontSize: this.options.fontSize || '14px',
       tabSize: this.options.tabSize || 4,
       content: this.options.content || '// Welcome to Code Editor\nconsole.log("Hello, HarmonyOS!");',
-      minimap: this.options.showMinimap !== false
+      minimap: this.options.showMinimap !== false,
+      wordWrap: this.options.wordWrap || true
     };
-
     hilog.info(0x0000, TAG, `Sending initial config with theme: ${config.theme}`);
-
     try {
       this.commManager.sendEvent('config', config);
       this.hasSentInitialConfig = true;
@@ -268,10 +267,8 @@ export struct WebCodeEditor {
       hilog.error(0x0000, TAG, 'Failed to initialize editor after 3 retries');
       return;
     }
-
     this.retryCount++;
     hilog.warn(0x0000, TAG, `Retrying initialization (${this.retryCount}/3)`);
-
     setTimeout(() => {
       this.initializeEditor();
     }, this.retryCount * 1000);

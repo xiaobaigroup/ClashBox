@@ -57,6 +57,7 @@ struct ConfigurationPage {
   @StorageLink('favoriteProfiles') favoriteProfiles: Map<string, string> = new Map<string, string>([])
   @StorageLink('appConfig') @Watch('onChangeConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @StorageLink('ConfigContent') configStr: string = ''
 
   // 所有子组件在容器内的对齐方式
   @Consume ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
@@ -325,6 +326,7 @@ struct ConfigurationPage {
               onDisappear: () => {
                 this.isNewConfig = false
                 this.onForwardChange()
+                this.configStr = ''  // 置空配置文本
               },
               onWillSpringBackWhenDismiss: (springBack: SpringBackAction) => {
                 springBack.springBack()

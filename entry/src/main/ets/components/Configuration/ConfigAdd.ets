@@ -217,40 +217,31 @@ export struct ConfigAdd {
   processUrlByQueryIdentifier(url: string): string {
     // 查找查询字符串起始位置
     const queryStartIndex = url.indexOf('?');
-
     // 如果没有查询参数，直接返回原URL
     if (queryStartIndex === -1) {
       return url;
     }
-
     // 查找片段标识符位置
     const fragmentStartIndex = url.indexOf('#', queryStartIndex);
-
     // 提取查询字符串部分
     const queryString = fragmentStartIndex === -1
       ? url.substring(queryStartIndex + 1)
       : url.substring(queryStartIndex + 1, fragmentStartIndex);
-
     // 解析查询参数
     const params = this.parseQueryString(queryString);
-
     // 检查是否存在flag参数（不区分大小写）
     const hasFlag = Object.keys(params).some(
       key => key.toLowerCase() === 'flag'
     );
-
     if (hasFlag) {
       // 删除整个查询字符串
       const baseUrl = url.substring(0, queryStartIndex);
-
       // 保留片段标识符（如果有）
       if (fragmentStartIndex !== -1) {
         return baseUrl + url.substring(fragmentStartIndex);
       }
-
       return baseUrl;
     }
-
     // 没有flag参数，保留原URL
     return url;
   }

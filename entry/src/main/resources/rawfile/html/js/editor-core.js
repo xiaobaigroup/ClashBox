@@ -156,6 +156,9 @@ class HarmonyCodeEditor {
                 case 'execute':
                     result = await this.executeCommand(data.command);
                     break;
+                case 'setWordWrap':
+                    result = await this.setWordWrap(data.enabled);
+                    break;
                 default:
                     throw new Error(`Unknown command: ${command}`);
             }
@@ -340,7 +343,7 @@ class HarmonyCodeEditor {
 
             const [
                 { EditorState },
-                { EditorView, keymap, drawSelection, lineNumbers, highlightActiveLine }, // 移除 Compartment
+                viewModule, // 修改：不直接解构，先保存整个模块
                 { defaultKeymap, history, historyKeymap },
                 { foldGutter, bracketMatching },
                 { closeBrackets, autocompletion },
@@ -349,6 +352,14 @@ class HarmonyCodeEditor {
                 { oneDark },  // 解构主题
                 minimapModule
             ] = moduleImports;
+
+            // 安全获取 ViewPlugin 和其他 view 模块导出
+            const { EditorView, keymap, drawSelection, lineNumbers, highlightActiveLine } = viewModule;
+            const ViewPlugin = viewModule.ViewPlugin || viewModule.default?.ViewPlugin;
+
+            if (!ViewPlugin) {
+                throw new Error('ViewPlugin not found in view module');
+            }
 
             // 获取 Compartment
             console.log('=== COMPARTMENT DEBUG ===');
@@ -389,6 +400,7 @@ class HarmonyCodeEditor {
                 EditorState,
                 EditorView,
                 keymap,
+                ViewPlugin, // 显式缓存 ViewPlugin
                 drawSelection,
                 lineNumbers,
                 highlightActiveLine,
@@ -412,6 +424,28 @@ class HarmonyCodeEditor {
             console.error('Critical module loading failed:', error);
             throw new Error(`Module loading failed: ${error.message}`);
         }
+    }
+
+    /**
+     * 创建一个用于实时监听内容变化的 ViewPlugin
+     * @param {ViewPlugin} ViewPlugin - ViewPlugin 类
+     * @returns {ViewPlugin}
+     */
+    createContentChangePlugin(ViewPlugin) {
+        // 确保类中的 'this' 指向正确
+        const self = this;
+        return ViewPlugin.fromClass(class {
+            update(update) {
+                // 只有当文档内容真的发生变化时才触发
+                if (update.docChanged) {
+                    // 获取最新的文档内容
+                    const content = update.state.doc.toString();
+                    console.log('Content changed via ViewPlugin, length:', content.length);
+                    // 立即通过通信端口发送事件到 ArkTS
+                    self.sendEvent('contentChange', content);
+                }
+            }
+        });
     }
 
     /**
@@ -513,7 +547,8 @@ class HarmonyCodeEditor {
             oneDark,
             showMinimap,
             isFacet,
-            Compartment // 获取 Compartment（可能为 null）
+            Compartment, // 获取 Compartment（可能为 null）
+            ViewPlugin, // 确保解构出 ViewPlugin
         } = modules;
 
         // 清理现有编辑器
@@ -535,6 +570,9 @@ class HarmonyCodeEditor {
         this.updateContainerTheme(config.theme);
 
         try {
+            // 传递 ViewPlugin 参数创建插件
+            const contentChangePlugin = this.createContentChangePlugin(ViewPlugin);
+
             // 创建基础扩展
             const extensions = [
                 lineNumbers(),
@@ -546,12 +584,19 @@ class HarmonyCodeEditor {
                 closeBrackets(),
                 autocompletion(),
                 keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap]),
-                EditorState.allowMultipleSelections.of(true)
+                EditorState.allowMultipleSelections.of(true),
+                contentChangePlugin
             ];
 
             // 添加语言支持
             if (config.language === 'javascript' && javascript) {
                 extensions.push(javascript());
+            }
+
+            // 添加自动换行支持
+            if (config.wordWrap) {
+                extensions.push(EditorView.lineWrapping);
+                console.log('Word wrap enabled');
             }
 
             // 根据 Compartment 可用性选择主题应用方式
@@ -618,10 +663,10 @@ class HarmonyCodeEditor {
      * 设置编辑器事件
      */
     setupEditorEvents() {
-        // 内容变化事件
-        this.editor.contentDOM.addEventListener('input', () => {
-            this.sendEvent('contentChange', this.getContent());
-        });
+        // 内容变化事件 已由 ViewPlugin 处理
+        // this.editor.contentDOM.addEventListener('input', () => {
+        //     this.sendEvent('contentChange', this.getContent());
+        // });
 
         // 选择变化事件
         this.editor.contentDOM.addEventListener('selectionchange', () => {
@@ -659,6 +704,33 @@ class HarmonyCodeEditor {
                 insert: content
             }
         });
+        return true;
+    }
+
+    // 设置自动换行
+    async setWordWrap(enabled) {
+        if (!this.editor) throw new Error('Editor not initialized');
+        // 由于 lineWrapping 是静态扩展，需要重新创建编辑器
+        const currentContent = this.getContent();
+        const currentSelection = this.getSelection();
+        // 更新配置
+        if (this.lastConfig) {
+            this.lastConfig.wordWrap = enabled;
+        }
+        // 重新创建编辑器
+        this.createEditor(this.cachedModules, this.lastConfig);
+        // 恢复内容
+        setTimeout(() => {
+            this.setContent(currentContent);
+            if (currentSelection && currentSelection.from !== currentSelection.to) {
+                this.editor.dispatch({
+                    selection: {
+                        anchor: currentSelection.from,
+                        head: currentSelection.to
+                    }
+                });
+            }
+        }, 50);
         return true;
     }
 

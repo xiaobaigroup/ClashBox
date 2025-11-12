@@ -28,10 +28,12 @@ struct EditConfigContent {
   // 是否显示bindSheet
   @StorageLink('ShowConfigBindSheet') isShowConfigAddBindSheet: boolean = false
   @StorageLink('ConfigContentChange') configContentChange: boolean = false
+  /* 主题色 */
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @Consume('currentColorMode') currentColorMode: boolean
 
   @StorageLink('ConfigContent') configStr: string = ''
-  @State lastConfigStr: string = ''
+  @State lastConfigStrLength: number = 0
 
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 主页面栈
@@ -56,6 +58,7 @@ struct EditConfigContent {
   @State editorOptions: WebCodeEditorOptions = {
     // 初始内容
     content: this.configStr,
+    wordWrap: this.uiConfig.editWordWrap || true, // 自动换行
     // 编辑器配置
     theme: 'light', // 主题：'dark' | 'light'
     language: 'javascript',  // 语言：'javascript' | 'typescript' | 'css' | 'html' | 'json' | 'python' | 'java'
@@ -64,8 +67,8 @@ struct EditConfigContent {
     // 回调函数
     onContentChange: (content: string) => {
       this.configStr = content;
-      console.log(`WebCodeEditor 初始文本长度：${this.lastConfigStr.length}，编辑文本：${JSON.stringify(content)}`)
-      if (this.lastConfigStr.length !== content.length) {
+      console.log(`WebCodeEditor 初始文本长度：${this.lastConfigStrLength}，编辑文本：${JSON.stringify(content)}`)
+      if (this.lastConfigStrLength !== content.length) {
         if (this.fileMenus.filter(i => i === this.saveMenus).length <= 0) {
           // 新增`保存配置`菜单按钮
           this.fileMenus.push(this.saveMenus)
@@ -103,9 +106,12 @@ struct EditConfigContent {
   };
 
   aboutToAppear(): void {
+    // 默认推送自动换行按钮
+    this.fileMenus.push(this.moreMenu)
+    this.saveMenus.symbolBackgroundColor = this.icon_emphasize
     this.editorOptions.theme = this.currentColorMode ? 'dark' : 'light'
     hilog.info(0x0000, 'WebCodeEditor', `初始要传递的 theme: ${this.editorOptions.theme}`);
-    this.lastConfigStr = this.configStr
+    this.lastConfigStrLength = this.configStr.length
   }
 
   aboutToDisappear(): void {
@@ -145,7 +151,7 @@ struct EditConfigContent {
         WebCodeEditor({
           options: this.editorOptions,
           webController: this.webController,
-          commManager: this.commManager // 传入通信管理器
+          commManager: this.commManager, // 传入通信管理器
         })
           .layoutWeight(1)
           .width('100%')
@@ -184,19 +190,22 @@ struct EditConfigContent {
   }
 
   /** 保存配置 */
-  saveConfigContent() {
+  async saveConfigContent() {
     try {
-      const context = this.getUIContext().getHostContext()!
-      const sandPath = context.filesDir + `/ClashBox/profiles/` + this.currentTouchConfigData.configId + '/config.yaml'
-      const sandboxUri = fileUri.getUriFromPath(sandPath)
-      // 写入配置文件
+      // 先从 WebView 强制获取最新内容
+      const latestContent = await this.commManager.sendCommand('getContent');
+      this.configStr = latestContent as string;
+      // 再写入文件
+      const context = this.getUIContext().getHostContext()!;
+      const sandPath = context.filesDir + `/ClashBox/profiles/` + this.currentTouchConfigData.configId + '/config.yaml';
+      const sandboxUri = fileUri.getUriFromPath(sandPath);
       const fileModify = fileIo.openSync(sandboxUri, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE);
       fileIo.writeSync(fileModify.fd, this.configStr);
       fileIo.close(fileModify).catch(() => {
         console.error(`saveConfigContent 文件关闭失败`)
       })
     } catch (error) {
-      console.error(`保存配置文本错误，message: ${error.message}`)
+      console.error(`保存配置文本错误，message: ${error.message}`);
     }
   }
 
@@ -227,6 +236,30 @@ struct EditConfigContent {
     backgroundColor: $r('app.color.list_item_background_color'),
   })
 
+  /** 设置自动换行 */
+  async setWordWrap(enabled: boolean): Promise<void> {
+    try {
+      this.editorOptions.wordWrap = enabled;
+      await this.commManager.sendCommand('setWordWrap', { enabled: enabled });
+      hilog.info(0x0000, 'Edit WebCodeEditor', `Word wrap set to: ${enabled}`);
+    } catch (error) {
+      const errorMsg: string = `Failed to set word wrap: ${error}`;
+      hilog.error(0x0000, 'Edit WebCodeEditor', errorMsg);
+      throw new Error(errorMsg);
+    }
+  }
+
+  // 功能按钮 - 自动换行
+  private moreMenu: BindSheetTitleCustomBuilderMenu = {
+    symbol: $r('sys.symbol.text_and_t'),
+    symbolFontColor: [$r('sys.color.icon_secondary')],
+    symbolBackgroundColor: $r('app.color.settings_container_background'),
+    action: () => {
+      this.uiConfig.editWordWrap = !this.uiConfig.editWordWrap
+      this.setWordWrap(this.uiConfig.editWordWrap)
+    }
+  }
+
   // 保存按钮
   private saveMenus: BindSheetTitleCustomBuilderMenu = {
     symbol: $r('sys.symbol.save'),
@@ -240,4 +273,5 @@ struct EditConfigContent {
       this.isShowConfigAddBindSheet = true
     }
   }
+
 }

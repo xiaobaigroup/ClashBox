@@ -105,6 +105,8 @@ export class UIConfig {
   Enablednotice: boolean = true
   // 启用代理页开关
   needProxyStart: boolean = false
+  // 编辑器自动换行
+  editWordWrap: boolean = true
   // 常驻通知开关
   EnabledPermanentnotice: boolean = true
   // 常驻状态栏开关

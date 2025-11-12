@@ -1062,6 +1062,7 @@ struct Index {
       this.uiConfig.isShowHomeCard = filterStringsByBooleans(str, 'string') as string
       this.theCurrentHomeCard = filterStringsByBooleans(str, 'array') as string[]
     }
+    this.uiConfig.editWordWrap = true
   }
 
   // 等待配置数据库初始化完成
