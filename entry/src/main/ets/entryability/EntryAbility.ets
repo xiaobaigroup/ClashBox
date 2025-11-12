@@ -60,28 +60,29 @@ export default class EntryAbility extends UIAbility {
     // 卡片Id持久化管理 并 监听卡片事件
     cardManager.init(this.context)
     this.registerCardEvent()
-
     // 初始化KV数据库
     Xb_KVdbUtil.initKVManager(this.context, 'clash_box')
-
     // 备份恢复工具初始化
     BackupRestoreUtil.init(this.context)
-
     // 添加崩溃监听
-    hiAppEvent.addWatcher({
-      name: "watcher",
-      // 订阅崩溃事件
-      appEventFilters: [
-        {
-          domain: hiAppEvent.domain.OS,
-          names: [hiAppEvent.event.APP_CRASH]
+    try {
+      hiAppEvent.addWatcher({
+        name: "watcher",
+        // 订阅崩溃事件
+        appEventFilters: [
+          {
+            domain: hiAppEvent.domain.OS,
+            names: [hiAppEvent.event.APP_CRASH]
+          }
+        ],
+        onReceive: (domain: string, appEventGroups: Array<hiAppEvent.AppEventGroup>) => {
+          AppStorage.setOrCreate('crash', true)
+          AppStorage.setOrCreate('crashEvent', appEventGroups)
         }
-      ],
-      onReceive: (domain: string, appEventGroups: Array<hiAppEvent.AppEventGroup>) => {
-        AppStorage.setOrCreate('crash', true)
-        AppStorage.setOrCreate('crashEvent', appEventGroups)
-      }
-    })
+      })
+    } catch (error) {
+      console.error(`崩溃事件监听注册失败`)
+    }
     // 当前主题模式
     AppStorage.setOrCreate<ConfigurationConstant.ColorMode>('currentColorMode', this.context.config.colorMode)
 
@@ -261,16 +262,22 @@ export default class EntryAbility extends UIAbility {
   
   /** @description 获取分享的配置URL */
   private getSharedConfigUrl(want: Want) {
-    let uri = want?.uri;
+    const uri = want?.uri;
     if (uri) {
-      let urlObject = url.URL.parseURL(want?.uri);
-      let configUrl = urlObject.params.get('configUrl');
-      let configName = urlObject.params.get('configName');
-      // 处理分享的配置链接
-      AppStorage.setOrCreate('appLinkConfigUrl', configUrl);
-      AppStorage.setOrCreate('appLinkConfigName', configName);
-      hilog.info(0x0000, 'EntryAbility', 'AppLink - 接收的configUrl为：%{public}s', configUrl);
-      hilog.info(0x0000, 'EntryAbility', 'AppLink - 接收的configName为：%{public}s', configName);
+      try {
+        const urlObject = url.URL.parseURL(want?.uri);
+        hilog.info(0x0000, 'EntryAbility', 'AppLink - 接收的urlObject为：%{public}s', JSON.stringify(urlObject));
+        const configUrl = urlObject.params.get('configUrl') || urlObject.params.get('url');
+        const configName = urlObject.params.get('configName');
+        // 处理分享的配置链接
+        AppStorage.setOrCreate('appLinkConfigUrl', configUrl);
+        AppStorage.setOrCreate('appLinkConfigName', configName);
+        hilog.info(0x0000, 'EntryAbility', 'AppLink - 接收的configUrl为：%{public}s', configUrl);
+        hilog.info(0x0000, 'EntryAbility', 'AppLink - 接收的configName为：%{public}s', configName);
+      } catch (error) {
+        hilog.error(0x0000, 'EntryAbility', 'AppLink - 接收分享信息失败，message为：%{public}s', error.message);
+      }
+
     }
   }
 
