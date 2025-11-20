@@ -22,6 +22,7 @@ import { number2Time } from '../common/utils/TimeConvertUtil';
 import { customVibrator } from '../common/utils/VibratorUtil';
 import { Xb_KVdbUtil, Xb_ToastUtil } from 'xb_components';
 import BackupRestoreUtil from '../common/utils/BackupRestoreUtil';
+import ConfigAutoUpdateService from '../common/utils/ConfigAutoUpdateService';
 
 
 export default class EntryAbility extends UIAbility {
@@ -241,7 +242,23 @@ export default class EntryAbility extends UIAbility {
   onForeground(): void {
     // Ability has brought to foreground
     AppStorage.setOrCreate('ForwardState', true)
-    hilog.info(0x0000, 'c', '%{public}s', 'Ability onForeground');
+    hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onForeground');
+
+    // 应用切回前台时，触发一次配置更新检查
+    this.checkConfigAutoUpdate();
+  }
+
+  /** @description 检查配置自动更新（应用切回前台时调用） */
+  private checkConfigAutoUpdate(): void {
+    // 只有在核心已初始化的情况下才执行检查
+    if (this.clashCoreInitialized) {
+      ConfigAutoUpdateService.checkNow().then(() => {
+        hilog.info(0xFF00, 'ConfigAutoUpdateService', '前台配置更新检查完成');
+      }).catch((error: BusinessError) => {
+        hilog.error(0xFF00, 'ConfigAutoUpdateService',
+          `前台配置更新检查失败: ${error.message}`);
+      });
+    }
   }
 
   onBackground(): void {
@@ -258,8 +275,20 @@ export default class EntryAbility extends UIAbility {
     // 移除卡片监听事件
     this.unRegisterCardEvent()
     cardManager.pushCartProxyMode(false)
+    // 停止配置自动更新服务
+    this.stopConfigAutoUpdateService()
   }
-  
+
+  /** @description 停止配置自动更新服务 */
+  private stopConfigAutoUpdateService(): void {
+    ConfigAutoUpdateService.stop(this.context).then(() => {
+      hilog.info(0xFF00, 'ConfigAutoUpdateService', '配置自动更新服务已停止');
+    }).catch((error: BusinessError) => {
+      hilog.error(0xFF00, 'ConfigAutoUpdateService',
+        `配置自动更新服务停止失败: ${error.message}`);
+    });
+  }
+
   /** @description 获取分享的配置URL */
   private getSharedConfigUrl(want: Want) {
     const uri = want?.uri;
@@ -377,6 +406,21 @@ export default class EntryAbility extends UIAbility {
     hilog.info(0x0000, 'EntryAbility', 'Succeeded in loading the content.');
 
     this.clashCoreInitialized = true
+
+    // 启动配置自动更新服务
+    await this.startConfigAutoUpdateService();
+  }
+
+  /** @description 启动配置自动更新服务 */
+  private async startConfigAutoUpdateService(): Promise<void> {
+    try {
+      await ConfigAutoUpdateService.start(this.context);
+      hilog.info(0xFF00, 'ConfigAutoUpdateService', '配置自动更新服务已启动');
+    } catch (error) {
+      const err = error as BusinessError;
+      hilog.error(0xFF00, 'ConfigAutoUpdateService',
+        `配置自动更新服务启动失败: ${err.message}`);
+    }
   }
 
   /** @description 卡片Clash核心触发事件 */

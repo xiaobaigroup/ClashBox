@@ -1,0 +1,215 @@
+import { Context, WantAgent, wantAgent } from "@kit.AbilityKit";
+import { backgroundTaskManager } from "@kit.BackgroundTasksKit";
+import { BusinessError } from "@kit.BasicServicesKit";
+import { hilog } from "@kit.PerformanceAnalysisKit";
+import ClashViewModel from "../../entryability/ClashViewModel";
+import { Profile, ProfileType } from "proxy_core";
+
+/**
+ * 配置自动更新服务
+ * 负责定期检查并更新配置文件
+ */
+export class ConfigAutoUpdateService {
+  /** 定时任务ID */
+  private updateTimerId?: number = undefined;
+  /** 后台任务通知ID */
+  private notificationId?: number = undefined;
+  /** 检查间隔（毫秒）- 默认1分钟 */
+  private readonly CHECK_INTERVAL = 60 * 1000;
+  /** 是否正在更新 */
+  private isUpdating: boolean = false;
+  /** 需要自动更新的配置 */
+  private autoUpdateProfiles: Profile[] = [];
+
+  /**
+   * 启动配置自动更新服务
+   * @param context 应用上下文
+   */
+  async start(context: Context): Promise<void> {
+    if (this.updateTimerId) {
+      hilog.info(0xFF00, "ConfigAutoUpdateService", "配置自动更新服务已在运行");
+      return;
+    }
+
+    hilog.info(0xFF00, "ConfigAutoUpdateService", "启动配置自动更新服务");
+
+    // 启动后台长时任务
+    const notificationId = await this.startContinuousTask(context);
+    if (notificationId > 0) {
+      this.notificationId = notificationId;
+    }
+
+    // 立即执行一次检查
+    await this.checkAndUpdateConfigs();
+
+    // 找出更新频率最快的配置的毫秒值
+    const updateIntervalArray = this.autoUpdateProfiles.map((profile: Profile) => profile.autoUpdateDuration);
+    const updateInterval = Math.min(...updateIntervalArray) + 500 // 延迟 0.5 秒
+
+    // 启动定时任务
+    this.updateTimerId = setInterval(async () => {
+      await this.checkAndUpdateConfigs();
+    }, updateInterval ?? this.CHECK_INTERVAL);
+
+    hilog.info(0xFF00, "ConfigAutoUpdateService", "配置自动更新服务启动成功");
+  }
+
+  /**
+   * 停止配置自动更新服务
+   * @param context 应用上下文
+   */
+  async stop(context: Context): Promise<void> {
+    hilog.info(0xFF00, "ConfigAutoUpdateService", "停止配置自动更新服务");
+
+    // 清除定时器
+    if (this.updateTimerId) {
+      clearInterval(this.updateTimerId);
+      this.updateTimerId = undefined;
+    }
+
+    // 停止后台任务
+    if (this.notificationId) {
+      try {
+        await backgroundTaskManager.stopBackgroundRunning(context);
+        this.notificationId = undefined;
+        hilog.info(0xFF00, "ConfigAutoUpdateService", "后台任务停止成功");
+      } catch (err) {
+        hilog.error(0xFF00, "ConfigAutoUpdateService",
+          `后台任务停止失败: ${JSON.stringify(err)}`);
+      }
+    }
+
+    hilog.info(0xFF00, "ConfigAutoUpdateService", "配置自动更新服务已停止");
+  }
+
+  /**
+   * 手动触发检查更新（用于应用切回前台时）
+   */
+  async checkNow(): Promise<void> {
+    hilog.info(0xFF00, "ConfigAutoUpdateService", "手动触发配置更新检查");
+    await this.checkAndUpdateConfigs();
+  }
+
+  /**
+   * 检查并更新所有需要自动更新的配置
+   */
+  private async checkAndUpdateConfigs(): Promise<void> {
+    // 防止重复执行
+    if (this.isUpdating) {
+      hilog.info(0xFF00, "ConfigAutoUpdateService", "配置更新正在进行中，跳过本次检查");
+      return;
+    }
+
+    this.isUpdating = true;
+
+    try {
+      hilog.info(0xFF00, "ConfigAutoUpdateService", "开始检查配置更新");
+
+      // 获取所有配置
+      const profiles = await ClashViewModel.getProfiles();
+      hilog.info(0xFF00, "ConfigAutoUpdateService", `获取到 ${profiles.length} 个配置`);
+
+      // 筛选需要自动更新的配置
+      this.autoUpdateProfiles = profiles.filter((profile: Profile) => {
+        return profile.autoUpdate && profile.type === ProfileType.Url;
+      });
+
+      hilog.info(0xFF00, "ConfigAutoUpdateService",
+        `需要自动更新的配置数量: ${this.autoUpdateProfiles.length}`);
+
+      if (this.autoUpdateProfiles.length === 0) {
+        hilog.info(0xFF00, "ConfigAutoUpdateService", "没有需要自动更新的配置");
+        return;
+      }
+
+      // 当前时间
+      const now = Date.now();
+
+      // 检查每个配置是否需要更新
+      for (const profile of this.autoUpdateProfiles) {
+        try {
+          const updateInterval = profile.autoUpdateDuration
+          // 忽略小于等于0的间隔
+          if (updateInterval <= 0) {
+            return
+          }
+          
+          const lastUpdateTime = profile.lastUpdateDate || 0;
+          const timeSinceLastUpdate = now - lastUpdateTime;
+
+          hilog.info(0xFF00, "ConfigAutoUpdateService",
+            `配置 [${profile.name}] - 上次更新: ${new Date(lastUpdateTime).toLocaleString()}, ` +
+            `更新间隔: ${updateInterval} - ${updateInterval}毫秒, 距离上次更新: ${Math.floor(timeSinceLastUpdate / 1000 / 60)}分钟`);
+
+          // 判断是否需要更新
+          if (timeSinceLastUpdate >= updateInterval) {
+            hilog.info(0xFF00, "ConfigAutoUpdateService",
+              `配置 [${profile.name}] 需要更新，开始更新...`);
+
+            // 执行更新
+            await ClashViewModel.updateProfileConfig(profile.id);
+
+            hilog.info(0xFF00, "ConfigAutoUpdateService",
+              `配置 [${profile.name}] 更新完成`);
+          } else {
+            const remainingTime = Math.floor((updateInterval - timeSinceLastUpdate) / 1000 / 60);
+            hilog.info(0xFF00, "ConfigAutoUpdateService",
+              `配置 [${profile.name}] 无需更新，还需等待 ${remainingTime} 分钟`);
+          }
+        } catch (error) {
+          const err = error as BusinessError;
+          hilog.error(0xFF00, "ConfigAutoUpdateService",
+            `配置 [${profile.name}] 更新失败: ${err.message}`);
+        }
+      }
+
+      hilog.info(0xFF00, "ConfigAutoUpdateService", "配置更新检查完成");
+    } catch (error) {
+      const err = error as BusinessError;
+      hilog.error(0xFF00, "ConfigAutoUpdateService",
+        `配置更新检查失败: ${err.message}`);
+    } finally {
+      this.isUpdating = false;
+    }
+  }
+
+  /**
+   *  启动后台长时任务
+   * @param context 应用上下文
+   * @returns 通知ID
+   */
+  private async startContinuousTask(context: Context): Promise<number> {
+    const wantAgentInfo: wantAgent.WantAgentInfo = {
+      wants: [
+        {
+          bundleName: context.applicationInfo.name,
+          abilityName: "EntryAbility",
+        },
+      ],
+      actionType: wantAgent.OperationType.START_ABILITY,
+      requestCode: 0,
+      actionFlags: [wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG],
+    };
+
+    try {
+      const wantAgentObj: WantAgent = await wantAgent.getWantAgent(wantAgentInfo);
+      const result = await backgroundTaskManager.startBackgroundRunning(
+        context,
+        ["dataTransfer"], // 使用数据传输类型
+        wantAgentObj
+      );
+      hilog.info(0xFF00, "ConfigAutoUpdateService",
+        `后台长时任务启动成功, notificationId=${result.notificationId}`);
+      return result.notificationId;
+    } catch (err) {
+      const error = err as BusinessError;
+      hilog.error(0xFF00, "ConfigAutoUpdateService",
+        `后台长时任务启动失败: Code=${error.code}, Msg=${error.message}`);
+      return -1;
+    }
+  }
+}
+
+/** 导出单例 */
+export default new ConfigAutoUpdateService();
+
