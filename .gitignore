@@ -1,5 +1,5 @@
 /node_modules
-
+**/oh-package-lock.json5
 /oh_modules
 **/node_modules
 **/oh_modules
