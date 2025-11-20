@@ -1034,6 +1034,65 @@ export const LIST_ITEM_PADDING: Padding = { left: 12, right: 12 }
 // 配置自动更新的间隔`TextPicker`组件显示文本默认值，用于获取string_array.json资源异常的时候显示
 export const CONFIG_AUTO_UPDATE_TIME_GAT_STRING_ARR: Array<string> = [ 'Minute', 'Hour', 'Day', ]
 
+/**
+ * @description 时间单位到毫秒的转换映射
+ * 根据 CONFIG_AUTO_UPDATE_TIME_GAT_STRING_ARR 的索引返回对应的毫秒倍数
+ */
+export const CONFIG_AUTO_UPDATE_TIME_GAP_TO_MS_MAP: Map<number, number> = new Map([
+  [0, 60 * 1000],        // Minute: 60秒 * 1000毫秒 = 60000毫秒
+  [1, 60 * 60 * 1000],   // Hour: 60分钟 * 60秒 * 1000毫秒 = 3600000毫秒
+  [2, 24 * 60 * 60 * 1000] // Day: 24小时 * 60分钟 * 60秒 * 1000毫秒 = 86400000毫秒
+])
+
+/**
+ * @description 将时间间隔值转换为毫秒
+ * @param value 时间间隔数值（如：10）
+ * @param unitIndex 时间单位索引（0=Minute, 1=Hour, 2=Day），对应 CONFIG_AUTO_UPDATE_TIME_GAT_STRING_ARR
+ * @returns 转换后的毫秒数，如果索引无效则返回 value * 60000（默认按分钟计算）
+ */
+export function convertTimeGapToMilliseconds(value: number, unitIndex?: number): number {
+  if (unitIndex === undefined || unitIndex === null) {
+    // 默认按分钟计算
+    return value * 60 * 1000
+  }
+  
+  const multiplier = CONFIG_AUTO_UPDATE_TIME_GAP_TO_MS_MAP.get(unitIndex)
+  if (multiplier === undefined) {
+    // 索引无效，默认按分钟计算
+    return value * 60 * 1000
+  }
+  
+  return value * multiplier
+}
+
+export interface ITimeGap {
+  value: number
+  unit: number
+}
+
+/**
+ * @description 将毫秒转换为时间间隔
+ * @param value 毫秒数
+ * @returns ITimeGap 包含时间间隔和单位信息的对象
+ */
+export function convertMillisecondsToTimeGap(value: number): ITimeGap {
+  let timeGap: ITimeGap = {
+    value: 0,
+    unit: 0
+  }
+
+  CONFIG_AUTO_UPDATE_TIME_GAP_TO_MS_MAP.forEach((multiplier, index) => {
+    if (value % multiplier === 0) {
+      timeGap = {
+        value: value / multiplier,
+        unit: index
+      }
+    }
+  })
+
+  return timeGap
+}
+
 /** @description 包名信息 */
 export class BundleInfo {
   /** @description 包名 */

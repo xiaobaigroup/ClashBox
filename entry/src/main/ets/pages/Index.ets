@@ -22,6 +22,7 @@ import {
   BundleInfo,
   HomeCards,
   filterStringsByBooleans,
+  convertMillisecondsToTimeGap,
 } from '../common/entity/Constants'
 import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/datasources/ProxyData'
 import { ClashConfig, IpInfo, Profile, ProxyMode } from 'proxy_core'
@@ -582,6 +583,9 @@ struct Index {
     const profiles = await ClashViewModel.getProfiles()
     console.error(`配置已获取：${JSON.stringify(profiles)}`)
     this.configList = profiles.map((d) => {
+
+      const timeGap = convertMillisecondsToTimeGap(d.autoUpdateDuration)
+
       return {
         configId: d.id,
         configName: d.name,
@@ -589,7 +593,9 @@ struct Index {
         configUrl: d.url,
         sourceType: d.type,
         isConfigAutoUpdate: d.autoUpdate,
-        configAutoUpdateTimeGapValue: d.autoUpdateDuration,
+        configAutoUpdateTimeGapValue: timeGap.value,
+        configAutoUpdateTimeGapMs: d.autoUpdateDuration,
+        configAutoUpdateTimeGapTextPickerIndex: timeGap.unit,
         lastUpdateDateTime: d.lastUpdateDate,
         subscriptionInfo: d.subscriptionInfo
       } as ConfigData

@@ -7,6 +7,7 @@ import { SocketProxyService, Profile, ProfileType, UpdateConfigParams, ClashConf
   ProxySort} from "proxy_core";
 import { socket, vpnExtension } from "@kit.NetworkKit";
 import { ConfigData } from "../common/entity/PageArgumentEntity";
+import { convertTimeGapToMilliseconds } from "../common/entity/Constants";
 import { PromptAction } from "@kit.ArkUI";
 import { ProxyGroup } from "proxy_core/src/main/ets/models/Common";
 import { ConfigExtendedParams } from "proxy_core/src/main/ets/models/ClashConfig";
@@ -59,7 +60,11 @@ export class ClashViewModel {
     profile.name = data.configName
     profile.url = data.configUrl
     profile.autoUpdate = data.isConfigAutoUpdate
-    profile.autoUpdateDuration = data.configAutoUpdateTimeGapValue ?? 10
+    // 转换为毫秒
+    profile.autoUpdateDuration = convertTimeGapToMilliseconds(
+      data.configAutoUpdateTimeGapValue ?? 10,
+      data.configAutoUpdateTimeGapTextPickerIndex
+    )
     await profile.checkAndUpdate((c)=>this.VailConfig(c))
     const isExists = await profile.check();
     if (isExists) {

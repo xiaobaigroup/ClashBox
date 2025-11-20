@@ -10,6 +10,7 @@ import {
   FONT_SIZE_14,
   CONFIG_AUTO_UPDATE_TIME_GAT_STRING_ARR,
   LIST_ITEM_HEIGHT,
+  convertTimeGapToMilliseconds,
 } from "../../common/entity/Constants"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { PromptAction } from "@kit.ArkUI"
@@ -31,7 +32,7 @@ export struct ConfigInfo {
   icon_emphasize: ResourceColor
 
   // 配置详情
-  @Link configData: ConfigData
+  @Link @Watch("CalcMS") configData: ConfigData
 
   /* List */
   // 配置是否自动更新
@@ -40,10 +41,6 @@ export struct ConfigInfo {
   // 配置自动更新的间隔菜单显示文本默认值，用于获取string_array.json资源异常的时候显示
   private configAutoUpdateTextPickerStringArr: Array<string> = CONFIG_AUTO_UPDATE_TIME_GAT_STRING_ARR
 
-  // 配置自动更新 填写的间隔值（由于`configData.configAutoUpdateTimeGapValue`是`number`类型，用这个变量当作一个中间变量利用`@Watch`实现双向绑定）
-  @State
-  @Watch('configAutoUpdateTimeGapInputChanged')
-  private configAutoUpdateTimeGapInputValue: string = String(this.configData.configAutoUpdateTimeGapValue)
   // 配置自动更新 已选择的间隔 index
   /*@State
   private configAutoUpdateTimeGapTextPickerSelectedIndex: number = 1*/
@@ -172,7 +169,7 @@ export struct ConfigInfo {
                 Text($r('app.string.auto_update_interval')).fontColor($r('sys.color.font_primary')).fontSize(FONT_SIZE_16)
                 Blank()
                 Row(){
-                  TextInput({ text: $$this.configAutoUpdateTimeGapInputValue, placeholder: $r('app.string.text_input_placeholder') })
+                  TextInput({ text: this.configData.configAutoUpdateTimeGapValue?.toString(), placeholder: $r('app.string.text_input_placeholder') })
                     .width(50)
                     .height(30)
                     .padding(0)
@@ -193,6 +190,10 @@ export struct ConfigInfo {
                     .maxLength(5)
                     .enterKeyType(EnterKeyType.Done)
                     .type(InputType.Number)
+                    .onChange((text: string) => {
+                      this.configData.configAutoUpdateTimeGapValue = Number(text)
+                      this.CalcMS()
+                    })
                     .onSubmit( (enterKey: EnterKeyType, event: SubmitEvent) => {
                       if (this.uiConfig.isVibrate) {
                         customVibrator.vibratorTriggerOfHapticClockTimer()
@@ -226,6 +227,8 @@ export struct ConfigInfo {
                         customSound.playAudioForSoundPool()
                       }
                       console.info('autoUpdateTimeUtils1',this.configData.configAutoUpdateTimeGapTextPickerIndex)
+
+                      this.CalcMS()
                     })
                     // 手指按下之后静态
                     // .onHover( (isHover: boolean, event: HoverEvent) => {
@@ -341,7 +344,6 @@ export struct ConfigInfo {
     if(this.uiConfig.isSound) {
       customSound.initSoundPool(3, 'beat_short.wav')
     }
-    this.configData.configAutoUpdateTimeGapTextPickerIndex = this.uiConfig.autoUpdateTimeUtils
   }
 
   aboutToDisappear(): void {
@@ -386,10 +388,13 @@ export struct ConfigInfo {
     }
   }*/
 
-  /**
-   * @Watch监听事件：配置自动更新 填写的间隔值
-   */
-  configAutoUpdateTimeGapInputChanged() {
-    this.configData.configAutoUpdateTimeGapValue = Number(this.configAutoUpdateTimeGapInputValue)
+  /** @description 计算毫秒值
+   *  时间间隔 和 单位 字段发生改变就重新计算毫秒值
+   * */
+  CalcMS() {
+    this.configData.configAutoUpdateTimeGapMs = convertTimeGapToMilliseconds(
+      this.configData.configAutoUpdateTimeGapValue ?? 0,
+      this.configData.configAutoUpdateTimeGapTextPickerIndex
+    )
   }
 }
