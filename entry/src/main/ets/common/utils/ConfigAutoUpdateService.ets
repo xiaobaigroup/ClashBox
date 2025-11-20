@@ -34,14 +34,19 @@ export class ConfigAutoUpdateService {
 
     hilog.info(0xFF00, "ConfigAutoUpdateService", "启动配置自动更新服务");
 
+    // 立即执行一次检查
+    await this.checkAndUpdateConfigs();
+
+    if (this.autoUpdateProfiles.length > 0) {
+      hilog.info(0xFF00, "ConfigAutoUpdateService", "没有需要自动更新的配置");
+      return;
+    }
+
     // 启动后台长时任务
     const notificationId = await this.startContinuousTask(context);
     if (notificationId > 0) {
       this.notificationId = notificationId;
     }
-
-    // 立即执行一次检查
-    await this.checkAndUpdateConfigs();
 
     // 找出更新频率最快的配置的毫秒值
     const updateIntervalArray = this.autoUpdateProfiles.map((profile: Profile) => profile.autoUpdateDuration);
