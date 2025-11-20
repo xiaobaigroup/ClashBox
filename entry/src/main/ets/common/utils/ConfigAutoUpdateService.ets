@@ -4,6 +4,7 @@ import { BusinessError } from "@kit.BasicServicesKit";
 import { hilog } from "@kit.PerformanceAnalysisKit";
 import ClashViewModel from "../../entryability/ClashViewModel";
 import { Profile, ProfileType } from "proxy_core";
+import { convertMillisecondsToTimeGap } from "../entity/Constants";
 
 /**
  * 配置自动更新服务
@@ -44,7 +45,7 @@ export class ConfigAutoUpdateService {
 
     // 找出更新频率最快的配置的毫秒值
     const updateIntervalArray = this.autoUpdateProfiles.map((profile: Profile) => profile.autoUpdateDuration);
-    const updateInterval = Math.min(...updateIntervalArray) + 500 // 延迟 0.5 秒
+    const updateInterval = Math.min(...updateIntervalArray)
 
     // 启动定时任务
     this.updateTimerId = setInterval(async () => {
@@ -137,12 +138,32 @@ export class ConfigAutoUpdateService {
           const lastUpdateTime = profile.lastUpdateDate || 0;
           const timeSinceLastUpdate = now - lastUpdateTime;
 
+          // 格式化打印字符串
+          let updateIntervalStr = `${updateInterval}毫秒`
+          const timeGap = convertMillisecondsToTimeGap(updateInterval)
+          switch (timeGap.unit) {
+            case 0: // 分钟
+              updateIntervalStr = `${timeGap.value}分钟`
+            break;
+            case 1: // 小时
+              updateIntervalStr = `${timeGap.value}小时`
+            break;
+            case 2: // 天
+              updateIntervalStr = `${timeGap.value}天`
+            break;
+          }
+
+          // 更新间隔 => 允许5秒误差
+          const tolerance = 5 * 1000;
+          const updateThreshold = updateInterval - tolerance;
+
           hilog.info(0xFF00, "ConfigAutoUpdateService",
             `配置 [${profile.name}] - 上次更新: ${new Date(lastUpdateTime).toLocaleString()}, ` +
-            `更新间隔: ${updateInterval} - ${updateInterval}毫秒, 距离上次更新: ${Math.floor(timeSinceLastUpdate / 1000 / 60)}分钟`);
+            `更新间隔: ${updateInterval} - ${updateIntervalStr}, 距离上次更新: ${Math.floor(timeSinceLastUpdate / 1000 / 60)}分钟, ` +
+            `允许误差: ${tolerance / 1000}秒`);
 
           // 判断是否需要更新
-          if (timeSinceLastUpdate >= updateInterval) {
+          if (timeSinceLastUpdate >= updateThreshold) {
             hilog.info(0xFF00, "ConfigAutoUpdateService",
               `配置 [${profile.name}] 需要更新，开始更新...`);
 
