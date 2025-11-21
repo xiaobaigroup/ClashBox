@@ -187,6 +187,8 @@ export default class EntryAbility extends UIAbility {
         Xb_ToastUtil.initContext(this.uiContext, data.getUIContext().getHostContext() as common.UIAbilityContext)
         // 初始化窗口避让属性
         this.intRectWindow(windowStage)
+        // 初始化配置自动更新服务
+        ConfigAutoUpdateService.initContext(this.context)
 
         // 设备断点获取
         let widthBp: WidthBreakpoint = this.uiContext.getWindowWidthBreakpoint()
@@ -245,7 +247,7 @@ export default class EntryAbility extends UIAbility {
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onForeground');
 
     // 应用切回前台时，触发一次配置更新检查
-    this.checkConfigAutoUpdate();
+    // this.checkConfigAutoUpdate();
   }
 
   /** @description 检查配置自动更新（应用切回前台时调用） */
@@ -281,7 +283,7 @@ export default class EntryAbility extends UIAbility {
 
   /** @description 停止配置自动更新服务 */
   private stopConfigAutoUpdateService(): void {
-    ConfigAutoUpdateService.stop(this.context).then(() => {
+    ConfigAutoUpdateService.stop().then(() => {
       hilog.info(0xFF00, 'ConfigAutoUpdateService', '配置自动更新服务已停止');
     }).catch((error: BusinessError) => {
       hilog.error(0xFF00, 'ConfigAutoUpdateService',
@@ -414,12 +416,10 @@ export default class EntryAbility extends UIAbility {
   /** @description 启动配置自动更新服务 */
   private async startConfigAutoUpdateService(): Promise<void> {
     try {
-      await ConfigAutoUpdateService.start(this.context);
-      hilog.info(0xFF00, 'ConfigAutoUpdateService', '配置自动更新服务已启动');
+      await ConfigAutoUpdateService.start();
     } catch (error) {
-      const err = error as BusinessError;
       hilog.error(0xFF00, 'ConfigAutoUpdateService',
-        `配置自动更新服务启动失败: ${err.message}`);
+        `配置自动更新服务启动失败 - ${JSON.stringify(error)}`);
     }
   }
 

@@ -22,6 +22,7 @@ import ClashViewModel from "../../entryability/ClashViewModel"
 import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { UIConfig } from "../../entryability/AppState"
 import { Xb_ToastUtil } from "xb_components"
+import ConfigAutoUpdateService from "../../common/utils/ConfigAutoUpdateService"
 
 
 // 关联：route_map.json
@@ -255,6 +256,9 @@ export struct ImportConfigFromURL {
       }
 
     }
+
+    // 检查是否需要开启配置自动更新服务
+    ConfigAutoUpdateService.reset()
   }
 
   /**
