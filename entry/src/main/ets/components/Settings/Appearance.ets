@@ -33,6 +33,7 @@ struct Appearance {
   @State EnableAnimationSpeedText: ResourceStr = $r('app.string.normal')
   // 字符串显示权重选中文本
   @State EnableStringDisplayText: ResourceStr = $r('app.string.appearance')
+  @State TabStyleDisplayText: ResourceStr = $r('app.string.float')
   // 关闭窗口选中文本
   @State EnableCloseWindowText: ResourceStr = $r('app.string.appearance')
   // 按钮位置选中文本
@@ -46,14 +47,17 @@ struct Appearance {
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   // 所有子组件在容器内的对齐方式
   @Consume ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
 
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 窗口模式
   @StorageProp('WindowMode') windowMode: boolean = false
+  @StorageProp('EnableAPIVersion') apiVersionEnable: boolean = false
   // 手机横屏判断
   @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
+
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   // 高度断点
@@ -141,6 +145,7 @@ struct Appearance {
           }
         }.width('100%').margin({top: 20, bottom: 15})
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+
         // 列表区 Start
         ListItem() {
           Column() {
@@ -260,13 +265,25 @@ struct Appearance {
             })
             // 分割线
             Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
+            // Tab栏样式
+            if (this.apiVersionEnable) {
+              menuRowList({
+                icons: $r('sys.symbol.circle_on_circle_filled'),
+                title: $r('app.string.tab_style'),
+                // 确保this指向父组件
+                tips: (): void => { this.TipsText(4) },
+                menu: (): void => { this.MenuEntrance(4) }
+              })
+              // 分割线
+              Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
+            }
             // 字符串显示权重
             menuRowList({
               icons: $r('sys.symbol.list_square_bill'),
               title: $r('app.string.string_display_preferences'),
               // 确保this指向父组件
-              tips: (): void => { this.TipsText(4) },
-              menu: (): void => { this.MenuEntrance(4) }
+              tips: (): void => { this.TipsText(5) },
+              menu: (): void => { this.MenuEntrance(5) }
             })
             if (this.windowMode) {
               // 分割线
@@ -276,8 +293,8 @@ struct Appearance {
                 icons: $r('sys.symbol.wrench_and_screwdriver'),
                 title: $r('app.string.exit_window'),
                 // 确保this指向父组件
-                tips: (): void => { this.TipsText(5) },
-                menu: (): void => { this.MenuEntrance(5) }
+                tips: (): void => { this.TipsText(6) },
+                menu: (): void => { this.MenuEntrance(6) }
               })
             }
           }
@@ -356,7 +373,7 @@ struct Appearance {
           })
             .selected(this.uiConfig.buttonPositionIndex === index)
             .onChange((selected) => {
-              animateTo(this.uiConfig.isAnimation?{ duration: this.uiConfig.animationSpeed, curve: curves.springMotion() }:null, () => {
+              animateTo(this.uiConfig.isAnimation ? { duration: this.uiConfig.animationSpeed, curve: curves.springMotion() } : null, () => {
                 // 持久化按钮位置
                 this.uiConfig.buttonPositionIndex = index
                 this.switchButtonPosition(index)
@@ -384,7 +401,24 @@ struct Appearance {
             })
         }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
       }
-    } else if (index === 4) {
+    }  else if (index === 4) {
+      // 切换导航栏样式
+      Menu() {
+        ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
+          MenuItem({
+            content: menuItem.title,
+            symbolEndIcon: this.uiConfig.tabStyle === (index == 0 ? 'float' : 'custom') ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+          })
+            .selected(this.uiConfig.tabStyle === (index == 0 ? 'float' : 'custom'))
+            .onChange((selected) => {
+              // 持久导航栏样式
+              this.uiConfig.tabStyle = (index == 0 ? 'float' : 'custom')
+              this.TabStyleDisplayText = menuItem.title
+              this.isEnableIndexForegroundBlur = false
+            })
+        }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
+      }
+    } else if (index === 5) {
       // 切换字符显示权重
       Menu() {
         ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
@@ -401,7 +435,7 @@ struct Appearance {
             })
         }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
       }
-    } else if (index === 5) {
+    } else if (index === 6) {
       // 关闭窗口
       Menu() {
         ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
@@ -440,10 +474,14 @@ struct Appearance {
       Text(this.EnableAnimationSpeedText)
         .tipsText()
     } else if (index === 4) {
+      // 导航栏位置
+      Text(this.TabStyleDisplayText)
+        .tipsText()
+    }  else if (index === 5) {
       // 字符显示权重
       Text(this.EnableStringDisplayText)
         .tipsText()
-    } else if (index === 5) {
+    } else if (index === 6) {
       // 关闭窗口
       Text(this.EnableCloseWindowText)
         .tipsText()
@@ -477,16 +515,22 @@ struct Appearance {
         this.switchMenu(this.appearanceList[3].children, 3)
       }
     } else if (index === 4) {
-      // 字符显示权重
+      // Tab栏位置
       // 确保children存在
       if(this.appearanceList && this.appearanceList[4].children) {
         this.switchMenu(this.appearanceList[4].children, 4)
       }
     } else if (index === 5) {
-      // 关闭窗口
+      // 字符显示权重
       // 确保children存在
       if(this.appearanceList && this.appearanceList[5].children) {
         this.switchMenu(this.appearanceList[5].children, 5)
+      }
+    } else if (index === 6) {
+      // 关闭窗口
+      // 确保children存在
+      if(this.appearanceList && this.appearanceList[6].children) {
+        this.switchMenu(this.appearanceList[6].children, 6)
       }
     }
   }
@@ -555,15 +599,19 @@ struct Appearance {
     if (this.appearanceList && this.appearanceList[3].children) {
       this.EnableAnimationSpeedText = this.appearanceList[3].children[this.uiConfig.animationSpeedIndex].title
     }
-    // 初始化字符显示权重显示文本
+    // 初始化导航栏样式显示文本
     if (this.appearanceList && this.appearanceList[4].children) {
-      this.EnableStringDisplayText = this.appearanceList[4].children[this.uiConfig.stringDisplayIndex].title
+      this.TabStyleDisplayText = this.appearanceList[4].children[(this.uiConfig.tabStyle === 'float') ? 0 : 1].title
+    }
+    // 初始化字符显示权重显示文本
+    if (this.appearanceList && this.appearanceList[5].children) {
+      this.EnableStringDisplayText = this.appearanceList[5].children[this.uiConfig.stringDisplayIndex].title
     }
     // 窗口模式时才处理
     if (this.windowMode) {
       // 初始化关闭窗口显示文本
-      if (this.appearanceList && this.appearanceList[5].children) {
-        this.EnableCloseWindowText = this.appearanceList[5].children[this.uiConfig.exitWindowMode].title
+      if (this.appearanceList && this.appearanceList[6].children) {
+        this.EnableCloseWindowText = this.appearanceList[6].children[this.uiConfig.exitWindowMode].title
       }
     }
   }

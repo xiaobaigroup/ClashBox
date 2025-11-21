@@ -15,7 +15,7 @@ import { hilog } from "@kit.PerformanceAnalysisKit"
 import { number2Time } from "../common/utils/TimeConvertUtil"
 import { getResourceString } from "../common/utils/ResourceStringUtil"
 import { HomeCardPadding } from "../common/breakpoint/BreakPoint"
-import { Xb_GetResourceString } from "xb_components"
+import { Xb_GetResourceString, Xb_ToastUtil } from "xb_components"
 import { ProxyGroupItemDataSource } from "../common/datasources/ProxyData"
 
 
@@ -51,7 +51,6 @@ export struct PXSecScreen{
 
   // 收藏与ping延迟即时动作
   private indicatorController: IndicatorComponentController = new IndicatorComponentController()
-  private PXPromptAction: PromptAction = this.getUIContext()?.getPromptAction()
   private swiperController2: SwiperController = new SwiperController()
 
   @State tabsSelect: TabsSelect = new TabsSelect()
@@ -60,9 +59,9 @@ export struct PXSecScreen{
   @State tabsIconScale: number = 1
 
   build() {
-    Stack(){
-      Swiper(this.swiperController2){
-        ForEach(TabsList,(n:TabsItem)=>{
+    Stack() {
+      Swiper(this.swiperController2) {
+        ForEach(TabsList,(n: TabsItem)=>{
           this.PXSS(n.swiperPage)
         })
       }
@@ -89,11 +88,9 @@ export struct PXSecScreen{
         LongPressGesture({ repeat: true })
           .onAction((event: GestureEvent) => {
             if (event) {
-              this.PXPromptAction.showToast({ message: $r('app.string.px_sec_screen_tips') ,bottom:36})
+              Xb_ToastUtil.showToast({ message: $r('app.string.px_sec_screen_tips') ,bottom:36})
             }
-          })
-      )
-
+          }))
       if (!this.isTabSelect) {
         Stack() {
           IndicatorComponent(this.indicatorController)
@@ -139,7 +136,7 @@ export struct PXSecScreen{
         })
       //  .geometryTransition("picture")
         .transition(customAnimationUtil.isSlideScaleSmall(0, this.uiConfig))
-      }else{
+      } else {
         this.tabSelect()
       }
     }
@@ -149,10 +146,10 @@ export struct PXSecScreen{
     .align(Alignment.Bottom)
   }
 
-  // 外屏三页
+  // 外屏分页
   @Builder
-  PXSS(i: number){
-    if (i==SwiperPage.PXSSHome){
+  PXSS(i: number) {
+    if (i == SwiperPage.PXSSHome){
       Column({ space: 8 }){
         Column(){
           ProxyINFO()
@@ -163,8 +160,8 @@ export struct PXSecScreen{
         .backgroundColor($r('app.color.container_background'))
         .transition(customAnimationUtil.isScaleTran(1, this.uiConfig))
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-        Row({ space: 8 }){
-          Column(){
+        Row({ space: 8 }) {
+          Column() {
             SwitchMode()
           }
           .aspectRatio(1)
@@ -212,7 +209,7 @@ export struct PXSecScreen{
                       customVibrator.vibratorTriggerOfHapticClockTimer()
                     }
                     // 配置页没有数据，或者代理节点未加载
-                    this.PXPromptAction.showToast({ message: `${Xb_GetResourceString($r('app.string.start_prompt'), this.getUIContext())}` })
+                    Xb_ToastUtil.showToast({ message: $r('app.string.start_prompt') })
                     // vpn小钥匙可能卡死，关闭vpn小钥匙
                     await ClashViewModel.StopVpn()
                   } else {
@@ -247,10 +244,10 @@ export struct PXSecScreen{
       .height('100%')
       .margin({top:14})
       .justifyContent(FlexAlign.Start)
-    }else if (i==SwiperPage.PXSSProxy){
+    } else if (i == SwiperPage.PXSSProxy){
       ProxyPage()
         .padding({top:4})
-    }else if (i==SwiperPage.PXSSConfiguration){
+    } else if (i == SwiperPage.PXSSConfiguration){
       ConfigurationPage()
         .padding({top:14,bottom:14})
     }
@@ -258,8 +255,8 @@ export struct PXSecScreen{
 
   // 底部切换页面组件
   @Builder
-  tabSelect(){
-    Stack(){
+  tabSelect() {
+    Stack() {
       Button({type: ButtonType.Normal})
         .backgroundColor($r('app.color.container_background'))
         .shadow({ radius:10,color:$r('app.color.shadow')})
@@ -344,6 +341,6 @@ export const TabsList:TabsItem[] = [
   {text:$r('app.string.Configuration'),icon:$r('sys.symbol.folder_fill'),swiperPage:SwiperPage.PXSSConfiguration}
 ]
 
-class TabsSelect{
-  swiperPage?:SwiperPage = SwiperPage.PXSSHome
+class TabsSelect {
+  swiperPage?: SwiperPage = SwiperPage.PXSSHome
 }

@@ -1,5 +1,5 @@
 // Index
-import { LengthMetrics, mediaquery } from '@kit.ArkUI'
+import { LengthMetrics, mediaquery, UIUtils } from '@kit.ArkUI'
 import Home from './HomePage'
 import ProxyPage from './ProxyPage'
 import { util } from "@kit.ArkTS";
@@ -65,9 +65,23 @@ import { ImportConfigFromURL } from '../components/Configuration/ImportConfigFro
 import { Xb_ChangeThemeColor } from 'xb_components/src/main/ets/utils/ChangeThemeColorUtil'
 import {
   Xb_BackgroundRunning,
-  Xb_ColorModeManager, Xb_Global, Xb_NotificationUtils,
+  Xb_ColorModeManager,
+  Xb_FloatTabBarAlignCenter,
+  Xb_FloatTabBarAlignEnd,
+  Xb_FloatTabBarAlignStart,
+  Xb_FloatTabBarDirection,
+  Xb_FloatTabBarDirectionReverse,
+  Xb_FloatTabBarPadding,
+  Xb_Global, Xb_NotificationUtils,
   Xb_ResourceColorUtil,
-  Xb_StatusBarUtils, Xb_UIConfig } from 'xb_components'
+  Xb_StatusBarUtils,
+  Xb_TabBarFunctionButton,
+  Xb_TabBarVertical,
+  Xb_TabComponent,
+  Xb_TabComponentConfig,
+  Xb_TabIconFontSize,
+  Xb_TabTitleFontSize,
+  Xb_UIConfig } from 'xb_components'
 import { Xb_GoToWeb } from 'xb_components/src/main/ets/utils/JumpTo'
 import BackgroundDownService from '../common/utils/BackgroundDownService'
 import { notificationManager } from '@kit.NotificationKit'
@@ -77,11 +91,14 @@ import LiveViewUtil from '../common/utils/LiveViewUtil'
 import { UpdateLog } from '../components/Start/UpdateLog'
 import { animationStyle } from 'xb_components/src/main/ets/components/Animation';
 import { getJsonArrayType } from '../common/entity/utils';
+import { customVibrator } from '../common/utils/VibratorUtil';
+import { RoundButton } from '../components/Common/RoundButton';
 
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 
 export const indexController: TabsController = new TabsController()
+const swiperController: SwiperController = new SwiperController()
 
 const componentName: string = 'Index'
 
@@ -140,8 +157,9 @@ struct Index {
   @Provide('WelcomeNavPathStack') welcomePageInfos: NavPathStack = new NavPathStack()
   // 主页面栈
   @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
-  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+
   @Provide paddingButtom: number | Resource = $r('app.integer.vp_proxy_start_button_left_right_margin')
   @StorageLink('appLinkConfigUrl') @Watch('onOpenConfigLink') appLinkConfigUrl: string = ''
   @StorageLink('appLinkConfigName') @Watch('onOpenConfigLink') appLinkConfigName: string = ''
@@ -171,6 +189,8 @@ struct Index {
   @Provide isDisclaimer: boolean = false
   // 是否在主页
   @Provide isHomePage: boolean = false
+
+  @StorageProp('EnableAPIVersion') apiVersionEnable: boolean = false
   // 顶部Bar高度
   @Provide heightTop: Length = TAB_CONTENT_TITLE_HEIGHT
   // 主界面当前index
@@ -247,6 +267,10 @@ struct Index {
   @Provide('isEnableConfigPageBindSheetForegroundBlur') isEnableConfigPageBindSheetForegroundBlur: boolean = false
   // 当前触摸的配置行
   @StorageLink('currentTouchConfigData') currentTouchConfigData: ConfigData = NewConfigData
+  // 是否显示配置页bindSheet
+  @StorageLink('ShowConfigBindSheet') isShowConfigAddBindSheet: boolean = false
+  // 是否为新建配置
+  @StorageLink('ConfigNew') isNewConfig: boolean = false
   // 当前选中的配置行
   @Provide currentConfigRadioCheckedConfigData: ConfigData = NewConfigData
   // 路由栈
@@ -302,11 +326,57 @@ struct Index {
       Navigation(this.pageInfos) {
         this.MainContent()
       }
+      .foregroundBlurStyle(this.isEnableIndexForegroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
+        { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 })
+      .hideTitleBar(true).hideToolBar(true)
+      .height('100%').width('100%')
       .mode(NavigationMode.Stack)
-      .hideTitleBar(true)
-      .hideToolBar(true)
-      .height('100%')
-      .width('100%')
+      // 欢迎页&崩溃页
+      .bindSheet($$this.isShowWelcome, this.WelcomeSheet(), {
+        detents: [BIND_SHEET_CONTAINER_HEIGHT],
+        showClose: (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) ||
+          this.appLinkConfigUrl != '' || (this.uiConfig.oldVersionCode !== AppState.versionCode && !this.uiConfig.isFirstStart) || this.showUpdateLog,
+        dragBar: false,
+        backgroundColor: $r('app.color.background'),
+        keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
+        scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+        preferType: SheetType.CENTER,
+        onWillDismiss: ((DismissSheetAction: DismissSheetAction) => {
+          hilog.debug(0xFF00, "WelcomeTestTag", "弹窗关闭原因：%{public}d", DismissSheetAction.reason)
+
+          // 无论什么原因关闭，都重置状态
+          this.showUpdateLog = false
+          this.isShowWelcome = false
+          this.uiConfig.oldVersionCode = AppState.versionCode
+
+          // 清空 AppLink 相关状态，避免重复导入
+          if (this.appLinkConfigUrl != '') {
+            this.appLinkConfigUrl = ''
+            this.appLinkConfigName = ''
+          }
+
+          // 重置设置状态
+          this.SettingsPageInfos.clear()
+          // 关闭背景模糊
+          this.isEnableIndexForegroundBlur = false
+
+          hilog.error(0xFF00, "WelcomeTestTag", `Update 历史应用版本更新为：${this.uiConfig.oldVersionCode} showUpdateLog: ${this.showUpdateLog}`)
+
+          DismissSheetAction.dismiss()
+          hilog.info(0xFF00, "WelcomeTestTag", "欢迎页启用状态： %{private}s", this.isShowWelcome)
+        }),
+        onWillAppear: () => {
+          // 启用背景模糊
+          this.isEnableIndexForegroundBlur = true
+          console.error(`Update Index isShowWelcome：${this.isShowWelcome} showUpdateLog: ${this.showUpdateLog}`)
+        },
+        onDisappear: async () => {
+          // 重置设置状态
+          this.SettingsPageInfos.clear()
+          // 关闭背景模糊
+          this.isEnableIndexForegroundBlur = false
+        }
+      })
     } else {
       // PX外屏样式
       PXSecScreen()
@@ -322,125 +392,22 @@ struct Index {
           .zIndex(2)
       }
       // 主界面
-      Tabs({
-        barPosition: TabBarPosition(this.widthBp, this.heightBp),
-       // index: this.tabCurrentPage,onchange里面有了 不需要这里再赋值
-        controller: indexController
-      }) {
-        ForEach(this.tabList, (item: TabBuild, index: number) => {
-          TabContent() {
-            this.TabContentBuilder(index)
-          }
-          .tabBar(this.TabBarBuilder(item.name, index, item.icon))
-          .gesture(
-            // 二级Tabs第一个页签向左拖动时，触发手势事件，当Tab栏竖排时不触发
-            PanGesture({
-              direction: !TabBarVertical(this.widthBp, this.heightBp) ? PanDirection.Down : PanDirection.None
-            })
-              .onActionStart((event?: GestureEvent) => {
-                console.info('Pan start')
-              })// 通过父组件的TabsController的实例，改变其index，达到跳转一级Tabs（首页）的效果
-              .onActionEnd(() => {
-                if (this.isLandscapePhone || this.istabletLandscape) {
-                  if (this.tabCurrentPage == 0) {
-                    indexController.changeIndex(1)
-                    console.info('Pan end')
-                  }
-                }
-              }))
-        })
-
+      if (this.uiConfig.tabStyle == 'float' && this.apiVersionEnable) {
+        // 悬浮Tab
+        this.FloatTab()
       }
-      .zIndex(1)
-      .backgroundColor($r('app.color.background'))
-      // .barBackgroundBlurStyle(this.uiConfig.isBlurr ? BlurStyle.Thin: null)
-      // .backgroundBrightness({rate:0.5,lightUpDegree:0.5})
-      //  .backdropBlur(this.uiConfig.isBlurr ? 0.3 : 0)
-      .barOverlap(false)
-      .scrollable(!this.isSecondary)
-      .vertical(TabBarVertical(this.widthBp, this.heightBp))
-      .barWidth(this.windowMode ? WindowTabBarWidth(this.widthBp, this.heightBp) :
-        TabBarWidth(this.widthBp, this.heightBp))
-      .barHeight((this.isSecondary && this.widthBp <= 2 && !this.windowMode) || this.isSmallSquareScreen ?
-        this.barHeight : this.bottomRectHeight == 0 ? TabBarHeight(this.widthBp, this.heightBp) :
-          TabBarAvoidHeight(this.widthBp, this.heightBp))
-      .onTabBarClick((index: number) => {
-        animationStyle.animToAPI18(()=>{
-          this.tabCurrentPage = index
-        },this.uiConfig.animationSpeed, 'app', 0)
-      })
-      .onChange((index) => {
-        animationStyle.animToAPI18(()=>{
-          if (index == 0) {
-            this.isHomePage = true
-            return
-          }
-          this.isHomePage = false
-
-          this.tabCurrentPage = index
-        },this.uiConfig.animationSpeed, 'app', 0)
-      })
-      .onAnimationStart((index: number, targetIndex: number) => {
-        animationStyle.animToAPI18(()=>{
-          if (index == targetIndex) {
-            return
-          }
-          this.tabCurrentPage = targetIndex;
-        },this.uiConfig.animationSpeed, 'app', 0)
-      })
-      .width('100%')
-      .height('100%')
-      .backgroundColor($r('app.color.background'))
-      .foregroundBlurStyle(this.isEnableIndexForegroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
-        { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 })
-      .fadingEdge(true)
-      .padding({ top: this.topRectHeight, bottom: this.bottomRectHeight == 0 ? this.bottomRectHeight / 2 : 0 })
+      else {
+        // 普通Tab
+        this.CustomTab()
+      }
     }
     .width('100%')
     .height('100%')
     .backgroundColor($r('app.color.background'))
-    // 欢迎页&崩溃页
-    .bindSheet($$this.isShowWelcome, this.WelcomeSheet(), {
-      detents: [BIND_SHEET_CONTAINER_HEIGHT],
-      showClose: (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) ||
-        this.appLinkConfigUrl != '' || (this.uiConfig.oldVersionCode !== AppState.versionCode && !this.uiConfig.isFirstStart) || this.showUpdateLog,
-      dragBar: false,
-      backgroundColor: $r('app.color.background'),
-      keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
-      scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-      preferType: SheetType.CENTER,
-      onWillDismiss: ((DismissSheetAction: DismissSheetAction) => {
-        hilog.debug(0xFF00, "WelcomeTestTag", "弹窗关闭原因：%{public}d", DismissSheetAction.reason)
-
-        // 无论什么原因关闭，都重置状态
-        this.showUpdateLog = false
-        this.isShowWelcome = false
-        this.uiConfig.oldVersionCode = AppState.versionCode
-
-        // 清空 AppLink 相关状态，避免重复导入
-        if (this.appLinkConfigUrl != '') {
-          this.appLinkConfigUrl = ''
-          this.appLinkConfigName = ''
-        }
-
-        hilog.error(0xFF00, "WelcomeTestTag", `Update 历史应用版本更新为：${this.uiConfig.oldVersionCode} showUpdateLog: ${this.showUpdateLog}`)
-        // 关闭背景模糊
-        this.isEnableIndexForegroundBlur = false
-        DismissSheetAction.dismiss()
-        hilog.info(0xFF00, "WelcomeTestTag", "欢迎页启用状态： %{private}s", this.isShowWelcome)
-      }),
-      onWillAppear: () => {
-        // 启用背景模糊
-        this.isEnableIndexForegroundBlur = true
-        console.error(`Update Index isShowWelcome：${this.isShowWelcome} showUpdateLog: ${this.showUpdateLog}`)
-      },
-      onDisappear: async () => {
-      }
-    })
   }
 
   @Builder
-  TabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
+  CustomTabBarBuilder(title: ResourceStr, index: number, TabIcon: Resource) {
     Flex({
       direction: FlexDirection.Column,
       justifyContent: TabBarJustifyContent(this.widthBp, this.heightBp),
@@ -464,6 +431,201 @@ struct Index {
     .width('100%')
     .height('100%')
     .padding({ top: 8 })
+  }
+  @Builder
+  CustomTab() {
+    Tabs({
+      barPosition: TabBarPosition(this.widthBp, this.heightBp),
+      controller: indexController
+    }) {
+      ForEach(this.tabList, (item: TabBuild, index: number) => {
+        TabContent() {
+          this.TabContentBuilder(index)
+        }
+        .tabBar(this.CustomTabBarBuilder(item.name, index, item.icon))
+        .gesture(
+          // 二级Tabs第一个页签向左拖动时，触发手势事件，当Tab栏竖排时不触发
+          PanGesture({
+            direction: !TabBarVertical(this.widthBp, this.heightBp) ? PanDirection.Down : PanDirection.None
+          })
+            .onActionStart((event?: GestureEvent) => {
+              console.info('Pan start')
+            })// 通过父组件的TabsController的实例，改变其index，达到跳转一级Tabs（首页）的效果
+            .onActionEnd(() => {
+              if (this.isLandscapePhone || this.istabletLandscape) {
+                if (this.tabCurrentPage == 0) {
+                  indexController.changeIndex(1)
+                  console.info('Pan end')
+                }
+              }
+            }))
+      })
+    }
+    .zIndex(1)
+    .backgroundColor($r('app.color.background'))
+    .barOverlap(false)
+    .scrollable(!this.isSecondary)
+    .vertical(TabBarVertical(this.widthBp, this.heightBp))
+    .barWidth(this.windowMode ? WindowTabBarWidth(this.widthBp, this.heightBp) :
+      TabBarWidth(this.widthBp, this.heightBp))
+    .barHeight((this.isSecondary && this.widthBp <= 2 && !this.windowMode) || this.isSmallSquareScreen ?
+      this.barHeight : this.bottomRectHeight == 0 ? TabBarHeight(this.widthBp, this.heightBp) :
+        TabBarAvoidHeight(this.widthBp, this.heightBp))
+    .onTabBarClick((index: number) => {
+      animationStyle.animToAPI18(()=>{
+        this.tabCurrentPage = index
+      },this.uiConfig.animationSpeed, 'app', 0)
+    })
+    .onChange((index) => {
+      animationStyle.animToAPI18(()=>{
+        if (index == 0) {
+          this.isHomePage = true
+          return
+        }
+        this.isHomePage = false
+      },this.uiConfig.animationSpeed, 'app', 0)
+    })
+    .onAnimationStart((index: number, targetIndex: number) => {
+      animationStyle.animToAPI18(()=>{
+        this.tabCurrentPage = targetIndex;
+      },this.uiConfig.animationSpeed, 'app', 0)
+    })
+    .width('100%').height('100%')
+    .backgroundColor($r('app.color.background')).fadingEdge(true)
+    .padding({ top: this.topRectHeight, bottom: this.bottomRectHeight == 0 ? this.bottomRectHeight / 2 : 0 })
+  }
+
+  @Builder
+  FloatBarFunctionContentBuilder() {
+    if (this.widthBp <= 2 && (this.tabCurrentPage == 0 || this.uiConfig.needProxyStart)) {
+      Text(this.proxyStartingDuration)
+        .fontSize(20).fontWeight(FontWeight.Bold)
+        .fontColor(this.proxyEnabled ? Color.White : Color.Transparent)
+    }
+  }
+  @Builder
+  FloatBarBuilder() {
+    Flex({
+      direction: ((this.getFloatAlign() == 0 && Xb_TabBarVertical(this.widthBp, this.heightBp)) || (this.getFloatAlign() == 6 && !Xb_TabBarVertical(this.widthBp, this.heightBp))) ? Xb_FloatTabBarDirectionReverse(this.widthBp, this.heightBp) : Xb_FloatTabBarDirection(this.widthBp, this.heightBp),
+      justifyContent: FlexAlign.Center,
+      alignItems: ItemAlign.Center,
+      space: { main: LengthMetrics.vp(10) }
+    }) {
+      // tab区
+      Flex({
+        direction: Xb_FloatTabBarDirection(this.widthBp, this.heightBp),
+        justifyContent: FlexAlign.SpaceAround,
+        alignItems: ItemAlign.Center,
+        space: { main: LengthMetrics.vp(10) }
+      }) {
+        ForEach(this.tabList, (item: TabBuild, index: number) => {
+          Column() {
+            SymbolGlyph(item.icon)
+              .fontSize(Xb_TabIconFontSize(this.widthBp, this.heightBp))
+              .fontColor([this.tabCurrentPage === index ? this.icon_emphasize : $r('sys.color.icon_tertiary')])
+              .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)
+              .translate({ y: this.tabCurrentPage == index ? -2 : 0 })
+              .animation(animationStyle.animNormalUtils(0))
+            Text(item.name)
+              .fontColor(this.tabCurrentPage === index ? this.icon_emphasize : $r('sys.color.icon_tertiary'))
+              .fontSize(Xb_TabTitleFontSize(this.widthBp, this.heightBp))
+          }
+          .width(60)
+          .height(60)
+          .justifyContent(FlexAlign.Center)
+          .alignItems(HorizontalAlign.Center)
+          .onClick(() => {
+            this.tabCurrentPage = index
+            swiperController.changeIndex(index, true)
+          })
+        })
+      }
+      .padding(Xb_FloatTabBarPadding(this.widthBp, this.heightBp))
+      .width('auto')
+      .height('auto')
+      // .layoutWeight(1)
+      .borderRadius(30)
+      .backgroundColor('#1ab1b1b1')
+      .shadow({
+        radius: 10,
+        offsetY: 4,
+        color: '#1ab1b1b1',
+        type: ShadowType.BLUR
+      })
+      // 控制按钮区
+      if (this.tabCurrentPage == 0) {
+        Row() {
+          SymbolGlyph(this.proxyEnabled ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
+            .fontSize(27).fontColor([this.proxyEnabled ? Color.White : '#99000000'])
+          this.FloatBarFunctionContentBuilder()
+        }.functionButtonStyle(this.proxyEnabled && this.widthBp <= 2)
+        .backgroundColor(this.proxyEnabled ? this.icon_emphasize : '#1ab1b1b1')
+        .onClick(() => {
+          // 触发代理启动事件
+          EventHub.sendEvent(EventKey.ChangeProxy)
+        })
+      }
+      else if (this.tabCurrentPage == 1) {
+        Row() {
+          SymbolGlyph(this.proxyEnabled ? (this.uiConfig.needProxyStart ? $r('sys.symbol.pause') : $r('sys.symbol.bolt_filled_on_circle')) : (this.uiConfig.needProxyStart ? $r('sys.symbol.play_fill') : $r('sys.symbol.bolt_filled_on_circle')))
+            .fontSize(27).fontColor([(this.proxyEnabled && this.uiConfig.needProxyStart) ? Color.White : '#99000000'])
+          this.FloatBarFunctionContentBuilder()
+        }.functionButtonStyle(this.proxyEnabled && this.widthBp <= 2)
+        .backgroundColor(this.proxyEnabled ? this.icon_emphasize : '#1ab1b1b1')
+        .onClick(() => {
+          if (this.uiConfig.needProxyStart) {
+            // 触发代理启动事件
+            EventHub.sendEvent(EventKey.ChangeProxy)
+          } else {
+            // 触发测试所有延迟事件
+            EventHub.sendEvent(EventKey.TestAllDelay)
+          }
+        })
+      }
+      else if (this.tabCurrentPage == 2) {
+        Row() {
+          SymbolGlyph($r('sys.symbol.plus'))
+            .fontSize(27).fontColor(['#99000000'])
+        }.functionButtonStyle(true)
+        .backgroundColor('#1ab1b1b1')
+        .onClick(() => {
+          // 触发添加配置事件（打开添加配置半模态）
+          EventHub.sendEvent(EventKey.AddConfig)
+        })
+      }
+      else {
+      }
+
+    }
+    .width('auto')
+    .height('auto')
+    .padding({ left: 10, right: 10})
+    .margin({ bottom: this.bottomRectHeight - 10, top: this.topRectHeight })
+  }
+  @Builder
+  FloatTab() {
+    Stack() {
+      Swiper(swiperController) {
+        ForEach(this.tabList, (item: TabBuild, index: number) => {
+          this.TabContentBuilder(index)
+        })
+      }
+      .cachedCount(0)
+      .indicator(false).loop(false)
+      .width('100%').height('100%')
+      .padding({ top: this.topRectHeight, left: (Xb_TabBarVertical(this.widthBp, this.heightBp)) ? 66 : 0 })
+      .vertical(Xb_TabBarVertical(this.widthBp, this.heightBp))
+      .onAnimationStart((startIndex: number, targetIndex: number, extraInfo: SwiperAnimationEvent) => {
+        this.tabCurrentPage = targetIndex
+        swiperController.changeIndex(targetIndex, true)
+      })
+      // tab栏
+      this.FloatBarBuilder()
+    }
+    .width('100%')
+    .height('100%')
+    .align(this.getFloatAlign())
+    .backgroundColor($r('app.color.background'))
   }
 
   @Builder
@@ -672,7 +834,7 @@ struct Index {
       Xb_StatusBarUtils.initStatusBar(this.context, $rawfile('clash_status.svg'), undefined)
     }
     // 检查后台运行全局变量的状态
-    if(this.uiConfig.backgroundLocateModel || this.uiConfig.backgroundDownModel || this.uiConfig.backgroundPiPModel || this.uiConfig.backgroundKeepTask) {
+    if (this.uiConfig.backgroundLocateModel || this.uiConfig.backgroundDownModel || this.uiConfig.backgroundPiPModel || this.uiConfig.backgroundKeepTask) {
       this.uiConfig.Enablebackgrounder = true
     } else {
       this.uiConfig.Enablebackgrounder = false
@@ -1043,6 +1205,7 @@ struct Index {
     this.uiConfig.useTime = new Date().getTime()
     // 解注册画中画生命周期及状态回调
     PipManager.getInstance().unregisterPipStateChangeListener()
+    EventHub.off(EventKey.ChangeProxy)
     EventHub.off(EventKey.FetchProxyGroup)
     EventHub.off(EventKey.ShareBundle)
     EventHub.off(EventKey.EnabledNotice)
@@ -1347,4 +1510,28 @@ struct Index {
     }, 400)
   }
 
+  /**
+   * 获取悬浮tab状态
+   */
+  getFloatAlign() {
+    const value = this.uiConfig.buttonPositionIndex == 0 ? Xb_FloatTabBarAlignEnd(this.widthBp, this.heightBp) :
+      (this.uiConfig.buttonPositionIndex == 1 ? Xb_FloatTabBarAlignCenter(this.widthBp, this.heightBp) : Xb_FloatTabBarAlignStart(this.widthBp, this.heightBp))
+    return value
+  }
+
+}
+
+@Extend(Row)
+function functionButtonStyle(during: boolean) {
+  .borderRadius(30)
+  .padding(during ? { left: 8, right: 8 } : 0)
+  .width(during ? undefined : 60).height(during ? 56 : 60)
+  .justifyContent(FlexAlign.Center)
+  .alignItems(VerticalAlign.Center)
+  .shadow({
+    radius: 10,
+    offsetY: 4,
+    color: '#1ab1b1b1',
+    type: ShadowType.BLUR
+  })
 }

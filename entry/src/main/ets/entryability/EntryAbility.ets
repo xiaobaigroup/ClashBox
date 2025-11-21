@@ -20,7 +20,7 @@ import { commonEventManager } from '@kit.BasicServicesKit';
 import { Timer } from '../common/utils/HHmmssTimer';
 import { number2Time } from '../common/utils/TimeConvertUtil';
 import { customVibrator } from '../common/utils/VibratorUtil';
-import { Xb_KVdbUtil, Xb_ToastUtil } from 'xb_components';
+import { Xb_Global, Xb_KVdbUtil, Xb_ToastUtil } from 'xb_components';
 import BackupRestoreUtil from '../common/utils/BackupRestoreUtil';
 import ConfigAutoUpdateService from '../common/utils/ConfigAutoUpdateService';
 
@@ -34,6 +34,7 @@ export default class EntryAbility extends UIAbility {
   private onWindowSizeChange: (windowSize: window.Size) => void = (windowSize: window.Size) => {
     let widthBp: WidthBreakpoint = this.uiContext!.getWindowWidthBreakpoint();
     AppStorage.setOrCreate('currentWidthBreakpoint', widthBp);
+    Xb_Global.WidthBp = widthBp
     console.log(`断点测试 widthBp: ${widthBp}`)
   };
   /** @description ClashCore是否初始化过 */
@@ -147,14 +148,21 @@ export default class EntryAbility extends UIAbility {
     // Main window is created, set main page for this ability
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onWindowStageCreate');
 
+    // 判断API版本是否满足要求
+    const APIVersion = deviceInfo.sdkApiVersion
+    console.log(`APIversion 当前系统API版本：${APIVersion}`)
+    if (APIVersion >= 19) {
+      AppStorage.setOrCreate('EnableAPIVersion', true)
+    } else {
+      AppStorage.setOrCreate('EnableAPIVersion', false)
+    }
+
     // 设置自动记忆最后关闭的窗口大小(仅2in1设备生效)
     try {
       await windowStage.setWindowRectAutoSave(true);
       hilog.info(0xFF00, "EntryAbility", 'Succeeded in setting window rect auto-save')
     } catch (exception) {
-      hilog.error(0xFF00, "EntryAbility",
-        'Failed to set window rect auto-save. Cause code: %{public}s smessage: %{public}s', exception.code,
-        exception.message)
+      hilog.error(0xFF00, "EntryAbility", 'Failed to set window rect auto-save. Cause code: %{public}s smessage: %{public}s', exception.code, exception.message)
     }
 
     const storage = new LocalStorage()
@@ -164,7 +172,7 @@ export default class EntryAbility extends UIAbility {
       if (err) return;
       try {
         const mainWindowId = mainWindow.getWindowProperties().id;
-        AppStorage.setOrCreate('MainWindowId', mainWindowId) // ✅ 主窗口ID
+        AppStorage.setOrCreate('MainWindowId', mainWindowId) // 主窗口ID
       } catch (error) {
         console.error(`主窗口ID获取失败, name: ${error.name} message: ${error.message}`)
       }
@@ -193,6 +201,7 @@ export default class EntryAbility extends UIAbility {
         // 设备断点获取
         let widthBp: WidthBreakpoint = this.uiContext.getWindowWidthBreakpoint()
         AppStorage.setOrCreate('currentWidthBreakpoint', widthBp)
+        Xb_Global.WidthBp = widthBp
         data.on('windowSizeChange', this.onWindowSizeChange)
 
         // 卡片初始化过就无须再次初始化
@@ -553,6 +562,7 @@ export default class EntryAbility extends UIAbility {
     let avoidArea = windowClass.getWindowAvoidArea(type);
     let bottomRectHeight = this.uiContext?.px2vp(avoidArea.bottomRect.height); // 获取到导航条区域的高度
     AppStorage.setOrCreate('bottomRectHeight', bottomRectHeight);
+    Xb_Global.BottomRectHeight = bottomRectHeight as number
 
     type = window.AvoidAreaType.TYPE_SYSTEM; // 以状态栏避让为例
     avoidArea = windowClass.getWindowAvoidArea(type);
@@ -560,6 +570,7 @@ export default class EntryAbility extends UIAbility {
     AppStorage.setOrCreate('topRectHeight', topRectHeight);
     hilog.info(0x0000, 'EntryAbility', '初始避让高度 Top：%{public}d Bottom: %{public}i', topRectHeight,
       bottomRectHeight);
+    Xb_Global.TopRectHeight = topRectHeight as number
     // 注册监听函数，动态获取避让区域数据
     windowClass.on('avoidAreaChange', (data) => {
       let topRectActiveHeight = 0
@@ -609,15 +620,19 @@ export default class EntryAbility extends UIAbility {
       // 设置默认标题栏功能按钮是否显示
       windowClass.setWindowTitleButtonVisible(false, false, false)
       // 全屏时鼠标移动至顶部不显示标题栏和dock栏，平板自由多窗则是无法唤起状态栏
-      windowClass.setTitleAndDockHoverShown(false, false)
+      windowClass.setTitleAndDockHoverShown(false, false).catch((err: Error) => {
+        console.error(`EntryAbility setTitleAndDockHoverShown 失败, message: ${err.message}`)
+      })
       // 设置标题栏高度
       // windowClass.setWindowDecorHeight(50)
       hilog.info(0xFF00, "EntryAbility", 'WindowMode 当前为PC窗口模式')
       AppStorage.setOrCreate('WindowMode', true)
+      Xb_Global.windowMode = true
     } catch (exception) {
       hilog.error(0xFF00, "EntryAbility",
         'WindowMode 当前为普通模式 Cause code: %{public}s smessage: %{public}s', exception.code, exception.message)
       AppStorage.setOrCreate('WindowMode', false)
+      Xb_Global.windowMode = false
     }
   }
 
@@ -626,17 +641,16 @@ export default class EntryAbility extends UIAbility {
     const WindowAspectRatio = WindowHeight / WindowWidth // 重写高度断点
     if (WindowAspectRatio < 0.79) {
       heightBp = 0
-      AppStorage.setOrCreate('currentHeightBreakpoint', heightBp)
       console.log(`断点测试 heightBp: ${heightBp} 高宽比：${WindowAspectRatio}`)
     } else if (WindowAspectRatio >= 0.79 && WindowAspectRatio < 1.2) {
       heightBp = 1
-      AppStorage.setOrCreate('currentHeightBreakpoint', heightBp)
       console.log(`断点测试 heightBp: ${heightBp} 高宽比：${WindowAspectRatio}`)
     } else if (WindowAspectRatio >= 1.2) {
       heightBp = 2
-      AppStorage.setOrCreate('currentHeightBreakpoint', heightBp)
       console.log(`断点测试 heightBp: ${heightBp} 高宽比：${WindowAspectRatio}`)
     }
+    AppStorage.setOrCreate('currentHeightBreakpoint', heightBp)
+    Xb_Global.HeightBp = heightBp
   }
 }
 

@@ -683,6 +683,12 @@ export const AppearanceList: AppearanceListItemProp[] = [
       { title: $r('app.string.close') }
     ]
   },
+  { title: $r('app.string.tab_style'),
+    children: [
+      { title: $r('app.string.float') },
+      { title: $r('app.string.custom') },
+    ]
+  },
   { title: $r('app.string.string_display_preferences'),
     children: [
       { title: $r('app.string.Appearance') },

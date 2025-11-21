@@ -22,6 +22,8 @@ export enum EventKey{
   StopedClashEntry = 10018,
   LoginWebDav = 10019,
   LoadConfigStr = 10020,
+  AddConfig = 10021,
+  TestAllDelay = 10022
 }
 
 export class EventHub{

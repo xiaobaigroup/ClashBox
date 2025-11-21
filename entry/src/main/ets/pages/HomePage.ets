@@ -1,12 +1,11 @@
 // 主页 栅格布局、二维断点
-import { curves, PromptAction } from '@kit.ArkUI'
+import { curves } from '@kit.ArkUI'
 import SwitchMode from '../components/Home/SwitchMode'
 import CellularData from '../components/Home/CellularData'
 import PublicNetwork from '../components/Home/PublicNetwork'
 import Speed from '../components/Home/Speed'
 import { getGreeting } from '../common/utils/GreetingUtil'
 import { hilog } from '@kit.PerformanceAnalysisKit'
-import { Timer } from '../common/utils/HHmmssTimer'
 import {
   BIND_SHEET_CONTAINER_HEIGHT,
   TAB_CONTENT_TITLE_HEIGHT,
@@ -27,7 +26,7 @@ import { AppConfig, UIConfig } from '../entryability/AppState'
 import { ConfigData, HomeCardInfo } from '../common/entity/PageArgumentEntity'
 import { customVibrator } from '../common/utils/VibratorUtil'
 import { customAnimationUtil } from '../common/utils/Animation'
-import { Profile, ProxyGroup, ProxyMode } from 'proxy_core'
+import { Profile, ProxyMode } from 'proxy_core'
 import { ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/datasources/ProxyData'
 import { EventHub, EventKey } from '../common/EventHub'
 import { PopTips, PopupBuilder } from '../components/Start/Popup'
@@ -41,9 +40,7 @@ import {
   HomeTopHeight,
   WindowHomeGridRowPadding } from '../common/breakpoint/BreakPoint'
 import { RoundButton } from '../components/Common/RoundButton'
-import { AccessControl, VpnRawOptions } from 'proxy_core/src/main/ets/rpc/IClashManager'
 import { Xb_GetResourceString, Xb_ToastUtil } from 'xb_components'
-import { common } from '@kit.AbilityKit'
 import { animationStyle } from 'xb_components/src/main/ets/components/Animation'
 
 
@@ -249,7 +246,7 @@ struct Home {
         })
 
         // 代理启动按钮层
-        if (!this.isShowHomeEdit) {
+        if ((!this.isShowHomeEdit && this.uiConfig.tabStyle == 'custom') || (this.widthBp > 2 && this.proxyEnabled)) {
           RoundButton({
             Icon1: $r('sys.symbol.pause'),
             Icon2: $r('sys.symbol.play_fill'),
@@ -367,7 +364,6 @@ struct Home {
     // 将dialogController置空
     this.SaveDialogController = null
     EventHub.off(EventKey.SwitchModeCard)
-    EventHub.off(EventKey.ChangeProxy)
   }
 
   /** @description 切换代理状态 */

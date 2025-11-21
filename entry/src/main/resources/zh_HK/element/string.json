@@ -2263,6 +2263,18 @@
     {
       "name": "check_configured_URL",
       "value": "請檢查配置的URL"
+    },
+    {
+      "name": "tab_style",
+      "value": "導航欄樣式"
+    },
+    {
+      "name": "custom",
+      "value": "普通"
+    },
+    {
+      "name": "float",
+      "value": "懸浮"
     }
   ]
 }

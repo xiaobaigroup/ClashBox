@@ -27,6 +27,8 @@ import { TopBar } from '../components/Common/TopBar'
 import { getResourceString } from '../common/utils/ResourceStringUtil'
 import { RoundButton } from '../components/Common/RoundButton'
 import { cardManager } from '../common/utils/CardManageUtil'
+import { Xb_TabBarVertical, Xb_ToastUtil } from 'xb_components'
+
 
 // 定义日志组件名
 const componentName: string = 'ProxyPage'
@@ -58,6 +60,8 @@ struct ProxyPage {
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+  // 导航条区域的高度
+  @StorageProp('bottomRectHeight') bottomRectHeight: number = 0
   // 代理启动持续的时间
   @StorageProp('proxyStartingDuration') proxyStartingDuration: string = ''
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
@@ -309,12 +313,18 @@ struct ProxyPage {
             Row({ space: 7 }) {
               if (this.uiConfig.buttonPositionIndex === 0 && this.uiConfig.needProxyStart) {
                 this.delayButton()
-                this.startButton()
+                if (this.uiConfig.tabStyle == 'custom' || (this.widthBp > 2 && this.proxyEnabled)) {
+                  this.startButton()
+                }
               } else if (this.uiConfig.buttonPositionIndex === 2 && this.uiConfig.needProxyStart) {
-                this.startButton()
+                if (this.uiConfig.tabStyle == 'custom' || (this.widthBp > 2 && this.proxyEnabled)) {
+                  this.startButton()
+                }
                 this.delayButton()
               } else {
-                this.delayButton()
+                if (this.uiConfig.tabStyle == 'custom') {
+                  this.delayButton()
+                }
               }
             }.height(50)
             .alignItems(VerticalAlign.Center)
@@ -371,6 +381,7 @@ struct ProxyPage {
           .offset({y: 3})
       }
     }
+    .margin({ bottom: Xb_TabBarVertical(this.widthBp, this.heightBp) || this.uiConfig.tabStyle == 'custom' ? 0 : this.bottomRectHeight + 145 })
     .bindPopup(!!this.isShowDelayPop, {
       builder: PopupBuilder(this, PopTips[3], () => {
         this.isShowDelayPop = false
@@ -379,30 +390,7 @@ struct ProxyPage {
       autoCancel: false
     })
     .onClick(async () => {
-      this.ProxyPromptAction.showToast({ message: $r('app.string.Test_Delay_Tip') })
-      let results: number[] = []
-      try {
-        results = await ClashViewModel.testAllDelay(this.proxyGroups.getData(this.currentProxyIndex).proxies as ProxyItem[])
-        console.log(`ProxySort results: ${JSON.stringify(results)}`)
-        // 测速完成后如果配置为延迟排序则触发一次排序事件
-        if (this.appConfig.proxySort === ProxySort.Delay && results) {
-          this.needChangeSort = true
-        }
-        // 卡片延迟
-        const delay = ClashViewModel.delayMap.get(this.appConfig.currentProxyItem?.name ?? '')?.delay ?? 0
-        cardManager.pushCartDelay(delay)
-      } catch (err) {
-        if (this.appConfig.proxySort === ProxySort.Delay && results) {
-          this.needChangeSort = true
-        }
-        console.error(`ProxySort message: ${err.message}, code: ${err.code}`)
-      }
-      if (!results) {
-        this.getUIContext().getPromptAction().showToast({ message: `延迟测试失败，请检查测试用链接`, duration: 3000})
-      }
-      if (this.uiConfig.isVibrate) {
-        customVibrator.vibratorTriggerOfHapticClockTimer()
-      }
+      EventHub.sendEvent(EventKey.TestAllDelay)
     })
   }
   // 开始按钮
@@ -509,10 +497,37 @@ struct ProxyPage {
         }
       }, 200)
     }*/
+    EventHub.on(EventKey.TestAllDelay, async () => {
+      Xb_ToastUtil.showToast({ message: $r('app.string.Test_Delay_Tip') })
+      let results: number[] = []
+      try {
+        results = await ClashViewModel.testAllDelay(this.proxyGroups.getData(this.currentProxyIndex).proxies as ProxyItem[])
+        console.log(`ProxySort results: ${JSON.stringify(results)}`)
+        // 测速完成后如果配置为延迟排序则触发一次排序事件
+        if (this.appConfig.proxySort === ProxySort.Delay && results) {
+          this.needChangeSort = true
+        }
+        // 卡片延迟
+        const delay = ClashViewModel.delayMap.get(this.appConfig.currentProxyItem?.name ?? '')?.delay ?? 0
+        cardManager.pushCartDelay(delay)
+      } catch (err) {
+        if (this.appConfig.proxySort === ProxySort.Delay && results) {
+          this.needChangeSort = true
+        }
+        console.error(`ProxySort message: ${err.message}, code: ${err.code}`)
+      }
+      if (!results) {
+        Xb_ToastUtil.showToast({ message: `延迟测试失败，请检查测试用链接`, duration: 3000})
+      }
+      if (this.uiConfig.isVibrate) {
+        customVibrator.vibratorTriggerOfHapticClockTimer()
+      }
+    })
   }
 
   aboutToDisappear() {
     EventHub.off(EventKey.FetchProxyGroup)
+    EventHub.off(EventKey.TestAllDelay)
     EventHub.off(EventKey.TestDelay)
     this.uiConfig.ShowDelayPop = this.isShowDelayPop
   }

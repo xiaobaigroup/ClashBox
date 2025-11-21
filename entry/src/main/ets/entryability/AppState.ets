@@ -6,6 +6,7 @@ import ClashViewModel from "./ClashViewModel";
 import { bundleManager } from "@kit.AbilityKit";
 import { EventHub, EventKey } from "../common/EventHub";
 import { CustomThemeName } from "xb_components/src/main/ets/utils/AppThemeManager";
+import { TabStyle } from "xb_components";
 
 export enum ProxyGroupType{
   Tabs,
@@ -95,6 +96,8 @@ export class UIConfig {
   isShowHomeCard: string = JSON.stringify(showHomeCard)
   // 用户选择的语言
   userLanguage: string = "default"
+  // 导航栏样式
+  tabStyle: TabStyle = 'float'
   // 系统语言
   systemLanguage: string = ''
   // 震动反馈变量

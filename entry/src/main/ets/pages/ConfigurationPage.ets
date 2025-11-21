@@ -34,7 +34,7 @@ import { harmonyShare, systemShare } from '@kit.ShareKit'
 import { uniformTypeDescriptor as utd } from '@kit.ArkData'
 import { common, Context } from '@kit.AbilityKit'
 import { BusinessError } from '@kit.BasicServicesKit';
-import { fileUri, fileIo as fs, fileIo, picker } from '@kit.CoreFileKit'
+import { fileUri, fileIo as fs, picker } from '@kit.CoreFileKit'
 import { ShareData, Xb_GetResourceString, Xb_Share, Xb_ToastUtil } from 'xb_components'
 
 
@@ -76,7 +76,7 @@ struct ConfigurationPage {
   // 窗口模式
   @StorageProp('WindowMode') windowMode: boolean = false
   // 是否为新建配置
-  private isNewConfig: boolean = false
+  @StorageLink('ConfigNew') isNewConfig: boolean = false
   @State isRefreshing: boolean = false
   @State isShowMenu: boolean = false
   // 是否来自文件导入
@@ -288,59 +288,13 @@ struct ConfigurationPage {
         }
 
         // 悬浮新增配置按钮 START
-        if (!this.isPXSecScreen) {
+        if (!this.isPXSecScreen && this.uiConfig.tabStyle == 'custom') {
           RoundButton({
             Icon2: $r('sys.symbol.plus')
           })
-            .bindSheet($$this.isShowConfigAddBindSheet, this.ConfigAddBindSheetBuilder(), {
-              detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,], // SheetSize.LARGE
-              backgroundColor: $r('app.color.background'),
-              showClose: true,
-              dragBar: false,
-              preferType: SheetType.CENTER,
-              scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-              // width: ('100%'),
-              /**
-               * 半模态页面显示（动画开始前）回调函数
-               *    目前`通过URL(链接)导入`和`长按配置编辑`是用的同一个页面，
-               *    这里主要是用来处理拉起`bindSheet`之后可以等`bindSheet`渲染完毕之后正确传入路由信息
-               */
-              onWillAppear: () => {
-                hilog.info(0xC020, componentName, `#button#bindSheet#onWillAppear() executed`)
-                this.isEnableIndexForegroundBlur = true
-                this.onForwardChange()
-              },
-              // 半模态页面交互式关闭回调函数
-              onWillDismiss: async (dismissSheet: DismissSheetAction) => {
-                // 在二级路由页面内只能通过点击关闭按钮才能关掉bindSheet
-                if (this.configAddPageInfos.size() <= 0 || (dismissSheet.reason === DismissReason.CLOSE_BUTTON)) {
-                  dismissSheet.dismiss()
-                  this.isShowConfigAddBindSheet = false
-                  this.isEnableIndexForegroundBlur = false
-                  this.configAddPageInfos.clear(true)
-                  hilog.info(0xC020, componentName,
-                    `#button#bindSheet#onWillDismiss()#关闭配置添加按钮的bindSheet：DismissSheetAction.dismiss()`)
-                }
-              },
-              onWillDisappear: async () => {},
-              onDisappear: () => {
-                this.isNewConfig = false
-                this.onForwardChange()
-                this.configStr = ''  // 置空配置文本
-              },
-              onWillSpringBackWhenDismiss: (springBack: SpringBackAction) => {
-                springBack.springBack()
-              }
-            })
             .onClick(() => {
               // 新配置
-              this.isNewConfig = true
-              this.currentTouchConfigData = NewConfigData
-              this.isShowConfigAddBindSheet = true
-              this.isEnableIndexForegroundBlur = true
-              if (this.uiConfig.isVibrate) {
-                customVibrator.vibratorTriggerOfHapticClockTimer()
-              }
+              EventHub.sendEvent(EventKey.AddConfig)
             })
         }
         // 悬浮新增配置按钮 END
@@ -354,6 +308,46 @@ struct ConfigurationPage {
     .height('100%')
     .alignContent(Alignment.Top)
     .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear, delay: 0 })
+    .bindSheet($$this.isShowConfigAddBindSheet, this.ConfigAddBindSheetBuilder(), {
+      detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,], // SheetSize.LARGE
+      backgroundColor: $r('app.color.background'),
+      showClose: true,
+      dragBar: false,
+      preferType: SheetType.CENTER,
+      scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+      // width: ('100%'),
+      /**
+       * 半模态页面显示（动画开始前）回调函数
+       *    目前`通过URL(链接)导入`和`长按配置编辑`是用的同一个页面，
+       *    这里主要是用来处理拉起`bindSheet`之后可以等`bindSheet`渲染完毕之后正确传入路由信息
+       */
+      onWillAppear: () => {
+        hilog.info(0xC020, componentName, `#button#bindSheet#onWillAppear() executed`)
+        this.isEnableIndexForegroundBlur = true
+        this.onForwardChange()
+      },
+      // 半模态页面交互式关闭回调函数
+      onWillDismiss: async (dismissSheet: DismissSheetAction) => {
+        // 在二级路由页面内只能通过点击关闭按钮才能关掉bindSheet
+        if (this.configAddPageInfos.size() <= 0 || (dismissSheet.reason === DismissReason.CLOSE_BUTTON)) {
+          dismissSheet.dismiss()
+          this.isShowConfigAddBindSheet = false
+          this.isEnableIndexForegroundBlur = false
+          this.configAddPageInfos.clear(true)
+          hilog.info(0xC020, componentName,
+            `#button#bindSheet#onWillDismiss()#关闭配置添加按钮的bindSheet：DismissSheetAction.dismiss()`)
+        }
+      },
+      onWillDisappear: async () => {},
+      onDisappear: () => {
+        this.isNewConfig = false
+        this.onForwardChange()
+        this.configStr = ''  // 置空配置文本
+      },
+      onWillSpringBackWhenDismiss: (springBack: SpringBackAction) => {
+        springBack.springBack()
+      }
+    })
   }
 
   // ContextMenu 列表项 动态替换用
@@ -542,6 +536,16 @@ struct ConfigurationPage {
     this.currentRadioConfigData = this.configList.find((data: ConfigData) => data.configId === this.appConfig.currentProfileId) as ConfigData
     // 初始化分享工具
     Xb_Share.inputInfo(this.getUIContext())
+    // 注册打开添加配置弹窗事件
+    EventHub.on(EventKey.AddConfig, async () => {
+      this.isNewConfig = true
+      this.currentTouchConfigData = NewConfigData
+      this.isShowConfigAddBindSheet = true
+      this.isEnableIndexForegroundBlur = true
+      if (this.uiConfig.isVibrate) {
+        customVibrator.vibratorTriggerOfHapticClockTimer()
+      }
+    })
   }
 
   async onDidBuild(): Promise<void> {
@@ -611,6 +615,7 @@ struct ConfigurationPage {
   aboutToDisappear(): void {
     hilog.info(0xC000, componentName, `#aboutToDisappear executed`)
     EventHub.off(EventKey.FetchProfile)
+    EventHub.off(EventKey.AddConfig)
     this.configCustomDialogController = null
     this.isEnableIndexForegroundBlur = false
     hilog.info(0xC000, componentName, `#aboutToDisappear#置空[配置页\`bindSheet\`内提示是否删除配置信息的自定义弹框]`)

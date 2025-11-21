@@ -2263,6 +2263,18 @@
     {
       "name": "check_configured_URL",
       "value": "Please check the configured URL"
+    },
+    {
+      "name": "float",
+      "value": "Float"
+    },
+    {
+      "name": "custom",
+      "value": "Custom"
+    },
+    {
+      "name": "tab_style",
+      "value": "Tab bar style"
     }
   ]
 }
