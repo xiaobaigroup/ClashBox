@@ -934,30 +934,48 @@ class HarmonyCodeEditor {
      * 通信方法
      */
     sendEvent(event, data) {
-        if (!this.communicationPort) return;
-
-        const message = {
-            type: 'event',
-            event,
-            data,
-            timestamp: Date.now()
-        };
-
-        this.communicationPort.postMessage(JSON.stringify(message));
+        if (!this.communicationPort) {
+            console.warn('Attempting to send event, but communication port is not available.');
+            return;
+        }
+        try {
+            const message = {
+                type: 'event',
+                event,
+                data,
+                timestamp: Date.now()
+            };
+            this.communicationPort.postMessage(JSON.stringify(message));
+        } catch (error) {
+            // 捕获异常
+            console.error('sendEvent: Failed to send event via communication port:', error);
+            // 设置端口为 null，防止后续尝试
+            this.communicationPort = null;
+        }
     }
 
+    /**
+     * 发送响应
+     */
     sendResponse(id, data, error = null) {
-        if (!this.communicationPort) return;
-
-        const message = {
-            type: 'response',
-            id,
-            data,
-            error,
-            timestamp: Date.now()
-        };
-
-        this.communicationPort.postMessage(JSON.stringify(message));
+        if (!this.communicationPort) {
+            console.warn('Attempting to send response, but communication port is not available.');
+            return;
+        }
+        try {
+            const message = {
+                type: 'response',
+                id,
+                data,
+                error,
+                timestamp: Date.now()
+            };
+            this.communicationPort.postMessage(JSON.stringify(message));
+        } catch (error) {
+            console.error('sendResponse: Failed to send response via communication port:', error);
+            // 设置端口为 null，防止后续尝试
+            this.communicationPort = null;
+        }
     }
 
     /**
