@@ -24,7 +24,7 @@ import { PROXY_STARTED_DURATION_INIT_VALUE } from "../common/entity/Constants";
 import { Timer } from "../common/utils/HHmmssTimer";
 import { number2Time } from "../common/utils/TimeConvertUtil";
 import { picker } from "@kit.CoreFileKit"
-import { Xb_GetResourceString } from "xb_components";
+import { Xb_GetResourceString, Xb_ToastUtil } from "xb_components";
 
 export interface DelayInfo{
     name: string
@@ -164,10 +164,19 @@ export class ClashViewModel {
     const ua = AppStorage.get<ClashConfig>("clashConfig")?.["global-ua"]
     if(id){
       const profile = await this.getProfile(id)
-      if(profile && profile.type == ProfileType.Url){
-        profile.loadContext(this.context, ua)
-        await profile.update((c)=> this.VailConfig(c))
-        await this.profileRepo.addOrUpdate(profile)
+      if (profile && profile.type == ProfileType.Url) {
+        try {
+          profile.loadContext(this.context, ua)
+          await profile.update((c) => this.VailConfig(c))
+          await this.profileRepo.addOrUpdate(profile)
+          if (this.context) {
+            ClashViewModel.promptAction.showToast({ message: `${profile.name} ${Xb_GetResourceString($r('app.string.update_success'), this.context)}`})
+          }
+        } catch (e) {
+          if (this.context) {
+            ClashViewModel.promptAction.showToast({ message: `${profile.name} ${Xb_GetResourceString($r('app.string.update_failed'), this.context)} ${Xb_GetResourceString($r('app.string.check_configured_URL'), this.context)}`})
+          }
+        }
       }
     } else {
       const list = (await this.getProfiles()).filter(d => d.type == ProfileType.Url)

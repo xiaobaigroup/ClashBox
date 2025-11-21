@@ -2259,6 +2259,10 @@
     {
       "name": "appPackageName_isEmpty",
       "value": "应用包名不能为空"
+    },
+    {
+      "name": "check_configured_URL",
+      "value": "请检查配置的URL"
     }
   ]
 }

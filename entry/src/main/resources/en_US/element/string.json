@@ -2259,6 +2259,10 @@
     {
       "name": "appPackageName_isEmpty",
       "value": "Application package name cannot be empty"
+    },
+    {
+      "name": "check_configured_URL",
+      "value": "Please check the configured URL"
     }
   ]
 }
