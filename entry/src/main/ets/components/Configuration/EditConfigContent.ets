@@ -116,9 +116,12 @@ struct EditConfigContent {
 
   aboutToDisappear(): void {
     // 清理通信管理器
-    if (this.commManager) {
-      this.commManager.destroy();
-    }
+    // 延迟销毁，等待WebView工作线程处理完最后消息
+    setTimeout(() => {
+      if (this.commManager) {
+        this.commManager.destroy();
+      }
+    }, 100)
   }
 
   build() {

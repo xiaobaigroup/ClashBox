@@ -139,6 +139,7 @@ export class EditorCommunicationManager {
   private pendingRequests: Map<string, CommandRequestCallback> = new Map();
   private eventCallbacks: Map<string, EventCallback[]> = new Map();
   private lastSentConfigKey: string = '';
+  private isDestroyed: boolean = false; // 是否销毁标志
   private isPortValid: boolean = false; // 端口有效性标记
   private retryCount: number = 0; // 重试计数
 
@@ -263,6 +264,11 @@ export class EditorCommunicationManager {
    */
   sendCommand(command: string, data?: Record<string, unknown>): Promise<string | EditorSelection> {
     return new Promise((resolve, reject) => {
+      // 销毁检查
+      if (this.isDestroyed) {
+        reject('sendCommand: Communication manager is destroyed');
+        return;
+      }
       // 检查端口有效性
       if (!this.messagePort || !this.isPortValid) {
         // 尝试重新初始化
@@ -335,6 +341,11 @@ export class EditorCommunicationManager {
    * 发送事件到Web端
    */
   sendEvent(event: string, data?: EditorSelection | boolean | string | EditorConfig): void {
+    // 销毁检查
+    if (this.isDestroyed) {
+      hilog.warn(0x0000, TAG, 'Cannot send event: communication manager is destroyed');
+      return;
+    }
     // 检查端口有效性
     if (!this.messagePort || !this.isPortValid) {
       hilog.warn(0x0000, TAG, 'Cannot send event: communication port not ready');
@@ -411,25 +422,33 @@ export class EditorCommunicationManager {
    * 清理资源
    */
   destroy(): void {
+    hilog.info(0x0000, TAG, 'Starting communication manager destroy process');
+    // 设置销毁标志，阻止新操作
+    this.isDestroyed = true;
     // 拒绝所有待处理的请求
-    this.pendingRequests.forEach((callback) => {
+    this.pendingRequests.forEach((callback, id) => {
+      hilog.debug(0x0000, TAG, `Rejecting pending request: ${id}`);
       callback.reject('Communication manager destroyed');
     });
     this.pendingRequests.clear();
+    // 清理事件回调
     this.eventCallbacks.clear();
-
-    // 清理端口
+    this.lastSentConfigKey = '';
+    this.retryCount = 0;
+    // 安全关闭端口
     if (this.messagePort) {
       try {
+        // 先标记端口无效
+        this.isPortValid = false;
+        hilog.info(0x0000, TAG, 'Closing message port...');
         this.messagePort.close();
+        hilog.info(0x0000, TAG, 'Message port closed successfully');
       } catch (error) {
         hilog.warn(0x0000, TAG, `Failed to close port during destroy: ${error}`);
       }
     }
-
+    // 清理引用
     this.messagePort = null;
-    this.isPortValid = false;
-    this.lastSentConfigKey = '';
-    this.retryCount = 0;
+    hilog.info(0x0000, TAG, 'Communication manager destroy completed');
   }
 }
