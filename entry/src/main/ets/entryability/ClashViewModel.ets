@@ -170,12 +170,16 @@ export class ClashViewModel {
           await profile.update((c) => this.VailConfig(c))
           await this.profileRepo.addOrUpdate(profile)
           if (this.context) {
-            ClashViewModel.promptAction.showToast({ message: `${profile.name} ${Xb_GetResourceString($r('app.string.update_success'), this.context)}`})
+            ClashViewModel.promptAction.showToast({ message: `${Xb_GetResourceString($r('app.string.Configuration'), this.context)} ${profile.name} ${Xb_GetResourceString($r('app.string.update_success'), this.context)}`})
           }
         } catch (e) {
+          let message = ""
           if (this.context) {
-            ClashViewModel.promptAction.showToast({ message: `${profile.name} ${Xb_GetResourceString($r('app.string.update_failed'), this.context)} ${Xb_GetResourceString($r('app.string.check_configured_URL'), this.context)}`})
+            message = `${Xb_GetResourceString($r('app.string.Configuration'), this.context)} ${profile.name} ${Xb_GetResourceString($r('app.string.update_failed'), this.context)} ${Xb_GetResourceString($r('app.string.check_configured_URL'), this.context)}`
+            ClashViewModel.promptAction.showToast({ message })
           }
+
+          return Promise.reject(message)
         }
       }
     } else {

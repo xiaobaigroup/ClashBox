@@ -1,10 +1,12 @@
-import { Context, WantAgent, wantAgent } from "@kit.AbilityKit";
+import { common, Context, WantAgent, wantAgent } from "@kit.AbilityKit";
 import { backgroundTaskManager } from "@kit.BackgroundTasksKit";
 import { BusinessError } from "@kit.BasicServicesKit";
 import { hilog } from "@kit.PerformanceAnalysisKit";
 import ClashViewModel from "../../entryability/ClashViewModel";
 import { Profile, ProfileType } from "proxy_core";
 import { convertMillisecondsToTimeGap } from "../entity/Constants";
+import { Xb_GetResourceString, Xb_NotificationUtils } from "xb_components";
+import { notificationManager } from "@kit.NotificationKit";
 
 /**
  * 配置自动更新服务
@@ -211,6 +213,20 @@ export class ConfigAutoUpdateService {
             // 执行更新
             await ClashViewModel.updateProfileConfig(profile.id);
 
+            // 推送通知消息 - 成功
+            if (this.context) {
+              await Xb_NotificationUtils.publishTextNotification(
+                (this.context as common.UIAbilityContext),
+                Number(profile.id),
+                {
+                  title: "ClashBox",
+                  text: `${Xb_GetResourceString($r('app.string.Configuration'), this.context)} ${profile.name} ${Xb_GetResourceString($r('app.string.update_success'), this.context)}`
+                },
+                notificationManager.SlotType.SERVICE_INFORMATION,
+                { abilityName: 'EntryAbility' }
+              )
+            }
+
             hilog.info(0xFF00, "ConfigAutoUpdateService",
               `配置 [${profile.name}] 更新完成`);
           } else {
@@ -219,9 +235,21 @@ export class ConfigAutoUpdateService {
               `配置 [${profile.name}] 无需更新，还需等待 ${remainingTime} 分钟`);
           }
         } catch (error) {
-          const err = error as BusinessError;
-          hilog.error(0xFF00, "ConfigAutoUpdateService",
-            `配置 [${profile.name}] 更新失败: ${err.message}`);
+          hilog.error(0xFF00, "ConfigAutoUpdateService", error);
+
+          // 推送通知消息 - 失败
+          if (this.context) {
+            await Xb_NotificationUtils.publishTextNotification(
+              (this.context as common.UIAbilityContext),
+              Number(profile.id),
+              {
+                title: "ClashBox",
+                text: error
+              },
+              notificationManager.SlotType.SERVICE_INFORMATION,
+              { abilityName: 'EntryAbility' }
+            )
+          }
         }
       }
 
