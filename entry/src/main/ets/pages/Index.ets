@@ -543,14 +543,14 @@ struct Index {
       .height(this.widthBp < 2 ? 60 : 'auto')
       // .layoutWeight(1)
       .borderRadius(30)
-      .borderColor($r("app.color.border"))
-      .borderWidth(0.5)
+     // .borderColor($r("app.color.border"))
+      //.borderWidth(0.5)
       .backgroundColor($r('app.color.background'))
       .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
       .shadow({
         radius: 15,
         offsetY: 4,
-        color: $r('app.color.shadow'),
+        color: $r('app.color.shadow_button'),
         type: ShadowType.COLOR,
       })
       // 控制按钮区
@@ -559,7 +559,7 @@ struct Index {
           SymbolGlyph(this.proxyEnabled ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
             .fontSize(27).fontColor([this.proxyEnabled ? Color.White : icon_tertiary])
           this.FloatBarFunctionContentBuilder()
-        }.functionButtonStyle(this.proxyEnabled && this.widthBp <= 2)
+        }.functionButtonStyle(this.proxyEnabled && this.widthBp <= 2, this.icon_emphasize)
         .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
         .backgroundColor(this.proxyEnabled ? this.icon_emphasize : $r('app.color.background'))
         .onClick(() => {
@@ -572,7 +572,7 @@ struct Index {
           SymbolGlyph(this.proxyEnabled ? (this.uiConfig.needProxyStart ? $r('sys.symbol.pause') : $r('sys.symbol.bolt_filled_on_circle')) : (this.uiConfig.needProxyStart ? $r('sys.symbol.play_fill') : $r('sys.symbol.bolt_filled_on_circle')))
             .fontSize(27).fontColor([(this.proxyEnabled && this.uiConfig.needProxyStart) ? Color.White : icon_tertiary])
           this.FloatBarFunctionContentBuilder()
-        }.functionButtonStyle(this.proxyEnabled && this.widthBp <= 2)
+        }.functionButtonStyle(this.proxyEnabled && this.widthBp <= 2, this.icon_emphasize)
         .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
         .backgroundColor(this.proxyEnabled ? this.icon_emphasize : $r('app.color.background'))
         .onClick(() => {
@@ -590,6 +590,7 @@ struct Index {
           SymbolGlyph($r('sys.symbol.plus'))
             .fontSize(27).fontColor([icon_tertiary])
         }.functionButtonStyle(false)
+        .backgroundColor($r('app.color.background'))
         .onClick(() => {
           // 触发添加配置事件（打开添加配置半模态）
           EventHub.sendEvent(EventKey.AddConfig)
@@ -1524,19 +1525,18 @@ struct Index {
 }
 
 @Extend(Row)
-function functionButtonStyle(during: boolean) {
+function functionButtonStyle(during: boolean, c: ResourceColor = $r('app.color.shadow_button')) {
   .borderRadius(30)
   .padding(during ? { left: 8, right: 8 } : 0)
   .size({width: during ? 130 : 60, height: 60})
   .justifyContent(FlexAlign.Center)
   .alignItems(VerticalAlign.Center)
-  .backgroundColor($r('app.color.background'))
   .shadow({
     radius: 15,
     offsetY: 4,
-    color: $r('app.color.shadow'),
+    color: during ? c : $r('app.color.shadow_button'),
     type: ShadowType.COLOR
   })
-  .borderColor($r("app.color.border"))
-  .borderWidth(0.5)
+ // .borderColor($r("app.color.border"))
+ // .borderWidth(0.5)
 }
