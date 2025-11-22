@@ -75,13 +75,9 @@ import {
   Xb_Global, Xb_NotificationUtils,
   Xb_ResourceColorUtil,
   Xb_StatusBarUtils,
-  Xb_TabBarFunctionButton,
   Xb_TabBarVertical,
-  Xb_TabComponent,
-  Xb_TabComponentConfig,
   Xb_TabIconFontSize,
-  Xb_TabTitleFontSize,
-  Xb_UIConfig } from 'xb_components'
+  Xb_TabTitleFontSize } from 'xb_components'
 import { Xb_GoToWeb } from 'xb_components/src/main/ets/utils/JumpTo'
 import BackgroundDownService from '../common/utils/BackgroundDownService'
 import { notificationManager } from '@kit.NotificationKit'
@@ -91,8 +87,6 @@ import LiveViewUtil from '../common/utils/LiveViewUtil'
 import { UpdateLog } from '../components/Start/UpdateLog'
 import { animationStyle } from 'xb_components/src/main/ets/components/Animation';
 import { getJsonArrayType } from '../common/entity/utils';
-import { customVibrator } from '../common/utils/VibratorUtil';
-import { RoundButton } from '../components/Common/RoundButton';
 
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
