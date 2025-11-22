@@ -1,5 +1,5 @@
 // Index
-import { LengthMetrics, mediaquery, UIUtils } from '@kit.ArkUI'
+import { curves, LengthMetrics, mediaquery, UIUtils } from '@kit.ArkUI'
 import Home from './HomePage'
 import ProxyPage from './ProxyPage'
 import { util } from "@kit.ArkTS";
@@ -87,6 +87,7 @@ import LiveViewUtil from '../common/utils/LiveViewUtil'
 import { UpdateLog } from '../components/Start/UpdateLog'
 import { animationStyle } from 'xb_components/src/main/ets/components/Animation';
 import { getJsonArrayType } from '../common/entity/utils';
+import { hdsEffect } from '@kit.UIDesignKit';
 
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
@@ -315,6 +316,7 @@ struct Index {
   @Provide proxyTime: number = 0
 
 
+
   build() {
     if (!this.isPXSecScreen) {
       Navigation(this.pageInfos) {
@@ -502,7 +504,7 @@ struct Index {
     Flex({
       direction: ((this.getFloatAlign() == 0 && Xb_TabBarVertical(this.widthBp, this.heightBp)) || (this.getFloatAlign() == 6 && !Xb_TabBarVertical(this.widthBp, this.heightBp))) ? Xb_FloatTabBarDirectionReverse(this.widthBp, this.heightBp) : Xb_FloatTabBarDirection(this.widthBp, this.heightBp),
       justifyContent: FlexAlign.Center,
-      alignItems: ItemAlign.Center,
+      alignItems: this.widthBp < 2 ? ItemAlign.Center : ItemAlign.Start,
       space: { main: LengthMetrics.vp(10) }
     }) {
       // tab区
@@ -529,31 +531,37 @@ struct Index {
           .justifyContent(FlexAlign.Center)
           .alignItems(HorizontalAlign.Center)
           .onClick(() => {
-            this.tabCurrentPage = index
+            animationStyle.animToAPI18(()=>{
+              this.tabCurrentPage = index
+            }, this.uiConfig.animationSpeed, 'app')
             swiperController.changeIndex(index, true)
           })
         })
       }
       .padding(Xb_FloatTabBarPadding(this.widthBp, this.heightBp))
       .width('auto')
-      .height('auto')
+      .height(this.widthBp < 2 ? 60 : 'auto')
       // .layoutWeight(1)
       .borderRadius(30)
-      .backgroundColor('#1ab1b1b1')
+      .borderColor($r("app.color.border"))
+      .borderWidth(0.5)
+      .backgroundColor($r('app.color.background'))
+      .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
       .shadow({
-        radius: 10,
+        radius: 15,
         offsetY: 4,
-        color: '#1ab1b1b1',
-        type: ShadowType.BLUR
+        color: $r('app.color.shadow'),
+        type: ShadowType.COLOR,
       })
       // 控制按钮区
       if (this.tabCurrentPage == 0) {
         Row() {
           SymbolGlyph(this.proxyEnabled ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
-            .fontSize(27).fontColor([this.proxyEnabled ? Color.White : '#99000000'])
+            .fontSize(27).fontColor([this.proxyEnabled ? Color.White : icon_tertiary])
           this.FloatBarFunctionContentBuilder()
         }.functionButtonStyle(this.proxyEnabled && this.widthBp <= 2)
-        .backgroundColor(this.proxyEnabled ? this.icon_emphasize : '#1ab1b1b1')
+        .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
+        .backgroundColor(this.proxyEnabled ? this.icon_emphasize : $r('app.color.background'))
         .onClick(() => {
           // 触发代理启动事件
           EventHub.sendEvent(EventKey.ChangeProxy)
@@ -562,10 +570,11 @@ struct Index {
       else if (this.tabCurrentPage == 1) {
         Row() {
           SymbolGlyph(this.proxyEnabled ? (this.uiConfig.needProxyStart ? $r('sys.symbol.pause') : $r('sys.symbol.bolt_filled_on_circle')) : (this.uiConfig.needProxyStart ? $r('sys.symbol.play_fill') : $r('sys.symbol.bolt_filled_on_circle')))
-            .fontSize(27).fontColor([(this.proxyEnabled && this.uiConfig.needProxyStart) ? Color.White : '#99000000'])
+            .fontSize(27).fontColor([(this.proxyEnabled && this.uiConfig.needProxyStart) ? Color.White : icon_tertiary])
           this.FloatBarFunctionContentBuilder()
         }.functionButtonStyle(this.proxyEnabled && this.widthBp <= 2)
-        .backgroundColor(this.proxyEnabled ? this.icon_emphasize : '#1ab1b1b1')
+        .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
+        .backgroundColor(this.proxyEnabled ? this.icon_emphasize : $r('app.color.background'))
         .onClick(() => {
           if (this.uiConfig.needProxyStart) {
             // 触发代理启动事件
@@ -579,9 +588,8 @@ struct Index {
       else if (this.tabCurrentPage == 2) {
         Row() {
           SymbolGlyph($r('sys.symbol.plus'))
-            .fontSize(27).fontColor(['#99000000'])
-        }.functionButtonStyle(true)
-        .backgroundColor('#1ab1b1b1')
+            .fontSize(27).fontColor([icon_tertiary])
+        }.functionButtonStyle(false)
         .onClick(() => {
           // 触发添加配置事件（打开添加配置半模态）
           EventHub.sendEvent(EventKey.AddConfig)
@@ -593,7 +601,7 @@ struct Index {
     }
     .width('auto')
     .height('auto')
-    .padding({ left: 10, right: 10})
+    .padding({ left: 10, right: 10 })
     .margin({ bottom: this.bottomRectHeight - 10, top: this.topRectHeight })
   }
   @Builder
@@ -619,7 +627,7 @@ struct Index {
     .width('100%')
     .height('100%')
     .align(this.getFloatAlign())
-    .backgroundColor($r('app.color.background'))
+   // .backgroundColor($r('app.color.background'))
   }
 
   @Builder
@@ -1519,13 +1527,16 @@ struct Index {
 function functionButtonStyle(during: boolean) {
   .borderRadius(30)
   .padding(during ? { left: 8, right: 8 } : 0)
-  .width(during ? undefined : 60).height(during ? 56 : 60)
+  .size({width: during ? 130 : 60, height: 60})
   .justifyContent(FlexAlign.Center)
   .alignItems(VerticalAlign.Center)
+  .backgroundColor($r('app.color.background'))
   .shadow({
-    radius: 10,
+    radius: 15,
     offsetY: 4,
-    color: '#1ab1b1b1',
-    type: ShadowType.BLUR
+    color: $r('app.color.shadow'),
+    type: ShadowType.COLOR
   })
+  .borderColor($r("app.color.border"))
+  .borderWidth(0.5)
 }

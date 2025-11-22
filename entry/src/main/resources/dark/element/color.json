@@ -81,6 +81,14 @@
       "value": "#1AFFFFFF"
     },
     {
+      "name": "shadow_button",
+      "value": "#66FFFFFF"
+    },
+    {
+      "name": "border",
+      "value": "#33FFFFFF"
+    },
+    {
       "name": "home_card_background",
       "value": "#26FFFFFF"
     },
