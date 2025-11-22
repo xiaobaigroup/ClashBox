@@ -49,10 +49,10 @@ export class ConfigAutoUpdateService {
     }
 
     // 启动后台长时任务
-    const notificationId = await this.startContinuousTask();
-    if (notificationId > 0) {
-      this.notificationId = notificationId;
-    }
+    // const notificationId = await this.startContinuousTask();
+    // if (notificationId > 0) {
+    //   this.notificationId = notificationId;
+    // }
 
     // 找出更新频率最快的配置的毫秒值
     const updateIntervalArray = this.autoUpdateProfiles.map((profile: Profile) => profile.autoUpdateDuration);
@@ -85,16 +85,16 @@ export class ConfigAutoUpdateService {
     }
 
     // 停止后台任务
-    if (this.notificationId) {
-      try {
-        await backgroundTaskManager.stopBackgroundRunning(this.context);
-        this.notificationId = undefined;
-        hilog.info(0xFF00, "ConfigAutoUpdateService", "后台任务停止成功");
-      } catch (err) {
-        hilog.error(0xFF00, "ConfigAutoUpdateService",
-          `后台任务停止失败: ${JSON.stringify(err)}`);
-      }
-    }
+    // if (this.notificationId) {
+    //   try {
+    //     await backgroundTaskManager.stopBackgroundRunning(this.context, this.notificationId);
+    //     this.notificationId = undefined;
+    //     hilog.info(0xFF00, "ConfigAutoUpdateService", "后台任务停止成功");
+    //   } catch (err) {
+    //     hilog.error(0xFF00, "ConfigAutoUpdateService",
+    //       `后台任务停止失败: ${JSON.stringify(err)}`);
+    //   }
+    // }
 
     hilog.info(0xFF00, "ConfigAutoUpdateService", "配置自动更新服务已停止");
   }
@@ -308,6 +308,5 @@ export class ConfigAutoUpdateService {
   }
 }
 
-/** 导出单例 */
 export default new ConfigAutoUpdateService();
 
