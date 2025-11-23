@@ -2275,6 +2275,22 @@
     {
       "name": "float",
       "value": "悬浮"
+    },
+    {
+      "name": "qrcode_share",
+      "value": "二维码分享"
+    },
+    {
+      "name": "qrcode_share_subtitle",
+      "value": "支持系统扫一扫跳转分享哦~"
+    },
+    {
+      "name": "qrcode_saved_to_gallery",
+      "value": "已保存到图库！🖼"
+    },
+    {
+      "name": "qrcode_save_failed",
+      "value": "保存二维码失败！"
     }
   ]
 }

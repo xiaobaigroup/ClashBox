@@ -2275,6 +2275,22 @@
     {
       "name": "tab_style",
       "value": "Tab bar style"
+    },
+    {
+      "name": "qrcode_share",
+      "value": "QR Code Sharing"
+    },
+    {
+      "name": "qrcode_share_subtitle",
+      "value": "Supports system scan for quick sharing~"
+    },
+    {
+      "name": "qrcode_saved_to_gallery",
+      "value": "Saved to Gallery! 🖼"
+    },
+    {
+      "name": "qrcode_save_failed",
+      "value": "Failed to save QR code!"
     }
   ]
 }

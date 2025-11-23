@@ -60,7 +60,7 @@ export struct QRCodeDialog {
             }
           });
           Xb_ToastUtil.showToast({
-            message: "已保存到图库！🖼"
+            message: $r('app.string.qrcode_saved_to_gallery')
           });
         }
       });
@@ -131,7 +131,7 @@ export struct QRCodeDialog {
               }
             } catch (e) {
               Xb_ToastUtil.showToast({
-                message: "保存二维码失败！"
+                message: $r('app.string.qrcode_save_failed')
               })
             }
 

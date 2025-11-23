@@ -518,8 +518,8 @@ struct ConfigurationPage {
     // 分享二维码
     else if (this.isShowQRCode) {
       QRCodeDialog({
-        theDialogTitle: "二维码分享",
-        theDialogSubTitle: "支持系统扫一扫跳转分享哦~",
+        theDialogTitle: $r('app.string.qrcode_share'),
+        theDialogSubTitle: $r('app.string.qrcode_share_subtitle'),
         QRCodeParam: { // 二维码参数
           url: this.currentTouchConfigData.configUrl,
           name: this.currentTouchConfigData.configName,
@@ -816,7 +816,6 @@ struct ConfigurationPage {
   private generateQRcode(): void {
     this.isShowQRCode = true
     this.isShowConfigAddBindSheet = true
-    this.QRCodeUrl = this.currentTouchConfigData.configUrl
     hilog.info(0xC014, componentName, `#generateQRcode#生成二维码: configName is [${this.currentTouchConfigData.configName}]`)
   }
 
