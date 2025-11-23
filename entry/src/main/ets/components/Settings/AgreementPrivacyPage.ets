@@ -9,6 +9,8 @@ import { TopTitleText } from "../Start/WelcomePage"
 @Component
 export struct UserAgreement {
 
+  // 窗口模式区分，true为窗口式，false为普通式
+  @StorageProp('WindowMode') windowMode: boolean = false
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
 
@@ -21,7 +23,7 @@ export struct UserAgreement {
         .width('100%')
         .backgroundColor($r('app.color.background'))
         Row() {
-          BackButton()
+          BackButton(!this.windowMode)
         }.zIndex(2)
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .onClick(() => {
@@ -45,6 +47,8 @@ export struct UserAgreement {
 @Component
 export struct PrivacyPolicy {
 
+  // 窗口模式区分，true为窗口式，false为普通式
+  @StorageProp('WindowMode') windowMode: boolean = false
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
 
@@ -57,7 +61,7 @@ export struct PrivacyPolicy {
         .width('100%')
         .backgroundColor($r('app.color.background'))
         Column() {
-          BackButton()
+          BackButton(!this.windowMode)
         }.zIndex(1)
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .onClick(() => {

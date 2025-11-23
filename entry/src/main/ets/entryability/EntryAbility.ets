@@ -399,7 +399,7 @@ export default class EntryAbility extends UIAbility {
       if (!ClashViewModel.socketProxy.active) {
         ClashViewModel.socketProxy.active = true;
         ClashViewModel.socketProxy.offlineTime.push(Date.now());
-        this.uiContext?.getPromptAction().showToast({
+        Xb_ToastUtil.showToast({
           message: `核心恢复中(${ClashViewModel.socketProxy.offlineTime.length})...`
         });
         // let clashCore = AppStorage.get<AppConfig>("appConfig")?.clashCore;

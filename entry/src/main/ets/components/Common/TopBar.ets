@@ -6,6 +6,7 @@ import { ButtonBuilder, context, font_primary, icon_primary } from "./Common";
 import { BusinessError } from "@kit.BasicServicesKit";
 import { calculateFontSizeLinear } from "../../common/utils/CalculateFontSizeUtil";
 import { common } from "@kit.AbilityKit";
+import { Xb_ToastUtil } from "xb_components";
 
 let theWindowClass: window.Window
 
@@ -121,8 +122,8 @@ export struct WindowTopBar {
           if (this.windowClass) {
             if (this.WindowMaximize) {
               console.log(`#WindowDecorButtonModel 即将最小化`)
-              let promise = this.windowClass.recover()
-              promise.then(() => {
+              this.windowClass.recover()
+                .then(() => {
                 this.WindowMaximize = false
                 console.info(`#WindowDecorButtonModel Succeeded in recover the window. ${this.WindowMaximize}`)
               }).catch((err: BusinessError) => {
@@ -130,13 +131,14 @@ export struct WindowTopBar {
               })
             } else {
               console.log(`#WindowDecorButtonModel 即将最大化`)
-              try {
-                this.windowClass.maximize()
-                this.WindowMaximize = true
-                console.info(`#WindowDecorButtonModel Succeeded in maximizing the window. ${this.WindowMaximize}`)
-              } catch (err) {
-                console.error(`#WindowDecorButtonModel 最大化失败：${err.code}, message: ${err.message}`)
-              }
+              this.windowClass.maximize()
+                .then(() => {
+                  this.WindowMaximize = true
+                  console.info(`#WindowDecorButtonModel Succeeded in maximizing the window. ${this.WindowMaximize}`)
+                })
+                .catch((err: BusinessError) => {
+                  console.error(`#WindowDecorButtonModel 最大化失败：${err.code}, message: ${err.message}`)
+                })
             }
           } else {
             console.error(`#WindowDecorButtonModel WindowClass不存在`)
@@ -146,15 +148,23 @@ export struct WindowTopBar {
       {
         icon: $r('sys.symbol.minus'),
         onClick: async () => {
-          this.windowClass.minimize()
+          this.windowClass.minimize().catch((err: BusinessError) => {
+            console.error(`#WindowDecorButtonModel 最小化失败 name: ${err.name} message: ${err.message}`)
+          })
         }
       },
       {
         icon: $r('sys.symbol.xmark'),
         onClick: () => {
-          this.uiConfig.exitWindowMode === 1 ?
-          this.getUIContext()?.getHostContext()?.getApplicationContext().killAllProcesses()
-            : this.windowClass.minimize()
+          if (this.uiConfig.exitWindowMode === 1) {
+            Xb_ToastUtil.exitApp()
+          } else {
+            this.context.hideAbility().then(() => {
+              console.info(`#WindowDecorButtonModel hideAbility success`);
+            }).catch((err: BusinessError) => {
+              console.error(`#WindowDecorButtonModel hideAbility fail, err: ${JSON.stringify(err)}`);
+            });
+          }
         }
       }
     ]

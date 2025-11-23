@@ -164,8 +164,8 @@ export const HomeGridRowPadding = BreakpointFunction2D<Padding>({
 export const WindowHomeGridRowPadding = BreakpointFunction2D<Padding>({
   ['sm']: {['hsm']: { top: 4, left: 10, right: 14 }, ['hmd']: { top: 4, left: 25, right: 25 }, ['hlg']: {top: 4, left: 14, right: 14}},
   ['md']: {['hsm']: { top: 4, left: 10, right: 25 }, ['hmd']: { top: 4, left: 50, right: 50 }, ['hlg']: { top: 4, left: 100, right: 100 }},
-  ['lg']: {['hsm']: { top: 4, left: 10, right: 25 }, ['hmd']: { top: 4, left: 10, right: 50 }, ['hlg']: { top: 4, left: 10, right: 25 }},
-  ['xl']: {['hsm']: { top: 4, left: 10, right: 25 }, ['hmd']: { top: 4, left: 10, right: 25 }, ['hlg']: { top: 4, left: 10, right: 25 }},
+  ['lg']: {['hsm']: { top: 4, left: 15, right: 25 }, ['hmd']: { top: 4, left: 15, right: 50 }, ['hlg']: { top: 4, left: 15, right: 25 }},
+  ['xl']: {['hsm']: { top: 4, left: 15, right: 25 }, ['hmd']: { top: 4, left: 15, right: 25 }, ['hlg']: { top: 4, left: 15, right: 25 }},
 })
 
 /**主页栅格列间距*/

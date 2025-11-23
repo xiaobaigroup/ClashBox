@@ -28,7 +28,7 @@ export const font_primary: ResourceColor = $r('sys.color.font_primary')
 
 
 @Builder
-export function BackButton() {
+export function BackButton(showBackgroundColor: boolean = true) {
   Button({ type: ButtonType.Circle, stateEffect: true }) {
     SymbolGlyph($r('sys.symbol.chevron_left'))
       .fontSize(28)
@@ -37,7 +37,7 @@ export function BackButton() {
   .width(40)
   .height(40)
   .margin({left: 16, top: 16 })
-  .backgroundColor($r('app.color.back'))
+  .backgroundColor(showBackgroundColor ? $r('app.color.back') : Color.Transparent)
 }
 
 /* bindSheet 里套 `Navigation`、`NavDestination`是的标题栏的替代品 START */

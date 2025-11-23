@@ -56,6 +56,9 @@ export struct WelcomeUserAgreement {
 // 隐私政策
 @Component
 export struct WelcomePrivacyPolicy {
+
+  // 窗口模式区分，true为窗口式，false为普通式
+  @StorageProp('WindowMode') windowMode: boolean = false
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 欢迎页面栈
   @Consume('WelcomeNavPathStack') welcomePageInfos: NavPathStack
@@ -67,7 +70,7 @@ export struct WelcomePrivacyPolicy {
       Stack() {
         // 返回图标
         Column() {
-          BackButton()
+          BackButton(!this.windowMode)
         }.zIndex(1)
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .height(70)
@@ -101,6 +104,8 @@ export struct WelcomePrivacyPolicy {
 export struct Welcome {
   @Consume isDisclaimer: boolean
   @Consume isShowWelcome: boolean
+  // 窗口模式区分，true为窗口式，false为普通式
+  @StorageProp('WindowMode') windowMode: boolean = false
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
@@ -123,7 +128,7 @@ export struct Welcome {
       Stack() {
         // 返回图标
         Column() {
-          BackButton()
+          BackButton(!this.windowMode)
         }.zIndex(1)
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .onClick(() => {

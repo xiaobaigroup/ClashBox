@@ -137,7 +137,7 @@ struct Home {
           // 编辑布局按钮判定：非编辑状态
           // 顶栏
           TopBar({
-            title: this.uiConfig.isGreeting ? getResourceString(getGreeting(), this) : 'ClashBox',
+            title: this.uiConfig.isGreeting ? Xb_GetResourceString(getGreeting(), this) : 'ClashBox',
             icons: [$r('sys.symbol.square_and_pencil'), $r('sys.symbol.gearshape')],
             iconSize: this.windowMode ? 16 : (this.curYOffset < 0 ? 24 - this.curYOffset / 100 : 24),
             // 编辑按钮

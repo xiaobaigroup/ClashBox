@@ -1,5 +1,5 @@
 // Index
-import { curves, LengthMetrics, mediaquery, UIUtils } from '@kit.ArkUI'
+import { curves, LengthMetrics, mediaquery, UIUtils, window } from '@kit.ArkUI'
 import Home from './HomePage'
 import ProxyPage from './ProxyPage'
 import { util } from "@kit.ArkTS";
@@ -64,6 +64,8 @@ import { WindowTopBar } from '../components/Common/TopBar'
 import { ImportConfigFromURL } from '../components/Configuration/ImportConfigFromURL'
 import { Xb_ChangeThemeColor } from 'xb_components/src/main/ets/utils/ChangeThemeColorUtil'
 import {
+  StatusBarConfig,
+  StatusBarIconResource,
   Xb_BackgroundRunning,
   Xb_ColorModeManager,
   Xb_FloatTabBarAlignCenter,
@@ -124,8 +126,6 @@ struct Index {
   @StorageLink('isFoldStatus') isFoldStatus: boolean = false
   // 平板竖屏判断变量
   @Provide istabletLandscape: boolean = false
-  // PC判定
-  @StorageLink('2in1') is2in1: boolean = false
   // px外屏判定
   @Provide isPXSecScreen: boolean = false
   /**
@@ -316,90 +316,93 @@ struct Index {
   @Provide proxyTime: number = 0
 
 
-
   build() {
-    if (!this.isPXSecScreen) {
-      Navigation(this.pageInfos) {
-        this.MainContent()
-      }
-      .foregroundBlurStyle(this.isEnableIndexForegroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
-        { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 })
-      .hideTitleBar(true).hideToolBar(true)
-      .height('100%').width('100%')
-      .mode(NavigationMode.Stack)
-      // 欢迎页&崩溃页
-      .bindSheet($$this.isShowWelcome, this.WelcomeSheet(), {
-        detents: [BIND_SHEET_CONTAINER_HEIGHT],
-        showClose: (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) ||
-          this.appLinkConfigUrl != '' || (this.uiConfig.oldVersionCode !== AppState.versionCode && !this.uiConfig.isFirstStart) || this.showUpdateLog,
-        dragBar: false,
-        backgroundColor: $r('app.color.background'),
-        keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
-        scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-        preferType: SheetType.CENTER,
-        onWillDismiss: ((DismissSheetAction: DismissSheetAction) => {
-          hilog.debug(0xFF00, "WelcomeTestTag", "弹窗关闭原因：%{public}d", DismissSheetAction.reason)
-
-          // 无论什么原因关闭，都重置状态
-          this.showUpdateLog = false
-          this.isShowWelcome = false
-          this.uiConfig.oldVersionCode = AppState.versionCode
-
-          // 清空 AppLink 相关状态，避免重复导入
-          if (this.appLinkConfigUrl != '') {
-            this.appLinkConfigUrl = ''
-            this.appLinkConfigName = ''
-          }
-
-          // 重置设置状态
-          this.SettingsPageInfos.clear()
-          // 关闭背景模糊
-          this.isEnableIndexForegroundBlur = false
-
-          hilog.error(0xFF00, "WelcomeTestTag", `Update 历史应用版本更新为：${this.uiConfig.oldVersionCode} showUpdateLog: ${this.showUpdateLog}`)
-
-          DismissSheetAction.dismiss()
-          hilog.info(0xFF00, "WelcomeTestTag", "欢迎页启用状态： %{private}s", this.isShowWelcome)
-        }),
-        onWillAppear: () => {
-          // 启用背景模糊
-          this.isEnableIndexForegroundBlur = true
-          console.error(`Update Index isShowWelcome：${this.isShowWelcome} showUpdateLog: ${this.showUpdateLog}`)
-        },
-        onDisappear: async () => {
-          // 重置设置状态
-          this.SettingsPageInfos.clear()
-          // 关闭背景模糊
-          this.isEnableIndexForegroundBlur = false
-        }
-      })
-    } else {
-      // PX外屏样式
-      PXSecScreen()
-    }
-  }
-
-  @Builder
-  MainContent() {
     Stack({ alignContent: Alignment.TopEnd }) {
       // 窗口控制器(窗口模式显示)
       if (this.windowMode) {
         WindowTopBar()
           .zIndex(2)
       }
-      // 主界面
-      if (this.uiConfig.tabStyle == 'float' && this.apiVersionEnable) {
-        // 悬浮Tab
-        this.FloatTab()
+      // 主内容区
+      if (this.uiConfig.tabStyle == 'window') {
+
       }
-      else {
-        // 普通Tab
-        this.CustomTab()
+      else if (!this.isPXSecScreen) {
+        Navigation(this.pageInfos) {
+          this.MainContent()
+        }
+        .hideTitleBar(true).hideToolBar(true)
+        .height('100%').width('100%')
+        .mode(NavigationMode.Stack)
+      } else {
+        // PX外屏样式
+        PXSecScreen()
       }
     }
     .width('100%')
     .height('100%')
     .backgroundColor($r('app.color.background'))
+    .foregroundBlurStyle(this.isEnableIndexForegroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
+      { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 })
+    // 欢迎页&崩溃页
+    .bindSheet($$this.isShowWelcome, this.WelcomeSheet(), {
+      detents: [BIND_SHEET_CONTAINER_HEIGHT],
+      showClose: (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) ||
+        this.appLinkConfigUrl != '' || (this.uiConfig.oldVersionCode !== AppState.versionCode && !this.uiConfig.isFirstStart) || this.showUpdateLog,
+      dragBar: false,
+      backgroundColor: $r('app.color.background'),
+      keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
+      scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+      preferType: SheetType.CENTER,
+      onWillDismiss: ((DismissSheetAction: DismissSheetAction) => {
+        hilog.debug(0xFF00, "WelcomeTestTag", "弹窗关闭原因：%{public}d", DismissSheetAction.reason)
+
+        // 无论什么原因关闭，都重置状态
+        this.showUpdateLog = false
+        this.isShowWelcome = false
+        this.uiConfig.oldVersionCode = AppState.versionCode
+
+        // 清空 AppLink 相关状态，避免重复导入
+        if (this.appLinkConfigUrl != '') {
+          this.appLinkConfigUrl = ''
+          this.appLinkConfigName = ''
+        }
+
+        // 重置设置状态
+        this.SettingsPageInfos.clear()
+        // 关闭背景模糊
+        this.isEnableIndexForegroundBlur = false
+
+        hilog.error(0xFF00, "WelcomeTestTag", `Update 历史应用版本更新为：${this.uiConfig.oldVersionCode} showUpdateLog: ${this.showUpdateLog}`)
+
+        DismissSheetAction.dismiss()
+        hilog.info(0xFF00, "WelcomeTestTag", "欢迎页启用状态： %{private}s", this.isShowWelcome)
+      }),
+      onWillAppear: () => {
+        // 启用背景模糊
+        this.isEnableIndexForegroundBlur = true
+        console.error(`Update Index isShowWelcome：${this.isShowWelcome} showUpdateLog: ${this.showUpdateLog}`)
+      },
+      onDisappear: async () => {
+        // 重置设置状态
+        this.SettingsPageInfos.clear()
+        // 关闭背景模糊
+        this.isEnableIndexForegroundBlur = false
+      }
+    })
+  }
+
+  @Builder
+  MainContent() {
+    // 主界面
+    if (this.uiConfig.tabStyle == 'float' && this.apiVersionEnable) {
+      // 悬浮Tab
+      this.FloatTab()
+    }
+    else {
+      // 普通Tab
+      this.CustomTab()
+    }
   }
 
   @Builder
@@ -506,7 +509,8 @@ struct Index {
       justifyContent: FlexAlign.Center,
       alignItems: this.widthBp < 2 ? ItemAlign.Center : ItemAlign.Start,
       space: { main: LengthMetrics.vp(10) }
-    }) {
+    })
+    {
       // tab区
       Flex({
         direction: Xb_FloatTabBarDirection(this.widthBp, this.heightBp),
@@ -603,7 +607,7 @@ struct Index {
     .width('auto')
     .height('auto')
     .padding({ left: 10, right: 10 })
-    .margin({ bottom: this.bottomRectHeight - 10, top: this.topRectHeight })
+    .margin({ bottom: this.windowMode ? 10 : this.bottomRectHeight - 10, top: this.windowMode ? 10 : this.topRectHeight })
   }
   @Builder
   FloatTab() {
@@ -834,7 +838,26 @@ struct Index {
     hilog.info(0x1000, componentName, `#aboutToAppear executed`)
     // 初始化状态栏工具(仅PC设备)
     if (this.windowMode) {
-      Xb_StatusBarUtils.initStatusBar(this.context, $rawfile('clash_status.svg'), undefined)
+      const iconResource: StatusBarIconResource = {
+        white: 'clash_status_white.svg',
+        black: 'clash_status_black.svg'
+      };
+      const statusBarConfig: StatusBarConfig = {
+        icon: iconResource,
+        title: "ClashBox",
+        abilityName: '' // 留空，接管并使用默认状态栏图标点击事件
+        // menus: [[{
+        //   title: "",
+        //   menuAction: { abilityName: "" }
+        // }]]
+      };
+      Xb_StatusBarUtils.initStatusBar(this.getUIContext()!, statusBarConfig)
+        .then(() => {
+          Xb_StatusBarUtils.setIconClickCallback()
+        })
+        .catch((err: BusinessError) => {
+          console.error(`Index #aboutToAppear StatusBarUtils.initStatusBar 状态栏图标初始化失败. Code: ${err.code}, Message: ${err.message}`);
+        })
     }
     // 检查后台运行全局变量的状态
     if (this.uiConfig.backgroundLocateModel || this.uiConfig.backgroundDownModel || this.uiConfig.backgroundPiPModel || this.uiConfig.backgroundKeepTask) {
@@ -1499,15 +1522,23 @@ struct Index {
    * @description 跳转到访问控制添加包名
    */
   jumpAccessControl(bundleInfo: BundleInfo) {
-    indexController.changeIndex(3)
-    const path = this.pageInfos.getAllPathName()
-    if (path[0] !== 'AccessControl' || path.length === 0) {
-      if (this.widthBp > 1) {
-        this.morePageInfos.replacePathByName('AccessControl', false)
-      } else {
+    if (this.uiConfig.tabStyle == 'custom') {
+      indexController.changeIndex(3)
+    } else if (this.uiConfig.tabStyle == 'float') {
+      swiperController.changeIndex(3)
+    }
+    if (this.widthBp <= 1) {
+      const mainPath = this.pageInfos.getAllPathName()
+      if (mainPath[0] !== 'AccessControl' || mainPath.length === 0) {
         this.pageInfos.pushPathByName('AccessControl', false)
       }
+    } else {
+      const morePath = this.morePageInfos.getAllPathName()
+      if (morePath[0] !== 'AccessControl' || morePath.length === 0) {
+        this.morePageInfos.replacePathByName('AccessControl', false)
+      }
     }
+
     setTimeout(() => {
       EventHub.sendEvent(EventKey.AddAPP, { bundleName: bundleInfo.bundleName, appName: bundleInfo.appName })
     }, 400)

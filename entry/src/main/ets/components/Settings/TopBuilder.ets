@@ -10,6 +10,8 @@ struct TopBuilder {
   @State title: ResourceStr = '设置'
   @State subtitle: ResourceStr = ''
   @State showBackButton: boolean = true
+  // 窗口模式区分，true为窗口式，false为普通式
+  @StorageProp('WindowMode') windowMode: boolean = false
   @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
@@ -22,11 +24,10 @@ struct TopBuilder {
             .fontSize(28)
             .fontColor([icon_primary])
         }
+        .width(40).height(40)
         .margin({left: 16, top: BIND_SHEET_DRAG_BAR_HEIGHT })
-        .width(40)
-        .height(40)
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-        .backgroundColor($r('app.color.back'))
+        .backgroundColor(this.windowMode ? Color.Transparent : $r('app.color.back'))
         .onClick(() => {
           this.SettingsPageInfos.pop(true)
         })

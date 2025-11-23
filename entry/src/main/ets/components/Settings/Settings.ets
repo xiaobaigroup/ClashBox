@@ -1,7 +1,7 @@
-import { UIUtils } from '@kit.ArkUI';
+
 import {
   BORDER_RADIUS_20,
-  CONTENT_END_OFFSET_150, FONT_SIZE_16, settingsData, SettingsListItem } from "../../common/entity/Constants"
+  CONTENT_END_OFFSET_150, settingsData, SettingsListItem } from "../../common/entity/Constants"
 import settingsListItem from "./settingsListItem"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import Appearance from "./Appearance"
@@ -16,7 +16,6 @@ import TopBuilder from "./TopBuilder"
 import { DisclaimerCustomDialog, Nothing, theRowCustomDialog } from "../Common/Common"
 import { AppState, UIConfig } from "../../entryability/AppState"
 import { PromptAction } from "@kit.ArkUI"
-import { removeItemsByIndex } from "../../common/utils/RemoveItemsUtils"
 import ClashViewModel from "../../entryability/ClashViewModel"
 import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { common } from "@kit.AbilityKit"
@@ -53,7 +52,6 @@ struct Settings {
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
 
-  private promptAction: PromptAction = this.getUIContext().getPromptAction()
   private context = this.getUIContext().getHostContext()! as common.UIAbilityContext
 
   build() {
@@ -176,11 +174,11 @@ struct Settings {
       setTimeout(() => {
         Xb_ToastUtil.restartApp()
       }, 2000)
-      this.promptAction.showToast({message: $r('app.string.restart_tips'), duration: 2000 })
+      Xb_ToastUtil.showToast({message: $r('app.string.restart_tips'), duration: 2000 })
       // 关闭背景模糊
       this.isEnableIndexForegroundBlur = false
     } catch (e) {
-      this.promptAction.showToast({message: "清理配置失败!"})
+      Xb_ToastUtil.showToast({message: "清理配置失败!"})
     }
 
   }

@@ -27,6 +27,7 @@
           "split",
           "fullscreen"
         ],
+        "recoverable": true,
         "minWindowWidth": 332,
         "maxWindowHeight": 4800,
         "exported": true,
