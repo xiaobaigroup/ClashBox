@@ -344,6 +344,10 @@ struct ConfigurationPage {
       },
       onWillDisappear: async () => {},
       onDisappear: () => {
+        setTimeout(() => {
+          // 关闭背景模糊 TODO 此处添加是为了修复添加配置关闭半模态背景模糊未能正常关闭
+          this.isEnableIndexForegroundBlur = false
+        })
         this.isNewConfig = false
         this.onForwardChange()
         this.configStr = ''  // 置空配置文本
