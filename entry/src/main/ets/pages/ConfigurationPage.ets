@@ -11,7 +11,7 @@ import {
   NewConfigData,
   APP_LINKING,
 } from '../common/entity/Constants'
-import { LengthMetrics, PromptAction, SymbolGlyphModifier } from '@kit.ArkUI'
+import { LengthMetrics, SymbolGlyphModifier } from '@kit.ArkUI'
 import { ConfigAdd } from '../components/Configuration/ConfigAdd'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
@@ -31,12 +31,13 @@ import { ImportConfigFromFile } from '../components/Configuration/ImportConfigFr
 import { TopBar } from '../components/Common/TopBar'
 import { ListGutter, ListLanes, TabContentTitleMargin } from '../common/breakpoint/BreakPoint'
 import { RoundButton } from '../components/Common/RoundButton'
-import { harmonyShare, systemShare } from '@kit.ShareKit'
+import { harmonyShare } from '@kit.ShareKit'
 import { uniformTypeDescriptor as utd } from '@kit.ArkData'
 import { common, Context } from '@kit.AbilityKit'
 import { BusinessError } from '@kit.BasicServicesKit';
 import { fileUri, fileIo as fs, picker } from '@kit.CoreFileKit'
 import { ShareData, Xb_GetResourceString, Xb_Share, Xb_ToastUtil } from 'xb_components'
+import { QRCodeDialog } from '../components/Configuration/QRCodeComponent'
 
 
 /**
@@ -87,6 +88,8 @@ struct ConfigurationPage {
 
   // 是否显示bindSheet
   @StorageLink('ShowConfigBindSheet') isShowConfigAddBindSheet: boolean = false
+  // 是否显示二维码半模态
+  @State isShowQRCode: boolean = false
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   // 是否小窗口
@@ -312,7 +315,7 @@ struct ConfigurationPage {
     .bindSheet($$this.isShowConfigAddBindSheet, this.ConfigAddBindSheetBuilder(), {
       detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,], // SheetSize.LARGE
       backgroundColor: $r('app.color.background'),
-      showClose: true,
+      showClose: this.isShowQRCode ? false : true,
       dragBar: false,
       preferType: SheetType.CENTER,
       scrollSizeMode: ScrollSizeMode.CONTINUOUS,
@@ -400,6 +403,7 @@ struct ConfigurationPage {
       { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.square_and_pencil')).fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
         content: $r('app.string.Edit'),
         callback: () => {
+         this.isShowQRCode = false
          this.isNewConfig = false
          this.editConfig()
         }
@@ -413,11 +417,11 @@ struct ConfigurationPage {
         .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
         content: $r('app.string.share'), callback: () => { this.shareConfigUrl() }
       } as LongPressContextMenuItem ] : []),
-      // TODO 生成二维码、创建副本
-    /* { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.qrcode'))
+      // 二维码分享
+      { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.qrcode'))
        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
        content: $r('app.string.generate_QR_code'), callback: ()=>{ this.generateQRcode() }
-     },*/
+     },
       // 导出配置文件
       { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.doc_text'))
         .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
@@ -510,6 +514,27 @@ struct ConfigurationPage {
   ConfigAddBindSheetBuilder() {
     if (this.isNewConfig) {
       ConfigAdd()
+    }
+    // 分享二维码
+    else if (this.isShowQRCode) {
+      QRCodeDialog({
+        theDialogTitle: "二维码分享",
+        theDialogSubTitle: "支持系统扫一扫跳转分享哦~",
+        QRCodeParam: { // 二维码参数
+          url: this.currentTouchConfigData.configUrl,
+          name: this.currentTouchConfigData.configName,
+        },
+        confirm: async () => {
+          // 关闭二级界面
+          this.isShowQRCode = false
+          this.isShowConfigAddBindSheet = false
+        },
+        cancel: () => {
+          // 关闭二级界面
+          this.isShowQRCode = false
+          this.isShowConfigAddBindSheet = false
+        },
+      })
     } else {
       // 二级编辑界面
       if (this.isFromFile) {
@@ -789,7 +814,9 @@ struct ConfigurationPage {
    *    2. 其他方式导入的配置不能生成二维码
    */
   private generateQRcode(): void {
-    Xb_ToastUtil.showToast({ message: `${getResourceString($r('app.string.config_share_prompt'), this)}~🫡` })
+    this.isShowQRCode = true
+    this.isShowConfigAddBindSheet = true
+    this.QRCodeUrl = this.currentTouchConfigData.configUrl
     hilog.info(0xC014, componentName, `#generateQRcode#生成二维码: configName is [${this.currentTouchConfigData.configName}]`)
   }
 

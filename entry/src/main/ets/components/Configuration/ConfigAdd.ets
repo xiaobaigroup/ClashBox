@@ -1,5 +1,6 @@
 
 import {
+  APP_LINKING,
   BIND_SHEET_CONTAINER_HEIGHT,
   BIND_SHEET_DRAG_BAR_HEIGHT,
   BIND_SHEET_MAIN_FONTSIZE,
@@ -185,13 +186,24 @@ export struct ConfigAdd {
               return;
             }
             // 解析码值结果跳转应用服务页
-            hilog.info(0x0001, '[Scan CPSample]', `Succeeded in getting import origin url, origin url is ${result.originalValue}`);
-            const newUrl = this.processUrlByQueryIdentifier(result.originalValue)
+            const originalUrl = result.originalValue;
+            hilog.info(0x0001, '[Scan CPSample]', `Succeeded in getting import origin url, origin url is ${originalUrl}`);
+            let newUrl = ""
+            let configName = ""
+            // AppLinking 处理
+            if (originalUrl.startsWith(APP_LINKING)) {
+              const params= originalUrl.split("?configUrl=")[1].split("&configName=");
+              newUrl = params[0]
+              configName = params[1]
+            } else {
+              newUrl = this.processUrlByQueryIdentifier(originalUrl)
+            }
+
             hilog.info(0x0001, '[Scan CPSample]', `Succeeded in process origin url, newUrl is ${newUrl}`);
             const params: ConfigData = {
               configId: 'newQR',
               isNewConfig: true,
-              configName: '',
+              configName,
               configUrl: newUrl,
               isConfigAutoUpdate: false,
               lastUpdateDateTime: 0,
