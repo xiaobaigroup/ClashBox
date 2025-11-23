@@ -845,7 +845,7 @@ struct Index {
       };
       const statusBarConfig: StatusBarConfig = {
         icon: iconResource,
-        title: "ClashBox",
+        title: "entry", // 当前模块的的model-name
         abilityName: '' // 留空，接管并使用默认状态栏图标点击事件
         // menus: [[{
         //   title: "",
