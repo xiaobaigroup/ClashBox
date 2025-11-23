@@ -303,7 +303,7 @@ struct ProxyPage {
                 this.isRolling = false
                 this.curOffsetRemain = 0
               }
-              console.info("offsetRemain:" + offset + '/' + this.curOffsetRemain);
+              // console.info("offsetRemain:" + offset + '/' + this.curOffsetRemain);
               return { offsetRemain: offset }
             })
           }

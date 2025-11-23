@@ -167,7 +167,7 @@ struct ProxyGroupItem {
         this.isRolling = false
         this.curOffsetRemain = 0
       }
-      console.info("offsetRemain:" + offset + '/' +this.curOffsetRemain);
+      // console.info("offsetRemain:" + offset + '/' +this.curOffsetRemain);
       return { offsetRemain: offset }
     })
     .lanes(this.ProxyGroupItemSelected === ProxyCardSize.Large ? 0 : ProxyListLanes(this.widthBp, this.heightBp), ListGutter(this.widthBp, this.heightBp))

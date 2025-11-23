@@ -441,9 +441,9 @@ struct Appearance {
         ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
           MenuItem({
             content: menuItem.title,
-            symbolEndIcon: this.uiConfig.stringDisplayIndex === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+            symbolEndIcon: this.uiConfig.exitWindowMode === index ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
           })
-            .selected(this.uiConfig.stringDisplayIndex === index)
+            .selected(this.uiConfig.exitWindowMode === index)
             .onChange((selected) => {
               // 持久化关闭窗口模式
               this.uiConfig.exitWindowMode = index

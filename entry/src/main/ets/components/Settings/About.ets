@@ -14,7 +14,7 @@ import { AboutListItemProp, BORDER_RADIUS_20,
   CollaboratorsListItemProp,
 } from "../../common/entity/Constants"
 import TopBuilder from "./TopBuilder"
-import { Xb_Studio } from "xb_components"
+import { Xb_Studio, Xb_ToastUtil,} from "xb_components"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { LengthMetrics, PromptAction, SymbolGlyphModifier } from "@kit.ArkUI"
 import { AppConfig, ClashCore, isEnd, UIConfig } from "../../entryability/AppState"
@@ -46,7 +46,6 @@ struct About {
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink ('isLandscapePhone') isLandscapePhone: boolean = false
-  private promptAction: PromptAction = this.getUIContext().getPromptAction()
   // 点击次数
   @State clickCount: number = 0
   // 实验功能开关列表行数据
@@ -54,13 +53,13 @@ struct About {
   @Consume theAppVersionInfo: UpdateInfo
 
   onClickCount() {
-    //振动触发
+    // 振动触发
     if (this.uiConfig.isVibrate) {
       customVibrator.vibratorTriggerOfHapticClockTimer()
     }
     hilog.info(0xFF00, "AboutClickTag", "点击次数: %{public}d", this.clickCount)
     if(this.uiConfig.enabledADvanced) {
-      this.promptAction.showToast({message: '已处于高级模式' /*$r('app.string.click_prompt')*/, duration: 2000 })
+      Xb_ToastUtil.showToast({message: '已处于高级模式' /*$r('app.string.click_prompt')*/, duration: 2000 })
     } else {
       if (this.clickCount >= 5) {
         this.uiConfig.enabledADvanced = true
@@ -69,11 +68,11 @@ struct About {
         this.aboutList.splice(1, 0, this.ExperimentData)
         // 刷新更多页面数据
         this.moreList = ListMoreData()
-        this.promptAction.showToast({message: '高级模式已开启' /*$r('app.string.click_prompt')*/, duration: 2000 })
+        Xb_ToastUtil.showToast({message: '高级模式已开启' /*$r('app.string.click_prompt')*/, duration: 2000 })
         //音效触发
         customSound.playAudioForSoundPool()
       } else if (this.clickCount === 3) {
-        this.promptAction.showToast({message: '什么东西闪过去了' /*$r('app.string.click_prompt')*/, duration: 1000 })
+        Xb_ToastUtil.showToast({message: '什么东西闪过去了' /*$r('app.string.click_prompt')*/, duration: 1000 })
       }
     }
   }
@@ -370,7 +369,7 @@ struct About {
                   .onClick(() => {
                    if(itemChild.sign === 1) {
                      // 点击提示 防误触
-                     this.promptAction.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
+                     Xb_ToastUtil.showToast({message: $r('app.string.click_prompt'), duration: 2000 })
                       if (itemChild.name === 'ExperimentalFunction') {
 
                       // } else {
@@ -521,7 +520,7 @@ export struct AboutCollaborators {
                         Xb_HandleMailto(item.link)
                       } else if (item.sign == 2) {
                         Xb_Copy(item.link)
-                        this.promptAction.showToast({ message: `${getResourceString($r('app.string.qq_copy'), this)}：${item.link}`})
+                        Xb_ToastUtil.showToast({ message: `${getResourceString($r('app.string.qq_copy'), this)}：${item.link}`})
                       }
                     })
                   if(item.contact2) {
@@ -863,7 +862,7 @@ export struct CheckUpdate {
       hilog.info(0xFF00, "UpdatetestTag", "Update Info: %{public}s", JSON.stringify(updateInfo))
       const theLatest = extractUpdateInfo(updateInfo)
       if (theLatest !== null) {
-        this.promptAction.showToast({message: $r('app.string.query_success'), duration: 2000 })
+        Xb_ToastUtil.showToast({message: $r('app.string.query_success'), duration: 2000 })
         // 查询完成
         this.theAppVersionInfo = theLatest
       } else {
@@ -931,14 +930,14 @@ export struct CheckUpdate {
                   Xb_GoToWeb('https://github.com/xiaobaigroup/ClashBox/releases')
                 } else if(index === 3) {
                   // 忽略本次更新
-                  this.promptAction.showToast({
+                  Xb_ToastUtil.showToast({
                     message: $r('app.string.developing'),
                     duration: 2000
                   })
                 } else if(index === 2) {
                   // 前往下载
                   if (this.theAppVersionInfo.browser_download_url === '') {
-                    this.promptAction.showToast({
+                    Xb_ToastUtil.showToast({
                       message: $r('app.string.no_link'),
                       duration: 2000
                     })

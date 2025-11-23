@@ -149,7 +149,7 @@ export struct WindowTopBar {
         icon: $r('sys.symbol.minus'),
         onClick: async () => {
           this.windowClass.minimize().catch((err: BusinessError) => {
-            console.error(`#WindowDecorButtonModel 最小化失败 name: ${err.name} message: ${err.message}`)
+            console.error(`#WindowDecorButtonModel 最小化失败 code: ${err.code} message: ${err.message}`)
           })
         }
       },
@@ -160,9 +160,9 @@ export struct WindowTopBar {
             Xb_ToastUtil.exitApp()
           } else {
             this.context.hideAbility().then(() => {
-              console.info(`#WindowDecorButtonModel hideAbility success`);
+              console.debug(`#WindowDecorButtonModel hideAbility success`);
             }).catch((err: BusinessError) => {
-              console.error(`#WindowDecorButtonModel hideAbility fail, err: ${JSON.stringify(err)}`);
+              console.error(`#WindowDecorButtonModel hideAbility fail, code: ${err.code} message: ${err.message}, stack: ${JSON.stringify(err.stack)}`);
             });
           }
         }

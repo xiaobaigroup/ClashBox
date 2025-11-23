@@ -210,7 +210,7 @@ struct Index {
   ]
   private context = this.getUIContext().getHostContext()! as common.UIAbilityContext
   private promptAction = this.getUIContext().getPromptAction()
-  private UIcontext = this.getUIContext()
+  private UIContext = this.getUIContext()
 
   /**
    * 主页相关变量
@@ -836,6 +836,7 @@ struct Index {
 
   async aboutToAppear(): Promise<void> {
     hilog.info(0x1000, componentName, `#aboutToAppear executed`)
+
     // 初始化状态栏工具(仅PC设备)
     if (this.windowMode) {
       const iconResource: StatusBarIconResource = {
@@ -851,14 +852,15 @@ struct Index {
         //   menuAction: { abilityName: "" }
         // }]]
       };
-      Xb_StatusBarUtils.initStatusBar(this.getUIContext()!, statusBarConfig)
+      Xb_StatusBarUtils.initStatusBar(this.UIContext, statusBarConfig)
         .then(() => {
           Xb_StatusBarUtils.setIconClickCallback()
         })
         .catch((err: BusinessError) => {
-          console.error(`Index #aboutToAppear StatusBarUtils.initStatusBar 状态栏图标初始化失败. Code: ${err.code}, Message: ${err.message}`);
+          console.error(`Index #aboutToAppear StatusBarUtils.initStatusBar 状态栏图标初始化失败, Message: ${err.message}`);
         })
     }
+
     // 检查后台运行全局变量的状态
     if (this.uiConfig.backgroundLocateModel || this.uiConfig.backgroundDownModel || this.uiConfig.backgroundPiPModel || this.uiConfig.backgroundKeepTask) {
       this.uiConfig.Enablebackgrounder = true
@@ -1099,6 +1101,7 @@ struct Index {
           `#媒体查询#设备高度改变#(320vp< height <= 500vp) and (640vp< width <= 1000vp)手机横屏结果: ${this.isLandscapePhone}`)
       })
     }*/
+
     this.colorModeListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
       this.currentColorMode = mediaQueryResult.matches
       hilog.info(0x1000, 'Index', `#媒体查询 #深色模式: ${this.currentColorMode}`)
@@ -1217,7 +1220,7 @@ struct Index {
       this.updateData()   // TODO 强制更新数据函数
     }
 
-    animationStyle.setContext(this.UIcontext)
+    animationStyle.setContext(this.UIContext)
   }
 
   aboutToDisappear() {

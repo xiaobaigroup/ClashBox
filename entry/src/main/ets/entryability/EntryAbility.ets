@@ -20,7 +20,9 @@ import { commonEventManager } from '@kit.BasicServicesKit';
 import { Timer } from '../common/utils/HHmmssTimer';
 import { number2Time } from '../common/utils/TimeConvertUtil';
 import { customVibrator } from '../common/utils/VibratorUtil';
-import { Xb_Global, Xb_KVdbUtil, Xb_ToastUtil } from 'xb_components';
+import { StatusBarConfig, StatusBarIconResource, Xb_Global, Xb_KVdbUtil,
+  Xb_StatusBarUtils,
+  Xb_ToastUtil } from 'xb_components';
 import BackupRestoreUtil from '../common/utils/BackupRestoreUtil';
 import ConfigAutoUpdateService from '../common/utils/ConfigAutoUpdateService';
 
@@ -28,6 +30,7 @@ import ConfigAutoUpdateService from '../common/utils/ConfigAutoUpdateService';
 export default class EntryAbility extends UIAbility {
   private want?: Want
   private isChangeCore = false
+  private windowMode: boolean = false
   // 设备断点获取
   private uiContext?: UIContext;
   private debugVpn: SocketStubService | null = null
@@ -183,7 +186,6 @@ export default class EntryAbility extends UIAbility {
         hilog.error(0x0000, 'EntryAbility', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
         return;
       }
-
       // 初始化应用配置
       await AppState.init()
 
@@ -627,12 +629,14 @@ export default class EntryAbility extends UIAbility {
       // windowClass.setWindowDecorHeight(50)
       hilog.info(0xFF00, "EntryAbility", 'WindowMode 当前为PC窗口模式')
       AppStorage.setOrCreate('WindowMode', true)
+      this.windowMode = true
       Xb_Global.windowMode = true
     } catch (exception) {
       hilog.error(0xFF00, "EntryAbility",
         'WindowMode 当前为普通模式 Cause code: %{public}s smessage: %{public}s', exception.code, exception.message)
       AppStorage.setOrCreate('WindowMode', false)
       Xb_Global.windowMode = false
+      this.windowMode = false
     }
   }
 
