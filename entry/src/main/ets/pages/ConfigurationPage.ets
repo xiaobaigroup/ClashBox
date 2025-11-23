@@ -9,6 +9,7 @@ import {
   LIST_ITEM_PADDING,
   CONTENT_END_OFFSET_150,
   NewConfigData,
+  APP_LINKING,
 } from '../common/entity/Constants'
 import { LengthMetrics, PromptAction, SymbolGlyphModifier } from '@kit.ArkUI'
 import { ConfigAdd } from '../components/Configuration/ConfigAdd'
@@ -746,7 +747,7 @@ struct ConfigurationPage {
     // TODO 构造分享数据 AppLink 携带订阅 URL 完成 => 应用直达订阅分享
     const shareData: ShareData = {
       utd: utd.UniformDataType.HYPERLINK,
-      content: `https://xbstudio.top/clashbox?configUrl=${currentConfigData.configUrl}&configName=${currentConfigData.configName}`,
+      content: `${APP_LINKING}?configUrl=${currentConfigData.configUrl}&configName=${currentConfigData.configName}`,
       thumbnailUri: fileUri.getUriFromPath(filePath),
       title: $r('app.string.configuration_shared'),
       description: currentConfigData.configName,

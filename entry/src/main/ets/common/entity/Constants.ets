@@ -9,6 +9,7 @@ import { ConfigData, HomeCardInfo } from "./PageArgumentEntity";
 
 
 /* 基础 */
+export const APP_LINKING: string = "https://xbstudio.top/clashbox"
 // borderRadius 20
 export const BORDER_RADIUS_20: number = 20
 // bindSheet 初始默认高度
