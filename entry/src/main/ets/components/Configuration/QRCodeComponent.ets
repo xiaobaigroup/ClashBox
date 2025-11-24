@@ -13,6 +13,7 @@ import { image } from "@kit.ImageKit"
 import { fileIo as fs } from "@kit.CoreFileKit"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { APP_LINKING } from "../../common/entity/Constants"
+import { BusinessError } from '@kit.BasicServicesKit';
 
 export interface IQRCodeParam {
   url: string
@@ -99,6 +100,9 @@ export struct QRCodeDialog {
           .fontSize(14)
           .fontColor(Color.Gray)
       }
+
+
+      // TODO 添加一个 App Linking 和正常URL切换的逻辑
 
       // 二维码
       Stack({ alignContent: Alignment.Center }) {
