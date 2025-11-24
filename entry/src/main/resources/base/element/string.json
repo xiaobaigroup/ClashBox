@@ -2291,6 +2291,10 @@
     {
       "name": "qrcode_save_failed",
       "value": "保存二维码失败！"
+    },
+    {
+      "name": "qrcode_universal_link_subtitle",
+      "value": "仅支持本应用扫码和其它App识别~"
     }
   ]
 }

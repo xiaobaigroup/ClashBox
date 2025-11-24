@@ -2291,6 +2291,10 @@
     {
       "name": "qrcode_save_failed",
       "value": "Failed to save QR code!"
+    },
+    {
+      "name": "qrcode_universal_link_subtitle",
+      "value": "Only supports scanning within this app and other App recognition~"
     }
   ]
 }
