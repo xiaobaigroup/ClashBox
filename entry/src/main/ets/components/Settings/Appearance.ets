@@ -237,15 +237,18 @@ struct Appearance {
             Row() {
               toggleRowList({
                 icons: $r('sys.symbol.circle_filled_and_circle'),
+                rowEnabled: this.uiConfig.tabStyle != 'float',
                 title: $r('app.string.proxy_open_button'),
               }) {
                 // 代理页按钮开关
-                Toggle({ type: ToggleType.Switch, isOn: $$this.uiConfig.needProxyStart })
+                Toggle({ type: ToggleType.Switch, isOn: this.uiConfig.needProxyStart || this.uiConfig.tabStyle == 'float' })
+                  .enabled(this.uiConfig.tabStyle != 'float')
                   .selectedColor(this.icon_emphasize)
                   .hitTestBehavior(HitTestMode.None)
                   .margin({right: 12})
               }
-            }.onClick(()=> {
+            }.enabled(this.uiConfig.tabStyle != 'float')
+            .onClick(()=> {
               // 打开代理页按钮 显式动画
               this.getUIContext()?.animateTo({
                 duration: ANIMATION_DURATION_300

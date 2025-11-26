@@ -506,9 +506,9 @@ struct Index {
   FloatBarBuilder() {
     Flex({
       direction: ((this.getFloatAlign() == 0 && Xb_TabBarVertical(this.widthBp, this.heightBp)) || (this.getFloatAlign() == 6 && !Xb_TabBarVertical(this.widthBp, this.heightBp))) ? Xb_FloatTabBarDirectionReverse(this.widthBp, this.heightBp) : Xb_FloatTabBarDirection(this.widthBp, this.heightBp),
-      justifyContent: FlexAlign.Center,
+      justifyContent: (this.isRolling && this.uiConfig.isAnimation && this.widthBp < 2) ? FlexAlign.SpaceBetween : FlexAlign.Center,
       alignItems: this.widthBp < 2 ? ItemAlign.Center : ItemAlign.Start,
-      space: { main: LengthMetrics.vp(10) }
+      space: { main: (this.isRolling && this.uiConfig.isAnimation && this.widthBp < 2) ? LengthMetrics.vp(0) : LengthMetrics.vp(10) }
     })
     {
       // tab区
@@ -518,31 +518,45 @@ struct Index {
         alignItems: ItemAlign.Center,
         space: { main: LengthMetrics.vp(10) }
       }) {
-        ForEach(this.tabList, (item: TabBuild, index: number) => {
+        if (this.isRolling && this.uiConfig.isAnimation && this.widthBp < 2) {
           Column() {
-            SymbolGlyph(item.icon)
-              .fontSize(Xb_TabIconFontSize(this.widthBp, this.heightBp))
-              .fontColor([this.tabCurrentPage === index ? this.icon_emphasize : $r('sys.color.icon_tertiary')])
+            SymbolGlyph($r('sys.symbol.list_bullet_square_fill'))
+              .fontSize(27)
+              .fontColor([this.icon_emphasize])
               .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)
-              .translate({ y: this.tabCurrentPage == index ? -2 : 0 })
               .animation(animationStyle.animNormalUtils(0))
-            Text(item.name)
-              .fontColor(this.tabCurrentPage === index ? this.icon_emphasize : $r('sys.color.icon_tertiary'))
-              .fontSize(Xb_TabTitleFontSize(this.widthBp, this.heightBp))
           }
           .width(60)
           .height(60)
           .justifyContent(FlexAlign.Center)
           .alignItems(HorizontalAlign.Center)
-          .onClick(() => {
-            animationStyle.animToAPI18(()=>{
-              this.tabCurrentPage = index
-            }, this.uiConfig.animationSpeed, 'app')
-            swiperController.changeIndex(index, true)
+        } else {
+          ForEach(this.tabList, (item: TabBuild, index: number) => {
+            Column() {
+              SymbolGlyph(item.icon)
+                .fontSize(Xb_TabIconFontSize(this.widthBp, this.heightBp))
+                .fontColor([this.tabCurrentPage === index ? this.icon_emphasize : $r('sys.color.icon_tertiary')])
+                .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)
+                .translate({ y: this.tabCurrentPage == index ? -2 : 0 })
+                .animation(animationStyle.animNormalUtils(0))
+              Text(item.name)
+                .fontColor(this.tabCurrentPage === index ? this.icon_emphasize : $r('sys.color.icon_tertiary'))
+                .fontSize(Xb_TabTitleFontSize(this.widthBp, this.heightBp))
+            }
+            .width(60)
+            .height(60)
+            .justifyContent(FlexAlign.Center)
+            .alignItems(HorizontalAlign.Center)
+            .onClick(() => {
+              animationStyle.animToAPI18(() => {
+                this.tabCurrentPage = index
+              }, this.uiConfig.animationSpeed, 'app')
+              swiperController.changeIndex(index, true)
+            })
           })
-        })
+        }
       }
-      .padding(Xb_FloatTabBarPadding(this.widthBp, this.heightBp))
+      .padding((this.isRolling && this.uiConfig.isAnimation && this.widthBp < 2) ? 0 : Xb_FloatTabBarPadding(this.widthBp, this.heightBp))
       .width('auto')
       .height(this.widthBp < 2 ? 60 : 'auto')
       // .layoutWeight(1)
@@ -558,7 +572,18 @@ struct Index {
         type: ShadowType.COLOR,
       })
       // 控制按钮区
-      if (this.tabCurrentPage == 0) {
+      Row() {
+        SymbolGlyph(this.proxyEnabled ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
+          .fontSize(27).fontColor([this.proxyEnabled ? Color.White : icon_tertiary])
+        // this.FloatBarFunctionContentBuilder()
+      }.functionButtonStyle(this.proxyEnabled && this.widthBp <= 2, this.icon_emphasize)
+      .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
+      .backgroundColor(this.proxyEnabled ? this.icon_emphasize : $r('app.color.background'))
+      .onClick(() => {
+        // 触发代理启动事件
+        EventHub.sendEvent(EventKey.ChangeProxy)
+      })
+/*      if (this.tabCurrentPage == 0) {
         Row() {
           SymbolGlyph(this.proxyEnabled ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
             .fontSize(27).fontColor([this.proxyEnabled ? Color.White : icon_tertiary])
@@ -601,13 +626,13 @@ struct Index {
         })
       }
       else {
-      }
+      }*/
 
     }
-    .width('auto')
+    .width((this.isRolling && this.uiConfig.isAnimation && this.widthBp < 2) ? '100%' : 'auto')
     .height('auto')
     .padding({ left: 10, right: 10 })
-    .margin({ bottom: this.windowMode ? 10 : this.bottomRectHeight - 10, top: this.windowMode ? 10 : this.topRectHeight })
+    .margin({ bottom: this.windowMode || this.bottomRectHeight == 0 ? 10 : this.bottomRectHeight - 10, top: this.windowMode ? 10 : this.topRectHeight })
   }
   @Builder
   FloatTab() {
@@ -1562,7 +1587,7 @@ struct Index {
 function functionButtonStyle(during: boolean, c: ResourceColor = $r('app.color.shadow_button')) {
   .borderRadius(30)
   .padding(during ? { left: 8, right: 8 } : 0)
-  .size({width: during ? 130 : 60, height: 60})
+  .size({width: /*during ? 130 : */60, height: 60})
   .justifyContent(FlexAlign.Center)
   .alignItems(VerticalAlign.Center)
   .shadow({

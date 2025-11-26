@@ -16,7 +16,7 @@ import { ConfigAdd } from '../components/Configuration/ConfigAdd'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
 import { ConfigData } from '../common/entity/PageArgumentEntity'
-import { CellularData, CustomConfirmDialog, Nothing } from '../components/Common/Common'
+import { CellularData, CustomConfirmDialog, icon_tertiary, Nothing } from '../components/Common/Common'
 import { customVibrator } from "../common/utils/VibratorUtil"
 import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig, UIConfig } from '../entryability/AppState'
@@ -36,7 +36,7 @@ import { uniformTypeDescriptor as utd } from '@kit.ArkData'
 import { common, Context } from '@kit.AbilityKit'
 import { BusinessError } from '@kit.BasicServicesKit';
 import { fileUri, fileIo as fs, picker } from '@kit.CoreFileKit'
-import { ShareData, Xb_GetResourceString, Xb_Share, Xb_ToastUtil } from 'xb_components'
+import { ShareData, Xb_GetResourceString, Xb_Share, Xb_TabBarVertical, Xb_ToastUtil } from 'xb_components'
 import { QRCodeDialog } from '../components/Configuration/QRCodeComponent'
 
 
@@ -68,6 +68,8 @@ struct ConfigurationPage {
 
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  // 导航条区域的高度
+  @StorageProp('bottomRectHeight') bottomRectHeight: number = 0
   // 主窗口ID
   @StorageProp('MainWindowId') mainWindowId: number = 1
   // 开关不触发list转场动画判定
@@ -300,6 +302,33 @@ struct ConfigurationPage {
               // 新配置
               EventHub.sendEvent(EventKey.AddConfig)
             })
+        } else {
+          Row() {
+            SymbolGlyph($r('sys.symbol.plus'))
+              .fontSize(27).fontColor([icon_tertiary])
+          }
+          .borderRadius(30)
+          .margin({ bottom: 20})
+          .size({width: 50, height: 50})
+          .justifyContent(FlexAlign.Center)
+          .alignItems(VerticalAlign.Center)
+          .shadow({
+            radius: 15,
+            offsetY: 4,
+            color: $r('app.color.shadow_button'),
+            type: ShadowType.COLOR
+          })
+          .backgroundColor($r('app.color.background'))
+          .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
+          .margin({
+            bottom: Xb_TabBarVertical(this.widthBp, this.heightBp) || this.uiConfig.tabStyle == 'custom' ? 0 : this.bottomRectHeight + 80,
+            right: this.uiConfig.buttonPositionIndex == 0 ? 15 : 0,
+            left: this.uiConfig.buttonPositionIndex == 2 ? 15 : 0,
+          })
+          .onClick(() => {
+            // 新配置
+            EventHub.sendEvent(EventKey.AddConfig)
+          })
         }
         // 悬浮新增配置按钮 END
       }

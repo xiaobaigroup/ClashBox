@@ -115,7 +115,6 @@ struct Speed {
             alignItems: ItemAlign.Center,
             direction: FlexDirection.Row,
             justifyContent: FlexAlign.End,
-
             space: { main: LengthMetrics.vp(5) }
           })
           {

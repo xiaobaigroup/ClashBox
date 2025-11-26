@@ -20,7 +20,9 @@ import { commonEventManager } from '@kit.BasicServicesKit';
 import { Timer } from '../common/utils/HHmmssTimer';
 import { number2Time } from '../common/utils/TimeConvertUtil';
 import { customVibrator } from '../common/utils/VibratorUtil';
-import { StatusBarConfig, StatusBarIconResource, Xb_Global, Xb_KVdbUtil,
+import { StatusBarConfig, StatusBarIconResource,
+  Xb_ColorUtils,
+  Xb_Global, Xb_KVdbUtil,
   Xb_StatusBarUtils,
   Xb_ToastUtil } from 'xb_components';
 import BackupRestoreUtil from '../common/utils/BackupRestoreUtil';
@@ -69,6 +71,7 @@ export default class EntryAbility extends UIAbility {
     Xb_KVdbUtil.initKVManager(this.context, 'clash_box')
     // 备份恢复工具初始化
     BackupRestoreUtil.init(this.context)
+    Xb_ColorUtils.init(this.context)
     // 添加崩溃监听
     try {
       hiAppEvent.addWatcher({

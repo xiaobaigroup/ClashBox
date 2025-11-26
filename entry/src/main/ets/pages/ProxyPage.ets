@@ -17,7 +17,7 @@ import { curves, PromptAction } from '@kit.ArkUI'
 import { ProviderPage } from '../components/Proxy/Provider'
 import { indexController } from './Index'
 import { customAnimationUtil } from '../common/utils/Animation'
-import { ButtonBuilder, Nothing, RightDownButton } from '../components/Common/Common'
+import { ButtonBuilder, icon_tertiary, Nothing, RightDownButton } from '../components/Common/Common'
 import { StylesEdit } from '../components/Proxy/StylesEdit'
 import { PopTips, PopupBuilder } from '../components/Start/Popup'
 import { deviceInfo } from '@kit.BasicServicesKit'
@@ -311,20 +311,14 @@ struct ProxyPage {
           // 悬浮代理测速按钮 START
           if (!this.isPXSecScreen) {
             Row({ space: 7 }) {
-              if (this.uiConfig.buttonPositionIndex === 0 && this.uiConfig.needProxyStart) {
+              if (this.uiConfig.buttonPositionIndex === 0 && this.uiConfig.needProxyStart && this.uiConfig.tabStyle == 'custom') {
                 this.delayButton()
-                if (this.uiConfig.tabStyle == 'custom' || (this.widthBp > 2 && this.proxyEnabled)) {
-                  this.startButton()
-                }
-              } else if (this.uiConfig.buttonPositionIndex === 2 && this.uiConfig.needProxyStart) {
-                if (this.uiConfig.tabStyle == 'custom' || (this.widthBp > 2 && this.proxyEnabled)) {
-                  this.startButton()
-                }
+                this.startButton()
+              } else if (this.uiConfig.buttonPositionIndex === 2 && this.uiConfig.needProxyStart && this.uiConfig.tabStyle == 'custom') {
+                this.startButton()
                 this.delayButton()
               } else {
-                if (this.uiConfig.tabStyle == 'custom') {
-                  this.delayButton()
-                }
+                this.delayButton()
               }
             }.height(50)
             .alignItems(VerticalAlign.Center)
@@ -368,12 +362,31 @@ struct ProxyPage {
   @Builder
   delayButton() {
     Column() {
-      if (this.uiConfig.buttonPositionIndex === 1 || !this.uiConfig.needProxyStart) {
+      if (this.uiConfig.tabStyle == 'float') {
+        Row() {
+          SymbolGlyph($r('sys.symbol.bolt_filled_on_circle'))
+            .fontSize(27).fontColor([icon_tertiary])
+        }
+        .borderRadius(30)
+        .size({width: 50, height: 50})
+        .justifyContent(FlexAlign.Center)
+        .alignItems(VerticalAlign.Center)
+        .shadow({
+          radius: 15,
+          offsetY: 4,
+          color: $r('app.color.shadow_button'),
+          type: ShadowType.COLOR
+        })
+        .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
+        .backgroundColor($r('app.color.background'))
+      }
+      else if (this.uiConfig.buttonPositionIndex === 1 || !this.uiConfig.needProxyStart) {
         RoundButton({
           needMargin: false,
           Icon2: $r('sys.symbol.bolt_filled_on_circle'),
         })
-      } else {
+      }
+      else {
         ButtonBuilder({
           enableClick: false,
           icon: $r('sys.symbol.bolt_filled_on_circle')
@@ -381,7 +394,7 @@ struct ProxyPage {
           .offset({y: 3})
       }
     }
-    .margin({ bottom: Xb_TabBarVertical(this.widthBp, this.heightBp) || this.uiConfig.tabStyle == 'custom' ? 0 : this.bottomRectHeight + 145 })
+    .margin({ bottom: Xb_TabBarVertical(this.widthBp, this.heightBp) || this.uiConfig.tabStyle == 'custom' ? 0 : this.bottomRectHeight + 175 })
     .bindPopup(!!this.isShowDelayPop, {
       builder: PopupBuilder(this, PopTips[3], () => {
         this.isShowDelayPop = false

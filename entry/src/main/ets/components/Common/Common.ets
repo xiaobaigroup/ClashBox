@@ -15,6 +15,7 @@ import { KeyValueData } from "../More/Overwrite/EditArrayConfig"
 import { Provider } from "proxy_core"
 import { common } from "@kit.AbilityKit"
 import { convertToSwitchNub1 } from "../../common/utils/DataUnitConvertUtils"
+import { Xb_ColorUtils } from "xb_components"
 
 export const context = getContext() as common.UIAbilityContext
 // 一级图标色，黑色
@@ -905,6 +906,8 @@ export struct checkoutRowListItem {
  */
 @Component
 export struct toggleRowList {
+
+  @Prop rowEnabled: boolean = true
   // 标题
   @State title: ResourceStr = ''
   // 图标
@@ -931,12 +934,15 @@ export struct toggleRowList {
       if(this.icons) {
         SymbolGlyph(this.icons)
           .fontSize(24)
-          .fontColor([this.isPrimaryIcons ? icon_primary : this.icon_emphasize])
+          // .opacity(this.rowEnabled ? undefined : 0.4)  // 调整透明度模拟禁用效果
+          .fontColor([!this.rowEnabled ? Xb_ColorUtils.getUnableColor(this.icon_emphasize) : this.isPrimaryIcons ? icon_primary : this.icon_emphasize])
           .transition(customAnimationUtil.isScaleTranIcon(10,this.uiConfig))
       }
       Column() {
         Row() {
           Text(this.title)
+            // .opacity(this.rowEnabled ? undefined : 0.4)  // 调整透明度模拟禁用效果
+            .fontColor(this.rowEnabled ? undefined : $r('sys.color.font_fourth'))
             .fontWeight(FontWeight.Medium)
             .fontSize(16)
           // 实验功能提示框
@@ -948,6 +954,8 @@ export struct toggleRowList {
           Text(this.subtitle)
             .fontWeight(FontWeight.Normal)
             .fontColor($r('sys.color.font_secondary'))
+            // .opacity(this.rowEnabled ? undefined : 0.4)  // 调整透明度模拟禁用效果
+            .fontColor(this.rowEnabled ? undefined : $r('sys.color.font_fourth'))  // 修改文字颜色
             .textOverflow({ overflow: this.uiConfig.stringDisplayIndex === 0 ? TextOverflow.Ellipsis : TextOverflow.Clip})
             .maxLines(this.uiConfig.stringDisplayIndex === 0 ? 1 : 2)
             .margin({top: 2})
@@ -960,8 +968,10 @@ export struct toggleRowList {
       this.toggle()
     }
     .RowStyle()
+    .enabled(this.rowEnabled)
     .clickEffect(this.uiConfig.isAnimation ? { level: ClickEffectLevel.MIDDLE} : null)
   }
+
 }
 
 /**
