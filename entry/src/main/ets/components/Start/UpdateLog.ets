@@ -37,7 +37,7 @@ export struct UpdateLog {
           logoImageBg: $r("app.media.foreground_box_cat_large"),
           appNameImage: $r("app.media.clash_box_blue"),
           listItemGroupBgColor: $r('app.color.container_background'),
-          versionName: AppState.versionName,
+          versionName: `${AppState.versionName}(${AppState.versionCode})`,
           updateLog: UpdateLogData,
           alignRow: VerticalAlign.Bottom,
           marginTitle: 8,
@@ -81,7 +81,7 @@ const UpdateLogData: TCItemProp[] = [
   // 名称：版本号+时间
   {
     title: '1.7.0 2025.11.24',
-    content: '* 如果启动后ip地址显示在国内可以多尝试几次刷新或者重新开关启动按钮 \n* 更新部分UI（导航栏样式可选悬浮或普通）\n* 新增配置分享二维码功能 \n* 新增pc状态栏猫咪图标 \n* 新增虚拟ip地址功能（解决部分用户ip冲突问题） \n* 新增配置导出功能 \n* 新增配置编辑功能 \n* 修复首页ip地址无法获取ipv6地址问题 \n* 修复首页网速图表无法正常显示流量曲线 \n* 更换新的webdav组件 \n* 其他体验bug修复'
+    content: '* 如果启动后ip地址显示在国内可以多尝试几次刷新或者重新开关启动按钮 \n* 更新部分UI（导航栏样式可选悬浮或普通）\n* 新增配置分享二维码功能 \n* 新增pc状态栏猫咪图标 \n* 新增虚拟ip地址功能（解决部分用户ip冲突问题） \n* 新增配置导出功能 \n* 新增配置编辑功能 \n* 修复首页ip地址无法获取ipv6地址问题 \n* 修复首页网速图表无法正常显示流量曲线 \n* 更换新的webdav库 \n* 其他体验bug修复'
   },
   {
     title: '1.6.6 2025.10.07',
