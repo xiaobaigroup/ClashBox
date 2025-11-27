@@ -13,6 +13,10 @@
       "value": "#F1F3F5"
     },
     {
+      "name": "tab_background",
+      "value": "#66F1F3F5"
+    },
+    {
       "name": "container_background",
       "value": "#FFFFFFFF"
     },

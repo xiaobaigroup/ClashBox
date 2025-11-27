@@ -307,6 +307,8 @@ struct ConfigurationPage {
             SymbolGlyph($r('sys.symbol.plus'))
               .fontSize(27).fontColor([icon_tertiary])
           }
+          .backdropBlur(this.uiConfig.isBlurr ? 20 : 0)
+          .backgroundColor(this.uiConfig.isBlurr ? $r('app.color.tab_background') : $r('app.color.background'))
           .borderRadius(30)
           .margin({ bottom: 20})
           .size({width: 50, height: 50})
@@ -318,12 +320,11 @@ struct ConfigurationPage {
             color: $r('app.color.shadow_button'),
             type: ShadowType.COLOR
           })
-          .backgroundColor($r('app.color.background'))
           .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
-          .margin({
-            bottom: Xb_TabBarVertical(this.widthBp, this.heightBp) || this.uiConfig.tabStyle == 'custom' ? 0 : this.bottomRectHeight + 80,
-            right: this.uiConfig.buttonPositionIndex == 0 ? 15 : 0,
-            left: this.uiConfig.buttonPositionIndex == 2 ? 15 : 0,
+         .margin({
+            bottom: Xb_TabBarVertical(this.widthBp, this.heightBp) || this.uiConfig.tabStyle == 'custom' ? 15 : this.bottomRectHeight + 63.5,
+            right: 15,
+            left: 15,
           })
           .onClick(() => {
             // 新配置

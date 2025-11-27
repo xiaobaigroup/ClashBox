@@ -367,6 +367,8 @@ struct ProxyPage {
           SymbolGlyph($r('sys.symbol.bolt_filled_on_circle'))
             .fontSize(27).fontColor([icon_tertiary])
         }
+        .backdropBlur(this.uiConfig.isBlurr ? 20 : 0)
+        .backgroundColor(this.uiConfig.isBlurr ? $r('app.color.tab_background') : $r('app.color.background'))
         .borderRadius(30)
         .size({width: 50, height: 50})
         .justifyContent(FlexAlign.Center)
@@ -378,7 +380,6 @@ struct ProxyPage {
           type: ShadowType.COLOR
         })
         .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
-        .backgroundColor($r('app.color.background'))
       }
       else if (this.uiConfig.buttonPositionIndex === 1 || !this.uiConfig.needProxyStart) {
         RoundButton({

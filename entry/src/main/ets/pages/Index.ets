@@ -314,6 +314,8 @@ struct Index {
   // 设置 -> 外观 -> 按钮位置变量
   @Provide ButtonPositionOffset: number = 0
   @Provide proxyTime: number = 0
+  // 光效
+  @Provide lightSourceType: hdsEffect.PointLightSourceType = hdsEffect.PointLightSourceType.NONE;
 
 
   build() {
@@ -506,9 +508,9 @@ struct Index {
   FloatBarBuilder() {
     Flex({
       direction: ((this.getFloatAlign() == 0 && Xb_TabBarVertical(this.widthBp, this.heightBp)) || (this.getFloatAlign() == 6 && !Xb_TabBarVertical(this.widthBp, this.heightBp))) ? Xb_FloatTabBarDirectionReverse(this.widthBp, this.heightBp) : Xb_FloatTabBarDirection(this.widthBp, this.heightBp),
-      justifyContent: (this.isRolling && this.uiConfig.isAnimation && this.widthBp < 2) ? FlexAlign.SpaceBetween : FlexAlign.Center,
+      justifyContent: this.widthBp < 2 ? FlexAlign.SpaceBetween : FlexAlign.Center,
       alignItems: this.widthBp < 2 ? ItemAlign.Center : ItemAlign.Start,
-      space: { main: (this.isRolling && this.uiConfig.isAnimation && this.widthBp < 2) ? LengthMetrics.vp(0) : LengthMetrics.vp(10) }
+      space: { main: LengthMetrics.vp(10) }
     })
     {
       // tab区
@@ -520,16 +522,18 @@ struct Index {
       }) {
         if (this.isRolling && this.uiConfig.isAnimation && this.widthBp < 2) {
           Column() {
-            SymbolGlyph($r('sys.symbol.list_bullet_square_fill'))
+            SymbolGlyph(this.tabList[this.tabCurrentPage].icon)
               .fontSize(27)
               .fontColor([this.icon_emphasize])
               .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)
-              .animation(animationStyle.animNormalUtils(0))
           }
           .width(60)
           .height(60)
           .justifyContent(FlexAlign.Center)
           .alignItems(HorizontalAlign.Center)
+          .onClick(()=>{
+            this.isRolling = false
+          })
         } else {
           ForEach(this.tabList, (item: TabBuild, index: number) => {
             Column() {
@@ -553,24 +557,29 @@ struct Index {
               }, this.uiConfig.animationSpeed, 'app')
               swiperController.changeIndex(index, true)
             })
+            .transition(customAnimationUtil.isSlideScaleBigMove(this.uiConfig))
           })
         }
       }
+      .transition(customAnimationUtil.isOpacity(this.uiConfig))
       .padding((this.isRolling && this.uiConfig.isAnimation && this.widthBp < 2) ? 0 : Xb_FloatTabBarPadding(this.widthBp, this.heightBp))
-      .width('auto')
+      .width((!this.isRolling && this.widthBp < 2) ? '100%' : 'auto')
       .height(this.widthBp < 2 ? 60 : 'auto')
-      // .layoutWeight(1)
+      .layoutWeight((!this.isRolling && this.widthBp < 2) ? 1 : undefined)
       .borderRadius(30)
-     // .borderColor($r("app.color.border"))
-      //.borderWidth(0.5)
-      .backgroundColor($r('app.color.background'))
-      .transition(customAnimationUtil.isSlideSwitch(this.uiConfig))
+      .borderColor($r("app.color.border"))
+      .borderWidth(0.5)
+      //背景模糊
+      .backdropBlur(this.uiConfig.isBlurr ? 20 : 0)
+      .backgroundColor(this.uiConfig.isBlurr ? $r('app.color.tab_background') : $r('app.color.background'))
+      .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
       .shadow({
         radius: 15,
         offsetY: 4,
         color: $r('app.color.shadow_button'),
         type: ShadowType.COLOR,
       })
+
       // 控制按钮区
       Row() {
         SymbolGlyph(this.proxyEnabled ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
@@ -578,7 +587,9 @@ struct Index {
         // this.FloatBarFunctionContentBuilder()
       }.functionButtonStyle(this.proxyEnabled && this.widthBp <= 2, this.icon_emphasize)
       .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
-      .backgroundColor(this.proxyEnabled ? this.icon_emphasize : $r('app.color.background'))
+      //背景模糊
+      .backdropBlur(this.uiConfig.isBlurr && !this.proxyEnabled ? 20 : 0)
+      .backgroundColor(this.proxyEnabled ? this.icon_emphasize : this.uiConfig.isBlurr ? $r('app.color.tab_background') : $r('app.color.background'))
       .onClick(() => {
         // 触发代理启动事件
         EventHub.sendEvent(EventKey.ChangeProxy)
@@ -629,7 +640,7 @@ struct Index {
       }*/
 
     }
-    .width((this.isRolling && this.uiConfig.isAnimation && this.widthBp < 2) ? '100%' : 'auto')
+    .width(this.widthBp < 2 ? '100%' : 'auto')
     .height('auto')
     .padding({ left: 10, right: 10 })
     .margin({ bottom: this.windowMode || this.bottomRectHeight == 0 ? 10 : this.bottomRectHeight - 10, top: this.windowMode ? 10 : this.topRectHeight })
@@ -642,6 +653,9 @@ struct Index {
           this.TabContentBuilder(index)
         })
       }
+      // 渐变模糊
+     // .linearGradientBlur(this.uiConfig.isBlurr && !this.isRolling ? 100 : 0,
+    //    { fractionStops: [[0, 0.3],[0, 0.85],[0.7, 0.9],[1, 1]], direction: GradientDirection.Bottom })
       .cachedCount(0)
       .indicator(false).loop(false)
       .width('100%').height('100%')
@@ -656,8 +670,7 @@ struct Index {
     }
     .width('100%')
     .height('100%')
-    .align(this.getFloatAlign())
-   // .backgroundColor($r('app.color.background'))
+    .align(Xb_FloatTabBarAlignCenter(this.widthBp, this.heightBp))//this.getFloatAlign())
   }
 
   @Builder
@@ -1589,6 +1602,7 @@ function functionButtonStyle(during: boolean, c: ResourceColor = $r('app.color.s
   .padding(during ? { left: 8, right: 8 } : 0)
   .size({width: /*during ? 130 : */60, height: 60})
   .justifyContent(FlexAlign.Center)
+  .aspectRatio(1)
   .alignItems(VerticalAlign.Center)
   .shadow({
     radius: 15,

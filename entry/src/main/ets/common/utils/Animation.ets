@@ -81,6 +81,18 @@ class AnimationUtil{
     return effectEvent
   }
 
+  //转场放大动画，i为直接延迟数值，uiConfig为动画速度以及开关的切换
+  public isSlideScaleBigMove(uiConfig:UIConfig){
+    effectEvent=
+      uiConfig.isAnimation ?
+        TransitionEffect.OPACITY
+          .animation({ duration: 50, curve: Curve.Linear,delay: 0 })
+          .combine(TransitionEffect.scale({x:0,y:0})):null
+    {}
+
+    return effectEvent
+  }
+
   //转场缩小动画，i为直接延迟数值，uiConfig为动画速度以及开关的切换
   public isSlideScaleSmall(i:number,uiConfig:UIConfig){
     effectEvent=
