@@ -68,8 +68,8 @@ export const TabBarHeight = BreakpointFunction2D<string>({
 export const FloatTabBarHeight = BreakpointFunction2D<Length>({
   ['sm']: {['hsm']: 60, ['hmd']: 60, ['hlg']: 60},
   ['md']: {['hsm']: '100%', ['hmd']: 'auto', ['hlg']: 'auto'},
-  ['lg']: {['hsm']: '100%', ['hmd']: 'auto', ['hlg']: 'auto'},
-  ['xl']: {['hsm']: '100%', ['hmd']: 'auto', ['hlg']: 'auto'},
+  ['lg']: {['hsm']: 'auto', ['hmd']: 'auto', ['hlg']: 'auto'},
+  ['xl']: {['hsm']: 'auto', ['hmd']: 'auto', ['hlg']: 'auto'},
 })
 
 /**Tab栏字体大小*/

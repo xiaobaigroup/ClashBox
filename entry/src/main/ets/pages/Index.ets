@@ -653,7 +653,7 @@ struct Index {
     .margin({
       bottom: this.windowMode || this.bottomRectHeight == 0 ? 10 : this.bottomRectHeight - 10,
       top: this.windowMode ? 10 : this.topRectHeight,
-      left: this.leftAvoidWidth + 19,  // TODO 待实机测试确定取值
+      left: this.leftAvoidWidth != 0 ? this.leftAvoidWidth + 19 : 0,  // TODO 待实机测试确定取值
     })
   }
   @Builder
@@ -672,7 +672,7 @@ struct Index {
       .width('100%').height('100%')
       .padding({
         top: this.topRectHeight,
-        left: (Xb_TabBarVertical(this.widthBp, this.heightBp)) ? 69 + this.leftAvoidWidth : 0
+        left: (Xb_TabBarVertical(this.widthBp, this.heightBp)) ? 69 + (this.leftAvoidWidth != 0 ? this.leftAvoidWidth + 19 : 0) : 0
       })
       .vertical(Xb_TabBarVertical(this.widthBp, this.heightBp))
       .onAnimationStart((startIndex: number, targetIndex: number, extraInfo: SwiperAnimationEvent) => {
