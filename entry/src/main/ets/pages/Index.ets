@@ -48,6 +48,7 @@ import { ConvertedUnit } from '../common/utils/DataUnitConvertUtils'
 import { WelcomeUserAgreement } from '../components/Start/WelcomePage'
 import { i18n } from '@kit.LocalizationKit'
 import {
+  FloatTabBarHeight,
   MoreNavMode,
   TabBarAlignItems,
   TabBarAvoidHeight,
@@ -568,7 +569,7 @@ struct Index {
       .margin({ top: (this.windowMode || this.topRectHeight == 0) && Xb_TabBarVertical(this.widthBp, this.heightBp)  ? 10 : 0})
       .padding((this.isRolling && this.uiConfig.isAnimation && this.widthBp < 2) ? 0 : Xb_FloatTabBarPadding(this.widthBp, this.heightBp))
       .width((!this.isRolling && this.widthBp < 2) ? '100%' : 'auto')
-      .height(this.widthBp < 2 ? 60 : (this.widthBp == 2 && this.heightBp == 0) ? '100%' : 'auto')
+      .height(FloatTabBarHeight(this.widthBp, this.heightBp))
       .layoutWeight((!this.isRolling && this.widthBp < 2) ? 1 : undefined)
       .borderRadius(30)
       .borderColor($r("app.color.border"))
@@ -646,13 +647,13 @@ struct Index {
       }*/
 
     }
-    .height((this.widthBp == 2 && this.heightBp == 0) ? '100%' : 'auto')
+    .height(FloatTabBarHeight(this.widthBp, this.heightBp))
     .width(this.widthBp < 2 ? '100%' : 'auto')
     .padding({ left: 10, right: 10 })
     .margin({
       bottom: this.windowMode || this.bottomRectHeight == 0 ? 10 : this.bottomRectHeight - 10,
       top: this.windowMode ? 10 : this.topRectHeight,
-      left: this.leftAvoidWidth,
+      left: this.leftAvoidWidth + 19,  // TODO 待实机测试确定取值
     })
   }
   @Builder

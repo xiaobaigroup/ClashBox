@@ -69,7 +69,7 @@ export function number2Time(number: number, isTextStyle: boolean = false) {
   const seconds = Math.floor((number % 60000) / 1000)
 
   if (isTextStyle) {
-    return `${hours}小时${minutes}分` // ${seconds}
+    return `${hours}小时${minutes}分${seconds}秒`
   } else {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
   }

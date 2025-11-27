@@ -64,6 +64,14 @@ export const TabBarHeight = BreakpointFunction2D<string>({
   ['xl']: {['hsm']: '100%', ['hmd']: '100%', ['hlg']: '100%'},
 })
 
+/**悬浮Tab栏高度*/
+export const FloatTabBarHeight = BreakpointFunction2D<Length>({
+  ['sm']: {['hsm']: 60, ['hmd']: 60, ['hlg']: 60},
+  ['md']: {['hsm']: '100%', ['hmd']: 'auto', ['hlg']: 'auto'},
+  ['lg']: {['hsm']: '100%', ['hmd']: 'auto', ['hlg']: 'auto'},
+  ['xl']: {['hsm']: '100%', ['hmd']: 'auto', ['hlg']: 'auto'},
+})
+
 /**Tab栏字体大小*/
 export const TabTitleFontSize = BreakpointFunction2D<number>({
   ['sm']: {['hsm']: 12, ['hmd']: 12, ['hlg']: 12},
