@@ -324,7 +324,7 @@ struct ProxyPage {
             .alignItems(VerticalAlign.Center)
             .backgroundColor(Color.Transparent)
             .margin({
-              bottom: $r('app.integer.vp_proxy_start_button_left_right_margin'),
+              bottom: Xb_TabBarVertical(this.widthBp, this.heightBp) || this.uiConfig.tabStyle == 'custom' ? 15 : this.bottomRectHeight == 0 ? 85 : this.bottomRectHeight + 63.5,
               right: $r('app.integer.vp_proxy_start_button_left_right_margin'),
               left: $r('app.integer.vp_proxy_start_button_left_right_margin')
             })
@@ -334,7 +334,6 @@ struct ProxyPage {
         .backgroundColor($r('app.color.background'))
         .width('100%')
         .height('100%')
-
         // 主体 END
       }
     }
@@ -395,7 +394,6 @@ struct ProxyPage {
           .offset({y: 3})
       }
     }
-    .margin({ bottom: Xb_TabBarVertical(this.widthBp, this.heightBp) || this.uiConfig.tabStyle == 'custom' ? 0 : this.bottomRectHeight + 175 })
     .bindPopup(!!this.isShowDelayPop, {
       builder: PopupBuilder(this, PopTips[3], () => {
         this.isShowDelayPop = false

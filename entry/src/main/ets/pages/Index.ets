@@ -527,11 +527,10 @@ struct Index {
               .fontColor([this.icon_emphasize])
               .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)
           }
-          .width(60)
-          .height(60)
+          .size({ width: 60, height: 60})
           .justifyContent(FlexAlign.Center)
           .alignItems(HorizontalAlign.Center)
-          .onClick(()=>{
+          .onClick(() => {
             this.isRolling = false
           })
         } else {
@@ -562,14 +561,15 @@ struct Index {
         }
       }
       .transition(customAnimationUtil.isOpacity(this.uiConfig))
+      .margin({ top: this.windowMode || this.topRectHeight == 0 ? 10 : 0})
       .padding((this.isRolling && this.uiConfig.isAnimation && this.widthBp < 2) ? 0 : Xb_FloatTabBarPadding(this.widthBp, this.heightBp))
       .width((!this.isRolling && this.widthBp < 2) ? '100%' : 'auto')
-      .height(this.widthBp < 2 ? 60 : 'auto')
+      .height(this.widthBp < 2 ? 60 : (this.widthBp == 2 && this.heightBp == 0) ? '100%' : 'auto')
       .layoutWeight((!this.isRolling && this.widthBp < 2) ? 1 : undefined)
       .borderRadius(30)
       .borderColor($r("app.color.border"))
       .borderWidth(0.5)
-      //背景模糊
+      // 背景模糊
       .backdropBlur(this.uiConfig.isBlurr ? 20 : 0)
       .backgroundColor(this.uiConfig.isBlurr ? $r('app.color.tab_background') : $r('app.color.background'))
       .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
@@ -585,9 +585,11 @@ struct Index {
         SymbolGlyph(this.proxyEnabled ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
           .fontSize(27).fontColor([this.proxyEnabled ? Color.White : icon_tertiary])
         // this.FloatBarFunctionContentBuilder()
-      }.functionButtonStyle(this.proxyEnabled && this.widthBp <= 2, this.icon_emphasize)
+      }
+      .margin({ bottom: this.windowMode || this.bottomRectHeight == 0 ? 20 : 0})
+      .functionButtonStyle(this.proxyEnabled && this.widthBp <= 2, this.icon_emphasize)
       .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
-      //背景模糊
+      // 背景模糊
       .backdropBlur(this.uiConfig.isBlurr && !this.proxyEnabled ? 20 : 0)
       .backgroundColor(this.proxyEnabled ? this.icon_emphasize : this.uiConfig.isBlurr ? $r('app.color.tab_background') : $r('app.color.background'))
       .onClick(() => {
@@ -640,8 +642,8 @@ struct Index {
       }*/
 
     }
-    .width(this.widthBp < 2 ? '100%' : 'auto')
-    .height('auto')
+    .height((this.widthBp == 2 && this.heightBp == 0) ? '100%' : 'auto')
+    .width('auto')
     .padding({ left: 10, right: 10 })
     .margin({ bottom: this.windowMode || this.bottomRectHeight == 0 ? 10 : this.bottomRectHeight - 10, top: this.windowMode ? 10 : this.topRectHeight })
   }

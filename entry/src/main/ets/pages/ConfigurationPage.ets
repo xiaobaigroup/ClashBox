@@ -303,33 +303,7 @@ struct ConfigurationPage {
               EventHub.sendEvent(EventKey.AddConfig)
             })
         } else {
-          Row() {
-            SymbolGlyph($r('sys.symbol.plus'))
-              .fontSize(27).fontColor([icon_tertiary])
-          }
-          .backdropBlur(this.uiConfig.isBlurr ? 20 : 0)
-          .backgroundColor(this.uiConfig.isBlurr ? $r('app.color.tab_background') : $r('app.color.background'))
-          .borderRadius(30)
-          .margin({ bottom: 20})
-          .size({width: 50, height: 50})
-          .justifyContent(FlexAlign.Center)
-          .alignItems(VerticalAlign.Center)
-          .shadow({
-            radius: 15,
-            offsetY: 4,
-            color: $r('app.color.shadow_button'),
-            type: ShadowType.COLOR
-          })
-          .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
-         .margin({
-            bottom: Xb_TabBarVertical(this.widthBp, this.heightBp) || this.uiConfig.tabStyle == 'custom' ? 15 : this.bottomRectHeight + 63.5,
-            right: 15,
-            left: 15,
-          })
-          .onClick(() => {
-            // 新配置
-            EventHub.sendEvent(EventKey.AddConfig)
-          })
+          this.FloatAddButton()
         }
         // 悬浮新增配置按钮 END
       }
@@ -341,7 +315,7 @@ struct ConfigurationPage {
     .width('100%')
     .height('100%')
     .alignContent(Alignment.Top)
-    .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear, delay: 0 })
+    // .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear, delay: 0 })
     .bindSheet($$this.isShowConfigAddBindSheet, this.ConfigAddBindSheetBuilder(), {
       detents: [BIND_SHEET_CONTAINER_HEIGHT, SheetSize.LARGE,], // SheetSize.LARGE
       backgroundColor: $r('app.color.background'),
@@ -467,6 +441,37 @@ struct ConfigurationPage {
      },*/
     ]
 
+  }
+
+  @Builder
+  FloatAddButton() {
+    Row() {
+      SymbolGlyph($r('sys.symbol.plus'))
+        .fontSize(27).fontColor([icon_tertiary])
+    }
+    .backdropBlur(this.uiConfig.isBlurr ? 20 : 0)
+    .backgroundColor(this.uiConfig.isBlurr ? $r('app.color.tab_background') : $r('app.color.background'))
+    .borderRadius(30)
+    .margin({ bottom: 20})
+    .size({width: 50, height: 50})
+    .justifyContent(FlexAlign.Center)
+    .alignItems(VerticalAlign.Center)
+    .shadow({
+      radius: 15,
+      offsetY: 4,
+      color: $r('app.color.shadow_button'),
+      type: ShadowType.COLOR
+    })
+    .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
+    .margin({
+      bottom: Xb_TabBarVertical(this.widthBp, this.heightBp) || this.uiConfig.tabStyle == 'custom' ? 15 : this.bottomRectHeight == 0 ? 85 : this.bottomRectHeight + 63.5,
+      right: 15,
+      left: 15,
+    })
+    .onClick(() => {
+      // 新配置
+      EventHub.sendEvent(EventKey.AddConfig)
+    })
   }
 
   /**
