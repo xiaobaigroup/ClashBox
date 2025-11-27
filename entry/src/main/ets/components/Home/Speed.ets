@@ -14,6 +14,8 @@ import { customAnimationUtil } from '../../common/utils/Animation';
 import { HomeCardPadding, HomeCardSpeedFontSize } from '../../common/breakpoint/BreakPoint';
 import { LengthMetrics } from '@kit.ArkUI';
 import { Xb_ResourceColorUtil } from 'xb_components';
+import { getResourceString } from '../../common/utils/ResourceStringUtil';
+import { number2Time } from '../../common/utils/TimeConvertUtil';
 
 
 @Component
@@ -37,6 +39,8 @@ struct Speed {
   @Consume isHomePage: boolean
   // 定时器ID，用于清除定时器
   private timerId: number = 0
+  // 代理启动持续的时间
+  @Consume proxyTime:number
   // 初始化图表数据
   @State defOption: Options = new Options({
     //图例
@@ -108,7 +112,10 @@ struct Speed {
         direction: FlexDirection.Row,
         justifyContent: FlexAlign.SpaceBetween
       }) {
-        CardTitle({ title: $r('app.string.Speed') })
+        CardTitle({
+          title: $r('app.string.Speed'),
+          subtitle: (getResourceString($r('app.string.px_sec_screen_use_time'), this) + number2Time(Number(this.proxyTime), true))
+        })
 
         Column() {
           Flex({

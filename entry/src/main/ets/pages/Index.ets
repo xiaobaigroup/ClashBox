@@ -117,6 +117,10 @@ struct Index {
   @StorageLink('windowHeight') @Watch('onWindowChange') windowHeight: number = 0
   // 应用窗口宽度
   @StorageLink('windowWidth') @Watch('onWindowChange') windowWidth: number = 0
+  // 左侧避让宽度
+  @StorageProp('LeftAvoidWidth') leftAvoidWidth: number = 0
+  // 左侧避让宽度
+  @StorageProp('RightAvoidWidth') rightAvoidWidth: number = 0
   // 分屏（正方形窗口）
   @Provide @Watch('isHiddenChange') isSmallSquareScreen: boolean = false
   // 手机横屏判断
@@ -561,7 +565,7 @@ struct Index {
         }
       }
       .transition(customAnimationUtil.isOpacity(this.uiConfig))
-      .margin({ top: this.windowMode || this.topRectHeight == 0 ? 10 : 0})
+      .margin({ top: (this.windowMode || this.topRectHeight == 0) && Xb_TabBarVertical(this.widthBp, this.heightBp)  ? 10 : 0})
       .padding((this.isRolling && this.uiConfig.isAnimation && this.widthBp < 2) ? 0 : Xb_FloatTabBarPadding(this.widthBp, this.heightBp))
       .width((!this.isRolling && this.widthBp < 2) ? '100%' : 'auto')
       .height(this.widthBp < 2 ? 60 : (this.widthBp == 2 && this.heightBp == 0) ? '100%' : 'auto')
@@ -586,7 +590,7 @@ struct Index {
           .fontSize(27).fontColor([this.proxyEnabled ? Color.White : icon_tertiary])
         // this.FloatBarFunctionContentBuilder()
       }
-      .margin({ bottom: this.windowMode || this.bottomRectHeight == 0 ? 20 : 0})
+      .margin({ bottom: (this.windowMode || this.bottomRectHeight == 0) && Xb_TabBarVertical(this.widthBp, this.heightBp) ? 20 : 0})
       .functionButtonStyle(this.proxyEnabled && this.widthBp <= 2, this.icon_emphasize)
       .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
       // 背景模糊
@@ -643,9 +647,13 @@ struct Index {
 
     }
     .height((this.widthBp == 2 && this.heightBp == 0) ? '100%' : 'auto')
-    .width('auto')
+    .width(this.widthBp < 2 ? '100%' : 'auto')
     .padding({ left: 10, right: 10 })
-    .margin({ bottom: this.windowMode || this.bottomRectHeight == 0 ? 10 : this.bottomRectHeight - 10, top: this.windowMode ? 10 : this.topRectHeight })
+    .margin({
+      bottom: this.windowMode || this.bottomRectHeight == 0 ? 10 : this.bottomRectHeight - 10,
+      top: this.windowMode ? 10 : this.topRectHeight,
+      left: this.leftAvoidWidth,
+    })
   }
   @Builder
   FloatTab() {
@@ -661,7 +669,10 @@ struct Index {
       .cachedCount(0)
       .indicator(false).loop(false)
       .width('100%').height('100%')
-      .padding({ top: this.topRectHeight, left: (Xb_TabBarVertical(this.widthBp, this.heightBp)) ? 66 : 0 })
+      .padding({
+        top: this.topRectHeight,
+        left: (Xb_TabBarVertical(this.widthBp, this.heightBp)) ? 69 + this.leftAvoidWidth : 0
+      })
       .vertical(Xb_TabBarVertical(this.widthBp, this.heightBp))
       .onAnimationStart((startIndex: number, targetIndex: number, extraInfo: SwiperAnimationEvent) => {
         this.tabCurrentPage = targetIndex

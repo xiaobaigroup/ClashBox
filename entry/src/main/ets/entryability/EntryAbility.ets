@@ -563,58 +563,75 @@ export default class EntryAbility extends UIAbility {
     console.info('Succeeded in 保存窗口对象.');
 
     // 获取布局避让遮挡的区域
-    let type = window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR; // 以导航条避让为例
-    let avoidArea = windowClass.getWindowAvoidArea(type);
-    let bottomRectHeight = this.uiContext?.px2vp(avoidArea.bottomRect.height); // 获取到导航条区域的高度
-    AppStorage.setOrCreate('bottomRectHeight', bottomRectHeight);
-    Xb_Global.BottomRectHeight = bottomRectHeight as number
+    let type = window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR; // 导航条避让
+    try {
+      let avoidArea = windowClass.getWindowAvoidArea(type);
+      let bottomRectHeight = this.uiContext?.px2vp(avoidArea.bottomRect.height); // 获取到导航条区域的高度
+      AppStorage.setOrCreate('bottomRectHeight', bottomRectHeight);
+      Xb_Global.BottomRectHeight = bottomRectHeight as number
 
-    type = window.AvoidAreaType.TYPE_SYSTEM; // 以状态栏避让为例
-    avoidArea = windowClass.getWindowAvoidArea(type);
-    let topRectHeight = this.uiContext?.px2vp(avoidArea.topRect.height); // 获取状态栏区域高度
-    AppStorage.setOrCreate('topRectHeight', topRectHeight);
-    hilog.info(0x0000, 'EntryAbility', '初始避让高度 Top：%{public}d Bottom: %{public}i', topRectHeight,
-      bottomRectHeight);
-    Xb_Global.TopRectHeight = topRectHeight as number
-    // 注册监听函数，动态获取避让区域数据
-    windowClass.on('avoidAreaChange', (data) => {
-      let topRectActiveHeight = 0
-      let bottomRectActiveHeight = 0
-      if (data.type === window.AvoidAreaType.TYPE_SYSTEM) {
-        topRectActiveHeight = data.area.topRect.height;
-        AppStorage.setOrCreate('topRectHeight', this.uiContext?.px2vp(topRectActiveHeight));
-      } else if (data.type == window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR) {
-        bottomRectActiveHeight = this.uiContext?.px2vp(data.area.bottomRect.height)!;
-        AppStorage.setOrCreate('bottomRectHeight', bottomRectActiveHeight);
+      type = window.AvoidAreaType.TYPE_SYSTEM; // 状态栏避让
+      try {
+        avoidArea = windowClass.getWindowAvoidArea(type);
+        let topRectHeight = this.uiContext?.px2vp(avoidArea.topRect.height); // 获取状态栏区域高度
+        AppStorage.setOrCreate('topRectHeight', topRectHeight);
+        hilog.info(0x0000, 'EntryAbility', '初始避让高度 Top：%{public}d Bottom: %{public}i', topRectHeight,
+          bottomRectHeight);
+        Xb_Global.TopRectHeight = topRectHeight as number
+        // 注册监听函数，动态获取避让区域数据
+        windowClass.on('avoidAreaChange', (data) => {
+          if (data.type === window.AvoidAreaType.TYPE_SYSTEM) {
+            const topRectActiveHeight = data.area.topRect.height;
+            AppStorage.setOrCreate('topRectHeight', this.uiContext?.px2vp(topRectActiveHeight));
+            hilog.info(0x0000, 'EntryAbility', '动态避让高度 Top：%{public}d', topRectActiveHeight);
+          } else if (data.type == window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR) {
+            const bottomRectActiveHeight = this.uiContext?.px2vp(data.area.bottomRect.height)!;
+            AppStorage.setOrCreate('bottomRectHeight', bottomRectActiveHeight);
+            hilog.info(0x0000, 'EntryAbility', '动态避让高度 Bottom: %{public}i', bottomRectActiveHeight);
+          } else if (data.type == window.AvoidAreaType.TYPE_CUTOUT) {
+            const leftAvoidWidth = this.uiContext?.px2vp(data.area.leftRect.width)
+            AppStorage.setOrCreate('LeftAvoidWidth', this.uiContext?.px2vp(leftAvoidWidth));
+            const rightAvoidWidth = this.uiContext?.px2vp(data.area.rightRect.width)
+            AppStorage.setOrCreate('RightAvoidWidth', this.uiContext?.px2vp(rightAvoidWidth));
+            hilog.info(0x0000, 'EntryAbility', '左侧避让宽度：%{public}i 右侧避让宽度：%{public}i', leftAvoidWidth, rightAvoidWidth)
+          }
+
+        });
+      } catch (error) {
+        console.error(`#EntryAbility Failed to 获取状态栏高度. Cause code: ${error.code}, message: ${error.message}`)
       }
-      hilog.info(0x0000, 'EntryAbility', '动态避让高度 Top：%{public}d Bottom: %{public}i', topRectActiveHeight,
-        bottomRectActiveHeight);
-    });
+    } catch (error) {
+      console.error(`#EntryAbility Failed to 导航栏高度. Cause code: ${error.code}, message: ${error.message}`)
+    }
 
     // 应用窗口初始高度和宽度
-    let properties = windowClass.getWindowProperties()
-    let rect = properties.windowRect
-    let WindowHeight = this.uiContext?.px2vp(rect.height)
-    let WindowWidth = this.uiContext?.px2vp(rect.width)
-    hilog.info(0x0000, 'WindowLog', '窗口高度：%{public}d px 宽度：%{public}i px', rect.height, rect.width)
-    AppStorage.setOrCreate('windowHeight', WindowHeight)
-    AppStorage.setOrCreate('windowWidth', WindowWidth)
-    // 监听窗口大小变化
     try {
-      windowClass.on('windowSizeChange', async (data) => {
-        // 动态监听设备窗口模式
-        this.onWindowModeChange(windowStage, windowClass)
-        console.info('#WindowChange Succeeded in enabling the listener for window size changes. Data: ' +
-        JSON.stringify(data))
-        WindowWidth = this.uiContext?.px2vp(data.width)!
-        WindowHeight = this.uiContext?.px2vp(data.height)!
-        AppStorage.setOrCreate('windowWidth', WindowWidth)
-        AppStorage.setOrCreate('windowHeight', WindowHeight) // 980px 约等于 512vp
-        // 动态监听高度断点
-        this.onHeightBpChange(WindowHeight, WindowWidth)
-      })
-    } catch (exception) {
-      console.error(`#EntryAbility Failed to enable the listener for window size changes. Cause code: ${exception.code}, message: ${exception.message}`)
+      let properties = windowClass.getWindowProperties()
+      let rect = properties.windowRect
+      let WindowHeight = this.uiContext?.px2vp(rect.height)
+      let WindowWidth = this.uiContext?.px2vp(rect.width)
+      hilog.info(0x0000, 'WindowLog', '窗口高度：%{public}d px 宽度：%{public}i px', rect.height, rect.width)
+      AppStorage.setOrCreate('windowHeight', WindowHeight)
+      AppStorage.setOrCreate('windowWidth', WindowWidth)
+      // 监听窗口大小变化
+      try {
+        windowClass.on('windowSizeChange', async (data) => {
+          // 动态监听设备窗口模式
+          this.onWindowModeChange(windowStage, windowClass)
+          console.info('#WindowChange Succeeded in enabling the listener for window size changes. Data: ' +
+          JSON.stringify(data))
+          WindowWidth = this.uiContext?.px2vp(data.width)!
+          WindowHeight = this.uiContext?.px2vp(data.height)!
+          AppStorage.setOrCreate('windowWidth', WindowWidth)
+          AppStorage.setOrCreate('windowHeight', WindowHeight) // 980px 约等于 512vp
+          // 动态监听高度断点
+          this.onHeightBpChange(WindowHeight, WindowWidth)
+        })
+      } catch (exception) {
+        console.error(`#EntryAbility Failed to enable the listener for window size changes. Cause code: ${exception.code}, message: ${exception.message}`)
+      }
+    } catch (error) {
+      console.error(`#EntryAbility Failed to getWindowProperties. Cause code: ${error.code}, message: ${error.message}`)
     }
   }
 

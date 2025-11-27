@@ -12,8 +12,6 @@ export struct CardTitle {
   @Consume proxyEnabled: boolean
   @State title: ResourceStr = ''
   @Prop subtitle: ResourceStr
-  // 代理启动持续的时间
-  @Consume proxyTime:number
 
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   /* 当前设备`height`是否符合(320vp< height <= 500vp) */
@@ -34,13 +32,14 @@ export struct CardTitle {
         if (this.subtitle) {
           // 计时器文本
           if(this.proxyEnabled) {
-            Text((getResourceString($r('app.string.px_sec_screen_use_time'), this) + number2Time(Number(this.proxyTime), true)))
+            Text(this.subtitle)
               .fontSize(14)
               .fontColor($r('sys.color.font_secondary'))
               .transition(customAnimationUtil.isSlideR(0, this.uiConfig))
           }
         }
       }
+      .alignItems(HorizontalAlign.Start)
     }
     .width('100%')
     .padding({bottom: HomeCardTitleBottomMargin(this.widthBp, this.heightBp)})

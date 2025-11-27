@@ -29,7 +29,7 @@
         ],
         "recoverable": true,
         "minWindowWidth": 332,
-        "minWindowHeight": 332,
+        "minWindowHeight": 498,
         "maxWindowHeight": 4800,
         "exported": true,
         "backgroundModes": [
