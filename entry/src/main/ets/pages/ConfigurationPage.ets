@@ -449,8 +449,8 @@ struct ConfigurationPage {
       SymbolGlyph($r('sys.symbol.plus'))
         .fontSize(27).fontColor([icon_tertiary])
     }
-    .backdropBlur(this.uiConfig.isBlurr ? 20 : 0)
-    .backgroundColor(this.uiConfig.isBlurr ? $r('app.color.tab_background') : $r('app.color.background'))
+    .backdropBlur(this.uiConfig.isBlurr ? 30 : 0)
+    .backgroundColor(this.uiConfig.isBlurr ? $r('app.color.float_tab_background_blur') : $r('app.color.background'))
     .borderRadius(30)
     .margin({ bottom: 20})
     .size({width: 50, height: 50})

@@ -13,8 +13,8 @@
       "value": "#F1F3F5"
     },
     {
-      "name": "tab_background",
-      "value": "#66F1F3F5"
+      "name": "float_tab_background_blur",
+      "value": "#B3F1F3F5"
     },
     {
       "name": "container_background",

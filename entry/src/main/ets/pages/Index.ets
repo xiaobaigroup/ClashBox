@@ -572,11 +572,11 @@ struct Index {
       .height(FloatTabBarHeight(this.widthBp, this.heightBp))
       .layoutWeight((!this.isRolling && this.widthBp < 2) ? 1 : undefined)
       .borderRadius(30)
-      .borderColor($r("app.color.border"))
-      .borderWidth(0.5)
+      //.borderColor($r("app.color.border"))
+      //.borderWidth(0.5)
       // 背景模糊
-      .backdropBlur(this.uiConfig.isBlurr ? 20 : 0)
-      .backgroundColor(this.uiConfig.isBlurr ? $r('app.color.tab_background') : $r('app.color.background'))
+      .backdropBlur(this.uiConfig.isBlurr ? 30 : 0)
+      .backgroundColor(this.uiConfig.isBlurr ? $r('app.color.float_tab_background_blur') : $r('app.color.background'))
       .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
       .shadow({
         radius: 15,
@@ -595,8 +595,8 @@ struct Index {
       .functionButtonStyle(this.proxyEnabled && this.widthBp <= 2, this.icon_emphasize)
       .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
       // 背景模糊
-      .backdropBlur(this.uiConfig.isBlurr && !this.proxyEnabled ? 20 : 0)
-      .backgroundColor(this.proxyEnabled ? this.icon_emphasize : this.uiConfig.isBlurr ? $r('app.color.tab_background') : $r('app.color.background'))
+      .backdropBlur(this.uiConfig.isBlurr && !this.proxyEnabled ? 30 : 0)
+      .backgroundColor(this.proxyEnabled ? this.icon_emphasize : this.uiConfig.isBlurr ? $r('app.color.float_tab_background_blur') : $r('app.color.background'))
       .onClick(() => {
         // 触发代理启动事件
         EventHub.sendEvent(EventKey.ChangeProxy)
@@ -649,7 +649,7 @@ struct Index {
     }
     .height(FloatTabBarHeight(this.widthBp, this.heightBp))
     .width(this.widthBp < 2 ? '100%' : 'auto')
-    .padding({ left: 10, right: 10 })
+    .padding({ left: 10, right: 10, top: this.topRectHeight === 0 ? 10 : 0, bottom: this.topRectHeight === 0 ? 10 : 0 })
     .margin({
       bottom: this.windowMode || this.bottomRectHeight == 0 ? 10 : this.bottomRectHeight - 10,
       top: this.windowMode ? 10 : this.topRectHeight,
