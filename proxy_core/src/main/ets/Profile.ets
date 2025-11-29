@@ -3,7 +3,7 @@ import { getProfilePath, getProfilesPath } from './appPath';
 import { Context } from '@kit.AbilityKit';
 import { fileUri } from '@kit.CoreFileKit';
 import { ProxyGroup, ProxyType, SubscriptionInfo } from './models/Common';
-import {  util } from '@kit.ArkTS';
+import { JSON, util } from '@kit.ArkTS';
 import { http } from '@kit.NetworkKit';
 
 export function generateUUID() {
@@ -68,7 +68,6 @@ export class Profile {
     let profilePath = await getProfilePath(this.context, this.id);
     fs.unlink(profilePath)
     fs.unlink(profileDir)
-
   }
   async update(vailConfig: (config: string) =>Promise<string>): Promise<boolean>{
     let httpRequest = http.createHttp()
@@ -85,6 +84,11 @@ export class Profile {
       this.subscriptionInfo = SubscriptionInfo.formHString(userinfo)
     }
     if (resp.result) {
+      let json = JSON.parse(resp.result as string) as object
+      let msg = json?.["msg"] as string
+      if(msg)
+        throw new Error(msg);
+      // TODO 验证是否yaml格式的内容,不是不能更新
       await this.save(resp.result as string | ArrayBuffer, vailConfig)
     }
     return true
@@ -92,20 +96,25 @@ export class Profile {
   async save(raw: string | ArrayBuffer, vailConfig:(config: string)=> Promise<string>): Promise<Profile>{
     let bytes = new Uint8Array()
     if(typeof raw == "string"){
+
       bytes= utf8e.encodeInto(raw)
     }else{
       bytes = new Uint8Array(raw)
     }
     const filePath = await getProfilePath(this.context, this.id)
+    const tempPath = this.context!.tempDir + "/temp.config";
+    const temp = await fs.open(tempPath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE | fs.OpenMode.TRUNC)
+    await fs.write(temp.fd, bytes.buffer)
+    await fs.close(temp.fd)
+    let message = await vailConfig(tempPath);
+    await fs.unlink(tempPath);
+    if (message != "") {
+      throw new Error(message);
+    }
     const file = await fs.open(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE | fs.OpenMode.TRUNC)
     await fs.write(file.fd, bytes.buffer)
     await fs.fsync(file.fd)
     await fs.close(file.fd)
-    let message = await vailConfig(filePath);
-    if (message != "") {
-      this.delete()
-      throw new Error(message);
-    }
     this.lastUpdateDate = new Date().getTime()
     return this
   }

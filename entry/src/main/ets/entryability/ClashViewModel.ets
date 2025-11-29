@@ -65,7 +65,7 @@ export class ClashViewModel {
       data.configAutoUpdateTimeGapValue ?? 10,
       data.configAutoUpdateTimeGapTextPickerIndex
     )
-    await profile.checkAndUpdate((c)=>this.VailConfig(c))
+    await profile.checkAndUpdate(async (c)=> await this.VailConfig(c))
     const isExists = await profile.check();
     if (isExists) {
       await this.profileRepo.addOrUpdate(profile)
@@ -96,7 +96,7 @@ export class ClashViewModel {
         newProfile.autoUpdate = profile.autoUpdate
         newProfile.autoUpdateDuration = profile.autoUpdateDuration ?? 10
         console.log(`配置${profile.name}基础设置完成`)
-        await newProfile.checkAndUpdate((c)=>this.VailConfig(c))
+        await newProfile.checkAndUpdate(async (c)=> await this.VailConfig(c))
       } else {
         // 本地文件配置
         try {
@@ -175,10 +175,9 @@ export class ClashViewModel {
         } catch (e) {
           let message = ""
           if (this.context) {
-            message = `${Xb_GetResourceString($r('app.string.Configuration'), this.context)} ${profile.name} ${Xb_GetResourceString($r('app.string.update_failed'), this.context)} ${Xb_GetResourceString($r('app.string.check_configured_URL'), this.context)}`
-            ClashViewModel.promptAction.showToast({ message })
+            message = `${Xb_GetResourceString($r('app.string.Configuration'), this.context)} ${profile.name} ${Xb_GetResourceString($r('app.string.update_failed'), this.context)}: ${e.message} ${Xb_GetResourceString($r('app.string.check_configured_URL'), this.context)}`
+            Xb_ToastUtil.showToast({message: message})
           }
-
           return Promise.reject(message)
         }
       }
@@ -186,14 +185,14 @@ export class ClashViewModel {
       const list = (await this.getProfiles()).filter(d => d.type == ProfileType.Url)
       for(let p of list){
         p.loadContext(this.context, ua)
-        await p.update((c) => this.VailConfig(c))
+        await p.update(async (c) => await this.VailConfig(c))
         await this.profileRepo.addOrUpdate(p)
       }
     }
     EventHub.sendEvent(EventKey.FetchProfile, null)
   }
   async VailConfig(config: string): Promise<string>{
-    return this.socketProxy.vailConfig(config)
+    return await this.socketProxy.vailConfig(config)
   }
   async changeProxy(profile: Profile, g:string, p: string){
     try {

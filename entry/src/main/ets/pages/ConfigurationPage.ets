@@ -737,7 +737,7 @@ struct ConfigurationPage {
       this.isON.toggleAnim = true
       await ClashViewModel.updateProfileConfig(configId)
       hilog.info(0xC012, componentName, `#updateConfig#更新配置{单个}: configUrl is [${this.currentTouchConfigData.configUrl}], configId is [${this.currentTouchConfigData.configId}]`)
-      Xb_ToastUtil.showToast({message: $r('app.string.updated_success_config')})
+
     } else {
       // 使开关点击时不触发转场动画
       this.isON.toggleAnim = true
