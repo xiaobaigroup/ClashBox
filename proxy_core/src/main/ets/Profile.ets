@@ -84,10 +84,14 @@ export class Profile {
       this.subscriptionInfo = SubscriptionInfo.formHString(userinfo)
     }
     if (resp.result) {
-      let json = JSON.parse(resp.result as string) as object
-      let msg = json?.["msg"] as string
-      if(msg)
-        throw new Error(msg);
+      try {
+        let json = JSON.parse(resp.result as string) as object
+        let msg = json?.["msg"] as string
+        if(msg)
+          throw new Error(msg);
+      }catch (_) {
+        // ignore
+      }
       // TODO 验证是否yaml格式的内容,不是不能更新
       await this.save(resp.result as string | ArrayBuffer, vailConfig)
     }
