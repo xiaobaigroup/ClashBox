@@ -120,7 +120,7 @@ struct Index {
   @StorageLink('windowWidth') @Watch('onWindowChange') windowWidth: number = 0
   // 左侧避让宽度
   @StorageProp('LeftAvoidWidth') leftAvoidWidth: number = 0
-  // 左侧避让宽度
+  // 右侧避让宽度
   @StorageProp('RightAvoidWidth') rightAvoidWidth: number = 0
   // 分屏（正方形窗口）
   @Provide @Watch('isHiddenChange') isSmallSquareScreen: boolean = false
@@ -492,7 +492,7 @@ struct Index {
       },this.uiConfig.animationSpeed, 'app', 0)
     })
     .onAnimationStart((index: number, targetIndex: number) => {
-      animationStyle.animToAPI18(()=>{
+      animationStyle.animToAPI18(() => {
         this.tabCurrentPage = targetIndex;
       },this.uiConfig.animationSpeed, 'app', 0)
     })
@@ -651,9 +651,9 @@ struct Index {
     .width(this.widthBp < 2 ? '100%' : 'auto')
     .padding({ left: 10, right: 10, top: this.topRectHeight === 0 ? 10 : 0, bottom: this.topRectHeight === 0 ? 10 : 0 })
     .margin({
-      bottom: this.windowMode || this.bottomRectHeight == 0 ? 10 : this.bottomRectHeight - 10,
+      bottom: this.windowMode || this.bottomRectHeight == 0 ? 10 : this.bottomRectHeight /*+ this.bottomAvoidWidth*/ - 10,
       top: this.windowMode ? 10 : this.topRectHeight,
-      left: this.leftAvoidWidth != 0 ? this.leftAvoidWidth + 19 : 0,  // TODO 待实机测试确定取值
+      left: (this.leftAvoidWidth != 0/* && this.windowHeight <= 520*/)  ? this.leftAvoidWidth + 19 : 0,  // TODO 待实机测试确定取值
     })
   }
   @Builder
@@ -672,7 +672,7 @@ struct Index {
       .width('100%').height('100%')
       .padding({
         top: this.topRectHeight,
-        left: (Xb_TabBarVertical(this.widthBp, this.heightBp)) ? 69 + (this.leftAvoidWidth != 0 ? this.leftAvoidWidth + 19 : 0) : 0
+        left: (Xb_TabBarVertical(this.widthBp, this.heightBp)) ? 69 + ((this.leftAvoidWidth != 0 && this.windowHeight <= 520) ? this.leftAvoidWidth + 19 : 0) : 0
       })
       .vertical(Xb_TabBarVertical(this.widthBp, this.heightBp))
       .onAnimationStart((startIndex: number, targetIndex: number, extraInfo: SwiperAnimationEvent) => {

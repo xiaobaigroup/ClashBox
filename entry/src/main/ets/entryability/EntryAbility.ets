@@ -21,6 +21,8 @@ import { Timer } from '../common/utils/HHmmssTimer';
 import { number2Time } from '../common/utils/TimeConvertUtil';
 import { customVibrator } from '../common/utils/VibratorUtil';
 import { StatusBarConfig, StatusBarIconResource,
+  SmartAvoidance,
+  Xb_AvoidanceManager,
   Xb_ColorUtils,
   Xb_Global, Xb_KVdbUtil,
   Xb_StatusBarUtils,
@@ -55,6 +57,15 @@ export default class EntryAbility extends UIAbility {
     events: ["VpnServiceTimeEvent"]
   };
   private proxyStartedTimer = new Timer()
+  private avoidManager: Xb_AvoidanceManager | undefined = undefined;
+  private avoidListener: (avoidance: SmartAvoidance) => void = (newAvoidance) => {
+    AppStorage.setOrCreate('bottomRectHeight', newAvoidance.bottom);
+    Xb_Global.BottomRectHeight = newAvoidance.bottom
+    AppStorage.setOrCreate('topRectHeight', newAvoidance.top);
+    Xb_Global.TopRectHeight = newAvoidance.top
+    AppStorage.setOrCreate('LeftAvoidWidth', newAvoidance.left);
+    AppStorage.setOrCreate('RightAvoidWidth', newAvoidance.right);
+  }
 
   // 冷启动
   async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam) {
@@ -282,6 +293,11 @@ export default class EntryAbility extends UIAbility {
     AppStorage.setOrCreate('ForwardState', false)
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onBackground');
     this.saveConfigThePreferences();
+    if (this.avoidManager) {
+      this.avoidManager.offChangeListener(this.avoidListener);
+      this.avoidManager.destroy();
+      this.avoidManager = undefined;
+    }
   }
 
   onDestroy(): void {
@@ -547,7 +563,7 @@ export default class EntryAbility extends UIAbility {
     }
   }
 
-  private intRectWindow(windowStage: window.WindowStage) {
+  private async intRectWindow(windowStage: window.WindowStage) {
     // 获取应用主窗口
     let windowClass: window.Window = windowStage.getMainWindowSync();
     // 设置窗口全屏
@@ -563,46 +579,11 @@ export default class EntryAbility extends UIAbility {
     console.info('Succeeded in 保存窗口对象.');
 
     // 获取布局避让遮挡的区域
-    let type = window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR; // 导航条避让
-    try {
-      let avoidArea = windowClass.getWindowAvoidArea(type);
-      let bottomRectHeight = this.uiContext?.px2vp(avoidArea.bottomRect.height); // 获取到导航条区域的高度
-      AppStorage.setOrCreate('bottomRectHeight', bottomRectHeight);
-      Xb_Global.BottomRectHeight = bottomRectHeight as number
-
-      type = window.AvoidAreaType.TYPE_SYSTEM; // 状态栏避让
-      try {
-        avoidArea = windowClass.getWindowAvoidArea(type);
-        let topRectHeight = this.uiContext?.px2vp(avoidArea.topRect.height); // 获取状态栏区域高度
-        AppStorage.setOrCreate('topRectHeight', topRectHeight);
-        hilog.info(0x0000, 'EntryAbility', '初始避让高度 Top：%{public}d Bottom: %{public}i', topRectHeight,
-          bottomRectHeight);
-        Xb_Global.TopRectHeight = topRectHeight as number
-        // 注册监听函数，动态获取避让区域数据
-        windowClass.on('avoidAreaChange', (data) => {
-          if (data.type === window.AvoidAreaType.TYPE_SYSTEM) {
-            const topRectActiveHeight = data.area.topRect.height;
-            AppStorage.setOrCreate('topRectHeight', this.uiContext?.px2vp(topRectActiveHeight));
-            hilog.info(0x0000, 'EntryAbility', '动态避让高度 Top：%{public}d', topRectActiveHeight);
-          } else if (data.type == window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR) {
-            const bottomRectActiveHeight = this.uiContext?.px2vp(data.area.bottomRect.height)!;
-            AppStorage.setOrCreate('bottomRectHeight', bottomRectActiveHeight);
-            hilog.info(0x0000, 'EntryAbility', '动态避让高度 Bottom: %{public}i', bottomRectActiveHeight);
-          } else if (data.type == window.AvoidAreaType.TYPE_CUTOUT) {
-            const leftAvoidWidth = this.uiContext?.px2vp(data.area.leftRect.width)
-            AppStorage.setOrCreate('LeftAvoidWidth', this.uiContext?.px2vp(leftAvoidWidth));
-            const rightAvoidWidth = this.uiContext?.px2vp(data.area.rightRect.width)
-            AppStorage.setOrCreate('RightAvoidWidth', this.uiContext?.px2vp(rightAvoidWidth));
-            hilog.info(0x0000, 'EntryAbility', '左侧避让宽度：%{public}i 右侧避让宽度：%{public}i', leftAvoidWidth, rightAvoidWidth)
-          }
-
-        });
-      } catch (error) {
-        console.error(`#EntryAbility Failed to 获取状态栏高度. Cause code: ${error.code}, message: ${error.message}`)
-      }
-    } catch (error) {
-      console.error(`#EntryAbility Failed to 导航栏高度. Cause code: ${error.code}, message: ${error.message}`)
-    }
+    this.avoidManager = new Xb_AvoidanceManager(windowClass, this.uiContext!);
+    await this.avoidManager.init();
+    // 注册监听器，当避让值变化时，更新UI状态
+    this.avoidManager.onChangeListener(this.avoidListener);
+    hilog.info(0x0000, 'EntryAbility Avoidance', 'Manager initialized and listener registered.');
 
     // 应用窗口初始高度和宽度
     try {
