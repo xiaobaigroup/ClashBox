@@ -1293,6 +1293,10 @@
       "value": "Auto Update"
     },
     {
+      "name": "disable_update",
+      "value": "Disable Update"
+    },
+    {
       "name": "auto_update_interval",
       "value": "Automatic update interval"
     },

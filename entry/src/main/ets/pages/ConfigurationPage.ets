@@ -232,7 +232,7 @@ struct ConfigurationPage {
                     this.isON.toggleAnim = true
                     // 更新当前选中
                     this.currentRadioConfigData = item
-                    await this.loadConfig(item, true)
+                    await this.loadConfig(item)
                   })
                   .onMouse((event) => {
                     if (event.action == MouseAction.Press && event.button == MouseButton.Right) {
@@ -622,8 +622,8 @@ struct ConfigurationPage {
     }
   }
 
-  async loadConfig(item: ConfigData, needUpdated: boolean) {
-    hilog.info(0xC011, componentName, `EditConfig #loadConfig#加载配置: configName is [${this.currentTouchConfigData.configName}] 是否需要更新：${needUpdated} 更新时间：${item.updateTime}`)
+  async loadConfig(item: ConfigData, needUpdated: boolean = true) {
+    hilog.info(0xC011, componentName, `EditConfig UpdateConfig #loadConfig#加载配置: configName is [${this.currentTouchConfigData.configName}] 是否需要更新：${needUpdated && !item.disableUpdate} 更新时间：${item.updateTime}`)
     if (this.isLoading)
       return
     this.getUIContext().animateTo({
@@ -637,10 +637,10 @@ struct ConfigurationPage {
     this.appConfig.currentProfileName = item.configName
     this.appConfig.currentProfileId = item.configId
     try {
-      if (needUpdated) {
+      if (needUpdated && !item.disableUpdate) {
         ClashViewModel.updateProfileConfig(item.configId)
       }
-      ClashViewModel.socketProxy.reset()
+      await ClashViewModel.socketProxy.reset()
       await ClashViewModel.loadConfig(false, '配置页-加载')
       hilog.info(0xC011, componentName, `EditConfig #loadConfig#更新并加载完成 configName is [${this.currentTouchConfigData.configName}]`)
     } catch (e) {
@@ -668,7 +668,7 @@ struct ConfigurationPage {
     // 首次导入配置自动选中
     if (this.configList.length === 1 && this.uiConfig.isFirstImportConfig) {
       this.isON.toggleAnim = true
-      await this.loadConfig(this.configList[0], true)
+      await this.loadConfig(this.configList[0])
       this.uiConfig.isFirstImportConfig = false
       hilog.info(0xC002, componentName,
         `EditConfig #onConfigListChange: 首次导入：${this.uiConfig.isFirstImportConfig} configName is [${this.configList[0].configName}]`)
@@ -729,7 +729,7 @@ struct ConfigurationPage {
   /**更新配置*/
   private async updateConfig(configId?: string): Promise<void> {
     Xb_ToastUtil.showToast({message: $r('app.string.updating_config')})
-    this.loadConfig(this.currentRadioConfigData, true)
+    this.loadConfig(this.currentRadioConfigData)
     if (configId) {
       this.isRefreshing = false
       // 使开关点击时不触发转场动画

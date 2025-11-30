@@ -109,16 +109,6 @@ export struct ImportConfigFromURL {
       }
     })
     .onReady( (ctx: NavDestinationContext) => {
-      // let paramJsonStr: string = JSON.stringify(this.configAddPageInfos.getParamByName(RouteName.IMPORT_CONFIG_FROM_URL))
-      // hilog.info(0xCA11, componentName, `#aboutToAppear#NavPathStack.getParamByName(${RouteName.IMPORT_CONFIG_FROM_URL}), result is: ${paramJsonStr}`)
-      // if( this.configAddPageInfos.getParamByName(RouteName.IMPORT_CONFIG_FROM_URL).length > 0 && this.configAddPageInfos.getParamByName(RouteName.IMPORT_CONFIG_FROM_URL)[0] !== null ) {
-      //   try {
-      //     this.configData = (JSON.parse(paramJsonStr) as Array<ConfigData>)[0]
-      //   } catch (e) {
-      //     let error = e as BusinessError;
-      //     hilog.error(0xCA11, componentName, `#aboutToAppear#JSON.parse(paramJsonStr) as ConfigData#ERROR: code is [${error.code}],message is [${error.message}]`)
-      //   }
-      // }
       // 接收信息
       try {
         const params: ConfigData = ctx?.pathInfo?.param as ConfigData

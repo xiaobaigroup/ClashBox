@@ -804,9 +804,7 @@ struct Index {
     const profiles = await ClashViewModel.getProfiles()
     console.error(`配置已获取：${JSON.stringify(profiles)}`)
     this.configList = profiles.map((d) => {
-
       const timeGap = convertMillisecondsToTimeGap(d.autoUpdateDuration)
-
       return {
         configId: d.id,
         configName: d.name,
@@ -814,6 +812,7 @@ struct Index {
         configUrl: d.url,
         sourceType: d.type,
         isConfigAutoUpdate: d.autoUpdate,
+        disableUpdate: d.isUpdating,
         configAutoUpdateTimeGapValue: timeGap.value,
         configAutoUpdateTimeGapMs: d.autoUpdateDuration,
         configAutoUpdateTimeGapTextPickerIndex: timeGap.unit,

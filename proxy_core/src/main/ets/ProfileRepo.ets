@@ -3,6 +3,7 @@ import { common } from '@kit.AbilityKit';
 import { Profile } from './Profile';
 import { SubscriptionInfo } from './models/Common';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { JSON } from '@kit.ArkTS';
 
 export class ProfileRepo {
   store: relationalStore.RdbStore | undefined
@@ -103,7 +104,8 @@ export class ProfileRepo {
       subscriptionInfo: JSON.stringify(details.subscriptionInfo),
       proxySelected: JSON.stringify(jsonObject)
     }
-    if (old.rowCount > 0){
+    console.debug(`UpdateConfig 待更新或插入数据：${JSON.stringify(input, null, 2)}`)
+    if (old.rowCount > 0) {
       await this.store!.update(input, predicates)
       return 1
     }
@@ -114,18 +116,18 @@ export class ProfileRepo {
 
   getFromCursor(c: relationalStore.ResultSet): Profile {
     const details = new Profile(0,"");
-    details.id = c.getString(0);
-    details.name = c.getString(1);
-    details.type = c.getLong(2);
-    details.url = c.getString(3);
-    details.currentGroupName = c.getString(4);
-    details.isUpdating = c.getLong(5) == 1;
-    details.autoUpdate = c.getLong(6) == 1;
-    details.lastUpdateDate = c.getLong(7);
-    details.autoUpdateDuration = c.getLong(8);
-
     try {
+      details.id = c.getString(0);
+      details.name = c.getString(1);
+      details.type = c.getLong(2);
+      details.url = c.getString(3);
+      details.currentGroupName = c.getString(4);
+      details.isUpdating = c.getLong(5) == 1;
+      details.autoUpdate = c.getLong(6) == 1;
+      details.lastUpdateDate = c.getLong(7);
+      details.autoUpdateDuration = c.getLong(8);
       details.subscriptionInfo = JSON.parse(c.getString(9)) as SubscriptionInfo;
+
       const map = new Map<string, string>();
       let json = JSON.parse(c.getString(10)) as Record<string, string>
       Object.keys(json).forEach((key) => {

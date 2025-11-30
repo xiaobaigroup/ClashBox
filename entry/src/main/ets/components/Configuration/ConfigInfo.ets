@@ -21,11 +21,10 @@ import { UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../common/utils/Animation"
 import { NavigationListPadding } from "../../common/breakpoint/BreakPoint"
 
+const componentName: string = 'ConfigInfo'
+
 @Component
 export struct ConfigInfo {
-
-  private componentName: string = 'ConfigInfo'
-  private promptAction:PromptAction = this.getUIContext()?.getPromptAction()
 
   /* 主题色 */
   @Consume('icon_emphasize')
@@ -116,18 +115,46 @@ export struct ConfigInfo {
           }
         })
 
-      // 配置自动更新 START
-      List({space:LIST_SPACE}){
-        ListItemGroup({style:ListItemGroupStyle.CARD}){
+      // 配置自动更新 & 禁用更新 START
+      List({space: LIST_SPACE}) {
+        ListItemGroup({style: ListItemGroupStyle.CARD}) {
+          // 禁用更新开关 START
+          ListItem({ style:ListItemStyle.CARD }) {
+            Row() {
+              Text($r('app.string.disable_update')).fontColor($r('sys.color.font_primary')).fontSize(FONT_SIZE_16)
+              Blank()
+              Toggle({ type: ToggleType.Switch, isOn: this.configData.disableUpdate })
+                .selectedColor(this.icon_emphasize)
+                .onChange((isOn: boolean) => {
+                  hilog.info(0xCA1A, componentName, `#ListItem#Toggle#自动更新状态: ${isOn}`)
+                  if (this.uiConfig.isVibrate) {
+                    customVibrator.vibratorTriggerOfHapticClockTimer()
+                  }
+                })
+            }.width('100%').alignItems(VerticalAlign.Center)
+          }
+          .height(LIST_ITEM_HEIGHT_45)
+          .padding(LIST_ITEM_PADDING)
+          .borderRadius(BORDER_RADIUS_20)
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+          .onClick( ()=> {
+            // 禁用更新 显式动画
+            this.getUIContext()?.animateTo({
+              duration: this.uiConfig.animationSpeed
+            }, () => {
+              this.configData.disableUpdate = !this.configData.disableUpdate
+            })
+          })
+          // 禁用更新开关 END
           // 自动更新开关 START
-          ListItem({ style:ListItemStyle.CARD }){
-            Row(){
+          ListItem({ style:ListItemStyle.CARD }) {
+            Row() {
               Text($r('app.string.auto_update')).fontColor($r('sys.color.font_primary')).fontSize(FONT_SIZE_16)
               Blank()
               Toggle({ type: ToggleType.Switch, isOn: this.configData.isConfigAutoUpdate })
                 .selectedColor(this.icon_emphasize)
                 .onChange((isOn: boolean) => {
-                  hilog.info(0xCA1A, this.componentName, `#ListItem#Toggle#自动更新状态: ${isOn}`)
+                  hilog.info(0xCA1A, componentName, `#ListItem#Toggle#自动更新状态: ${isOn}`)
                   // 焦点置于`自动更新间隔`文本框
                   focusControl.requestFocus('text_input_auto_update_time')
                   if (this.uiConfig.isVibrate) {
@@ -281,6 +308,35 @@ export struct ConfigInfo {
           }
           // 自动更新间隔 END
 
+          // 编辑配置内容
+          if (this.configData.configId !== 'new') {
+            ListItem() {
+              Row() {
+                SymbolGlyph($r('sys.symbol.doc_plaintext_and_pencil'))
+                  .fontSize(24)
+                  .margin({left: 12})
+                  .fontColor([this.icon_emphasize])
+                  .transition(customAnimationUtil.isScaleTranIcon(10, this.uiConfig))
+                Text($r('app.string.edit_config'))
+                  .fontWeight(FontWeight.Medium)
+                  .fontSize(16)
+                  .margin({ left: 12 })
+                Blank()
+              }
+              .height(53)
+              .width('100%')
+              .borderRadius(20)
+              .backgroundColor($r('app.color.container_background'))
+              .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+              .onClick(() => {
+                // 关闭编辑配置页
+                this.isShowConfigAddBindSheet = false
+                // 跳转编辑文本页
+                this.pageInfos.pushPathByName('EditConfigContent', this.configData.configId, true)
+              })
+            }
+          }
+
         }
         .margin({right: 0, left: 0 })
         .divider({
@@ -290,43 +346,13 @@ export struct ConfigInfo {
           endMargin: LIST_ITEM_PADDING.right
         })
 
-        // 编辑配置内容
-        if (this.configData.configId !== 'new') {
-          ListItem() {
-            Row() {
-              SymbolGlyph($r('sys.symbol.doc_plaintext_and_pencil'))
-                .fontSize(24)
-                .margin({left: 12})
-                .fontColor([this.icon_emphasize])
-                .transition(customAnimationUtil.isScaleTranIcon(10, this.uiConfig))
-              Text($r('app.string.edit_config'))
-                .fontWeight(FontWeight.Medium)
-                .fontSize(16)
-                .margin({ left: 12 })
-              Blank()
-            }
-            .height(53)
-            .width('100%')
-            .borderRadius(20)
-            .backgroundColor($r('app.color.container_background'))
-            .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-            .onClick(() => {
-              // 关闭编辑配置页
-              this.isShowConfigAddBindSheet = false
-              // 跳转编辑文本页
-              this.pageInfos.pushPathByName('EditConfigContent', this.configData.configId, true)
-            })
-          }
-        }
-
       }
       .width('100%')
       .height('auto')
       .borderRadius(BORDER_RADIUS_20)
       .backgroundColor($r('app.color.container_background'))
-      // // 配置自动更新 END
-      // Text(`NavigationListPadding(this.widthBp, this.heightBp) value is [${NavigationListPadding(this.widthBp, this.heightBp)}]`)
-      // Text(`isNewConfig: ${this.configData.isNewConfig}`).fontSize(35)
+      // 配置自动更新 & 禁用更新 END
+
     }
     .width('100%')
     .height('100%')
@@ -339,7 +365,7 @@ export struct ConfigInfo {
   }
 
   aboutToAppear(): void {
-    hilog.info(0xCA1A, this.componentName, `#aboutToAppear executed`)
+    hilog.info(0xCA1A, componentName, `#aboutToAppear executed`)
     // this.getConfigAutoUpdateMenuStringArr()
     if(this.uiConfig.isSound) {
       customSound.initSoundPool(3, 'beat_short.wav')
@@ -347,20 +373,9 @@ export struct ConfigInfo {
   }
 
   aboutToDisappear(): void {
-    hilog.info(0xCA1A, this.componentName, `#aboutToDisappear executed`)
+    hilog.info(0xCA1A, componentName, `#aboutToDisappear executed`)
     customSound.destroySoundPool()
   }
-
-  /**
-   * 系统语言发生改变事件
-   * @param changedPropertyName
-   */
-  /*languageChange(changedPropertyName: string) {
-    hilog.info(0xCA1A, this.componentName, `#languageChange#监听到系统语言发生改变: ${this.currentLanguage}`)
-    // this.getConfigAutoUpdateMenuStringArr()
-    // 更换语言之后更换`TextPicker`显示的文本
-    // this.configAutoUpdateTimeGapTextPickerSelectedValue = this.configAutoUpdateMenuStringArr[this.configAutoUpdateTimeGapTextPickerSelectedIndex]
-  }*/
 
   /**
    * TODO `bindMenu`改成了`TextPicker`，支持直接使用Resource的方式来适应系统语言的改变
@@ -372,10 +387,10 @@ export struct ConfigInfo {
     try {
       let resourceManager = this.getUIContext().getHostContext()?.resourceManager
       let configAutoUpdateTimeGapStringArr = resourceManager?.getStringArrayValueSync($r('app.strarray.config_auto_update_text_picker').id) as Array<string>
-      hilog.info(0xCA1A, this.componentName, `#aboutToAppear#getStringArrayValueSync($r('app.strarray.config_auto_update_menu')#configAutoUpdateMenuStringArr: index[${configAutoUpdateTimeGapStringArr.length}], value [${configAutoUpdateTimeGapStringArr}])}`)
+      hilog.info(0xCA1A, componentName, `#aboutToAppear#getStringArrayValueSync($r('app.strarray.config_auto_update_menu')#configAutoUpdateMenuStringArr: index[${configAutoUpdateTimeGapStringArr.length}], value [${configAutoUpdateTimeGapStringArr}])}`)
       if (configAutoUpdateTimeGapStringArr.length <= 0) {
         this.promptAction.showToast({message: `菜单数据获取失败！`})
-        hilog.error(0xCA1A, this.componentName, `#aboutToAppear#getStringArrayValueSync($r('app.strarray.config_auto_update_menu')#ERROR: 配置自动更新时间间隔菜单数据获取数据为空！`)
+        hilog.error(0xCA1A, componentName, `#aboutToAppear#getStringArrayValueSync($r('app.strarray.config_auto_update_menu')#ERROR: 配置自动更新时间间隔菜单数据获取数据为空！`)
       } else {
         // 给菜单赋值
         configAutoUpdateTimeGapStringArr.forEach( (item: string, index) => {
@@ -384,7 +399,7 @@ export struct ConfigInfo {
       }
     } catch (e) {
       let error = e as BusinessError;
-      hilog.error(0xCA1A, this.componentName, `#aboutToAppear#getStringArrayValueSync($r('app.strarray.config_auto_update_menu')#ERROR: code is [${error.code}],message is [${error.message}]`)
+      hilog.error(0xCA1A, componentName, `#aboutToAppear#getStringArrayValueSync($r('app.strarray.config_auto_update_menu')#ERROR: code is [${error.code}],message is [${error.message}]`)
     }
   }*/
 

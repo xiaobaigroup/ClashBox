@@ -1305,6 +1305,10 @@
       "value": "自动更新"
     },
     {
+      "name": "disable_update",
+      "value": "禁用更新"
+    },
+    {
       "name": "auto_update_interval",
       "value": "自动更新间隔"
     },

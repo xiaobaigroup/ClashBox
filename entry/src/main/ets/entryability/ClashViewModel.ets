@@ -51,13 +51,14 @@ export class ClashViewModel {
   // 添加配置 url
   async addOrUpdateProfileByUrl(data: ConfigData, id: string | null) {
     let profile = new Profile(ProfileType.Url, data.configUrl)
-    if(id){
+    if(id) {
       const old = await this.profileRepo.query(id)
       if(old)
         profile = old
     }
     profile.loadContext(this.context)
     profile.url = data.configUrl
+    profile.isUpdating = data.disableUpdate
     profile.autoUpdate = data.isConfigAutoUpdate
     // 转换为毫秒
     profile.autoUpdateDuration = convertTimeGapToMilliseconds(

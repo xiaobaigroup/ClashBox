@@ -95,6 +95,7 @@ export const NewConfigData: ConfigData = {
   isNewConfig: false,
   configName: '',
   configUrl: '',
+  disableUpdate: false,
   isConfigAutoUpdate: false,
   lastUpdateDateTime: 0,
   updateTime: 0,

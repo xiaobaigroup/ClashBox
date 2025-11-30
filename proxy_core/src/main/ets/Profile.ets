@@ -80,7 +80,7 @@ export class Profile {
       readTimeout: 20000,
     });
     const disposition = resp.header["content-disposition"] as string;
-    console.info(`UpdateConfig disposition: ${disposition}`);
+    console.debug(`UpdateConfig resp：${JSON.stringify(resp, null, 2)} disposition: ${disposition}`);
     const userinfo = resp.header["subscription-userinfo"] as string;
     if (!this.name || this.name == "") {
       this.name = getFileNameFromDisposition(disposition) ?? this.id;

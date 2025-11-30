@@ -1293,6 +1293,10 @@
       "value": "自動更新"
     },
     {
+      "name": "disable_update",
+      "value": "停用更新"
+    },
+    {
       "name": "auto_update_interval",
       "value": "自動更新間隔"
     },

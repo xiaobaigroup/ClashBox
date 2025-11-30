@@ -68,6 +68,8 @@ export interface ConfigData {
   configUrl: string
   // 是否自动更新
   isConfigAutoUpdate: boolean
+  // 是否允许更新
+  disableUpdate: boolean
   // 自动更新间隔对应的值
   configAutoUpdateTimeGapValue?: number
   // 自动更新间隔对应的毫秒数
