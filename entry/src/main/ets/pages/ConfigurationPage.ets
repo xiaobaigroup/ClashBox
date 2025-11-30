@@ -232,7 +232,7 @@ struct ConfigurationPage {
                     this.isON.toggleAnim = true
                     // 更新当前选中
                     this.currentRadioConfigData = item
-                    await this.loadConfig(item, false)
+                    await this.loadConfig(item, true)
                   })
                   .onMouse((event) => {
                     if (event.action == MouseAction.Press && event.button == MouseButton.Right) {
@@ -462,7 +462,6 @@ struct ConfigurationPage {
       color: $r('app.color.shadow_button'),
       type: ShadowType.COLOR
     })
-    //.animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })会导致按钮跳动 此处不使用动画参数
     .margin({
       bottom: Xb_TabBarVertical(this.widthBp, this.heightBp) || this.uiConfig.tabStyle == 'custom' ? 15 : this.bottomRectHeight == 0 ? 85 : this.bottomRectHeight + 63.5,
       right: 15,
@@ -646,7 +645,7 @@ struct ConfigurationPage {
       hilog.info(0xC011, componentName, `EditConfig #loadConfig#更新并加载完成 configName is [${this.currentTouchConfigData.configName}]`)
     } catch (e) {
       console.debug("loadConfigList", e.message, JSON.stringify(e))
-      Xb_ToastUtil.showToast({message: `${getResourceString($r('app.string.failed_load_config'), this)}` + (e.message || e) })
+      Xb_ToastUtil.showToast({message: `${getResourceString($r('app.string.failed_load_config'), this)}` + (e.message || e), duration: 3000 })
     }
     this.getUIContext().animateTo({
       duration: this.uiConfig.animationSpeed,

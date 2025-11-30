@@ -6,7 +6,6 @@ import {
   BIND_SHEET_MAIN_FONT_WEIGHT, BIND_SHEET_SUB_FONTSIZE,
   NewConfigData,} from "../../common/entity/Constants";
 import { BindSheetTitleCustomBuilder } from "../Common/Common"
-import { HMCodeEditor } from 'hm_code_editor';
 import { EventHub, EventKey } from "../../common/EventHub";
 import { WebCodeEditor } from "../Common/CodeEditor";
 import { EditorCommunicationManager, WebCodeEditorOptions } from "../../common/entity/WebCodeEditor";

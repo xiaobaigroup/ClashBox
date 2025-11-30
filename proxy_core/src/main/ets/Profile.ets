@@ -5,6 +5,7 @@ import { fileUri } from '@kit.CoreFileKit';
 import { ProxyGroup, ProxyType, SubscriptionInfo } from './models/Common';
 import { JSON, util } from '@kit.ArkTS';
 import { http } from '@kit.NetworkKit';
+import { parse, YAMLError } from 'yaml'
 
 export function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -69,40 +70,56 @@ export class Profile {
     fs.unlink(profilePath)
     fs.unlink(profileDir)
   }
-  async update(vailConfig: (config: string) =>Promise<string>): Promise<boolean>{
-    let httpRequest = http.createHttp()
-    const resp = await httpRequest.request(this.url, { header: {
-      "User-Agent": this.globalUa ?? "clash.meta/1.19.5"
-    },connectTimeout: 20000, readTimeout: 20000, })
-    const disposition = resp.header["content-disposition"] as string
-    const userinfo = resp.header["subscription-userinfo"] as string
-
+  async update(vailConfig: (config: string) => Promise<string>): Promise<boolean> {
+    let httpRequest = http.createHttp();
+    const resp = await httpRequest.request(this.url, {
+      header: {
+        "User-Agent": this.globalUa ?? "clash.meta/1.19.5"
+      },
+      connectTimeout: 20000,
+      readTimeout: 20000,
+    });
+    const disposition = resp.header["content-disposition"] as string;
+    console.info(`UpdateConfig disposition: ${disposition}`);
+    const userinfo = resp.header["subscription-userinfo"] as string;
     if (!this.name || this.name == "") {
-      this.name = getFileNameForDisposition(disposition) ?? this.id
+      this.name = getFileNameFromDisposition(disposition) ?? this.id;
     }
-    if(userinfo){
-      this.subscriptionInfo = SubscriptionInfo.formHString(userinfo)
+    if (userinfo) {
+      this.subscriptionInfo = SubscriptionInfo.formHString(userinfo);
     }
+    console.info(`UpdateConfig this.name: ${this.name} userinfo: ${userinfo}`);
     if (resp.result) {
+      // JSON 数据，直接按错误处理
       try {
         let json = JSON.parse(resp.result as string) as object
         let msg = json?.["msg"] as string
-        if(msg)
+        if (msg) {
           throw new Error(msg);
-      }catch (_) {
-        // ignore
+        } else {
+          throw new Error("非配置JSON数据");
+        }
+      } catch (_) {
       }
-      // TODO 验证是否yaml格式的内容,不是不能更新
-      await this.save(resp.result as string | ArrayBuffer, vailConfig)
+      const value = await isYAML(resp.result as string | ArrayBuffer);
+      console.debug(`UpdateConfig raw is yaml:${value} value: ${JSON.stringify(resp.result)}`);
+      if (!value) {
+        console.error(`UpdateConfig 非yaml数据，不保存配置`);
+        throw new Error("无有效链接数据");
+      } else {
+        await this.save(resp.result as string | ArrayBuffer, vailConfig);
+        return true;
+      }
     }
-    return true
+    // 无resp.result，直接抛出
+    throw new Error("无响应数据");
   }
+
   async save(raw: string | ArrayBuffer, vailConfig:(config: string)=> Promise<string>): Promise<Profile>{
     let bytes = new Uint8Array()
-    if(typeof raw == "string"){
-
+    if (typeof raw == "string") {
       bytes= utf8e.encodeInto(raw)
-    }else{
+    } else {
       bytes = new Uint8Array(raw)
     }
     const filePath = await getProfilePath(this.context, this.id)
@@ -146,15 +163,61 @@ export class Profile {
   }
 }
 
+async function isYAML(data: string | ArrayBuffer): Promise<boolean> {
+  try {
+    let content: string;
+    if (typeof data === 'string') {
+      content = data;
+    } else if (data instanceof ArrayBuffer) {
+      const decoder = util.TextDecoder.create('utf-8', { ignoreBOM: true });
+      content = decoder.decodeWithStream(new Uint8Array(data));
+    } else {
+      return false;
+    }
+    // 解析失败，直接返回 false
+    parse(content);
+    // 严格校验
+    const trimmedContent = content.trim();
+    // 如果内容是单行的、以 { 开头和 } 结尾的紧凑 JSON，不是典型的 YAML 配置
+    if (trimmedContent.startsWith('{') && trimmedContent.endsWith('}') && !trimmedContent.includes('\n')) {
+      return false;
+    }
+    // 合法 YAML 配置
+    return true;
 
-function getFileNameForDisposition(disposition: string | undefined): string | null {
-  if (disposition == null) return null;
-  console.log("disposition", disposition)
-  const match = disposition.match(/filename="?(.+)"?/)
-  if(match){
-    const filename = decodeURIComponent(match[1]);
-    return filename
-  }else{
-    return null;
+  } catch (e) {
+    console.error("YAML 解析失败:", e);
+    return false;
   }
+}
+
+/**
+ * 从 Content-Disposition 响应头中提取文件名
+ * @param disposition - Content-Disposition 头的值，
+ * @returns {string | null} - 提取到的文件名，如果解析失败返回 null
+ */
+function getFileNameFromDisposition(disposition: string | null | undefined): string | null {
+  if (!disposition) return null;
+  // 去除字符串两端的空格
+  const cleanDisposition = disposition.trim();
+  // 优先尝试解析 RFC 5987 格式
+  // 使用更灵活的正则，允许大小写、空格等变化
+  const filenameStarRegex = /filename\*\s*=\s*(?:UTF-8|utf-8)\s*''\s*([^;]+)/i;
+  const filenameStarMatch = cleanDisposition.match(filenameStarRegex);
+
+  if (filenameStarMatch && filenameStarMatch[1]) {
+    // 去除可能的空格并进行 URL 解码
+    const encodedFileName = filenameStarMatch[1].trim();
+    return decodeURIComponent(encodedFileName);
+  }
+  // 无 filename*，尝试解析普通的 filename=
+  const filenameRegex = /filename\s*=\s*"?([^;"]+)"?/i;
+  const filenameMatch = cleanDisposition.match(filenameRegex);
+
+  if (filenameMatch && filenameMatch[1]) {
+    return filenameMatch[1].trim();
+  }
+
+  // 都没匹配到，返回 null
+  return null;
 }

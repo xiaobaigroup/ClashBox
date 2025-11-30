@@ -49,7 +49,7 @@ export class ClashViewModel {
     console.error("ClashViewModel初始化成功");
   }
   // 添加配置 url
-  async addOrUpdateProfileByUrl(data: ConfigData, id: string | null){
+  async addOrUpdateProfileByUrl(data: ConfigData, id: string | null) {
     let profile = new Profile(ProfileType.Url, data.configUrl)
     if(id){
       const old = await this.profileRepo.query(id)
@@ -57,7 +57,6 @@ export class ClashViewModel {
         profile = old
     }
     profile.loadContext(this.context)
-    profile.name = data.configName
     profile.url = data.configUrl
     profile.autoUpdate = data.isConfigAutoUpdate
     // 转换为毫秒
@@ -70,12 +69,12 @@ export class ClashViewModel {
     if (isExists) {
       await this.profileRepo.addOrUpdate(profile)
         .then((value) => {
-          hilog.info(0xFF00, "EditConfig configSaveTestTag", `文件名${profile.name} URL: ${profile.url} 保存结果${value}`)
+          hilog.info(0xFF00, "EditConfig&UpdateConfig configSaveTestTag", `文件名${profile.name} URL: ${profile.url} 保存结果${value}`)
           EventHub.sendEvent(EventKey.FetchProfile, null)
         })
     } else {
       console.error("ClashBox文件保存失败");
-      ClashViewModel.promptAction.showToast({message: "文件保存失败！"})
+      Xb_ToastUtil.showToast({message: "文件保存失败！"})
     }
   }
 
