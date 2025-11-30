@@ -256,6 +256,7 @@ struct ConfigurationPage {
                   })
                 })
               }
+              .zIndex(3)
               .width('100%')
               .height('100%')
               .onScrollFrameBegin((offset: number) => {
@@ -283,7 +284,7 @@ struct ConfigurationPage {
                 scrollBackward: NestedScrollMode.SELF_FIRST
               })
               // 配置列表 END
-            }
+            }.zIndex(2)
             .refreshOffset(64)
             .pullToRefresh(true)
             .onRefreshing(() => {
@@ -416,10 +417,11 @@ struct ConfigurationPage {
          this.editConfig()
         }
       },
-      { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.arrow_clockwise'))
-        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
-        content: $r('app.string.update'), callback: () => { this.updateConfig(this.currentTouchConfigData.configId) }
-      },
+      ...(!item.disableUpdate ? [
+        { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.arrow_clockwise'))
+          .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
+          content: $r('app.string.update'), callback: () => { this.updateConfig(this.currentTouchConfigData.configId) }
+        } as LongPressContextMenuItem] : []),
       ...(this.currentTouchConfigData.sourceType === ProfileType.Url ? [
         { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.share'))
         .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
@@ -729,7 +731,7 @@ struct ConfigurationPage {
   /**更新配置*/
   private async updateConfig(configId?: string): Promise<void> {
     Xb_ToastUtil.showToast({message: $r('app.string.updating_config')})
-    this.loadConfig(this.currentRadioConfigData)
+    this.loadConfig(this.currentRadioConfigData, !this.currentRadioConfigData.disableUpdate)
     if (configId) {
       this.isRefreshing = false
       // 使开关点击时不触发转场动画

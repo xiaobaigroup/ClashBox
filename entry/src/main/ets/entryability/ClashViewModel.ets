@@ -160,11 +160,11 @@ export class ClashViewModel {
     }
   }
 
-  async updateProfileConfig(id: string | null): Promise<void>{
+  async updateProfileConfig(id: string | null): Promise<void> {
     const ua = AppStorage.get<ClashConfig>("clashConfig")?.["global-ua"]
-    if(id){
+    if (id) {
       const profile = await this.getProfile(id)
-      if (profile && profile.type == ProfileType.Url) {
+      if (profile && profile.type == ProfileType.Url && !profile.isUpdating) {
         try {
           profile.loadContext(this.context, ua)
           await profile.update((c) => this.VailConfig(c))
@@ -183,10 +183,12 @@ export class ClashViewModel {
       }
     } else {
       const list = (await this.getProfiles()).filter(d => d.type == ProfileType.Url)
-      for(let p of list){
-        p.loadContext(this.context, ua)
-        await p.update(async (c) => await this.VailConfig(c))
-        await this.profileRepo.addOrUpdate(p)
+      for(let p of list) {
+        if (!p.isUpdating) {
+          p.loadContext(this.context, ua)
+          await p.update(async (c) => await this.VailConfig(c))
+          await this.profileRepo.addOrUpdate(p)
+        }
       }
     }
     EventHub.sendEvent(EventKey.FetchProfile, null)

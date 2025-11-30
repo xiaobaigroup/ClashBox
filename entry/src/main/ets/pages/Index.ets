@@ -912,6 +912,51 @@ struct Index {
         })
     }
 
+    // 通知事件
+    EventHub.on(EventKey.EnabledNotice, async (enadblNotice: boolean) => {
+      try {
+        // 先获取最新权限状态
+        const currentStatus = await notificationManager.isNotificationEnabled()
+        if (currentStatus) {
+          // 已有权限时
+          // 显示通知设置 显式动画
+          this.uiConfig.Enablednotice = enadblNotice ?? true
+        } else {
+          // 没有授权时
+          if (!this.uiConfig.isRequestNotification) {
+            // 首次请求权限
+            try {
+              await notificationManager.requestEnableNotification(this.context)
+              this.uiConfig.isRequestNotification = true
+              this.uiConfig.Enablednotice = true
+            } catch (err) {
+              if ((err as BusinessError).code === 1600004) {
+                hilog.error(0xFF00, 'Index-Notice', '用户拒绝授权')
+                // 关闭总通知
+                this.uiConfig.Enablednotice = false
+                // 关闭模拟下载
+                this.uiConfig.backgroundDownModel = false
+                // 标记已经请求过授权
+                this.uiConfig.isRequestNotification = true
+                this.promptAction.showToast({ message: $r('app.string.enable_notice_failed') })
+              }
+            }
+          } else {
+            // 已请求过权限且通知开关未启用，进入跳转设置
+            if(!this.uiConfig.Enablednotice) {
+              this.toDialogController.open()
+            }
+          }
+        }
+      } catch (err) {
+        hilog.error(0xFF00, 'Index', `Toggle Error: ${(err as BusinessError).code}, ${(err as BusinessError).message}`);
+      }
+    })
+    // 首次启动启用通知
+    if (!this.uiConfig.isRequestNotification) {
+      EventHub.sendEvent(EventKey.EnabledNotice, true)
+    }
+
     // 检查后台运行全局变量的状态
     if (this.uiConfig.backgroundLocateModel || this.uiConfig.backgroundDownModel || this.uiConfig.backgroundPiPModel || this.uiConfig.backgroundKeepTask) {
       this.uiConfig.Enablebackgrounder = true
@@ -1032,50 +1077,6 @@ struct Index {
       this.proxyTime = time
       this.proxyStartingDuration = number2Time(time)
     })
-    // 通知事件
-    EventHub.on(EventKey.EnabledNotice, async (enadblNotice: boolean) => {
-      try {
-        // 先获取最新权限状态
-        const currentStatus = await notificationManager.isNotificationEnabled()
-        if (currentStatus) {
-          // 已有权限时
-          // 显示通知设置 显式动画
-          this.uiConfig.Enablednotice = enadblNotice ?? true
-        } else {
-          // 没有授权时
-          if (!this.uiConfig.isRequestNotification) {
-            // 首次请求权限
-            try {
-              await notificationManager.requestEnableNotification(this.context)
-              this.uiConfig.isRequestNotification = true
-              this.uiConfig.Enablednotice = true
-            } catch (err) {
-              if ((err as BusinessError).code === 1600004) {
-                hilog.error(0xFF00, 'Index-Notice', '用户拒绝授权')
-                // 关闭总通知
-                this.uiConfig.Enablednotice = false
-                // 关闭模拟下载
-                this.uiConfig.backgroundDownModel = false
-                // 标记已经请求过授权
-                this.uiConfig.isRequestNotification = true
-                this.promptAction.showToast({ message: $r('app.string.enable_notice_failed') })
-              }
-            }
-          } else {
-            // 已请求过权限且通知开关未启用，进入跳转设置
-            if(!this.uiConfig.Enablednotice) {
-              this.toDialogController.open()
-            }
-          }
-        }
-      } catch (err) {
-        hilog.error(0xFF00, 'Index', `Toggle Error: ${(err as BusinessError).code}, ${(err as BusinessError).message}`);
-      }
-    })
-    // 首次启动启用通知
-    if (!this.uiConfig.isRequestNotification) {
-      EventHub.sendEvent(EventKey.EnabledNotice, true)
-    }
 
     // 分享包名
     const localStorage = this.getUIContext().getSharedLocalStorage()
