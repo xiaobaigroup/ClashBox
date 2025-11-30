@@ -1259,6 +1259,15 @@ struct Index {
       }
     })
 
+    // 确保tabStyle有值
+    if (!this.uiConfig.tabStyle) {
+      if (this.apiVersionEnable) {
+        this.uiConfig.tabStyle = 'float'
+      } else {
+        this.uiConfig.tabStyle = 'custom'
+      }
+    }
+
     // 更新应用版本号
     const packageInfo = await getPackageInfo()
     AppState.versionCode = packageInfo.versionCode
@@ -1399,6 +1408,8 @@ struct Index {
     // 赋值配置链接
     if (this.appLinkConfigUrl != '') {
       this.currentTouchConfigData.isNewConfig = true
+      this.currentTouchConfigData.disableUpdate = false
+      this.currentTouchConfigData.isConfigAutoUpdate = false
       this.currentTouchConfigData.configUrl = this.appLinkConfigUrl
       this.isShowWelcome = true
     }

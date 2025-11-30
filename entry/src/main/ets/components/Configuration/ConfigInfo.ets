@@ -124,6 +124,7 @@ export struct ConfigInfo {
               Text($r('app.string.disable_update')).fontColor($r('sys.color.font_primary')).fontSize(FONT_SIZE_16)
               Blank()
               Toggle({ type: ToggleType.Switch, isOn: this.configData.disableUpdate })
+                .hitTestBehavior(HitTestMode.None)
                 .selectedColor(this.icon_emphasize)
                 .onChange((isOn: boolean) => {
                   hilog.info(0xCA1A, componentName, `#ListItem#Toggle#自动更新状态: ${isOn}`)
@@ -309,7 +310,7 @@ export struct ConfigInfo {
           // 自动更新间隔 END
 
           // 编辑配置内容
-          if (this.configData.configId !== 'new') {
+          if (this.configData.configId !== 'new' && !this.configData.isNewConfig) {
             ListItem() {
               Row() {
                 SymbolGlyph($r('sys.symbol.doc_plaintext_and_pencil'))

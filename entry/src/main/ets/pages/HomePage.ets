@@ -246,7 +246,7 @@ struct Home {
         })
 
         // 代理启动按钮层
-        if ((!this.isShowHomeEdit && this.uiConfig.tabStyle == 'custom') || (this.widthBp > 2 && this.proxyEnabled)) {
+        if ((!this.isShowHomeEdit && this.uiConfig.tabStyle == 'custom') || (this.widthBp > 2)) {
           RoundButton({
             Icon1: $r('sys.symbol.pause'),
             Icon2: $r('sys.symbol.play_fill'),
