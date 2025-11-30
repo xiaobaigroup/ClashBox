@@ -121,7 +121,7 @@ struct ConfigurationPage {
    */
   @StorageLink('currentTouchConfigData') currentTouchConfigData: ConfigData = NewConfigData
   @Consume('Configuration') @Watch('onConfigListChange') configList: Array<ConfigData>
-  @State  currentRadioConfigData: ConfigData = NewConfigData
+  @State currentRadioConfigData: ConfigData = NewConfigData
 
   build() {
     Stack() {
@@ -156,7 +156,7 @@ struct ConfigurationPage {
           Nothing({ name: $r('app.string.Configuration') })
             .height('90%')
         } else {
-          Column(){
+          Column() {
             if (!this.isPXSecScreen) {
               Blank().height((this.isRolling && this.isSmallSquareScreen) ? this.heightTop : TAB_CONTENT_TITLE_HEIGHT)
             }
@@ -207,7 +207,8 @@ struct ConfigurationPage {
                     .width('100%')
                     .padding(LIST_ITEM_PADDING)
 
-                  }.width('100%')
+                  }
+                  .width('100%')
                   .backgroundColor($r('app.color.container_background'))
                   .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
                   .borderRadius(BORDER_RADIUS_20)
@@ -231,7 +232,7 @@ struct ConfigurationPage {
                     this.isON.toggleAnim = true
                     // 更新当前选中
                     this.currentRadioConfigData = item
-                    await this.loadConfig(item, true)
+                    await this.loadConfig(item, false)
                   })
                   .onMouse((event) => {
                     if (event.action == MouseAction.Press && event.button == MouseButton.Right) {
@@ -253,7 +254,6 @@ struct ConfigurationPage {
                     onWillDismiss: false,
                     autoCancel: false
                   })
-
                 })
               }
               .width('100%')
@@ -274,7 +274,7 @@ struct ConfigurationPage {
                 right: TabContentTitleMargin(this.widthBp, this.heightBp),
               })
               // 110 = app.integer.vp_proxy_start_button_margin *2 + app.integer.vp_proxy_not_start_button_width
-              .contentEndOffset(this.isPXSecScreen? 65:CONTENT_END_OFFSET_150)
+              .contentEndOffset(this.isPXSecScreen? 65 : CONTENT_END_OFFSET_150)
               .lanes(ListLanes(this.widthBp, this.heightBp), ListGutter(this.widthBp, this.heightBp))
               .edgeEffect(EdgeEffect.Spring)
               .chainAnimation(true)
@@ -435,7 +435,7 @@ struct ConfigurationPage {
         .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
         content: $r('app.string.export_config_file'), callback: () => { this.exportConfig() }
       },
-    /* { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.plus_square_on_square'))
+ /*    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.plus_square_on_square'))
        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
        content: $r('app.string.create_copy'), callback: ()=>{ this.generateQRcode() }
      },*/
@@ -638,7 +638,7 @@ struct ConfigurationPage {
     this.appConfig.currentProfileName = item.configName
     this.appConfig.currentProfileId = item.configId
     try {
-      if(needUpdated) {
+      if (needUpdated) {
         ClashViewModel.updateProfileConfig(item.configId)
       }
       ClashViewModel.socketProxy.reset()
