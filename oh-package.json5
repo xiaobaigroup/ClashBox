@@ -8,6 +8,6 @@
   "dynamicDependencies": {},
   "dependencies": {
     "@mcui/mccharts": "^2.8.9",
-    "hm_code_editor": "^1.0.4"
+    "yaml": "^2.8.0"
   }
 }
