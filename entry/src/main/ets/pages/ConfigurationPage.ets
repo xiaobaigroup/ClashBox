@@ -462,7 +462,7 @@ struct ConfigurationPage {
       color: $r('app.color.shadow_button'),
       type: ShadowType.COLOR
     })
-    .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
+    //.animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })会导致按钮跳动 此处不使用动画参数
     .margin({
       bottom: Xb_TabBarVertical(this.widthBp, this.heightBp) || this.uiConfig.tabStyle == 'custom' ? 15 : this.bottomRectHeight == 0 ? 85 : this.bottomRectHeight + 63.5,
       right: 15,
