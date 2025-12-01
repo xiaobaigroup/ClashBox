@@ -226,7 +226,7 @@ export struct AccessControl {
             }
             .width('100%')
             .height('100%')
-            .contentEndOffset(195)
+            .contentEndOffset(260)
             .chainAnimation(true)
             .edgeEffect(EdgeEffect.Spring)
             .nestedScroll({
