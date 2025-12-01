@@ -566,7 +566,6 @@ struct Index {
         }
       }
       .transition(customAnimationUtil.isOpacity(this.uiConfig))
-      .margin({ top: (this.windowMode || this.topRectHeight == 0) && Xb_TabBarVertical(this.widthBp, this.heightBp)  ? 10 : 0})
       .padding((this.isRolling && this.uiConfig.isAnimation && this.widthBp < 2) ? 0 : Xb_FloatTabBarPadding(this.widthBp, this.heightBp))
       .width((!this.isRolling && this.widthBp < 2) ? '100%' : 'auto')
       .height(FloatTabBarHeight(this.widthBp, this.heightBp))
@@ -589,10 +588,7 @@ struct Index {
       Row() {
         SymbolGlyph(this.proxyEnabled ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
           .fontSize(27).fontColor([this.proxyEnabled ? Color.White : icon_tertiary])
-        // this.FloatBarFunctionContentBuilder()
-      }
-      .margin({ bottom: (this.windowMode || this.bottomRectHeight == 0) && Xb_TabBarVertical(this.widthBp, this.heightBp) ? 20 : 0})
-      .functionButtonStyle(this.proxyEnabled && this.widthBp <= 2, this.icon_emphasize)
+      }.functionButtonStyle(this.proxyEnabled && this.widthBp <= 2, this.icon_emphasize)
       .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
       // 背景模糊
       .backdropBlur(this.uiConfig.isBlurr && !this.proxyEnabled ? 30 : 0)
@@ -651,9 +647,9 @@ struct Index {
     .width(this.widthBp < 2 ? '100%' : 'auto')
     .padding({ left: 10, right: 10, top: this.topRectHeight === 0 ? 10 : 0, bottom: this.topRectHeight === 0 ? 10 : 0 })
     .margin({
-      bottom: this.windowMode || this.bottomRectHeight == 0 ? 10 : this.bottomRectHeight /*+ this.bottomAvoidWidth*/ - 10,
-      top: this.windowMode ? 10 : this.topRectHeight,
-      left: (this.leftAvoidWidth != 0/* && this.windowHeight <= 520*/)  ? this.leftAvoidWidth + 19 : 0,  // TODO 待实机测试确定取值
+      bottom: this.windowMode || this.bottomRectHeight == 0 ? 0 : this.bottomRectHeight - 10,
+      top: this.windowMode ? 0 : this.topRectHeight,
+      left: (this.leftAvoidWidth != 0)  ? this.leftAvoidWidth + 19 : 0,  // TODO 待实机测试确定取值
     })
   }
   @Builder
@@ -684,7 +680,7 @@ struct Index {
     }
     .width('100%')
     .height('100%')
-    .align(Xb_FloatTabBarAlignCenter(this.widthBp, this.heightBp))//this.getFloatAlign())
+    .align(this.getFloatAlign())
   }
 
   @Builder
