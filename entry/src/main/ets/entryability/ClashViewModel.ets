@@ -58,6 +58,7 @@ export class ClashViewModel {
     }
     profile.loadContext(this.context)
     profile.url = data.configUrl
+    profile.name = data.configName
     profile.isUpdating = data.disableUpdate
     profile.autoUpdate = data.isConfigAutoUpdate
     // 转换为毫秒
