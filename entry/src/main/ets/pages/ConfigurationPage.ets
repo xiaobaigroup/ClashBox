@@ -560,6 +560,7 @@ struct ConfigurationPage {
       QRCodeDialog({
         theDialogTitle: $r('app.string.qrcode_share'),
         QRCodeParam: { // 二维码参数
+          // TODO PC端需适配
           url: this.currentTouchConfigData.configUrl,
           name: this.currentTouchConfigData.configName,
         },
