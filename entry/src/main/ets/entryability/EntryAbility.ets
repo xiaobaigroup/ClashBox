@@ -328,8 +328,13 @@ export default class EntryAbility extends UIAbility {
       try {
         const urlObject = url.URL.parseURL(want?.uri);
         hilog.info(0x0000, 'EntryAbility', 'AppLink - 接收的urlObject为：%{public}s', JSON.stringify(urlObject));
-        const configUrl = urlObject.params.get('configUrl') || urlObject.params.get('url');
+        let configUrl = urlObject.params.get('configUrl') || urlObject.params.get('url');
         const configName = urlObject.params.get('configName');
+
+        // flag参数 -> 一般是 clash、shadowrocket 等，机场用于区分软件的
+        const flag = urlObject.params.get('flag');
+        if (flag) configUrl += `&flag=${flag}`;
+
         // 处理分享的配置链接
         AppStorage.setOrCreate('appLinkConfigUrl', configUrl);
         AppStorage.setOrCreate('appLinkConfigName', configName);
