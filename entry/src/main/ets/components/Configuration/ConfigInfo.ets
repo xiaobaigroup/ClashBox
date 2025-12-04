@@ -225,7 +225,7 @@ export struct ConfigInfo {
                     .type(InputType.Number)
                     .onChange((text: string) => {
                       // 最小值为 1
-                      if (text == "0") {
+                      if (text == "0" || text.trim() == "") {
                         text = "1"
                         this.isWaring = true
                       } else {
