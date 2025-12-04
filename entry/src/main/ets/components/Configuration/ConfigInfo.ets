@@ -225,13 +225,23 @@ export struct ConfigInfo {
                     .type(InputType.Number)
                     .onChange((text: string) => {
                       // 最小值为 1
-                      if (text == "0" || text.trim() == "") {
-                        text = "1"
-                        this.isWaring = true
+                      if (text == "0") {
+                        this.getUIContext().animateTo({
+                          duration: 400,
+                          curve: Curve.Ease
+                        },() => {
+                          text = "1"
+                          this.isWaring = true
+                        })
                       } else {
                         setTimeout(()=> {
-                          this.isWaring = false
-                        }, 800)
+                          this.getUIContext().animateTo({
+                            duration: 400,
+                            curve: Curve.Ease
+                          },() => {
+                            this.isWaring = false
+                          })
+                        }, 1400)
                       }
 
                       this.configData.configAutoUpdateTimeGapValue = Number(text)
@@ -424,7 +434,7 @@ export struct ConfigInfo {
    * */
   CalcMS() {
     this.configData.configAutoUpdateTimeGapMs = convertTimeGapToMilliseconds(
-      this.configData.configAutoUpdateTimeGapValue ?? 0,
+      this.configData.configAutoUpdateTimeGapValue ?? 10,
       this.configData.configAutoUpdateTimeGapTextPickerIndex
     )
   }
