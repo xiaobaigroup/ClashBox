@@ -1,5 +1,5 @@
 // Index
-import { curves, LengthMetrics, mediaquery, UIUtils, window } from '@kit.ArkUI'
+import { LengthMetrics, mediaquery, UIUtils } from '@kit.ArkUI'
 import Home from './HomePage'
 import ProxyPage from './ProxyPage'
 import { util } from "@kit.ArkTS";
@@ -28,7 +28,7 @@ import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } f
 import { ClashConfig, IpInfo, Profile, ProxyMode } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
-import { AppConfig, AppFlowingState, AppState, ClashCore, getPackageInfo, UIConfig } from '../entryability/AppState'
+import { AppConfig, AppFlowingState, AppState, getPackageInfo, UIConfig } from '../entryability/AppState'
 import { common } from '@kit.AbilityKit'
 import { ChangeLanguage } from '../common/utils/ChangeLanguageUtil'
 import { ConfigData, HomeCardInfo, TabBuild } from '../common/entity/PageArgumentEntity'
@@ -90,7 +90,7 @@ import LiveViewUtil from '../common/utils/LiveViewUtil'
 import { UpdateLog } from '../components/Start/UpdateLog'
 import { animationStyle } from 'xb_components/src/main/ets/components/Animation';
 import { getJsonArrayType } from '../common/entity/utils';
-import { hdsEffect } from '@kit.UIDesignKit';
+// import { hdsEffect } from '@kit.UIDesignKit';
 
 
 PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
@@ -319,8 +319,8 @@ struct Index {
   // 设置 -> 外观 -> 按钮位置变量
   @Provide ButtonPositionOffset: number = 0
   @Provide proxyTime: number = 0
-  // 光效
-  @Provide lightSourceType: hdsEffect.PointLightSourceType = hdsEffect.PointLightSourceType.NONE;
+  // TODO 6.0(20)光效
+  // @Provide lightSourceType: hdsEffect.PointLightSourceType = hdsEffect.PointLightSourceType.NONE;
 
 
   build() {
