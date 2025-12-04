@@ -1256,15 +1256,6 @@ struct Index {
       }
     })
 
-    // 确保tabStyle有值
-    if (!this.uiConfig.tabStyle) {
-      if (this.apiVersionEnable) {
-        this.uiConfig.tabStyle = 'float'
-      } else {
-        this.uiConfig.tabStyle = 'custom'
-      }
-    }
-
     // 更新应用版本号
     const packageInfo = await getPackageInfo()
     AppState.versionCode = packageInfo.versionCode
@@ -1316,8 +1307,20 @@ struct Index {
       // 转化字符串
       this.uiConfig.isShowHomeCard = filterStringsByBooleans(str, 'string') as string
       this.theCurrentHomeCard = filterStringsByBooleans(str, 'array') as string[]
+    } else if (typeof type == 'undefined') {
+      this.uiConfig.isShowHomeCard = JSON.stringify(showHomeCard)
     }
-    this.uiConfig.editWordWrap = true
+    if (typeof this.uiConfig.editWordWrap != 'boolean') {
+      this.uiConfig.editWordWrap = true
+    }
+    // 确保tabStyle有值
+    if (!this.uiConfig.tabStyle) {
+      if (this.apiVersionEnable) {
+        this.uiConfig.tabStyle = 'custom'
+      } else {
+        this.uiConfig.tabStyle = 'custom'
+      }
+    }
   }
 
   // 等待配置数据库初始化完成

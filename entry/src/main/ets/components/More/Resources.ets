@@ -16,7 +16,7 @@ import { NeedClearMoreStack, PageMargin } from "../../common/breakpoint/BreakPoi
 import { icon_primary } from "../Common/Common"
 import { Xb_ToastUtil } from "xb_components"
 
-// 资源数据（假设）
+// 资源数据
 interface ResourcesData {
   // 资源名
   resourceName: string
@@ -45,7 +45,7 @@ function switchResourceSize(size: number) {
   }
 }
 
-export const theResouresData: Array<ResourcesData> = [
+export const theResourcesData: Array<ResourcesData> = [
   {
     key: "geoip",
     resourceName: 'GeoIp',
@@ -125,7 +125,7 @@ struct Resources {
   @StorageProp('topRectHeight') topRectHeight: number = 0
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
 
-  @Provide resourceListData: Array<ResourcesData> = theResouresData
+  @Provide resourceListData: Array<ResourcesData> = theResourcesData
   // 开关不触发list转场动画判定
   @State isON:isON = new isON()
   // page内顶部标题偏移量

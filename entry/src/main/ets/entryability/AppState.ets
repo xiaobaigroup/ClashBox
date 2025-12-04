@@ -1,7 +1,7 @@
 import { ClashConfig,  IpInfo, ProxyGroup, ProxyMode, ProxySort, SnifferDefault, Traffic, } from "proxy_core";
 import { ANIMATION_DURATION_300, showHomeCard } from "../common/entity/Constants";
 import { ProxyItem } from "../common/datasources/ProxyData";
-import { resourcesBlankData, theResouresData } from "../components/More/Resources";
+import { resourcesBlankData, theResourcesData } from "../components/More/Resources";
 import ClashViewModel from "./ClashViewModel";
 import { bundleManager } from "@kit.AbilityKit";
 import { EventHub, EventKey } from "../common/EventHub";
@@ -151,7 +151,7 @@ export class UIConfig {
   proxyEnabled: boolean = false
   // 高级功能启用状态
   enabledADvanced: boolean = false
-  // 是否第一次启动应用 TODO debug时为false release时为true
+  // 是否第一次启动应用 TODO debug时为 false release时为 true
   isFirstStart: boolean = true
   // 应用使用时间记录
   useTime: number = new Date().getTime()
@@ -169,7 +169,7 @@ export class UIConfig {
   autoUpdateTimeUtils?: number
   // 是否第一次导入配置
   isFirstImportConfig: boolean = true
-  resourcesData: string = JSON.stringify(theResouresData)
+  resourcesData: string = JSON.stringify(theResourcesData)
   resourcesHideData: string = JSON.stringify(resourcesBlankData)
   // 日志时间排序
   LogSortTime: number = 0
