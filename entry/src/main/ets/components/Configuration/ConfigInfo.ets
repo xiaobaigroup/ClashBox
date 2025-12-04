@@ -73,6 +73,8 @@ export struct ConfigInfo {
   @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
   // 是否显示bindSheet
   @StorageLink('ShowConfigBindSheet') isShowConfigAddBindSheet: boolean = false
+  // 自动更新警告
+  @State isWaring: boolean = false;
 
   build() {
     Column({ space: 10 }) {
@@ -197,6 +199,9 @@ export struct ConfigInfo {
                 Text($r('app.string.auto_update_interval')).fontColor($r('sys.color.font_primary')).fontSize(FONT_SIZE_16)
                 Blank()
                 Row(){
+                  // 警告内容
+                  if (this.isWaring) Text('最小值为1').fontColor(Color.Orange)
+
                   TextInput({ text: this.configData.configAutoUpdateTimeGapValue?.toString(), placeholder: $r('app.string.text_input_placeholder') })
                     .width(50)
                     .height(30)
@@ -219,6 +224,16 @@ export struct ConfigInfo {
                     .enterKeyType(EnterKeyType.Done)
                     .type(InputType.Number)
                     .onChange((text: string) => {
+                      // 最小值为 1
+                      if (text == "0") {
+                        text = "1"
+                        this.isWaring = true
+                      } else {
+                        setTimeout(()=> {
+                          this.isWaring = false
+                        }, 800)
+                      }
+
                       this.configData.configAutoUpdateTimeGapValue = Number(text)
                       this.CalcMS()
                     })
