@@ -41,7 +41,7 @@ export class Profile {
     this.name = null
     this.type = type // 0 url
     this.url = url
-    this.autoUpdateDuration = 0
+    this.autoUpdateDuration = 60 * 1000 // 1 分钟
     this.lastUpdateDate = new Date().getTime()
     this.subscriptionInfo = null
   }

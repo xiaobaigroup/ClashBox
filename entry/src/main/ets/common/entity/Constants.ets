@@ -10,6 +10,8 @@ import { ConfigData, HomeCardInfo } from "./PageArgumentEntity";
 
 /* 基础 */
 export const APP_LINKING: string = "https://xbstudio.top/clashbox"
+// 默认一分钟
+export const DEFAULT_TIMEOUT: number = 60 * 1000
 // borderRadius 20
 export const BORDER_RADIUS_20: number = 20
 // bindSheet 初始默认高度
@@ -1061,13 +1063,13 @@ export const CONFIG_AUTO_UPDATE_TIME_GAP_TO_MS_MAP: Map<number, number> = new Ma
 export function convertTimeGapToMilliseconds(value: number, unitIndex?: number): number {
   if (unitIndex === undefined || unitIndex === null) {
     // 默认按分钟计算
-    return value * 60 * 1000
+    return value * DEFAULT_TIMEOUT
   }
   
   const multiplier = CONFIG_AUTO_UPDATE_TIME_GAP_TO_MS_MAP.get(unitIndex)
   if (multiplier === undefined) {
     // 索引无效，默认按分钟计算
-    return value * 60 * 1000
+    return value * DEFAULT_TIMEOUT
   }
   
   return value * multiplier

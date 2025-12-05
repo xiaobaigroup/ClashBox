@@ -4,7 +4,7 @@ import { BusinessError } from "@kit.BasicServicesKit";
 import { hilog } from "@kit.PerformanceAnalysisKit";
 import ClashViewModel from "../../entryability/ClashViewModel";
 import { Profile, ProfileType } from "proxy_core";
-import { convertMillisecondsToTimeGap } from "../entity/Constants";
+import { convertMillisecondsToTimeGap, DEFAULT_TIMEOUT } from "../entity/Constants";
 import { Xb_GetResourceString, Xb_NotificationUtils } from "xb_components";
 import { notificationManager } from "@kit.NotificationKit";
 
@@ -18,8 +18,6 @@ export class ConfigAutoUpdateService {
   private updateTimerId?: number = undefined;
   /** 后台任务通知ID */
   private notificationId?: number = undefined;
-  /** 检查间隔（毫秒）- 默认1分钟 */
-  private readonly CHECK_INTERVAL = 60 * 1000;
   /** 是否正在更新 */
   private isUpdating: boolean = false;
   /** 需要自动更新的配置 */
@@ -55,13 +53,14 @@ export class ConfigAutoUpdateService {
     // }
 
     // 找出更新频率最快的配置的毫秒值
-    const updateIntervalArray = this.autoUpdateProfiles.map((profile: Profile) => profile.autoUpdateDuration);
-    const updateInterval = Math.min(...updateIntervalArray)
+    const updateIntervalArray: number[] = this.autoUpdateProfiles.map((profile: Profile) => profile.autoUpdateDuration);
+    const minUpdateInterval: number = Math.min(...updateIntervalArray);
+    const updateInterval: number = (minUpdateInterval > DEFAULT_TIMEOUT) ? minUpdateInterval : DEFAULT_TIMEOUT; // 默认1分钟
 
     // 启动定时任务
     this.updateTimerId = setInterval(async () => {
       await this.checkAndUpdateConfigs();
-    }, updateInterval ?? this.CHECK_INTERVAL);
+    }, updateInterval);
 
     hilog.warn(0xFF00, "ConfigAutoUpdateService", "配置自动更新服务启动成功");
   }
@@ -220,7 +219,9 @@ export class ConfigAutoUpdateService {
                 Number(profile.id),
                 {
                   title: "ClashBox",
-                  text: `${Xb_GetResourceString($r('app.string.Configuration'), this.context)} ${profile.name} ${Xb_GetResourceString($r('app.string.update_success'), this.context)}`
+                  text: `${Xb_GetResourceString($r('app.string.Configuration'),
+                    this.context)} ${profile.name} ${Xb_GetResourceString($r('app.string.update_success'),
+                    this.context)}`
                 },
                 notificationManager.SlotType.SERVICE_INFORMATION,
                 { abilityName: 'EntryAbility' }
