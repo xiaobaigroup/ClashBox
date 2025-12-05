@@ -53,9 +53,17 @@ export class ConfigAutoUpdateService {
     // }
 
     // 找出更新频率最快的配置的毫秒值
-    const updateIntervalArray: number[] = this.autoUpdateProfiles.map((profile: Profile) => profile.autoUpdateDuration);
-    const minUpdateInterval: number = Math.min(...updateIntervalArray);
-    const updateInterval: number = (minUpdateInterval > DEFAULT_TIMEOUT) ? minUpdateInterval : DEFAULT_TIMEOUT; // 默认1分钟
+    const updateIntervalArray: number[] = this.autoUpdateProfiles.map((profile: Profile) => {
+      // 小于1分钟的重置为默认值并更新一次数据库
+      if (profile.autoUpdateDuration < DEFAULT_TIMEOUT) {
+        profile.autoUpdateDuration = DEFAULT_TIMEOUT; // 默认1分钟
+        ClashViewModel.updateProfile(profile);
+      }
+
+      return profile.autoUpdateDuration;
+    })
+
+    const updateInterval: number = Math.min(...updateIntervalArray) // 默认1分钟
 
     // 启动定时任务
     this.updateTimerId = setInterval(async () => {
