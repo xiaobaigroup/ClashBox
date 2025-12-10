@@ -242,12 +242,12 @@ struct Appearance {
               }) {
                 // 代理页按钮开关
                 Toggle({ type: ToggleType.Switch, isOn: this.uiConfig.needProxyStart || this.uiConfig.tabStyle == 'float' })
-                  .enabled(this.uiConfig.tabStyle != 'float')
+                  .enabled(!(this.uiConfig.tabStyle == 'float' && this.apiVersionEnable))
                   .selectedColor(this.icon_emphasize)
                   .hitTestBehavior(HitTestMode.None)
                   .margin({right: 12})
               }
-            }.enabled(this.uiConfig.tabStyle != 'float')
+            }.enabled(!(this.uiConfig.tabStyle == 'float' && this.apiVersionEnable))
             .onClick(()=> {
               // 打开代理页按钮 显式动画
               this.getUIContext()?.animateTo({

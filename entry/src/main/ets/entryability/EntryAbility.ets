@@ -572,8 +572,7 @@ export default class EntryAbility extends UIAbility {
     // 获取应用主窗口
     let windowClass: window.Window = windowStage.getMainWindowSync();
     // 设置窗口全屏
-    let isLayoutFullScreen = true;
-    windowClass.setWindowLayoutFullScreen(isLayoutFullScreen).then(() => {
+    windowClass.setWindowLayoutFullScreen(true).then(() => {
       console.info('Succeeded in setting the window layout to full-screen mode.');
     }).catch((err: BusinessError) => {
       console.error('Failed to set the window layout to full-screen mode. Cause:' + JSON.stringify(err));

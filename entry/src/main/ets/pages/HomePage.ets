@@ -73,6 +73,7 @@ struct Home {
   @StorageLink ('isLandscapePhone') @Watch('isLandscapePhoneScrollTo') isLandscapePhone: boolean = false
   // 弹窗时背景模糊
   @StorageLink('CustomDialog') showCustomDialogBackgroundBlur: boolean = false
+  @StorageProp('EnableAPIVersion') apiVersionEnable: boolean = false
   // 折叠屏展开状态判定
   @StorageLink ('isFoldStatus') isFoldStatus: boolean = false
   // 窗口模式区分，true为窗口式，false为普通式
@@ -246,7 +247,7 @@ struct Home {
         })
 
         // 代理启动按钮层
-        if ((!this.isShowHomeEdit && this.uiConfig.tabStyle == 'custom') || (this.widthBp > 2 && this.proxyEnabled)) {
+        if ((!this.isShowHomeEdit && this.uiConfig.tabStyle == 'custom') || (this.widthBp > 2 && this.proxyEnabled) || !this.apiVersionEnable) {
           RoundButton({
             Icon1: $r('sys.symbol.pause'),
             Icon2: $r('sys.symbol.play_fill'),

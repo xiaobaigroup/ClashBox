@@ -193,7 +193,7 @@ export class AppState {
   static versionName = ''
   static versionCode = 1006056
   static coreVersion = "Prerelease-Alpha"
-  static async init(){
+  static async init() {
 
     PersistentStorage.persistProp("appConfig", new AppConfig())
     PersistentStorage.persistProp("favoriteProfiles", new Map<string, string>([]))
