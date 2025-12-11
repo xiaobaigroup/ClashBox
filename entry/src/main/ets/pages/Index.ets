@@ -1152,7 +1152,7 @@ struct Index {
 
     this.colorModeListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
       this.currentColorMode = mediaQueryResult.matches
-      hilog.info(0x1000, 'Index', `#媒体查询 #深色模式: ${this.currentColorMode}`)
+      // hilog.debug(0x1000, 'Index', `#媒体查询 #深色模式: ${this.currentColorMode}`)
     })
 
     // 日志启用事件

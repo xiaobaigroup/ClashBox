@@ -134,7 +134,7 @@ export struct WebCodeEditor {
   }
 
   onColorModeChange() {
-    hilog.info(0x1000, TAG, `#媒体查询 #深色模式: ${this.currentColorMode}`)
+    // hilog.debug(0x1000, TAG, `#媒体查询 #深色模式: ${this.currentColorMode}`)
     if (this.currentColorMode) {
       this.setTheme('dark')
     } else {

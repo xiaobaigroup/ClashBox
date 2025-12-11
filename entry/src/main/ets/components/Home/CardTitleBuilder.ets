@@ -39,6 +39,8 @@ export struct CardTitle {
           }
         }
       }
+      .clip(true)
+      .width('100%')
       .alignItems(HorizontalAlign.Start)
     }
     .width('100%')

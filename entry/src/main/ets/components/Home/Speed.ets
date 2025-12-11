@@ -32,7 +32,6 @@ struct Speed {
   // 前台判断变量
   @StorageProp('ForwardState') @Watch('proxyEnabledChanged') isForward: boolean = true
   @Consume ChartData: number[] | ConvertedUnit[]
-  @State lineStart: boolean = true
   @Consume DownloadSpeed: string
   @Consume UploadSpeed: string
   // 是否在主页
@@ -43,18 +42,18 @@ struct Speed {
   @Consume proxyTime:number
   // 初始化图表数据
   @State defOption: Options = new Options({
-    //图例
+    // 图例
     legend: {
       show: false,
       selectAble: false,
     },
-    //图表位置
+    // 图表位置
     grid: {
       top: 0,
       left: 17,
       right: 17,
     },
-    //X轴
+    // X轴
     xAxis: {
       data: ['', '', '', '', '', '', '', '', '', '', '', ''],
       axisLine: {
@@ -65,23 +64,23 @@ struct Speed {
         show: false,
         interval: 2
       },
-      //坐标轴两侧是否留白
+      // 坐标轴两侧是否留白
       boundaryGap: false
     },
-    //Y轴
+    // Y轴
     yAxis:
     {
       min: 0,
       max: 1500,
-      //刻度线
+      // 刻度线
       axisTick: {
         show: false
       },
-      //轴线
+      // 轴线
       axisLine: {
         show: false
       },
-      //Y轴分割线
+      // Y轴分割线
       splitLine: {
         show: false
       },
@@ -89,9 +88,9 @@ struct Speed {
         show: false
       }
     },
-    //动画
+    // 动画
     animation: false,
-    //初始折线
+    // 初始折线
     series: [
       {
         data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -107,71 +106,94 @@ struct Speed {
   })
 
   build() {
-    Column() {
+    RelativeContainer() {
+      CardTitle({
+        title: $r('app.string.Speed'),
+        subtitle: (getResourceString($r('app.string.px_sec_screen_use_time'), this) + number2Time(Number(this.proxyTime), true))
+      })
+        .id('title')
+        .alignRules({
+          top: { anchor: "__container__", align: VerticalAlign.Top },
+          left: { anchor: "__container__", align: HorizontalAlign.Start }
+        })
+
+      // 速率
+      Column() {
+        // 上行流量
+        Flex({
+          alignItems: ItemAlign.Center,
+          direction: FlexDirection.Row,
+          justifyContent: FlexAlign.End,
+          space: { main: LengthMetrics.vp(5) }
+        })
+        {
+          Text(this.UploadSpeed.toString())
+            .fontSize(HomeCardSpeedFontSize(this.widthBp, this.heightBp))
+            .fontColor($r('sys.color.font_primary'))
+            .textAlign(TextAlign.End)
+          SymbolGlyph($r('sys.symbol.chevron_up'))
+            .fontColor([$r('sys.color.font_primary')])
+        }
+        // 下行流量
+        Flex({
+          alignItems: ItemAlign.Center,
+          direction: FlexDirection.Row,
+          justifyContent: FlexAlign.End,
+          space: { main: LengthMetrics.vp(5) }
+        })
+        {
+          Text(this.DownloadSpeed.toString())
+            .fontSize(HomeCardSpeedFontSize(this.widthBp, this.heightBp))
+            .fontColor($r('sys.color.font_primary'))
+            .textAlign(TextAlign.End)
+          SymbolGlyph($r('sys.symbol.chevron_down'))
+            .fontColor([$r('sys.color.font_primary')])
+        }
+      }
+      .id("speed")
+      .justifyContent(FlexAlign.End)
+      .alignRules({
+        top: { anchor: "__container__", align: VerticalAlign.Top },
+        right: { anchor: "__container__", align: HorizontalAlign.End }
+      })
+
+      // 图表
+      if (!this.proxyEnabled) {
+        Row()
+          .id('chart_0')
+          .width('92%').height(3)
+          .backgroundColor(this.colorTheme())
+          .margin({ left: 17, right: 17, bottom: /*28.5*/0 })
+          .transition(customAnimationUtil.isOpacity(this.uiConfig))
+          .alignRules({
+            bottom: { anchor: '__container__', align: VerticalAlign.Bottom } // 底部对齐父容器底部
+          })
+      } else {
+        McLineChart({ options: this.defOption })
+          .id('chart_1')
+          .offset({ y: 28.5 })
+          .transition(customAnimationUtil.isOpacity(this.uiConfig))
+          .alignRules({
+            bottom: { anchor: '__container__', align: VerticalAlign.Bottom } // 底部对齐父容器底部
+          })
+      }
+
+    }
+    .padding(HomeCardPadding(this.widthBp, this.heightBp))
+    .width('100%').height('100%')
+    .id('SpeedId')
+/*    Column() {
+
       Flex({
         direction: FlexDirection.Row,
         justifyContent: FlexAlign.SpaceBetween
       }) {
-        CardTitle({
-          title: $r('app.string.Speed'),
-          subtitle: (getResourceString($r('app.string.px_sec_screen_use_time'), this) + number2Time(Number(this.proxyTime), true))
-        })
-
-        Column() {
-          Flex({
-            alignItems: ItemAlign.Center,
-            direction: FlexDirection.Row,
-            justifyContent: FlexAlign.End,
-            space: { main: LengthMetrics.vp(5) }
-          })
-          {
-            Text(this.UploadSpeed.toString())
-              .fontSize(HomeCardSpeedFontSize(this.widthBp, this.heightBp))
-              .fontColor($r('sys.color.font_primary'))
-              .textAlign(TextAlign.End)
-
-            SymbolGlyph($r('sys.symbol.chevron_up'))
-              .fontColor([$r('sys.color.font_primary')])
-
-          }
-
-          Flex({
-            alignItems: ItemAlign.Center,
-            direction: FlexDirection.Row,
-            justifyContent: FlexAlign.End,
-            space: { main: LengthMetrics.vp(5) }
-          })
-          {
-            Text(this.DownloadSpeed.toString())
-              .fontSize(HomeCardSpeedFontSize(this.widthBp, this.heightBp))
-              .fontColor($r('sys.color.font_primary'))
-              .textAlign(TextAlign.End)
-
-            SymbolGlyph($r('sys.symbol.chevron_down'))
-              .fontColor([$r('sys.color.font_primary')])
-
-          }
-        }
-        .justifyContent(FlexAlign.End)
       }
       .width('100%')
 
-      // 图表
-      Stack(){
-        if (this.lineStart){
-          Row().width('92%').height(3).backgroundColor(this.colorTheme()).margin({left:17,right:17,bottom:28.5})
-            .transition(customAnimationUtil.isOpacity(this.uiConfig))
-        }else {
-          McLineChart({
-            options: this.defOption
-          }).transition(customAnimationUtil.isOpacity(this.uiConfig))
-        }
-      }.width('100%').height('100%').alignContent(Alignment.Bottom)
-    }
-    .padding(HomeCardPadding(this.widthBp, this.heightBp))
-    .width('100%')
-    .height('100%')
-    .id('SpeedId')
+
+    }*/
+
     /*.onAppear(() => {
       hilog.info(0xFF00, "HomeSpeedTestTag", "Speed Card onAppear")
       // 后台切回前台 -> 代理开启时，折线图显示
@@ -192,7 +214,7 @@ struct Speed {
   onSpeedData() {
     this.DownloadSpeed = this.appFlowingState.traffics.getLast()?.down?.toString() ?? "0 kb"
     this.UploadSpeed = this.appFlowingState.traffics.getLast()?.up?.toString() ?? "0 kb"
-    //图表
+    // 图表
     // 使用Option实例对象的setVal方法来实现，修改什么属性就传什么
     // Tip 如果是一条曲线 合成一个 up + down
     this.ChartData = this.proxyEnabled ? convertDataArray(this.appFlowingState.traffics.getData()) : CHART_NUMBER
@@ -310,7 +332,6 @@ struct Speed {
   private lineRenderStop() {
     // 清除定时器
     clearInterval(this.timerId);
-    this.lineStart = true;
     this.defOption = new Options({
       //图例
       legend: {
@@ -381,10 +402,6 @@ struct Speed {
     this.timerId = setInterval(() => {
       this.onSpeedData();
     }, 1000);
-
-    setTimeout(() => {
-      this.lineStart = false;
-    }, 1000);
   }
 
   aboutToAppear() {
@@ -401,6 +418,7 @@ struct Speed {
     let colorValue = Xb_ResourceColorUtil(this.icon_emphasize, this.getUIContext().getHostContext()!)
     return colorValue
   }
+
 }
 
 export default Speed
