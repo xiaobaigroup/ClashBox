@@ -885,7 +885,8 @@ struct Index {
 
   async aboutToAppear(): Promise<void> {
     hilog.info(0x1000, componentName, `#aboutToAppear executed`)
-
+    this.registerEvent()
+    
     // 初始化状态栏工具(仅PC设备)
     if (this.windowMode) {
       const iconResource: StatusBarIconResource = {
@@ -910,6 +911,124 @@ struct Index {
         })
     }
 
+    // 首次启动启用通知
+    if (!this.uiConfig.isRequestNotification) {
+      EventHub.sendEvent(EventKey.EnabledNotice, true)
+    }
+
+    // 检查后台运行全局变量的状态
+    if (this.uiConfig.backgroundLocateModel || this.uiConfig.backgroundDownModel || this.uiConfig.backgroundPiPModel || this.uiConfig.backgroundKeepTask) {
+      this.uiConfig.Enablebackgrounder = true
+    } else {
+      this.uiConfig.Enablebackgrounder = false
+    }
+
+    // 分享包名
+    const localStorage = this.getUIContext().getSharedLocalStorage()
+    const bundleInfo = localStorage?.get<BundleInfo>('bundleInfo') || new BundleInfo()
+    //  冷启动 -> 触发
+    if (BundleInfo.isEmpty(bundleInfo)) {
+      this.jumpAccessControl(bundleInfo)
+    }
+    // 运行一次窗口检查
+    this.onWindowChange()
+    // 除手机外更多页均默认跳转覆写
+    if (this.widthBp > 1) {
+      this.morePageInfos.pushPathByName('Overwrite', null, false)
+    }
+    // 启动时检查上一次是否崩溃
+    if (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) {
+      hilog.info(0x1000, componentName, `进入崩溃日志`)
+      this.isShowWelcome = true
+    }
+    // 首次启动打开欢迎页
+    if (this.uiConfig.isFirstStart) {
+      this.isShowWelcome = true
+    }
+    // 在页面build前改变主题颜色
+    Xb_ChangeThemeColor(this.uiConfig.themeColor)
+    hilog.info(0x1000, componentName, `#aboutToAppear#ThemeControl.setDefaultTheme(${this.uiConfig.themeColor})`)
+    // 初始化切换颜色模式(深色模式)
+    Xb_ColorModeManager.setColorModeByString(this.context, this.uiConfig.darkMode)
+    // 初始化切换按钮位置
+    this.switchButtonPosition(this.uiConfig.buttonPositionIndex)
+
+    // 检查版本更新
+    /* if (this.uiConfig.autoCheckUpdate) {
+       try {
+         const updateInfo = await getUpdateInfo()
+         hilog.info(0xFF00, "UpdatetestTag", "Update Info: %{public}s", JSON.stringify(updateInfo))
+         const theLatest = extractUpdateInfo(updateInfo)
+         if (theLatest) {
+           // 查询完成
+           if (compareVersions(theLatest.tag_name, AppState.versionName)) {
+             this.theAppVersionInfo = theLatest
+             this.isDisclaimer = false
+             this.dialogController.open()
+           }
+         } else {
+           hilog.info(0xFF00, "UpdatetestTag", "提取更新信息失败")
+         }
+       } catch (err) {
+         // 处理错误情况
+         const infoError = `Error:${JSON.stringify(err)}`
+         hilog.info(0xFF00, "UpdatetestTag", "Info: %{public}s", infoError)
+       }
+     }*/
+
+    // if(!this.uiConfig.enabledADvanced || !this.uiConfig.isShowExperimentalFunction) {
+    //   // 屏蔽分流策略
+    //   this.moreList = removeItemsByIndex(this.moreList, [5])
+    // }
+    // if(this.appConfig.clashCore !== ClashCore.mihomo) {
+    //   // 屏蔽请求与连接
+    //   this.moreList = removeItemsByIndex(this.moreList, [2,3])
+    // }
+
+    // 根据设备选择性开启change监听
+    /*if (deviceInfo.deviceType === 'phone') {
+      this.deviceHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
+        this.isLandscapePhone = mediaQueryResult.matches
+        AppStorage.setOrCreate<boolean>('isLandscapePhone', this.isLandscapePhone)
+        hilog.info(0x1000, componentName,
+          `#媒体查询#设备高度改变#(320vp< height <= 500vp) and (640vp< width <= 1000vp)手机横屏结果: ${this.isLandscapePhone}`)
+      })
+    }*/
+
+    this.colorModeListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
+      this.currentColorMode = mediaQueryResult.matches
+      // hilog.debug(0x1000, 'Index', `#媒体查询 #深色模式: ${this.currentColorMode}`)
+    })
+
+    // 初始化配置列表
+    await this.awaitInit()
+
+    // 初始化实况窗
+/*    const isLive = await LiveViewUtil.init(this.getUIContext().getHostContext()!)
+    if (isLive) {
+      console.log(`LiveViewUtil 实况窗初始化成功`)
+    } else {
+      console.error(`LiveViewUtil 实况窗初始化失败`)
+    }*/
+
+    // 更新应用版本号
+    const packageInfo = await getPackageInfo()
+    AppState.versionCode = packageInfo.versionCode
+    AppState.versionName = packageInfo.versionName
+    console.error(`Update 历史应用版本：${this.uiConfig.oldVersionCode} 当前应用版本：${AppState.versionCode}`)
+
+    if (this.uiConfig.oldVersionCode !== AppState.versionCode) {
+      this.isEnableIndexForegroundBlur = true
+      this.isShowWelcome = true
+      this.updateData()   // TODO 强制更新数据函数
+    }
+
+    animationStyle.setContext(this.UIContext)
+    holdingHandleUtil.setContext(this.UIContext)
+  }
+
+  /** @description 统一注册事件 */
+  registerEvent(){
     // 通知事件
     EventHub.on(EventKey.EnabledNotice, async (enadblNotice: boolean) => {
       try {
@@ -950,17 +1069,6 @@ struct Index {
         hilog.error(0xFF00, 'Index', `Toggle Error: ${(err as BusinessError).code}, ${(err as BusinessError).message}`);
       }
     })
-    // 首次启动启用通知
-    if (!this.uiConfig.isRequestNotification) {
-      EventHub.sendEvent(EventKey.EnabledNotice, true)
-    }
-
-    // 检查后台运行全局变量的状态
-    if (this.uiConfig.backgroundLocateModel || this.uiConfig.backgroundDownModel || this.uiConfig.backgroundPiPModel || this.uiConfig.backgroundKeepTask) {
-      this.uiConfig.Enablebackgrounder = true
-    } else {
-      this.uiConfig.Enablebackgrounder = false
-    }
     const appFlowingState = AppStorage.get<AppFlowingState>("appFlowingState") ?? new AppFlowingState()
     // 启动Clash后
     EventHub.on(EventKey.StartedClash, () => {
@@ -1075,88 +1183,10 @@ struct Index {
       this.proxyTime = time
       this.proxyStartingDuration = number2Time(time)
     })
-
-    // 分享包名
-    const localStorage = this.getUIContext().getSharedLocalStorage()
-    const bundleInfo = localStorage?.get<BundleInfo>('bundleInfo') || new BundleInfo()
-    //  冷启动 -> 触发
-    if (BundleInfo.isEmpty(bundleInfo)) {
-      this.jumpAccessControl(bundleInfo)
-    }
     // 热启动 -> 通过事件监听触发
     EventHub.on(EventKey.ShareBundle, (bundleInfo: BundleInfo) => {
       this.jumpAccessControl(bundleInfo)
     })
-    // 运行一次窗口检查
-    this.onWindowChange()
-    // 除手机外更多页均默认跳转覆写
-    if (this.widthBp > 1) {
-      this.morePageInfos.pushPathByName('Overwrite', null, false)
-    }
-    // 启动时检查上一次是否崩溃
-    if (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) {
-      hilog.info(0x1000, componentName, `进入崩溃日志`)
-      this.isShowWelcome = true
-    }
-    // 首次启动打开欢迎页
-    if (this.uiConfig.isFirstStart) {
-      this.isShowWelcome = true
-    }
-    // 在页面build前改变主题颜色
-    Xb_ChangeThemeColor(this.uiConfig.themeColor)
-    hilog.info(0x1000, componentName, `#aboutToAppear#ThemeControl.setDefaultTheme(${this.uiConfig.themeColor})`)
-    // 初始化切换颜色模式(深色模式)
-    Xb_ColorModeManager.setColorModeByString(this.context, this.uiConfig.darkMode)
-    // 初始化切换按钮位置
-    this.switchButtonPosition(this.uiConfig.buttonPositionIndex)
-
-    // 检查版本更新
-    /* if (this.uiConfig.autoCheckUpdate) {
-       try {
-         const updateInfo = await getUpdateInfo()
-         hilog.info(0xFF00, "UpdatetestTag", "Update Info: %{public}s", JSON.stringify(updateInfo))
-         const theLatest = extractUpdateInfo(updateInfo)
-         if (theLatest) {
-           // 查询完成
-           if (compareVersions(theLatest.tag_name, AppState.versionName)) {
-             this.theAppVersionInfo = theLatest
-             this.isDisclaimer = false
-             this.dialogController.open()
-           }
-         } else {
-           hilog.info(0xFF00, "UpdatetestTag", "提取更新信息失败")
-         }
-       } catch (err) {
-         // 处理错误情况
-         const infoError = `Error:${JSON.stringify(err)}`
-         hilog.info(0xFF00, "UpdatetestTag", "Info: %{public}s", infoError)
-       }
-     }*/
-
-    // if(!this.uiConfig.enabledADvanced || !this.uiConfig.isShowExperimentalFunction) {
-    //   // 屏蔽分流策略
-    //   this.moreList = removeItemsByIndex(this.moreList, [5])
-    // }
-    // if(this.appConfig.clashCore !== ClashCore.mihomo) {
-    //   // 屏蔽请求与连接
-    //   this.moreList = removeItemsByIndex(this.moreList, [2,3])
-    // }
-
-    // 根据设备选择性开启change监听
-    /*if (deviceInfo.deviceType === 'phone') {
-      this.deviceHeightListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
-        this.isLandscapePhone = mediaQueryResult.matches
-        AppStorage.setOrCreate<boolean>('isLandscapePhone', this.isLandscapePhone)
-        hilog.info(0x1000, componentName,
-          `#媒体查询#设备高度改变#(320vp< height <= 500vp) and (640vp< width <= 1000vp)手机横屏结果: ${this.isLandscapePhone}`)
-      })
-    }*/
-
-    this.colorModeListener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
-      this.currentColorMode = mediaQueryResult.matches
-      // hilog.debug(0x1000, 'Index', `#媒体查询 #深色模式: ${this.currentColorMode}`)
-    })
-
     // 日志启用事件
     EventHub.on(EventKey.StartLog, async (enable: boolean) => {
       ClashViewModel.startLog(enable, (log) => {
@@ -1209,22 +1239,11 @@ struct Index {
       }
 
     })
-
-    // 初始化配置列表
-    await this.awaitInit()
     // 注册配置加载事件
     EventHub.on(EventKey.FetchProfile, async () => {
       console.log(`开始获取配置信息`)
       this.fetchProfiles()
     })
-    // 初始化实况窗
-/*    const isLive = await LiveViewUtil.init(this.getUIContext().getHostContext()!)
-    if (isLive) {
-      console.log(`LiveViewUtil 实况窗初始化成功`)
-    } else {
-      console.error(`LiveViewUtil 实况窗初始化失败`)
-    }*/
-
     // 注册配置详情加载事件
     EventHub.on(EventKey.LoadConfigStr, () => {
       const context = this.getUIContext().getHostContext()!
@@ -1257,21 +1276,6 @@ struct Index {
         console.error(`打开配置文件失败，name: ${error.name} message: ${error.message}`)
       }
     })
-
-    // 更新应用版本号
-    const packageInfo = await getPackageInfo()
-    AppState.versionCode = packageInfo.versionCode
-    AppState.versionName = packageInfo.versionName
-    console.error(`Update 历史应用版本：${this.uiConfig.oldVersionCode} 当前应用版本：${AppState.versionCode}`)
-
-    if (this.uiConfig.oldVersionCode !== AppState.versionCode) {
-      this.isEnableIndexForegroundBlur = true
-      this.isShowWelcome = true
-      this.updateData()   // TODO 强制更新数据函数
-    }
-
-    animationStyle.setContext(this.UIContext)
-    holdingHandleUtil.setContext(this.UIContext)
   }
 
   aboutToDisappear() {
@@ -1285,6 +1289,13 @@ struct Index {
     this.uiConfig.useTime = new Date().getTime()
     // 解注册画中画生命周期及状态回调
     PipManager.getInstance().unregisterPipStateChangeListener()
+    this.unRegisterEvent()
+    // 解绑listener中注册的回调函数
+    // this.deviceHeightListener.off('change');
+  }
+
+  /** @description 统一取消监听事件 */
+  unRegisterEvent() {
     EventHub.off(EventKey.ChangeProxy)
     EventHub.off(EventKey.FetchProxyGroup)
     EventHub.off(EventKey.ShareBundle)
@@ -1295,8 +1306,6 @@ struct Index {
     EventHub.off(EventKey.ClearLog)
     EventHub.off(EventKey.StartLog)
     EventHub.off(EventKey.LoadConfigStr)
-    // 解绑listener中注册的回调函数
-    // this.deviceHeightListener.off('change');
   }
 
   // 更新后强化赋值一次
