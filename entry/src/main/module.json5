@@ -86,6 +86,10 @@
         "name": "ohos.permission.INTERNET",
       },
       {
+        // 适人握持(动作感知)
+        "name": "ohos.permission.DETECT_GESTURE"
+      },
+      {
         // 振动器
         "name": "ohos.permission.VIBRATE"
       },

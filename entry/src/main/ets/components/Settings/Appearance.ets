@@ -9,7 +9,7 @@ import {
 } from "../../common/entity/Constants"
 import TopBuilder from "./TopBuilder"
 import { curves, SymbolGlyphModifier } from "@kit.ArkUI"
-import { common } from "@kit.AbilityKit"
+import { abilityAccessCtrl, common } from "@kit.AbilityKit"
 import { font_primary, menuRowList, toggleRowList } from "../Common/Common"
 import { UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../common/utils/Animation"
@@ -254,6 +254,35 @@ struct Appearance {
                 duration: ANIMATION_DURATION_300
               }, () => {
                 this.uiConfig.needProxyStart = !this.uiConfig.needProxyStart
+              })
+            })
+            // 分割线
+            Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
+            // 适人握持(动作感知)
+            Row() {
+              toggleRowList({
+                icons: $r('sys.symbol.hand_draw'),
+                title: '适人握持',
+                subtitle: '动作感知开关',
+              }) {
+                // 主页问候开关
+                Toggle({ type: ToggleType.Switch, isOn: $$this.uiConfig.isHoldingHand })
+                  .selectedColor(this.icon_emphasize)
+                  .hitTestBehavior(HitTestMode.None)
+                  .margin({right: 12})
+              }
+            }.onClick(()=> {
+              // 显式动画
+              this.getUIContext()?.animateTo({
+                duration: ANIMATION_DURATION_300
+              }, () => {
+                this.uiConfig.isHoldingHand = !this.uiConfig.isHoldingHand
+
+                if (this.uiConfig.isHoldingHand) {
+                  // 首次使用 -> 需要授权
+                  const atManager = abilityAccessCtrl.createAtManager();
+                  atManager.requestPermissionsFromUser(this.context, ['ohos.permission.DETECT_GESTURE']);
+                }
               })
             })
             // 分割线
