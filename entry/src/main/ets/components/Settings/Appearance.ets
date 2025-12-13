@@ -263,8 +263,8 @@ struct Appearance {
             Row() {
               toggleRowList({
                 icons: $r('sys.symbol.hand_draw'),
-                title: '适人握持',
-                subtitle: '动作感知开关',
+                title: $r('app.string.holding_hand_gesture'),
+                subtitle: $r('app.string.holding_hand_gesture_subtitle'),
               }) {
                 // 主页问候开关
                 Toggle({ type: ToggleType.Switch, isOn: $$this.uiConfig.isHoldingHand })
