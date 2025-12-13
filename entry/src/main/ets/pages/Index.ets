@@ -90,6 +90,8 @@ import LiveViewUtil from '../common/utils/LiveViewUtil'
 import { UpdateLog } from '../components/Start/UpdateLog'
 import { animationStyle } from 'xb_components/src/main/ets/components/Animation';
 import { getJsonArrayType } from '../common/entity/utils';
+import { holdingHandleUtil } from '../common/utils/HoldingHandleUtil';
+
 // import { hdsEffect } from '@kit.UIDesignKit';
 
 
@@ -1269,6 +1271,7 @@ struct Index {
     }
 
     animationStyle.setContext(this.UIContext)
+    holdingHandleUtil.setContext(this.UIContext)
   }
 
   aboutToDisappear() {
@@ -1401,6 +1404,7 @@ struct Index {
     hilog.info(0x1000, componentName,
       `#aboutToAppear#Language 当前系统语言文本：${getResourceString(this.SystemLanguageSubtitle, this)}`)
     this.onOpenConfigLink()
+    holdingHandleUtil.start()
   }
 
   /**通过AppLink导入配置*/
@@ -1430,6 +1434,7 @@ struct Index {
     hilog.info(0xFF00, "PipTag", "代理启用状态： %{public}s", this.proxyEnabled)
     hilog.info(0xFF00, "PipTag", "画中画启用状态： %{public}s", this.uiConfig.backgroundPiPModel)
     this.ShowPipChange()
+    holdingHandleUtil.stop()
   }
 
   /**初始化应用语言*/

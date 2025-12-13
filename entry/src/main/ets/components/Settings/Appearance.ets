@@ -14,8 +14,9 @@ import { font_primary, menuRowList, toggleRowList } from "../Common/Common"
 import { UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../common/utils/Animation"
 import { PageMargin } from "../../common/breakpoint/BreakPoint"
-import { Xb_ColorModeManager, Xb_UIConfig } from "xb_components"
+import { Xb_ColorModeManager, Xb_ToastUtil, Xb_UIConfig } from "xb_components"
 import { Xb_ChangeThemeColor } from "xb_components/src/main/ets/utils/ChangeThemeColorUtil"
+import { holdingHandleUtil } from "../../common/utils/HoldingHandleUtil"
 
 
 @Component
@@ -275,13 +276,21 @@ struct Appearance {
               // 显式动画
               this.getUIContext()?.animateTo({
                 duration: ANIMATION_DURATION_300
-              }, () => {
+              }, async () => {
                 this.uiConfig.isHoldingHand = !this.uiConfig.isHoldingHand
 
+                // 首次使用 -> 需要授权
                 if (this.uiConfig.isHoldingHand) {
-                  // 首次使用 -> 需要授权
                   const atManager = abilityAccessCtrl.createAtManager();
-                  atManager.requestPermissionsFromUser(this.context, ['ohos.permission.DETECT_GESTURE']);
+                  await atManager.requestPermissionsFromUser(this.context, ['ohos.permission.DETECT_GESTURE']).catch(() => {
+                    Xb_ToastUtil.showToast({
+                      message: "当前设备不支持"
+                    })
+                  });
+
+                  holdingHandleUtil.start()
+                } else {
+                  holdingHandleUtil.stop()
                 }
               })
             })
@@ -291,10 +300,11 @@ struct Appearance {
             menuRowList({
               icons: $r('sys.symbol.local_fill'),
               title: $r('app.string.suspension_button_position'),
+              rowEnabled: !this.uiConfig.isHoldingHand,
               // 确保this指向父组件
               tips: (): void => { this.TipsText(2) },
               menu: (): void => { this.MenuEntrance(2) }
-            })
+            }).enabled(this.uiConfig.tabStyle == 'float' && !this.uiConfig.isHoldingHand)
             // 分割线
             Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
             // Tab栏样式
@@ -501,6 +511,7 @@ struct Appearance {
       // 按钮位置
       Text(this.EnableButtonPositionText)
         .tipsText()
+        .fontColor(this.uiConfig.isHoldingHand ? $r('sys.color.font_fourth') : $r('sys.color.font_secondary'))
     } else if (index === 3) {
       // 动画速度
       Text(this.EnableAnimationSpeedText)

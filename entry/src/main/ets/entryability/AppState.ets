@@ -109,7 +109,7 @@ export class UIConfig {
   // 启用代理页开关
   needProxyStart: boolean = false
   // 适人握持(动作感知)开关
-  isHoldingHand: boolean = true
+  isHoldingHand: boolean = false
   // 编辑器自动换行
   editWordWrap: boolean = true
   // 常驻通知开关
