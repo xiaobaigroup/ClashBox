@@ -1,5 +1,5 @@
 // Index
-import { LengthMetrics, mediaquery, UIUtils } from '@kit.ArkUI'
+import { curves, LengthMetrics, mediaquery, UIUtils } from '@kit.ArkUI'
 import Home from './HomePage'
 import ProxyPage from './ProxyPage'
 import { util } from "@kit.ArkTS";
@@ -1276,6 +1276,14 @@ struct Index {
         console.error(`打开配置文件失败，name: ${error.name} message: ${error.message}`)
       }
     })
+    // 注册监听切换按钮位置事件
+    EventHub.on(EventKey.SwitchButtonPosition, () => {
+      this.getUIContext().animateTo(this.uiConfig.isAnimation ?
+        { duration: this.uiConfig.animationSpeed, curve: curves.springMotion() } : null,
+        () => {
+          this.switchButtonPosition(this.uiConfig.buttonPositionIndex)
+        })
+    })
   }
 
   aboutToDisappear() {
@@ -1306,6 +1314,7 @@ struct Index {
     EventHub.off(EventKey.ClearLog)
     EventHub.off(EventKey.StartLog)
     EventHub.off(EventKey.LoadConfigStr)
+    EventHub.off(EventKey.SwitchButtonPosition)
   }
 
   // 更新后强化赋值一次

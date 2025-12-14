@@ -1,6 +1,7 @@
 import { motion } from "@kit.MultimodalAwarenessKit";
 import { hilog } from "@kit.PerformanceAnalysisKit";
 import { UIConfig } from "../../entryability/AppState";
+import { EventHub, EventKey } from '../EventHub'
 import { curves } from "@kit.ArkUI";
 
 /**
@@ -73,15 +74,15 @@ class HoldingHandleUtil {
             uiConfig.buttonPositionIndex = 2;
           })
         break;
-        /* TODO 双手 -> 考虑是否需要添加
-        case motion.HoldingHandStatus.BOTH_HANDS_HELD:
-          // 双手
-          this.ctx?.animateTo(uiConfig.isAnimation ?
-            { duration: uiConfig.animationSpeed, curve: curves.springMotion() } : null,
-            () => {
-              uiConfig.buttonPositionIndex = 1;
-            })
-          break;*/
+      /* TODO 双手 -> 考虑是否需要添加
+      case motion.HoldingHandStatus.BOTH_HANDS_HELD:
+        // 双手
+        this.ctx?.animateTo(uiConfig.isAnimation ?
+          { duration: uiConfig.animationSpeed, curve: curves.springMotion() } : null,
+          () => {
+            uiConfig.buttonPositionIndex = 1;
+          })
+        break;*/
       case motion.HoldingHandStatus.RIGHT_HAND_HELD:
       default: // 右手和默认
         this.ctx?.animateTo(uiConfig.isAnimation ?
@@ -91,6 +92,8 @@ class HoldingHandleUtil {
           })
         break;
     }
+
+    EventHub.sendEvent(EventKey.SwitchButtonPosition)
   }
 }
 
