@@ -27,7 +27,9 @@ class HoldingHandleUtil {
   }
 
   start(): void {
-    if (this.isStart) {
+    const UIConfig: UIConfig = AppStorage.get("uiConfig")!;
+
+    if (this.isStart || !UIConfig.isHoldingHand) {
       return
     }
 
@@ -71,6 +73,15 @@ class HoldingHandleUtil {
             uiConfig.buttonPositionIndex = 2;
           })
         break;
+        /* TODO 双手 -> 考虑是否需要添加
+        case motion.HoldingHandStatus.BOTH_HANDS_HELD:
+          // 双手
+          this.ctx?.animateTo(uiConfig.isAnimation ?
+            { duration: uiConfig.animationSpeed, curve: curves.springMotion() } : null,
+            () => {
+              uiConfig.buttonPositionIndex = 1;
+            })
+          break;*/
       case motion.HoldingHandStatus.RIGHT_HAND_HELD:
       default: // 右手和默认
         this.ctx?.animateTo(uiConfig.isAnimation ?
