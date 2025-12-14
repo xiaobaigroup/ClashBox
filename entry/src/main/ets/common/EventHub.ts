@@ -23,7 +23,8 @@ export enum EventKey{
   LoginWebDav = 10019,
   LoadConfigStr = 10020,
   AddConfig = 10021,
-  TestAllDelay = 10022
+  TestAllDelay = 10022,
+  SwitchButtonPosition = 10023,
 }
 
 export class EventHub{

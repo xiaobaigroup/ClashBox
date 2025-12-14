@@ -2299,6 +2299,14 @@
     {
       "name": "qrcode_universal_link_subtitle",
       "value": "仅支持本应用扫码和其它App识别~"
+    },
+    {
+      "name": "holding_hand_gesture",
+      "value": "适人握持(动作感知)"
+    },
+    {
+      "name": "holding_hand_gesture_subtitle",
+      "value": "开启将禁用悬浮按钮位置"
     }
   ]
 }

@@ -953,7 +953,6 @@ export struct toggleRowList {
         if(this.subtitle) {
           Text(this.subtitle)
             .fontWeight(FontWeight.Normal)
-            .fontColor($r('sys.color.font_secondary'))
             // .opacity(this.rowEnabled ? undefined : 0.4)  // 调整透明度模拟禁用效果
             .fontColor(this.rowEnabled ? undefined : $r('sys.color.font_fourth'))  // 修改文字颜色
             .textOverflow({ overflow: this.uiConfig.stringDisplayIndex === 0 ? TextOverflow.Ellipsis : TextOverflow.Clip})
@@ -984,6 +983,8 @@ export struct toggleRowList {
  */
 @Component
 export struct menuRowList {
+  // 行是否启用
+  @Prop rowEnabled: boolean = true
   // 标题
   @State title: ResourceStr = ''
   // 图标
@@ -1021,12 +1022,14 @@ export struct menuRowList {
       if(this.icons) {
         SymbolGlyph(this.icons)
           .fontSize(24)
-          .fontColor([this.isPrimaryIcons ? icon_primary : this.icon_emphasize])
+          // .fontColor([this.isPrimaryIcons ? icon_primary : this.icon_emphasize])
+          .fontColor([!this.rowEnabled ? Xb_ColorUtils.getUnableColor(this.icon_emphasize) : this.isPrimaryIcons ? icon_primary : this.icon_emphasize])
           .transition(customAnimationUtil.isScaleTranIcon(10,this.uiConfig))
       }
       Column() {
         Row() {
           Text(this.title)
+            .fontColor(this.rowEnabled ? undefined : $r('sys.color.font_fourth'))
             .fontWeight(FontWeight.Medium)
             .fontSize(16)
           // 实验功能提示框
@@ -1036,6 +1039,7 @@ export struct menuRowList {
         }
         if(this.subtitle) {
           Text(this.subtitle)
+            .fontColor(this.rowEnabled ? undefined : $r('sys.color.font_fourth'))
             .fontWeight(FontWeight.Normal)
             .textOverflow({ overflow: this.uiConfig.stringDisplayIndex === 0 ? TextOverflow.Ellipsis : TextOverflow.Clip})
             .maxLines(this.uiConfig.stringDisplayIndex == 0 ? 1 : 2)
@@ -1051,7 +1055,7 @@ export struct menuRowList {
         SymbolGlyph($r('sys.symbol.arrowtriangle_down_fill'))
           .fontSize(14)
           .margin({left: 7, right: 8})
-          .fontColor([icon_primary])
+          .fontColor([this.rowEnabled ? icon_primary : $r('sys.color.font_fourth')])
       }.bindMenu(this.menu())
     }
     .RowStyle()

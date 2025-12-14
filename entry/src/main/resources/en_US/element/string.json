@@ -2299,6 +2299,14 @@
     {
       "name": "qrcode_universal_link_subtitle",
       "value": "Only supports scanning within this app and other App recognition~"
+    },
+    {
+      "name": "holding_hand_gesture",
+      "value": "Adaptive Hand Holding (Motion Sensing)"
+    },
+    {
+      "name": "holding_hand_gesture_subtitle",
+      "value": "Enabling will disable floating button position"
     }
   ]
 }
