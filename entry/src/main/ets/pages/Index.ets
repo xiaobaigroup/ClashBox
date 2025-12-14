@@ -80,7 +80,8 @@ import {
   Xb_StatusBarUtils,
   Xb_TabBarVertical,
   Xb_TabIconFontSize,
-  Xb_TabTitleFontSize } from 'xb_components'
+  Xb_TabTitleFontSize,
+  Xb_ToastUtil} from 'xb_components'
 import { Xb_GoToWeb } from 'xb_components/src/main/ets/utils/JumpTo'
 import BackgroundDownService from '../common/utils/BackgroundDownService'
 import { notificationManager } from '@kit.NotificationKit'
@@ -647,9 +648,9 @@ struct Index {
     .width(this.widthBp < 2 ? '100%' : 'auto')
     .padding({ left: 10, right: 10, top: this.topRectHeight === 0 ? 10 : 0, bottom: this.topRectHeight === 0 ? 10 : 0 })
     .margin({
-      bottom: this.windowMode || this.bottomRectHeight == 0 ? 0 : this.bottomRectHeight - 10,
+      bottom: this.getFloatBottom(),
       top: this.windowMode ? 0 : this.topRectHeight,
-      left: (this.leftAvoidWidth != 0)  ? this.leftAvoidWidth + 19 : 0,  // TODO 待实机测试确定取值
+      left: (this.leftAvoidWidth != 0 && !this.windowMode)  ? this.leftAvoidWidth + 19 : 0,  // TODO 待实机测试确定取值
     })
   }
   @Builder
@@ -1615,7 +1616,31 @@ struct Index {
   getFloatAlign() {
     const value = this.uiConfig.buttonPositionIndex == 0 ? Xb_FloatTabBarAlignEnd(this.widthBp, this.heightBp) :
       (this.uiConfig.buttonPositionIndex == 1 ? Xb_FloatTabBarAlignCenter(this.widthBp, this.heightBp) : Xb_FloatTabBarAlignStart(this.widthBp, this.heightBp))
+    // Xb_ToastUtil.showToast({ message: `getFloatAlign: ${value}`})
     return value
+  }
+
+  /**
+   * 获取悬浮tab底部避让值
+   */
+  getFloatBottom() {
+    const isTabBarVertical = Xb_TabBarVertical(this.widthBp, this.heightBp);
+    const isFloatTabBarFullHeight = FloatTabBarHeight(this.widthBp, this.heightBp) == '100%';
+    // 优先级 1: 侧边撑满布局
+    if (isTabBarVertical && isFloatTabBarFullHeight) {
+      return 5;
+    }
+    // 优先级 2: 窗口模式下的水平布局 (两种情况)
+    if (!isTabBarVertical && this.windowMode) {
+      // 撑满(widthBp < 2时)，返回 8；非撑满，返回 1
+      return this.widthBp < 2 ? 8 : 1;
+    }
+    // 优先级 3: 常规避让布局：有高度就减 10
+    if (this.bottomRectHeight !== 0) {
+      return this.bottomRectHeight - 10;
+    }
+    // 优先级 4 (兜底逻辑): 其他所有情况
+    return isTabBarVertical ? 3 : 8;
   }
 
 }
