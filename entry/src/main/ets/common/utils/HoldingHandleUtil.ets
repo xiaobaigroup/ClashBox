@@ -34,31 +34,43 @@ class HoldingHandleUtil {
       return
     }
 
-    motion.on('holdingHandChanged', (status: motion.HoldingHandStatus) => {
-      let str: string = ""
-      switch (status) {
-        case motion.HoldingHandStatus.NOT_HELD:
-          str = '未握持';
-          break;
-        case motion.HoldingHandStatus.LEFT_HAND_HELD:
-          str = '左手握持';
-          break;
-        case motion.HoldingHandStatus.RIGHT_HAND_HELD:
-          str = '右手握持';
-          break;
-        case motion.HoldingHandStatus.BOTH_HANDS_HELD:
-          str = '双手握持';
-          break;
-      }
-      hilog.info(0x114514, TAG, `HoldingHandChanged: ${status} - ${str}`)
-      this.holdingHandler = status;
-    });
+    try {
+      motion.on('holdingHandChanged', (status: motion.HoldingHandStatus) => {
+        let str: string = ""
+        switch (status) {
+          case motion.HoldingHandStatus.NOT_HELD:
+            str = '未握持';
+            break;
+          case motion.HoldingHandStatus.LEFT_HAND_HELD:
+            str = '左手握持';
+            break;
+          case motion.HoldingHandStatus.RIGHT_HAND_HELD:
+            str = '右手握持';
+            break;
+          case motion.HoldingHandStatus.BOTH_HANDS_HELD:
+            str = '双手握持';
+            break;
+        }
+        hilog.info(0x114514, TAG, `HoldingHandChanged: ${status} - ${str}`)
+        this.holdingHandler = status;
+      });
+    } catch (e) {
+      hilog.error(0x114514, TAG,
+        `开启适人握持事件失败: ${JSON.stringify(e)}`);
+    }
   }
 
   stop(): void {
-    motion.off('holdingHandChanged');
-    this.holdingHandler = motion.HoldingHandStatus.NOT_HELD;
-    this.isStart = false;
+    if (this.isStart) {
+      try {
+        motion.off('holdingHandChanged');
+        this.holdingHandler = motion.HoldingHandStatus.NOT_HELD;
+        this.isStart = false;
+      } catch (error) {
+        hilog.error(0x114514, TAG,
+          `关闭适人握持事件失败: ${JSON.stringify(error)}`);
+      }
+    }
   }
 
   @Monitor('holdingHandler')
