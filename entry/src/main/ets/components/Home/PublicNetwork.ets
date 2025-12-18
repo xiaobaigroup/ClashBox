@@ -11,6 +11,7 @@ import { HomeCardFontSize,
   HomeCardIPFontSize,
   HomeCardPadding, HomeCardPartSmallFontSize } from '../../common/breakpoint/BreakPoint'
 import { updateGeoData } from 'proxy_core/src/main/cpp/types/libflclash/Index'
+import { Xb_ToastUtil } from 'xb_components'
 
 @Component
 struct PublicNetwork {
@@ -65,8 +66,8 @@ struct PublicNetwork {
 
       Row() {
         Button($r('app.string.refresh_IP'))
-          .width('55%')
-          .height('25%')
+          .width(Xb_ToastUtil.px2vp(212))
+          .height(Xb_ToastUtil.px2vp(95))
           .labelStyle({ overflow: TextOverflow.Clip,
             maxLines: 1,
             minFontSize: 6,

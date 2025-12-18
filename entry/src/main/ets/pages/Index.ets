@@ -2,7 +2,7 @@
 import { curves, LengthMetrics, mediaquery, UIUtils } from '@kit.ArkUI'
 import Home from './HomePage'
 import ProxyPage from './ProxyPage'
-import { util } from "@kit.ArkTS";
+import { JSON, util } from "@kit.ArkTS";
 import ConfigurationPage from './ConfigurationPage'
 import MorePage from './MorePage'
 import { hilog } from '@kit.PerformanceAnalysisKit'
@@ -28,7 +28,7 @@ import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } f
 import { ClashConfig, IpInfo, Profile, ProxyMode } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
-import { AppConfig, AppFlowingState, AppState, getPackageInfo, UIConfig } from '../entryability/AppState'
+import { AppConfig, AppFlowingState, AppState, getPackageInfo, UIConfig, UIConfig_2 } from '../entryability/AppState'
 import { common } from '@kit.AbilityKit'
 import { ChangeLanguage } from '../common/utils/ChangeLanguageUtil'
 import { ConfigData, HomeCardInfo, TabBuild } from '../common/entity/PageArgumentEntity'
@@ -92,6 +92,7 @@ import { UpdateLog } from '../components/Start/UpdateLog'
 import { animationStyle } from 'xb_components/src/main/ets/components/Animation';
 import { getJsonArrayType } from '../common/entity/utils';
 import { holdingHandleUtil } from '../common/utils/HoldingHandleUtil';
+import { sortByCustomOrder } from '../common/utils/SortUtil';
 
 // import { hdsEffect } from '@kit.UIDesignKit';
 
@@ -160,6 +161,7 @@ struct Index {
   @Provide('WelcomeNavPathStack') welcomePageInfos: NavPathStack = new NavPathStack()
   // 主页面栈
   @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
+  @StorageLink('uiConfig_2') uiConfig_2: UIConfig_2 = new UIConfig_2()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
@@ -798,7 +800,7 @@ struct Index {
   })
 
   /** 获取配置列表 */
-  async fetchProfiles() {
+  async fetchProfiles(isFirst: boolean = false) {
     console.error(`开始获取配置`)
     const profiles = await ClashViewModel.getProfiles()
     console.error(`配置已获取：${JSON.stringify(profiles)}`)
@@ -819,6 +821,20 @@ struct Index {
         subscriptionInfo: d.subscriptionInfo
       } as ConfigData
     })
+    // 初始化配置项排序列表
+    if (!this.uiConfig_2.configSort) {
+      this.uiConfig_2.configSort = JSON.stringify(this.configList.map(id => id.configId))
+      console.info(`ConfigSort #fetchProfiles uiConfig_2.configSort 不存在，进行初始化：${this.uiConfig_2.configSort}`)
+    } else {
+      if (!isFirst) {
+        // 更新保存的排序表
+        this.uiConfig_2.configSort = JSON.stringify(this.configList.map(id => id.configId))
+        console.info(`ConfigSort uiConfig_2.configSort 更新为，${this.uiConfig_2.configSort}`)
+      } else {
+        this.configList = sortByCustomOrder(this.configList, JSON.parse(this.uiConfig_2.configSort) as string[], 'configId')
+      }
+      console.info(`ConfigSort #fetchProfiles uiConfig_2.configSort 存在，${this.uiConfig_2.configSort}`)
+    }
   }
 
   /**
@@ -1350,7 +1366,7 @@ struct Index {
     const checkInterval = setInterval(() => {
       if (this.theAwaitInit) {
         // 获取配置列表
-        this.fetchProfiles()
+        this.fetchProfiles(true)
         clearInterval(checkInterval)
       }
     }, 100);

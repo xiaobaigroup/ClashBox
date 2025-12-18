@@ -179,11 +179,19 @@ export class UIConfig {
   }
 }
 
-export function isEnd(length: number, i: number){
+export class UIConfig_2 {
+  // 配置项排序
+  configSort: string = ''
+
+  constructor() {
+  }
+}
+
+export function isEnd(length: number, i: number) {
   return length -1 == i
 }
 
-export function getPackageInfo(){
+export function getPackageInfo() {
   return bundleManager.getBundleInfoForSelf(bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION)
 }
 
@@ -203,6 +211,7 @@ export class AppState {
 
     PersistentStorage.persistProp("clashConfig", new ClashConfig(AppState.globalUA))
     PersistentStorage.persistProp("uiConfig", new UIConfig())
+    PersistentStorage.persistProp("uiConfig_2", new UIConfig_2())
     AppStorage.setOrCreate<AppFlowingState>("appFlowingState", new AppFlowingState())
   }
   // 还原覆写配置
@@ -217,6 +226,7 @@ export class AppState {
     AppStorage.set("favoriteProfiles", new Map<string, string>([]))
     AppStorage.set("favoriteProxys", new Map<string, string>([]))
     AppStorage.set("uiConfig",  new UIConfig())
+    AppStorage.set("uiConfig_2",  new UIConfig_2())
     AppStorage.set("appFlowingState", new AppFlowingState())
     AppStorage.set("proxyGroups", [])
     await ClashViewModel.profileRepo.ClearAll(context)

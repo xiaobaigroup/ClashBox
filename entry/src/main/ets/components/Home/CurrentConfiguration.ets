@@ -5,6 +5,7 @@ import { AppConfig, UIConfig } from "../../entryability/AppState"
 import { customVibrator } from "../../common/utils/VibratorUtil"
 import ClashViewModel from "../../entryability/ClashViewModel"
 import { HomeCardFontSize, HomeCardPadding, HomeCardProxyFontSize } from "../../common/breakpoint/BreakPoint"
+import { Xb_ToastUtil } from "xb_components"
 
 @Component
 struct CurrentConfiguration {
@@ -24,8 +25,8 @@ struct CurrentConfiguration {
 
 
   build() {
-    Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.End, justifyContent: FlexAlign.SpaceBetween}) {
-      Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start, justifyContent: FlexAlign.Start }) {
+    Column() {
+      Column() {
         CardTitle({ title: $r('app.string.CurrentConfiguration') })
         Text(this.appConfig.currentProfileName ?? $r('app.string.config_name'))
           .fontSize(HomeCardProxyFontSize(this.widthBp, this.heightBp))
@@ -33,10 +34,11 @@ struct CurrentConfiguration {
           .maxLines(2)
           .fontColor($r('sys.color.font_primary'))
       }
-
+      .width('100%')
+      .alignItems(HorizontalAlign.Start)
       Button($r('app.string.refresh_IP'))
-        .width('55%')
-        .height('34%')
+        .width(Xb_ToastUtil.px2vp(212))
+        .height(Xb_ToastUtil.px2vp(95))
         .labelStyle({ overflow: TextOverflow.Clip,
           maxLines: 1,
           minFontSize: 6,
@@ -49,7 +51,7 @@ struct CurrentConfiguration {
         .fontSize(HomeCardFontSize(this.widthBp, this.heightBp))
         .backgroundColor($r('app.color.home_card_background'))
         .onClick(() => {
-          //在home页添加按钮的半模拟态里和在编辑卡片状态时，无法操作，点击回调写在if判定里
+          // 在home页添加按钮的半模拟态里和在编辑卡片状态时，无法操作，点击回调写在if判定里
           if (this.isShowHomeEdit == false) {
             ClashViewModel.updateProfileConfig(this.appConfig.currentProfileId??'')
             if (this.uiConfig.isVibrate) {
@@ -58,6 +60,8 @@ struct CurrentConfiguration {
           }
         })
     }
+    .alignItems(HorizontalAlign.End)
+    .justifyContent(FlexAlign.SpaceBetween)
     .padding(HomeCardPadding(this.widthBp, this.heightBp))
     .width('100%')
     .height('100%')

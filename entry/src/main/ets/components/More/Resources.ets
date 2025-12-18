@@ -456,7 +456,6 @@ struct Sort {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @State SortHideList: Array<ResourcesData> = resourcesBlankData
-  private promptAction: PromptAction = this.getUIContext().getPromptAction()
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
 
@@ -480,7 +479,7 @@ struct Sort {
           this.uiConfig.resourcesHideData = JSON.stringify(this.SortHideList)
           this.isShowGroupSort = false
           this.isEnableIndexForegroundBlur = false
-          this.promptAction.showToast({message: $r('app.string.saved'), duration: 2000 })
+          Xb_ToastUtil.showToast({message: $r('app.string.saved'), duration: 2000 })
         })
         Text(`${getResourceString($r('app.string.Resources'), this)}${getResourceString($r('app.string.sort'), this)}`)
           .fontSize(20)

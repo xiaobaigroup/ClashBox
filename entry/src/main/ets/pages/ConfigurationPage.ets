@@ -10,16 +10,24 @@ import {
   CONTENT_END_OFFSET_150,
   NewConfigData,
   APP_LINKING,
+  BIND_SHEET_DRAG_BAR_HEIGHT,
+  BIND_SHEET_MAIN_FONT_WEIGHT,
+  BIND_SHEET_MAIN_FONTSIZE,
+  BIND_SHEET_SUB_FONTSIZE,
+  BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT,
+  BIND_SHEET_TITLE_CONTAINER_HEIGHT,
 } from '../common/entity/Constants'
 import { LengthMetrics, SymbolGlyphModifier } from '@kit.ArkUI'
 import { ConfigAdd } from '../components/Configuration/ConfigAdd'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
 import { ConfigData } from '../common/entity/PageArgumentEntity'
-import { CellularData, CustomConfirmDialog, icon_tertiary, Nothing } from '../components/Common/Common'
+import {
+  BindSheetTitleCustomBuilder,
+  CellularData, CustomConfirmDialog, icon_tertiary, Nothing } from '../components/Common/Common'
 import { customVibrator } from "../common/utils/VibratorUtil"
 import ClashViewModel from '../entryability/ClashViewModel'
-import { AppConfig, UIConfig } from '../entryability/AppState'
+import { AppConfig, UIConfig, UIConfig_2 } from '../entryability/AppState'
 import { EventHub, EventKey } from '../common/EventHub'
 import { getResourceString } from '../common/utils/ResourceStringUtil'
 import { convertTime } from '../common/utils/TimeConvertUtil'
@@ -29,7 +37,7 @@ import { PopTips, PopupBuilder } from '../components/Start/Popup'
 import { ImportConfigFromURL } from '../components/Configuration/ImportConfigFromURL'
 import { ImportConfigFromFile } from '../components/Configuration/ImportConfigFromFile'
 import { TopBar } from '../components/Common/TopBar'
-import { ListGutter, ListLanes, TabContentTitleMargin } from '../common/breakpoint/BreakPoint'
+import { ListGutter, ListLanes, NavigationListPadding, TabContentTitleMargin } from '../common/breakpoint/BreakPoint'
 import { RoundButton } from '../components/Common/RoundButton'
 import { harmonyShare } from '@kit.ShareKit'
 import { uniformTypeDescriptor as utd } from '@kit.ArkData'
@@ -38,6 +46,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { fileUri, fileIo as fs, picker } from '@kit.CoreFileKit'
 import { ShareData, Xb_GetResourceString, Xb_Share, Xb_TabBarVertical, Xb_ToastUtil } from 'xb_components'
 import { QRCodeDialog } from '../components/Configuration/QRCodeComponent'
+import { JSON } from '@kit.ArkTS'
 
 
 /**
@@ -58,6 +67,7 @@ struct ConfigurationPage {
 
   @StorageLink('favoriteProfiles') favoriteProfiles: Map<string, string> = new Map<string, string>([])
   @StorageLink('appConfig') @Watch('onChangeConfig') appConfig: AppConfig = new AppConfig()
+  @StorageLink('uiConfig_2') uiConfig_2: UIConfig_2 = new UIConfig_2()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('ConfigContent') configStr: string = ''
 
@@ -85,8 +95,10 @@ struct ConfigurationPage {
   @State isShowMenu: boolean = false
   // 是否来自文件导入
   @State isFromFile: boolean = false
-  //loading动画
+  // loading动画
   @State isLoading : boolean = false
+  // 展示排序界面
+  @State showSort: boolean = false
 
   // 是否显示bindSheet
   @StorageLink('ShowConfigBindSheet') isShowConfigAddBindSheet: boolean = false
@@ -131,10 +143,15 @@ struct ConfigurationPage {
           TopBar({
             title: getResourceString($r('app.string.Configuration'), this),
             titleFontSize: this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE - this.curYOffset / 100 : TAB_CONTENT_TITLE_FONT_SIZE,
-            icons: [$r('sys.symbol.arrow_clockwise')],
+            icons: [$r('sys.symbol.sort'), $r('sys.symbol.arrow_clockwise')],
             iconSize: this.windowMode ? 16 : (this.curYOffset < 0 ? 24 - this.curYOffset / 100 : 24),
-            // 刷新图标
+            // 排序按钮
             onFClick: () => {
+              this.showSort = true
+              this.isShowConfigAddBindSheet = true
+            },
+            // 刷新图标
+            onSClick: () => {
               this.isON.toggleAnim = true
               hilog.info(0xC001, componentName, `#button#onClick()#更新配置`)
               this.updateConfig()
@@ -228,13 +245,31 @@ struct ConfigurationPage {
                         this.isShowMenu = false
                       }
                     })
-                  .onClick(async () => {
-                    this.isON.toggleAnim = true
-                    // 更新当前选中
-                    this.currentRadioConfigData = item
-                    await this.loadConfig(item)
-                  })
+                  .gesture(
+                    TapGesture({ count: 2 })
+                      .onAction(async (event: GestureEvent) => {
+                        if (event) {
+                          hilog.debug(0xC020, componentName, `#TapGesture 配置列表项双击`)
+                          await this.loadConfig(item)
+                        }
+                      })
+                  )
+                  .gesture(
+                    TapGesture({ count: 1 })
+                      .onAction((event: GestureEvent) => {
+                        if (event) {
+                          hilog.debug(0xC020, componentName, `#TapGesture 配置列表项单击`)
+                          this.isON.toggleAnim = true
+                          if (this.currentRadioConfigData.configId != item.configId) {
+                            this.loadConfig(item)
+                          }
+                          // 更新当前选中
+                          this.currentRadioConfigData = item
+                        }
+                      })
+                  )
                   .onMouse((event) => {
+                    // 右键菜单
                     if (event.action == MouseAction.Press && event.button == MouseButton.Right) {
                       this.currentTouchConfigData = item
                       this.isShowMenu = true
@@ -242,7 +277,7 @@ struct ConfigurationPage {
                   })
                   .gesture(LongPressGesture()
                     .onAction(() => {
-                      // 赋值当前触摸列表项
+                      // 赋值当前长按触摸列表项
                       this.currentTouchConfigData = item
                       // 显示菜单
                       this.isShowMenu = true
@@ -254,7 +289,7 @@ struct ConfigurationPage {
                     onWillDismiss: false,
                     autoCancel: false
                   })
-                })
+                }, /*(item: ConfigData) => item.configId*/) // TODO 这id明明挺唯一的说
               }
               .zIndex(3)
               .width('100%')
@@ -354,6 +389,7 @@ struct ConfigurationPage {
           this.isEnableIndexForegroundBlur = false
         })
         this.isNewConfig = false
+        this.showSort = false
         this.onForwardChange()
         this.configStr = ''  // 置空配置文本
       },
@@ -575,6 +611,9 @@ struct ConfigurationPage {
           this.isShowConfigAddBindSheet = false
         },
       })
+    } else if (this.showSort) {
+      // 排序窗口
+      this.SortBuilder()
     } else {
       // 二级编辑界面
       if (this.isFromFile) {
@@ -596,10 +635,63 @@ struct ConfigurationPage {
       .margin({bottom: 15})
   }
 
+  @Builder
+  SortBuilder() {
+    Column() {
+      Row() {
+        Text($r('app.string.sort'))
+          .fontWeight(FontWeight.Bold)
+          .fontColor($r('sys.color.font_primary'))
+          .textOverflow({overflow: TextOverflow.MARQUEE})
+          .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
+      }.width('100%')
+      .margin({ left: 5 })
+      .alignItems(VerticalAlign.Center)
+      .height(BIND_SHEET_TITLE_CONTAINER_HEIGHT + BIND_SHEET_DRAG_BAR_HEIGHT)
+      List({ space: LIST_SPACE }) {
+        ForEach(this.configList, (item: ConfigData, index: number) => {
+          ListItem() {
+            Row() {
+              // 名称
+              Text(item.configName).fontColor(($r('sys.color.font_primary'))).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+              SymbolGlyph($r('sys.symbol.sort'))
+                .fontSize(24)
+                .fontColor([$r('sys.color.font_primary')])
+            }
+            .height(56)
+            .width('100%')
+            .padding(LIST_ITEM_PADDING)
+            .justifyContent(FlexAlign.SpaceBetween)
+          }
+          .width('100%')
+          .backgroundColor($r('app.color.container_background'))
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+          .borderRadius(BORDER_RADIUS_20)
+          .hoverEffect(HoverEffect.Scale)
+          .transition(this.isON.toggleAnim ? null : customAnimationUtil.isScaleTran(index, this.uiConfig))
+        }, (item: ConfigData) => item.configId)
+          .onMove((from: number, to: number) => {
+            let tmp = this.configList.splice(from, 1)
+            this.configList.splice(to, 0, tmp[0])
+            // 更新保存的排序表
+            this.uiConfig_2.configSort = JSON.stringify(this.configList.map(id => id.configId))
+            console.info(`ConfigSort uiConfig_2.configSort 更新为，${this.uiConfig_2.configSort}`)
+          })
+      }
+      .width('100%')
+    }
+    .width('100%')
+    .height('100%')
+    .padding({
+      left: NavigationListPadding(this.widthBp, this.heightBp),
+      right: NavigationListPadding(this.widthBp, this.heightBp)
+    })
+  }
+
   async aboutToAppear(): Promise<void> {
     hilog.info(0xC000, componentName, `#aboutToAppear executed`)
     // 初始化当前选中项数据
-    this.currentRadioConfigData = this.configList.find((data: ConfigData) => data.configId === this.appConfig.currentProfileId) as ConfigData
+    this.currentRadioConfigData = this.configList.find((data: ConfigData) => data.configId === this.appConfig.currentProfileId) ?? NewConfigData
     // 初始化分享工具
     Xb_Share.inputInfo(this.getUIContext())
     // 注册打开添加配置弹窗事件

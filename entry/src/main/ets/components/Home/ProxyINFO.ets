@@ -17,6 +17,7 @@ import { HomeCardFontSize,
   HomeCardProxyFontSize,
   HomeCardSpeedFontSize,
   HomeCardTextMaxLines} from "../../common/breakpoint/BreakPoint"
+import { Xb_ToastUtil } from "xb_components"
 
 @Component
 struct ProxyINFO {
@@ -136,8 +137,8 @@ struct ProxyINFO {
         }
 
         Button($r('app.string.refresh_IP2'))
-          .width(70)
-          .height(30)
+          .width(Xb_ToastUtil.px2vp(212))
+          .height(Xb_ToastUtil.px2vp(95))
           .labelStyle({ overflow: TextOverflow.Clip,
             maxLines: 1,
             minFontSize: 6,

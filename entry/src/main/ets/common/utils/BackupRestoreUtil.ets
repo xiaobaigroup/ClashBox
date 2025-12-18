@@ -1,6 +1,6 @@
 import { ClashConfig, Profile } from "proxy_core";
 import { Xb_FileUtils, Xb_GetResourceString, Xb_ToastUtil } from "xb_components";
-import { AppConfig, UIConfig } from "../../entryability/AppState";
+import { AppConfig, UIConfig, UIConfig_2 } from "../../entryability/AppState";
 import ClashViewModel from "../../entryability/ClashViewModel";
 import { filterStringsByBooleans } from "../entity/Constants";
 import { getJsonArrayType } from "../entity/utils";
@@ -9,6 +9,7 @@ import { getJsonArrayType } from "../entity/utils";
 export interface BackupConfig {
   appConfig: AppConfig
   uiConfig: UIConfig
+  uiConfig_2: UIConfig_2
   clashConfig: ClashConfig
   configList: Profile[]
 }
@@ -25,11 +26,13 @@ class BackupRestoreUtil {
     try {
       const appConfig: AppConfig = AppStorage.get<AppConfig>("appConfig") ?? new AppConfig()
       const uiConfig: UIConfig = AppStorage.get<UIConfig>("uiConfig") ?? new UIConfig()
+      const uiConfig_2: UIConfig_2 = AppStorage.get<UIConfig_2>("uiConfig_2") ?? new UIConfig_2()
       const clashConfig: ClashConfig = AppStorage.get<ClashConfig>("clashConfig") ?? new ClashConfig()
       const configList = await ClashViewModel.getProfiles()
       const backupConfig: BackupConfig = {
         appConfig: appConfig,
         uiConfig: uiConfig,
+        uiConfig_2: uiConfig_2,
         clashConfig: clashConfig,
         configList: configList
       }
@@ -59,6 +62,7 @@ class BackupRestoreUtil {
               console.log(`旧版本数据转化为：${config.uiConfig.isShowHomeCard}`)
             }
             AppStorage.set("uiConfig",  config.uiConfig)
+            AppStorage.set("uiConfig_2",  config.uiConfig_2)
             AppStorage.set("clashConfig", config.clashConfig)
             console.info(`ClashBoxConfig.restore 配置列表：${JSON.stringify(config.configList)}`)
             ClashViewModel.addOrUpdateProfiles(config.configList).then(() => {
