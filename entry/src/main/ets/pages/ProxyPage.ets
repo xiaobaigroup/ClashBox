@@ -113,7 +113,6 @@ struct ProxyPage {
   @Consume heightTop: number
 
   @StorageLink('favoriteProxys') favoriteProxys: Map<string, string> = new Map<string, string>([])
-  private ProxyPromptAction: PromptAction = this.getUIContext()?.getPromptAction()
   @StorageLink('clashConfig') clashConfig: ClashConfig = new ClashConfig()
   // 代理节点Swiper控制器
   private SwiperController: SwiperController = new SwiperController()
@@ -132,21 +131,21 @@ struct ProxyPage {
             title: getResourceString($r('app.string.Proxy'), this),
             titleFontSize: this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE - this.curYOffset / 100 : TAB_CONTENT_TITLE_FONT_SIZE,
             iconSize: this.windowMode ? 16 : (this.curYOffset < 0 ? 24 - this.curYOffset / 100 : 24),
-            icons: [$r('sys.symbol.puzzle'), $r('sys.symbol.square_and_pencil')],
-            // 一键取消所有收藏按钮 TODO 判定有误，搁置；启用时需将图标$r('sys.symbol.heart_slash')添加进数组并添加修改对应                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               点击事件
-            /* onFClick: () => {
-               this.favoriteProxys.clear()
-               this.showStart = true
-               this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_all_tip') })
-             }*/
-            // 提供者按钮
+            icons: [$r('sys.symbol.heart_slash'), $r('sys.symbol.puzzle'), $r('sys.symbol.square_and_pencil')],
+            // 一键取消所有收藏按钮                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              点击事件
             onFClick: () => {
+              this.favoriteProxys.clear()
+              this.showStart = true
+              Xb_ToastUtil.showToast({ message: $r('app.string.uncollected_all_tip') })
+            },
+            // 提供者按钮
+            onSClick: () => {
               this.isStylesEdit = false
               this.isShowProxyBindSheet = true
               this.isEnableIndexForegroundBlur = true
             },
             // 编辑图标
-            onSClick: () => {
+            onTClick: () => {
               this.isStylesEdit = true
               this.isShowProxyBindSheet = true
               this.isEnableIndexForegroundBlur = true

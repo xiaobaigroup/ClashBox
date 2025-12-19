@@ -83,7 +83,7 @@ struct ConfigurationPage {
   // 主窗口ID
   @StorageProp('MainWindowId') mainWindowId: number = 1
   // 开关不触发list转场动画判定
-  @State isON:isON = new isON()
+  @State isON: isON = new isON()
 
   // 前台判断变量
   @StorageProp('ForwardState') @Watch('onForwardChange') isForward: boolean = false
@@ -231,7 +231,7 @@ struct ConfigurationPage {
                   .borderRadius(BORDER_RADIUS_20)
                   .hoverEffect(HoverEffect.Scale)
                   .transition(this.isON.toggleAnim ? null : customAnimationUtil.isScaleTran(index, this.uiConfig))
-                  .bindContextMenu(this.isShowMenu && this.currentTouchConfigData.configId == item.configId, this.isPXSecScreen ? null : this.configListLongPressCtxMenuBuilder(item?.isFavorite ?? false, item),
+                  .bindContextMenu(this.isShowMenu && this.currentTouchConfigData.configId == item.configId, this.isPXSecScreen ? null : this.configListLongPressCtxMenuBuilder(item),
                     {
                       preview: MenuPreviewMode.IMAGE,
                       previewAnimationOptions: { scale: [1.0, 1.1] },
@@ -473,7 +473,7 @@ struct ConfigurationPage {
         .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
         content: $r('app.string.export_config_file'), callback: () => { this.exportConfig() }
       },
- /*    { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.plus_square_on_square'))
+   /*  { symbolStartIcon: new SymbolGlyphModifier($r('sys.symbol.plus_square_on_square'))
        .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE).fontColor([$r('sys.color.font_primary')]),
        content: $r('app.string.create_copy'), callback: ()=>{ this.generateQRcode() }
      },*/
@@ -515,12 +515,12 @@ struct ConfigurationPage {
    * 配置页面ListItem的长按ContextMenu的Builder
    */
   @Builder
-  configListLongPressCtxMenuBuilder(isFavorite: boolean, data: ConfigData) {
+  configListLongPressCtxMenuBuilder(data: ConfigData) {
     // 当菜单过多（横屏时），自身的滚动条不支持回弹，套一层Scroll
     Scroll(){
       Menu() {
         // 根据当前配置信息来判断显示[收藏 /取消收藏] 单独处理 START
-        if (isFavorite) {
+        if (this.favoriteProfiles.has(data.configId)) {
           MenuItem({
             symbolStartIcon: this.configListLongPressCtxMenuForUnFavorite.symbolStartIcon!
               .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
@@ -784,24 +784,24 @@ struct ConfigurationPage {
    * 收藏配置
    */
   private favoriteConfig(): void {
-    if (this.favoriteProfiles.size <= 3) {
-      Xb_ToastUtil.showToast({ message: $r('app.string.Collect_Tip') })
     hilog.info(0xC010, componentName, `#favoriteConfig#收藏配置: configName is [${this.currentTouchConfigData.configName}]`)
     this.currentTouchConfigData.isFavorite = true
     this.favoriteProfiles.set(this.currentTouchConfigData.configId, this.currentTouchConfigData.configName)
+    Xb_ToastUtil.showToast({ message: $r('app.string.Collect_Tip') })
+ /*   if (this.favoriteProfiles.size <= 3) {
     } else {
       Xb_ToastUtil.showToast({ message: $r('app.string.favorite_config_no') })
-    }
+    }*/
   }
 
   /**
    * 取消收藏配置
    */
   private cancelFavoriteConfig(): void {
-    Xb_ToastUtil.showToast({ message: $r('app.string.uncollected_tip') })
     hilog.info(0xC010, componentName, `#favoriteConfig#取消收藏配置: configName is [${this.currentTouchConfigData.configName}]`)
     this.currentTouchConfigData.isFavorite = false
     this.favoriteProfiles.delete(this.currentTouchConfigData.configId)
+    Xb_ToastUtil.showToast({ message: $r('app.string.uncollected_tip') })
   }
 
   /**
@@ -988,13 +988,14 @@ struct ConfigurationPage {
 
   /**删除配置*/
   private async  deleteConfig(): Promise<void> {
-    Xb_ToastUtil.showToast({ message: `${getResourceString($r('app.string.configuration_deleted'), this)}💔` })
     hilog.info(0xC016, componentName, `#deleteConfig#删除配置: configName is [${this.currentTouchConfigData.configName}]`)
     await ClashViewModel.deleteProfile(this.currentTouchConfigData.configId)
     this.appConfig.currentProxyName = undefined
     this.appConfig.currentProfileName = undefined
+    this.favoriteProfiles.delete(this.currentTouchConfigData.configId)
     // 加载配置
     EventHub.sendEvent(EventKey.FetchProfile)
+    Xb_ToastUtil.showToast({ message: `${getResourceString($r('app.string.configuration_deleted'), this)}💔` })
   }
 
   /**

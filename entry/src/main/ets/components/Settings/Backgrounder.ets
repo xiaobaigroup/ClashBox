@@ -141,6 +141,7 @@ struct Backgrounder {
         ListItem() {
           Text() {
             Span($r('app.string.backgrounder_tips'))
+            Span($r('app.string.backgrounder_tips_3'))
             if (deviceInfo.deviceType === 'tablet' || deviceInfo.deviceType === '2in1') {
               Span($r('app.string.backgrounder_tips_2'))
             }

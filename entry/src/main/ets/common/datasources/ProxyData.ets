@@ -62,7 +62,7 @@ export class ProxyGroupItemDataSource extends BaseDataSource<ProxyGroup> {
     return this.dataArray[index]
   }
 
-  public getDatas(): ProxyGroup[] {
+  public getAllData(): ProxyGroup[] {
     return this.dataArray
   }
 

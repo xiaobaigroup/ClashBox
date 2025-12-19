@@ -120,6 +120,8 @@ struct Backup {
             Span($r('app.string.file_config_restore_tips'))
             Span($r('app.string.restore_tips'))
               .fontColor(Color.Red)
+            Span($r('app.string.restore_tips_2'))
+              .fontColor(Color.Red)
           }
         }
       }

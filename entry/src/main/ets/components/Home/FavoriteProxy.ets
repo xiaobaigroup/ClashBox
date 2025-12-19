@@ -34,18 +34,18 @@ struct FavoriteProxy {
     Column() {
       CardTitle({ title: $r('app.string.FavoriteProxy') })
       //拥有收藏节点的布局 start
-      if (AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups.getDatas()).length > 0 ) {
+      if (AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups.getAllData()).length > 0 ) {
         Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceEvenly }) {
-          List({}) {
-            ForEach(AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups.getDatas()),
-              (p: [string, string], i: number) => {
+          List() {
+            ForEach(AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups.getAllData()),
+              (group_node: [string, string], i: number) => {
                 ListItem() {
                   Flex({
                     direction: FlexDirection.Row,
                     alignItems: ItemAlign.Center,
                     justifyContent: FlexAlign.SpaceBetween
                   }) {
-                    Text(`${p[1]}`)
+                    Text(group_node[1])
                       .fontSize(HomeCardFontSize(this.widthBp, this.heightBp))
                       .fontColor($r('sys.color.font_primary'))
                       .maxLines(1)
@@ -53,7 +53,7 @@ struct FavoriteProxy {
                       .textOverflow({ overflow: TextOverflow.Ellipsis })
                     Radio({ value: 'FavoriteProxyRadio', group: 'FavoriteProxyGroup' })
                       .width(HomeCardFontSize(this.widthBp, this.heightBp))
-                      .checked(this.appConfig.currentProxyName === p[1])
+                      .checked(this.appConfig.currentProxyName === group_node[1])
                       .radioStyle({
                         checkedBackgroundColor: this.icon_emphasize,
                       })
@@ -61,18 +61,28 @@ struct FavoriteProxy {
                   }
                   .onClick(() => {
                     // 在home页编辑状态时，无法操作
-                    if (this.isShowHomeEdit === false) {
-                      this.appConfig.currentProxyName = p[1]
-                      this.appConfig.currentProxyItem = AppState.fetchProxyItem(this.proxyGroups.getDatas(), p[0], p[1])
+                    if (!this.isShowHomeEdit) {
+                      this.appConfig.currentProxyName = group_node[1]
+                      this.appConfig.currentProxyItem = AppState.fetchProxyItem(this.proxyGroups.getAllData(), group_node[0], group_node[1])
                       // 对应切换代理页节点
-                      this.changeProxy(p[0], this.appConfig.currentProxyItem)
+                      this.changeProxy(group_node[0], this.appConfig.currentProxyItem)
                       if (this.uiConfig.isVibrate) {
                         customVibrator.vibratorTriggerOfHapticClockTimer()
                       }
                     }
                   })
                   .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
-                }.height(AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups.getDatas()).length - 1 == 1 ? '50%' : '32%')
+                }
+                .height(AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups.getAllData()).length - 1 == 1 ? '50%' : '32%')
+                .transition({ type: TransitionType.Delete, opacity: 0 }).swipeAction({
+                  end: {
+                    builder: () => {
+                      this.itemEnd(group_node[0] + '|' + group_node[1]);
+                    },
+                    actionAreaDistance: 56,
+                  },
+                  edgeEffect: SwipeEdgeEffect.Spring
+                })
               })
           }.divider({ strokeWidth: 1, color: $r('app.color.FavoriteProxyDivider') })
           .scrollBar(BarState.Off)
@@ -107,6 +117,20 @@ struct FavoriteProxy {
     .height('100%')
     .alignItems(HorizontalAlign.Start)
     .id('FavoriteProxyId')
+  }
+
+  @Builder
+  itemEnd(key: string) {
+    Button({ type: ButtonType.Circle }) {
+      SymbolGlyph($r('sys.symbol.trash_fill'))
+        .fontColor([Color.Red])
+        .fontSize(HomeCardFontSize(this.widthBp, this.heightBp))
+    }
+    .padding(5)
+    .backgroundColor(Color.Transparent)
+    .onClick(() => {
+      this.favoriteProxys.delete(key)
+    })
   }
 
   changeProxy(g: string, item: ProxyItem){

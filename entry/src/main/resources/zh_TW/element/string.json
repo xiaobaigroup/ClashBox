@@ -994,7 +994,11 @@
     },
     {
       "name": "backgrounder_tips_2",
-      "value": " ⑤平板及電腦建議使用工作保持\n"
+      "value": " ⑥平板及電腦建議使用工作保持\n"
+    },
+    {
+      "name": "backgrounder_tips_3",
+      "value": "⑤若使用模擬定位，請授權允許位置權限並保持定位開關處於啟用狀態\n"
     },
     {
       "name": "notice_main_switch",
@@ -1638,7 +1642,7 @@
     },
     {
       "name": "favorite_proxy_no",
-      "value": "當前設定最多只能收藏3個節點"
+      "value": "當前設定最多只能收藏6個節點"
     },
     {
       "name": "favorite_config_no",
@@ -2251,6 +2255,10 @@
     {
       "name": "restore_tips",
       "value": "\n ⑤ 資料還原成功後將自動重新啟動應用程式"
+    },
+    {
+      "name": "restore_tips_2",
+      "value": "\n ⑥配置清單順序、收藏的內容均無法還原"
     },
     {
       "name": "export_config_file_success",

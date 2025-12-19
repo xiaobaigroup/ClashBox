@@ -18,6 +18,7 @@ import { PopTips, PopupBuilder } from '../Start/Popup';
 import { ListGutter, ProxyListLanes } from '../../common/breakpoint/BreakPoint';
 import { cardManager } from '../../common/utils/CardManageUtil';
 import { EventKey, EventHub } from '../../common/EventHub';
+import { Xb_ToastUtil } from 'xb_components';
 
 // 组件名
 const componentName: string = 'ProxyPage'
@@ -34,7 +35,6 @@ struct ProxyGroupItem {
   @State currentTouchIndex: number = 0
   // 主界面index
   @Consume tabCurrentPage: number
-
 
   /* 本页布局相关参数 */
   // 定义ProxyGroupItemSelectedWide的值便于切换布局方式
@@ -119,7 +119,7 @@ struct ProxyGroupItem {
         .ListItemStyle()
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .height(LIST_ITEM_HEIGHT + (this.ProxyGroupItemSelected === ProxyCardSize.Small ? 32 : 0))
-        .bindContextMenu(this.isShowMenu && this.currentTouchIndex == index , this.isPXSecScreen ? null : this.MyMenu(item.isShowFavoriteProxy ?? false, item),
+        .bindContextMenu(this.isShowMenu && this.currentTouchIndex == index , this.isPXSecScreen ? null : this.MyMenu(item),
           {
             preview: MenuPreviewMode.IMAGE,
             placement: Placement.BottomRight,
@@ -141,12 +141,14 @@ struct ProxyGroupItem {
         .onMouse((event) => {
           if (event.button == MouseButton.Right) {
             this.currentTouchIndex = index
+            ProxyGroupItem.currentTouchProxyData = item
             this.isShowMenu = true
           }
         })
         .gesture(LongPressGesture()
           .onAction(() => {
             this.currentTouchIndex = index
+            ProxyGroupItem.currentTouchProxyData = item
             this.isShowMenu = true
           }))
         .bindPopup((this.uiConfig.ShowProxyPop && this.proxyGroup === 0 && index === 0 && this.tabCurrentPage === 1), {
@@ -281,8 +283,6 @@ struct ProxyGroupItem {
     console.info('Click the callback in the blank area')
   }
 
-  ProxyPromptAction: PromptAction = this.getUIContext()?.getPromptAction()
-
   OnProxyChange: ((item: ProxyItem) => void) = () => {
 
   }
@@ -290,11 +290,10 @@ struct ProxyGroupItem {
   // 长按菜单 start
   @Builder
   // 长按菜单相关
-  MyMenu(isShowFavoriteProxy: boolean, item: ProxyItem) {
-
+  MyMenu(item: ProxyItem) {
     Menu() {
       // 根据当前配置信息来判断显示[收藏 /取消收藏] 单独处理 START
-      if (isShowFavoriteProxy && this.favoriteProxys.size>0 ) {
+      if (this.favoriteProxys.has(ProxyGroupItem.currentTouchProxyData.g + '|' + ProxyGroupItem.currentTouchProxyData.name)) {
         MenuItem({
           symbolStartIcon: this.proxyListLongPressCtxMenuForUnFavorite.symbolStartIcon!
             .fontSize(TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE),
@@ -303,7 +302,6 @@ struct ProxyGroupItem {
           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .contentFontColor($r('sys.color.font_primary'))
           .onClick(() => {
-            ProxyGroupItem.currentTouchProxyData = item
             this.proxyListLongPressCtxMenuForUnFavorite.callback()
           })
       } else {
@@ -315,7 +313,6 @@ struct ProxyGroupItem {
           .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
           .contentFontColor($r('sys.color.font_primary'))
           .onClick(() => {
-            ProxyGroupItem.currentTouchProxyData = item
             this.proxyListLongPressCtxMenuForFavorite.callback()
           })
       }
@@ -376,15 +373,14 @@ struct ProxyGroupItem {
    * 收藏配置
    */
   private favoriteProxy(): void {
-    //  收藏节点 & 判断是否已经收藏
+    // 收藏节点 & 判断是否已经收藏
     const p = ProxyGroupItem.currentTouchProxyData
-    if (!p.isShowFavoriteProxy && AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups.getDatas()).length<3){
-      this.ProxyPromptAction.showToast({ message: $r('app.string.Collect_Tip') })
-      p.isShowFavoriteProxy = true
+    if (AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups.getAllData()).length < 6) {
+      Xb_ToastUtil.showToast({ message: $r('app.string.Collect_Tip') })
       this.favoriteProxys.set(p.g + '|' + p.name, this.appConfig.currentProfileId ?? "")
-      console.info('favoriteProxys',`${JSON.stringify(this.favoriteProxys)}`)
-    }else {
-      this.ProxyPromptAction.showToast({ message: $r('app.string.favorite_proxy_no') })
+      console.debug('favoriteProxys',`${JSON.stringify(this.favoriteProxys)}`)
+    } else {
+      Xb_ToastUtil.showToast({ message: $r('app.string.favorite_proxy_no') })
     }
   }
 
@@ -392,11 +388,10 @@ struct ProxyGroupItem {
    * 取消收藏配置
    */
   private cancelFavoriteProxy(): void {
-    this.ProxyPromptAction.showToast({ message: $r('app.string.uncollected_tip') })
+    Xb_ToastUtil.showToast({ message: $r('app.string.uncollected_tip') })
     const p = ProxyGroupItem.currentTouchProxyData
-    p.isShowFavoriteProxy = false
     this.favoriteProxys.delete(p.g + '|' + p.name)
-    console.info('favoriteProxys',`${JSON.stringify(this.favoriteProxys)}`)
+    console.debug('favoriteProxys',`${JSON.stringify(this.favoriteProxys)}`)
   }
 }
 
@@ -460,7 +455,7 @@ interface LongPressContextMenuItem {
   callback : Callback<void>
 }
 
-//list公用样式
+// list公用样式
 @Extend(List)
 function ListStyle() {
   // transition保证组件离场不被立即析构，可设置其他转场效果
@@ -472,18 +467,12 @@ function ListStyle() {
   .alignListItem(ListItemAlign.Center)
 }
 
-//ListItem公用样式
+// ListItem公用样式
 @Extend(ListItem)
 function ListItemStyle() {
   .width('100%')
   .borderRadius(BORDER_RADIUS_20)
   .backgroundColor($r('app.color.container_background'))
 }
-
-
-
-
-
-
 
 export default ProxyGroupItem

@@ -111,7 +111,7 @@ struct ProxyArrangement {
     hilog.info(0xB000, componentName, '#aboutToAppear 组1数组长度： %{public}d', this.proxyGroups.getData(0).proxies.length )
     hilog.info(0xFF00, "ProxyPageGroupTag", "#ProxyArrangement#aboutToAppear 当前显示分组%{public}d", this.currentProxyIndex)
     if (this.currentProfile) {
-      const theProxyGroups = this.proxyGroups.getDatas()
+      const theProxyGroups = this.proxyGroups.getAllData()
       let listIndexes = theProxyGroups.findIndex((d) => d.name == this.currentProfile?.currentGroupName)
       setTimeout(() => {
         if (listIndexes > -1 && this.currentProxyIndex === 0) {

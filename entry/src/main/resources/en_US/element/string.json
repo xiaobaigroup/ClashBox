@@ -990,11 +990,15 @@
     },
     {
       "name": "backgrounder_tips_2",
-      "value": " ⑤ Tablet and computer recommended task maintenance"
+      "value": " ⑥ Tablet and computer recommended task maintenance"
     },
     {
       "name": "backgrounder_tips",
       "value": "Hint:\n① Enabling it will increase the power consumption of the application, and please restart the software after simulating the positioning of the switch;\n② At present, it is known that the free multi window mode cannot actively initiate a picture in picture window, and the system will lock 90 frames after picture in picture is enabled;\n③ The simulated download notification cannot be deleted, otherwise the simulated download will become invalid;\n④ Simulated download notifications may be killed by the system, causing the simulated download function to fail. It is recommended to use simulated positioning or picture in picture functions unless necessary;\n"
+    },
+    {
+      "name": "backgrounder_tips_3",
+      "value": "⑤ If using simulated positioning, please authorize and allow location permissions while keeping the location switch enabled\n"
     },
     {
       "name": "notice_main_switch",
@@ -1638,7 +1642,7 @@
     },
     {
       "name": "favorite_proxy_no",
-      "value": "The current configuration can only collect up to 3 nodes"
+      "value": "The current configuration can only collect up to 6 nodes"
     },
     {
       "name": "favorite_config_no",
@@ -2251,6 +2255,10 @@
     {
       "name": "restore_tips",
       "value": "\n ⑤ After successful data recovery, the application will automatically restart"
+    },
+    {
+      "name": "restore_tips_2",
+      "value": "\n ⑥ The order of the configuration list and the contents of the collection cannot be restored"
     },
     {
       "name": "export_config_file_success",
