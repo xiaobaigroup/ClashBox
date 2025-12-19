@@ -17,6 +17,7 @@ import { PageMargin } from "../../common/breakpoint/BreakPoint"
 import { Xb_ColorModeManager, Xb_ToastUtil, Xb_UIConfig } from "xb_components"
 import { Xb_ChangeThemeColor } from "xb_components/src/main/ets/utils/ChangeThemeColorUtil"
 import { holdingHandleUtil } from "../../common/utils/HoldingHandleUtil"
+import { hilog } from "@kit.PerformanceAnalysisKit"
 
 
 @Component
@@ -52,7 +53,7 @@ struct Appearance {
   // 所有子组件在容器内的对齐方式
   @Consume ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
 
-  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @StorageLink('uiConfig') @Watch('onUIConfigChange') uiConfig: UIConfig = new UIConfig()
   // 窗口模式
   @StorageProp('WindowMode') windowMode: boolean = false
   @StorageProp('EnableAPIVersion') apiVersionEnable: boolean = false
@@ -259,43 +260,44 @@ struct Appearance {
             })
             // 分割线
             Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
-            // 适人握持(动作感知)
-            Row() {
-              toggleRowList({
-                icons: $r('sys.symbol.hand_draw'),
-                title: $r('app.string.holding_hand_gesture'),
-                subtitle: $r('app.string.holding_hand_gesture_subtitle'),
-              }) {
-                // 主页问候开关
-                Toggle({ type: ToggleType.Switch, isOn: $$this.uiConfig.isHoldingHand })
-                  .selectedColor(this.icon_emphasize)
-                  .hitTestBehavior(HitTestMode.None)
-                  .margin({right: 12})
-              }
-            }.onClick(()=> {
-              // 显式动画
-              this.getUIContext()?.animateTo({
-                duration: ANIMATION_DURATION_300
-              }, async () => {
-                this.uiConfig.isHoldingHand = !this.uiConfig.isHoldingHand
-
-                // 首次使用 -> 需要授权
-                if (this.uiConfig.isHoldingHand) {
-                  const atManager = abilityAccessCtrl.createAtManager();
-                  await atManager.requestPermissionsFromUser(this.context, ['ohos.permission.DETECT_GESTURE']).catch(() => {
-                    Xb_ToastUtil.showToast({
-                      message: "当前设备不支持"
-                    })
-                  });
-
-                  holdingHandleUtil.start()
-                } else {
-                  holdingHandleUtil.stop()
+            if (this.apiVersionEnable) { // 需要确保兼容最低API版本(17)
+              // 适人握持(动作感知)
+              Row() {
+                toggleRowList({
+                  icons: $r('sys.symbol.hand_draw'),
+                  title: $r('app.string.holding_hand_gesture'),
+                  subtitle: $r('app.string.holding_hand_gesture_subtitle'),
+                }) {
+                  // 适人握持开关
+                  Toggle({ type: ToggleType.Switch, isOn: $$this.uiConfig.isHoldingHand })
+                    .selectedColor(this.icon_emphasize)
+                    .hitTestBehavior(HitTestMode.None)
+                    .margin({right: 12})
                 }
+              }.onClick(() => {
+                // 显式动画
+                this.getUIContext()?.animateTo({
+                  duration: ANIMATION_DURATION_300
+                }, async () => {
+                  this.uiConfig.isHoldingHand = !this.uiConfig.isHoldingHand
+                  // 首次使用 -> 需要授权
+                  if (this.uiConfig.isHoldingHand) {
+                    const atManager = abilityAccessCtrl.createAtManager();
+                    await atManager.requestPermissionsFromUser(this.context, ['ohos.permission.DETECT_GESTURE']).catch(() => {
+                      Xb_ToastUtil.showToast({
+                        message: "当前设备不支持"
+                      })
+                    });
+                    holdingHandleUtil.start()
+                    hilog.error(0x4514, 'HoldingHandleUtil', `适人握持事件已订阅`);
+                  } else {
+                    holdingHandleUtil.stop()
+                  }
+                })
               })
-            })
-            // 分割线
-            Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
+              // 分割线
+              Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
+            }
             // 悬浮按钮位置
             menuRowList({
               icons: $r('sys.symbol.local_fill'),
@@ -578,8 +580,14 @@ struct Appearance {
     }
   }
 
+  onUIConfigChange() {
+    if (this.appearanceList && this.appearanceList[2].children && this.uiConfig.isHoldingHand) {
+      this.EnableButtonPositionText = this.appearanceList[2].children[this.uiConfig.buttonPositionIndex].title
+    }
+  }
+
   // 切换按钮位置
-  switchButtonPosition(index:number) {
+  switchButtonPosition(index: number) {
     switch (index) {
       case 0:
         // 右侧

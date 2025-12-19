@@ -1041,7 +1041,10 @@ struct Index {
     }
 
     animationStyle.setContext(this.UIContext)
-    holdingHandleUtil.setContext(this.UIContext)
+    if (this.apiVersionEnable) {
+      // 需要确保兼容最低API版本(17)
+      holdingHandleUtil.setContext(this.UIContext)
+    }
   }
 
   /** @description 统一注册事件 */
@@ -1353,11 +1356,10 @@ struct Index {
     }
     // 确保tabStyle有值
     if (!this.uiConfig.tabStyle) {
-      if (this.apiVersionEnable) {
-        this.uiConfig.tabStyle = 'custom'
-      } else {
-        this.uiConfig.tabStyle = 'custom'
-      }
+      this.uiConfig.tabStyle = 'custom'
+    }
+    if (this.uiConfig.isHoldingHand === undefined) {
+      this.uiConfig.isHoldingHand = false
     }
   }
 

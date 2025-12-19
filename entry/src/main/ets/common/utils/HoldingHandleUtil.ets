@@ -18,8 +18,6 @@ const TAG = 'HoldingHandleUtil';
 @ObservedV2
 class HoldingHandleUtil {
   private ctx?: UIContext;
-  /** @description 是否开启 */
-  private isStart: boolean = false;
   /** @description 当前握持的手 */
   @Trace holdingHandler: motion.HoldingHandStatus = motion.HoldingHandStatus.NOT_HELD;
 
@@ -30,7 +28,7 @@ class HoldingHandleUtil {
   start(): void {
     const UIConfig: UIConfig = AppStorage.get("uiConfig")!;
 
-    if (this.isStart || !UIConfig.isHoldingHand) {
+    if (!UIConfig.isHoldingHand) {
       return
     }
 
@@ -51,25 +49,28 @@ class HoldingHandleUtil {
             str = '双手握持';
             break;
         }
-        hilog.info(0x114514, TAG, `HoldingHandChanged: ${status} - ${str}`)
+        hilog.info(0x4514, TAG, `HoldingHandChanged: ${status} - ${str}`)
         this.holdingHandler = status;
       });
     } catch (e) {
-      hilog.error(0x114514, TAG,
+      hilog.error(0x4514, TAG,
         `开启适人握持事件失败: ${JSON.stringify(e)}`);
     }
   }
 
   stop(): void {
-    if (this.isStart) {
-      try {
+    try {
+      if (canIUse("SystemCapability.MultimodalAwareness.Motion")) {
         motion.off('holdingHandChanged');
-        this.holdingHandler = motion.HoldingHandStatus.NOT_HELD;
-        this.isStart = false;
-      } catch (error) {
-        hilog.error(0x114514, TAG,
-          `关闭适人握持事件失败: ${JSON.stringify(error)}`);
+        hilog.error(0x4514, TAG, `适人握持事件已取消订阅`);
+      } else {
+        hilog.error(0x4514, TAG,
+          `无法使用 SystemCapability.MultimodalAwareness.Motion `);
       }
+      this.holdingHandler = motion.HoldingHandStatus.NOT_HELD;
+    } catch (error) {
+      hilog.error(0x4514, TAG,
+        `关闭适人握持事件失败: ${JSON.stringify(error)}`);
     }
   }
 
