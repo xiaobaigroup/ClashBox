@@ -24,6 +24,7 @@ export struct TopBar {
   onFClick: () => void = () => {}
   onSClick: () => void = () => {}
   onTClick: () => void = () => {}
+  onFoClick: () => void = () => {}
 
   build() {
     Flex({
@@ -66,6 +67,15 @@ export struct TopBar {
             iconSize: this.iconSize,
             iconWeight: this.windowMode ? FontWeight.Bold : undefined,
             onCheck: () => { this.onTClick() }
+          }).transition(customAnimationUtil.isSlide(0, this.uiConfig))
+        }
+        // 按钮4
+        if (this.icons.length >= 4) {
+          ButtonBuilder({
+            icon: this.icons[3],
+            iconSize: this.iconSize,
+            iconWeight: this.windowMode ? FontWeight.Bold : undefined,
+            onCheck: () => { this.onFoClick() }
           }).transition(customAnimationUtil.isSlide(0, this.uiConfig))
         }
         // 窗口控制按钮

@@ -11,10 +11,6 @@ import {
   NewConfigData,
   APP_LINKING,
   BIND_SHEET_DRAG_BAR_HEIGHT,
-  BIND_SHEET_MAIN_FONT_WEIGHT,
-  BIND_SHEET_MAIN_FONTSIZE,
-  BIND_SHEET_SUB_FONTSIZE,
-  BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT,
   BIND_SHEET_TITLE_CONTAINER_HEIGHT,
 } from '../common/entity/Constants'
 import { LengthMetrics, SymbolGlyphModifier } from '@kit.ArkUI'
@@ -23,7 +19,6 @@ import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Callback } from '@ohos.base'
 import { ConfigData } from '../common/entity/PageArgumentEntity'
 import {
-  BindSheetTitleCustomBuilder,
   CellularData, CustomConfirmDialog, icon_tertiary, Nothing } from '../components/Common/Common'
 import { customVibrator } from "../common/utils/VibratorUtil"
 import ClashViewModel from '../entryability/ClashViewModel'
@@ -648,6 +643,10 @@ struct ConfigurationPage {
       .margin({ left: 5 })
       .alignItems(VerticalAlign.Center)
       .height(BIND_SHEET_TITLE_CONTAINER_HEIGHT + BIND_SHEET_DRAG_BAR_HEIGHT)
+      .padding({
+        left: NavigationListPadding(this.widthBp, this.heightBp),
+        right: NavigationListPadding(this.widthBp, this.heightBp)
+      })
       List({ space: LIST_SPACE }) {
         ForEach(this.configList, (item: ConfigData, index: number) => {
           ListItem() {
@@ -679,13 +678,14 @@ struct ConfigurationPage {
           })
       }
       .width('100%')
+      .contentEndOffset(86)
+      .padding({
+        left: NavigationListPadding(this.widthBp, this.heightBp),
+        right: NavigationListPadding(this.widthBp, this.heightBp)
+      })
     }
     .width('100%')
     .height('100%')
-    .padding({
-      left: NavigationListPadding(this.widthBp, this.heightBp),
-      right: NavigationListPadding(this.widthBp, this.heightBp)
-    })
   }
 
   async aboutToAppear(): Promise<void> {

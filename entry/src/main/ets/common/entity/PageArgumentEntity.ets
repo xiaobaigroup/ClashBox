@@ -44,6 +44,7 @@ export interface HomeCardInfo {
   span_md?: number,
   span_lg?: number,
   key: string,
+  name: ResourceStr,
   order: number,
   isShow: boolean,
   spanMultiple: number,

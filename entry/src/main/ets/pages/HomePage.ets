@@ -12,6 +12,11 @@ import {
   showHomeCard,
   showHomeCardPC,
   HomeCards,
+  BIND_SHEET_TITLE_CONTAINER_HEIGHT,
+  BIND_SHEET_DRAG_BAR_HEIGHT,
+  LIST_SPACE,
+  LIST_ITEM_PADDING,
+  BORDER_RADIUS_20,
 } from '../common/entity/Constants'
 import Settings from '../components/Settings/Settings'
 import CurrentNode from '../components/Home/CurrentNode'
@@ -38,10 +43,12 @@ import {
   HomeCardSpan346lg, HomeCardSpan346md, HomeCardSpan36sm,
   HomeGridRowPadding,
   HomeTopHeight,
+  NavigationListPadding,
   WindowHomeGridRowPadding } from '../common/breakpoint/BreakPoint'
 import { RoundButton } from '../components/Common/RoundButton'
 import { Xb_GetResourceString, Xb_ToastUtil } from 'xb_components'
 import { animationStyle } from 'xb_components/src/main/ets/components/Animation'
+import { sortByCustomOrder } from '../common/utils/SortUtil'
 
 
 @Entry
@@ -82,6 +89,8 @@ struct Home {
   @StorageLink ('2in1') is2in1: boolean = false
   // 主页半模态页
   @State showHomeSheet: boolean = false
+  // 排序半模态显示
+  @State showCardSort: boolean = false
 
   // 所有子组件在容器内的对齐方式
   @Consume ('stackAlignContentAlignment') stackAlignContentAlignment: Alignment
@@ -111,11 +120,14 @@ struct Home {
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   // 状态栏高度
   @StorageProp('topRectHeight') topRectHeight: number = 0
-  // 页面名称 主页
-  private componentName: string = 'HomePage'
+  // 当前触摸序号
+  @State currentTouchIndex: number = 0
+
   // 代理启动持续的时间
   @StorageProp('proxyStartingDuration') proxyStartingDuration: string = ''
   @Consume ("currentProfile") currentProfile: Profile | null
+  // 页面名称 主页
+  private componentName: string = 'HomePage'
   // 主界面当前index
   @Consume tabCurrentPage: number
   @Consume curOffsetRemain: number
@@ -168,17 +180,24 @@ struct Home {
           TopBar({
             title: `${getResourceString($r('app.string.home_edit'), this)}`,
             titleFontSize: this.windowMode ? 20 : 24,
-            icons: [$r('sys.symbol.plus'), $r('sys.symbol.save'), $r('sys.symbol.xmark')],
-            // 添加按钮
+            icons: [$r('sys.symbol.sort'), $r('sys.symbol.plus'), $r('sys.symbol.save'), $r('sys.symbol.xmark')],
+            // 排序按钮
             onFClick: () => {
+              this.isShowCardEdit = true
+              this.showCardSort = true
+              this.showHomeSheet = true
+              this.isEnableIndexForegroundBlur = true
+            },
+            // 添加按钮
+            onSClick: () => {
               this.isShowCardEdit = true
               this.showHomeSheet = true
               this.isEnableIndexForegroundBlur = true
             },
-            onSClick: () => {
+            onTClick: () => {
               this.saveHomeLayout()
             },
-            onTClick: () => {
+            onFoClick: () => {
               if (this.SaveDialogController != null) {
                 this.SaveDialogController.open()
                 this.isEnableIndexForegroundBlur = true
@@ -212,7 +231,7 @@ struct Home {
                   item: item,
                   index: index
                 })
-              }, (item: HomeCardInfo) => item.key)
+              }, /*(item: HomeCardInfo) => item.key*/)
             }
             Blank().height(100)
           }
@@ -277,11 +296,12 @@ struct Home {
         scrollSizeMode: ScrollSizeMode.CONTINUOUS,
         backgroundColor: $r('app.color.background'),
         dragBar: false,
-        title: this.isShowCardEdit ? { title: $r('app.string.add_home_card') } : undefined,
+        title: this.isShowCardEdit && !this.showCardSort ? { title: $r('app.string.add_home_card') } : undefined,
         keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
         onWillDismiss: () => {
           this.isShowCardEdit = false
           this.showHomeSheet = false
+          this.showCardSort = false
           this.isEnableIndexForegroundBlur = false
           this.SettingsPageInfos.clear()
         }
@@ -292,8 +312,13 @@ struct Home {
   @Builder
   HomeSheet() {
     if (this.isShowCardEdit) {
-      // 卡片编辑半模态
-      CardEdit()
+      if (this.showCardSort) {
+        // 卡片排序
+        this.SortBuilder()
+      } else {
+        // 卡片编辑半模态
+        CardEdit()
+      }
     } else {
       // 设置模态界面
       Column() {
@@ -304,6 +329,65 @@ struct Home {
       .foregroundBlurStyle(this.showCustomDialogBackgroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
         { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 })
     }
+  }
+
+  @Builder
+  SortBuilder() {
+    Column() {
+      Row() {
+        Text($r('app.string.sort'))
+          .fontWeight(FontWeight.Bold)
+          .fontColor($r('sys.color.font_primary'))
+          .textOverflow({overflow: TextOverflow.MARQUEE})
+          .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
+      }.width('100%')
+      .margin({ left: 5 })
+      .alignItems(VerticalAlign.Center)
+      .height(BIND_SHEET_TITLE_CONTAINER_HEIGHT + BIND_SHEET_DRAG_BAR_HEIGHT)
+      .padding({
+        left: NavigationListPadding(this.widthBp, this.heightBp),
+        right: NavigationListPadding(this.widthBp, this.heightBp)
+      })
+      List({ space: LIST_SPACE }) {
+        ForEach(this.homeCardList, (item: HomeCardInfo, index: number) => {
+          ListItem() {
+            Row() {
+              // 名称
+              Text(item.name).fontColor(($r('sys.color.font_primary'))).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis })
+              SymbolGlyph($r('sys.symbol.sort'))
+                .fontSize(24)
+                .fontColor([$r('sys.color.font_primary')])
+            }
+            .height(56)
+            .width('100%')
+            .padding(LIST_ITEM_PADDING)
+            .justifyContent(FlexAlign.SpaceBetween)
+          }
+          .width('100%')
+          .backgroundColor($r('app.color.container_background'))
+          .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
+          .borderRadius(BORDER_RADIUS_20)
+          .hoverEffect(HoverEffect.Scale)
+        }, (item: HomeCardInfo) => item.key)
+          .onMove((from: number, to: number) => {
+            let tmp = this.homeCardList.splice(from, 1)
+            this.homeCardList.splice(to, 0, tmp[0])
+            const currentCards = this.theCurrentHomeCard.splice(from, 1)
+            this.theCurrentHomeCard.splice(to, 0, currentCards[0])
+            // 更新保存的排序表
+            // this.uiConfig.isShowHomeCard = JSON.stringify(this.homeCardList.map(id => id.key))
+            // console.info(`HomeCardSort uiConfig.isShowHomeCard 更新为，${this.uiConfig.isShowHomeCard}`)
+          })
+      }
+      .width('100%')
+      .contentEndOffset(86)
+      .padding({
+        left: NavigationListPadding(this.widthBp, this.heightBp),
+        right: NavigationListPadding(this.widthBp, this.heightBp)
+      })
+    }
+    .width('100%')
+    .height('100%')
   }
 
   /**是否保存布局弹窗*/
@@ -334,7 +418,7 @@ struct Home {
     if (this.uiConfig.isShowHomeCard)
       this.theCurrentHomeCard = JSON.parse(this.uiConfig.isShowHomeCard)
     hilog.info(0xFF00, "HomeTestTag", "布局初始化为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
-    this.homeCardList = HomeCards.filter(value => this.theCurrentHomeCard.includes(value.key))
+    this.homeCardList = sortByCustomOrder(HomeCards.filter(value => this.theCurrentHomeCard.includes(value.key)), this.theCurrentHomeCard, 'key')
     if (this.tabCurrentPage == 0) {
       this.isHomePage = true
     }
@@ -410,7 +494,7 @@ struct Home {
     hilog.info(0xA000, this.componentName, '#existApp: Click the callback in the blank area')
   }
 
-  /**横屏HOME页滚动到中间*/
+  /** 横屏HOME页滚动到中间 */
   isLandscapePhoneScrollTo() {
     if (this.isLandscapePhone) {
       this.scrollerForScroll.scrollTo({xOffset: 0,yOffset: '50%',animation: true})
@@ -460,7 +544,7 @@ struct Home {
     // 还原布局
     this.theCurrentHomeCard = this.theLastHomeCard
     this.uiConfig.isShowHomeCard = JSON.stringify(this.theLastHomeCard)
-    this.homeCardList = HomeCards.filter(value => this.theCurrentHomeCard.includes(value.key))
+    this.homeCardList = sortByCustomOrder(HomeCards.filter(value => this.theCurrentHomeCard.includes(value.key)), this.theCurrentHomeCard, 'key')
     hilog.info(0xFF00, "HomeTestTag", "布局还原为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
     Xb_ToastUtil.showToast({ message: `${Xb_GetResourceString($r('app.string.layout_restored'), this)}🫡` })
     this.isShowHomeEdit = false
@@ -469,10 +553,10 @@ struct Home {
     }, this.uiConfig.animationSpeed, 'app', 0, Curve.Linear)
   }
 
-  /**卡片编辑页面显示监听*/
+  /** 卡片编辑页面显示监听 */
   ShowHomeEditChange() {
     hilog.info(0xFF00, "HomeTestTag", "进入卡片编辑页面显示监听  %{public}s")
-    if(this.isShowHomeEdit && !this.isShowCardEdit) {
+    if (this.isShowHomeEdit && !this.isShowCardEdit) {
       this.stopAnim()
       this.startAnim()
     }else{
@@ -516,14 +600,16 @@ struct HomeCard {
         md: HomeCardSpan346md(this.widthBp, this.heightBp) * this.item.spanMultiple,
         lg: HomeCardSpan346lg(this.widthBp, this.heightBp) * this.item.spanMultiple
       },
-      order: this.item.order
+      order: this.index
     })
     {
       Stack({ alignContent: Alignment.TopEnd }) {
+        // 卡片主体
         this.HomeCardContent(this.item.key)
+        // 删除角标
         if (this.isShowDeleteButton) {
           DeleteButton()
-            .position({ x: this.item.key == 'speed' || this.item.key == 'node_info' ? '95%' : '92%', y: -4 })
+            .position({ x: this.item.spanMultiple == 2 ? '95%' : '92%', y: -4 })
             .onClick(() => {
               animationStyle.animToAPI18(() => {
                 const index = this.homeCardList.findIndex(value => this.item.key == value.key)

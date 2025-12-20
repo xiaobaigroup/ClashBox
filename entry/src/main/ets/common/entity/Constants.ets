@@ -951,6 +951,7 @@ export const HomeCards: HomeCardInfo[] = [
     aspectRatio: 2.07,
     spanMultiple: 2,
     key: 'speed',
+    name: $r('app.string.Speed'),
     isShow: true,
     order: 1
   },
@@ -958,6 +959,7 @@ export const HomeCards: HomeCardInfo[] = [
     aspectRatio: 1,
     spanMultiple: 1,
     key: 'mode',
+    name: $r('app.string.Mode'),
     isShow: true,
     order: 2
   },
@@ -966,6 +968,7 @@ export const HomeCards: HomeCardInfo[] = [
     spanMultiple: 1,
     isShow: true,
     key: 'data',
+    name: $r('app.string.CellularData'),
     order: 3
   },
   { // 当前节点小卡片
@@ -973,6 +976,7 @@ export const HomeCards: HomeCardInfo[] = [
     spanMultiple: 1,
     isShow: true,
     key: 'node',
+    name: $r('app.string.CurrentNode'),
     order: 4
   },
   { // IP地址小卡片
@@ -980,6 +984,7 @@ export const HomeCards: HomeCardInfo[] = [
     spanMultiple: 1,
     isShow: true,
     key: 'ip',
+    name: $r('app.string.PublicNetwork'),
     order: 5
   },
   { // 收藏节点小卡片
@@ -987,6 +992,7 @@ export const HomeCards: HomeCardInfo[] = [
     spanMultiple: 1,
     isShow: true,
     key: 'f_node',
+    name: $r('app.string.FavoriteProxy'),
     order: 6
   },
   { // 收藏配置小卡片
@@ -994,6 +1000,7 @@ export const HomeCards: HomeCardInfo[] = [
     spanMultiple: 1,
     key: 'f_config',
     isShow: true,
+    name: $r('app.string.FavoriteConfiguration'),
     order: 7
   },
   { // 快捷方式小卡片
@@ -1001,6 +1008,7 @@ export const HomeCards: HomeCardInfo[] = [
     spanMultiple: 1,
     isShow: false,
     key: 'fast',
+    name: $r('app.string.shortcuts'),
     order: 8
   },
   { // 当前配置小卡片
@@ -1008,16 +1016,36 @@ export const HomeCards: HomeCardInfo[] = [
     spanMultiple: 1,
     isShow: false,
     key: 'config',
+    name: $r('app.string.CurrentConfiguration'),
     order: 9
   },
   { // 节点信息小卡片
     order: 10,
     isShow: false,
     key: 'node_info',
+    name: $r('app.string.proxy_info'),
     spanMultiple: 2,
     aspectRatio: 2.07,
   }
 ]
+
+export const NullHomeCard1_1: HomeCardInfo = {
+  key: "null",
+  name: "null",
+  order: 0,
+  isShow: false,
+  spanMultiple: 1,
+  aspectRatio: 1
+}
+
+export const NullHomeCard2_1: HomeCardInfo = {
+  key: "null",
+  name: "null",
+  order: 0,
+  isShow: false,
+  spanMultiple: 2,
+  aspectRatio: 2.07
+}
 
 
 /* 断点相关 */
