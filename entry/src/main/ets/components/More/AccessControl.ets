@@ -10,9 +10,14 @@ import { ItemRestriction, SegmentButton, SegmentButtonOptions, SegmentButtonText
 import { KeyValueData } from "./Overwrite/EditArrayConfig"
 import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { intl } from "@kit.LocalizationKit"
-import { Xb_CapsuleButton, Xb_CircleButton, Xb_FileUtils, Xb_GetResourceString, Xb_ToastUtil } from "xb_components"
+import { Xb_CapsuleButton, Xb_CircleButton, Xb_FileUtils, Xb_GetResourceString,
+  Xb_KVdbUtil,
+  Xb_PreferenceUtil,
+  Xb_ToastUtil } from "xb_components"
 import { customAnimationUtil } from "../../common/utils/Animation"
 import { EventHub, EventKey } from '../../common/EventHub'
+import { distributedKVStore } from "@kit.ArkData"
+import { AccessControlCompatibleMerger } from "../../common/utils/AccessControlCompatibleUtil"
 
 @Builder
 export function AccessControlBuilder(name: string, param: Object){
@@ -153,18 +158,35 @@ export struct AccessControl {
               .enabled(this.appConfig.accessControl)
               .checkboxShape(CheckBoxShape.CIRCLE)
               .selectedColor(this.icon_emphasize)
-              .onChange((itemName: CheckboxGroupResult) => {
-                console.info("AccessControl CheckBoxGroup#onChange checkbox group content" + JSON.stringify(itemName))
-                this.nameStringData = itemName.name
+              .onChange(async (itemName: CheckboxGroupResult) => {
+                console.info(`AccessControl CheckBoxGroup#onChange 访问控制类型：${this.appConfig.accessControlMode}, checkbox group content` + JSON.stringify(itemName))
+                let entries: Array<distributedKVStore.Entry> = []
                 if (this.appConfig.accessControlMode == 'AcceptSelected') {
                   // 白名单
-                  this.appConfig.accessControlAcceptList = JSON.stringify(itemName.name)
-                  console.info("AccessControl CheckBoxGroup#onChange this.appConfig.accessControlAcceptList: " +  this.appConfig.accessControlAcceptList)
+                  entries = itemName.name.map(pkg => {
+                    const app: distributedKVStore.Entry = {
+                      key: `accept_${pkg}`, // 构造带前缀的key
+                      value: {
+                        type: distributedKVStore.ValueType.STRING,
+                        value: pkg
+                      }
+                    }
+                    return app
+                  });
                 } else {
                   // 黑名单
-                  this.appConfig.accessControlRejectList = JSON.stringify(itemName.name)
-                  console.info("AccessControl CheckBoxGroup#onChange this.appConfig.accessControlRejectList: " + this.appConfig.accessControlRejectList)
+                  entries = itemName.name.map(pkg => {
+                    const app: distributedKVStore.Entry = {
+                      key: `reject_${pkg}`, // 构造带前缀的key
+                      value: {
+                        type: distributedKVStore.ValueType.STRING,
+                        value: pkg
+                      }
+                    }
+                    return app
+                  });
                 }
+                await Xb_KVdbUtil.putEntriesBatch(entries);
               })
           }.width('100%')
           .backgroundColor($r('app.color.background'))
@@ -295,7 +317,7 @@ export struct AccessControl {
       keyPlaceholder: $r('app.string.the_app_name'),
       valuePlaceholder: $r('app.string.package_name'),
       theDialogTitle: this.kvDialogTitle,
-      confirm: (value) => {
+      confirm: async (value) => {
         // 非空处理
         if (value.key.toString().trim() === '') {
           Xb_ToastUtil.showToast({ message: $r('app.string.appName_isEmpty') })
@@ -305,42 +327,12 @@ export struct AccessControl {
           Xb_ToastUtil.showToast({ message: $r('app.string.appPackageName_isEmpty') })
           return
         }
-
         // 关闭背景模糊
         this.isEnableIndexForegroundBlur = false
         console.log(`AccessControl kvCustomdialog 当前value: ${JSON.stringify(value)}`)
-        const indexes = this.appListData.findIndex((d) => d.name == value.key)
-        console.log(`AccessControl kvCustomdialog 当前indexes序号: ${indexes} 当前currentIndex序号: ${this.currentIndex}`)
-        if (this.isNewApp) {
-          console.log(`AccessControl kvCustomdialog 窗口为新增`)
-          // 应用为新增
-          if (indexes === -1 && value.value !== this.getUIContext().getHostContext()!.applicationInfo.name) {
-            // 应用名称不存在
-            const param: AppInfo = {
-              name: value.key,
-              package_name: value.value as string,
-              time: Date.now(),
-              isSelected: false
-            }
-            this.appListData.push(param)
-            // 添加后保存数据
-            this.appConfig.accessControlAppInfo = JSON.stringify(this.appListData)
-          } else {
-            // 应用名称存在
-            this.getUIContext().getPromptAction().showToast({ message: $r('app.string.app_already_exist') })
-          }
-
-        } else {
-          console.log(`AccessControl kvCustomdialog 窗口为非新增`)
-          // 应用非新增
-          let data = this.appListData[this.currentIndex]
-          data.name = value.key
-          data.package_name = value.value as string
-          this.appListData.splice(this.currentIndex, 1, data)
-          // 添加后保存数据
-          this.appConfig.accessControlAppInfo = JSON.stringify(this.appListData)
-        }
-        // 保存后重置数据
+        // --- 核心逻辑：以磁盘数据为准 ---
+        await this.saveApp(value)
+        // 保存后重置弹窗状态
         this.keyValueData = new KeyValueData("")
         this.isNewApp = true
       },
@@ -446,13 +438,12 @@ export struct AccessControl {
       this.keyValueData = new KeyValueData(bundleInfo?.appName || '', bundleInfo?.bundleName || '')
       this.addApp()
     })
-    console.info("AccessControl #aboutToAppear this.appConfig.accessControlRejectList: " + this.appConfig.accessControlRejectList)
     this.loadAppsInfo()
     this.sortTabSelectedIndexes.splice(0, 1, this.appConfig.accessControlSort == 'name' ? 0 : 1)
   }
 
-  aboutToDisappear(): void {
-    this.appConfig.accessControlAppInfo = JSON.stringify(this.appListData)
+  async aboutToDisappear(): Promise<void> {
+
   }
 
   addApp() {
@@ -460,57 +451,198 @@ export struct AccessControl {
     this.kvDialogController.open()
   }
 
-  loadAppsInfo() {
+  async saveApp(value: KeyValueData) {
+    console.log(`AccessControl saveApp 开始处理弹窗数据保存: ${JSON.stringify(value)}`);
     try {
-      this.appListData = JSON.parse(this.appConfig.accessControlAppInfo ?? "[]")
+      // UI列表的副本，用于界面更新
+      const originalUIList: AppInfo[] = [...this.appListData];
+      // 持久化总清单的副本，从磁盘读取，用于数据保存
+      const originalMasterList: AppInfo[] = JSON.parse(await Xb_PreferenceUtil.get('access_control_apps', "[]"));
+      const newPackageName = (value.value as string).trim();
+      const newAppName = value.key.toString().trim();
+      if (this.isNewApp) {
+        // --- 新增逻辑 ---
+        console.log(`AccessControl saveApp 执行新增逻辑`);
+        // 检查包名是否已存在于当前UI列表中（避免重复添加到同一页面）
+        if (originalUIList.some(app => app.package_name === newPackageName)) {
+          Xb_ToastUtil.showToast({ message: $r('app.string.app_already_exist') })
+          return;
+        }
+        // 业务规则检查：不能添加自身
+        if (newPackageName === this.getUIContext().getHostContext()!.applicationInfo.name) {
+          console.log("不能添加当前应用自身到控制列表");
+          return;
+        }
+        const newApp: AppInfo = {
+          name: newAppName,
+          package_name: newPackageName,
+          time: Date.now(),
+          isSelected: false
+        };
+        // 操作UI列表副本：添加新应用
+        originalUIList.push(newApp);
+        // 操作持久化列表副本：检查总清单中是否存在，不存在则添加
+        if (!originalMasterList.some(app => app.package_name === newPackageName)) {
+          originalMasterList.push(newApp);
+        }
+      } else {
+        // --- 编辑逻辑 ---
+        console.log(`AccessControl saveApp 执行编辑逻辑`);
+        // 获取当前UI列表中待编辑应用的原始包名作为查找依据
+        const originalPkgName = this.appListData[this.currentIndex].package_name;
+        // 检查新的包名是否与当前UI列表中“其他”应用冲突
+        if (originalUIList.some(app => app.package_name === newPackageName && app.package_name !== originalPkgName)) {
+          Xb_ToastUtil.showToast({ message: '应用包名已经存在' })
+          return;
+        }
+        // 操作UI列表副本：找到并更新应用
+        const uiAppToEdit = originalUIList[this.currentIndex];
+        uiAppToEdit.name = newAppName;
+        uiAppToEdit.package_name = newPackageName;
+        uiAppToEdit.time = Date.now();
+        // 操作持久化列表副本：找到并更新应用
+        const masterAppToEditIndex = originalMasterList.findIndex(app => app.package_name === originalPkgName);
+        if (masterAppToEditIndex !== -1) {
+          const masterAppToEdit = originalMasterList[masterAppToEditIndex];
+          masterAppToEdit.name = newAppName;
+          masterAppToEdit.package_name = newPackageName;
+          masterAppToEdit.time = Date.now();
+        } else {
+          console.error("错误：要编辑的应用在总清单中未找到！");
+          Xb_ToastUtil.showToast({ message: '编辑失败，数据异常' });
+          return;
+        }
+      }
+
+      // 更新UI状态
+      this.appListData = originalUIList;
+      // 执行持久化
+      await Xb_PreferenceUtil.put('access_control_apps', JSON.stringify(originalMasterList));
+      console.log(`AccessControl saveApp 应用列表已成功保存`);
+    } catch (error) {
+      console.error('AccessControl saveApp 保存应用列表失败:', error);
+      Xb_ToastUtil.showToast({ message: '保存失败: ' + error.message });
+    }
+  }
+
+  async loadAppsInfo() {
+    try {
+      const apps = await Xb_PreferenceUtil.get<string>('access_control_apps', "[]")
+      console.debug(`AccessControl #loadAppsInfo apps: ${apps}，accessControlMode: ${this.appConfig.accessControlMode}`)
+      this.appListData = JSON.parse(apps)
       if (this.appConfig.accessControlMode == 'AcceptSelected') {
         // 白名单
         this.modeTabSelectedIndexes.splice(0, 1, 0)
-        const packagenameStringData: string[] = JSON.parse(this.appConfig.accessControlAcceptList ?? "[]")
-        console.log(`AccessControl #loadAppsInfo ${JSON.stringify(packagenameStringData)}`)
-        this.selectedApp(packagenameStringData)
+        const acceptData = await Xb_KVdbUtil.getEntriesByPrefix('accept_')
+        console.debug(`AccessControl #loadAppsInfo acceptData: ${JSON.stringify(acceptData)}`)
+        const packageNameStringData: string[] = acceptData.map(app => app.value.value as string)
+        console.debug(`AccessControl #loadAppsInfo packageNameStringData: ${JSON.stringify(packageNameStringData)}`)
+        this.selectedApp(packageNameStringData)
       } else {
         // 黑名单
         this.modeTabSelectedIndexes.splice(0, 1, 1)
-        const packagenameStringData = JSON.parse(this.appConfig.accessControlRejectList ?? "[]") as string[]
-        console.log(`AccessControl #loadAppsInfo ${JSON.stringify(packagenameStringData)}`)
-        this.selectedApp(packagenameStringData)
+        const rejectData = await Xb_KVdbUtil.getEntriesByPrefix('reject_')
+        const packageNameStringData = rejectData.map(app => app.value.value as string)
+        console.debug(`AccessControl #loadAppsInfo ${JSON.stringify(packageNameStringData)}`)
+        this.selectedApp(packageNameStringData)
       }
     } catch (e) {
       console.error(`AccessControl 错误: ${e}`)
     }
   }
 
-  deleteApp(index?: number, item?: AppInfo) {
-    console.log(`AccessControl 进入删除 #deleteApp ${index}`)
-    console.log(`AccessControl #deleteApp 前 this.appConfig.accessControlAcceptList值：${this.appConfig.accessControlRejectList}`)
-    let rejectString = JSON.parse(this.appConfig.accessControlRejectList ?? "[]") as string[]
-    let acceptString = JSON.parse(this.appConfig.accessControlAcceptList ?? "[]") as string[]
-    if (index != undefined && item != undefined) {
-      console.log(`AccessControl #deleteApp 前 this.appListData值：${JSON.stringify(this.appListData)}`)
-      this.appListData.splice(index, 1)
-      console.log(`AccessControl #deleteApp 后 this.appListData值：${JSON.stringify(this.appListData)}`)
-      this.appConfig.accessControlAppInfo = JSON.stringify(this.appListData)
-      console.log(`AccessControl #deleteApp ${index}`)
-      // 黑名单
-      rejectString = rejectString.filter(stringData => stringData != item.package_name)
-      // 白名单
-      acceptString = acceptString.filter(stringData => stringData != item.package_name)
-    } else {
-      // 批量删除
-      const deleteSet = new Set(this.nameStringData)
-      this.appListData = this.appListData.filter(app => !deleteSet.has(app.package_name))
-      this.appConfig.accessControlAppInfo = JSON.stringify(this.appListData)
-      // 黑名单
-      rejectString = rejectString.filter(packageName => !deleteSet.has(packageName))
-      // 白名单
-      acceptString = acceptString.filter(packageName => !deleteSet.has(packageName))
-    }
-    this.appConfig.accessControlRejectList = JSON.stringify(rejectString)
-    this.appConfig.accessControlAcceptList = JSON.stringify(acceptString)
-    console.log(`AccessControl #deleteApp 后 this.appConfig.accessControlAcceptList值：${this.appConfig.accessControlRejectList}`)
-  }
+  async deleteApp(index?: number, item?: AppInfo) {
+    // UI列表的副本，用于界面更新
+    const originalUIList: AppInfo[] = [...this.appListData];
+    // 持久化总清单的副本，从磁盘读取，用于数据保存
+    const originalMasterList: AppInfo[] = JSON.parse(await Xb_PreferenceUtil.get('access_control_apps', "[]"));
 
+    if (index != undefined && item != undefined) {
+      // --- 选中单个应用 ---
+      console.log(`AccessControl #deleteApp [单个] 删除应用: ${item.name}`);
+      try {
+        let keyToDelete: string;
+        let otherKeyPrefix: string;
+        if (this.appConfig.accessControlMode == 'AcceptSelected') {
+          keyToDelete = 'accept_' + item.package_name;
+          otherKeyPrefix = 'reject_';
+        } else {
+          keyToDelete = 'reject_' + item.package_name;
+          otherKeyPrefix = 'accept_';
+        }
+        // 从当前列表删除
+        await Xb_KVdbUtil.deleteData(keyToDelete);
+        // 操作UI列表副本：移除应用
+        const uiIndexToRemove = originalUIList.findIndex(app => app.package_name === item.package_name);
+        if (uiIndexToRemove > -1) {
+          originalUIList.splice(uiIndexToRemove, 1);
+        }
+        // 检查另一个列表中是否存在
+        const existsInOtherList = await Xb_KVdbUtil.hasKey(otherKeyPrefix + item.package_name);
+        // 操作持久化列表副本：如果另一个列表中也不存在，则从总清单中删除
+        if (!existsInOtherList) {
+          const masterIndexToRemove = originalMasterList.findIndex(app => app.package_name === item.package_name);
+          if (masterIndexToRemove > -1) {
+            originalMasterList.splice(masterIndexToRemove, 1);
+          }
+        }
+      } catch (error) {
+        console.error(`删除单个应用 ${item.name} 失败:`, error);
+      }
+    } else {
+      // --- 批量删除应用 ---
+      if (!this.nameStringData || this.nameStringData.length === 0) {
+        console.log('AccessControl #deleteApp [批量] 删除列表为空，无需操作。');
+        return;
+      }
+      try {
+        let keyPrefixToDelete: string;
+        let otherKeyPrefix: string;
+        if (this.appConfig.accessControlMode == 'AcceptSelected') {
+          keyPrefixToDelete = 'accept_';
+          otherKeyPrefix = 'reject_';
+        } else {
+          keyPrefixToDelete = 'reject_';
+          otherKeyPrefix = 'accept_';
+        }
+        const keysToDelete = this.nameStringData.map(pkgName => keyPrefixToDelete + pkgName);
+        await Xb_KVdbUtil.deleteKeysBatch(keysToDelete);
+
+        const otherListEntries = await Xb_KVdbUtil.getEntriesByPrefix(otherKeyPrefix);
+        const otherListPkgSet = new Set(
+          otherListEntries.map(entry => entry.key.substring(otherKeyPrefix.length))
+        );
+        // 操作UI列表副本：移除所有选中的应用
+        const packageNamesToRemoveSet = new Set(this.nameStringData);
+        for (let i = originalUIList.length - 1; i >= 0; i--) {
+          if (packageNamesToRemoveSet.has(originalUIList[i].package_name)) {
+            originalUIList.splice(i, 1);
+          }
+        }
+        // 操作持久化列表副本：移除在两个列表中都不存在的应用
+        for (let i = originalMasterList.length - 1; i >= 0; i--) {
+          const pkgName = originalMasterList[i].package_name;
+          if (packageNamesToRemoveSet.has(pkgName) && !otherListPkgSet.has(pkgName)) {
+            originalMasterList.splice(i, 1);
+          }
+        }
+      } catch (error) {
+        console.error('AccessControl #deleteApp [批量] 批量删除失败:', error);
+      }
+    }
+
+    try {
+      // 更新UI状态
+      this.appListData = originalUIList;
+      // 执行持久化
+      await Xb_PreferenceUtil.put('access_control_apps', JSON.stringify(originalMasterList));
+      console.log(`AccessControl #deleteApp 删除操作完成，UI和持久化数据已同步更新。`);
+    } catch (error) {
+      console.error('AccessControl #deleteApp 删除应用UI与磁盘同步更新失败:', error);
+      Xb_ToastUtil.showToast({ message: '删除失败' });
+    }
+  }
+  
   // 取消所有选中
   cancelSelected() {
     this.appListData = this.appListData.map((app): AppInfo => ({
@@ -529,18 +661,21 @@ export struct AccessControl {
       time: app.time,
       isSelected: selectedPackagesSet.has(app.package_name)
     }))
-    console.log(`AccessControl #selectedApp 黑 列表数据：${JSON.stringify(this.appListData)} 包名数据：${JSON.stringify(packageNames)}`)
+    console.log(`AccessControl #selectedApp 列表数据：${JSON.stringify(this.appListData)} 包名数据：${JSON.stringify(packageNames)}`)
   }
 
   // 导出配置
-  exportAccessConfig() {
+  async exportAccessConfig() {
+    const apps = await Xb_PreferenceUtil.get<string>('access_control_apps', "[]")
+    const acceptData = await Xb_KVdbUtil.getEntriesByPrefix('accept_')
+    const rejectData = await Xb_KVdbUtil.getEntriesByPrefix('reject_')
     const config: AccessConfig = {
       enable: this.appConfig.accessControl,
       mode: this.appConfig.accessControlMode,
       sort: this.appConfig.accessControlSort,
-      appList: this.appConfig.accessControlAppInfo,
-      acceptList: this.appConfig.accessControlAcceptList,
-      rejectList: this.appConfig.accessControlRejectList
+      appList: apps,
+      acceptList: JSON.stringify(acceptData),
+      rejectList: JSON.stringify(rejectData)
     }
     Xb_FileUtils.exportDataByFile<AccessConfig>('ClashBox AccessControlConfig', config, this.getUIContext().getHostContext()!).then(() => {
       Xb_ToastUtil.showToast({ message: $r('app.string.export_success') })
@@ -553,28 +688,77 @@ export struct AccessControl {
 
   // 导入配置
   async importAccessConfig() {
-    let config: AccessConfig | null
-    Xb_FileUtils.openFile(this.getUIContext().getHostContext()!).then(async (uri) => {
-      if (uri) {
-        config = await Xb_FileUtils.importDataByFile<AccessConfig>(uri)
-        if (config) {
-          this.appConfig.accessControl = config.enable
-          this.appConfig.accessControlMode = config.mode
-          this.appConfig.accessControlSort = config.sort as "name" | "time"
-          this.appConfig.accessControlAppInfo = config.appList
-          this.appConfig.accessControlAcceptList = config.acceptList
-          this.appConfig.accessControlRejectList = config.rejectList
-          this.loadAppsInfo()
-          Xb_ToastUtil.showToast({ message: $r('app.string.import_success') })
-        } else {
-          console.error(`AccessControl 配置解析失败`)
-          Xb_ToastUtil.showToast({ message: Xb_GetResourceString($r('app.string.import_failed'), this) + '配置解析失败' })
-        }
-      } else {
-        Xb_ToastUtil.showToast({ message: Xb_GetResourceString($r('app.string.import_failed'), this) + '文件uri不存在' })
-        console.error(`AccessControl 文件uri不存在`)
+    try {
+      const uri = await Xb_FileUtils.openFile(this.getUIContext().getHostContext()!);
+      if (!uri) {
+        throw new Error('文件uri不存在');
       }
-    })
+      const config = await this._parseConfigFile(uri);
+      await this._mergeAndSaveAppList(config.appList);
+      await this._mergeAndSaveAccessLists(config.acceptList, config.rejectList);
+      // --- 所有数据操作成功后，再更新UI状态和视图 ---
+      this.appConfig.accessControl = config.enable;
+      this.appConfig.accessControlMode = config.mode;
+      this.appConfig.accessControlSort = config.sort as "name" | "time";
+      await this.loadAppsInfo();
+      Xb_ToastUtil.showToast({ message: $r('app.string.import_success') });
+    } catch (error) {
+      // --- 错误处理 ---
+      const errorMessage = error instanceof Error ? error.message : '未知错误';
+      console.error('AccessControl 导入配置时发生错误:', error);
+      Xb_ToastUtil.showToast({ message: Xb_GetResourceString($r('app.string.import_failed'), this) + errorMessage });
+    } finally {
+    }
+  }
+
+  // 解析配置文件
+  private async _parseConfigFile(uri: string): Promise<AccessConfig> {
+    console.log('AccessControl: 开始解析配置文件...');
+    const config = await Xb_FileUtils.importDataByFile<AccessConfig>(uri);
+    if (!config) {
+      throw new Error('配置文件解析失败或内容为空');
+    }
+    return config;
+  }
+
+  // 合并并保存总应用清单
+  private async _mergeAndSaveAppList(importedAppListString: string): Promise<void> {
+    console.log('AccessControl: 开始合并总应用清单...');
+    const currentAppList: AppInfo[] = JSON.parse(await Xb_PreferenceUtil.get('access_control_apps', "[]"));
+    const importedAppList: AppInfo[] = JSON.parse(importedAppListString);
+
+    const mergedAppMap = new Map<string, AppInfo>(currentAppList.map(app => [app.package_name, app]));
+    importedAppList.forEach(app => mergedAppMap.set(app.package_name, app));
+
+    const finalAppList = Array.from(mergedAppMap.values());
+    await Xb_PreferenceUtil.put('access_control_apps', JSON.stringify(finalAppList));
+    console.log(`AccessControl: 总清单合并完成，当前${currentAppList.length}条，导入${importedAppList.length}条，合并后${finalAppList.length}条。`);
+  }
+
+  // 合并并保存黑白名单
+  private async _mergeAndSaveAccessLists(importedAcceptList: string, importedRejectList: string): Promise<void> {
+    console.log('AccessControl: 开始合并访问控制黑白名单列表...');
+    const currentAcceptEntries = await Xb_KVdbUtil.getEntriesByPrefix('accept_');
+    const currentRejectEntries = await Xb_KVdbUtil.getEntriesByPrefix('reject_');
+    const currentAcceptSet = new Set(currentAcceptEntries.map(entry => entry.key.substring('accept_'.length)));
+    const currentRejectSet = new Set(currentRejectEntries.map(entry => entry.key.substring('reject_'.length)));
+
+    const mergeResult = AccessControlCompatibleMerger.calculateMergeDifferences(
+      currentAcceptSet,
+      currentRejectSet,
+      importedAcceptList,
+      importedRejectList
+    );
+
+    if (mergeResult.keysToDelete.length > 0) {
+      await Xb_KVdbUtil.deleteKeysBatch(mergeResult.keysToDelete);
+      console.log(`AccessControl: 准备删除 ${mergeResult.keysToDelete.length} 条旧记录。`);
+    }
+    if (mergeResult.entriesToAdd.length > 0) {
+      await Xb_KVdbUtil.putEntriesBatch(mergeResult.entriesToAdd);
+      console.log(`AccessControl: 准备新增 ${mergeResult.entriesToAdd.length} 条新记录。`);
+    }
+    console.log('AccessControl: 访问列表合并完成。');
   }
 
   onModeChange() {
@@ -592,11 +776,9 @@ export struct AccessControl {
     if (this.modeTabSelectedIndexes[0] == 0) {
       // 白名单
       console.log(`AccessControl #onModeChange 模式：${ this.appConfig.accessControlMode}`)
-      this.appConfig.accessControlAcceptList = JSON.stringify(this.nameStringData)
     } else {
       // 黑名单
       console.log(`AccessControl #onModeChange 模式：${ this.appConfig.accessControlMode}`)
-      this.appConfig.accessControlRejectList = JSON.stringify(this.nameStringData)
     }
   }
 
@@ -653,7 +835,7 @@ export struct AccessControl {
 
 const nameSortCollator = new intl.Collator("zh-CN")
 
-interface AppInfo {
+export interface AppInfo {
   name: string
   package_name: string
   time: number

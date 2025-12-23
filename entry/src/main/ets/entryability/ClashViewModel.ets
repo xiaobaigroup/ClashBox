@@ -24,7 +24,7 @@ import { PROXY_STARTED_DURATION_INIT_VALUE } from "../common/entity/Constants";
 import { Timer } from "../common/utils/HHmmssTimer";
 import { number2Time } from "../common/utils/TimeConvertUtil";
 import { picker } from "@kit.CoreFileKit"
-import { Xb_GetResourceString, Xb_ToastUtil } from "xb_components";
+import { Xb_GetResourceString, Xb_KVdbUtil, Xb_ToastUtil } from "xb_components";
 
 export interface DelayInfo{
     name: string
@@ -454,10 +454,13 @@ export class ClashViewModel {
     let clashConfig = AppStorage.get<ClashConfig>("clashConfig") || cardManager.getClashConfig()
     if (appConfig == null)
       return
-    if(appConfig!.accessControl){
-      let acceptList = JSON.parse(appConfig?.accessControlAcceptList ?? "[]") as string[]
+    if (appConfig!.accessControl) {
+      const currentAcceptEntries = await Xb_KVdbUtil.getEntriesByPrefix('accept_');
+      const currentRejectEntries = await Xb_KVdbUtil.getEntriesByPrefix('reject_');
+      let acceptList = currentAcceptEntries.map(entry => entry.key.substring('accept_'.length))
       acceptList.push(...[this.context?.applicationInfo.name as string, 'com.atomicservice.5765880207855877209'])
-      const rejectList = JSON.parse(appConfig?.accessControlRejectList ?? "[]") as string[]
+      const rejectList = currentRejectEntries.map(entry => entry.key.substring('reject_'.length))
+      console.log(`AccessControl 将加载 acceptList ${acceptList.length} 个，rejectList ${rejectList.length} 个`)
       const accessControl = {
         tunIp : clashConfig?.tun?.["tun-ip"],
         accessControl: { mode:appConfig?.accessControlMode ?? "", acceptList: acceptList, rejectList: rejectList } as AccessControl

@@ -1,6 +1,6 @@
 import { ClashConfig, Profile } from "proxy_core";
-import { Xb_FileUtils, Xb_GetResourceString, Xb_ToastUtil } from "xb_components";
-import { AppConfig, UIConfig, UIConfig_2 } from "../../entryability/AppState";
+import { Xb_FileUtils, Xb_GetResourceString, Xb_PreferenceUtil, Xb_ToastUtil } from "xb_components";
+import { AppConfig, UIConfig } from "../../entryability/AppState";
 import ClashViewModel from "../../entryability/ClashViewModel";
 import { filterStringsByBooleans } from "../entity/Constants";
 import { getJsonArrayType } from "../entity/utils";
@@ -9,7 +9,7 @@ import { getJsonArrayType } from "../entity/utils";
 export interface BackupConfig {
   appConfig: AppConfig
   uiConfig: UIConfig
-  uiConfig_2: UIConfig_2
+  configSort: string
   clashConfig: ClashConfig
   configList: Profile[]
 }
@@ -26,13 +26,13 @@ class BackupRestoreUtil {
     try {
       const appConfig: AppConfig = AppStorage.get<AppConfig>("appConfig") ?? new AppConfig()
       const uiConfig: UIConfig = AppStorage.get<UIConfig>("uiConfig") ?? new UIConfig()
-      const uiConfig_2: UIConfig_2 = AppStorage.get<UIConfig_2>("uiConfig_2") ?? new UIConfig_2()
+      const configSort: string = await Xb_PreferenceUtil.get('config_sort', '')
       const clashConfig: ClashConfig = AppStorage.get<ClashConfig>("clashConfig") ?? new ClashConfig()
       const configList = await ClashViewModel.getProfiles()
       const backupConfig: BackupConfig = {
         appConfig: appConfig,
         uiConfig: uiConfig,
-        uiConfig_2: uiConfig_2,
+        configSort: configSort,
         clashConfig: clashConfig,
         configList: configList
       }
@@ -62,19 +62,24 @@ class BackupRestoreUtil {
               console.log(`旧版本数据转化为：${config.uiConfig.isShowHomeCard}`)
             }
             AppStorage.set("uiConfig",  config.uiConfig)
-            AppStorage.set("uiConfig_2",  config.uiConfig_2)
             AppStorage.set("clashConfig", config.clashConfig)
             console.info(`ClashBoxConfig.restore 配置列表：${JSON.stringify(config.configList)}`)
             ClashViewModel.addOrUpdateProfiles(config.configList).then(() => {
+              Xb_ToastUtil.showToast({ message: $r('app.string.import_success') })
+              console.error(`ClashBoxConfig.restore ClashViewModel 配置添加恢复成功`)
+            })
+              .catch((err: Error) => {
+                console.error(`ClashBox Restore ClashViewModel 配置恢复失败, name: ${err.name}, message: ${err.message}`)
+              })
+            Xb_PreferenceUtil.put('config_sort', '').then(() => {
               Xb_ToastUtil.showToast({ message: $r('app.string.import_success') })
               // 重启应用
               setTimeout(() => {
                 Xb_ToastUtil.restartApp()
               }, 2000)
+            }).catch((err: Error) => {
+              console.error(`ClashBox Restore Xb_PreferenceUtil.put 配置列表排序恢复失败, name: ${err.name}, message: ${err.message}`)
             })
-              .catch((err: Error) => {
-                console.error(`ClashBox Restore 配置恢复失败 ${err.name} ${err.message}`)
-              })
           } else {
             console.error(`ClashBoxConfig.restore 配置解析失败`)
             Xb_ToastUtil.showToast({ message: Xb_GetResourceString($r('app.string.import_failed'), this) + '配置解析失败' })

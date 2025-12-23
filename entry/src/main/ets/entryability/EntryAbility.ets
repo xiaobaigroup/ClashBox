@@ -26,7 +26,8 @@ import { StatusBarConfig, StatusBarIconResource,
   Xb_ColorUtils,
   Xb_Global, Xb_KVdbUtil,
   Xb_StatusBarUtils,
-  Xb_ToastUtil } from 'xb_components';
+  Xb_ToastUtil,
+  Xb_PreferenceUtil} from 'xb_components';
 import BackupRestoreUtil from '../common/utils/BackupRestoreUtil';
 import ConfigAutoUpdateService from '../common/utils/ConfigAutoUpdateService';
 
@@ -83,6 +84,13 @@ export default class EntryAbility extends UIAbility {
     // 备份恢复工具初始化
     BackupRestoreUtil.init(this.context)
     Xb_ColorUtils.init(this.context)
+    // 初始化首选项
+    try {
+      await Xb_PreferenceUtil.init(this.context, 'clash_box_preference');
+      hilog.info(0x0000, 'EntryAbility', 'Xb_PreferenceUtil initialized successfully.');
+    } catch (error) {
+      hilog.error(0x0000, 'EntryAbility', 'Xb_PreferenceUtil initialization failed.');
+    }
     // 添加崩溃监听
     try {
       hiAppEvent.addWatcher({
@@ -100,7 +108,7 @@ export default class EntryAbility extends UIAbility {
         }
       })
     } catch (error) {
-      console.error(`崩溃事件监听注册失败`)
+      console.error(`崩溃事件监听注册失败，message：${error.message}`)
     }
     // 当前主题模式
     AppStorage.setOrCreate<ConfigurationConstant.ColorMode>('currentColorMode', this.context.config.colorMode)
@@ -298,6 +306,13 @@ export default class EntryAbility extends UIAbility {
       this.avoidManager.destroy();
       this.avoidManager = undefined;
     }
+    Xb_PreferenceUtil.save().then(() => {
+      hilog.debug(0xC020, 'EntryAbility',
+        `#onBackground ConfigSort Xb_PreferenceUtil 首选项保存成功`)
+    }).catch((err: BusinessError) => {
+      hilog.error(0xC020, 'EntryAbility',
+        `#onBackground ConfigSort Xb_PreferenceUtil 首选项保存失败，message：${err.message}`)
+    })
   }
 
   onDestroy(): void {

@@ -22,7 +22,7 @@ import {
   CellularData, CustomConfirmDialog, icon_tertiary, Nothing } from '../components/Common/Common'
 import { customVibrator } from "../common/utils/VibratorUtil"
 import ClashViewModel from '../entryability/ClashViewModel'
-import { AppConfig, UIConfig, UIConfig_2 } from '../entryability/AppState'
+import { AppConfig, UIConfig } from '../entryability/AppState'
 import { EventHub, EventKey } from '../common/EventHub'
 import { getResourceString } from '../common/utils/ResourceStringUtil'
 import { convertTime } from '../common/utils/TimeConvertUtil'
@@ -39,7 +39,9 @@ import { uniformTypeDescriptor as utd } from '@kit.ArkData'
 import { common, Context } from '@kit.AbilityKit'
 import { BusinessError } from '@kit.BasicServicesKit';
 import { fileUri, fileIo as fs, picker } from '@kit.CoreFileKit'
-import { ShareData, Xb_GetResourceString, Xb_Share, Xb_TabBarVertical, Xb_ToastUtil } from 'xb_components'
+import { ShareData, Xb_GetResourceString,
+  Xb_PreferenceUtil,
+  Xb_Share, Xb_TabBarVertical, Xb_ToastUtil } from 'xb_components'
 import { QRCodeDialog } from '../components/Configuration/QRCodeComponent'
 import { JSON } from '@kit.ArkTS'
 
@@ -62,7 +64,6 @@ struct ConfigurationPage {
 
   @StorageLink('favoriteProfiles') favoriteProfiles: Map<string, string> = new Map<string, string>([])
   @StorageLink('appConfig') @Watch('onChangeConfig') appConfig: AppConfig = new AppConfig()
-  @StorageLink('uiConfig_2') uiConfig_2: UIConfig_2 = new UIConfig_2()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('ConfigContent') configStr: string = ''
 
@@ -379,6 +380,13 @@ struct ConfigurationPage {
       },
       onWillDisappear: async () => {},
       onDisappear: () => {
+        Xb_PreferenceUtil.save().then(() => {
+          hilog.debug(0xC020, componentName,
+            `#button#bindSheet#onWillDismiss()#关闭配置添加按钮的bindSheet：DismissSheetAction.dismiss() ConfigSort Xb_PreferenceUtil 首选项保存成功`)
+        }).catch((err: BusinessError) => {
+          hilog.error(0xC020, componentName,
+            `#button#bindSheet#onWillDismiss()#关闭配置添加按钮的bindSheet：DismissSheetAction.dismiss() ConfigSort Xb_PreferenceUtil 首选项保存失败，message：${err.message}`)
+        })
         setTimeout(() => {
           // 关闭背景模糊 TODO 此处添加是为了修复添加配置关闭半模态背景模糊未能正常关闭
           this.isEnableIndexForegroundBlur = false
@@ -673,8 +681,8 @@ struct ConfigurationPage {
             let tmp = this.configList.splice(from, 1)
             this.configList.splice(to, 0, tmp[0])
             // 更新保存的排序表
-            this.uiConfig_2.configSort = JSON.stringify(this.configList.map(id => id.configId))
-            console.info(`ConfigSort uiConfig_2.configSort 更新为，${this.uiConfig_2.configSort}`)
+            Xb_PreferenceUtil.putSync('config_sort', JSON.stringify(this.configList.map(id => id.configId)))
+            console.info(`ConfigSort  Xb_PreferenceUtil config_sort 更新为，${JSON.stringify(this.configList.map(id => id.configId))}`)
           })
       }
       .width('100%')
@@ -785,13 +793,13 @@ struct ConfigurationPage {
    */
   private favoriteConfig(): void {
     hilog.info(0xC010, componentName, `#favoriteConfig#收藏配置: configName is [${this.currentTouchConfigData.configName}]`)
-    this.currentTouchConfigData.isFavorite = true
-    this.favoriteProfiles.set(this.currentTouchConfigData.configId, this.currentTouchConfigData.configName)
-    Xb_ToastUtil.showToast({ message: $r('app.string.Collect_Tip') })
- /*   if (this.favoriteProfiles.size <= 3) {
+    if (this.favoriteProfiles.size <= 5) {
+      this.currentTouchConfigData.isFavorite = true
+      this.favoriteProfiles.set(this.currentTouchConfigData.configId, this.currentTouchConfigData.configName)
+      Xb_ToastUtil.showToast({ message: $r('app.string.Collect_Tip') })
     } else {
       Xb_ToastUtil.showToast({ message: $r('app.string.favorite_config_no') })
-    }*/
+    }
   }
 
   /**
@@ -987,7 +995,7 @@ struct ConfigurationPage {
   }
 
   /**删除配置*/
-  private async  deleteConfig(): Promise<void> {
+  private async deleteConfig(): Promise<void> {
     hilog.info(0xC016, componentName, `#deleteConfig#删除配置: configName is [${this.currentTouchConfigData.configName}]`)
     await ClashViewModel.deleteProfile(this.currentTouchConfigData.configId)
     this.appConfig.currentProxyName = undefined

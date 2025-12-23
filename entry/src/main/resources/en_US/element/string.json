@@ -1646,7 +1646,7 @@
     },
     {
       "name": "favorite_config_no",
-      "value": "You can only save up to 3 configurations at most"
+      "value": "You can only save up to 6 configurations at most"
     },
     {
       "name": "uncollected_all_tip",

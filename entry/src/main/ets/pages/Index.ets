@@ -2,7 +2,7 @@
 import { curves, LengthMetrics, mediaquery, UIUtils } from '@kit.ArkUI'
 import Home from './HomePage'
 import ProxyPage from './ProxyPage'
-import { JSON, util } from "@kit.ArkTS";
+import { util } from "@kit.ArkTS";
 import ConfigurationPage from './ConfigurationPage'
 import MorePage from './MorePage'
 import { hilog } from '@kit.PerformanceAnalysisKit'
@@ -28,7 +28,7 @@ import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } f
 import { ClashConfig, IpInfo, Profile, ProxyMode } from 'proxy_core'
 import { EventHub, EventKey } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
-import { AppConfig, AppFlowingState, AppState, getPackageInfo, UIConfig, UIConfig_2 } from '../entryability/AppState'
+import { AppConfig, AppFlowingState, AppState, getPackageInfo, UIConfig } from '../entryability/AppState'
 import { common } from '@kit.AbilityKit'
 import { ChangeLanguage } from '../common/utils/ChangeLanguageUtil'
 import { ConfigData, HomeCardInfo, TabBuild } from '../common/entity/PageArgumentEntity'
@@ -75,7 +75,10 @@ import {
   Xb_FloatTabBarDirection,
   Xb_FloatTabBarDirectionReverse,
   Xb_FloatTabBarPadding,
-  Xb_Global, Xb_NotificationUtils,
+  Xb_Global,
+  Xb_KVdbUtil,
+  Xb_NotificationUtils,
+  Xb_PreferenceUtil,
   Xb_ResourceColorUtil,
   Xb_StatusBarUtils,
   Xb_TabBarVertical,
@@ -93,6 +96,8 @@ import { animationStyle } from 'xb_components/src/main/ets/components/Animation'
 import { getJsonArrayType } from '../common/entity/utils';
 import { holdingHandleUtil } from '../common/utils/HoldingHandleUtil';
 import { sortByCustomOrder } from '../common/utils/SortUtil';
+import { AppInfo } from '../components/More/AccessControl';
+import { AccessControlCompatibleMerger } from '../common/utils/AccessControlCompatibleUtil';
 
 // import { hdsEffect } from '@kit.UIDesignKit';
 
@@ -161,7 +166,6 @@ struct Index {
   @Provide('WelcomeNavPathStack') welcomePageInfos: NavPathStack = new NavPathStack()
   // 主页面栈
   @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
-  @StorageLink('uiConfig_2') uiConfig_2: UIConfig_2 = new UIConfig_2()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
@@ -822,18 +826,21 @@ struct Index {
       } as ConfigData
     })
     // 初始化配置项排序列表
-    if (!this.uiConfig_2.configSort) {
-      this.uiConfig_2.configSort = JSON.stringify(this.configList.map(id => id.configId))
-      console.info(`ConfigSort #fetchProfiles uiConfig_2.configSort 不存在，进行初始化：${this.uiConfig_2.configSort}`)
+    let configSort = await Xb_PreferenceUtil.get<string>('config_sort', '')
+    if (!configSort) {
+      configSort = JSON.stringify(this.configList.map(id => id.configId))
+      await Xb_PreferenceUtil.put('config_sort', configSort)
+      console.info(`ConfigSort #fetchProfiles Xb_PreferenceUtil config_sort 不存在，进行初始化：${configSort}`)
     } else {
       if (!isFirst) {
-        // 更新保存的排序表
-        this.uiConfig_2.configSort = JSON.stringify(this.configList.map(id => id.configId))
-        console.info(`ConfigSort uiConfig_2.configSort 更新为，${this.uiConfig_2.configSort}`)
+        // 当前的排序表
+        this.configList = sortByCustomOrder(this.configList, JSON.parse(configSort) as string[], 'configId')
+        console.info(`ConfigSort #fetchProfiles Xb_PreferenceUtil config_sort 当前的排序表为，${configSort}`)
       } else {
-        this.configList = sortByCustomOrder(this.configList, JSON.parse(this.uiConfig_2.configSort) as string[], 'configId')
+        // 应用启动加载顺序配置列表
+        this.configList = sortByCustomOrder(this.configList, JSON.parse(configSort) as string[], 'configId')
+        console.info(`ConfigSort #fetchProfiles Xb_PreferenceUtil config_sort 存在，${configSort}`)
       }
-      console.info(`ConfigSort #fetchProfiles uiConfig_2.configSort 存在，${this.uiConfig_2.configSort}`)
     }
   }
 
@@ -1320,6 +1327,9 @@ struct Index {
     this.unRegisterEvent()
     // 解绑listener中注册的回调函数
     // this.deviceHeightListener.off('change');
+    Xb_KVdbUtil.closeKVStore().catch((err: BusinessError) => {
+      console.error(`KvDb #aboutToDisappear Xb_KVdbUtil.closeKVStore() 失败，message，${err.message}`)
+    })
   }
 
   /** @description 统一取消监听事件 */
@@ -1338,7 +1348,7 @@ struct Index {
   }
 
   // 更新后强化赋值一次
-  updateData() {
+  async updateData() {
     if (this.clashConfig.tun && this.clashConfig.tun['tun-ip']) {
       this.clashConfig.tun['tun-ip'] = '172.19.0.1/30'
     }
@@ -1361,6 +1371,41 @@ struct Index {
     if (this.uiConfig.isHoldingHand === undefined) {
       this.uiConfig.isHoldingHand = false
     }
+
+    setTimeout(async () => {
+      // 等待PreferenceUtil完成初始化后，更新访问控制数据
+      console.log(`AccessControl PreferenceUtil Index #updateData 准备数据迁移`)
+      const appsString = await Xb_PreferenceUtil.get<string>('access_control_apps', "[]")
+      console.log(`AccessControl PreferenceUtil Index #updateData apps: ${appsString}，准备数据迁移`)
+      await Xb_PreferenceUtil.put('access_control_apps', this.appConfig.accessControlAppInfo)
+      let apps: AppInfo[] = JSON.parse(appsString) as AppInfo[]
+      console.log(`AccessControl PreferenceUtil Index #updateData apps: ${apps.length}，准备数据迁移`)
+      if (apps.length == 0) {
+        apps = JSON.parse(this.appConfig.accessControlAppInfo)
+        const currentAcceptEntries = await Xb_KVdbUtil.getEntriesByPrefix('accept_');
+        const currentRejectEntries = await Xb_KVdbUtil.getEntriesByPrefix('reject_');
+        const currentAcceptSet = new Set(currentAcceptEntries.map(entry => entry.key.substring('accept_'.length)));
+        const currentRejectSet = new Set(currentRejectEntries.map(entry => entry.key.substring('reject_'.length)));
+        const mergeResult = AccessControlCompatibleMerger.calculateMergeDifferences(
+          currentAcceptSet,
+          currentRejectSet,
+          this.appConfig.accessControlAcceptList,
+          this.appConfig.accessControlRejectList
+        );
+        if (mergeResult.keysToDelete.length > 0) {
+          await Xb_KVdbUtil.deleteKeysBatch(mergeResult.keysToDelete);
+          console.log(`AccessControl Index: 准备删除 ${mergeResult.keysToDelete.length} 条旧记录。`);
+        }
+        if (mergeResult.entriesToAdd.length > 0) {
+          await Xb_KVdbUtil.putEntriesBatch(mergeResult.entriesToAdd);
+          console.log(`AccessControl Index: 准备新增 ${mergeResult.entriesToAdd.length} 条新记录。`);
+        }
+        const newAcceptEntries = await Xb_KVdbUtil.getEntriesByPrefix('accept_');
+        const newRejectEntries = await Xb_KVdbUtil.getEntriesByPrefix('reject_');
+        console.log(`AccessControl Index #updateData 已迁移 apps :${apps.length} 个，白名单: ${newAcceptEntries.map(entry => entry.key.substring('accept_'.length)).length}, 黑名单: ${newRejectEntries.map(entry => entry.key.substring('reject_'.length)).length}`)
+      }
+    }, 3000)
+
   }
 
   // 等待配置数据库初始化完成

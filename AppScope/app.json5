@@ -1,9 +1,9 @@
 {
   "app": {
     //"bundleName": "org.xbgroup.clashboxb", // 测试版 图标前景为app_icon_pre
-    "bundleName": "org.xbgroup.clashbox", // 正式版 图标前景为panda
+    "bundleName": "org.xbgroup.clashbox",
     "vendor": "example",
-    "versionCode": 1007010,
+    "versionCode": 1007016,
     "versionName": "1.7.1",
     "icon": "$media:layered_image",
     "label": "$string:app_name"

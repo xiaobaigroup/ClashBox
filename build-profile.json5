@@ -5,13 +5,13 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "C:\\Users\\xfz\\.ohos\\config\\default_clashnext_nt7a1MWR64f3m7D6h_sgB-Ikc3VK-tSfisxkz8TXs6g=.cer",
-          "keyAlias": "debugKey",
-          "keyPassword": "0000001BBF12DB53B2B4F5711F2B8E68C1181C57C21D08F289EF1B957BEA68C6B7FDD071D13F48CFC492D2",
-          "profile": "C:\\Users\\xfz\\.ohos\\config\\default_clashnext_nt7a1MWR64f3m7D6h_sgB-Ikc3VK-tSfisxkz8TXs6g=.p7b",
+          "storeFile": "D:/HUAWEI/key/小白工坊证书/小白工坊.p12",
+          "storePassword": "0000001D90D6A5E6746D64E579B7B1D4E0B65B6E8ADA12D28D903567D3ADD3365DB64F874580A3DA4DC06374A4",
+          "keyAlias": "xiaobaigongfang",
+          "keyPassword": "0000001DCD1AD3F5C0B6CD8BE8970835C926322A9B6566933DB850A66D1D2633408378A9E57324AB0EC6C7F98E",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\xfz\\.ohos\\config\\default_clashnext_nt7a1MWR64f3m7D6h_sgB-Ikc3VK-tSfisxkz8TXs6g=.p12",
-          "storePassword": "0000001BE5F82E2A58F26998C9C046D826F9F6C174FCDF04C2278C8B7214A87ACB3143FB6E6EDB1625F300"
+          "profile": "D:/HUAWEI/key/小白工坊证书/debug证书clashbox专用/ClashboxdebugDebug.p7b",
+          "certpath": "D:/HUAWEI/key/小白工坊证书/debug证书clashbox专用/debug.cer"
         }
       }
     ],

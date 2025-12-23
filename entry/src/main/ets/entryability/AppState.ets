@@ -6,7 +6,7 @@ import ClashViewModel from "./ClashViewModel";
 import { bundleManager } from "@kit.AbilityKit";
 import { EventHub, EventKey } from "../common/EventHub";
 import { CustomThemeName } from "xb_components/src/main/ets/utils/AppThemeManager";
-import { TabStyle } from "xb_components";
+import { TabStyle, Xb_PreferenceUtil } from "xb_components";
 
 export enum ProxyGroupType{
   Tabs,
@@ -179,14 +179,6 @@ export class UIConfig {
   }
 }
 
-export class UIConfig_2 {
-  // 配置项排序
-  configSort: string = ''
-
-  constructor() {
-  }
-}
-
 export function isEnd(length: number, i: number) {
   return length -1 == i
 }
@@ -211,7 +203,6 @@ export class AppState {
 
     PersistentStorage.persistProp("clashConfig", new ClashConfig(AppState.globalUA))
     PersistentStorage.persistProp("uiConfig", new UIConfig())
-    PersistentStorage.persistProp("uiConfig_2", new UIConfig_2())
     AppStorage.setOrCreate<AppFlowingState>("appFlowingState", new AppFlowingState())
   }
   // 还原覆写配置
@@ -219,17 +210,18 @@ export class AppState {
     AppStorage.set("clashConfig", new ClashConfig(AppState.globalUA))
   }
   // 清理数据 还原默认值
-  static async ResetConfig(context: Context){
+  static async ResetConfig(context: Context) {
     ClashViewModel.StopVpn()
     AppState.ResetClashConfig()
     AppStorage.set("appConfig", new AppConfig())
     AppStorage.set("favoriteProfiles", new Map<string, string>([]))
     AppStorage.set("favoriteProxys", new Map<string, string>([]))
     AppStorage.set("uiConfig",  new UIConfig())
-    AppStorage.set("uiConfig_2",  new UIConfig_2())
     AppStorage.set("appFlowingState", new AppFlowingState())
     AppStorage.set("proxyGroups", [])
     await ClashViewModel.profileRepo.ClearAll(context)
+    // 清空配置排序表
+    await Xb_PreferenceUtil.delete('config_sort')
     EventHub.sendEvent(EventKey.FetchProfile)
     // TODO 还原其他配置
   }
