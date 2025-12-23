@@ -181,9 +181,17 @@ struct ProxyINFO {
     // 检查IP事件(按需执行)
     if (!this.isCheckIP) {
       this.isCheckIP = true
-      EventHub.on(EventKey.checkIpInfo, async ()=>{
+      EventHub.on(EventKey.checkIpInfo, async () => {
+        // 检查IP是否正在刷新中
+        const isCheckIpInfo = AppStorage.get<boolean>('isCheckIpInfo') ?? false
+        if (isCheckIpInfo) {
+          return
+        }
+
+        AppStorage.setOrCreate("isCheckIpInfo", true) // 标记IP正在刷新中
         this.remoteIp = null
         this.remoteIp = await ClashViewModel.checkIpInfo()
+        AppStorage.delete("isCheckIpInfo") // 刷新完成移除临时的全局变量，减少内存开销
       })
     }
   }
