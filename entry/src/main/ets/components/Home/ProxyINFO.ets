@@ -167,6 +167,14 @@ struct ProxyINFO {
     .height('100%')
     .padding(HomeCardPadding(this.widthBp, this.heightBp))
     .id('ProxyINFOId')
+    .onVisibleAreaChange([0],(isExpanding: boolean, currentRatio: number) => {
+      console.debug('显示 ProxyINFO -', isExpanding, currentRatio)
+
+      // 当组件显示的时候 -> 执行一次 IP刷新
+      if (isExpanding) {
+        EventHub.sendEvent(EventKey.checkIpInfo)
+      }
+    })
   }
 
   aboutToAppear(): void {
