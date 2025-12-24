@@ -64,14 +64,12 @@ class BackupRestoreUtil {
             AppStorage.set("uiConfig",  config.uiConfig)
             AppStorage.set("clashConfig", config.clashConfig)
             console.info(`ClashBoxConfig.restore 配置列表：${JSON.stringify(config.configList)}`)
-            ClashViewModel.addOrUpdateProfiles(config.configList).then(() => {
-              Xb_ToastUtil.showToast({ message: $r('app.string.import_success') })
-              console.error(`ClashBoxConfig.restore ClashViewModel 配置添加恢复成功`)
-            })
-              .catch((err: Error) => {
-                console.error(`ClashBox Restore ClashViewModel 配置恢复失败, name: ${err.name}, message: ${err.message}`)
-              })
-            Xb_PreferenceUtil.put('config_sort', '').then(() => {
+            try {
+              await ClashViewModel.addOrUpdateProfiles(config.configList)
+            } catch (err) {
+              console.error(`ClashBox Restore ClashViewModel 配置恢复失败, name: ${err.name}, message: ${err.message}`)
+            }
+            Xb_PreferenceUtil.put('config_sort', config.configSort).then(() => {
               Xb_ToastUtil.showToast({ message: $r('app.string.import_success') })
               // 重启应用
               setTimeout(() => {

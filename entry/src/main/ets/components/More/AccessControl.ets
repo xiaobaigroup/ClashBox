@@ -72,8 +72,8 @@ export struct AccessControl {
     textPadding: { top: 5, bottom: 5 },
     fontColor: font_primary,
   })
-  @State @Watch('onModeChange') modeTabSelectedIndexes: number[] = [1]
-  @State @Watch('onSortChange') sortTabSelectedIndexes: number[] = [0]
+  @State modeTabSelectedIndexes: number[] = [this.appConfig.accessControlMode == 'AcceptSelected' ? 0 : 1]
+  @State sortTabSelectedIndexes: number[] = [this.appConfig.accessControlSort == 'name' ? 0 : 1]
 
   build() {
     NavDestination() {
@@ -147,7 +147,7 @@ export struct AccessControl {
                       this.deleteApp()
                     } else {
                       this.isDeleteing = true
-                      this.cancelSelected()
+                      this.cancelTotalSelected()
                     }
                   }
                 })
@@ -159,34 +159,7 @@ export struct AccessControl {
               .checkboxShape(CheckBoxShape.CIRCLE)
               .selectedColor(this.icon_emphasize)
               .onChange(async (itemName: CheckboxGroupResult) => {
-                console.info(`AccessControl CheckBoxGroup#onChange 访问控制类型：${this.appConfig.accessControlMode}, checkbox group content` + JSON.stringify(itemName))
-                let entries: Array<distributedKVStore.Entry> = []
-                if (this.appConfig.accessControlMode == 'AcceptSelected') {
-                  // 白名单
-                  entries = itemName.name.map(pkg => {
-                    const app: distributedKVStore.Entry = {
-                      key: `accept_${pkg}`, // 构造带前缀的key
-                      value: {
-                        type: distributedKVStore.ValueType.STRING,
-                        value: pkg
-                      }
-                    }
-                    return app
-                  });
-                } else {
-                  // 黑名单
-                  entries = itemName.name.map(pkg => {
-                    const app: distributedKVStore.Entry = {
-                      key: `reject_${pkg}`, // 构造带前缀的key
-                      value: {
-                        type: distributedKVStore.ValueType.STRING,
-                        value: pkg
-                      }
-                    }
-                    return app
-                  });
-                }
-                await Xb_KVdbUtil.putEntriesBatch(entries);
+                this.nameStringData = itemName.name
               })
           }.width('100%')
           .backgroundColor($r('app.color.background'))
@@ -228,10 +201,24 @@ export struct AccessControl {
                 })
                 .enabled(this.appConfig.accessControl)
                 .transition(customAnimationUtil.isScaleTran(index + 2, this.uiConfig))
-                .onClick(() => {
+                .onClick(async () => {
                   const itemData = this.appListData[index]
                   itemData.isSelected = !itemData.isSelected
                   this.appListData.splice(index, 1, itemData)
+                  if (!itemData.isSelected) {
+                    // 取消当前选择
+                    this.cancelSelected(item)
+                  } else {
+                    let key = ''
+                    if (this.appConfig.accessControlMode == 'AcceptSelected') {
+                      // 白名单
+                      key = `accept_${item.package_name}`
+                    } else {
+                      // 黑名单
+                      key = `reject_${item.package_name}`
+                    }
+                    Xb_KVdbUtil.putData(key, item.package_name)
+                  }
                 })
                 .onMouse((event) => {
                   if (event.action == MouseAction.Press && event.button == MouseButton.Right) {
@@ -364,13 +351,38 @@ export struct AccessControl {
       Text($r('app.string.mode'))
       SegmentButton({
         options: this.modeTabOptions,
-        selectedIndexes: this.modeTabSelectedIndexes
+        selectedIndexes: this.modeTabSelectedIndexes,
+        onItemClicked: (tab) => {
+          console.debug(`AccessControl 模式 #onItemClicked，accessControlMode: ${tab}`)
+          if (tab == 0) {
+            // 白名单
+            this.appConfig.accessControlMode = 'AcceptSelected'
+          } else {
+            // 黑名单
+            this.appConfig.accessControlMode = 'RejectSelected'
+          }
+          this.loadAppsInfo()
+        }
       })
       // 排序
       Text($r('app.string.sort'))
       SegmentButton({
         options: this.sortTabOptions,
-        selectedIndexes: this.sortTabSelectedIndexes
+        selectedIndexes: this.sortTabSelectedIndexes,
+        onItemClicked: (tab) => {
+          console.debug(`AccessControl 排序 #onItemClicked，accessControlMode: ${tab}`)
+          if (tab == 0) {
+            // 名称
+            this.appConfig.accessControlSort = 'name'
+            this.appListData.sort((a, b) => nameSortCollator.compare(a.name, b.name))
+          } else {
+            // 时间
+            this.appConfig.accessControlSort = 'time'
+            this.appListData.sort((a, b) => {
+              return a.time - b.time
+            })
+          }
+        }
       })
     }
     .padding({ top: 56, bottom: 12, left: 12, right: 12})
@@ -439,7 +451,6 @@ export struct AccessControl {
       this.addApp()
     })
     this.loadAppsInfo()
-    this.sortTabSelectedIndexes.splice(0, 1, this.appConfig.accessControlSort == 'name' ? 0 : 1)
   }
 
   async aboutToDisappear(): Promise<void> {
@@ -532,7 +543,6 @@ export struct AccessControl {
       this.appListData = JSON.parse(apps)
       if (this.appConfig.accessControlMode == 'AcceptSelected') {
         // 白名单
-        this.modeTabSelectedIndexes.splice(0, 1, 0)
         const acceptData = await Xb_KVdbUtil.getEntriesByPrefix('accept_')
         console.debug(`AccessControl #loadAppsInfo acceptData: ${JSON.stringify(acceptData)}`)
         const packageNameStringData: string[] = acceptData.map(app => app.value.value as string)
@@ -540,8 +550,8 @@ export struct AccessControl {
         this.selectedApp(packageNameStringData)
       } else {
         // 黑名单
-        this.modeTabSelectedIndexes.splice(0, 1, 1)
         const rejectData = await Xb_KVdbUtil.getEntriesByPrefix('reject_')
+        console.debug(`AccessControl #loadAppsInfo acceptData: ${JSON.stringify(rejectData)}`)
         const packageNameStringData = rejectData.map(app => app.value.value as string)
         console.debug(`AccessControl #loadAppsInfo ${JSON.stringify(packageNameStringData)}`)
         this.selectedApp(packageNameStringData)
@@ -644,13 +654,24 @@ export struct AccessControl {
   }
   
   // 取消所有选中
-  cancelSelected() {
+  cancelTotalSelected() {
     this.appListData = this.appListData.map((app): AppInfo => ({
       name: app.name,
       package_name: app.package_name,
       time: app.time,
       isSelected: false
     }))
+  }
+
+  cancelSelected(item: AppInfo) {
+    let key =''
+    if (this.appConfig.accessControlMode == 'AcceptSelected') {
+      // 白名单
+      key = `accept_${item.package_name}`
+    } else {
+      key = `reject_${item.package_name}`
+    }
+    Xb_KVdbUtil.deleteData(key)
   }
 
   selectedApp(packageNames: string[]) {
@@ -759,41 +780,6 @@ export struct AccessControl {
       console.log(`AccessControl: 准备新增 ${mergeResult.entriesToAdd.length} 条新记录。`);
     }
     console.log('AccessControl: 访问列表合并完成。');
-  }
-
-  onModeChange() {
-    console.log(`AccessControl 运行 #onModeChange nameStringData值：${JSON.stringify(this.nameStringData)}`)
-    console.log(`AccessControl 运行 #onModeChange-实际 nameStringData[0]值：${JSON.stringify(this.nameStringData[0])}`)
-    if (this.modeTabSelectedIndexes[0] == 0) {
-      // 白名单
-      this.appConfig.accessControlMode = 'AcceptSelected'
-    } else {
-      // 黑名单
-      this.appConfig.accessControlMode = 'RejectSelected'
-    }
-    if (!this.nameStringData[0])
-      return
-    if (this.modeTabSelectedIndexes[0] == 0) {
-      // 白名单
-      console.log(`AccessControl #onModeChange 模式：${ this.appConfig.accessControlMode}`)
-    } else {
-      // 黑名单
-      console.log(`AccessControl #onModeChange 模式：${ this.appConfig.accessControlMode}`)
-    }
-  }
-
-  onSortChange() {
-    if (this.sortTabSelectedIndexes[0] == 0) {
-      // 名称
-      this.appConfig.accessControlSort = 'name'
-      this.appListData.sort((a, b) => nameSortCollator.compare(a.name, b.name))
-    } else {
-      // 时间
-      this.appConfig.accessControlSort = 'time'
-      this.appListData.sort((a, b) => {
-        return a.time - b.time
-      })
-    }
   }
 
   openDialog(item: AppInfo) {
