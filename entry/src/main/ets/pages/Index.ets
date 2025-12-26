@@ -1312,11 +1312,11 @@ struct Index {
       }
     })
     // 注册监听切换按钮位置事件
-    EventHub.on(EventKey.SwitchButtonPosition, () => {
+    EventHub.on(EventKey.SwitchButtonPosition, (buttonPositionIndex: number) => {
       this.getUIContext().animateTo(this.uiConfig.isAnimation ?
         { duration: this.uiConfig.animationSpeed, curve: curves.springMotion() } : null,
         () => {
-          this.switchButtonPosition(this.uiConfig.buttonPositionIndex)
+          this.switchButtonPosition(buttonPositionIndex)
         })
     })
   }

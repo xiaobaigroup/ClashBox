@@ -6,6 +6,7 @@ import { curves } from "@kit.ArkUI"
 @Component
 export struct RoundButton {
 
+  @StorageProp('EnableAPIVersion') apiVersionEnable: boolean = false
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
@@ -20,7 +21,7 @@ export struct RoundButton {
   build() {
     Column() {
       Row() {
-        if (this.uiConfig.tabStyle == 'custom') {
+        if (this.uiConfig.tabStyle == 'custom' || !this.apiVersionEnable) {
           Stack({ alignContent: Alignment.Center }) {
             SymbolGlyph(this.Switch ? this.Icon1 : this.Icon2)
               .fontSize(24)

@@ -113,7 +113,7 @@ class AnimationUtil{
   }
 
 
-  //右下角按钮滑动动画（从右到左），uiConfig为动画速度以及开关的切换
+  // 右下角按钮滑动动画（从右到左），uiConfig为动画速度以及开关的切换
   public isSlideSwitch(uiConfig:UIConfig){
   effectEvent=
     uiConfig.isAnimation ?

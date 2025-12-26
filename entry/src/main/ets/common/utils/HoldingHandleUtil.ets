@@ -1,40 +1,42 @@
-import { motion } from "@kit.MultimodalAwarenessKit";
+import { motion } from "@kit.MultimodalAwarenessKit"; // 保留引入，编译时需使用高版本SDK
 import { hilog } from "@kit.PerformanceAnalysisKit";
 import { UIConfig } from "../../entryability/AppState";
 import { EventHub, EventKey } from '../EventHub'
 import { curves } from "@kit.ArkUI";
-
-/**
- * @projectName:    clashnext
- * @fileName:      HoldingHandleUtil
- * @author:     SummerKaze
- * @description:  适人握持工具类
- * @date:    2025/12/13 16:16
- * @version:    1.0
- */
 
 const TAG = 'HoldingHandleUtil';
 
 @ObservedV2
 class HoldingHandleUtil {
   private ctx?: UIContext;
-  /** @description 当前握持的手 */
-  @Trace holdingHandler: motion.HoldingHandStatus = motion.HoldingHandStatus.NOT_HELD;
+  // 缓存上一次按钮位置
+  private lastButtonPosition: number = 0
+  // 缓存系统能力是否可用，避免每次都查询
+  private isCapabilityAvailable: boolean = false;
 
   setContext(context: UIContext) {
     this.ctx = context;
   }
 
   start(): void {
-    const UIConfig: UIConfig = AppStorage.get("uiConfig")!;
+    const uiConfig: UIConfig = AppStorage.get("uiConfig")!;
 
-    if (!UIConfig.isHoldingHand) {
-      return
+    // 用户配置未开启，直接返回
+    if (!uiConfig.isHoldingHand) {
+      return;
     }
-
+    // 严格检查系统能力
+    // 如果不支持此能力，标记为不可用并直接返回，不执行后续 motion 相关代码
+    if (!canIUse("SystemCapability.MultimodalAwareness.Motion")) {
+      this.isCapabilityAvailable = false;
+      hilog.warn(0x4514, TAG, `当前设备不支持握持检测 API (HoldingHand)，保持在默认状态。`);
+      return;
+    }
+    this.isCapabilityAvailable = true;
     try {
+      // 只有确定可用时，才调用 motion.on
       motion.on('holdingHandChanged', (status: motion.HoldingHandStatus) => {
-        let str: string = ""
+        let str: string = "";
         switch (status) {
           case motion.HoldingHandStatus.NOT_HELD:
             str = '未握持';
@@ -49,65 +51,65 @@ class HoldingHandleUtil {
             str = '双手握持';
             break;
         }
-        hilog.info(0x4514, TAG, `HoldingHandChanged: ${status} - ${str}`)
-        this.holdingHandler = status;
+        // 更新状态
+        this.changeHandling(status)
+        hilog.debug(0x4514, TAG, `HoldingHandChanged: 系统状态 - ${status} - ${str}`);
       });
     } catch (e) {
-      hilog.error(0x4514, TAG,
-        `开启适人握持事件失败: ${JSON.stringify(e)}`);
+      hilog.error(0x4514, TAG, `开启适人握持事件失败: ${JSON.stringify(e)}`);
+      this.isCapabilityAvailable = false;
     }
   }
 
   stop(): void {
+    if (!this.isCapabilityAvailable) {
+      return;
+    }
+
     try {
       if (canIUse("SystemCapability.MultimodalAwareness.Motion")) {
         motion.off('holdingHandChanged');
-        hilog.error(0x4514, TAG, `适人握持事件已取消订阅`);
-      } else {
-        hilog.error(0x4514, TAG,
-          `无法使用 SystemCapability.MultimodalAwareness.Motion `);
+        hilog.info(0x4514, TAG, `适人握持事件已取消订阅`);
       }
-      this.holdingHandler = motion.HoldingHandStatus.NOT_HELD;
     } catch (error) {
-      hilog.error(0x4514, TAG,
-        `关闭适人握持事件失败: ${JSON.stringify(error)}`);
+      hilog.error(0x4514, TAG, `关闭适人握持事件失败: ${JSON.stringify(error)}`);
+    } finally {
     }
   }
 
-  @Monitor('holdingHandler')
-  changeHandling(): void {
+  changeHandling(holdingHandler: motion.HoldingHandStatus): void {
     const uiConfig: UIConfig = AppStorage.get("uiConfig")!;
-
-    switch (this.holdingHandler) {
+    let targetIndex = 0; // 默认为右手/未握持
+    switch (holdingHandler) {
       case motion.HoldingHandStatus.LEFT_HAND_HELD:
-        // 左手
-        this.ctx?.animateTo(uiConfig.isAnimation ?
-          { duration: uiConfig.animationSpeed, curve: curves.springMotion() } : null,
-          () => {
-            uiConfig.buttonPositionIndex = 2;
-          })
+        targetIndex = 2;
         break;
-      /* TODO 双手 -> 考虑是否需要添加
       case motion.HoldingHandStatus.BOTH_HANDS_HELD:
-        // 双手
-        this.ctx?.animateTo(uiConfig.isAnimation ?
-          { duration: uiConfig.animationSpeed, curve: curves.springMotion() } : null,
-          () => {
-            uiConfig.buttonPositionIndex = 1;
-          })
-        break;*/
+        targetIndex = this.lastButtonPosition; // 双手逻辑
+        break;
       case motion.HoldingHandStatus.RIGHT_HAND_HELD:
-      default: // 右手和默认
-        this.ctx?.animateTo(uiConfig.isAnimation ?
-          { duration: uiConfig.animationSpeed, curve: curves.springMotion() } : null,
-          () => {
-            uiConfig.buttonPositionIndex = 0;
-          })
+      default:
+        targetIndex = 0;
         break;
     }
-
-    EventHub.sendEvent(EventKey.SwitchButtonPosition)
+    // 执行动画和状态更新
+    // 必须判断 ctx 是否存在，否则不执行动画逻辑
+    if (this.ctx) {
+      this.ctx.animateTo(uiConfig.isAnimation ?
+        { duration: uiConfig.animationSpeed, curve: curves.springMotion() } : null,
+        () => {
+          uiConfig.buttonPositionIndex = targetIndex;
+        });
+    } else {
+      // 如果 ctx 不存在（未初始化），直接赋值（无动画）
+      hilog.warn(0x4514, TAG, `UIContext 未初始化，跳过动画，直接更新索引: ${targetIndex}`);
+      uiConfig.buttonPositionIndex = targetIndex;
+    }
+    EventHub.sendEvent(EventKey.SwitchButtonPosition, targetIndex);
+    this.lastButtonPosition = targetIndex
+    hilog.debug(0x4514, TAG, `#changeHandling holdingHandler: ${holdingHandler} buttonPositionIndex 变更为: ${targetIndex}`);
   }
+
 }
 
 export const holdingHandleUtil = new HoldingHandleUtil();

@@ -70,12 +70,11 @@ export default class EntryAbility extends UIAbility {
 
   // 冷启动
   async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam) {
+    hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onCreate');
     // 赋值临时储存want
     this.want = want
     // 优先级最高-初始化内核
     await ClashViewModel.ChangeCore(undefined, false)
-    hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onCreate');
-
     // 卡片Id持久化管理 并 监听卡片事件
     cardManager.init(this.context)
     this.registerCardEvent()
@@ -176,7 +175,7 @@ export default class EntryAbility extends UIAbility {
     // 判断API版本是否满足要求
     const APIVersion = deviceInfo.sdkApiVersion
     console.log(`APIversion 当前系统API版本：${APIVersion}`)
-    if (APIVersion >= 19) {
+    if (APIVersion >= 20) {
       AppStorage.setOrCreate('EnableAPIVersion', true)
     } else {
       AppStorage.setOrCreate('EnableAPIVersion', false)
