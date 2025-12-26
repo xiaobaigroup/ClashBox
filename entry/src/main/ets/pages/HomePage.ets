@@ -223,6 +223,7 @@ struct Home {
             Row()
               .height(56)
             GridRow({
+              columns: 12,
               gutter: HomeCardGutter(this.widthBp, this.heightBp),
             })
             {
@@ -634,9 +635,9 @@ struct HomeCard {
     //   console.log(`HomeCard 前后台状态：${this.isForward} 当前注销：${this.index}`)
     // })
     // 显示时触发回调
-    // .onAttach(() => {
-    //   console.log(`HomeCard 前后台状态：${this.isForward} 当前显示：${this.index}`)
-    // })
+    .onAttach(() => {
+      console.log(`HomeCard 前后台状态：${this.isForward} 当前显示sm：${HomeCardSpan36sm(this.widthBp, this.heightBp) * this.item.spanMultiple}`)
+    })
     // 编辑模式下跳动动画
     .rotate({ angle: this.uiConfig.isAnimation ? this.rotateAngle : null })
   }
