@@ -304,7 +304,8 @@ struct Home {
           this.showCardSort = false
           this.isEnableIndexForegroundBlur = false
           this.SettingsPageInfos.clear()
-        }
+        },
+        onWillSpringBackWhenDismiss: () => {} // 注册回调，防止反向回弹
       })
     }.width('100%').height('100%')
   }

@@ -404,7 +404,8 @@ struct Index {
         this.SettingsPageInfos.clear()
         // 关闭背景模糊
         this.isEnableIndexForegroundBlur = false
-      }
+      },
+      onWillSpringBackWhenDismiss: () => {} // 注册回调，防止反向回弹
     })
   }
 
@@ -487,12 +488,13 @@ struct Index {
       this.barHeight : this.bottomRectHeight == 0 ? TabBarHeight(this.widthBp, this.heightBp) :
         TabBarAvoidHeight(this.widthBp, this.heightBp))
     .onTabBarClick((index: number) => {
-      animationStyle.animToAPI18(()=>{
+      animationStyle.animToAPI18(() => {
         this.tabCurrentPage = index
       },this.uiConfig.animationSpeed, 'app', 0)
     })
     .onChange((index) => {
-      animationStyle.animToAPI18(()=>{
+      animationStyle.animToAPI18(() => {
+        this.tabCurrentPage = index
         if (index == 0) {
           this.isHomePage = true
           return
@@ -504,6 +506,9 @@ struct Index {
       animationStyle.animToAPI18(() => {
         this.tabCurrentPage = targetIndex;
       },this.uiConfig.animationSpeed, 'app', 0)
+    })
+    .onAppear(() => {
+      indexController.changeIndex(this.tabCurrentPage)
     })
     .width('100%').height('100%')
     .backgroundColor($r('app.color.background')).fadingEdge(true)
@@ -591,6 +596,9 @@ struct Index {
         offsetY: 4,
         color: $r('app.color.shadow_button'),
         type: ShadowType.COLOR,
+      })
+      .onAppear(() => {
+        swiperController.changeIndex(this.tabCurrentPage, true)
       })
 
       // 控制按钮区

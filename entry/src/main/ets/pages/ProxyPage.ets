@@ -352,7 +352,8 @@ struct ProxyPage {
         setTimeout(() => {
           this.isStylesEdit = false
         }, 20)
-      }
+      },
+      onWillSpringBackWhenDismiss: () => {} // 注册回调，防止反向回弹
     })
   }
 

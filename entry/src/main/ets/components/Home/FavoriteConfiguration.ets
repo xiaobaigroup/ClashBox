@@ -35,7 +35,7 @@ struct FavoriteConfiguration {
         List() {
           ForEach(Array.from(this.favoriteProfiles.entries()), (f:[string, string], i: number) => {
             ListItem() {
-              Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
+              Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceEvenly }) {
                 Text(f[1])
                   .fontSize(HomeCardFontSize(this.widthBp, this.heightBp))
                   .fontColor($r('sys.color.font_primary'))
@@ -51,6 +51,7 @@ struct FavoriteConfiguration {
                   .hitTestBehavior(HitTestMode.None)
               }
             }
+            .height(this.favoriteProfiles.size - 1 == 1 ? '50%' : '32%')
             .onClick(async () => {
               if (!this.isShowHomeEdit) {
                 this.appConfig.currentProfileId = f[0]

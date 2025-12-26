@@ -396,9 +396,10 @@ struct ConfigurationPage {
         this.onForwardChange()
         this.configStr = ''  // 置空配置文本
       },
-      onWillSpringBackWhenDismiss: (springBack: SpringBackAction) => {
-        springBack.springBack()
-      }
+      // onWillSpringBackWhenDismiss: (springBack: SpringBackAction) => {
+      //   springBack.springBack()
+      // },
+      onWillSpringBackWhenDismiss: () => {} // 注册回调，防止反向回弹
     })
   }
 

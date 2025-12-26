@@ -162,7 +162,8 @@ struct MorePage {
               this.isShowSettings = false
               this.isEnableIndexForegroundBlur = false
               this.SettingsPageInfos.clear()
-            }
+            },
+            onWillSpringBackWhenDismiss: () => {} // 注册回调，防止反向回弹
           })
 
           /*  ListItem() {
