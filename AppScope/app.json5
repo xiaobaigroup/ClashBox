@@ -3,7 +3,7 @@
     //"bundleName": "org.xbgroup.clashboxb", // 测试版 图标前景为app_icon_pre
     "bundleName": "org.xbgroup.clashbox",
     "vendor": "example",
-    "versionCode": 1007020,
+    "versionCode": 1007025,
     "versionName": "1.7.2",
     "icon": "$media:layered_image",
     "label": "$string:app_name"
