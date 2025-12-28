@@ -36,6 +36,7 @@ export default class EntryAbility extends UIAbility {
   private want?: Want
   private isChangeCore = false
   private windowMode: boolean = false
+  private isFirstStart: boolean = true
   // 设备断点获取
   private uiContext?: UIContext;
   private debugVpn: SocketStubService | null = null
@@ -54,6 +55,12 @@ export default class EntryAbility extends UIAbility {
   /** @description 卡片延迟定时器 */
   private cardDelayTimer: number = -1
   private subscriber: commonEventManager.CommonEventSubscriber | null = null;
+  private windowLimits: window.WindowLimits = {
+    minWidth: 1345,
+    minHeight: 498,
+    maxWidth: 5200,
+    maxHeight: 1080
+  }
   private subscribeInfo: commonEventManager.CommonEventSubscribeInfo = {
     events: ["VpnServiceTimeEvent"]
   };
@@ -214,6 +221,19 @@ export default class EntryAbility extends UIAbility {
         const data = await windowStage.getMainWindow()
         // 确保UI上下文被赋值
         this.uiContext = data.getUIContext()
+        // 设置窗口背景色为透明
+        try {
+          data.setWindowBackgroundColor('#00000000');
+        } catch (exception) {
+          console.error(`WindowBackgroundColor  Failed to set the background color. Cause code: ${exception.code}, message: ${exception.message}`);
+        };
+        if (APIVersion >= 20) {
+          try {
+            data.setWindowContainerColor('#00000000', '#FFF1F3F5')
+          } catch (exception) {
+            console.error(`WindowBackgroundColor  Failed to set the container color. code: ${exception.code}, message: ${exception.message}`);
+          };
+        }
         // 初始化通知工具
         Xb_ToastUtil.initContext(this.uiContext, data.getUIContext().getHostContext() as common.UIAbilityContext)
         // 初始化窗口避让属性
@@ -644,6 +664,23 @@ export default class EntryAbility extends UIAbility {
       windowClass.setTitleAndDockHoverShown(false, false).catch((err: Error) => {
         console.error(`EntryAbility setTitleAndDockHoverShown 失败, message: ${err.message}`)
       })
+      try {
+        if (this.isFirstStart) {
+          const systemLimits = windowClass.getWindowLimits()
+          this.windowLimits.maxWidth = systemLimits.maxWidth
+          this.windowLimits.maxHeight = systemLimits.maxHeight
+          this.isFirstStart = false
+        }
+        console.info(`WindowMode  the window limits. FirstLimits: ${JSON.stringify(this.windowLimits)}`);
+        let promise = windowClass.setWindowLimits(this.windowLimits, true);
+        promise.then((data) => {
+          console.info(`WindowMode Succeeded in changing the window limits. limits: ${JSON.stringify(data)}`);
+        }).catch((err: BusinessError) => {
+          console.error(`WindowMode Failed to change the window limits. Cause code: ${err.code}, message: ${err.message}`);
+        });
+      } catch (exception) {
+        console.error(`WindowMode Failed to change the window limits. Cause code: ${exception.code}, message: ${exception.message}`);
+      }
       // 设置标题栏高度
       // windowClass.setWindowDecorHeight(50)
       hilog.info(0xFF00, "EntryAbility", 'WindowMode 当前为PC窗口模式')

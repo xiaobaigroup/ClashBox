@@ -34,7 +34,7 @@
       }
     },
     {
-      "name": "Log",
+      "name": "log",
       "pageSourceFile": "src/main/ets/components/More/Log.ets",
       "buildFunction": "LogBuilder",
       "data": {
@@ -42,7 +42,7 @@
       }
     },
     {
-      "name": "Resources",
+      "name": "resources",
       "pageSourceFile": "src/main/ets/components/More/Resources.ets",
       "buildFunction": "ResourcesBuilder",
       "data": {
@@ -50,7 +50,7 @@
       }
     },
     {
-      "name": "Request",
+      "name": "request",
       "pageSourceFile": "src/main/ets/components/More/Request.ets",
       "buildFunction": "RequestBuilder",
       "data": {
@@ -58,7 +58,7 @@
       }
     },
     {
-      "name": "Connect",
+      "name": "connect",
       "pageSourceFile": "src/main/ets/components/More/Connect.ets",
       "buildFunction": "ConnectBuilder",
       "data": {
@@ -66,7 +66,7 @@
       }
     },
     {
-      "name": "Overwrite",
+      "name": "overwrite",
       "pageSourceFile": "src/main/ets/components/More/Overwrite/Overwrite.ets",
       "buildFunction": "OverwriteBuilder",
       "data": {
@@ -74,7 +74,7 @@
       }
     },
     {
-      "name": "Diversion",
+      "name": "diversion",
       "pageSourceFile": "src/main/ets/components/More/Diversion.ets",
       "buildFunction": "DiversionBuilder",
       "data": {
@@ -138,7 +138,7 @@
       }
     },
     {
-      "name": "AccessControl",
+      "name": "access_control",
       "pageSourceFile": "src/main/ets/components/More/AccessControl.ets",
       "buildFunction": "AccessControlBuilder",
       "data": {

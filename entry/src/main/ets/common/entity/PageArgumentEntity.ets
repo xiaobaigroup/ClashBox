@@ -22,6 +22,7 @@ export interface TabBuild{
 // 窗口控制器
 export interface FunctionInfo {
   icon: Resource
+  image: boolean
   name?: ResourceStr
   subtitle?: ResourceStr
   onClick?: () => void

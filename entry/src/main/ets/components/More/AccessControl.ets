@@ -6,7 +6,7 @@ import { ButtonBuilder, checkoutRowListItem,
 import { NeedClearMoreStack, PageMargin } from "../../common/breakpoint/BreakPoint"
 import { BundleInfo, TAB_CONTENT_TITLE_HEIGHT } from "../../common/entity/Constants"
 import { AppConfig, UIConfig } from "../../entryability/AppState"
-import { ItemRestriction, SegmentButton, SegmentButtonOptions, SegmentButtonTextItem } from "@kit.ArkUI"
+import { ItemRestriction, LengthMetrics, SegmentButton, SegmentButtonOptions, SegmentButtonTextItem } from "@kit.ArkUI"
 import { KeyValueData } from "./Overwrite/EditArrayConfig"
 import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { intl } from "@kit.LocalizationKit"
@@ -36,6 +36,7 @@ export struct AccessControl {
   @State currentIndex: number = 0
   @State isShowSheet: boolean = false
   @State isDeleteing: boolean = false
+  @State initialized: boolean = false
   @State appListData: AppInfo[] = []
   @State nameStringData: string[] = []
   @State lastAppListData: AppInfo[] = []
@@ -104,7 +105,12 @@ export struct AccessControl {
               this.appConfig.accessControl = !this.appConfig.accessControl
             })
           // 显示栏
-          Row({ space: 10}) {
+          Flex({
+            direction: FlexDirection.Row,
+            space: { main:LengthMetrics.vp(10) },
+            alignItems: ItemAlign.Center
+          })
+          {
             Column() {
               Text(`${Xb_GetResourceString($r('app.string.selected'), this)} ${this.nameStringData.length}`)
               Text(this.isDeleteing ? `${Xb_GetResourceString($r('app.string.Edit'), this)}${Xb_GetResourceString($r('app.string.mode'), this)}`
@@ -114,7 +120,6 @@ export struct AccessControl {
                 .fontSize(14)
                 .textOverflow({ overflow: this.uiConfig.stringDisplayIndex === 0 ? TextOverflow.Ellipsis : TextOverflow.Clip })
             }
-            .width('56%')
             .alignItems(HorizontalAlign.Start)
             if (this.isDeleteing) {
               Xb_CapsuleButton({
@@ -147,7 +152,7 @@ export struct AccessControl {
                       this.deleteApp()
                     } else {
                       this.isDeleteing = true
-                      this.cancelTotalSelected()
+                      this.cancelTotalSelected(this.isDeleteing)
                     }
                   }
                 })
@@ -161,6 +166,18 @@ export struct AccessControl {
               .onChange(async (itemName: CheckboxGroupResult) => {
                 this.nameStringData = itemName.name
               })
+              .onClick(() => {
+                if (!this.isDeleteing && this.initialized) {
+                  if (this.nameStringData.length == this.appListData.length) {
+                    // 全选
+                    this.selectApps(this.nameStringData)
+                  }
+                  if (this.nameStringData.length == 0) {
+                    // 全不选
+                    this.cancelTotalSelected(false)
+                  }
+                }
+              })
           }.width('100%')
           .backgroundColor($r('app.color.background'))
           .transition(customAnimationUtil.isScaleTran(1, this.uiConfig))
@@ -169,7 +186,6 @@ export struct AccessControl {
         .hitTestBehavior(HitTestMode.Transparent)
         .width('100%')
         .zIndex(2)
-        // .height('100%')
         // 应用列表
         Column() {
           Blank().height(TAB_CONTENT_TITLE_HEIGHT + (this.uiConfig.stringDisplayIndex === 0 ? 112 : 139) + (this.widthBp < 2 ? this.topRectHeight : 0))
@@ -209,15 +225,7 @@ export struct AccessControl {
                     // 取消当前选择
                     this.cancelSelected(item)
                   } else {
-                    let key = ''
-                    if (this.appConfig.accessControlMode == 'AcceptSelected') {
-                      // 白名单
-                      key = `accept_${item.package_name}`
-                    } else {
-                      // 黑名单
-                      key = `reject_${item.package_name}`
-                    }
-                    Xb_KVdbUtil.putData(key, item.package_name)
+                    this.selectApps([item.package_name])
                   }
                 })
                 .onMouse((event) => {
@@ -258,8 +266,6 @@ export struct AccessControl {
           }
           .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring : null)
         }
-        // .width('100%')
-        // .height('100%')
       }
       .width('100%')
       .height('100%')
@@ -445,12 +451,15 @@ export struct AccessControl {
     .justifyContent(FlexAlign.SpaceEvenly)
   }
 
-  aboutToAppear(): void {
+  async aboutToAppear(): Promise<void> {
     EventHub.on(EventKey.AddAPP, (bundleInfo: BundleInfo) => {
       this.keyValueData = new KeyValueData(bundleInfo?.appName || '', bundleInfo?.bundleName || '')
       this.addApp()
     })
-    this.loadAppsInfo()
+    this.loadAppsInfo().then(() => {
+      this.initialized = true
+      console.debug(`AccessControl #aboutToAppear 数据初始化完成: ${this.initialized}`)
+    })
   }
 
   async aboutToDisappear(): Promise<void> {
@@ -547,14 +556,14 @@ export struct AccessControl {
         console.debug(`AccessControl #loadAppsInfo acceptData: ${JSON.stringify(acceptData)}`)
         const packageNameStringData: string[] = acceptData.map(app => app.value.value as string)
         console.debug(`AccessControl #loadAppsInfo packageNameStringData: ${JSON.stringify(packageNameStringData)}`)
-        this.selectedApp(packageNameStringData)
+        this.selectSelectedApp(packageNameStringData)
       } else {
         // 黑名单
         const rejectData = await Xb_KVdbUtil.getEntriesByPrefix('reject_')
         console.debug(`AccessControl #loadAppsInfo acceptData: ${JSON.stringify(rejectData)}`)
         const packageNameStringData = rejectData.map(app => app.value.value as string)
         console.debug(`AccessControl #loadAppsInfo ${JSON.stringify(packageNameStringData)}`)
-        this.selectedApp(packageNameStringData)
+        this.selectSelectedApp(packageNameStringData)
       }
     } catch (e) {
       console.error(`AccessControl 错误: ${e}`)
@@ -568,7 +577,7 @@ export struct AccessControl {
     const originalMasterList: AppInfo[] = JSON.parse(await Xb_PreferenceUtil.get('access_control_apps', "[]"));
 
     if (index != undefined && item != undefined) {
-      // --- 选中单个应用 ---
+      // --- 删除单个应用 ---
       console.log(`AccessControl #deleteApp [单个] 删除应用: ${item.name}`);
       try {
         let keyToDelete: string;
@@ -654,14 +663,34 @@ export struct AccessControl {
   }
   
   // 取消所有选中
-  cancelTotalSelected() {
+  async cancelTotalSelected(onUI: boolean = false) {
     this.appListData = this.appListData.map((app): AppInfo => ({
       name: app.name,
       package_name: app.package_name,
       time: app.time,
       isSelected: false
     }))
+    // 持久化
+    if (!onUI) {
+      const prefix = this.appConfig.accessControlMode === 'AcceptSelected' ? 'accept_' : 'reject_';
+      await Xb_KVdbUtil.deleteEntriesByPrefix(prefix)
+    }
   }
+
+  async selectApps(apps: string[]) {
+    const prefix = this.appConfig.accessControlMode === 'AcceptSelected' ? 'accept_' : 'reject_';
+    // 分块大小，每次 50 个并发
+    const CHUNK_SIZE = 50;
+    for (let i = 0; i < apps.length; i += CHUNK_SIZE) {
+      const chunk = apps.slice(i, i + CHUNK_SIZE);
+      const tasks = chunk.map(app => {
+        return Xb_KVdbUtil.putData(`${prefix}${app}`, app);
+      });
+      // 每次只等待分块完成
+      await Promise.all(tasks);
+    }
+  }
+
 
   cancelSelected(item: AppInfo) {
     let key =''
@@ -674,7 +703,8 @@ export struct AccessControl {
     Xb_KVdbUtil.deleteData(key)
   }
 
-  selectedApp(packageNames: string[]) {
+  selectSelectedApp(packageNames: string[]) {
+    console.debug(`AccessControl #selectedApp 列表数据：${JSON.stringify(this.appListData)} 包名数据：${JSON.stringify(packageNames)}`)
     const selectedPackagesSet = new Set(packageNames)
     this.appListData = this.appListData.map((app): AppInfo => ({
       name: app.name,
@@ -682,7 +712,6 @@ export struct AccessControl {
       time: app.time,
       isSelected: selectedPackagesSet.has(app.package_name)
     }))
-    console.log(`AccessControl #selectedApp 列表数据：${JSON.stringify(this.appListData)} 包名数据：${JSON.stringify(packageNames)}`)
   }
 
   // 导出配置

@@ -98,6 +98,7 @@ import { holdingHandleUtil } from '../common/utils/HoldingHandleUtil';
 import { sortByCustomOrder } from '../common/utils/SortUtil';
 import { AppInfo } from '../components/More/AccessControl';
 import { AccessControlCompatibleMerger } from '../common/utils/AccessControlCompatibleUtil';
+import { PCIndex } from './PCIndex';
 
 // import { hdsEffect } from '@kit.UIDesignKit';
 
@@ -341,9 +342,9 @@ struct Index {
       }
       // 主内容区
       if (this.uiConfig.tabStyle == 'window') {
-
-      }
-      else if (!this.isPXSecScreen) {
+        PCIndex()
+      } else
+      if (!this.isPXSecScreen) {
         Navigation(this.pageInfos) {
           this.MainContent()
         }
@@ -357,7 +358,8 @@ struct Index {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor($r('app.color.background'))
+    .backgroundBlurStyle(this.uiConfig.tabStyle == 'window' ? BlurStyle.BACKGROUND_THICK : undefined)
+    .backgroundColor(this.uiConfig.tabStyle == 'window' ? undefined : $r('app.color.background'))
     .foregroundBlurStyle(this.isEnableIndexForegroundBlur && this.uiConfig.isBlurr ? BlurStyle.Thin : BlurStyle.NONE,
       { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 })
     // 欢迎页&崩溃页
@@ -415,8 +417,7 @@ struct Index {
     if (this.uiConfig.tabStyle == 'float' && this.apiVersionEnable) {
       // 悬浮Tab
       this.FloatTab()
-    }
-    else {
+    } else {
       // 普通Tab
       this.CustomTab()
     }
@@ -1689,13 +1690,13 @@ struct Index {
     }
     if (this.widthBp <= 1) {
       const mainPath = this.pageInfos.getAllPathName()
-      if (mainPath[0] !== 'AccessControl' || mainPath.length === 0) {
-        this.pageInfos.pushPathByName('AccessControl', false)
+      if (mainPath[0] !== 'access_control' || mainPath.length === 0) {
+        this.pageInfos.pushPathByName('access_control', false)
       }
     } else {
       const morePath = this.morePageInfos.getAllPathName()
-      if (morePath[0] !== 'AccessControl' || morePath.length === 0) {
-        this.morePageInfos.replacePathByName('AccessControl', false)
+      if (morePath[0] !== 'access_control' || morePath.length === 0) {
+        this.morePageInfos.replacePathByName('access_control', false)
       }
     }
 

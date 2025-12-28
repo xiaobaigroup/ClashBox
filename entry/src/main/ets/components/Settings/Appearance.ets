@@ -3,9 +3,9 @@ import {
   ANIMATION_DURATION_100,
   ANIMATION_DURATION_300,
   ANIMATION_DURATION_500,
-  AppearanceList,
   AppearanceListItemProp,
   CONTENT_END_OFFSET_150,
+  getAppearance,
 } from "../../common/entity/Constants"
 import TopBuilder from "./TopBuilder"
 import { curves, SymbolGlyphModifier } from "@kit.ArkUI"
@@ -14,7 +14,7 @@ import { font_primary, menuRowList, toggleRowList } from "../Common/Common"
 import { UIConfig } from "../../entryability/AppState"
 import { customAnimationUtil } from "../../common/utils/Animation"
 import { PageMargin } from "../../common/breakpoint/BreakPoint"
-import { Xb_ColorModeManager, Xb_ToastUtil, Xb_UIConfig } from "xb_components"
+import { TabStyle, Xb_ColorModeManager, Xb_ToastUtil, Xb_UIConfig } from "xb_components"
 import { Xb_ChangeThemeColor } from "xb_components/src/main/ets/utils/ChangeThemeColorUtil"
 import { holdingHandleUtil } from "../../common/utils/HoldingHandleUtil"
 import { hilog } from "@kit.PerformanceAnalysisKit"
@@ -41,7 +41,7 @@ struct Appearance {
   // 按钮位置选中文本
   @State EnableButtonPositionText: ResourceStr = $r('app.string.right')
   // 列表
-  @State appearanceList: AppearanceListItemProp[] = AppearanceList
+  @State appearanceList: AppearanceListItemProp[] = []
 
   // 按钮位置偏移量（默认在右侧的偏移量）
   @Consume ButtonPositionOffset: number
@@ -451,14 +451,19 @@ struct Appearance {
         ForEach(item, (menuItem: AppearanceListItemProp, index: number) => {
           MenuItem({
             content: menuItem.title,
-            symbolEndIcon: this.uiConfig.tabStyle === (index == 0 ? 'float' : 'custom') ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined
+            symbolEndIcon: this.uiConfig.tabStyle === this.getTabStyle(this.windowMode, index) ? new SymbolGlyphModifier($r('sys.symbol.checkmark')) : undefined,
           })
-            .selected(this.uiConfig.tabStyle === (index == 0 ? 'float' : 'custom'))
+            .contentFontColor(this.getTabStyle(this.windowMode, index) != 'window' ? undefined : Color.Gray )
+            .selected(this.uiConfig.tabStyle === this.getTabStyle(this.windowMode, index))
             .onChange((selected) => {
+              const tabStyle = this.getTabStyle(this.windowMode, index)
+              if ( tabStyle == 'window') {
+                Xb_ToastUtil.showToast({ message: '敬请期待' })
+                return
+              }
               // 持久导航栏样式
-              this.uiConfig.tabStyle = (index == 0 ? 'float' : 'custom')
+              this.uiConfig.tabStyle = tabStyle
               this.TabStyleDisplayText = menuItem.title
-              this.isEnableIndexForegroundBlur = false
             })
         }, (menuItem: AppearanceListItemProp) => JSON.stringify(menuItem))
       }
@@ -634,6 +639,7 @@ struct Appearance {
   }
 
   aboutToAppear(): void {
+    this.appearanceList = getAppearance(this.windowMode)
     // 初始化主题色显示文本
     if (this.appearanceList && this.appearanceList[1].children) {
       this.EnableThemeColorText = this.appearanceList[1].children[this.uiConfig.themeColorIndex].title
@@ -652,7 +658,10 @@ struct Appearance {
     }
     // 初始化导航栏样式显示文本
     if (this.appearanceList && this.appearanceList[4].children) {
-      this.TabStyleDisplayText = this.appearanceList[4].children[(this.uiConfig.tabStyle === 'float') ? 0 : 1].title
+      const index = this.getTabStyleIndex(this.windowMode, this.uiConfig.tabStyle);
+      const title = this.appearanceList[4].children[index].title;
+      console.debug(`TabStyle >>> 最终计算结果 -> 索引: ${index}, 标题:${title}`);
+      this.TabStyleDisplayText = title;
     }
     // 初始化字符显示权重显示文本
     if (this.appearanceList && this.appearanceList[5].children) {
@@ -669,6 +678,29 @@ struct Appearance {
 
   aboutToDisappear(): void {
 
+  }
+
+  getTabStyle(windowMode: boolean, index: number): TabStyle {
+    if (windowMode) {
+      if (index === 0) return 'window';
+      if (index === 1) return 'float';
+      return 'custom';
+    } else {
+      if (index === 0) return 'float';
+      return 'custom';
+    }
+  }
+
+  getTabStyleIndex(isWindowMode: boolean, style: TabStyle): number {
+    console.debug(`TabStyle 当前窗口模式：${isWindowMode}，style：${style}`)
+    if (isWindowMode) {
+      if (style === 'window') return 0;
+      if (style === 'float') return 1;
+      return 2;
+    } else {
+      if (style === 'float') return 0;
+      return 1;
+    }
   }
 
 }

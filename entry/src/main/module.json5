@@ -98,6 +98,10 @@
         "name": "ohos.permission.KEEP_BACKGROUND_RUNNING"
       },
       {
+        // PC窗口透明色
+        'name': "ohos.permission.SET_WINDOW_TRANSPARENT"
+      },
+      {
         "name": "ohos.permission.LOCATION",
         "reason": "$string:permission_reason_MICROPHONE",
         "usedScene": {

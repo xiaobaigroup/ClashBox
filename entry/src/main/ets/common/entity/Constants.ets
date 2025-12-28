@@ -6,6 +6,7 @@ import { AppConfig, AppState, copy } from "../../entryability/AppState";
 import { BreakpointState } from "../breakpoint/breakpointsystem";
 import { UpdateInfo } from "../utils/CheckUpdateUtil";
 import { ConfigData, HomeCardInfo } from "./PageArgumentEntity";
+import { PCTabInfo } from "./PCTabInfo";
 
 
 /* 基础 */
@@ -376,23 +377,23 @@ export class moreData {
 }
 
 // 更多 -> MoreListItem
-export  const ListMoreData = (): moreData[] => {
+export const ListMoreData = (): moreData[] => {
   let result: moreData[] = new Array()
   result = [
-    new moreData($r('sys.symbol.doc_text_fill'), 'Log', $r('app.string.Log'), '', 0, false),
-    new moreData($r('sys.symbol.externaldrive_fill_3'), 'Resources', $r('app.string.Resources'), '', 0, false),
-    new moreData($r('sys.symbol.list_bullet'), 'Request', $r('app.string.Request'), '', 0, false),
-    new moreData($r('sys.symbol.swap'), 'Connect', $r('app.string.Connect'), '', 0, false),
-    new moreData($r('sys.symbol.pencil_line'), 'Overwrite', $r('app.string.Overwrite'), '', 0, false),
-    new moreData($r('sys.symbol.bolt_filled_on_circle'), 'AccessControl', $r('app.string.access_control'), '', 0, false),
-    // new moreData($r('sys.symbol.navigation'), 'Diversion', $r('app.string.Diversion_Strategy'), '', 5, false),
+    new moreData($r('sys.symbol.doc_text_fill'), 'log', $r('app.string.Log'), '', 0, false),
+    new moreData($r('sys.symbol.externaldrive_fill_3'), 'resources', $r('app.string.Resources'), '', 0, false),
+    new moreData($r('sys.symbol.list_bullet'), 'request', $r('app.string.Request'), '', 0, false),
+    new moreData($r('sys.symbol.swap'), 'connect', $r('app.string.Connect'), '', 0, false),
+    new moreData($r('sys.symbol.pencil_line'), 'overwrite', $r('app.string.Overwrite'), '', 0, false),
+    new moreData($r('sys.symbol.bolt_filled_on_circle'), 'access_control', $r('app.string.access_control'), '', 0, false),
+    // new moreData($r('sys.symbol.navigation'), 'diversion', $r('app.string.Diversion_Strategy'), '', 5, false),
     new moreData($r('sys.symbol.clean_fill'), 'QueryIP', $r('app.string.query_ip_region'), $r('app.string.query_ip_region_Subtitle'), 0, false),
   ]
   return result
 }
 
 // 更多 -> 覆写OverwriteListItem
-export  const ListOverwriteData = (): moreData[] => {
+export const ListOverwriteData = (): moreData[] => {
   let result: moreData[] = new Array()
   result = [
     new moreData($r('sys.symbol.pencil_line_1'), 'Basic', $r('app.string.Basic'), '', 0,  false),
@@ -404,7 +405,7 @@ export  const ListOverwriteData = (): moreData[] => {
 }
 
 // 更多 -> 覆写 -> 基础Listitem
-export  const ListOverwriteBasicData = (clashConfig: ClashConfig, appConfig: AppConfig): ConfigItemData[] => {
+export const ListOverwriteBasicData = (clashConfig: ClashConfig, appConfig: AppConfig): ConfigItemData[] => {
   let result: ConfigItemData[] = new Array()
   result = [
     new ConfigItemData($r('sys.symbol.info_circle'), 'log-level', $r('app.string.LogLevel'), '', $r('app.string.Info'), 0).bindClashConfig(clashConfig).bindOption(LogMenu),
@@ -437,7 +438,7 @@ export  const ListOverwriteBasicData = (clashConfig: ClashConfig, appConfig: App
 }
 
 // 更多 -> 覆写 -> DNSListitem
-export  const ListOverwriteDNSData = (clashConfig: ClashConfig, appConfig: AppConfig): ConfigItemData[] => {
+export const ListOverwriteDNSData = (clashConfig: ClashConfig, appConfig: AppConfig): ConfigItemData[] => {
   let result: ConfigItemData[] = new Array()
   let dns = clashConfig.dns ?? new Dns()
   result = [
@@ -471,7 +472,7 @@ export  const ListOverwriteDNSData = (clashConfig: ClashConfig, appConfig: AppCo
 }
 
 // 更多 -> 覆写 -> 网络Listitem
-export  const ListOverwriteNetworkData = (clashConfig: ClashConfig, appConfig: AppConfig): ConfigItemData[] => {
+export const ListOverwriteNetworkData = (clashConfig: ClashConfig, appConfig: AppConfig): ConfigItemData[] => {
   let result: ConfigItemData[] = new Array()
   result = [
     // new ConfigItemData($r('sys.symbol.key_shield_fill'), 'VPN', 'VPN', '', '', 2),
@@ -488,7 +489,7 @@ export  const ListOverwriteNetworkData = (clashConfig: ClashConfig, appConfig: A
 }
 
 // 更多 -> 覆写 -> 网络 -> 兼容模式
-export  const OverwriteNetworkCompatible = (clashConfig: ClashConfig, appConfig: AppConfig): ConfigItemData[] => {
+export const OverwriteNetworkCompatible = (clashConfig: ClashConfig, appConfig: AppConfig): ConfigItemData[] => {
   let result: ConfigItemData[] = new Array()
   clashConfig.sniffer = clashConfig.sniffer ?? clashConfig.snifferDefault
   result = [
@@ -650,62 +651,70 @@ export interface AppearanceListItemProp {
   startSymbolFontColor?: Array<ResourceColor>
   children?: Array<AppearanceListItemProp>
 }
+
 /**
  * 外观页菜单列表
  */
-export const AppearanceList: AppearanceListItemProp[] = [
-  { title: $r('app.string.dark_mode'),
-    children: [
-      { title: $r('app.string.follow_system'), colorMode: ThemeColorMode.SYSTEM },
-      { title: $r('app.string.always_light'), colorMode: ThemeColorMode.LIGHT },
-      { title: $r('app.string.always_dark'), colorMode: ThemeColorMode.DARK },
-    ]
-  },
-  { title: $r('app.string.theme_color'),
-    children: [
-      { title: $r('app.string.star_river_blue'), customThemeName: 'blueAppTheme', startSymbolFontColor: [$r('sys.color.icon_emphasize')] },
-      { title: $r('app.string.yellow'), customThemeName: 'yellowAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_yellow')] },
-      { title: $r('app.string.cat_blue'), customThemeName: 'catBlueAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_cat_blue')] },
-      { title: $r('app.string.red'), customThemeName: 'redAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_red')] },
-      { title: $r('app.string.purple'), customThemeName: 'purpleAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_purple')] },
-      { title: $r('app.string.pink'), customThemeName: 'pinkAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_pink')] },
-      { title: $r('app.string.green'), customThemeName: 'greenAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_green')] },
-    ]
-  },
-  { title: $r('app.string.suspension_button_position'),
-    children: [
-      { title: $r('app.string.right') },
-      { title: $r('app.string.middle') },
-      { title: $r('app.string.left') },
-    ]
-  },
-  { title: $r('app.string.animation_speed'),
-    children: [
-      { title: $r('app.string.fast') },
-      { title: $r('app.string.normal') },
-      { title: $r('app.string.low') },
-      { title: $r('app.string.close') }
-    ]
-  },
-  { title: $r('app.string.tab_style'),
-    children: [
-      { title: $r('app.string.float') },
-      { title: $r('app.string.custom') },
-    ]
-  },
-  { title: $r('app.string.string_display_preferences'),
-    children: [
-      { title: $r('app.string.Appearance') },
-      { title: $r('app.string.information') },
-    ]
-  },
-  { title: $r('app.string.exit_window'),
-    children: [
-      { title: $r('app.string.minimize_tray') },
-      { title: $r('app.string.exit') },
-    ]
+export function getAppearance(windowMode: boolean): AppearanceListItemProp[] {
+  const AppearanceList: AppearanceListItemProp[] = [
+    { title: $r('app.string.dark_mode'),
+      children: [
+        { title: $r('app.string.follow_system'), colorMode: ThemeColorMode.SYSTEM },
+        { title: $r('app.string.always_light'), colorMode: ThemeColorMode.LIGHT },
+        { title: $r('app.string.always_dark'), colorMode: ThemeColorMode.DARK },
+      ]
+    },
+    { title: $r('app.string.theme_color'),
+      children: [
+        { title: $r('app.string.star_river_blue'), customThemeName: 'blueAppTheme', startSymbolFontColor: [$r('sys.color.icon_emphasize')] },
+        { title: $r('app.string.yellow'), customThemeName: 'yellowAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_yellow')] },
+        { title: $r('app.string.cat_blue'), customThemeName: 'catBlueAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_cat_blue')] },
+        { title: $r('app.string.red'), customThemeName: 'redAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_red')] },
+        { title: $r('app.string.purple'), customThemeName: 'purpleAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_purple')] },
+        { title: $r('app.string.pink'), customThemeName: 'pinkAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_pink')] },
+        { title: $r('app.string.green'), customThemeName: 'greenAppTheme', startSymbolFontColor: [$r('app.color.theme_color_main_green')] },
+      ]
+    },
+    { title: $r('app.string.suspension_button_position'),
+      children: [
+        { title: $r('app.string.right') },
+        { title: $r('app.string.middle') },
+        { title: $r('app.string.left') },
+      ]
+    },
+    { title: $r('app.string.animation_speed'),
+      children: [
+        { title: $r('app.string.fast') },
+        { title: $r('app.string.normal') },
+        { title: $r('app.string.low') },
+        { title: $r('app.string.close') }
+      ]
+    },
+    { title: $r('app.string.tab_style'),
+      children: [
+        { title: $r('app.string.float') },
+        { title: $r('app.string.custom') },
+      ]
+    },
+    { title: $r('app.string.string_display_preferences'),
+      children: [
+        { title: $r('app.string.Appearance') },
+        { title: $r('app.string.information') },
+      ]
+    },
+    { title: $r('app.string.exit_window'),
+      children: [
+        { title: $r('app.string.minimize_tray') },
+        { title: $r('app.string.exit') },
+      ]
+    }
+  ]
+  if (windowMode) {
+    const tab = AppearanceList[4]
+    tab.children?.unshift({ title: '窗口' })
   }
-]
+  return AppearanceList
+}
 
 /**
  * 关于列表参数
@@ -1047,15 +1056,36 @@ export const NullHomeCard2_1: HomeCardInfo = {
   aspectRatio: 2.07
 }
 
-
-/* 断点相关 */
-
-export const CompStr: BreakpointState<string> = BreakpointState.of({
-  sm: "sm",
-  md: "md",
-  lg: "lg",
-  xl: "xl"
-})
+export const PCTabList: PCTabInfo[] = [
+  {
+    group: 'main',
+    groupName: '',
+    items: [
+      { name: 'home', title: $r('app.string.Home'), icon: $r('sys.symbol.house_fill') },
+      { name: 'node', title: $r('app.string.Proxy'), icon: $r('sys.symbol.list_bullet_square_fill') },
+      { name: 'config', title: $r('app.string.Configuration'), icon: $r('sys.symbol.folder_fill') }
+    ]
+  },
+  {
+    group: 'info',
+    groupName: $r('app.string.information'),
+    items: [
+      { name: 'log', title: $r('app.string.Log'), icon: $r('sys.symbol.doc_text_fill') },
+      { name: 'request', title: $r('app.string.Request'), icon: $r('sys.symbol.mobiledata_circle_fill') },
+      { name: 'connect', title: $r('app.string.Connect'), icon: $r('sys.symbol.transformation_fill') },
+      { name: 'resources', title: $r('app.string.Resources'), icon: $r('sys.symbol.externaldrive_fill_3') }
+    ]
+  },
+  {
+    group: 'control',
+    groupName: '高级',
+    items: [
+      { name: 'overwrite', title: $r('app.string.Overwrite'), icon: $r('sys.symbol.square_and_pencil_fill') },
+      { name: 'access_control', title: $r('app.string.access_control'), icon: $r('sys.symbol.bookmark_filled_on_bookmark') },
+      { name: 'settings', title: $r('app.string.Settings'), icon: $r('sys.symbol.gearshape_fill') }
+    ]
+  }
+]
 
 /* List 相关*/
 // List中子组件的间隔

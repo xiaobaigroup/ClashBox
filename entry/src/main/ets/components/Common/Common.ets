@@ -16,6 +16,7 @@ import { Provider } from "proxy_core"
 import { common } from "@kit.AbilityKit"
 import { convertToSwitchNub1 } from "../../common/utils/DataUnitConvertUtils"
 import { Xb_ColorUtils } from "xb_components"
+import { Core } from "@ohos/hypium"
 
 export const context = getContext() as common.UIAbilityContext
 // 一级图标色，黑色
@@ -100,6 +101,7 @@ export struct ButtonBuilder {
   @Prop icon: Resource
   @Prop iconWeight: number
   @Prop iconSize: number = 24
+  @Prop isImage: boolean = false
   @Prop enableClick: boolean = true
   @Prop enableTransition: boolean = true
   @Prop iconColor: ResourceColor = icon_primary
@@ -110,10 +112,16 @@ export struct ButtonBuilder {
 
   build() {
     Button({ type: ButtonType.Circle, stateEffect: true }) {
-      SymbolGlyph(this.icon)
-        .fontWeight(this.iconWeight)
-        .fontColor([this.iconColor])
-        .fontSize(this.iconSize)
+      if (this.isImage) {
+        Image(this.icon)
+          .width(this.iconSize)
+          .height(this.iconSize)
+      } else {
+        SymbolGlyph(this.icon)
+          .fontWeight(this.iconWeight)
+          .fontColor([this.iconColor])
+          .fontSize(this.iconSize)
+      }
     }
     .width(40)
     .height(40)
@@ -761,12 +769,12 @@ export struct Nothing {
  * 列表Row共有样式
  */
 @Extend(Row)
-function RowStyle() {
+function RowStyle(needColor: boolean = true) {
   .width('100%')
   .borderRadius(20)
   .constraintSize({minHeight: 53})
-  .padding(12)
-  .backgroundColor($r('app.color.container_background'))
+  .padding(needColor ? 12 : 3)
+  .backgroundColor(needColor ? $r('app.color.container_background') : Color.Transparent)
 }
 
 /**
@@ -784,6 +792,7 @@ export struct skipRowList {
   @State name: string = ''
   @State title: ResourceStr = ''
   @Prop subtitle: ResourceStr = ''
+  @Prop needBackgroundColor: boolean = true
   @State isPrimaryIcons: boolean = false
   @State isExperimentalFunction: boolean = false
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
@@ -832,11 +841,13 @@ export struct skipRowList {
       .alignItems(HorizontalAlign.Start)
       Blank()
       this.tips()
-      SymbolGlyph($r('sys.symbol.chevron_right'))
-        .fontSize(28)
-        .fontColor([icon_primary])
+      if (this.needBackgroundColor) {
+        SymbolGlyph($r('sys.symbol.chevron_right'))
+          .fontSize(28)
+          .fontColor([icon_primary])
+      }
     }
-    .RowStyle()
+    .RowStyle(this.needBackgroundColor)
     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
   }
 }

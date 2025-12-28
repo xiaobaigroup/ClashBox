@@ -105,6 +105,7 @@ export struct WindowTopBar {
         ButtonBuilder({
           icon: item.icon,
           iconColor: icon_primary,
+          isImage: item.image,
           enableTransition: false,
           iconSize: index == 0 && !this.WindowMaximize ? 15 : 18,
           iconWeight: index != 0 || this.WindowMaximize ? FontWeight.Bold : FontWeight.Regular,
@@ -126,7 +127,8 @@ export struct WindowTopBar {
   getWindowDecorButtonModel(): FunctionInfo[] {
     return [
       {
-        icon: this.WindowMaximize ? $r('sys.symbol.arrow_down_right_and_arrow_up_left') : $r('sys.symbol.arrowshape_up_left_and_arrowshape_down_right'),
+        icon: this.WindowMaximize ? $r('app.media.direction_down_right_and_direction_up_left') : $r('app.media.direction_down_right_and_direction_up_left'),
+        image: true,
         onClick: async () => {
           console.log(`#WindowDecorButtonModel 点击最大&最小化按钮`)
           if (this.windowClass) {
@@ -157,6 +159,7 @@ export struct WindowTopBar {
       },
       {
         icon: $r('sys.symbol.minus'),
+        image: false,
         onClick: async () => {
           this.windowClass.minimize().catch((err: BusinessError) => {
             console.error(`#WindowDecorButtonModel 最小化失败 code: ${err.code} message: ${err.message}`)
@@ -165,6 +168,7 @@ export struct WindowTopBar {
       },
       {
         icon: $r('sys.symbol.xmark'),
+        image: false,
         onClick: () => {
           if (this.uiConfig.exitWindowMode === 1) {
             Xb_ToastUtil.exitApp()
