@@ -130,7 +130,7 @@ struct ProxyPage {
           TopBar({
             title: getResourceString($r('app.string.Proxy'), this),
             titleFontSize: this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE - this.curYOffset / 100 : TAB_CONTENT_TITLE_FONT_SIZE,
-            iconSize: this.windowMode ? 16 : (this.curYOffset < 0 ? 24 - this.curYOffset / 100 : 24),
+            iconSize: this.windowMode ? 17 : (this.curYOffset < 0 ? 24 - this.curYOffset / 100 : 24),
             icons: [$r('sys.symbol.heart_slash'), $r('sys.symbol.puzzle'), $r('sys.symbol.square_and_pencil')],
             // 一键取消所有收藏按钮                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              点击事件
             onFClick: () => {

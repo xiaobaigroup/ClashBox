@@ -127,7 +127,7 @@ export struct WindowTopBar {
   getWindowDecorButtonModel(): FunctionInfo[] {
     return [
       {
-        icon: this.WindowMaximize ? $r('app.media.direction_down_right_and_direction_up_left') : $r('app.media.direction_down_right_and_direction_up_left'),
+        icon: this.WindowMaximize ? $r('app.media.direction_down_left_and_direction_up_right') : $r('app.media.direction_down_right_and_direction_up_left'),
         image: true,
         onClick: async () => {
           console.log(`#WindowDecorButtonModel 点击最大&最小化按钮`)
