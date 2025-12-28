@@ -1386,10 +1386,10 @@ struct Index {
       console.log(`AccessControl PreferenceUtil Index #updateData 准备数据迁移`)
       const appsString = await Xb_PreferenceUtil.get<string>('access_control_apps', "[]")
       console.log(`AccessControl PreferenceUtil Index #updateData apps: ${appsString}，准备数据迁移`)
-      await Xb_PreferenceUtil.put('access_control_apps', this.appConfig.accessControlAppInfo)
       let apps: AppInfo[] = JSON.parse(appsString) as AppInfo[]
       console.log(`AccessControl PreferenceUtil Index #updateData apps: ${apps.length}，准备数据迁移`)
       if (apps.length == 0) {
+        await Xb_PreferenceUtil.put('access_control_apps', this.appConfig.accessControlAppInfo)
         apps = JSON.parse(this.appConfig.accessControlAppInfo)
         const currentAcceptEntries = await Xb_KVdbUtil.getEntriesByPrefix('accept_');
         const currentRejectEntries = await Xb_KVdbUtil.getEntriesByPrefix('reject_');
