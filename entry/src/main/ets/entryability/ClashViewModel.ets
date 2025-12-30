@@ -151,11 +151,13 @@ export class ClashViewModel {
     await profile.saveByUri(path);
     const isExists = await profile.check();
     if (isExists) {
-      await this.profileRepo.addOrUpdate(profile)
-        .then((value) => {
-          hilog.info(0xFF00, "EditConfig configSaveTestTag", `文件名${profile.name} URL: ${profile.url} 保存结果${value}`)
-          EventHub.sendEvent(EventKey.FetchProfile, null)
-        })
+      try {
+        const value = await this.profileRepo.addOrUpdate(profile)
+        hilog.info(0xFF00, "EditConfig configSaveTestTag", `文件名${profile.name} URL: ${profile.url} 保存结果${value}`)
+        EventHub.sendEvent(EventKey.FetchProfile, null)
+      } catch (err) {
+        throw new Error(err.message)
+      }
     } else {
       ClashViewModel.promptAction.showToast({message: "文件保存失败！"})
     }

@@ -13,6 +13,9 @@ import { webview } from "@kit.ArkWeb";
 import { hilog } from "@kit.PerformanceAnalysisKit";
 import { fileIo, fileUri } from "@kit.CoreFileKit";
 import { ConfigData } from "../../common/entity/PageArgumentEntity";
+import { BusinessError } from '@kit.BasicServicesKit';
+import { util } from "@kit.ArkTS";
+import { common } from "@kit.AbilityKit";
 
 @Builder
 export function EditConfigContentBuilder(name: string, param: Object){
@@ -196,18 +199,34 @@ struct EditConfigContent {
     try {
       // 先从 WebView 强制获取最新内容
       const latestContent = await this.commManager.sendCommand('getContent');
-      this.configStr = latestContent as string;
-      // 再写入文件
-      const context = this.getUIContext().getHostContext()!;
+      const newConfigStr = latestContent as string;
+      console.info("EditConfig #saveConfigContent newConfigStr size is:" + newConfigStr.length);
+      this.configStr = newConfigStr;
+
+      //  创建指定编码的编码器
+      const textEncoder: util.TextEncoder = new util.TextEncoder('utf-8');
+      // 使用 encodeInto() 方法，返回 Uint8Array
+      const encodedData: Uint8Array = textEncoder.encodeInto(newConfigStr)
+
+      // 获取上下文路径
+      const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
       const sandPath = context.filesDir + `/ClashBox/profiles/` + this.currentTouchConfigData.configId + '/config.yaml';
+      console.debug("EditConfig #saveConfigContent sandPath:" + sandPath);
       const sandboxUri = fileUri.getUriFromPath(sandPath);
-      const fileModify = fileIo.openSync(sandboxUri, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE);
-      fileIo.writeSync(fileModify.fd, this.configStr);
-      fileIo.close(fileModify).catch(() => {
-        console.error(`saveConfigContent 文件关闭失败`)
-      })
+      console.debug("EditConfig #saveConfigContent sandboxUri:" + sandboxUri);
+
+      // 添加 TRUNC 标志，确保覆盖写入时清空旧文件内容
+      const fileModify = fileIo.openSync(
+        sandboxUri,
+        fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC
+      );
+      console.debug("EditConfig #saveConfigContent file fd:" + fileModify.fd);
+      const writeLen = fileIo.writeSync(fileModify.fd, newConfigStr);
+      console.info("EditConfig #saveConfigContent write data to file succeed, writeLen:" + writeLen);
+      fileIo.closeSync(fileModify.fd);
+      console.debug("EditConfig #saveConfigContent file closed");
     } catch (error) {
-      console.error(`保存配置文本错误，message: ${error.message}`);
+      console.error(`EditConfig #saveConfigContent 保存配置文本时错误，message: ${(error as Error).message}`);
     }
   }
 
