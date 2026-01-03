@@ -288,6 +288,16 @@ export default class EntryAbility extends UIAbility {
 
   }
 
+  onWindowStageWillDestroy(windowStage: window.WindowStage): void {
+    // Main window will destroy, release UI related resources
+    // 销毁避让管理器并移除监听
+    if (this.avoidManager) {
+      this.avoidManager.offChangeListener(this.avoidListener);
+      this.avoidManager.destroy();
+      this.avoidManager = undefined;
+    }
+  }
+
   onWindowStageDestroy(): void {
     // Main window is destroyed, release UI related resources
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onWindowStageDestroy');
@@ -320,11 +330,6 @@ export default class EntryAbility extends UIAbility {
     AppStorage.setOrCreate('ForwardState', false)
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onBackground');
     this.saveConfigThePreferences();
-    if (this.avoidManager) {
-      this.avoidManager.offChangeListener(this.avoidListener);
-      this.avoidManager.destroy();
-      this.avoidManager = undefined;
-    }
     Xb_PreferenceUtil.save().then(() => {
       hilog.debug(0xC020, 'EntryAbility',
         `#onBackground ConfigSort Xb_PreferenceUtil 首选项保存成功`)
@@ -336,7 +341,6 @@ export default class EntryAbility extends UIAbility {
 
   onDestroy(): void {
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onDestroy');
-
     this.saveConfigThePreferences()
     // 移除卡片监听事件
     this.unRegisterCardEvent()

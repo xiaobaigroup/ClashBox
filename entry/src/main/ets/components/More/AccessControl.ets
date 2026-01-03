@@ -191,7 +191,7 @@ export struct AccessControl {
           Blank().height(TAB_CONTENT_TITLE_HEIGHT + (this.uiConfig.stringDisplayIndex === 0 ? 112 : 139) + (this.widthBp < 2 ? this.topRectHeight : 0))
           Scroll() {
             List({space: 8}) {
-              ForEach(this.appListData, (item: AppInfo, index) => {
+              ForEach(this.getSelectedSortApps(this.appListData), (item: AppInfo, index) => {
                 ListItem() {
                   checkoutRowListItem({
                     title: item.name,
@@ -691,7 +691,6 @@ export struct AccessControl {
     }
   }
 
-
   cancelSelected(item: AppInfo) {
     let key =''
     if (this.appConfig.accessControlMode == 'AcceptSelected') {
@@ -844,6 +843,16 @@ export struct AccessControl {
       // 空文本恢复数据
       this.appListData = this.lastAppListData
     }
+  }
+
+  getSelectedSortApps(appList: AppInfo[]) {
+    return appList.sort((a, b) => {
+      if (a.isSelected === b.isSelected) {
+        return 0; // 状态相同，不动
+      }
+      // a 选中了，a 应该在前面 -> 返回负数
+      return a.isSelected ? -1 : 1;
+    });
   }
 
 }
