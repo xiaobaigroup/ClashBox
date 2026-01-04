@@ -306,6 +306,7 @@ export struct AccessControl {
 
   kvDialogController = new CustomDialogController({
     builder: KVCustomDialog({
+      type: "AccessControl",
       value: $keyValueData,
       keyPlaceholder: $r('app.string.the_app_name'),
       valuePlaceholder: $r('app.string.package_name'),
@@ -453,7 +454,7 @@ export struct AccessControl {
 
   async aboutToAppear(): Promise<void> {
     EventHub.on(EventKey.AddAPP, (bundleInfo: BundleInfo) => {
-      this.keyValueData = new KeyValueData(bundleInfo?.appName || '', bundleInfo?.bundleName || '')
+      this.keyValueData = new KeyValueData(bundleInfo?.appName || '', bundleInfo?.bundleName || '', bundleInfo?.iconUintArr)
       this.addApp()
     })
     this.loadAppsInfo().then(() => {

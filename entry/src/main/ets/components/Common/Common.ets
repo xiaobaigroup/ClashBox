@@ -17,6 +17,7 @@ import { common } from "@kit.AbilityKit"
 import { convertToSwitchNub1 } from "../../common/utils/DataUnitConvertUtils"
 import { Xb_ColorUtils } from "xb_components"
 import { Core } from "@ohos/hypium"
+import { image } from "@kit.ImageKit"
 
 export const context = getContext() as common.UIAbilityContext
 // 一级图标色，黑色
@@ -561,6 +562,7 @@ export struct KVCustomDialog {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
 
+  @Prop type: string = ""
   aboutToAppear(): void {
     this.currentKeyInputValue = this.value.key
     this.currentValueInputValue = this.value.value ?? ""
@@ -569,6 +571,18 @@ export struct KVCustomDialog {
   aboutToDisappear(): void {
     // 关闭背景模糊
     this.isEnableIndexForegroundBlur = false
+  }
+
+  getPixMap(): Resource | image.PixelMap {
+    const unit8Array = this.value.iconUintArr
+    if (unit8Array) {
+      const imageSource = image.createImageSource(unit8Array.buffer.slice(0, unit8Array.buffer.byteLength))
+      const pixelMap = imageSource.createPixelMapSync()
+      imageSource.release()
+      return pixelMap
+    }
+
+    return $r("app.media.box_cat_round")
   }
 
   build() {
@@ -586,6 +600,29 @@ export struct KVCustomDialog {
         .onChange((value: string) => {
           this.currentValueInputValue = value
         })
+
+      if (this.type == "AccessControl") {
+        Row() {
+          if (this.value.iconUintArr) {
+            Image(this.getPixMap())
+              .width("100%")
+              .aspectRatio(1)
+              .borderRadius(8)
+          } else {
+            SymbolGlyph($r("sys.symbol.plus"))
+              .fontSize(32)
+          }
+        }
+        .width(64)
+        .aspectRatio(1)
+        .borderRadius(8)
+        .justifyContent(FlexAlign.Center)
+        .backgroundColor(this.value.iconUintArr ? undefined : "#f3f3f3")
+        .onClick(() => {
+          // TODO 点击选择新的图片
+        })
+      }
+
       Row() {
         Button($r('app.string.Cancel'))
           .height(39)

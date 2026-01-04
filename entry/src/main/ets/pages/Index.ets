@@ -1701,7 +1701,7 @@ struct Index {
     }
 
     setTimeout(() => {
-      EventHub.sendEvent(EventKey.AddAPP, { bundleName: bundleInfo.bundleName, appName: bundleInfo.appName })
+      EventHub.sendEvent(EventKey.AddAPP, bundleInfo)
     }, 400)
   }
 

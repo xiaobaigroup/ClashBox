@@ -1167,10 +1167,14 @@ export class BundleInfo {
   bundleName?: string
   /** @description 应用名 */
   appName?: string
+  /** @description 应用缩略图 */
+  iconUintArr?: Uint8Array
 
-  constructor(bundleName?: string, appName?: string) {
+
+  constructor(bundleName?: string, appName?: string, iconUintArr?: Uint8Array) {
     this.bundleName = bundleName;
     this.appName = appName;
+    this.iconUintArr = iconUintArr
   }
 
   /**

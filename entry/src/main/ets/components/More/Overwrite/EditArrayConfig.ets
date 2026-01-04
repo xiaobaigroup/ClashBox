@@ -386,9 +386,12 @@ export struct ArrayConfigEditor {
 export class KeyValueData {
   key: string
   value: string | null
-  constructor(name: string, value: string | null = null) {
+  iconUintArr: Uint8Array | null
+
+  constructor(name: string, value: string | null = null, iconUintArr: Uint8Array | null = null) {
     this.key = name
     this.value = value
+    this.iconUintArr = iconUintArr
   }
 }
 
