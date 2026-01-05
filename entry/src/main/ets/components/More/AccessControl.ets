@@ -470,6 +470,7 @@ export struct AccessControl {
   addApp() {
     this.kvDialogTitle = getResourceString($r('app.string.add_app'), this)
     this.kvDialogController.open()
+    this.isNewApp = true
   }
 
   async saveApp(value: KeyValueData) {
