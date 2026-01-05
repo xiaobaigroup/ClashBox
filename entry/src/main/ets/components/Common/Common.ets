@@ -562,7 +562,8 @@ export struct KVCustomDialog {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
 
-  @Prop type: string = ""
+  @Prop type: string = "" // 判断是添加 Host or AccessControl
+
   aboutToAppear(): void {
     this.currentKeyInputValue = this.value.key
     this.currentValueInputValue = this.value.value ?? ""
@@ -643,7 +644,7 @@ export struct KVCustomDialog {
           .onClick(() => {
             this.controller.close()
             if (this.confirm) {
-              this.confirm(new KeyValueData(this.currentKeyInputValue, this.currentValueInputValue))
+              this.confirm(new KeyValueData(this.currentKeyInputValue, this.currentValueInputValue, this.value.iconUintArr))
             }
             this.isEnableIndexForegroundBlur = false
           })

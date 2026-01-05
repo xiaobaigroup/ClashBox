@@ -479,7 +479,7 @@ export struct AccessControl {
       // UI列表的副本，用于界面更新
       const originalUIList: AppInfo[] = [...this.appListData];
       // 持久化总清单的副本，从磁盘读取，用于数据保存
-      const originalMasterList: AppInfo[] = JSON.parse(await Xb_PreferenceUtil.get('access_control_apps', "[]"));
+      const originalMasterList: AppInfo[] = deserializeAppList(await Xb_PreferenceUtil.get('access_control_apps', "[]"));
       const newPackageName = (value.value as string).trim();
       const newAppName = value.key.toString().trim();
       if (this.isNewApp) {
@@ -498,6 +498,7 @@ export struct AccessControl {
         const newApp: AppInfo = {
           name: newAppName,
           package_name: newPackageName,
+          iconUintArr: value.iconUintArr,
           time: Date.now(),
           isSelected: false
         };
@@ -538,8 +539,8 @@ export struct AccessControl {
 
       // 更新UI状态
       this.appListData = originalUIList;
-      // 执行持久化
-      await Xb_PreferenceUtil.put('access_control_apps', JSON.stringify(originalMasterList));
+      // 执行持久化（使用 serializeAppList 正确处理 Uint8Array）
+      await Xb_PreferenceUtil.put('access_control_apps', serializeAppList(originalMasterList));
       console.log(`AccessControl saveApp 应用列表已成功保存`);
     } catch (error) {
       console.error('AccessControl saveApp 保存应用列表失败:', error);
@@ -551,7 +552,8 @@ export struct AccessControl {
     try {
       const apps = await Xb_PreferenceUtil.get<string>('access_control_apps', "[]")
       console.debug(`AccessControl #loadAppsInfo apps: ${apps}，accessControlMode: ${this.appConfig.accessControlMode}`)
-      this.appListData = JSON.parse(apps)
+      // 使用 deserializeAppList 正确恢复 Uint8Array 类型
+      this.appListData = deserializeAppList(apps)
       if (this.appConfig.accessControlMode == 'AcceptSelected') {
         // 白名单
         const acceptData = await Xb_KVdbUtil.getEntriesByPrefix('accept_')
@@ -576,7 +578,7 @@ export struct AccessControl {
     // UI列表的副本，用于界面更新
     const originalUIList: AppInfo[] = [...this.appListData];
     // 持久化总清单的副本，从磁盘读取，用于数据保存
-    const originalMasterList: AppInfo[] = JSON.parse(await Xb_PreferenceUtil.get('access_control_apps', "[]"));
+    const originalMasterList: AppInfo[] = deserializeAppList(await Xb_PreferenceUtil.get('access_control_apps', "[]"));
 
     if (index != undefined && item != undefined) {
       // --- 删除单个应用 ---
@@ -655,8 +657,8 @@ export struct AccessControl {
     try {
       // 更新UI状态
       this.appListData = originalUIList;
-      // 执行持久化
-      await Xb_PreferenceUtil.put('access_control_apps', JSON.stringify(originalMasterList));
+      // 执行持久化（使用 serializeAppList 正确处理 Uint8Array）
+      await Xb_PreferenceUtil.put('access_control_apps', serializeAppList(originalMasterList));
       console.log(`AccessControl #deleteApp 删除操作完成，UI和持久化数据已同步更新。`);
     } catch (error) {
       console.error('AccessControl #deleteApp 删除应用UI与磁盘同步更新失败:', error);
@@ -710,6 +712,7 @@ export struct AccessControl {
     this.appListData = this.appListData.map((app): AppInfo => ({
       name: app.name,
       package_name: app.package_name,
+      iconUintArr: app.iconUintArr,
       time: app.time,
       isSelected: selectedPackagesSet.has(app.package_name)
     }))
@@ -775,14 +778,14 @@ export struct AccessControl {
   // 合并并保存总应用清单
   private async _mergeAndSaveAppList(importedAppListString: string): Promise<void> {
     console.log('AccessControl: 开始合并总应用清单...');
-    const currentAppList: AppInfo[] = JSON.parse(await Xb_PreferenceUtil.get('access_control_apps', "[]"));
-    const importedAppList: AppInfo[] = JSON.parse(importedAppListString);
+    const currentAppList: AppInfo[] = deserializeAppList(await Xb_PreferenceUtil.get('access_control_apps', "[]"));
+    const importedAppList: AppInfo[] = deserializeAppList(importedAppListString);
 
-    const mergedAppMap = new Map<string, AppInfo>(currentAppList.map(app => [app.package_name, app]));
-    importedAppList.forEach(app => mergedAppMap.set(app.package_name, app));
+    const mergedAppMap = new Map<string, AppInfo>(currentAppList.map((app: AppInfo): [string, AppInfo] => [app.package_name, app]));
+    importedAppList.forEach((app: AppInfo) => mergedAppMap.set(app.package_name, app));
 
     const finalAppList = Array.from(mergedAppMap.values());
-    await Xb_PreferenceUtil.put('access_control_apps', JSON.stringify(finalAppList));
+    await Xb_PreferenceUtil.put('access_control_apps', serializeAppList(finalAppList));
     console.log(`AccessControl: 总清单合并完成，当前${currentAppList.length}条，导入${importedAppList.length}条，合并后${finalAppList.length}条。`);
   }
 
@@ -813,7 +816,7 @@ export struct AccessControl {
   }
 
   openDialog(item: AppInfo) {
-    const kvData: KeyValueData = new KeyValueData(item.name, item.package_name)
+    const kvData: KeyValueData = new KeyValueData(item.name, item.package_name, item.iconUintArr)
     this.keyValueData = kvData
     this.kvDialogTitle = getResourceString($r('app.string.edit_app'), this)
     this.isNewApp = false
@@ -865,7 +868,7 @@ export interface AppInfo {
   name: string
   package_name: string
   time: number
-  icon?: Resource,
+  iconUintArr?: Uint8Array,
   isSelected: boolean
 }
 
@@ -876,4 +879,57 @@ interface AccessConfig {
   appList: string
   acceptList: string
   rejectList: string
+}
+
+/** 提供给 JSON 序列化的 AppInfo 数据结构 */
+interface AppInfoSerializable {
+  name: string
+  package_name: string
+  time: number
+  iconUintArr?: number[]
+  isSelected: boolean
+}
+
+/**
+ * 将 AppInfo 数组序列化为 JSON 字符串
+ * @param appList 要序列化的应用列表
+ * @returns JSON String
+ */
+function serializeAppList(appList: AppInfo[]): string {
+  const serializableList: AppInfoSerializable[] = appList.map((app: AppInfo): AppInfoSerializable => {
+    const result: AppInfoSerializable = {
+      name: app.name,
+      package_name: app.package_name,
+      time: app.time,
+      isSelected: app.isSelected
+    }
+    // Uint8Array 二进制数组需要特殊处理才能进行反序列化还原
+    if (app.iconUintArr) {
+      result.iconUintArr = Array.from(app.iconUintArr)
+    }
+    return result
+  })
+  return JSON.stringify(serializableList)
+}
+
+/**
+ * 将 JSON 字符串反序列化为 AppInfo 数组
+ * @param jsonStr JSON 字符串
+ * @returns AppInfo 数组
+ */
+function deserializeAppList(jsonStr: string): AppInfo[] {
+  const parsed: AppInfoSerializable[] = JSON.parse(jsonStr) as AppInfoSerializable[]
+  return parsed.map((item: AppInfoSerializable): AppInfo => {
+    const result: AppInfo = {
+      name: item.name,
+      package_name: item.package_name,
+      time: item.time,
+      isSelected: item.isSelected
+    }
+    // 将数组还原成 Uint8Array 二进制数组
+    if (item.iconUintArr && Array.isArray(item.iconUintArr)) {
+      result.iconUintArr = new Uint8Array(item.iconUintArr)
+    }
+    return result
+  })
 }
