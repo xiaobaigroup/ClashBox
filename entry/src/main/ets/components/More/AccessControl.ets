@@ -11,6 +11,7 @@ import { KeyValueData } from "./Overwrite/EditArrayConfig"
 import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { intl } from "@kit.LocalizationKit"
 import { Xb_CapsuleButton, Xb_CircleButton, Xb_FileUtils, Xb_GetResourceString,
+  Xb_ImageUtils,
   Xb_KVdbUtil,
   Xb_PreferenceUtil,
   Xb_ToastUtil } from "xb_components"
@@ -194,6 +195,7 @@ export struct AccessControl {
               ForEach(this.getSelectedSortApps(this.appListData), (item: AppInfo, index) => {
                 ListItem() {
                   checkoutRowListItem({
+                    icon: item.iconUintArr ? Xb_ImageUtils.uint8ArrayToPixelMap(item.iconUintArr) : $r('app.media.box_cat_round'),
                     title: item.name,
                     subtitle: item.package_name,
                     isSelected: item.isSelected,

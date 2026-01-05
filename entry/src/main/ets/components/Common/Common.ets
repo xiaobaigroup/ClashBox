@@ -15,7 +15,7 @@ import { KeyValueData } from "../More/Overwrite/EditArrayConfig"
 import { Provider } from "proxy_core"
 import { common } from "@kit.AbilityKit"
 import { convertToSwitchNub1 } from "../../common/utils/DataUnitConvertUtils"
-import { Xb_ColorUtils } from "xb_components"
+import { Xb_ColorUtils, Xb_ImageUtils } from "xb_components"
 import { Core } from "@ohos/hypium"
 import { image } from "@kit.ImageKit"
 
@@ -574,18 +574,6 @@ export struct KVCustomDialog {
     this.isEnableIndexForegroundBlur = false
   }
 
-  getPixMap(): Resource | image.PixelMap {
-    const unit8Array = this.value.iconUintArr
-    if (unit8Array) {
-      const imageSource = image.createImageSource(unit8Array.buffer.slice(0, unit8Array.buffer.byteLength))
-      const pixelMap = imageSource.createPixelMapSync()
-      imageSource.release()
-      return pixelMap
-    }
-
-    return $r("app.media.box_cat_round")
-  }
-
   build() {
     Column({space: 8}) {
       // 标题
@@ -605,7 +593,7 @@ export struct KVCustomDialog {
       if (this.type == "AccessControl") {
         Row() {
           if (this.value.iconUintArr) {
-            Image(this.getPixMap())
+            Image(Xb_ImageUtils.uint8ArrayToPixelMap(this.value.iconUintArr))
               .width("100%")
               .aspectRatio(1)
               .borderRadius(8)
@@ -898,7 +886,7 @@ export struct skipRowList {
  */
 @Component
 export struct checkoutRowListItem {
-  @State icon?: Resource = undefined
+  @State icon?: Resource | PixelMap = undefined
   @State name: string = ''
   @State title: string = ''
   @State subtitle: string = ''
@@ -913,6 +901,9 @@ export struct checkoutRowListItem {
     Row({space: 12}) {
       if (this.icon) {
         Image(this.icon)
+          .height(48)
+          .aspectRatio(1)
+          .borderRadius(8)
       }
       Column() {
         Row() {
