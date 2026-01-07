@@ -8,6 +8,7 @@
   "dynamicDependencies": {},
   "dependencies": {
     "@mcui/mccharts": "^2.8.9",
-    "yaml": "^2.8.0"
+    "yaml": "^2.8.0",
+    "@cxy/sandboxfinder": "^1.0.5"
   }
 }

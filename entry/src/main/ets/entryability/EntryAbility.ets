@@ -30,6 +30,7 @@ import { StatusBarConfig, StatusBarIconResource,
   Xb_PreferenceUtil} from 'xb_components';
 import BackupRestoreUtil from '../common/utils/BackupRestoreUtil';
 import ConfigAutoUpdateService from '../common/utils/ConfigAutoUpdateService';
+import BuildProfile from 'BuildProfile';
 
 
 export default class EntryAbility extends UIAbility {
@@ -216,6 +217,17 @@ export default class EntryAbility extends UIAbility {
       }
       // 初始化应用配置
       await AppState.init()
+
+      // 推荐在 DEBUG 模式下使用 - 动态加载
+      if (BuildProfile.DEBUG) {
+        import('@cxy/sandboxfinder').then(async (ns: ESObject) => {
+          // 默认绑定到端口 7777
+          ns.SandboxFinder.run(1145)
+        });
+
+        // 避免服务挂起，设置不息屏
+        windowStage.getMainWindowSync().setWindowKeepScreenOn(true)
+      }
 
       try {
         const data = await windowStage.getMainWindow()
