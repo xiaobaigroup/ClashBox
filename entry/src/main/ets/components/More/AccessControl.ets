@@ -542,7 +542,7 @@ export struct AccessControl {
       // 更新UI状态
       this.appListData = originalUIList;
       // 执行持久化（使用 serializeAppList 正确处理 Uint8Array）
-      await Xb_PreferenceUtil.put('access_control_apps', serializeAppList(originalMasterList));
+      await Xb_PreferenceUtil.put('access_control_apps', serializeAppList(originalUIList));
       console.log(`AccessControl saveApp 应用列表已成功保存`);
     } catch (error) {
       console.error('AccessControl saveApp 保存应用列表失败:', error);
