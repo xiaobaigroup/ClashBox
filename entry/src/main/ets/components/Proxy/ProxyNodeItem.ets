@@ -5,6 +5,8 @@ import ClashViewModel, { DelayInfo } from '../../entryability/ClashViewModel'
 import { customVibrator } from '../../common/utils/VibratorUtil'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 
+// 复用组件装饰器
+@Reusable
 @Component
 export struct ProxyNode {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
@@ -17,7 +19,17 @@ export struct ProxyNode {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @Consume isPXSecScreen: boolean
   selectProxy?: (item: ProxyItem) => void
-  onLatencyChange?:(l: number)=>void
+  onLatencyChange?: (l: number) => void
+
+  // 使用 @Reusable 必须实现 aboutToReuse 函数
+  aboutToReuse(params: Record<string, Object>): void {
+    this.itemSize = params.itemSize as ProxyCardSize
+    this.item = params.item as ProxyItem
+    this.disabled = params.disabled as boolean
+    this.selected = params.selected as string
+    this.selectProxy = params.selectProxy as (item: ProxyItem) => void
+    this.onLatencyChange = params.onLatencyChange as (l: number)=> void
+  }
 
   aboutToAppear(): void {
     this.delay = ClashViewModel.delayMap.get(this.item.name)?.delay ?? 0

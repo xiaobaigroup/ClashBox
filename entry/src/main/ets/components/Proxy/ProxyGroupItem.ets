@@ -111,6 +111,7 @@ struct ProxyGroupItem {
               // hilog.info(0xFF00, "ProxyPageLatencyTag", "延迟运行3 %{public}s", JSON.stringify(nodeItem))
             }
           })
+            .restoreId(this.getRestoreId(index, item.id))
         }
         .transition(customAnimationUtil.isScaleTranFast(index, this.uiConfig))
         .onClick(() => {
@@ -159,7 +160,7 @@ struct ProxyGroupItem {
           onWillDismiss: false,
           autoCancel: false
         })
-      }, (item: ProxyItem,i: number) => item.name + '-' + i.toString())
+      }, (item: ProxyItem, index: number) => this.getRestoreId(index, item.id).toString())
     }.cachedCount(4)
     .onScrollFrameBegin((offset: number) => {
       this.curOffsetRemain += offset
@@ -246,6 +247,22 @@ struct ProxyGroupItem {
     }
     console.log(`ProxySort 排序类型：${this.appConfig.proxySort}, 节点数量：${this.proxyLazyItems.totalCount()}个`)
     this.needChangeSort = false
+  }
+
+  /** 将 字符串ID 转换为 HashID 用于 restoreId */
+  getRestoreId(index: number, id?: string): number {
+    if (id) {
+      let hash = 0;
+      for (let i = 0; i < id.length; i++) {
+        const char = id.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash |= 0; // Convert to 32bit integer
+      }
+
+      return hash;
+    }
+
+    return index
   }
 
   /**
