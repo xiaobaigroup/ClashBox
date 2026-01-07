@@ -3,9 +3,25 @@ import { getProfilePath, getProfilesPath } from './appPath';
 import { Context } from '@kit.AbilityKit';
 import { fileUri } from '@kit.CoreFileKit';
 import { ProxyGroup, ProxyType, SubscriptionInfo } from './models/Common';
-import { JSON, util } from '@kit.ArkTS';
+import { JSON, taskpool, util } from '@kit.ArkTS';
 import { http } from '@kit.NetworkKit';
 import { parse, YAMLError } from 'yaml'
+
+/**
+ * 在后台线程中解析 YAML 内容
+ * @param content - 待解析的 YAML 字符串内容
+ * @returns 解析成功返回 true，失败返回 false
+ */
+@Concurrent
+function parseYAMLInBackground(content: string): boolean {
+  try {
+    parse(content);
+    return true;
+  } catch (e) {
+    console.error("TaskPool YAML parse error:", e);
+    return false;
+  }
+}
 
 export function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -174,14 +190,24 @@ async function isYAML(data: string | ArrayBuffer): Promise<boolean> {
     } else {
       return false;
     }
-    // 解析失败，直接返回 false
-    parse(content);
-    // 严格校验
+
+    // 先进行快速的格式校验（在主线程进行轻量级检查）
     const trimmedContent = content.trim();
     // 如果内容是单行的、以 { 开头和 } 结尾的紧凑 JSON，不是典型的 YAML 配置
     if (trimmedContent.startsWith('{') && trimmedContent.endsWith('}') && !trimmedContent.includes('\n')) {
       return false;
     }
+
+    // 使用 TaskPool 在后台线程执行耗时的 YAML 解析
+    // 避免大数据量时阻塞 UI 主线程导致卡顿
+    const task = new taskpool.Task(parseYAMLInBackground, content);
+    const parseResult = await taskpool.execute(task) as boolean;
+
+    if (!parseResult) {
+      console.error("YAML 解析失败: TaskPool 解析返回 false");
+      return false;
+    }
+
     // 合法 YAML 配置
     return true;
 
