@@ -484,6 +484,7 @@ export struct AccessControl {
       const originalMasterList: AppInfo[] = deserializeAppList(await Xb_PreferenceUtil.get('access_control_apps', "[]"));
       const newPackageName = (value.value as string).trim();
       const newAppName = value.key.toString().trim();
+      const iconUintArr = value.iconUintArr
       if (this.isNewApp) {
         // --- 新增逻辑 ---
         console.log(`AccessControl saveApp 执行新增逻辑`);
@@ -500,7 +501,7 @@ export struct AccessControl {
         const newApp: AppInfo = {
           name: newAppName,
           package_name: newPackageName,
-          iconUintArr: value.iconUintArr,
+          iconUintArr,
           time: Date.now(),
           isSelected: false
         };
@@ -525,6 +526,7 @@ export struct AccessControl {
         uiAppToEdit.name = newAppName;
         uiAppToEdit.package_name = newPackageName;
         uiAppToEdit.time = Date.now();
+        uiAppToEdit.iconUintArr = iconUintArr;
         // 操作持久化列表副本：找到并更新应用
         const masterAppToEditIndex = originalMasterList.findIndex(app => app.package_name === originalPkgName);
         if (masterAppToEditIndex !== -1) {
