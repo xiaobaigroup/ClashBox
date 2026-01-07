@@ -15,8 +15,11 @@ import { KeyValueData } from "../More/Overwrite/EditArrayConfig"
 import { Provider } from "proxy_core"
 import { common } from "@kit.AbilityKit"
 import { convertToSwitchNub1 } from "../../common/utils/DataUnitConvertUtils"
-import { Xb_ColorUtils } from "xb_components"
+import { Xb_ColorUtils, Xb_ImageUtils } from "xb_components"
 import { Core } from "@ohos/hypium"
+import { image } from "@kit.ImageKit"
+import { photoAccessHelper } from "@kit.MediaLibraryKit"
+import { fileIo as fs } from "@kit.CoreFileKit"
 
 export const context = getContext() as common.UIAbilityContext
 // 一级图标色，黑色
@@ -561,6 +564,8 @@ export struct KVCustomDialog {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @Consume('isEnableIndexForegroundBlur') private isEnableIndexForegroundBlur: boolean
 
+  @Prop type: string = "" // 判断是添加 Host or AccessControl
+
   aboutToAppear(): void {
     this.currentKeyInputValue = this.value.key
     this.currentValueInputValue = this.value.value ?? ""
@@ -578,6 +583,31 @@ export struct KVCustomDialog {
         .fontWeight(FontWeight.Medium)
         .fontSize(20)
         .margin({ bottom: 7 })
+
+      // 应用Icon
+      if (this.type == "AccessControl") {
+        Row() {
+          if (this.value.iconUintArr) {
+            Image(Xb_ImageUtils.uint8ArrayToPixelMap(this.value.iconUintArr))
+              .width("100%")
+              .aspectRatio(1)
+              .borderRadius(8)
+          } else {
+            SymbolGlyph($r("sys.symbol.plus"))
+              .fontSize(32)
+          }
+        }
+        .width(64)
+        .aspectRatio(1)
+        .borderRadius(8)
+        .justifyContent(FlexAlign.Center)
+        .backgroundColor(this.value.iconUintArr ? undefined : "#f3f3f3")
+        .onClick(async () => {
+          // 点击选择新的图片
+          await this.selectCustomIcon()
+        })
+      }
+
       TextInput({placeholder: this.keyPlaceholder, text: this.currentKeyInputValue })
         .onChange((value: string) => {
           this.currentKeyInputValue = value
@@ -586,6 +616,7 @@ export struct KVCustomDialog {
         .onChange((value: string) => {
           this.currentValueInputValue = value
         })
+
       Row() {
         Button($r('app.string.Cancel'))
           .height(39)
@@ -606,7 +637,7 @@ export struct KVCustomDialog {
           .onClick(() => {
             this.controller.close()
             if (this.confirm) {
-              this.confirm(new KeyValueData(this.currentKeyInputValue, this.currentValueInputValue))
+              this.confirm(new KeyValueData(this.currentKeyInputValue, this.currentValueInputValue, this.value.iconUintArr))
             }
             this.isEnableIndexForegroundBlur = false
           })
@@ -615,6 +646,92 @@ export struct KVCustomDialog {
     .padding({left: 16, right: 16, top: 15, bottom: 15})
     .backgroundColor($r('app.color.container_background'))
     .width('100%')
+  }
+
+  /** @description 选择自定义的图标 */
+  private async selectCustomIcon() {
+    // TODO 建议将逻辑抽离到 ImageUtils
+    // 点击选择新的图片
+    const PhotoSelectOptions = new photoAccessHelper.PhotoSelectOptions();
+    PhotoSelectOptions.MIMEType = photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE;
+    PhotoSelectOptions.isEditSupported = true;
+    PhotoSelectOptions.maxSelectNumber = 1;
+    const photoPicker = new photoAccessHelper.PhotoViewPicker();
+    const res = await photoPicker.select(PhotoSelectOptions)
+
+    if (res.photoUris.length > 0) {
+      const uri = res.photoUris[0]
+      try {
+        // 打开文件读取图片数据
+        const file = fs.openSync(uri, fs.OpenMode.READ_ONLY)
+        try {
+          // 从文件描述符创建图片源
+          const imageSource = image.createImageSource(file.fd)
+          // 获取图片原始信息
+          const imageInfo = await imageSource.getImageInfo()
+          const originalWidth = imageInfo.size.width
+          const originalHeight = imageInfo.size.height
+
+          // 目标尺寸 64 vp，转换为像素（这里使用 3 作为默认像素密度）
+          const targetSizeVp = 64
+          const pixelDensity = 3 // 高分辨率设备的像素密度
+          const targetSizePx = targetSizeVp * pixelDensity
+
+          // 创建 PixelMap
+          let pixelMap: image.PixelMap
+
+          // 判断是否需要裁切（图片尺寸超过目标尺寸）
+          if (originalWidth > targetSizePx || originalHeight > targetSizePx) {
+            // 计算裁切区域（中心裁切）
+            const cropSize = Math.min(originalWidth, originalHeight)
+            const cropX = Math.floor((originalWidth - cropSize) / 2)
+            const cropY = Math.floor((originalHeight - cropSize) / 2)
+
+            // 先创建原始 PixelMap
+            pixelMap = await imageSource.createPixelMap()
+
+            // 裁切中心区域
+            const cropRegion: image.Region = {
+              x: cropX,
+              y: cropY,
+              size: {
+                width: cropSize,
+                height: cropSize
+              }
+            }
+            await pixelMap.crop(cropRegion)
+
+            // 缩放到目标尺寸
+            await pixelMap.scale(targetSizePx / cropSize, targetSizePx / cropSize)
+          } else {
+            // 图片尺寸在目标范围内，直接创建 PixelMap
+            pixelMap = await imageSource.createPixelMap()
+          }
+
+          // 使用 ImagePacker 将 PixelMap 打包为 ArrayBuffer
+          const imagePacker = image.createImagePacker()
+          const packOptions: image.PackingOption = {
+            format: 'image/png',
+            quality: 100
+          }
+          const packedData = await imagePacker.packing(pixelMap, packOptions)
+
+          // 转换为 Uint8Array 并存储
+          this.value.iconUintArr = new Uint8Array(packedData)
+
+          // 释放资源
+          imagePacker.release()
+          pixelMap.release()
+          imageSource.release()
+
+          console.info(`Icon processed successfully: ${originalWidth}x${originalHeight} -> ${targetSizePx}x${targetSizePx}`)
+        } finally {
+          fs.closeSync(file)
+        }
+      } catch (e) {
+        console.error("Process image failed: " + JSON.stringify(e))
+      }
+    }
   }
 }
 
@@ -860,7 +977,7 @@ export struct skipRowList {
  */
 @Component
 export struct checkoutRowListItem {
-  @State icon?: Resource = undefined
+  @State icon?: Resource | PixelMap = undefined
   @State name: string = ''
   @State title: string = ''
   @State subtitle: string = ''
@@ -875,6 +992,9 @@ export struct checkoutRowListItem {
     Row({space: 12}) {
       if (this.icon) {
         Image(this.icon)
+          .height(48)
+          .aspectRatio(1)
+          .borderRadius(8)
       }
       Column() {
         Row() {

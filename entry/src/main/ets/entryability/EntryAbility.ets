@@ -576,14 +576,14 @@ export default class EntryAbility extends UIAbility {
           case utd.UniformDataType.TEXT:
             if (record.content) {
               const bundleName = UrlUtils.extractPackageName(record.content, this.uiContext?.getPromptAction()!)
-              this.bundleInfo = new BundleInfo(bundleName, record.title ?? '')
+              this.bundleInfo = new BundleInfo(bundleName, record.title ?? '', record.thumbnail)
             }
             break;
           // 超链接类型
           case utd.UniformDataType.HYPERLINK:
             if (record.content) {
               const bundleName = UrlUtils.extractPackageName(record.content, this.uiContext?.getPromptAction()!)
-              this.bundleInfo = new BundleInfo(bundleName, record.title ?? '')
+              this.bundleInfo = new BundleInfo(bundleName, record.title ?? '', record.thumbnail)
             }
             break;
           default:
