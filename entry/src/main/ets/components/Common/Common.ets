@@ -1014,16 +1014,23 @@ export struct checkoutRowListItem {
       }.layoutWeight(1)
       .alignItems(HorizontalAlign.Start)
       Blank()
-      Checkbox({ name: this.subtitle, group: 'App' })
-        .hitTestBehavior(HitTestMode.None)
-        .selectedColor(this.icon_emphasize)
-        .shape(CheckBoxShape.CIRCLE)
+      SymbolGlyph(this.isSelected ? $r('sys.symbol.checkmark_circle_fill_1') : $r('sys.symbol.checkmark_circle'))
+        .fontSize(24)
         .enabled(this.enabledClick)
-        .select($$this.isSelected)
+        .fontColor([this.enabledClick ? (!this.isSelected ? icon_primary : this.icon_emphasize) : this.getColor(!this.isSelected ? icon_primary : this.icon_emphasize)])
+        .transition(customAnimationUtil.isScaleTranIcon(10, this.uiConfig))
     }
     .RowStyle()
     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
   }
+
+  getColor(color: ResourceColor) {
+    const context = this.getUIContext().getHostContext()!
+    if (typeof color == 'string' || typeof color == 'number') return
+    const colorValue = context.resourceManager.getColorSync(color.id)
+    return 0x33 << 24 | (colorValue & 0x00FFFFFF)
+  }
+
 }
 
 /**

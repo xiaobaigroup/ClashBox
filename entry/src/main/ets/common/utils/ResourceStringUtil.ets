@@ -18,7 +18,7 @@ export function getResourceString(resource: Resource | string , __this: object):
     return ""
   if(typeof resource == "string")
     return resource
-  if (!resource.id){
+  if (!resource.id) {
     return ""
   }
   let resourceString = getContext(__this).resourceManager.getStringSync(resource.id);

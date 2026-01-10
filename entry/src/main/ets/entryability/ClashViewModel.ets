@@ -24,7 +24,8 @@ import { PROXY_STARTED_DURATION_INIT_VALUE } from "../common/entity/Constants";
 import { Timer } from "../common/utils/HHmmssTimer";
 import { number2Time } from "../common/utils/TimeConvertUtil";
 import { picker } from "@kit.CoreFileKit"
-import { Xb_GetResourceString, Xb_KVdbUtil, Xb_ToastUtil } from "xb_components";
+import { Xb_GetResourceString, Xb_ToastUtil } from "xb_components";
+import { accessControlRdb } from "../common/datasources/AccessControlRdb";
 
 export interface DelayInfo{
     name: string
@@ -39,14 +40,12 @@ export class ClashViewModel {
   proxyStartedTimer = new Timer()
   static promptAction: PromptAction
   async init(context: Context, promptAction: PromptAction) {
-    console.error("ClashViewModel开始初始化");
     AppState.globalUA =  "clash.meta/1.19.5"
     this.context = context
     ClashViewModel.promptAction = promptAction
     await this.profileRepo.init(context)
     this.socketProxy.init(context, ClashViewModel.promptAction)
     await this.initGeoIp()
-    console.error("ClashViewModel初始化成功");
   }
   // 添加配置 url
   async addOrUpdateProfileByUrl(data: ConfigData, id: string | null) {
@@ -457,11 +456,25 @@ export class ClashViewModel {
     if (appConfig == null)
       return
     if (appConfig!.accessControl) {
-      const currentAcceptEntries = await Xb_KVdbUtil.getEntriesByPrefix('accept_');
-      const currentRejectEntries = await Xb_KVdbUtil.getEntriesByPrefix('reject_');
-      let acceptList = currentAcceptEntries.map(entry => entry.key.substring('accept_'.length))
-      acceptList.push(...[this.context?.applicationInfo.name as string, 'com.atomicservice.5765880207855877209'])
-      const rejectList = currentRejectEntries.map(entry => entry.key.substring('reject_'.length))
+      // 从数据库加载白名单
+      const whiteApps = await accessControlRdb.getAppsByDomain('WHITE', 'name');
+      // 提取出处于“选中”状态的包名
+      let acceptList = whiteApps.filter(a => a.isSelected).map(a => a.package_name);
+      // 补充强制放行的包名
+      const protectedPackages = [
+        this.context?.applicationInfo.name as string,
+        'com.atomicservice.5765880207855877209'
+      ];
+      // 去重并加入保护列表
+      protectedPackages.forEach(pkg => {
+        if (pkg && !acceptList.includes(pkg)) {
+          acceptList.push(pkg);
+        }
+      });
+      // 从数据库加载黑名单
+      const blackApps = await accessControlRdb.getAppsByDomain('BLACK', 'name');
+      // 提取出处于“选中”状态的包名
+      const rejectList = blackApps.filter(a => a.isSelected).map(a => a.package_name);
       console.log(`AccessControl 将加载 acceptList ${acceptList.length} 个，rejectList ${rejectList.length} 个`)
       const accessControl = {
         tunIp : clashConfig?.tun?.["tun-ip"],

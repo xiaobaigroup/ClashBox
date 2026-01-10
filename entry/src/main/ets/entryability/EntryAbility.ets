@@ -31,6 +31,7 @@ import { StatusBarConfig, StatusBarIconResource,
 import BackupRestoreUtil from '../common/utils/BackupRestoreUtil';
 import ConfigAutoUpdateService from '../common/utils/ConfigAutoUpdateService';
 import BuildProfile from 'BuildProfile';
+import { accessControlRdb } from '../common/datasources/AccessControlRdb';
 
 
 export default class EntryAbility extends UIAbility {
@@ -98,6 +99,8 @@ export default class EntryAbility extends UIAbility {
     } catch (error) {
       hilog.error(0x0000, 'EntryAbility', 'Xb_PreferenceUtil initialization failed.');
     }
+    // 初始化访问控制数据库
+    accessControlRdb.init(this.context)
     // 添加崩溃监听
     try {
       hiAppEvent.addWatcher({

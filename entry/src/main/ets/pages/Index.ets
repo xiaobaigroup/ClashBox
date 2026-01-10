@@ -96,9 +96,9 @@ import { animationStyle } from 'xb_components/src/main/ets/components/Animation'
 import { getJsonArrayType } from '../common/entity/utils';
 import { holdingHandleUtil } from '../common/utils/HoldingHandleUtil';
 import { sortByCustomOrder } from '../common/utils/SortUtil';
-import { AppInfo } from '../components/More/AccessControl';
 import { AccessControlCompatibleMerger } from '../common/utils/AccessControlCompatibleUtil';
 import { PCIndex } from './PCIndex';
+import { accessControlRdb, AppInfo } from '../common/datasources/AccessControlRdb';
 
 // import { hdsEffect } from '@kit.UIDesignKit';
 
@@ -1382,38 +1382,73 @@ struct Index {
     }
 
     setTimeout(async () => {
-      // 等待PreferenceUtil完成初始化后，更新访问控制数据
-      console.log(`AccessControl PreferenceUtil Index #updateData 准备数据迁移`)
+      // 等待 PreferenceUtil 完成初始化后，更新访问控制数据
+      console.log(`AccessControl Index #updateData 准备数据迁移`)
+
+      // 读取旧版应用列表
       const appsString = await Xb_PreferenceUtil.get<string>('access_control_apps', "[]")
-      console.log(`AccessControl PreferenceUtil Index #updateData apps: ${appsString}，准备数据迁移`)
-      let apps: AppInfo[] = JSON.parse(appsString) as AppInfo[]
-      console.log(`AccessControl PreferenceUtil Index #updateData apps: ${apps.length}，准备数据迁移`)
-      if (apps.length == 0) {
-        await Xb_PreferenceUtil.put('access_control_apps', this.appConfig.accessControlAppInfo)
-        apps = JSON.parse(this.appConfig.accessControlAppInfo)
-        const currentAcceptEntries = await Xb_KVdbUtil.getEntriesByPrefix('accept_');
-        const currentRejectEntries = await Xb_KVdbUtil.getEntriesByPrefix('reject_');
-        const currentAcceptSet = new Set(currentAcceptEntries.map(entry => entry.key.substring('accept_'.length)));
-        const currentRejectSet = new Set(currentRejectEntries.map(entry => entry.key.substring('reject_'.length)));
-        const mergeResult = AccessControlCompatibleMerger.calculateMergeDifferences(
-          currentAcceptSet,
-          currentRejectSet,
-          this.appConfig.accessControlAcceptList,
-          this.appConfig.accessControlRejectList
-        );
-        if (mergeResult.keysToDelete.length > 0) {
-          await Xb_KVdbUtil.deleteKeysBatch(mergeResult.keysToDelete);
-          console.log(`AccessControl Index: 准备删除 ${mergeResult.keysToDelete.length} 条旧记录。`);
+      let currentApps = JSON.parse(appsString) as AppInfo[]
+      let finalAppsString = appsString
+
+      // 处理“列表为空”的情况
+      if (currentApps.length === 0) {
+        console.log(`AccessControl Index #updateData 列表为空...`)
+        // 注入默认应用列表到 Preference
+        if (this.appConfig.accessControlAppInfo) {
+          await Xb_PreferenceUtil.put('access_control_apps', this.appConfig.accessControlAppInfo)
+          finalAppsString = this.appConfig.accessControlAppInfo
         }
-        if (mergeResult.entriesToAdd.length > 0) {
-          await Xb_KVdbUtil.putEntriesBatch(mergeResult.entriesToAdd);
-          console.log(`AccessControl Index: 准备新增 ${mergeResult.entriesToAdd.length} 条新记录。`);
+        // 注入默认黑白名单到 KVStore (兼容层逻辑)
+        const defaultAcceptList = this.appConfig.accessControlAcceptList || "[]"
+        const defaultRejectList = this.appConfig.accessControlRejectList || "[]"
+        if (defaultAcceptList !== "[]" || defaultRejectList !== "[]") {
+          const currentAcceptEntries = await Xb_KVdbUtil.getEntriesByPrefix('accept_');
+          const currentRejectEntries = await Xb_KVdbUtil.getEntriesByPrefix('reject_');
+          const currentAcceptSet = new Set(currentAcceptEntries.map(entry => entry.key.substring('accept_'.length)));
+          const currentRejectSet = new Set(currentRejectEntries.map(entry => entry.key.substring('reject_'.length)));
+          // 计算并合并差异
+          const mergeResult = AccessControlCompatibleMerger.calculateMergeDifferences(
+            currentAcceptSet,
+            currentRejectSet,
+            defaultAcceptList,
+            defaultRejectList
+          );
+          if (mergeResult.keysToDelete.length > 0) {
+            await Xb_KVdbUtil.deleteKeysBatch(mergeResult.keysToDelete);
+          }
+          if (mergeResult.entriesToAdd.length > 0) {
+            await Xb_KVdbUtil.putEntriesBatch(mergeResult.entriesToAdd);
+          }
         }
-        const newAcceptEntries = await Xb_KVdbUtil.getEntriesByPrefix('accept_');
-        const newRejectEntries = await Xb_KVdbUtil.getEntriesByPrefix('reject_');
-        console.log(`AccessControl Index #updateData 已迁移 apps :${apps.length} 个，白名单: ${newAcceptEntries.map(entry => entry.key.substring('accept_'.length)).length}, 黑名单: ${newRejectEntries.map(entry => entry.key.substring('reject_'.length)).length}`)
+      }
+
+      // 读取最终的旧版黑白名单状态
+      const finalAcceptEntries = await Xb_KVdbUtil.getEntriesByPrefix('accept_');
+      const finalRejectEntries = await Xb_KVdbUtil.getEntriesByPrefix('reject_');
+
+      // 执行迁移到新数据库 RDB
+      // 只要 Preference 或 KVStore 中有任意数据，就执行迁移
+      if (finalAppsString !== "[]" || finalAcceptEntries.length > 0 || finalRejectEntries.length > 0) {
+        console.log(`AccessControl Index #updateData 检测到旧数据，开始迁移到 RDB...`)
+        try {
+          await accessControlRdb.migrateFromOldStorage(
+            finalAppsString,
+            finalAcceptEntries,
+            finalRejectEntries
+          )
+          // 迁移成功后，可以清理旧数据以节省空间
+          // await Xb_PreferenceUtil.delete('access_control_apps')
+          // await Xb_KVdbUtil.deleteEntriesByPrefix('accept_')
+          // await Xb_KVdbUtil.deleteEntriesByPrefix('reject_')
+          console.log(`AccessControl Index #updateData 迁移完成`)
+        } catch (e) {
+          console.error(`AccessControl Index #updateData 迁移失败: ${JSON.stringify(e)}`)
+        }
+      } else {
+        console.log(`AccessControl Index #updateData 无旧数据，跳过迁移`)
       }
     }, 3000)
+
 
   }
 

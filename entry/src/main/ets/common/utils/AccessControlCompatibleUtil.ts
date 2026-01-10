@@ -1,4 +1,4 @@
-// AccessControlMerger.ts
+
 import { distributedKVStore } from "@kit.ArkData";
 
 /**

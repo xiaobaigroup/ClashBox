@@ -15,7 +15,7 @@ export interface UserPreferences{
 
 /* Index */
 // Tab栏构建
-export interface TabBuild{
+export interface TabBuild {
   name: ResourceStr
   icon: Resource
 }
