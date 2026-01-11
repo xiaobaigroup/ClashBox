@@ -77,7 +77,7 @@ export struct MoreTop {
          Text($r('app.string.Cancel'))
         }
         .height(40)
-        // .margin({ left: 10 })
+        .margin({ left: 5 })
         .backgroundColor($r('app.color.background'))
         .transition(customAnimationUtil.isSlide(50, this.uiConfig))
         .onClick(() => {

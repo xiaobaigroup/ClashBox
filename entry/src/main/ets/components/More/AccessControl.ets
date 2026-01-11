@@ -740,8 +740,9 @@ export struct AccessControl {
     }
   }
 
-  async searchApps(keyword: string) {
-    hilog.info(0xFF00, 'AccessControl', `#smartsearchLogs 搜索文本：${keyword}`)
+  async searchApps() {
+    const keyword = this.searchText
+    hilog.debug(0xFF00, 'AccessControl', `#smartsearchLogs 搜索文本：${keyword}`)
     if (keyword === '') {
       this.loadAppsInfo()
       return
@@ -749,12 +750,11 @@ export struct AccessControl {
     const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
     const sortBy = this.appConfig.accessControlSort === 'name' ? 'name' : 'time'
     this.appListData = await accessControlRdb.searchApps(keyword, domain, sortBy)
-    // 搜索结果更新 CheckboxGroup
-    this.selectedPkgNames = new Set(
-      this.appListData
-        .filter(a => a.isSelected)
-        .map(a => a.package_name)
-    )
+    hilog.info(0xFF00, 'AccessControl', `#smartsearchLogs 搜索到：${this.appListData.length} 个`)
+    if (this.appListData.length == 0) {
+      Xb_ToastUtil.showToast({ message: `没有 ${keyword} 哦`, duration: 1000 })
+    }
+    this.searchText = ''
   }
 
   // 导出配置
