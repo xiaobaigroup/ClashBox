@@ -2315,6 +2315,10 @@
     {
       "name": "holding_hand_gesture_subtitle",
       "value": "開啟將停用懸浮按鈕位置"
+    },
+    {
+      "name": "delete_old_data",
+      "value": "清除殘留舊資料"
     }
   ]
 }

@@ -98,7 +98,7 @@ import { holdingHandleUtil } from '../common/utils/HoldingHandleUtil';
 import { sortByCustomOrder } from '../common/utils/SortUtil';
 import { AccessControlCompatibleMerger } from '../common/utils/AccessControlCompatibleUtil';
 import { PCIndex } from './PCIndex';
-import { accessControlRdb, AppInfo } from '../common/datasources/AccessControlRdb';
+import { accessControlRdb, AppInfo, ListType } from '../common/datasources/AccessControlRdb';
 
 // import { hdsEffect } from '@kit.UIDesignKit';
 
@@ -1434,12 +1434,9 @@ struct Index {
           await accessControlRdb.migrateFromOldStorage(
             finalAppsString,
             finalAcceptEntries,
-            finalRejectEntries
+            finalRejectEntries,
+            this.appConfig.accessControlMode == 'AcceptSelected' ? ListType.WHITE_UNSELECTED : ListType.BLACK_UNSELECTED
           )
-          // 迁移成功后，可以清理旧数据以节省空间
-          // await Xb_PreferenceUtil.delete('access_control_apps')
-          // await Xb_KVdbUtil.deleteEntriesByPrefix('accept_')
-          // await Xb_KVdbUtil.deleteEntriesByPrefix('reject_')
           console.log(`AccessControl Index #updateData 迁移完成`)
         } catch (e) {
           console.error(`AccessControl Index #updateData 迁移失败: ${JSON.stringify(e)}`)

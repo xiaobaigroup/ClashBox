@@ -13,6 +13,8 @@ import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { intl } from "@kit.LocalizationKit"
 import { Xb_CapsuleButton, Xb_CircleButton, Xb_FileUtils, Xb_GetResourceString,
   Xb_ImageUtils,
+  Xb_KVdbUtil,
+  Xb_PreferenceUtil,
   Xb_ToastUtil } from "xb_components"
 import { customAnimationUtil } from "../../common/utils/Animation"
 import { EventHub, EventKey } from '../../common/EventHub'
@@ -436,6 +438,21 @@ export struct AccessControl {
           this.importAccessConfig()
         }
       })
+      Xb_CapsuleButton({
+        fontSize: 15,
+        icon: undefined,
+        buttonHeight: 40,
+        theBackgroundColor: $r('app.color.container_background'),
+        text: $r('app.string.delete_old_data'),
+        iconColor: $r('sys.color.font_primary'),
+        onCheck: async () => {
+          // 数据迁移成功后，可以清理旧数据以节省空间
+          await Xb_PreferenceUtil.delete('access_control_apps')
+          await Xb_KVdbUtil.deleteEntriesByPrefix('accept_')
+          await Xb_KVdbUtil.deleteEntriesByPrefix('reject_')
+          Xb_ToastUtil.showToast({ message: '残留旧数据清除成功' })
+        }
+      })
     }
   }
 
@@ -818,7 +835,8 @@ export struct AccessControl {
           await accessControlRdb.migrateFromOldStorage(
             v1Config.appList || '[]',
             acceptEntries,
-            rejectEntries
+            rejectEntries,
+            v1Config.mode == 'AcceptSelected' ? ListType.WHITE_UNSELECTED : ListType.BLACK_UNSELECTED
           )
           Xb_ToastUtil.showToast({ message: '旧版配置导入成功' })
           // 更新配置

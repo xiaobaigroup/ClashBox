@@ -2315,6 +2315,10 @@
     {
       "name": "holding_hand_gesture_subtitle",
       "value": "开启将禁用悬浮按钮位置"
+    },
+    {
+      "name": "delete_old_data",
+      "value": "清除残留旧数据"
     }
   ]
 }

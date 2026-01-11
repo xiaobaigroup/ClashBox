@@ -414,9 +414,9 @@ export class AccessControlRdb {
    * 策略：
    * 旧 accept_ -> ListType.WHITE_SELECTED (1)
    * 旧 reject_ -> ListType.BLACK_SELECTED (2)
-   * 旧 appList 中剩下的 -> ListType.WHITE_UNSELECTED (10) (防止数据丢失，默认归入白名单未选中)
+   * 旧 appList 中剩下的 -> ListType.WHITE_UNSELECTED (10) 或 ListType.BLACK_UNSELECTED (20)
    */
-  async migrateFromOldStorage(configContent: string, acceptEntries: distributedKVStore.Entry[], rejectEntries: distributedKVStore.Entry[]): Promise<void> {
+  async migrateFromOldStorage(configContent: string, acceptEntries: distributedKVStore.Entry[], rejectEntries: distributedKVStore.Entry[], listType: ListType): Promise<void> {
     if (!this.rdbStore) return
     this.createTable()
 
@@ -474,7 +474,7 @@ export class AccessControlRdb {
           if (!inserted) {
             await this.insertOrReplaceApp({
               package_name: pkg,
-              list_type: ListType.WHITE_UNSELECTED,
+              list_type: listType,
               app_name: app.name,
               icon_blob: app.iconUintArr,
               create_time: app.time

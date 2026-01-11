@@ -2315,6 +2315,10 @@
     {
       "name": "holding_hand_gesture_subtitle",
       "value": "Enabling will disable floating button position"
+    },
+    {
+      "name": "delete_old_data",
+      "value": "Clear residual old data"
     }
   ]
 }
