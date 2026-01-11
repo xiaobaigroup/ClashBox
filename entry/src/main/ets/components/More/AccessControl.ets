@@ -452,6 +452,40 @@ export struct AccessControl {
   @Builder
   swipeActionEnd(id: number, item: AppInfo) {
     Row() {
+      // 复制
+      Xb_CircleButton({
+        icon: $r('sys.symbol.doc_text_on_doc_text'),
+        iconBackgroundColor: undefined,
+        theBackgroundColor: $r('app.color.container_background'),
+        onCheck: () => {
+          const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
+          accessControlRdb.copyToOppositeDomain(item.package_name, domain).then(() => {
+            const mode = domain == 'WHITE' ? '黑名单' : '白名单'
+            Xb_ToastUtil.showToast({ message: `已将 ${item.name} 复制到${mode}` })
+          }).catch((err: Error) => {
+            Xb_ToastUtil.showToast({ message: err.message })
+          })
+        }
+      })
+        .margin({ right: 6})
+      // 移动
+      Xb_CircleButton({
+        icon: $r('sys.symbol.arrow_left_arrow_right'),
+        iconBackgroundColor: undefined,
+        theBackgroundColor: $r('app.color.container_background'),
+        onCheck: () => {
+          const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
+          accessControlRdb.moveToOppositeDomain(item.package_name, domain).then(() => {
+            this.loadAppsInfo()
+            const mode = domain == 'WHITE' ? '黑名单' : '白名单'
+            Xb_ToastUtil.showToast({ message: `已将 ${item.name} 移动到${mode}` })
+          }).catch((err: Error) => {
+            Xb_ToastUtil.showToast({ message: err.message })
+          })
+        }
+      })
+        .margin({ right: 6})
+      // 删除
       Xb_CircleButton({
         icon: $r('sys.symbol.trash_fill'),
         iconColor: Color.Red,
@@ -598,7 +632,7 @@ export struct AccessControl {
             console.log(`AccessControl [DEBUG App ${index}] 图标数据为 null 或 undefined`)
           }
         } else {
-          // 简单遍历检查是否有空数组（不打印日志，只防崩溃）
+          // 简单遍历检查是否有空数组（打印日志，防崩溃）
           if (app.iconUintArr && app.iconUintArr.length === 0) {
             console.warn(`[AccessControl] 警告：发现第 ${index} 条数据 (${app.package_name}) 包含空图标数组`)
             app.iconUintArr = undefined
@@ -617,7 +651,6 @@ export struct AccessControl {
    */
   async deleteApp(index?: number, item?: AppInfo) {
     const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
-
     try {
       if (index != undefined && item != undefined) {
         // 单个删除

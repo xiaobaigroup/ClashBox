@@ -291,20 +291,31 @@ export class AccessControlRdb {
    */
   async copyToOppositeDomain(package_name: string, sourceDomain: 'WHITE' | 'BLACK'): Promise<void> {
     this.ensureInitialized()
-
-    // 获取源域的记录
+    // 获取该包名在两个域中的所有记录
     const apps = await this.getAppsByPackageName(package_name)
+    // 找到源域的记录
     const sourceApp = apps.find(app => {
       if (sourceDomain === 'WHITE') return app.list_type === ListType.WHITE_SELECTED || app.list_type === ListType.WHITE_UNSELECTED
       return app.list_type === ListType.BLACK_SELECTED || app.list_type === ListType.BLACK_UNSELECTED
     })
-
     if (!sourceApp) return
-
+    // 确定目标域
+    const targetDomain = sourceDomain === 'WHITE' ? 'BLACK' : 'WHITE'
+    // 检查目标域是否已存在该应用
+    const existsInTarget = apps.some(app => {
+      if (targetDomain === 'WHITE') {
+        return app.list_type === ListType.WHITE_SELECTED || app.list_type === ListType.WHITE_UNSELECTED
+      } else {
+        return app.list_type === ListType.BLACK_SELECTED || app.list_type === ListType.BLACK_UNSELECTED
+      }
+    })
+    // 如果目标域已经存在，抛出错误，阻止复制
+    if (existsInTarget) {
+      throw new Error('目标名单中已存在该应用')
+    }
     // 计算目标域的 list_type (保持选中状态一致)
     let targetType: ListType
     const isSelected = (sourceApp.list_type === ListType.WHITE_SELECTED || sourceApp.list_type === ListType.BLACK_SELECTED)
-
     if (sourceDomain === 'WHITE') {
       // 白 -> 黑
       targetType = isSelected ? ListType.BLACK_SELECTED : ListType.BLACK_UNSELECTED
@@ -312,7 +323,6 @@ export class AccessControlRdb {
       // 黑 -> 白
       targetType = isSelected ? ListType.WHITE_SELECTED : ListType.WHITE_UNSELECTED
     }
-
     await this.insertOrReplaceApp({
       ...sourceApp,
       list_type: targetType,
@@ -328,10 +338,8 @@ export class AccessControlRdb {
    */
   async moveToOppositeDomain(package_name: string, sourceDomain: 'WHITE' | 'BLACK'): Promise<void> {
     this.ensureInitialized()
-
     // 先执行复制逻辑
     await this.copyToOppositeDomain(package_name, sourceDomain)
-
     // 再执行删除源域逻辑
     await this.removeAppFromDomain(package_name, sourceDomain)
   }
