@@ -252,7 +252,7 @@ struct MorePage {
   }
 
   handleCheck(index: number) {
-    if(index === this.moreList.length - 1) {
+    if (index === this.moreList.length - 1) {
       // 模糊背景
       this.isEnableIndexForegroundBlur = true
       // 召唤查询IP弹窗
@@ -268,8 +268,6 @@ struct MorePage {
         this.morePageInfos.replacePathByName(itemData.name, null, true)
       }
       console.log(`点击跳转，pageInfos：${this.pageInfos.size()}，morePageInfos：${this.morePageInfos.size()}`)
-      // this.isSecondary = true
-      // TabBarVertical(this.widthBp, this.heightBp) ? false : true
     }
   }
 

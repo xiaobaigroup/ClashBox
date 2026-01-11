@@ -967,7 +967,7 @@ struct Index {
     this.onWindowChange()
     // 除手机外更多页均默认跳转覆写
     if (this.widthBp > 1) {
-      this.morePageInfos.pushPathByName('Overwrite', null, false)
+      this.morePageInfos.pushPathByName('overwrite', null, false)
     }
     // 启动时检查上一次是否崩溃
     if (AppStorage.get<boolean>('crash') === true && !this.uiConfig.isFirstStart) {
@@ -1448,7 +1448,6 @@ struct Index {
         console.log(`AccessControl Index #updateData 无旧数据，跳过迁移`)
       }
     }, 3000)
-
 
   }
 
