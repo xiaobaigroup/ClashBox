@@ -291,6 +291,8 @@ struct Index {
    /**
    * 更多页相关变量
    */
+  // 访问控制 -> 在线应用添加
+  @StorageLink('OnlineSearchPageInfos') addPageInfos: NavPathStack = new NavPathStack()
   // 更多页面栈
   @StorageLink('MoreNavPathStack') morePageInfos: NavPathStack = new NavPathStack()
   // 更多页面数据

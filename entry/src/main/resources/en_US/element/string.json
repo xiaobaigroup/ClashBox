@@ -2319,6 +2319,10 @@
     {
       "name": "delete_old_data",
       "value": "Clear residual old data"
+    },
+    {
+      "name": "online_search",
+      "value": "Online search"
     }
   ]
 }

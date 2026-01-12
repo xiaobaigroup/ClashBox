@@ -987,6 +987,7 @@ export struct checkoutRowListItem {
   @State isExperimentalFunction: boolean = false
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  @Prop endSymbol: Resource = this.isSelected ? $r('sys.symbol.checkmark_circle_fill_1') : $r('sys.symbol.checkmark_circle')
 
   build() {
     Row({space: 12}) {
@@ -1014,7 +1015,7 @@ export struct checkoutRowListItem {
       }.layoutWeight(1)
       .alignItems(HorizontalAlign.Start)
       Blank()
-      SymbolGlyph(this.isSelected ? $r('sys.symbol.checkmark_circle_fill_1') : $r('sys.symbol.checkmark_circle'))
+      SymbolGlyph(this.endSymbol)
         .fontSize(24)
         .enabled(this.enabledClick)
         .fontColor([this.enabledClick ? (!this.isSelected ? icon_primary : this.icon_emphasize) : this.getColor(!this.isSelected ? icon_primary : this.icon_emphasize)])

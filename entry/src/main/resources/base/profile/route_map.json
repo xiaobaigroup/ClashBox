@@ -144,6 +144,14 @@
       "data": {
         "description": "访问控制页面"
       }
+    },
+    {
+      "name": "online_app_search",
+      "pageSourceFile": "src/main/ets/components/More/AccessControl.ets",
+      "buildFunction": "OnlineSearchBuilder",
+      "data": {
+        "description": "在线添加应用页面"
+      }
     }
   ]
 }

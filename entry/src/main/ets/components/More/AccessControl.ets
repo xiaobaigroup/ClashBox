@@ -3,11 +3,22 @@ import { hilog } from "@kit.PerformanceAnalysisKit"
 import { ButtonBuilder, checkoutRowListItem,
   font_primary,
   icon_primary,
-  KVCustomDialog, toggleRowList } from "../Common/Common"
-import { NeedClearMoreStack, PageMargin } from "../../common/breakpoint/BreakPoint"
-import { BundleInfo, TAB_CONTENT_TITLE_HEIGHT } from "../../common/entity/Constants"
+  KVCustomDialog, toggleRowList, BindSheetTitleCustomBuilder,
+  skipRowList } from "../Common/Common"
+import { NavigationListPadding, NeedClearMoreStack, PageMargin } from "../../common/breakpoint/BreakPoint"
+import { BIND_SHEET_CONTAINER_HEIGHT,
+  BIND_SHEET_DRAG_BAR_HEIGHT,
+  BIND_SHEET_MAIN_FONTSIZE,
+  BIND_SHEET_MAIN_FONT_WEIGHT,
+  BIND_SHEET_SUB_FONTSIZE,
+  BIND_SHEET_TITLE_CONTAINER_HEIGHT,
+  BundleInfo,
+  CONTENT_END_OFFSET_150,
+  LIST_SPACE,
+  TAB_CONTENT_TITLE_HEIGHT } from "../../common/entity/Constants"
 import { AppConfig, UIConfig } from "../../entryability/AppState"
-import { ItemRestriction, LengthMetrics, SegmentButton, SegmentButtonOptions, SegmentButtonTextItem } from "@kit.ArkUI"
+import { ItemRestriction, LengthMetrics, SegmentButton, SegmentButtonOptions, SegmentButtonTextItem,
+  SymbolGlyphModifier } from "@kit.ArkUI"
 import { KeyValueData } from "./Overwrite/EditArrayConfig"
 import { getResourceString } from "../../common/utils/ResourceStringUtil"
 import { intl } from "@kit.LocalizationKit"
@@ -27,6 +38,7 @@ import { accessControlRdb,
   AccessConfigExport } from "../../common/datasources/AccessControlRdb"
 import { Base64Util } from "../../common/utils/Base64Util"
 import { JSON } from "@kit.ArkTS"
+import TopBuilder from "../Settings/TopBuilder"
 
 @Builder
 export function AccessControlBuilder(name: string, param: Object){
@@ -43,6 +55,7 @@ export struct AccessControl {
   @Consume isSecondary: boolean
   @State isNewApp: boolean = true
   @State currentIndex: number = 0
+  @State isAddSelect: boolean = false
   @State isShowSheet: boolean = false
   @State isDeleteing: boolean = false
   @State initialized: boolean = false
@@ -52,18 +65,20 @@ export struct AccessControl {
   @State kvDialogTitle: ResourceStr = ''
   @Consume @Watch('onSearchAppList') isSearching: boolean
   @Consume @Watch('searchApps') searchText: string
+  @StorageLink('OnlineSearchPageInfos') addPageInfos: NavPathStack = new NavPathStack()
   @StorageLink('NavPathStack') pageInfos: NavPathStack = new NavPathStack()
-  // 主题色
-  @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  @State keyValueData: KeyValueData = new KeyValueData("")
-  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  @State keyValueData: KeyValueData = new KeyValueData("")
+
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   // 高度断点
   @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
   @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+  // 主题色
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 状态栏高度
   @StorageProp('topRectHeight') topRectHeight: number = 0
 
@@ -95,6 +110,7 @@ export struct AccessControl {
           name: 'AccessControl',
           enableClick2: true,
           onClick2: () => {
+            this.isAddSelect = false
             this.isEnableIndexForegroundBlur = true
             this.isShowSheet = true
           },
@@ -151,7 +167,9 @@ export struct AccessControl {
                 ButtonBuilder({
                   icon: $r('sys.symbol.plus'),
                   onCheck: () => {
-                    this.addApp()
+                    this.isAddSelect = true
+                    this.isEnableIndexForegroundBlur = true
+                    this.isShowSheet = true
                   }
                 })
                   .enabled(this.appConfig.accessControl)
@@ -291,7 +309,8 @@ export struct AccessControl {
               onWillDismiss: () => {
                 this.isShowSheet = false
                 this.isEnableIndexForegroundBlur = false
-              }
+              },
+              onWillSpringBackWhenDismiss: () => {} // 注册回调，防止反向回弹
             })
           }
           .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring : null)
@@ -375,6 +394,75 @@ export struct AccessControl {
 
   @Builder
   SheetBuilder() {
+    if (this.isAddSelect) {
+      // 添加
+      this.AddBuilder()
+    } else {
+      // 操作
+      this.OptionBuilder()
+    }
+  }
+
+  @Builder
+  AddBuilder() {
+    Navigation(this.addPageInfos) {
+      List({ space: LIST_SPACE }) {
+        ListItem() {
+          skipRowList({
+            icons: undefined,
+            title: $r('app.string.online_search'),
+          })
+            .onClick(() => {
+              this.addPageInfos.pushPathByName('online_app_search', '')
+            })
+        }
+        ListItem() {
+          skipRowList({
+            icons: undefined,
+            title: $r('app.string.add_app'),
+          })
+            .onClick(() => {
+              this.isShowSheet = false
+              this.addApp()
+            })
+        }
+      }
+      .padding({
+        left: NavigationListPadding(this.widthBp, this.heightBp),
+        right: NavigationListPadding(this.widthBp, this.heightBp)
+      })
+    }
+    .mode(NavigationMode.Stack)
+    .hideToolBar(true)
+    .width('100%')
+    .height('100%')
+    .title(
+      {
+        builder: BindSheetTitleCustomBuilder({
+          pageInfos: this.addPageInfos,
+          isSubPage: false,
+          mainTitle: $r('app.string.add_app'),
+          needSetHeight: true,
+          mainTitleFontWeight: BIND_SHEET_MAIN_FONT_WEIGHT,
+          mainTitleFontSize: BIND_SHEET_MAIN_FONTSIZE,
+          subTitleFontSize: BIND_SHEET_SUB_FONTSIZE,
+          padding: {
+            left: NavigationListPadding(this.widthBp, this.heightBp),
+            right: NavigationListPadding(this.widthBp, this.heightBp)
+          },
+          menus: []
+        }),
+        height: BIND_SHEET_TITLE_CONTAINER_HEIGHT + BIND_SHEET_DRAG_BAR_HEIGHT
+      })
+    .height(BIND_SHEET_CONTAINER_HEIGHT)
+    .mode(NavigationMode.Stack)
+    .hideBackButton(true)
+    .navBarWidthRange([255, '100%'])
+    .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
+  }
+
+  @Builder
+  OptionBuilder() {
     Column({space: 5}) {
       // 模式
       Text($r('app.string.mode'))
@@ -869,4 +957,70 @@ interface AccessConfig {
   appList: string
   acceptList: string
   rejectList: string
+}
+
+
+@Builder
+export function OnlineSearchBuilder(name: string, param: Object){
+  OnlineSearch()
+}
+
+@Component
+struct OnlineSearch {
+
+  @StorageLink('OnlineSearchPageInfos') addPageInfos: NavPathStack = new NavPathStack()
+  // 高度断点
+  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  // 宽度断点
+  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+  // 主题色
+  @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  @State searchText: string = ''
+  @State apps: AppInfo[] = []
+
+  build() {
+    NavDestination() {
+      TopBuilder({
+        showBackButton: true,
+        title: $r('app.string.online_search'),
+      })
+      Column() {
+        Search({ value: this.searchText, placeholder: $r('app.string.enter_search')})
+          .enterKeyType(EnterKeyType.Search)
+          .copyOption(CopyOptions.LocalDevice)
+          .searchIcon(new SymbolGlyphModifier($r('sys.symbol.magnifyingglass')).fontColor([this.icon_emphasize]))
+          .cancelButton({
+            style: CancelButtonStyle.CONSTANT,
+            icon: new SymbolGlyphModifier($r('sys.symbol.xmark')).fontColor([this.icon_emphasize])
+          })
+          .layoutWeight(1)
+          .onSubmit((value: string) => {
+            // 发送搜索
+            this.searchText = value
+          })
+        List() {
+          ForEach(this.apps, (app: AppInfo) => {
+            ListItem() {
+              checkoutRowListItem({
+                icon: app.iconUintArr ? Xb_ImageUtils.uint8ArrayToPixelMap(app.iconUintArr) : $r('app.media.box_cat_round'),
+                title: app.name,
+                endSymbol: $r('sys.symbol.plus_circle'),
+                subtitle: app.package_name,
+                enabledClick: true
+              })
+            }
+          })
+        }
+        .width('100%')
+        .alignListItem(ListItemAlign.Center)
+        .contentEndOffset(CONTENT_END_OFFSET_150 - 75)
+        .padding({left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp)})
+      }
+    }
+    .width('100%')
+    .height('100%')
+    .hideTitleBar(true)
+
+  }
+
 }

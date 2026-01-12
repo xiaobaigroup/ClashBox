@@ -180,6 +180,7 @@ struct Home {
           TopBar({
             title: `${getResourceString($r('app.string.home_edit'), this)}`,
             titleFontSize: this.windowMode ? 20 : 24,
+            iconSize: this.windowMode ? 18 : (this.curYOffset < 0 ? 24 - this.curYOffset / 100 : 24),
             icons: [$r('sys.symbol.sort'), $r('sys.symbol.plus'), $r('sys.symbol.save'), $r('sys.symbol.xmark')],
             // 排序按钮
             onFClick: () => {
