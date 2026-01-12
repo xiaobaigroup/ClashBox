@@ -336,7 +336,7 @@ struct Index {
   build() {
     Stack({ alignContent: Alignment.TopEnd }) {
       // 窗口控制器(窗口模式显示)
-      if (this.windowMode) {
+      if (this.windowMode && !this.isSearching) {
         WindowTopBar()
           .zIndex(2)
       }

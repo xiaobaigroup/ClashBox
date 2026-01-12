@@ -132,7 +132,7 @@ export struct MoreTop {
             // 默认搜索按钮
             ButtonBuilder({
               icon: $r('sys.symbol.magnifyingglass'),
-              iconSize: this.windowMode ? 16 : 24,
+              iconSize: this.windowMode ? 18 : 24,
               iconWeight: this.windowMode ? FontWeight.Bold : undefined,
               onCheck: () => {
                 this.isSearching = true
@@ -148,7 +148,7 @@ export struct MoreTop {
           Row() {
             ButtonBuilder({
               icon: this.icon1,
-              iconSize: this.windowMode ? 16 : 24,
+              iconSize: this.windowMode ? 18 : 24,
               iconWeight: this.windowMode ? FontWeight.Bold : undefined,
               onCheck: () => {
                 this.onClick1()
@@ -165,7 +165,7 @@ export struct MoreTop {
             ButtonBuilder({
               icon: this.icon2,
               enableClick: this.enableClick2,
-              iconSize: this.windowMode ? 16 : 24,
+              iconSize: this.windowMode ? 18 : 24,
               iconWeight: this.windowMode ? FontWeight.Bold : undefined,
               onCheck: () => {
                 this.onClick2()
@@ -185,7 +185,7 @@ export struct MoreTop {
     .alignItems(VerticalAlign.Center)
     .margin({ top: this.widthBp < 2 ? this.topRectHeight : 0 })
     .height(this.curYOffset < 0 ? TAB_CONTENT_TITLE_HEIGHT - this.curYOffset : TAB_CONTENT_TITLE_HEIGHT)
-    .padding({right: this.windowMode ? 120 : PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp)})
+    .padding({right: (this.windowMode && !this.isSearching) ? 120 : PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp)})
   }
 
   @Builder

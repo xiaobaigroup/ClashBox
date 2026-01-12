@@ -140,7 +140,7 @@ struct ConfigurationPage {
             title: getResourceString($r('app.string.Configuration'), this),
             titleFontSize: this.curYOffset < 0 ? TAB_CONTENT_TITLE_FONT_SIZE - this.curYOffset / 100 : TAB_CONTENT_TITLE_FONT_SIZE,
             icons: [$r('sys.symbol.sort'), $r('sys.symbol.arrow_clockwise')],
-            iconSize: this.windowMode ? 17 : (this.curYOffset < 0 ? 24 - this.curYOffset / 100 : 24),
+            iconSize: this.windowMode ? 18 : (this.curYOffset < 0 ? 24 - this.curYOffset / 100 : 24),
             // 排序按钮
             onFClick: () => {
               this.showSort = true

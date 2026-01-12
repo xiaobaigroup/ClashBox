@@ -152,7 +152,7 @@ struct Home {
           TopBar({
             title: this.uiConfig.isGreeting ? Xb_GetResourceString(getGreeting(), this) : 'ClashBox',
             icons: [$r('sys.symbol.square_and_pencil'), $r('sys.symbol.gearshape')],
-            iconSize: this.windowMode ? 17 : (this.curYOffset < 0 ? 24 - this.curYOffset / 100 : 24),
+            iconSize: this.windowMode ? 18 : (this.curYOffset < 0 ? 24 - this.curYOffset / 100 : 24),
             // 编辑按钮
             onFClick: () => {
               this.isShowHomeEdit = true
