@@ -70,7 +70,10 @@ struct Appearance {
   build() {
     NavDestination() {
       // 顶部导航区
-      TopBuilder({title: $r('app.string.Appearance')})
+      TopBuilder({
+        title: $r('app.string.Appearance'),
+        pathStack: this.SettingsPageInfos
+      })
       // 功能区
       List({ space: 10 }) {
         // 预览区

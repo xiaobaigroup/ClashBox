@@ -90,7 +90,10 @@ struct Notice {
 
   build() {
     NavDestination() {
-      TopBuilder({title: $r('app.string.Notice')})
+      TopBuilder({
+          title: $r('app.string.Notice'),
+          pathStack: this.SettingsPageInfos
+       })
       Column({space: 10}) {
         // 反馈 Start
         Column() {
@@ -498,7 +501,11 @@ export struct CellularDataReminder {
 
   build() {
     NavDestination() {
-      TopBuilder({title: $r('app.string.Notice'), subtitle: $r('app.string.cellular_data_reminder')})
+      TopBuilder({
+          title: $r('app.string.Notice'),
+          subtitle: $r('app.string.cellular_data_reminder'),
+          pathStack: this.SettingsPageInfos
+        })
       List() {
         // 流量提醒总开关行
         ListItem() {

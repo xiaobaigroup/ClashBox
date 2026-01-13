@@ -95,7 +95,10 @@ struct Kernel {
 
   build() {
     NavDestination() {
-      TopBuilder({title: $r('app.string.kernel')})
+      TopBuilder({
+        title: $r('app.string.kernel'),
+        pathStack: this.SettingsPageInfos
+      })
       Column({space:10}) {
         Column({space:8}){
           ForEach(this.kernel, (item: KernelListItem, index: number) => {

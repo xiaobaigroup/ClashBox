@@ -30,7 +30,8 @@ export struct UpdateLog {
       Column() {
         TopBuilder({
           title: $r('app.string.update_log'),
-          showBackButton: this.showBackButton
+          showBackButton: this.showBackButton,
+          pathStack: this.SettingsPageInfos
         })
         Xb_UpdateLog({
           logoImage: $r('app.media.background_white_large'),

@@ -1,7 +1,7 @@
-import { BIND_SHEET_DRAG_BAR_HEIGHT, BIND_SHEET_TITLE_CONTAINER_HEIGHT } from "../../common/entity/Constants"
-import { UIConfig } from "../../entryability/AppState"
-import { customAnimationUtil } from "../../common/utils/Animation"
-import { icon_primary } from "../Common/Common"
+import { BIND_SHEET_DRAG_BAR_HEIGHT, BIND_SHEET_TITLE_CONTAINER_HEIGHT } from '../../common/entity/Constants'
+import { UIConfig } from '../../entryability/AppState'
+import { customAnimationUtil } from '../../common/utils/Animation'
+import { icon_primary } from '../Common/Common'
 
 @Preview
 @Component
@@ -12,7 +12,8 @@ struct TopBuilder {
   @State showBackButton: boolean = true
   // 窗口模式区分，true为窗口式，false为普通式
   @StorageProp('WindowMode') windowMode: boolean = false
-  @Consume('NavSettingsPathStack') SettingsPageInfos: NavPathStack
+  /** 由调用方传入，支持不同路由栈的复用 */
+  @Link pathStack: NavPathStack
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
 
   build() {
@@ -29,7 +30,7 @@ struct TopBuilder {
         .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
         .backgroundColor(this.windowMode ? Color.Transparent : $r('app.color.back'))
         .onClick(() => {
-          this.SettingsPageInfos.pop(true)
+          this.pathStack.pop(true)
         })
       }
       Column() {

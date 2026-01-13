@@ -40,7 +40,10 @@ struct Backgrounder {
 
   build() {
     NavDestination() {
-      TopBuilder({title: $r('app.string.Backgrounder')})
+      TopBuilder({
+        title: $r('app.string.Backgrounder'),
+        pathStack: this.SettingsPageInfos
+      })
       List({space: 10}) {
         // 任务保持
         if (deviceInfo.deviceType === 'tablet' || deviceInfo.deviceType === '2in1') {

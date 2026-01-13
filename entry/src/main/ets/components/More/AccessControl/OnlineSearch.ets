@@ -38,6 +38,7 @@ struct OnlineSearch {
       TopBuilder({
         showBackButton: true,
         title: $r('app.string.online_search'),
+        pathStack: this.addPageInfos
       })
       Column() {
         Search({ value: this.searchText, placeholder: $r('app.string.enter_search')})

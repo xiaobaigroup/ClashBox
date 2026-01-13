@@ -59,6 +59,7 @@ struct Settings {
       TopBuilder({
         showBackButton: false,
         title: $r('app.string.Settings'),
+        pathStack: this.SettingsPageInfos
       })
       List({space: 10}) {
         ForEach(this.settingsList, (item: settingsData, index: number) => {
@@ -305,7 +306,8 @@ struct OfflineDetail {
     NavDestination() {
       TopBuilder({
         title: $r('app.string.offline'),
-        subtitle: ''
+        subtitle: '',
+        pathStack: this.SettingsPageInfos
       })
 
       if (this.offline.length === 0) {

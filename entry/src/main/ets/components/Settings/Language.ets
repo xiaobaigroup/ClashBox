@@ -64,7 +64,10 @@ struct Language {
 
   build() {
     NavDestination() {
-      TopBuilder({title: $r('app.string.Language')})
+      TopBuilder({
+        title: $r('app.string.Language'),
+        pathStack: this.SettingsPageInfos
+      })
       List() {
         // 跟随系统语言
         ListItem() {

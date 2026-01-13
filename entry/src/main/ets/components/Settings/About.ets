@@ -252,7 +252,10 @@ struct About {
   build() {
     NavDestination() {
       // 标题
-      TopBuilder({title: $r('app.string.About')})
+      TopBuilder({
+        title: $r('app.string.About'),
+        pathStack: this.SettingsPageInfos
+        })
       // List主体
       List() {
         // Logo&名称
@@ -437,7 +440,11 @@ export struct AboutXBStudio {
 
   build() {
     NavDestination() {
-      TopBuilder({title: $r('app.string.About'), subtitle: $r('app.string.xb_studio')})
+      TopBuilder({
+        title: $r('app.string.About'), 
+        subtitle: $r('app.string.xb_studio'), 
+        pathStack: this.SettingsPageInfos
+        })
       // 小白工坊
       Xb_Studio({
         route: undefined /*UIUtils.enableV2Compatibility(this.SettingsPageInfos)*/,
@@ -474,7 +481,11 @@ export struct AboutCollaborators {
 
   build() {
     NavDestination() {
-      TopBuilder({title: $r('app.string.About'), subtitle: $r('app.string.collaborators')})
+      TopBuilder({
+        title: $r('app.string.About'),
+        subtitle: $r('app.string.collaborators'),
+        pathStack: this.SettingsPageInfos
+        })
       List() {
         ForEach(this.CollaboratorsList, (item: CollaboratorsListItemProp, index: number) => {
           ListItem() {
@@ -583,7 +594,11 @@ export struct ThirdServices {
 
   build() {
     NavDestination() {
-      TopBuilder({title: $r('app.string.About'), subtitle: $r('app.string.third_party_services')})
+      TopBuilder({
+          title: $r('app.string.About'), 
+          subtitle: $r('app.string.third_party_services'), 
+          pathStack: this.SettingsPageInfos
+        })
       List({space: 10}) {
         ForEach(this.thirdServicesList, (item: TCItemProp, index: number) => {
           ListItem() {
@@ -645,7 +660,11 @@ export struct UseGuidance {
 
   build() {
     NavDestination() {
-      TopBuilder({title: $r('app.string.About'), subtitle: $r('app.string.UseGuidance')})
+      TopBuilder({
+        title: $r('app.string.About'),
+        subtitle: $r('app.string.UseGuidance'),
+        pathStack: this.SettingsPageInfos
+        })
       List({space: 10}) {
         ForEach(this.useGuidanceList, (item: TCItemProp, index: number) => {
           ListItem() {
@@ -707,7 +726,11 @@ export struct FAQ {
 
   build() {
     NavDestination() {
-      TopBuilder({title: $r('app.string.About'), subtitle: $r('app.string.FAQ')})
+      TopBuilder({
+          title: $r('app.string.About'), 
+          subtitle: $r('app.string.FAQ'), 
+          pathStack: this.SettingsPageInfos
+        })
       List({space: 10}) {
         ListItem() {
           Row({space: 10}) {
@@ -877,7 +900,10 @@ export struct CheckUpdate {
 
   build() {
     NavDestination() {
-      TopBuilder({title: $r('app.string.Check_Updates')})
+      TopBuilder({
+          title: $r('app.string.Check_Updates'), 
+          pathStack: this.SettingsPageInfos
+        })
       Column({space: 10}) {
         ForEach(this.updateList, (item: CheckUpdateListItemProp, index: number) => {
           Column() {

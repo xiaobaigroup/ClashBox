@@ -45,7 +45,10 @@ struct Backup {
 
   build() {
     NavDestination() {
-      TopBuilder({title: $r('app.string.Backup_Recovery')})
+      TopBuilder({
+        title: $r('app.string.Backup_Recovery'),
+        pathStack: this.SettingsPageInfos
+      })
       // 功能区
       List({ space: 10 }) {
         // 云备份
@@ -378,7 +381,11 @@ export struct CloudBackup {
 
   build() {
     NavDestination() {
-      TopBuilder({title: $r('app.string.Backup_Recovery'), subtitle: $r('app.string.cloud_backup')})
+      TopBuilder({
+        title: $r('app.string.Backup_Recovery'),
+        subtitle: $r('app.string.cloud_backup'),
+        pathStack: this.SettingsPageInfos
+      })
       List() {
         // 云备份开关
         ListItem() {

@@ -9,7 +9,10 @@ struct WipeData {
 
   build() {
     NavDestination() {
-      TopBuilder({title: $r('app.string.WipeData'), /*isShowSettings: this.isShowSettings*/})
+      TopBuilder({
+        title: $r('app.string.WipeData'),
+        pathStack: this.SettingsPageInfos
+      })
     }
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
