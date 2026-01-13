@@ -98,7 +98,7 @@ export struct ConfigAdd {
                   configId: 'new',
                   isNewConfig: true,
                   configName: '',
-                  configUrl: '',
+                  configUrl: 'https://api.lnnrhtp.com/api/v1/client/subscribe?token=bee93e527e608e545e4fca6529e27b17',
                   disableUpdate: false,
                   isConfigAutoUpdate: false,
                   lastUpdateDateTime: 0,

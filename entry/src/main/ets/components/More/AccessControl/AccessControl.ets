@@ -1,44 +1,54 @@
-import { MoreTop } from "../MoreTopBuilder"
-import { hilog } from "@kit.PerformanceAnalysisKit"
-import { ButtonBuilder, checkoutRowListItem,
+import { MoreTop } from '../MoreTopBuilder'
+import { hilog } from '@kit.PerformanceAnalysisKit'
+import {
+  BindSheetTitleCustomBuilder,
+  ButtonBuilder,
+  checkoutRowListItem,
   font_primary,
   icon_primary,
-  KVCustomDialog, toggleRowList, BindSheetTitleCustomBuilder,
-  skipRowList } from "../../Common/Common"
-import { NavigationListPadding, NeedClearMoreStack, PageMargin } from "../../../common/breakpoint/BreakPoint"
-import { BIND_SHEET_CONTAINER_HEIGHT,
+  KVCustomDialog,
+  skipRowList,
+  toggleRowList
+} from '../../Common/Common'
+import { NavigationListPadding, NeedClearMoreStack, PageMargin } from '../../../common/breakpoint/BreakPoint'
+import {
+  BIND_SHEET_CONTAINER_HEIGHT,
   BIND_SHEET_DRAG_BAR_HEIGHT,
-  BIND_SHEET_MAIN_FONTSIZE,
   BIND_SHEET_MAIN_FONT_WEIGHT,
+  BIND_SHEET_MAIN_FONTSIZE,
   BIND_SHEET_SUB_FONTSIZE,
   BIND_SHEET_TITLE_CONTAINER_HEIGHT,
   BundleInfo,
-  CONTENT_END_OFFSET_150,
   LIST_SPACE,
-  TAB_CONTENT_TITLE_HEIGHT } from "../../../common/entity/Constants"
-import { AppConfig, UIConfig } from "../../../entryability/AppState"
-import { ItemRestriction, LengthMetrics, SegmentButton, SegmentButtonOptions, SegmentButtonTextItem,
-  SymbolGlyphModifier } from "@kit.ArkUI"
-import { KeyValueData } from "../Overwrite/EditArrayConfig"
-import { getResourceString } from "../../../common/utils/ResourceStringUtil"
-import { intl } from "@kit.LocalizationKit"
-import { Xb_CapsuleButton, Xb_CircleButton, Xb_FileUtils, Xb_GetResourceString,
+  TAB_CONTENT_TITLE_HEIGHT
+} from '../../../common/entity/Constants'
+import { AppConfig, UIConfig } from '../../../entryability/AppState'
+import { ItemRestriction, LengthMetrics, SegmentButton, SegmentButtonOptions, SegmentButtonTextItem } from '@kit.ArkUI'
+import { KeyValueData } from '../Overwrite/EditArrayConfig'
+import { getResourceString } from '../../../common/utils/ResourceStringUtil'
+import {
+  Xb_CapsuleButton,
+  Xb_CircleButton,
+  Xb_FileUtils,
+  Xb_GetResourceString,
   Xb_ImageUtils,
   Xb_KVdbUtil,
   Xb_PreferenceUtil,
-  Xb_ToastUtil } from "xb_components"
-import { customAnimationUtil } from "../../../common/utils/Animation"
+  Xb_ToastUtil
+} from 'xb_components'
+import { customAnimationUtil } from '../../../common/utils/Animation'
 import { EventHub, EventKey } from '../../../common/EventHub'
-import { AccessControlCompatibleMerger } from "../../../common/utils/AccessControlCompatibleUtil"
-import { accessControlRdb,
+import { AccessControlCompatibleMerger } from '../../../common/utils/AccessControlCompatibleUtil'
+import {
+  AccessConfigExport,
+  accessControlRdb,
   AppInfo,
   AppInfoConfig,
   AppInfoRdb,
-  ListType,
-  AccessConfigExport } from "../../../common/datasources/AccessControlRdb"
-import { Base64Util } from "../../../common/utils/Base64Util"
-import { JSON } from "@kit.ArkTS"
-import TopBuilder from "../../Settings/TopBuilder"
+  ListType
+} from '../../../common/datasources/AccessControlRdb'
+import { JSON } from '@kit.ArkTS'
+import { AddAppListComponent } from './AddAppListComponent'
 
 @Builder
 export function AccessControlBuilder(name: string, param: Object){
@@ -396,14 +406,20 @@ export struct AccessControl {
   SheetBuilder() {
     if (this.isAddSelect) {
       // 添加
-      this.AddBuilder()
+      AddAppListComponent({
+        isShowSheet: this.isShowSheet,
+        addAppEvent: () => {
+          // 这里通过箭头函数的特性将 this 指向 AccessControl 组件
+          this.addApp()
+        }
+      })
     } else {
       // 操作
       this.OptionBuilder()
     }
   }
 
-  @Builder
+  @LocalBuilder
   AddBuilder() {
     Navigation(this.addPageInfos) {
       List({ space: LIST_SPACE }) {
@@ -413,7 +429,15 @@ export struct AccessControl {
             title: $r('app.string.online_search'),
           })
             .onClick(() => {
-              this.addPageInfos.pushPathByName('online_app_search', '')
+              this.addPageInfos.pushDestination({
+                name: 'online_app_search'
+              })
+                .then(() => {
+                  hilog.info(0x0001, "AccessControl", 'pushDestination success')
+                })
+                .catch((err: ESObject) => {
+                  hilog.error(0x0001, "AccessControl", 'pushDestination fail: ' + err)
+                })
             })
         }
         ListItem() {
