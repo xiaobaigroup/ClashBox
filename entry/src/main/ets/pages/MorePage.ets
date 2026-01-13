@@ -28,7 +28,7 @@ import { AppConfig, UIConfig } from '../entryability/AppState';
 import { ArrayConfigEditor } from '../components/More/Overwrite/EditArrayConfig';
 import { customAnimationUtil } from '../common/utils/Animation';
 import { ListItemMarginValue, MoreNavMode, NeedClearMoreStack, TabBarVertical } from '../common/breakpoint/BreakPoint';
-import { AccessControl } from '../components/More/AccessControl';
+import { AccessControl } from '../components/More/AccessControl/AccessControl';
 import { EventKey, EventHub } from '../common/EventHub';
 
 const componentName: string = 'MorePage'

@@ -1,11 +1,11 @@
-import { MoreTop } from "./MoreTopBuilder"
+import { MoreTop } from "../MoreTopBuilder"
 import { hilog } from "@kit.PerformanceAnalysisKit"
 import { ButtonBuilder, checkoutRowListItem,
   font_primary,
   icon_primary,
   KVCustomDialog, toggleRowList, BindSheetTitleCustomBuilder,
-  skipRowList } from "../Common/Common"
-import { NavigationListPadding, NeedClearMoreStack, PageMargin } from "../../common/breakpoint/BreakPoint"
+  skipRowList } from "../../Common/Common"
+import { NavigationListPadding, NeedClearMoreStack, PageMargin } from "../../../common/breakpoint/BreakPoint"
 import { BIND_SHEET_CONTAINER_HEIGHT,
   BIND_SHEET_DRAG_BAR_HEIGHT,
   BIND_SHEET_MAIN_FONTSIZE,
@@ -15,30 +15,30 @@ import { BIND_SHEET_CONTAINER_HEIGHT,
   BundleInfo,
   CONTENT_END_OFFSET_150,
   LIST_SPACE,
-  TAB_CONTENT_TITLE_HEIGHT } from "../../common/entity/Constants"
-import { AppConfig, UIConfig } from "../../entryability/AppState"
+  TAB_CONTENT_TITLE_HEIGHT } from "../../../common/entity/Constants"
+import { AppConfig, UIConfig } from "../../../entryability/AppState"
 import { ItemRestriction, LengthMetrics, SegmentButton, SegmentButtonOptions, SegmentButtonTextItem,
   SymbolGlyphModifier } from "@kit.ArkUI"
-import { KeyValueData } from "./Overwrite/EditArrayConfig"
-import { getResourceString } from "../../common/utils/ResourceStringUtil"
+import { KeyValueData } from "../Overwrite/EditArrayConfig"
+import { getResourceString } from "../../../common/utils/ResourceStringUtil"
 import { intl } from "@kit.LocalizationKit"
 import { Xb_CapsuleButton, Xb_CircleButton, Xb_FileUtils, Xb_GetResourceString,
   Xb_ImageUtils,
   Xb_KVdbUtil,
   Xb_PreferenceUtil,
   Xb_ToastUtil } from "xb_components"
-import { customAnimationUtil } from "../../common/utils/Animation"
-import { EventHub, EventKey } from '../../common/EventHub'
-import { AccessControlCompatibleMerger } from "../../common/utils/AccessControlCompatibleUtil"
+import { customAnimationUtil } from "../../../common/utils/Animation"
+import { EventHub, EventKey } from '../../../common/EventHub'
+import { AccessControlCompatibleMerger } from "../../../common/utils/AccessControlCompatibleUtil"
 import { accessControlRdb,
   AppInfo,
   AppInfoConfig,
   AppInfoRdb,
   ListType,
-  AccessConfigExport } from "../../common/datasources/AccessControlRdb"
-import { Base64Util } from "../../common/utils/Base64Util"
+  AccessConfigExport } from "../../../common/datasources/AccessControlRdb"
+import { Base64Util } from "../../../common/utils/Base64Util"
 import { JSON } from "@kit.ArkTS"
-import TopBuilder from "../Settings/TopBuilder"
+import TopBuilder from "../../Settings/TopBuilder"
 
 @Builder
 export function AccessControlBuilder(name: string, param: Object){
@@ -957,70 +957,4 @@ interface AccessConfig {
   appList: string
   acceptList: string
   rejectList: string
-}
-
-
-@Builder
-export function OnlineSearchBuilder(name: string, param: Object){
-  OnlineSearch()
-}
-
-@Component
-struct OnlineSearch {
-
-  @StorageLink('OnlineSearchPageInfos') addPageInfos: NavPathStack = new NavPathStack()
-  // 高度断点
-  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
-  // 宽度断点
-  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
-  // 主题色
-  @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  @State searchText: string = ''
-  @State apps: AppInfo[] = []
-
-  build() {
-    NavDestination() {
-      TopBuilder({
-        showBackButton: true,
-        title: $r('app.string.online_search'),
-      })
-      Column() {
-        Search({ value: this.searchText, placeholder: $r('app.string.enter_search')})
-          .enterKeyType(EnterKeyType.Search)
-          .copyOption(CopyOptions.LocalDevice)
-          .searchIcon(new SymbolGlyphModifier($r('sys.symbol.magnifyingglass')).fontColor([this.icon_emphasize]))
-          .cancelButton({
-            style: CancelButtonStyle.CONSTANT,
-            icon: new SymbolGlyphModifier($r('sys.symbol.xmark')).fontColor([this.icon_emphasize])
-          })
-          .layoutWeight(1)
-          .onSubmit((value: string) => {
-            // 发送搜索
-            this.searchText = value
-          })
-        List() {
-          ForEach(this.apps, (app: AppInfo) => {
-            ListItem() {
-              checkoutRowListItem({
-                icon: app.iconUintArr ? Xb_ImageUtils.uint8ArrayToPixelMap(app.iconUintArr) : $r('app.media.box_cat_round'),
-                title: app.name,
-                endSymbol: $r('sys.symbol.plus_circle'),
-                subtitle: app.package_name,
-                enabledClick: true
-              })
-            }
-          })
-        }
-        .width('100%')
-        .alignListItem(ListItemAlign.Center)
-        .contentEndOffset(CONTENT_END_OFFSET_150 - 75)
-        .padding({left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp)})
-      }
-    }
-    .width('100%')
-    .height('100%')
-    .hideTitleBar(true)
-
-  }
-
 }
