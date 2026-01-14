@@ -573,7 +573,7 @@ export struct KVCustomDialog {
   }
   aboutToDisappear(): void {
     // 关闭背景模糊
-    this.isEnableIndexForegroundBlur = false
+    // this.isEnableIndexForegroundBlur = false
   }
 
   build() {
@@ -639,7 +639,6 @@ export struct KVCustomDialog {
             if (this.confirm) {
               this.confirm(new KeyValueData(this.currentKeyInputValue, this.currentValueInputValue, this.value.iconUintArr))
             }
-            this.isEnableIndexForegroundBlur = false
           })
       }.width('100%')
     }
@@ -650,89 +649,13 @@ export struct KVCustomDialog {
 
   /** @description 选择自定义的图标 */
   private async selectCustomIcon() {
-    // TODO 建议将逻辑抽离到 ImageUtils
-    // 点击选择新的图片
-    const PhotoSelectOptions = new photoAccessHelper.PhotoSelectOptions();
-    PhotoSelectOptions.MIMEType = photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE;
-    PhotoSelectOptions.isEditSupported = true;
-    PhotoSelectOptions.maxSelectNumber = 1;
-    const photoPicker = new photoAccessHelper.PhotoViewPicker();
-    const res = await photoPicker.select(PhotoSelectOptions)
-
-    if (res.photoUris.length > 0) {
-      const uri = res.photoUris[0]
-      try {
-        // 打开文件读取图片数据
-        const file = fs.openSync(uri, fs.OpenMode.READ_ONLY)
-        try {
-          // 从文件描述符创建图片源
-          const imageSource = image.createImageSource(file.fd)
-          // 获取图片原始信息
-          const imageInfo = await imageSource.getImageInfo()
-          const originalWidth = imageInfo.size.width
-          const originalHeight = imageInfo.size.height
-
-          // 目标尺寸 64 vp，转换为像素（这里使用 3 作为默认像素密度）
-          const targetSizeVp = 64
-          const pixelDensity = 3 // 高分辨率设备的像素密度
-          const targetSizePx = targetSizeVp * pixelDensity
-
-          // 创建 PixelMap
-          let pixelMap: image.PixelMap
-
-          // 判断是否需要裁切（图片尺寸超过目标尺寸）
-          if (originalWidth > targetSizePx || originalHeight > targetSizePx) {
-            // 计算裁切区域（中心裁切）
-            const cropSize = Math.min(originalWidth, originalHeight)
-            const cropX = Math.floor((originalWidth - cropSize) / 2)
-            const cropY = Math.floor((originalHeight - cropSize) / 2)
-
-            // 先创建原始 PixelMap
-            pixelMap = await imageSource.createPixelMap()
-
-            // 裁切中心区域
-            const cropRegion: image.Region = {
-              x: cropX,
-              y: cropY,
-              size: {
-                width: cropSize,
-                height: cropSize
-              }
-            }
-            await pixelMap.crop(cropRegion)
-
-            // 缩放到目标尺寸
-            await pixelMap.scale(targetSizePx / cropSize, targetSizePx / cropSize)
-          } else {
-            // 图片尺寸在目标范围内，直接创建 PixelMap
-            pixelMap = await imageSource.createPixelMap()
-          }
-
-          // 使用 ImagePacker 将 PixelMap 打包为 ArrayBuffer
-          const imagePacker = image.createImagePacker()
-          const packOptions: image.PackingOption = {
-            format: 'image/png',
-            quality: 100
-          }
-          const packedData = await imagePacker.packing(pixelMap, packOptions)
-
-          // 转换为 Uint8Array 并存储
-          this.value.iconUintArr = new Uint8Array(packedData)
-
-          // 释放资源
-          imagePacker.release()
-          pixelMap.release()
-          imageSource.release()
-
-          console.info(`Icon processed successfully: ${originalWidth}x${originalHeight} -> ${targetSizePx}x${targetSizePx}`)
-        } finally {
-          fs.closeSync(file)
-        }
-      } catch (e) {
-        console.error("Process image failed: " + JSON.stringify(e))
-      }
+    try {
+      this.value.iconUintArr = await Xb_ImageUtils.selectCustomIcon()
+    } catch (error) {
+      console.error(`#selectCustomIcon Process image failed: Code ${error.code}, Message: ${error.message}`);
     }
   }
+
 }
 
 /**
@@ -984,6 +907,7 @@ export struct checkoutRowListItem {
   @Prop isSelected: boolean = false
   @Prop enabledClick: boolean = true
   @State isPrimaryIcons: boolean = false
+  @Prop needBackgroundColor: boolean = true
   @State isExperimentalFunction: boolean = false
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
@@ -1021,7 +945,7 @@ export struct checkoutRowListItem {
         .fontColor([this.enabledClick ? (!this.isSelected ? icon_primary : this.icon_emphasize) : this.getColor(!this.isSelected ? icon_primary : this.icon_emphasize)])
         .transition(customAnimationUtil.isScaleTranIcon(10, this.uiConfig))
     }
-    .RowStyle()
+    .RowStyle(this.needBackgroundColor)
     .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
   }
 

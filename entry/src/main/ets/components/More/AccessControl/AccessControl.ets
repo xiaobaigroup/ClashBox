@@ -319,6 +319,7 @@ export struct AccessControl {
               onWillDismiss: () => {
                 this.isShowSheet = false
                 this.isEnableIndexForegroundBlur = false
+                this.addPageInfos.clear()
               },
               onWillSpringBackWhenDismiss: () => {} // 注册回调，防止反向回弹
             })
@@ -379,8 +380,9 @@ export struct AccessControl {
           return
         }
         // 关闭背景模糊
-        this.isEnableIndexForegroundBlur = false
-        console.log(`AccessControl kvCustomdialog 当前value: ${JSON.stringify(value)}`)
+        if (!this.isShowSheet) {
+          this.isEnableIndexForegroundBlur = false
+        }
         await this.saveApp(value)
         // 保存后重置弹窗状态
         this.keyValueData = new KeyValueData("")
@@ -389,7 +391,9 @@ export struct AccessControl {
       cancel: ()=> {
         // 关闭背景模糊
         this.keyValueData = new KeyValueData("")
-        this.isEnableIndexForegroundBlur = false
+        if (!this.isShowSheet) {
+          this.isEnableIndexForegroundBlur = false
+        }
       },
     }),
     onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
@@ -397,7 +401,9 @@ export struct AccessControl {
         // 点击遮蔽层不响应，防误触
       } else {
         dismissDialogAction.dismiss()
-        this.isEnableIndexForegroundBlur = false
+        if (!this.isShowSheet) {
+          this.isEnableIndexForegroundBlur = false
+        }
       }
     }
   })

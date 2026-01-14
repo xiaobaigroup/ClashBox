@@ -11,11 +11,12 @@ import { AppInfo } from '../../../common/datasources/AccessControlRdb'
 import TopBuilder from '../../Settings/TopBuilder'
 import { SymbolGlyphModifier } from '@kit.ArkUI'
 import { checkoutRowListItem } from '../../Common/Common'
-import { CONTENT_END_OFFSET_150 } from '../../../common/entity/Constants'
+import { BundleInfo, CONTENT_END_OFFSET_150 } from '../../../common/entity/Constants'
 import { PageMargin } from '../../../common/breakpoint/BreakPoint'
-import { Xb_ImageUtils } from 'xb_components'
+import { EventHub, Xb_ImageUtils } from 'xb_components'
 import { http } from '@kit.NetworkKit'
 import { hilog } from '@kit.PerformanceAnalysisKit'
+import { EventKey } from '../../../common/EventHub'
 
 @Builder
 export function OnlineSearchBuilder(name: string, param: Object) {
@@ -71,7 +72,6 @@ struct OnlineSearch {
             }
           })
 
-
         List() {
           ForEach(this.apps, (app: AppInfo) => {
             ListItem() {
@@ -81,14 +81,20 @@ struct OnlineSearch {
                 title: app.name,
                 endSymbol: $r('sys.symbol.plus_circle'),
                 subtitle: app.package_name,
+                needBackgroundColor: false,
                 enabledClick: true
               })
             }
+            .onClick(() => {
+              const bundleInfo: BundleInfo = new BundleInfo(app.package_name, app.name, app.iconUintArr)
+              EventHub.sendEvent(EventKey.AddAPP, bundleInfo)
+            })
           })
         }
         .width('100%')
+        .contentStartOffset(5)
         .alignListItem(ListItemAlign.Center)
-        .contentEndOffset(CONTENT_END_OFFSET_150 - 75)
+        .contentEndOffset(CONTENT_END_OFFSET_150 - 55)
         .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
       }
       .padding({ bottom: 24 })
@@ -96,6 +102,7 @@ struct OnlineSearch {
     .width('100%')
     .height('100%')
     .hideTitleBar(true)
+    .backgroundColor($r('app.color.background'))
   }
 }
 
@@ -116,36 +123,6 @@ interface SearchResponse {
   total: number
   limit: number
   timestamp: string
-}
-
-/** TODO 建议抽离到 Xb_ImageUtils 去
- * 从 URL 下载图片并转换为 Uint8Array
- * @param url 图片的在线 URL 地址
- * @returns Promise<Uint8Array | undefined> 图片的 Uint8Array 数据，失败返回 undefined
- */
-function downloadImageAsUint8Array(url: string): Promise<Uint8Array | undefined> {
-  return new Promise<Uint8Array | undefined>((resolve) => {
-    if (!url) {
-      resolve(undefined)
-      return
-    }
-
-    let httpRequest = http.createHttp()
-    httpRequest.request(url, {
-      method: http.RequestMethod.GET,
-      expectDataType: http.HttpDataType.ARRAY_BUFFER
-    }, (err: Error, data: http.HttpResponse) => {
-      if (!err && data.result instanceof ArrayBuffer) {
-        const uint8Array = new Uint8Array(data.result)
-        hilog.info(0xFF00, TAG, "图片下载成功: %{public}s, 大小: %{public}d bytes", url, uint8Array.length)
-        resolve(uint8Array)
-      } else {
-        hilog.warn(0xFF00, TAG, "图片下载失败: %{public}s", url)
-        resolve(undefined)
-      }
-      httpRequest.destroy()
-    })
-  })
 }
 
 /**
@@ -196,7 +173,7 @@ async function convertToAppInfo(items: SearchAppItem[]): Promise<AppInfo[]> {
 
   for (const item of items) {
     // 下载图片并转换为 Uint8Array
-    const iconUintArr = await downloadImageAsUint8Array(item.icon_url)
+    const iconUintArr = await Xb_ImageUtils.downloadImageAsUint8Array(item.icon_url)
 
     appInfoList.push({
       name: item.name,
