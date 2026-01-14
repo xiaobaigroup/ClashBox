@@ -97,7 +97,7 @@ struct OnlineSearch {
         .contentEndOffset(CONTENT_END_OFFSET_150 - 55)
         .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
       }
-      .padding({ bottom: 24 })
+      .padding({ bottom: 32 })
     }
     .width('100%')
     .height('100%')
