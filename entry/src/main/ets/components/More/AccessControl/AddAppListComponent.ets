@@ -1,16 +1,15 @@
 import {
-  BIND_SHEET_CONTAINER_HEIGHT,
   BIND_SHEET_DRAG_BAR_HEIGHT,
-  BIND_SHEET_MAIN_FONTSIZE,
   BIND_SHEET_MAIN_FONT_WEIGHT,
+  BIND_SHEET_MAIN_FONTSIZE,
   BIND_SHEET_SUB_FONTSIZE,
   BIND_SHEET_TITLE_CONTAINER_HEIGHT,
   LIST_SPACE
-} from "../../../common/entity/Constants"
-import { UIConfig } from "../../../entryability/AppState"
-import { skipRowList, BindSheetTitleCustomBuilder } from "../../Common/Common"
-import { hilog } from "@kit.PerformanceAnalysisKit"
-import { NavigationListPadding } from "../../../common/breakpoint/BreakPoint"
+} from '../../../common/entity/Constants'
+import { UIConfig } from '../../../entryability/AppState'
+import { BindSheetTitleCustomBuilder, skipRowList } from '../../Common/Common'
+import { hilog } from '@kit.PerformanceAnalysisKit'
+import { NavigationListPadding } from '../../../common/breakpoint/BreakPoint'
 
 @Component
 export struct AddAppListComponent {
@@ -83,7 +82,6 @@ export struct AddAppListComponent {
         }),
         height: BIND_SHEET_TITLE_CONTAINER_HEIGHT + BIND_SHEET_DRAG_BAR_HEIGHT
       })
-    .height(BIND_SHEET_CONTAINER_HEIGHT)
     .mode(NavigationMode.Stack)
     .hideBackButton(true)
     .navBarWidthRange([255, '100%'])
