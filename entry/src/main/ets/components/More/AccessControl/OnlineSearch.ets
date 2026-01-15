@@ -1,3 +1,22 @@
+import { accessControlRdb, AppInfo } from '../../../common/datasources/AccessControlRdb'
+import TopBuilder from '../../Settings/TopBuilder'
+import { SymbolGlyphModifier } from '@kit.ArkUI'
+import { checkoutRowListItem } from '../../Common/Common'
+import { CONTENT_END_OFFSET_150 } from '../../../common/entity/Constants'
+import { PageMargin } from '../../../common/breakpoint/BreakPoint'
+import { EventHub, Xb_ImageUtils, Xb_ToastUtil } from 'xb_components'
+import { http } from '@kit.NetworkKit'
+import { hilog } from '@kit.PerformanceAnalysisKit'
+import { AppConfig } from '../../../entryability/AppState'
+import { EventKey } from '../../../common/EventHub'
+
+@Builder
+export function OnlineSearchBuilder(name: string, param: Object) {
+  OnlineSearch()
+}
+
+const TAG = "OnlineSearch"
+
 /**
  * @projectName:    clashnext
  * @fileName:      OnlineSearch
@@ -6,24 +25,6 @@
  * @date:    2026/1/13 16:19
  * @version:    1.0
  */
-
-import { accessControlRdb, AppInfo } from '../../../common/datasources/AccessControlRdb'
-import TopBuilder from '../../Settings/TopBuilder'
-import { SymbolGlyphModifier } from '@kit.ArkUI'
-import { checkoutRowListItem } from '../../Common/Common'
-import { CONTENT_END_OFFSET_150 } from '../../../common/entity/Constants'
-import { PageMargin } from '../../../common/breakpoint/BreakPoint'
-import { Xb_ImageUtils, Xb_ToastUtil } from 'xb_components'
-import { http } from '@kit.NetworkKit'
-import { hilog } from '@kit.PerformanceAnalysisKit'
-import { AppConfig } from '../../../entryability/AppState'
-
-@Builder
-export function OnlineSearchBuilder(name: string, param: Object) {
-  OnlineSearch()
-}
-
-const TAG = "OnlineSearch"
 
 @Component
 struct OnlineSearch {
@@ -39,7 +40,6 @@ struct OnlineSearch {
   // 搜索结果列表
   @State apps: SearchAppInfo[] = []
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
-
   // 临时的搜索结果列表 -> 用于刷新列表使用的存储一下减少请求次数
   private resultApps: SearchAppItem[] = []
 
@@ -114,6 +114,7 @@ struct OnlineSearch {
 
               // 3. 重新加载列表
               this.apps = await this.convertToAppInfo(this.resultApps)
+              EventHub.sendEvent(EventKey.ReLoadAccessControl)
             })
           })
         }

@@ -638,10 +638,8 @@ export struct AccessControl {
   }
 
   async aboutToAppear(): Promise<void> {
-    EventHub.on(EventKey.AddAPP, (bundleInfo: BundleInfo) => {
-      this.keyValueData = new KeyValueData(bundleInfo?.appName || '', bundleInfo?.bundleName || '', bundleInfo?.iconUintArr)
-      this.addApp()
-    })
+    this.resisterEvent()
+
     this.loadAppsInfo().then(() => {
       this.selectedPkgNames = new Set(
         this.appListData
@@ -650,6 +648,34 @@ export struct AccessControl {
       )
       this.initialized = true
       console.debug(`AccessControl #aboutToAppear 访问控制页面数据加载完成: ${this.initialized}`)
+    })
+  }
+
+  aboutToDisappear(): void {
+    // TODO AddAPP 这个事件关闭了可能分享包名后续逻辑会出问题(待验证的优化内容
+
+    EventHub.off(EventKey.ReLoadAccessControl)
+  }
+
+  private resisterEvent() {
+    // 添加App事件
+    EventHub.on(EventKey.AddAPP, (bundleInfo: BundleInfo) => {
+      this.keyValueData =
+        new KeyValueData(bundleInfo?.appName || '', bundleInfo?.bundleName || '', bundleInfo?.iconUintArr)
+      this.addApp()
+    })
+
+    // 刷新访问控制数据
+    EventHub.on(EventKey.ReLoadAccessControl, () => {
+      this.loadAppsInfo().then(() => {
+        this.selectedPkgNames = new Set(
+          this.appListData
+            .filter(a => a.isSelected)
+            .map(a => a.package_name)
+        )
+        this.initialized = true
+        console.debug(`AccessControl #aboutToAppear 访问控制页面数据加载完成: ${this.initialized}`)
+      })
     })
   }
 
