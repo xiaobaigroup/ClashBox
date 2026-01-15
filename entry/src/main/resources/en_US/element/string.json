@@ -2323,6 +2323,10 @@
     {
       "name": "online_search",
       "value": "Online search"
+    },
+    {
+      "name": "delete_app_confirm",
+      "value": "Are you sure you want to remove this app from the list?"
     }
   ]
 }

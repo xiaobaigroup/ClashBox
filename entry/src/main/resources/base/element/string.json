@@ -2323,6 +2323,10 @@
     {
       "name": "online_search",
       "value": "在线搜索"
+    },
+    {
+      "name": "delete_app_confirm",
+      "value": "确定要从列表中移除此应用吗？"
     }
   ]
 }

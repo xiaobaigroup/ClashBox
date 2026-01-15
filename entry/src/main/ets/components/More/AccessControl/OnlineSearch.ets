@@ -1,7 +1,7 @@
 import { accessControlRdb, AppInfo } from '../../../common/datasources/AccessControlRdb'
 import TopBuilder from '../../Settings/TopBuilder'
 import { SymbolGlyphModifier } from '@kit.ArkUI'
-import { checkoutRowListItem } from '../../Common/Common'
+import { checkoutRowListItem, theRowCustomDialog } from '../../Common/Common'
 import { CONTENT_END_OFFSET_150 } from '../../../common/entity/Constants'
 import { PageMargin } from '../../../common/breakpoint/BreakPoint'
 import { EventHub, Xb_ImageUtils, Xb_ToastUtil } from 'xb_components'
@@ -42,6 +42,88 @@ struct OnlineSearch {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   // 临时的搜索结果列表 -> 用于刷新列表使用的存储一下减少请求次数
   private resultApps: SearchAppItem[] = []
+  // 防抖定时器ID
+  private debounceTimerId: number = -1
+  // 防抖延迟时间（毫秒）
+  private readonly DEBOUNCE_DELAY: number = 400
+  // 待删除的应用信息
+  private pendingDeleteApp: SearchAppInfo | null = null
+  /* 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
+
+  /**
+   * 删除确认弹窗控制器
+   */
+  deleteDialogController: CustomDialogController = new CustomDialogController({
+    builder: theRowCustomDialog({
+      contentText: $r('app.string.delete_app_confirm'),
+      cancel: () => {
+        this.onDeleteCancel()
+      },
+      confirm: () => {
+        this.onDeleteConfirm()
+      },
+      leftButton: () => {
+        this.deleteBuilder()
+      }
+    }),
+    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+      if (dismissDialogAction.reason === DismissReason.TOUCH_OUTSIDE) {
+        // 点击遮蔽层不响应，防误触
+      } else {
+        dismissDialogAction.dismiss()
+        this.isEnableIndexForegroundBlur = false
+      }
+    }
+  })
+
+  /**
+   * 删除按钮样式
+   */
+  @Builder
+  deleteBuilder() {
+    Button($r('app.string.delete'))
+      .width('100%')
+      .height(39)
+      .fontColor(Color.Red)
+      .backgroundColor($r('app.color.container_background'))
+  }
+
+  /**
+   * 取消删除回调
+   */
+  onDeleteCancel(): void {
+    this.pendingDeleteApp = null
+    this.isEnableIndexForegroundBlur = false
+  }
+
+  /**
+   * 确认删除回调
+   */
+  async onDeleteConfirm(): Promise<void> {
+    if (this.pendingDeleteApp) {
+      const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
+      try {
+        await accessControlRdb.removeAppFromDomain(this.pendingDeleteApp.package_name, domain)
+        Xb_ToastUtil.showToast({ message: '删除成功' })
+        // 刷新列表
+        this.apps = await this.convertToAppInfo(this.resultApps)
+        EventHub.sendEvent(EventKey.ReLoadAccessControl)
+      } catch (error) {
+        hilog.error(0xFF00, TAG, "删除失败: %{public}s", error.message)
+        Xb_ToastUtil.showToast({ message: '删除失败' })
+      }
+    }
+    this.pendingDeleteApp = null
+    this.isEnableIndexForegroundBlur = false
+  }
+
+  /**
+   * 组件销毁时清除防抖定时器
+   */
+  aboutToDisappear(): void {
+    this.clearDebounceTimer()
+  }
 
   build() {
     NavDestination() {
@@ -52,6 +134,7 @@ struct OnlineSearch {
       })
 
       Column() {
+        // TODO 建议修改 placeholder 的内容，现在执行逻辑是 回车 和 用户输入停止一段时间 都会触发搜索
         Search({ value: this.searchText, placeholder: $r('app.string.enter_search') })
           .enterKeyType(EnterKeyType.Search)
           .copyOption(CopyOptions.LocalDevice)
@@ -61,11 +144,17 @@ struct OnlineSearch {
             style: CancelButtonStyle.CONSTANT,
             icon: new SymbolGlyphModifier($r('sys.symbol.xmark')).fontColor([this.icon_emphasize])
           })
+          .onChange((value: string) => {
+            // 使用防抖 (Debounce) 进行搜索
+            this.debounceSearch(value)
+          })
           .onSubmit(async (value: string) => {
-            // 发送搜索
+            // 提交时立即执行搜索（清除防抖定时器）
+            this.clearDebounceTimer()
             await this.searchApps(value)
           })
 
+        // TODO 搜索过程中添加动画
         List() {
           ForEach(this.apps, (app: SearchAppInfo) => {
             ListItem() {
@@ -87,7 +176,7 @@ struct OnlineSearch {
               const iconUintArr = app.iconUintArr
 
               if (!app.isExists) {
-                // TODO 1. --- 新增逻辑 ---
+                // 1. --- 新增逻辑 ---
                 const newApp: AppInfo = {
                   name: newAppName,
                   package_name: newPackageName,
@@ -100,19 +189,13 @@ struct OnlineSearch {
                 await accessControlRdb.addAppToDomain(newApp, domain)
                 Xb_ToastUtil.showToast({ message: '添加成功' })
               } else {
-                // TODO 2. 后续设计删除提示弹窗
-                // 执行删除逻辑
-                const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
-                try {
-                  await accessControlRdb.removeAppFromDomain(newPackageName, domain)
-                  Xb_ToastUtil.showToast({ message: '删除成功' })
-                } catch (error) {
-                  hilog.error(0xFF00, TAG, "删除失败: %{public}s", error.message)
-                  Xb_ToastUtil.showToast({ message: '删除失败' })
-                }
+                // 2. 删除逻辑 - 显示确认弹窗防止误操作
+                this.pendingDeleteApp = app
+                this.deleteDialogController.open()
+                return // 等待弹窗确认后再刷新列表
               }
 
-              // 3. 重新加载列表
+              // 3. 重新加载列表（仅新增时执行）
               this.apps = await this.convertToAppInfo(this.resultApps)
               EventHub.sendEvent(EventKey.ReLoadAccessControl)
             })
@@ -130,6 +213,39 @@ struct OnlineSearch {
     .height('100%')
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
+  }
+
+  /**
+   * 清除防抖定时器
+   */
+  private clearDebounceTimer(): void {
+    if (this.debounceTimerId !== -1) {
+      clearTimeout(this.debounceTimerId)
+      this.debounceTimerId = -1
+    }
+  }
+
+  /**
+   * 防抖搜索 - 延迟执行搜索，避免频繁请求
+   * @param value 搜索关键词
+   */
+  private debounceSearch(value: string): void {
+    // 清除之前的定时器
+    this.clearDebounceTimer()
+
+    // 如果输入为空，直接清空结果
+    if (value.length === 0) {
+      this.searchText = ''
+      this.apps = []
+      this.resultApps = []
+      return
+    }
+
+    // 设置新的定时器
+    this.debounceTimerId = setTimeout(async () => {
+      await this.searchApps(value)
+      this.debounceTimerId = -1
+    }, this.DEBOUNCE_DELAY)
   }
 
   /**
