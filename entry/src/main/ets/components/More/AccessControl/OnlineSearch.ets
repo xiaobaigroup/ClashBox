@@ -40,16 +40,8 @@ struct OnlineSearch {
   @State apps: SearchAppInfo[] = []
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
 
-  private async loadAppsInfo(): Promise<AppInfo[]> {
-    // 确定当前域
-    const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
-    // 确定排序方式
-    const sortBy = this.appConfig.accessControlSort === 'name' ? 'name' : 'time'
-    // 直接查询数据库，数据库已处理排序和选中状态
-    const appListData = await accessControlRdb.getAppsByDomain(domain, sortBy)
-
-    return appListData
-  }
+  // 临时的搜索结果列表 -> 用于刷新列表使用的存储一下减少请求次数
+  private resultApps: SearchAppItem[] = []
 
   build() {
     NavDestination() {
@@ -71,19 +63,7 @@ struct OnlineSearch {
           })
           .onSubmit(async (value: string) => {
             // 发送搜索
-            this.searchText = value
-            if (value.length > 0) {
-              try {
-                const response = await this.getAppList(value)
-
-                if (response.success && response.data) {
-                  this.apps = await this.convertToAppInfo(response.data)
-                  hilog.info(0xFF00, TAG, "搜索成功，获取到 %{public}d 条数据", this.apps.length)
-                }
-              } catch (error) {
-                hilog.error(0xFF00, TAG, "搜索失败: %{public}s", error.message)
-              }
-            }
+            await this.searchApps(value)
           })
 
         List() {
@@ -118,11 +98,22 @@ struct OnlineSearch {
                 // 确定添加到哪个域
                 const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
                 await accessControlRdb.addAppToDomain(newApp, domain)
+                Xb_ToastUtil.showToast({ message: '添加成功' })
               } else {
                 // TODO 2. 后续设计删除提示弹窗
+                // 执行删除逻辑
+                const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
+                try {
+                  await accessControlRdb.removeAppFromDomain(newPackageName, domain)
+                  Xb_ToastUtil.showToast({ message: '删除成功' })
+                } catch (error) {
+                  hilog.error(0xFF00, TAG, "删除失败: %{public}s", error.message)
+                  Xb_ToastUtil.showToast({ message: '删除失败' })
+                }
               }
 
-              // TODO 3. 重新加载列表并关闭弹窗
+              // 3. 重新加载列表
+              this.apps = await this.convertToAppInfo(this.resultApps)
             })
           })
         }
@@ -138,6 +129,42 @@ struct OnlineSearch {
     .height('100%')
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
+  }
+
+  /**
+   * 加载已添加的应用列表
+   * @returns Promise<AppInfo[]> 应用列表
+   */
+  private async loadAppsInfo(): Promise<AppInfo[]> {
+    // 确定当前域
+    const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
+    // 确定排序方式
+    const sortBy = this.appConfig.accessControlSort === 'name' ? 'name' : 'time'
+    // 直接查询数据库，数据库已处理排序和选中状态
+    const appListData = await accessControlRdb.getAppsByDomain(domain, sortBy)
+
+    return appListData
+  }
+
+  /**
+   * 执行在线搜索应用
+   * @param value 搜索关键词
+   */
+  private async searchApps(value: string): Promise<void> {
+    this.searchText = value
+    if (value.length > 0) {
+      try {
+        const response = await this.getAppList(value)
+
+        if (response.success && response.data) {
+          this.resultApps = response.data
+          this.apps = await this.convertToAppInfo(this.resultApps)
+          hilog.info(0xFF00, TAG, "搜索成功，获取到 %{public}d 条数据", this.apps.length)
+        }
+      } catch (error) {
+        hilog.error(0xFF00, TAG, "搜索失败: %{public}s", error.message)
+      }
+    }
   }
 
   /**
