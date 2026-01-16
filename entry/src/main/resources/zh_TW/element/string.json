@@ -2327,6 +2327,146 @@
     {
       "name": "delete_app_confirm",
       "value": "確定要從列表中移除此應用嗎？"
+    },
+    {
+      "name": "add_success",
+      "value": "新增成功"
+    },
+    {
+      "name": "delete_success",
+      "value": "刪除成功"
+    },
+    {
+      "name": "delete_failed",
+      "value": "刪除失敗"
+    },
+    {
+      "name": "old_data_cleared_success",
+      "value": "殘留舊資料清除成功"
+    },
+    {
+      "name": "input_complete_info",
+      "value": "請輸入完整資訊"
+    },
+    {
+      "name": "cannot_add_self",
+      "value": "無法新增自身"
+    },
+    {
+      "name": "modify_success",
+      "value": "修改成功"
+    },
+    {
+      "name": "save_failed",
+      "value": "儲存失敗"
+    },
+    {
+      "name": "copy_to_whitelist",
+      "value": "已將 %s 複製到允許名單"
+    },
+    {
+      "name": "copy_to_blacklist",
+      "value": "已將 %s 複製到封鎖名單"
+    },
+    {
+      "name": "move_to_whitelist",
+      "value": "已將 %s 移動到允許名單"
+    },
+    {
+      "name": "move_to_blacklist",
+      "value": "已將 %s 移動到封鎖名單"
+    },
+    {
+      "name": "import_v2_success",
+      "value": "V2.0 匯入成功 %d 筆"
+    },
+    {
+      "name": "import_legacy_success",
+      "value": "舊版設定匯入成功"
+    },
+    {
+      "name": "file_format_invalid",
+      "value": "檔案格式不符合"
+    },
+    {
+      "name": "no_results_found",
+      "value": "找不到 %s 喔"
+    },
+    {
+      "name": "no_apps_found",
+      "value": "找不到相關應用程式"
+    },
+    {
+      "name": "submit_app_help_text",
+      "value": "您可以提交應用程式資訊，協助我們完善資料庫"
+    },
+    {
+      "name": "submit_app",
+      "value": "提交應用程式"
+    },
+    {
+      "name": "submit_app_info",
+      "value": "提交應用程式資訊"
+    },
+    {
+      "name": "submitting",
+      "value": "提交中..."
+    },
+    {
+      "name": "submit",
+      "value": "提交"
+    },
+    {
+      "name": "app_id_tab",
+      "value": "AppID"
+    },
+    {
+      "name": "link_tab",
+      "value": "連結"
+    },
+    {
+      "name": "hint_input_app_id",
+      "value": "請輸入華為應用市場的 AppID"
+    },
+    {
+      "name": "hint_input_package_name",
+      "value": "請輸入應用程式的套件名稱"
+    },
+    {
+      "name": "hint_input_app_link",
+      "value": "請輸入華為應用市場連結"
+    },
+    {
+      "name": "hint_fill_app_info",
+      "value": "請填寫應用程式資訊"
+    },
+    {
+      "name": "placeholder_app_id",
+      "value": "例如: C123456789"
+    },
+    {
+      "name": "placeholder_package_name",
+      "value": "例如: com.example.app"
+    },
+    {
+      "name": "placeholder_app_link",
+      "value": "例如: https://appgallery.huawei.com/app/C123456789"
+    },
+    {
+      "name": "submit_success_thanks",
+      "value": "提交成功，感謝您的貢獻！"
+    },
+    {
+      "name": "submit_failed_retry",
+      "value": "提交失敗，請稍後重試"
+    },
+    {
+      "name": "submit_failed_network",
+      "value": "提交失敗，請檢查網路連線"
+    },
+    {
+      "name": "package_name_exists",
+      "value": "應用程式套件名稱已存在"
     }
   ]
 }

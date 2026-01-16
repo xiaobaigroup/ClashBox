@@ -2327,6 +2327,146 @@
     {
       "name": "delete_app_confirm",
       "value": "Are you sure you want to remove this app from the list?"
+    },
+    {
+      "name": "add_success",
+      "value": "Added successfully"
+    },
+    {
+      "name": "delete_success",
+      "value": "Deleted successfully"
+    },
+    {
+      "name": "delete_failed",
+      "value": "Delete failed"
+    },
+    {
+      "name": "old_data_cleared_success",
+      "value": "Legacy data cleared successfully"
+    },
+    {
+      "name": "input_complete_info",
+      "value": "Please enter complete information"
+    },
+    {
+      "name": "cannot_add_self",
+      "value": "Cannot add self"
+    },
+    {
+      "name": "modify_success",
+      "value": "Modified successfully"
+    },
+    {
+      "name": "save_failed",
+      "value": "Save failed"
+    },
+    {
+      "name": "copy_to_whitelist",
+      "value": "Copied %s to whitelist"
+    },
+    {
+      "name": "copy_to_blacklist",
+      "value": "Copied %s to blacklist"
+    },
+    {
+      "name": "move_to_whitelist",
+      "value": "Moved %s to whitelist"
+    },
+    {
+      "name": "move_to_blacklist",
+      "value": "Moved %s to blacklist"
+    },
+    {
+      "name": "import_v2_success",
+      "value": "V2.0 imported %d items successfully"
+    },
+    {
+      "name": "import_legacy_success",
+      "value": "Legacy configuration imported successfully"
+    },
+    {
+      "name": "file_format_invalid",
+      "value": "Invalid file format"
+    },
+    {
+      "name": "no_results_found",
+      "value": "No results for %s"
+    },
+    {
+      "name": "no_apps_found",
+      "value": "No apps found"
+    },
+    {
+      "name": "submit_app_help_text",
+      "value": "You can submit app info to help us improve the database"
+    },
+    {
+      "name": "submit_app",
+      "value": "Submit App"
+    },
+    {
+      "name": "submit_app_info",
+      "value": "Submit App Info"
+    },
+    {
+      "name": "submitting",
+      "value": "Submitting..."
+    },
+    {
+      "name": "submit",
+      "value": "Submit"
+    },
+    {
+      "name": "app_id_tab",
+      "value": "AppID"
+    },
+    {
+      "name": "link_tab",
+      "value": "Link"
+    },
+    {
+      "name": "hint_input_app_id",
+      "value": "Enter AppID from Huawei AppGallery"
+    },
+    {
+      "name": "hint_input_package_name",
+      "value": "Enter app package name"
+    },
+    {
+      "name": "hint_input_app_link",
+      "value": "Enter Huawei AppGallery link"
+    },
+    {
+      "name": "hint_fill_app_info",
+      "value": "Please fill in app information"
+    },
+    {
+      "name": "placeholder_app_id",
+      "value": "e.g., C123456789"
+    },
+    {
+      "name": "placeholder_package_name",
+      "value": "e.g., com.example.app"
+    },
+    {
+      "name": "placeholder_app_link",
+      "value": "e.g., https://appgallery.huawei.com/app/C123456789"
+    },
+    {
+      "name": "submit_success_thanks",
+      "value": "Submitted successfully, thanks for your contribution!"
+    },
+    {
+      "name": "submit_failed_retry",
+      "value": "Submit failed, please try again later"
+    },
+    {
+      "name": "submit_failed_network",
+      "value": "Submit failed, please check your network"
+    },
+    {
+      "name": "package_name_exists",
+      "value": "Package name already exists"
     }
   ]
 }

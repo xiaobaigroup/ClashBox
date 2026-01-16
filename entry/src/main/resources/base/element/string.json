@@ -2327,6 +2327,146 @@
     {
       "name": "delete_app_confirm",
       "value": "确定要从列表中移除此应用吗？"
+    },
+    {
+      "name": "add_success",
+      "value": "添加成功"
+    },
+    {
+      "name": "delete_success",
+      "value": "删除成功"
+    },
+    {
+      "name": "delete_failed",
+      "value": "删除失败"
+    },
+    {
+      "name": "old_data_cleared_success",
+      "value": "残留旧数据清除成功"
+    },
+    {
+      "name": "input_complete_info",
+      "value": "请输入完整信息"
+    },
+    {
+      "name": "cannot_add_self",
+      "value": "不能添加自身"
+    },
+    {
+      "name": "modify_success",
+      "value": "修改成功"
+    },
+    {
+      "name": "save_failed",
+      "value": "保存失败"
+    },
+    {
+      "name": "copy_to_whitelist",
+      "value": "已将 %s 复制到白名单"
+    },
+    {
+      "name": "copy_to_blacklist",
+      "value": "已将 %s 复制到黑名单"
+    },
+    {
+      "name": "move_to_whitelist",
+      "value": "已将 %s 移动到白名单"
+    },
+    {
+      "name": "move_to_blacklist",
+      "value": "已将 %s 移动到黑名单"
+    },
+    {
+      "name": "import_v2_success",
+      "value": "V2.0 导入成功 %d 条"
+    },
+    {
+      "name": "import_legacy_success",
+      "value": "旧版配置导入成功"
+    },
+    {
+      "name": "file_format_invalid",
+      "value": "文件格式不符合"
+    },
+    {
+      "name": "no_results_found",
+      "value": "没有 %s 哦"
+    },
+    {
+      "name": "no_apps_found",
+      "value": "未找到相关应用"
+    },
+    {
+      "name": "submit_app_help_text",
+      "value": "您可以提交应用信息，帮助我们完善数据"
+    },
+    {
+      "name": "submit_app",
+      "value": "提交应用"
+    },
+    {
+      "name": "submit_app_info",
+      "value": "提交应用信息"
+    },
+    {
+      "name": "submitting",
+      "value": "提交中..."
+    },
+    {
+      "name": "submit",
+      "value": "提交"
+    },
+    {
+      "name": "app_id_tab",
+      "value": "AppID"
+    },
+    {
+      "name": "link_tab",
+      "value": "链接"
+    },
+    {
+      "name": "hint_input_app_id",
+      "value": "请输入华为应用市场的 AppID"
+    },
+    {
+      "name": "hint_input_package_name",
+      "value": "请输入应用的包名"
+    },
+    {
+      "name": "hint_input_app_link",
+      "value": "请输入华为应用市场链接"
+    },
+    {
+      "name": "hint_fill_app_info",
+      "value": "请填写应用信息"
+    },
+    {
+      "name": "placeholder_app_id",
+      "value": "例如: C123456789"
+    },
+    {
+      "name": "placeholder_package_name",
+      "value": "例如: com.example.app"
+    },
+    {
+      "name": "placeholder_app_link",
+      "value": "例如: https://appgallery.huawei.com/app/C123456789"
+    },
+    {
+      "name": "submit_success_thanks",
+      "value": "提交成功，感谢您的贡献！"
+    },
+    {
+      "name": "submit_failed_retry",
+      "value": "提交失败，请稍后重试"
+    },
+    {
+      "name": "submit_failed_network",
+      "value": "提交失败，请检查网络连接"
+    },
+    {
+      "name": "package_name_exists",
+      "value": "应用包名已经存在"
     }
   ]
 }

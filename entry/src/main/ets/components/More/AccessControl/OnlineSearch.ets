@@ -177,7 +177,7 @@ struct OnlineSearch {
                   // 确定添加到哪个域
                   const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
                   await accessControlRdb.addAppToDomain(newApp, domain)
-                  Xb_ToastUtil.showToast({ message: '添加成功', duration: 1000 })
+                  Xb_ToastUtil.showToast({ message: $r('app.string.add_success'), duration: 1000 })
 
                   // 重新加载列表（仅新增时执行）
                   this.apps = await this.convertToAppInfo(this.resultApps)
@@ -300,14 +300,14 @@ struct OnlineSearch {
       const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
       try {
         await accessControlRdb.removeAppFromDomain(this.pendingDeleteApp.package_name, domain)
-        Xb_ToastUtil.showToast({ message: '删除成功', duration: 1000 })
+        Xb_ToastUtil.showToast({ message: $r('app.string.delete_success'), duration: 1000 })
 
         // 刷新列表
         this.apps = await this.convertToAppInfo(this.resultApps)
         EventHub.sendEvent(EventKey.ReLoadAccessControl)
       } catch (error) {
         hilog.error(0xFF00, TAG, "删除失败: %{public}s", error.message)
-        Xb_ToastUtil.showToast({ message: '删除失败' })
+        Xb_ToastUtil.showToast({ message: $r('app.string.delete_failed') })
       }
     }
     this.pendingDeleteApp = null

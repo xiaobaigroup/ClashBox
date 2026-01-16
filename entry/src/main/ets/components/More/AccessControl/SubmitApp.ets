@@ -56,20 +56,20 @@ export struct EmptySearchResult {
         .margin({ bottom: 16 })
 
       // 提示文本
-      Text('未找到相关应用')
+      Text($r('app.string.no_apps_found'))
         .fontSize(18)
         .fontColor($r('sys.color.font_primary'))
         .fontWeight(FontWeight.Medium)
         .margin({ bottom: 8 })
 
-      Text('您可以提交应用信息，帮助我们完善数据')
+      Text($r('app.string.submit_app_help_text'))
         .fontSize(14)
         .fontColor($r('sys.color.font_secondary'))
         .textAlign(TextAlign.Center)
         .margin({ bottom: 24 })
 
       // 提交按钮
-      Button('提交应用')
+      Button($r('app.string.submit_app'))
         .width(160)
         .height(40)
         .backgroundColor(this.icon_emphasize)
@@ -95,15 +95,15 @@ export struct EmptySearchResult {
       const response = await this.postSubmitApp(data)
       if (response.success && response.data) {
         // 使用接口返回的 message 提示用户
-        const message = response.data.message ?? '提交成功，感谢您的贡献！'
+        const message = response.data.message ?? $r('app.string.submit_success_thanks')
         Xb_ToastUtil.showToast({ message, duration: 2000 })
         this.onSubmitSuccess?.()
       } else {
-        Xb_ToastUtil.showToast({ message: response.message ?? '提交失败，请稍后重试', duration: 1000 })
+        Xb_ToastUtil.showToast({ message: response.message ?? $r('app.string.submit_failed_retry'), duration: 1000 })
       }
     } catch (error) {
       hilog.error(0xFF00, TAG, "提交应用失败: %{public}s", error.message)
-      Xb_ToastUtil.showToast({ message: '提交失败，请检查网络连接', duration: 1000 })
+      Xb_ToastUtil.showToast({ message: $r('app.string.submit_failed_network'), duration: 1000 })
     }
   }
 
@@ -167,7 +167,11 @@ struct SubmitAppDialog {
   controller: CustomDialogController
   /** Tab 选项配置 */
   @State tabOptions: SegmentButtonOptions = SegmentButtonOptions.tab({
-    buttons: [{ text: 'AppID' }, { text: '包名' }, { text: '链接' }] as ItemRestriction<SegmentButtonTextItem>,
+    buttons: [
+      { text: $r('app.string.app_id_tab') },
+      { text: $r('app.string.package_name') },
+      { text: $r('app.string.link_tab') }
+    ] as ItemRestriction<SegmentButtonTextItem>,
     selectedFontColor: Color.White,
     backgroundColor: $r('app.color.FavoriteProxyDivider')
   })
@@ -211,7 +215,7 @@ struct SubmitAppDialog {
   build() {
     Column({ space: 12 }) {
       // 标题
-      Text('提交应用信息')
+      Text($r('app.string.submit_app_info'))
         .fontWeight(FontWeight.Medium)
         .fontSize(20)
 
@@ -241,7 +245,7 @@ struct SubmitAppDialog {
 
       // 按钮组
       Row() {
-        Button('取消')
+        Button($r('app.string.Cancel'))
           .height(39)
           .width('50%')
           .fontColor(this.icon_emphasize)
@@ -250,7 +254,7 @@ struct SubmitAppDialog {
             this.controller.close()
           })
 
-        Button(this.isSubmitting ? '提交中...' : '提交')
+        Button(this.isSubmitting ? $r('app.string.submitting') : $r('app.string.submit'))
           .width('50%')
           .height(39)
           .fontColor(Color.White)
@@ -282,36 +286,36 @@ struct SubmitAppDialog {
   }
 
   /**
-   * 获取当前 Tab 对应的提示文本
-   * @returns 提示文本
+   * 获取当前 Tab 对应的提示文本资源
+   * @returns 提示文本资源
    */
-  private getHintText(): string {
+  private getHintText(): Resource {
     switch (this.tabSelectedIndexes[0]) {
       case 0:
-        return '请输入华为应用市场的 AppID'
+        return $r('app.string.hint_input_app_id')
       case 1:
-        return '请输入应用的包名'
+        return $r('app.string.hint_input_package_name')
       case 2:
-        return '请输入华为应用市场链接'
+        return $r('app.string.hint_input_app_link')
       default:
-        return '请填写应用信息'
+        return $r('app.string.hint_fill_app_info')
     }
   }
 
   /**
-   * 获取当前 Tab 对应的占位符
-   * @returns 占位符文本
+   * 获取当前 Tab 对应的占位符资源
+   * @returns 占位符资源
    */
-  private getPlaceholder(): string {
+  private getPlaceholder(): Resource {
     switch (this.tabSelectedIndexes[0]) {
       case 0:
-        return '例如: C123456789'
+        return $r('app.string.placeholder_app_id')
       case 1:
-        return '例如: com.example.app'
+        return $r('app.string.placeholder_package_name')
       case 2:
-        return '例如: https://appgallery.huawei.com/app/C123456789'
+        return $r('app.string.placeholder_app_link')
       default:
-        return '请输入'
+        return $r('app.string.text_input_placeholder')
     }
   }
 

@@ -569,7 +569,7 @@ export struct AccessControl {
           await Xb_PreferenceUtil.delete('access_control_apps')
           await Xb_KVdbUtil.deleteEntriesByPrefix('accept_')
           await Xb_KVdbUtil.deleteEntriesByPrefix('reject_')
-          Xb_ToastUtil.showToast({ message: '残留旧数据清除成功' })
+          Xb_ToastUtil.showToast({ message: $r('app.string.old_data_cleared_success') })
         }
       })
     }
@@ -596,8 +596,9 @@ export struct AccessControl {
         onCheck: () => {
           const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
           accessControlRdb.copyToOppositeDomain(item.package_name, domain).then(() => {
-            const mode = domain == 'WHITE' ? '黑名单' : '白名单'
-            Xb_ToastUtil.showToast({ message: `已将 ${item.name} 复制到${mode}` })
+            // TODO 验证 %s 的占位符是否正确
+            const msgRes = domain == 'WHITE' ? $r('app.string.copy_to_blacklist', item.name) : $r('app.string.copy_to_whitelist', item.name)
+            Xb_ToastUtil.showToast({ message: msgRes })
           }).catch((err: Error) => {
             Xb_ToastUtil.showToast({ message: err.message })
           })
@@ -613,8 +614,9 @@ export struct AccessControl {
           const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
           accessControlRdb.moveToOppositeDomain(item.package_name, domain).then(() => {
             this.loadAppsInfo()
-            const mode = domain == 'WHITE' ? '黑名单' : '白名单'
-            Xb_ToastUtil.showToast({ message: `已将 ${item.name} 移动到${mode}` })
+            // TODO 验证 %s 的占位符是否正确
+            const msgRes = domain == 'WHITE' ? $r('app.string.move_to_blacklist', item.name) : $r('app.string.move_to_whitelist', item.name)
+            Xb_ToastUtil.showToast({ message: msgRes })
           }).catch((err: Error) => {
             Xb_ToastUtil.showToast({ message: err.message })
           })
@@ -710,13 +712,13 @@ export struct AccessControl {
 
       // 校验
       if (!newPackageName || !newAppName) {
-        Xb_ToastUtil.showToast({ message: '请输入完整信息' })
+        Xb_ToastUtil.showToast({ message: $r('app.string.input_complete_info') })
         return
       }
       // 业务规则检查：不能添加自身
       if (newPackageName === this.getUIContext().getHostContext()!.applicationInfo.name) {
         console.debug("AccessControl 不能添加当前应用自身到控制列表");
-        Xb_ToastUtil.showToast({ message: '不能添加自身' })
+        Xb_ToastUtil.showToast({ message: $r('app.string.cannot_add_self') })
         return;
       }
 
@@ -758,7 +760,7 @@ export struct AccessControl {
         await accessControlRdb.updateAppBasicInfo(originalPkg, newApp)
       }
 
-      Xb_ToastUtil.showToast({ message: this.isNewApp ? '添加成功' : '修改成功' })
+      Xb_ToastUtil.showToast({ message: this.isNewApp ? $r('app.string.add_success') : $r('app.string.modify_success') })
       this.keyValueData = new KeyValueData("")
       this.isNewApp = true
       this.kvDialogController.close()
@@ -768,7 +770,7 @@ export struct AccessControl {
 
     } catch (error) {
       console.error('AccessControl saveApp 失败:', error)
-      Xb_ToastUtil.showToast({ message: '保存失败' })
+      Xb_ToastUtil.showToast({ message: $r('app.string.save_failed') })
     }
   }
 
