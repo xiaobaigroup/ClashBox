@@ -186,7 +186,7 @@ struct SubmitAppDialog {
     // 设置 Tab 选中背景色和字体颜色
     this.tabOptions.selectedBackgroundColor = this.icon_emphasize
     this.tabOptions.fontColor = this.icon_emphasize
-    // 预填充输入内容
+    // TODO 预填充输入内容 先测试使用 如果体验不太好就注释掉
     if (this.searchText.trim()) {
       this.inputValue = this.searchText
       // 自动判断输入类型并切换 Tab
@@ -201,6 +201,7 @@ struct SubmitAppDialog {
         this.tabSelectedIndexes = [2]
       }
     }
+    // TODO End
   }
 
   aboutToDisappear(): void {
