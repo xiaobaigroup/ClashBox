@@ -77,8 +77,8 @@ struct OnlineSearch {
   private serviceStatusTimerId: number = -1
   // 服务状态请求间隔 (5分钟/次)
   private readonly SERVICE_STATUS_INTERVAL: number = 5 * 60 * 1000
-  /** 红绿灯状态指示器尺寸 */
-  private readonly INDICATOR_SIZE: number = 24
+  // 红绿灯状态指示器尺寸
+  private readonly INDICATOR_SIZE: number = 16
 
   aboutToAppear(): void {
     this.fetchServiceStatus()
