@@ -45,7 +45,6 @@ struct OnlineSearch {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   // 是否正在搜索
   @State isSearch: boolean = false;
-  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   // 临时的搜索结果列表 -> 用于刷新列表使用的存储一下减少请求次数
   private resultApps: SearchAppItem[] = []
   // 防抖定时器ID
@@ -75,7 +74,6 @@ struct OnlineSearch {
         // 点击遮蔽层不响应，防误触
       } else {
         dismissDialogAction.dismiss()
-        this.isEnableIndexForegroundBlur = false
       }
     }
   })
@@ -93,7 +91,6 @@ struct OnlineSearch {
   /** 取消删除回调 */
   onDeleteCancel(): void {
     this.pendingDeleteApp = null
-    this.isEnableIndexForegroundBlur = false
   }
 
   /** 确认删除回调 */
@@ -113,7 +110,6 @@ struct OnlineSearch {
       }
     }
     this.pendingDeleteApp = null
-    this.isEnableIndexForegroundBlur = false
   }
 
   /** 组件销毁时清除防抖定时器 */
@@ -130,8 +126,7 @@ struct OnlineSearch {
       })
 
       Column() {
-        // TODO 建议修改 placeholder 的内容，现在执行逻辑是 回车 和 用户输入停止一段时间 都会触发搜索
-        Search({ value: this.searchText, placeholder: $r('app.string.enter_search') })
+        Search({ value: this.searchText, placeholder: $r('app.string.the_app_name') })
           .enterKeyType(EnterKeyType.Search)
           .copyOption(CopyOptions.LocalDevice)
           .searchIcon(new SymbolGlyphModifier($r('sys.symbol.magnifyingglass')).fontColor([this.icon_emphasize]))

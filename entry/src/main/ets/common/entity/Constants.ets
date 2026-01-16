@@ -844,6 +844,7 @@ export const ThirdServicesList: TCItemProp[] = [
   { title: 'mcCharts(莓创图表)', content: 'http://meichuangit.net.cn/GettingStarted' },
   { title: 'webdav', content: 'https://ohpm.openharmony.cn/#/cn/detail/@ya520%2Fwebdav' },
   { title: 'CodeMirror', content: 'https://codemirror.net/' },
+  { title: '应用检索服务', content: 'https://next.vcck.cn/' },
   { title: 'VORE-API', content: 'https://api.vore.top/doc/IPdata.html' },
   { title: 'IP-API', content: 'https://ip-api.com/' },
   { title: 'IPWHOIS.IO', content: 'https://ipwhois.io/' },

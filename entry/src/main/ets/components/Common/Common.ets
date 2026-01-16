@@ -900,6 +900,8 @@ export struct skipRowList {
  */
 @Component
 export struct checkoutRowListItem {
+
+  @Prop symbolColor?: ResourceColor = undefined
   @State icon?: Resource | PixelMap = undefined
   @State name: string = ''
   @State title: string = ''
@@ -911,8 +913,7 @@ export struct checkoutRowListItem {
   @State isExperimentalFunction: boolean = false
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
-  @Prop endSymbol: Resource = this.isSelected ? $r('sys.symbol.checkmark_circle_fill_1') : $r('sys.symbol.checkmark_circle')
-  @Prop symbolColor: ResourceColor = $r('sys.color.icon_primary')
+  @Prop endSymbol: Resource = $r('sys.symbol.checkmark_circle')
 
   build() {
     Row({space: 12}) {

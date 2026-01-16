@@ -244,6 +244,7 @@ export struct AccessControl {
                     icon: item.iconUintArr ? Xb_ImageUtils.uint8ArrayToPixelMap(item.iconUintArr) : $r('app.media.box_cat_round'),
                     title: item.name,
                     subtitle: item.package_name,
+                    endSymbol: this.getListItemEndSymbol(item),
                     isSelected: this.isDeleteing ? this.selectedDeletePkgNames.has(item.package_name) : this.selectedPkgNames.has(item.package_name),
                     enabledClick: this.appConfig.accessControl
                   })
@@ -685,6 +686,11 @@ export struct AccessControl {
     return size === this.appListData.length && this.appListData.length !== 0 ? $r('sys.symbol.checkmark_circle_fill_1')
       : size == 0 ? $r('sys.symbol.ohos_circle')
         : $r('sys.symbol.minus_circle_fill')
+  }
+
+  getListItemEndSymbol(item: AppInfo) {
+    const status = this.isDeleteing ? this.selectedDeletePkgNames.has(item.package_name) : this.selectedPkgNames.has(item.package_name)
+    return status ? $r('sys.symbol.checkmark_circle_fill_1') : $r('sys.symbol.checkmark_circle')
   }
 
   addApp() {
