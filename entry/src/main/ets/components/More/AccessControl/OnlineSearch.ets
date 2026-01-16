@@ -136,6 +136,14 @@ struct OnlineSearch {
           }
           .justifyContent(FlexAlign.Center)
           .layoutWeight(1)
+        } else if (this.apps.length === 0 /*&& this.searchText.trim() !== ''*/) {
+          // 搜索结果为空，显示提交应用建议
+          EmptySearchResult({
+            searchText: this.searchText,
+            onSubmitSuccess: () => {
+              // 提交成功后的回调（可选：重新搜索）
+            }
+          })
         } else {
           List() {
             ForEach(this.apps, (app: SearchAppInfo) => {
