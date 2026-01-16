@@ -136,7 +136,7 @@ struct OnlineSearch {
           }
           .justifyContent(FlexAlign.Center)
           .layoutWeight(1)
-        } else if (this.apps.length === 0 /*&& this.searchText.trim() !== ''*/) {
+        } else if (this.apps.length === 0 && this.searchText.trim() !== '') {
           // 搜索结果为空，显示提交应用建议
           EmptySearchResult({
             searchText: this.searchText,

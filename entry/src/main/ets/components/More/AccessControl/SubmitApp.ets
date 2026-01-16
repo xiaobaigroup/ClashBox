@@ -3,6 +3,8 @@ import { hilog } from '@kit.PerformanceAnalysisKit'
 import { Xb_ToastUtil } from 'xb_components'
 import { UIConfig } from '../../../entryability/AppState'
 import { customAnimationUtil } from '../../../common/utils/Animation'
+import { ItemRestriction, SegmentButton, SegmentButtonOptions, SegmentButtonTextItem } from '@kit.ArkUI'
+import { ANIMATION_DURATION_300 } from '../../../common/entity/Constants'
 
 const TAG = "SubmitAppDialog"
 
@@ -15,10 +17,6 @@ const TAG = "SubmitAppDialog"
  * @version:    1.0
  */
 
-/**
- * 搜索结果为空时的提示组件
- * 允许用户提交未找到的应用信息
- */
 @Component
 export struct EmptySearchResult {
   /** 搜索文本（用于预填充） */
@@ -95,15 +93,17 @@ export struct EmptySearchResult {
   private async submitApp(data: SubmitAppRequest): Promise<void> {
     try {
       const response = await this.postSubmitApp(data)
-      if (response.success) {
-        Xb_ToastUtil.showToast({ message: '提交成功，感谢您的贡献！', duration: 2000 })
+      if (response.success && response.data) {
+        // 使用接口返回的 message 提示用户
+        const message = response.data.message ?? '提交成功，感谢您的贡献！'
+        Xb_ToastUtil.showToast({ message, duration: 2000 })
         this.onSubmitSuccess?.()
       } else {
-        Xb_ToastUtil.showToast({ message: response.message ?? '提交失败，请稍后重试', duration: 2000 })
+        Xb_ToastUtil.showToast({ message: response.message ?? '提交失败，请稍后重试', duration: 1000 })
       }
     } catch (error) {
       hilog.error(0xFF00, TAG, "提交应用失败: %{public}s", error.message)
-      Xb_ToastUtil.showToast({ message: '提交失败，请检查网络连接', duration: 2000 })
+      Xb_ToastUtil.showToast({ message: '提交失败，请检查网络连接', duration: 1000 })
     }
   }
 
@@ -139,7 +139,7 @@ export struct EmptySearchResult {
             } else {
               // 如果返回的不是字符串，尝试直接判断状态码
               if (response.responseCode === 200 || response.responseCode === 201) {
-                resolve({ success: true, message: null })
+                resolve({ success: true })
               } else {
                 reject(new Error('请求失败，状态码: ' + response.responseCode))
               }
@@ -154,13 +154,10 @@ export struct EmptySearchResult {
   }
 }
 
-/**
- * 提交应用信息弹窗组件
- * 收集 appid、包名、链接 三个字段
- */
+/** 提交应用信息弹窗组件 */
 @CustomDialog
 struct SubmitAppDialog {
-  /** 搜索文本（用于预填充包名） */
+  /** 搜索文本（用于预填充） */
   @Prop searchText: string = ''
   /** 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
@@ -168,12 +165,16 @@ struct SubmitAppDialog {
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   /** 弹窗控制器 */
   controller: CustomDialogController
-  /** 表单字段 - AppID */
-  @State appId: string = ''
-  /** 表单字段 - 包名 */
-  @State packageName: string = ''
-  /** 表单字段 - 链接 */
-  @State appLink: string = ''
+  /** Tab 选项配置 */
+  @State tabOptions: SegmentButtonOptions = SegmentButtonOptions.tab({
+    buttons: [{ text: 'AppID' }, { text: '包名' }, { text: '链接' }] as ItemRestriction<SegmentButtonTextItem>,
+    selectedFontColor: Color.White,
+    backgroundColor: $r('app.color.FavoriteProxyDivider')
+  })
+  /** 当前选中的 Tab 索引 */
+  @State tabSelectedIndexes: number[] = [0]
+  /** 输入内容 */
+  @State inputValue: string = ''
   /** 是否正在提交 */
   @State isSubmitting: boolean = false
   /** 提交回调 */
@@ -182,9 +183,23 @@ struct SubmitAppDialog {
   aboutToAppear(): void {
     // 开启背景模糊
     this.isEnableIndexForegroundBlur = true
-    // 预填充包名（如果搜索文本像包名格式）
-    if (this.searchText.includes('.')) {
-      this.packageName = this.searchText
+    // 设置 Tab 选中背景色和字体颜色
+    this.tabOptions.selectedBackgroundColor = this.icon_emphasize
+    this.tabOptions.fontColor = this.icon_emphasize
+    // 预填充输入内容
+    if (this.searchText.trim()) {
+      this.inputValue = this.searchText
+      // 自动判断输入类型并切换 Tab
+      if (this.searchText.startsWith('C') && /^C\d+$/.test(this.searchText)) {
+        // 看起来像 AppID
+        this.tabSelectedIndexes = [0]
+      } else if (this.searchText.includes('.') && !this.searchText.startsWith('http')) {
+        // 看起来像包名
+        this.tabSelectedIndexes = [1]
+      } else if (this.searchText.startsWith('http')) {
+        // 看起来像链接
+        this.tabSelectedIndexes = [2]
+      }
     }
   }
 
@@ -198,49 +213,27 @@ struct SubmitAppDialog {
       Text('提交应用信息')
         .fontWeight(FontWeight.Medium)
         .fontSize(20)
-        .margin({ bottom: 8 })
 
-      // 提示文本
-      Text('请至少填写以下任意一项信息')
+      // 提示文本（根据选中的 Tab 显示不同提示）
+      Text(this.getHintText())
         .fontSize(14)
         .fontColor($r('sys.color.font_secondary'))
-        .margin({ bottom: 8 })
+        .transition(TransitionEffect.OPACITY.animation({ duration: ANIMATION_DURATION_300 }))
 
-      // AppID 输入框
-      Column({ space: 4 }) {
-        Text('AppID')
-          .fontSize(14)
-          .fontColor($r('sys.color.font_secondary'))
-          .alignSelf(ItemAlign.Start)
-        TextInput({ placeholder: '例如: C123456789', text: this.appId })
-          .onChange((value: string) => {
-            this.appId = value
-          })
-      }
-      .width('100%')
+      // Tab 切换按钮
+      SegmentButton({
+        options: this.tabOptions,
+        selectedIndexes: $tabSelectedIndexes
+      })
 
-      // 包名输入框
-      Column({ space: 4 }) {
-        Text('包名')
-          .fontSize(14)
-          .fontColor($r('sys.color.font_secondary'))
-          .alignSelf(ItemAlign.Start)
-        TextInput({ placeholder: '例如: com.example.app', text: this.packageName })
+      // 输入框区域
+      Column() {
+        TextInput({
+          placeholder: this.getPlaceholder(),
+          text: this.inputValue
+        })
           .onChange((value: string) => {
-            this.packageName = value
-          })
-      }
-      .width('100%')
-
-      // 链接输入框
-      Column({ space: 4 }) {
-        Text('应用商店链接')
-          .fontSize(14)
-          .fontColor($r('sys.color.font_secondary'))
-          .alignSelf(ItemAlign.Start)
-        TextInput({ placeholder: '例如: https://appgallery.huawei.com/app/C123456789', text: this.appLink })
-          .onChange((value: string) => {
-            this.appLink = value
+            this.inputValue = value
           })
       }
       .width('100%')
@@ -266,18 +259,7 @@ struct SubmitAppDialog {
             if (this.onSubmit) {
               this.isSubmitting = true
               try {
-                // 构建请求体，只包含非空字段
-                const requestData: SubmitAppRequest = {}
-                if (this.appId.trim()) {
-                  requestData.appid = this.appId.trim()
-                }
-                if (this.packageName.trim()) {
-                  requestData.pkg_name = this.packageName.trim()
-                }
-                if (this.appLink.trim()) {
-                  requestData.input = this.appLink.trim()
-                }
-                await this.onSubmit(requestData)
+                await this.onSubmit({ input: this.inputValue.trim() })
                 this.controller.close()
               } finally {
                 this.isSubmitting = false
@@ -299,33 +281,73 @@ struct SubmitAppDialog {
   }
 
   /**
+   * 获取当前 Tab 对应的提示文本
+   * @returns 提示文本
+   */
+  private getHintText(): string {
+    switch (this.tabSelectedIndexes[0]) {
+      case 0:
+        return '请输入华为应用市场的 AppID'
+      case 1:
+        return '请输入应用的包名'
+      case 2:
+        return '请输入华为应用市场链接'
+      default:
+        return '请填写应用信息'
+    }
+  }
+
+  /**
+   * 获取当前 Tab 对应的占位符
+   * @returns 占位符文本
+   */
+  private getPlaceholder(): string {
+    switch (this.tabSelectedIndexes[0]) {
+      case 0:
+        return '例如: C123456789'
+      case 1:
+        return '例如: com.example.app'
+      case 2:
+        return '例如: https://appgallery.huawei.com/app/C123456789'
+      default:
+        return '请输入'
+    }
+  }
+
+  /**
    * 验证表单是否有效
-   * @returns boolean 表单是否有效（至少填写一个字段）
+   * @returns boolean 表单是否有效
    */
   private isFormValid(): boolean {
-    // 至少需要填写一个字段
-    return this.appId.trim().length > 0 ||
-      this.packageName.trim().length > 0 ||
-      this.appLink.trim().length > 0
+    return this.inputValue.trim().length > 0
   }
 }
 
 
-/**
- * 提交应用请求体结构
- * 字段均为可选，但至少需要填写其中一个
- */
-export interface SubmitAppRequest {
-  /** AppID */
-  appid?: string
+/** 提交应用请求体结构 */
+interface SubmitAppRequest {
+  input: string
+}
+
+/** 提交应用响应数据结构 */
+interface SubmitAppData {
+  /** 应用ID */
+  app_id: string
+  /** 应用名称 */
+  name: string
+  /** 图标URL */
+  icon_url: string
   /** 包名 */
-  pkg_name?: string
-  /** 链接 */
-  input?: string
+  pkg_name: string
+  /** 是否为新增应用 */
+  is_new: boolean
+  /** 提示消息 */
+  message: string
 }
 
 /** 提交应用响应结构 */
 interface SubmitAppResponse {
   success: boolean
-  message: string | null
+  data?: SubmitAppData
+  message?: string | null
 }
