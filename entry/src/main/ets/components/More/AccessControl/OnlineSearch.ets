@@ -7,8 +7,9 @@ import { PageMargin } from '../../../common/breakpoint/BreakPoint'
 import { EventHub, Xb_ImageUtils, Xb_ToastUtil } from 'xb_components'
 import { http } from '@kit.NetworkKit'
 import { hilog } from '@kit.PerformanceAnalysisKit'
-import { AppConfig } from '../../../entryability/AppState'
+import { AppConfig, UIConfig } from '../../../entryability/AppState'
 import { EventKey } from '../../../common/EventHub'
+import { customAnimationUtil } from '../../../common/utils/Animation'
 
 @Builder
 export function OnlineSearchBuilder(name: string, param: Object) {
@@ -35,11 +36,16 @@ struct OnlineSearch {
   @StorageLink('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
+  // UI控制变量
+  @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   // 搜索文本
   @State searchText: string = ''
   // 搜索结果列表
   @State apps: SearchAppInfo[] = []
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
+  // 是否正在搜索
+  @State isSearch: boolean = false;
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   // 临时的搜索结果列表 -> 用于刷新列表使用的存储一下减少请求次数
   private resultApps: SearchAppItem[] = []
   // 防抖定时器ID
@@ -49,11 +55,8 @@ struct OnlineSearch {
   // 待删除的应用信息
   private pendingDeleteApp: SearchAppInfo | null = null
   /* 是否开启 `Index` 页面的前景模糊 */
-  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
 
-  /**
-   * 删除确认弹窗控制器
-   */
+  /** 删除确认弹窗控制器 */
   deleteDialogController: CustomDialogController = new CustomDialogController({
     builder: theRowCustomDialog({
       contentText: $r('app.string.delete_app_confirm'),
@@ -77,9 +80,7 @@ struct OnlineSearch {
     }
   })
 
-  /**
-   * 删除按钮样式
-   */
+  /** 删除按钮样式 */
   @Builder
   deleteBuilder() {
     Button($r('app.string.delete'))
@@ -89,23 +90,20 @@ struct OnlineSearch {
       .backgroundColor($r('app.color.container_background'))
   }
 
-  /**
-   * 取消删除回调
-   */
+  /** 取消删除回调 */
   onDeleteCancel(): void {
     this.pendingDeleteApp = null
     this.isEnableIndexForegroundBlur = false
   }
 
-  /**
-   * 确认删除回调
-   */
+  /** 确认删除回调 */
   async onDeleteConfirm(): Promise<void> {
     if (this.pendingDeleteApp) {
       const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
       try {
         await accessControlRdb.removeAppFromDomain(this.pendingDeleteApp.package_name, domain)
-        Xb_ToastUtil.showToast({ message: '删除成功' })
+        Xb_ToastUtil.showToast({ message: '删除成功', duration: 1000 })
+
         // 刷新列表
         this.apps = await this.convertToAppInfo(this.resultApps)
         EventHub.sendEvent(EventKey.ReLoadAccessControl)
@@ -118,9 +116,7 @@ struct OnlineSearch {
     this.isEnableIndexForegroundBlur = false
   }
 
-  /**
-   * 组件销毁时清除防抖定时器
-   */
+  /** 组件销毁时清除防抖定时器 */
   aboutToDisappear(): void {
     this.clearDebounceTimer()
   }
@@ -154,58 +150,69 @@ struct OnlineSearch {
             await this.searchApps(value)
           })
 
-        // TODO 搜索过程中添加动画
-        List() {
-          ForEach(this.apps, (app: SearchAppInfo) => {
-            ListItem() {
-              checkoutRowListItem({
-                icon: app.iconUintArr ? Xb_ImageUtils.uint8ArrayToPixelMap(app.iconUintArr) :
-                  $r('app.media.box_cat_round'),
-                title: app.name,
-                endSymbol: app.isExists ? $r('sys.symbol.xmark_circle') : $r('sys.symbol.plus_circle'),
-                symbolColor: app.isExists ? "#FFE84026" : this.icon_emphasize,
-                subtitle: app.package_name,
-                needBackgroundColor: false,
-                enabledClick: true
-              })
-            }
-            .onClick(async () => {
-              // 点击逻辑
-              const newPackageName = app.package_name;
-              const newAppName = app.name;
-              const iconUintArr = app.iconUintArr
-
-              if (!app.isExists) {
-                // 1. --- 新增逻辑 ---
-                const newApp: AppInfo = {
-                  name: newAppName,
-                  package_name: newPackageName,
-                  iconUintArr,
-                  time: Date.now(),
-                  isSelected: false
-                };
-                // 确定添加到哪个域
-                const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
-                await accessControlRdb.addAppToDomain(newApp, domain)
-                Xb_ToastUtil.showToast({ message: '添加成功' })
-              } else {
-                // 2. 删除逻辑 - 显示确认弹窗防止误操作
-                this.pendingDeleteApp = app
-                this.deleteDialogController.open()
-                return // 等待弹窗确认后再刷新列表
+        if (this.isSearch) {
+          // 搜索动画
+          Row() {
+            LoadingProgress()
+              .color(this.icon_emphasize)
+              .width("20%")
+              .aspectRatio(1)
+              .transition(customAnimationUtil.isOpacity(this.uiConfig))
+          }
+          .justifyContent(FlexAlign.Center)
+          .layoutWeight(1)
+        } else {
+          List() {
+            ForEach(this.apps, (app: SearchAppInfo) => {
+              ListItem() {
+                checkoutRowListItem({
+                  icon: app.iconUintArr ? Xb_ImageUtils.uint8ArrayToPixelMap(app.iconUintArr) :
+                    $r('app.media.box_cat_round'),
+                  title: app.name,
+                  endSymbol: app.isExists ? $r('sys.symbol.xmark_circle') : $r('sys.symbol.plus_circle'),
+                  symbolColor: app.isExists ? "#FFE84026" : this.icon_emphasize,
+                  subtitle: app.package_name,
+                  needBackgroundColor: false,
+                  enabledClick: true
+                })
               }
+              .onClick(async () => {
+                // 点击逻辑
+                const newPackageName = app.package_name;
+                const newAppName = app.name;
+                const iconUintArr = app.iconUintArr
 
-              // 3. 重新加载列表（仅新增时执行）
-              this.apps = await this.convertToAppInfo(this.resultApps)
-              EventHub.sendEvent(EventKey.ReLoadAccessControl)
+                if (!app.isExists) {
+                  // 1. --- 新增逻辑 ---
+                  const newApp: AppInfo = {
+                    name: newAppName,
+                    package_name: newPackageName,
+                    iconUintArr,
+                    time: Date.now(),
+                    isSelected: false
+                  };
+                  // 确定添加到哪个域
+                  const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
+                  await accessControlRdb.addAppToDomain(newApp, domain)
+                  Xb_ToastUtil.showToast({ message: '添加成功', duration: 1000 })
+
+                  // 重新加载列表（仅新增时执行）
+                  this.apps = await this.convertToAppInfo(this.resultApps)
+                  EventHub.sendEvent(EventKey.ReLoadAccessControl)
+                } else {
+                  // 2. 删除逻辑 - 显示确认弹窗防止误操作
+                  this.pendingDeleteApp = app
+                  this.deleteDialogController.open()
+                }
+              })
             })
-          })
+          }
+          .width('100%')
+          .contentStartOffset(5)
+          .alignListItem(ListItemAlign.Center)
+          .contentEndOffset(CONTENT_END_OFFSET_150 - 55)
+          .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
         }
-        .width('100%')
-        .contentStartOffset(5)
-        .alignListItem(ListItemAlign.Center)
-        .contentEndOffset(CONTENT_END_OFFSET_150 - 55)
-        .padding({ left: PageMargin(this.widthBp, this.heightBp), right: PageMargin(this.widthBp, this.heightBp) })
       }
       .padding({ bottom: 32 })
     }
@@ -215,9 +222,7 @@ struct OnlineSearch {
     .backgroundColor($r('app.color.background'))
   }
 
-  /**
-   * 清除防抖定时器
-   */
+  /** 清除防抖定时器 */
   private clearDebounceTimer(): void {
     if (this.debounceTimerId !== -1) {
       clearTimeout(this.debounceTimerId)
@@ -271,11 +276,14 @@ struct OnlineSearch {
     this.searchText = value
     if (value.length > 0) {
       try {
+        this.isSearch = true
         const response = await this.getAppList(value)
 
         if (response.success && response.data) {
           this.resultApps = response.data
           this.apps = await this.convertToAppInfo(this.resultApps)
+
+          this.isSearch = false
           hilog.info(0xFF00, TAG, "搜索成功，获取到 %{public}d 条数据", this.apps.length)
         }
       } catch (error) {
