@@ -10,6 +10,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit'
 import { AppConfig, UIConfig } from '../../../entryability/AppState'
 import { EventKey } from '../../../common/EventHub'
 import { customAnimationUtil } from '../../../common/utils/Animation'
+import { EmptySearchResult } from './SubmitApp'
 
 @Builder
 export function OnlineSearchBuilder(name: string, param: Object) {
@@ -17,6 +18,21 @@ export function OnlineSearchBuilder(name: string, param: Object) {
 }
 
 const TAG = "OnlineSearch"
+
+/**
+ * 服务状态枚举
+ * @description 用于表示在线服务的运行状态
+ */
+enum ServiceStatus {
+  /** 故障 */
+  DOWN = 0,
+  /** 正常 */
+  UP = 1,
+  /** 维护中 */
+  MAINTENANCE = 3,
+  /** 加载中 */
+  LOADING = -1
+}
 
 /**
  * @projectName:    clashnext
@@ -45,6 +61,10 @@ struct OnlineSearch {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   // 是否正在搜索
   @State isSearch: boolean = false;
+  /* 是否开启 `Index` 页面的前景模糊 */
+  @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
+  // 在线服务状态（-1: 加载中, 0: 故障, 1: 正常, 3: 维护）
+  @State serviceStatus: ServiceStatus = ServiceStatus.LOADING
   // 临时的搜索结果列表 -> 用于刷新列表使用的存储一下减少请求次数
   private resultApps: SearchAppItem[] = []
   // 防抖定时器ID
@@ -53,68 +73,25 @@ struct OnlineSearch {
   private readonly DEBOUNCE_DELAY: number = 400
   // 待删除的应用信息
   private pendingDeleteApp: SearchAppInfo | null = null
-  /* 是否开启 `Index` 页面的前景模糊 */
+  // 服务状态请求定时器ID
+  private serviceStatusTimerId: number = -1
+  // 服务状态请求间隔 (5分钟/次)
+  private readonly SERVICE_STATUS_INTERVAL: number = 5 * 60 * 1000
+  /** 红绿灯状态指示器尺寸 */
+  private readonly INDICATOR_SIZE: number = 24
 
-  /** 删除确认弹窗控制器 */
-  deleteDialogController: CustomDialogController = new CustomDialogController({
-    builder: theRowCustomDialog({
-      contentText: $r('app.string.delete_app_confirm'),
-      cancel: () => {
-        this.onDeleteCancel()
-      },
-      confirm: () => {
-        this.onDeleteConfirm()
-      },
-      leftButton: () => {
-        this.deleteBuilder()
-      }
-    }),
-    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
-      if (dismissDialogAction.reason === DismissReason.TOUCH_OUTSIDE) {
-        // 点击遮蔽层不响应，防误触
-      } else {
-        dismissDialogAction.dismiss()
-      }
-    }
-  })
+  aboutToAppear(): void {
+    this.fetchServiceStatus()
 
-  /** 删除按钮样式 */
-  @Builder
-  deleteBuilder() {
-    Button($r('app.string.delete'))
-      .width('100%')
-      .height(39)
-      .fontColor(Color.Red)
-      .backgroundColor($r('app.color.container_background'))
+    // 5分钟获取一次服务状态
+    this.serviceStatusTimerId = setInterval(() => {
+      this.fetchServiceStatus()
+    }, this.SERVICE_STATUS_INTERVAL)
   }
 
-  /** 取消删除回调 */
-  onDeleteCancel(): void {
-    this.pendingDeleteApp = null
-  }
-
-  /** 确认删除回调 */
-  async onDeleteConfirm(): Promise<void> {
-    if (this.pendingDeleteApp) {
-      const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
-      try {
-        await accessControlRdb.removeAppFromDomain(this.pendingDeleteApp.package_name, domain)
-        Xb_ToastUtil.showToast({ message: '删除成功', duration: 1000 })
-
-        // 刷新列表
-        this.apps = await this.convertToAppInfo(this.resultApps)
-        EventHub.sendEvent(EventKey.ReLoadAccessControl)
-      } catch (error) {
-        hilog.error(0xFF00, TAG, "删除失败: %{public}s", error.message)
-        Xb_ToastUtil.showToast({ message: '删除失败' })
-      }
-    }
-    this.pendingDeleteApp = null
-  }
-
-  /** 组件销毁时清除防抖定时器 */
   aboutToDisappear(): void {
     this.clearDebounceTimer()
+    clearInterval(this.serviceStatusTimerId)
   }
 
   build() {
@@ -122,7 +99,10 @@ struct OnlineSearch {
       TopBuilder({
         showBackButton: true,
         title: $r('app.string.online_search'),
-        pathStack: this.addPageInfos
+        pathStack: this.addPageInfos,
+        extraBuilder: () => {
+          this.statusIndicatorBuilder()
+        }
       })
 
       Column() {
@@ -215,6 +195,169 @@ struct OnlineSearch {
     .height('100%')
     .hideTitleBar(true)
     .backgroundColor($r('app.color.background'))
+  }
+
+  /** 红绿灯状态指示器 */
+  @Builder
+  statusIndicatorBuilder() {
+    Row() {
+      // 外层泛光效果容器
+      Stack() {
+        // 泛光层（底层发光效果）
+        Row()
+          .borderRadius("50%")
+          .backgroundColor(this.getStatusColor())
+          .width(this.INDICATOR_SIZE * 0.75)
+          .aspectRatio(1)
+          .shadow({
+            radius: this.INDICATOR_SIZE * 0.5,
+            color: this.getStatusColor(),
+            offsetX: 0,
+            offsetY: 0
+          })
+          .opacity(0.6)
+
+        // 主指示灯
+        Row()
+          .borderRadius("50%")
+          .backgroundColor(this.getStatusColor())
+          .width(this.INDICATOR_SIZE * 0.58)
+          .aspectRatio(1)
+          .shadow({
+            radius: this.INDICATOR_SIZE * 0.25,
+            color: this.getStatusColor(),
+            offsetX: 0,
+            offsetY: 0
+          })
+
+        // 高光点（增加立体感）
+        Row()
+          .borderRadius("50%")
+          .backgroundColor('#FFFFFF')
+          .width(this.INDICATOR_SIZE / 6)
+          .aspectRatio(1)
+          .opacity(0.7)
+          .offset({ x: -this.INDICATOR_SIZE / 8, y: -this.INDICATOR_SIZE / 8 })
+      }
+      .width(this.INDICATOR_SIZE)
+      .aspectRatio(1)
+      .margin({ left: 8 })
+    }
+    .alignItems(VerticalAlign.Center)
+  }
+
+  /** 删除确认弹窗控制器 */
+  deleteDialogController: CustomDialogController = new CustomDialogController({
+    builder: theRowCustomDialog({
+      contentText: $r('app.string.delete_app_confirm'),
+      cancel: () => {
+        this.onDeleteCancel()
+      },
+      confirm: () => {
+        this.onDeleteConfirm()
+      },
+      leftButton: () => {
+        this.deleteBuilder()
+      }
+    }),
+    onWillDismiss: (dismissDialogAction: DismissDialogAction) => {
+      if (dismissDialogAction.reason === DismissReason.TOUCH_OUTSIDE) {
+        // 点击遮蔽层不响应，防误触
+      } else {
+        dismissDialogAction.dismiss()
+        this.isEnableIndexForegroundBlur = false
+      }
+    }
+  })
+
+  /** 删除按钮样式 */
+  @Builder
+  deleteBuilder() {
+    Button($r('app.string.delete'))
+      .width('100%')
+      .height(39)
+      .fontColor(Color.Red)
+      .backgroundColor($r('app.color.container_background'))
+  }
+
+  /** 取消删除回调 */
+  onDeleteCancel(): void {
+    this.pendingDeleteApp = null
+    this.isEnableIndexForegroundBlur = false
+  }
+
+  /** 确认删除回调 */
+  async onDeleteConfirm(): Promise<void> {
+    if (this.pendingDeleteApp) {
+      const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
+      try {
+        await accessControlRdb.removeAppFromDomain(this.pendingDeleteApp.package_name, domain)
+        Xb_ToastUtil.showToast({ message: '删除成功', duration: 1000 })
+
+        // 刷新列表
+        this.apps = await this.convertToAppInfo(this.resultApps)
+        EventHub.sendEvent(EventKey.ReLoadAccessControl)
+      } catch (error) {
+        hilog.error(0xFF00, TAG, "删除失败: %{public}s", error.message)
+        Xb_ToastUtil.showToast({ message: '删除失败' })
+      }
+    }
+    this.pendingDeleteApp = null
+    this.isEnableIndexForegroundBlur = false
+  }
+
+  /**
+   * 根据服务状态获取对应颜色
+   * @returns 状态对应的颜色值
+   */
+  private getStatusColor(): ResourceColor {
+    switch (this.serviceStatus) {
+      case ServiceStatus.UP:
+        // 正常 - 绿色
+        return '#00C853'
+      case ServiceStatus.DOWN:
+        // 故障 - 红色
+        return '#FF1744'
+      case ServiceStatus.MAINTENANCE:
+        // 维护 - 黄色/橙色
+        return '#FFAB00'
+      case ServiceStatus.LOADING:
+      default:
+      // 加载中 - 灰色
+        return '#9E9E9E'
+    }
+  }
+
+  /**
+   * 获取在线服务状态
+   * @description 从 API 获取心跳数据，解析服务状态
+   */
+  private fetchServiceStatus(): void {
+    const httpRequest = http.createHttp()
+    const url = 'https://jk.vcck.cn/api/status-page/heartbeat/clashbox'
+
+    httpRequest.request(url, (err: Error, data: http.HttpResponse) => {
+      if (!err && typeof data.result === 'string') {
+        try {
+          const response = JSON.parse(data.result) as HeartbeatResponse
+          // 获取 key 为 "8" 的心跳列表
+          const heartbeatList8 = response.heartbeatList['8']
+          if (heartbeatList8 && heartbeatList8.length > 0) {
+            // 取最后一个对象的 status 值
+            const lastHeartbeat = heartbeatList8[heartbeatList8.length - 1]
+            this.serviceStatus = lastHeartbeat.status as ServiceStatus
+            hilog.info(0xFF00, TAG, "服务状态获取成功: %{public}d", this.serviceStatus)
+          }
+        } catch (parseErr) {
+          hilog.error(0xFF00, TAG, "解析服务状态失败: %{public}s", (parseErr as Error).message)
+          this.serviceStatus = ServiceStatus.DOWN
+        }
+      } else {
+        hilog.error(0xFF00, TAG, "获取服务状态失败")
+        this.serviceStatus = ServiceStatus.DOWN
+      }
+      httpRequest.destroy()
+    })
   }
 
   /** 清除防抖定时器 */
@@ -373,4 +516,18 @@ interface SearchResponse {
 interface SearchAppInfo extends AppInfo {
   // 此应用是否存在
   isExists: boolean
+}
+
+/** 心跳响应数据结构 */
+interface HeartbeatItem {
+  status: number
+  time: string
+  msg: string
+  ping: number
+}
+
+/** 心跳 API 响应结构 */
+interface HeartbeatResponse {
+  heartbeatList: Record<string, HeartbeatItem[]>
+  uptimeList: Record<string, number>
 }

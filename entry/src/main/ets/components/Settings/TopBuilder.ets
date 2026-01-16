@@ -15,6 +15,8 @@ struct TopBuilder {
   /** 由调用方传入，支持不同路由栈的复用 */
   @Link pathStack: NavPathStack
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
+  /** 可选的额外 Builder，用于在标题右侧绘制自定义内容 */
+  @BuilderParam extraBuilder?: () => void
 
   build() {
     Row() {
@@ -34,10 +36,18 @@ struct TopBuilder {
         })
       }
       Column() {
-        Text(this.title)
-          .fontSize(20)
-          .fontWeight(FontWeight.Bold)
-          .margin(this.showBackButton ? {left: 8, top: 21 } : {left: 16, top: 21 })
+        Row() {
+          Text(this.title)
+            .fontSize(20)
+            .fontWeight(FontWeight.Bold)
+          // 渲染额外的 Builder（如状态指示器）
+          if (this.extraBuilder) {
+            this.extraBuilder()
+          }
+        }
+        .alignItems(VerticalAlign.Center)
+        .margin(this.showBackButton ? {left: 8, top: 21 } : {left: 16, top: 21 })
+
         if (this.subtitle) {
           Text(this.subtitle)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -51,24 +61,6 @@ struct TopBuilder {
       .alignItems(HorizontalAlign.Start)
       .height(BIND_SHEET_TITLE_CONTAINER_HEIGHT)
       Blank()
-      /*Button({ type: ButtonType.Circle, stateEffect: true }) {
-        SymbolGlyph($r('sys.symbol.xmark'))
-          .fontSize(24)
-          .fontColor([this.icon_secondary])
-      }
-      .width(40)
-      .height(40)
-      .backgroundColor($r('app.color.settings_container_background'))
-      .backgroundBlurStyle(BlurStyle.BACKGROUND_REGULAR)
-      .margin({right: 16, top: BIND_SHEET_DRAG_BAR_HEIGHT })
-      .onClick(() => {
-        if (this.SettingsPageInfos.size() != 0 ) {
-          this.SettingsPageInfos.pop(true)
-        } else {
-          this.isShowSettings = false
-          this.SettingsPageInfos.clear()
-        }
-      })*/
     }
     .margin({bottom: 8})
     .alignItems(VerticalAlign.Top)
