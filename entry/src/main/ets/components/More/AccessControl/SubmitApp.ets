@@ -42,7 +42,7 @@ export struct EmptySearchResult {
         // 点击遮蔽层不响应，防误触
       } else {
         dismissDialogAction.dismiss()
-        this.isEnableIndexForegroundBlur = false
+        // this.isEnableIndexForegroundBlur = false
       }
     }
   })
@@ -209,7 +209,7 @@ struct SubmitAppDialog {
   }
 
   aboutToDisappear(): void {
-    this.isEnableIndexForegroundBlur = false
+    // this.isEnableIndexForegroundBlur = false
   }
 
   build() {

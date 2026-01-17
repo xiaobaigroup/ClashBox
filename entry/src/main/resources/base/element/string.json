@@ -2467,6 +2467,10 @@
     {
       "name": "package_name_exists",
       "value": "应用包名已经存在"
+    },
+    {
+      "name": "online_search_tips_1",
+      "value": "1. 在线搜索只能查询到市场正式版应用，没有正式上架的应用暂不支持检索; \n"
     }
   ]
 }

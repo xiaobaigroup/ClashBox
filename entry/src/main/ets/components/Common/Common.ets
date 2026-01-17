@@ -168,7 +168,7 @@ export function BindSheetTitleCustomBuilder(param: BindSheetTitleCustomBuilderPa
     // 返回按钮 END
 
     // 主副标题 START
-    Column(){
+    Column() {
       Text(param.mainTitle)
         .fontWeight(param.mainTitleFontWeight?? FontWeight.Bold)
         .fontSize(param.mainTitleFontSize)
@@ -188,9 +188,10 @@ export function BindSheetTitleCustomBuilder(param: BindSheetTitleCustomBuilderPa
       }
     }
     .alignItems(HorizontalAlign.Start)
+    .justifyContent(FlexAlign.Center)
     // 避让菜单menus、返回按钮（所以param.menus.length + 1）
     .width(`calc(100% - ${(BIND_SHEET_TITLE_LEFT_SYMBOL_WEIGHT + 10) * (param.menus.length + 1)}vp)`)
-    .height(param.subTitle != null && param.subTitle != '' ? param.mainTitleFontSize * 2 : param.mainTitleFontSize )
+    // .height(param.subTitle != null && param.subTitle != '' ? param.mainTitleFontSize * 2 : param.mainTitleFontSize )
     .padding({ left: param.isSubPage ? param.titlePaddingLeft??0 : 0 })
     .animation({ duration: ANIMATION_DURATION_300, curve: Curve.Ease })
     // 主副标题 END

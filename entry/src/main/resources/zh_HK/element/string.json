@@ -2467,6 +2467,10 @@
     {
       "name": "package_name_exists",
       "value": "應用套件名稱已經存在"
+    },
+    {
+      "name": "online_search_tips_1",
+      "value": "1. 在線搜尋只能搵到市場正式版應用，未正式上架嘅應用暫時唔支援檢索；\n"
     }
   ]
 }

@@ -54,6 +54,13 @@ export struct AddAppListComponent {
               this.addAppEvent()
             })
         }
+        ListItem() {
+          Text() {
+            Span($r('app.string.tips'))
+            Span(': \n')
+            Span($r('app.string.online_search_tips_1'))
+          }
+        }.padding({ left: 5, right: 5})
       }
       .padding({
         left: NavigationListPadding(this.widthBp, this.heightBp),
