@@ -92,6 +92,7 @@ const (
 	SetOptionState
 	GetVpnRunTime
 	VpnConfigInited
+	SetNetInterfaces
 )
 
 func handleRemoteRequest(request RpcRequest, fn func(RpcResult)) {
@@ -252,6 +253,15 @@ func handleRemoteRequest(request RpcRequest, fn func(RpcResult)) {
 	case VpnConfigInited:
 		ret.Result = ConfigInited()
 		fn(ret)
+	case SetNetInterfaces:
+        paramsString, _ := request.Params[0].(string)
+        err := SetInterfaces(paramsString)
+        if err != nil {
+            ret.Error = err.Error()
+        } else {
+            ret.Result = ""
+        }
+        fn(ret)
 	default:
 		ret.Error = "未知请求"
 		fn(ret)
