@@ -2471,6 +2471,14 @@
     {
       "name": "online_search_tips_1",
       "value": "1. 線上搜尋僅能查詢到市集正式版應用程式，尚未正式上架的應用程式暫不支援搜尋；\n"
+    },
+    {
+      "name": "confirm",
+      "value": "確認"
+    },
+    {
+      "name": "delete_apps_confirm",
+      "value": "確認刪除選取的 %s 個應用程式"
     }
   ]
 }

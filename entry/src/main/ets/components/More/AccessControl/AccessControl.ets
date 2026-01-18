@@ -66,7 +66,7 @@ export struct AccessControl {
   @State currentIndex: number = 0
   @State isAddSelect: boolean = false
   @State isShowSheet: boolean = false
-  @State isDeleteing: boolean = false
+  @State isEditMode: boolean = false
   @State initialized: boolean = false
   @State appListData: AppInfo[] = []
   @State selectedPkgNames: Set<string> = new Set<string>()
@@ -150,9 +150,9 @@ export struct AccessControl {
             alignItems: ItemAlign.Center
           }) {
             Column() {
-              Text(`${Xb_GetResourceString($r('app.string.selected'), this)} ${this.isDeleteing ?
+              Text(`${Xb_GetResourceString($r('app.string.selected'), this)} ${this.isEditMode ?
                 this.selectedDeletePkgNames.size : this.selectedPkgNames.size}`)
-              Text(this.isDeleteing ?
+              Text(this.isEditMode ?
                 `${Xb_GetResourceString($r('app.string.Edit'), this)}${Xb_GetResourceString($r('app.string.mode'),
                   this)}`
                 : this.appConfig.accessControlMode != 'AcceptSelected' ? $r('app.string.white_list_tips') :
@@ -166,7 +166,7 @@ export struct AccessControl {
             }
             .alignItems(HorizontalAlign.Start)
 
-            if (this.isDeleteing) {
+            if (this.isEditMode) {
               Xb_CapsuleButton({
                 icon: undefined,
                 fontSize: 16,
@@ -174,7 +174,7 @@ export struct AccessControl {
                 text: $r('app.string.exit'),
                 theBackgroundColor: $r('app.color.settings_container_background'),
                 onCheck: () => {
-                  this.isDeleteing = false
+                  this.isEditMode = false
                   this.selectedDeletePkgNames.clear()
                   this.loadAppsInfo()
                 }
@@ -182,7 +182,7 @@ export struct AccessControl {
             }
             Blank()
             if (this.appConfig.accessControl) {
-              if (!this.isDeleteing) {
+              if (!this.isEditMode) {
                 ButtonBuilder({
                   icon: $r('sys.symbol.plus'),
                   onCheck: () => {
@@ -196,12 +196,12 @@ export struct AccessControl {
               }
               if (this.appListData.length != 0) {
                 ButtonBuilder({
-                  icon: this.isDeleteing ? $r('sys.symbol.trash_fill') : $r('sys.symbol.square_and_pencil'),
+                  icon: this.isEditMode ? $r('sys.symbol.trash_fill') : $r('sys.symbol.square_and_pencil'),
                   onCheck: () => {
-                    if (this.isDeleteing) {
+                    if (this.isEditMode) {
                       this.deleteApp()
                     } else {
-                      this.isDeleteing = true
+                      this.isEditMode = true
                     }
                   }
                 })
@@ -211,26 +211,37 @@ export struct AccessControl {
               SymbolGlyph(this.getGroupSymbol())
                 .fontSize(24)
                 .fontColor([this.selectedPkgNames.size == 0 ||
-                  (this.isDeleteing && this.selectedDeletePkgNames.size == 0) ? icon_primary : this.icon_emphasize])
+                  (this.isEditMode && this.selectedDeletePkgNames.size == 0) ? icon_primary : this.icon_emphasize])
                 .transition(customAnimationUtil.isScaleTranIcon(10, this.uiConfig))
                 .onClick(() => {
                   if (this.initialized) {
-                    if (this.selectedPkgNames.size == 0) {
-                      // 全选
-                      this.selectedPkgNames = new Set(
-                        this.appListData
-                          .map(a => a.package_name)
-                      )
-                      this.selectApps(Array.from(this.selectedPkgNames))
-                    } else if (this.selectedPkgNames.size == 0) {
-                      // 全选
-                      this.selectedDeletePkgNames = new Set(
-                        this.appListData
-                          .map(a => a.package_name)
-                      )
+                    if (this.isEditMode) {
+                      // --- 处理删除模式的逻辑 ---
+                      if (this.selectedDeletePkgNames.size == 0) {
+                        // 如果当前没选中任何删除项 -> 全选
+                        this.selectedDeletePkgNames = new Set(
+                          this.appListData.map(a => a.package_name)
+                        );
+                        console.debug(`Select 删除选中数量: ${this.selectedDeletePkgNames.size}`);
+                        this.loadAppsInfo();
+                      } else {
+                        // 如果当前已经选中了删除项 -> 全不选
+                        this.selectedDeletePkgNames.clear();
+                        this.loadAppsInfo();
+                      }
+
                     } else {
-                      // 全不选
-                      this.cancelTotalSelected()
+                      // --- 处理普通模式的逻辑 ---
+                      if (this.selectedPkgNames.size == 0) {
+                        // 如果当前没选中任何应用 -> 全选
+                        this.selectedPkgNames = new Set(
+                          this.appListData.map(a => a.package_name)
+                        );
+                        this.selectApps(Array.from(this.selectedPkgNames));
+                      } else {
+                        // 如果当前已经选中了应用 -> 全不选
+                        this.cancelTotalSelected();
+                      }
                     }
                   }
                 })
@@ -262,7 +273,7 @@ export struct AccessControl {
                     title: item.name,
                     subtitle: item.package_name,
                     endSymbol: this.getListItemEndSymbol(item),
-                    isSelected: this.isDeleteing ? this.selectedDeletePkgNames.has(item.package_name) :
+                    isSelected: this.isEditMode ? this.selectedDeletePkgNames.has(item.package_name) :
                       this.selectedPkgNames.has(item.package_name),
                     enabledClick: this.appConfig.accessControl
                   })
@@ -282,7 +293,7 @@ export struct AccessControl {
                   const itemData = this.appListData[index]
                   itemData.isSelected = !itemData.isSelected
                   this.appListData.splice(index, 1, itemData)
-                  if (this.isDeleteing) {
+                  if (this.isEditMode) {
                     if (this.selectedDeletePkgNames.has(item.package_name)) {
                       // 取消：移除列表
                       this.selectedDeletePkgNames.delete(item.package_name)
@@ -368,8 +379,8 @@ export struct AccessControl {
         this.searchText = ''
         return true
       }
-      if (this.isDeleteing) {
-        this.isDeleteing = false
+      if (this.isEditMode) {
+        this.isEditMode = false
         this.loadAppsInfo()
         return true
       }
@@ -445,73 +456,6 @@ export struct AccessControl {
       // 操作
       this.OptionBuilder()
     }
-  }
-
-  @LocalBuilder
-  AddBuilder() {
-    Navigation(this.addPageInfos) {
-      List({ space: LIST_SPACE }) {
-        ListItem() {
-          skipRowList({
-            icons: undefined,
-            title: $r('app.string.online_search'),
-          })
-            .onClick(() => {
-              this.addPageInfos.pushDestination({
-                name: 'online_app_search'
-              })
-                .then(() => {
-                  hilog.info(0x0001, "AccessControl", 'pushDestination success')
-                })
-                .catch((err: ESObject) => {
-                  hilog.error(0x0001, "AccessControl", 'pushDestination fail: ' + err)
-                })
-            })
-        }
-
-        ListItem() {
-          skipRowList({
-            icons: undefined,
-            title: $r('app.string.add_app'),
-          })
-            .onClick(() => {
-              this.isShowSheet = false
-              this.addApp()
-            })
-        }
-      }
-      .padding({
-        left: NavigationListPadding(this.widthBp, this.heightBp),
-        right: NavigationListPadding(this.widthBp, this.heightBp)
-      })
-    }
-    .mode(NavigationMode.Stack)
-    .hideToolBar(true)
-    .width('100%')
-    .height('100%')
-    .title(
-      {
-        builder: BindSheetTitleCustomBuilder({
-          pageInfos: this.addPageInfos,
-          isSubPage: false,
-          mainTitle: $r('app.string.add_app'),
-          needSetHeight: true,
-          mainTitleFontWeight: BIND_SHEET_MAIN_FONT_WEIGHT,
-          mainTitleFontSize: BIND_SHEET_MAIN_FONTSIZE,
-          subTitleFontSize: BIND_SHEET_SUB_FONTSIZE,
-          padding: {
-            left: NavigationListPadding(this.widthBp, this.heightBp),
-            right: NavigationListPadding(this.widthBp, this.heightBp)
-          },
-          menus: []
-        }),
-        height: BIND_SHEET_TITLE_CONTAINER_HEIGHT + BIND_SHEET_DRAG_BAR_HEIGHT
-      })
-    .height(BIND_SHEET_CONTAINER_HEIGHT)
-    .mode(NavigationMode.Stack)
-    .hideBackButton(true)
-    .navBarWidthRange([255, '100%'])
-    .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
   }
 
   @Builder
@@ -660,6 +604,7 @@ export struct AccessControl {
         theBackgroundColor: $r('app.color.container_background'),
         onCheck: () => {
           console.log(`AccessControl 点击 #deleteApp ${id}`)
+          this.selectedPkgNames.add(item.package_name)
           this.deleteApp(id, item)
         }
       })
@@ -713,14 +658,14 @@ export struct AccessControl {
 
   getGroupSymbol() {
     // 根据模式获取当前选中的数量
-    const size = this.isDeleteing ? this.selectedDeletePkgNames.size : this.selectedPkgNames.size
+    const size = this.isEditMode ? this.selectedDeletePkgNames.size : this.selectedPkgNames.size
     return size === this.appListData.length && this.appListData.length !== 0 ? $r('sys.symbol.checkmark_circle_fill_1')
       : size == 0 ? $r('sys.symbol.ohos_circle')
         : $r('sys.symbol.minus_circle_fill')
   }
 
   getListItemEndSymbol(item: AppInfo) {
-    const status = this.isDeleteing ? this.selectedDeletePkgNames.has(item.package_name) :
+    const status = this.isEditMode ? this.selectedDeletePkgNames.has(item.package_name) :
       this.selectedPkgNames.has(item.package_name)
     return status ? $r('sys.symbol.checkmark_circle_fill_1') : $r('sys.symbol.checkmark_circle')
   }
@@ -852,19 +797,47 @@ export struct AccessControl {
    */
   async deleteApp(index?: number, item?: AppInfo) {
     const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
+    const size = `${this.selectedDeletePkgNames.size}`
+    const mode = index != undefined && item != undefined
     try {
-      if (index != undefined && item != undefined) {
-        // 单个删除
-        this.selectedPkgNames.delete(item.package_name)
-        await accessControlRdb.removeAppFromDomain(item.package_name, domain)
-      } else {
-        // 批量删除
-        await accessControlRdb.batchRemoveFromDomain(Array.from(this.selectedDeletePkgNames), domain)
-        this.selectedDeletePkgNames.clear()
-      }
-      this.isDeleteing = false
-      await this.loadAppsInfo()
-      Xb_ToastUtil.showToast({ message: '删除成功' })
+      Xb_ToastUtil.showAlertDialog({
+        title: mode ? $r('app.string.delete_app_confirm') : $r('app.string.delete_apps_confirm', size),
+        message: '',
+        primaryButton: {
+          value: $r('app.string.Cancel'),
+          action: () => {}
+        },
+        secondaryButton: {
+          value: $r('app.string.confirm'),
+          fontColor: Color.Red,
+          action: async () => {
+            if (mode) {
+              // 单个删除
+              this.selectedPkgNames.delete(item.package_name)
+              this.selectedDeletePkgNames.delete((item.package_name))
+              await accessControlRdb.removeAppFromDomain(item.package_name, domain)
+            } else {
+              // 批量删除
+              const pkgToDeletes = Array.from(this.selectedDeletePkgNames)
+              await accessControlRdb.batchRemoveFromDomain(pkgToDeletes, domain)
+              // 清除对应应用选中
+              pkgToDeletes.forEach(pkgName => {
+                this.selectedPkgNames.delete(pkgName);
+              })
+              // 清空删除选中
+              this.selectedDeletePkgNames.clear()
+            }
+            await this.loadAppsInfo()
+            Xb_ToastUtil.showToast({ message: '删除成功' })
+          }
+        },
+        onWillAppear: () => {
+          this.isEnableIndexForegroundBlur = true
+        },
+        onWillDisappear: () => {
+          this.isEnableIndexForegroundBlur = false
+        }
+      })
     } catch (error) {
       console.error('删除失败:', error)
       Xb_ToastUtil.showToast({ message: '删除失败' })

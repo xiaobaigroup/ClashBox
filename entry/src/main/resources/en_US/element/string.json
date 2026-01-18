@@ -2471,6 +2471,14 @@
     {
       "name": "online_search_tips_1",
       "value": "1. Online search can only retrieve official market applications. Applications that have not been officially listed are not supported for retrieval; \n"
+    },
+    {
+      "name": "confirm",
+      "value": "Confirm"
+    },
+    {
+      "name": "delete_apps_confirm",
+      "value": "Confirm to delete the selected %s applications"
     }
   ]
 }

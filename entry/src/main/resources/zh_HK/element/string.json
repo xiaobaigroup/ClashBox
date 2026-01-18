@@ -2471,6 +2471,14 @@
     {
       "name": "online_search_tips_1",
       "value": "1. 在線搜尋只能搵到市場正式版應用，未正式上架嘅應用暫時唔支援檢索；\n"
+    },
+    {
+      "name": "confirm",
+      "value": "確認"
+    },
+    {
+      "name": "delete_apps_confirm",
+      "value": "確認刪除選中嘅 %s 個應用"
     }
   ]
 }

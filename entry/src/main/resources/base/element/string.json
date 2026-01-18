@@ -2471,6 +2471,14 @@
     {
       "name": "online_search_tips_1",
       "value": "1. 在线搜索只能查询到市场正式版应用，没有正式上架的应用暂不支持检索; \n"
+    },
+    {
+      "name": "confirm",
+      "value": "确认"
+    },
+    {
+      "name": "delete_apps_confirm",
+      "value": "确认删除选中的 %s 个应用"
     }
   ]
 }
