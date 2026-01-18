@@ -51,13 +51,12 @@ import { JSON } from '@kit.ArkTS'
 import { AddAppListComponent } from './AddAppListComponent'
 
 @Builder
-export function AccessControlBuilder(name: string, param: Object){
+export function AccessControlBuilder(name: string, param: Object) {
   AccessControl()
 }
 
 @Component
 export struct AccessControl {
-
   // page内顶部标题偏移量
   @Consume curYOffset: number
   @Consume needSearch: boolean
@@ -80,20 +79,19 @@ export struct AccessControl {
   @StorageLink('appConfig') appConfig: AppConfig = new AppConfig()
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
   @State keyValueData: KeyValueData = new KeyValueData("")
-
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
   // 高度断点
-  @StorageLink ('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
+  @StorageLink('currentHeightBreakpoint') heightBp: HeightBreakpoint = 0
   // 宽度断点
-  @StorageLink ('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
+  @StorageLink('currentWidthBreakpoint') widthBp: WidthBreakpoint = 1
   // 主题色
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   // 状态栏高度
   @StorageProp('topRectHeight') topRectHeight: number = 0
-
   @State modeTabOptions: SegmentButtonOptions = SegmentButtonOptions.tab({
-    buttons: [{ text: $r('app.string.white_list') }, { text: $r('app.string.blacklist')
+    buttons: [{ text: $r('app.string.white_list') }, {
+      text: $r('app.string.blacklist')
     }] as ItemRestriction<SegmentButtonTextItem>,
     selectedBackgroundColor: $r('app.color.container_background'),
     backgroundBlurStyle: BlurStyle.BACKGROUND_THICK,
@@ -101,7 +99,8 @@ export struct AccessControl {
     fontColor: font_primary,
   })
   @State sortTabOptions: SegmentButtonOptions = SegmentButtonOptions.tab({
-    buttons: [{ text: $r('app.string.Name') }, { text: $r('app.string.time')
+    buttons: [{ text: $r('app.string.Name') }, {
+      text: $r('app.string.time')
     }] as ItemRestriction<SegmentButtonTextItem>,
     selectedBackgroundColor: $r('app.color.container_background'),
     backgroundBlurStyle: BlurStyle.BACKGROUND_THICK,
@@ -127,13 +126,17 @@ export struct AccessControl {
           icon2: $r('sys.symbol.dot_grid_2x2'),
         })
         // 控制区
-        Column({ space: 10}) {
-          Blank().height(TAB_CONTENT_TITLE_HEIGHT - (this.uiConfig.stringDisplayIndex === 0 ? 12 : 6) + (this.widthBp < 2 ? this.topRectHeight : 0))
+        Column({ space: 10 }) {
+          Blank()
+            .height(TAB_CONTENT_TITLE_HEIGHT - (this.uiConfig.stringDisplayIndex === 0 ? 12 : 6) +
+              (this.widthBp < 2 ? this.topRectHeight : 0))
           // 访问控制开关
           toggleRowList({
             title: $r('app.string.app_access_control'),
             subtitle: $r('app.string.access_control_tips'),
-            toggle: () => { this.controlBuilder() }
+            toggle: () => {
+              this.controlBuilder()
+            }
           })
             .margin({ right: PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp) })
             .transition(customAnimationUtil.isScaleTran(0, this.uiConfig))
@@ -143,20 +146,26 @@ export struct AccessControl {
           // 显示栏
           Flex({
             direction: FlexDirection.Row,
-            space: { main:LengthMetrics.vp(10) },
+            space: { main: LengthMetrics.vp(10) },
             alignItems: ItemAlign.Center
-          })
-          {
+          }) {
             Column() {
-              Text(`${Xb_GetResourceString($r('app.string.selected'), this)} ${this.isDeleteing ? this.selectedDeletePkgNames.size : this.selectedPkgNames.size}`)
-              Text(this.isDeleteing ? `${Xb_GetResourceString($r('app.string.Edit'), this)}${Xb_GetResourceString($r('app.string.mode'), this)}`
-                : this.appConfig.accessControlMode != 'AcceptSelected' ? $r('app.string.white_list_tips') : $r('app.string.blacklist_tips'))
+              Text(`${Xb_GetResourceString($r('app.string.selected'), this)} ${this.isDeleteing ?
+                this.selectedDeletePkgNames.size : this.selectedPkgNames.size}`)
+              Text(this.isDeleteing ?
+                `${Xb_GetResourceString($r('app.string.Edit'), this)}${Xb_GetResourceString($r('app.string.mode'),
+                  this)}`
+                : this.appConfig.accessControlMode != 'AcceptSelected' ? $r('app.string.white_list_tips') :
+                  $r('app.string.blacklist_tips'))
                 .maxLines(this.uiConfig.stringDisplayIndex === 0 ? 1 : 2)
                 .fontColor($r('sys.color.font_secondary'))
                 .fontSize(14)
-                .textOverflow({ overflow: this.uiConfig.stringDisplayIndex === 0 ? TextOverflow.Ellipsis : TextOverflow.Clip })
+                .textOverflow({
+                  overflow: this.uiConfig.stringDisplayIndex === 0 ? TextOverflow.Ellipsis : TextOverflow.Clip
+                })
             }
             .alignItems(HorizontalAlign.Start)
+
             if (this.isDeleteing) {
               Xb_CapsuleButton({
                 icon: undefined,
@@ -201,7 +210,8 @@ export struct AccessControl {
               }
               SymbolGlyph(this.getGroupSymbol())
                 .fontSize(24)
-                .fontColor([this.selectedPkgNames.size == 0 || (this.isDeleteing && this.selectedDeletePkgNames.size == 0) ? icon_primary : this.icon_emphasize])
+                .fontColor([this.selectedPkgNames.size == 0 ||
+                  (this.isDeleteing && this.selectedDeletePkgNames.size == 0) ? icon_primary : this.icon_emphasize])
                 .transition(customAnimationUtil.isScaleTranIcon(10, this.uiConfig))
                 .onClick(() => {
                   if (this.initialized) {
@@ -218,7 +228,7 @@ export struct AccessControl {
                         this.appListData
                           .map(a => a.package_name)
                       )
-                    } else  {
+                    } else {
                       // 全不选
                       this.cancelTotalSelected()
                     }
@@ -228,30 +238,40 @@ export struct AccessControl {
           }.width('100%')
           .backgroundColor($r('app.color.background'))
           .transition(customAnimationUtil.isScaleTran(1, this.uiConfig))
-          .padding({ right: PageMargin(this.widthBp, this.heightBp) + 12, left: PageMargin(this.widthBp, this.heightBp) + 12 })
+          .padding({
+            right: PageMargin(this.widthBp, this.heightBp) + 12,
+            left: PageMargin(this.widthBp, this.heightBp) + 12
+          })
         }
         .hitTestBehavior(HitTestMode.Transparent)
         .width('100%')
         .zIndex(2)
+
         // 应用列表
         Column() {
-          Blank().height(TAB_CONTENT_TITLE_HEIGHT + (this.uiConfig.stringDisplayIndex === 0 ? 112 : 139) + (this.widthBp < 2 ? this.topRectHeight : 0))
+          Blank()
+            .height(TAB_CONTENT_TITLE_HEIGHT + (this.uiConfig.stringDisplayIndex === 0 ? 112 : 139) +
+              (this.widthBp < 2 ? this.topRectHeight : 0))
           Scroll() {
-            List({space: 8}) {
+            List({ space: 8 }) {
               ForEach(this.appListData, (item: AppInfo, index) => {
                 ListItem() {
                   checkoutRowListItem({
-                    icon: item.iconUintArr ? Xb_ImageUtils.uint8ArrayToPixelMap(item.iconUintArr) : $r('app.media.box_cat_round'),
+                    icon: item.iconUintArr ? Xb_ImageUtils.uint8ArrayToPixelMap(item.iconUintArr) :
+                      $r('app.media.box_cat_round'),
                     title: item.name,
                     subtitle: item.package_name,
                     endSymbol: this.getListItemEndSymbol(item),
-                    isSelected: this.isDeleteing ? this.selectedDeletePkgNames.has(item.package_name) : this.selectedPkgNames.has(item.package_name),
+                    isSelected: this.isDeleteing ? this.selectedDeletePkgNames.has(item.package_name) :
+                      this.selectedPkgNames.has(item.package_name),
                     enabledClick: this.appConfig.accessControl
                   })
                 }
                 .swipeAction({
                   end: {
-                    builder: () => { this.swipeActionEnd(index, item) },
+                    builder: () => {
+                      this.swipeActionEnd(index, item)
+                    },
                     actionAreaDistance: 56,
                   },
                   edgeEffect: SwipeEdgeEffect.None
@@ -322,7 +342,8 @@ export struct AccessControl {
                 this.isEnableIndexForegroundBlur = false
                 this.addPageInfos.clear()
               },
-              onWillSpringBackWhenDismiss: () => {} // 注册回调，防止反向回弹
+              onWillSpringBackWhenDismiss: () => {
+              } // 注册回调，防止反向回弹
             })
           }
           .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring : null)
@@ -389,7 +410,7 @@ export struct AccessControl {
         this.keyValueData = new KeyValueData("")
         this.isNewApp = true
       },
-      cancel: ()=> {
+      cancel: () => {
         // 关闭背景模糊
         this.keyValueData = new KeyValueData("")
         if (!this.isShowSheet) {
@@ -447,6 +468,7 @@ export struct AccessControl {
                 })
             })
         }
+
         ListItem() {
           skipRowList({
             icons: undefined,
@@ -494,7 +516,7 @@ export struct AccessControl {
 
   @Builder
   OptionBuilder() {
-    Column({space: 5}) {
+    Column({ space: 5 }) {
       // 模式
       Text($r('app.string.mode'))
       SegmentButton({
@@ -529,50 +551,55 @@ export struct AccessControl {
           this.loadAppsInfo()
         }
       })
+      // 操作
+      Text($r('app.string.operation'))
+      Row({ space: 7 }) {
+        Xb_CapsuleButton({
+          fontSize: 15,
+          icon: undefined,
+          buttonHeight: 40,
+          iconColor: $r('sys.color.font_primary'),
+          theBackgroundColor: $r('app.color.container_background'),
+          text: $r('app.string.export_access'),
+          onCheck: () => {
+            this.exportAccessConfig()
+          }
+        })
+        Xb_CapsuleButton({
+          fontSize: 15,
+          icon: undefined,
+          buttonHeight: 40,
+          theBackgroundColor: $r('app.color.container_background'),
+          text: $r('app.string.import_access'),
+          iconColor: $r('sys.color.font_primary'),
+          onCheck: () => {
+            this.importAccessConfig()
+          }
+        })
+        Xb_CapsuleButton({
+          fontSize: 15,
+          icon: undefined,
+          buttonHeight: 40,
+          theBackgroundColor: $r('app.color.container_background'),
+          text: $r('app.string.delete_old_data'),
+          iconColor: $r('sys.color.font_primary'),
+          onCheck: async () => {
+            // 数据迁移成功后，可以清理旧数据以节省空间
+            await Xb_PreferenceUtil.delete('access_control_apps')
+            await Xb_KVdbUtil.deleteEntriesByPrefix('accept_')
+            await Xb_KVdbUtil.deleteEntriesByPrefix('reject_')
+            Xb_ToastUtil.showToast({ message: $r('app.string.old_data_cleared_success') })
+          }
+        })
+      }
     }
-    .padding({ top: 56, bottom: 12, left: 12, right: 12})
+    .padding({
+      top: 56,
+      bottom: 12,
+      left: 12,
+      right: 12
+    })
     .alignItems(HorizontalAlign.Start)
-    // 操作
-    Text($r('app.string.operation'))
-    Row({space: 7}) {
-      Xb_CapsuleButton({
-        fontSize: 15,
-        icon: undefined,
-        buttonHeight: 40,
-        iconColor: $r('sys.color.font_primary'),
-        theBackgroundColor: $r('app.color.container_background'),
-        text: $r('app.string.export_access'),
-        onCheck: () => {
-          this.exportAccessConfig()
-        }
-      })
-      Xb_CapsuleButton({
-        fontSize: 15,
-        icon: undefined,
-        buttonHeight: 40,
-        theBackgroundColor: $r('app.color.container_background'),
-        text: $r('app.string.import_access'),
-        iconColor: $r('sys.color.font_primary'),
-        onCheck: () => {
-          this.importAccessConfig()
-        }
-      })
-      Xb_CapsuleButton({
-        fontSize: 15,
-        icon: undefined,
-        buttonHeight: 40,
-        theBackgroundColor: $r('app.color.container_background'),
-        text: $r('app.string.delete_old_data'),
-        iconColor: $r('sys.color.font_primary'),
-        onCheck: async () => {
-          // 数据迁移成功后，可以清理旧数据以节省空间
-          await Xb_PreferenceUtil.delete('access_control_apps')
-          await Xb_KVdbUtil.deleteEntriesByPrefix('accept_')
-          await Xb_KVdbUtil.deleteEntriesByPrefix('reject_')
-          Xb_ToastUtil.showToast({ message: $r('app.string.old_data_cleared_success') })
-        }
-      })
-    }
   }
 
   @Builder
@@ -597,14 +624,15 @@ export struct AccessControl {
           const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
           accessControlRdb.copyToOppositeDomain(item.package_name, domain).then(() => {
             // TODO 验证 %s 的占位符是否正确
-            const msgRes = domain == 'WHITE' ? $r('app.string.copy_to_blacklist', item.name) : $r('app.string.copy_to_whitelist', item.name)
+            const msgRes = domain == 'WHITE' ? $r('app.string.copy_to_blacklist', item.name) :
+              $r('app.string.copy_to_whitelist', item.name)
             Xb_ToastUtil.showToast({ message: msgRes })
           }).catch((err: Error) => {
             Xb_ToastUtil.showToast({ message: err.message })
           })
         }
       })
-        .margin({ right: 6})
+        .margin({ right: 6 })
       // 移动
       Xb_CircleButton({
         icon: $r('sys.symbol.arrow_left_arrow_right'),
@@ -615,14 +643,15 @@ export struct AccessControl {
           accessControlRdb.moveToOppositeDomain(item.package_name, domain).then(() => {
             this.loadAppsInfo()
             // TODO 验证 %s 的占位符是否正确
-            const msgRes = domain == 'WHITE' ? $r('app.string.move_to_blacklist', item.name) : $r('app.string.move_to_whitelist', item.name)
+            const msgRes = domain == 'WHITE' ? $r('app.string.move_to_blacklist', item.name) :
+              $r('app.string.move_to_whitelist', item.name)
             Xb_ToastUtil.showToast({ message: msgRes })
           }).catch((err: Error) => {
             Xb_ToastUtil.showToast({ message: err.message })
           })
         }
       })
-        .margin({ right: 6})
+        .margin({ right: 6 })
       // 删除
       Xb_CircleButton({
         icon: $r('sys.symbol.trash_fill'),
@@ -691,7 +720,8 @@ export struct AccessControl {
   }
 
   getListItemEndSymbol(item: AppInfo) {
-    const status = this.isDeleteing ? this.selectedDeletePkgNames.has(item.package_name) : this.selectedPkgNames.has(item.package_name)
+    const status = this.isDeleteing ? this.selectedDeletePkgNames.has(item.package_name) :
+      this.selectedPkgNames.has(item.package_name)
     return status ? $r('sys.symbol.checkmark_circle_fill_1') : $r('sys.symbol.checkmark_circle')
   }
 
@@ -760,7 +790,9 @@ export struct AccessControl {
         await accessControlRdb.updateAppBasicInfo(originalPkg, newApp)
       }
 
-      Xb_ToastUtil.showToast({ message: this.isNewApp ? $r('app.string.add_success') : $r('app.string.modify_success') })
+      Xb_ToastUtil.showToast({
+        message: this.isNewApp ? $r('app.string.add_success') : $r('app.string.modify_success')
+      })
       this.keyValueData = new KeyValueData("")
       this.isNewApp = true
       this.kvDialogController.close()
@@ -1010,7 +1042,6 @@ export struct AccessControl {
       })
     }
   }
-
 }
 
 // 旧版配置接口定义 (仅用于导入解析)
