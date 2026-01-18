@@ -28,10 +28,10 @@ enum ServiceStatus {
   DOWN = 0,
   /** 正常 */
   UP = 1,
+  /** 重试 */
+  RETRY = 2,
   /** 维护中 */
-  MAINTENANCE = 3,
-  /** 加载中 */
-  LOADING = -1
+  MAINTENANCE = 3
 }
 
 /**
@@ -63,8 +63,8 @@ struct OnlineSearch {
   @State isSearch: boolean = false;
   /* 是否开启 `Index` 页面的前景模糊 */
   @Consume('isEnableIndexForegroundBlur') isEnableIndexForegroundBlur: boolean
-  // 在线服务状态（-1: 加载中, 0: 故障, 1: 正常, 3: 维护）
-  @State serviceStatus: ServiceStatus = ServiceStatus.LOADING
+  // 在线服务状态（0: 故障, 2: 重试, 1: 正常, 3: 维护）
+  @State serviceStatus: ServiceStatus = ServiceStatus.RETRY
   // 临时的搜索结果列表 -> 用于刷新列表使用的存储一下减少请求次数
   private resultApps: SearchAppItem[] = []
   // 防抖定时器ID
@@ -329,9 +329,9 @@ struct OnlineSearch {
       case ServiceStatus.MAINTENANCE:
         // 维护 - 黄色/橙色
         return '#FFAB00'
-      case ServiceStatus.LOADING:
+      case ServiceStatus.RETRY:
       default:
-      // 加载中 - 灰色
+      // 加载/重试状态 - 灰色
         return '#9E9E9E'
     }
   }
