@@ -1,25 +1,16 @@
 import { MoreTop } from '../MoreTopBuilder'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import {
-  BindSheetTitleCustomBuilder,
   ButtonBuilder,
   checkoutRowListItem,
   font_primary,
   icon_primary,
   KVCustomDialog,
-  skipRowList,
   toggleRowList
 } from '../../Common/Common'
-import { NavigationListPadding, NeedClearMoreStack, PageMargin } from '../../../common/breakpoint/BreakPoint'
+import { NeedClearMoreStack, PageMargin } from '../../../common/breakpoint/BreakPoint'
 import {
-  BIND_SHEET_CONTAINER_HEIGHT,
-  BIND_SHEET_DRAG_BAR_HEIGHT,
-  BIND_SHEET_MAIN_FONT_WEIGHT,
-  BIND_SHEET_MAIN_FONTSIZE,
-  BIND_SHEET_SUB_FONTSIZE,
-  BIND_SHEET_TITLE_CONTAINER_HEIGHT,
   BundleInfo,
-  LIST_SPACE,
   TAB_CONTENT_TITLE_HEIGHT
 } from '../../../common/entity/Constants'
 import { AppConfig, UIConfig } from '../../../entryability/AppState'
@@ -372,6 +363,7 @@ export struct AccessControl {
     .onWillHide(() => {
       this.needSearch = false
       this.isSearching = false
+      this.searchText = ''
     })
     .onBackPressed(() => {
       if (this.isSearching) {
@@ -901,7 +893,7 @@ export struct AccessControl {
     const keyword = this.searchText
     hilog.debug(0xFF00, 'AccessControl', `#smartsearchLogs 搜索文本：${keyword}`)
     if (keyword === '') {
-      this.loadAppsInfo()
+      hilog.debug(0xFF00, 'AccessControl', `#smartsearchLogs 无内容`)
       return
     }
     const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
@@ -911,7 +903,6 @@ export struct AccessControl {
     if (this.appListData.length == 0) {
       Xb_ToastUtil.showToast({ message: `没有 ${keyword} 哦`, duration: 1000 })
     }
-    this.searchText = ''
   }
 
   // 导出配置
