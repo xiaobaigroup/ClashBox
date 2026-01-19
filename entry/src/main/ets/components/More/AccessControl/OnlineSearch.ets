@@ -149,8 +149,7 @@ struct OnlineSearch {
             ForEach(this.apps, (app: SearchAppInfo) => {
               ListItem() {
                 checkoutRowListItem({
-                  icon: app.iconUintArr ? Xb_ImageUtils.uint8ArrayToPixelMap(app.iconUintArr) :
-                    $r('app.media.box_cat_round'),
+                  icon: Xb_ImageUtils.uint8ArrayToPixelMap(app.iconUintArr) || $r('app.media.box_cat_round'),
                   title: app.name,
                   endSymbol: app.isExists ? $r('sys.symbol.xmark_circle') : $r('sys.symbol.plus_circle'),
                   symbolColor: app.isExists ? "#FFE84026" : this.icon_emphasize,

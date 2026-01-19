@@ -377,9 +377,11 @@ export class AccessControlRdb {
     let count = 0
     try {
       for (const appData of config.apps) {
+        // hilog.debug(0x0000, TAG, `导入数据 appData: ${JSON.stringify(appData)}`)
         // 将 Base64 字符串解码回 Uint8Array
-        const iconUint8 = appData.icon_base64 ? Base64Util.decodeSync(appData.icon_base64) : undefined
-        await this.insertOrReplaceApp({
+        const iconUint8 = appData.icon_base64 ? Base64Util.decodeSync(appData.icon_base64) : new Uint8Array(0);
+        // hilog.debug(0x0000, TAG, `导入数据 iconUint8: ${JSON.stringify(iconUint8)}`)
+        await this.saveOrMergeApp({
           package_name: appData.package_name,
           list_type: appData.list_type,
           app_name: appData.app_name,
@@ -392,7 +394,7 @@ export class AccessControlRdb {
       return count
     } catch (e) {
       this.rollBackTransaction()
-      hilog.error(0x0000, TAG, `导入数据写入失败: ${JSON.stringify(e)}`)
+      hilog.error(0x0000, TAG, `导入数据写入失败, message: ${e.message}, code: ${e.code}`)
       throw e
     }
   }
@@ -421,7 +423,7 @@ export class AccessControlRdb {
     this.createTable()
 
     try {
-      hilog.debug(0x0000, TAG, '开始从旧存储迁移数据...')
+      hilog.debug(0x0000, TAG, '#migrateFromOldStorage 开始从旧存储迁移数据...')
       // 读取旧数据
       const oldApps: AppInfo[] = JSON.parse(configContent)
       // JSON.parse 后 iconUintArr 可能是 number[]，需要转为 Uint8Array 以适配 RDB BLOB 字段
@@ -439,7 +441,7 @@ export class AccessControlRdb {
       const rejectSet = new Set<string>()
       rejectEntries.forEach(e => rejectSet.add(e.key.substring(7)))
 
-      hilog.info(0x0000, TAG, `迁移准备: app总数 = ${cleanApps.length}, accept = ${acceptSet.size}, reject = ${rejectSet.size}`)
+      hilog.info(0x0000, TAG, `#migrateFromOldStorage 迁移准备: app总数 = ${cleanApps.length}, accept = ${acceptSet.size}, reject = ${rejectSet.size}`)
 
       // 批量插入
       this.beginTransaction()
@@ -449,7 +451,7 @@ export class AccessControlRdb {
           let inserted = false
 
           if (acceptSet.has(pkg)) {
-            await this.insertOrReplaceApp({
+            await this.saveOrMergeApp({
               package_name: pkg,
               list_type: ListType.WHITE_SELECTED,
               app_name: app.name,
@@ -460,7 +462,7 @@ export class AccessControlRdb {
           }
 
           if (rejectSet.has(pkg)) {
-            await this.insertOrReplaceApp({
+            await this.saveOrMergeApp({
               package_name: pkg,
               list_type: ListType.BLACK_SELECTED,
               app_name: app.name,
@@ -470,9 +472,9 @@ export class AccessControlRdb {
             inserted = true
           }
 
-          // 如果既不在白也不在黑，归入白名单未选中，防止应用列表消失
+          // 如果既不在白也不在黑，归入当前模式的未选中，防止应用列表消失
           if (!inserted) {
-            await this.insertOrReplaceApp({
+            await this.saveOrMergeApp({
               package_name: pkg,
               list_type: listType,
               app_name: app.name,
@@ -482,10 +484,10 @@ export class AccessControlRdb {
           }
         }
         this.commitTransaction()
-        hilog.info(0x0000, TAG, '旧数据迁移完成')
+        hilog.info(0x0000, TAG, '#migrateFromOldStorage 旧数据迁移完成')
       } catch (e) {
         const errorMsg = e instanceof Error ? e.message : JSON.stringify(e)
-        hilog.error(0x0000, TAG, `迁移事务执行失败: ${errorMsg}`)
+        hilog.error(0x0000, TAG, `#migrateFromOldStorage 迁移事务执行失败: ${errorMsg}`)
         // 打印堆栈以便追踪具体是哪一行出错
         if (e instanceof Error) {
           console.error(e.stack)
@@ -495,7 +497,7 @@ export class AccessControlRdb {
       }
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : JSON.stringify(error)
-      hilog.error(0x0000, TAG, `迁移失败: ${errorMsg}`)
+      hilog.error(0x0000, TAG, `#migrateFromOldStorage 迁移失败: ${errorMsg}`)
     }
   }
 
@@ -640,7 +642,54 @@ export class AccessControlRdb {
       icon_blob: info.icon_blob,
       create_time: info.create_time
     }
-    return await this.rdbStore!.insert('access_control_apps', valueBucket)
+    return await this.rdbStore!.insert('access_control_apps', valueBucket, relationalStore.ConflictResolution.ON_CONFLICT_REPLACE)
+  }
+
+  /**
+   * 保存或合并应用配置
+   * 如果包名已存在 -> 更新配置 (list_type, app_name, create_time)，保留原有图标 (icon_blob)
+   * 如果包名不存在 -> 插入新记录
+   */
+  private async saveOrMergeApp(value: AppInfoRdb): Promise<number> {
+    const tableName = 'access_control_apps'
+    // 查询该包名是否已存在
+    const pred = new relationalStore.RdbPredicates(tableName)
+    pred.equalTo('package_name', value.package_name)
+    const resultSet = await this.rdbStore.query(pred)
+    let rowCount = 0
+
+    if (resultSet.rowCount > 0) {
+      // 数据已存在 -> 执行部分更新
+      // 准备更新桶：只更新列表类型、名字、时间
+      const updateBucket: relationalStore.ValuesBucket = {
+        list_type: value.list_type,
+        app_name: value.app_name,
+        create_time: value.create_time
+      }
+      // 只有当导入的数据里有图标时，才更新图标字段
+      // 如果导入的 icon_blob 是空的，updateBucket 里就不包含 icon_blob
+      if (value.icon_blob && value.icon_blob.length > 0) {
+        updateBucket.icon_blob = value.icon_blob
+      }
+
+      rowCount = await this.rdbStore.update(updateBucket, pred)
+      hilog.debug(0x0000, TAG, `#saveOrMergeApp 更新已存在的应用: ${value.package_name}`)
+    } else {
+      // 数据不存在 -> 直接插入
+      const valueBucket: relationalStore.ValuesBucket = {
+        package_name: value.package_name,
+        list_type: value.list_type,
+        app_name: value.app_name,
+        icon_blob: value.icon_blob,
+        create_time: value.create_time
+      }
+      rowCount = await this.rdbStore.insert(tableName, valueBucket)
+      hilog.debug(0x0000, TAG, `#saveOrMergeApp 插入新应用: ${value.package_name}`)
+    }
+
+    // 记得关闭查询结果集
+    resultSet.close()
+    return rowCount
   }
 
   private async getAppsByPackageName(packageName: string): Promise<AppInfoRdb[]> {

@@ -259,8 +259,7 @@ export struct AccessControl {
               ForEach(this.appListData, (item: AppInfo, index) => {
                 ListItem() {
                   checkoutRowListItem({
-                    icon: item.iconUintArr ? Xb_ImageUtils.uint8ArrayToPixelMap(item.iconUintArr) :
-                      $r('app.media.box_cat_round'),
+                    icon: Xb_ImageUtils.uint8ArrayToPixelMap(item.iconUintArr) || $r('app.media.box_cat_round'),
                     title: item.name,
                     subtitle: item.package_name,
                     endSymbol: this.getListItemEndSymbol(item),
@@ -898,7 +897,18 @@ export struct AccessControl {
     }
     const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
     const sortBy = this.appConfig.accessControlSort === 'name' ? 'name' : 'time'
-    this.appListData = await accessControlRdb.searchApps(keyword, domain, sortBy)
+    // 获取原始数据
+    const rawList = await accessControlRdb.searchApps(keyword, domain, sortBy);
+    this.appListData = rawList.map((item: AppInfo) => {
+      const data: AppInfo = {
+        name: item.name,
+        package_name: item.package_name,
+        time: item.time,
+        iconUintArr: item.iconUintArr,
+        isSelected: item.isSelected,
+      };
+      return data;
+    });
     hilog.info(0xFF00, 'AccessControl', `#smartsearchLogs 搜索到：${this.appListData.length} 个`)
     if (this.appListData.length == 0) {
       Xb_ToastUtil.showToast({ message: `没有 ${keyword} 哦`, duration: 1000 })
@@ -962,6 +972,7 @@ export struct AccessControl {
         this.appConfig.accessControl = v2Config.enable
         this.appConfig.accessControlMode = v2Config.mode
         this.appConfig.accessControlSort = v2Config.sort as "name" | "time"
+        this.modeTabSelectedIndexes = [v2Config.mode == 'AcceptSelected' ? 0 : 1]
       }
       // --- 如果不是新版，尝试解析为旧版 ---
       else {
