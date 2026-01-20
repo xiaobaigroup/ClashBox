@@ -721,7 +721,8 @@ export struct AccessControl {
           time: Date.now(),
           isSelected: this.appListData[this.currentIndex].isSelected // 保持当前选中状态
         }
-
+        // 刷新UI对应列表
+        this.appListData.splice(this.currentIndex, 1, newApp)
         // 调用数据库更新，会自动同步黑白名单中的所有记录
         await accessControlRdb.updateAppBasicInfo(originalPkg, newApp)
       }
@@ -745,7 +746,7 @@ export struct AccessControl {
   /**
    * 加载应用列表（从数据库）
    */
-  async loadAppsInfo() {
+  async loadAppsInfo(desIndex?: number) {
     try {
       // 确定当前域
       const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
@@ -755,7 +756,7 @@ export struct AccessControl {
       let rawApps = await accessControlRdb.getAppsByDomain(domain, sortBy)
       console.debug(`[AccessControl] 原始数据加载完成，共 ${rawApps.length} 条, ${JSON.stringify(rawApps.map(item => item.isSelected))}`)
       rawApps.forEach((app, index) => {
-        // 只打印前 5 条，防止控制台刷屏，如果报错通常在前面就能看到
+        // 只打印前 5 条，防止控制台刷屏
         if (index < 5) {
           console.debug(`AccessControl [DEBUG App ${index}] 包名: ${app.package_name} 状态：${app.isSelected}`)
           if (app.iconUintArr) {
@@ -769,14 +770,14 @@ export struct AccessControl {
             console.log(`AccessControl [DEBUG App ${index}] 图标数据为 null 或 undefined`)
           }
         } else {
-          // 简单遍历检查是否有空数组（打印日志，防崩溃）
+          // 简单遍历检查是否有空数组
           if (app.iconUintArr && app.iconUintArr.length === 0) {
             console.warn(`[AccessControl] 警告：发现第 ${index} 条数据 (${app.package_name}) 包含空图标数组`)
             app.iconUintArr = undefined
           }
         }
       })
-      this.appListData = [...rawApps]
+      this.appListData = rawApps
       console.debug(`AccessControl #loadAppsInfo 数据处理完毕`)
     } catch (e) {
       console.error(`AccessControl loadAppsInfo 错误: ${JSON.stringify(e)}`)
@@ -885,6 +886,7 @@ export struct AccessControl {
     if (!this.isSearching) {
       // 退出搜索，恢复数据
       this.loadAppsInfo()
+      this.searchText = ''
     }
   }
 

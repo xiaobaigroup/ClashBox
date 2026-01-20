@@ -602,7 +602,7 @@ export struct KVCustomDialog {
         .aspectRatio(1)
         .borderRadius(8)
         .justifyContent(FlexAlign.Center)
-        .backgroundColor(this.value.iconUintArr ? undefined : "#f3f3f3")
+        .backgroundColor(this.value.iconUintArr ? undefined : $r('app.color.background'))
         .onClick(async () => {
           // 点击选择新的图片
           await this.selectCustomIcon()
