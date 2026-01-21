@@ -319,7 +319,7 @@ export struct AccessControl {
                     this.currentIndex = index
                     this.openDialog(item)
                   }))
-              }, (app: AppInfo) => app.package_name)
+              }, /*(app: AppInfo) => app.package_name*/) // ??? 不自定义就能刷新列表是吧
             }
             .width('100%')
             .height('100%')
@@ -721,8 +721,10 @@ export struct AccessControl {
           time: Date.now(),
           isSelected: this.appListData[this.currentIndex].isSelected // 保持当前选中状态
         }
-        // 刷新UI对应列表
+        // 刷新对应列表UI
+        console.debug(`AccessControl 当前编辑序号：${this.currentIndex} 图标长度：${this.appListData[this.currentIndex].iconUintArr?.length}`);
         this.appListData.splice(this.currentIndex, 1, newApp)
+        console.debug(`AccessControl 序号：${this.currentIndex} 图标长度：${this.appListData[this.currentIndex].iconUintArr?.length}`);
         // 调用数据库更新，会自动同步黑白名单中的所有记录
         await accessControlRdb.updateAppBasicInfo(originalPkg, newApp)
       }
@@ -730,12 +732,15 @@ export struct AccessControl {
       Xb_ToastUtil.showToast({
         message: this.isNewApp ? $r('app.string.add_success') : $r('app.string.modify_success')
       })
+
+      // 列表重加载
+      if (this.isNewApp) {
+        await this.loadAppsInfo()
+      }
+
       this.keyValueData = new KeyValueData("")
       this.isNewApp = true
       this.kvDialogController.close()
-
-      // 刷新列表
-      await this.loadAppsInfo()
 
     } catch (error) {
       console.error('AccessControl saveApp 失败:', error)
