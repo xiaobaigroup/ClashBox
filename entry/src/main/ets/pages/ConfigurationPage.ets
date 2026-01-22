@@ -781,7 +781,6 @@ struct ConfigurationPage {
 
   aboutToDisappear(): void {
     hilog.info(0xC000, componentName, `#aboutToDisappear executed`)
-    EventHub.off(EventKey.FetchProfile)
     EventHub.off(EventKey.AddConfig)
     this.configCustomDialogController = null
     this.isEnableIndexForegroundBlur = false

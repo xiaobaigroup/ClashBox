@@ -67,16 +67,16 @@ export class ClashViewModel {
     )
     await profile.checkAndUpdate(async (c)=> await this.VailConfig(c))
     const isExists = await profile.check();
-    if (isExists) {
-      await this.profileRepo.addOrUpdate(profile)
-        .then((value) => {
-          hilog.info(0xFF00, "EditConfig&UpdateConfig configSaveTestTag", `文件名${profile.name} URL: ${profile.url} 保存结果${value}`)
-          EventHub.sendEvent(EventKey.FetchProfile, null)
-        })
+    let value: number
+    if (isExists) { // 本地文件存在
+      value = await this.profileRepo.addOrUpdate(profile)
     } else {
+      value = -1
       console.error("ClashBox文件保存失败");
       Xb_ToastUtil.showToast({message: "文件保存失败！"})
     }
+    EventHub.sendEvent(EventKey.FetchProfile, null)
+    console.info("EditConfig&UpdateConfig&ConfigSort configSaveTestTag", `文件名${profile.name} URL: ${profile.url} 保存结果: ${value}`)
   }
 
   // 批量插入配置

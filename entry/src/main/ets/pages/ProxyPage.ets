@@ -538,7 +538,6 @@ struct ProxyPage {
   }
 
   aboutToDisappear() {
-    EventHub.off(EventKey.FetchProxyGroup)
     EventHub.off(EventKey.TestAllDelay)
     EventHub.off(EventKey.TestDelay)
     this.uiConfig.ShowDelayPop = this.isShowDelayPop

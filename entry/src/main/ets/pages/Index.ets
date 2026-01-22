@@ -816,9 +816,9 @@ struct Index {
 
   /** 获取配置列表 */
   async fetchProfiles(isFirst: boolean = false) {
-    console.error(`开始获取配置`)
+    console.debug(`Config #fetchProfiles 开始获取配置`)
     const profiles = await ClashViewModel.getProfiles()
-    console.error(`配置已获取：${JSON.stringify(profiles)}`)
+    console.error(`Config #fetchProfiles 配置已获取：${JSON.stringify(profiles)}`)
     this.configList = profiles.map((d) => {
       const timeGap = convertMillisecondsToTimeGap(d.autoUpdateDuration)
       return {
@@ -843,16 +843,10 @@ struct Index {
       await Xb_PreferenceUtil.put('config_sort', configSort)
       console.info(`ConfigSort #fetchProfiles Xb_PreferenceUtil config_sort 不存在，进行初始化：${configSort}`)
     } else {
-      if (!isFirst) {
-        // 当前的排序表
-        this.configList = sortByCustomOrder(this.configList, JSON.parse(configSort) as string[], 'configId')
-        console.info(`ConfigSort #fetchProfiles Xb_PreferenceUtil config_sort 当前的排序表为，${configSort}`)
-      } else {
-        // 应用启动加载顺序配置列表
-        this.configList = sortByCustomOrder(this.configList, JSON.parse(configSort) as string[], 'configId')
-        console.info(`ConfigSort #fetchProfiles Xb_PreferenceUtil config_sort 存在，${configSort}`)
-      }
+      // 当前的排序表
+      this.configList = sortByCustomOrder(this.configList, JSON.parse(configSort) as string[], 'configId')
     }
+    console.info(`ConfigSort #fetchProfiles Xb_PreferenceUtil config_sort 当前的排序表为，${configSort} 配置列表长度：${this.configList.length}`)
   }
 
   /**
@@ -1066,7 +1060,7 @@ struct Index {
   }
 
   /** @description 统一注册事件 */
-  registerEvent(){
+  registerEvent() {
     // 通知事件
     EventHub.on(EventKey.EnabledNotice, async (enadblNotice: boolean) => {
       try {
@@ -1279,9 +1273,9 @@ struct Index {
     })
     // 注册配置加载事件
     EventHub.on(EventKey.FetchProfile, async () => {
-      console.log(`开始获取配置信息`)
       this.fetchProfiles()
     })
+    console.log(`ConfigSort EventKey.FetchProfile on 获取配置信息事件已注册`)
     // 注册配置详情加载事件
     EventHub.on(EventKey.LoadConfigStr, () => {
       const context = this.getUIContext().getHostContext()!
@@ -1326,6 +1320,9 @@ struct Index {
 
   aboutToDisappear() {
     hilog.info(0x1000, componentName, `#aboutToDisappear executed`)
+    // 统一注销根目录事件
+    EventHub.off(EventKey.FetchProfile)
+    EventHub.off(EventKey.FetchProxyGroup)
     // 取消通知
     if (this.uiConfig.Enablednotice && this.uiConfig.EnabledPermanentnotice) {
       Xb_NotificationUtils.cancelNotification(this.noticeJob)
