@@ -331,24 +331,10 @@ export struct AccessControl {
               scrollBackward: NestedScrollMode.SELF_FIRST
             })
             .padding({ right: PageMargin(this.widthBp, this.heightBp), left: PageMargin(this.widthBp, this.heightBp) })
-            .bindSheet($$this.isShowSheet, this.SheetBuilder(), {
-              detents: [SheetSize.MEDIUM],
-              dragBar: false,
-              backgroundColor: $r('app.color.background'),
-              keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
-              scrollSizeMode: ScrollSizeMode.CONTINUOUS,
-              preferType: SheetType.CENTER,
-              onWillDismiss: () => {
-                this.isShowSheet = false
-                this.isEnableIndexForegroundBlur = false
-                this.addPageInfos.clear()
-              },
-              onWillSpringBackWhenDismiss: () => {
-              } // 注册回调，防止反向回弹
-            })
           }
           .edgeEffect(this.uiConfig.isAnimation ? EdgeEffect.Spring : null)
         }
+        .layoutWeight(1)
       }
       .width('100%')
       .height('100%')
@@ -383,7 +369,21 @@ export struct AccessControl {
         return false
       }
     })
-
+    .bindSheet($$this.isShowSheet, this.SheetBuilder(), {
+      detents: [SheetSize.MEDIUM, SheetSize.LARGE],
+      dragBar: false,
+      backgroundColor: $r('app.color.background'),
+      keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
+      scrollSizeMode: ScrollSizeMode.CONTINUOUS,
+      preferType: SheetType.CENTER,
+      onWillDismiss: () => {
+        this.isShowSheet = false
+        this.isEnableIndexForegroundBlur = false
+        this.addPageInfos.clear()
+      },
+      onWillSpringBackWhenDismiss: () => {
+      } // 注册回调，防止反向回弹
+    })
   }
 
   kvDialogController = new CustomDialogController({

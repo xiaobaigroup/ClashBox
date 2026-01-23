@@ -417,7 +417,9 @@ struct Resources {
             this.isEnableIndexForegroundBlur = false
           },
           onDisappear: () => {
-          }
+          },
+          onWillSpringBackWhenDismiss: () => {
+          } // 注册回调，防止反向回弹
         })
 
     }
