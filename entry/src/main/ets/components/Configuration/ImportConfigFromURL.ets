@@ -58,6 +58,7 @@ export struct ImportConfigFromURL {
   /* 主题色 */
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
 
+  @StorageLink('ConfigDownloading') isConfigDownloading: boolean = false
   // 是否显示bindSheet
   @StorageLink('ShowConfigBindSheet') isShowConfigAddBindSheet: boolean = false
   // [true: 都有值, false: 不是所有的input都有值]
@@ -137,7 +138,6 @@ export struct ImportConfigFromURL {
       // 保存配置后关闭半模态窗口
       this.isShowWelcome = false
       this.isShowConfigAddBindSheet = false
-      this.isEnableIndexForegroundBlur = false
     }
   }
 
@@ -188,6 +188,11 @@ export struct ImportConfigFromURL {
     alignment: DialogAlignment.Center,
     width: 328,
     backgroundColor: $r('app.color.list_item_background_color'),
+    onDidDisappear: () => {
+      if (!this.isConfigDownloading) {
+        this.isEnableIndexForegroundBlur = false
+      }
+    }
   })
 
   aboutToAppear(): void {
@@ -213,6 +218,7 @@ export struct ImportConfigFromURL {
    * 保存配置
    */
   async saveConfig(isNewConfig: boolean) {
+    this.isConfigDownloading = true
     this.currentTouchConfigData = this.configData
     hilog.info(0xFF00, "EditConfig #saveConfig configSaveTestTag", `URL新文件保存：${isNewConfig}`)
     hilog.info(0xC002, componentName,
@@ -220,17 +226,20 @@ export struct ImportConfigFromURL {
     if (isNewConfig) {
       this.customDownloadingDialogTitle = $r('app.string.downloading_configuration_file')
       this.configCustomDownloadingDialogController.open()
-      try {
-        await ClashViewModel.addOrUpdateProfileByUrl(this.configData, null)
-        this.configCustomDownloadingDialogController.close()
-        if (this.appLinkConfigUrl != '') {
-          this.appLinkConfigUrl = ''
-        }
-        Xb_ToastUtil.showToast({message: getResourceString($r('app.string.download_success'), this)})
-      } catch (e) {
-        console.error("ClashBox下载配置失败：", e.message, e.stack);
-        this.configCustomDownloadingDialogController.close()
-        Xb_ToastUtil.showToast({message: getResourceString($r('app.string.download_failed'), this) + e.message || e})
+      ClashViewModel.addOrUpdateProfileByUrl(this.configData, null)
+        .then(() => {
+          Xb_ToastUtil.showToast({message: getResourceString($r('app.string.download_success'), this)})
+          this.isConfigDownloading = false
+          this.configCustomDownloadingDialogController.close()
+        })
+        .catch((err: Error) => {
+          console.error("ClashBox下载配置失败：", err.message, err.stack);
+          this.isConfigDownloading = false
+          Xb_ToastUtil.showToast({message: getResourceString($r('app.string.download_failed'), this) + `name: ${err.name}, message: ${err.message}, stack: ${err.stack}`})
+          this.configCustomDownloadingDialogController.close()
+        })
+      if (this.appLinkConfigUrl != '') {
+        this.appLinkConfigUrl = ''
       }
     } else {
       this.customDownloadingDialogTitle = $r('app.string.updating_configuration_file')
@@ -238,9 +247,11 @@ export struct ImportConfigFromURL {
       this.uiConfig.autoUpdateTimeUtils = this.configData.configAutoUpdateTimeGapTextPickerIndex
       try {
         await ClashViewModel.addOrUpdateProfileByUrl(this.configData, this.configData.configId)
+        this.isConfigDownloading = false
         this.configCustomDownloadingDialogController.close()
       } catch (e) {
         console.error("ClashBox下载配置失败：", e.message, e.stack);
+        this.isConfigDownloading = false
         this.configCustomDownloadingDialogController.close()
         Xb_ToastUtil.showToast({message: getResourceString($r('app.string.download_failed'), this) + e.message || e})
       }

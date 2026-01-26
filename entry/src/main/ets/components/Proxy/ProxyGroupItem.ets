@@ -392,10 +392,13 @@ struct ProxyGroupItem {
   private favoriteProxy(): void {
     // 收藏节点 & 判断是否已经收藏
     const p = ProxyGroupItem.currentTouchProxyData
+    console.debug(`FavoriteProxy [ProxyPage] 当前ProxyItem信息：${JSON.stringify(p)}`);
     if (AppState.fetchFavoriteProxys(this.favoriteProxys, this.proxyGroups.getAllData()).length < 6) {
       Xb_ToastUtil.showToast({ message: $r('app.string.Collect_Tip') })
       this.favoriteProxys.set(p.g + '|' + p.name, this.appConfig.currentProfileId ?? "")
-      console.debug('favoriteProxys',`${JSON.stringify(this.favoriteProxys)}`)
+      this.favoriteProxys.forEach((value, key) => {
+          console.debug(`FavoriteProxy [ProxyPage] favoriteProxys收藏信息：${key}: ${value}`);
+        });
     } else {
       Xb_ToastUtil.showToast({ message: $r('app.string.favorite_proxy_no') })
     }
@@ -408,7 +411,9 @@ struct ProxyGroupItem {
     Xb_ToastUtil.showToast({ message: $r('app.string.uncollected_tip') })
     const p = ProxyGroupItem.currentTouchProxyData
     this.favoriteProxys.delete(p.g + '|' + p.name)
-    console.debug('favoriteProxys',`${JSON.stringify(this.favoriteProxys)}`)
+    this.favoriteProxys.forEach((value, key) => {
+      console.debug(`FavoriteProxy [ProxyPage] favoriteProxys收藏信息：${key}: ${value}`);
+    });
   }
 }
 

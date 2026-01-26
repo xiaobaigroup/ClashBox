@@ -133,7 +133,8 @@ struct FavoriteProxy {
     })
   }
 
-  changeProxy(g: string, item: ProxyItem){
+  changeProxy(g: string, item: ProxyItem) {
+    console.debug(`FavoriteProxy [FavoriteProxyCard] Group：${g} node: ${item.name}`)
     if (this.currentProfile) {
       ClashViewModel.changeProxy(this.currentProfile, g, item.name)
       // 首选项持久化存储 -> 供卡片使用

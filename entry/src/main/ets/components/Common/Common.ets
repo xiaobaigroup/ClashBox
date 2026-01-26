@@ -362,7 +362,7 @@ export struct CustomDownloadingDialog {
     this.isEnableIndexForegroundBlur = true
   }
   aboutToDisappear(): void {
-    this.isEnableIndexForegroundBlur = false
+    // this.isEnableIndexForegroundBlur = false
   }
 
   build() {

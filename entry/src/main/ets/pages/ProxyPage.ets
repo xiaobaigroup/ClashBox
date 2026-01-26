@@ -544,6 +544,7 @@ struct ProxyPage {
   }
 
   changeProxy(group: string, item: ProxyItem) {
+    console.debug(`FavoriteProxy [ProxyPage] Group：${group} node: ${item.name}`)
     if (this.currentProfile) {
       ClashViewModel.changeProxy(this.currentProfile, group, item.name)
       // 首选项持久化存储 -> 供卡片使用

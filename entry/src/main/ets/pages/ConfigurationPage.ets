@@ -98,6 +98,7 @@ struct ConfigurationPage {
 
   // 是否显示bindSheet
   @StorageLink('ShowConfigBindSheet') isShowConfigAddBindSheet: boolean = false
+  @StorageLink('ConfigDownloading') isConfigDownloading: boolean = false
   // 是否显示二维码半模态
   @State isShowQRCode: boolean = false
   /* 是否开启 `Index` 页面的前景模糊 */
@@ -372,7 +373,9 @@ struct ConfigurationPage {
         if (this.configAddPageInfos.size() <= 0 || (dismissSheet.reason === DismissReason.CLOSE_BUTTON)) {
           dismissSheet.dismiss()
           this.isShowConfigAddBindSheet = false
-          this.isEnableIndexForegroundBlur = false
+          if (!this.isConfigDownloading) {
+            this.isEnableIndexForegroundBlur = false
+          }
           this.configAddPageInfos.clear(true)
           hilog.info(0xC020, componentName,
             `#button#bindSheet#onWillDismiss()#关闭配置添加按钮的bindSheet：DismissSheetAction.dismiss()`)
@@ -389,7 +392,9 @@ struct ConfigurationPage {
         })
         setTimeout(() => {
           // 关闭背景模糊 TODO 此处添加是为了修复添加配置关闭半模态背景模糊未能正常关闭
-          this.isEnableIndexForegroundBlur = false
+          if (!this.isConfigDownloading) {
+            this.isEnableIndexForegroundBlur = false
+          }
         })
         this.isNewConfig = false
         this.showSort = false
