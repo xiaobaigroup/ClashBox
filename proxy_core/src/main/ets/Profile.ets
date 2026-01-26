@@ -94,6 +94,7 @@ export class Profile {
       },
       connectTimeout: 20000,
       readTimeout: 20000,
+      maxLimit: 100 * 1024 * 1024,
     });
     const disposition = resp.header["content-disposition"] as string;
     console.debug(`UpdateConfig resp：${JSON.stringify(resp, null, 2)} disposition: ${disposition}`);
