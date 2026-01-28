@@ -240,8 +240,9 @@ export class AccessControlRdb {
    * 切换指定域内应用的选中状态 (勾选/取消勾选)
    * @param package_name 应用包名
    * @param domain 当前所在的域 ('WHITE' | 'BLACK')
+   * @returns 操作是否成功 (false 表示已达到上限，无法勾选)
    */
-  async toggleSelection(package_name: string, domain: 'WHITE' | 'BLACK'): Promise<void> {
+  async toggleSelection(package_name: string, domain: 'WHITE' | 'BLACK'): Promise<boolean> {
     this.ensureInitialized()
     // 查找当前应用
     const apps = await this.getAppsByPackageName(package_name)
@@ -251,7 +252,7 @@ export class AccessControlRdb {
     })
     if (!currentApp) {
       hilog.warn(0x0000, TAG, `toggleSelection: 未找到应用 ${package_name} 在域 ${domain}`)
-      return
+      return false
     }
     // 计算新的状态类型
     let newType: ListType
@@ -260,8 +261,24 @@ export class AccessControlRdb {
     } else {
       newType = (currentApp.list_type === ListType.BLACK_UNSELECTED) ? ListType.BLACK_SELECTED : ListType.BLACK_UNSELECTED
     }
+    // 数量限制检查
+    // 只有当目标是“选中”状态时，才需要检查数量限制
+    const isTargetSelected = (newType === ListType.WHITE_SELECTED || newType === ListType.BLACK_SELECTED)
+    if (isTargetSelected) {
+      const maxLimit = (domain === 'WHITE') ? 62 : 64
+      // 查询当前域内已选中的数量
+      const countPredicates = new relationalStore.RdbPredicates('access_control_apps')
+        .equalTo('list_type', newType)
+      const resultSet = await this.rdbStore!.query(countPredicates)
+      const currentCount = resultSet.rowCount
+      resultSet.close() // 记得关闭结果集
+
+      if (currentCount >= maxLimit) {
+        hilog.warn(0x0000, TAG, `toggleSelection: ${domain} 名单已满 (${currentCount}/${maxLimit})`)
+        return false // 已满，返回 false
+      }
+    }
     // 执行事务：先删后增
-    // 因为 list_type 是主键的一部分，修改它等同于修改主键，必须手动处理旧数据
     this.beginTransaction()
     try {
       // 删除旧状态
@@ -276,12 +293,14 @@ export class AccessControlRdb {
       })
       this.commitTransaction()
       hilog.info(0x0000, TAG, `切换状态成功: ${package_name} -> ${newType}`)
+      return true // 操作成功
     } catch (e) {
       this.rollBackTransaction()
       hilog.error(0x0000, TAG, `切换状态失败: ${JSON.stringify(e)}`)
       throw e
     }
   }
+
 
   /**
    * 将应用复制到对面名单
@@ -608,13 +627,18 @@ export class AccessControlRdb {
    * @param packageNames 包名数组
    * @param domain 域 ('WHITE' | 'BLACK')
    * @param isSelected 目标选中状态
+   * @param sortBy 优先级排序 ('name' | 'time')，当选中数量超限时，按此顺序优先选中
+   * @returns 实际被改变的包名列表
    */
-  async batchToggleSelection(packageNames: string[], domain: 'WHITE' | 'BLACK', isSelected: boolean): Promise<void> {
+  async batchToggleSelection(
+    packageNames: string[],
+    domain: 'WHITE' | 'BLACK',
+    isSelected: boolean,
+    sortBy: 'name' | 'time' = 'time'
+  ): Promise<string[]> {
     this.ensureInitialized()
-    if (packageNames.length === 0) return
-
+    if (packageNames.length === 0) return []
     // 确定源类型（当前状态）和目标类型
-    // 逻辑：如果是选中操作，则把未选中的更新为选中；反之亦然
     const currentTypes = (domain === 'WHITE')
       ? (isSelected ? [ListType.WHITE_UNSELECTED] : [ListType.WHITE_SELECTED])
       : (isSelected ? [ListType.BLACK_UNSELECTED] : [ListType.BLACK_SELECTED])
@@ -622,17 +646,69 @@ export class AccessControlRdb {
     const targetType = (domain === 'WHITE')
       ? (isSelected ? ListType.WHITE_SELECTED : ListType.WHITE_UNSELECTED)
       : (isSelected ? ListType.BLACK_SELECTED : ListType.BLACK_UNSELECTED)
-
-    // 构建批量更新谓词
-    // 关键：必须匹配当前的 list_type，防止误更新另一个域的数据或已经是目标状态的数据
-    const predicates = new relationalStore.RdbPredicates('access_control_apps')
+    // --- 执行选中操作 (需要检查限额) ---
+    if (isSelected) {
+      const maxLimit = (domain === 'WHITE') ? 62 : 64
+      // 查询当前已选中的数量
+      const currentPred = new relationalStore.RdbPredicates('access_control_apps')
+        .equalTo('list_type', targetType)
+      const currentRs = await this.rdbStore!.query(currentPred)
+      const currentCount = currentRs.rowCount
+      currentRs.close()
+      // 计算剩余名额
+      const remainingSlots = maxLimit - currentCount
+      if (remainingSlots <= 0) {
+        return [] // 没有空位，返回空列表
+      }
+      // 查询符合条件的应用并按优先级排序
+      const candidatePred = new relationalStore.RdbPredicates('access_control_apps')
+        .in('package_name', packageNames)
+        .in('list_type', currentTypes)
+      if (sortBy === 'name') {
+        candidatePred.orderByAsc('app_name')
+      } else {
+        candidatePred.orderByDesc('create_time')
+      }
+      const candidateRs = await this.rdbStore!.query(candidatePred)
+      // 筛选并截取前 N 个包名
+      const actualPackages: string[] = []
+      while (candidateRs.goToNextRow()) {
+        if (actualPackages.length >= remainingSlots) break
+        const pkg = candidateRs.getString(candidateRs.getColumnIndex('package_name'))
+        actualPackages.push(pkg)
+      }
+      candidateRs.close()
+      // 执行更新
+      if (actualPackages.length > 0) {
+        const updatePred = new relationalStore.RdbPredicates('access_control_apps')
+          .in('package_name', actualPackages)
+          .in('list_type', currentTypes)
+        const valueBucket: relationalStore.ValuesBucket = { list_type: targetType }
+        await this.rdbStore!.update(valueBucket, updatePred)
+      }
+      return actualPackages // 返回实际被选中的包名
+    }
+    // --- 执行取消选中操作 (无限制，但需精确返回实际发生改变的) ---
+    // 为了确保返回准确，先查询哪些包名当前是“已选中”状态
+    const targetPred = new relationalStore.RdbPredicates('access_control_apps')
       .in('package_name', packageNames)
-      .in('list_type', currentTypes)
-
-    // 执行一次更新操作
-    const valueBucket: relationalStore.ValuesBucket = { list_type: targetType }
-    await this.rdbStore!.update(valueBucket, predicates)
+      .in('list_type', currentTypes) // currentTypes 在这里是 SELECTED 状态
+    const targetRs = await this.rdbStore!.query(targetPred)
+    const actualToUnselect: string[] = []
+    while (targetRs.goToNextRow()) {
+      actualToUnselect.push(targetRs.getString(targetRs.getColumnIndex('package_name')))
+    }
+    targetRs.close()
+    if (actualToUnselect.length > 0) {
+      const updatePred = new relationalStore.RdbPredicates('access_control_apps')
+        .in('package_name', actualToUnselect)
+        .in('list_type', currentTypes)
+      const valueBucket: relationalStore.ValuesBucket = { list_type: targetType }
+      await this.rdbStore!.update(valueBucket, updatePred)
+    }
+    return actualToUnselect // 返回实际被取消选中的包名
   }
+
 
   private async insertOrReplaceApp(info: AppInfoRdb): Promise<number> {
     const valueBucket: relationalStore.ValuesBucket = {

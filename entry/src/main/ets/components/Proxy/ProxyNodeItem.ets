@@ -11,7 +11,6 @@ import { hilog } from '@kit.PerformanceAnalysisKit'
 export struct ProxyNode {
   @Consume('icon_emphasize') icon_emphasize: ResourceColor
   @StorageLink('uiConfig') uiConfig: UIConfig = new UIConfig()
-  @Prop itemSize: ProxyCardSize
   @Prop item: ProxyItem
   @Prop disabled: boolean
   @State delay: number = 0
@@ -23,7 +22,6 @@ export struct ProxyNode {
 
   // 使用 @Reusable 必须实现 aboutToReuse 函数
   aboutToReuse(params: Record<string, Object>): void {
-    this.itemSize = params.itemSize as ProxyCardSize
     this.item = params.item as ProxyItem
     this.disabled = params.disabled as boolean
     this.selected = params.selected as string
@@ -44,12 +42,12 @@ export struct ProxyNode {
   }
 
 
-
   build() {
-    if (this.itemSize === ProxyCardSize.Large) {
+    if (this.appConfig.proxyCardSize === ProxyCardSize.Large) {
       Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween}) {
         Column({space: 3}) {
           Text(`${this.item.name}`).ItemTextStyle()
+            .maxLines(1)
           Text(`${this.item.type}`).ItemTypeStyle()
         }.layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
@@ -69,10 +67,34 @@ export struct ProxyNode {
         }
       }.width('100%')
       .padding({left: 14, right: 16})
-    } else if (this.itemSize === ProxyCardSize.Mini){
+    } else if (this.appConfig.proxyCardSize === ProxyCardSize.Small) {
+      Row() {
+        Column() {
+          Text(`${this.item.name}`).ItemTextStyle()
+            .maxLines(2).padding({bottom: 5})
+          Text(`${this.item.type}`).ItemTypeStyle()
+            .textOverflow({ overflow: TextOverflow.Ellipsis})
+          Text(delayText(this.delay))
+            .fontColor(ProxyData.getColorForLatency(this.delay))
+            .fontSize(12)
+            .maxLines(1)
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start)
+        .justifyContent(FlexAlign.SpaceBetween)
+        Radio({ value: this.item.name, group: this.item.g + this.item.name })
+          .checked(this.item.name === this.selected)
+          .radioStyle({
+            checkedBackgroundColor: this.icon_emphasize,
+          })
+          .hitTestBehavior(HitTestMode.None)
+      }
+      .ListRowStyle()
+    } else {
       Row() {
         Column({space: 3}) {
           Text(`${this.item.name}`).ItemTextStyle()
+            .maxLines(1)
           Row({space: 3}) {
             Text(`${this.item.type}`) //
               .maxLines(1)
@@ -80,7 +102,7 @@ export struct ProxyNode {
               .fontSize(this.isPXSecScreen ? 10 : 12)
               .constraintSize({maxWidth: this.uiConfig.stringDisplayIndex === 0 ? '55%' : Infinity})
               .textOverflow({ overflow: TextOverflow.Clip})
-            Text(/**/`${delayText(this.delay)}`)
+            Text(`${delayText(this.delay)}`)
               .fontColor(ProxyData.getColorForLatency(this.delay))
               .textOverflow({ overflow:this.isPXSecScreen ? TextOverflow.MARQUEE : TextOverflow.Ellipsis})
               .layoutWeight(1)
@@ -98,32 +120,8 @@ export struct ProxyNode {
           })
           .hitTestBehavior(HitTestMode.None)
           .onChange((isChecked) => {
-            hilog.info(0xFF00, "ProxyPageGroupTag", "ProxyNodeItem #onChange %{public}s的选中状态%{public}s", this.item.name, isChecked)
+            hilog.debug(0xFF00, "ProxyPageGroupTag", "ProxyNodeItem #onChange %{public}s的选中状态%{public}s", this.item.name, isChecked)
           })
-      }
-      .ListRowStyle()
-    } else {
-      Row() {
-        Column() {
-          Text(`${this.item.name}`).ItemTextStyle().maxLines(2).padding({bottom: 5})
-          Column() {
-            Text(`${this.item.type}`).ItemTypeStyle()
-              .textOverflow({ overflow: TextOverflow.Ellipsis})
-            Text(delayText(this.delay))
-              .fontColor(ProxyData.getColorForLatency(this.delay))
-              .fontSize(12)
-              .maxLines(1)
-          }.alignItems(HorizontalAlign.Start)
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start)
-        .justifyContent(FlexAlign.SpaceBetween)
-        Radio({ value: this.item.name, group: this.item.g + this.item.name })
-          .checked(this.item.name === this.selected)
-          .radioStyle({
-            checkedBackgroundColor: this.icon_emphasize,
-          })
-          .hitTestBehavior(HitTestMode.None)
       }
       .ListRowStyle()
     }
@@ -135,7 +133,6 @@ function ItemTextStyle() {
   .fontColor(($r('sys.color.font_primary')))
   .fontSize(16)
   .fontWeight(FontWeight.Medium)
-  .maxLines(1)
   .textOverflow({ overflow: TextOverflow.Ellipsis })
 }
 //Item中type（节点类型）公用样式

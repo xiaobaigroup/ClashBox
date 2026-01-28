@@ -95,7 +95,6 @@ struct ProxyGroupItem {
       LazyForEach(this.proxyLazyItems, (item: ProxyItem, index: number) => {
         ListItem() {
           ProxyNode({
-            itemSize: this.ProxyGroupItemSelected,
             item: item,
             disabled: this.disabled,
             selected: this.selectedProxy,

@@ -220,15 +220,11 @@ export struct AccessControl {
                         this.selectedDeletePkgNames.clear();
                         this.loadAppsInfo();
                       }
-
                     } else {
                       // --- 处理普通模式的逻辑 ---
                       if (this.selectedPkgNames.size == 0) {
                         // 如果当前没选中任何应用 -> 全选
-                        this.selectedPkgNames = new Set(
-                          this.appListData.map(a => a.package_name)
-                        );
-                        this.selectApps(Array.from(this.selectedPkgNames));
+                        this.selectApps(this.appListData.map(a => a.package_name));
                       } else {
                         // 如果当前已经选中了应用 -> 全不选
                         this.cancelTotalSelected();
@@ -294,18 +290,25 @@ export struct AccessControl {
                   } else {
                     // 选中或取消选中，更新数据库
                     const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
-                    await accessControlRdb.toggleSelection(item.package_name, domain)
-                    this.loadAppsInfo().then(() => {
-                      console.debug(`AccessControl #onClick ${item.name}: ${item.isSelected}`)
-                      // 更新全选复选框列表
-                      if (this.selectedPkgNames.has(item.package_name)) {
-                        // 取消：移除列表
-                        this.selectedPkgNames.delete(item.package_name)
-                      } else {
-                        // 选中：加入列表
-                        this.selectedPkgNames.add(item.package_name)
-                      }
-                    })
+                    const success = await accessControlRdb.toggleSelection(item.package_name, domain)
+                    if (success) {
+                      this.loadAppsInfo().then(() => {
+                        console.debug(`AccessControl #onClick ${item.name}: ${item.isSelected}`)
+                        // 更新全选复选框列表
+                        if (this.selectedPkgNames.has(item.package_name)) {
+                          // 取消：移除列表
+                          this.selectedPkgNames.delete(item.package_name)
+                        } else {
+                          // 选中：加入列表
+                          this.selectedPkgNames.add(item.package_name)
+                        }
+                      })
+                    } else {
+                      const msg = this.appConfig.accessControlMode === 'AcceptSelected'
+                        ? $r('app.string.access_control_limit_msg_white')
+                        : $r('app.string.access_control_limit_msg_black')
+                      Xb_ToastUtil.showToast({ message: msg })
+                    }
                   }
                 })
                 .onMouse((event) => {
@@ -866,10 +869,23 @@ export struct AccessControl {
 
   async selectApps(apps: string[]) {
     const domain = this.appConfig.accessControlMode === 'AcceptSelected' ? 'WHITE' : 'BLACK'
-    // 持久化层：批量修改为选中
-    await accessControlRdb.batchToggleSelection(apps, domain, true)
-    // 刷新列表
-    await this.loadAppsInfo()
+    const sortBy = this.appConfig.accessControlSort
+    try {
+      // 获取实际被操作的包名列表
+      const actualPackages = await accessControlRdb.batchToggleSelection(apps, domain, true, sortBy)
+      // 添加选中
+      this.selectedPkgNames = new Set(actualPackages);
+      // 刷新列表
+      await this.loadAppsInfo()
+      // 提示逻辑
+      if (actualPackages.length > 0 && actualPackages.length < apps.length) {
+        const missedCount = apps.length - actualPackages.length
+        Xb_ToastUtil.showToast({ message: $r('app.string.access_control_limit_msg', actualPackages.length, missedCount), duration: 2000 })
+      }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : '操作失败'
+      Xb_ToastUtil.showToast({ message: msg })
+    }
   }
 
   async cancelSelected(item: AppInfo) {
