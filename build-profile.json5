@@ -2,23 +2,58 @@
   "app": {
     "signingConfigs": [
       {
-        "name": "default",
+        "name": "debug",
+        // 调试证书
         "type": "HarmonyOS",
         "material": {
-          "storeFile": "D:/HUAWEI/key/小白工坊证书/小白工坊.p12",
-          "storePassword": "0000001D90D6A5E6746D64E579B7B1D4E0B65B6E8ADA12D28D903567D3ADD3365DB64F874580A3DA4DC06374A4",
+          "storeFile": "",
+          "storePassword": "",
           "keyAlias": "xiaobaigongfang",
-          "keyPassword": "0000001DCD1AD3F5C0B6CD8BE8970835C926322A9B6566933DB850A66D1D2633408378A9E57324AB0EC6C7F98E",
+          "keyPassword": "",
           "signAlg": "SHA256withECDSA",
-          "profile": "D:/HUAWEI/key/小白工坊证书/debug证书clashbox专用/ClashboxdebugDebug.p7b",
-          "certpath": "D:/HUAWEI/key/小白工坊证书/debug证书clashbox专用/debug.cer"
+          "profile": "",
+          "certpath": ""
+        }
+      },
+      {
+        "name": "release",
+        // 发布证书
+        "type": "HarmonyOS",
+        "material": {
+          "storeFile": "",
+          "storePassword": "",
+          "keyAlias": "xiaobaigongfang",
+          "keyPassword": "",
+          "signAlg": "SHA256withECDSA",
+          "profile": "",
+          "certpath": ""
         }
       }
     ],
+    // 产品配置
     "products": [
       {
         "name": "default",
-        "signingConfig": "default",
+        "signingConfig": "debug",
+        "compatibleSdkVersion": "5.0.5(17)",
+        "targetSdkVersion": "6.0.0(20)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          },
+          "externalNativeOptions": {
+            "abiFilters": [
+              "arm64-v8a",
+              "x86_64"
+            ]
+          }
+        }
+      },
+      {
+        "name": "release",
+        "signingConfig": "release",
         "compatibleSdkVersion": "5.0.5(17)",
         "targetSdkVersion": "6.0.0(20)",
         "runtimeOS": "HarmonyOS",
@@ -52,8 +87,10 @@
       "targets": [
         {
           "name": "default",
+          // 入口模块的产品信息配置
           "applyToProducts": [
-            "default"
+            "default",
+            "release"
           ]
         }
       ]
