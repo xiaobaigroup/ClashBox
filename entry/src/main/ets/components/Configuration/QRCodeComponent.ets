@@ -121,8 +121,8 @@ export struct QRCodeDialog {
           .backgroundColor(this.icon_emphasize)
           .fontColor(Color.White)
 
-        // TODO 按钮样式需要修改
         Button($r('app.string.close'))
+          .type(ButtonType.Capsule)
           .height(39)
           .width('100%')
           .fontColor(this.icon_emphasize)
