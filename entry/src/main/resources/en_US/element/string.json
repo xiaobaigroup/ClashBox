@@ -2479,6 +2479,18 @@
     {
       "name": "delete_apps_confirm",
       "value": "Confirm to delete the selected %s applications"
+    },
+    {
+      "name": "access_control_limit_msg",
+      "value": "Quota exceeded, added %d, skipped %s"
+    },
+    {
+      "name": "access_control_limit_msg_white",
+      "value": "The whitelist is full, and it supports up to 62 applications"
+    },
+    {
+      "name": "access_control_limit_msg_black",
+      "value": "The blacklist is full, and it supports up to 64 applications"
     }
   ]
 }

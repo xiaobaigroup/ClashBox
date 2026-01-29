@@ -2479,6 +2479,18 @@
     {
       "name": "delete_apps_confirm",
       "value": "確認刪除選中嘅 %s 個應用"
+    },
+    {
+      "name": "access_control_limit_msg_black",
+      "value": "黑名單已滿，最多支援 64 個應用"
+    },
+    {
+      "name": "access_control_limit_msg_white",
+      "value": "白名單已滿，最多支援 62 個應用"
+    },
+    {
+      "name": "access_control_limit_msg",
+      "value": "名額不足，只添加咗 %d 個，跳過咗 %s 個"
     }
   ]
 }
