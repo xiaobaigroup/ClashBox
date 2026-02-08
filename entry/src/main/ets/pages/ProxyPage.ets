@@ -378,6 +378,7 @@ struct ProxyPage {
           color: $r('app.color.shadow_button'),
           type: ShadowType.COLOR
         })
+        // TODO 适人握持 - 需要修改动画
         .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
       }
       else if (this.uiConfig.buttonPositionIndex === 1 || !this.uiConfig.needProxyStart) {
