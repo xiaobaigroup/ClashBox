@@ -188,6 +188,9 @@ export struct ImportConfigFromURL {
     alignment: DialogAlignment.Center,
     width: 328,
     backgroundColor: $r('app.color.list_item_background_color'),
+    onWillDismiss: () => {
+      this.isEnableIndexForegroundBlur = false
+    },
     onDidDisappear: () => {
       if (!this.isConfigDownloading) {
         this.isEnableIndexForegroundBlur = false
