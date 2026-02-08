@@ -1,5 +1,5 @@
 // Index
-import { curves, LengthMetrics, mediaquery, UIUtils } from '@kit.ArkUI'
+import { curves, LengthMetrics, mediaquery } from '@kit.ArkUI'
 import Home from './HomePage'
 import ProxyPage from './ProxyPage'
 import { util } from "@kit.ArkTS";
@@ -48,7 +48,6 @@ import { ConvertedUnit } from '../common/utils/DataUnitConvertUtils'
 import { WelcomeUserAgreement } from '../components/Start/WelcomePage'
 import { i18n } from '@kit.LocalizationKit'
 import {
-  FloatTabBarHeight,
   MoreNavMode,
   TabBarAlignItems,
   TabBarAvoidHeight,
@@ -72,19 +71,14 @@ import {
   Xb_FloatTabBarAlignCenter,
   Xb_FloatTabBarAlignEnd,
   Xb_FloatTabBarAlignStart,
-  Xb_FloatTabBarDirection,
-  Xb_FloatTabBarDirectionReverse,
-  Xb_FloatTabBarPadding,
   Xb_Global,
   Xb_KVdbUtil,
   Xb_NotificationUtils,
   Xb_PreferenceUtil,
   Xb_ResourceColorUtil,
   Xb_StatusBarUtils,
-  Xb_TabBarVertical,
-  Xb_TabIconFontSize,
-  Xb_TabTitleFontSize,
-  Xb_ToastUtil} from 'xb_components'
+  Xb_TabBarVertical
+} from 'xb_components'
 import { Xb_GoToWeb } from 'xb_components/src/main/ets/utils/JumpTo'
 import BackgroundDownService from '../common/utils/BackgroundDownService'
 import { notificationManager } from '@kit.NotificationKit'
@@ -99,6 +93,7 @@ import { sortByCustomOrder } from '../common/utils/SortUtil';
 import { AccessControlCompatibleMerger } from '../common/utils/AccessControlCompatibleUtil';
 import { PCIndex } from './PCIndex';
 import { accessControlRdb, AppInfo, ListType } from '../common/datasources/AccessControlRdb';
+import { FloatBar } from '../components/Common/FloatBar';
 
 // import { hdsEffect } from '@kit.UIDesignKit';
 
@@ -519,160 +514,6 @@ struct Index {
   }
 
   @Builder
-  FloatBarFunctionContentBuilder() {
-    if (this.widthBp <= 2 && (this.tabCurrentPage == 0 || this.uiConfig.needProxyStart)) {
-      Text(this.proxyStartingDuration)
-        .fontSize(20).fontWeight(FontWeight.Bold)
-        .fontColor(this.proxyEnabled ? Color.White : Color.Transparent)
-    }
-  }
-  @Builder
-  FloatBarBuilder() {
-    Flex({
-      direction: ((this.getFloatAlign() == 0 && Xb_TabBarVertical(this.widthBp, this.heightBp)) || (this.getFloatAlign() == 6 && !Xb_TabBarVertical(this.widthBp, this.heightBp))) ? Xb_FloatTabBarDirectionReverse(this.widthBp, this.heightBp) : Xb_FloatTabBarDirection(this.widthBp, this.heightBp),
-      justifyContent: this.widthBp < 2 ? FlexAlign.SpaceBetween : FlexAlign.Center,
-      alignItems: this.widthBp < 2 ? ItemAlign.Center : ItemAlign.Start,
-      space: { main: LengthMetrics.vp(10) }
-    })
-    {
-      // tab区
-      Flex({
-        direction: Xb_FloatTabBarDirection(this.widthBp, this.heightBp),
-        justifyContent: FlexAlign.SpaceAround,
-        alignItems: ItemAlign.Center,
-        space: { main: LengthMetrics.vp(10) }
-      }) {
-        if (this.isRolling && this.uiConfig.isAnimation && this.widthBp < 2) {
-          Column() {
-            SymbolGlyph(this.tabList[this.tabCurrentPage].icon)
-              .fontSize(27)
-              .fontColor([this.icon_emphasize])
-              .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)
-          }
-          .size({ width: 60, height: 60})
-          .justifyContent(FlexAlign.Center)
-          .alignItems(HorizontalAlign.Center)
-          .onClick(() => {
-            this.isRolling = false
-          })
-        } else {
-          ForEach(this.tabList, (item: TabBuild, index: number) => {
-            Column() {
-              SymbolGlyph(item.icon)
-                .fontSize(Xb_TabIconFontSize(this.widthBp, this.heightBp))
-                .fontColor([this.tabCurrentPage === index ? this.icon_emphasize : $r('sys.color.icon_tertiary')])
-                .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)
-                .translate({ y: this.tabCurrentPage == index ? -2 : 0 })
-                .animation(animationStyle.animNormalUtils(0))
-              Text(item.name)
-                .fontColor(this.tabCurrentPage === index ? this.icon_emphasize : $r('sys.color.icon_tertiary'))
-                .fontSize(Xb_TabTitleFontSize(this.widthBp, this.heightBp))
-            }
-            .width(60)
-            .height(60)
-            .justifyContent(FlexAlign.Center)
-            .alignItems(HorizontalAlign.Center)
-            .onClick(() => {
-              animationStyle.animToAPI18(() => {
-                this.tabCurrentPage = index
-              }, this.uiConfig.animationSpeed, 'app')
-              swiperController.changeIndex(index, true)
-            })
-            .transition(customAnimationUtil.isSlideScaleBigMove(this.uiConfig))
-          })
-        }
-      }
-      .transition(customAnimationUtil.isOpacity(this.uiConfig))
-      .padding((this.isRolling && this.uiConfig.isAnimation && this.widthBp < 2) ? 0 : Xb_FloatTabBarPadding(this.widthBp, this.heightBp))
-      .width((!this.isRolling && this.widthBp < 2) ? '100%' : 'auto')
-      .height(FloatTabBarHeight(this.widthBp, this.heightBp))
-      .layoutWeight((!this.isRolling && this.widthBp < 2) ? 1 : undefined)
-      .borderRadius(30)
-      //.borderColor($r("app.color.border"))
-      //.borderWidth(0.5)
-      // 背景模糊
-      .backdropBlur(this.uiConfig.isBlurr ? 30 : 0)
-      .backgroundColor(this.uiConfig.isBlurr ? $r('app.color.float_tab_background_blur') : $r('app.color.background'))
-      .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
-      .shadow({
-        radius: 15,
-        offsetY: 4,
-        color: $r('app.color.shadow_button'),
-        type: ShadowType.COLOR,
-      })
-      .onAppear(() => {
-        swiperController.changeIndex(this.tabCurrentPage, true)
-      })
-
-      // 控制按钮区
-      Row() {
-        SymbolGlyph(this.proxyEnabled ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
-          .fontSize(27).fontColor([this.proxyEnabled ? Color.White : icon_tertiary])
-      }.functionButtonStyle(this.proxyEnabled && this.widthBp <= 2, this.icon_emphasize)
-      .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
-      // 背景模糊
-      .backdropBlur(this.uiConfig.isBlurr && !this.proxyEnabled ? 30 : 0)
-      .backgroundColor(this.proxyEnabled ? this.icon_emphasize : this.uiConfig.isBlurr ? $r('app.color.float_tab_background_blur') : $r('app.color.background'))
-      .onClick(() => {
-        // 触发代理启动事件
-        EventHub.sendEvent(EventKey.ChangeProxy)
-      })
-/*      if (this.tabCurrentPage == 0) {
-        Row() {
-          SymbolGlyph(this.proxyEnabled ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
-            .fontSize(27).fontColor([this.proxyEnabled ? Color.White : icon_tertiary])
-          this.FloatBarFunctionContentBuilder()
-        }.functionButtonStyle(this.proxyEnabled && this.widthBp <= 2, this.icon_emphasize)
-        .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
-        .backgroundColor(this.proxyEnabled ? this.icon_emphasize : $r('app.color.background'))
-        .onClick(() => {
-          // 触发代理启动事件
-          EventHub.sendEvent(EventKey.ChangeProxy)
-        })
-      }
-      else if (this.tabCurrentPage == 1) {
-        Row() {
-          SymbolGlyph(this.proxyEnabled ? (this.uiConfig.needProxyStart ? $r('sys.symbol.pause') : $r('sys.symbol.bolt_filled_on_circle')) : (this.uiConfig.needProxyStart ? $r('sys.symbol.play_fill') : $r('sys.symbol.bolt_filled_on_circle')))
-            .fontSize(27).fontColor([(this.proxyEnabled && this.uiConfig.needProxyStart) ? Color.White : icon_tertiary])
-          this.FloatBarFunctionContentBuilder()
-        }.functionButtonStyle(this.proxyEnabled && this.widthBp <= 2, this.icon_emphasize)
-        .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
-        .backgroundColor(this.proxyEnabled ? this.icon_emphasize : $r('app.color.background'))
-        .onClick(() => {
-          if (this.uiConfig.needProxyStart) {
-            // 触发代理启动事件
-            EventHub.sendEvent(EventKey.ChangeProxy)
-          } else {
-            // 触发测试所有延迟事件
-            EventHub.sendEvent(EventKey.TestAllDelay)
-          }
-        })
-      }
-      else if (this.tabCurrentPage == 2) {
-        Row() {
-          SymbolGlyph($r('sys.symbol.plus'))
-            .fontSize(27).fontColor([icon_tertiary])
-        }.functionButtonStyle(false)
-        .backgroundColor($r('app.color.background'))
-        .onClick(() => {
-          // 触发添加配置事件（打开添加配置半模态）
-          EventHub.sendEvent(EventKey.AddConfig)
-        })
-      }
-      else {
-      }*/
-
-    }
-    .height(FloatTabBarHeight(this.widthBp, this.heightBp))
-    .width(this.widthBp < 2 ? '100%' : 'auto')
-    .padding({ left: 10, right: 10, top: this.topRectHeight === 0 ? 10 : 0, bottom: this.topRectHeight === 0 ? 10 : 0 })
-    .margin({
-      bottom: this.getFloatBottom(),
-      top: this.windowMode ? 0 : this.topRectHeight,
-      left: (this.leftAvoidWidth != 0 && !this.windowMode)  ? this.leftAvoidWidth + 19 : 0,  // TODO 待实机测试确定取值
-    })
-  }
-  @Builder
   FloatTab() {
     Stack() {
       Swiper(swiperController) {
@@ -695,8 +536,9 @@ struct Index {
         this.tabCurrentPage = targetIndex
         swiperController.changeIndex(targetIndex, true)
       })
-      // tab栏
-      this.FloatBarBuilder()
+
+      // tab栏（抽离成组件）
+      FloatBar({ tabList: this.tabList, swiperController: swiperController })
     }
     .width('100%')
     .height('100%')
@@ -915,7 +757,7 @@ struct Index {
   async aboutToAppear(): Promise<void> {
     hilog.info(0x1000, componentName, `#aboutToAppear executed`)
     this.registerEvent()
-    
+
     // 初始化状态栏工具(仅PC设备)
     if (this.windowMode) {
       const iconResource: StatusBarIconResource = {
@@ -1745,45 +1587,6 @@ struct Index {
     return value
   }
 
-  /**
-   * 获取悬浮tab底部避让值
-   */
-  getFloatBottom() {
-    const isTabBarVertical = Xb_TabBarVertical(this.widthBp, this.heightBp);
-    const isFloatTabBarFullHeight = FloatTabBarHeight(this.widthBp, this.heightBp) == '100%';
-    // 优先级 1: 侧边撑满布局
-    if (isTabBarVertical && isFloatTabBarFullHeight) {
-      return 5;
-    }
-    // 优先级 2: 窗口模式下的水平布局 (两种情况)
-    if (!isTabBarVertical && this.windowMode) {
-      // 撑满(widthBp < 2时)，返回 8；非撑满，返回 1
-      return this.widthBp < 2 ? 8 : 1;
-    }
-    // 优先级 3: 常规避让布局：有高度就减 10
-    if (this.bottomRectHeight !== 0) {
-      return this.bottomRectHeight - 10;
-    }
-    // 优先级 4 (兜底逻辑): 其他所有情况
-    return isTabBarVertical ? 3 : 8;
-  }
-
-}
-
-@Extend(Row)
-function functionButtonStyle(during: boolean, c: ResourceColor = $r('app.color.shadow_button')) {
-  .borderRadius(30)
-  .padding(during ? { left: 8, right: 8 } : 0)
-  .size({width: /*during ? 130 : */60, height: 60})
-  .justifyContent(FlexAlign.Center)
-  .aspectRatio(1)
-  .alignItems(VerticalAlign.Center)
-  .shadow({
-    radius: 15,
-    offsetY: 4,
-    color: during ? c : $r('app.color.shadow_button'),
-    type: ShadowType.COLOR
-  })
- // .borderColor($r("app.color.border"))
- // .borderWidth(0.5)
+  // getFloatBottom() 已迁移至 FloatBar 组件
+  // functionButtonStyle @Extend 已迁移至 FloatControlButton 组件
 }
