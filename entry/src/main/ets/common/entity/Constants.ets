@@ -737,7 +737,7 @@ export function getAboutList(): AboutListItemProp[] {
       subtitle: '',
       name: '',
       children: [
-        { title: $r('app.string.Application_Version'), subtitle: `${AppState.versionName}(${AppState.versionCode}) Release`, sign: 0, name: 'ApplicationVersion' },
+        { title: $r('app.string.Application_Version'), subtitle: `${AppState.versionName}(${AppState.versionCode}) ${AppState.appProvisionType}`, sign: 0, name: 'ApplicationVersion' },
         { title: $r('app.string.Kernel_Version'), subtitle: `${AppState.coreVersion}`, sign: 0, name: 'KernelVersion' }
       ]
     },

@@ -195,6 +195,7 @@ export class AppState {
   static versionName = ''
   static versionCode = 1006056
   static coreVersion = "Prerelease-Alpha"
+  static appProvisionType = 'release'
   static async init() {
 
     PersistentStorage.persistProp("appConfig", new AppConfig())
@@ -204,6 +205,8 @@ export class AppState {
     PersistentStorage.persistProp("clashConfig", new ClashConfig(AppState.globalUA))
     PersistentStorage.persistProp("uiConfig", new UIConfig())
     AppStorage.setOrCreate<AppFlowingState>("appFlowingState", new AppFlowingState())
+    // 获取打包类型
+    AppState.getAppProvisionType()
   }
   // 还原覆写配置
   static  ResetClashConfig(){
@@ -241,6 +244,22 @@ export class AppState {
     let group = proxyGroups.find((p: ProxyGroup) => p.name == g)
     return group?.proxies.find((ps)=> ps.name == p) as ProxyItem
   }
+
+  static getAppProvisionType() {
+    let bundleFlags = bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_APPLICATION | bundleManager.BundleFlag.GET_BUNDLE_INFO_WITH_METADATA;
+    try {
+      bundleManager.getBundleInfoForSelf(bundleFlags).then((data) => {
+        console.info('getBundleInfoForSelf successfully. Data: %{public}s', JSON.stringify(data));
+        AppState.appProvisionType = data.appInfo.appProvisionType
+      }).catch((err: BusinessError) => {
+        console.error('getBundleInfoForSelf failed. Cause: %{public}s', err.message);
+      });
+    } catch (err) {
+      let message = (err as BusinessError).message;
+      console.error('getBundleInfoForSelf failed: %{public}s', message);
+    }
+  }
+
 }
 // PersistentStorage 不支持嵌套对象，修改属性需要copy 更新引用来触发持久化更新
 export function copy<T>(obj: T): T {
