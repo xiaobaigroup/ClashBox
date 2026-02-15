@@ -665,7 +665,7 @@ struct Index {
     }
     .height(FloatTabBarHeight(this.widthBp, this.heightBp))
     .width(this.widthBp < 2 ? '100%' : 'auto')
-    .padding({ left: 10, right: 10, top: this.topRectHeight === 0 ? 10 : 0, bottom: this.topRectHeight === 0 ? 10 : 0 })
+    .padding({ left: Xb_TabBarVertical(this.widthBp, this.heightBp) ? 10 : 25, right: Xb_TabBarVertical(this.widthBp, this.heightBp) ? 10 : 25, top: this.topRectHeight === 0 ? 10 : 0, bottom: this.topRectHeight === 0 ? 10 : 0 })
     .margin({
       bottom: this.getFloatBottom(),
       top: this.windowMode ? 0 : this.topRectHeight,
