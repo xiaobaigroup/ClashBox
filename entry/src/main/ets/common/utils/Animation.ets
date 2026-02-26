@@ -190,9 +190,9 @@ class AnimationUtil{
     if (!uiConfig.isAnimation) return null
     return TransitionEffect.asymmetric(
       TransitionEffect.move(TransitionEdge.END)
-        .animation({ duration: uiConfig.animationSpeed, curve: Curve.Ease }),
+        .animation({ duration: uiConfig.animationSpeed, curve: curves.springMotion(0.5, 0.7) }),
       TransitionEffect.move(TransitionEdge.END)
-        .animation({ duration: 400, curve: Curve.EaseIn })
+        .animation({ duration: 400, curve: curves.springMotion(0.5, 0.7) })
     )
   }
 
@@ -205,9 +205,9 @@ class AnimationUtil{
     if (!uiConfig.isAnimation) return null
     return TransitionEffect.asymmetric(
       TransitionEffect.move(TransitionEdge.START)
-        .animation({ duration: uiConfig.animationSpeed, curve: Curve.Ease }),
+        .animation({ duration: uiConfig.animationSpeed, curve: curves.springMotion(0.5, 0.7) }),
       TransitionEffect.move(TransitionEdge.START)
-        .animation({ duration: 400, curve: Curve.EaseIn })
+        .animation({ duration: 400, curve: curves.springMotion(0.5, 0.7) })
     )
   }
 
@@ -219,7 +219,7 @@ class AnimationUtil{
   public centerTransition(uiConfig: UIConfig): TransitionEffect | null {
     if (!uiConfig.isAnimation) return null
     return TransitionEffect.OPACITY
-      .animation({ duration: uiConfig.animationSpeed, curve: Curve.Ease })
+      .animation({ duration: uiConfig.animationSpeed, curve: curves.springMotion(0.5, 0.7) })
   }
 
   /**

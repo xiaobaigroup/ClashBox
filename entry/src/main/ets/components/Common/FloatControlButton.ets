@@ -1,6 +1,7 @@
 import { UIConfig } from '../../entryability/AppState'
 import { EventHub, EventKey } from '../../common/EventHub'
 import { icon_tertiary } from './Common'
+import { customAnimationUtil } from '../../common/utils/Animation'
 
 /**
  * @fileName:      FloatControlButton
@@ -45,11 +46,7 @@ export struct FloatControlButton {
       EventHub.sendEvent(EventKey.ChangeProxy)
     })
     // 滑入/滑出 动画
-    .transition(
-      TransitionEffect.move(
-        this.isLeft ? TransitionEdge.START : TransitionEdge.END
-      ).animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Ease })
-    )
+    .transition(customAnimationUtil.getFloatButtonTransition(this.uiConfig, this.uiConfig.buttonPositionIndex))
   }
 }
 
