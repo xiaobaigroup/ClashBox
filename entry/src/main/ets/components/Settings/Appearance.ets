@@ -383,7 +383,7 @@ struct Appearance {
           .onChange((selected) => {
             // 持久化深色模式
             this.uiConfig.darkMode = menuItem.colorMode!
-            Xb_ColorModeManager.setColorModeByString(this.context, this.uiConfig.darkMode)
+            Xb_ColorModeManager.setThemeColorMode(this.context, this.uiConfig.darkMode)
             // UI刷新
             this.EnableDarkModeText = menuItem.title
           })

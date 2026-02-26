@@ -820,7 +820,7 @@ struct Index {
     Xb_ChangeThemeColor(this.uiConfig.themeColor)
     hilog.info(0x1000, componentName, `#aboutToAppear#ThemeControl.setDefaultTheme(${this.uiConfig.themeColor})`)
     // 初始化切换颜色模式(深色模式)
-    Xb_ColorModeManager.setColorModeByString(this.context, this.uiConfig.darkMode)
+    Xb_ColorModeManager.setThemeColorMode(this.context, this.uiConfig.darkMode)
     // 初始化切换按钮位置
     this.switchButtonPosition(this.uiConfig.buttonPositionIndex)
 
