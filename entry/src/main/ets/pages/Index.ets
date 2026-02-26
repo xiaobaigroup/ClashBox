@@ -1221,6 +1221,9 @@ struct Index {
     if (this.uiConfig.isHoldingHand === undefined) {
       this.uiConfig.isHoldingHand = false
     }
+    if (this.uiConfig.isFloatButtonVisible === undefined) {
+      this.uiConfig.isFloatButtonVisible = true
+    }
 
     setTimeout(async () => {
       // 等待 PreferenceUtil 完成初始化后，更新访问控制数据

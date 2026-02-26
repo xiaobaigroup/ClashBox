@@ -110,6 +110,8 @@ export class UIConfig {
   needProxyStart: boolean = false
   // 适人握持(动作感知)开关
   isHoldingHand: boolean = false
+  // 适人握持切换时浮动按钮可见性
+  isFloatButtonVisible: boolean = true
   // 编辑器自动换行
   editWordWrap: boolean = true
   // 常驻通知开关

@@ -307,14 +307,20 @@ struct ProxyPage {
             })
           }
 
-          // 悬浮代理测速按钮 START
-          if (!this.isPXSecScreen) {
+          // 悬浮代理测速按钮 START — 按位置选择转场与按钮顺序，三元简化判断
+          if (!this.isPXSecScreen && this.uiConfig.isFloatButtonVisible) {
             Row({ space: 7 }) {
-              if (this.uiConfig.buttonPositionIndex === 0 && this.uiConfig.needProxyStart && this.uiConfig.tabStyle == 'custom') {
+              // 右侧按钮
+              if (this.uiConfig.buttonPositionIndex === 0) {
                 this.delayButton()
-                this.startButton()
-              } else if (this.uiConfig.buttonPositionIndex === 2 && this.uiConfig.needProxyStart && this.uiConfig.tabStyle == 'custom') {
-                this.startButton()
+                if (this.uiConfig.needProxyStart && this.uiConfig.tabStyle == 'custom') {
+                  this.startButton()
+                }
+              // 左侧按钮
+              } else if (this.uiConfig.buttonPositionIndex === 2) {
+                if (this.uiConfig.needProxyStart && this.uiConfig.tabStyle == 'custom') {
+                  this.startButton()
+                }
                 this.delayButton()
               } else {
                 this.delayButton()
@@ -322,6 +328,7 @@ struct ProxyPage {
             }.height(50)
             .alignItems(VerticalAlign.Center)
             .backgroundColor(Color.Transparent)
+            .transition(customAnimationUtil.getFloatButtonTransition(this.uiConfig, this.uiConfig.buttonPositionIndex))
             .margin({
               bottom: Xb_TabBarVertical(this.widthBp, this.heightBp) || this.uiConfig.tabStyle == 'custom' ? 15 : this.bottomRectHeight == 0 ? 85 : this.bottomRectHeight + 63.5,
               right: $r('app.integer.vp_proxy_start_button_left_right_margin'),
@@ -378,8 +385,7 @@ struct ProxyPage {
           color: $r('app.color.shadow_button'),
           type: ShadowType.COLOR
         })
-        // TODO 适人握持 - 需要修改动画
-        .animation({ duration: this.uiConfig.animationSpeed, curve: Curve.Linear })
+        .transition(customAnimationUtil.getFloatButtonTransition(this.uiConfig, this.uiConfig.buttonPositionIndex))
       }
       else if (this.uiConfig.buttonPositionIndex === 1 || !this.uiConfig.needProxyStart) {
         RoundButton({

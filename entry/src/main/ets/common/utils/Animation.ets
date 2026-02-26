@@ -173,12 +173,63 @@ class AnimationUtil{
   //配置添加，更多页，设置页图标转场缩放动画，i为延迟，在list或者foreach中可以将i设为index，达到递增的动画效果，uiConfig为动画速度以及开关的切换
   public isScaleTranIcon(i:number,uiConfig:UIConfig){
     effectEvent=
-      uiConfig.isAnimation ?
-      TransitionEffect.scale({x: 0, y: 0})
+    uiConfig.isAnimation ?
+    TransitionEffect.scale({x: 0, y: 0})
         .combine(TransitionEffect.rotate({angle:360}))
         .animation({ duration: uiConfig.animationSpeed,curve:curves.springMotion(),delay: i*10+50 })
         :null
     return effectEvent
+  }
+
+  /**
+   * 右侧悬浮按钮转场：固定 END 方向
+   * @param uiConfig 动画配置（开关、速度）
+   * @returns TransitionEffect 或 null（动画关闭时）
+   */
+  public rightTransition(uiConfig: UIConfig): TransitionEffect | null {
+    if (!uiConfig.isAnimation) return null
+    return TransitionEffect.asymmetric(
+      TransitionEffect.move(TransitionEdge.END)
+        .animation({ duration: uiConfig.animationSpeed, curve: Curve.Ease }),
+      TransitionEffect.move(TransitionEdge.END)
+        .animation({ duration: 400, curve: Curve.EaseIn })
+    )
+  }
+
+  /**
+   * 左侧悬浮按钮转场：固定 START 方向
+   * @param uiConfig 动画配置（开关、速度）
+   * @returns TransitionEffect 或 null（动画关闭时）
+   */
+  public leftTransition(uiConfig: UIConfig): TransitionEffect | null {
+    if (!uiConfig.isAnimation) return null
+    return TransitionEffect.asymmetric(
+      TransitionEffect.move(TransitionEdge.START)
+        .animation({ duration: uiConfig.animationSpeed, curve: Curve.Ease }),
+      TransitionEffect.move(TransitionEdge.START)
+        .animation({ duration: 400, curve: Curve.EaseIn })
+    )
+  }
+
+  /**
+   * 中间悬浮按钮转场：纯透明度
+   * @param uiConfig 动画配置（开关、速度）
+   * @returns TransitionEffect 或 null（动画关闭时）
+   */
+  public centerTransition(uiConfig: UIConfig): TransitionEffect | null {
+    if (!uiConfig.isAnimation) return null
+    return TransitionEffect.OPACITY
+      .animation({ duration: uiConfig.animationSpeed, curve: Curve.Ease })
+  }
+
+  /**
+   * 根据悬浮按钮位置索引返回对应转场效果
+   * @param uiConfig 动画配置
+   * @param positionIndex 0=右侧, 1=中间, 2=左侧
+   */
+  public getFloatButtonTransition(uiConfig: UIConfig, positionIndex: number): TransitionEffect | null {
+    return positionIndex === 2 ? this.leftTransition(uiConfig) :
+      positionIndex === 0 ? this.rightTransition(uiConfig) : this.centerTransition(uiConfig)
   }
 }
 
@@ -189,6 +240,9 @@ class AnimationUtil{
 * .clickEffect(customAnimationUtil.isClickEffect(this.uiConfig))
 图标动效使用方法
 * .effectStrategy(customAnimationUtil.isIconEffect(this.uiConfig))
+悬浮按钮转场使用方法（配置页/代理页）:
+* .transition(customAnimationUtil.getFloatButtonTransition(this.uiConfig, this.uiConfig.buttonPositionIndex))
+* 或单独使用: rightTransition/leftTransition/centerTransition(uiConfig)
  */
 export const customAnimationUtil = new AnimationUtil()
 

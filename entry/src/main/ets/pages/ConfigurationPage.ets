@@ -326,17 +326,15 @@ struct ConfigurationPage {
           }
         }
 
-        // 悬浮新增配置按钮 START
-        if (!this.isPXSecScreen && this.uiConfig.tabStyle == 'custom') {
-          RoundButton({
-            Icon2: $r('sys.symbol.plus')
-          })
-            .onClick(() => {
-              // 新配置
-              EventHub.sendEvent(EventKey.AddConfig)
-            })
-        } else {
-          this.FloatAddButton()
+        // 悬浮新增配置按钮 START — 按位置选择转场方向，三元简化判断
+        if (this.uiConfig.isFloatButtonVisible) {
+          if (!this.isPXSecScreen && this.uiConfig.tabStyle == 'custom') {
+            RoundButton({ Icon2: $r('sys.symbol.plus') })
+              .transition(customAnimationUtil.getFloatButtonTransition(this.uiConfig, this.uiConfig.buttonPositionIndex))
+              .onClick(() => { EventHub.sendEvent(EventKey.AddConfig) })
+          } else {
+            this.FloatAddButton()
+          }
         }
         // 悬浮新增配置按钮 END
       }
@@ -491,7 +489,6 @@ struct ConfigurationPage {
   }
 
   @Builder
-  // TODO 适人握持 - 需要修改动画
   FloatAddButton() {
     Row() {
       SymbolGlyph($r('sys.symbol.plus'))
@@ -519,6 +516,7 @@ struct ConfigurationPage {
       // 新配置
       EventHub.sendEvent(EventKey.AddConfig)
     })
+    .transition(customAnimationUtil.getFloatButtonTransition(this.uiConfig, this.uiConfig.buttonPositionIndex))
   }
 
   /**
