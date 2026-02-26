@@ -1,5 +1,5 @@
 // Index
-import { curves, LengthMetrics, mediaquery, UIUtils } from '@kit.ArkUI'
+import { curves, LengthMetrics, mediaquery } from '@kit.ArkUI'
 import Home from './HomePage'
 import ProxyPage from './ProxyPage'
 import { util } from "@kit.ArkTS";
@@ -48,7 +48,6 @@ import { ConvertedUnit } from '../common/utils/DataUnitConvertUtils'
 import { WelcomeUserAgreement } from '../components/Start/WelcomePage'
 import { i18n } from '@kit.LocalizationKit'
 import {
-  FloatTabBarHeight,
   MoreNavMode,
   TabBarAlignItems,
   TabBarAvoidHeight,
@@ -72,19 +71,14 @@ import {
   Xb_FloatTabBarAlignCenter,
   Xb_FloatTabBarAlignEnd,
   Xb_FloatTabBarAlignStart,
-  Xb_FloatTabBarDirection,
-  Xb_FloatTabBarDirectionReverse,
-  Xb_FloatTabBarPadding,
   Xb_Global,
   Xb_KVdbUtil,
   Xb_NotificationUtils,
   Xb_PreferenceUtil,
   Xb_ResourceColorUtil,
   Xb_StatusBarUtils,
-  Xb_TabBarVertical,
-  Xb_TabIconFontSize,
-  Xb_TabTitleFontSize,
-  Xb_ToastUtil} from 'xb_components'
+  Xb_TabBarVertical
+} from 'xb_components'
 import { Xb_GoToWeb } from 'xb_components/src/main/ets/utils/JumpTo'
 import BackgroundDownService from '../common/utils/BackgroundDownService'
 import { notificationManager } from '@kit.NotificationKit'
@@ -99,6 +93,7 @@ import { sortByCustomOrder } from '../common/utils/SortUtil';
 import { AccessControlCompatibleMerger } from '../common/utils/AccessControlCompatibleUtil';
 import { PCIndex } from './PCIndex';
 import { accessControlRdb, AppInfo, ListType } from '../common/datasources/AccessControlRdb';
+import { FloatBar } from '../components/Common/FloatBar';
 
 // import { hdsEffect } from '@kit.UIDesignKit';
 
@@ -695,8 +690,9 @@ struct Index {
         this.tabCurrentPage = targetIndex
         swiperController.changeIndex(targetIndex, true)
       })
-      // tab栏
-      this.FloatBarBuilder()
+
+      // tab栏（抽离成组件）
+      FloatBar({ tabList: this.tabList, swiperController: swiperController })
     }
     .width('100%')
     .height('100%')
@@ -915,7 +911,7 @@ struct Index {
   async aboutToAppear(): Promise<void> {
     hilog.info(0x1000, componentName, `#aboutToAppear executed`)
     this.registerEvent()
-    
+
     // 初始化状态栏工具(仅PC设备)
     if (this.windowMode) {
       const iconResource: StatusBarIconResource = {
@@ -1379,6 +1375,9 @@ struct Index {
     if (this.uiConfig.isHoldingHand === undefined) {
       this.uiConfig.isHoldingHand = false
     }
+    if (this.uiConfig.isFloatButtonVisible === undefined) {
+      this.uiConfig.isFloatButtonVisible = true
+    }
 
     setTimeout(async () => {
       // 等待 PreferenceUtil 完成初始化后，更新访问控制数据
@@ -1745,45 +1744,6 @@ struct Index {
     return value
   }
 
-  /**
-   * 获取悬浮tab底部避让值
-   */
-  getFloatBottom() {
-    const isTabBarVertical = Xb_TabBarVertical(this.widthBp, this.heightBp);
-    const isFloatTabBarFullHeight = FloatTabBarHeight(this.widthBp, this.heightBp) == '100%';
-    // 优先级 1: 侧边撑满布局
-    if (isTabBarVertical && isFloatTabBarFullHeight) {
-      return 5;
-    }
-    // 优先级 2: 窗口模式下的水平布局 (两种情况)
-    if (!isTabBarVertical && this.windowMode) {
-      // 撑满(widthBp < 2时)，返回 8；非撑满，返回 1
-      return this.widthBp < 2 ? 8 : 1;
-    }
-    // 优先级 3: 常规避让布局：有高度就减 10
-    if (this.bottomRectHeight !== 0) {
-      return this.bottomRectHeight - 10;
-    }
-    // 优先级 4 (兜底逻辑): 其他所有情况
-    return isTabBarVertical ? 3 : 8;
-  }
-
-}
-
-@Extend(Row)
-function functionButtonStyle(during: boolean, c: ResourceColor = $r('app.color.shadow_button')) {
-  .borderRadius(30)
-  .padding(during ? { left: 8, right: 8 } : 0)
-  .size({width: /*during ? 130 : */60, height: 60})
-  .justifyContent(FlexAlign.Center)
-  .aspectRatio(1)
-  .alignItems(VerticalAlign.Center)
-  .shadow({
-    radius: 15,
-    offsetY: 4,
-    color: during ? c : $r('app.color.shadow_button'),
-    type: ShadowType.COLOR
-  })
- // .borderColor($r("app.color.border"))
- // .borderWidth(0.5)
+  // getFloatBottom() 已迁移至 FloatBar 组件
+  // functionButtonStyle @Extend 已迁移至 FloatControlButton 组件
 }
