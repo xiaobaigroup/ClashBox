@@ -265,7 +265,7 @@ export class AccessControlRdb {
     // 只有当目标是“选中”状态时，才需要检查数量限制
     const isTargetSelected = (newType === ListType.WHITE_SELECTED || newType === ListType.BLACK_SELECTED)
     if (isTargetSelected) {
-      const maxLimit = (domain === 'WHITE') ? 62 : 64
+      const maxLimit = (domain === 'WHITE') ? 254 : 256
       // 查询当前域内已选中的数量
       const countPredicates = new relationalStore.RdbPredicates('access_control_apps')
         .equalTo('list_type', newType)
@@ -648,7 +648,7 @@ export class AccessControlRdb {
       : (isSelected ? ListType.BLACK_SELECTED : ListType.BLACK_UNSELECTED)
     // --- 执行选中操作 (需要检查限额) ---
     if (isSelected) {
-      const maxLimit = (domain === 'WHITE') ? 62 : 64
+      const maxLimit = (domain === 'WHITE') ? 254 : 256
       // 查询当前已选中的数量
       const currentPred = new relationalStore.RdbPredicates('access_control_apps')
         .equalTo('list_type', targetType)
