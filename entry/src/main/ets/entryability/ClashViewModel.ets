@@ -49,13 +49,14 @@ export class ClashViewModel {
   }
   // 添加配置 url
   async addOrUpdateProfileByUrl(data: ConfigData, id: string | null) {
+    const ua = AppStorage.get<ClashConfig>("clashConfig")?.["global-ua"]
     let profile = new Profile(ProfileType.Url, data.configUrl)
     if(id) {
       const old = await this.profileRepo.query(id)
       if(old)
         profile = old
     }
-    profile.loadContext(this.context)
+    profile.loadContext(this.context, ua)
     profile.url = data.configUrl
     profile.name = data.configName
     profile.isUpdating = data.disableUpdate
