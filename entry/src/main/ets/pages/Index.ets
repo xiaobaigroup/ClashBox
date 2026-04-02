@@ -90,7 +90,7 @@ import { BusinessError } from '@kit.BasicServicesKit'
 import { cardManager } from '../common/utils/CardManageUtil'
 import LiveViewUtil from '../common/utils/LiveViewUtil'
 import { UpdateLog } from '../components/Start/UpdateLog'
-import { animationStyle } from 'xb_components/src/main/ets/components/Animation';
+import { Xb_AnimationStyle } from 'xb_components';
 import { getJsonArrayType } from '../common/entity/utils';
 import { holdingHandleUtil } from '../common/utils/HoldingHandleUtil';
 import { sortByCustomOrder } from '../common/utils/SortUtil';
@@ -98,11 +98,6 @@ import { AccessControlCompatibleMerger } from '../common/utils/AccessControlComp
 import { PCIndex } from './PCIndex';
 import { accessControlRdb, AppInfo, ListType } from '../common/datasources/AccessControlRdb';
 import { FloatBar } from '../components/Common/FloatBar';
-
-// import { hdsEffect } from '@kit.UIDesignKit';
-
-
-PersistentStorage.persistProp("persistedMapString", new Map<number, string>([]));
 
 export const indexController: TabsController = new TabsController()
 const swiperController: SwiperController = new SwiperController()
@@ -490,12 +485,12 @@ struct Index {
       this.barHeight : this.bottomRectHeight == 0 ? TabBarHeight(this.widthBp, this.heightBp) :
         TabBarAvoidHeight(this.widthBp, this.heightBp))
     .onTabBarClick((index: number) => {
-      animationStyle.animToAPI18(() => {
+      Xb_AnimationStyle.animToAPI18(() => {
         this.tabCurrentPage = index
       },this.uiConfig.animationSpeed, 'app', 0)
     })
     .onChange((index) => {
-      animationStyle.animToAPI18(() => {
+      Xb_AnimationStyle.animToAPI18(() => {
         this.tabCurrentPage = index
         if (index == 0) {
           this.isHomePage = true
@@ -505,7 +500,7 @@ struct Index {
       },this.uiConfig.animationSpeed, 'app', 0)
     })
     .onAnimationStart((index: number, targetIndex: number) => {
-      animationStyle.animToAPI18(() => {
+      Xb_AnimationStyle.animToAPI18(() => {
         this.tabCurrentPage = targetIndex;
       },this.uiConfig.animationSpeed, 'app', 0)
     })
@@ -907,7 +902,7 @@ struct Index {
       this.updateData()   // TODO 强制更新数据函数
     }
 
-    animationStyle.setContext(this.UIContext)
+    Xb_AnimationStyle.setContext(this.UIContext)
     if (this.apiVersionEnable) {
       // 需要确保兼容最低API版本(17)
       holdingHandleUtil.setContext(this.UIContext)
@@ -1503,7 +1498,7 @@ struct Index {
   /**tab移动开始动画*/
   startAnim() {
     indexController.setTabBarTranslate({ y: 0 })
-    animationStyle.animToAPI18(()=>{
+    Xb_AnimationStyle.animToAPI18(()=>{
       indexController.setTabBarTranslate({ y: '100%' })
       this.barHeight = 0
       console.info('tab横竖：', `${TabBarVertical(this.widthBp, this.heightBp)}`)
@@ -1512,7 +1507,7 @@ struct Index {
 
   /**tab移动停止动画*/
   stopAnim() {
-    animationStyle.animToAPI18(()=>{
+    Xb_AnimationStyle.animToAPI18(()=>{
       if (!this.isSmallSquareScreen || !this.isRolling) {
         indexController.setTabBarTranslate({ y: 0 })
         this.barHeight = this.bottomRectHeight == 0 ? TabBarHeight(this.widthBp, this.heightBp) :
@@ -1535,7 +1530,7 @@ struct Index {
   /*px外屏手势动画*/
   // tab隐藏
   startAnimPX() {
-    animationStyle.animToAPI18(()=>{
+    Xb_AnimationStyle.animToAPI18(()=>{
       indexController.setTabBarTranslate({ y: '100%' })
       this.barHeight = 0
 
@@ -1545,7 +1540,7 @@ struct Index {
 
   // tab显示
   stopAnimPX() {
-    animationStyle.animToAPI18(()=>{
+    Xb_AnimationStyle.animToAPI18(()=>{
       indexController.setTabBarTranslate({ y: 0 })
       this.barHeight = TabBarHeight(this.widthBp, this.heightBp)
       this.heightTop = 0

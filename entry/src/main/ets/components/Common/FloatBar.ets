@@ -9,7 +9,7 @@ import {
   Xb_TabIconFontSize,
   Xb_TabTitleFontSize
 } from 'xb_components'
-import { animationStyle } from 'xb_components/src/main/ets/components/Animation'
+import { Xb_AnimationStyle } from 'xb_components'
 import { FloatControlButton } from './FloatControlButton'
 import { FloatTabBarHeight } from '../../common/breakpoint/BreakPoint'
 
@@ -86,7 +86,7 @@ export struct FloatBar {
                 .fontColor([this.tabCurrentPage === index ? this.icon_emphasize : $r('sys.color.icon_tertiary')])
                 .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)
                 .translate({ y: this.tabCurrentPage == index ? -2 : 0 })
-                .animation(animationStyle.animNormalUtils(0))
+                .animation(Xb_AnimationStyle.animNormalUtils(0))
               Text(item.name)
                 .fontColor(this.tabCurrentPage === index ? this.icon_emphasize : $r('sys.color.icon_tertiary'))
                 .fontSize(Xb_TabTitleFontSize(this.widthBp, this.heightBp))
@@ -96,7 +96,7 @@ export struct FloatBar {
             .justifyContent(FlexAlign.Center)
             .alignItems(HorizontalAlign.Center)
             .onClick(() => {
-              animationStyle.animToAPI18(() => {
+              Xb_AnimationStyle.animToAPI18(() => {
                 this.tabCurrentPage = index
               }, this.uiConfig.animationSpeed, 'app')
               this.swiperController.changeIndex(index, true)

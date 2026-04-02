@@ -236,7 +236,6 @@ struct OnlineSearch {
             offsetX: 0,
             offsetY: 0
           })
-
         // 高光点（增加立体感）
         Row()
           .borderRadius("50%")

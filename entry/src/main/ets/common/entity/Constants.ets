@@ -821,10 +821,8 @@ export interface CollaboratorsListItemProp {
 export const CollaboratorsList: CollaboratorsListItemProp[] = [
   { title: 'mihomo', subtitle: $r('app.string.mihomo_subtitle'), contact: 'Github', sign: 0, link: 'https://github.com/MetaCubeX/mihomo', image: $rawfile('mihomo.png')},
   { title: 'FlClash', subtitle: $r('app.string.flclash_subtitle'), contact: 'Github', sign: 0, link: 'https://github.com/chen08209/FlClash', image: $rawfile('FlClash.svg')},
-  // { title: '冲浪喵', subtitle: $r('app.string.flclash_subtitle'), contact: 'Github', sign: 0, link: 'https://github.com/awaLiny2333/LinysBrowser_NEXT', image: $rawfile('Linys_Browser.png')},
   { title: '恩临大帝', subtitle: $r('app.string.FrondEnd_Development'), contact: $r('app.string.Email'), sign: 1, link: 'mailto:ealion@outlook.com?subject=联系&body=你的内容...', image: $rawfile('enlin.png')},
   { title: 'SummerKaze', subtitle: $r('app.string.FrondEnd_Development'), contact: 'Github', sign: 0, link: 'https://github.com/SummerKaze', image: $rawfile('SummerKaze.jpg')},
-  // { title: '鱼🐟', subtitle: $r('app.string.FrondEnd_Development'), contact: 'Github', image: $rawfile('yu.png')},
   { title: '凛凛早露', subtitle: $r('app.string.LLZL_Subtitle'), sign: 3, link: '', image: $rawfile('llzl.png')},
   { title: $r('app.string.Dear_Group_Members'), subtitle: $r('app.string.Dear_Group_Members_Subtitle'), sign: 2, link: '693903194', contact: $r('app.string.copy_qq_group'), image: $rawfile('group.jpg')},
 ]

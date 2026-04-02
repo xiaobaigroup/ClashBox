@@ -3,30 +3,28 @@
     "signingConfigs": [
       {
         "name": "debug",
-        // 调试证书
         "type": "HarmonyOS",
         "material": {
-          "storeFile": "",
-          "storePassword": "",
-          "keyAlias": "xiaobaigongfang",
-          "keyPassword": "",
+          "certpath": "C:\\Users\\Administrator\\.ohos\\config\\debug_ClashBox_V1_qYh9rRy3wMKgLXPB_VE_s74V-IdJwULbnIao5Ah-cm8=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "00000019914AEDF2B4AD7929A302BC50992FB433AEEF2F4C13BA35B6BD4D8475AFC2FD85E12DCFCFDC",
+          "profile": "C:\\Users\\Administrator\\.ohos\\config\\debug_ClashBox_V1_qYh9rRy3wMKgLXPB_VE_s74V-IdJwULbnIao5Ah-cm8=.p7b",
           "signAlg": "SHA256withECDSA",
-          "profile": "",
-          "certpath": ""
+          "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\debug_ClashBox_V1_qYh9rRy3wMKgLXPB_VE_s74V-IdJwULbnIao5Ah-cm8=.p12",
+          "storePassword": "000000191379DDE3A212117954EBC2FE77F21CB199FA7E5C84F75453D31614DC1182D1DFAAB83C94E1"
         }
       },
       {
         "name": "release",
-        // 发布证书
         "type": "HarmonyOS",
         "material": {
-          "storeFile": "",
-          "storePassword": "",
+          "certpath": "D:/HUAWEI/key/小白工坊证书/小白工坊.cer",
           "keyAlias": "xiaobaigongfang",
-          "keyPassword": "",
+          "keyPassword": "0000001DB26F4D6B09A2214BE9D49BCB53A46294ACC078516F41B1DCBCD216D497E30283AD1E4E596CBF29FED6",
+          "profile": "D:/HUAWEI/key/小白工坊证书/ClashBoxreleaseRelease.p7b",
           "signAlg": "SHA256withECDSA",
-          "profile": "",
-          "certpath": ""
+          "storeFile": "D:/HUAWEI/key/小白工坊证书/小白工坊.p12",
+          "storePassword": "0000001D0CF731FF829D831CCFB9C6A3371D2B8A62D4D51B21CE1740BA33E51FE15CDE3D5F2C7A70287725DF26"
         }
       }
     ],

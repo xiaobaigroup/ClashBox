@@ -14,7 +14,7 @@ import { customAnimationUtil, isON } from '../../../common/utils/Animation'
 import { common } from '@kit.AbilityKit'
 import { PageMargin } from '../../../common/breakpoint/BreakPoint'
 import { Xb_ToastUtil } from 'xb_components'
-import { animationStyle } from 'xb_components/src/main/ets/components/Animation'
+import { Xb_AnimationStyle } from 'xb_components'
 
 @Component
 export struct ConfigList {
@@ -247,7 +247,7 @@ export struct ConfigList {
               }
               .transition(this.isON.toggleAnim ? null : customAnimationUtil.isScaleTran(index, this.uiConfig))
               .onClick(() => {
-                animationStyle.animToAPI18(()=>{
+                Xb_AnimationStyle.animToAPI18(()=>{
                   this.currentItemIndex = index
                   this.handleToggle(index)
                 },this.uiConfig.animationSpeed, 'app', 0)

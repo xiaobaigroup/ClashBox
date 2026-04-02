@@ -1,7 +1,6 @@
 {
   "app": {
-    //"bundleName": "org.xbgroup.clashboxb", // 测试版 图标前景为app_icon_pre
-    "bundleName": "org.xbgroup.clashbox",
+    "bundleName": "org.xbgroup.clashboxLTS",
     "vendor": "example",
     "versionCode": 1007047,
     "versionName": "1.7.4",

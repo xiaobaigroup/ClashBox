@@ -1,14 +1,13 @@
 import { hilog } from '@kit.PerformanceAnalysisKit'
-import { BreakpointState, } from '../../common/breakpoint/breakpointsystem'
 import {
   BORDER_RADIUS_20,
   CONTENT_END_OFFSET_150,
   LIST_ITEM_HEIGHT,
   TAB_CONTENT_TITLE_SYMBOL_FONT_SIZE } from '../../common/entity/Constants'
-import { LengthMetrics, SymbolGlyphModifier,PromptAction, curves } from '@kit.ArkUI';
+import { LengthMetrics, SymbolGlyphModifier } from '@kit.ArkUI';
 import { webview } from '@kit.ArkWeb';
 import { ProxyGroupItemDataSource, ProxyItem, ProxyItemDataSource } from '../../common/datasources/ProxyData';
-import { Profile, ProxyGroup, ProxySort } from 'proxy_core';
+import { Profile, ProxySort } from 'proxy_core';
 import { AppConfig, AppState, ClashCore, ProxyCardSize, ProxyGroupType, UIConfig } from '../../entryability/AppState';
 import { ProxyNode } from './ProxyNodeItem';
 import { customAnimationUtil } from '../../common/utils/Animation';
@@ -17,7 +16,6 @@ import ClashViewModel from '../../entryability/ClashViewModel';
 import { PopTips, PopupBuilder } from '../Start/Popup';
 import { ListGutter, ProxyListLanes } from '../../common/breakpoint/BreakPoint';
 import { cardManager } from '../../common/utils/CardManageUtil';
-import { EventKey, EventHub } from '../../common/EventHub';
 import { Xb_ToastUtil } from 'xb_components';
 
 // 组件名

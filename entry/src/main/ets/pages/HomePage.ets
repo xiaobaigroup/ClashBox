@@ -47,7 +47,7 @@ import {
   WindowHomeGridRowPadding } from '../common/breakpoint/BreakPoint'
 import { RoundButton } from '../components/Common/RoundButton'
 import { Xb_GetResourceString, Xb_ToastUtil } from 'xb_components'
-import { animationStyle } from 'xb_components/src/main/ets/components/Animation'
+import { Xb_AnimationStyle } from 'xb_components'
 import { sortByCustomOrder } from '../common/utils/SortUtil'
 
 
@@ -507,7 +507,7 @@ struct Home {
   // 卡片摇摆动画
   startAnim() {
     this.rotateAngle = 0
-    animationStyle.animToCustomAPI18({
+    Xb_AnimationStyle.animToCustomAPI18({
       duration: this.uiConfig.animationSpeed,
       curve: Curve.Linear,
       iterations:-1,
@@ -518,7 +518,7 @@ struct Home {
   }
 
   stopAnim() {
-    animationStyle.animToCustomAPI18({
+    Xb_AnimationStyle.animToCustomAPI18({
       delay: 0,
       duration: 0,
       iterations: 0,
@@ -536,7 +536,7 @@ struct Home {
     Xb_ToastUtil.showToast({ message: `${Xb_GetResourceString($r('app.string.layout_saved'), this)}💾` })
     this.isShowHomeEdit = false
     if (this.uiConfig.isAnimation) {
-      animationStyle.animToAPI18(() => {
+      Xb_AnimationStyle.animToAPI18(() => {
         this.isShowDeleteButton = false
       }, this.uiConfig.animationSpeed, 'app', 0, Curve.Linear)
     } else { this.isShowDeleteButton = false }
@@ -551,7 +551,7 @@ struct Home {
     hilog.info(0xFF00, "HomeTestTag", "布局还原为： %{public}s", JSON.stringify(this.theCurrentHomeCard))
     Xb_ToastUtil.showToast({ message: `${Xb_GetResourceString($r('app.string.layout_restored'), this)}🫡` })
     this.isShowHomeEdit = false
-    animationStyle.animToAPI18(() => {
+    Xb_AnimationStyle.animToAPI18(() => {
       this.isShowDeleteButton = false
     }, this.uiConfig.animationSpeed, 'app', 0, Curve.Linear)
   }
@@ -614,7 +614,7 @@ struct HomeCard {
           DeleteButton()
             .position({ x: this.item.spanMultiple == 2 ? '95%' : '92%', y: -4 })
             .onClick(() => {
-              animationStyle.animToAPI18(() => {
+              Xb_AnimationStyle.animToAPI18(() => {
                 const index = this.homeCardList.findIndex(value => this.item.key == value.key)
                 this.homeCardList.splice(index, 1)
                 const keyIndex = this.theCurrentHomeCard.findIndex(value => this.item.key == value)

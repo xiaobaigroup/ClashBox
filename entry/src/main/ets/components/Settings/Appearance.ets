@@ -263,7 +263,7 @@ struct Appearance {
             })
             // 分割线
             Row().height(0.5).backgroundColor($r('app.color.divider')).width('93%')
-            if (this.apiVersionEnable) { // 需要确保兼容最低API版本(17)
+            if (this.apiVersionEnable) {
               // 适人握持(动作感知)
               Row() {
                 toggleRowList({

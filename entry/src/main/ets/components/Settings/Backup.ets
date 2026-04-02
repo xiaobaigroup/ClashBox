@@ -11,7 +11,7 @@ import { EventHub, EventKey } from "../../common/EventHub"
 import { WebDavManager } from "../../common/utils/webdav/manager"
 import { WebDavClient } from "../../common/utils/webdav/client"
 import { FileInfo, WebDavConfig } from "../../common/utils/webdav/config"
-import { animationStyle } from "xb_components/src/main/ets/components/Animation"
+import { Xb_AnimationStyle } from "xb_components"
 
 
 @Component
@@ -325,7 +325,7 @@ struct CloudFiles {
           .width('100%')
           .align(Alignment.Start)
           .backgroundColor($r('app.color.list_item_background_color'))
-          .clickEffect(animationStyle.isClick())
+          .clickEffect(Xb_AnimationStyle.isClick())
           .padding({ top: 16, bottom: 16, left: 12, right: 12 })
           .borderRadius(20)
           .onClick(() => {
@@ -439,7 +439,7 @@ export struct CloudBackup {
           .backgroundColor($r('app.color.container_background'))
           .onClick( ()=> {
             // 显式动画
-            animationStyle.animToAPI18(()=>{
+            Xb_AnimationStyle.animToAPI18(()=>{
               this.uiConfig.isShowCloudBackupConfig = !this.uiConfig.isShowCloudBackupConfig
             }, this.uiConfig.animationSpeed, 'app')
           })

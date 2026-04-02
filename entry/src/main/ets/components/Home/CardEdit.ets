@@ -6,7 +6,7 @@ import { customAnimationUtil } from "../../common/utils/Animation"
 import { TabContentTitleMargin } from "../../common/breakpoint/BreakPoint"
 import { Xb_ToastUtil } from "xb_components"
 import { HomeCardInfo } from "../../common/entity/PageArgumentEntity"
-import { animationStyle } from "xb_components/src/main/ets/components/Animation"
+import { Xb_AnimationStyle } from "xb_components"
 
 
 @Component
@@ -31,7 +31,7 @@ export struct CardEdit {
       .ImageItemStyle()
       .transition(customAnimationUtil.isScaleTran(i, this.uiConfig))
       .onClick(() => {
-        animationStyle.animToAPI18(() => {
+        Xb_AnimationStyle.animToAPI18(() => {
           const index = HomeCards.findIndex(value => key == value.key)
           const data = HomeCards[index]
           this.homeCardList.push(data)

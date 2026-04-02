@@ -450,7 +450,7 @@ export struct AboutXBStudio {
         route: undefined /*UIUtils.enableV2Compatibility(this.SettingsPageInfos)*/,
         showTopTitle: false,
         PageBackgroundColor: $r('app.color.background'),
-        ItemBackgroundCorlor: $r('app.color.container_background')
+        ItemBackgroundColor: $r('app.color.container_background')
       })
     }
     .backgroundColor($r('app.color.background'))

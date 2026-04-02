@@ -8,11 +8,11 @@ import { EventHub, EventKey } from "../common/EventHub";
 import { CustomThemeName } from "xb_components/src/main/ets/utils/AppThemeManager";
 import { TabStyle, Xb_PreferenceUtil } from "xb_components";
 
-export enum ProxyGroupType{
+export enum ProxyGroupType {
   Tabs,
   List
 }
-export enum ProxyCardSize{
+export enum ProxyCardSize {
   Mini,
   Small,
   Large
@@ -23,7 +23,7 @@ export enum SwitchModeCard{
   Rule = "RULE",
   Direct = "DIRECT"
 }
-export enum ClashCore{
+export enum ClashCore {
   mihomo,
   // 非mihomo用于开发调试， ui进程运行vpn核心；调试vpn核心崩溃和杀进程问题
   ClashMeta,
