@@ -212,7 +212,10 @@ export function ParseProxyGroup(mode, result: string): ProxyGroup[] {
     const group = map[groupName];
     if (group){
       group["proxies"] = (group["all"] ?? []).map((n: string) => {
-        map[n]["name"] = map[n]["name"]
+        if(!map[n]){
+          return;
+        }
+        map[n]["name"] = map[n]?.["name"]
         return map[n]
       }).filter((d: string) => d != null && d != undefined)
       return {
