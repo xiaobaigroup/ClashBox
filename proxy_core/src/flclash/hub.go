@@ -107,7 +107,7 @@ func handleUpdateConfig(bytes []byte) string {
 func handleGetProxies() string {
 	runLock.Lock()
 	defer runLock.Unlock()
-	data, err := json.Marshal(tunnel.Proxies())
+	data, err := json.Marshal(tunnel.ProxiesWithProviders())
 	if err != nil {
 		return ""
 	}
@@ -126,7 +126,7 @@ func handleChangeProxy(data string, fn func(string string)) {
 		}
 		groupName := *params.GroupName
 		proxyName := *params.ProxyName
-		proxies := tunnel.Proxies()
+		proxies := tunnel.ProxiesWithProviders()
 		group, ok := proxies[groupName]
 		if !ok {
 			fn("Not found group")
@@ -203,7 +203,7 @@ func handleAsyncTestDelay(paramsString string, fn func(string)) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*time.Duration(params.Timeout))
 		defer cancel()
 
-		proxies := tunnel.Proxies()
+		proxies := tunnel.ProxiesWithProviders()
 		proxy := proxies[params.ProxyName]
 
 		delayData := &Delay{

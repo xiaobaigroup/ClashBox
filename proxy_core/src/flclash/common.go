@@ -326,7 +326,7 @@ func patchSelectGroup() {
 	if mapping == nil {
 		return
 	}
-	for name, proxy := range tunnel.Proxies() {
+	for name, proxy := range tunnel.ProxiesWithProviders() {
 		outbound, ok := proxy.(*adapter.Proxy)
 		if !ok {
 			continue
