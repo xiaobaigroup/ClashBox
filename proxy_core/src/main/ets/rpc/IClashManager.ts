@@ -43,6 +43,8 @@ export interface AccessControl{
 }
 export interface VpnRawOptions{
   tunIp: string
+  ipv6?: boolean
+  routeAddress?: string[]
   accessControl: AccessControl
 }
 

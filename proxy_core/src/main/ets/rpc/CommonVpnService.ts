@@ -4,9 +4,11 @@ import { common } from "@kit.AbilityKit";
 export class Address {
   address: string;
   family: number;
-  constructor(address: string, family: number) {
+  port: number;
+  constructor(address: string, family: number, port: number = 0) {
     this.address = address;
     this.family = family;
+    this.port = port;
   }
 }
 export  class AddressWithPrefix {
@@ -17,10 +19,21 @@ export  class AddressWithPrefix {
     this.prefixLength = prefixLength;
   }
 }
+export interface RouteInfo {
+  "interface": string;
+  destination: AddressWithPrefix;
+  gateway: Address;
+  hasGateway: boolean;
+  isDefaultRoute: boolean;
+  isExcludedRoute?: boolean;
+}
 export class VpnConfig {
   addresses: AddressWithPrefix[];
+  routes: RouteInfo[];
   mtu: number;
   dnsAddresses: string[];
+  isIPv4Accepted: boolean = true
+  isIPv6Accepted: boolean = false
   trustedApplications: string[] = []
   blockedApplications: string[] = []
   constructor(
@@ -30,6 +43,7 @@ export class VpnConfig {
     this.addresses = [
       new AddressWithPrefix(tunIp, 30)
     ];
+    this.routes = [];
     this.mtu = 1400;
     this.dnsAddresses = dnsAddresses;
   }
@@ -73,21 +87,48 @@ export abstract class CommonVpnService{
 }
 
 export function isIpv4(ip: string): Boolean {
-  let parts = ip.split("/")
-  if (parts.length != 2) {
-    return false
-  }
-  // TODO
-  return ip.length == 4
+  let address = ip.split("/")[0].trim()
+  return address.split(".").length == 4 && address.indexOf(":") == -1
 }
 
 export function isIpv6(ip: string): Boolean {
   let parts = ip.split("/")
-  if (parts.length != 2) {
-    return false
-  }
-  // TODO
-  return ip.length == 16
+  let address = parts[0].trim()
+  return address.indexOf(":") >= 0
 }
 
+export function cidrToAddressWithPrefix(cidr: string): AddressWithPrefix | null {
+  let parts = cidr.split("/")
+  if (parts.length != 2) {
+    return null
+  }
+  let address = parts[0].trim()
+  let prefixLength = parseInt(parts[1])
+  if (Number.isNaN(prefixLength)) {
+    return null
+  }
+  if (isIpv4(cidr)) {
+    return new AddressWithPrefix(new Address(address, 1), prefixLength)
+  }
+  if (isIpv6(cidr)) {
+    return new AddressWithPrefix(new Address(address, 2), prefixLength)
+  }
+  return null
+}
+
+export function cidrToRoute(cidr: string): RouteInfo | null {
+  let destination = cidrToAddressWithPrefix(cidr)
+  if (destination == null) {
+    return null
+  }
+  let family = destination.address.family
+  let gateway = family == 2 ? "fe80::" : "172.19.0.1"
+  return {
+    "interface": "vpn-tun",
+    destination: destination,
+    gateway: new Address(gateway, family),
+    hasGateway: false,
+    isDefaultRoute: cidr == "0.0.0.0/0" || cidr == "::/0",
+  }
+}
 
