@@ -479,12 +479,18 @@ export class ClashViewModel {
       console.log(`AccessControl 将加载 acceptList ${acceptList.length} 个，rejectList ${rejectList.length} 个`)
       const accessControl = {
         tunIp : clashConfig?.tun?.["tun-ip"],
+        // Capture IPv6 at the VPN layer even when Mihomo DNS/outbound IPv6 remains disabled.
+        ipv6: true,
+        routeAddress: clashConfig?.["route-address"] ?? [],
         accessControl: { mode:appConfig?.accessControlMode ?? "", acceptList: acceptList, rejectList: rejectList } as AccessControl
       } as VpnRawOptions
       this.socketProxy.setOptionStates(accessControl)
     } else {
       const accessControl = {
         tunIp : clashConfig?.tun?.["tun-ip"],
+        // Capture IPv6 at the VPN layer even when Mihomo DNS/outbound IPv6 remains disabled.
+        ipv6: true,
+        routeAddress: clashConfig?.["route-address"] ?? [],
         accessControl: { mode:appConfig?.accessControlMode ?? "", acceptList: [], rejectList: [] } as AccessControl } as VpnRawOptions
       this.socketProxy.setOptionStates(accessControl)
     }
