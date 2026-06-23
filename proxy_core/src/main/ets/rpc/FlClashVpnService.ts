@@ -22,13 +22,7 @@ import {
   startListener,
   stopListener
 } from 'libflclash.so';
-import {
-  Address,
-  AddressWithPrefix,
-  cidrToRoute,
-  CommonVpnService,
-  VpnConfig
-} from './CommonVpnService';
+import { Address, CommonVpnService, isIpv4, isIpv6, VpnConfig } from './CommonVpnService';
 import { JSON, util } from '@kit.ArkTS';
 import { RpcRequest, RpcResult } from './RpcRequest';
 import { ClashRpcType } from './IClashManager';
@@ -49,7 +43,7 @@ export interface VpnOptions {
   ipv4Address: string,
   ipv6Address: string,
   accessControl: AccessControl,
-  systemProxy: boolean,
+  systemProxy: string,
   allowBypass: boolean,
   routeAddress: string[],
   bypassDomain: string[],
@@ -104,45 +98,21 @@ export class FlClashVpnService extends CommonVpnService {
   ParseConfig(): VpnConfig {
     let vpnConfig = new VpnConfig();
     let option = JSON.parse(getVpnOptions()) as VpnOptions
-    if (option.ipv6Address == undefined || option.ipv6Address == "") {
-      option.ipv6Address = "fdfe:dcba:9876::1/126"
-    }
-    if (option.routeAddress == undefined) {
-      option.routeAddress = []
-    }
     if (option.ipv4Address != "") {
       const ips = option.ipv4Address.split("/")
       console.debug("tunIp ", ips)
-      const prefixLength = ips.length > 1 ? parseInt(ips[1]) : 30
-      vpnConfig.addresses[0] = new AddressWithPrefix(new Address(ips[0], 1), prefixLength)
-      vpnConfig.isIPv4Accepted = true
+      if(ips.length > 1){
+        vpnConfig.addresses[0].address = new Address(ips[0], 1)
+        vpnConfig.addresses[0].prefixLength = parseInt(ips[1])
+      }else{
+        vpnConfig.addresses[0].address = new Address(ips[0], 1)
+      }
+      option.routeAddress?.filter(a => isIpv4(a)).map(f => f.split("/")[0])
     }
     if (option.ipv6Address != "") {
-      const ips = option.ipv6Address.split("/")
-      const prefixLength = ips.length > 1 ? parseInt(ips[1]) : 126
-      vpnConfig.addresses.push(new AddressWithPrefix(new Address(ips[0], 2), prefixLength))
-      vpnConfig.isIPv6Accepted = true
+      vpnConfig.addresses[0].address = new Address(option.ipv6Address.split("/")[0], 2)
+      option.routeAddress?.filter(a => isIpv6(a)).map(f => f.split("/")[0])
     }
-    const routeAddresses: string[] = []
-    const addRouteAddress = (cidr: string) => {
-      if (cidr != "" && !routeAddresses.includes(cidr)) {
-        routeAddresses.push(cidr)
-      }
-    }
-    // Explicit defaults avoid OHOS auto-generating only fe80::/derived IPv6 coverage.
-    option.routeAddress?.forEach(addRouteAddress)
-    if (option.ipv4Address != "") {
-      addRouteAddress("0.0.0.0/0")
-    }
-    if (option.ipv6Address != "") {
-      addRouteAddress("::/0")
-    }
-    routeAddresses.forEach((cidr) => {
-      const route = cidrToRoute(cidr)
-      if (route != null) {
-        vpnConfig.routes.push(route)
-      }
-    })
     if (option.accessControl?.mode) {
       if (option.accessControl?.mode == "AcceptSelected") {
         vpnConfig.trustedApplications = option.accessControl?.acceptList
