@@ -17,14 +17,15 @@ import (
 	"syscall"
 	"time"
 
+	"net"
+
 	"github.com/metacubex/mihomo/component/dialer"
+	"github.com/metacubex/mihomo/component/iface"
 	"github.com/metacubex/mihomo/component/process"
 	"github.com/metacubex/mihomo/constant"
 	"github.com/metacubex/mihomo/dns"
 	"github.com/metacubex/mihomo/listener/sing_tun"
 	"github.com/metacubex/mihomo/log"
-    "net"
-	"github.com/metacubex/mihomo/component/iface"
 )
 
 type ProcessMap struct {
@@ -89,7 +90,7 @@ func StartTUN(fd int, markSocket func(Fd)) {
 		tunLock.Lock()
 		defer tunLock.Unlock()
 		f := int(fd)
-		tunListener, _ = t.Start(f, currentConfig.General.Tun.Device, currentConfig.General.Tun.Stack)
+		tunListener, _ = t.Start(f, currentConfig.General.Tun.Device, currentConfig.General.Tun.Stack, currentConfig.General.Tun.DNSHijack)
 		if tunListener != nil {
 			log.Infoln("TUN address: %v", tunListener.Address())
 		}
