@@ -1,0 +1,116 @@
+name: Build OHOS core (libflclash.so)
+
+# Cross-compiles the mihomo/gVisor backend into proxy_core/libs/arm64-v8a/libflclash.so
+# using the OpenHarmony NDK + the OHOS-patched Go toolchain (the one that understands
+# the fork-only `-tlsmodegd` flag). Mirrors proxy_core/src/flclash/build.sh, but split
+# into small, independently-failing steps so a break is easy to localize.
+
+on:
+  workflow_dispatch: {}
+  push:
+    paths:
+      - "proxy_core/src/flclash/**"
+      - ".github/workflows/build-core.yml"
+
+env:
+  CORE_DIR: proxy_core/src/flclash
+  OHOS_SDK_VERSION: "5.0.0"            # API 12
+  GO_OHOS_BRANCH: release-branch.go1.24
+  GO_OHOS_DIR: ${{ github.workspace }}/.go-ohos
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # --- 1. Source -----------------------------------------------------------
+      - name: Checkout (submodules deferred)
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Init only the flclash submodules (skip gitee xb_components)
+        run: |
+          git submodule update --init --depth 1 \
+            "$CORE_DIR/core" \
+            "$CORE_DIR/gvisor-ohos"
+
+      # --- 2. Toolchains -------------------------------------------------------
+      - name: Setup OpenHarmony NDK
+        id: ohos
+        uses: openharmony-rs/setup-ohos-sdk@v1.0.1
+        with:
+          version: ${{ env.OHOS_SDK_VERSION }}
+          components: native            # fall back to `all` if `native` is rejected
+
+      - name: Setup bootstrap Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: Restore OHOS Go toolchain (cache)
+        id: cache-go-ohos
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.GO_OHOS_DIR }}
+          key: go-ohos-${{ runner.os }}-${{ env.GO_OHOS_BRANCH }}
+
+      - name: Clone OHOS Go fork
+        if: steps.cache-go-ohos.outputs.cache-hit != 'true'
+        run: |
+          git clone --depth 1 --branch "$GO_OHOS_BRANCH" \
+            https://gitcode.com/openharmony-sig/ohos_golang_go.git \
+            "$GO_OHOS_DIR"
+
+      - name: Build OHOS Go toolchain (make.bash)
+        if: steps.cache-go-ohos.outputs.cache-hit != 'true'
+        working-directory: ${{ env.GO_OHOS_DIR }}/src
+        run: GOROOT_BOOTSTRAP="$(go env GOROOT)" ./make.bash
+
+      # --- 3. Build env --------------------------------------------------------
+      - name: Configure CGO / cross-compile env
+        run: |
+          native='${{ steps.ohos.outputs.ohos_sdk_native }}'
+          llvm="$native/llvm"
+          sysroot="$native/sysroot"
+          {
+            echo "GO_OHOS_BIN=$GO_OHOS_DIR/bin/go"
+            echo "CC=$llvm/bin/clang"
+            echo "CXX=$llvm/bin/clang++"
+            echo "CGO_AR=$llvm/bin/llvm-ar"
+            echo "GOOS=linux"
+            echo "GOARCH=arm64"
+            echo "CGO_ENABLED=1"
+            echo "CGO_CFLAGS=--target=aarch64-linux-ohos --sysroot=$sysroot -D__MUSL__ -fPIC -Wno-error"
+            echo "CGO_LDFLAGS=--target=aarch64-linux-ohos --sysroot=$sysroot"
+          } >> "$GITHUB_ENV"
+
+      # --- 4. Compile ----------------------------------------------------------
+      - name: Build libflclash.so
+        working-directory: ${{ env.CORE_DIR }}
+        run: |
+          "$GO_OHOS_BIN" build \
+            -tlsmodegd \
+            -buildmode c-shared \
+            -tags "ohos with_gvisor" \
+            -trimpath -ldflags "-s -w" \
+            -o libflclash.so ./
+
+      - name: Verify output
+        working-directory: ${{ env.CORE_DIR }}
+        run: |
+          test -f libflclash.so
+          ls -la libflclash.so
+          file libflclash.so || true
+
+      - name: Stage into libs/arm64-v8a
+        run: |
+          mkdir -p proxy_core/libs/arm64-v8a
+          cp -f "$CORE_DIR/libflclash.so" proxy_core/libs/arm64-v8a/libflclash.so
+
+      # --- 5. Publish ----------------------------------------------------------
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: libflclash-arm64-v8a
+          path: proxy_core/libs/arm64-v8a/libflclash.so
+          if-no-files-found: error
