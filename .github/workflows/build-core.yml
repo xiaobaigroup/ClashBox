@@ -28,11 +28,21 @@ jobs:
         with:
           submodules: false
 
-      - name: Init only the flclash submodules (skip gitee xb_components)
+      - name: Fetch flclash core + gvisor at branch tip
+        # The parent repo pins a `core` submodule commit that upstream force-pushed
+        # away (git submodule update fails with "not our ref"), so the exact pin is
+        # unrecoverable. Track the current default branch instead. NOTE: this may
+        # drift from the shipped binary; a compile break in a later step is upstream
+        # drift to resolve (or pin CORE_REF/GVISOR_REF below to a known-good commit).
+        env:
+          CORE_URL: https://github.com/xfz347/Clash.Meta.git
+          GVISOR_URL: https://github.com/likuai2010/gvisor-ohos.git
         run: |
-          git submodule update --init --depth 1 \
-            "$CORE_DIR/core" \
-            "$CORE_DIR/gvisor-ohos"
+          rm -rf "$CORE_DIR/core" "$CORE_DIR/gvisor-ohos"
+          git clone --depth 1 "$CORE_URL"   "$CORE_DIR/core"
+          git clone --depth 1 "$GVISOR_URL" "$CORE_DIR/gvisor-ohos"
+          echo "core:   $(git -C "$CORE_DIR/core" rev-parse HEAD)"
+          echo "gvisor: $(git -C "$CORE_DIR/gvisor-ohos" rev-parse HEAD)"
 
       # --- 2. Toolchains -------------------------------------------------------
       - name: Setup OpenHarmony NDK
