@@ -15,7 +15,7 @@ on:
 env:
   CORE_DIR: proxy_core/src/flclash
   OHOS_SDK_VERSION: "5.0.0"            # API 12
-  GO_OHOS_BRANCH: release-branch.go1.24
+  GO_OHOS_BRANCH: master
   GO_OHOS_DIR: ${{ github.workspace }}/.go-ohos
 
 jobs:
@@ -62,28 +62,17 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.GO_OHOS_DIR }}
-          key: go-ohos-${{ runner.os }}-${{ env.GO_OHOS_BRANCH }}-${{ hashFiles('.github/patches/0001-support-tls-mode-gd.patch') }}
+          key: gotoolchain-${{ runner.os }}-moody-tls-mode-gd-${{ env.GO_OHOS_BRANCH }}
 
-      - name: Clone stock Go source (base for the patch)
+      - name: Clone patched Go toolchain (moodyhunter/go-tls-mode-gd)
         if: steps.cache-go-ohos.outputs.cache-hit != 'true'
         run: |
-          # Patch is authored against upstream go1.24 (a specific 1.24.x point).
-          # Full single-branch clone (no --depth) so `git apply --3way` can find
-          # the pre-image blobs and 3-way merge past point-release drift.
-          git clone --single-branch --branch "$GO_OHOS_BRANCH" \
-            https://github.com/golang/go.git \
+          # Go 1.26 with the tls-mode-gd patch already applied: adds -tlsmodegd
+          # (arm64 general-dynamic TLS) so the c-shared .so is dlopen-able on OHOS musl.
+          git clone --depth 1 --branch "$GO_OHOS_BRANCH" \
+            https://github.com/moodyhunter/go-tls-mode-gd.git \
             "$GO_OHOS_DIR"
-
-      - name: Apply -tlsmodegd patch (arm64 general-dynamic TLS for OHOS c-shared)
-        if: steps.cache-go-ohos.outputs.cache-hit != 'true'
-        working-directory: ${{ env.GO_OHOS_DIR }}
-        run: |
-          patch_file="${{ github.workspace }}/.github/patches/0001-support-tls-mode-gd.patch"
-          git apply -v --3way "$patch_file" \
-            || git apply -v "$patch_file" \
-            || patch -p1 --fuzz=3 --forward < "$patch_file"
-          # sanity: the -tlsmodegd flag is now registered
-          grep -q 'tlsmodegd' src/cmd/go/internal/work/build.go
+          grep -q 'tlsmodegd' "$GO_OHOS_DIR/src/cmd/go/internal/work/build.go"
 
       - name: Build OHOS Go toolchain (make.bash)
         if: steps.cache-go-ohos.outputs.cache-hit != 'true'
