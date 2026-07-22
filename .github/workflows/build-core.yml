@@ -87,7 +87,7 @@ jobs:
             echo "CC=$llvm/bin/clang"
             echo "CXX=$llvm/bin/clang++"
             echo "CGO_AR=$llvm/bin/llvm-ar"
-            echo "GOOS=linux"
+            echo "GOOS=ohos"
             echo "GOARCH=arm64"
             echo "CGO_ENABLED=1"
             echo "CGO_CFLAGS=--target=aarch64-linux-ohos --sysroot=$sysroot -D__MUSL__ -fPIC -Wno-error"
@@ -98,10 +98,13 @@ jobs:
       - name: Build libflclash.so
         working-directory: ${{ env.CORE_DIR }}
         run: |
+          # Probe: build for the native ohos target instead of the legacy
+          # GOOS=linux + -tlsmodegd flag hack. GOOS=ohos also implies the `ohos`
+          # build tag. If this toolchain isn't OHOS-patched, this fails fast with
+          # "unsupported GOOS/GOARCH pair ohos/arm64".
           "$GO_OHOS_BIN" build \
-            -tlsmodegd \
             -buildmode c-shared \
-            -tags "ohos with_gvisor" \
+            -tags "with_gvisor" \
             -trimpath -ldflags "-s -w" \
             -o libflclash.so ./
 
