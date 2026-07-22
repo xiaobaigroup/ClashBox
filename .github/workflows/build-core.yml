@@ -15,7 +15,7 @@ on:
 env:
   CORE_DIR: proxy_core/src/flclash
   OHOS_SDK_VERSION: "5.0.0"            # API 12
-  GO_OHOS_BRANCH: release-branch.go1.24
+  GO_OHOS_BRANCH: release-branch.go1.23
   GO_OHOS_DIR: ${{ github.workspace }}/.go-ohos
 
 jobs:
@@ -87,7 +87,7 @@ jobs:
             echo "CC=$llvm/bin/clang"
             echo "CXX=$llvm/bin/clang++"
             echo "CGO_AR=$llvm/bin/llvm-ar"
-            echo "GOOS=ohos"
+            echo "GOOS=linux"
             echo "GOARCH=arm64"
             echo "CGO_ENABLED=1"
             echo "CGO_CFLAGS=--target=aarch64-linux-ohos --sysroot=$sysroot -D__MUSL__ -fPIC -Wno-error"
@@ -98,13 +98,16 @@ jobs:
       - name: Build libflclash.so
         working-directory: ${{ env.CORE_DIR }}
         run: |
-          # Probe: build for the native ohos target instead of the legacy
-          # GOOS=linux + -tlsmodegd flag hack. GOOS=ohos also implies the `ohos`
-          # build tag. If this toolchain isn't OHOS-patched, this fails fast with
-          # "unsupported GOOS/GOARCH pair ohos/arm64".
+          # Project's proven recipe: GOOS=linux + c-shared + -tlsmodegd (forces
+          # global-dynamic TLS so the .so is dlopen-able on OHOS musl). Needs an
+          # ohos_golang_go branch that still carries the -tlsmodegd patch; the
+          # go1.24 branch dropped it, so we're on go1.23. If this branch also
+          # lacks it, the step fails with "flag provided but not defined:
+          # -tlsmodegd" and we walk further down (1.22, ...).
           "$GO_OHOS_BIN" build \
+            -tlsmodegd \
             -buildmode c-shared \
-            -tags "with_gvisor" \
+            -tags "ohos with_gvisor" \
             -trimpath -ldflags "-s -w" \
             -o libflclash.so ./
 
