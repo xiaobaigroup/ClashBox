@@ -67,9 +67,10 @@ jobs:
       - name: Clone stock Go source (base for the patch)
         if: steps.cache-go-ohos.outputs.cache-hit != 'true'
         run: |
-          # The patch is authored against upstream go1.24; the OHOS fork has its
-          # own edits in the same files and rejects it. Use stock golang/go.
-          git clone --depth 1 --branch "$GO_OHOS_BRANCH" \
+          # Patch is authored against upstream go1.24 (a specific 1.24.x point).
+          # Full single-branch clone (no --depth) so `git apply --3way` can find
+          # the pre-image blobs and 3-way merge past point-release drift.
+          git clone --single-branch --branch "$GO_OHOS_BRANCH" \
             https://github.com/golang/go.git \
             "$GO_OHOS_DIR"
 
@@ -78,7 +79,9 @@ jobs:
         working-directory: ${{ env.GO_OHOS_DIR }}
         run: |
           patch_file="${{ github.workspace }}/.github/patches/0001-support-tls-mode-gd.patch"
-          git apply -v "$patch_file" || patch -p1 --fuzz=3 --forward < "$patch_file"
+          git apply -v --3way "$patch_file" \
+            || git apply -v "$patch_file" \
+            || patch -p1 --fuzz=3 --forward < "$patch_file"
           # sanity: the -tlsmodegd flag is now registered
           grep -q 'tlsmodegd' src/cmd/go/internal/work/build.go
 
