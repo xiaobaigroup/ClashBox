@@ -15,7 +15,7 @@ on:
 env:
   CORE_DIR: proxy_core/src/flclash
   OHOS_SDK_VERSION: "5.0.0"            # API 12
-  GO_OHOS_BRANCH: release-branch.go1.23
+  GO_OHOS_BRANCH: master
   GO_OHOS_DIR: ${{ github.workspace }}/.go-ohos
 
 jobs:
