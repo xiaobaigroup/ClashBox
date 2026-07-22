@@ -15,7 +15,7 @@ on:
 env:
   CORE_DIR: proxy_core/src/flclash
   OHOS_SDK_VERSION: "5.0.0"            # API 12
-  GO_OHOS_BRANCH: master
+  GO_OHOS_BRANCH: release-branch.go1.24
   GO_OHOS_DIR: ${{ github.workspace }}/.go-ohos
 
 jobs:
@@ -62,14 +62,23 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.GO_OHOS_DIR }}
-          key: go-ohos-${{ runner.os }}-${{ env.GO_OHOS_BRANCH }}
+          key: go-ohos-${{ runner.os }}-${{ env.GO_OHOS_BRANCH }}-${{ hashFiles('.github/patches/0001-support-tls-mode-gd.patch') }}
 
-      - name: Clone OHOS Go fork
+      - name: Clone Go source (ohos_golang_go = stock go1.24 base)
         if: steps.cache-go-ohos.outputs.cache-hit != 'true'
         run: |
           git clone --depth 1 --branch "$GO_OHOS_BRANCH" \
             https://gitcode.com/openharmony-sig/ohos_golang_go.git \
             "$GO_OHOS_DIR"
+
+      - name: Apply -tlsmodegd patch (arm64 general-dynamic TLS for OHOS c-shared)
+        if: steps.cache-go-ohos.outputs.cache-hit != 'true'
+        working-directory: ${{ env.GO_OHOS_DIR }}
+        run: |
+          patch_file="${{ github.workspace }}/.github/patches/0001-support-tls-mode-gd.patch"
+          git apply -v "$patch_file" || patch -p1 --forward < "$patch_file"
+          # sanity: the -tlsmodegd flag is now registered
+          grep -q 'tlsmodegd' src/cmd/go/internal/work/build.go
 
       - name: Build OHOS Go toolchain (make.bash)
         if: steps.cache-go-ohos.outputs.cache-hit != 'true'
@@ -91,19 +100,16 @@ jobs:
             echo "GOARCH=arm64"
             echo "CGO_ENABLED=1"
             echo "CGO_CFLAGS=--target=aarch64-linux-ohos --sysroot=$sysroot -D__MUSL__ -fPIC -Wno-error"
-            echo "CGO_LDFLAGS=--target=aarch64-linux-ohos --sysroot=$sysroot"
+            echo "CGO_LDFLAGS=--target=aarch64-linux-ohos --sysroot=$sysroot -fuse-ld=lld"
           } >> "$GITHUB_ENV"
 
       # --- 4. Compile ----------------------------------------------------------
       - name: Build libflclash.so
         working-directory: ${{ env.CORE_DIR }}
         run: |
-          # Project's proven recipe: GOOS=linux + c-shared + -tlsmodegd (forces
-          # global-dynamic TLS so the .so is dlopen-able on OHOS musl). Needs an
-          # ohos_golang_go branch that still carries the -tlsmodegd patch; the
-          # go1.24 branch dropped it, so we're on go1.23. If this branch also
-          # lacks it, the step fails with "flag provided but not defined:
-          # -tlsmodegd" and we walk further down (1.22, ...).
+          # GOOS=linux + c-shared + -tlsmodegd forces arm64 general-dynamic TLS so
+          # the .so is dlopen-able on OHOS musl. The -tlsmodegd flag comes from the
+          # patch applied to the toolchain above (moodyhunter/libHv2rayCore).
           "$GO_OHOS_BIN" build \
             -tlsmodegd \
             -buildmode c-shared \

@@ -1,0 +1,693 @@
+diff --git a/src/cmd/asm/internal/flags/flags.go b/src/cmd/asm/internal/flags/flags.go
+index 19aa65630f..4dbb06c5ff 100644
+--- a/src/cmd/asm/internal/flags/flags.go
++++ b/src/cmd/asm/internal/flags/flags.go
+@@ -26,6 +26,7 @@ var (
+ 	SymABIs    = flag.Bool("gensymabis", false, "write symbol ABI information to output file, don't assemble")
+ 	Importpath = flag.String("p", obj.UnlinkablePkg, "set expected package import to path")
+ 	Spectre    = flag.String("spectre", "", "enable spectre mitigations in `list` (all, ret)")
++	Tlsmodegd  = flag.Bool("tlsmodegd", false, "generate code that in general dynamic mode")
+ )
+ 
+ var DebugFlags struct {
+diff --git a/src/cmd/asm/main.go b/src/cmd/asm/main.go
+index 25cf307140..9975a1999a 100644
+--- a/src/cmd/asm/main.go
++++ b/src/cmd/asm/main.go
+@@ -47,6 +47,7 @@ func main() {
+ 	ctxt.Flag_linkshared = *flags.Linkshared
+ 	ctxt.Flag_shared = *flags.Shared || *flags.Dynlink
+ 	ctxt.Flag_maymorestack = flags.DebugFlags.MayMoreStack
++	ctxt.Flag_tlsmodelgd = *flags.Tlsmodegd
+ 	ctxt.Debugpcln = flags.DebugFlags.PCTab
+ 	ctxt.IsAsm = true
+ 	ctxt.Pkgpath = *flags.Importpath
+diff --git a/src/cmd/cgo/internal/testcarchive/testdata/libgo/libgo.go b/src/cmd/cgo/internal/testcarchive/testdata/libgo/libgo.go
+index 37b30c1463..1b0189637d 100644
+--- a/src/cmd/cgo/internal/testcarchive/testdata/libgo/libgo.go
++++ b/src/cmd/cgo/internal/testcarchive/testdata/libgo/libgo.go
+@@ -46,7 +46,13 @@ func DidMainRun() bool { return ranMain }
+ 
+ //export CheckArgs
+ func CheckArgs() {
+-	if len(os.Args) != 3 || os.Args[1] != "arg1" || os.Args[2] != "arg2" {
++	// Dynamic linkers which supply the library initialization functions with the
++	// main program's argc / argc should have 3 args here, else they should have
++	// none.
++	valid := (len(os.Args) == 3 && os.Args[1] == "arg1" && os.Args[2] == "arg2") ||
++		(len(os.Args) == 0)
++
++	if !valid {
+ 		fmt.Printf("CheckArgs: want [_, arg1, arg2], got: %v\n", os.Args)
+ 		os.Exit(2)
+ 	}
+diff --git a/src/cmd/compile/internal/base/flag.go b/src/cmd/compile/internal/base/flag.go
+index 4a2b7c5434..7c7bc06629 100644
+--- a/src/cmd/compile/internal/base/flag.go
++++ b/src/cmd/compile/internal/base/flag.go
+@@ -127,6 +127,7 @@ type CmdFlags struct {
+ 	WB                 bool         "help:\"enable write barrier\"" // TODO: remove
+ 	PgoProfile         string       "help:\"read profile or pre-process profile from `file`\""
+ 	ErrorURL           bool         "help:\"print explanatory URL with error message if applicable\""
++	Tlsmodegd          *bool        "help:\"generate code that thread local storage with general dynamic mode. currently only support Arm64\"" // &Ctxt.Tlsmodegd, set below
+ 
+ 	// Configuration derived from flags; not a flag itself.
+ 	Cfg struct {
+@@ -175,6 +176,7 @@ func ParseFlags() {
+ 	Flag.LinkShared = &Ctxt.Flag_linkshared
+ 	Flag.Shared = &Ctxt.Flag_shared
+ 	Flag.WB = true
++	Flag.Tlsmodegd = &Ctxt.Flag_tlsmodelgd
+ 
+ 	Debug.ConcurrentOk = true
+ 	Debug.CompressInstructions = 1
+diff --git a/src/cmd/go/alldocs.go b/src/cmd/go/alldocs.go
+index 8c346dafdb..05490f3a77 100644
+--- a/src/cmd/go/alldocs.go
++++ b/src/cmd/go/alldocs.go
+@@ -194,6 +194,8 @@
+ //	-linkshared
+ //		build code that will be linked against shared libraries previously
+ //		created with -buildmode=shared.
++//	-tlsmodegd
++//		build code that will be linked with general dynamic mode.
+ //	-mod mode
+ //		module download mode to use: readonly, vendor, or mod.
+ //		By default, if a vendor directory is present and the go version in go.mod
+diff --git a/src/cmd/go/internal/cfg/cfg.go b/src/cmd/go/internal/cfg/cfg.go
+index a4edd854f1..7292e14ae4 100644
+--- a/src/cmd/go/internal/cfg/cfg.go
++++ b/src/cmd/go/internal/cfg/cfg.go
+@@ -96,6 +96,7 @@ var (
+ 	BuildV                 bool // -v flag
+ 	BuildWork              bool // -work flag
+ 	BuildX                 bool // -x flag
++	BuildTlsmodegd     	   bool // -tlsmodegd flag
+ 
+ 	ModCacheRW bool   // -modcacherw flag
+ 	ModFile    string // -modfile flag
+diff --git a/src/cmd/go/internal/help/helpdoc.go b/src/cmd/go/internal/help/helpdoc.go
+index 1d3ffefc97..7b842f6087 100644
+--- a/src/cmd/go/internal/help/helpdoc.go
++++ b/src/cmd/go/internal/help/helpdoc.go
+@@ -811,6 +811,9 @@ are:
+ 		Combine all the listed non-main packages into a single shared
+ 		library that will be used when building with the -linkshared
+ 		option. Packages named main are ignored.
++		
++	-tlsmodegd
++		thread local storage with general dynamic mode only support ARM64.
+ 
+ 	-buildmode=exe
+ 		Build the listed main packages and everything they import into
+diff --git a/src/cmd/go/internal/work/build.go b/src/cmd/go/internal/work/build.go
+index 75d05d65de..bd92e606e5 100644
+--- a/src/cmd/go/internal/work/build.go
++++ b/src/cmd/go/internal/work/build.go
+@@ -150,6 +150,8 @@ and test commands:
+ 	-linkshared
+ 		build code that will be linked against shared libraries previously
+ 		created with -buildmode=shared.
++	-tlsmodegd
++		arm64 ganeral dynamic mode.
+ 	-mod mode
+ 		module download mode to use: readonly, vendor, or mod.
+ 		By default, if a vendor directory is present and the go version in go.mod
+@@ -352,6 +354,7 @@ func AddBuildFlags(cmd *base.Command, mask BuildFlagMask) {
+ 	cmd.Flag.Var((*base.StringsFlag)(&cfg.BuildToolexec), "toolexec", "")
+ 	cmd.Flag.BoolVar(&cfg.BuildTrimpath, "trimpath", false, "")
+ 	cmd.Flag.BoolVar(&cfg.BuildWork, "work", false, "")
++	cmd.Flag.BoolVar(&cfg.BuildTlsmodegd, "tlsmodegd", false, "")
+ 
+ 	// Undocumented, unstable debugging flags.
+ 	cmd.Flag.StringVar(&cfg.DebugActiongraph, "debug-actiongraph", "", "")
+diff --git a/src/cmd/go/internal/work/init.go b/src/cmd/go/internal/work/init.go
+index 964d6e8363..148e29824d 100644
+--- a/src/cmd/go/internal/work/init.go
++++ b/src/cmd/go/internal/work/init.go
+@@ -332,6 +332,15 @@ func buildModeInit() {
+ 			forcedLdflags = append(forcedLdflags, "-linkshared", "-w")
+ 		}
+ 	}
++
++	if cfg.BuildTlsmodegd {
++		if gccgo { // todo: gd params
++		} else {
++			forcedAsmflags = append(forcedAsmflags, "-tlsmodegd")
++			forcedGcflags = append(forcedGcflags, "-tlsmodegd")
++		}
++	}
++
+ 	if codegenArg != "" {
+ 		if gccgo {
+ 			forcedGccgoflags = append([]string{codegenArg}, forcedGccgoflags...)
+diff --git a/src/cmd/internal/obj/arm64/a.out.go b/src/cmd/internal/obj/arm64/a.out.go
+index 814dba2c10..b0f08bba1e 100644
+--- a/src/cmd/internal/obj/arm64/a.out.go
++++ b/src/cmd/internal/obj/arm64/a.out.go
+@@ -464,6 +464,9 @@ const (
+ 	// The GOT slot for a symbol in -dynlink mode.
+ 	C_GOTADDR
+ 
++	// TLS "var" in general dynamic mode
++	C_TLS_GD
++
+ 	// TLS "var" in local exec mode: will become a constant offset from
+ 	// thread local base that is ultimately chosen by the program linker.
+ 	C_TLS_LE
+diff --git a/src/cmd/internal/obj/arm64/asm7.go b/src/cmd/internal/obj/arm64/asm7.go
+index 7addf0ddad..8028686c3c 100644
+--- a/src/cmd/internal/obj/arm64/asm7.go
++++ b/src/cmd/internal/obj/arm64/asm7.go
+@@ -480,6 +480,7 @@ var optab = []Optab{
+ 	{AMOVD, C_GOTADDR, C_NONE, C_NONE, C_ZREG, C_NONE, 71, 8, 0, 0, 0},
+ 	{AMOVD, C_TLS_LE, C_NONE, C_NONE, C_ZREG, C_NONE, 69, 4, 0, 0, 0},
+ 	{AMOVD, C_TLS_IE, C_NONE, C_NONE, C_ZREG, C_NONE, 70, 8, 0, 0, 0},
++	{AMOVD, C_TLS_GD, C_NONE, C_NONE, C_ZREG, C_NONE, 109, 12, 0, 0, 0}, // NOTE: 此处为12, 而sym在Addrel声明size<=8可以跳过链接时buf内容的长度检查
+ 
+ 	{AFMOVS, C_FREG, C_NONE, C_NONE, C_ADDR, C_NONE, 64, 12, 0, 0, 0},
+ 	{AFMOVS, C_ADDR, C_NONE, C_NONE, C_FREG, C_NONE, 65, 12, 0, 0, 0},
+@@ -2089,6 +2090,9 @@ func (c *ctxt7) aclass(a *obj.Addr) int {
+ 			if a.Sym != nil { // use relocation
+ 				if a.Sym.Type == objabi.STLSBSS {
+ 					if c.ctxt.Flag_shared {
++						if c.ctxt.Flag_tlsmodelgd {
++							return C_TLS_GD
++						}
+ 						return C_TLS_IE
+ 					} else {
+ 						return C_TLS_LE
+@@ -5826,7 +5830,33 @@ func (c *ctxt7) asmout(p *obj.Prog, out []uint32) (count int) {
+ 			c.ctxt.Diag("illegal argument: %v\n", p)
+ 			break
+ 		}
++
++	case 109: /* ldr GD model movd $tlsvar, reg -> adrp REGTMP, 0; ldr reg, [REGTMP, #0] + relocs; add reg, reg, #0 + relocs */
++		o1 = ADR(1, 0, REG_R0)
++		o2 = c.olsr12u(p, c.opldr(p, AMOVD), 0, REG_R0, p.To.Reg)
++		o3 = uint32((0x244 << 22) | uint32(0)<<10 | uint32(REG_R0&31)<<5 | uint32(REG_R0&31))
++
++		c.cursym.AddRel(c.ctxt, obj.Reloc{
++			Type: objabi.R_ARM64_TLS_GD,
++			Off:  int32(c.pc),
++			Siz:  8,
++			Sym:  p.From.Sym,
++			Add:  0,
++		})
++
++		c.cursym.AddRel(c.ctxt, obj.Reloc{
++			Type: objabi.R_ARM64_TLS_GD_PAGEOFF12,
++			Off:  int32(c.pc + 8),
++			Siz:  4,
++			Sym:  p.From.Sym,
++			Add:  0,
++		})
++		if p.From.Offset != 0 {
++			c.ctxt.Diag("invalid offset on MOVW $tlsvar")
++		}
++
+ 	}
++
+ 	out[0] = o1
+ 	out[1] = o2
+ 	out[2] = o3
+diff --git a/src/cmd/internal/obj/link.go b/src/cmd/internal/obj/link.go
+index c70c1d9438..37ce818db3 100644
+--- a/src/cmd/internal/obj/link.go
++++ b/src/cmd/internal/obj/link.go
+@@ -1165,6 +1165,7 @@ type Link struct {
+ 	Flag_optimize        bool
+ 	Flag_locationlists   bool
+ 	Flag_noRefName       bool   // do not include referenced symbol names in object file
++	Flag_tlsmodelgd      bool   // use global-dynamic TLS model for thread-local variables
+ 	Retpoline            bool   // emit use of retpoline stubs for indirect jmp/call
+ 	Flag_maymorestack    string // If not "", call this function before stack checks
+ 	Bso                  *bufio.Writer
+diff --git a/src/cmd/internal/objabi/reloctype.go b/src/cmd/internal/objabi/reloctype.go
+index aef890049c..8be138a21a 100644
+--- a/src/cmd/internal/objabi/reloctype.go
++++ b/src/cmd/internal/objabi/reloctype.go
+@@ -127,6 +127,9 @@ const (
+ 
+ 	// Arm64.
+ 
++	// TLS General Dynamic
++	R_ARM64_TLS_GD
++	R_ARM64_TLS_GD_PAGEOFF12
+ 	// Set a MOV[NZ] immediate field to bits [15:0] of the offset from the thread
+ 	// local base to the thread local variable defined by the referenced (thread
+ 	// local) symbol. Error if the offset does not fit into 16 bits.
+diff --git a/src/cmd/internal/objabi/reloctype_string.go b/src/cmd/internal/objabi/reloctype_string.go
+index 9137baeb96..0746bb6c83 100644
+--- a/src/cmd/internal/objabi/reloctype_string.go
++++ b/src/cmd/internal/objabi/reloctype_string.go
+@@ -39,88 +39,90 @@ func _() {
+ 	_ = x[R_GOTPCREL-29]
+ 	_ = x[R_JMPMIPS-30]
+ 	_ = x[R_DWARFSECREF-31]
+-	_ = x[R_ARM64_TLS_LE-32]
+-	_ = x[R_ARM64_TLS_IE-33]
+-	_ = x[R_ARM64_GOTPCREL-34]
+-	_ = x[R_ARM64_GOT-35]
+-	_ = x[R_ARM64_PCREL-36]
+-	_ = x[R_ARM64_PCREL_LDST8-37]
+-	_ = x[R_ARM64_PCREL_LDST16-38]
+-	_ = x[R_ARM64_PCREL_LDST32-39]
+-	_ = x[R_ARM64_PCREL_LDST64-40]
+-	_ = x[R_ARM64_LDST8-41]
+-	_ = x[R_ARM64_LDST16-42]
+-	_ = x[R_ARM64_LDST32-43]
+-	_ = x[R_ARM64_LDST64-44]
+-	_ = x[R_ARM64_LDST128-45]
+-	_ = x[R_POWER_TLS_LE-46]
+-	_ = x[R_POWER_TLS_IE-47]
+-	_ = x[R_POWER_TLS-48]
+-	_ = x[R_POWER_TLS_IE_PCREL34-49]
+-	_ = x[R_POWER_TLS_LE_TPREL34-50]
+-	_ = x[R_ADDRPOWER_DS-51]
+-	_ = x[R_ADDRPOWER_GOT-52]
+-	_ = x[R_ADDRPOWER_GOT_PCREL34-53]
+-	_ = x[R_ADDRPOWER_PCREL-54]
+-	_ = x[R_ADDRPOWER_TOCREL-55]
+-	_ = x[R_ADDRPOWER_TOCREL_DS-56]
+-	_ = x[R_ADDRPOWER_D34-57]
+-	_ = x[R_ADDRPOWER_PCREL34-58]
+-	_ = x[R_RISCV_JAL-59]
+-	_ = x[R_RISCV_JAL_TRAMP-60]
+-	_ = x[R_RISCV_CALL-61]
+-	_ = x[R_RISCV_PCREL_ITYPE-62]
+-	_ = x[R_RISCV_PCREL_STYPE-63]
+-	_ = x[R_RISCV_TLS_IE-64]
+-	_ = x[R_RISCV_TLS_LE-65]
+-	_ = x[R_RISCV_GOT_HI20-66]
+-	_ = x[R_RISCV_GOT_PCREL_ITYPE-67]
+-	_ = x[R_RISCV_PCREL_HI20-68]
+-	_ = x[R_RISCV_PCREL_LO12_I-69]
+-	_ = x[R_RISCV_PCREL_LO12_S-70]
+-	_ = x[R_RISCV_BRANCH-71]
+-	_ = x[R_RISCV_ADD32-72]
+-	_ = x[R_RISCV_SUB32-73]
+-	_ = x[R_RISCV_RVC_BRANCH-74]
+-	_ = x[R_RISCV_RVC_JUMP-75]
+-	_ = x[R_PCRELDBL-76]
+-	_ = x[R_LOONG64_ADDR_HI-77]
+-	_ = x[R_LOONG64_ADDR_LO-78]
+-	_ = x[R_LOONG64_ADDR_PCREL20_S2-79]
+-	_ = x[R_LOONG64_TLS_LE_HI-80]
+-	_ = x[R_LOONG64_TLS_LE_LO-81]
+-	_ = x[R_CALLLOONG64-82]
+-	_ = x[R_LOONG64_CALL36-83]
+-	_ = x[R_LOONG64_TLS_IE_HI-84]
+-	_ = x[R_LOONG64_TLS_IE_LO-85]
+-	_ = x[R_LOONG64_GOT_HI-86]
+-	_ = x[R_LOONG64_GOT_LO-87]
+-	_ = x[R_LOONG64_ADD64-88]
+-	_ = x[R_LOONG64_SUB64-89]
+-	_ = x[R_JMP16LOONG64-90]
+-	_ = x[R_JMP21LOONG64-91]
+-	_ = x[R_JMPLOONG64-92]
+-	_ = x[R_ADDRMIPSU-93]
+-	_ = x[R_ADDRMIPSTLS-94]
+-	_ = x[R_ADDRCUOFF-95]
+-	_ = x[R_WASMIMPORT-96]
+-	_ = x[R_XCOFFREF-97]
+-	_ = x[R_PEIMAGEOFF-98]
+-	_ = x[R_INITORDER-99]
+-	_ = x[R_DWTXTADDR_U1-100]
+-	_ = x[R_DWTXTADDR_U2-101]
+-	_ = x[R_DWTXTADDR_U3-102]
+-	_ = x[R_DWTXTADDR_U4-103]
++	_ = x[R_ARM64_TLS_GD-32]
++	_ = x[R_ARM64_TLS_GD_PAGEOFF12-33]
++	_ = x[R_ARM64_TLS_LE-34]
++	_ = x[R_ARM64_TLS_IE-35]
++	_ = x[R_ARM64_GOTPCREL-36]
++	_ = x[R_ARM64_GOT-37]
++	_ = x[R_ARM64_PCREL-38]
++	_ = x[R_ARM64_PCREL_LDST8-39]
++	_ = x[R_ARM64_PCREL_LDST16-40]
++	_ = x[R_ARM64_PCREL_LDST32-41]
++	_ = x[R_ARM64_PCREL_LDST64-42]
++	_ = x[R_ARM64_LDST8-43]
++	_ = x[R_ARM64_LDST16-44]
++	_ = x[R_ARM64_LDST32-45]
++	_ = x[R_ARM64_LDST64-46]
++	_ = x[R_ARM64_LDST128-47]
++	_ = x[R_POWER_TLS_LE-48]
++	_ = x[R_POWER_TLS_IE-49]
++	_ = x[R_POWER_TLS-50]
++	_ = x[R_POWER_TLS_IE_PCREL34-51]
++	_ = x[R_POWER_TLS_LE_TPREL34-52]
++	_ = x[R_ADDRPOWER_DS-53]
++	_ = x[R_ADDRPOWER_GOT-54]
++	_ = x[R_ADDRPOWER_GOT_PCREL34-55]
++	_ = x[R_ADDRPOWER_PCREL-56]
++	_ = x[R_ADDRPOWER_TOCREL-57]
++	_ = x[R_ADDRPOWER_TOCREL_DS-58]
++	_ = x[R_ADDRPOWER_D34-59]
++	_ = x[R_ADDRPOWER_PCREL34-60]
++	_ = x[R_RISCV_JAL-61]
++	_ = x[R_RISCV_JAL_TRAMP-62]
++	_ = x[R_RISCV_CALL-63]
++	_ = x[R_RISCV_PCREL_ITYPE-64]
++	_ = x[R_RISCV_PCREL_STYPE-65]
++	_ = x[R_RISCV_TLS_IE-66]
++	_ = x[R_RISCV_TLS_LE-67]
++	_ = x[R_RISCV_GOT_HI20-68]
++	_ = x[R_RISCV_GOT_PCREL_ITYPE-69]
++	_ = x[R_RISCV_PCREL_HI20-70]
++	_ = x[R_RISCV_PCREL_LO12_I-71]
++	_ = x[R_RISCV_PCREL_LO12_S-72]
++	_ = x[R_RISCV_BRANCH-73]
++	_ = x[R_RISCV_ADD32-74]
++	_ = x[R_RISCV_SUB32-75]
++	_ = x[R_RISCV_RVC_BRANCH-76]
++	_ = x[R_RISCV_RVC_JUMP-77]
++	_ = x[R_PCRELDBL-78]
++	_ = x[R_LOONG64_ADDR_HI-79]
++	_ = x[R_LOONG64_ADDR_LO-80]
++	_ = x[R_LOONG64_ADDR_PCREL20_S2-81]
++	_ = x[R_LOONG64_TLS_LE_HI-82]
++	_ = x[R_LOONG64_TLS_LE_LO-83]
++	_ = x[R_CALLLOONG64-84]
++	_ = x[R_LOONG64_CALL36-85]
++	_ = x[R_LOONG64_TLS_IE_HI-86]
++	_ = x[R_LOONG64_TLS_IE_LO-87]
++	_ = x[R_LOONG64_GOT_HI-88]
++	_ = x[R_LOONG64_GOT_LO-89]
++	_ = x[R_LOONG64_ADD64-90]
++	_ = x[R_LOONG64_SUB64-91]
++	_ = x[R_JMP16LOONG64-92]
++	_ = x[R_JMP21LOONG64-93]
++	_ = x[R_JMPLOONG64-94]
++	_ = x[R_ADDRMIPSU-95]
++	_ = x[R_ADDRMIPSTLS-96]
++	_ = x[R_ADDRCUOFF-97]
++	_ = x[R_WASMIMPORT-98]
++	_ = x[R_XCOFFREF-99]
++	_ = x[R_PEIMAGEOFF-100]
++	_ = x[R_INITORDER-101]
++	_ = x[R_DWTXTADDR_U1-102]
++	_ = x[R_DWTXTADDR_U2-103]
++	_ = x[R_DWTXTADDR_U3-104]
++	_ = x[R_DWTXTADDR_U4-105]
+ }
+ 
+-const _RelocType_name = "R_ADDRR_ADDRPOWERR_ADDRARM64R_ADDRMIPSR_ADDROFFR_SIZER_CALLR_CALLARMR_CALLARM64R_CALLINDR_CALLPOWERR_CALLMIPSR_CONSTR_PCRELR_TLS_LER_TLS_IER_GOTOFFR_PLT0R_PLT1R_PLT2R_USEFIELDR_USETYPER_USEIFACER_USEIFACEMETHODR_USENAMEDMETHODR_METHODOFFR_KEEPR_POWER_TOCR_GOTPCRELR_JMPMIPSR_DWARFSECREFR_ARM64_TLS_LER_ARM64_TLS_IER_ARM64_GOTPCRELR_ARM64_GOTR_ARM64_PCRELR_ARM64_PCREL_LDST8R_ARM64_PCREL_LDST16R_ARM64_PCREL_LDST32R_ARM64_PCREL_LDST64R_ARM64_LDST8R_ARM64_LDST16R_ARM64_LDST32R_ARM64_LDST64R_ARM64_LDST128R_POWER_TLS_LER_POWER_TLS_IER_POWER_TLSR_POWER_TLS_IE_PCREL34R_POWER_TLS_LE_TPREL34R_ADDRPOWER_DSR_ADDRPOWER_GOTR_ADDRPOWER_GOT_PCREL34R_ADDRPOWER_PCRELR_ADDRPOWER_TOCRELR_ADDRPOWER_TOCREL_DSR_ADDRPOWER_D34R_ADDRPOWER_PCREL34R_RISCV_JALR_RISCV_JAL_TRAMPR_RISCV_CALLR_RISCV_PCREL_ITYPER_RISCV_PCREL_STYPER_RISCV_TLS_IER_RISCV_TLS_LER_RISCV_GOT_HI20R_RISCV_GOT_PCREL_ITYPER_RISCV_PCREL_HI20R_RISCV_PCREL_LO12_IR_RISCV_PCREL_LO12_SR_RISCV_BRANCHR_RISCV_ADD32R_RISCV_SUB32R_RISCV_RVC_BRANCHR_RISCV_RVC_JUMPR_PCRELDBLR_LOONG64_ADDR_HIR_LOONG64_ADDR_LOR_LOONG64_ADDR_PCREL20_S2R_LOONG64_TLS_LE_HIR_LOONG64_TLS_LE_LOR_CALLLOONG64R_LOONG64_CALL36R_LOONG64_TLS_IE_HIR_LOONG64_TLS_IE_LOR_LOONG64_GOT_HIR_LOONG64_GOT_LOR_LOONG64_ADD64R_LOONG64_SUB64R_JMP16LOONG64R_JMP21LOONG64R_JMPLOONG64R_ADDRMIPSUR_ADDRMIPSTLSR_ADDRCUOFFR_WASMIMPORTR_XCOFFREFR_PEIMAGEOFFR_INITORDERR_DWTXTADDR_U1R_DWTXTADDR_U2R_DWTXTADDR_U3R_DWTXTADDR_U4"
++const _RelocType_name = "R_ADDRR_ADDRPOWERR_ADDRARM64R_ADDRMIPSR_ADDROFFR_SIZER_CALLR_CALLARMR_CALLARM64R_CALLINDR_CALLPOWERR_CALLMIPSR_CONSTR_PCRELR_TLS_LER_TLS_IER_GOTOFFR_PLT0R_PLT1R_PLT2R_USEFIELDR_USETYPER_USEIFACER_USEIFACEMETHODR_USENAMEDMETHODR_METHODOFFR_KEEPR_POWER_TOCR_GOTPCRELR_JMPMIPSR_DWARFSECREFR_ARM64_TLS_GDR_ARM64_TLS_GD_PAGEOFF12R_ARM64_TLS_LER_ARM64_TLS_IER_ARM64_GOTPCRELR_ARM64_GOTR_ARM64_PCRELR_ARM64_PCREL_LDST8R_ARM64_PCREL_LDST16R_ARM64_PCREL_LDST32R_ARM64_PCREL_LDST64R_ARM64_LDST8R_ARM64_LDST16R_ARM64_LDST32R_ARM64_LDST64R_ARM64_LDST128R_POWER_TLS_LER_POWER_TLS_IER_POWER_TLSR_POWER_TLS_IE_PCREL34R_POWER_TLS_LE_TPREL34R_ADDRPOWER_DSR_ADDRPOWER_GOTR_ADDRPOWER_GOT_PCREL34R_ADDRPOWER_PCRELR_ADDRPOWER_TOCRELR_ADDRPOWER_TOCREL_DSR_ADDRPOWER_D34R_ADDRPOWER_PCREL34R_RISCV_JALR_RISCV_JAL_TRAMPR_RISCV_CALLR_RISCV_PCREL_ITYPER_RISCV_PCREL_STYPER_RISCV_TLS_IER_RISCV_TLS_LER_RISCV_GOT_HI20R_RISCV_GOT_PCREL_ITYPER_RISCV_PCREL_HI20R_RISCV_PCREL_LO12_IR_RISCV_PCREL_LO12_SR_RISCV_BRANCHR_RISCV_ADD32R_RISCV_SUB32R_RISCV_RVC_BRANCHR_RISCV_RVC_JUMPR_PCRELDBLR_LOONG64_ADDR_HIR_LOONG64_ADDR_LOR_LOONG64_ADDR_PCREL20_S2R_LOONG64_TLS_LE_HIR_LOONG64_TLS_LE_LOR_CALLLOONG64R_LOONG64_CALL36R_LOONG64_TLS_IE_HIR_LOONG64_TLS_IE_LOR_LOONG64_GOT_HIR_LOONG64_GOT_LOR_LOONG64_ADD64R_LOONG64_SUB64R_JMP16LOONG64R_JMP21LOONG64R_JMPLOONG64R_ADDRMIPSUR_ADDRMIPSTLSR_ADDRCUOFFR_WASMIMPORTR_XCOFFREFR_PEIMAGEOFFR_INITORDERR_DWTXTADDR_U1R_DWTXTADDR_U2R_DWTXTADDR_U3R_DWTXTADDR_U4"
+ 
+-var _RelocType_index = [...]uint16{0, 6, 17, 28, 38, 47, 53, 59, 68, 79, 88, 99, 109, 116, 123, 131, 139, 147, 153, 159, 165, 175, 184, 194, 210, 226, 237, 243, 254, 264, 273, 286, 300, 314, 330, 341, 354, 373, 393, 413, 433, 446, 460, 474, 488, 503, 517, 531, 542, 564, 586, 600, 615, 638, 655, 673, 694, 709, 728, 739, 756, 768, 787, 806, 820, 834, 850, 873, 891, 911, 931, 945, 958, 971, 989, 1005, 1015, 1032, 1049, 1074, 1093, 1112, 1125, 1141, 1160, 1179, 1195, 1211, 1226, 1241, 1255, 1269, 1281, 1292, 1305, 1316, 1328, 1338, 1350, 1361, 1375, 1389, 1403, 1417}
++var _RelocType_index = [...]uint16{0, 6, 17, 28, 38, 47, 53, 59, 68, 79, 88, 99, 109, 116, 123, 131, 139, 147, 153, 159, 165, 175, 184, 194, 210, 226, 237, 243, 254, 264, 273, 286, 300, 324, 338, 352, 368, 379, 392, 411, 431, 451, 471, 484, 498, 512, 526, 541, 555, 569, 580, 602, 624, 638, 653, 676, 693, 711, 732, 747, 766, 777, 794, 806, 825, 844, 858, 872, 888, 911, 929, 949, 969, 983, 996, 1009, 1027, 1043, 1053, 1070, 1087, 1112, 1131, 1150, 1163, 1179, 1198, 1217, 1233, 1249, 1264, 1279, 1293, 1307, 1319, 1330, 1343, 1354, 1366, 1376, 1388, 1399, 1413, 1427, 1441, 1455}
+ 
+ func (i RelocType) String() string {
+-	i -= 1
+-	if i < 0 || i >= RelocType(len(_RelocType_index)-1) {
+-		return "RelocType(" + strconv.FormatInt(int64(i+1), 10) + ")"
++	idx := int(i) - 1
++	if i < 1 || idx >= len(_RelocType_index)-1 {
++		return "RelocType(" + strconv.FormatInt(int64(i), 10) + ")"
+ 	}
+-	return _RelocType_name[_RelocType_index[i]:_RelocType_index[i+1]]
++	return _RelocType_name[_RelocType_index[idx]:_RelocType_index[idx+1]]
+ }
+diff --git a/src/cmd/internal/objabi/symkind_string.go b/src/cmd/internal/objabi/symkind_string.go
+index fbf6a826a4..a22f9a6a1c 100644
+--- a/src/cmd/internal/objabi/symkind_string.go
++++ b/src/cmd/internal/objabi/symkind_string.go
+@@ -41,8 +41,9 @@ const _SymKind_name = "SxxxSTEXTSTEXTFIPSSRODATASRODATAFIPSSNOPTRDATASNOPTRDATAF
+ var _SymKind_index = [...]uint16{0, 4, 9, 18, 25, 36, 46, 60, 65, 74, 78, 87, 94, 106, 117, 126, 138, 148, 157, 168, 177, 188, 198, 221, 238, 254, 268}
+ 
+ func (i SymKind) String() string {
+-	if i >= SymKind(len(_SymKind_index)-1) {
++	idx := int(i) - 0
++	if i < 0 || idx >= len(_SymKind_index)-1 {
+ 		return "SymKind(" + strconv.FormatInt(int64(i), 10) + ")"
+ 	}
+-	return _SymKind_name[_SymKind_index[i]:_SymKind_index[i+1]]
++	return _SymKind_name[_SymKind_index[idx]:_SymKind_index[idx+1]]
+ }
+diff --git a/src/cmd/link/internal/arm64/asm.go b/src/cmd/link/internal/arm64/asm.go
+index 7c4546fb17..bc088217c0 100644
+--- a/src/cmd/link/internal/arm64/asm.go
++++ b/src/cmd/link/internal/arm64/asm.go
+@@ -561,6 +561,18 @@ func elfreloc1(ctxt *ld.Link, out *ld.OutBuf, ldr *loader.Loader, s loader.Sym,
+ 		out.Write64(uint64(r.Xadd))
+ 		out.Write64(uint64(sectoff + 4))
+ 		out.Write64(uint64(elf.R_AARCH64_TLSIE_LD64_GOTTPREL_LO12_NC) | uint64(elfsym)<<32)
++		/// NOTE: 上边会自动生成R_AARCH64_TLS_TPREL64或者R_AARCH64_TLSDESC的标识，取决于ADR_PAGE类型，哪里控制的指令立即数值调整的映射，尚未清楚。猜测大约是通过调用外部的lld拿到了对应的类型(llvm项目的lld\ELF\Arch\AArch64.cpp的方法getRelExpr有映射关系)。
++	case objabi.R_ARM64_TLS_GD:
++		// 符号重定向类型：R_AARCH64_TLSDESC  __tls_get_addr是libc开放接口，但此处可经过TLSDESC方式，获取tls ld的偏移信息。此处是通过desc获得汇编函数地址(函数返回偏移量)
++		out.Write64(uint64(elf.R_AARCH64_TLSDESC_ADR_PAGE21) | uint64(elfsym)<<32) // 标识desc重定位
++		out.Write64(uint64(r.Xadd))
++		out.Write64(uint64(sectoff + 4))
++		out.Write64(uint64(elf.R_AARCH64_TLSDESC_LD64_LO12_NC) | uint64(elfsym)<<32)
++	case objabi.R_ARM64_TLS_GD_PAGEOFF12:
++		if siz != 4 {
++			return false
++		}
++		out.Write64(uint64(elf.R_AARCH64_TLSDESC_ADD_LO12_NC) | uint64(elfsym)<<32)
+ 	case objabi.R_ARM64_GOTPCREL:
+ 		out.Write64(uint64(elf.R_AARCH64_ADR_GOT_PAGE) | uint64(elfsym)<<32)
+ 		out.Write64(uint64(r.Xadd))
+@@ -870,6 +882,12 @@ func archreloc(target *ld.Target, ldr *loader.Loader, syms *ld.ArchSyms, r loade
+ 		case objabi.R_ARM64_TLS_IE:
+ 			nExtReloc = 2 // need two ELF relocations. see elfreloc1
+ 			return val, nExtReloc, isOk
++		case objabi.R_ARM64_TLS_GD_PAGEOFF12:
++			nExtReloc = 1 // 只要一处重定位，需要与elfreloc1里边声明的重定位个数一致
++			return val, nExtReloc, isOk
++		case objabi.R_ARM64_TLS_GD:
++			nExtReloc = 2 // need two ELF relocations. see elfreloc1. 不可使用该外部extreloc
++			return val, nExtReloc, isOk
+ 
+ 		case objabi.R_ADDR:
+ 			if target.IsWindows() && r.Add() != 0 {
+@@ -945,6 +963,7 @@ func archreloc(target *ld.Target, ldr *loader.Loader, syms *ld.ArchSyms, r loade
+ 		}
+ 		return val | (v << 5), noExtReloc, true
+ 
++	case objabi.R_ARM64_TLS_GD: // TDOO: pie & elf  -> le mode
+ 	case objabi.R_ARM64_TLS_IE:
+ 		if target.IsPIE() && target.IsElf() {
+ 			// We are linking the final executable, so we
+@@ -1131,6 +1150,8 @@ func extreloc(target *ld.Target, ldr *loader.Loader, r loader.Reloc, s loader.Sy
+ 		return rr, true
+ 	case objabi.R_CALLARM64,
+ 		objabi.R_ARM64_TLS_LE,
++		objabi.R_ARM64_TLS_GD,
++		objabi.R_ARM64_TLS_GD_PAGEOFF12,
+ 		objabi.R_ARM64_TLS_IE:
+ 		return ld.ExtrelocSimple(ldr, r), true
+ 	}
+diff --git a/src/runtime/asm_arm64.s b/src/runtime/asm_arm64.s
+index 9916378a93..2bc3679d41 100644
+--- a/src/runtime/asm_arm64.s
++++ b/src/runtime/asm_arm64.s
+@@ -1204,6 +1204,7 @@ nosecret:
+ 
+ 	// Switch to system stack.
+ 	MOVD	R0, R9	// gosave_systemstack_switch<> and save_g might clobber R0
++  MOVD	R1, R10	// gosave_systemstack_switch<> and save_g might clobber R1  // 作者可能比较了解该调用，否则仅仅对R0作了保存，一般函数会内部作保存与恢复
+ 	BL	gosave_systemstack_switch<>(SB)
+ 	MOVD	R3, g
+ 	BL	runtime·save_g(SB)
+@@ -1211,6 +1212,7 @@ nosecret:
+ 	MOVD	R0, RSP
+ 	MOVD	(g_sched+gobuf_bp)(g), R29
+ 	MOVD	R9, R0
++  MOVD	R10, R1
+ 
+ 	// Now on a scheduling stack (a pthread-created stack).
+ 	// Save room for two of our pointers /*, plus 32 bytes of callee
+diff --git a/src/runtime/cgo.go b/src/runtime/cgo.go
+index 60f2403d73..4d31456dc7 100644
+--- a/src/runtime/cgo.go
++++ b/src/runtime/cgo.go
+@@ -12,6 +12,7 @@ import "unsafe"
+ 
+ //go:linkname _cgo_init _cgo_init
+ //go:linkname _cgo_thread_start _cgo_thread_start
++//go:linkname _cgo_sys_lib_args_valid _cgo_sys_lib_args_valid
+ //go:linkname _cgo_sys_thread_create _cgo_sys_thread_create
+ //go:linkname _cgo_notify_runtime_init_done _cgo_notify_runtime_init_done
+ //go:linkname _cgo_callers _cgo_callers
+@@ -26,6 +27,7 @@ import "unsafe"
+ var (
+ 	_cgo_init                     unsafe.Pointer
+ 	_cgo_thread_start             unsafe.Pointer
++	_cgo_sys_lib_args_valid       unsafe.Pointer
+ 	_cgo_sys_thread_create        unsafe.Pointer
+ 	_cgo_notify_runtime_init_done unsafe.Pointer
+ 	_cgo_callers                  unsafe.Pointer
+diff --git a/src/runtime/cgo/callbacks.go b/src/runtime/cgo/callbacks.go
+index 986f61914f..a384847bbd 100644
+--- a/src/runtime/cgo/callbacks.go
++++ b/src/runtime/cgo/callbacks.go
+@@ -59,6 +59,15 @@ var _cgo_init = &x_cgo_init
+ var x_cgo_thread_start byte
+ var _cgo_thread_start = &x_cgo_thread_start
+ 
++// Determines if the argc / argv passed to the library initialization functions
++// are valid.
++
++//go:cgo_import_static x_cgo_sys_lib_args_valid
++//go:linkname x_cgo_sys_lib_args_valid x_cgo_sys_lib_args_valid
++//go:linkname _cgo_sys_lib_args_valid _cgo_sys_lib_args_valid
++var x_cgo_sys_lib_args_valid byte
++var _cgo_sys_lib_args_valid = &x_cgo_sys_lib_args_valid
++
+ // Creates a new system thread without updating any Go state.
+ //
+ // This method is invoked during shared library loading to create a new OS
+diff --git a/src/runtime/cgo/gcc_libinit.c b/src/runtime/cgo/gcc_libinit.c
+index 05998fadf8..ae75a499e3 100644
+--- a/src/runtime/cgo/gcc_libinit.c
++++ b/src/runtime/cgo/gcc_libinit.c
+@@ -13,6 +13,7 @@
+ 
+ #include <pthread.h>
+ #include <errno.h>
++#include <limits.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h> // strerror
+@@ -208,6 +209,20 @@ void x_cgo_call_symbolizer_function(struct cgoSymbolizerArg* arg) {
+ 	_cgo_tsan_release();
+ }
+ 
++int
++x_cgo_sys_lib_args_valid()
++{
++	// The ELF gABI doesn't require an argc / argv to be passed to the functions
++	// in the DT_INIT_ARRAY. However, glibc always does.
++
++	// Ignore uClibc masquerading as glibc.
++#if defined(__GLIBC__) && !defined(__UCLIBC__)
++	return 1;
++#else
++	return 0;
++#endif
++}
++
+ // _cgo_try_pthread_create retries pthread_create if it fails with
+ // EAGAIN.
+ int
+diff --git a/src/runtime/cgo/gcc_libinit_windows.c b/src/runtime/cgo/gcc_libinit_windows.c
+index 7e7ff3e667..a92531f07d 100644
+--- a/src/runtime/cgo/gcc_libinit_windows.c
++++ b/src/runtime/cgo/gcc_libinit_windows.c
+@@ -11,6 +11,8 @@
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <errno.h>
++#include <limits.h>
+ 
+ #include "libcgo.h"
+ #include "libcgo_windows.h"
+@@ -56,6 +58,11 @@ _cgo_maybe_run_preinit() {
+ 	 }
+ }
+ 
++int
++x_cgo_sys_lib_args_valid() {
++	return 1;
++}
++
+ void
+ x_cgo_sys_thread_create(unsigned long (__stdcall *func)(void*), void* arg) {
+ 	_cgo_beginthread(func, arg);
+diff --git a/src/runtime/runtime1.go b/src/runtime/runtime1.go
+index 965ff8ab51..1711a16ecf 100644
+--- a/src/runtime/runtime1.go
++++ b/src/runtime/runtime1.go
+@@ -64,10 +64,41 @@ func argv_index(argv **byte, i int32) *byte {
+ 	return *(**byte)(add(unsafe.Pointer(argv), uintptr(i)*goarch.PtrSize))
+ }
+ 
++func argsValid() bool {
++	valid := true
++	if islibrary || isarchive {
++		if _cgo_sys_lib_args_valid != nil {
++			ret := asmcgocall(_cgo_sys_lib_args_valid, nil)
++			valid = (ret == 1)
++		}
++	}
++	return valid
++}
++
+ func args(c int32, v **byte) {
+-	argc = c
+-	argv = v
+-	sysargs(c, v)
++	// Not all dynamic linkers pass the main program's argc / argv to the init
++	// functions used by c-archive / c-shared builds. In these cases, the argc
++	// and argv passed to this function will be garbage, and a valid but empty
++	// set of arguments is allocated.
++	if argsValid() {
++		argc = c
++		argv = v
++	} else {
++		args := unsafe.Pointer(persistentalloc(goarch.PtrSize*4, 0, &memstats.other_sys))
++
++		// argv pointer
++		*(**byte)(args) = (*byte)(add(args, goarch.PtrSize*1))
++
++		// argv data
++		*(**byte)(add(args, goarch.PtrSize*1)) = (*byte)(nil) // end argv
++		*(**byte)(add(args, goarch.PtrSize*2)) = (*byte)(nil) // end envp
++		*(**byte)(add(args, goarch.PtrSize*3)) = (*byte)(nil) // end auxv
++
++		argc = 0
++		argv = (**byte)(args)
++	}
++
++	sysargs(argc, argv)
+ }
+ 
+ func goargs() {
+diff --git a/src/runtime/tls_arm64.s b/src/runtime/tls_arm64.s
+index 52b3e8f222..9f213aeba0 100644
+--- a/src/runtime/tls_arm64.s
++++ b/src/runtime/tls_arm64.s
+@@ -19,12 +19,16 @@ TEXT runtime·load_g(SB),NOSPLIT,$0
+ #endif
+ 
+ 	MRS_TPIDR_R0
++  MOVD R0, R27
+ #ifdef TLS_darwin
+ 	// Darwin sometimes returns unaligned pointers
+ 	AND	$0xfffffffffffffff8, R0
+ #endif
+-	MOVD	runtime·tls_g(SB), R27
+-	MOVD	(R0)(R27), g
++//	MOVD	runtime·tls_g(SB), R27
++//	MOVD	(R0)(R27), g
++  MOVD runtime·tls_g(SB), R1
++  CALL  (R1)
++  MOVD	(R27)(R0), g
+ 
+ nocgo:
+ 	RET
+@@ -39,14 +43,17 @@ TEXT runtime·save_g(SB),NOSPLIT,$0
+ #endif
+ #endif
+ 
+-	MRS_TPIDR_R0
++  MRS_TPIDR_R0
++  MOVD R0, R27 // 临时保留到R27, musl函数似乎未污染R27
+ #ifdef TLS_darwin
+ 	// Darwin sometimes returns unaligned pointers
+ 	AND	$0xfffffffffffffff8, R0
+ #endif
+-	MOVD	runtime·tls_g(SB), R27
+-	MOVD	g, (R0)(R27)
+-
++//	MOVD	runtime·tls_g(SB), R27
++//	MOVD	(R0)(R27), g
++  MOVD runtime·tls_g(SB), R1  // MOVD与adrp有关，封装了调用musl的函数（call时调用）获得模块线程静态变量地址的偏移
++  CALL  (R1) // 此时X0相对于TPIDR_R0的偏移得到runtime·tls_g实际地址
++  MOVD	g, (R27)(R0)
+ nocgo:
+ 	RET
+ 
