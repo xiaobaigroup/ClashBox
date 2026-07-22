@@ -107,7 +107,10 @@ jobs:
           # GOOS=linux + c-shared + -tlsmodegd forces arm64 general-dynamic TLS so
           # the .so is dlopen-able on OHOS musl. The -tlsmodegd flag comes from the
           # patch applied to the toolchain above (moodyhunter/libHv2rayCore).
+          # -mod=mod: the flclash go.sum is pinned to the old (lost) core; the ohos
+          # core pulls newer deps, so let go add the missing go.sum entries / download.
           "$GO_OHOS_BIN" build \
+            -mod=mod \
             -tlsmodegd \
             -buildmode c-shared \
             -tags "ohos with_gvisor" \
