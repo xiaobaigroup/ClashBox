@@ -90,6 +90,7 @@ jobs:
           sysroot="$native/sysroot"
           {
             echo "GO_OHOS_BIN=$GO_OHOS_DIR/bin/go"
+            echo "GOTOOLCHAIN=local"
             echo "CC=$llvm/bin/clang"
             echo "CXX=$llvm/bin/clang++"
             echo "CGO_AR=$llvm/bin/llvm-ar"
@@ -99,6 +100,26 @@ jobs:
             echo "CGO_CFLAGS=--target=aarch64-linux-ohos --sysroot=$sysroot -D__MUSL__ -fPIC -Wno-error"
             echo "CGO_LDFLAGS=--target=aarch64-linux-ohos --sysroot=$sysroot -fuse-ld=lld"
           } >> "$GITHUB_ENV"
+
+      # --- 3b. Reconcile modules ----------------------------------------------
+      - name: Reconcile flclash go.mod with the ohos core
+        working-directory: ${{ env.CORE_DIR }}
+        env:
+          GOFLAGS: -tags=ohos,with_gvisor
+        run: |
+          # flclash's committed go.mod/go.sum pin the lost core commit and drag in
+          # NEWER metacubex deps than the ohos core expects (quic-go/sing-quic API
+          # drift). Regenerate a minimal go.mod so ./core's go.mod drives versions.
+          rm -f go.mod go.sum
+          "$GO_OHOS_BIN" mod init core
+          "$GO_OHOS_BIN" mod edit \
+            -go=1.23 \
+            -require=github.com/likuai2010/ohos-napi@v1.0.3 \
+            -require=github.com/metacubex/mihomo@v1.17.1 \
+            -require=github.com/samber/lo@v1.53.0 \
+            -replace=github.com/metacubex/mihomo=./core \
+            -replace=github.com/metacubex/gvisor=./gvisor-ohos
+          "$GO_OHOS_BIN" mod tidy
 
       # --- 4. Compile ----------------------------------------------------------
       - name: Build libflclash.so
