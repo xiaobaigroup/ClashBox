@@ -64,11 +64,13 @@ jobs:
           path: ${{ env.GO_OHOS_DIR }}
           key: go-ohos-${{ runner.os }}-${{ env.GO_OHOS_BRANCH }}-${{ hashFiles('.github/patches/0001-support-tls-mode-gd.patch') }}
 
-      - name: Clone Go source (ohos_golang_go = stock go1.24 base)
+      - name: Clone stock Go source (base for the patch)
         if: steps.cache-go-ohos.outputs.cache-hit != 'true'
         run: |
+          # The patch is authored against upstream go1.24; the OHOS fork has its
+          # own edits in the same files and rejects it. Use stock golang/go.
           git clone --depth 1 --branch "$GO_OHOS_BRANCH" \
-            https://gitcode.com/openharmony-sig/ohos_golang_go.git \
+            https://github.com/golang/go.git \
             "$GO_OHOS_DIR"
 
       - name: Apply -tlsmodegd patch (arm64 general-dynamic TLS for OHOS c-shared)
@@ -76,7 +78,7 @@ jobs:
         working-directory: ${{ env.GO_OHOS_DIR }}
         run: |
           patch_file="${{ github.workspace }}/.github/patches/0001-support-tls-mode-gd.patch"
-          git apply -v "$patch_file" || patch -p1 --forward < "$patch_file"
+          git apply -v "$patch_file" || patch -p1 --fuzz=3 --forward < "$patch_file"
           # sanity: the -tlsmodegd flag is now registered
           grep -q 'tlsmodegd' src/cmd/go/internal/work/build.go
 
