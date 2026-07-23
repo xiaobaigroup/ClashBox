@@ -4,9 +4,9 @@
     "externalNativeOptions": {
       "path": "./src/main/cpp/CMakeLists.txt",
       "arguments": "",
-      "abiFilters": ["arm64-v8a", "x86_64"],
+      "abiFilters": ["arm64-v8a"],
       "cppFlags": ""
-    },
+    }
   },
   "buildOptionSet": [
     {
@@ -30,7 +30,7 @@
           "exclude": []
         }
       }
-    },
+    }
   ],
   "targets": [
     {

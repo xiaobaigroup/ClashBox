@@ -1,19 +1,38 @@
-name: Build OHOS core (libflclash.so)
+name: Build installable HarmonyOS HAP
 
 # Cross-compiles the mihomo/gVisor backend into proxy_core/libs/arm64-v8a/libflclash.so
 # using the OpenHarmony NDK + the OHOS-patched Go toolchain (the one that understands
 # the fork-only `-tlsmodegd` flag). Mirrors proxy_core/src/flclash/build.sh, but split
-# into small, independently-failing steps so a break is easy to localize.
+# into small, independently-failing steps so a break is easy to localize. The
+# second job packages that core into a signed, verified HAP.
 
 on:
   workflow_dispatch: {}
   push:
     paths:
-      - "proxy_core/src/flclash/**"
+      - "AppScope/**"
+      - "entry/**"
+      - "proxy_core/**"
+      - "xb_components"
+      - "build-profile.json5"
+      - "oh-package.json5"
+      - "hvigor/**"
+      - "hvigorfile.ts"
+      - "scripts/ci/**"
+      - "docs/ci-hap-signing.md"
       - ".github/workflows/build-core.yml"
   pull_request:
     paths:
-      - "proxy_core/src/flclash/**"
+      - "AppScope/**"
+      - "entry/**"
+      - "proxy_core/**"
+      - "xb_components"
+      - "build-profile.json5"
+      - "oh-package.json5"
+      - "hvigor/**"
+      - "hvigorfile.ts"
+      - "scripts/ci/**"
+      - "docs/ci-hap-signing.md"
       - ".github/workflows/build-core.yml"
 
 permissions:
@@ -261,3 +280,122 @@ jobs:
             proxy_core/libs/arm64-v8a/libflclash.so.sha256
           if-no-files-found: error
           retention-days: 14
+
+  package-hap:
+    name: Package, sign and verify HAP
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    container:
+      image: ghcr.io/sanchuanhehe/harmony-next-pipeline-docker/harmonyos-ci-image@sha256:77b1360864304a14802c36e8e65c77c26f2dc89ada1c6d39f41290d07ecf4668
+    env:
+      HAP_BUNDLE_NAME: org.xbgroup.clashboxLTS
+      HAP_COMPATIBLE_VERSION: "17"
+    steps:
+      - name: Checkout application
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: false
+          persist-credentials: false
+
+      - name: Initialize pinned UI component submodule
+        run: |
+          git submodule sync -- xb_components
+          git -c protocol.version=2 submodule update \
+            --init --depth 1 --recommend-shallow -- xb_components
+          test "$(git -C xb_components rev-parse HEAD)" = \
+            "$(git ls-tree HEAD xb_components | awk '{print $3}')"
+
+      - name: Download compiled arm64 core
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: libflclash-arm64-v8a
+          path: proxy_core/libs/arm64-v8a
+
+      - name: Verify compiled core
+        working-directory: proxy_core/libs/arm64-v8a
+        run: |
+          test -s libflclash.so
+          test -s libflclash.so.sha256
+          sha256sum --check libflclash.so.sha256
+          file libflclash.so
+
+      - name: Show HarmonyOS tool versions
+        run: |
+          node --version
+          java -version
+          ohpm --version
+          hvigorw --version
+          test -d "$OHOS_BASE_SDK_HOME/toolchains/lib"
+
+      - name: Install OHPM dependencies
+        run: ohpm install --all
+
+      - name: Assemble unsigned release HAP
+        run: |
+          hvigorw clean --no-daemon --no-parallel
+          hvigorw assembleHap \
+            --mode module \
+            -p product=default \
+            -p buildMode=release \
+            --no-daemon \
+            --no-parallel \
+            --stacktrace
+
+      - name: Locate unsigned HAP
+        id: unsigned
+        shell: bash
+        run: |
+          mapfile -t haps < <(
+            find entry/build -type f -name '*.hap' ! -name '*signed*.hap' -print |
+              sort
+          )
+          if [[ "${#haps[@]}" -ne 1 ]]; then
+            printf 'Expected exactly one unsigned HAP, found %s:\n' "${#haps[@]}" >&2
+            printf '  %s\n' "${haps[@]:-<none>}" >&2
+            exit 1
+          fi
+          test -s "${haps[0]}"
+          echo "hap=${haps[0]}" >> "$GITHUB_OUTPUT"
+          ls -lh "${haps[0]}"
+
+      - name: Sign and verify HAP
+        id: sign
+        shell: bash
+        env:
+          HAP_SIGNING_P12_B64: ${{ secrets.HAP_SIGNING_P12_B64 }}
+          HAP_SIGNING_CERT_B64: ${{ secrets.HAP_SIGNING_CERT_B64 }}
+          HAP_SIGNING_PROFILE_B64: ${{ secrets.HAP_SIGNING_PROFILE_B64 }}
+          HAP_KEY_ALIAS: ${{ secrets.HAP_KEY_ALIAS }}
+          HAP_KEY_PASSWORD: ${{ secrets.HAP_KEY_PASSWORD }}
+          HAP_STORE_PASSWORD: ${{ secrets.HAP_STORE_PASSWORD }}
+        run: |
+          bash scripts/ci/sign-hap.sh \
+            "${{ steps.unsigned.outputs.hap }}" \
+            artifacts
+
+      - name: Publish HAP summary
+        shell: bash
+        run: |
+          checksum="$(cut -d ' ' -f 1 artifacts/SHA256SUMS)"
+          {
+            echo "### Installable HAP"
+            echo
+            echo "- file: \`${{ steps.sign.outputs.hap_name }}\`"
+            echo "- signing: \`${{ steps.sign.outputs.signing_mode }}\`"
+            echo "- bundle: \`$HAP_BUNDLE_NAME\`"
+            echo "- ABI: \`arm64-v8a\`"
+            echo "- SHA-256: \`$checksum\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload signed HAP
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ steps.sign.outputs.artifact_name }}
+          path: |
+            artifacts/*.hap
+            artifacts/SHA256SUMS
+            artifacts/build-metadata.txt
+            artifacts/INSTALLATION-NOTES.txt
+          if-no-files-found: error
+          retention-days: 30
