@@ -352,7 +352,7 @@ jobs:
         shell: bash
         run: |
           mapfile -t haps < <(
-            find entry/build -type f -name '*.hap' ! -name '*signed*.hap' -print |
+            find entry/build -type f -name '*-unsigned.hap' -print |
               sort
           )
           if [[ "${#haps[@]}" -ne 1 ]]; then
