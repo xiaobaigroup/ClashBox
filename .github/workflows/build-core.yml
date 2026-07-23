@@ -300,6 +300,7 @@ jobs:
 
       - name: Initialize pinned UI component submodule
         run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git submodule sync -- xb_components
           git -c protocol.version=2 submodule update \
             --init --depth 1 --recommend-shallow -- xb_components
