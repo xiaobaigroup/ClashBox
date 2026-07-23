@@ -287,7 +287,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     container:
-      image: ghcr.io/sanchuanhehe/harmony-next-pipeline-docker/harmonyos-ci-image@sha256:77b1360864304a14802c36e8e65c77c26f2dc89ada1c6d39f41290d07ecf4668
+      # CLT 6.0.2.642 image, pinned to its immutable registry digest.
+      image: ghcr.io/sanchuanhehe/harmony-next-pipeline-docker/harmonyos-ci-image@sha256:2836142b7b6ae8837ad0e36cacc650f00e8c88f55b4e9f34be66cc98a731c5da
     env:
       HAP_BUNDLE_NAME: org.xbgroup.clashboxLTS
       HAP_COMPATIBLE_VERSION: "17"
