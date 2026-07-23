@@ -47,6 +47,31 @@ jobs:
           echo "core:   $(git -C "$CORE_DIR/core" rev-parse HEAD)"
           echo "gvisor: $(git -C "$CORE_DIR/gvisor-ohos" rev-parse HEAD)"
 
+      - name: Add API compat shims to the cloned core
+        # The flclash glue code (hub.go / lib_linux.go) was written against the lost
+        # pinned core commit. The ohos branch has the same functionality under new
+        # names, so inject tiny same-package wrappers instead of forking the core:
+        #   statistic.Manager.NowTraffic   -> renamed to Current(onlyProxy)
+        #   statistic.Manager.TotalTraffic -> renamed to Total(onlyProxy)
+        #   iface.SetNetInterfaces         -> unexported as setNetInterfaces
+        run: |
+          cat > "$CORE_DIR/core/component/iface/zz_flclash_compat.go" <<'EOF'
+          package iface
+
+          import "net"
+
+          // SetNetInterfaces re-exports setNetInterfaces for the flclash glue code.
+          func SetNetInterfaces(nets []net.Interface) { setNetInterfaces(nets) }
+          EOF
+          cat > "$CORE_DIR/core/tunnel/statistic/zz_flclash_compat.go" <<'EOF'
+          package statistic
+
+          // NowTraffic / TotalTraffic keep the names the flclash glue code expects;
+          // the ohos core renamed them to Current / Total (same semantics).
+          func (m *Manager) NowTraffic(onlyProxy bool) (up, down int64)  { return m.Current(onlyProxy) }
+          func (m *Manager) TotalTraffic(onlyProxy bool) (up, down int64) { return m.Total(onlyProxy) }
+          EOF
+
       # --- 2. Toolchains -------------------------------------------------------
       - name: Setup OpenHarmony NDK
         id: ohos
