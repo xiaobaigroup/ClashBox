@@ -1,0 +1,19 @@
+{
+  "routerMap": [
+    {
+      "name": "XbStudio",
+      "pageSourceFile": "src/main/ets/view/Xb_Studio.ets",
+      "buildFunction": "XbStudioBuilder"
+    },
+    {
+      "name": "XbCollaborators",
+      "pageSourceFile": "src/main/ets/view/Xb_Collaborators.ets",
+      "buildFunction": "XbCollaboratorsBuilder"
+    },
+    {
+      "name": "XbCrashPage",
+      "pageSourceFile": "src/main/ets/view/Xb_CrashPage.ets",
+      "buildFunction": "Xb_CrashPage"
+    }
+  ]
+}

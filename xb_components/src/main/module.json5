@@ -1,0 +1,13 @@
+{
+  "module": {
+    "name": "xb_components",
+    "type": "har",
+    "deviceTypes": [
+      "default",
+      "tablet",
+      "2in1",
+      "car"
+    ],
+    "routerMap": "$profile:route_map"
+  }
+}

@@ -13,7 +13,7 @@ on:
       - "AppScope/**"
       - "entry/**"
       - "proxy_core/**"
-      - "xb_components"
+      - "xb_components/**"
       - "build-profile.json5"
       - "oh-package.json5"
       - "hvigor/**"
@@ -26,7 +26,7 @@ on:
       - "AppScope/**"
       - "entry/**"
       - "proxy_core/**"
-      - "xb_components"
+      - "xb_components/**"
       - "build-profile.json5"
       - "oh-package.json5"
       - "hvigor/**"
@@ -298,14 +298,13 @@ jobs:
           submodules: false
           persist-credentials: false
 
-      - name: Initialize pinned UI component submodule
+      - name: Verify vendored UI components
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git submodule sync -- xb_components
-          git -c protocol.version=2 submodule update \
-            --init --depth 1 --recommend-shallow -- xb_components
-          test "$(git -C xb_components rev-parse HEAD)" = \
-            "$(git ls-tree HEAD xb_components | awk '{print $3}')"
+          test -s xb_components/Index.ets
+          test -s xb_components/oh-package.json5
+          test "$(cat xb_components/.upstream-revision)" = \
+            "55efa4d59785a94c2a9ff06010e1874c7fb30107"
 
       - name: Download compiled arm64 core
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1

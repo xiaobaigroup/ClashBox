@@ -1,0 +1,384 @@
+{
+  "string": [
+    {
+      "name": "xb_studio",
+      "value": "小白工坊"
+    },
+    {
+      "name": "page_show",
+      "value": "page from package"
+    },
+    {
+      "name": "xb_about_xb_studio",
+      "value": "关于小白工坊"
+    },
+    {
+      "name": "xb_member",
+      "value": "团队成员"
+    },
+    {
+      "name": "xb_app",
+      "value": "团队软件"
+    },
+    {
+      "name": "xb_sponsor_contact",
+      "value": "赞助和联系方式"
+    },
+    {
+      "name": "xb_developer",
+      "value": "开发者"
+    },
+    {
+      "name": "xb_planner",
+      "value": "统筹、规划"
+    },
+    {
+      "name": "xb_designer",
+      "value": "UI设计、图标设计"
+    },
+    {
+      "name": "xb_sponsor",
+      "value": "赞助我们(爱发电)"
+    },
+    {
+      "name": "xb_contact1",
+      "value": "官方QQ交流1群"
+    },
+    {
+      "name": "xb_contact2",
+      "value": "官方QQ交流2群"
+    },
+    {
+      "name": "xb_introduce",
+      "value": "小白工坊是一支专注于鸿蒙应用移植的个人组织的民间开发团队，拥有丰富的鸿蒙平台适配与移植经验。目前，团队成员已成功将多款应用上架至鸿蒙应用市场，深受用户好评。"
+    },
+    {
+      "name": "xb_reject_exit",
+      "value": "拒绝并退出"
+    },
+    {
+      "name": "xb_return",
+      "value": "返回"
+    },
+    {
+      "name": "xb_completed",
+      "value": "完成"
+    },
+    {
+      "name": "xb_agree_continue",
+      "value": "同意并继续"
+    },
+    {
+      "name": "xb_user_agreement",
+      "value": "用户协议"
+    },
+    {
+      "name": "xb_privacy",
+      "value": "隐私声明"
+    },
+    {
+      "name": "xb_save",
+      "value": "保存"
+    },
+    {
+      "name": "xb_cancel",
+      "value": "取消"
+    },
+    {
+      "name": "xb_collaborators",
+      "value": "协作者名单"
+    },
+    {
+      "name": "xb_reference_excellent_project",
+      "value": "参考优秀项目"
+    },
+    {
+      "name": "xb_supporter",
+      "value": "支持者"
+    },
+    {
+      "name": "xb_language",
+      "value": "语言"
+    },
+    {
+      "name": "xb_zh_CN",
+      "value": "简体中文"
+    },
+    {
+      "name": "xb_en",
+      "value": "英文"
+    },
+    {
+      "name": "xb_dark_mode",
+      "value": "深色模式"
+    },
+    {
+      "name": "xb_follow_system",
+      "value": "跟随系统"
+    },
+    {
+      "name": "xb_always_light",
+      "value": "始终浅色"
+    },
+    {
+      "name": "xb_always_dark",
+      "value": "始终深色"
+    },
+    {
+      "name": "xb_theme_color",
+      "value": "主题色"
+    },
+    {
+      "name": "xb_star_river_blue",
+      "value": "星河蓝"
+    },
+    {
+      "name": "xb_cat_blue",
+      "value": "猫咪蓝"
+    },
+    {
+      "name": "xb_yellow",
+      "value": "橘黄黄"
+    },
+    {
+      "name": "xb_red",
+      "value": "华为红"
+    },
+    {
+      "name": "xb_purple",
+      "value": "优雅紫"
+    },
+    {
+      "name": "xb_pink",
+      "value": "哔哩粉"
+    },
+    {
+      "name": "xb_green",
+      "value": "小草绿"
+    },
+    {
+      "name": "xb_today",
+      "value": "今天"
+    },
+    {
+      "name": "xb_yesterday",
+      "value": "昨天"
+    },
+    {
+      "name": "xb_now",
+      "value": "刚刚"
+    },
+    {
+      "name": "xb_appearance",
+      "value": "外观"
+    },
+    {
+      "name": "xb_appearance_subtitle",
+      "value": "深色模式、主题色"
+    },
+    {
+      "name": "xb_about",
+      "value": "关于"
+    },
+    {
+      "name": "xb_system_language",
+      "value": "系统语言"
+    },
+    {
+      "name": "xb_notice",
+      "value": "通知与反馈"
+    },
+    {
+      "name": "xb_backgrounder",
+      "value": "后台运行"
+    },
+    {
+      "name": "xb_vibration_feedback",
+      "value": "震动反馈"
+    },
+    {
+      "name": "xb_sound_feedback",
+      "value": "声音反馈"
+    },
+    {
+      "name": "xb_notice_main_switch",
+      "value": "通知总开关"
+    },
+    {
+      "name": "xb_resident_notice",
+      "value": "常驻通知"
+    },
+    {
+      "name": "xb_resident_notice_tips",
+      "value": "不建议关闭"
+    },
+    {
+      "name": "xb_resident_notice_column",
+      "value": "常驻通知栏"
+    },
+    {
+      "name": "xb_simulated_positioning",
+      "value": "模拟定位"
+    },
+    {
+      "name": "xb_simulated_positioning_tips",
+      "value": "通过模拟定位保留程序后台"
+    },
+    {
+      "name": "xb_simulate_pip",
+      "value": "模拟画中画"
+    },
+    {
+      "name": "xb_simulate_pip_tips",
+      "value": "通过空白画中画保留程序后台"
+    },
+    {
+      "name": "xb_tips",
+      "value": "温馨提示"
+    },
+    {
+      "name": "xb_backgrounder_tips",
+      "value": "您只能选择开启其中的一个选项，开启后可能会导致耗电量增加。 开/关模拟定位选项后需删除后台重启App才会生效。 从自由多窗模式无法主动开启画中画窗口；画中画需一直在显示状态，收起(最小化)后将无法保持后台运行；开启画中画窗口后系统会锁90帧。"
+    },
+    {
+      "name": "xb_blurr",
+      "value": "背景模糊"
+    },
+    {
+      "name": "xb_blurr_subtitle",
+      "value": "关闭以缓解APP内卡顿问题"
+    },
+    {
+      "name": "xb_position_center",
+      "value": "居中"
+    },
+    {
+      "name": "xb_position_right",
+      "value": "右侧"
+    },
+    {
+      "name": "xb_position_left",
+      "value": "左侧"
+    },
+    {
+      "name": "xb_app_version",
+      "value": "应用版本"
+    },
+    {
+      "name": "xb_faq",
+      "value": "常见问题"
+    },
+    {
+      "name": "xb_open_three",
+      "value": "开源项目与三方库"
+    },
+    {
+      "name": "xb_core_version",
+      "value": "内核版本"
+    },
+    {
+      "name": "xb_use_guidance",
+      "value": "使用引导"
+    },
+    {
+      "name": "xb_telegram",
+      "value": "官方Telegram频道"
+    },
+    {
+      "name": "xb_discord",
+      "value": "官方Discord社区"
+    },
+    {
+      "name": "xb_email",
+      "value": "开发者电子邮件"
+    },
+    {
+      "name": "xb_repo",
+      "value": "项目仓库"
+    },
+    {
+      "name": "xb_copy",
+      "value": "复制"
+    },
+    {
+      "name": "xb_delete",
+      "value": "删除"
+    },
+    {
+      "name": "xb_input",
+      "value": "请输入..."
+    },
+    {
+      "name": "xb_edit",
+      "value": "编辑"
+    },
+    {
+      "name": "xb_pay_title_buy_out",
+      "value": "购买"
+    },
+    {
+      "name": "xb_pay_title_subscribe",
+      "value": "高级分享"
+    },
+    {
+      "name": "update_log",
+      "value": "更新日志"
+    },
+    {
+      "name": "current_version",
+      "value": "当前版本"
+    },
+    {
+      "name": "pay_button",
+      "value": "使用华为支付购买"
+    },
+    {
+      "name": "pay_button_sec",
+      "value": "支持微信、支付宝、储蓄卡、信用卡等付款方式"
+    },
+    {
+      "name": "xb_enable_notice_failed",
+      "value": "通知授权失败"
+    },
+    {
+      "name": "xb_go_settings_auth",
+      "value": "前往设置授权"
+    },
+    {
+      "name": "xb_go_settings_auth_content",
+      "value": "您已取消通知权限授予，是否跳转至设置页进行通知权限授予"
+    },
+    {
+      "name": "xb_confirm",
+      "value": "确认"
+    },
+    {
+      "name": "xb_task_keeping",
+      "value": "任务保持"
+    },
+    {
+      "name": "crash_subtitle",
+      "value": "请将日志交给开发者，以便于排查~"
+    },
+    {
+      "name": "crash_title",
+      "value": "啊哦，刚刚好像崩溃了"
+    },
+    {
+      "name": "show_full_log",
+      "value": "展示完整日志信息"
+    },
+    {
+      "name": "email_feedback",
+      "value": "邮件反馈"
+    },
+    {
+      "name": "export_share",
+      "value": "导出分享"
+    },
+    {
+      "name": "xb_open",
+      "value": "打开"
+    }
+  ]
+}

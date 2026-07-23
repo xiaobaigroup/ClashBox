@@ -1,0 +1,14 @@
+{
+  "name": "xb_components",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "libxb_components.so": "file:./src/main/cpp/types/libxb_compontents",
+    "@linke/ui-color-picker": "^1.0.4"
+  },
+  "devDependencies": {},
+  "dynamicDependencies": {}
+}
