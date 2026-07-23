@@ -318,7 +318,6 @@ jobs:
           test -s libflclash.so
           test -s libflclash.so.sha256
           sha256sum --check libflclash.so.sha256
-          file libflclash.so
 
       - name: Show HarmonyOS tool versions
         run: |
