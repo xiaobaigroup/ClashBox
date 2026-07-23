@@ -11,38 +11,64 @@ on:
     paths:
       - "proxy_core/src/flclash/**"
       - ".github/workflows/build-core.yml"
+  pull_request:
+    paths:
+      - "proxy_core/src/flclash/**"
+      - ".github/workflows/build-core.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-ohos-core-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   CORE_DIR: proxy_core/src/flclash
-  OHOS_SDK_VERSION: "5.0.0"            # API 12
-  GO_OHOS_BRANCH: master
+  OHOS_SDK_VERSION: "5.0.0" # API 12
+  CORE_URL: https://github.com/xfz347/Clash.Meta.git
+  CORE_REV: 98ca8a7bf1737001d5488baf93223c9878e532a7
+  GVISOR_URL: https://github.com/likuai2010/gvisor-ohos.git
+  GVISOR_REV: 82104eaba946b7cc463b87648af9724d3f268537
+  BOOTSTRAP_GO_VERSION: "1.24.13"
+  GO_OHOS_URL: https://github.com/moodyhunter/go-tls-mode-gd.git
+  GO_OHOS_REV: 0136c5054dec5322f49a4d5431a610b972c44b4f
   GO_OHOS_DIR: ${{ github.workspace }}/.go-ohos
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       # --- 1. Source -----------------------------------------------------------
       - name: Checkout (submodules deferred)
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: false
+          persist-credentials: false
 
-      - name: Fetch flclash core + gvisor (ohos branch)
+      - name: Fetch pinned flclash core + gVisor revisions
         # The parent repo pins a `core` submodule commit that upstream force-pushed
-        # away, so the exact pin is unrecoverable. Track the `ohos` branch, which is
-        # where the OHOS-adapted code + go.mod live (the default branches don't have
-        # a go.mod). NOTE: this may drift from the shipped binary.
-        env:
-          CORE_URL: https://github.com/xfz347/Clash.Meta.git
-          GVISOR_URL: https://github.com/likuai2010/gvisor-ohos.git
-          CORE_REF: ohos
-          GVISOR_REF: ohos
+        # away. These revisions are the tested tips of the two `ohos` branches from
+        # the first successful cloud build; pinning them prevents silent API drift.
         run: |
           rm -rf "$CORE_DIR/core" "$CORE_DIR/gvisor-ohos"
-          git clone --depth 1 --branch "$CORE_REF"   "$CORE_URL"   "$CORE_DIR/core"
-          git clone --depth 1 --branch "$GVISOR_REF" "$GVISOR_URL" "$CORE_DIR/gvisor-ohos"
-          test -f "$CORE_DIR/core/go.mod"          # fail loudly if the branch is wrong
+
+          fetch_revision() {
+            local repository="$1"
+            local revision="$2"
+            local destination="$3"
+            mkdir -p "$destination"
+            git -C "$destination" init --quiet
+            git -C "$destination" remote add origin "$repository"
+            git -C "$destination" fetch --quiet --depth 1 origin "$revision"
+            git -C "$destination" checkout --quiet --detach FETCH_HEAD
+            test "$(git -C "$destination" rev-parse HEAD)" = "$revision"
+          }
+
+          fetch_revision "$CORE_URL" "$CORE_REV" "$CORE_DIR/core"
+          fetch_revision "$GVISOR_URL" "$GVISOR_REV" "$CORE_DIR/gvisor-ohos"
+          test -f "$CORE_DIR/core/go.mod"
           test -f "$CORE_DIR/gvisor-ohos/go.mod"
           echo "core:   $(git -C "$CORE_DIR/core" rev-parse HEAD)"
           echo "gvisor: $(git -C "$CORE_DIR/gvisor-ohos" rev-parse HEAD)"
@@ -75,37 +101,50 @@ jobs:
       # --- 2. Toolchains -------------------------------------------------------
       - name: Setup OpenHarmony NDK
         id: ohos
-        uses: openharmony-rs/setup-ohos-sdk@v1.0.1
+        uses: openharmony-rs/setup-ohos-sdk@b312caf8a43bb836aa24c08f65f97e1f09a89cad # v1.0.1
         with:
           version: ${{ env.OHOS_SDK_VERSION }}
-          components: native            # fall back to `all` if `native` is rejected
+          components: native
 
       - name: Setup bootstrap Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version: "1.24"
+          go-version: ${{ env.BOOTSTRAP_GO_VERSION }}
+          cache: false
 
       - name: Restore OHOS Go toolchain (cache)
         id: cache-go-ohos
-        uses: actions/cache@v4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ env.GO_OHOS_DIR }}
-          key: gotoolchain-${{ runner.os }}-moody-tls-mode-gd-${{ env.GO_OHOS_BRANCH }}
+          key: gotoolchain-${{ runner.os }}-${{ runner.arch }}-${{ env.BOOTSTRAP_GO_VERSION }}-${{ env.GO_OHOS_REV }}
 
-      - name: Clone patched Go toolchain (moodyhunter/go-tls-mode-gd)
+      - name: Fetch pinned patched Go toolchain
         if: steps.cache-go-ohos.outputs.cache-hit != 'true'
         run: |
           # Go 1.26 with the tls-mode-gd patch already applied: adds -tlsmodegd
           # (arm64 general-dynamic TLS) so the c-shared .so is dlopen-able on OHOS musl.
-          git clone --depth 1 --branch "$GO_OHOS_BRANCH" \
-            https://github.com/moodyhunter/go-tls-mode-gd.git \
-            "$GO_OHOS_DIR"
+          mkdir -p "$GO_OHOS_DIR"
+          git -C "$GO_OHOS_DIR" init --quiet
+          git -C "$GO_OHOS_DIR" remote add origin "$GO_OHOS_URL"
+          git -C "$GO_OHOS_DIR" fetch --quiet --depth 1 origin "$GO_OHOS_REV"
+          git -C "$GO_OHOS_DIR" checkout --quiet --detach FETCH_HEAD
+          test "$(git -C "$GO_OHOS_DIR" rev-parse HEAD)" = "$GO_OHOS_REV"
           grep -q 'tlsmodegd' "$GO_OHOS_DIR/src/cmd/go/internal/work/build.go"
 
       - name: Build OHOS Go toolchain (make.bash)
         if: steps.cache-go-ohos.outputs.cache-hit != 'true'
         working-directory: ${{ env.GO_OHOS_DIR }}/src
+        env:
+          GOTOOLCHAIN: local
         run: GOROOT_BOOTSTRAP="$(go env GOROOT)" ./make.bash
+
+      - name: Verify OHOS Go toolchain
+        run: |
+          test -x "$GO_OHOS_DIR/bin/go"
+          test "$(git -C "$GO_OHOS_DIR" rev-parse HEAD)" = "$GO_OHOS_REV"
+          grep -q 'tlsmodegd' "$GO_OHOS_DIR/src/cmd/go/internal/work/build.go"
+          "$GO_OHOS_DIR/bin/go" version
 
       # --- 3. Build env --------------------------------------------------------
       - name: Configure CGO / cross-compile env
@@ -166,19 +205,59 @@ jobs:
       - name: Verify output
         working-directory: ${{ env.CORE_DIR }}
         run: |
-          test -f libflclash.so
+          test -s libflclash.so
           ls -la libflclash.so
-          file libflclash.so || true
+
+          file libflclash.so
+          elf_header="$(readelf -h libflclash.so)"
+          dynamic_section="$(readelf -d libflclash.so)"
+          program_headers="$(readelf -l libflclash.so)"
+          dynamic_symbols="$(readelf --dyn-syms --wide libflclash.so)"
+
+          echo "$elf_header"
+          echo "$dynamic_section"
+          grep -F "Class:                             ELF64" <<<"$elf_header" >/dev/null
+          grep -F "Type:                              DYN (Shared object file)" <<<"$elf_header" >/dev/null
+          grep -F "Machine:                           AArch64" <<<"$elf_header" >/dev/null
+
+          for library in libhilog_ndk.z.so libace_napi.z.so libc.so; do
+            grep -F "Shared library: [$library]" <<<"$dynamic_section" >/dev/null
+          done
+          if grep -F "(TEXTREL)" <<<"$dynamic_section" >/dev/null; then
+            echo "::error::libflclash.so contains text relocations"
+            exit 1
+          fi
+          if grep -F " INTERP " <<<"$program_headers" >/dev/null; then
+            echo "::error::A shared library must not contain a program interpreter"
+            exit 1
+          fi
+          grep -E "[[:space:]]InitializeModule$" <<<"$dynamic_symbols" >/dev/null
+
+          sha256sum libflclash.so | tee libflclash.so.sha256
+          checksum="$(cut -d ' ' -f 1 libflclash.so.sha256)"
+          {
+            echo "### OHOS core artifact"
+            echo
+            echo "- core: \`$CORE_REV\`"
+            echo "- gVisor: \`$GVISOR_REV\`"
+            echo "- patched Go: \`$GO_OHOS_REV\`"
+            echo "- SHA-256: \`$checksum\`"
+            echo "- size: $(stat -c '%s bytes' libflclash.so)"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Stage into libs/arm64-v8a
         run: |
           mkdir -p proxy_core/libs/arm64-v8a
           cp -f "$CORE_DIR/libflclash.so" proxy_core/libs/arm64-v8a/libflclash.so
+          cp -f "$CORE_DIR/libflclash.so.sha256" proxy_core/libs/arm64-v8a/libflclash.so.sha256
 
       # --- 5. Publish ----------------------------------------------------------
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: libflclash-arm64-v8a
-          path: proxy_core/libs/arm64-v8a/libflclash.so
+          path: |
+            proxy_core/libs/arm64-v8a/libflclash.so
+            proxy_core/libs/arm64-v8a/libflclash.so.sha256
           if-no-files-found: error
+          retention-days: 14
