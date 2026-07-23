@@ -319,8 +319,13 @@ jobs:
           test -s libflclash.so.sha256
           sha256sum --check libflclash.so.sha256
 
-      - name: Show HarmonyOS tool versions
+      - name: Configure tool environment
         run: |
+          node_bin="$COMMANDLINE_TOOL_DIR/command-line-tools/tool/node/bin"
+          test -x "$node_bin/node"
+          echo "$node_bin" >> "$GITHUB_PATH"
+          export PATH="$node_bin:$PATH"
+
           node --version
           java -version
           ohpm --version
