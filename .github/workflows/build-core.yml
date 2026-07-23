@@ -311,14 +311,17 @@ jobs:
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: libflclash-arm64-v8a
-          path: proxy_core/libs/arm64-v8a
+          path: ${{ runner.temp }}/libflclash-arm64-v8a
 
-      - name: Verify compiled core
-        working-directory: proxy_core/libs/arm64-v8a
+      - name: Verify and stage compiled core
+        working-directory: ${{ runner.temp }}/libflclash-arm64-v8a
         run: |
           test -s libflclash.so
           test -s libflclash.so.sha256
           sha256sum --check libflclash.so.sha256
+          mkdir -p "$GITHUB_WORKSPACE/proxy_core/libs/arm64-v8a"
+          cp libflclash.so "$GITHUB_WORKSPACE/proxy_core/libs/arm64-v8a/libflclash.so"
+          test -s "$GITHUB_WORKSPACE/proxy_core/libs/arm64-v8a/libflclash.so"
 
       - name: Configure tool environment
         run: |
