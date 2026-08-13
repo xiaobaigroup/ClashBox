@@ -25,7 +25,9 @@ export enum EventKey{
   AddConfig = 10021,
   TestAllDelay = 10022,
   SwitchButtonPosition = 10023,
-  ReLoadAccessControl = 10024
+  ReLoadAccessControl = 10024,
+  // 托盘右键菜单刷新(代理分组/选中节点变化后触发，供 TrayManager 重建菜单)
+  TrayMenuRefresh = 10025
 }
 
 export class EventHub{

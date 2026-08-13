@@ -6,7 +6,7 @@ import { ButtonBuilder, context, font_primary, icon_primary } from "./Common";
 import { BusinessError } from "@kit.BasicServicesKit";
 import { calculateFontSizeLinear } from "../../common/utils/CalculateFontSizeUtil";
 import { common } from "@kit.AbilityKit";
-import { Xb_ToastUtil } from "xb_components";
+import { TrayManager } from "../../common/utils/TrayManager";
 
 let theWindowClass: window.Window
 
@@ -171,7 +171,11 @@ export struct WindowTopBar {
         image: false,
         onClick: () => {
           if (this.uiConfig.exitWindowMode === 1) {
-            Xb_ToastUtil.exitApp()
+            // 应用内"直接退出"保留既有强制退出语义，但不复用系统预终止路径
+            TrayManager.getInstance().forceExitApp()
+          } else if (TrayManager.getInstance().isActive()) {
+            // 桌面托盘激活：隐藏到托盘，VPN/Mihomo 与既有长连接保持运行
+            TrayManager.getInstance().hideMainWindow()
           } else {
             this.context.hideAbility().then(() => {
               console.debug(`#WindowDecorButtonModel hideAbility success`);

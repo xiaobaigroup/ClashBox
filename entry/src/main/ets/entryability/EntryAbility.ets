@@ -32,6 +32,7 @@ import BackupRestoreUtil from '../common/utils/BackupRestoreUtil';
 import ConfigAutoUpdateService from '../common/utils/ConfigAutoUpdateService';
 import BuildProfile from 'BuildProfile';
 import { accessControlRdb } from '../common/datasources/AccessControlRdb';
+import { TrayManager } from '../common/utils/TrayManager';
 
 
 export default class EntryAbility extends UIAbility {
@@ -283,6 +284,13 @@ export default class EntryAbility extends UIAbility {
         // 通过主窗口UIContext创建typeNode节点
         PipManager.getInstance().makeTypeNode(this.uiContext)
 
+        // 桌面环境(PC/平板PC模式)下初始化系统托盘(内部保证仅执行一次，
+        // 不触碰VPN/核心/连接状态，重复窗口重建不会产生重复托盘资源)
+        TrayManager.getInstance().init(this.context).catch((err: BusinessError) => {
+          hilog.error(0x0000, 'EntryAbility',
+            `TrayManager.init fail, code: ${err.code}, message: ${err.message}`)
+        })
+
       } catch (err) {
         console.error(`Failed to obtain the main window. Cause code: ${err.code}, message: ${err.message}`);
       }
@@ -301,6 +309,24 @@ export default class EntryAbility extends UIAbility {
       AppStorage.setOrCreate('2in1', false)
     }
 
+  }
+
+  /**
+   * @description UIAbility 窗口级终止(如最近任务关闭窗口)前回调。
+   *              桌面托盘激活期间拦截终止：隐藏主窗口到托盘，保持应用与VPN运行；
+   *              显式退出(TrayManager.exitApp)时不拦截。
+   *              注意：系统托盘/任务栏右键关闭走 AbilityStage.onPrepareTermination
+   *              (应用级退出)，不经过本回调 —— 两条路径职责分离：
+   *              窗口关闭 -> 隐藏到托盘；托盘退出 -> 真实终止应用。
+   */
+  onPrepareToTerminate(): boolean {
+    const tray = TrayManager.getInstance()
+    if (tray.isActive()) {
+      hilog.info(0x0000, 'EntryAbility', 'onPrepareToTerminate 拦截终止，隐藏到托盘')
+      tray.hideMainWindow()
+      return true
+    }
+    return false
   }
 
   onWindowStageWillDestroy(windowStage: window.WindowStage): void {
@@ -356,6 +382,8 @@ export default class EntryAbility extends UIAbility {
 
   onDestroy(): void {
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onDestroy');
+    // 应用真正退出时注销托盘监听并移除托盘图标(隐藏窗口不会走到这里)
+    TrayManager.getInstance().destroy()
     this.saveConfigThePreferences()
     // 移除卡片监听事件
     this.unRegisterCardEvent()

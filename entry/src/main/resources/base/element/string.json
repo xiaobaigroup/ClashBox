@@ -2089,6 +2089,14 @@
       "value": "退出"
     },
     {
+      "name": "tray_open_app",
+      "value": "打开ClashBox"
+    },
+    {
+      "name": "tray_more_nodes",
+      "value": "更多节点…"
+    },
+    {
       "name": "app_already_exist",
       "value": "应用已存在"
     },

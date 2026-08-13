@@ -205,6 +205,8 @@ export class ClashViewModel {
       await this.profileRepo.addOrUpdate(profile)
       await this.socketProxy.changeProxy(g, p)
       EventHub.sendEvent(EventKey.checkIpInfo)
+      // 通知托盘刷新右键菜单(与主界面保持同步)
+      EventHub.sendEvent(EventKey.TrayMenuRefresh)
     } catch (e) {
       ClashViewModel.promptAction.showToast({message: e.message, duration:3000})
     }
@@ -319,7 +321,7 @@ export class ClashViewModel {
   async clearRequestList(){
     return await this.socketProxy.clearRequestList()
   }
-  async getProxyGroups(model: ProxyMode): Promise<ProxyGroup[]>{
+  async getProxyGroups(model: ProxyMode, silent: boolean = false): Promise<ProxyGroup[]>{
     try {
       let list = await this.socketProxy.queryProxyGroups(model)
       let favoriteProxys = AppStorage.get<Map<string, string>>("favoriteProxys")
@@ -335,7 +337,9 @@ export class ClashViewModel {
       return groups
     } catch (e) {
       console.error(" 获取代理失败: ", e.stack)
-      ClashViewModel.promptAction.showToast({message: "获取代理失败: " + (e.message || e) + e.stack})
+      if (!silent) {
+        ClashViewModel.promptAction.showToast({message: "获取代理失败: " + (e.message || e) + e.stack})
+      }
     }
     return []
   }
@@ -407,6 +411,8 @@ export class ClashViewModel {
       ClashViewModel.promptAction.showToast({message: result, duration: 3000 })
     }
     EventHub.sendEvent(EventKey.FetchProxyGroup, null)
+    // 通知托盘刷新右键菜单(配置加载/重载后分组可能变化)
+    EventHub.sendEvent(EventKey.TrayMenuRefresh, null)
   }
   async ReStartVpn(){
     if(this.vpnStarted){

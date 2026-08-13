@@ -4,6 +4,7 @@
     "type": "entry",
     "description": "$string:module_desc",
     "mainElement": "EntryAbility",
+    "srcEntry": "./ets/entryability/ClashAbilityStage.ets",
     "deviceTypes": [
       "phone",
       "tablet",
@@ -79,11 +80,27 @@
             "domainVerify": true
           }
         ]
+      },
+      {
+        // 托盘保活Ability：以 ATTACH_TO_STATUS_BAR_ITEM + STARTUP_HIDE 模式启动，
+        // 将进程附着到状态栏图标(托盘可见/可退出)，并满足 showAbility/hideAbility 前置条件
+        "name": "ClashTrayHolderAbility",
+        "srcEntry": "./ets/entryability/ClashTrayHolderAbility.ets",
+        "description": "$string:EntryAbility_desc",
+        "icon": "$media:layered_image",
+        "label": "$string:EntryAbility_label",
+        "startWindowIcon": "$media:foreground_box_cat_large",
+        "startWindowBackground": "$color:start_window_background",
+        "exported": true
       }
     ],
     "requestPermissions": [
       {
         "name": "ohos.permission.INTERNET",
+      },
+      {
+        // 托盘保活/关闭拦截：onPrepareToTerminate 前置权限(系统授予)
+        "name": "ohos.permission.PREPARE_APP_TERMINATE"
       },
       {
         // 适人握持(动作感知)
