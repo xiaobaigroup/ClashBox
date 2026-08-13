@@ -1,4 +1,5 @@
 import { UIAbility } from '@kit.AbilityKit';
+import { BusinessError } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { TrayManager } from '../common/utils/TrayManager';
 
@@ -14,6 +15,17 @@ export default class ClashTrayHolderAbility extends UIAbility {
 
   onCreate(): void {
     hilog.info(0x0000, TAG, 'onCreate 托盘保活Ability已启动(隐藏模式)')
+  }
+
+  /**
+   * 右键菜单的 StatusBarMenuAction 必须路由到一个 UIAbility。系统若将本保活
+   * Ability 切到前台，立即恢复隐藏；真正的节点操作由 TrayManager.rightMenuClick 执行。
+   */
+  onForeground(): void {
+    this.context.hideAbility().catch((err: BusinessError) => {
+      hilog.error(0x0000, TAG,
+        `hide tray action ability fail, code: ${err.code}, message: ${err.message}`)
+    })
   }
 
   /**

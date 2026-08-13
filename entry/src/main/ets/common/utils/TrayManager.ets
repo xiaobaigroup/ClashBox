@@ -14,11 +14,10 @@ import { window } from '@kit.ArkUI';
 import { common, contextConstant, StartOptions, Want } from '@kit.AbilityKit';
 import { emitter, BusinessError } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { ClashConfig, Profile, ProxyGroup, ProxyMode, ProxyType } from 'proxy_core';
+import { ClashConfig, ProxyGroup, ProxyMode, ProxyType } from 'proxy_core';
 import ClashViewModel from '../../entryability/ClashViewModel';
 import { AppConfig, AppState } from '../../entryability/AppState';
 import { EventHub, EventKey } from '../EventHub';
-import { cardManager } from './CardManageUtil';
 import { ProxyItem } from '../datasources/ProxyData';
 import { Xb_ToastUtil } from 'xb_components';
 import { DesktopEnvironment } from './DesktopEnvironment';
@@ -27,12 +26,22 @@ const TAG = 'TrayManager'
 /** 右键菜单项唯一标识 */
 const MENU_CODE_OPEN = 'clashbox.tray.open'
 const MENU_CODE_MORE = 'clashbox.tray.more'
+/**
+ * 状态栏菜单动作必须指定一个 UIAbility。notifyOnly 只开启 rightMenuClick
+ * 通知，并不阻止系统拉起该 Ability，因此不能指向主界面 EntryAbility。
+ */
+const MENU_ACTION_ABILITY = 'ClashTrayHolderAbility'
 /** 平台限制：单个一级菜单最多20个子菜单项 */
 const MAX_SUB_MENU = 20
 /** 平台限制：所有分组一级菜单项总和不超过20个(为操作组预留2项) */
 const MAX_GROUP_MENU = 18
 /** 菜单重建防抖(ms) - 避免配置加载期间的密集刷新触发1010710003 */
 const MENU_REBUILD_DEBOUNCE = 300
+
+interface TrayMenuSnapshot {
+  groupMenus: statusBarManager.StatusBarGroupMenu[]
+  codeMap: Map<string, [string, string]>
+}
 
 export class TrayManager {
   private static instance: TrayManager | undefined = undefined
@@ -49,6 +58,11 @@ export class TrayManager {
   private exiting: boolean = false
   /** menuCode -> [分组名, 节点名] 映射，重建菜单时整体替换 */
   private menuCodeMap: Map<string, [string, string]> = new Map()
+  /** 每份已发布菜单使用独立代码，避免更新过渡期将旧菜单映射到新节点 */
+  private menuGeneration: number = 0
+  /** 菜单更新串行化，防止慢查询覆盖后到的最新状态 */
+  private menuRefreshInProgress: boolean = false
+  private menuRefreshRequested: boolean = false
   private rebuildTimer: number = -1
 
   static getInstance(): TrayManager {
@@ -283,6 +297,7 @@ export class TrayManager {
     }
     this.initialized = false
     clearTimeout(this.rebuildTimer)
+    this.menuRefreshRequested = false
     try {
       statusBarManager.off('statusBarIconClick', this.onStatusBarIconClick)
       statusBarManager.off('rightMenuClick', this.onRightMenuClick)
@@ -336,7 +351,10 @@ export class TrayManager {
       default: {
         const target = this.menuCodeMap.get(menuCode)
         if (target) {
-          this.switchProxy(target[0], target[1])
+          this.switchProxy(target[0], target[1]).catch((err: BusinessError) => {
+            hilog.error(0x0000, TAG,
+              `switchProxy fail, code: ${err.code}, message: ${err.message}`)
+          })
         }
         break
       }
@@ -344,8 +362,7 @@ export class TrayManager {
   }
 
   /**
-   * @description 快捷节点切换 - 与代理页切换完全相同的实现路径
-   *              (ClashViewModel.changeProxy + 卡片持久化 + 主界面选中态同步)，
+   * @description 快捷节点切换 - 与代理页使用同一 ClashViewModel 状态发布路径，
    *              不创建独立的代理状态系统。
    */
   private async switchProxy(group: string, node: string): Promise<void> {
@@ -360,18 +377,36 @@ export class TrayManager {
         hilog.error(0x0000, TAG, `switchProxy 配置不存在，无法切换节点`)
         return
       }
-      // 与 ProxyPage.changeProxy 一致的核心切换路径(内部触发 TrayMenuRefresh 刷新菜单)
-      await ClashViewModel.changeProxy(profile, group, node)
-      // 卡片持久化(与 ProxyPage.changeProxy 一致)
-      cardManager.setSelectedProxyNode(profile, group, node)
-      // 主界面选中态同步(与 ProxyGroupItem.selectProxy 一致)
-      appConfig.currentProxyName = node
+      // 只有内核确认切换成功后才更新卡片和主界面，避免本地假选中。
+      const changed = await ClashViewModel.changeProxy(profile, group, node)
+      if (!changed) {
+        this.requestRebuildMenu()
+        return
+      }
+
+      // 回读 Mihomo 运行时状态作为唯一真值，不用 Profile 缓存推测切换结果。
       const groups = await ClashViewModel.getProxyGroups(
         AppStorage.get<ClashConfig>('clashConfig')?.mode ?? ProxyMode.Rule, true)
+      const actualGroup = groups.find((item: ProxyGroup) => item.name === group)
+      const actualNode = actualGroup?.now
+      if (!actualNode || actualNode !== node) {
+        hilog.error(0x0000, TAG,
+          `switchProxy 运行时校验失败, group: ${group}, requested: ${node}, actual: ${actualNode ?? ''}`)
+        // 如果内核回读与请求不一致，用真实值修复持久化选择。
+        if (actualNode) {
+          await ClashViewModel.syncProxySelection(profile, group, actualNode)
+          appConfig.currentProxyItem = AppState.fetchProxyItem(
+            groups, group, actualNode) as ProxyItem
+        }
+        this.requestRebuildMenu()
+        return
+      }
+      // currentProxyName/Profile/卡片已由 changeProxy 的成功事件统一更新。
       appConfig.currentProxyItem = AppState.fetchProxyItem(groups, group, node) as ProxyItem
-      cardManager.pushCartCurrentProxyName(node)
+      this.requestRebuildMenu()
     } catch (e) {
       hilog.error(0x0000, TAG, `switchProxy 切换节点失败: ${e.message}`)
+      this.requestRebuildMenu()
     }
   }
 
@@ -424,24 +459,51 @@ export class TrayManager {
 
   /** @description 防抖重建右键菜单 */
   private requestRebuildMenu(): void {
+    this.menuRefreshRequested = true
+    if (this.menuRefreshInProgress) {
+      return
+    }
     clearTimeout(this.rebuildTimer)
     this.rebuildTimer = setTimeout(() => {
+      this.rebuildTimer = -1
       this.refreshProxyMenu()
     }, MENU_REBUILD_DEBOUNCE)
   }
 
   /** @description 依据当前代理分组数据重建右键菜单并推送到托盘 */
   private async refreshProxyMenu(): Promise<void> {
-    if (!this.initialized || this.exiting || !this.context) {
+    if (this.menuRefreshInProgress || !this.initialized || this.exiting || !this.context) {
       return
     }
+    this.menuRefreshInProgress = true
+    this.menuRefreshRequested = false
     try {
-      const groupMenus = await this.buildGroupMenus()
-      statusBarManager.updateStatusBarMenu(this.context, groupMenus)
-      hilog.info(0x0000, TAG, `updateStatusBarMenu success, groups: ${groupMenus.length}`)
+      const snapshot = await this.buildGroupMenus()
+      // 更新期同时保留新旧代码：旧菜单或新菜单的点击都不会被错配。
+      const previousCodeMap = this.menuCodeMap
+      const transitionCodeMap = new Map<string, [string, string]>(previousCodeMap)
+      snapshot.codeMap.forEach((value: [string, string], key: string) => {
+        transitionCodeMap.set(key, value)
+      })
+      this.menuCodeMap = transitionCodeMap
+      try {
+        await this.updateStatusBarMenu(snapshot.groupMenus)
+        this.menuCodeMap = snapshot.codeMap
+      } catch (e) {
+        this.menuCodeMap = previousCodeMap
+        throw e as Error
+      }
+      hilog.info(0x0000, TAG,
+        `updateStatusBarMenu success, groups: ${snapshot.groupMenus.length}`)
     } catch (e) {
       // 代理数据暂不可用(Mihomo未就绪/配置加载中)时保留上一次菜单，不崩溃
       hilog.error(0x0000, TAG, `refreshProxyMenu failed. code: ${e.code}, message: ${e.message}`)
+    } finally {
+      this.menuRefreshInProgress = false
+      // 更新期又有代理状态变化时，防抖后再发布一份最新快照。
+      if (this.menuRefreshRequested) {
+        this.requestRebuildMenu()
+      }
     }
   }
 
@@ -451,18 +513,14 @@ export class TrayManager {
    *              分组2 - 打开ClashBox / 退出。
    *              超长节点列表按平台限制截断，并提供"更多节点"入口。
    */
-  private async buildGroupMenus(): Promise<statusBarManager.StatusBarGroupMenu[]> {
-    const appConfig = AppStorage.get<AppConfig>('appConfig')
+  private async buildGroupMenus(): Promise<TrayMenuSnapshot> {
     const clashConfig = AppStorage.get<ClashConfig>('clashConfig')
-    let profile: Profile | null = null
-    if (appConfig?.currentProfileId) {
-      profile = await ClashViewModel.getProfile(appConfig.currentProfileId)
-    }
     // 静默获取(不弹Toast)，代理数据暂不可用时返回空列表
     const groups = await ClashViewModel.getProxyGroups(clashConfig?.mode ?? ProxyMode.Rule, true)
     const selectable = groups.filter((g: ProxyGroup) => g.type === ProxyType.Selector && g.hidden !== true)
 
     const codeMap = new Map<string, [string, string]>()
+    const generation = ++this.menuGeneration
     const proxyMenu: statusBarManager.StatusBarMenuItem[] = []
     const maxGroups = Math.min(selectable.length, MAX_GROUP_MENU)
     for (let i = 0; i < maxGroups; i++) {
@@ -472,13 +530,14 @@ export class TrayManager {
       if (nodes.length === 0) {
         continue
       }
-      const selected = profile ? profile.getSelectedProxy(group) : group.now
+      // group.now 来自 Mihomo 运行时查询，才是当前真正生效的节点。
+      const selected = group.now
       const subMenus: statusBarManager.StatusBarSubMenuItem[] = []
       // 每个一级菜单最多 MAX_SUB_MENU 个子菜单项(平台限制)
       const maxNodes = Math.min(nodes.length, MAX_SUB_MENU - 1)
       for (let j = 0; j < maxNodes; j++) {
         const node = nodes[j]
-        const menuCode = `clashbox.tray.m${i}-${j}`
+        const menuCode = `clashbox.tray.n${generation}-${i}-${j}`
         codeMap.set(menuCode, [group.name, node.name])
         const isSelected = node.name === selected
         subMenus.push({
@@ -504,24 +563,44 @@ export class TrayManager {
         menuAction: this.notifyMenuAction(MENU_CODE_OPEN)
       }
     ]
-    this.menuCodeMap = codeMap
-
     const groupMenus: statusBarManager.StatusBarGroupMenu[] = []
     if (proxyMenu.length > 0) {
       groupMenus.push(proxyMenu)
     }
     groupMenus.push(actionMenu)
-    return groupMenus
+    return {
+      groupMenus: groupMenus,
+      codeMap: codeMap
+    }
   }
 
-  /** @description 构建 notifyOnly 菜单行为(点击仅通知应用，由 rightMenuClick 统一处理) */
+  /** @description 构建托盘保活 Ability 路由 + rightMenuClick 通知的菜单行为。 */
   private notifyMenuAction(menuCode: string): statusBarManager.StatusBarMenuAction {
     return {
-      abilityName: 'EntryAbility',
+      // 菜单动作会拉起 abilityName；路由到无窗口的托盘保活 Ability，
+      // 节点切换仅由 rightMenuClick 处理，不显示主界面。
+      abilityName: MENU_ACTION_ABILITY,
       moduleName: 'entry',
       notifyOnly: true,
       menuCode: menuCode
     }
+  }
+
+  /** @description 等待系统确认菜单快照已发布，再切换对应的 menuCode 映射。 */
+  private updateStatusBarMenu(groupMenus: statusBarManager.StatusBarGroupMenu[]): Promise<void> {
+    const context = this.context
+    if (!context) {
+      return Promise.reject(new Error('UIAbilityContext unavailable'))
+    }
+    return new Promise<void>((resolve, reject) => {
+      statusBarManager.updateStatusBarMenu(context, groupMenus, (error: BusinessError) => {
+        if (error) {
+          reject(error)
+          return
+        }
+        resolve()
+      })
+    })
   }
 
   /** @description 加载托盘图标(黑/白两份)。优先使用专用状态栏图标，失败时回退到应用Logo */

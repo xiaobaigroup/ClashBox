@@ -11,7 +11,7 @@ import { convertTimeGapToMilliseconds } from "../common/entity/Constants";
 import { PromptAction } from "@kit.ArkUI";
 import { ProxyGroup } from "proxy_core/src/main/ets/models/Common";
 import { ConfigExtendedParams } from "proxy_core/src/main/ets/models/ClashConfig";
-import { EventHub, EventKey } from "../common/EventHub";
+import { EventHub, EventKey, ProxySelectionChangedData } from "../common/EventHub";
 import { AppConfig, AppState, ClashCore, getPackageInfo } from "./AppState";
 import  fs from  "@ohos.file.fs"
 import { sleep } from "./EntryAbility";
@@ -199,16 +199,57 @@ export class ClashViewModel {
   async VailConfig(config: string): Promise<string>{
     return await this.socketProxy.vailConfig(config)
   }
-  async changeProxy(profile: Profile, g:string, p: string){
+  async changeProxy(profile: Profile, g:string, p: string): Promise<boolean> {
     try {
-      profile.proxySelected?.set(g, p)
-      await this.profileRepo.addOrUpdate(profile)
-      await this.socketProxy.changeProxy(g, p)
+      // 内核以空字符串表示成功，非空字符串是业务错误，不会通过 Promise reject。
+      const result = await this.socketProxy.changeProxy(g, p)
+      if (result !== '') {
+        throw new Error(result)
+      }
+
+      // 只在内核确认切换后发布同一份选择结果，避免各入口各自维护假状态。
+      await this.syncProxySelection(profile, g, p)
       EventHub.sendEvent(EventKey.checkIpInfo)
-      // 通知托盘刷新右键菜单(与主界面保持同步)
-      EventHub.sendEvent(EventKey.TrayMenuRefresh)
+      return true
     } catch (e) {
-      ClashViewModel.promptAction.showToast({message: e.message, duration:3000})
+      ClashViewModel.promptAction?.showToast({message: e.message, duration:3000})
+      // 失败时也回读运行时状态，用实际选择修正菜单。
+      EventHub.sendEvent(EventKey.TrayMenuRefresh)
+      return false
+    }
+  }
+
+  /**
+   * 将内核已经确认的节点选择同步到 Profile、AppStorage、卡片和界面事件。
+   * TrayManager 回读到不同运行时结果时也使用此入口进行纠正。
+   */
+  async syncProxySelection(profile: Profile, group: string, proxy: string): Promise<void> {
+    profile.proxySelected.set(group, proxy)
+    const appConfig = AppStorage.get<AppConfig>('appConfig')
+    if (appConfig) {
+      appConfig.currentProxyName = proxy
+    }
+
+    try {
+      cardManager.setSelectedProxyNode(profile, group, proxy)
+      cardManager.pushCartCurrentProxyName(proxy)
+    } catch (cardError) {
+      hilog.error(0x0000, 'ClashViewModel',
+        `syncProxySelection card failed, group: ${group}, proxy: ${proxy}, message: ${cardError.message}`)
+    }
+
+    EventHub.sendEvent(EventKey.ProxySelectionChanged, {
+      group: group,
+      proxy: proxy
+    } as ProxySelectionChangedData)
+    EventHub.sendEvent(EventKey.TrayMenuRefresh)
+
+    try {
+      await this.profileRepo.addOrUpdate(profile)
+    } catch (persistError) {
+      // 内核已切换成功，持久化失败不应将本次运行时操作报为失败。
+      hilog.error(0x0000, 'ClashViewModel',
+        `syncProxySelection persist failed, group: ${group}, proxy: ${proxy}, message: ${persistError.message}`)
     }
   }
   async setVpnOptions(options: VpnRawOptions){

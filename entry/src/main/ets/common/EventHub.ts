@@ -27,7 +27,14 @@ export enum EventKey{
   SwitchButtonPosition = 10023,
   ReLoadAccessControl = 10024,
   // 托盘右键菜单刷新(代理分组/选中节点变化后触发，供 TrayManager 重建菜单)
-  TrayMenuRefresh = 10025
+  TrayMenuRefresh = 10025,
+  // 内核确认节点切换后，同步所有应用内界面持有的 Profile/ProxyGroup 快照
+  ProxySelectionChanged = 10026
+}
+
+export interface ProxySelectionChangedData {
+  group: string
+  proxy: string
 }
 
 export class EventHub{

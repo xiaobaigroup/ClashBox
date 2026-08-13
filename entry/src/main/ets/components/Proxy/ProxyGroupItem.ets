@@ -15,7 +15,6 @@ import { customVibrator } from '../../common/utils/VibratorUtil';
 import ClashViewModel from '../../entryability/ClashViewModel';
 import { PopTips, PopupBuilder } from '../Start/Popup';
 import { ListGutter, ProxyListLanes } from '../../common/breakpoint/BreakPoint';
-import { cardManager } from '../../common/utils/CardManageUtil';
 import { Xb_ToastUtil } from 'xb_components';
 
 // 组件名
@@ -361,9 +360,7 @@ struct ProxyGroupItem {
 
   selectProxy(item: ProxyItem) {
     if (!this.disabled) {
-      this.appConfig.currentProxyName = item.name
-      cardManager.pushCartCurrentProxyName(item.name)
-      this.appConfig.currentProxyItem = item
+      // 选中态由内核成功事件统一发布，避免 RPC 尚未完成时显示假选中。
       this.OnProxyChange(item)
     }
   }

@@ -562,7 +562,11 @@ export default class EntryAbility extends UIAbility {
 
     // 启动/停止代理
     if (proxyNodeInfo?.profile) {
-      ClashViewModel.changeProxy(proxyNodeInfo.profile, proxyNodeInfo.g, proxyNodeInfo.p)
+      const proxyChanged = await ClashViewModel.changeProxy(
+        proxyNodeInfo.profile, proxyNodeInfo.g, proxyNodeInfo.p)
+      if (!proxyChanged) {
+        return
+      }
 
       console.log('卡片 - 启动/停止代理', proxyActionType)
 
