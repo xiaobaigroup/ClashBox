@@ -169,19 +169,13 @@ export struct WindowTopBar {
       {
         icon: $r('sys.symbol.xmark'),
         image: false,
-        onClick: () => {
+        onClick: async () => {
           if (this.uiConfig.exitWindowMode === 1) {
             // 应用内"直接退出"保留既有强制退出语义，但不复用系统预终止路径
             TrayManager.getInstance().forceExitApp()
-          } else if (TrayManager.getInstance().isActive()) {
-            // 桌面托盘激活：隐藏到托盘，VPN/Mihomo 与既有长连接保持运行
-            TrayManager.getInstance().hideMainWindow()
           } else {
-            this.context.hideAbility().then(() => {
-              console.debug(`#WindowDecorButtonModel hideAbility success`);
-            }).catch((err: BusinessError) => {
-              console.error(`#WindowDecorButtonModel hideAbility fail, code: ${err.code} message: ${err.message}, stack: ${JSON.stringify(err.stack)}`);
-            });
+            // 等待应用完成状态栏接入后隐藏主窗口；不退化成普通最小化。
+            await TrayManager.getInstance().hideMainWindow(this.context)
           }
         }
       }

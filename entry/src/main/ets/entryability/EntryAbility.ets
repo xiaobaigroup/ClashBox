@@ -20,12 +20,10 @@ import { commonEventManager } from '@kit.BasicServicesKit';
 import { Timer } from '../common/utils/HHmmssTimer';
 import { number2Time } from '../common/utils/TimeConvertUtil';
 import { customVibrator } from '../common/utils/VibratorUtil';
-import { StatusBarConfig, StatusBarIconResource,
-  SmartAvoidance,
+import { SmartAvoidance,
   Xb_AvoidanceManager,
   Xb_ColorUtils,
   Xb_Global, Xb_KVdbUtil,
-  Xb_StatusBarUtils,
   Xb_ToastUtil,
   Xb_PreferenceUtil} from 'xb_components';
 import BackupRestoreUtil from '../common/utils/BackupRestoreUtil';
@@ -252,8 +250,13 @@ export default class EntryAbility extends UIAbility {
         }
         // 初始化通知工具
         Xb_ToastUtil.initContext(this.uiContext, data.getUIContext().getHostContext() as common.UIAbilityContext)
-        // 初始化窗口避让属性
-        this.intRectWindow(windowStage)
+        // 窗口和状态栏初始化不能阻塞配置数据库、核心及页面断点初始化。
+        // intRectWindow 会在首次 await 前同步缓存 WindowClass；其余工作异步继续。
+        this.intRectWindow(windowStage).catch((err: BusinessError) => {
+          hilog.error(0x0000, 'EntryAbility',
+            `intRectWindow fail, code: ${err.code}, message: ${err.message}`)
+        })
+        this.initTray()
         // 初始化配置自动更新服务
         ConfigAutoUpdateService.initContext(this.context)
 
@@ -284,19 +287,13 @@ export default class EntryAbility extends UIAbility {
         // 通过主窗口UIContext创建typeNode节点
         PipManager.getInstance().makeTypeNode(this.uiContext)
 
-        // 桌面环境(PC/平板PC模式)下初始化系统托盘(内部保证仅执行一次，
-        // 不触碰VPN/核心/连接状态，重复窗口重建不会产生重复托盘资源)
-        TrayManager.getInstance().init(this.context).catch((err: BusinessError) => {
-          hilog.error(0x0000, 'EntryAbility',
-            `TrayManager.init fail, code: ${err.code}, message: ${err.message}`)
-        })
+        // 核心初始化后再幂等补试一次；初次窗口模式尚未就绪时，
+        // 可在此时完成状态栏接入，且不会重复注册图标或监听。
+        this.initTray()
 
       } catch (err) {
         console.error(`Failed to obtain the main window. Cause code: ${err.code}, message: ${err.message}`);
       }
-
-      // 执行首次窗口检测
-      // this.onWindowModeChange(windowStage, windowClass)
 
       // 初始化完成标记
       AppStorage.setOrCreate('awaitInit', true)
@@ -323,7 +320,10 @@ export default class EntryAbility extends UIAbility {
     const tray = TrayManager.getInstance()
     if (tray.isActive()) {
       hilog.info(0x0000, 'EntryAbility', 'onPrepareToTerminate 拦截终止，隐藏到托盘')
-      tray.hideMainWindow()
+      tray.hideMainWindow(this.context).catch((err: BusinessError) => {
+        hilog.error(0x0000, 'EntryAbility',
+          `hideMainWindow fail, code: ${err.code}, message: ${err.message}`)
+      })
       return true
     }
     return false
@@ -683,7 +683,10 @@ export default class EntryAbility extends UIAbility {
       try {
         windowClass.on('windowSizeChange', async (data) => {
           // 动态监听设备窗口模式
-          this.onWindowModeChange(windowStage, windowClass)
+          await this.onWindowModeChange(windowStage, windowClass)
+          // 平板从普通模式切入自由窗口/PC模式时补做托盘初始化；
+          // TrayManager 内部的 initialization/initialized 守卫保证不会重复注册。
+          this.initTray()
           console.info('#WindowChange Succeeded in enabling the listener for window size changes. Data: ' +
           JSON.stringify(data))
           WindowWidth = this.uiContext?.px2vp(data.width)!
@@ -699,6 +702,15 @@ export default class EntryAbility extends UIAbility {
     } catch (error) {
       console.error(`#EntryAbility Failed to getWindowProperties. Cause code: ${error.code}, message: ${error.message}`)
     }
+  }
+
+  /** @description 幂等初始化桌面托盘，并统一记录异步失败。 */
+  private initTray(): void {
+    TrayManager.getInstance().init(this.context).catch((err: BusinessError) => {
+      const error = err as BusinessError
+      hilog.error(0x0000, 'EntryAbility',
+        `TrayManager.init fail, code: ${error.code}, message: ${error.message}`)
+    })
   }
 
   async onWindowModeChange(windowStage: window.WindowStage, windowClass: window.Window) {

@@ -65,8 +65,6 @@ import { WindowTopBar } from '../components/Common/TopBar'
 import { ImportConfigFromURL } from '../components/Configuration/ImportConfigFromURL'
 import { Xb_ChangeThemeColor } from 'xb_components/src/main/ets/utils/ChangeThemeColorUtil'
 import {
-  StatusBarConfig,
-  StatusBarIconResource,
   Xb_BackgroundRunning,
   Xb_ColorModeManager,
   Xb_FloatTabBarAlignCenter,
@@ -78,7 +76,6 @@ import {
   Xb_NotificationUtils,
   Xb_PreferenceUtil,
   Xb_ResourceColorUtil,
-  Xb_StatusBarUtils,
   Xb_TabBarVertical,
   Xb_TabIconFontSize,
   Xb_TabTitleFontSize
@@ -765,30 +762,6 @@ struct Index {
   async aboutToAppear(): Promise<void> {
     hilog.info(0x1000, componentName, `#aboutToAppear executed`)
     this.registerEvent()
-
-    // 初始化状态栏工具(仅PC设备)
-    if (this.windowMode) {
-      const iconResource: StatusBarIconResource = {
-        white: 'clash_status_white.svg',
-        black: 'clash_status_black.svg'
-      };
-      const statusBarConfig: StatusBarConfig = {
-        icon: iconResource,
-        title: "entry", // 当前模块的的model-name
-        abilityName: '' // 留空，接管并使用默认状态栏图标点击事件
-        // menus: [[{
-        //   title: "",
-        //   menuAction: { abilityName: "" }
-        // }]]
-      };
-      Xb_StatusBarUtils.initStatusBar(this.UIContext, statusBarConfig)
-        .then(() => {
-          Xb_StatusBarUtils.setIconClickCallback()
-        })
-        .catch((err: BusinessError) => {
-          console.error(`Index #aboutToAppear StatusBarUtils.initStatusBar 状态栏图标初始化失败, Message: ${err.message}`);
-        })
-    }
 
     // 首次启动启用通知
     if (!this.uiConfig.isRequestNotification) {

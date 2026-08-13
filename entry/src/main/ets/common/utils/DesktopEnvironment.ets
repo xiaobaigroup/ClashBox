@@ -1,8 +1,8 @@
 /**
- * @description 桌面环境检测 - 用于判断当前环境是否具备桌面级窗口能力(系统托盘/自由窗口)。
- *              不依赖具体设备型号：实现预期为 MatePad Edge 在 PC/桌面模式下会被系统
- *              标记为具备状态栏(托盘)服务能力，普通平板/手机模式则不具备 ——
- *              该预期须在真机实测验证(见 TrayDiag 本地诊断日志)。
+ * @description 桌面环境检测 - 用于判断当前窗口是否处于桌面级窗口模式。
+ *              状态栏 syscap 仅作为诊断信息；MatePad Edge 桌面窗口实测可使用状态栏 API，
+ *              但 canIUse(SystemCapability.PCService.StatusBarManager) 返回 false。
+ *              实际能力以 statusBarManager.addToStatusBar 的返回为准。
  */
 import { window } from '@kit.ArkUI';
 import { deviceInfo } from '@kit.BasicServicesKit';
@@ -12,15 +12,14 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 const TAG = 'TrayDiag'
 
 export class DesktopEnvironment {
-  /** 系统状态栏(托盘)服务能力 */
+  /** 系统状态栏服务 syscap 名称(仅用于诊断，不作为硬门槛) */
   private static readonly STATUS_BAR_SYSCAP: string = 'SystemCapability.PCService.StatusBarManager'
-  /** 能力探测结果缓存(设备能力在运行期内不变) */
+  /** syscap 上报结果缓存(设备能力在运行期内不变) */
   private static trayCapability: boolean | undefined = undefined
 
   /**
-   * @description 当前环境是否支持桌面系统托盘(状态栏图标)。
-   *              通过运行时系统能力探测实现：HarmonyOS PC 与处于 PC/桌面模式的
-   *              平板(如 MatePad Edge PC 模式)具备该能力，普通平板/手机模式不具备。
+   * @description 读取系统是否上报状态栏 syscap，仅用于诊断。
+   *              该值在 MatePad Edge 桌面窗口模式存在假阴性，不能据此跳过真实 API 调用。
    */
   static isTraySupported(): boolean {
     if (DesktopEnvironment.trayCapability === undefined) {
@@ -64,17 +63,18 @@ export class DesktopEnvironment {
   }
 
   /**
-   * @description 是否为桌面环境：托盘能力 + 桌面式窗口模式。
+   * @description 是否为桌面环境：以桌面式窗口模式为准。
+   *              状态栏能力由调用方实际执行 addToStatusBar 并处理 BusinessError 验证。
    *              HarmonyOS PC、MatePad Edge PC 模式 -> true；
    *              普通平板/手机/MatePad Edge 平板模式 -> false(保留既有行为)。
    */
   static isDesktopEnvironment(windowClass?: window.Window): boolean {
     const trayCapable = DesktopEnvironment.isTraySupported()
     const desktopWindow = DesktopEnvironment.isDesktopWindowMode(windowClass)
-    const result = trayCapable && desktopWindow
-    // 临时诊断日志(仅本地)：用于在 MatePad Edge 平板/PC 两种模式实测系统实际暴露的能力
+    const result = desktopWindow
+    // syscap 结果保留在诊断日志中，但不再阻断 MatePad Edge 的真实状态栏 API 探测。
     hilog.info(0x0000, TAG,
-      `isDesktopEnvironment deviceType=${deviceInfo.deviceType} sdkApi=${deviceInfo.sdkApiVersion} trayCapable=${trayCapable} desktopWindow=${desktopWindow} -> ${result}`)
+      `isDesktopEnvironment deviceType=${deviceInfo.deviceType} sdkApi=${deviceInfo.sdkApiVersion} syscapReported=${trayCapable} desktopWindow=${desktopWindow} -> ${result}`)
     return result
   }
 }

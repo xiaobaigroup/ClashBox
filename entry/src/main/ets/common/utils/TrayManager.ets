@@ -37,10 +37,14 @@ const MENU_REBUILD_DEBOUNCE = 300
 export class TrayManager {
   private static instance: TrayManager | undefined = undefined
   private context: common.UIAbilityContext | undefined = undefined
-  /** 托盘是否已初始化(图标+监听，仅一次) */
+  /** 托盘图标是否已添加 */
   private initialized: boolean = false
-  /** 托盘是否正在初始化(防止异步图标加载期间重复注册) */
-  private initializing: boolean = false
+  /** 保活Ability是否已完成状态栏附着 */
+  private holderAttached: boolean = false
+  /** 正在进行的状态栏初始化；并发入口共享同一个任务，避免重复注册或提前隐藏 */
+  private initialization: Promise<void> | undefined = undefined
+  /** 主窗口正在隐藏/恢复，防止连续点击并发执行可见性操作 */
+  private visibilityChanging: boolean = false
   /** 是否正在显式退出(拦截系统终止回调时放行) */
   private exiting: boolean = false
   /** menuCode -> [分组名, 节点名] 映射，重建菜单时整体替换 */
@@ -56,7 +60,7 @@ export class TrayManager {
 
   /** @description 托盘是否已激活(图标已添加且监听已注册) */
   isActive(): boolean {
-    return this.initialized && !this.exiting
+    return this.initialized && this.holderAttached && !this.exiting
   }
 
   /** @description 是否正在显式退出 */
@@ -69,93 +73,165 @@ export class TrayManager {
    *              重复调用(如窗口重建/页面重载)不会产生重复图标与监听。
    */
   async init(context: common.UIAbilityContext): Promise<void> {
-    if (this.initialized || this.initializing || this.exiting) {
+    // 即使窗口模式尚未就绪也先缓存上下文，X 键可在模式就绪后补做初始化。
+    this.context = context
+    if (this.exiting) {
+      return
+    }
+    // 图标已经添加但保活Ability尚未附着时，仍须等待同一个初始化任务。
+    // 因此 pending 检查必须早于 initialized，避免刚启动时点击 X 偶发无响应。
+    const pending: Promise<void> | undefined = this.initialization
+    if (pending) {
+      await pending
+      return
+    }
+    if (this.initialized) {
       return
     }
     // EntryAbility 缓存的主窗口对象(供桌面窗口模式探测)
-    const windowClass = AppStorage.get<window.Window>('WindowClass')
-    if (!DesktopEnvironment.isDesktopEnvironment(windowClass)) {
+    const mainWindow = AppStorage.get<window.Window>('WindowClass')
+    if (!DesktopEnvironment.isDesktopEnvironment(mainWindow)) {
       hilog.info(0x0000, TAG, '非桌面环境，跳过托盘初始化')
       return
     }
-    this.initializing = true
+    const task: Promise<void> = this.initialize(context)
+    this.initialization = task
     try {
-      this.context = context
-      // 托盘图标(黑/白两份适配深浅色壁纸)
-      const icons = await this.loadStatusBarIcon(context)
-      // 图标加载期间可能已经收到系统退出请求，不再创建新的托盘资源
-      if (this.exiting) {
-        return
-      }
-      // 左键弹窗信息：abilityName 传空字符串 -> 左键点击走 statusBarIconClick 事件，直接恢复主窗口
-      const operation: statusBarManager.QuickOperation = {
-        abilityName: '',
-        title: 'ClashBox',
-        height: 30,
-        moduleName: 'entry'
-      }
-      const item: statusBarManager.StatusBarItem = {
-        icons: icons,
-        quickOperation: operation
-      }
-      try {
-        statusBarManager.addToStatusBar(context, item)
-        hilog.info(0x0000, TAG, 'addToStatusBar success')
-        hilog.info(0x0000, 'TrayDiag', 'trayInit result=success')
-      } catch (e) {
-        hilog.error(0x0000, TAG, `addToStatusBar failed. code: ${e.code}, message: ${e.message}`)
-        hilog.error(0x0000, 'TrayDiag', `trayInit result=failed code=${e.code ?? ''} message=${e.message}`)
-        return
-      }
-      this.initialized = true
-      // 注册点击事件(仅此一次)
-      try {
-        statusBarManager.on('statusBarIconClick', this.onStatusBarIconClick)
-        statusBarManager.on('rightMenuClick', this.onRightMenuClick)
-      } catch (e) {
-        hilog.error(0x0000, TAG, `register statusBar event failed. message: ${e.message}`)
-      }
-      // 订阅代理状态变化 -> 重建右键菜单(与主界面共用同一份代理状态)
-      EventHub.on(EventKey.TrayMenuRefresh, () => {
-        this.requestRebuildMenu()
-      })
-      // 绑定保活Ability：使应用进程附着到状态栏图标(托盘可见、可退出)，
-      // 同时是 showAbility/hideAbility 的前置条件(ATTACH_TO_STATUS_BAR_ITEM)
-      this.startHolderAbility()
-      hilog.info(0x0000, 'TrayDiag', 'trayInit 已完成：图标+监听+保活Ability(ATTACH_TO_STATUS_BAR_ITEM)')
-      // 初始构建右键菜单(代理数据就绪后由 TrayMenuRefresh 再次刷新)
-      this.requestRebuildMenu()
+      await task
     } finally {
-      this.initializing = false
+      this.initialization = undefined
     }
   }
 
-  /** @description 隐藏主窗口到托盘(不终止应用，VPN/长连接保持) */
-  hideMainWindow(): void {
-    if (!this.context) {
+  /** @description 按“创建条目 -> 附着进程 -> 注册监听”的顺序完成状态栏接入。 */
+  private async initialize(context: common.UIAbilityContext): Promise<void> {
+    // 状态栏图标(黑/白两份适配深浅色壁纸)
+    const icons = await this.loadStatusBarIcon(context)
+    // 图标加载期间可能已经收到系统退出请求，不再创建新的状态栏资源
+    if (this.exiting) {
       return
     }
-    this.context.hideAbility().catch((err: BusinessError) => {
-      hilog.error(0x0000, TAG, `hideAbility fail, code: ${err.code}, message: ${err.message}`)
-      // 降级：隐藏失败时退回后台，保证不退出应用
-      this.context?.moveAbilityToBackground().catch((bgErr: BusinessError) => {
-        hilog.error(0x0000, TAG, `moveAbilityToBackground fail, code: ${bgErr.code}, message: ${bgErr.message}`)
-      })
+    // abilityName 传空字符串：左键点击走 statusBarIconClick，直接恢复主窗口
+    const operation: statusBarManager.QuickOperation = {
+      abilityName: '',
+      title: 'ClashBox',
+      height: 30,
+      moduleName: 'entry'
+    }
+    const item: statusBarManager.StatusBarItem = {
+      icons: icons,
+      quickOperation: operation
+    }
+    try {
+      hilog.info(0x0000, 'TrayDiag', 'addToStatusBar request')
+      // 使用回调重载等待系统确认，避免“API已返回但条目尚不能附着”的竞态。
+      await this.addStatusBarItem(context, item)
+      hilog.info(0x0000, TAG, 'addToStatusBar success')
+      hilog.info(0x0000, 'TrayDiag', 'trayInit result=success')
+    } catch (err) {
+      const error = err as BusinessError
+      hilog.error(0x0000, TAG,
+        `addToStatusBar failed. code: ${error.code}, message: ${error.message}`)
+      hilog.error(0x0000, 'TrayDiag',
+        `trayInit result=failed code=${error.code ?? ''} message=${error.message}`)
+      return
+    }
+    this.initialized = true
+    if (this.exiting) {
+      this.destroy()
+      return
+    }
+
+    // 必须等保活Ability的附着启动请求成功后才对外宣告状态栏可用。
+    const holderStarted = await this.startHolderAbility()
+    if (this.exiting) {
+      return
+    }
+    if (!holderStarted) {
+      this.destroy()
+      return
+    }
+
+    // 注册点击事件(仅此一次)
+    try {
+      statusBarManager.on('statusBarIconClick', this.onStatusBarIconClick)
+      statusBarManager.on('rightMenuClick', this.onRightMenuClick)
+    } catch (err) {
+      const error = err as BusinessError
+      hilog.error(0x0000, TAG,
+        `register statusBar event failed. code: ${error.code}, message: ${error.message}`)
+      // 事件未完整注册时不暴露半激活状态，并回收已添加的图标。
+      this.destroy()
+      return
+    }
+
+    // 订阅代理状态变化 -> 重建右键菜单(与主界面共用同一份代理状态)
+    EventHub.on(EventKey.TrayMenuRefresh, () => {
+      this.requestRebuildMenu()
     })
+    this.holderAttached = true
+    hilog.info(0x0000, 'TrayDiag',
+      'trayInit 已完成：图标+监听+保活Ability(ATTACH_TO_STATUS_BAR_ITEM)')
+    // 初始构建右键菜单(代理数据就绪后由 TrayMenuRefresh 再次刷新)
+    this.requestRebuildMenu()
+  }
+
+  /**
+   * @description 隐藏主窗口到状态栏(不终止应用，VPN/长连接保持)。
+   *              若初始化尚未完成，先等待同一初始化任务；不以最小化伪装成功。
+   */
+  async hideMainWindow(context?: common.UIAbilityContext): Promise<void> {
+    if (this.visibilityChanging || this.exiting) {
+      return
+    }
+    if (context) {
+      this.context = context
+    }
+    this.visibilityChanging = true
+    try {
+      const abilityContext: common.UIAbilityContext | undefined = this.context
+      if (!abilityContext) {
+        hilog.error(0x0000, TAG, 'hideAbility skipped: UIAbilityContext unavailable')
+        return
+      }
+      if (!this.isActive()) {
+        await this.init(abilityContext)
+      }
+      if (!this.isActive()) {
+        hilog.error(0x0000, TAG, 'hideAbility skipped: status bar attachment is not ready')
+        return
+      }
+      await abilityContext.hideAbility()
+      hilog.info(0x0000, TAG, 'hideAbility success')
+    } catch (err) {
+      const error = err as BusinessError
+      hilog.error(0x0000, TAG, `hideAbility fail, code: ${error.code}, message: ${error.message}`)
+    } finally {
+      this.visibilityChanging = false
+    }
   }
 
   /** @description 恢复既有主窗口(不创建新窗口实例)，并刷新托盘菜单状态 */
-  restoreMainWindow(): void {
-    if (!this.context) {
+  async restoreMainWindow(): Promise<void> {
+    if (this.visibilityChanging || this.exiting) {
       return
     }
-    this.context.showAbility().then(() => {
+    this.visibilityChanging = true
+    try {
+      const context: common.UIAbilityContext | undefined = this.context
+      if (!context || !this.isActive()) {
+        hilog.error(0x0000, TAG, 'showAbility skipped: status bar attachment is not ready')
+        return
+      }
+      await context.showAbility()
       hilog.info(0x0000, TAG, 'showAbility success')
-      // 恢复后顺带刷新一次菜单，保证与主界面状态同步
       this.requestRebuildMenu()
-    }).catch((err: BusinessError) => {
-      hilog.error(0x0000, TAG, `showAbility fail, code: ${err.code}, message: ${err.message}`)
-    })
+    } catch (err) {
+      const error = err as BusinessError
+      hilog.error(0x0000, TAG, `showAbility fail, code: ${error.code}, message: ${error.message}`)
+    } finally {
+      this.visibilityChanging = false
+    }
   }
 
   /**
@@ -198,6 +274,7 @@ export class TrayManager {
 
   /** @description 注销监听并移除托盘图标。仅在应用真正退出时调用。 */
   destroy(): void {
+    this.holderAttached = false
     if (!this.initialized) {
       return
     }
@@ -230,7 +307,9 @@ export class TrayManager {
       const iconClickType = data['iconClickType']
       if (iconClickType === 'leftClick') {
         hilog.info(0x0000, TAG, `statusBarIconClick ${iconClickType} 恢复主窗口`)
-        this.restoreMainWindow()
+        this.restoreMainWindow().catch((err: BusinessError) => {
+          hilog.error(0x0000, TAG, `restoreMainWindow fail, code: ${err.code}, message: ${err.message}`)
+        })
       }
     }
   }
@@ -247,7 +326,9 @@ export class TrayManager {
       case MENU_CODE_OPEN:
       case MENU_CODE_MORE:
         // 打开主界面(更多节点场景下进入代理页自行选择)
-        this.restoreMainWindow()
+        this.restoreMainWindow().catch((err: BusinessError) => {
+          hilog.error(0x0000, TAG, `restoreMainWindow fail, code: ${err.code}, message: ${err.message}`)
+        })
         break
       default: {
         const target = this.menuCodeMap.get(menuCode)
@@ -291,27 +372,50 @@ export class TrayManager {
     }
   }
 
-  /** @description 启动托盘保活Ability(ATTACH_TO_STATUS_BAR_ITEM + 隐藏启动) */
-  private startHolderAbility(): void {
-    if (!this.context) {
-      return
+  /** @description 启动状态栏保活Ability(当前进程附着 + 隐藏启动) */
+  private async startHolderAbility(): Promise<boolean> {
+    const context: common.UIAbilityContext | undefined = this.context
+    if (!context) {
+      return false
     }
     const want: Want = {
-      bundleName: this.context.abilityInfo.bundleName,
+      bundleName: context.abilityInfo.bundleName,
       abilityName: 'ClashTrayHolderAbility'
     }
     const options: StartOptions = {
-      // 附着到状态栏图标(不强制新建进程)：托盘可见、可退出，进程可保活
+      // 当前进程附着到状态栏图标；TrayManager退出守卫可覆盖两个Ability回调。
       processMode: contextConstant.ProcessMode.ATTACH_TO_STATUS_BAR_ITEM,
       // 目标Ability启动后隐藏，不显示窗口
       startupVisibility: contextConstant.StartupVisibility.STARTUP_HIDE
     }
-    this.context.startAbility(want, options).then(() => {
+    let started: boolean = false
+    await context.startAbility(want, options).then(() => {
+      started = true
       hilog.info(0x0000, TAG, 'startHolderAbility success')
-      hilog.info(0x0000, 'TrayDiag', 'holderAbility start=success (ATTACH_TO_STATUS_BAR_ITEM + STARTUP_HIDE)')
+      hilog.info(0x0000, 'TrayDiag',
+        'holderAbility start=success (ATTACH_TO_STATUS_BAR_ITEM + STARTUP_HIDE)')
     }).catch((err: BusinessError) => {
       hilog.error(0x0000, TAG, `startHolderAbility fail, code: ${err.code}, message: ${err.message}`)
-      hilog.error(0x0000, 'TrayDiag', `holderAbility start=failed code=${err.code ?? ''} message=${err.message}`)
+      hilog.error(0x0000, 'TrayDiag',
+        `holderAbility start=failed code=${err.code ?? ''} message=${err.message}`)
+    })
+    return started
+  }
+
+  /** @description 完成一次状态栏注册；回调返回后系统条目才可用于进程附着。 */
+  private addStatusBarItem(context: common.UIAbilityContext,
+    item: statusBarManager.StatusBarItem): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      statusBarManager.addToStatusBar(context, item, (error: BusinessError) => {
+        // HarmonyOS 的 AsyncCallback 在成功时不传 BusinessError。
+        // 不能直接读取 error.code，否则成功回调会抛异常并让此 Promise 永久 pending。
+        if (error) {
+          reject(error)
+          return
+        }
+        hilog.info(0x0000, 'TrayDiag', 'addToStatusBar callback=success')
+        resolve()
+      })
     })
   }
 
