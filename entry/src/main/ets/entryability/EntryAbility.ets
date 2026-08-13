@@ -347,6 +347,8 @@ export default class EntryAbility extends UIAbility {
   onForeground(): void {
     // Ability has brought to foreground
     AppStorage.setOrCreate('ForwardState', true)
+    // 覆盖从状态栏、Dock或应用图标恢复的入口；计时器未运行时该调用为 no-op。
+    ClashViewModel.refreshProxyDuration()
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onForeground');
 
     // 应用切回前台时，触发一次配置更新检查

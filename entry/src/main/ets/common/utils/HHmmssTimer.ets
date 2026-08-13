@@ -21,16 +21,22 @@ export class Timer {
 
   public start(callback?: (time: number) => void, startTime?: number): void {
     this.callback = callback
-    if (startTime) {
+    if (startTime !== undefined) {
       this.startTime = startTime
     } else {
       this.startTime = Date.now() - this.elapsed
     }
+    // 重复启动只保留一个调度器，避免多个 interval 交错刷新同一显示值。
+    if (this.timerId !== undefined) {
+      clearInterval(this.timerId)
+    }
     this.timerId = setInterval(() => this.updateTimer(), 900)
+    // 首次启动立即同步，避免先显示 00:00:00、下一拍才跳到真实运行时长。
+    this.updateTimer()
   }
 
   public pause(): void {
-    if (this.timerId) {
+    if (this.timerId !== undefined) {
       this.elapsed = Date.now() - this.startTime
       clearInterval(this.timerId)
       this.timerId = undefined
@@ -42,6 +48,13 @@ export class Timer {
     this.start(this.callback)
   }
 
+  /** @description 前台恢复前立即发布当前运行时长，消除后台定时器节流造成的陈旧首帧。 */
+  public refresh(): void {
+    if (this.timerId !== undefined) {
+      this.updateTimer()
+    }
+  }
+
   private updateTimer(): void {
     if (this.callback) {
       const timeString = this.getTime()
@@ -50,7 +63,7 @@ export class Timer {
   }
 
   public reset(): void {
-    if (this.timerId) {
+    if (this.timerId !== undefined) {
       clearInterval(this.timerId);
       this.timerId = undefined;
     }
@@ -63,6 +76,4 @@ export class Timer {
     return totalMilliseconds
   }
 }
-
-
 

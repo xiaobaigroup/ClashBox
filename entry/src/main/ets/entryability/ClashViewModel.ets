@@ -519,6 +519,11 @@ export class ClashViewModel {
   async getRuntime(){
     return await this.socketProxy.getRuntime()
   }
+
+  /** @description 立即同步一次代理运行时长；用于窗口从状态栏恢复前更新UI。 */
+  refreshProxyDuration(): void {
+    this.proxyStartedTimer.refresh()
+  }
   // 校验是否配置成功
   async vpnConfigIsLoad(){
     const flag = await this.socketProxy.vpnConfigIsLoad()

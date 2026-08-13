@@ -223,6 +223,9 @@ export class TrayManager {
         hilog.error(0x0000, TAG, 'showAbility skipped: status bar attachment is not ready')
         return
       }
+      // 后台状态下 interval 可能被系统节流；先同步运行时长再显示窗口，
+      // 避免首帧显示隐藏前的旧值、下一拍突然追平。
+      ClashViewModel.refreshProxyDuration()
       await context.showAbility()
       hilog.info(0x0000, TAG, 'showAbility success')
       this.requestRebuildMenu()
