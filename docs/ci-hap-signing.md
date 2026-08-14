@@ -22,3 +22,17 @@ Configure these repository Actions secrets:
 
 All six values must be configured together. A partial configuration deliberately
 fails instead of silently publishing a test-signed package.
+
+# Unsigned release HAP
+
+A separate workflow, `release-hap.yml`, builds the core from the same pinned
+revisions and publishes the **unsigned** release HAP as a GitHub Release:
+
+- Pushing a version tag (`1.2.3`, `1.7.4-lts-stable.1`, ...) creates a stable
+  release named after the tag.
+- A manual `workflow_dispatch` run refreshes the rolling `nightly` prerelease.
+
+The release notes and `INSTALLATION-NOTES.txt` in each release explain that the
+package is unsigned. An unsigned HAP cannot be installed on commercial
+HarmonyOS devices: re-sign it in DevEco Studio or with `hap-sign-tool` (the
+`scripts/ci/sign-hap.sh` flow above) before installing.
