@@ -28,7 +28,6 @@
         }
       }
     ],
-    // 产品配置
     "products": [
       {
         "name": "default",
@@ -83,7 +82,6 @@
       "targets": [
         {
           "name": "default",
-          // 入口模块的产品信息配置
           "applyToProducts": [
             "default",
             "release"
