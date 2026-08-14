@@ -9,7 +9,6 @@ import { customAnimationUtil } from '../../common/utils/Animation'
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { HomeCardDeleteButtonSize, HomeCardFontSize, HomeCardPadding,
   HomeCardPartSmallFontSize } from '../../common/breakpoint/BreakPoint'
-import { cardManager } from '../../common/utils/CardManageUtil'
 
 
 @Component
@@ -62,10 +61,10 @@ struct FavoriteProxy {
                   .onClick(() => {
                     // 在home页编辑状态时，无法操作
                     if (!this.isShowHomeEdit) {
-                      this.appConfig.currentProxyName = group_node[1]
-                      this.appConfig.currentProxyItem = AppState.fetchProxyItem(this.proxyGroups.getAllData(), group_node[0], group_node[1])
-                      // 对应切换代理页节点
-                      this.changeProxy(group_node[0], this.appConfig.currentProxyItem)
+                      const proxyItem = AppState.fetchProxyItem(
+                        this.proxyGroups.getAllData(), group_node[0], group_node[1])
+                      // 对应切换代理页节点；成功后由统一事件更新 UI 与卡片。
+                      this.changeProxy(group_node[0], proxyItem)
                       if (this.uiConfig.isVibrate) {
                         customVibrator.vibratorTriggerOfHapticClockTimer()
                       }
@@ -137,8 +136,6 @@ struct FavoriteProxy {
     console.debug(`FavoriteProxy [FavoriteProxyCard] Group：${g} node: ${item.name}`)
     if (this.currentProfile) {
       ClashViewModel.changeProxy(this.currentProfile, g, item.name)
-      // 首选项持久化存储 -> 供卡片使用
-      cardManager.setSelectedProxyNode(this.currentProfile, g, item.name)
     }
   }
 

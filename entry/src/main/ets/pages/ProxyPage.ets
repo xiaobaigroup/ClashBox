@@ -207,8 +207,9 @@ struct ProxyPage {
                         proxyitems: group.proxies as ProxyItem[] ?? [],
                         ProxyGroupItemSelected: this.appConfig.proxyCardSize,
                         disabled: group.type !== ProxyType.Selector,
-                        selectedProxy: this.currentProfile?.getSelectedProxy(group) ??
-                        this.appConfig.currentProxyName ?? '',
+                        // Mihomo 运行时结果优先；Profile 仅作为核心尚未返回状态时的回退。
+                        selectedProxy: group.now || this.currentProfile?.getSelectedProxy(group) ||
+                        this.appConfig.currentProxyName || '',
                         OnProxyChange: (item) => {
                           this.changeProxy(group.name, item)
                         }
@@ -555,8 +556,6 @@ struct ProxyPage {
     console.debug(`FavoriteProxy [ProxyPage] Group：${group} node: ${item.name}`)
     if (this.currentProfile) {
       ClashViewModel.changeProxy(this.currentProfile, group, item.name)
-      // 首选项持久化存储 -> 供卡片使用
-      cardManager.setSelectedProxyNode(this.currentProfile, group, item.name)
     }
   }
 

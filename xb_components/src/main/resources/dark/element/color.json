@@ -1,0 +1,104 @@
+{
+  "color": [
+    {
+      "name": "start_window_background",
+      "value": "#FF202224"
+    },
+    {
+      "name": "xb_window_background",
+      "value": "#000000"
+    },
+    {
+      "name": "font_color",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "background",
+      "value": "#000000"
+    },
+    {
+      "name": "home_title_icon_background",
+      "value": "#26FFFFFF"
+    },
+    {
+      "name": "pip_background",
+      "value": "#FF000000"
+    },
+    {
+      "name": "home_refresh_background",
+      "value": "#99FFFFFF"
+    },
+    {
+      "name": "comp_background_list_card",
+      "value": "#1AFFFFFF"
+    },
+    {
+      "name": "back",
+      "value": "#FF191919"
+    },
+    {
+      "name": "divider",
+      "value": "#1f1f1f"
+    },
+    {
+      "name": "menu_background",
+      "value": "#AB737070"
+    },
+    {
+      "name": "divider_light",
+      "value": "#0DFDFCFC"
+    },
+    {
+      "name": "bind_sheet_list_background",
+      "value": "#26FFFFFF"
+    },
+    {
+      "name": "text_input_placeholder",
+      "value": "#8c8d8e"
+    },
+    {
+      "name": "settings_switch_button_floor",
+      "value": "#26FFFFFF"
+    },
+    {
+      "name": "settings_list_background",
+      "value": "#1AFFFFFF"
+    },
+    {
+      "name": "emphasize",
+      "value": "#FF317AF7"
+    },
+    {
+      "name": "theme_color_main_cat_blue",
+      "value": "#E61E4377"
+    },
+    {
+      "name": "theme_color_main_yellow",
+      "value": "#ff9926"
+    },
+    {
+      "name": "theme_color_main_red",
+      "value": "#E6D41C26"
+    },
+    {
+      "name": "theme_color_main_purple",
+      "value": "#E6722ED1"
+    },
+    {
+      "name": "theme_color_main_pink",
+      "value": "#E6FB7299"
+    },
+    {
+      "name": "theme_color_main_green",
+      "value": "#E682D41C"
+    },
+    {
+      "name": "switch_button",
+      "value": "#000000"
+    },
+    {
+      "name": "button_bg",
+      "value": "#1AFFFFFF"
+    }
+  ]
+}

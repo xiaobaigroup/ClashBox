@@ -6,7 +6,6 @@ import { ProxyItem, ProxyGroupItemDataSource } from '../../common/datasources/Pr
 import ClashViewModel from '../../entryability/ClashViewModel'
 import { AppConfig, UIConfig } from '../../entryability/AppState'
 import { customAnimationUtil } from '../../common/utils/Animation'
-import { cardManager } from '../../common/utils/CardManageUtil'
 
 const  componentName: string = 'ProxyPageArrangement'
 
@@ -135,17 +134,15 @@ struct ProxyArrangement {
   changeProxy(g: string, item: ProxyItem){
     if (this.currentProfile) {
       ClashViewModel.changeProxy(this.currentProfile, g, item.name)
-      // 首选项持久化存储 -> 供卡片使用
-      cardManager.setSelectedProxyNode(this.currentProfile, g, item.name)
     }
   }
 
   /** 获取当前分组名 */
   getCurrentProxyName(group: ProxyGroup): string {
     if (!this.currentProfile) {
-      return ''
+      return group.now
     } else {
-      return this.currentProfile.getSelectedProxy(group) ?? this.appConfig.currentProxyName ?? ''
+      return group.now || this.currentProfile.getSelectedProxy(group) || this.appConfig.currentProxyName || ''
     }
   }
 
@@ -174,5 +171,4 @@ struct ProxyArrangement {
 }
 
 export default ProxyArrangement
-
 

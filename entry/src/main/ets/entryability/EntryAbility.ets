@@ -20,18 +20,18 @@ import { commonEventManager } from '@kit.BasicServicesKit';
 import { Timer } from '../common/utils/HHmmssTimer';
 import { number2Time } from '../common/utils/TimeConvertUtil';
 import { customVibrator } from '../common/utils/VibratorUtil';
-import { StatusBarConfig, StatusBarIconResource,
-  SmartAvoidance,
+import { SmartAvoidance,
   Xb_AvoidanceManager,
   Xb_ColorUtils,
   Xb_Global, Xb_KVdbUtil,
-  Xb_StatusBarUtils,
   Xb_ToastUtil,
   Xb_PreferenceUtil} from 'xb_components';
 import BackupRestoreUtil from '../common/utils/BackupRestoreUtil';
 import ConfigAutoUpdateService from '../common/utils/ConfigAutoUpdateService';
 import BuildProfile from 'BuildProfile';
 import { accessControlRdb } from '../common/datasources/AccessControlRdb';
+import { TrayManager } from '../common/utils/TrayManager';
+import ProxyKeepAliveService from '../common/utils/ProxyKeepAliveService';
 
 
 export default class EntryAbility extends UIAbility {
@@ -57,6 +57,7 @@ export default class EntryAbility extends UIAbility {
   /** @description 卡片延迟定时器 */
   private cardDelayTimer: number = -1
   private subscriber: commonEventManager.CommonEventSubscriber | null = null;
+  private screenSubscriber: commonEventManager.CommonEventSubscriber | null = null;
   private windowLimits: window.WindowLimits = {
     minWidth: 1345,
     minHeight: 498,
@@ -165,10 +166,56 @@ export default class EntryAbility extends UIAbility {
         }
       });
 
+    // 监听锁屏/解锁事件：锁定前后重新确认长时任务保活
+    this.registerScreenStateEvents();
+
   }
 
   // 实时监听系统系统配置更新状态
   onConfigurationUpdate(Config: Configuration): void {
+  }
+
+  /**
+   * @description 监听锁屏/息屏与解锁/亮屏事件。
+   *              机器锁定后系统可能冻结/回收后台应用进程并撤销长时任务，
+   *              在锁定前后重新确认 ProxyKeepAliveService 的长时任务保活；
+   *              代理内核自身的健康检查由 ClashCoreInit 的 1s 恢复循环负责。
+   *              订阅失败仅记录日志，不影响主流程。
+   */
+  private registerScreenStateEvents(): void {
+    const screenSubscribeInfo: commonEventManager.CommonEventSubscribeInfo = {
+      events: [
+        "usual.event.SCREEN_OFF",
+        "usual.event.SCREEN_LOCKED",
+        "usual.event.SCREEN_ON",
+        "usual.event.SCREEN_UNLOCKED"
+      ]
+    };
+    commonEventManager.createSubscriber(screenSubscribeInfo,
+      (err: BusinessError, subscriber: commonEventManager.CommonEventSubscriber) => {
+        if (err) {
+          hilog.error(0x0000, 'EntryAbility',
+            `Failed to create screen event subscriber. Code is ${err.code}, message is ${err.message}`)
+          return
+        }
+        this.screenSubscriber = subscriber;
+        commonEventManager.subscribe(subscriber,
+          (subErr: BusinessError, data: commonEventManager.CommonEventData) => {
+            if (subErr) {
+              hilog.error(0x0000, 'EntryAbility',
+                `Failed to subscribe screen events. Code is ${subErr.code}, message is ${subErr.message}`)
+              return
+            }
+            const event = data?.event ?? ''
+            if (event === "usual.event.SCREEN_OFF" || event === "usual.event.SCREEN_LOCKED") {
+              hilog.info(0x0000, 'EntryAbility', `屏幕锁定/息屏事件: ${event}，重新确认长时任务保活`)
+              ProxyKeepAliveService.reassert(this.context)
+            } else if (event === "usual.event.SCREEN_ON" || event === "usual.event.SCREEN_UNLOCKED") {
+              hilog.info(0x0000, 'EntryAbility', `屏幕解锁/亮屏事件: ${event}，重新确认长时任务保活`)
+              ProxyKeepAliveService.reassert(this.context)
+            }
+          })
+      })
   }
 
   // 热启动
@@ -251,8 +298,13 @@ export default class EntryAbility extends UIAbility {
         }
         // 初始化通知工具
         Xb_ToastUtil.initContext(this.uiContext, data.getUIContext().getHostContext() as common.UIAbilityContext)
-        // 初始化窗口避让属性
-        this.intRectWindow(windowStage)
+        // 窗口和状态栏初始化不能阻塞配置数据库、核心及页面断点初始化。
+        // intRectWindow 会在首次 await 前同步缓存 WindowClass；其余工作异步继续。
+        this.intRectWindow(windowStage).catch((err: BusinessError) => {
+          hilog.error(0x0000, 'EntryAbility',
+            `intRectWindow fail, code: ${err.code}, message: ${err.message}`)
+        })
+        this.initTray()
         // 初始化配置自动更新服务
         ConfigAutoUpdateService.initContext(this.context)
 
@@ -283,12 +335,13 @@ export default class EntryAbility extends UIAbility {
         // 通过主窗口UIContext创建typeNode节点
         PipManager.getInstance().makeTypeNode(this.uiContext)
 
+        // 核心初始化后再幂等补试一次；初次窗口模式尚未就绪时，
+        // 可在此时完成状态栏接入，且不会重复注册图标或监听。
+        this.initTray()
+
       } catch (err) {
         console.error(`Failed to obtain the main window. Cause code: ${err.code}, message: ${err.message}`);
       }
-
-      // 执行首次窗口检测
-      // this.onWindowModeChange(windowStage, windowClass)
 
       // 初始化完成标记
       AppStorage.setOrCreate('awaitInit', true)
@@ -301,6 +354,27 @@ export default class EntryAbility extends UIAbility {
       AppStorage.setOrCreate('2in1', false)
     }
 
+  }
+
+  /**
+   * @description UIAbility 窗口级终止(如最近任务关闭窗口)前回调。
+   *              桌面托盘激活期间拦截终止：隐藏主窗口到托盘，保持应用与VPN运行；
+   *              显式退出(TrayManager.exitApp)时不拦截。
+   *              注意：系统托盘/任务栏右键关闭走 AbilityStage.onPrepareTermination
+   *              (应用级退出)，不经过本回调 —— 两条路径职责分离：
+   *              窗口关闭 -> 隐藏到托盘；托盘退出 -> 真实终止应用。
+   */
+  onPrepareToTerminate(): boolean {
+    const tray = TrayManager.getInstance()
+    if (tray.isActive()) {
+      hilog.info(0x0000, 'EntryAbility', 'onPrepareToTerminate 拦截终止，隐藏到托盘')
+      tray.hideMainWindow(this.context).catch((err: BusinessError) => {
+        hilog.error(0x0000, 'EntryAbility',
+          `hideMainWindow fail, code: ${err.code}, message: ${err.message}`)
+      })
+      return true
+    }
+    return false
   }
 
   onWindowStageWillDestroy(windowStage: window.WindowStage): void {
@@ -321,6 +395,8 @@ export default class EntryAbility extends UIAbility {
   onForeground(): void {
     // Ability has brought to foreground
     AppStorage.setOrCreate('ForwardState', true)
+    // 覆盖从状态栏、Dock或应用图标恢复的入口；计时器未运行时该调用为 no-op。
+    ClashViewModel.refreshProxyDuration()
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onForeground');
 
     // 应用切回前台时，触发一次配置更新检查
@@ -356,6 +432,8 @@ export default class EntryAbility extends UIAbility {
 
   onDestroy(): void {
     hilog.info(0x0000, 'EntryAbility', '%{public}s', 'Ability onDestroy');
+    // 应用真正退出时注销托盘监听并移除托盘图标(隐藏窗口不会走到这里)
+    TrayManager.getInstance().destroy()
     this.saveConfigThePreferences()
     // 移除卡片监听事件
     this.unRegisterCardEvent()
@@ -532,7 +610,11 @@ export default class EntryAbility extends UIAbility {
 
     // 启动/停止代理
     if (proxyNodeInfo?.profile) {
-      ClashViewModel.changeProxy(proxyNodeInfo.profile, proxyNodeInfo.g, proxyNodeInfo.p)
+      const proxyChanged = await ClashViewModel.changeProxy(
+        proxyNodeInfo.profile, proxyNodeInfo.g, proxyNodeInfo.p)
+      if (!proxyChanged) {
+        return
+      }
 
       console.log('卡片 - 启动/停止代理', proxyActionType)
 
@@ -655,7 +737,10 @@ export default class EntryAbility extends UIAbility {
       try {
         windowClass.on('windowSizeChange', async (data) => {
           // 动态监听设备窗口模式
-          this.onWindowModeChange(windowStage, windowClass)
+          await this.onWindowModeChange(windowStage, windowClass)
+          // 平板从普通模式切入自由窗口/PC模式时补做托盘初始化；
+          // TrayManager 内部的 initialization/initialized 守卫保证不会重复注册。
+          this.initTray()
           console.info('#WindowChange Succeeded in enabling the listener for window size changes. Data: ' +
           JSON.stringify(data))
           WindowWidth = this.uiContext?.px2vp(data.width)!
@@ -671,6 +756,15 @@ export default class EntryAbility extends UIAbility {
     } catch (error) {
       console.error(`#EntryAbility Failed to getWindowProperties. Cause code: ${error.code}, message: ${error.message}`)
     }
+  }
+
+  /** @description 幂等初始化桌面托盘，并统一记录异步失败。 */
+  private initTray(): void {
+    TrayManager.getInstance().init(this.context).catch((err: BusinessError) => {
+      const error = err as BusinessError
+      hilog.error(0x0000, 'EntryAbility',
+        `TrayManager.init fail, code: ${error.code}, message: ${error.message}`)
+    })
   }
 
   async onWindowModeChange(windowStage: window.WindowStage, windowClass: window.Window) {

@@ -26,7 +26,7 @@ import {
 } from '../common/entity/Constants'
 import { ProxyItem, ProxyData, ProxyGroupItemDataSource, ProxyItemDataSource } from '../common/datasources/ProxyData'
 import { ClashConfig, IpInfo, Profile, ProxyMode } from 'proxy_core'
-import { EventHub, EventKey } from '../common/EventHub'
+import { EventHub, EventKey, ProxySelectionChangedData } from '../common/EventHub'
 import ClashViewModel from '../entryability/ClashViewModel'
 import { AppConfig, AppFlowingState, AppState, getPackageInfo, UIConfig } from '../entryability/AppState'
 import { common } from '@kit.AbilityKit'
@@ -65,8 +65,6 @@ import { WindowTopBar } from '../components/Common/TopBar'
 import { ImportConfigFromURL } from '../components/Configuration/ImportConfigFromURL'
 import { Xb_ChangeThemeColor } from 'xb_components/src/main/ets/utils/ChangeThemeColorUtil'
 import {
-  StatusBarConfig,
-  StatusBarIconResource,
   Xb_BackgroundRunning,
   Xb_ColorModeManager,
   Xb_FloatTabBarAlignCenter,
@@ -78,7 +76,6 @@ import {
   Xb_NotificationUtils,
   Xb_PreferenceUtil,
   Xb_ResourceColorUtil,
-  Xb_StatusBarUtils,
   Xb_TabBarVertical,
   Xb_TabIconFontSize,
   Xb_TabTitleFontSize
@@ -205,6 +202,9 @@ struct Index {
   @Provide theRestoreTime: number = 0
   // 通知更新任务id
   @State updateNoticeJob: number = 0
+  /** 防止较早发起的运行时查询覆盖刚收到的节点切换事件。 */
+  private proxyRefreshGeneration: number = 0
+  private proxySelectionRevision: number = 0
   // 暂停时刻
   @Provide thePauseTime: number = 0
   // 流量任务id
@@ -766,30 +766,6 @@ struct Index {
     hilog.info(0x1000, componentName, `#aboutToAppear executed`)
     this.registerEvent()
 
-    // 初始化状态栏工具(仅PC设备)
-    if (this.windowMode) {
-      const iconResource: StatusBarIconResource = {
-        white: 'clash_status_white.svg',
-        black: 'clash_status_black.svg'
-      };
-      const statusBarConfig: StatusBarConfig = {
-        icon: iconResource,
-        title: "entry", // 当前模块的的model-name
-        abilityName: '' // 留空，接管并使用默认状态栏图标点击事件
-        // menus: [[{
-        //   title: "",
-        //   menuAction: { abilityName: "" }
-        // }]]
-      };
-      Xb_StatusBarUtils.initStatusBar(this.UIContext, statusBarConfig)
-        .then(() => {
-          Xb_StatusBarUtils.setIconClickCallback()
-        })
-        .catch((err: BusinessError) => {
-          console.error(`Index #aboutToAppear StatusBarUtils.initStatusBar 状态栏图标初始化失败, Message: ${err.message}`);
-        })
-    }
-
     // 首次启动启用通知
     if (!this.uiConfig.isRequestNotification) {
       EventHub.sendEvent(EventKey.EnabledNotice, true)
@@ -1081,21 +1057,28 @@ struct Index {
       })
     })
     // 获取代理分组事件
-    EventHub.on(EventKey.FetchProxyGroup, async () => {
-      if (this.appConfig.currentProfileId) {
-        this.currentProfile = await ClashViewModel.getProfile(this.appConfig.currentProfileId)
-        if (this.currentProfile) {
-          // 写入数据
-          this.proxyGroups.empty()
-          const rawProxyGroups = await ClashViewModel.getProxyGroups(this.clashConfig.mode ?? ProxyMode.Rule)
-          const ProxyGroups = rawProxyGroups.filter(item => item.hidden !== true)
-          // hilog.info(0xB000, componentName, `ProxySort #Index 节点数据：${JSON.stringify(rawProxyGroups[0].proxies[0])}`)
-          this.proxyGroups.pushData(ProxyGroups)
-          this.proxyGroups.refresh()
-        }
-      } else {
-        this.proxyGroups = new ProxyGroupItemDataSource([])
+    EventHub.on(EventKey.FetchProxyGroup, () => {
+      this.refreshProxyGroups()
+    })
+    // 节点可从主界面、收藏卡片或状态栏菜单切换；统一更新页面持有的快照。
+    EventHub.on(EventKey.ProxySelectionChanged, (selection: ProxySelectionChangedData) => {
+      this.proxySelectionRevision++
+      const groups = this.proxyGroups.getAllData()
+      const selectedGroup = groups.find(group => group.name === selection.group)
+      if (selectedGroup) {
+        selectedGroup.now = selection.proxy
       }
+      if (this.currentProfile) {
+        this.currentProfile.proxySelected.set(selection.group, selection.proxy)
+      }
+
+      this.appConfig.currentProxyName = selection.proxy
+      const selectedItem = AppState.fetchProxyItem(groups, selection.group, selection.proxy)
+      if (selectedItem) {
+        this.appConfig.currentProxyItem = selectedItem
+      }
+      // Map/ProxyGroup 的原地修改不会自动触发 ArkUI 重绘，显式刷新数据源。
+      this.proxyGroups.refresh()
     })
     // 清理日志事件
     EventHub.on(EventKey.ClearLog, () => {
@@ -1168,6 +1151,46 @@ struct Index {
     })
   }
 
+  /** 从 Profile 数据库和 Mihomo 运行时重新获取页面快照。 */
+  private async refreshProxyGroups(): Promise<void> {
+    const refreshGeneration = ++this.proxyRefreshGeneration
+    const selectionRevision = this.proxySelectionRevision
+    try {
+      if (!this.appConfig.currentProfileId) {
+        this.currentProfile = null
+        this.proxyGroups = new ProxyGroupItemDataSource([])
+        return
+      }
+
+      const profile = await ClashViewModel.getProfile(this.appConfig.currentProfileId)
+      if (!profile) {
+        if (refreshGeneration !== this.proxyRefreshGeneration ||
+          selectionRevision !== this.proxySelectionRevision) {
+          return
+        }
+        this.currentProfile = null
+        this.proxyGroups = new ProxyGroupItemDataSource([])
+        return
+      }
+
+      const rawProxyGroups = await ClashViewModel.getProxyGroups(
+        this.clashConfig.mode ?? ProxyMode.Rule)
+      if (refreshGeneration !== this.proxyRefreshGeneration ||
+        selectionRevision !== this.proxySelectionRevision) {
+        return
+      }
+
+      const proxyGroups = rawProxyGroups.filter(item => item.hidden !== true)
+      this.currentProfile = profile
+      this.proxyGroups.empty()
+      this.proxyGroups.pushData(proxyGroups)
+      this.proxyGroups.refresh()
+    } catch (error) {
+      hilog.error(0x0000, componentName,
+        `refreshProxyGroups failed: ${error.message}`)
+    }
+  }
+
   aboutToDisappear() {
     hilog.info(0x1000, componentName, `#aboutToDisappear executed`)
     // 统一注销根目录事件
@@ -1193,6 +1216,7 @@ struct Index {
   /** @description 统一取消监听事件 */
   unRegisterEvent() {
     EventHub.off(EventKey.ChangeProxy)
+    EventHub.off(EventKey.ProxySelectionChanged)
     EventHub.off(EventKey.FetchProxyGroup)
     EventHub.off(EventKey.ShareBundle)
     EventHub.off(EventKey.EnabledNotice)
@@ -1368,6 +1392,8 @@ struct Index {
       hilog.info(0xFF00, "TimertestTag", "恢复的时刻： %{public}d", this.theRestoreTime)
     }
     this.proxyEnabled = ClashViewModel.vpnStarted
+    // 状态栏菜单可能在主页面未订阅事件时切换节点，回到前台时以运行时状态兜底校准。
+    this.refreshProxyGroups()
     console.log(`HomeCard 前后台状态：${this.isForward}`)
     this.ShowPipChange()
     this.initLanguage()

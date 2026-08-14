@@ -1,0 +1,504 @@
+name: Release unsigned HAP
+
+# Builds a fresh OHOS native core at the pinned revisions (same toolchain and
+# steps as the `build` job in build-core.yml) and packages the UNSIGNED release
+# HAP, then publishes it as a GitHub Release:
+#
+#   - push of a version tag (`1.2.3`, `1.7.4-lts-stable.1`, ...)
+#       -> stable release named after the tag
+#   - manual workflow_dispatch
+#       -> rolling `nightly` prerelease (deleted and recreated on every run)
+#
+# The signed pipeline lives in build-core.yml. An unsigned HAP cannot be
+# installed on commercial HarmonyOS devices directly: it must be re-signed
+# with a Huawei developer certificate in DevEco Studio or with hap-sign-tool
+# (see docs/ci-hap-signing.md).
+
+on:
+  workflow_dispatch: {}
+  push:
+    tags:
+      # Matches ClashBox-style version tags (1.2.3, 1.7.4-lts-stable.1, ...).
+      # Deliberately excludes the `nightly` tag so the rolling prerelease that
+      # this workflow creates never retriggers itself.
+      - "*.*.*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-ohos-hap-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CORE_DIR: proxy_core/src/flclash
+  OHOS_SDK_VERSION: "5.0.0" # API 12
+  CORE_URL: https://github.com/xfz347/Clash.Meta.git
+  CORE_REV: 98ca8a7bf1737001d5488baf93223c9878e532a7
+  GVISOR_URL: https://github.com/likuai2010/gvisor-ohos.git
+  GVISOR_REV: 82104eaba946b7cc463b87648af9724d3f268537
+  BOOTSTRAP_GO_VERSION: "1.24.13"
+  GO_OHOS_URL: https://github.com/moodyhunter/go-tls-mode-gd.git
+  GO_OHOS_REV: 0136c5054dec5322f49a4d5431a610b972c44b4f
+  GO_OHOS_DIR: ${{ github.workspace }}/.go-ohos
+
+jobs:
+  build:
+    # Mirrors the `build` job of build-core.yml step-for-step. When bumping
+    # CORE_REV / GVISOR_REV / GO_OHOS_REV / BOOTSTRAP_GO_VERSION or changing
+    # any toolchain step, update BOTH workflows.
+    name: Build OHOS native core
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      # --- 1. Source -----------------------------------------------------------
+      - name: Checkout (submodules deferred)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: false
+          persist-credentials: false
+
+      - name: Fetch pinned flclash core + gVisor revisions
+        # The parent repo pins a `core` submodule commit that upstream force-pushed
+        # away. These revisions are the tested tips of the two `ohos` branches from
+        # the first successful cloud build; pinning them prevents silent API drift.
+        run: |
+          rm -rf "$CORE_DIR/core" "$CORE_DIR/gvisor-ohos"
+
+          fetch_revision() {
+            local repository="$1"
+            local revision="$2"
+            local destination="$3"
+            mkdir -p "$destination"
+            git -C "$destination" init --quiet
+            git -C "$destination" remote add origin "$repository"
+            git -C "$destination" fetch --quiet --depth 1 origin "$revision"
+            git -C "$destination" checkout --quiet --detach FETCH_HEAD
+            test "$(git -C "$destination" rev-parse HEAD)" = "$revision"
+          }
+
+          fetch_revision "$CORE_URL" "$CORE_REV" "$CORE_DIR/core"
+          fetch_revision "$GVISOR_URL" "$GVISOR_REV" "$CORE_DIR/gvisor-ohos"
+          test -f "$CORE_DIR/core/go.mod"
+          test -f "$CORE_DIR/gvisor-ohos/go.mod"
+          echo "core:   $(git -C "$CORE_DIR/core" rev-parse HEAD)"
+          echo "gvisor: $(git -C "$CORE_DIR/gvisor-ohos" rev-parse HEAD)"
+
+      - name: Add API compat shims to the cloned core
+        # The flclash glue code (hub.go / lib_linux.go) was written against the lost
+        # pinned core commit. The ohos branch has the same functionality under new
+        # names, so inject tiny same-package wrappers instead of forking the core:
+        #   statistic.Manager.NowTraffic   -> renamed to Current(onlyProxy)
+        #   statistic.Manager.TotalTraffic -> renamed to Total(onlyProxy)
+        #   iface.SetNetInterfaces         -> unexported as setNetInterfaces
+        run: |
+          cat > "$CORE_DIR/core/component/iface/zz_flclash_compat.go" <<'EOF'
+          package iface
+
+          import "net"
+
+          // SetNetInterfaces re-exports setNetInterfaces for the flclash glue code.
+          func SetNetInterfaces(nets []net.Interface) { setNetInterfaces(nets) }
+          EOF
+          cat > "$CORE_DIR/core/tunnel/statistic/zz_flclash_compat.go" <<'EOF'
+          package statistic
+
+          // NowTraffic / TotalTraffic keep the names the flclash glue code expects;
+          // the ohos core renamed them to Current / Total (same semantics).
+          func (m *Manager) NowTraffic(onlyProxy bool) (up, down int64)  { return m.Current(onlyProxy) }
+          func (m *Manager) TotalTraffic(onlyProxy bool) (up, down int64) { return m.Total(onlyProxy) }
+          EOF
+
+      # --- 2. Toolchains -------------------------------------------------------
+      - name: Setup OpenHarmony NDK
+        id: ohos
+        uses: openharmony-rs/setup-ohos-sdk@b312caf8a43bb836aa24c08f65f97e1f09a89cad # v1.0.1
+        with:
+          version: ${{ env.OHOS_SDK_VERSION }}
+          components: native
+
+      - name: Setup bootstrap Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.BOOTSTRAP_GO_VERSION }}
+          cache: false
+
+      - name: Restore OHOS Go toolchain (cache)
+        id: cache-go-ohos
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ env.GO_OHOS_DIR }}
+          key: gotoolchain-${{ runner.os }}-${{ runner.arch }}-${{ env.BOOTSTRAP_GO_VERSION }}-${{ env.GO_OHOS_REV }}
+
+      - name: Fetch pinned patched Go toolchain
+        if: steps.cache-go-ohos.outputs.cache-hit != 'true'
+        run: |
+          # Go 1.26 with the tls-mode-gd patch already applied: adds -tlsmodegd
+          # (arm64 general-dynamic TLS) so the c-shared .so is dlopen-able on OHOS musl.
+          mkdir -p "$GO_OHOS_DIR"
+          git -C "$GO_OHOS_DIR" init --quiet
+          git -C "$GO_OHOS_DIR" remote add origin "$GO_OHOS_URL"
+          git -C "$GO_OHOS_DIR" fetch --quiet --depth 1 origin "$GO_OHOS_REV"
+          git -C "$GO_OHOS_DIR" checkout --quiet --detach FETCH_HEAD
+          test "$(git -C "$GO_OHOS_DIR" rev-parse HEAD)" = "$GO_OHOS_REV"
+          grep -q 'tlsmodegd' "$GO_OHOS_DIR/src/cmd/go/internal/work/build.go"
+
+      - name: Build OHOS Go toolchain (make.bash)
+        if: steps.cache-go-ohos.outputs.cache-hit != 'true'
+        working-directory: ${{ env.GO_OHOS_DIR }}/src
+        env:
+          GOTOOLCHAIN: local
+        run: GOROOT_BOOTSTRAP="$(go env GOROOT)" ./make.bash
+
+      - name: Verify OHOS Go toolchain
+        run: |
+          test -x "$GO_OHOS_DIR/bin/go"
+          test "$(git -C "$GO_OHOS_DIR" rev-parse HEAD)" = "$GO_OHOS_REV"
+          grep -q 'tlsmodegd' "$GO_OHOS_DIR/src/cmd/go/internal/work/build.go"
+          "$GO_OHOS_DIR/bin/go" version
+
+      # --- 3. Build env --------------------------------------------------------
+      - name: Configure CGO / cross-compile env
+        run: |
+          native='${{ steps.ohos.outputs.ohos_sdk_native }}'
+          llvm="$native/llvm"
+          sysroot="$native/sysroot"
+          {
+            echo "GO_OHOS_BIN=$GO_OHOS_DIR/bin/go"
+            echo "GOTOOLCHAIN=local"
+            echo "CC=$llvm/bin/clang"
+            echo "CXX=$llvm/bin/clang++"
+            echo "CGO_AR=$llvm/bin/llvm-ar"
+            echo "GOOS=linux"
+            echo "GOARCH=arm64"
+            echo "CGO_ENABLED=1"
+            echo "CGO_CFLAGS=--target=aarch64-linux-ohos --sysroot=$sysroot -D__MUSL__ -fPIC -Wno-error"
+            echo "CGO_LDFLAGS=--target=aarch64-linux-ohos --sysroot=$sysroot -fuse-ld=lld"
+          } >> "$GITHUB_ENV"
+
+      # --- 3b. Reconcile modules ----------------------------------------------
+      - name: Reconcile flclash go.mod with the ohos core
+        working-directory: ${{ env.CORE_DIR }}
+        env:
+          GOFLAGS: -tags=ohos,with_gvisor
+        run: |
+          # flclash's committed go.mod/go.sum pin the lost core commit and drag in
+          # NEWER metacubex deps than the ohos core expects (quic-go/sing-quic API
+          # drift). Regenerate a minimal go.mod so ./core's go.mod drives versions.
+          rm -f go.mod go.sum
+          "$GO_OHOS_BIN" mod init core
+          "$GO_OHOS_BIN" mod edit \
+            -go=1.23 \
+            -require=github.com/likuai2010/ohos-napi@v1.0.3 \
+            -require=github.com/metacubex/mihomo@v1.17.1 \
+            -require=github.com/samber/lo@v1.53.0 \
+            -replace=github.com/metacubex/mihomo=./core \
+            -replace=github.com/metacubex/gvisor=./gvisor-ohos
+          "$GO_OHOS_BIN" mod tidy
+
+      # --- 4. Compile ----------------------------------------------------------
+      - name: Build libflclash.so
+        working-directory: ${{ env.CORE_DIR }}
+        run: |
+          # GOOS=linux + c-shared + -tlsmodegd forces arm64 general-dynamic TLS so
+          # the .so is dlopen-able on OHOS musl. The -tlsmodegd flag comes from the
+          # patch applied to the toolchain above (moodyhunter/libHv2rayCore).
+          # -mod=mod: the flclash go.sum is pinned to the old (lost) core; the ohos
+          # core pulls newer deps, so let go add the missing go.sum entries / download.
+          "$GO_OHOS_BIN" build \
+            -mod=mod \
+            -tlsmodegd \
+            -buildmode c-shared \
+            -tags "ohos with_gvisor" \
+            -trimpath -ldflags "-s -w" \
+            -o libflclash.so ./
+
+      - name: Verify output
+        working-directory: ${{ env.CORE_DIR }}
+        run: |
+          test -s libflclash.so
+          ls -la libflclash.so
+
+          file libflclash.so
+          elf_header="$(readelf -h libflclash.so)"
+          dynamic_section="$(readelf -d libflclash.so)"
+          program_headers="$(readelf -l libflclash.so)"
+          dynamic_symbols="$(readelf --dyn-syms --wide libflclash.so)"
+
+          echo "$elf_header"
+          echo "$dynamic_section"
+          grep -F "Class:                             ELF64" <<<"$elf_header" >/dev/null
+          grep -F "Type:                              DYN (Shared object file)" <<<"$elf_header" >/dev/null
+          grep -F "Machine:                           AArch64" <<<"$elf_header" >/dev/null
+
+          for library in libhilog_ndk.z.so libace_napi.z.so libc.so; do
+            grep -F "Shared library: [$library]" <<<"$dynamic_section" >/dev/null
+          done
+          if grep -F "(TEXTREL)" <<<"$dynamic_section" >/dev/null; then
+            echo "::error::libflclash.so contains text relocations"
+            exit 1
+          fi
+          if grep -F " INTERP " <<<"$program_headers" >/dev/null; then
+            echo "::error::A shared library must not contain a program interpreter"
+            exit 1
+          fi
+          grep -E "[[:space:]]InitializeModule$" <<<"$dynamic_symbols" >/dev/null
+
+          sha256sum libflclash.so | tee libflclash.so.sha256
+          checksum="$(cut -d ' ' -f 1 libflclash.so.sha256)"
+          {
+            echo "### OHOS core artifact"
+            echo
+            echo "- core: \`$CORE_REV\`"
+            echo "- gVisor: \`$GVISOR_REV\`"
+            echo "- patched Go: \`$GO_OHOS_REV\`"
+            echo "- SHA-256: \`$checksum\`"
+            echo "- size: $(stat -c '%s bytes' libflclash.so)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Stage into libs/arm64-v8a
+        run: |
+          mkdir -p proxy_core/libs/arm64-v8a
+          cp -f "$CORE_DIR/libflclash.so" proxy_core/libs/arm64-v8a/libflclash.so
+          cp -f "$CORE_DIR/libflclash.so.sha256" proxy_core/libs/arm64-v8a/libflclash.so.sha256
+
+      # --- 5. Publish ----------------------------------------------------------
+      - name: Upload artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: libflclash-arm64-v8a
+          path: |
+            proxy_core/libs/arm64-v8a/libflclash.so
+            proxy_core/libs/arm64-v8a/libflclash.so.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+  package:
+    name: Package unsigned release HAP
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    container:
+      # CLT 6.0.2.642 image, pinned to its immutable registry digest.
+      image: ghcr.io/sanchuanhehe/harmony-next-pipeline-docker/harmonyos-ci-image@sha256:2836142b7b6ae8837ad0e36cacc650f00e8c88f55b4e9f34be66cc98a731c5da
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      hap_filename: ${{ steps.meta.outputs.hap_filename }}
+    env:
+      HAP_BUNDLE_NAME: org.xbgroup.clashboxLTS
+    steps:
+      - name: Checkout application
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: false
+          persist-credentials: false
+
+      - name: Verify vendored UI components
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          test -s xb_components/Index.ets
+          test -s xb_components/oh-package.json5
+          test "$(cat xb_components/.upstream-revision)" = \
+            "55efa4d59785a94c2a9ff06010e1874c7fb30107"
+
+      - name: Download compiled arm64 core
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: libflclash-arm64-v8a
+          path: ${{ runner.temp }}/libflclash-arm64-v8a
+
+      - name: Verify and stage compiled core
+        working-directory: ${{ runner.temp }}/libflclash-arm64-v8a
+        run: |
+          test -s libflclash.so
+          test -s libflclash.so.sha256
+          sha256sum --check libflclash.so.sha256
+          mkdir -p "$GITHUB_WORKSPACE/proxy_core/libs/arm64-v8a"
+          cp libflclash.so "$GITHUB_WORKSPACE/proxy_core/libs/arm64-v8a/libflclash.so"
+          test -s "$GITHUB_WORKSPACE/proxy_core/libs/arm64-v8a/libflclash.so"
+
+      - name: Configure tool environment
+        run: |
+          node_bin="$COMMANDLINE_TOOL_DIR/command-line-tools/tool/node/bin"
+          test -x "$node_bin/node"
+          echo "$node_bin" >> "$GITHUB_PATH"
+          export PATH="$node_bin:$PATH"
+
+          node --version
+          java -version
+          ohpm --version
+          hvigorw --version
+          test -d "$OHOS_BASE_SDK_HOME/toolchains/lib"
+
+      - name: Install OHPM dependencies
+        run: |
+          ohpm config set registry https://ohpm.openharmony.cn/ohpm/
+          ohpm install --all
+
+      - name: Assemble unsigned release HAP
+        run: |
+          hvigorw clean --no-daemon --no-parallel
+          hvigorw assembleHap \
+            --mode module \
+            -p product=default \
+            -p buildMode=release \
+            --no-daemon \
+            --no-parallel \
+            --stacktrace
+
+      - name: Locate unsigned HAP
+        id: unsigned
+        shell: bash
+        run: |
+          mapfile -t haps < <(
+            find entry/build -type f -name '*-unsigned.hap' -print |
+              sort
+          )
+          if [[ "${#haps[@]}" -ne 1 ]]; then
+            printf 'Expected exactly one unsigned HAP, found %s:\n' "${#haps[@]}" >&2
+            printf '  %s\n' "${haps[@]:-<none>}" >&2
+            exit 1
+          fi
+          test -s "${haps[0]}"
+          echo "hap=${haps[0]}" >> "$GITHUB_OUTPUT"
+          ls -lh "${haps[0]}"
+
+      - name: Stage release assets
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+          unsigned_hap="${{ steps.unsigned.outputs.hap }}"
+          test -s "$unsigned_hap"
+
+          version="$(sed -n 's/.*"versionName"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' AppScope/app.json5 | head -n 1)"
+          test -n "$version"
+          sha7="${GITHUB_SHA:0:7}"
+          hap_filename="ClashBox-${version}-${sha7}-unsigned.hap"
+
+          mkdir -p artifacts
+          cp -f "$unsigned_hap" "artifacts/$hap_filename"
+          (
+            cd artifacts
+            sha256sum "$hap_filename" | tee SHA256SUMS
+            {
+              echo "commit=$GITHUB_SHA"
+              echo "bundle=$HAP_BUNDLE_NAME"
+              echo "version=$version"
+              echo "signing=none"
+            } > build-metadata.txt
+            printf '%s\n' \
+              'This HAP is UNSIGNED and cannot be installed on commercial HarmonyOS devices' \
+              'as-is. Re-sign it with a Huawei developer certificate in DevEco Studio or with' \
+              'hap-sign-tool before installing (see docs/ci-hap-signing.md). Signed builds are' \
+              'available from the build-core workflow.' \
+              '' \
+              '未签名 HAP：无法直接安装到商用 HarmonyOS 设备。安装前请使用华为开发者证书' \
+              '在 DevEco Studio 或 hap-sign-tool 中重新签名（参见 docs/ci-hap-signing.md）。' \
+              > INSTALLATION-NOTES.txt
+          )
+
+          checksum="$(cut -d ' ' -f 1 artifacts/SHA256SUMS)"
+          {
+            echo "### Unsigned release HAP"
+            echo
+            echo "- file: \`$hap_filename\`"
+            echo "- bundle: \`$HAP_BUNDLE_NAME\`"
+            echo "- version: \`$version\`"
+            echo "- signing: \`none\`"
+            echo "- SHA-256: \`$checksum\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          {
+            echo "version=$version"
+            echo "hap_filename=$hap_filename"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Upload unsigned HAP
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: clashbox-unsigned-hap
+          path: |
+            artifacts/*.hap
+            artifacts/SHA256SUMS
+            artifacts/build-metadata.txt
+            artifacts/INSTALLATION-NOTES.txt
+          if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    name: Publish GitHub release
+    needs: package
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Download unsigned HAP bundle
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: clashbox-unsigned-hap
+          path: ${{ runner.temp }}/release-assets
+
+      - name: Publish GitHub release
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/release-assets"
+
+          hap_file="${{ needs.package.outputs.hap_filename }}"
+          version="${{ needs.package.outputs.version }}"
+          for asset in "$hap_file" SHA256SUMS build-metadata.txt INSTALLATION-NOTES.txt; do
+            test -s "$asset"
+          done
+
+          sha7="${GITHUB_SHA:0:7}"
+          checksum="$(cut -d ' ' -f 1 SHA256SUMS)"
+          {
+            echo "ClashBox **$version**（未签名 HAP，自动构建）"
+            echo
+            echo "- file: \`$hap_file\`"
+            echo "- bundle: \`org.xbgroup.clashboxLTS\`"
+            echo "- commit: \`$sha7\` (\`$GITHUB_SHA\`)"
+            echo "- SHA-256: \`$checksum\`"
+            echo
+            echo "> ⚠️ 未签名 HAP 无法直接安装到商用 HarmonyOS 设备。"
+            echo "> 安装前请用华为开发者证书在 DevEco Studio 或 hap-sign-tool 中重新签名，"
+            echo "> 参见 docs/ci-hap-signing.md。带签名的构建产物见 build-core 工作流。"
+          } > notes.md
+
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            tag="$GITHUB_REF_NAME"
+            if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+              echo "Release $tag already exists; uploading assets to it."
+              gh release upload "$tag" \
+                "$hap_file" SHA256SUMS build-metadata.txt INSTALLATION-NOTES.txt \
+                --clobber \
+                --repo "$GITHUB_REPOSITORY"
+            else
+              # The tag was just pushed and already exists; no --target needed,
+              # which also keeps annotated tags working (GITHUB_SHA is the tag
+              # object, not a commit, for annotated tags).
+              gh release create "$tag" \
+                "$hap_file" SHA256SUMS build-metadata.txt INSTALLATION-NOTES.txt \
+                --repo "$GITHUB_REPOSITORY" \
+                --title "ClashBox $tag（未签名 HAP）" \
+                --notes-file notes.md
+            fi
+          else
+            # Rolling nightly prerelease for manual dispatches: the `nightly`
+            # tag has no dots, so it does not match the `*.*.*` tag filter and
+            # cannot retrigger this workflow.
+            gh release delete nightly --yes --cleanup-tag --repo "$GITHUB_REPOSITORY" || true
+            gh release create nightly \
+              "$hap_file" SHA256SUMS build-metadata.txt INSTALLATION-NOTES.txt \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "ClashBox nightly $version（未签名 HAP）" \
+              --prerelease \
+              --notes-file notes.md
+          fi

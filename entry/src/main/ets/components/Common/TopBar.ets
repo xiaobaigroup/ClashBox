@@ -6,7 +6,7 @@ import { ButtonBuilder, context, font_primary, icon_primary } from "./Common";
 import { BusinessError } from "@kit.BasicServicesKit";
 import { calculateFontSizeLinear } from "../../common/utils/CalculateFontSizeUtil";
 import { common } from "@kit.AbilityKit";
-import { Xb_ToastUtil } from "xb_components";
+import { TrayManager } from "../../common/utils/TrayManager";
 
 let theWindowClass: window.Window
 
@@ -169,15 +169,13 @@ export struct WindowTopBar {
       {
         icon: $r('sys.symbol.xmark'),
         image: false,
-        onClick: () => {
+        onClick: async () => {
           if (this.uiConfig.exitWindowMode === 1) {
-            Xb_ToastUtil.exitApp()
+            // 应用内"直接退出"保留既有强制退出语义，但不复用系统预终止路径
+            TrayManager.getInstance().forceExitApp()
           } else {
-            this.context.hideAbility().then(() => {
-              console.debug(`#WindowDecorButtonModel hideAbility success`);
-            }).catch((err: BusinessError) => {
-              console.error(`#WindowDecorButtonModel hideAbility fail, code: ${err.code} message: ${err.message}, stack: ${JSON.stringify(err.stack)}`);
-            });
+            // 等待应用完成状态栏接入后隐藏主窗口；不退化成普通最小化。
+            await TrayManager.getInstance().hideMainWindow(this.context)
           }
         }
       }

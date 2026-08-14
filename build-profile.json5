@@ -28,7 +28,6 @@
         }
       }
     ],
-    // 产品配置
     "products": [
       {
         "name": "default",
@@ -43,8 +42,7 @@
           },
           "externalNativeOptions": {
             "abiFilters": [
-              "arm64-v8a",
-              "x86_64"
+              "arm64-v8a"
             ]
           }
         }
@@ -62,8 +60,7 @@
           },
           "externalNativeOptions": {
             "abiFilters": [
-              "arm64-v8a",
-              "x86_64"
+              "arm64-v8a"
             ]
           }
         }
@@ -71,7 +68,7 @@
     ],
     "buildModeSet": [
       {
-        "name": "debug",
+        "name": "debug"
       },
       {
         "name": "release"
@@ -85,7 +82,6 @@
       "targets": [
         {
           "name": "default",
-          // 入口模块的产品信息配置
           "applyToProducts": [
             "default",
             "release"
@@ -95,7 +91,7 @@
     },
     {
       "name": "proxy_core",
-      "srcPath": "./proxy_core",
+      "srcPath": "./proxy_core"
     },
     {
       "name": "xb_components",

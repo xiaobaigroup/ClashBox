@@ -2077,6 +2077,14 @@
       "value": "Exit"
     },
     {
+      "name": "tray_open_app",
+      "value": "Open ClashBox"
+    },
+    {
+      "name": "tray_more_nodes",
+      "value": "More nodes…"
+    },
+    {
       "name": "app_already_exist",
       "value": "The application already exists"
     },

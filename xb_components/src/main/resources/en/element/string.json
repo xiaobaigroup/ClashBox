@@ -1,0 +1,384 @@
+{
+  "string": [
+    {
+      "name": "page_show",
+      "value": "page from package"
+    },
+    {
+      "name": "xb_about_xb_studio",
+      "value": "About Xiaobai Studio"
+    },
+    {
+      "name": "xb_member",
+      "value": "Members"
+    },
+    {
+      "name": "xb_app",
+      "value": "App"
+    },
+    {
+      "name": "xb_sponsor_contact",
+      "value": "Sponsor And Contact"
+    },
+    {
+      "name": "xb_developer",
+      "value": "developer"
+    },
+    {
+      "name": "xb_planner",
+      "value": "planner"
+    },
+    {
+      "name": "xb_designer",
+      "value": "designer"
+    },
+    {
+      "name": "xb_sponsor",
+      "value": "Sponsor us (AFDIAN)"
+    },
+    {
+      "name": "xb_contact1",
+      "value": "Official QQ Communication Group 1"
+    },
+    {
+      "name": "xb_contact2",
+      "value": "Official QQ Communication Group 2"
+    },
+    {
+      "name": "xb_introduce",
+      "value": "Xiaobai Studio is a private development team dedicated to the porting of HarmonyOS applications, with rich experience in adapting and porting HarmonyOS platforms. At present, team members have successfully launched multiple applications on the HarmonyOS app market, receiving high praise from users."
+    },
+    {
+      "name": "xb_reject_exit",
+      "value": "Reject and Exit"
+    },
+    {
+      "name": "xb_return",
+      "value": "Return"
+    },
+    {
+      "name": "xb_completed",
+      "value": "Completed"
+    },
+    {
+      "name": "xb_agree_continue",
+      "value": "Agree and Continue"
+    },
+    {
+      "name": "xb_user_agreement",
+      "value": "User Agreement"
+    },
+    {
+      "name": "xb_privacy",
+      "value": "Privacy Statement"
+    },
+    {
+      "name": "xb_save",
+      "value": "Save"
+    },
+    {
+      "name": "xb_cancel",
+      "value": "Cancel"
+    },
+    {
+      "name": "xb_collaborators",
+      "value": "Collaborators"
+    },
+    {
+      "name": "xb_studio",
+      "value": "XiaoBai Studio"
+    },
+    {
+      "name": "xb_reference_excellent_project",
+      "value": "Reference excellent projects"
+    },
+    {
+      "name": "xb_supporter",
+      "value": "Supporter"
+    },
+    {
+      "name": "xb_language",
+      "value": "Language"
+    },
+    {
+      "name": "xb_zh_CN",
+      "value": "Simplified Chinese"
+    },
+    {
+      "name": "xb_en",
+      "value": "English"
+    },
+    {
+      "name": "xb_dark_mode",
+      "value": "Dark Mode"
+    },
+    {
+      "name": "xb_follow_system",
+      "value": "Follow System"
+    },
+    {
+      "name": "xb_always_light",
+      "value": "Always Light"
+    },
+    {
+      "name": "xb_always_dark",
+      "value": "Always Dark"
+    },
+    {
+      "name": "xb_theme_color",
+      "value": "Theme Color"
+    },
+    {
+      "name": "xb_star_river_blue",
+      "value": "Star River Blue"
+    },
+    {
+      "name": "xb_cat_blue",
+      "value": "Cat Blue"
+    },
+    {
+      "name": "xb_yellow",
+      "value": "Yellow"
+    },
+    {
+      "name": "xb_red",
+      "value": "Red"
+    },
+    {
+      "name": "xb_purple",
+      "value": "Purple"
+    },
+    {
+      "name": "xb_pink",
+      "value": "Pink"
+    },
+    {
+      "name": "xb_green",
+      "value": "Green"
+    },
+    {
+      "name": "xb_today",
+      "value": "Today"
+    },
+    {
+      "name": "xb_yesterday",
+      "value": "Yesterday"
+    },
+    {
+      "name": "xb_now",
+      "value": "Now"
+    },
+    {
+      "name": "xb_appearance",
+      "value": "Appearance"
+    },
+    {
+      "name": "xb_appearance_subtitle",
+      "value": "Dark mode, Theme color"
+    },
+    {
+      "name": "xb_about",
+      "value": "About"
+    },
+    {
+      "name": "xb_system_language",
+      "value": "System Language"
+    },
+    {
+      "name": "xb_notice",
+      "value": "Notification and Feedback"
+    },
+    {
+      "name": "xb_backgrounder",
+      "value": "Backgrounder"
+    },
+    {
+      "name": "xb_vibration_feedback",
+      "value": "Vibration Feedback"
+    },
+    {
+      "name": "xb_sound_feedback",
+      "value": "Sound Feedback"
+    },
+    {
+      "name": "xb_notice_main_switch",
+      "value": "Main switch for notification"
+    },
+    {
+      "name": "xb_resident_notice",
+      "value": "Resident Notice"
+    },
+    {
+      "name": "xb_resident_notice_column",
+      "value": "Resident Notification Column"
+    },
+    {
+      "name": "xb_simulated_positioning",
+      "value": "Simulated Positioning"
+    },
+    {
+      "name": "xb_simulated_positioning_tips",
+      "value": "By simulating the positioning and retention of the program backend"
+    },
+    {
+      "name": "xb_simulate_pip",
+      "value": "Simulated Picture in Picture"
+    },
+    {
+      "name": "xb_simulate_pip_tips",
+      "value": "Preserve program background through blank picture in picture"
+    },
+    {
+      "name": "xb_tips",
+      "value": "Tips"
+    },
+    {
+      "name": "xb_backgrounder_tips",
+      "value": "You can only choose to turn on one of the options, which may result in increased power consumption. After turning on/off the simulation positioning option, you need to delete the background and restart the app for it to take effect. Unable to actively open the picture in picture window from the free multi window mode; Picture in picture must always be in display mode, and when folded (minimized), it will not be able to maintain background operation; After opening the picture in picture window, the system will lock 90 frames."
+    },
+    {
+      "name": "xb_resident_notice_tips",
+      "value": "Not recommended to close"
+    },
+    {
+      "name": "xb_blurr",
+      "value": "Blurriness of background"
+    },
+    {
+      "name": "xb_blurr_subtitle",
+      "value": "Close to alleviate APP lag issues"
+    },
+    {
+      "name": "xb_position_center",
+      "value": "Center"
+    },
+    {
+      "name": "xb_position_right",
+      "value": "Right"
+    },
+    {
+      "name": "xb_position_left",
+      "value": "Left"
+    },
+    {
+      "name": "xb_app_version",
+      "value": "App Version"
+    },
+    {
+      "name": "xb_faq",
+      "value": "Frequently asked Questions"
+    },
+    {
+      "name": "xb_open_three",
+      "value": "Open source projects and third-party libraries"
+    },
+    {
+      "name": "xb_core_version",
+      "value": "Core Version"
+    },
+    {
+      "name": "xb_use_guidance",
+      "value": "Use Guidance"
+    },
+    {
+      "name": "xb_repo",
+      "value": "Repository"
+    },
+    {
+      "name": "xb_email",
+      "value": "E-mail"
+    },
+    {
+      "name": "xb_discord",
+      "value": "Discord"
+    },
+    {
+      "name": "xb_telegram",
+      "value": "Telegram"
+    },
+    {
+      "name": "xb_copy",
+      "value": "Copy"
+    },
+    {
+      "name": "xb_delete",
+      "value": "Delete"
+    },
+    {
+      "name": "xb_input",
+      "value": "Please enter..."
+    },
+    {
+      "name": "xb_edit",
+      "value": "Edit"
+    },
+    {
+      "name": "xb_pay_title_buy_out",
+      "value": "Buy Out"
+    },
+    {
+      "name": "xb_pay_title_subscribe",
+      "value": "Subscribe"
+    },
+    {
+      "name": "update_log",
+      "value": "Update Log"
+    },
+    {
+      "name": "current_version",
+      "value": "Current Version"
+    },
+    {
+      "name": "pay_button",
+      "value": "Purchase with Huawei Pay"
+    },
+    {
+      "name": "pay_button_sec",
+      "value": "WeChat Pay, Alipay, debit card, credit card, and other payment methods supported"
+    },
+    {
+      "name": "xb_enable_notice_failed",
+      "value": "Notification authorization failed"
+    },
+    {
+      "name": "xb_go_settings_auth",
+      "value": "Go to Set Authorization"
+    },
+    {
+      "name": "xb_go_settings_auth_content",
+      "value": "You have cancelled the notification permission grant. Do you want to go to the settings to grant notification permission"
+    },
+    {
+      "name": "xb_confirm",
+      "value": "Confirm"
+    },
+    {
+      "name": "xb_task_keeping",
+      "value": "Maintain tasks"
+    },
+    {
+      "name": "crash_subtitle",
+      "value": "请将日志交给开发者，以便于排查~"
+    },
+    {
+      "name": "crash_title",
+      "value": "啊哦，刚刚好像崩溃了"
+    },
+    {
+      "name": "show_full_log",
+      "value": "展示完整日志信息"
+    },
+    {
+      "name": "email_feedback",
+      "value": "邮件反馈"
+    },
+    {
+      "name": "export_share",
+      "value": "导出分享"
+    },
+    {
+      "name": "xb_open",
+      "value": "Open"
+    }
+  ]
+}

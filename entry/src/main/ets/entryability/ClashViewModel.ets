@@ -11,7 +11,7 @@ import { convertTimeGapToMilliseconds } from "../common/entity/Constants";
 import { PromptAction } from "@kit.ArkUI";
 import { ProxyGroup } from "proxy_core/src/main/ets/models/Common";
 import { ConfigExtendedParams } from "proxy_core/src/main/ets/models/ClashConfig";
-import { EventHub, EventKey } from "../common/EventHub";
+import { EventHub, EventKey, ProxySelectionChangedData } from "../common/EventHub";
 import { AppConfig, AppState, ClashCore, getPackageInfo } from "./AppState";
 import  fs from  "@ohos.file.fs"
 import { sleep } from "./EntryAbility";
@@ -26,6 +26,7 @@ import { number2Time } from "../common/utils/TimeConvertUtil";
 import { picker } from "@kit.CoreFileKit"
 import { Xb_GetResourceString, Xb_ToastUtil } from "xb_components";
 import { accessControlRdb } from "../common/datasources/AccessControlRdb";
+import ProxyKeepAliveService from "../common/utils/ProxyKeepAliveService";
 
 export interface DelayInfo{
     name: string
@@ -199,14 +200,57 @@ export class ClashViewModel {
   async VailConfig(config: string): Promise<string>{
     return await this.socketProxy.vailConfig(config)
   }
-  async changeProxy(profile: Profile, g:string, p: string){
+  async changeProxy(profile: Profile, g:string, p: string): Promise<boolean> {
     try {
-      profile.proxySelected?.set(g, p)
-      await this.profileRepo.addOrUpdate(profile)
-      await this.socketProxy.changeProxy(g, p)
+      // 内核以空字符串表示成功，非空字符串是业务错误，不会通过 Promise reject。
+      const result = await this.socketProxy.changeProxy(g, p)
+      if (result !== '') {
+        throw new Error(result)
+      }
+
+      // 只在内核确认切换后发布同一份选择结果，避免各入口各自维护假状态。
+      await this.syncProxySelection(profile, g, p)
       EventHub.sendEvent(EventKey.checkIpInfo)
+      return true
     } catch (e) {
-      ClashViewModel.promptAction.showToast({message: e.message, duration:3000})
+      ClashViewModel.promptAction?.showToast({message: e.message, duration:3000})
+      // 失败时也回读运行时状态，用实际选择修正菜单。
+      EventHub.sendEvent(EventKey.TrayMenuRefresh)
+      return false
+    }
+  }
+
+  /**
+   * 将内核已经确认的节点选择同步到 Profile、AppStorage、卡片和界面事件。
+   * TrayManager 回读到不同运行时结果时也使用此入口进行纠正。
+   */
+  async syncProxySelection(profile: Profile, group: string, proxy: string): Promise<void> {
+    profile.proxySelected.set(group, proxy)
+    const appConfig = AppStorage.get<AppConfig>('appConfig')
+    if (appConfig) {
+      appConfig.currentProxyName = proxy
+    }
+
+    try {
+      cardManager.setSelectedProxyNode(profile, group, proxy)
+      cardManager.pushCartCurrentProxyName(proxy)
+    } catch (cardError) {
+      hilog.error(0x0000, 'ClashViewModel',
+        `syncProxySelection card failed, group: ${group}, proxy: ${proxy}, message: ${cardError.message}`)
+    }
+
+    EventHub.sendEvent(EventKey.ProxySelectionChanged, {
+      group: group,
+      proxy: proxy
+    } as ProxySelectionChangedData)
+    EventHub.sendEvent(EventKey.TrayMenuRefresh)
+
+    try {
+      await this.profileRepo.addOrUpdate(profile)
+    } catch (persistError) {
+      // 内核已切换成功，持久化失败不应将本次运行时操作报为失败。
+      hilog.error(0x0000, 'ClashViewModel',
+        `syncProxySelection persist failed, group: ${group}, proxy: ${proxy}, message: ${persistError.message}`)
     }
   }
   async setVpnOptions(options: VpnRawOptions){
@@ -319,7 +363,7 @@ export class ClashViewModel {
   async clearRequestList(){
     return await this.socketProxy.clearRequestList()
   }
-  async getProxyGroups(model: ProxyMode): Promise<ProxyGroup[]>{
+  async getProxyGroups(model: ProxyMode, silent: boolean = false): Promise<ProxyGroup[]>{
     try {
       let list = await this.socketProxy.queryProxyGroups(model)
       let favoriteProxys = AppStorage.get<Map<string, string>>("favoriteProxys")
@@ -335,7 +379,9 @@ export class ClashViewModel {
       return groups
     } catch (e) {
       console.error(" 获取代理失败: ", e.stack)
-      ClashViewModel.promptAction.showToast({message: "获取代理失败: " + (e.message || e) + e.stack})
+      if (!silent) {
+        ClashViewModel.promptAction.showToast({message: "获取代理失败: " + (e.message || e) + e.stack})
+      }
     }
     return []
   }
@@ -407,6 +453,8 @@ export class ClashViewModel {
       ClashViewModel.promptAction.showToast({message: result, duration: 3000 })
     }
     EventHub.sendEvent(EventKey.FetchProxyGroup, null)
+    // 通知托盘刷新右键菜单(配置加载/重载后分组可能变化)
+    EventHub.sendEvent(EventKey.TrayMenuRefresh, null)
   }
   async ReStartVpn(){
     if(this.vpnStarted){
@@ -414,6 +462,10 @@ export class ClashViewModel {
       await this.loadVpnOptions()
       await this.socketProxy.stopClash()
       await this.socketProxy.startClash()
+      // 内核恢复后重新确认长时任务保活(幂等)
+      if (this.context) {
+        ProxyKeepAliveService.start(this.context)
+      }
     }
   }
   vpnStarted = false
@@ -449,6 +501,12 @@ export class ClashViewModel {
     })
 
     cardManager.pushCartProxyMode(this.vpnStarted)
+
+    // 自动申请长时任务保活：机器锁定/息屏后防止 UI 进程被系统回收导致代理中断
+    // (Codex 等依赖代理的应用无法连接)。与用户手动开启的保活开关互斥。
+    if (this.context) {
+      ProxyKeepAliveService.start(this.context)
+    }
   }
   async loadVpnOptions(){
     // 使用首选项持久化单个节点信息供卡片拉起服务
@@ -501,6 +559,10 @@ export class ClashViewModel {
   async StopVpn(){
     this.vpnStarted = false
     this.socketProxy.stopClash()
+    // 代理停止后释放自动长时任务保活(仅释放本服务申请的任务)
+    if (this.context) {
+      ProxyKeepAliveService.stop(this.context)
+    }
     // Index里的停止后操作
     EventHub.sendEvent(EventKey.StopedClash)
     // EntryAbility里的停止后操作
@@ -512,6 +574,11 @@ export class ClashViewModel {
 
   async getRuntime(){
     return await this.socketProxy.getRuntime()
+  }
+
+  /** @description 立即同步一次代理运行时长；用于窗口从状态栏恢复前更新UI。 */
+  refreshProxyDuration(): void {
+    this.proxyStartedTimer.refresh()
   }
   // 校验是否配置成功
   async vpnConfigIsLoad(){

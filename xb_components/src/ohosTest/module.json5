@@ -1,0 +1,14 @@
+{
+  "module": {
+    "name": "xb_components_test",
+    "type": "feature",
+    "deviceTypes": [
+      "default",
+      "tablet",
+      "2in1",
+      "car"
+    ],
+    "deliveryWithInstall": true,
+    "installationFree": false
+  }
+}

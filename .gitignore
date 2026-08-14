@@ -25,6 +25,7 @@
 proxy_core/src/flclash/libflclash.so
 /key
 /.*
+!/.github
 run.sh
 internalTesting
 profiler
