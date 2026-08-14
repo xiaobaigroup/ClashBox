@@ -31,6 +31,7 @@ import ConfigAutoUpdateService from '../common/utils/ConfigAutoUpdateService';
 import BuildProfile from 'BuildProfile';
 import { accessControlRdb } from '../common/datasources/AccessControlRdb';
 import { TrayManager } from '../common/utils/TrayManager';
+import ProxyKeepAliveService from '../common/utils/ProxyKeepAliveService';
 
 
 export default class EntryAbility extends UIAbility {
@@ -56,6 +57,7 @@ export default class EntryAbility extends UIAbility {
   /** @description 卡片延迟定时器 */
   private cardDelayTimer: number = -1
   private subscriber: commonEventManager.CommonEventSubscriber | null = null;
+  private screenSubscriber: commonEventManager.CommonEventSubscriber | null = null;
   private windowLimits: window.WindowLimits = {
     minWidth: 1345,
     minHeight: 498,
@@ -164,10 +166,56 @@ export default class EntryAbility extends UIAbility {
         }
       });
 
+    // 监听锁屏/解锁事件：锁定前后重新确认长时任务保活
+    this.registerScreenStateEvents();
+
   }
 
   // 实时监听系统系统配置更新状态
   onConfigurationUpdate(Config: Configuration): void {
+  }
+
+  /**
+   * @description 监听锁屏/息屏与解锁/亮屏事件。
+   *              机器锁定后系统可能冻结/回收后台应用进程并撤销长时任务，
+   *              在锁定前后重新确认 ProxyKeepAliveService 的长时任务保活；
+   *              代理内核自身的健康检查由 ClashCoreInit 的 1s 恢复循环负责。
+   *              订阅失败仅记录日志，不影响主流程。
+   */
+  private registerScreenStateEvents(): void {
+    const screenSubscribeInfo: commonEventManager.CommonEventSubscribeInfo = {
+      events: [
+        "usual.event.SCREEN_OFF",
+        "usual.event.SCREEN_LOCKED",
+        "usual.event.SCREEN_ON",
+        "usual.event.SCREEN_UNLOCKED"
+      ]
+    };
+    commonEventManager.createSubscriber(screenSubscribeInfo,
+      (err: BusinessError, subscriber: commonEventManager.CommonEventSubscriber) => {
+        if (err) {
+          hilog.error(0x0000, 'EntryAbility',
+            `Failed to create screen event subscriber. Code is ${err.code}, message is ${err.message}`)
+          return
+        }
+        this.screenSubscriber = subscriber;
+        commonEventManager.subscribe(subscriber,
+          (subErr: BusinessError, data: commonEventManager.CommonEventData) => {
+            if (subErr) {
+              hilog.error(0x0000, 'EntryAbility',
+                `Failed to subscribe screen events. Code is ${subErr.code}, message is ${subErr.message}`)
+              return
+            }
+            const event = data?.event ?? ''
+            if (event === "usual.event.SCREEN_OFF" || event === "usual.event.SCREEN_LOCKED") {
+              hilog.info(0x0000, 'EntryAbility', `屏幕锁定/息屏事件: ${event}，重新确认长时任务保活`)
+              ProxyKeepAliveService.reassert(this.context)
+            } else if (event === "usual.event.SCREEN_ON" || event === "usual.event.SCREEN_UNLOCKED") {
+              hilog.info(0x0000, 'EntryAbility', `屏幕解锁/亮屏事件: ${event}，重新确认长时任务保活`)
+              ProxyKeepAliveService.reassert(this.context)
+            }
+          })
+      })
   }
 
   // 热启动

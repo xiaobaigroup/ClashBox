@@ -26,6 +26,7 @@ import { number2Time } from "../common/utils/TimeConvertUtil";
 import { picker } from "@kit.CoreFileKit"
 import { Xb_GetResourceString, Xb_ToastUtil } from "xb_components";
 import { accessControlRdb } from "../common/datasources/AccessControlRdb";
+import ProxyKeepAliveService from "../common/utils/ProxyKeepAliveService";
 
 export interface DelayInfo{
     name: string
@@ -461,6 +462,10 @@ export class ClashViewModel {
       await this.loadVpnOptions()
       await this.socketProxy.stopClash()
       await this.socketProxy.startClash()
+      // 内核恢复后重新确认长时任务保活(幂等)
+      if (this.context) {
+        ProxyKeepAliveService.start(this.context)
+      }
     }
   }
   vpnStarted = false
@@ -496,6 +501,12 @@ export class ClashViewModel {
     })
 
     cardManager.pushCartProxyMode(this.vpnStarted)
+
+    // 自动申请长时任务保活：机器锁定/息屏后防止 UI 进程被系统回收导致代理中断
+    // (Codex 等依赖代理的应用无法连接)。与用户手动开启的保活开关互斥。
+    if (this.context) {
+      ProxyKeepAliveService.start(this.context)
+    }
   }
   async loadVpnOptions(){
     // 使用首选项持久化单个节点信息供卡片拉起服务
@@ -548,6 +559,10 @@ export class ClashViewModel {
   async StopVpn(){
     this.vpnStarted = false
     this.socketProxy.stopClash()
+    // 代理停止后释放自动长时任务保活(仅释放本服务申请的任务)
+    if (this.context) {
+      ProxyKeepAliveService.stop(this.context)
+    }
     // Index里的停止后操作
     EventHub.sendEvent(EventKey.StopedClash)
     // EntryAbility里的停止后操作
