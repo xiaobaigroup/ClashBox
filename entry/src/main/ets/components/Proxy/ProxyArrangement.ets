@@ -145,7 +145,7 @@ struct ProxyArrangement {
     if (!this.currentProfile) {
       return ''
     } else {
-      return this.currentProfile.getSelectedProxy(group) ?? this.appConfig.currentProxyName ?? ''
+      return this.currentProfile.getSelectedProxyName(group) ?? this.appConfig.currentProxyName ?? ''
     }
   }
 

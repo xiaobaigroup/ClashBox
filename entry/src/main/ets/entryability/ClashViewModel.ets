@@ -44,7 +44,7 @@ export class ClashViewModel {
     this.context = context
     ClashViewModel.promptAction = promptAction
     await this.profileRepo.init(context)
-    this.socketProxy.init(context, ClashViewModel.promptAction)
+    this.socketProxy.init(context)
     await this.initGeoIp()
   }
   // 添加配置 url
@@ -66,7 +66,7 @@ export class ClashViewModel {
       data.configAutoUpdateTimeGapValue ?? 10,
       data.configAutoUpdateTimeGapTextPickerIndex
     )
-    await profile.checkAndUpdate(async (c)=> await this.VailConfig(c))
+    await profile.checkAndUpdate( this.socketProxy)
     const isExists = await profile.check();
     let value: number
     if (isExists) { // 本地文件存在
@@ -97,7 +97,7 @@ export class ClashViewModel {
         newProfile.autoUpdate = profile.autoUpdate
         newProfile.autoUpdateDuration = profile.autoUpdateDuration ?? 10
         console.log(`配置${profile.name}基础设置完成`)
-        await newProfile.checkAndUpdate(async (c)=> await this.VailConfig(c))
+        await newProfile.checkAndUpdate(this.socketProxy)
       } else {
         // 本地文件配置
         try {
@@ -170,7 +170,7 @@ export class ClashViewModel {
       if (profile && profile.type == ProfileType.Url && !profile.isUpdating) {
         try {
           profile.loadContext(this.context, ua)
-          await profile.update((c) => this.VailConfig(c))
+          await profile.update(this.socketProxy)
           await this.profileRepo.addOrUpdate(profile)
           if (this.context) {
             ClashViewModel.promptAction.showToast({ message: `${Xb_GetResourceString($r('app.string.Configuration'), this.context)} ${profile.name} ${Xb_GetResourceString($r('app.string.update_success'), this.context)}`})
@@ -189,7 +189,7 @@ export class ClashViewModel {
       for(let p of list) {
         if (!p.isUpdating) {
           p.loadContext(this.context, ua)
-          await p.update(async (c) => await this.VailConfig(c))
+          await p.update(this.socketProxy)
           await this.profileRepo.addOrUpdate(p)
         }
       }
@@ -325,7 +325,7 @@ export class ClashViewModel {
       let favoriteProxys = AppStorage.get<Map<string, string>>("favoriteProxys")
       const groups = list.map((g)=>{
         g.proxies = g.proxies.map((p) => {
-          p.isShowFavoriteProxy = favoriteProxys?.get(g.name + "|" + p.name) != null
+          // p.isShowFavoriteProxy = favoriteProxys?.get(g.name + "|" + p.name) != null
           p.latency = -1
           p.g = g.name
           return p

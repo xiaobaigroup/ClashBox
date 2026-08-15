@@ -20,12 +20,11 @@ export default class ClashVpnAbility extends VpnExtensionAbility {
       if(core == ClashCore.mihomo){
         console.log("ClashBox", `启用核心 mihomo`);
         this.clashStubService = new SocketStubService(this.context)
-        await this.clashStubService.startService()
+        await this.clashStubService.startService(requestId)
         console.log("ClashBox", `启用核心 mihomo 成功`);
       }else{
         console.log("ClashBox", `前台模式`);
       }
-      await this.lockVpn(requestId)
     } catch (e) {
       console.log("ClashBox", `启用VPN失败 ${e.message} ${e.stack}`);
     }

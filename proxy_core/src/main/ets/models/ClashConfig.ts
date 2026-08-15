@@ -174,6 +174,7 @@ export class  ClashConfig {
   /** 覆写 Sniffer: 开启后应用 UI 的 sniffer 配置(与 overrideDns 同模式) */
   overrideSniffer: boolean = false
   snifferDefault?: SnifferDefault = new SnifferDefault()
+  "route-address": string[]
   constructor(ua: string = "clash-verge/v2.5.1") {
     this["global-ua"] = ua
     this.sniffer = this.snifferDefault
