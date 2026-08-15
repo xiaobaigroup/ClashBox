@@ -207,7 +207,7 @@ struct ProxyPage {
                         proxyitems: group.proxies as ProxyItem[] ?? [],
                         ProxyGroupItemSelected: this.appConfig.proxyCardSize,
                         disabled: group.type !== ProxyType.Selector,
-                        selectedProxy: this.currentProfile?.getSelectedProxy(group) ??
+                        selectedProxy: this.currentProfile?.getSelectedProxyName(group) ??
                         this.appConfig.currentProxyName ?? '',
                         OnProxyChange: (item) => {
                           this.changeProxy(group.name, item)

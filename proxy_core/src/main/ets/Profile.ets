@@ -77,7 +77,6 @@ export class Profile {
       }
     }
   }
-
   async check(): Promise<boolean> {
     let profilePath = await getProfilePath(this.context, this.id);
     return await fs.access(profilePath, fs.AccessModeType.EXIST)
