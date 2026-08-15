@@ -2,6 +2,9 @@
   "module": {
     "name": "proxy_core",
     "type": "har",
+    "requestPermissions": [
+      {"name":"ohos.permission.GET_IP_MAC_INFO"}
+    ],
     "deviceTypes": [
       "default",
       "tablet",

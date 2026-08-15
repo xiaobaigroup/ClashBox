@@ -179,6 +179,9 @@ func decorationConfig(profileId string, cfg config.RawConfig) *config.RawConfig 
 }
 
 func genHosts(hosts, patchHosts map[string]any) {
+	if hosts == nil {
+		hosts = make(map[string]any)
+	}
 	for k, v := range patchHosts {
 		hosts[k] = v
 	}
@@ -208,16 +211,17 @@ func overrideRules(rules *[]string) {
 		return
 	}
 	var rulesExt = lo.Map(ips, func(ip string, index int) string {
-		return fmt.Sprintf("DOMAIN %s %s", ip, target)
+		// mihomo 规则必须是逗号分隔，空格分隔会报 format invalid（rules[0] [DOMAIN ipinfo.io PROXY]）
+		return fmt.Sprintf("DOMAIN,%s,%s", ip, target)
 	})
 	*rules = append(rulesExt, *rules...)
 }
 
 func overwriteConfig(targetConfig *config.RawConfig, patchConfig config.RawConfig) {
 	targetConfig.ExternalController = patchConfig.ExternalController
-	targetConfig.ExternalUI = ""
-	targetConfig.Interface = ""
-	targetConfig.ExternalUIURL = ""
+	targetConfig.ExternalUI = patchConfig.ExternalUI
+	// 	targetConfig.Interface = ""
+	targetConfig.ExternalUIURL = patchConfig.ExternalUIURL
 	targetConfig.TCPConcurrent = patchConfig.TCPConcurrent
 	targetConfig.UnifiedDelay = patchConfig.UnifiedDelay
 	targetConfig.IPv6 = patchConfig.IPv6
@@ -233,12 +237,23 @@ func overwriteConfig(targetConfig *config.RawConfig, patchConfig config.RawConfi
 	targetConfig.Tun.Device = patchConfig.Tun.Device
 	targetConfig.Tun.DNSHijack = patchConfig.Tun.DNSHijack
 	targetConfig.Tun.Stack = patchConfig.Tun.Stack
+	// ★ 网络配置: MTU / ICMP转发 / NAT增强 从 UI 配置透传到内核
+	if patchConfig.Tun.MTU > 0 {
+		targetConfig.Tun.MTU = patchConfig.Tun.MTU
+	}
+	targetConfig.Tun.DisableICMPForwarding = patchConfig.Tun.DisableICMPForwarding
+	targetConfig.Tun.EndpointIndependentNat = patchConfig.Tun.EndpointIndependentNat
 	targetConfig.GeodataLoader = patchConfig.GeodataLoader
 	targetConfig.Profile.StoreSelected = false
 	targetConfig.GeoXUrl = patchConfig.GeoXUrl
 	targetConfig.GlobalUA = patchConfig.GlobalUA
 	if patchConfig.Sniffer.Enable {
 		targetConfig.Sniffer = patchConfig.Sniffer
+	}
+	// ★ Tunnel 流量转发: 从 UI 配置透传到内核(与 mihomo tunnels 段字段一致)
+	targetConfig.Tunnels = patchConfig.Tunnels
+	if patchConfig.App != nil {
+		targetConfig.App = patchConfig.App
 	}
 
 	if configParams.TestURL != nil {

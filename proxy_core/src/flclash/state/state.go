@@ -17,6 +17,7 @@ type AndroidVpnOptions struct {
 	Ipv4Address      string         `json:"ipv4Address"`
 	Ipv6Address      string         `json:"ipv6Address"`
 	DnsServerAddress string         `json:"dnsServerAddress"`
+	Mtu              int            `json:"mtu"`
 }
 
 type AccessControl struct {
@@ -34,6 +35,7 @@ type AndroidVpnRawOptions struct {
 	RouteAddress  []string       `json:"routeAddress"`
 	Ipv6          bool           `json:"ipv6"`
 	BypassDomain  []string       `json:"bypassDomain"`
+	Mtu           int            `json:"mtu"`
 }
 
 type State struct {

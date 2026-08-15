@@ -33,7 +33,13 @@ export enum ClashRpcType{
   vpnOptions,
   setOptionState,
   GetVpnRunTime,
-  VpnConfigInited
+  VpnConfigInited,
+  SetNetInterfaces,
+  downloadConfig,
+  SetSystemDns,
+  healthCheckAll,
+  healthCheckBatch,
+  GetVersion
 }
 
 export interface AccessControl{
@@ -46,6 +52,14 @@ export interface VpnRawOptions{
   ipv6?: boolean
   routeAddress?: string[]
   accessControl: AccessControl
+  /** 最大传输单元: VPN 层 VpnConfig.mtu, 缺省 1400 */
+  mtu?: number
+}
+
+export interface HealthCheckBatchParams{
+  "proxy-names": string[]
+  timeout: number
+  "test-url": string
 }
 
 

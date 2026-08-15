@@ -8,6 +8,7 @@ import (
 	"runtime"
 	"sort"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/metacubex/mihomo/adapter"
@@ -26,12 +27,22 @@ import (
 	"github.com/metacubex/mihomo/tunnel/statistic"
 )
 
+type healthCheckTarget struct {
+	name           string
+	proxy          constant.Proxy
+	testURL        string
+	expectedStatus string
+}
+
 var (
-	isInit            = false
-	configParams      = ConfigExtendedParams{}
-	externalProviders = map[string]cp.Provider{}
-	logSubscriber     observable.Subscription[log.Event]
-	currentConfig     *config.Config
+	isInit             = false
+	configParams       = ConfigExtendedParams{}
+	externalProviders  = map[string]cp.Provider{}
+	logSubscriber      observable.Subscription[log.Event]
+	logStop            chan struct{}
+	currentConfig      *config.Config
+	healthCheckMu      sync.Mutex
+	healthCheckRunning bool
 )
 
 func handleInitClash(homeDirStr string) bool {
@@ -94,9 +105,6 @@ func handleUpdateConfig(bytes []byte) string {
 
 	configParams = params.Params
 	prof := decorationConfig(params.ProfileId, params.Config)
-	fmt.Println("ipc_go", "handleUpdateConfig before", params.Config.DNS)
-	prof.DNS.NameServerPolicy = nil
-	fmt.Println("ipc_go", "handleUpdateConfig affer", prof.DNS)
 	err = applyConfig(prof)
 	if err != nil {
 		return err.Error()
@@ -217,7 +225,12 @@ func handleAsyncTestDelay(paramsString string, fn func(string)) {
 			return false, nil
 		}
 
-		delay, err := proxy.URLTest(ctx, constant.DefaultTestURL, expectedStatus)
+		testUrl := constant.DefaultTestURL
+		if params.TestUrl != "" {
+			testUrl = params.TestUrl
+		}
+
+		delay, err := proxy.URLTest(ctx, testUrl, expectedStatus)
 		if err != nil || delay == 0 {
 			delayData.Value = -1
 			data, _ := json.Marshal(delayData)
@@ -229,7 +242,195 @@ func handleAsyncTestDelay(paramsString string, fn func(string)) {
 		data, _ := json.Marshal(delayData)
 		fn(string(data))
 		return false, nil
-	})
+		})
+		 }
+
+		 func handleAsyncTestDelayBatch(paramsString string, fn func(string)) {
+		  var params = &TestDelayBatchParams{}
+		  err := json.Unmarshal([]byte(paramsString), params)
+		  if err != nil || len(params.ProxyNames) == 0 {
+		   fn("[]")
+		   return
+		  }
+
+		  expectedStatus, err := utils.NewUnsignedRanges[uint16]("")
+		  if err != nil {
+		   fn("[]")
+		   return
+		  }
+
+		  testURL := constant.DefaultTestURL
+		  if params.TestURL != "" {
+		   testURL = params.TestURL
+		  }
+
+		  proxies := tunnel.ProxiesWithProviders()
+		  var mu sync.Mutex
+		  results := make([]Delay, 0, len(params.ProxyNames))
+		  sem := make(chan struct{}, 50)
+		  var wg sync.WaitGroup
+
+		  for _, proxyName := range params.ProxyNames {
+		   proxy := proxies[proxyName]
+		   if proxy == nil {
+		    mu.Lock()
+		    results = append(results, Delay{Name: proxyName, Value: -1})
+		    mu.Unlock()
+		    continue
+		   }
+
+		   sem <- struct{}{}
+		   wg.Add(1)
+		   go func(name string, p constant.Proxy) {
+		    defer func() {
+		     <-sem
+		     wg.Done()
+		    }()
+
+		    ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*time.Duration(params.Timeout))
+		    defer cancel()
+
+		    d := Delay{Name: name}
+		    delay, err := p.URLTest(ctx, testURL, expectedStatus)
+		    if err != nil || delay == 0 {
+		     d.Value = -1
+		    } else {
+		     d.Value = int32(delay)
+		    }
+
+		    mu.Lock()
+		    results = append(results, d)
+		    mu.Unlock()
+		   }(proxyName, proxy)
+		  }
+
+		  // 不阻塞 IPC handler，后台等待所有测试完成再回调
+		  go func() {
+		   wg.Wait()
+		   data, _ := json.Marshal(results)
+		   fn(string(data))
+		  }()
+		 }
+
+		 func handleHealthCheckAll() {
+	healthCheckMu.Lock()
+	if healthCheckRunning {
+		healthCheckMu.Unlock()
+		return
+	}
+	healthCheckRunning = true
+	healthCheckMu.Unlock()
+	defer func() {
+		healthCheckMu.Lock()
+		healthCheckRunning = false
+		healthCheckMu.Unlock()
+	}()
+
+	// 直连模式下不需要健康检查，URLTest/Fallback 策略组不生效
+	if currentConfig != nil && string(currentConfig.General.Mode) == "direct" {
+		return
+	}
+	proxies := tunnel.ProxiesWithProviders()
+	if len(proxies) == 0 {
+		return
+	}
+
+	// URLTest/Fallback 的自动切换依赖子节点的 delay history。
+	// 后台只测策略组本身时，可能只复用当前不可用节点，无法刷新其它候选节点的延迟，
+	// 导致必须等 UI 回前台执行全量测速后才恢复。这里按每个策略组配置的 url/expectedStatus 展开子节点测速。
+	targets := make(map[string]healthCheckTarget)
+	visitedGroups := make(map[string]struct{})
+	var collectGroupTargets func(string)
+	collectGroupTargets = func(groupName string) {
+		if _, visited := visitedGroups[groupName]; visited {
+			return
+		}
+		visitedGroups[groupName] = struct{}{}
+		group := proxies[groupName]
+		if group == nil {
+			return
+		}
+		raw, err := json.Marshal(group)
+		if err != nil {
+			return
+		}
+		var info struct {
+			All            []string `json:"all"`
+			TestURL        string   `json:"testUrl"`
+			ExpectedStatus string   `json:"expectedStatus"`
+		}
+		if err := json.Unmarshal(raw, &info); err != nil {
+			return
+		}
+		testURL := info.TestURL
+		if testURL == "" {
+			testURL = constant.DefaultTestURL
+		}
+		for _, childName := range info.All {
+			child := proxies[childName]
+			if child == nil {
+				continue
+			}
+			if childAdapter, ok := child.(*adapter.Proxy); ok {
+				switch childAdapter.ProxyAdapter.(type) {
+				case *outboundgroup.URLTest, *outboundgroup.Fallback:
+					collectGroupTargets(childName)
+					continue
+				}
+			}
+			key := groupName + "\x00" + childName + "\x00" + testURL + "\x00" + info.ExpectedStatus
+			targets[key] = healthCheckTarget{
+				name:           childName,
+				proxy:          child,
+				testURL:        testURL,
+				expectedStatus: info.ExpectedStatus,
+			}
+		}
+	}
+
+	for name, proxy := range proxies {
+		if proxy == nil {
+			continue
+		}
+		adapterProxy, ok := proxy.(*adapter.Proxy)
+		if !ok {
+			continue
+		}
+		switch adapterProxy.ProxyAdapter.(type) {
+		case *outboundgroup.URLTest, *outboundgroup.Fallback:
+			collectGroupTargets(name)
+		default:
+			continue
+		}
+	}
+	if len(targets) == 0 {
+		return
+	}
+
+	// 限制并发健康检查数，防止大量 protect IPC 堵塞 JS 消息循环（尤其是 rule-provider 下载场景）
+	sem := make(chan struct{}, 10)
+	var wg sync.WaitGroup
+	for _, target := range targets {
+		target := target
+		sem <- struct{}{}
+		wg.Add(1)
+		go func() {
+			defer func() {
+				<-sem
+				wg.Done()
+			}()
+			expectedStatus, err := utils.NewUnsignedRanges[uint16](target.expectedStatus)
+			if err != nil {
+				expectedStatus, _ = utils.NewUnsignedRanges[uint16]("")
+			}
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+			defer cancel()
+			_, _ = target.proxy.URLTest(ctx, target.testURL, expectedStatus)
+			log.Debugln("[HealthCheckAll] checked %s", target.name)
+		}()
+	}
+	// 等待所有候选节点健康检查完成，确保 URLTest/Fallback 后台也能基于新延迟切换
+	wg.Wait()
 }
 
 func handleGetConnections() string {
@@ -345,6 +546,14 @@ func handleUpdateGeoData(geoType string, geoName string, fn func(value string)) 
 				fn(err.Error())
 				return
 			}
+		case "MRS":
+			// ★ BundleMRS 规则集: 官方地址下载最新 7z 覆盖内置版本(geox-url 无 mrs 字段, 用固定官方源)
+			const mrsUrl = "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/BundleMRS.7z"
+			_, err := handleDownloadConfig(mrsUrl, "clash-verge/v2.5.1", path)
+			if err != nil {
+				fn(err.Error())
+				return
+			}
 		}
 		fn("")
 	}()
@@ -385,22 +594,36 @@ func handleSideLoadExternalProvider(providerName string, data []byte, fn func(va
 }
 
 func handleStartLog(fn func(value string)) {
+	// 通知旧的 goroutine 退出，防止泄漏
+	if logStop != nil {
+		close(logStop)
+		logStop = nil
+	}
 	if logSubscriber != nil {
 		log.UnSubscribe(logSubscriber)
 		logSubscriber = nil
 	}
 	logSubscriber = log.Subscribe()
+	logStop = make(chan struct{})
 	go func() {
-		for logData := range logSubscriber {
-			if logData.LogLevel < log.Level() {
-				continue
+		for {
+			select {
+			case <-logStop:
+				return
+			case logData, ok := <-logSubscriber:
+				if !ok {
+					return
+				}
+				if logData.LogLevel < log.Level() {
+					continue
+				}
+				logMessage, _ := json.Marshal(LogInfo{
+					LogLevel: logData.LogLevel.String(),
+					Payload:  logData.Payload,
+					Time:     time.Now().Unix(),
+				})
+				fn(string(logMessage))
 			}
-			logMessage, _ := json.Marshal(LogInfo{
-				LogLevel: logData.LogLevel.String(),
-				Payload:  logData.Payload,
-				Time:     time.Now().Unix(),
-			})
-			fn(string(logMessage))
 		}
 	}()
 }
@@ -412,6 +635,10 @@ type LogInfo struct {
 }
 
 func handleStopLog() {
+	if logStop != nil {
+		close(logStop)
+		logStop = nil
+	}
 	if logSubscriber != nil {
 		log.UnSubscribe(logSubscriber)
 		logSubscriber = nil
@@ -437,6 +664,7 @@ func handleGetMemory(fn func(value string)) {
 }
 
 var reqeustList = []statistic.Tracker{}
+const maxRequestList = 1000
 
 func init() {
 	adapter.UrlTestHook = func(url string, name string, delay uint16) {
@@ -455,6 +683,11 @@ func init() {
 	}
 	statistic.DefaultRequestNotify = func(c statistic.Tracker) {
 		reqeustList = append(reqeustList, c)
+		if len(reqeustList) > maxRequestList {
+			// 超过上限，丢弃最旧的 1/4 记录，防止无限增长
+			drop := len(reqeustList) / 4
+			reqeustList = reqeustList[drop:]
+		}
 		sendMessage(Message{
 			Type: RequestMessage,
 			Data: c,
