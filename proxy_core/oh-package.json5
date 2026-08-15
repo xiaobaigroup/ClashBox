@@ -7,6 +7,10 @@
   "license": "Apache-2.0",
   "dependencies": {
     "libproxy_core.so": "file:./src/main/cpp/types/libproxy_core",
+    "xb_components": "file:./../xb_components",
     "libflclash.so": "file:./src/main/cpp/types/libflclash",
-  }
+    "@devzeng/quickjs": "^0.1.0"
+  },
+  "devDependencies": {},
+  "dynamicDependencies": {}
 }

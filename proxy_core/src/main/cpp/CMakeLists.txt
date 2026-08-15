@@ -9,10 +9,10 @@ if(DEFINED PACKAGE_FIND_FILE)
 endif()
 
 #add_library(flclash SHARED IMPORTED)
-#set_target_properties(flclash PROPERTIES IMPORTED_LOCATION ${NATIVERENDER_ROOT_PATH}/libflclash.so IMPORTED_NO_SONAME TRUE)
+#set_target_properties(flclash PROPERTIES IMPORTED_LOCATION ${NATIVERENDER_ROOT_PATH}/../../../libs/${OHOS_ARCH}/libflclash.so)
 
 include_directories(${NATIVERENDER_ROOT_PATH}
                     ${NATIVERENDER_ROOT_PATH}/include)
 
 add_library(proxy_core SHARED napi_init.cpp)
-target_link_libraries(proxy_core PUBLIC libace_napi.z.so hilog_ndk.z )
+target_link_libraries(proxy_core PUBLIC libace_napi.z.so hilog_ndk.z)

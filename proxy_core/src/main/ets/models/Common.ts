@@ -49,13 +49,43 @@ export class SubscriptionInfo{
       return
     return new TrafficValue((info["Upload"] ?? info.upload) + (info["Download"] ?? info.download ?? 0))
   }
-  static getExpire(info: SubscriptionInfo){
+  static getExpire(info: SubscriptionInfo): number{
     if(!info)
       return
-    return info["Expire"] ?? info.expire
+    var expire =  (info["Expire"] ?? info.expire);
+    if(isTimestampInSeconds(expire)){
+      return expire * 1000
+    }else
+      return expire;
   }
 
 }
+
+
+function isTimestampInSeconds(timestamp) {
+  // 将时间戳转为数字
+  const ts = Number(timestamp);
+
+  // 获取当前时间戳（毫秒）
+  const nowMs = Date.now();
+  const nowS = Math.floor(nowMs / 1000);
+
+  // 计算时间差（绝对值）
+  const diffToNowMs = Math.abs(nowMs - ts);
+  const diffToNowS = Math.abs(nowS - ts);
+
+  // 如果与当前毫秒时间戳的差距更小，则判断为毫秒
+  // 或者如果时间戳大于 10^12（常见毫秒时间戳阈值）
+  if (ts > 1e12) {
+    return false; // 毫秒
+  } else if (ts < 1e10) {
+    return true;  // 秒
+  }
+
+  // 模糊判断：看哪个更接近当前时间
+  return diffToNowS < diffToNowMs;
+}
+
 
 export enum ProxySort {
   Default = "Default", Title = "Title", Delay = "Delay"
@@ -93,19 +123,22 @@ export enum ProxyType {
   Unknown = "Unknown"
 }
 export interface Proxy {
+  display: string
   name: string
   type: ProxyType;
   latency?: number
   id?: string
   g?: string
-  isShowFavoriteProxy?: boolean
+  icon?: string
 }
 
-export interface ProxyGroup{
+export interface ProxyGroup {
   type: ProxyType
   name: string
+  display: string
   proxies: Array<Proxy>
   now: string
+  id?: string
   hidden?: boolean
   icon?: string
 }
@@ -238,6 +271,48 @@ export class Traffic{
 export class IpInfo {
   ip: string
   country: string
+  ipv6?: string
+}
+
+/**
+ * IP 质量信息（来源 ip.net.coffee /api/ip/lookup/{ip}）
+ * 用于主页节点信息大卡片展示：家宽/机房识别、ASN、信任评分、风险标记等
+ */
+export class IpQualityInfo {
+  ip: string
+  /** 信任评分 0-100，越高越可信 */
+  trustScore: number = -1
+  /** 是否机房/数据中心 IP */
+  isDatacenter: boolean = false
+  /** 是否住宅 IP（家宽） */
+  isResidential: boolean = false
+  /** 是否 VPN 出口 */
+  isVpn: boolean = false
+  /** 是否代理出口 */
+  isProxy: boolean = false
+  /** 是否 Tor 出口 */
+  isTor: boolean = false
+  /** 是否爬虫/滥用 */
+  isCrawler: boolean = false
+  isAbuser: boolean = false
+  isMobile: boolean = false
+  /** 机构类型：hosting / isp / education / business 等 */
+  companyType: string = ''
+  /** 机构名称 */
+  companyName: string = ''
+  /** ASN 编号 */
+  asn: number = 0
+  /** ASN 机构名 */
+  asOrganization: string = ''
+  /** 国家码（小写） */
+  countryCode: string = ''
+  country: string = ''
+  region: string = ''
+  city: string = ''
+  /** 反向 DNS */
+  rdns: string = ''
+  /** CIDR 段 */
+  cidr: string = ''
 }
 
 

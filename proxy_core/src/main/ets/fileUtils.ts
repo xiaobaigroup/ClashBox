@@ -31,3 +31,13 @@ export function writeFile(filePath: string, data: Uint8Array | null) {
     fs.closeSync(file);
   }
 }
+
+ /**
+ * 解码 Unicode 转义字符串
+ * 支持 \uXXXX 格式（包括代理对 \uD83D\uDE00 → emoji）
+ */
+export function decodeUnicodeEscape(str: string): string {
+  return str.replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) => {
+    return String.fromCharCode(parseInt(hex, 16));
+  });
+}

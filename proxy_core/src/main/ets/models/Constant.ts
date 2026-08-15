@@ -20,5 +20,5 @@ const maxMobileWidth = 600;
 const maxLaptopWidth = 840;
 const geodataLoaderMemconservative = "memconservative";
 const geodataLoaderStandard = "standard";
-const defaultTestUrl = "https://www.gstatic.com/generate_204";
+const defaultTestUrl = "http://www.gstatic.com/generate_204";
 

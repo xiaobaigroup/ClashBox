@@ -35,7 +35,7 @@ struct CallbackData {
 };
 static CallbackData callbackData;
 
-static napi_threadsafe_function tsfn;
+static napi_threadsafe_function tsfn = nullptr;
 static napi_value nativeStartTun(napi_env env, napi_callback_info info)
 {
     size_t argc = 2;
@@ -44,6 +44,12 @@ static napi_value nativeStartTun(napi_env env, napi_callback_info info)
     
     int tunFd;
     napi_get_value_int32(env, args[0], &tunFd);
+
+    // 释放旧的 tsfn，防止泄漏
+    if (tsfn != nullptr) {
+        napi_release_threadsafe_function(tsfn, napi_tsfn_abort);
+        tsfn = nullptr;
+    }
 
     napi_value resourceName;
     napi_create_string_latin1(env, "nativeStartTun'", NAPI_AUTO_LENGTH, &resourceName);
@@ -66,11 +72,12 @@ static napi_value nativeStartTun(napi_env env, napi_callback_info info)
    
     std::thread t([](int fd){
         OH_LOG_Print(LOG_APP, LOG_DEBUG, 0x00000, "ClashVpn", "startRun %{public}d", fd);
-//        startFlTun(fd, (void*)+[](int id, int fd){
-//            callbackData.id = id;
-//            callbackData.fd = fd;
-//            napi_call_threadsafe_function(tsfn, &callbackData, napi_tsfn_blocking);
-//        });
+        // startFlTun 尚未就绪，待 libflclash 实现后取消注释
+        // startFlTun(fd, (void*)+[](int id, int fd){
+        //     callbackData.id = id;
+        //     callbackData.fd = fd;
+        //     napi_call_threadsafe_function(tsfn, &callbackData, napi_tsfn_blocking);
+        // });
     }, tunFd);
     t.detach();
     return NULL;

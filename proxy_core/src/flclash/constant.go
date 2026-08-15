@@ -1,10 +1,11 @@
 package main
 
 import (
+	"time"
+
 	"github.com/metacubex/mihomo/adapter/provider"
 	"github.com/metacubex/mihomo/config"
 	"github.com/metacubex/mihomo/constant"
-	"time"
 )
 
 type ConfigExtendedParams struct {
@@ -29,6 +30,13 @@ type ChangeProxyParams struct {
 type TestDelayParams struct {
 	ProxyName string `json:"proxy-name"`
 	Timeout   int64  `json:"timeout"`
+	TestUrl   string `json:"test-url"`
+}
+
+type TestDelayBatchParams struct {
+	ProxyNames []string `json:"proxy-names"`
+	Timeout    int64    `json:"timeout"`
+	TestURL    string   `json:"test-url"`
 }
 
 type ProcessMapItem struct {
