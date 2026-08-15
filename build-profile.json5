@@ -5,13 +5,13 @@
         "name": "debug",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "C:\\Users\\Administrator\\.ohos\\config\\debug_ClashBox_V1_qYh9rRy3wMKgLXPB_VE_s74V-IdJwULbnIao5Ah-cm8=.cer",
+          "certpath": "/Users/xiaobai/.ohos/config/debug_ClashNEXT_M3PM-oolzOYP-75We9OVco6Ti7Bq5kXGy-eK73DtKFU=.cer",
           "keyAlias": "debugKey",
-          "keyPassword": "00000019914AEDF2B4AD7929A302BC50992FB433AEEF2F4C13BA35B6BD4D8475AFC2FD85E12DCFCFDC",
-          "profile": "C:\\Users\\Administrator\\.ohos\\config\\debug_ClashBox_V1_qYh9rRy3wMKgLXPB_VE_s74V-IdJwULbnIao5Ah-cm8=.p7b",
+          "keyPassword": "0000001BAE658DBC9FF8BB560AFF168412F967ADA1CCD0AF99EA25960CE1592D7B6DA2BEC8CE4A50967222",
+          "profile": "/Users/xiaobai/.ohos/config/debug_ClashNEXT_M3PM-oolzOYP-75We9OVco6Ti7Bq5kXGy-eK73DtKFU=.p7b",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\Administrator\\.ohos\\config\\debug_ClashBox_V1_qYh9rRy3wMKgLXPB_VE_s74V-IdJwULbnIao5Ah-cm8=.p12",
-          "storePassword": "000000191379DDE3A212117954EBC2FE77F21CB199FA7E5C84F75453D31614DC1182D1DFAAB83C94E1"
+          "storeFile": "/Users/xiaobai/.ohos/config/debug_ClashNEXT_M3PM-oolzOYP-75We9OVco6Ti7Bq5kXGy-eK73DtKFU=.p12",
+          "storePassword": "0000001B35F91E73409F39D6F1624D7609C8324F020F5F14EE9874575383E5E66D629C870D216CE40B0191"
         }
       },
       {
